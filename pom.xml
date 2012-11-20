@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.inmobi.channels</groupId>
+    <artifactId>cas</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <parent>
+      <groupId>com.inmobi</groupId>
+      <artifactId>inmobi-master-pom</artifactId>
+      <version>1.0.1</version>
+    </parent>
+
+    <modules>
+         <module>Repository</module>
+         <module>Server</module>
+    </modules>
+
+    <repositories>
+      <repository>
+         <id>releases</id>
+         <name>Releases</name>
+         <url>http://maven.scm.corp.inmobi.com/content/repositories/releases/</url>
+      </repository>
+    </repositories>
+
+     <build>  
+     <plugins>  
+      <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-jar-plugin</artifactId>
+         <configuration>
+       <archive>
+         <manifest>
+           <mainClass>com.inmobi.adserve.channels.reporting.ReportFetcher</mainClass>
+           <packageName>com.inmobi.adserve.channels.reporting</packageName>
+         </manifest>
+         <manifestEntries>
+           <mode>development</mode>
+           <url>${pom.url}</url>
+         </manifestEntries>
+       </archive>
+         </configuration>
+     </plugin>
+     </plugins>  
+    </build>  
+</project>
