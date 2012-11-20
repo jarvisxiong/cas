@@ -105,7 +105,9 @@ public class SegmentFactory {
     } else if((advertiserId.equals(config.getString("httpool.advertiserId"))) && (advertiserSet.isEmpty() || advertiserSet.contains("httpool"))
         && (config.getString("httpool.status").equals("on"))) {
       return new DCPHttPoolAdNetwork(logger, config, clientBootstrap, base, serverEvent);
-    } else {
+    } 
+    /*
+    else {
       logger.debug("going in generic adapter for advId" + advertiserId);
       String advertiserName = "";
       Iterator itr = config.getKeys();
@@ -122,6 +124,7 @@ public class SegmentFactory {
       }
     }
     logger.debug("no genric adapter");
+    */
     return null;
   }
 }

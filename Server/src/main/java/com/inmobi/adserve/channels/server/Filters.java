@@ -34,11 +34,13 @@ public class Filters {
   };
 
   private static Configuration serverConfiguration;
+  private static Configuration adapterConfiguration;
   private static RepositoryHelper repositoryHelper;
   private static InspectorStats inspectorStat;
 
-  public static void init(Configuration configuration, RepositoryHelper repositoryHelper, InspectorStats inspectorStat) {
-    Filters.serverConfiguration = configuration;
+  public static void init(Configuration serverConfiguration, Configuration adapterConfiguration, RepositoryHelper repositoryHelper, InspectorStats inspectorStat) {
+    Filters.serverConfiguration = serverConfiguration;
+    Filters.adapterConfiguration = adapterConfiguration;
     Filters.repositoryHelper = repositoryHelper;
     Filters.inspectorStat = inspectorStat;
   }
@@ -108,7 +110,7 @@ public class Filters {
    * Filter to short list a configurable number of segments per partner
    * 
    * @param matchedSegments
-   *          : The map containg advertiserid mapped to its map of adgroupid
+   *          : The map containing advertiserid mapped to its map of adgroupid
    *          mapped to its segments
    * @param siteFloor
    *          : lowest ecpm segment that can be served for that request
@@ -149,7 +151,9 @@ public class Filters {
       // choosing top segments from the sorted list\
 
       int adGpCount = 0;
-      int partnerSegmentNo = serverConfiguration.getInt("partnerSegmentNo");
+      int partnerSegmentNo = getPartnerSpecificSegmentNo(key);
+      logger.debug("PartnersegmentNo for advertiser " + key + " is " + partnerSegmentNo);
+      
       for (ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity : hashMapList) {
         if(adGpCount > partnerSegmentNo)
           break;
@@ -311,5 +315,35 @@ public class Filters {
     arrayList.add(segment.get(0));
     logger.info("Ranked candidate adapters randomly");
     return arrayList;
+  }
+  
+  public static int getPartnerSpecificSegmentNo(String key)
+  {
+    int partnerSegmentNo = 2;
+    if (key.equalsIgnoreCase(adapterConfiguration.getString("atnt.advertiserId")))
+      partnerSegmentNo = adapterConfiguration.getInt("atnt.partnerSegmentNo", serverConfiguration.getInt("partnerSegmentNo", 2));
+    else if (key.equalsIgnoreCase(adapterConfiguration.getString("mobilecommerce.advertiserId")))
+      partnerSegmentNo = adapterConfiguration.getInt("mobilecommerce.partnerSegmentNo", serverConfiguration.getInt("partnerSegmentNo", 2));
+    else if (key.equalsIgnoreCase(adapterConfiguration.getString("drawbridge.advertiserId")))
+      partnerSegmentNo = adapterConfiguration.getInt("drawbridge.partnerSegmentNo", serverConfiguration.getInt("partnerSegmentNo", 2));
+    else if (key.equalsIgnoreCase(adapterConfiguration.getString("mullahmedia.advertiserId")))
+      partnerSegmentNo = adapterConfiguration.getInt("mullahmedia.partnerSegmentNo", serverConfiguration.getInt("partnerSegmentNo", 2));
+    else if (key.equalsIgnoreCase(adapterConfiguration.getString("openx.advertiserId")))
+      partnerSegmentNo = adapterConfiguration.getInt("openx.partnerSegmentNo", serverConfiguration.getInt("partnerSegmentNo", 2));
+    else if (key.equalsIgnoreCase(adapterConfiguration.getString("ifd.advertiserId")))
+      partnerSegmentNo = adapterConfiguration.getInt("ifd.partnerSegmentNo", serverConfiguration.getInt("partnerSegmentNo", 2));
+    else if (key.equalsIgnoreCase(adapterConfiguration.getString("tapit.advertiserId")))
+      partnerSegmentNo = adapterConfiguration.getInt("tapit.partnerSegmentNo", serverConfiguration.getInt("partnerSegmentNo", 2));
+    else if (key.equalsIgnoreCase(adapterConfiguration.getString("ifc.advertiserId")))
+      partnerSegmentNo = adapterConfiguration.getInt("ifc.partnerSegmentNo", serverConfiguration.getInt("partnerSegmentNo", 2));
+    else if (key.equalsIgnoreCase(adapterConfiguration.getString("webmoblink.advertiserId")))
+      partnerSegmentNo = adapterConfiguration.getInt("webmoblink.partnerSegmentNo", serverConfiguration.getInt("partnerSegmentNo", 2));
+    else if (key.equalsIgnoreCase(adapterConfiguration.getString("siquis.advertiserId")))
+      partnerSegmentNo = adapterConfiguration.getInt("siquis.partnerSegmentNo", serverConfiguration.getInt("partnerSegmentNo", 2));
+    else if (key.equalsIgnoreCase(adapterConfiguration.getString("huntmads.advertiserId")))
+      partnerSegmentNo = adapterConfiguration.getInt("huntmads.partnerSegmentNo", serverConfiguration.getInt("partnerSegmentNo", 2));
+    else if (key.equalsIgnoreCase(adapterConfiguration.getString("httpool.advertiserId")))
+      partnerSegmentNo = adapterConfiguration.getInt("httpool.partnerSegmentNo", serverConfiguration.getInt("partnerSegmentNo", 2));
+    return partnerSegmentNo;
   }
 }

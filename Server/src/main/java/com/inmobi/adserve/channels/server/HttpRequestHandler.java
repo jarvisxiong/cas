@@ -203,8 +203,9 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     // server
     // could not write the response with in 800 ms
     logger.debug("inside channel idle event handler for Request channel ID: " + e.getChannel().getId());
-    if(e.getState().toString().equalsIgnoreCase("ALL_IDLE")) {
+    if(e.getState().toString().equalsIgnoreCase("ALL_IDLE") || e.getState().toString().equalsIgnoreCase("WRITE_IDLE")) {
       InspectorStats.incrementStatCount(InspectorStrings.totalTimeout);
+      logger.debug("server timeout");
     }
   }
 
