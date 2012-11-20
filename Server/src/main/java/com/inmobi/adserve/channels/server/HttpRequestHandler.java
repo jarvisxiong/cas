@@ -177,17 +177,19 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     // whenever channel throws closedchannelexception increment the
     // totalterminate
     // means channel is closed by party who requested for the ad
-     if(logger == null)
-       logger = new DebugLogger();
-     if(e.getCause().toString().equalsIgnoreCase(CLOSED_CHANNEL_EXCEPTION) || e.getCause().toString().equalsIgnoreCase(CONNECTION_RESET_PEER)) {
-       InspectorStats.incrementStatCount(InspectorStrings.totalTerminate);
-       logger.debug("Channel is terminated " + ctx.getChannel().getId());
-     }
-     logger.error("Getting netty error in HttpRequestHandler: " + e.getCause());
-     if(e.getChannel().isOpen()) {
-       sendNoAdResponse(e);
-     }
-     e.getCause().printStackTrace();
+    String exceptionClass = e.getClass().getName();
+    inspectorStat.incrementStatCount(InspectorStrings.channelException, e.getCause().toString().split(":", 2)[0]);
+    if(logger == null)
+      logger = new DebugLogger();
+    if(e.getCause().toString().equalsIgnoreCase(CLOSED_CHANNEL_EXCEPTION) || e.getCause().toString().equalsIgnoreCase(CONNECTION_RESET_PEER)) {
+      InspectorStats.incrementStatCount(InspectorStrings.totalTerminate);
+      logger.debug("Channel is terminated " + ctx.getChannel().getId());
+    }
+    logger.error("Getting netty error in HttpRequestHandler: " + e.getCause());
+    if(e.getChannel().isOpen()) {
+      sendNoAdResponse(e);
+    }
+    e.getCause().printStackTrace();
   }
 
   // Invoked when request timeout.
