@@ -91,7 +91,7 @@ public class FilterTest extends TestCase {
     cSFE6 = new ChannelSegmentFeedbackEntity("advertiserId3", "adgroupId6", 0.7, 0.1);
     expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
     expect(mockConfig.getString("loggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties").anyTimes();
-    expect(mockConfig.getInt("partnerSegmentNo", 2)).andReturn(2).anyTimes();
+    expect(mockConfig.getInt("partnerSegmentNo", 3)).andReturn(2).anyTimes();
     expect(mockConfig.getInt("totalSegmentNo")).andReturn(5).anyTimes();
     expect(mockConfig.getDouble("revenueWindow", 0.33)).andReturn(10.0).anyTimes();
     expect(mockConfig.getDouble("ecpmShift", 0.1)).andReturn(0.0).anyTimes();
@@ -287,7 +287,7 @@ public class FilterTest extends TestCase {
   @Test
   public void testGetPartnerSpecificSegmentNo() {
     assertEquals(1, Filters.getPartnerSpecificSegmentNo("1"));
-    assertEquals(2, Filters.getPartnerSpecificSegmentNo("2"));
+    assertEquals(3, Filters.getPartnerSpecificSegmentNo("2"));
     assertEquals(3, Filters.getPartnerSpecificSegmentNo("3"));
     assertEquals(4, Filters.getPartnerSpecificSegmentNo("4"));
   }

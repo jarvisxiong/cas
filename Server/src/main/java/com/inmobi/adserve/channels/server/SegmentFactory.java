@@ -54,11 +54,11 @@ public class SegmentFactory {
     if(isRtbEnabled) {
       //following code will be enabled once we have entries in DB
       logger.debug("Creating RTB adapter instance for advertiser id : " + advertiserId);
-      /*
-      RtbAdNetwork rtbAdNetwork = new RtbAdNetwork(logger, config, rtbClientBootstrap, base, serverEvent, channelEntity.getUrlBase(),
-          channelEntity.getUrlArg(), channelEntity.getRtbMethod(), channelEntity.getRtbVer(), channelEntity.getWnUrl(), channelEntity.getAccountId(), channelEntity.isWnRequied(), channelEntity.isWnFromClient());
-      return rtbAdNetwork;
-      */
+      
+      //RtbAdNetwork rtbAdNetwork = new RtbAdNetwork(logger, config, rtbClientBootstrap, base, serverEvent, channelEntity.getUrlBase(),
+      //    channelEntity.getUrlArg(), channelEntity.getRtbMethod(), channelEntity.getRtbVer(), channelEntity.getWnUrl(), channelEntity.getAccountId(), channelEntity.isWnRequied(), channelEntity.isWnFromClient());
+      //return rtbAdNetwork;
+      //
       
       if((advertiserId.equalsIgnoreCase(config.getString("rtbAdvertiserName.advertiserId"))) && (null==advertiserSet || advertiserSet.isEmpty() || advertiserSet.contains("rtbAdvertiserName"))
           && (config.getString("rtbAdvertiserName.status").equalsIgnoreCase("on"))) {
@@ -106,25 +106,25 @@ public class SegmentFactory {
         && (config.getString("httpool.status").equals("on"))) {
       return new DCPHttPoolAdNetwork(logger, config, clientBootstrap, base, serverEvent);
     } 
-    /*
-    else {
-      logger.debug("going in generic adapter for advId" + advertiserId);
-      String advertiserName = "";
-      Iterator itr = config.getKeys();
-      while (itr.hasNext()) {
-        String key = itr.next().toString();
-        if(config.getString(key).equals(advertiserId) && key.endsWith(".advertiserId")) {
-          advertiserName = key.replace(".advertiserId", "");
-          break;
-        }
-      }
-      if(!advertiserName.equals("") && config.getString(advertiserName + ".status").equals("on")
-          && (advertiserSet.isEmpty() || advertiserSet.contains(advertiserName))) {
-        return new GenericAdapter(logger, config, clientBootstrap, base, serverEvent, advertiserName);
-      }
-    }
-    logger.debug("no genric adapter");
-    */
+    
+//    else {
+//      logger.debug("going in generic adapter for advId" + advertiserId);
+//      String advertiserName = "";
+//      Iterator itr = config.getKeys();
+//      while (itr.hasNext()) {
+//        String key = itr.next().toString();
+//        if(config.getString(key).equals(advertiserId) && key.endsWith(".advertiserId")) {
+//          advertiserName = key.replace(".advertiserId", "");
+//          break;
+//        }
+//      }
+//      if(!advertiserName.equals("") && config.getString(advertiserName + ".status").equals("on")
+//          && (advertiserSet.isEmpty() || advertiserSet.contains(advertiserName))) {
+//        return new GenericAdapter(logger, config, clientBootstrap, base, serverEvent, advertiserName);
+//      }
+//    }
+//    logger.debug("no genric adapter");
+    
     return null;
   }
 }
