@@ -8,6 +8,7 @@
     <artifactId>cas</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
+    <url>https://github.corp.inmobi.com/channel-adserve</url>
 
     <parent>
       <groupId>com.inmobi</groupId>
@@ -19,6 +20,15 @@
          <module>Repository</module>
          <module>Server</module>
     </modules>
+    <properties>
+		<maven-release-plugin>2.3.2</maven-release-plugin>
+    </properties>
+    <scm>
+		<connection>scm:git:https://github.corp.inmobi.com/channel-adserve/cas.git</connection>
+		<url>scm:git:https://github.corp.inmobi.com/channel-adserve/cas.git</url>
+		<developerConnection>scm:git:https://github.corp.inmobi.com/channel-adserve/cas.git</developerConnection>
+		<tag>HEAD</tag>
+    </scm>
 
     <repositories>
       <repository>
@@ -44,23 +54,36 @@
        </dependencies>
     </dependencyManagement>
      <build>  
-     <plugins>  
-      <plugin>
-         <groupId>org.apache.maven.plugins</groupId>
-         <artifactId>maven-jar-plugin</artifactId>
-         <configuration>
-       <archive>
-         <manifest>
-           <mainClass>com.inmobi.adserve.channels.reporting.ReportFetcher</mainClass>
-           <packageName>com.inmobi.adserve.channels.reporting</packageName>
-         </manifest>
-         <manifestEntries>
-           <mode>development</mode>
-           <url>${pom.url}</url>
-         </manifestEntries>
-       </archive>
-         </configuration>
-     </plugin>
+     <plugins> 
+ <plugin>
+    <artifactId>maven-assembly-plugin</artifactId>
+    <version>2.3</version>
+    <configuration>
+     <descriptorRefs>
+      <descriptorRef>jar-with-dependencies</descriptorRef>
+     </descriptorRefs>
+<!--      <archive> -->
+<!--       <manifest> -->
+<!--        <mainClass>com.inmobi.appengage.general.segment.SegmentMigrator</mainClass> -->
+<!--       </manifest> -->
+<!--      </archive> -->
+     <archive>
+      <manifest>
+       <mainClass>MessageQueueTest</mainClass>
+      </manifest>
+     </archive>
+    </configuration>
+    <executions>
+     <execution>
+      <id>make-assembly</id> <!-- this is used for inheritance merges -->
+      <phase>package</phase> <!-- bind to the packaging phase -->
+      <goals>
+       <goal>single</goal>
+      </goals>
+     </execution>
+    </executions>
+   </plugin>
+
      </plugins>  
     </build>  
 </project>
