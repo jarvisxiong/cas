@@ -32,7 +32,7 @@ public class HttpRequestHandlerTest extends TestCase{
   private static int count = 0;
   
   public void prepareConfig() throws Exception {
-    FileWriter fstream = new FileWriter("/tmp/HTTpChannel-server.properties");
+    FileWriter fstream = new FileWriter("/tmp/Channel-server.properties");
     BufferedWriter out = new BufferedWriter(fstream);
     out.write("log4j.logger.app = DEBUG, channel\n");
     out.write("log4j.additivity.app = false\n");
@@ -73,25 +73,33 @@ public class HttpRequestHandlerTest extends TestCase{
     out.write("\n logger.debug = debug \n");
     out.write("logger.advertiser = advertiser\n");
     out.write("logger.sampledadvertiser = sampledadvertiser");
-    out.write("\nlogger.loggerConf = /opt/mkhoj/conf/cas/channel-server.properties\n");
+    out.write("\nlogger.loggerConf = /tmp/Channel-server.properties\n");
     out.close();
   }
   public void setUp() throws Exception {
     prepareConfig();
     if(count == 0) {
-      config = ConfigurationLoader.getInstance("/tmp/HTTpChannel-server.properties");
+      config = ConfigurationLoader.getInstance("/tmp/Channel-server.properties");
       count++;
     }
     Configuration mockConfig = createMock(Configuration.class);
+    Configuration mockServerConfig = createMock(Configuration.class);
+    expect(mockServerConfig.getInt("percentRollout")).andReturn(100).anyTimes();
+    expect(mockServerConfig.getString("siteType")).andReturn("PERFORMANCE,FAMILYSAFE,MATURE").anyTimes();
+    expect(mockServerConfig.getBoolean("enableDatabusLogging")).andReturn(true).anyTimes();
+    expect(mockServerConfig.getBoolean("enableFileLogging")).andReturn(true).anyTimes();
+    expect(mockServerConfig.getInt("sampledadvertisercount")).andReturn(10).anyTimes();
+    expect(mockServerConfig.getInt("maxconnections")).andReturn(100).anyTimes();
+    replay(mockServerConfig);
     expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
-    expect(mockConfig.getString("loggerConf")).andReturn("/tmp/channel-server.properties").anyTimes();
+    expect(mockConfig.getString("loggerConf")).andReturn("/tmp/Channel-server.properties").anyTimes();
     replay(mockConfig);
     DebugLogger.init(mockConfig);
     InspectorStats.initializeWorkflow("WorkFlow");
     HttpRequestHandler.init(config, (ChannelAdGroupRepository) null, (InspectorStats) null, (ClientBootstrap) null, (ClientBootstrap) null, null, null, null,
         null);
     AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
-    Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-channel", "cas-advertisement", config.serverConfiguration());
+    Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-channel", "cas-advertisement", mockServerConfig);
   }
   
   @Test
