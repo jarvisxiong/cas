@@ -31,70 +31,24 @@ public class HttpRequestHandlerTest extends TestCase{
   private static String debugFile  = "";
   private static int count = 0;
   
-  public void prepareConfig() throws Exception {
-    FileWriter fstream = new FileWriter("/tmp/Channel-server.properties");
-    BufferedWriter out = new BufferedWriter(fstream);
-    out.write("log4j.logger.app = DEBUG, channel\n");
-    out.write("log4j.additivity.app = false\n");
-    out.write("log4j.appender.channel=org.apache.log4j.DailyRollingFileAppender\n");
-    out.write("log4j.appender.channel.layout=org.apache.log4j.PatternLayout\n");
-    out.write("log4j.appender.channel.DatePattern='.'yyyy-MM-dd-HH\n");
-    channelFile = "/tmp/channel.log." + System.currentTimeMillis();
-    out.write("log4j.appender.channel.File=" + channelFile + "\n");
-
-    out.write("log4j.logger.app = DEBUG, rr\n");
-    out.write("log4j.additivity.rr.app = false\n");
-    out.write("log4j.appender.rr=org.apache.log4j.DailyRollingFileAppender\n");
-    out.write("log4j.appender.rr.layout=org.apache.log4j.PatternLayout\n");
-    out.write("log4j.appender.rr.DatePattern='.'yyyy-MM-dd-HH\n");
-    System.out.println("here rr file name is " + rrFile);
-    rrFile = "/tmp/rr.log." + System.currentTimeMillis();
-    
-    out.write("log4j.logger.app = DEBUG, debug\n");
-    out.write("log4j.additivity.rr.app = false\n");
-    out.write("log4j.appender.rr=org.apache.log4j.DailyRollingFileAppender\n");
-    out.write("log4j.appender.rr.layout=org.apache.log4j.PatternLayout\n");
-    out.write("log4j.appender.rr.DatePattern='.'yyyy-MM-dd-HH\n");
-    debugFile = "/tmp/debug.log." + System.currentTimeMillis();
-    System.out.println("here debug file name is " + debugFile);
-
-    
-    out.write("log4j.appender.rr.File = " + rrFile + "\n");
-    out.write("log4j.category.debug = DEBUG,debug\n");
-    out.write("log4j.category.rr = DEBUG,rr\n");
-    out.write("log4j.category.channel = DEBUG,channel\n");
-    out.write("server.percentRollout=100 \nserver.siteType=PERFORMANCE,FAMILYSAFE,MATURE\n");
-    out.write("server.enableDatabusLogging = true\n");
-    out.write("server.enableFileLogging = true \n");
-    out.write("server.sampledadvertisercount = 2");
-    out.write("\nserver.maxconnections=100\n");
-    out.write("logger.rr = rr \n");
-    out.write("logger.channel = channel");
-    out.write("\n logger.debug = debug \n");
-    out.write("logger.advertiser = advertiser\n");
-    out.write("logger.sampledadvertiser = sampledadvertiser");
-    out.write("\nlogger.loggerConf = /tmp/Channel-server.properties\n");
-    out.close();
-  }
   public void setUp() throws Exception {
-    prepareConfig();
-    if(count == 0) {
-      config = ConfigurationLoader.getInstance("/tmp/Channel-server.properties");
-      count++;
-    }
     Configuration loggerConfig = createMock(Configuration.class);
     expect(loggerConfig.getString("channel")).andReturn("channel").anyTimes();
+    expect(loggerConfig.getString("rr")).andReturn("rr").anyTimes();
+    expect(loggerConfig.getString("advertiser")).andReturn("advertiser").anyTimes();
+    expect(loggerConfig.getString("sampledadvertiser")).andReturn("sampledadvertiser").anyTimes();
+
     replay(loggerConfig);
     
     Configuration mockServerConfig = createMock(Configuration.class);
-    expect(mockServerConfig.getInt("percentRollout")).andReturn(100).anyTimes();
-    expect(mockServerConfig.getString("siteType")).andReturn("PERFORMANCE,FAMILYSAFE,MATURE").anyTimes();
+    expect(mockServerConfig.getInt("percentRollout", 100)).andReturn(100).anyTimes();
+    expect(mockServerConfig.getList("allowedSiteTypes")).andReturn(null).anyTimes();
     expect(mockServerConfig.getBoolean("enableDatabusLogging")).andReturn(true).anyTimes();
     expect(mockServerConfig.getBoolean("enableFileLogging")).andReturn(true).anyTimes();
     expect(mockServerConfig.getInt("sampledadvertisercount")).andReturn(10).anyTimes();
     expect(mockServerConfig.getInt("maxconnections")).andReturn(100).anyTimes();
     replay(mockServerConfig);
-    
+        
     ConfigurationLoader mockConfigLoader = createMock(ConfigurationLoader.class);
     expect(mockConfigLoader.loggerConfiguration()).andReturn(loggerConfig).anyTimes();
     expect(mockConfigLoader.adapterConfiguration()).andReturn(null).anyTimes();
@@ -110,7 +64,7 @@ public class HttpRequestHandlerTest extends TestCase{
     replay(mockConfig);
     DebugLogger.init(mockConfig);
     InspectorStats.initializeWorkflow("WorkFlow");
-    HttpRequestHandler.init(config, (ChannelAdGroupRepository) null, (InspectorStats) null, (ClientBootstrap) null, (ClientBootstrap) null, null, null, null,
+    HttpRequestHandler.init(mockConfigLoader, (ChannelAdGroupRepository) null, (InspectorStats) null, (ClientBootstrap) null, (ClientBootstrap) null, null, null, null,
         null);
     AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
     Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-channel", "cas-advertisement", mockServerConfig);
@@ -279,7 +233,7 @@ public class HttpRequestHandlerTest extends TestCase{
   assertEquals(false, result);
   }
   
-  /*
+  
   @Test
   public void testWriteLogsBothListNull() {
     HttpRequestHandler httpRequestHandler = new HttpRequestHandler();
@@ -310,5 +264,5 @@ public class HttpRequestHandlerTest extends TestCase{
     httpRequestHandlerbase.rtbSegments.add(channelSegment1);
     httpRequestHandlerbase.writeLogs();
   }
-  */
+  
 }
