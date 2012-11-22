@@ -7,6 +7,7 @@ import static org.easymock.classextension.EasyMock.replay;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
@@ -48,6 +49,12 @@ public class FilterTest extends TestCase {
   public void setUp() {
     mockConfig = createMock(Configuration.class);
     mockAdapterConfig = createMock(Configuration.class);
+    ArrayList<String> arr = new ArrayList<String>();
+    arr.add("atnt.advertiserId");
+    arr.add("mobilecommerce.advertiserId");
+    arr.add("drawbridge.advertiserId");
+    Iterator<String> itr = arr.iterator();
+    expect(mockAdapterConfig.getKeys()).andReturn(itr).anyTimes();
     expect(mockAdapterConfig.getString("atnt.advertiserId")).andReturn("1").anyTimes();
     expect(mockAdapterConfig.getInt("atnt.partnerSegmentNo", 2)).andReturn(1).anyTimes();
     expect(mockAdapterConfig.getString("mobilecommerce.advertiserId")).andReturn("3").anyTimes();
