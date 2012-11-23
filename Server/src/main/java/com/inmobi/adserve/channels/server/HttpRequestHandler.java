@@ -339,10 +339,10 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
 
       // applying channel level filters and per partner ecpm filter
       ChannelSegmentEntity[] rows = convertToSegmentsArray(Filters
-          .partnerSegmentCountFilter(Filters.impressionBurnFilter(matchedSegments, logger), 0.0, logger));
+          .partnerSegmentCountFilter(Filters.impressionBurnFilter(matchedSegments, logger, config), 0.0, logger, config, adapterConfig));
 
       // applying request level ecpm filter
-      rows = Filters.segmentsPerRequestFilter(matchedSegments, rows, logger);
+      rows = Filters.segmentsPerRequestFilter(matchedSegments, rows, logger, config);
 
       logger.debug("repo: " + channelAdGroupRepository.toString());
       if(rows == null || rows.length == 0) {
@@ -459,7 +459,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
         sendNoAdResponse(e);
         return;
       }
-      rankList = Filters.rankAdapters(segments, logger);
+      rankList = Filters.rankAdapters(segments, logger, config);
 
       // Resetting the rankIndexToProcess for already completed adapters.
       ChannelSegment segment = rankList.get(rankIndexToProcess);
