@@ -96,7 +96,7 @@ public class ChannelServer {
     InspectorStats.initializeRepoStats("ChannelFeedbackRepository");
     InspectorStats.initializeRepoStats("ChannelSegmentFeedbackRepository");
     instantiateRepository(logger, config);
-    Filters.init(config.serverConfiguration(), repositoryHelper, inspectorStat);
+    Filters.init(config.serverConfiguration(), config.adapterConfiguration(), repositoryHelper, inspectorStat);
 
     // Creating netty client for out-bound calls.
     ClientBootstrap clientBootstrap = BootstrapCreation.createBootstrap(logger, config.serverConfiguration());

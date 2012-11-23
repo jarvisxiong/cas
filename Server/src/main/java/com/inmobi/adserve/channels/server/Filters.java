@@ -7,6 +7,7 @@ import org.apache.commons.configuration.Configuration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -26,7 +27,7 @@ import com.inmobi.adserve.channels.server.HttpRequestHandler.ChannelSegment;
  */
 
 public class Filters {
-
+  public static HashMap<String/* adgroupid*/, Integer/*partnersegmentNo*/> partnerSegmentNosMapping = new HashMap<String, Integer>();
   private static Comparator<ChannelSegmentFeedbackEntity> COMPARATOR = new Comparator<ChannelSegmentFeedbackEntity>() {
     public int compare(ChannelSegmentFeedbackEntity o1, ChannelSegmentFeedbackEntity o2) {
       return o1.getPrioritisedECPM() - o2.getPrioritisedECPM() > 0.0 ? -1 : 1;
@@ -34,13 +35,25 @@ public class Filters {
   };
 
   private static Configuration serverConfiguration;
+  private static Configuration adapterConfiguration;
   private static RepositoryHelper repositoryHelper;
   private static InspectorStats inspectorStat;
+  private static ArrayList<String> adapterNames = new ArrayList<String>();
 
-  public static void init(Configuration configuration, RepositoryHelper repositoryHelper, InspectorStats inspectorStat) {
-    Filters.serverConfiguration = configuration;
+  public static void init(Configuration serverConfiguration, Configuration adapterConfiguration, RepositoryHelper repositoryHelper, InspectorStats inspectorStat) {
+    Filters.serverConfiguration = serverConfiguration;
+    Filters.adapterConfiguration = adapterConfiguration;
     Filters.repositoryHelper = repositoryHelper;
     Filters.inspectorStat = inspectorStat;
+    Iterator<String> itr = Filters.adapterConfiguration.getKeys();
+    while(null!=itr && itr.hasNext())
+    {
+      String str = itr.next();
+      if (str.endsWith(".advertiserId")) {
+        adapterNames.add(str.split(".advertiserId")[0]);
+      }
+    }
+    
   }
 
   /**
@@ -108,7 +121,7 @@ public class Filters {
    * Filter to short list a configurable number of segments per partner
    * 
    * @param matchedSegments
-   *          : The map containg advertiserid mapped to its map of adgroupid
+   *          : The map containing advertiserid mapped to its map of adgroupid
    *          mapped to its segments
    * @param siteFloor
    *          : lowest ecpm segment that can be served for that request
@@ -149,7 +162,16 @@ public class Filters {
       // choosing top segments from the sorted list\
 
       int adGpCount = 0;
-      int partnerSegmentNo = serverConfiguration.getInt("partnerSegmentNo");
+      int partnerSegmentNo;
+      if (partnerSegmentNosMapping.containsKey(key))
+        partnerSegmentNo = partnerSegmentNosMapping.get(key);
+      else {
+        partnerSegmentNo= getPartnerSpecificSegmentNo(key);
+        partnerSegmentNosMapping.put(key, partnerSegmentNo);
+      }
+      if (logger.isDebugEnabled())
+        logger.debug("PartnersegmentNo for advertiser " + key + " is " + partnerSegmentNo);
+      
       for (ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity : hashMapList) {
         if(adGpCount > partnerSegmentNo)
           break;
@@ -311,5 +333,17 @@ public class Filters {
     arrayList.add(segment.get(0));
     logger.info("Ranked candidate adapters randomly");
     return arrayList;
+  }
+  
+  public static int getPartnerSpecificSegmentNo(String key)
+  {
+    int partnerSegmentNo = 3; 		
+    for (int i =0; i< adapterNames.size(); i++) {
+      if (key.equalsIgnoreCase(adapterConfiguration.getString(adapterNames.get(i) + ".advertiserId"))) {
+        partnerSegmentNo = adapterConfiguration.getInt(adapterNames.get(i) + ".partnerSegmentNo", serverConfiguration.getInt("partnerSegmentNo", partnerSegmentNo));
+        break;
+      }
+    }
+    return partnerSegmentNo;
   }
 }
