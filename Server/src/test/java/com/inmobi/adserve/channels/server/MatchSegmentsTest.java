@@ -22,7 +22,7 @@ import com.inmobi.adserve.channels.repository.ChannelRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
-
+/*
 public class MatchSegmentsTest extends TestCase {
 
   MatchSegments segments;
@@ -65,7 +65,7 @@ public class MatchSegmentsTest extends TestCase {
     channelSegmentEntity2 = new ChannelSegmentEntity("advertiserId", "adgroupId", "adId", "channelId", (long) 1, rcList, tags, false, false, "externalSiteKey",
         modified_on, "campaignId", slotIds, (long) 0, false, "pricingModel", siteRatings, 0, null);
 
-  }
+  }*/
 /*
   @Test
   public void testMatchSegmentsCacheHit() throws Exception {
@@ -119,6 +119,7 @@ public class MatchSegmentsTest extends TestCase {
     segments.matchSegments(logger, 1, categories, 1, 1, 1, 1, -1);
   }
 */
+/*
   @Test
   public void testMatchSegmentsPlatformMatching() throws Exception {
     long[] categories = { 1, 2 };
@@ -162,3 +163,4 @@ public class MatchSegmentsTest extends TestCase {
             "{\"os\": [{\"id\": 1,\"min\": 2.2, \"max\": 4, \"incl\" : true },{\"id\": 1,\"min\": 2.2, \"max\": 4, \"incl\" : true }] }").size(), 2);
   }
 }
+*/
