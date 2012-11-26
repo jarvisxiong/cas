@@ -158,9 +158,9 @@ public class Filters {
 
       // choosing top segments from the sorted list\
 
-      int adGpCount = 0;
+      int adGpCount = 1;
       int partnerSegmentNo;
-      partnerSegmentNo = adapterConfiguration.getInt(advertiserIdtoNameMapping.get(key) + ".partnerSegmentNo");
+      partnerSegmentNo = adapterConfiguration.getInt(advertiserIdtoNameMapping.get(key) + ".partnerSegmentNo", serverConfiguration.getInt("partnerSegmentNo", 2));
       if(logger.isDebugEnabled())
         logger.debug("PartnersegmentNo for advertiser " + key + " is " + partnerSegmentNo);
 
