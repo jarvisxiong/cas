@@ -48,10 +48,10 @@ public class MatchSegmentsTest extends TestCase {
     replay(mockConfig);
     DebugLogger.init(mockConfig);
     logger = new DebugLogger();
-    cache = createMock(ChannelSegmentCache.class);
+    //cache = createMock(ChannelSegmentCache.class);
 
     channelAdGroupRepository = createMock(ChannelAdGroupRepository.class);
-    MatchSegments.init(cache, channelAdGroupRepository, repoHelper, new InspectorStats());
+    MatchSegments.init(channelAdGroupRepository, repoHelper, new InspectorStats());
     segments = new MatchSegments(logger);
     Long[] rcList = null;
     Long[] tags = null;
@@ -66,7 +66,7 @@ public class MatchSegmentsTest extends TestCase {
         modified_on, "campaignId", slotIds, (long) 0, false, "pricingModel", siteRatings, 0, null);
 
   }
-
+/*
   @Test
   public void testMatchSegmentsCacheHit() throws Exception {
     assertNotNull(segments);
@@ -118,7 +118,7 @@ public class MatchSegmentsTest extends TestCase {
     replay(cache);
     segments.matchSegments(logger, 1, categories, 1, 1, 1, 1, -1);
   }
-
+*/
   @Test
   public void testMatchSegmentsPlatformMatching() throws Exception {
     long[] categories = { 1, 2 };
@@ -139,6 +139,16 @@ public class MatchSegmentsTest extends TestCase {
     replay(channelAdGroupRepository);
     replay(cache);
     segments.matchSegments(logger, 1, categories, 1, 1, 1, 1, -1);
+  }
+  
+  @Test
+  public void testMatchSegments() throws Exception {
+    long[] categeries = {1,2};
+    ArrayList<ChannelSegmentEntity> nonEmptyArray = new ArrayList<ChannelSegmentEntity>();
+    expect(channelAdGroupRepository.getEntities(1, -1, 1, 1, 1)).andReturn(nonEmptyArray);
+    expect(channelAdGroupRepository.getEntities(1, 1, -1, 1, 1)).andReturn(nonEmptyArray);
+    expect(channelAdGroupRepository.getEntities(1, -1, -1, 1, 1)).andReturn(nonEmptyArray);
+    
   }
 
   @Test
