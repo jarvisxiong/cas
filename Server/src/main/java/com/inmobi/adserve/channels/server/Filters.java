@@ -27,28 +27,33 @@ import com.inmobi.adserve.channels.server.HttpRequestHandler.ChannelSegment;
  */
 
 public class Filters {
-
+  public static HashMap<String/* adgroupid*/, Integer/*partnersegmentNo*/> partnerSegmentNosMapping = new HashMap<String, Integer>();
   private static Comparator<ChannelSegmentFeedbackEntity> COMPARATOR = new Comparator<ChannelSegmentFeedbackEntity>() {
     public int compare(ChannelSegmentFeedbackEntity o1, ChannelSegmentFeedbackEntity o2) {
       return o1.getPrioritisedECPM() - o2.getPrioritisedECPM() > 0.0 ? -1 : 1;
     }
   };
 
+  private static Configuration serverConfiguration;
+  private static Configuration adapterConfiguration;
   private static RepositoryHelper repositoryHelper;
   private static InspectorStats inspectorStat;
-  public static HashMap<String/* adgroupid */, String/* partnersegmentNo */> advertiserIdtoNameMapping = new HashMap<String, String>();
+  private static ArrayList<String> adapterNames = new ArrayList<String>();
 
-  public static void init(Configuration adapterConfiguration, RepositoryHelper repositoryHelper, InspectorStats inspectorStat) {
+  public static void init(Configuration serverConfiguration, Configuration adapterConfiguration, RepositoryHelper repositoryHelper, InspectorStats inspectorStat) {
+    Filters.serverConfiguration = serverConfiguration;
+    Filters.adapterConfiguration = adapterConfiguration;
     Filters.repositoryHelper = repositoryHelper;
     Filters.inspectorStat = inspectorStat;
-    Iterator<String> itr = adapterConfiguration.getKeys();
-    while (null != itr && itr.hasNext()) {
+    Iterator<String> itr = Filters.adapterConfiguration.getKeys();
+    while(null!=itr && itr.hasNext())
+    {
       String str = itr.next();
-      if(str.endsWith(".advertiserId")) {
-        advertiserIdtoNameMapping.put(adapterConfiguration.getString(str), str.replace(".advertiserId", ""));
+      if (str.endsWith(".advertiserId")) {
+        adapterNames.add(str.split(".advertiserId")[0]);
       }
     }
-
+    
   }
 
   /**
@@ -60,7 +65,7 @@ public class Filters {
    * @return
    */
   public static HashMap<String, HashMap<String, ChannelSegmentEntity>> impressionBurnFilter(
-      HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments, DebugLogger logger, Configuration serverConfiguration) {
+      HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments, DebugLogger logger) {
     double revenueWindow = serverConfiguration.getDouble("revenueWindow", 0.33);
     if(logger.isDebugEnabled())
       logger.debug("Inside impressionBurnFilter");
@@ -98,9 +103,9 @@ public class Filters {
           continue;
         }
         if(logger.isDebugEnabled())
-          logger.debug("Burn limit filter passed by advertiser " + key + " " + repositoryHelper.queryChannelFeedbackRepository(key).getRevenue()
-              * revenueWindow);
-      } catch (NullPointerException e) {
+          logger.debug("Burn limit filter passed by advertiser " + key + " " + repositoryHelper.queryChannelFeedbackRepository(key).getRevenue() * revenueWindow);
+      } 
+      catch (NullPointerException e) {
         if(logger.isDebugEnabled())
           logger.debug("Repo Exception/No entry in ChannelFeedbackRepository for advertiserID " + key);
         // adding the advertiser in case of no entry in repo
@@ -124,8 +129,7 @@ public class Filters {
    * @return
    */
   public static HashMap<String, HashMap<String, ChannelSegmentEntity>> partnerSegmentCountFilter(
-      HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments, Double siteFloor, DebugLogger logger, Configuration serverConfiguration,
-      Configuration adapterConfiguration) {
+      HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments, Double siteFloor, DebugLogger logger) {
     if(logger.isDebugEnabled())
       logger.debug("Inside PartnerSegmentCountFilter");
     HashMap<String, HashMap<String, ChannelSegmentEntity>> rows = new HashMap<String, HashMap<String, ChannelSegmentEntity>>();
@@ -157,12 +161,17 @@ public class Filters {
 
       // choosing top segments from the sorted list\
 
-      int adGpCount = 1;
+      int adGpCount = 0;
       int partnerSegmentNo;
-      partnerSegmentNo = adapterConfiguration.getInt(advertiserIdtoNameMapping.get(key) + ".partnerSegmentNo", serverConfiguration.getInt("partnerSegmentNo", 2));
-      if(logger.isDebugEnabled())
+      if (partnerSegmentNosMapping.containsKey(key))
+        partnerSegmentNo = partnerSegmentNosMapping.get(key);
+      else {
+        partnerSegmentNo= getPartnerSpecificSegmentNo(key);
+        partnerSegmentNosMapping.put(key, partnerSegmentNo);
+      }
+      if (logger.isDebugEnabled())
         logger.debug("PartnersegmentNo for advertiser " + key + " is " + partnerSegmentNo);
-
+      
       for (ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity : hashMapList) {
         if(adGpCount > partnerSegmentNo)
           break;
@@ -187,7 +196,7 @@ public class Filters {
    * @return
    */
   public static ChannelSegmentEntity[] segmentsPerRequestFilter(HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments,
-      ChannelSegmentEntity[] rows, DebugLogger logger, Configuration serverConfiguration) {
+      ChannelSegmentEntity[] rows, DebugLogger logger) {
     if(logger.isDebugEnabled())
       logger.debug("Inside SegmentsPerRequestFilter");
 
@@ -237,8 +246,7 @@ public class Filters {
         shortlistedRow.add(matchedSegments.get(advertiserId).get(adgroupId));
         totalSegments++;
       } else {
-        inspectorStat.incrementStatCount("P_"
-            + repositoryHelper.queryChannelRepository(matchedSegments.get(advertiserId).get(adgroupId).getChannelId()).getName(),
+        inspectorStat.incrementStatCount("P_" + repositoryHelper.queryChannelRepository(matchedSegments.get(advertiserId).get(adgroupId).getChannelId()).getName(),
             InspectorStrings.droppedInSegmentPerRequestFilter);
       }
     }
@@ -281,7 +289,7 @@ public class Filters {
 
   // creating ranks of shortlisted channelsegments ased on weighted random mean
   // of their prioritised ecpm
-  public static ArrayList<ChannelSegment> rankAdapters(List<ChannelSegment> segment, DebugLogger logger, Configuration serverConfiguration) {
+  public static ArrayList<ChannelSegment> rankAdapters(List<ChannelSegment> segment, DebugLogger logger) {
 
     Random random = new Random();
     int rank = 0;
@@ -326,5 +334,16 @@ public class Filters {
     logger.info("Ranked candidate adapters randomly");
     return arrayList;
   }
-
+  
+  public static int getPartnerSpecificSegmentNo(String key)
+  {
+    int partnerSegmentNo = 3; 		
+    for (int i =0; i< adapterNames.size(); i++) {
+      if (key.equalsIgnoreCase(adapterConfiguration.getString(adapterNames.get(i) + ".advertiserId"))) {
+        partnerSegmentNo = adapterConfiguration.getInt(adapterNames.get(i) + ".partnerSegmentNo", serverConfiguration.getInt("partnerSegmentNo", partnerSegmentNo));
+        break;
+      }
+    }
+    return partnerSegmentNo;
+  }
 }

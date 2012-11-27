@@ -18,11 +18,14 @@ import com.inmobi.phoenix.exception.RepositoryException;
 
 public class MatchSegments {
   private DebugLogger logger;
+  private static ChannelSegmentCache cache;
   private static ChannelAdGroupRepository channelAdGroupRepository;
   private static RepositoryHelper repositoryHelper;
   private static InspectorStats inspectorStat;
 
-  public static void init(ChannelAdGroupRepository channelAdGroupRepository, RepositoryHelper repositoryHelper, InspectorStats inspectorStat) {
+  public static void init(ChannelSegmentCache cache, ChannelAdGroupRepository channelAdGroupRepository, RepositoryHelper repositoryHelper,
+      InspectorStats inspectorStat) {
+    MatchSegments.cache = cache;
     MatchSegments.channelAdGroupRepository = channelAdGroupRepository;
     MatchSegments.repositoryHelper = repositoryHelper;
     MatchSegments.inspectorStat = inspectorStat;
@@ -124,32 +127,38 @@ public class MatchSegments {
     if(logger.isDebugEnabled())
       logger.debug("Loading entities for slot: " + slotId + " category: " + category + " country: " + country + " platform: " + platform
           + " targetingPlatform: " + targetingPlatform + " siteRating: " + siteRating + " osId: " + osId);
-    ArrayList<ChannelSegmentEntity> filteredEntities = new ArrayList();
-    if(platform == -1) {
-      Collection<ChannelSegmentEntity> entities = channelAdGroupRepository.getEntities(slotId, category, country, targetingPlatform, siteRating,
-          new Integer(-1));
-      entities.addAll(channelAdGroupRepository.getEntities(slotId, category, country, targetingPlatform, siteRating, new Integer(osId)));
-      filteredEntities.addAll(entities);
-      return filteredEntities;
-    }
-
-    // Load data from repository for specific country.
-    Collection<ChannelSegmentEntity> entities = channelAdGroupRepository.getEntities(slotId, category, country, targetingPlatform, siteRating);
-
-    if(null != entities) {
-      {
+    ArrayList<ChannelSegmentEntity> filteredEntities = cache.query(logger, slotId, category, country, targetingPlatform, siteRating, platform, osId);
+    if(null == filteredEntities) {
+      if(logger.isDebugEnabled())
+        logger.info("Cache miss for slot: " + slotId + " category: " + category + " country: " + country + " platform: " + platform + " osId: " + osId);
+      // Load data from repository for specific country.
+      Collection<ChannelSegmentEntity> entities = channelAdGroupRepository.getEntities(slotId, category, country, targetingPlatform, siteRating);
+      filteredEntities = new ArrayList();
+      if(null != entities) {
         for (ChannelSegmentEntity entity : entities) {
           // Platform filtering.
-
-          if((entity.getPlatformTargeting() & platform) == platform)
-            filteredEntities.add(entity);
-          else {
-            if(logger.isDebugEnabled())
-              logger.debug("Dropping AdGroup: " + entity.getAdgroupId() + " request platform: " + platform + " Entity Platform: "
-                  + entity.getPlatformTargeting());
+          if(osId == -1) {
+            if((entity.getPlatformTargeting() & platform) == platform)
+              filteredEntities.add(entity);
+            else {
+              if(logger.isDebugEnabled())
+                logger.debug("Dropping AdGroup: " + entity.getAdgroupId() + " request platform: " + platform + " Entity Platform: "
+                    + entity.getPlatformTargeting());
+            }
+          } else {
+            if(entity.getOsIds() == null)
+              continue;
+            for (Integer id : entity.getOsIds()) {
+              if(id == osId) {
+                filteredEntities.add(entity);
+                break;
+              }
+            }
           }
         }
       }
+      // Update cache
+      cache.addOrUpdate(logger, slotId, category, country, targetingPlatform, siteRating, platform, osId, filteredEntities);
     }
     return filteredEntities;
   }
