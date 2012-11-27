@@ -84,9 +84,9 @@ public class FilterTest extends TestCase {
     expect(mockAdapterConfig.getString("openx.advertiserId")).andReturn("advertiserId1").anyTimes();
     expect(mockAdapterConfig.getString("atnt.advertiserId")).andReturn("advertiserId2").anyTimes();
     expect(mockAdapterConfig.getString("tapit.advertiserId")).andReturn("advertiserId3").anyTimes();
-    expect(mockAdapterConfig.getInt("openx.partnerSegmentNo")).andReturn(2).anyTimes();
-    expect(mockAdapterConfig.getInt("atnt.partnerSegmentNo")).andReturn(2).anyTimes();
-    expect(mockAdapterConfig.getInt("tapit.partnerSegmentNo")).andReturn(2).anyTimes();
+    expect(mockAdapterConfig.getInt("openx.partnerSegmentNo",2)).andReturn(2).anyTimes();
+    expect(mockAdapterConfig.getInt("atnt.partnerSegmentNo",2)).andReturn(2).anyTimes();
+    expect(mockAdapterConfig.getInt("tapit.partnerSegmentNo",2)).andReturn(2).anyTimes();
     replay(mockAdapterConfig);
 
     expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
@@ -96,6 +96,7 @@ public class FilterTest extends TestCase {
     expect(mockConfig.getDouble("revenueWindow", 0.33)).andReturn(10.0).anyTimes();
     expect(mockConfig.getDouble("ecpmShift", 0.1)).andReturn(0.0).anyTimes();
     expect(mockConfig.getDouble("feedbackPower", 2.0)).andReturn(1.0).anyTimes();
+    expect(mockConfig.getInt("partnerSegmentNo", 2)).andReturn(2).anyTimes();
     expect(repositoryHelper.queryChannelRepository("channelId1")).andReturn(cE1).anyTimes();
     expect(repositoryHelper.queryChannelRepository("channelId2")).andReturn(cE2).anyTimes();
     expect(repositoryHelper.queryChannelRepository("channelId3")).andReturn(cE3).anyTimes();

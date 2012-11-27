@@ -42,7 +42,6 @@ public class Filters {
     Filters.repositoryHelper = repositoryHelper;
     Filters.inspectorStat = inspectorStat;
     Iterator<String> itr = adapterConfiguration.getKeys();
-    System.out.println(itr);
     while (null != itr && itr.hasNext()) {
       String str = itr.next();
       if(str.endsWith(".advertiserId")) {
