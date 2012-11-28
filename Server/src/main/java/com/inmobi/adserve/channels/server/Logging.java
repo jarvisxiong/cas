@@ -271,11 +271,14 @@ public class Logging {
     log.append("]");
 
     JSONArray handset = getHandset(jObject);
-    HandsetMeta handsetMeta = null;
-    if(null != handset) {
+    HandsetMeta handsetMeta = new HandsetMeta();
+    if(null != handset && handset.length() > 3) {
       log.append(separator).append("handset=").append(handset);
-      handsetMeta = new HandsetMeta(handset.getInt(3), handset.getInt(2));
-    }
+      handsetMeta.setId(handset.getInt(3));
+      handsetMeta.setManufacturer(handset.getInt(2));
+    }else
+      if(jObject != null)
+      handsetMeta.setOsId(jObject.optInt("os-id", -1));    
     JSONArray carrier = getCarrier(jObject);
     Geo geo = null;
     if(null != carrier) {
@@ -359,7 +362,7 @@ public class Logging {
 
   // Write Channel Logs
   public static void channelLogline(List<ChannelSegment> rankList, String clickUrl, DebugLogger logger, Configuration config, InspectorStats inspectorStat,
-      SASRequestParameters sasParams, long totalTime, JSONObject jObject) throws JSONException, TException  {
+      SASRequestParameters sasParams, long totalTime, JSONObject jObject) throws JSONException, TException {
     logger.debug("came inside channel log line");
     Logger debugLogger = Logger.getLogger(config.getString("channel"));
     logger.debug("got logger handle for cas logs");
@@ -405,7 +408,7 @@ public class Logging {
         logLine.put("resp", resp);
         logLine.put("latency", adResponse.latency);
         AdResponse response = new AdResponse(advertiserId, externalSiteKey, resp, latency);
-        if (bid != -1) {
+        if(bid != -1) {
           logLine.put("bid", bid);
           response.setBid(bid);
         }
