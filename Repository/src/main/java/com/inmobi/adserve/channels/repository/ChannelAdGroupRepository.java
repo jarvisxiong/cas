@@ -227,10 +227,18 @@ public class ChannelAdGroupRepository extends AbstractHashDBUpdatableRepository<
       for (Integer targetingPlatform : entity.getTargetingPlatform()) {
         for (Long slotId : entity.getSlotIds()) {
           if(entity.getAllTags()) {
-            removeEntity(slotId, -1 /* All categories */, country, targetingPlatform, siteRating, entity);
+            if(entity.getOsIds() == null || entity.getOsIds().size() == 0)
+              removeEntity(slotId, -1 /* All categories */, country, targetingPlatform, siteRating, entity, -1);
+            else
+              for(Integer id : entity.getOsIds())
+                removeEntity(slotId, -1 /* All categories */, country, targetingPlatform, siteRating, entity, id);
           } else {
             for (Long category : entity.getTags()) {
-              removeEntity(slotId, category, country, targetingPlatform, siteRating, entity);
+              if(entity.getOsIds() == null || entity.getOsIds().size() == 0)
+                insertEntity(slotId, category, country, targetingPlatform, siteRating, entity, -1);
+                else
+                  for(Integer id : entity.getOsIds())
+                    insertEntity(slotId, category , country, targetingPlatform, siteRating, entity, id);
             }
           }
         }
@@ -238,11 +246,19 @@ public class ChannelAdGroupRepository extends AbstractHashDBUpdatableRepository<
     }
   }
 
-  private void removeEntity(long slotId, long category, long country, Integer targetingPlatform, Integer siteRating, ChannelSegmentEntity entity) {
+  private void removeEntity(long slotId, long category, long country, Integer targetingPlatform, Integer siteRating, ChannelSegmentEntity entity, Integer osId) {
     String key = getKey(slotId, category, country, targetingPlatform, siteRating);
     HashMap<String, ChannelSegmentEntity> map = entityHashMap.get(key);
     if(null != map) {
       map.remove(entity.getAdgroupId());
+      if(logger.isDebugEnabled())
+        logger.debug("removed channel segment with key: " + key + " and AdGroupId: " + entity.getAdgroupId());
+    }
+    
+    key = key + "_" + osId;
+    HashMap<String, ChannelSegmentEntity> mapOs = entityHashMap.get(key);
+    if(null != mapOs) {
+      mapOs.remove(entity.getAdgroupId());
       if(logger.isDebugEnabled())
         logger.debug("removed channel segment with key: " + key + " and AdGroupId: " + entity.getAdgroupId());
     }

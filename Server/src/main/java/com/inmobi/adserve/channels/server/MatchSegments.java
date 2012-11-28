@@ -127,14 +127,21 @@ public class MatchSegments {
     if(logger.isDebugEnabled())
       logger.debug("Loading entities for slot: " + slotId + " category: " + category + " country: " + country + " platform: " + platform
           + " targetingPlatform: " + targetingPlatform + " siteRating: " + siteRating + " osId: " + osId);
-    ArrayList<ChannelSegmentEntity> filteredEntities = cache.query(logger, slotId, category, country, targetingPlatform, siteRating, platform, osId);
-    if(null == filteredEntities) {
-      if(logger.isDebugEnabled())
-        logger.info("Cache miss for slot: " + slotId + " category: " + category + " country: " + country + " platform: " + platform + " osId: " + osId);
-      // Load data from repository for specific country.
-      Collection<ChannelSegmentEntity> entities = channelAdGroupRepository.getEntities(slotId, category, country, targetingPlatform, siteRating);
-      filteredEntities = new ArrayList();
-      if(null != entities) {
+    ArrayList<ChannelSegmentEntity> filteredEntities = new ArrayList();
+    if(platform == -1) {
+      Collection<ChannelSegmentEntity> entitiesAllOs = channelAdGroupRepository.getEntities(slotId, category, country, targetingPlatform, siteRating,
+          -1);
+      Collection<ChannelSegmentEntity> entities = channelAdGroupRepository.getEntities(slotId, category, country, targetingPlatform, siteRating, osId);
+      filteredEntities.addAll(entitiesAllOs);
+      filteredEntities.addAll(entities);
+      return filteredEntities;
+    }
+
+    // Load data from repository for specific country.
+    Collection<ChannelSegmentEntity> entities = channelAdGroupRepository.getEntities(slotId, category, country, targetingPlatform, siteRating);
+
+    if(null != entities) {
+      {
         for (ChannelSegmentEntity entity : entities) {
           // Platform filtering.
           if(osId == -1) {
