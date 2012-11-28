@@ -4,6 +4,9 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +18,7 @@ import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.entity.*;
 import com.inmobi.adserve.channels.repository.*;
+import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.phoenix.exception.RepositoryException;
@@ -46,40 +50,19 @@ public class FilterTest extends TestCase {
   private ChannelSegmentEntity channelSegmentEntity5;
   private ChannelSegmentEntity channelSegmentEntity6;
 
-  public void setUp() {
+  public void setUp() throws IOException {
     mockConfig = createMock(Configuration.class);
     mockAdapterConfig = createMock(Configuration.class);
-    ArrayList<String> arr = new ArrayList<String>();
-    arr.add("atnt.advertiserId");
-    arr.add("mobilecommerce.advertiserId");
-    arr.add("drawbridge.advertiserId");
-    Iterator<String> itr = arr.iterator();
-    expect(mockAdapterConfig.getKeys()).andReturn(itr).anyTimes();
-    expect(mockAdapterConfig.getString("atnt.advertiserId")).andReturn("1").anyTimes();
-    expect(mockAdapterConfig.getInt("atnt.partnerSegmentNo", 2)).andReturn(1).anyTimes();
-    expect(mockAdapterConfig.getString("mobilecommerce.advertiserId")).andReturn("3").anyTimes();
-    expect(mockAdapterConfig.getInt("mobilecommerce.partnerSegmentNo", 2)).andReturn(3).anyTimes();
-    expect(mockAdapterConfig.getString("drawbridge.advertiserId")).andReturn("4").anyTimes();
-    expect(mockAdapterConfig.getInt("drawbridge.partnerSegmentNo", 2)).andReturn(4).anyTimes();
-    expect(mockAdapterConfig.getString("mullahmedia.advertiserId")).andReturn("5").anyTimes();
-    expect(mockAdapterConfig.getInt("mullahmedia.partnerSegmentNo", 2)).andReturn(5).anyTimes();
-    expect(mockAdapterConfig.getString("openx.advertiserId")).andReturn("6").anyTimes();
-    expect(mockAdapterConfig.getInt("openx.partnerSegmentNo", 2)).andReturn(6).anyTimes();
-    expect(mockAdapterConfig.getString("ifd.advertiserId")).andReturn("7").anyTimes();
-    expect(mockAdapterConfig.getInt("ifd.partnerSegmentNo", 2)).andReturn(7).anyTimes();
-    expect(mockAdapterConfig.getString("tapit.advertiserId")).andReturn("8").anyTimes();
-    expect(mockAdapterConfig.getInt("tapit.partnerSegmentNo", 2)).andReturn(8).anyTimes();
-    expect(mockAdapterConfig.getString("ifc.advertiserId")).andReturn("9").anyTimes();
-    expect(mockAdapterConfig.getInt("ifc.partnerSegmentNo", 2)).andReturn(9).anyTimes();
-    expect(mockAdapterConfig.getString("webmoblink.advertiserId")).andReturn("10").anyTimes();
-    expect(mockAdapterConfig.getInt("webmoblink.partnerSegmentNo", 2)).andReturn(10).anyTimes();
-    expect(mockAdapterConfig.getString("siquis.advertiserId")).andReturn("11").anyTimes();
-    expect(mockAdapterConfig.getInt("siquis.partnerSegmentNo", 2)).andReturn(11).anyTimes();
-    expect(mockAdapterConfig.getString("huntmads.advertiserId")).andReturn("12").anyTimes();
-    expect(mockAdapterConfig.getInt("huntmads.partnerSegmentNo", 2)).andReturn(12).anyTimes();
-    expect(mockAdapterConfig.getString("httpool.advertiserId")).andReturn("13").anyTimes();
-    expect(mockAdapterConfig.getInt("httpool.partnerSegmentNo", 2)).andReturn(13).anyTimes();    
-    replay(mockAdapterConfig);
+
+    HashMap<String, String> temp = new HashMap<String, String>();
+    temp.put("openx.advertiserId", "");
+    temp.put("openx.partnerSegmentNo", "");
+    temp.put("atnt.advertiserId", "");
+    temp.put("atnt.partnerSegmentNo", "");
+    temp.put("tapit.advertiserId", "");
+    temp.put("tapit.partnerSegmentNo", "");
+    Iterator<String> itr = temp.keySet().iterator();
+
     repositoryHelper = createMock(RepositoryHelper.class);
     cE1 = new ChannelEntity();
     cE1.setId("advertiserId1").setPriority(1).setImpressionCeil(90).setName("name1");
@@ -96,13 +79,24 @@ public class FilterTest extends TestCase {
     cSFE4 = new ChannelSegmentFeedbackEntity("advertiserId2", "adgroupId4", 0.2, 0.1);
     cSFE5 = new ChannelSegmentFeedbackEntity("advertiserId2", "adgroupId5", 0.5, 0.1);
     cSFE6 = new ChannelSegmentFeedbackEntity("advertiserId3", "adgroupId6", 0.7, 0.1);
+
+    expect(mockAdapterConfig.getKeys()).andReturn(itr).anyTimes();
+    expect(mockAdapterConfig.getString("openx.advertiserId")).andReturn("advertiserId1").anyTimes();
+    expect(mockAdapterConfig.getString("atnt.advertiserId")).andReturn("advertiserId2").anyTimes();
+    expect(mockAdapterConfig.getString("tapit.advertiserId")).andReturn("advertiserId3").anyTimes();
+    expect(mockAdapterConfig.getInt("openx.partnerSegmentNo",2)).andReturn(2).anyTimes();
+    expect(mockAdapterConfig.getInt("atnt.partnerSegmentNo",2)).andReturn(2).anyTimes();
+    expect(mockAdapterConfig.getInt("tapit.partnerSegmentNo",2)).andReturn(2).anyTimes();
+    replay(mockAdapterConfig);
+
     expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
     expect(mockConfig.getString("loggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties").anyTimes();
-    expect(mockConfig.getInt("partnerSegmentNo", 3)).andReturn(2).anyTimes();
+    // expect(mockConfig.getInt("partnerSegmentNo", 3)).andReturn(2).anyTimes();
     expect(mockConfig.getInt("totalSegmentNo")).andReturn(5).anyTimes();
     expect(mockConfig.getDouble("revenueWindow", 0.33)).andReturn(10.0).anyTimes();
     expect(mockConfig.getDouble("ecpmShift", 0.1)).andReturn(0.0).anyTimes();
     expect(mockConfig.getDouble("feedbackPower", 2.0)).andReturn(1.0).anyTimes();
+    expect(mockConfig.getInt("partnerSegmentNo", 2)).andReturn(2).anyTimes();
     expect(repositoryHelper.queryChannelRepository("channelId1")).andReturn(cE1).anyTimes();
     expect(repositoryHelper.queryChannelRepository("channelId2")).andReturn(cE2).anyTimes();
     expect(repositoryHelper.queryChannelRepository("channelId3")).andReturn(cE3).anyTimes();
@@ -146,7 +140,7 @@ public class FilterTest extends TestCase {
     replay(mockConfig);
     DebugLogger.init(mockConfig);
     logger = new DebugLogger();
-    Filters.init(mockConfig, mockAdapterConfig, repositoryHelper, new InspectorStats());
+    Filters.init(mockAdapterConfig, repositoryHelper, new InspectorStats());
   }
 
   @Test
@@ -184,7 +178,7 @@ public class FilterTest extends TestCase {
     matchedSegments.put(channelSegmentEntity4.getId(), adv2);
     matchedSegments.put(channelSegmentEntity6.getId(), adv3);
 
-    matchedSegments = Filters.impressionBurnFilter(matchedSegments, logger);
+    matchedSegments = Filters.impressionBurnFilter(matchedSegments, logger, mockConfig);
 
     assertEquals(false, matchedSegments.containsKey(channelSegmentEntity1.getId()));
     assertEquals(false, matchedSegments.containsKey(channelSegmentEntity4.getId()));
@@ -226,7 +220,7 @@ public class FilterTest extends TestCase {
     matchedSegments.put(channelSegmentEntity4.getId(), adv2);
     matchedSegments.put(channelSegmentEntity6.getId(), adv3);
 
-    matchedSegments = Filters.partnerSegmentCountFilter(matchedSegments, 0.3, logger);
+    matchedSegments = Filters.partnerSegmentCountFilter(matchedSegments, 0.3, logger, mockConfig, mockAdapterConfig);
 
     assertEquals(false, matchedSegments.get("advertiserId1").containsKey("adgroupId1"));
     assertEquals(2, matchedSegments.get("advertiserId1").size());
@@ -261,7 +255,7 @@ public class FilterTest extends TestCase {
       }
     }
     ChannelSegmentEntity[] finalRow = (ChannelSegmentEntity[]) rows.toArray(new ChannelSegmentEntity[0]);
-    finalRow = Filters.segmentsPerRequestFilter(matchedSegments, finalRow, logger);
+    finalRow = Filters.segmentsPerRequestFilter(matchedSegments, finalRow, logger, mockConfig);
 
     assertEquals(5, finalRow.length);
     assertEquals("adgroupId2", finalRow[0].getAdgroupId());
@@ -290,12 +284,5 @@ public class FilterTest extends TestCase {
      * " Low priority range " + channelSegment.lowerPriorityRange +
      * " high priority range " + channelSegment.higherPriorityRange); }
      */
-  }
-  @Test
-  public void testGetPartnerSpecificSegmentNo() {
-    assertEquals(1, Filters.getPartnerSpecificSegmentNo("1"));
-    assertEquals(3, Filters.getPartnerSpecificSegmentNo("2"));
-    assertEquals(3, Filters.getPartnerSpecificSegmentNo("3"));
-    assertEquals(4, Filters.getPartnerSpecificSegmentNo("4"));
   }
 }
