@@ -45,6 +45,7 @@ public class ChannelServer {
   private static RepositoryHelper repositoryHelper;
   private static InspectorStats inspectorStat;
   private static final String configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
+  private static ChannelSegmentCache cache;
   private static String DATACENTERIDKEY = "dc.id";
   private static String HOSTNAMEKEY = "host.name";
   public static byte dataCenterIdCode;
@@ -69,6 +70,7 @@ public class ChannelServer {
     ChannelServerHelper channelServerHelper = new ChannelServerHelper(logger);
     dataCenterIdCode = channelServerHelper.getDataCenterId(DATACENTERIDKEY);
     hostIdCode = channelServerHelper.getHostId(HOSTNAMEKEY);
+    cache = new ChannelSegmentCache();
     // Initialising Internal logger factory for Netty
     InternalLoggerFactory.setDefaultFactory(new Log4JLoggerFactory());
 
@@ -89,12 +91,12 @@ public class ChannelServer {
     channelSegmentFeedbackRepository = new ChannelSegmentFeedbackRepository();
     repositoryHelper = new RepositoryHelper(channelRepository, channelAdGroupRepository, channelFeedbackRepository, channelSegmentFeedbackRepository);
 
-    MatchSegments.init(channelAdGroupRepository, repositoryHelper, inspectorStat);
+    MatchSegments.init(cache, channelAdGroupRepository, repositoryHelper, inspectorStat);
     InspectorStats.initializeRepoStats("ChannelAdGroupRepository");
     InspectorStats.initializeRepoStats("ChannelFeedbackRepository");
     InspectorStats.initializeRepoStats("ChannelSegmentFeedbackRepository");
     instantiateRepository(logger, config);
-    Filters.init(config.adapterConfiguration(), repositoryHelper, inspectorStat);
+    Filters.init(config.serverConfiguration(), config.adapterConfiguration(), repositoryHelper, inspectorStat);
 
     // Creating netty client for out-bound calls.
     ClientBootstrap clientBootstrap = BootstrapCreation.createBootstrap(logger, config.serverConfiguration());
@@ -111,7 +113,7 @@ public class ChannelServer {
     // Configure the netty server.
     try {
       // Initialising request handler
-      HttpRequestHandler.init(config, channelAdGroupRepository, inspectorStat, clientBootstrap, rtbClientBootstrap, channelRepository,
+      HttpRequestHandler.init(config, channelAdGroupRepository, inspectorStat, clientBootstrap, rtbClientBootstrap, channelRepository, cache,
           channelFeedbackRepository, channelSegmentFeedbackRepository);
       SegmentFactory.init(repositoryHelper);
       ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
