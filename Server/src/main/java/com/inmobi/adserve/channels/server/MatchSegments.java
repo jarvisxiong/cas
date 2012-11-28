@@ -126,9 +126,10 @@ public class MatchSegments {
           + " targetingPlatform: " + targetingPlatform + " siteRating: " + siteRating + " osId: " + osId);
     ArrayList<ChannelSegmentEntity> filteredEntities = new ArrayList();
     if(platform == -1) {
-      Collection<ChannelSegmentEntity> entities = channelAdGroupRepository.getEntities(slotId, category, country, targetingPlatform, siteRating,
-          new Integer(-1));
-      entities.addAll(channelAdGroupRepository.getEntities(slotId, category, country, targetingPlatform, siteRating, new Integer(osId)));
+      Collection<ChannelSegmentEntity> entitiesAllOs = channelAdGroupRepository.getEntities(slotId, category, country, targetingPlatform, siteRating,
+          -1);
+      Collection<ChannelSegmentEntity> entities = channelAdGroupRepository.getEntities(slotId, category, country, targetingPlatform, siteRating, osId);
+      filteredEntities.addAll(entitiesAllOs);
       filteredEntities.addAll(entities);
       return filteredEntities;
     }
