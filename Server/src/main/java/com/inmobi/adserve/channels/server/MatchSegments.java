@@ -18,14 +18,11 @@ import com.inmobi.phoenix.exception.RepositoryException;
 
 public class MatchSegments {
   private DebugLogger logger;
-  private static ChannelSegmentCache cache;
   private static ChannelAdGroupRepository channelAdGroupRepository;
   private static RepositoryHelper repositoryHelper;
   private static InspectorStats inspectorStat;
 
-  public static void init(ChannelSegmentCache cache, ChannelAdGroupRepository channelAdGroupRepository, RepositoryHelper repositoryHelper,
-      InspectorStats inspectorStat) {
-    MatchSegments.cache = cache;
+  public static void init(ChannelAdGroupRepository channelAdGroupRepository, RepositoryHelper repositoryHelper, InspectorStats inspectorStat) {
     MatchSegments.channelAdGroupRepository = channelAdGroupRepository;
     MatchSegments.repositoryHelper = repositoryHelper;
     MatchSegments.inspectorStat = inspectorStat;
@@ -144,28 +141,16 @@ public class MatchSegments {
       {
         for (ChannelSegmentEntity entity : entities) {
           // Platform filtering.
-          if(osId == -1) {
-            if((entity.getPlatformTargeting() & platform) == platform)
-              filteredEntities.add(entity);
-            else {
-              if(logger.isDebugEnabled())
-                logger.debug("Dropping AdGroup: " + entity.getAdgroupId() + " request platform: " + platform + " Entity Platform: "
-                    + entity.getPlatformTargeting());
-            }
-          } else {
-            if(entity.getOsIds() == null)
-              continue;
-            for (Integer id : entity.getOsIds()) {
-              if(id == osId) {
-                filteredEntities.add(entity);
-                break;
-              }
-            }
+
+          if((entity.getPlatformTargeting() & platform) == platform)
+            filteredEntities.add(entity);
+          else {
+            if(logger.isDebugEnabled())
+              logger.debug("Dropping AdGroup: " + entity.getAdgroupId() + " request platform: " + platform + " Entity Platform: "
+                  + entity.getPlatformTargeting());
           }
         }
       }
-      // Update cache
-      cache.addOrUpdate(logger, slotId, category, country, targetingPlatform, siteRating, platform, osId, filteredEntities);
     }
     return filteredEntities;
   }

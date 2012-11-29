@@ -130,7 +130,6 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
   private SASRequestParameters sasParams = new SASRequestParameters();
   private JSONObject jObject = null;
   private static InspectorStats inspectorStat;
-  private static ChannelSegmentCache cache;
   private static Random random = new Random();
   private final int adIndex[] = new int[1];
   private static List<String> allowedSiteTypes;
@@ -142,7 +141,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
   private static final String CONNECTION_RESET_PEER = "java.io.IOException: Connection reset by peer";
 
   public static void init(ConfigurationLoader config, ChannelAdGroupRepository channelAdGroupRepo, InspectorStats inspectorStat,
-      ClientBootstrap clientBootstrap, ClientBootstrap rtbClientBootstrap, ChannelRepository channelRepository, ChannelSegmentCache cache,
+      ClientBootstrap clientBootstrap, ClientBootstrap rtbClientBootstrap, ChannelRepository channelRepository,
       ChannelFeedbackRepository channelFeedbackRepository, ChannelSegmentFeedbackRepository channelSegmentFeedbackRepository) {
     HttpRequestHandler.rtbConfig = config.rtbConfiguration();
     HttpRequestHandler.loggerConfig = config.loggerConfiguration();
@@ -159,7 +158,6 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     HttpRequestHandler.channelSegmentFeedbackRepository = channelSegmentFeedbackRepository;
     allowedSiteTypes = HttpRequestHandler.config.getList("allowedSiteTypes");
     percentRollout = HttpRequestHandler.config.getInt("percentRollout", 100);
-    HttpRequestHandler.cache = cache;
     inspectorStat.setWorkflowStats(InspectorStrings.percentRollout, Long.valueOf(percentRollout));
   }
 
@@ -339,10 +337,10 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
 
       // applying channel level filters and per partner ecpm filter
       ChannelSegmentEntity[] rows = convertToSegmentsArray(Filters
-          .partnerSegmentCountFilter(Filters.impressionBurnFilter(matchedSegments, logger), 0.0, logger));
+          .partnerSegmentCountFilter(Filters.impressionBurnFilter(matchedSegments, logger, config), 0.0, logger, config, adapterConfig));
 
       // applying request level ecpm filter
-      rows = Filters.segmentsPerRequestFilter(matchedSegments, rows, logger);
+      rows = Filters.segmentsPerRequestFilter(matchedSegments, rows, logger, config);
 
       logger.debug("repo: " + channelAdGroupRepository.toString());
       if(rows == null || rows.length == 0) {
@@ -459,7 +457,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
         sendNoAdResponse(e);
         return;
       }
-      rankList = Filters.rankAdapters(segments, logger);
+      rankList = Filters.rankAdapters(segments, logger, config);
 
       // Resetting the rankIndexToProcess for already completed adapters.
       ChannelSegment segment = rankList.get(rankIndexToProcess);
@@ -671,7 +669,6 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       list.addAll(rankList);
     if (null != rtbSegments)
       list.addAll(rtbSegments);
- // TODO: fix this.
     if (totalTime > 2000)
       totalTime = 0;
     try {
@@ -1060,7 +1057,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     } else if(siteRatingStr.equalsIgnoreCase("family_safe")) {
       siteRating = 2;
     }
-    if(slotStr == null || (platformStr == null && osId == -1) || Arrays.equals(sasParams.categories, null)) {
+    if(slotStr == null || Arrays.equals(sasParams.categories, null)) {
       return null;
     }
     try {
@@ -1070,7 +1067,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       }
       long slot = Long.parseLong(slotStr);
       long platform;
-      if(osId == -1)
+      if(platformStr !=null)
         platform = Long.parseLong(platformStr);
       else
         platform = -1;

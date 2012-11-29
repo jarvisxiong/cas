@@ -58,7 +58,7 @@ public class ServerTest extends TestCase {
     DebugLogger.init(mockConfig);
     logger = new DebugLogger();
     InspectorStats.initializeWorkflow("WorkFlow");
-    HttpRequestHandler.init(config, (ChannelAdGroupRepository) null, (InspectorStats) null, (ClientBootstrap) null, (ClientBootstrap) null, null, null, null,
+    HttpRequestHandler.init(config, (ChannelAdGroupRepository) null, (InspectorStats) null, (ClientBootstrap) null, (ClientBootstrap) null, null, null,
         null);
     httpRequestHandler = new HttpRequestHandler();
     AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
