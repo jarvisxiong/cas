@@ -37,7 +37,6 @@
          <url>http://maven.scm.corp.inmobi.com/content/repositories/releases/</url>
       </repository>
     </repositories>
-
      <build>  
      <plugins> 
  <plugin>
