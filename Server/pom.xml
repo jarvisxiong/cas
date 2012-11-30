@@ -86,7 +86,7 @@
         <dependency>
           <groupId>inmobi.adserve.channels</groupId>
           <artifactId>api</artifactId>
-          <version>1.0-SNAPSHOT</version>
+          <version>1.2-SNAPSHOT</version>
         </dependency>
         <dependency>
           <groupId>com.inmobi.messaging</groupId>
@@ -148,12 +148,12 @@
         <dependency>
           <groupId>inmobi.adserve.channels</groupId>
           <artifactId>adnetworks</artifactId>
-          <version>1.0-SNAPSHOT</version>
+          <version>1.2-SNAPSHOT</version>
         </dependency>
         <dependency>
           <groupId>inmobi.adserve.channels</groupId>
           <artifactId>util</artifactId>
-          <version>1.0-SNAPSHOT</version>
+          <version>1.3-SNAPSHOT</version>
         </dependency>
 
         <dependency>
