@@ -85,7 +85,7 @@
         </dependency>
         <dependency>
           <groupId>inmobi.adserve.channels</groupId>
-          <artifactId>api</artifactId>
+          <artifactId>integrationCas</artifactId>
           <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
@@ -145,16 +145,7 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-          <groupId>inmobi.adserve.channels</groupId>
-          <artifactId>adnetworks</artifactId>
-          <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-          <groupId>inmobi.adserve.channels</groupId>
-          <artifactId>util</artifactId>
-          <version>1.0-SNAPSHOT</version>
-        </dependency>
+        
 
         <dependency>
           <groupId>inmobi.adserve.channels</groupId>
