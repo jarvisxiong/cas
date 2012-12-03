@@ -76,46 +76,4 @@
          </plugin>
       </plugins>
    </build>
-    </repositories>
-     <build>  
-     <plugins> 
- <plugin>
-    <artifactId>maven-assembly-plugin</artifactId>
-    <version>2.3</version>
-    <configuration>
-     <descriptorRefs>
-      <descriptorRef>jar-with-dependencies</descriptorRef>
-     </descriptorRefs>
-<!--      <archive> -->
-<!--       <manifest> -->
-<!--        <mainClass>com.inmobi.appengage.general.segment.SegmentMigrator</mainClass> -->
-<!--       </manifest> -->
-<!--      </archive> -->
-     <archive>
-      <manifest>
-       <mainClass>MessageQueueTest</mainClass>
-      </manifest>
-     </archive>
-    </configuration>
-    <executions>
-     <execution>
-      <id>make-assembly</id> <!-- this is used for inheritance merges -->
-      <phase>package</phase> <!-- bind to the packaging phase -->
-      <goals>
-       <goal>single</goal>
-      </goals>
-     </execution>
-    </executions>
-   </plugin>
-                       <plugin>
-                               <groupId>org.apache.maven.plugins</groupId>
-                               <artifactId>maven-release-plugin</artifactId>
-                               <version>2.3.2</version>
-                               <configuration>
-                                      <!-- Auto-Version all modules the same as the parent module -->
-                                      <autoVersionSubmodules>true</autoVersionSubmodules>
-                               </configuration>
-                       </plugin>
-     </plugins>  
-    </build>  
 </project>
