@@ -80,8 +80,8 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     public AdNetworkInterface adNetworkInterface;
     public ChannelEntity channelEntity;
     public ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity;
-    public int lowerPriorityRange;
-    public int higherPriorityRange;
+    public double lowerPriorityRange;
+    public double higherPriorityRange;
 
     public ChannelSegment(ChannelSegmentEntity channelSegmentEntity, AdNetworkInterface adNetworkInterface, ChannelEntity channelEntity,
         ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity) {
