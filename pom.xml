@@ -40,7 +40,7 @@
          <url>http://maven.scm.corp.inmobi.com/content/repositories/releases/</url>
       </repository>
    </repositories>
-   <build>
+<!--   <build>
       <plugins>
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -55,7 +55,6 @@
             <artifactId>maven-release-plugin</artifactId>
             <version>2.3.2</version>
             <configuration>
-               <!-- Auto-Version all modules the same as the parent module -->
                <autoVersionSubmodules>true</autoVersionSubmodules>
             </configuration>
          </plugin>
@@ -78,5 +77,5 @@
             </executions>
          </plugin>
       </plugins>
-   </build>
+   </build-->
 </project>
