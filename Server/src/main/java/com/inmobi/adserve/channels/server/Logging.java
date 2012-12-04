@@ -328,10 +328,11 @@ public class Logging {
       log.append("\"u-postalcode\":\"").append(sasParams.postalCode).append("\"");
     if(log.charAt(log.length() - 1) == ',')
       log.deleteCharAt(log.length() - 1);
-    log.append("}").append(separator).append("u-id-params={");
-    if(null != sasParams.uid)
-      log.append("\"u-id\":\"").append(sasParams.uid).append("\"");
-    log.append("}");
+    log.append("}").append(separator).append("u-id-params=");
+    if(null != stringify(jObject, "u-id-params"))
+      log.append(stringify(jObject, "u-id-params"));
+    else 
+      log.append("{}");
     logger.debug("finally writing to rr log" + log.toString());
     if(enableFileLogging)
       rrLogger.info(log.toString());
