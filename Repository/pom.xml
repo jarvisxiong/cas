@@ -66,37 +66,52 @@
     	<url>http://inmobi.com</url>
     </organization>
     
-    <build>
-        <sourceDirectory>src/main/java</sourceDirectory>
-        <testSourceDirectory>test/java</testSourceDirectory>
-        <defaultGoal>install</defaultGoal>
-        <directory>target</directory>
-        <finalName>${groupId}-${artifactId}-${version}</finalName>
-        <resources>
-            <resource>
-                <directory>conf</directory>
-            </resource>
-        </resources>
-        <testResources>
-            <testResource>
-                <directory>test/resources</directory>
-            </testResource>
-        </testResources>
-        <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <compilerArgument>-Xlint</compilerArgument>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+   <build>
+       <sourceDirectory>src/main/java</sourceDirectory>
+       <testSourceDirectory>src/test/java</testSourceDirectory>
+       <defaultGoal>install</defaultGoal>
+       <directory>target</directory>
+       <finalName>${groupId}-${artifactId}-${version}</finalName>
+       <plugins><!--
+       <plugin>
+       
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-compiler-plugin</artifactId>
+         <configuration>
+        <compilerArgument>-Xlint</compilerArgument> 
+          <source>1.5</source>
+          <target>1.5</target>
+
+       <archive>
+         <manifestEntries>
+           <mode>development</mode>
+           <url>${pom.url}</url>
+         </manifestEntries>
+       </archive>
+         </configuration>
+     </plugin>
+     -->
+     <plugin>
+  <groupId>org.apache.maven.plugins</groupId>
+  <artifactId>maven-surefire-report-plugin</artifactId>
+  <version>2.7.2</version>
+</plugin>
+
+           <plugin>
+               <artifactId>maven-compiler-plugin</artifactId>
+               <version>2.0.2</version>
+               <configuration>
+                   <compilerArgument>-Xlint</compilerArgument>
+                   <source>1.6</source>
+                   <target>1.6</target>
+               </configuration>
+           </plugin>
+           <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-resources-plugin</artifactId>
+           </plugin>
+       </plugins>
+   </build>
     
     <reporting>
         <outputDirectory>${artifactId}-reports</outputDirectory>
