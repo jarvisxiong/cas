@@ -80,8 +80,8 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     public AdNetworkInterface adNetworkInterface;
     public ChannelEntity channelEntity;
     public ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity;
-    public int lowerPriorityRange;
-    public int higherPriorityRange;
+    public double lowerPriorityRange;
+    public double higherPriorityRange;
 
     public ChannelSegment(ChannelSegmentEntity channelSegmentEntity, AdNetworkInterface adNetworkInterface, ChannelEntity channelEntity,
         ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity) {
@@ -175,11 +175,12 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     // whenever channel throws closedchannelexception increment the
     // totalterminate
     // means channel is closed by party who requested for the ad
-    String exceptionClass = e.getClass().getName();
-    inspectorStat.incrementStatCount(InspectorStrings.channelException, e.getCause().toString().split(":", 2)[0]);
+    String exceptionString = e.getCause().toString();
+    inspectorStat.incrementStatCount(InspectorStrings.channelException,
+        exceptionString.substring(exceptionString.lastIndexOf(".") + 1, exceptionString.length()));
     if(logger == null)
       logger = new DebugLogger();
-    if(e.getCause().toString().equalsIgnoreCase(CLOSED_CHANNEL_EXCEPTION) || e.getCause().toString().equalsIgnoreCase(CONNECTION_RESET_PEER)) {
+    if(exceptionString.equalsIgnoreCase(CLOSED_CHANNEL_EXCEPTION) || exceptionString.equalsIgnoreCase(CONNECTION_RESET_PEER)) {
       InspectorStats.incrementStatCount(InspectorStrings.totalTerminate);
       logger.debug("Channel is terminated " + ctx.getChannel().getId());
     }
@@ -212,7 +213,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
   public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
     try {
       logger = new DebugLogger();
-      bidFloor = rtbConfig.getDouble("bidFloor",0.0);
+      bidFloor = rtbConfig.getDouble("bidFloor", 0.0);
       logger.debug("bidFloor is " + bidFloor);
       totalTime = System.currentTimeMillis();
       HttpRequest request = (HttpRequest) e.getMessage();
@@ -336,8 +337,8 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       }
 
       // applying channel level filters and per partner ecpm filter
-      ChannelSegmentEntity[] rows = convertToSegmentsArray(Filters
-          .partnerSegmentCountFilter(Filters.impressionBurnFilter(matchedSegments, logger, config), 0.0, logger, config, adapterConfig));
+      ChannelSegmentEntity[] rows = convertToSegmentsArray(Filters.partnerSegmentCountFilter(Filters.impressionBurnFilter(matchedSegments, logger, config),
+          0.0, logger, config, adapterConfig));
 
       // applying request level ecpm filter
       rows = Filters.segmentsPerRequestFilter(matchedSegments, rows, logger, config);
@@ -384,7 +385,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
 
       for (ChannelSegmentEntity row : rows) {
         boolean isRtbEnabled = false;
-        isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled",false);
+        isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled", false);
         logger.debug("isRtbEnabled is " + isRtbEnabled);
 
         AdNetworkInterface network = SegmentFactory.getChannel(row.getId(), row.getChannelId(), this.adapterConfig, clientBootstrap, rtbClientBootstrap, this,
@@ -443,8 +444,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
             if(network.isRtbPartner()) {
               rtbSegments.add(new ChannelSegment(row, network, channelRepository.query(row.getChannelId()), channelSegmentFeedbackEntity));
               logger.debug(network.getName() + " is a rtb partner so adding this network to rtb ranklist");
-            }
-              else
+            } else
               segments.add(new ChannelSegment(row, network, channelRepository.query(row.getChannelId()), channelSegmentFeedbackEntity));
           }
         }
@@ -665,11 +665,11 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
 
   public void writeLogs() {
     List<ChannelSegment> list = new ArrayList<HttpRequestHandler.ChannelSegment>();
-    if (null != rankList)
+    if(null != rankList)
       list.addAll(rankList);
-    if (null != rtbSegments)
+    if(null != rtbSegments)
       list.addAll(rtbSegments);
-    if (totalTime > 2000)
+    if(totalTime > 2000)
       totalTime = 0;
     try {
       if(adResponse == null) {
@@ -697,7 +697,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       System.out.println("stack trace is ");
       exception.printStackTrace();
       return;
-    }   
+    }
     logger.debug("done with logging");
   }
 
@@ -1035,7 +1035,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     }
     return parameter;
   }
-  
+
   // select channel segment based on specified rules
   private HashMap<String, HashMap<String, ChannelSegmentEntity>> matchSegments(JSONObject args) {
     MatchSegments segmentMatcher = new MatchSegments(logger);
@@ -1067,7 +1067,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       }
       long slot = Long.parseLong(slotStr);
       long platform;
-      if(platformStr !=null)
+      if(platformStr != null)
         platform = Long.parseLong(platformStr);
       else
         platform = -1;
@@ -1208,8 +1208,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     if(rtbSegments.size() == 0)
       return true;
     for (ChannelSegment channelSegment : rtbSegments) {
-      if(channelSegment.adNetworkInterface.isRequestCompleted());
-      else
+      if(!channelSegment.adNetworkInterface.isRequestCompleted())
         return false;
     }
     return true;
