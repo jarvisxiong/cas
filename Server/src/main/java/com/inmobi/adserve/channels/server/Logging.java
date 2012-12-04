@@ -272,8 +272,9 @@ public class Logging {
 
     JSONArray handset = getHandset(jObject);
     HandsetMeta handsetMeta = new HandsetMeta();
-    if(null != handset && handset.length() > 3) {
+    if(null != handset)
       log.append(separator).append("handset=").append(handset);
+    if(null != handset && handset.length() > 3) {
       handsetMeta.setId(handset.getInt(3));
       handsetMeta.setManufacturer(handset.getInt(2));
     }else
