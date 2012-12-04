@@ -1208,9 +1208,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     if(rtbSegments.size() == 0)
       return true;
     for (ChannelSegment channelSegment : rtbSegments) {
-      if(channelSegment.adNetworkInterface.isRequestCompleted())
-        ;
-      else
+      if(!channelSegment.adNetworkInterface.isRequestCompleted())
         return false;
     }
     return true;
