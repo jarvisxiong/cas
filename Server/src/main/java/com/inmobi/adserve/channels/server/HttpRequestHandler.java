@@ -995,7 +995,8 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     } catch (JSONException e) {
       return null;
     }
-    logger.debug("Retrived from json " + field + " = " + fieldValue);
+    if (logger.isDebugEnabled())
+      logger.debug("Retrived from json " + field + " = " + fieldValue);
     return fieldValue;
   }
 
