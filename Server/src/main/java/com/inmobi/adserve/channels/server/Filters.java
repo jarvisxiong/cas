@@ -307,7 +307,7 @@ public class Filters {
         }
       }
 
-      double randomNumber = Math.random()*totalPriority;
+      double randomNumber = Math.random() * totalPriority;
       for (int index = 0; index < segment.size(); index++) {
         if(randomNumber >= segment.get(index).lowerPriorityRange && randomNumber <= segment.get(index).higherPriorityRange) {
           if(logger.isDebugEnabled()) {
