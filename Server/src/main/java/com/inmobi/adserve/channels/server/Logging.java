@@ -129,7 +129,7 @@ public class Logging {
   private static String stringify(JSONObject jObject, String field) {
     String fieldValue = "";
     try {
-      fieldValue = jObject.getString(field);
+      fieldValue = (String)jObject.get(field);
     } catch (JSONException e) {
       return null;
     } catch (NullPointerException exception) {
@@ -330,8 +330,8 @@ public class Logging {
     if(log.charAt(log.length() - 1) == ',')
       log.deleteCharAt(log.length() - 1);
     log.append("}").append(separator).append("u-id-params=");
-    if(null != stringify(jObject, "u-id-params"))
-      log.append(stringify(jObject, "u-id-params"));
+    if(null != jObject && null != jObject.optJSONObject("u-id-params"))
+      log.append(jObject.optJSONObject("u-id-params").toString());
     else 
       log.append("{}");
     logger.debug("finally writing to rr log" + log.toString());
