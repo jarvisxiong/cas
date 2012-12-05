@@ -293,21 +293,21 @@ public class Filters {
 
     ArrayList<ChannelSegment> arrayList = new ArrayList();
     while (segment.size() > 1) {
-      int totalPriority = 0;
+      double totalPriority = 0.0;
       for (int index = 0; index < segment.size(); index++) {
         // setting the prioritised ecpm for this segment
         segment.get(index).channelSegmentFeedbackEntity.setPrioritisedECPM(Math.pow((segment.get(index).channelSegmentFeedbackEntity.geteCPM() + eCPMShift),
             feedbackPower) * (segment.get(index).channelEntity.getPriority() < 5 ? (5 - segment.get(index).channelEntity.getPriority()) : 1));
 
         segment.get(index).lowerPriorityRange = totalPriority;
-        totalPriority += (int) (segment.get(index).channelSegmentFeedbackEntity.getPrioritisedECPM() * 1000000);
+        totalPriority += segment.get(index).channelSegmentFeedbackEntity.getPrioritisedECPM();
         segment.get(index).higherPriorityRange = totalPriority;
         if(logger.isDebugEnabled()) {
           logger.debug("total priority here is " + totalPriority);
         }
       }
 
-      int randomNumber = random.nextInt((int) totalPriority - 1) + 1;
+      double randomNumber = Math.random() * totalPriority;
       for (int index = 0; index < segment.size(); index++) {
         if(randomNumber >= segment.get(index).lowerPriorityRange && randomNumber <= segment.get(index).higherPriorityRange) {
           if(logger.isDebugEnabled()) {
