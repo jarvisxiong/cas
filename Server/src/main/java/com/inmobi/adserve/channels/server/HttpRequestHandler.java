@@ -1047,7 +1047,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       String o1Uid = stringify(userIdMap, "SO1");
       parameter.uidO1 = (o1Uid != null) ? o1Uid : stringify(userIdMap, "O1");
       parameter.uidMd5 = stringify(userIdMap, "UM5");
-      parameter.uidIFA = stringify(userIdMap, "IDA");
+      parameter.uidIFA = ("iphone".equalsIgnoreCase(parameter.source)) ? stringify(userIdMap, "IDA") : null;
 
     } catch (JSONException exception) {
       setNullValueForUid(parameter);
