@@ -9,7 +9,7 @@ BEGIN
 		adgroup_id as ad_group_id ,
 		case   total_server_impression=0 
 			when true then 0.0 
-			else (total_revenue/total_server_impression)*10000 
+			else (total_revenue/total_server_impression)*1000 
 		end as ecpm ,
 		case   total_request=0 
 			when true then 0.0 
