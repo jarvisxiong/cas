@@ -129,7 +129,7 @@ public class Logging {
   private static String stringify(JSONObject jObject, String field) {
     String fieldValue = "";
     try {
-      fieldValue = (String) jObject.get(field);
+      fieldValue = jObject.getString(field);
     } catch (JSONException e) {
       return null;
     } catch (NullPointerException exception) {
