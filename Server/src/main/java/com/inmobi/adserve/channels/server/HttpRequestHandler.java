@@ -940,6 +940,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       logger.debug("osId is " + params.platformOsId);
     }
     params = getUserParams(params, jObject);
+    params = getUserIdParams(params, jObject);
     try {
       JSONArray siteInfo = jObject.getJSONArray("site");
       if(siteInfo != null && siteInfo.length() > 0) {
@@ -995,7 +996,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     } catch (JSONException e) {
       return null;
     }
-    if (logger.isDebugEnabled())
+    if(logger.isDebugEnabled())
       logger.debug("Retrived from json " + field + " = " + fieldValue);
     return fieldValue;
   }
@@ -1035,6 +1036,32 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       logger.error("uparams missing in the request");
     }
     return parameter;
+  }
+
+  // Get user id params
+  public SASRequestParameters getUserIdParams(SASRequestParameters parameter, JSONObject jObject) {
+    if(logger.isDebugEnabled())
+      logger.debug("inside parsing userid params");
+    try {
+      JSONObject userIdMap = (JSONObject) jObject.get("u-id-params");
+      String o1Uid = stringify(userIdMap, "SO1");
+      parameter.uidO1 = (o1Uid != null) ? o1Uid : stringify(userIdMap, "O1");
+      parameter.uidMd5 = stringify(userIdMap, "UM5");
+      parameter.uidIFA = ("iphone".equalsIgnoreCase(parameter.source)) ? stringify(userIdMap, "IDA") : null;
+
+    } catch (JSONException exception) {
+      setNullValueForUid(parameter);
+    } catch (NullPointerException exception) {
+      setNullValueForUid(parameter);
+    }
+    return parameter;
+  }
+
+  private void setNullValueForUid(SASRequestParameters parameter) {
+    parameter.uidO1 = null;
+    parameter.uidMd5 = null;
+    parameter.uidIFA = null;
+    logger.error("uidparams missing in the request");
   }
 
   // select channel segment based on specified rules
