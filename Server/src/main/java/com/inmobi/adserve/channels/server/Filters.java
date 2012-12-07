@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.inmobi.adserve.channels.entity.*;
 import com.inmobi.adserve.channels.util.DebugLogger;
@@ -37,11 +38,14 @@ public class Filters {
   private static RepositoryHelper repositoryHelper;
   private static InspectorStats inspectorStat;
   public static HashMap<String/* adgroupid */, String/* partnersegmentNo */> advertiserIdtoNameMapping = new HashMap<String, String>();
+  // To boost ecpm of a parnter to meet the impression floor
+  public static ConcurrentHashMap<String/* advertiserId */, Integer/* BoostFactor */> advertiserECPMBoosterFactor;
 
   public static void init(Configuration adapterConfiguration, RepositoryHelper repositoryHelper, InspectorStats inspectorStat) {
     Filters.repositoryHelper = repositoryHelper;
     Filters.inspectorStat = inspectorStat;
     Iterator<String> itr = adapterConfiguration.getKeys();
+    advertiserECPMBoosterFactor = new ConcurrentHashMap<String, Integer>();
     while (null != itr && itr.hasNext()) {
       String str = itr.next();
       if(str.endsWith(".advertiserId")) {
@@ -61,52 +65,54 @@ public class Filters {
    */
   public static HashMap<String, HashMap<String, ChannelSegmentEntity>> impressionBurnFilter(
       HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments, DebugLogger logger, Configuration serverConfiguration) {
+    
     double revenueWindow = serverConfiguration.getDouble("revenueWindow", 0.33);
     if(logger.isDebugEnabled())
       logger.debug("Inside impressionBurnFilter");
     HashMap<String, HashMap<String, ChannelSegmentEntity>> rows = new HashMap<String, HashMap<String, ChannelSegmentEntity>>();
-    for (String key : matchedSegments.keySet()) {
+    
+    for (String advertiserId : matchedSegments.keySet()) {
 
-      String channelId = ((ChannelSegmentEntity[]) matchedSegments.get(key).values().toArray(new ChannelSegmentEntity[0]))[0].getChannelId();
+      String channelId = ((ChannelSegmentEntity[]) matchedSegments.get(advertiserId).values().toArray(new ChannelSegmentEntity[0]))[0].getChannelId();
       ChannelEntity channelEntity = repositoryHelper.queryChannelRepository(channelId);
       // dropping advertiser(all segments) if todays impression is greater than
       // impression ceiling
       inspectorStat.initializeFilterStats("P_" + channelEntity.getName());
       try {
-        if(repositoryHelper.queryChannelFeedbackRepository(key).getTodayImpressions() > channelEntity.getImpressionCeil()) {
+        if(repositoryHelper.queryChannelFeedbackRepository(advertiserId).getTodayImpressions() > channelEntity.getImpressionCeil()) {
           if(logger.isDebugEnabled())
-            logger.debug("Impression limit exceeded by advertiser " + key);
+            logger.debug("Impression limit exceeded by advertiser " + advertiserId);
           inspectorStat.incrementStatCount("P_" + channelEntity.getName(), InspectorStrings.droppedInImpressionFilter);
           continue;
         }
       } catch (NullPointerException e) {
         if(logger.isDebugEnabled())
-          logger.debug("Repo Exception/No entry in ChannelFeedbackRepository/ChannelRepository for advertiserID " + key);
+          logger.debug("Repo Exception/No entry in ChannelFeedbackRepository/ChannelRepository for advertiserID " + advertiserId);
       }
       if(logger.isDebugEnabled())
-        logger.debug("Impression limit filter passed by advertiserId " + key);
+        logger.debug("Impression limit filter passed by advertiserId " + advertiserId);
 
       // dropping advertiser(all segments) if balance is less than 10*revenue of
       // that channel(advertiser)
 
       try {
-        if(repositoryHelper.queryChannelFeedbackRepository(key).getBalance() < repositoryHelper.queryChannelFeedbackRepository(key).getRevenue()
+        if(repositoryHelper.queryChannelFeedbackRepository(advertiserId).getBalance() < repositoryHelper.queryChannelFeedbackRepository(advertiserId).getRevenue()
             * revenueWindow) {
           if(logger.isDebugEnabled())
-            logger.debug("Burn limit exceeded by advertiser " + key);
+            logger.debug("Burn limit exceeded by advertiser " + advertiserId);
           inspectorStat.incrementStatCount("P_" + channelEntity.getName(), InspectorStrings.droppedInburnFilter);
           continue;
         }
         if(logger.isDebugEnabled())
-          logger.debug("Burn limit filter passed by advertiser " + key + " " + repositoryHelper.queryChannelFeedbackRepository(key).getRevenue()
+          logger.debug("Burn limit filter passed by advertiser " + advertiserId + " " + repositoryHelper.queryChannelFeedbackRepository(advertiserId).getRevenue()
               * revenueWindow);
       } catch (NullPointerException e) {
         if(logger.isDebugEnabled())
-          logger.debug("Repo Exception/No entry in ChannelFeedbackRepository for advertiserID " + key);
+          logger.debug("Repo Exception/No entry in ChannelFeedbackRepository for advertiserID " + advertiserId);
         // adding the advertiser in case of no entry in repo
       }
       // otherwise adding the advertiser to the list
-      rows.put(key, matchedSegments.get(key));
+      rows.put(advertiserId, matchedSegments.get(advertiserId));
     }
     printSegments(rows, logger);
     return rows;
@@ -126,19 +132,20 @@ public class Filters {
   public static HashMap<String, HashMap<String, ChannelSegmentEntity>> partnerSegmentCountFilter(
       HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments, Double siteFloor, DebugLogger logger, Configuration serverConfiguration,
       Configuration adapterConfiguration) {
+    
     if(logger.isDebugEnabled())
       logger.debug("Inside PartnerSegmentCountFilter");
     HashMap<String, HashMap<String, ChannelSegmentEntity>> rows = new HashMap<String, HashMap<String, ChannelSegmentEntity>>();
 
-    for (String key : matchedSegments.keySet()) {
+    for (String advertiserId : matchedSegments.keySet()) {
       HashMap<String, ChannelSegmentEntity> hashMap = new HashMap<String, ChannelSegmentEntity>();
       List<ChannelSegmentFeedbackEntity> hashMapList = new ArrayList<ChannelSegmentFeedbackEntity>();
 
       // Creating a sorted list of segments based on their ecpm
 
-      for (String adGp : matchedSegments.get(key).keySet()) {
-        ChannelSegmentEntity channelSegmentEntity = matchedSegments.get(key).get(adGp);
-        ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = repositoryHelper.queryChannelSegmentFeedbackRepository(adGp);
+      for (String adgroupId : matchedSegments.get(advertiserId).keySet()) {
+        ChannelSegmentEntity channelSegmentEntity = matchedSegments.get(advertiserId).get(adgroupId);
+        ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = repositoryHelper.queryChannelSegmentFeedbackRepository(adgroupId);
         if(null == channelSegmentFeedbackEntity) {
           if(logger.isDebugEnabled())
             logger.debug("Error in retreiving from repo so setting ecpm to default value");
@@ -159,17 +166,18 @@ public class Filters {
 
       int adGpCount = 1;
       int partnerSegmentNo;
-      partnerSegmentNo = adapterConfiguration.getInt(advertiserIdtoNameMapping.get(key) + ".partnerSegmentNo", serverConfiguration.getInt("partnerSegmentNo", 2));
+      partnerSegmentNo = adapterConfiguration.getInt(advertiserIdtoNameMapping.get(advertiserId) + ".partnerSegmentNo",
+          serverConfiguration.getInt("partnerSegmentNo", 2));
       if(logger.isDebugEnabled())
-        logger.debug("PartnersegmentNo for advertiser " + key + " is " + partnerSegmentNo);
+        logger.debug("PartnersegmentNo for advertiser " + advertiserId + " is " + partnerSegmentNo);
 
       for (ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity : hashMapList) {
         if(adGpCount > partnerSegmentNo)
           break;
-        hashMap.put(channelSegmentFeedbackEntity.getId(), matchedSegments.get(key).get(channelSegmentFeedbackEntity.getId()));
+        hashMap.put(channelSegmentFeedbackEntity.getId(), matchedSegments.get(advertiserId).get(channelSegmentFeedbackEntity.getId()));
         adGpCount++;
       }
-      rows.put(key, hashMap);
+      rows.put(advertiserId, hashMap);
     }
     printSegments(rows, logger);
     return rows;
@@ -199,6 +207,7 @@ public class Filters {
     // Creating a sorted list of segments based on their ecpm
 
     for (ChannelSegmentEntity row : rows) {
+      
       ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity;
       channelSegmentFeedbackEntity = repositoryHelper.queryChannelSegmentFeedbackRepository(row.getAdgroupId());
       if(null == channelSegmentFeedbackEntity) {
@@ -207,6 +216,8 @@ public class Filters {
         channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(row.getId(), row.getAdgroupId(), serverConfiguration.getDouble("default.ecpm"),
             serverConfiguration.getDouble("default.fillratio"));
       }
+      
+      advertiserECPMBoosterFactor.putIfAbsent(row.getId(), 0);
       // setting prioritisedECPM to take control of
       // shorlisting
       ChannelEntity channelEntity;
@@ -218,8 +229,8 @@ public class Filters {
         channelEntity = new ChannelEntity();
         channelEntity.setPriority(serverConfiguration.getInt("default.priority"));
       }
-      channelSegmentFeedbackEntity.setPrioritisedECPM(Math.pow((channelSegmentFeedbackEntity.geteCPM() + eCPMShift), feedbackPower)
-          * (5 - channelEntity.getPriority()));
+      channelSegmentFeedbackEntity.setPrioritisedECPM((Math.pow((channelSegmentFeedbackEntity.geteCPM() + eCPMShift), feedbackPower) * (5 - channelEntity
+          .getPriority())) + advertiserECPMBoosterFactor.get(row.getId()));
 
       hashMapList.add(channelSegmentFeedbackEntity);
     }
@@ -240,6 +251,11 @@ public class Filters {
         inspectorStat.incrementStatCount("P_"
             + repositoryHelper.queryChannelRepository(matchedSegments.get(advertiserId).get(adgroupId).getChannelId()).getName(),
             InspectorStrings.droppedInSegmentPerRequestFilter);
+        if(repositoryHelper.queryChannelFeedbackRepository(advertiserId).getTodayImpressions() < 
+            repositoryHelper.queryChannelRepository(matchedSegments.get(advertiserId).get(adgroupId).getChannelId()).getImpressionFloor())
+        advertiserECPMBoosterFactor.put(advertiserId, advertiserECPMBoosterFactor.get(advertiserId) + 1);
+        else
+          advertiserECPMBoosterFactor.put(advertiserId, 0);  
       }
     }
 
