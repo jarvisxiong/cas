@@ -802,7 +802,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     if(jObject == null || (responseFormat = stringify(jObject, "r-format")) == null) {
       return "html";
     }
-    if(responseFormat.equalsIgnoreCase("axml")) {
+    if(responseFormat.equalsIgnoreCase("axml") || responseFormat.equalsIgnoreCase("xhtml")) {
       responseFormat = "xhtml";
     }
     return responseFormat;
