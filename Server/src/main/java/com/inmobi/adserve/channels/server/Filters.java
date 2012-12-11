@@ -48,7 +48,7 @@ public class Filters {
     Filters.repositoryHelper = repositoryHelper;
     Filters.inspectorStat = inspectorStat;
     Iterator<String> itr = adapterConfiguration.getKeys();
-    advertiserECPMBoosterFactor = new ConcurrentHashMap<String, Integer>();
+    advertiserECPMBoosterFactor = new ConcurrentHashMap<String, AtomicLong>();
     while (null != itr && itr.hasNext()) {
       String str = itr.next();
       if(str.endsWith(".advertiserId")) {
@@ -213,7 +213,7 @@ public class Filters {
         channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(row.getId(), row.getAdgroupId(), serverConfiguration.getDouble("default.ecpm"),
             serverConfiguration.getDouble("default.fillratio"));
       }
-      advertiserECPMBoosterFactor.putIfAbsent(row.getId(), 0);
+      advertiserECPMBoosterFactor.putIfAbsent(row.getId(), new AtomicLong(0));
       // setting prioritisedECPM to take control of
       // shorlisting
       ChannelEntity channelEntity;
@@ -229,7 +229,7 @@ public class Filters {
         channelEntity.setPriority(serverConfiguration.getInt("default.priority"));
       }
       channelSegmentFeedbackEntity.setPrioritisedECPM((Math.pow((channelSegmentFeedbackEntity.geteCPM() + eCPMShift), feedbackPower) * (5 - channelEntity
-          .getPriority())) + advertiserECPMBoosterFactor.get(row.getId()));
+          .getPriority())) + advertiserECPMBoosterFactor.get(row.getId()).get());
 
       hashMapList.add(channelSegmentFeedbackEntity);
     }
@@ -333,13 +333,11 @@ public class Filters {
   public static void adjustadvertiserECPMBoosterFactor(String advertiserId, String channelId, String selectedOrDropped) {
     if(repositoryHelper.queryChannelFeedbackRepository(advertiserId).getTodayImpressions() < repositoryHelper.queryChannelRepository(channelId)
         .getImpressionFloor()) {
-      int boostFactor = advertiserECPMBoosterFactor.get(advertiserId);
       if(selectedOrDropped.equals(DROPPED))
-        advertiserECPMBoosterFactor.put(advertiserId, boostFactor + 1);
-      else
-        advertiserECPMBoosterFactor.put(advertiserId, boostFactor > 0 ? boostFactor - 1 : 0);
-
+        advertiserECPMBoosterFactor.get(advertiserId).getAndIncrement();
+      else if(advertiserECPMBoosterFactor.get(advertiserId).get()>0)
+        advertiserECPMBoosterFactor.get(advertiserId).getAndDecrement();
     } else
-      advertiserECPMBoosterFactor.put(advertiserId, 0);
+      advertiserECPMBoosterFactor.put(advertiserId,0);
   }
 }
