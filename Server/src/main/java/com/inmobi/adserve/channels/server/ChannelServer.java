@@ -114,7 +114,7 @@ public class ChannelServer {
       HttpRequestHandler.init(config, channelAdGroupRepository, inspectorStat, clientBootstrap, rtbClientBootstrap, channelRepository,
           channelFeedbackRepository, channelSegmentFeedbackRepository);
       SegmentFactory.init(repositoryHelper);
-      ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
+      ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(Executors.newFixedThreadPool(100), Executors.newCachedThreadPool()));
       Timer timer = new HashedWheelTimer();
       bootstrap.setPipelineFactory(new ChannelServerPipelineFactory(timer, config.serverConfiguration()));
       bootstrap.setOption("child.keepAlive", true);
