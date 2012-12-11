@@ -178,6 +178,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     String exceptionString = e.getCause().toString();
     inspectorStat.incrementStatCount(InspectorStrings.channelException,
         exceptionString.substring(exceptionString.lastIndexOf(".") + 1, exceptionString.length()));
+    inspectorStat.incrementStatCount(InspectorStrings.channelException, InspectorStrings.totalFills);
     if(logger == null)
       logger = new DebugLogger();
     if(exceptionString.equalsIgnoreCase(CLOSED_CHANNEL_EXCEPTION) || exceptionString.equalsIgnoreCase(CONNECTION_RESET_PEER)) {
