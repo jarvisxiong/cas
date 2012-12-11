@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.inmobi.adserve.channels.entity.*;
 import com.inmobi.adserve.channels.util.DebugLogger;
@@ -41,7 +42,7 @@ public class Filters {
   private static InspectorStats inspectorStat;
   public static HashMap<String/* adgroupid */, String/* partnersegmentNo */> advertiserIdtoNameMapping = new HashMap<String, String>();
   // To boost ecpm of a parnter to meet the impression floor
-  public static ConcurrentHashMap<String/* advertiserId */, Integer/* BoostFactor */> advertiserECPMBoosterFactor;
+  public static ConcurrentHashMap<String/* advertiserId */, AtomicLong/* BoostFactor */> advertiserECPMBoosterFactor;
 
   public static void init(Configuration adapterConfiguration, RepositoryHelper repositoryHelper, InspectorStats inspectorStat) {
     Filters.repositoryHelper = repositoryHelper;
