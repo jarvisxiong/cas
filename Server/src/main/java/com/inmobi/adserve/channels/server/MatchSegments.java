@@ -19,12 +19,10 @@ import com.inmobi.phoenix.exception.RepositoryException;
 public class MatchSegments {
   private DebugLogger logger;
   private static ChannelAdGroupRepository channelAdGroupRepository;
-  private static RepositoryHelper repositoryHelper;
   private static InspectorStats inspectorStat;
 
-  public static void init(ChannelAdGroupRepository channelAdGroupRepository, RepositoryHelper repositoryHelper, InspectorStats inspectorStat) {
+  public static void init(ChannelAdGroupRepository channelAdGroupRepository, InspectorStats inspectorStat) {
     MatchSegments.channelAdGroupRepository = channelAdGroupRepository;
-    MatchSegments.repositoryHelper = repositoryHelper;
     MatchSegments.inspectorStat = inspectorStat;
   }
 
@@ -126,8 +124,7 @@ public class MatchSegments {
           + " targetingPlatform: " + targetingPlatform + " siteRating: " + siteRating + " osId: " + osId);
     ArrayList<ChannelSegmentEntity> filteredEntities = new ArrayList();
     if(platform == -1) {
-      Collection<ChannelSegmentEntity> entitiesAllOs = channelAdGroupRepository.getEntities(slotId, category, country, targetingPlatform, siteRating,
-          -1);
+      Collection<ChannelSegmentEntity> entitiesAllOs = channelAdGroupRepository.getEntities(slotId, category, country, targetingPlatform, siteRating, -1);
       Collection<ChannelSegmentEntity> entities = channelAdGroupRepository.getEntities(slotId, category, country, targetingPlatform, siteRating, osId);
       filteredEntities.addAll(entitiesAllOs);
       filteredEntities.addAll(entities);
@@ -156,9 +153,11 @@ public class MatchSegments {
   }
 
   private void insertEntityToResultSet(HashMap<String, HashMap<String, ChannelSegmentEntity>> result, ChannelSegmentEntity channelSegmentEntity) {
-    String advertiserName = repositoryHelper.queryChannelRepository(channelSegmentEntity.getChannelId()).getName();
-    InspectorStats.initializeFilterStats("P_" + advertiserName);
-    InspectorStats.incrementStatCount("P_" + advertiserName, InspectorStrings.totalSelectedSegments);
+    if(Filters.advertiserIdtoNameMapping.containsKey(channelSegmentEntity.getId())) {
+      InspectorStats.initializeFilterStats(Filters.advertiserIdtoNameMapping.get(channelSegmentEntity.getId()), "filter_stat");
+      InspectorStats.incrementStatCount(Filters.advertiserIdtoNameMapping.get(channelSegmentEntity.getId()), "filter_stat",
+          InspectorStrings.totalSelectedSegments);
+    }
 
     if(result.get(channelSegmentEntity.getId()) == null) {
       HashMap<String, ChannelSegmentEntity> hashMap = new HashMap<String, ChannelSegmentEntity>();

@@ -41,14 +41,13 @@ public class Filters {
   private static RepositoryHelper repositoryHelper;
   private static InspectorStats inspectorStat;
   public static HashMap<String/* adgroupid */, String/* partnersegmentNo */> advertiserIdtoNameMapping = new HashMap<String, String>();
+
   // To boost ecpm of a parnter to meet the impression floor
-  public static ConcurrentHashMap<String/* advertiserId */, AtomicLong/* BoostFactor */> advertiserECPMBoosterFactor;
 
   public static void init(Configuration adapterConfiguration, RepositoryHelper repositoryHelper, InspectorStats inspectorStat) {
     Filters.repositoryHelper = repositoryHelper;
     Filters.inspectorStat = inspectorStat;
     Iterator<String> itr = adapterConfiguration.getKeys();
-    advertiserECPMBoosterFactor = new ConcurrentHashMap<String, AtomicLong>();
     while (null != itr && itr.hasNext()) {
       String str = itr.next();
       if(str.endsWith(".advertiserId")) {
@@ -78,13 +77,15 @@ public class Filters {
       ChannelEntity channelEntity = repositoryHelper.queryChannelRepository(channelId);
       // dropping advertiser(all segments) if todays impression is greater than
       // impression ceiling
-      inspectorStat.initializeFilterStats("P_" + channelEntity.getName());
+      if(advertiserIdtoNameMapping.containsKey(advertiserId))
+        inspectorStat.initializeFilterStats(advertiserIdtoNameMapping.get(advertiserId), "filter_stat");
       try {
         if(repositoryHelper.queryChannelFeedbackRepository(advertiserId).getTodayImpressions() > channelEntity.getImpressionCeil()) {
 
           logger.debug("Impression limit exceeded by advertiser " + advertiserId);
 
-          inspectorStat.incrementStatCount("P_" + channelEntity.getName(), InspectorStrings.droppedInImpressionFilter);
+          if(advertiserIdtoNameMapping.containsKey(advertiserId))
+            inspectorStat.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId), "filter_stat", InspectorStrings.droppedInImpressionFilter);
           continue;
         }
       } catch (NullPointerException e) {
@@ -101,7 +102,8 @@ public class Filters {
 
           logger.debug("Burn limit exceeded by advertiser " + advertiserId);
 
-          inspectorStat.incrementStatCount("P_" + channelEntity.getName(), InspectorStrings.droppedInburnFilter);
+          if(advertiserIdtoNameMapping.containsKey(advertiserId))
+            inspectorStat.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId), "filter_stat", InspectorStrings.droppedInburnFilter);
           continue;
         }
 
@@ -213,7 +215,6 @@ public class Filters {
         channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(row.getId(), row.getAdgroupId(), serverConfiguration.getDouble("default.ecpm"),
             serverConfiguration.getDouble("default.fillratio"));
       }
-      advertiserECPMBoosterFactor.putIfAbsent(row.getId(), new AtomicLong(0));
       // setting prioritisedECPM to take control of
       // shorlisting
       ChannelEntity channelEntity;
@@ -229,7 +230,7 @@ public class Filters {
         channelEntity.setPriority(serverConfiguration.getInt("default.priority"));
       }
       channelSegmentFeedbackEntity.setPrioritisedECPM((Math.pow((channelSegmentFeedbackEntity.geteCPM() + eCPMShift), feedbackPower) * (5 - channelEntity
-          .getPriority())) + advertiserECPMBoosterFactor.get(row.getId()).get());
+          .getPriority())) * getECPMBoostFactor(row.getId(), row.getChannelId()));
 
       hashMapList.add(channelSegmentFeedbackEntity);
     }
@@ -242,13 +243,10 @@ public class Filters {
       String adgroupId = hashMapList.get(i).getId();
       if(totalSegments < totalSegmentNo) {
         shortlistedRow.add(matchedSegments.get(advertiserId).get(adgroupId));
-        adjustadvertiserECPMBoosterFactor(advertiserId, matchedSegments.get(advertiserId).get(adgroupId).getChannelId(), SELECTED);
         totalSegments++;
       } else {
-        inspectorStat.incrementStatCount("P_"
-            + repositoryHelper.queryChannelRepository(matchedSegments.get(advertiserId).get(adgroupId).getChannelId()).getName(),
-            InspectorStrings.droppedInSegmentPerRequestFilter);
-        adjustadvertiserECPMBoosterFactor(advertiserId, matchedSegments.get(advertiserId).get(adgroupId).getChannelId(), DROPPED);
+        if(advertiserIdtoNameMapping.containsKey(advertiserId))
+          inspectorStat.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId), "filter_stat", InspectorStrings.droppedInSegmentPerRequestFilter);
       }
     }
 
@@ -330,14 +328,18 @@ public class Filters {
     return arrayList;
   }
 
-  public static void adjustadvertiserECPMBoosterFactor(String advertiserId, String channelId, String selectedOrDropped) {
+  public static double getECPMBoostFactor(String advertiserId, String channelId) {
     if(repositoryHelper.queryChannelFeedbackRepository(advertiserId).getTodayImpressions() < repositoryHelper.queryChannelRepository(channelId)
         .getImpressionFloor()) {
-      if(selectedOrDropped.equals(DROPPED))
-        advertiserECPMBoosterFactor.get(advertiserId).getAndIncrement();
-      else if(advertiserECPMBoosterFactor.get(advertiserId).get()>0)
-        advertiserECPMBoosterFactor.get(advertiserId).getAndDecrement();
-    } else
-      advertiserECPMBoosterFactor.put(advertiserId,0);
+      String advertiserName = advertiserIdtoNameMapping.get(advertiserId);
+      Long droppedSegments = InspectorStats.getStatValue(advertiserName, "filter_stat", InspectorStrings.droppedInSegmentPerRequestFilter);
+      Long totalInvocations = InspectorStats.getStatValue(advertiserName, "filter_stat", InspectorStrings.totalInvocations);
+      Long serverImpressions = InspectorStats.getStatValue(advertiserName, "filter_stat", InspectorStrings.serverImpression);
+      Long totalNoFills = InspectorStats.getStatValue(advertiserName, "filter_stat", InspectorStrings.totalNoFills);
+      Long notServedInvocations = totalInvocations - serverImpressions;
+      Double boostFactor = (droppedSegments + notServedInvocations - totalNoFills + 1.0) / (serverImpressions + 1);
+      return (boostFactor < 1.0 ? 1.0 : boostFactor);
+    }
+    return 1;
   }
 }
