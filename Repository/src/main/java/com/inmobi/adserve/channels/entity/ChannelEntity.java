@@ -19,6 +19,7 @@ public class ChannelEntity implements IdentifiableEntity<String> {
   private boolean isTestMode;
   private long burstQps;
   private long impressionCeil;
+  private long impressionFloor;
   private int priority;
   private int demandSourceTypeId;
   private Timestamp modified_on;
@@ -129,6 +130,10 @@ public class ChannelEntity implements IdentifiableEntity<String> {
   public long getImpressionCeil() {
     return this.impressionCeil;
   }
+  
+  public long getImpressionFloor() {
+    return this.impressionFloor;
+  }
 
   public long getBurstQps() {
     return this.burstQps;
@@ -194,6 +199,11 @@ public class ChannelEntity implements IdentifiableEntity<String> {
 
   public ChannelEntity setImpressionCeil(long impressionCeil) {
     this.impressionCeil = impressionCeil;
+    return this;
+  }
+  
+  public ChannelEntity setImpressionFloor(long impressionFloor) {
+    this.impressionFloor = impressionFloor;
     return this;
   }
 
