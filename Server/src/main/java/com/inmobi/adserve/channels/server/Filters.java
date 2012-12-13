@@ -75,7 +75,7 @@ public class Filters {
       // dropping advertiser(all segments) if todays impression is greater than
       // impression ceiling
       if(advertiserIdtoNameMapping.containsKey(advertiserId))
-        inspectorStat.initializeFilterStats(advertiserIdtoNameMapping.get(advertiserId), "filter_stat");
+        inspectorStat.initializeFilterStats(advertiserIdtoNameMapping.get(advertiserId));
       if(null == repositoryHelper.queryChannelFeedbackRepository(advertiserId) || null == channelEntity)
         logger.debug("Repo Exception/No entry in ChannelFeedbackRepository/ChannelRepository for advertiserID " + advertiserId);
       else {
@@ -302,18 +302,6 @@ public class Filters {
   }
 
   public static double getECPMBoostFactor(String advertiserId, String channelId) {
-    
-    if(repositoryHelper.queryChannelFeedbackRepository(advertiserId).getTodayImpressions() < repositoryHelper.queryChannelRepository(channelId)
-        .getImpressionFloor()) {
-      String advertiserName = advertiserIdtoNameMapping.get(advertiserId);
-      Long droppedSegments = InspectorStats.getStatValue(advertiserName, "filter_stat", InspectorStrings.droppedInSegmentPerRequestFilter);
-      Long totalInvocations = InspectorStats.getStatValue(advertiserName, "filter_stat", InspectorStrings.totalInvocations);
-      Long serverImpressions = InspectorStats.getStatValue(advertiserName, "filter_stat", InspectorStrings.serverImpression);
-      Long totalNoFills = InspectorStats.getStatValue(advertiserName, "filter_stat", InspectorStrings.totalNoFills);
-      Long notServedInvocations = totalInvocations - serverImpressions;
-      Double boostFactor = (droppedSegments + notServedInvocations - totalNoFills + 1.0) / (serverImpressions + 1);
-      return (boostFactor < 1 ? 1 : boostFactor);
-    }
     return 1;
   }
   

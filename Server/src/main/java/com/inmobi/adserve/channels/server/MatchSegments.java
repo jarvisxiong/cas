@@ -154,7 +154,7 @@ public class MatchSegments {
 
   private void insertEntityToResultSet(HashMap<String, HashMap<String, ChannelSegmentEntity>> result, ChannelSegmentEntity channelSegmentEntity) {
     if(Filters.advertiserIdtoNameMapping.containsKey(channelSegmentEntity.getId())) {
-      InspectorStats.initializeFilterStats(Filters.advertiserIdtoNameMapping.get(channelSegmentEntity.getId()), "filter_stat");
+      InspectorStats.initializeFilterStats(Filters.advertiserIdtoNameMapping.get(channelSegmentEntity.getId()));
       InspectorStats.incrementStatCount(Filters.advertiserIdtoNameMapping.get(channelSegmentEntity.getId()), "filter_stat",
           InspectorStrings.totalSelectedSegments);
     }
