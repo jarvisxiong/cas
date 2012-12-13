@@ -203,7 +203,7 @@ public class ChannelEntity implements IdentifiableEntity<String> {
   }
   
   public ChannelEntity setImpressionFloor(long impressionFloor) {
-    this.impressionCeil = impressionFloor;
+    this.impressionFloor = impressionFloor;
     return this;
   }
 
