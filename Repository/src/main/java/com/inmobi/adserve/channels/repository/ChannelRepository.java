@@ -63,6 +63,7 @@ public class ChannelRepository extends AbstractHashDBUpdatableRepository<Channel
           boolean isActive = rs.getBoolean("is_active");
           long burstQps = rs.getLong("burst_qps");
           long impressionCeil = rs.getLong("impression_ceil");
+          long impressionFloor = rs.getLong("impression_floor");
           Timestamp modifiedOn = rs.getTimestamp("modified_on");
           int priority = rs.getInt("priority");
           int demandSourceTypeId = rs.getInt("demand_source_type_id");

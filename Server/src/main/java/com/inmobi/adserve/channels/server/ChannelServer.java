@@ -89,7 +89,7 @@ public class ChannelServer {
     channelSegmentFeedbackRepository = new ChannelSegmentFeedbackRepository();
     repositoryHelper = new RepositoryHelper(channelRepository, channelAdGroupRepository, channelFeedbackRepository, channelSegmentFeedbackRepository);
 
-    MatchSegments.init(channelAdGroupRepository, repositoryHelper, inspectorStat);
+    MatchSegments.init(channelAdGroupRepository, inspectorStat);
     InspectorStats.initializeRepoStats("ChannelAdGroupRepository");
     InspectorStats.initializeRepoStats("ChannelFeedbackRepository");
     InspectorStats.initializeRepoStats("ChannelSegmentFeedbackRepository");
