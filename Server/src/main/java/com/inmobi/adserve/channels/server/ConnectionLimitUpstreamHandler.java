@@ -3,11 +3,8 @@ package com.inmobi.adserve.channels.server;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelStateEvent;
-import org.jboss.netty.channel.ChannelUpstreamHandler;
 import org.jboss.netty.channel.SimpleChannelHandler;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 public class ConnectionLimitUpstreamHandler extends SimpleChannelHandler {
