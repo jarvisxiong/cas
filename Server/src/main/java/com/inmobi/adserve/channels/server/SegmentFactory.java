@@ -20,6 +20,7 @@ import com.inmobi.adserve.channels.adnetworks.openx.OpenxAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.siquis.DCPSiquisAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.tapit.DCPTapitAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.verve.DCPVerveAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.webmoblink.WebmobLinkAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.xad.DCPxAdAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
@@ -115,6 +116,9 @@ public class SegmentFactory {
     } else if((advertiserId.equals(config.getString("xad.advertiserId"))) && (advertiserSet.isEmpty() || advertiserSet.contains("xad"))
         && (config.getString("xad.status").equals("on"))) {
       return new DCPxAdAdNetwork(logger, config, clientBootstrap, base, serverEvent);
+    } else if((advertiserId.equals(config.getString("verve.advertiserId"))) && (advertiserSet.isEmpty() || advertiserSet.contains("verve"))
+        && (config.getString("verve.status").equals("on"))) {
+      return new DCPVerveAdNetwork(logger, config, clientBootstrap, base, serverEvent);
     }
 
     // else {
