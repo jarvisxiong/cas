@@ -330,7 +330,7 @@ public class Filters {
   }
 
   public static double getECPMBoostFactor(String advertiserId, String channelId, String adGroupId) {
-    long impressions = 0;
+    /*long impressions = 0;
     long floor = 0;
     double fillRatio = 0;
     double ecpm = 0;
@@ -345,7 +345,7 @@ public class Filters {
     long currentHour = (System.currentTimeMillis()%86400000)/3600000;
     if(impressions < floor / 24 * currentHour) {
       return 1 + ((floor - impressions) / floor) * fillRatio * ecpm * (currentHour + 1);
-    }
+    }*/
     return 1;
   }
 }
