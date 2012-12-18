@@ -5,14 +5,11 @@ import java.util.HashMap;
 import org.apache.commons.configuration.Configuration;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.util.TimeZone;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.inmobi.adserve.channels.entity.*;
 import com.inmobi.adserve.channels.util.DebugLogger;
@@ -39,7 +36,6 @@ public class Filters {
 
   private static RepositoryHelper repositoryHelper;
   private static InspectorStats inspectorStat;
-  private static AtomicInteger presentHour;
   public static HashMap<String, String> advertiserIdtoNameMapping = new HashMap<String, String>();
 
   // To boost ecpm of a parnter to meet the impression floor
@@ -54,7 +50,6 @@ public class Filters {
         advertiserIdtoNameMapping.put(adapterConfiguration.getString(str), str.replace(".advertiserId", ""));
       }
     }
-    presentHour = new AtomicInteger(Calendar.getInstance(TimeZone.getTimeZone("Etc/UTC")).get(Calendar.HOUR_OF_DAY));
   }
 
   /**
@@ -347,14 +342,10 @@ public class Filters {
     }
     if(null != repositoryHelper.queryChannelRepository(channelId))
       floor = repositoryHelper.queryChannelRepository(channelId).getImpressionFloor();
-    int currentHour = Calendar.getInstance(TimeZone.getTimeZone("Etc/UTC")).get(Calendar.HOUR_OF_DAY);
-    int lastHour = presentHour.get();
-    if(currentHour > lastHour || (currentHour == 0 && lastHour == 23))
-      presentHour.set(currentHour);
+    long currentHour = (System.currentTimeMillis()%86400000)/3600000;
     if(impressions < floor / 24 * currentHour) {
       return 1 + ((floor - impressions) / floor) * fillRatio * ecpm * (currentHour + 1);
     }
     return 1;
   }
-
 }

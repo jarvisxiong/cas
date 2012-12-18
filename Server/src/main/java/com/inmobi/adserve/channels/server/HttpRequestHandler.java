@@ -174,9 +174,8 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     // whenever channel throws closedchannelexception increment the
     // totalterminate
     // means channel is closed by party who requested for the ad
-    String exceptionString = e.getCause().toString();
-    inspectorStat.incrementStatCount(InspectorStrings.channelException,
-        exceptionString.substring(exceptionString.lastIndexOf(".") + 1, exceptionString.length()));
+    String exceptionString = e.getClass().getSimpleName();
+    inspectorStat.incrementStatCount(InspectorStrings.channelException, exceptionString);
     inspectorStat.incrementStatCount(InspectorStrings.channelException, InspectorStrings.totalFills);
     if(logger == null)
       logger = new DebugLogger();
@@ -481,10 +480,10 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       terminationReason = processingError;
       inspectorStat.incrementStatCount(InspectorStrings.processingError, InspectorStrings.count);
       sendNoAdResponse(e);
-      String exceptionClass = exception.getClass().getName();
+      String exceptionClass = exception.getClass().getSimpleName();
       // incrementing the count of the number of exceptions thrown in the
       // server code
-      inspectorStat.incrementStatCount(exceptionClass.substring(exceptionClass.lastIndexOf('.') + 1, exceptionClass.length()), InspectorStrings.count);
+      inspectorStat.incrementStatCount(exceptionClass, InspectorStrings.count);
       StringWriter sw = new StringWriter();
       PrintWriter pw = new PrintWriter(sw);
       exception.printStackTrace(pw);
@@ -656,7 +655,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
   private int getRankIndex(AdNetworkInterface adNetwork) {
     int index = 0;
     for (index = 0; index < rankList.size(); index++) {
-      if(rankList.get(index).adNetworkInterface.getName().equals(adNetwork.getName())) {
+      if(rankList.get(index).adNetworkInterface.getImpressionId().equals(adNetwork.getImpressionId())) {
         break;
       }
     }
