@@ -103,7 +103,7 @@ public class Filters {
           // dropping advertiser(all segments) if todays impression is greater than impression ceiling
           logger.debug("Impression limit exceeded by advertiser " + advertiserId);
           if(advertiserIdtoNameMapping.containsKey(advertiserId))
-            inspectorStat.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId), "filter_stat", InspectorStrings.droppedInImpressionFilter);
+            inspectorStat.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId), InspectorStrings.droppedInImpressionFilter);
           continue;
         }
       }
@@ -116,7 +116,7 @@ public class Filters {
           // dropping advertiser(all segments) if balance is less than 10*revenue of that channel(advertiser)
           logger.debug("Burn limit exceeded by advertiser " + advertiserId);
           if(advertiserIdtoNameMapping.containsKey(advertiserId))
-            inspectorStat.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId), "filter_stat", InspectorStrings.droppedInburnFilter);
+            inspectorStat.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId), InspectorStrings.droppedInburnFilter);
           continue;
         }
         logger.debug("Burn limit filter passed by advertiser " + advertiserId + " "
@@ -179,10 +179,12 @@ public class Filters {
           serverConfiguration.getInt("partnerSegmentNo", 2));
       logger.debug("PartnersegmentNo for advertiser " + advertiserId + " is " + partnerSegmentNo);
       for (ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity : hashMapList) {
-        if(adGpCount > partnerSegmentNo)
-          break;
-        hashMap.put(channelSegmentFeedbackEntity.getId(), matchedSegments.get(advertiserId).get(channelSegmentFeedbackEntity.getId()));
-        adGpCount++;
+        if(adGpCount <= partnerSegmentNo) {
+          hashMap.put(channelSegmentFeedbackEntity.getId(), matchedSegments.get(advertiserId).get(channelSegmentFeedbackEntity.getId()));
+          adGpCount++;
+        }else if(advertiserIdtoNameMapping.containsKey(advertiserId)) {
+          inspectorStat.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId), InspectorStrings.totalSelectedSegments);
+        }
       }
       rows.put(advertiserId, hashMap);
     }
@@ -246,7 +248,7 @@ public class Filters {
         shortlistedRow.add(matchedSegments.get(advertiserId).get(adgroupId));
         totalSegments++;
       } else if(advertiserIdtoNameMapping.containsKey(advertiserId))
-        inspectorStat.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId), "filter_stat", InspectorStrings.droppedInSegmentPerRequestFilter);
+        inspectorStat.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId), InspectorStrings.droppedInSegmentPerRequestFilter);
     }
     logger.debug("Number of  ShortListed Segments are : " + shortlistedRow.size());
     for (int i = 0; i < shortlistedRow.size(); i++) {
