@@ -82,8 +82,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     public double lowerPriorityRange;
     public double higherPriorityRange;
 
-    public ChannelSegment(ChannelSegmentEntity channelSegmentEntity,
-        AdNetworkInterface adNetworkInterface, ChannelEntity channelEntity,
+    public ChannelSegment(ChannelSegmentEntity channelSegmentEntity, AdNetworkInterface adNetworkInterface, ChannelEntity channelEntity,
         ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity) {
       this.channelSegmentEntity = channelSegmentEntity;
       this.adNetworkInterface = adNetworkInterface;
@@ -109,10 +108,8 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
   private static final String noAdXhtml = "<AdResponse><Ads></Ads></AdResponse>";
   private static final String noAdHtml = "<!-- mKhoj: No advt for this position -->";
   private static final String noAdJsAdcode = "<html><head><title></title><style type=\"text/css\">"
-      + " body {margin: 0; overflow: hidden; background-color: transparent}"
-      + " </style></head><body class=\"nofill\"><!-- NO FILL -->"
-      + "<script type=\"text/javascript\" charset=\"utf-8\">"
-      + "parent.postMessage('{\"topic\":\"nfr\",\"container\" : \"%s\"}', '*');</script></body></html>";
+      + " body {margin: 0; overflow: hidden; background-color: transparent}" + " </style></head><body class=\"nofill\"><!-- NO FILL -->"
+      + "<script type=\"text/javascript\" charset=\"utf-8\">" + "parent.postMessage('{\"topic\":\"nfr\",\"container\" : \"%s\"}', '*');</script></body></html>";
   private static int rollCount = 0;
   private static int percentRollout;
   private long totalTime;
@@ -142,11 +139,9 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
   private static final String CLOSED_CHANNEL_EXCEPTION = "java.nio.channels.ClosedChannelException";
   private static final String CONNECTION_RESET_PEER = "java.io.IOException: Connection reset by peer";
 
-  public static void init(ConfigurationLoader config, ChannelAdGroupRepository channelAdGroupRepo,
-      InspectorStats inspectorStat, ClientBootstrap clientBootstrap,
-      ClientBootstrap rtbClientBootstrap, ChannelRepository channelRepository,
-      ChannelFeedbackRepository channelFeedbackRepository,
-      ChannelSegmentFeedbackRepository channelSegmentFeedbackRepository) {
+  public static void init(ConfigurationLoader config, ChannelAdGroupRepository channelAdGroupRepo, InspectorStats inspectorStat,
+      ClientBootstrap clientBootstrap, ClientBootstrap rtbClientBootstrap, ChannelRepository channelRepository,
+      ChannelFeedbackRepository channelFeedbackRepository, ChannelSegmentFeedbackRepository channelSegmentFeedbackRepository) {
     HttpRequestHandler.rtbConfig = config.rtbConfiguration();
     HttpRequestHandler.loggerConfig = config.loggerConfiguration();
     HttpRequestHandler.config = config.serverConfiguration();
@@ -181,12 +176,10 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     // means channel is closed by party who requested for the ad
     String exceptionString = e.getClass().getSimpleName();
     inspectorStat.incrementStatCount(InspectorStrings.channelException, exceptionString);
-    inspectorStat
-        .incrementStatCount(InspectorStrings.channelException, InspectorStrings.totalFills);
+    inspectorStat.incrementStatCount(InspectorStrings.channelException, InspectorStrings.totalFills);
     if(logger == null)
       logger = new DebugLogger();
-    if(exceptionString.equalsIgnoreCase(CLOSED_CHANNEL_EXCEPTION)
-        || exceptionString.equalsIgnoreCase(CONNECTION_RESET_PEER)) {
+    if(exceptionString.equalsIgnoreCase(CLOSED_CHANNEL_EXCEPTION) || exceptionString.equalsIgnoreCase(CONNECTION_RESET_PEER)) {
       InspectorStats.incrementStatCount(InspectorStrings.totalTerminate);
       logger.debug("Channel is terminated " + ctx.getChannel().getId());
     }
@@ -207,10 +200,8 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     // Whenever channel is Wrter_idle, increment the totalTimeout. It means
     // server
     // could not write the response with in 800 ms
-    logger.debug("inside channel idle event handler for Request channel ID: "
-        + e.getChannel().getId());
-    if(e.getState().toString().equalsIgnoreCase("ALL_IDLE")
-        || e.getState().toString().equalsIgnoreCase("WRITE_IDLE")) {
+    logger.debug("inside channel idle event handler for Request channel ID: " + e.getChannel().getId());
+    if(e.getState().toString().equalsIgnoreCase("ALL_IDLE") || e.getState().toString().equalsIgnoreCase("WRITE_IDLE")) {
       InspectorStats.incrementStatCount(InspectorStrings.totalTimeout);
       logger.debug("server timeout");
     }
@@ -230,9 +221,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       QueryStringDecoder queryStringDecoder = new QueryStringDecoder(request.getUri());
 
       if(queryStringDecoder.getPath().equalsIgnoreCase("/stat")) {
-        sendResponse(
-            inspectorStat.getStats(BootstrapCreation.getMaxConnections(),
-                BootstrapCreation.getDroppedConnections()), e);
+        sendResponse(inspectorStat.getStats(BootstrapCreation.getMaxConnections(), BootstrapCreation.getDroppedConnections()), e);
         return;
       }
 
@@ -296,29 +285,25 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       }
 
       if(!sasParams.allowBannerAds || sasParams.siteFloor > 5) {
-        logger
-            .debug("Request not being served because of banner not allowed or site floor above threshold");
+        logger.debug("Request not being served because of banner not allowed or site floor above threshold");
         sendNoAdResponse(e);
         return;
       }
       if(sasParams.siteType != null && !allowedSiteTypes.contains(sasParams.siteType)) {
         logger.error("Terminating request as incompatible content type");
         terminationReason = incompatibleSiteType;
-        inspectorStat.incrementStatCount(InspectorStrings.incompatibleSiteType,
-            InspectorStrings.count);
+        inspectorStat.incrementStatCount(InspectorStrings.incompatibleSiteType, InspectorStrings.count);
         sendNoAdResponse(e);
         return;
       }
 
       if(sasParams.sdkVersion != null) {
         try {
-          if((sasParams.sdkVersion.substring(0, 1).equalsIgnoreCase("i") || sasParams.sdkVersion
-              .substring(0, 1).equalsIgnoreCase("a"))
+          if((sasParams.sdkVersion.substring(0, 1).equalsIgnoreCase("i") || sasParams.sdkVersion.substring(0, 1).equalsIgnoreCase("a"))
               && Integer.parseInt(sasParams.sdkVersion.substring(1, 2)) < 3) {
             logger.error("Terminating request as sdkVersion is less than 3");
             terminationReason = lowSdkVersion;
-            inspectorStat
-                .incrementStatCount(InspectorStrings.lowSdkVersion, InspectorStrings.count);
+            inspectorStat.incrementStatCount(InspectorStrings.lowSdkVersion, InspectorStrings.count);
             sendNoAdResponse(e);
             return;
           } else
@@ -351,9 +336,8 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       }
 
       // applying channel level filters and per partner ecpm filter
-      ChannelSegmentEntity[] rows = convertToSegmentsArray(Filters.partnerSegmentCountFilter(
-          Filters.impressionBurnFilter(matchedSegments, logger, config), 0.0, logger, config,
-          adapterConfig));
+      ChannelSegmentEntity[] rows = convertToSegmentsArray(Filters.partnerSegmentCountFilter(Filters.impressionBurnFilter(matchedSegments, logger, config),
+          0.0, logger, config, adapterConfig));
 
       // applying request level ecpm filter
       rows = Filters.segmentsPerRequestFilter(matchedSegments, rows, logger, config);
@@ -403,9 +387,8 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
         isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled", false);
         logger.debug("isRtbEnabled is " + isRtbEnabled);
 
-        AdNetworkInterface network = SegmentFactory.getChannel(row.getId(), row.getChannelId(),
-            this.adapterConfig, clientBootstrap, rtbClientBootstrap, this, e, advertiserSet,
-            logger, isRtbEnabled);
+        AdNetworkInterface network = SegmentFactory.getChannel(row.getId(), row.getChannelId(), this.adapterConfig, clientBootstrap, rtbClientBootstrap, this,
+            e, advertiserSet, logger, isRtbEnabled);
         if(null == network) {
           if(logger.isDebugEnabled()) {
             logger.debug("No adapter found for adGroup: " + row.getAdgroupId());
@@ -413,8 +396,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
           continue;
         }
         if(logger.isDebugEnabled()) {
-          logger.debug("adapter found for adGroup: " + row.getAdgroupId() + " advertiserid is "
-              + row.getId());
+          logger.debug("adapter found for adGroup: " + row.getAdgroupId() + " advertiserid is " + row.getId());
         }
 
         if(null == channelRepository.query(row.getChannelId())) {
@@ -432,8 +414,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
           logger.debug("impression id is " + sasParams.impressionId);
         }
 
-        if((network.isClickUrlRequired() || network.isBeaconUrlRequired())
-            && null != sasParams.impressionId) {
+        if((network.isClickUrlRequired() || network.isBeaconUrlRequired()) && null != sasParams.impressionId) {
           ClickUrlMaker clickUrlMaker = new ClickUrlMaker(config, jObject, sasParams, logger);
           TrackingUrls trackingUrls = clickUrlMaker.getClickUrl(row.getPricingModel());
           clickUrl = trackingUrls.getClickUrl();
@@ -453,23 +434,17 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
           inspectorStat.incrementStatCount(network.getName(), InspectorStrings.successfulConfigure);
           if(network.makeAsyncRequest()) {
             if(logger.isDebugEnabled()) {
-              logger.debug("Successfully sent request to channel of  advertiser id " + row.getId()
-                  + "and channel id " + row.getChannelId());
+              logger.debug("Successfully sent request to channel of  advertiser id " + row.getId() + "and channel id " + row.getChannelId());
             }
-            ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = channelSegmentFeedbackRepository
-                .query(row.getAdgroupId());
+            ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = channelSegmentFeedbackRepository.query(row.getAdgroupId());
             if(null == channelSegmentFeedbackEntity)
-              channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(row.getId(),
-                  row.getAdgroupId(), config.getDouble("default.ecpm"),
+              channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(row.getId(), row.getAdgroupId(), config.getDouble("default.ecpm"),
                   config.getDouble("default.fillratio"));
             if(network.isRtbPartner()) {
-              rtbSegments.add(new ChannelSegment(row, network, channelRepository.query(row
-                  .getChannelId()), channelSegmentFeedbackEntity));
-              logger.debug(network.getName()
-                  + " is a rtb partner so adding this network to rtb ranklist");
+              rtbSegments.add(new ChannelSegment(row, network, channelRepository.query(row.getChannelId()), channelSegmentFeedbackEntity));
+              logger.debug(network.getName() + " is a rtb partner so adding this network to rtb ranklist");
             } else
-              segments.add(new ChannelSegment(row, network, channelRepository.query(row
-                  .getChannelId()), channelSegmentFeedbackEntity));
+              segments.add(new ChannelSegment(row, network, channelRepository.query(row.getChannelId()), channelSegmentFeedbackEntity));
           }
         }
       }
@@ -523,8 +498,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     if(logger.isDebugEnabled()) {
       if(rankList != null) {
         for (int index = 0; index < rankList.size(); ++index) {
-          logger.debug("RankList: ChannelSegment @ " + index + " is "
-              + rankList.get(index).adNetworkInterface.getName());
+          logger.debug("RankList: ChannelSegment @ " + index + " is " + rankList.get(index).adNetworkInterface.getName());
         }
       } else {
         logger.debug("RankList is empty");
@@ -532,15 +506,13 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     }
   }
 
-  private ChannelSegmentEntity[] convertToSegmentsArray(
-      HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments) {
+  private ChannelSegmentEntity[] convertToSegmentsArray(HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments) {
     ArrayList<ChannelSegmentEntity> rows = new ArrayList<ChannelSegmentEntity>();
     for (String advertiserId : matchedSegments.keySet()) {
       for (String adgroupId : matchedSegments.get(advertiserId).keySet()) {
         rows.add(matchedSegments.get(advertiserId).get(adgroupId));
         if(logger.isDebugEnabled())
-          logger.debug("ChannelSegmentEntity Added to array for advertiserid : " + advertiserId
-              + " and adgroupid " + adgroupId);
+          logger.debug("ChannelSegmentEntity Added to array for advertiserid : " + advertiserId + " and adgroupid " + adgroupId);
       }
     }
     return (ChannelSegmentEntity[]) rows.toArray(new ChannelSegmentEntity[0]);
@@ -577,11 +549,9 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
               jObject = new JSONObject(val);
             } catch (JSONException ex) {
               jObject = new JSONObject();
-              logger
-                  .debug("Encountered Json Error while creating json object inside HttpRequest Handler");
+              logger.debug("Encountered Json Error while creating json object inside HttpRequest Handler");
               terminationReason = jsonParsingError;
-              inspectorStat.incrementStatCount(InspectorStrings.jsonParsingError,
-                  InspectorStrings.count);
+              inspectorStat.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
             }
           }
         }
@@ -619,8 +589,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     }
     int index = getRankIndex(adNetwork);
     if(logger.isDebugEnabled()) {
-      logger.debug("inside isEligibleForProcess for " + adNetwork.getName() + " and index is "
-          + index);
+      logger.debug("inside isEligibleForProcess for " + adNetwork.getName() + " and index is " + index);
     }
 
     if(index == 0 || index == rankIndexToProcess) {
@@ -648,8 +617,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
   public void reassignRanks(AdNetworkInterface adNetworkCaller, MessageEvent event) {
     int index = getRankIndex(adNetworkCaller);
     if(logger.isDebugEnabled()) {
-      logger.debug("reassignRanks called for " + adNetworkCaller.getName() + " and index is "
-          + index);
+      logger.debug("reassignRanks called for " + adNetworkCaller.getName() + " and index is " + index);
     }
 
     while (index < rankList.size()) {
@@ -657,8 +625,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       AdNetworkInterface adNetwork = channel.adNetworkInterface;
 
       if(logger.isDebugEnabled()) {
-        logger.debug("reassignRanks iterating for " + adNetwork.getName() + " and index is "
-            + index);
+        logger.debug("reassignRanks iterating for " + adNetwork.getName() + " and index is " + index);
       }
 
       if(adNetwork.isRequestCompleted()) {
@@ -688,8 +655,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
   private int getRankIndex(AdNetworkInterface adNetwork) {
     int index = 0;
     for (index = 0; index < rankList.size(); index++) {
-      if(rankList.get(index).adNetworkInterface.getImpressionId().equals(
-          adNetwork.getImpressionId())) {
+      if(rankList.get(index).adNetworkInterface.getImpressionId().equals(adNetwork.getImpressionId())) {
         break;
       }
     }
@@ -706,20 +672,16 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       totalTime = 0;
     try {
       if(adResponse == null) {
-        Logging.channelLogline(list, null, logger, loggerConfig, inspectorStat, sasParams,
-            totalTime, jObject);
+        Logging.channelLogline(list, null, logger, loggerConfig, inspectorStat, sasParams, totalTime, jObject);
         Logging.rrLogging(jObject, null, logger, loggerConfig, sasParams, terminationReason);
         Logging.advertiserLogging(list, logger, loggerConfig);
         Logging.sampledAdvertiserLogging(list, logger, loggerConfig);
       } else {
-        Logging.channelLogline(list, adResponse.clickUrl, logger, loggerConfig, inspectorStat,
-            sasParams, totalTime, jObject);
+        Logging.channelLogline(list, adResponse.clickUrl, logger, loggerConfig, inspectorStat, sasParams, totalTime, jObject);
         if(rtbResponse == null)
-          Logging.rrLogging(jObject, rankList.get(selectedAdIndex), logger, loggerConfig,
-              sasParams, terminationReason);
+          Logging.rrLogging(jObject, rankList.get(selectedAdIndex), logger, loggerConfig, sasParams, terminationReason);
         else
-          Logging.rrLogging(jObject, rtbResponse, logger, loggerConfig, sasParams,
-              terminationReason);
+          Logging.rrLogging(jObject, rtbResponse, logger, loggerConfig, sasParams, terminationReason);
         Logging.advertiserLogging(list, logger, loggerConfig);
         Logging.sampledAdvertiserLogging(list, logger, loggerConfig);
 
@@ -754,25 +716,21 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     // closing unclosed channels
     for (int index = 0; rankList != null && index < rankList.size(); index++) {
       if(logger.isDebugEnabled()) {
-        logger.debug("calling clean up for channel "
-            + rankList.get(index).adNetworkInterface.getId());
+        logger.debug("calling clean up for channel " + rankList.get(index).adNetworkInterface.getId());
       }
       try {
         rankList.get(index).adNetworkInterface.cleanUp();
       } catch (Exception exception) {
         if(logger.isDebugEnabled()) {
-          logger.debug("Error in closing channel for index: " + index + " Name: "
-              + rankList.get(index).adNetworkInterface.getName() + " Exception: "
+          logger.debug("Error in closing channel for index: " + index + " Name: " + rankList.get(index).adNetworkInterface.getName() + " Exception: "
               + exception.getLocalizedMessage());
         }
       }
     }
     for (int index = 0; rankList != null && index < rankList.size(); index++) {
-      ChannelsClientHandler.responseMap.remove(rankList.get(index).adNetworkInterface
-          .getChannelId());
+      ChannelsClientHandler.responseMap.remove(rankList.get(index).adNetworkInterface.getChannelId());
       ChannelsClientHandler.statusMap.remove(rankList.get(index).adNetworkInterface.getChannelId());
-      ChannelsClientHandler.adStatusMap.remove(rankList.get(index).adNetworkInterface
-          .getChannelId());
+      ChannelsClientHandler.adStatusMap.remove(rankList.get(index).adNetworkInterface.getChannelId());
     }
     if(logger.isDebugEnabled()) {
       logger.debug("done with closing channels");
@@ -875,8 +833,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       return;
     }
     HttpResponse response = new DefaultHttpResponse(HTTP_1_1, NOT_FOUND);
-    response.setContent(ChannelBuffers.copiedBuffer(ServerStatusInfo.statusString,
-        Charset.forName("UTF-8").name()));
+    response.setContent(ChannelBuffers.copiedBuffer(ServerStatusInfo.statusString, Charset.forName("UTF-8").name()));
     if(e != null) {
       Channel channel = e.getChannel();
       if(channel != null && channel.isWritable()) {
@@ -892,8 +849,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     adResponse = selectedAdNetwork.getResponseAd();
     selectedAdIndex = getRankIndex(selectedAdNetwork);
     sendAdResponse(adResponse.response, event);
-    inspectorStat
-        .incrementStatCount(selectedAdNetwork.getName(), InspectorStrings.serverImpression);
+    inspectorStat.incrementStatCount(selectedAdNetwork.getName(), InspectorStrings.serverImpression);
   }
 
   // send Ad Response
@@ -909,8 +865,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
         logger.debug("slot served is " + sasParams.slot);
       }
 
-      if(sasParams.slot != null
-          && SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot)) != null) {
+      if(sasParams.slot != null && SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot)) != null) {
         Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot));
         String startElement = String.format(startTags, (int) dim.getWidth(), (int) dim.getHeight());
         responseString = startElement + responseString + endTags;
@@ -927,8 +882,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
   // send response to the caller
   public void sendResponse(String responseString, ChannelEvent event) throws NullPointerException {
     HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
-    response.setContent(ChannelBuffers
-        .copiedBuffer(responseString, Charset.forName("UTF-8").name()));
+    response.setContent(ChannelBuffers.copiedBuffer(responseString, Charset.forName("UTF-8").name()));
     if(event != null) {
       logger.debug("event not null inside send Response");
       Channel channel = event.getChannel();
@@ -977,10 +931,8 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       params.siteType = params.siteType.toUpperCase();
     }
     params.categories = getCategory(jObject);
-    params.allowBannerAds = jObject.opt("site-allowBanner") == null ? true : (Boolean) (jObject
-        .opt("site-allowBanner"));
-    params.siteFloor = jObject.opt("site-floor") == null ? 0.0 : Double.parseDouble(jObject.opt(
-        "site-floor").toString());
+    params.allowBannerAds = jObject.opt("site-allowBanner") == null ? true : (Boolean) (jObject.opt("site-allowBanner"));
+    params.siteFloor = jObject.opt("site-floor") == null ? 0.0 : Double.parseDouble(jObject.opt("site-floor").toString());
     if(logger.isDebugEnabled()) {
       logger.debug("country obtained is " + params.country);
       logger.debug("site floor is " + params.siteFloor);
@@ -1030,10 +982,8 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
   }
 
   public String getImpressionId(JSONObject jObject, long adId) {
-    String uuidIntKey = (WilburyUUID.setIntKey(WilburyUUID.getUUID().toString(), (int) adId))
-        .toString();
-    String uuidMachineKey = (WilburyUUID.setMachineId(uuidIntKey, ChannelServer.hostIdCode))
-        .toString();
+    String uuidIntKey = (WilburyUUID.setIntKey(WilburyUUID.getUUID().toString(), (int) adId)).toString();
+    String uuidMachineKey = (WilburyUUID.setMachineId(uuidIntKey, ChannelServer.hostIdCode)).toString();
     return (WilburyUUID.setDataCenterId(uuidMachineKey, ChannelServer.dataCenterIdCode)).toString();
   }
 
@@ -1064,10 +1014,8 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       parameter.userLocation = stringify(userMap, "u-location");
       parameter.genderOrig = stringify(userMap, "u-gender-orig");
       if(logger.isDebugEnabled()) {
-        logger.debug("uid is " + parameter.uid + ",postalCode is " + parameter.postalCode
-            + ",gender is " + parameter.gender);
-        logger.debug("age is " + parameter.age + ",location is " + parameter.userLocation
-            + ",genderorig is " + parameter.genderOrig);
+        logger.debug("uid is " + parameter.uid + ",postalCode is " + parameter.postalCode + ",gender is " + parameter.gender);
+        logger.debug("age is " + parameter.age + ",location is " + parameter.userLocation + ",genderorig is " + parameter.genderOrig);
       }
     } catch (JSONException exception) {
       parameter.age = null;
@@ -1098,8 +1046,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       String o1Uid = stringify(userIdMap, "SO1");
       parameter.uidO1 = (o1Uid != null) ? o1Uid : stringify(userIdMap, "O1");
       parameter.uidMd5 = stringify(userIdMap, "UM5");
-      parameter.uidIFA = ("iphone".equalsIgnoreCase(parameter.source)) ? stringify(userIdMap, "IDA")
-          : null;
+      parameter.uidIFA = ("iphone".equalsIgnoreCase(parameter.source)) ? stringify(userIdMap, "IDA") : null;
 
     } catch (JSONException exception) {
       setNullValueForUid(parameter);
@@ -1142,9 +1089,8 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     }
     try {
       if(logger.isDebugEnabled()) {
-        logger.debug("Request# slot: " + slotStr + " country: " + countryStr + " categories: "
-            + sasParams.categories + " platform: " + platformStr + " targetingPlatform: "
-            + targetingPlatform + " siteRating: " + siteRating + " osId" + osId);
+        logger.debug("Request# slot: " + slotStr + " country: " + countryStr + " categories: " + sasParams.categories + " platform: " + platformStr
+            + " targetingPlatform: " + targetingPlatform + " siteRating: " + siteRating + " osId" + osId);
       }
       long slot = Long.parseLong(slotStr);
       long platform;
@@ -1156,8 +1102,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       if(countryStr != null) {
         country = Long.parseLong(countryStr);
       }
-      return (segmentMatcher.matchSegments(logger, slot, sasParams.categories, country,
-          targetingPlatform, siteRating, platform, osId));
+      return (segmentMatcher.matchSegments(logger, slot, sasParams.categories, country, targetingPlatform, siteRating, platform, osId));
     } catch (NumberFormatException exception) {
       logger.error("Error parsing required arguments " + exception.getMessage());
       return null;
@@ -1175,8 +1120,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       MimeMessage message = new MimeMessage(session);
       message.setFrom(new InternetAddress(config.getString("sender")));
       List recipients = config.getList("recipients");
-      javax.mail.internet.InternetAddress[] addressTo = new javax.mail.internet.InternetAddress[recipients
-          .size()];
+      javax.mail.internet.InternetAddress[] addressTo = new javax.mail.internet.InternetAddress[recipients.size()];
 
       for (int index = 0; index < recipients.size(); index++) {
         addressTo[index] = new javax.mail.internet.InternetAddress((String) recipients.get(index));
@@ -1209,11 +1153,9 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       Iterator itr = jObj.keys();
       while (itr.hasNext()) {
         String configKey = itr.next().toString();
-        if(configKey.startsWith("adapter")
-            && adapterConfig.containsKey(configKey.replace("adapter.", ""))) {
+        if(configKey.startsWith("adapter") && adapterConfig.containsKey(configKey.replace("adapter.", ""))) {
           adapterConfig.setProperty(configKey.replace("adapter.", ""), jObj.getString(configKey));
-          updates.append(configKey).append("=")
-              .append(adapterConfig.getString(configKey.replace("adapter.", ""))).append("\n");
+          updates.append(configKey).append("=").append(adapterConfig.getString(configKey.replace("adapter.", ""))).append("\n");
         }
         if(configKey.startsWith("logger")) {
           loggerConfig.setProperty(configKey.replace("logger.", ""), jObj.getString(configKey));
@@ -1221,11 +1163,9 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
         if(configKey.startsWith("server") && config.containsKey(configKey.replace("server.", ""))) {
           config.setProperty(configKey.replace("server.", ""), jObj.getString(configKey));
           if(configKey.replace("server.", "").equals("maxconnections")) {
-            BootstrapCreation
-                .setMaxConnectionLimit(config.getInt(configKey.replace("server.", "")));
+            BootstrapCreation.setMaxConnectionLimit(config.getInt(configKey.replace("server.", "")));
           }
-          updates.append(configKey).append("=")
-              .append(config.getString(configKey.replace("server.", ""))).append("\n");
+          updates.append(configKey).append("=").append(config.getString(configKey.replace("server.", ""))).append("\n");
         }
         if(configKey.startsWith("log4j")) {
           log4jConfig.setProperty(configKey.replace("log4j.", ""), jObj.getString(configKey));
@@ -1236,8 +1176,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       }
       sendResponse(updates.toString(), e);
     } catch (JSONException ex) {
-      logger
-          .debug("Encountered Json Error while creating json object inside HttpRequest Handler for config change");
+      logger.debug("Encountered Json Error while creating json object inside HttpRequest Handler for config change");
       terminationReason = jsonParsingError;
     }
   }
@@ -1256,8 +1195,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
 
     for (int i = 0; i < rtbSegments.size(); i++) {
       for (int j = i + 1; j < rtbSegments.size(); j++) {
-        if(rtbSegments.get(i).adNetworkInterface.getBidprice() < rtbSegments.get(j).adNetworkInterface
-            .getBidprice()) {
+        if(rtbSegments.get(i).adNetworkInterface.getBidprice() < rtbSegments.get(j).adNetworkInterface.getBidprice()) {
           ChannelSegment channelSegment = rtbSegments.get(i);
           rtbSegments.set(i, rtbSegments.get(j));
           rtbSegments.set(j, channelSegment);
@@ -1271,13 +1209,11 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       if(rtbSegments.get(i).adNetworkInterface.getBidprice() < maxPrice) {
         secondHighestBidNumber = i;
         break;
-      } else if(rtbSegments.get(i).adNetworkInterface.getLatency() < rtbSegments.get(lowestLatency).adNetworkInterface
-          .getLatency())
+      } else if(rtbSegments.get(i).adNetworkInterface.getLatency() < rtbSegments.get(lowestLatency).adNetworkInterface.getLatency())
         lowestLatency = i;
     }
     if(secondHighestBidNumber != 1) {
-      double secondHighestBidPrice = rtbSegments.get(secondHighestBidNumber).adNetworkInterface
-          .getBidprice();
+      double secondHighestBidPrice = rtbSegments.get(secondHighestBidNumber).adNetworkInterface.getBidprice();
       double price = maxPrice * 0.9;
       if(price > secondHighestBidPrice)
         secondBidPrice = price;
