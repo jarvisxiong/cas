@@ -176,7 +176,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     // means channel is closed by party who requested for the ad
     String exceptionString = e.getClass().getSimpleName();
     inspectorStat.incrementStatCount(InspectorStrings.channelException, exceptionString);
-    inspectorStat.incrementStatCount(InspectorStrings.channelException, InspectorStrings.totalFills);
+    inspectorStat.incrementStatCount(InspectorStrings.channelException, InspectorStrings.count);
     if(logger == null)
       logger = new DebugLogger();
     if(exceptionString.equalsIgnoreCase(CLOSED_CHANNEL_EXCEPTION) || exceptionString.equalsIgnoreCase(CONNECTION_RESET_PEER)) {
