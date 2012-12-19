@@ -24,7 +24,7 @@
 	<dependency>
           <groupId>com.inmobi.messaging</groupId>
           <artifactId>messaging-client-scribe</artifactId>
-          <version>1.3.0</version>
+          <version>1.4.1</version>
           <exclusions>
             <exclusion>
               <artifactId>servlet-api</artifactId>
@@ -73,12 +73,12 @@
         <dependency>
           <groupId>com.inmobi.messaging</groupId>
           <artifactId>messaging-client-core</artifactId>
-          <version>1.3.0</version>
+          <version>1.4.1</version>
         </dependency>
         <dependency>
           <groupId>com.inmobi.messaging</groupId>
           <artifactId>messaging-client-scribe</artifactId>
-          <version>1.3.0</version>
+          <version>1.4.1</version>
         </dependency>
         <dependency>
 	<groupId>commons-codec</groupId>
