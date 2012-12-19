@@ -179,10 +179,12 @@ public class Filters {
           serverConfiguration.getInt("partnerSegmentNo", 2));
       logger.debug("PartnersegmentNo for advertiser " + advertiserId + " is " + partnerSegmentNo);
       for (ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity : hashMapList) {
-        if(adGpCount <= partnerSegmentNo) {
-          hashMap.put(channelSegmentFeedbackEntity.getId(), matchedSegments.get(advertiserId).get(channelSegmentFeedbackEntity.getId()));
-          adGpCount++;
-        }else if(advertiserIdtoNameMapping.containsKey(advertiserId)) {
+        if(adGpCount > partnerSegmentNo) {
+          break;
+        }
+        hashMap.put(channelSegmentFeedbackEntity.getId(), matchedSegments.get(advertiserId).get(channelSegmentFeedbackEntity.getId()));
+        adGpCount++;
+        if(advertiserIdtoNameMapping.containsKey(advertiserId)) {
           inspectorStat.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId), InspectorStrings.totalSelectedSegments);
         }
       }
