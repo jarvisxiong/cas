@@ -336,11 +336,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       }
 
       // applying channel level filters and per partner ecpm filter
-      ChannelSegmentEntity[] rows = convertToSegmentsArray(Filters.partnerSegmentCountFilter(Filters.impressionBurnFilter(matchedSegments, logger, config),
-          0.0, logger, config, adapterConfig));
-
-      // applying request level ecpm filter
-      rows = Filters.segmentsPerRequestFilter(matchedSegments, rows, logger, config);
+      ChannelSegmentEntity[] rows = Filters.filter(matchedSegments, logger, 0.0, config, adapterConfig);
 
       logger.debug("repo: " + channelAdGroupRepository.toString());
       if(rows == null || rows.length == 0) {
@@ -360,9 +356,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
           advertiserList = advertisers.split(",");
         }
       } catch (JSONException exception) {
-        if(logger.isDebugEnabled()) {
-          logger.debug("Some thing went wrong in finding adapters for end to end testing");
-        }
+        logger.debug("Some thing went wrong in finding adapters for end to end testing");
       }
 
       Set<String> advertiserSet = new HashSet<String>();
@@ -378,17 +372,15 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       // if the async request is successful we add it to segment list else
       // we drop it
 
-      if(logger.isDebugEnabled()) {
-        logger.debug("Total channels available for sending requests " + rows.length);
-      }
+      logger.debug("Total channels available for sending requests " + rows.length);
 
       for (ChannelSegmentEntity row : rows) {
         boolean isRtbEnabled = false;
         isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled", false);
         logger.debug("isRtbEnabled is " + isRtbEnabled);
 
-        AdNetworkInterface network = SegmentFactory.getChannel(row.getId(), row.getChannelId(), this.adapterConfig, clientBootstrap, rtbClientBootstrap, this,
-            e, advertiserSet, logger, isRtbEnabled);
+        AdNetworkInterface network = SegmentFactory.getChannel(row.getId(), row.getChannelId(), HttpRequestHandler.adapterConfig, clientBootstrap,
+            rtbClientBootstrap, this, e, advertiserSet, logger, isRtbEnabled);
         if(null == network) {
           if(logger.isDebugEnabled()) {
             logger.debug("No adapter found for adGroup: " + row.getAdgroupId());
@@ -403,6 +395,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
           logger.debug("No channel entity found for channel id: " + row.getChannelId());
           continue;
         }
+
         InspectorStats.initializeNetworkStats(network.getName());
 
         String clickUrl = null;
@@ -410,9 +403,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
         sasParams.impressionId = getImpressionId(jObject, row.getIncId());
         sasParams.adIncId = row.getIncId();
         sasParams.segmentCategories = row.getTags();
-        if(logger.isDebugEnabled()) {
-          logger.debug("impression id is " + sasParams.impressionId);
-        }
+        logger.debug("impression id is " + sasParams.impressionId);
 
         if((network.isClickUrlRequired() || network.isBeaconUrlRequired()) && null != sasParams.impressionId) {
           ClickUrlMaker clickUrlMaker = new ClickUrlMaker(config, jObject, sasParams, logger);
@@ -429,22 +420,34 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
           logger.debug("Sending request to Channel of Id " + row.getId());
           logger.debug("external site key is " + row.getExternalSiteKey());
         }
-        inspectorStat.incrementStatCount(network.getName(), InspectorStrings.totalInvocations);
+
         if(network.configureParameters(sasParams, row.getExternalSiteKey(), clickUrl, beaconUrl)) {
           inspectorStat.incrementStatCount(network.getName(), InspectorStrings.successfulConfigure);
-          if(network.makeAsyncRequest()) {
-            if(logger.isDebugEnabled()) {
-              logger.debug("Successfully sent request to channel of  advertiser id " + row.getId() + "and channel id " + row.getChannelId());
-            }
-            ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = channelSegmentFeedbackRepository.query(row.getAdgroupId());
-            if(null == channelSegmentFeedbackEntity)
-              channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(row.getId(), row.getAdgroupId(), config.getDouble("default.ecpm"),
-                  config.getDouble("default.fillratio"));
-            if(network.isRtbPartner()) {
-              rtbSegments.add(new ChannelSegment(row, network, channelRepository.query(row.getChannelId()), channelSegmentFeedbackEntity));
-              logger.debug(network.getName() + " is a rtb partner so adding this network to rtb ranklist");
-            } else
-              segments.add(new ChannelSegment(row, network, channelRepository.query(row.getChannelId()), channelSegmentFeedbackEntity));
+          ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = channelSegmentFeedbackRepository.query(row.getAdgroupId());
+          if(null == channelSegmentFeedbackEntity)
+            channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(row.getId(), row.getAdgroupId(), config.getDouble("default.ecpm"),
+                config.getDouble("default.fillratio"));
+          if(network.isRtbPartner()) {
+            rtbSegments.add(new ChannelSegment(row, network, channelRepository.query(row.getChannelId()), channelSegmentFeedbackEntity));
+            logger.debug(network.getName() + " is a rtb partner so adding this network to rtb ranklist");
+          } else
+            segments.add(new ChannelSegment(row, network, channelRepository.query(row.getChannelId()), channelSegmentFeedbackEntity));
+        }
+      }
+
+      rankList = Filters.rankAdapters(segments, logger, config, adapterConfig);
+
+      int successfullCalls = 0;
+      for (int i = 0; i < rankList.size(); i++) {
+        ChannelSegment channelSegment = rankList.get(i);
+        inspectorStat.incrementStatCount(channelSegment.adNetworkInterface.getName(), InspectorStrings.totalInvocations);
+        {
+          if(channelSegment.adNetworkInterface.makeAsyncRequest()) {
+            logger.debug("Successfully sent request to channel of  advertiser id " + channelSegment.channelSegmentEntity.getId() + "and channel id "
+                + channelSegment.channelSegmentEntity.getChannelId());
+            successfullCalls++;
+          } else {
+            rankList.remove(i);
           }
         }
       }
@@ -452,11 +455,10 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
         logger.debug("Number of tpans whose request was successfully completed " + segments.size());
       }
       // if none of the async request succeed, we return "NO_AD"
-      if(segments.size() <= 0) {
+      if(successfullCalls == 0) {
         sendNoAdResponse(e);
         return;
       }
-      rankList = Filters.rankAdapters(segments, logger, config);
 
       // Resetting the rankIndexToProcess for already completed adapters.
       ChannelSegment segment = rankList.get(rankIndexToProcess);

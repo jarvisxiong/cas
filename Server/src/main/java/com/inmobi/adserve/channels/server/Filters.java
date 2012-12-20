@@ -51,6 +51,21 @@ public class Filters {
       }
     }
   }
+  
+  public static ChannelSegmentEntity[] filter(HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments, DebugLogger logger, Double siteFloor, 
+      Configuration serverConfiguration, Configuration adapterConfiguration) {
+    return segmentsPerRequestFilter(matchedSegments, 
+                                    convertToSegmentsArray(Filters.partnerSegmentCountFilter(Filters.impressionBurnFilter(matchedSegments, 
+                                                                                                                          logger, 
+                                                                                                                          serverConfiguration),
+                                                                                             siteFloor,
+                                                                                             logger,
+                                                                                             serverConfiguration,
+                                                                                             adapterConfiguration),
+                                                           logger),
+                                     logger,
+                                     serverConfiguration);
+  }
 
   /**
    * 
@@ -284,16 +299,16 @@ public class Filters {
 
   // creating ranks of shortlisted channelsegments ased on weighted random mean
   // of their prioritised ecpm
-  public static ArrayList<ChannelSegment> rankAdapters(List<ChannelSegment> segment, DebugLogger logger, Configuration serverConfiguration) {
+  public static ArrayList<ChannelSegment> rankAdapters(List<ChannelSegment> segment, DebugLogger logger, Configuration serverConfiguration,
+      Configuration adapterConfiguration) {
 
-    Random random = new Random();
     int rank = 0;
     double eCPMShift = serverConfiguration.getDouble("ecpmShift", 0.1);
     double feedbackPower = serverConfiguration.getDouble("feedbackPower", 2.0);
 
     // Arraylist will contain the order in which we will wait for response
     // of the third party ad networks
-    ArrayList<ChannelSegment> arrayList = new ArrayList();
+    ArrayList<ChannelSegment> arrayList = new ArrayList<ChannelSegment>();
     while (segment.size() > 1) {
       double totalPriority = 0.0;
       for (int index = 0; index < segment.size(); index++) {
@@ -313,10 +328,11 @@ public class Filters {
       double randomNumber = Math.random() * totalPriority;
       for (int index = 0; index < segment.size(); index++) {
         if(randomNumber >= segment.get(index).lowerPriorityRange && randomNumber <= segment.get(index).higherPriorityRange) {
-          {
+          String advertiserName = advertiserIdtoNameMapping.get(segment.get(index).channelSegmentEntity.getId());
+          if(!adapterConfiguration.getString(advertiserName + ".gauranteedDelivery","false").equals("true") || rank == 0) {
             logger.debug("rank " + rank++ + " adapter has channel id " + segment.get(index).adNetworkInterface.getId());
+            arrayList.add(segment.get(index));
           }
-          arrayList.add(segment.get(index));
           segment.remove(index);
           break;
         }
@@ -326,6 +342,17 @@ public class Filters {
     arrayList.add(segment.get(0));
     logger.info("Ranked candidate adapters randomly");
     return arrayList;
+  }
+  
+  private static ChannelSegmentEntity[] convertToSegmentsArray(HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments, DebugLogger logger) {
+    ArrayList<ChannelSegmentEntity> rows = new ArrayList<ChannelSegmentEntity>();
+    for (String advertiserId : matchedSegments.keySet()) {
+      for (String adgroupId : matchedSegments.get(advertiserId).keySet()) {
+        rows.add(matchedSegments.get(advertiserId).get(adgroupId));
+          logger.debug("ChannelSegmentEntity Added to array for advertiserid : " + advertiserId + " and adgroupid " + adgroupId);
+      }
+    }
+    return (ChannelSegmentEntity[]) rows.toArray(new ChannelSegmentEntity[0]);
   }
 
   public static double getECPMBoostFactor(String advertiserId, String channelId, String adGroupId) {
