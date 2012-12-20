@@ -377,6 +377,9 @@ public class Logging {
 
     String timestamp = ReportTime.getUTCTimestamp();
     log.append(sep).append("ttime=\"").append(timestamp).append("\"");
+    String tempParam = "";
+    if(null != (tempParam = stringify(jObject, "tid")))
+    log.append(sep).append("tid=\"").append(tempParam).append("\"");
     if(clickUrl != null)
       log.append(sep + "clurl=\"" + clickUrl + "\"");
     log.append(sep).append("rq-tpan=[");
