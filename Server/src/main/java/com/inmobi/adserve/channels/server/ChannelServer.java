@@ -94,7 +94,7 @@ public class ChannelServer {
     InspectorStats.initializeRepoStats("ChannelFeedbackRepository");
     InspectorStats.initializeRepoStats("ChannelSegmentFeedbackRepository");
     instantiateRepository(logger, config);
-    Filters.init(config.adapterConfiguration(), repositoryHelper, inspectorStat);
+    Filters.init(config.adapterConfiguration(), repositoryHelper);
 
     // Creating netty client for out-bound calls.
     ClientBootstrap clientBootstrap = BootstrapCreation.createBootstrap(logger, config.serverConfiguration());
@@ -111,7 +111,7 @@ public class ChannelServer {
     // Configure the netty server.
     try {
       // Initialising request handler
-      HttpRequestHandler.init(config, channelAdGroupRepository, inspectorStat, clientBootstrap, rtbClientBootstrap, channelRepository,
+      HttpRequestHandler.init(config, channelAdGroupRepository, clientBootstrap, rtbClientBootstrap, channelRepository,
           channelFeedbackRepository, channelSegmentFeedbackRepository);
       SegmentFactory.init(repositoryHelper);
       ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
@@ -126,8 +126,6 @@ public class ChannelServer {
       bootstrap.bind(new InetSocketAddress(8800));
       // If client bootstrap is not present throwing exception which will set
       // lbStatus as NOT_OK.
-      if(clientBootstrap == null)
-        throw new NullPointerException("Client bootstrap not initialized.");
     } catch (Exception exception) {
       ServerStatusInfo.statusString = getMyStackTrace(exception);
       ServerStatusInfo.statusCode = 404;
