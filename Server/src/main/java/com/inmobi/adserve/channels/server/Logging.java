@@ -173,7 +173,7 @@ public class Logging {
     log.append(separator + "rq-src=[\"uk\",\"uk\",\"uk\",\"uk\",");
     String tp = stringify(jObject, "tp");
     if(null != tp)
-      log.append("\"" + tempParam + "\"]");
+      log.append("\"" + tp + "\"]");
     else
       log.append("\"dir\"]");
 
