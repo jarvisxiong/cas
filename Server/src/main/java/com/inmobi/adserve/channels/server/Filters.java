@@ -374,10 +374,9 @@ public class Filters {
   
   public static List<ChannelSegment> ensureGuaranteedDelivery(List<ChannelSegment> rankList, Configuration adapterConfiguration) {
     List<ChannelSegment> newRankList = new ArrayList<ChannelSegment>();
-    for(int rank = 0; rank <= rankList.size(); rank++) {
+    for(int rank = 1; rank <= rankList.size(); rank++) {
       ChannelSegment rankedSegment = rankList.get(rank);
-      if(!adapterConfiguration.getString(rankedSegment.adNetworkInterface.getName() + ".gauranteedDelivery", "false").equals("true") 
-          || rank == 0) {
+      if(!adapterConfiguration.getString(rankedSegment.adNetworkInterface.getName() + ".gauranteedDelivery", "false").equals("true")) {
         newRankList.add(rankedSegment);
       }
     }
