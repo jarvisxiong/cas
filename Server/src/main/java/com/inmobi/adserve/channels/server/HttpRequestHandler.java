@@ -674,12 +674,12 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       totalTime = 0;
     try {
       if(adResponse == null) {
-        Logging.channelLogline(list, null, logger, loggerConfig, inspectorStat, sasParams, totalTime, jObject);
+        Logging.channelLogline(list, null, logger, loggerConfig, sasParams, totalTime, jObject);
         Logging.rrLogging(jObject, null, logger, loggerConfig, sasParams, terminationReason);
         Logging.advertiserLogging(list, logger, loggerConfig);
         Logging.sampledAdvertiserLogging(list, logger, loggerConfig);
       } else {
-        Logging.channelLogline(list, adResponse.clickUrl, logger, loggerConfig, inspectorStat, sasParams, totalTime, jObject);
+        Logging.channelLogline(list, adResponse.clickUrl, logger, loggerConfig, sasParams, totalTime, jObject);
         if(rtbResponse == null)
           Logging.rrLogging(jObject, rankList.get(selectedAdIndex), logger, loggerConfig, sasParams, terminationReason);
         else
