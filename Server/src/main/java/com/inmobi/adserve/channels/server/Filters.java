@@ -377,7 +377,7 @@ public class Filters {
     for(int rank = 0; rank <= rankList.size(); rank++) {
       ChannelSegment rankedSegment = rankList.get(rank);
       if(!adapterConfiguration.getString(rankedSegment.adNetworkInterface.getName() + ".gauranteedDelivery", "false").equals("true") 
-          && rank == 0) {
+          || rank == 0) {
         newRankList.add(rankedSegment);
       }
     }
