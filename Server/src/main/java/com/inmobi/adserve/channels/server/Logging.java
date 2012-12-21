@@ -3,13 +3,10 @@ package com.inmobi.adserve.channels.server;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
-import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -17,15 +14,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.inmobi.adserve.channels.api.*;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
-import java.net.*;
-import java.nio.ByteBuffer;
-import org.apache.commons.codec.binary.Base64;
 
-import org.apache.commons.configuration.Configuration;
-import org.json.JSONArray;
 import com.inmobi.adserve.channels.server.HttpRequestHandler.ChannelSegment;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -51,57 +41,8 @@ import com.inmobi.types.adserving.Request;
 import com.inmobi.types.adserving.RequestSource;
 import com.inmobi.types.adserving.User;
 
-import com.inmobi.messaging.Message;
-import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import com.inmobi.log.advertisement.CasAdvertisementLog;
-import com.inmobi.log.channel.AdResponse;
-import com.inmobi.log.channel.CasChannelLog;
-import com.inmobi.log.channel.RequestParams;
-import com.inmobi.log.channel.RequestTpan;
-import com.inmobi.log.channel.SiteParams;
-import com.google.gson.Gson;
-import com.inmobi.types.ContentRating;
-import com.inmobi.types.Geo;
-import com.inmobi.types.Gender;
-import com.inmobi.types.HandsetMeta;
-import com.inmobi.types.AdIdChain;
-import com.inmobi.types.AdMeta;
-import com.inmobi.types.Ad;
-import com.inmobi.types.adserving.AdRR;
-import com.inmobi.types.adserving.Impression;
-import com.inmobi.types.InventoryType;
-import com.inmobi.types.PricingModel;
-import com.inmobi.types.adserving.Request;
-import com.inmobi.types.adserving.RequestSource;
-import com.inmobi.types.adserving.User;
-import org.apache.thrift.*;
-import org.apache.thrift.protocol.*;
 
-import com.inmobi.messaging.Message;
-import com.inmobi.messaging.publisher.AbstractMessagePublisher;
-import com.inmobi.log.advertisement.CasAdvertisementLog;
-import com.inmobi.log.channel.AdResponse;
-import com.inmobi.log.channel.CasChannelLog;
-import com.inmobi.log.channel.RequestParams;
-import com.inmobi.log.channel.RequestTpan;
-import com.inmobi.log.channel.SiteParams;
-import com.google.gson.Gson;
-import com.inmobi.types.ContentRating;
-import com.inmobi.types.Geo;
-import com.inmobi.types.Gender;
-import com.inmobi.types.HandsetMeta;
-import com.inmobi.types.AdIdChain;
-import com.inmobi.types.AdMeta;
-import com.inmobi.types.Ad;
-import com.inmobi.types.adserving.AdRR;
-import com.inmobi.types.adserving.Impression;
-import com.inmobi.types.InventoryType;
-import com.inmobi.types.PricingModel;
-import com.inmobi.types.adserving.Request;
-import com.inmobi.types.adserving.RequestSource;
-import com.inmobi.types.adserving.User;
-import org.apache.thrift.*;
-import org.apache.thrift.protocol.*;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 public class Logging {
@@ -363,8 +304,7 @@ public class Logging {
   }
 
   // Write Channel Logs
-  public static void channelLogline(List<ChannelSegment> rankList, String clickUrl, DebugLogger logger, Configuration config, InspectorStats inspectorStat,
-      SASRequestParameters sasParams, long totalTime, JSONObject jObject) throws JSONException, TException {
+  public static void channelLogline(List<ChannelSegment> rankList, String clickUrl, DebugLogger logger, Configuration config, SASRequestParameters sasParams, long totalTime, JSONObject jObject) throws JSONException, TException {
     logger.debug("came inside channel log line");
     Logger debugLogger = Logger.getLogger(config.getString("channel"));
     logger.debug("got logger handle for cas logs");

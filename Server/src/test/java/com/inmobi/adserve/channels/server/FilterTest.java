@@ -140,7 +140,7 @@ public class FilterTest extends TestCase {
     replay(mockConfig);
     DebugLogger.init(mockConfig);
     logger = new DebugLogger();
-    Filters.init(mockAdapterConfig, repositoryHelper, new InspectorStats());
+    Filters.init(mockAdapterConfig, repositoryHelper);
   }
 
   @Test
