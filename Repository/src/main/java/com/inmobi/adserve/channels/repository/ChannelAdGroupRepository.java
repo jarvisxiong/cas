@@ -9,8 +9,6 @@ import java.util.Collections;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -313,6 +311,9 @@ public class ChannelAdGroupRepository extends AbstractHashDBUpdatableRepository<
             super.getInstanceName(), super.getLastUpdateTime(), super.getLastSuccessfulUpdateTime(), getTimeForUpdate(), super.getEntityCount(),
             super.getRefreshTime(), getUpdatedEntityCount(), getSkippedEntityCount(), super.getRepoSource(), super.getRepoSourceDesc(), isUpdating(),
             getUpdates(), getSuccessfulUpdates(), getUnSuccessfulUpdates());
-    return formatter.toString();
+    String stats = formatter.toString();
+    formatter.close();
+    return stats;
+    
   }
 }
