@@ -72,7 +72,6 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
 
-
 public class HttpRequestHandler extends HttpRequestHandlerBase {
 
   public class ChannelSegment {
@@ -137,9 +136,9 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
   private static final String CLOSED_CHANNEL_EXCEPTION = "java.nio.channels.ClosedChannelException";
   private static final String CONNECTION_RESET_PEER = "java.io.IOException: Connection reset by peer";
 
-  public static void init(ConfigurationLoader config, ChannelAdGroupRepository channelAdGroupRepo,
-      ClientBootstrap clientBootstrap, ClientBootstrap rtbClientBootstrap, ChannelRepository channelRepository,
-      ChannelFeedbackRepository channelFeedbackRepository, ChannelSegmentFeedbackRepository channelSegmentFeedbackRepository) {
+  public static void init(ConfigurationLoader config, ChannelAdGroupRepository channelAdGroupRepo, ClientBootstrap clientBootstrap,
+      ClientBootstrap rtbClientBootstrap, ChannelRepository channelRepository, ChannelFeedbackRepository channelFeedbackRepository,
+      ChannelSegmentFeedbackRepository channelSegmentFeedbackRepository) {
     HttpRequestHandler.rtbConfig = config.rtbConfiguration();
     HttpRequestHandler.loggerConfig = config.loggerConfiguration();
     HttpRequestHandler.config = config.serverConfiguration();
@@ -153,7 +152,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     HttpRequestHandler.channelSegmentFeedbackRepository = channelSegmentFeedbackRepository;
     allowedSiteTypes = HttpRequestHandler.config.getList("allowedSiteTypes");
     percentRollout = HttpRequestHandler.config.getInt("percentRollout", 100);
-   InspectorStats.setWorkflowStats(InspectorStrings.percentRollout, Long.valueOf(percentRollout));
+    InspectorStats.setWorkflowStats(InspectorStrings.percentRollout, Long.valueOf(percentRollout));
   }
 
   public static Configuration getRtbConfig() {
@@ -171,8 +170,8 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     // totalterminate
     // means channel is closed by party who requested for the ad
     String exceptionString = e.getClass().getSimpleName();
-   InspectorStats.incrementStatCount(InspectorStrings.channelException, exceptionString);
-   InspectorStats.incrementStatCount(InspectorStrings.channelException, InspectorStrings.count);
+    InspectorStats.incrementStatCount(InspectorStrings.channelException, exceptionString);
+    InspectorStats.incrementStatCount(InspectorStrings.channelException, InspectorStrings.count);
     if(logger == null)
       logger = new DebugLogger();
     if(exceptionString.equalsIgnoreCase(CLOSED_CHANNEL_EXCEPTION) || exceptionString.equalsIgnoreCase(CONNECTION_RESET_PEER)) {
@@ -261,7 +260,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
         return;
       }
 
-     InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
+      InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
       Map<String, List<String>> params = queryStringDecoder.getParameters();
       extractParams(params);
       sasParams = parseRequestParameters(jObject);
@@ -275,7 +274,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       if(null == sasParams || null == sasParams.siteId) {
         logger.debug("Terminating request as site id was missing");
         terminationReason = missingSiteId;
-       InspectorStats.incrementStatCount(InspectorStrings.missingSiteId, InspectorStrings.count);
+        InspectorStats.incrementStatCount(InspectorStrings.missingSiteId, InspectorStrings.count);
         sendNoAdResponse(e);
         return;
       }
@@ -288,7 +287,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       if(sasParams.siteType != null && !allowedSiteTypes.contains(sasParams.siteType)) {
         logger.error("Terminating request as incompatible content type");
         terminationReason = incompatibleSiteType;
-       InspectorStats.incrementStatCount(InspectorStrings.incompatibleSiteType, InspectorStrings.count);
+        InspectorStats.incrementStatCount(InspectorStrings.incompatibleSiteType, InspectorStrings.count);
         sendNoAdResponse(e);
         return;
       }
@@ -299,7 +298,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
               && Integer.parseInt(sasParams.sdkVersion.substring(1, 2)) < 3) {
             logger.error("Terminating request as sdkVersion is less than 3");
             terminationReason = lowSdkVersion;
-           InspectorStats.incrementStatCount(InspectorStrings.lowSdkVersion, InspectorStrings.count);
+            InspectorStats.incrementStatCount(InspectorStrings.lowSdkVersion, InspectorStrings.count);
             sendNoAdResponse(e);
             return;
           } else
@@ -418,7 +417,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
         }
 
         if(network.configureParameters(sasParams, row.getExternalSiteKey(), clickUrl, beaconUrl)) {
-         InspectorStats.incrementStatCount(network.getName(), InspectorStrings.successfulConfigure);
+          InspectorStats.incrementStatCount(network.getName(), InspectorStrings.successfulConfigure);
           ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = channelSegmentFeedbackRepository.query(row.getAdgroupId());
           if(null == channelSegmentFeedbackEntity)
             channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(row.getId(), row.getAdgroupId(), config.getDouble("default.ecpm"),
@@ -431,28 +430,35 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
         }
       }
 
+      if(segments.size() == 0) {
+        logger.debug("No succesfull configuration of adapter ");
+        sendNoAdResponse(e);
+      }
+        
       rankList = Filters.rankAdapters(segments, logger, config);
-      rankList = Filters.ensureGuaranteedDelivery(rankList, adapterConfig);
+      rankList = Filters.ensureGuaranteedDelivery(rankList, adapterConfig, logger);
+      //if(logger.isDebugEnabled())
 
       int successfullCalls = 0;
       for (int i = 0; i < rankList.size(); i++) {
+        logger.debug("in for loop");
         ChannelSegment channelSegment = rankList.get(i);
-       InspectorStats.incrementStatCount(channelSegment.adNetworkInterface.getName(), InspectorStrings.totalInvocations);
-        {
-          if(channelSegment.adNetworkInterface.makeAsyncRequest()) {
+        InspectorStats.incrementStatCount(channelSegment.adNetworkInterface.getName(), InspectorStrings.totalInvocations);
+        if(channelSegment.adNetworkInterface.makeAsyncRequest()) {
+          if(logger.isDebugEnabled())
             logger.debug("Successfully sent request to channel of  advertiser id " + channelSegment.channelSegmentEntity.getId() + "and channel id "
                 + channelSegment.channelSegmentEntity.getChannelId());
-            successfullCalls++;
-          } else {
-            rankList.remove(i);
-          }
+          successfullCalls++;
+        } else {
+          rankList.remove(i);
         }
       }
       if(logger.isDebugEnabled()) {
-        logger.debug("Number of tpans whose request was successfully completed " + segments.size());
+        logger.debug("Number of tpans whose request was successfully completed " + rankList.size());
       }
       // if none of the async request succeed, we return "NO_AD"
       if(successfullCalls == 0) {
+        logger.debug("No calls");
         sendNoAdResponse(e);
         return;
       }
@@ -477,12 +483,12 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       }
     } catch (Exception exception) {
       terminationReason = processingError;
-     InspectorStats.incrementStatCount(InspectorStrings.processingError, InspectorStrings.count);
+      InspectorStats.incrementStatCount(InspectorStrings.processingError, InspectorStrings.count);
       sendNoAdResponse(e);
       String exceptionClass = exception.getClass().getSimpleName();
       // incrementing the count of the number of exceptions thrown in the
       // server code
-     InspectorStats.incrementStatCount(exceptionClass, InspectorStrings.count);
+      InspectorStats.incrementStatCount(exceptionClass, InspectorStrings.count);
       StringWriter sw = new StringWriter();
       PrintWriter pw = new PrintWriter(sw);
       exception.printStackTrace(pw);
@@ -505,7 +511,6 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     }
   }
 
-
   // changing rollout percentage
   public void changeRollout(MessageEvent e, QueryStringDecoder queryStringDecoder) throws Exception {
     try {
@@ -516,7 +521,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       sendResponse("INVALIDPERCENT", e);
       return;
     }
-   InspectorStats.setWorkflowStats(InspectorStrings.percentRollout, Long.valueOf(percentRollout));
+    InspectorStats.setWorkflowStats(InspectorStrings.percentRollout, Long.valueOf(percentRollout));
     logger.debug("new roll out percentage is " + percentRollout);
     sendResponse("OK", e);
   }
@@ -539,7 +544,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
               jObject = new JSONObject();
               logger.debug("Encountered Json Error while creating json object inside HttpRequest Handler");
               terminationReason = jsonParsingError;
-             InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
+              InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
             }
           }
         }
@@ -735,8 +740,8 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     String host = null;
 
     for (int index = 0; index < headers.size(); index++) {
-      if(((String) ((Map.Entry<String,String>) (headers.get(index))).getKey()).equalsIgnoreCase("Host")) {
-        host = (String) ((Map.Entry<String,String>) (headers.get(index))).getValue();
+      if(((String) ((Map.Entry<String, String>) (headers.get(index))).getKey()).equalsIgnoreCase("Host")) {
+        host = (String) ((Map.Entry<String, String>) (headers.get(index))).getValue();
       }
     }
 
@@ -759,7 +764,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     }
     responseSent = true;
     logger.debug("no ad received");
-   InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
+    InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
 
     if(getResponseFormat().equals("xhtml")) {
       sendResponse(noAdXhtml, event);
@@ -814,9 +819,9 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       rollCount = 0;
     }
     logger.debug("asked for load balancer status");
-   InspectorStats.incrementStatCount("LbStatus", InspectorStrings.totalRequests);
+    InspectorStats.incrementStatCount("LbStatus", InspectorStrings.totalRequests);
     if(ServerStatusInfo.statusCode != 404) {
-     InspectorStats.incrementStatCount("LbStatus", InspectorStrings.successfulRequests);
+      InspectorStats.incrementStatCount("LbStatus", InspectorStrings.successfulRequests);
       sendResponse("OK", e);
       return;
     }
@@ -832,13 +837,13 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
   }
 
   // Called only if the adNetwork have an ad.
-  
+
   @Override
   public void sendAdResponse(AdNetworkInterface selectedAdNetwork, MessageEvent event) {
     adResponse = selectedAdNetwork.getResponseAd();
     selectedAdIndex = getRankIndex(selectedAdNetwork);
     sendAdResponse(adResponse.response, event);
-   InspectorStats.incrementStatCount(selectedAdNetwork.getName(), InspectorStrings.serverImpression);
+    InspectorStats.incrementStatCount(selectedAdNetwork.getName(), InspectorStrings.serverImpression);
   }
 
   // send Ad Response
@@ -858,15 +863,16 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
         Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot));
         String startElement = String.format(startTags, (int) dim.getWidth(), (int) dim.getHeight());
         responseString = startElement + responseString + endTags;
-       InspectorStats.incrementStatCount(InspectorStrings.totalFills);
+        InspectorStats.incrementStatCount(InspectorStrings.totalFills);
       } else {
         logger.error("invalid slot, so not returning response, even though we got an ad");
         responseString = noAdXhtml;
-       InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
+        InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
       }
     }
     sendResponse(responseString, event);
   }
+
   // send response to the caller
   public void sendResponse(String responseString, ChannelEvent event) throws NullPointerException {
     HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);

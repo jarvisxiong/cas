@@ -372,14 +372,19 @@ public class Filters {
     return 1;
   }
   
-  public static List<ChannelSegment> ensureGuaranteedDelivery(List<ChannelSegment> rankList, Configuration adapterConfiguration) {
+  public static List<ChannelSegment> ensureGuaranteedDelivery(List<ChannelSegment> rankList, Configuration adapterConfiguration, DebugLogger logger) {
+    logger.debug("Inside guaranteed delivery filter");
     List<ChannelSegment> newRankList = new ArrayList<ChannelSegment>();
-    for(int rank = 1; rank <= rankList.size(); rank++) {
+    newRankList.add(rankList.get(0));
+    for(int rank = 1; rank < rankList.size(); rank++) {
       ChannelSegment rankedSegment = rankList.get(rank);
       if(!adapterConfiguration.getString(rankedSegment.adNetworkInterface.getName() + ".gauranteedDelivery", "false").equals("true")) {
         newRankList.add(rankedSegment);
       }
+      else
+        logger.debug("Dropping partner" + rankedSegment.adNetworkInterface.getName() + "rank " + rank + "due to guarnteed delivery");
     }
+    logger.debug("New ranklist size :" + newRankList.size());
     return newRankList;
   }
 
