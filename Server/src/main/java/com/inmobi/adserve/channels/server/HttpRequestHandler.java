@@ -437,12 +437,13 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
         
       rankList = Filters.rankAdapters(segments, logger, config);
       rankList = Filters.ensureGuaranteedDelivery(rankList, adapterConfig, logger);
-      //if(logger.isDebugEnabled())
+      
 
       int successfullCalls = 0;
-      for (int i = 0; i < rankList.size(); i++) {
+      Iterator<ChannelSegment> itr = rankList.iterator(); 
+      while(itr.hasNext()) {
         logger.debug("in for loop");
-        ChannelSegment channelSegment = rankList.get(i);
+        ChannelSegment channelSegment = itr.next();
         InspectorStats.incrementStatCount(channelSegment.adNetworkInterface.getName(), InspectorStrings.totalInvocations);
         if(channelSegment.adNetworkInterface.makeAsyncRequest()) {
           if(logger.isDebugEnabled())
@@ -450,7 +451,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
                 + channelSegment.channelSegmentEntity.getChannelId());
           successfullCalls++;
         } else {
-          rankList.remove(i);
+          itr.remove();
         }
       }
       if(logger.isDebugEnabled()) {
@@ -626,7 +627,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
         if(adResponse.responseStatus == ThirdPartyAdResponse.ResponseStatus.SUCCESS) {
           // Sends the response if request is completed for the
           // specific adapter.
-          sendAdResponse(adResponse.response, event);
+          sendAdResponse(adNetwork, event);
           break;
         } else {
           // Iterates to the next adapter.
