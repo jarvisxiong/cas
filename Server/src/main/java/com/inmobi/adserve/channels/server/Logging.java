@@ -38,7 +38,6 @@ import com.inmobi.types.PricingModel;
 import com.inmobi.types.adserving.AdRR;
 import com.inmobi.types.adserving.Impression;
 import com.inmobi.types.adserving.Request;
-import com.inmobi.types.adserving.RequestSource;
 import com.inmobi.types.adserving.User;
 
 import com.inmobi.log.advertisement.CasAdvertisementLog;
@@ -245,7 +244,6 @@ public class Logging {
     if(null != slotServed) {
       log.append(separator).append("slot-served=").append(slotServed);
     }
-    RequestSource requestSource = new RequestSource("uk", "uk", "uk", tp);
 
     User user = new User();
     log.append(separator + "uparams={");
@@ -437,7 +435,6 @@ public class Logging {
       String partnerName = adNetworkInterface.getName();
       log.append(partnerName);
       log.append(sep).append(adResponse.adStatus);
-      String adStatus = adResponse.adStatus;
       String response = "";
       String requestUrl = "";
       if(adResponse.adStatus.equalsIgnoreCase("AD")) {

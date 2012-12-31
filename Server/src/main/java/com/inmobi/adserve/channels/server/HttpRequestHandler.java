@@ -1063,7 +1063,6 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     MatchSegments segmentMatcher = new MatchSegments(logger);
     String slotStr = stringify(args, "slot-served");
     String countryStr = parseArray(args, "carrier", 1);
-    String platformStr = parseArray(args, "handset", 5);
     int osId = jObject.optInt("os-id", -1);
     String sourceStr = stringify(args, "source");
     String siteRatingStr = stringify(args, "site-type");
@@ -1084,20 +1083,15 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     }
     try {
       if(logger.isDebugEnabled()) {
-        logger.debug("Request# slot: " + slotStr + " country: " + countryStr + " categories: " + sasParams.categories + " platform: " + platformStr
+        logger.debug("Request# slot: " + slotStr + " country: " + countryStr + " categories: " + sasParams.categories 
             + " targetingPlatform: " + targetingPlatform + " siteRating: " + siteRating + " osId" + osId);
       }
       long slot = Long.parseLong(slotStr);
-      long platform;
-      if(platformStr != null)
-        platform = Long.parseLong(platformStr);
-      else
-        platform = -1;
       long country = -1;
       if(countryStr != null) {
         country = Long.parseLong(countryStr);
       }
-      return (segmentMatcher.matchSegments(logger, slot, sasParams.categories, country, targetingPlatform, siteRating, platform, osId));
+      return (segmentMatcher.matchSegments(logger, slot, sasParams.categories, country, targetingPlatform, siteRating, osId));
     } catch (NumberFormatException exception) {
       logger.error("Error parsing required arguments " + exception.getMessage());
       return null;
