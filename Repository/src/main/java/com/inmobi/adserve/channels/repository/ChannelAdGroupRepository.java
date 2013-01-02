@@ -29,7 +29,8 @@ import com.inmobi.phoenix.data.RepositoryQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
 import com.inmobi.phoenix.exception.UnpreparedException;
 
-public class ChannelAdGroupRepository extends AbstractHashDBUpdatableRepository<ChannelSegmentEntity, String> implements RepositoryManager {
+public class ChannelAdGroupRepository extends AbstractHashDBUpdatableRepository<ChannelSegmentEntity, String> implements
+    RepositoryManager {
   private long startTime = 0L;
   private long endTime = 0L;
   private boolean updating = false;
@@ -68,7 +69,8 @@ public class ChannelAdGroupRepository extends AbstractHashDBUpdatableRepository<
           String pricingModel = rs.getString("pricing_model");
           boolean isTestMode = rs.getBoolean("is_test_mode");
           Timestamp modified_on = rs.getTimestamp("modified_on");
-          if((rs.getArray("tags") == null) || (rs.getArray("rc_list") == null) || (rs.getArray("slot_ids") == null) || (rs.getArray("site_ratings") == null))
+          if((rs.getArray("tags") == null) || (rs.getArray("rc_list") == null) || (rs.getArray("slot_ids") == null)
+              || (rs.getArray("site_ratings") == null))
             continue;
           Integer[] siteRatings = (Integer[]) rs.getArray("site_ratings").getArray();
           Long[] rcList = (Long[]) rs.getArray("rc_list").getArray();
@@ -80,8 +82,9 @@ public class ChannelAdGroupRepository extends AbstractHashDBUpdatableRepository<
           String osVersionTargeting = rs.getString("os_version_targeting");
           ArrayList<Integer> osIds = parseOsIds(osVersionTargeting);
 
-          ChannelSegmentEntity thirdPartyNetwork = new ChannelSegmentEntity(advertiserId, adgroupId, adId, channelId, platformTargeting, rcList, tags, status,
-              isTestMode, externalSiteKey, modified_on, campaignId, slotIds, incId, allTags, pricingModel, siteRatings, targetingPlatform, osIds);
+          ChannelSegmentEntity thirdPartyNetwork = new ChannelSegmentEntity(advertiserId, adgroupId, adId, channelId,
+              platformTargeting, rcList, tags, status, isTestMode, externalSiteKey, modified_on, campaignId, slotIds, incId,
+              allTags, pricingModel, siteRatings, targetingPlatform, osIds);
           ChannelSegmentEntity oldEntity = entitySet.get(adgroupId);
           entitySet.put(adgroupId, thirdPartyNetwork);
           if(null != oldEntity) {
@@ -96,7 +99,8 @@ public class ChannelAdGroupRepository extends AbstractHashDBUpdatableRepository<
         } catch (SQLException e) {
           logger.error("exception in rs" + e.getMessage());
           InspectorStats.incrementRepoStatCount("ChannelAdGroupRepository", InspectorStrings.entityFailedtoLoad, increment);
-          InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.lastUnsuccessfulUpdate, System.currentTimeMillis());
+          InspectorStats
+              .setStats("ChannelAdGroupRepository", InspectorStrings.lastUnsuccessfulUpdate, System.currentTimeMillis());
         }
       }
     } catch (SQLException e) {
@@ -200,8 +204,8 @@ public class ChannelAdGroupRepository extends AbstractHashDBUpdatableRepository<
     return entitySet.values().toArray(new ChannelSegmentEntity[0]);
   }
 
-
-  public Collection<ChannelSegmentEntity> getEntities(long slotId, long category, long country, Integer targetingPlatform, Integer siteRating, Integer osId) {
+  public Collection<ChannelSegmentEntity> getEntities(long slotId, long category, long country, Integer targetingPlatform,
+      Integer siteRating, Integer osId) {
     String key = getKey(slotId, category, country, targetingPlatform, siteRating, osId);
     HashMap<String, ChannelSegmentEntity> entities = entityHashMap.get(key);
     if(null == entities) {
@@ -213,7 +217,7 @@ public class ChannelAdGroupRepository extends AbstractHashDBUpdatableRepository<
       logger.error("No entries found in the database for the key " + key);
     return entities.values();
   }
-  
+
   private void cleanupEntity(ChannelSegmentEntity entity) {
     long country = -1; // All countries.
     if(entity.getRcList().length > 0) {
@@ -228,15 +232,15 @@ public class ChannelAdGroupRepository extends AbstractHashDBUpdatableRepository<
             if(entity.getOsIds() == null || entity.getOsIds().size() == 0)
               removeEntity(slotId, -1 /* All categories */, country, targetingPlatform, siteRating, entity, -1);
             else
-              for(Integer id : entity.getOsIds())
+              for (Integer id : entity.getOsIds())
                 removeEntity(slotId, -1 /* All categories */, country, targetingPlatform, siteRating, entity, id);
           } else {
             for (Long category : entity.getTags()) {
               if(entity.getOsIds() == null || entity.getOsIds().size() == 0)
                 insertEntity(slotId, category, country, targetingPlatform, siteRating, entity, -1);
-                else
-                  for(Integer id : entity.getOsIds())
-                    insertEntity(slotId, category , country, targetingPlatform, siteRating, entity, id);
+              else
+                for (Integer id : entity.getOsIds())
+                  insertEntity(slotId, category, country, targetingPlatform, siteRating, entity, id);
             }
           }
         }
@@ -244,7 +248,8 @@ public class ChannelAdGroupRepository extends AbstractHashDBUpdatableRepository<
     }
   }
 
-  private void removeEntity(long slotId, long category, long country, Integer targetingPlatform, Integer siteRating, ChannelSegmentEntity entity, Integer osId) {
+  private void removeEntity(long slotId, long category, long country, Integer targetingPlatform, Integer siteRating,
+      ChannelSegmentEntity entity, Integer osId) {
     String key = getKey(slotId, category, country, targetingPlatform, siteRating, osId);
     HashMap<String, ChannelSegmentEntity> map = entityHashMap.get(key);
     if(null != map) {
@@ -255,28 +260,46 @@ public class ChannelAdGroupRepository extends AbstractHashDBUpdatableRepository<
   }
 
   private void insertEntityToHashMap(ChannelSegmentEntity entity) {
-    long country = -1; // All countries.
-    if(entity.getRcList().length > 0) {
-      country = entity.getRcList()[0];
-    }
     // Family safe, Maturei
     for (Integer siteRating : entity.getSiteRatings()) {
       // Wap, APP
       for (Integer targetingPlatform : entity.getTargetingPlatform()) {
         for (Long slotId : entity.getSlotIds()) {
           if(entity.getAllTags()) {
-            if(entity.getOsIds() == null || entity.getOsIds().size() == 0)
-              insertEntity(slotId, -1 /* All categories */, country, targetingPlatform, siteRating, entity, -1);
-            else
-              for(Integer id : entity.getOsIds())
-                insertEntity(slotId, -1 /* All categories */, country, targetingPlatform, siteRating, entity, id);
+            if(entity.getRcList() == null || entity.getRcList().length == 0) {
+              if(entity.getOsIds() == null || entity.getOsIds().size() == 0) {
+                insertEntity(slotId, -1 /* All categories */, -1, targetingPlatform, siteRating, entity, -1);
+              } else
+                for (Integer id : entity.getOsIds()) {
+                  insertEntity(slotId, -1 /* All categories */, -1, targetingPlatform, siteRating, entity, id);
+                }
+            }else {
+              for(Long country : entity.getRcList())
+              if(entity.getOsIds() == null || entity.getOsIds().size() == 0) {
+                insertEntity(slotId, -1 /* All categories */, country, targetingPlatform, siteRating, entity, -1);
+              } else
+                for (Integer id : entity.getOsIds()) {
+                  insertEntity(slotId, -1 /* All categories */, country, targetingPlatform, siteRating, entity, id);
+                }
+            }
           } else {
             for (Long category : entity.getTags()) {
-              if(entity.getOsIds() == null || entity.getOsIds().size() == 0)
-              insertEntity(slotId, category, country, targetingPlatform, siteRating, entity, -1);
-              else
-                for(Integer id : entity.getOsIds())
-                  insertEntity(slotId, category , country, targetingPlatform, siteRating, entity, id);
+              if(entity.getRcList() == null || entity.getRcList().length == 0) {
+                if(entity.getOsIds() == null || entity.getOsIds().size() == 0) {
+                  insertEntity(slotId, category, -1, targetingPlatform, siteRating, entity, -1);
+                } else
+                  for (Integer id : entity.getOsIds()) {
+                    insertEntity(slotId, category, -1, targetingPlatform, siteRating, entity, id);
+                  }
+              }else {
+                for(Long country : entity.getRcList())
+                if(entity.getOsIds() == null || entity.getOsIds().size() == 0) {
+                  insertEntity(slotId, category, country, targetingPlatform, siteRating, entity, -1);
+                } else
+                  for (Integer id : entity.getOsIds()) {
+                    insertEntity(slotId, category, country, targetingPlatform, siteRating, entity, id);
+                  }
+              }
             }
           }
         }
@@ -284,7 +307,8 @@ public class ChannelAdGroupRepository extends AbstractHashDBUpdatableRepository<
     }
   }
 
-  private void insertEntity(long slotId, long category, long country, Integer targetingPlatform, Integer siteRating, ChannelSegmentEntity entity, Integer osId) {
+  private void insertEntity(long slotId, long category, long country, Integer targetingPlatform, Integer siteRating,
+      ChannelSegmentEntity entity, Integer osId) {
     String key = getKey(slotId, category, country, targetingPlatform, siteRating, osId);
     HashMap<String, ChannelSegmentEntity> map = entityHashMap.get(key);
     if(null == map) {
@@ -294,26 +318,25 @@ public class ChannelAdGroupRepository extends AbstractHashDBUpdatableRepository<
     map.put(entity.getAdgroupId(), entity);
     if(logger.isDebugEnabled())
       logger.debug("Updated channel segment with key: " + key + " and AdGroupId: " + entity.getAdgroupId());
-    
+
   }
 
-  
   private String getKey(long slotId, long category, long country, Integer targetingPlatform, Integer siteRating, Integer osId) {
     return slotId + "_" + category + "_" + country + "_" + targetingPlatform + "_" + siteRating + "_" + osId;
   }
-  
 
   public String getStats() {
     Formatter formatter = new Formatter();
     formatter
         .format(
             " \"%s\": { \"stats\": { \"age\": %d, \"lastSuccessfulUpdate\"  : %d, \"timeForUpdate\"  : %d, \"entities\": %d, \"refreshTime\"  : %d, \"updatedEntities\" : %d, \"skippedEntities\"  : %d, \"repoSource\"  : %s, \"query/path\"  : %s, \"isUpdating\"  : %s, \"No_of_Updates\"  : %d, \"no_of_successful_updates\"  : %d, \"no_of_unsuccessful_updates\"  : %d,} } ",
-            super.getInstanceName(), super.getLastUpdateTime(), super.getLastSuccessfulUpdateTime(), getTimeForUpdate(), super.getEntityCount(),
-            super.getRefreshTime(), getUpdatedEntityCount(), getSkippedEntityCount(), super.getRepoSource(), super.getRepoSourceDesc(), isUpdating(),
-            getUpdates(), getSuccessfulUpdates(), getUnSuccessfulUpdates());
+            super.getInstanceName(), super.getLastUpdateTime(), super.getLastSuccessfulUpdateTime(), getTimeForUpdate(),
+            super.getEntityCount(), super.getRefreshTime(), getUpdatedEntityCount(), getSkippedEntityCount(),
+            super.getRepoSource(), super.getRepoSourceDesc(), isUpdating(), getUpdates(), getSuccessfulUpdates(),
+            getUnSuccessfulUpdates());
     String stats = formatter.toString();
     formatter.close();
     return stats;
-    
+
   }
 }

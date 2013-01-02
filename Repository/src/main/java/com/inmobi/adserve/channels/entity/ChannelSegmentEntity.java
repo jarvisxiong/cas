@@ -29,6 +29,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
   private ArrayList<Integer> targetingPlatform = new ArrayList<Integer>();
   private Integer[] siteRatings;
   private List<Integer> osIds;
+  private List<String>
 
   public ChannelSegmentEntity(final String advertiserId, final String adgroupId, final String adId, final String channelId, long platformTargeting,
       Long[] rcList, Long[] tags, boolean status, boolean isTestMode, String externalSiteKey, Timestamp modified_on, String campaignId, Long[] slotIds,
