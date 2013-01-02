@@ -124,24 +124,21 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
   private static ClientBootstrap clientBootstrap;
   private static ClientBootstrap rtbClientBootstrap;
   private static ChannelRepository channelRepository;
-  private static ChannelFeedbackRepository channelFeedbackRepository;
   private static ChannelSegmentFeedbackRepository channelSegmentFeedbackRepository;
   private SASRequestParameters sasParams = new SASRequestParameters();
   private JSONObject jObject = null;
-  private static InspectorStats inspectorStat;
   private static Random random = new Random();
-  private final int adIndex[] = new int[1];
   private static List<String> allowedSiteTypes;
   private int rankIndexToProcess = 0;
   private int selectedAdIndex = 0;
-  static DebugLogger logger = new DebugLogger();
+  public DebugLogger logger;
   public ThirdPartyAdResponse adResponse = null;
   private static final String CLOSED_CHANNEL_EXCEPTION = "java.nio.channels.ClosedChannelException";
   private static final String CONNECTION_RESET_PEER = "java.io.IOException: Connection reset by peer";
 
-  public static void init(ConfigurationLoader config, ChannelAdGroupRepository channelAdGroupRepo, InspectorStats inspectorStat,
-      ClientBootstrap clientBootstrap, ClientBootstrap rtbClientBootstrap, ChannelRepository channelRepository,
-      ChannelFeedbackRepository channelFeedbackRepository, ChannelSegmentFeedbackRepository channelSegmentFeedbackRepository) {
+  public static void init(ConfigurationLoader config, ChannelAdGroupRepository channelAdGroupRepo, ClientBootstrap clientBootstrap,
+      ClientBootstrap rtbClientBootstrap, ChannelRepository channelRepository, ChannelFeedbackRepository channelFeedbackRepository,
+      ChannelSegmentFeedbackRepository channelSegmentFeedbackRepository) {
     HttpRequestHandler.rtbConfig = config.rtbConfiguration();
     HttpRequestHandler.loggerConfig = config.loggerConfiguration();
     HttpRequestHandler.config = config.serverConfiguration();
@@ -149,15 +146,13 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     HttpRequestHandler.log4jConfig = config.log4jConfiguration();
     HttpRequestHandler.databaseConfig = config.databaseConfiguration();
     HttpRequestHandler.channelAdGroupRepository = channelAdGroupRepo;
-    HttpRequestHandler.inspectorStat = inspectorStat;
     HttpRequestHandler.clientBootstrap = clientBootstrap;
     HttpRequestHandler.rtbClientBootstrap = rtbClientBootstrap;
     HttpRequestHandler.channelRepository = channelRepository;
-    HttpRequestHandler.channelFeedbackRepository = channelFeedbackRepository;
     HttpRequestHandler.channelSegmentFeedbackRepository = channelSegmentFeedbackRepository;
     allowedSiteTypes = HttpRequestHandler.config.getList("allowedSiteTypes");
     percentRollout = HttpRequestHandler.config.getInt("percentRollout", 100);
-    inspectorStat.setWorkflowStats(InspectorStrings.percentRollout, Long.valueOf(percentRollout));
+    InspectorStats.setWorkflowStats(InspectorStrings.percentRollout, Long.valueOf(percentRollout));
   }
 
   public static Configuration getRtbConfig() {
@@ -175,8 +170,8 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     // totalterminate
     // means channel is closed by party who requested for the ad
     String exceptionString = e.getClass().getSimpleName();
-    inspectorStat.incrementStatCount(InspectorStrings.channelException, exceptionString);
-    inspectorStat.incrementStatCount(InspectorStrings.channelException, InspectorStrings.count);
+    InspectorStats.incrementStatCount(InspectorStrings.channelException, exceptionString);
+    InspectorStats.incrementStatCount(InspectorStrings.channelException, InspectorStrings.count);
     if(logger == null)
       logger = new DebugLogger();
     if(exceptionString.equalsIgnoreCase(CLOSED_CHANNEL_EXCEPTION) || exceptionString.equalsIgnoreCase(CONNECTION_RESET_PEER)) {
@@ -221,7 +216,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       QueryStringDecoder queryStringDecoder = new QueryStringDecoder(request.getUri());
 
       if(queryStringDecoder.getPath().equalsIgnoreCase("/stat")) {
-        sendResponse(inspectorStat.getStats(BootstrapCreation.getMaxConnections(), BootstrapCreation.getDroppedConnections()), e);
+        sendResponse(InspectorStats.getStats(BootstrapCreation.getMaxConnections(), BootstrapCreation.getDroppedConnections()), e);
         return;
       }
 
@@ -265,7 +260,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
         return;
       }
 
-      inspectorStat.incrementStatCount(InspectorStrings.totalRequests);
+      InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
       Map<String, List<String>> params = queryStringDecoder.getParameters();
       extractParams(params);
       sasParams = parseRequestParameters(jObject);
@@ -279,7 +274,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       if(null == sasParams || null == sasParams.siteId) {
         logger.debug("Terminating request as site id was missing");
         terminationReason = missingSiteId;
-        inspectorStat.incrementStatCount(InspectorStrings.missingSiteId, InspectorStrings.count);
+        InspectorStats.incrementStatCount(InspectorStrings.missingSiteId, InspectorStrings.count);
         sendNoAdResponse(e);
         return;
       }
@@ -292,7 +287,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       if(sasParams.siteType != null && !allowedSiteTypes.contains(sasParams.siteType)) {
         logger.error("Terminating request as incompatible content type");
         terminationReason = incompatibleSiteType;
-        inspectorStat.incrementStatCount(InspectorStrings.incompatibleSiteType, InspectorStrings.count);
+        InspectorStats.incrementStatCount(InspectorStrings.incompatibleSiteType, InspectorStrings.count);
         sendNoAdResponse(e);
         return;
       }
@@ -303,7 +298,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
               && Integer.parseInt(sasParams.sdkVersion.substring(1, 2)) < 3) {
             logger.error("Terminating request as sdkVersion is less than 3");
             terminationReason = lowSdkVersion;
-            inspectorStat.incrementStatCount(InspectorStrings.lowSdkVersion, InspectorStrings.count);
+            InspectorStats.incrementStatCount(InspectorStrings.lowSdkVersion, InspectorStrings.count);
             sendNoAdResponse(e);
             return;
           } else
@@ -319,7 +314,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       // if sendonlytowhitelist flag is true, check if site id is present
       // in whitelist, else send no ad.
       if(config.getBoolean("sendOnlyToWhitelist") == true) {
-        List whitelist = config.getList("whitelist");
+        List<String> whitelist = config.getList("whitelist");
         if(null == whitelist || !whitelist.contains(sasParams.siteId)) {
           logger.debug("site id not present in whitelist, so sending no ad response");
           sendNoAdResponse(e);
@@ -336,11 +331,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       }
 
       // applying channel level filters and per partner ecpm filter
-      ChannelSegmentEntity[] rows = convertToSegmentsArray(Filters.partnerSegmentCountFilter(Filters.impressionBurnFilter(matchedSegments, logger, config),
-          0.0, logger, config, adapterConfig));
-
-      // applying request level ecpm filter
-      rows = Filters.segmentsPerRequestFilter(matchedSegments, rows, logger, config);
+      ChannelSegmentEntity[] rows = Filters.filter(matchedSegments, logger, 0.0, config, adapterConfig);
 
       logger.debug("repo: " + channelAdGroupRepository.toString());
       if(rows == null || rows.length == 0) {
@@ -360,9 +351,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
           advertiserList = advertisers.split(",");
         }
       } catch (JSONException exception) {
-        if(logger.isDebugEnabled()) {
-          logger.debug("Some thing went wrong in finding adapters for end to end testing");
-        }
+        logger.debug("Some thing went wrong in finding adapters for end to end testing");
       }
 
       Set<String> advertiserSet = new HashSet<String>();
@@ -378,17 +367,15 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       // if the async request is successful we add it to segment list else
       // we drop it
 
-      if(logger.isDebugEnabled()) {
-        logger.debug("Total channels available for sending requests " + rows.length);
-      }
+      logger.debug("Total channels available for sending requests " + rows.length);
 
       for (ChannelSegmentEntity row : rows) {
         boolean isRtbEnabled = false;
         isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled", false);
         logger.debug("isRtbEnabled is " + isRtbEnabled);
 
-        AdNetworkInterface network = SegmentFactory.getChannel(row.getId(), row.getChannelId(), this.adapterConfig, clientBootstrap, rtbClientBootstrap, this,
-            e, advertiserSet, logger, isRtbEnabled);
+        AdNetworkInterface network = SegmentFactory.getChannel(row.getId(), row.getChannelId(), HttpRequestHandler.adapterConfig, clientBootstrap,
+            rtbClientBootstrap, this, e, advertiserSet, logger, isRtbEnabled);
         if(null == network) {
           if(logger.isDebugEnabled()) {
             logger.debug("No adapter found for adGroup: " + row.getAdgroupId());
@@ -403,6 +390,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
           logger.debug("No channel entity found for channel id: " + row.getChannelId());
           continue;
         }
+
         InspectorStats.initializeNetworkStats(network.getName());
 
         String clickUrl = null;
@@ -410,9 +398,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
         sasParams.impressionId = getImpressionId(jObject, row.getIncId());
         sasParams.adIncId = row.getIncId();
         sasParams.segmentCategories = row.getTags();
-        if(logger.isDebugEnabled()) {
-          logger.debug("impression id is " + sasParams.impressionId);
-        }
+        logger.debug("impression id is " + sasParams.impressionId);
 
         if((network.isClickUrlRequired() || network.isBeaconUrlRequired()) && null != sasParams.impressionId) {
           ClickUrlMaker clickUrlMaker = new ClickUrlMaker(config, jObject, sasParams, logger);
@@ -429,34 +415,54 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
           logger.debug("Sending request to Channel of Id " + row.getId());
           logger.debug("external site key is " + row.getExternalSiteKey());
         }
-        inspectorStat.incrementStatCount(network.getName(), InspectorStrings.totalInvocations);
+
         if(network.configureParameters(sasParams, row.getExternalSiteKey(), clickUrl, beaconUrl)) {
-          inspectorStat.incrementStatCount(network.getName(), InspectorStrings.successfulConfigure);
-          if(network.makeAsyncRequest()) {
-            if(logger.isDebugEnabled()) {
-              logger.debug("Successfully sent request to channel of  advertiser id " + row.getId() + "and channel id " + row.getChannelId());
-            }
-            ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = channelSegmentFeedbackRepository.query(row.getAdgroupId());
-            if(null == channelSegmentFeedbackEntity)
-              channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(row.getId(), row.getAdgroupId(), config.getDouble("default.ecpm"),
-                  config.getDouble("default.fillratio"));
-            if(network.isRtbPartner()) {
-              rtbSegments.add(new ChannelSegment(row, network, channelRepository.query(row.getChannelId()), channelSegmentFeedbackEntity));
-              logger.debug(network.getName() + " is a rtb partner so adding this network to rtb ranklist");
-            } else
-              segments.add(new ChannelSegment(row, network, channelRepository.query(row.getChannelId()), channelSegmentFeedbackEntity));
-          }
+          InspectorStats.incrementStatCount(network.getName(), InspectorStrings.successfulConfigure);
+          ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = channelSegmentFeedbackRepository.query(row.getAdgroupId());
+          if(null == channelSegmentFeedbackEntity)
+            channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(row.getId(), row.getAdgroupId(), config.getDouble("default.ecpm"),
+                config.getDouble("default.fillratio"));
+          if(network.isRtbPartner()) {
+            rtbSegments.add(new ChannelSegment(row, network, channelRepository.query(row.getChannelId()), channelSegmentFeedbackEntity));
+            logger.debug(network.getName() + " is a rtb partner so adding this network to rtb ranklist");
+          } else
+            segments.add(new ChannelSegment(row, network, channelRepository.query(row.getChannelId()), channelSegmentFeedbackEntity));
+        }
+      }
+
+      if(segments.size() == 0) {
+        logger.debug("No succesfull configuration of adapter ");
+        sendNoAdResponse(e);
+      }
+        
+      rankList = Filters.rankAdapters(segments, logger, config);
+      rankList = Filters.ensureGuaranteedDelivery(rankList, adapterConfig, logger);
+      
+
+      int successfullCalls = 0;
+      Iterator<ChannelSegment> itr = rankList.iterator(); 
+      while(itr.hasNext()) {
+        logger.debug("in for loop");
+        ChannelSegment channelSegment = itr.next();
+        InspectorStats.incrementStatCount(channelSegment.adNetworkInterface.getName(), InspectorStrings.totalInvocations);
+        if(channelSegment.adNetworkInterface.makeAsyncRequest()) {
+          if(logger.isDebugEnabled())
+            logger.debug("Successfully sent request to channel of  advertiser id " + channelSegment.channelSegmentEntity.getId() + "and channel id "
+                + channelSegment.channelSegmentEntity.getChannelId());
+          successfullCalls++;
+        } else {
+          itr.remove();
         }
       }
       if(logger.isDebugEnabled()) {
-        logger.debug("Number of tpans whose request was successfully completed " + segments.size());
+        logger.debug("Number of tpans whose request was successfully completed " + rankList.size());
       }
       // if none of the async request succeed, we return "NO_AD"
-      if(segments.size() <= 0) {
+      if(successfullCalls == 0) {
+        logger.debug("No calls");
         sendNoAdResponse(e);
         return;
       }
-      rankList = Filters.rankAdapters(segments, logger, config);
 
       // Resetting the rankIndexToProcess for already completed adapters.
       ChannelSegment segment = rankList.get(rankIndexToProcess);
@@ -478,12 +484,12 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       }
     } catch (Exception exception) {
       terminationReason = processingError;
-      inspectorStat.incrementStatCount(InspectorStrings.processingError, InspectorStrings.count);
+      InspectorStats.incrementStatCount(InspectorStrings.processingError, InspectorStrings.count);
       sendNoAdResponse(e);
       String exceptionClass = exception.getClass().getSimpleName();
       // incrementing the count of the number of exceptions thrown in the
       // server code
-      inspectorStat.incrementStatCount(exceptionClass, InspectorStrings.count);
+      InspectorStats.incrementStatCount(exceptionClass, InspectorStrings.count);
       StringWriter sw = new StringWriter();
       PrintWriter pw = new PrintWriter(sw);
       exception.printStackTrace(pw);
@@ -506,18 +512,6 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     }
   }
 
-  private ChannelSegmentEntity[] convertToSegmentsArray(HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments) {
-    ArrayList<ChannelSegmentEntity> rows = new ArrayList<ChannelSegmentEntity>();
-    for (String advertiserId : matchedSegments.keySet()) {
-      for (String adgroupId : matchedSegments.get(advertiserId).keySet()) {
-        rows.add(matchedSegments.get(advertiserId).get(adgroupId));
-        if(logger.isDebugEnabled())
-          logger.debug("ChannelSegmentEntity Added to array for advertiserid : " + advertiserId + " and adgroupid " + adgroupId);
-      }
-    }
-    return (ChannelSegmentEntity[]) rows.toArray(new ChannelSegmentEntity[0]);
-  }
-
   // changing rollout percentage
   public void changeRollout(MessageEvent e, QueryStringDecoder queryStringDecoder) throws Exception {
     try {
@@ -528,7 +522,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       sendResponse("INVALIDPERCENT", e);
       return;
     }
-    inspectorStat.setWorkflowStats(InspectorStrings.percentRollout, Long.valueOf(percentRollout));
+    InspectorStats.setWorkflowStats(InspectorStrings.percentRollout, Long.valueOf(percentRollout));
     logger.debug("new roll out percentage is " + percentRollout);
     sendResponse("OK", e);
   }
@@ -551,7 +545,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
               jObject = new JSONObject();
               logger.debug("Encountered Json Error while creating json object inside HttpRequest Handler");
               terminationReason = jsonParsingError;
-              inspectorStat.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
+              InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
             }
           }
         }
@@ -633,7 +627,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
         if(adResponse.responseStatus == ThirdPartyAdResponse.ResponseStatus.SUCCESS) {
           // Sends the response if request is completed for the
           // specific adapter.
-          sendAdResponse(adResponse.response, event);
+          sendAdResponse(adNetwork, event);
           break;
         } else {
           // Iterates to the next adapter.
@@ -672,12 +666,12 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       totalTime = 0;
     try {
       if(adResponse == null) {
-        Logging.channelLogline(list, null, logger, loggerConfig, inspectorStat, sasParams, totalTime, jObject);
+        Logging.channelLogline(list, null, logger, loggerConfig, sasParams, totalTime, jObject);
         Logging.rrLogging(jObject, null, logger, loggerConfig, sasParams, terminationReason);
         Logging.advertiserLogging(list, logger, loggerConfig);
         Logging.sampledAdvertiserLogging(list, logger, loggerConfig);
       } else {
-        Logging.channelLogline(list, adResponse.clickUrl, logger, loggerConfig, inspectorStat, sasParams, totalTime, jObject);
+        Logging.channelLogline(list, adResponse.clickUrl, logger, loggerConfig, sasParams, totalTime, jObject);
         if(rtbResponse == null)
           Logging.rrLogging(jObject, rankList.get(selectedAdIndex), logger, loggerConfig, sasParams, terminationReason);
         else
@@ -743,12 +737,12 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
 
   // get host name
   public String getHost(HttpRequest request) {
-    List headers = request.getHeaders();
+    List<Map.Entry<String, String>> headers = request.getHeaders();
     String host = null;
 
     for (int index = 0; index < headers.size(); index++) {
-      if(((String) ((Map.Entry) (headers.get(index))).getKey()).equalsIgnoreCase("Host")) {
-        host = (String) ((Map.Entry) (headers.get(index))).getValue();
+      if(((String) ((Map.Entry<String, String>) (headers.get(index))).getKey()).equalsIgnoreCase("Host")) {
+        host = (String) ((Map.Entry<String, String>) (headers.get(index))).getValue();
       }
     }
 
@@ -771,7 +765,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     }
     responseSent = true;
     logger.debug("no ad received");
-    inspectorStat.incrementStatCount(InspectorStrings.totalNoFills);
+    InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
 
     if(getResponseFormat().equals("xhtml")) {
       sendResponse(noAdXhtml, event);
@@ -826,9 +820,9 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       rollCount = 0;
     }
     logger.debug("asked for load balancer status");
-    inspectorStat.incrementStatCount("LbStatus", InspectorStrings.totalRequests);
+    InspectorStats.incrementStatCount("LbStatus", InspectorStrings.totalRequests);
     if(ServerStatusInfo.statusCode != 404) {
-      inspectorStat.incrementStatCount("LbStatus", InspectorStrings.successfulRequests);
+      InspectorStats.incrementStatCount("LbStatus", InspectorStrings.successfulRequests);
       sendResponse("OK", e);
       return;
     }
@@ -844,12 +838,13 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
   }
 
   // Called only if the adNetwork have an ad.
+
   @Override
   public void sendAdResponse(AdNetworkInterface selectedAdNetwork, MessageEvent event) {
     adResponse = selectedAdNetwork.getResponseAd();
     selectedAdIndex = getRankIndex(selectedAdNetwork);
     sendAdResponse(adResponse.response, event);
-    inspectorStat.incrementStatCount(selectedAdNetwork.getName(), InspectorStrings.serverImpression);
+    InspectorStats.incrementStatCount(selectedAdNetwork.getName(), InspectorStrings.serverImpression);
   }
 
   // send Ad Response
@@ -869,11 +864,11 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
         Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot));
         String startElement = String.format(startTags, (int) dim.getWidth(), (int) dim.getHeight());
         responseString = startElement + responseString + endTags;
-        inspectorStat.incrementStatCount(InspectorStrings.totalFills);
+        InspectorStats.incrementStatCount(InspectorStrings.totalFills);
       } else {
         logger.error("invalid slot, so not returning response, even though we got an ad");
         responseString = noAdXhtml;
-        inspectorStat.incrementStatCount(InspectorStrings.totalNoFills);
+        InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
       }
     }
     sendResponse(responseString, event);
@@ -1068,7 +1063,6 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     MatchSegments segmentMatcher = new MatchSegments(logger);
     String slotStr = stringify(args, "slot-served");
     String countryStr = parseArray(args, "carrier", 1);
-    String platformStr = parseArray(args, "handset", 5);
     int osId = jObject.optInt("os-id", -1);
     String sourceStr = stringify(args, "source");
     String siteRatingStr = stringify(args, "site-type");
@@ -1089,20 +1083,15 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     }
     try {
       if(logger.isDebugEnabled()) {
-        logger.debug("Request# slot: " + slotStr + " country: " + countryStr + " categories: " + sasParams.categories + " platform: " + platformStr
+        logger.debug("Request# slot: " + slotStr + " country: " + countryStr + " categories: " + sasParams.categories 
             + " targetingPlatform: " + targetingPlatform + " siteRating: " + siteRating + " osId" + osId);
       }
       long slot = Long.parseLong(slotStr);
-      long platform;
-      if(platformStr != null)
-        platform = Long.parseLong(platformStr);
-      else
-        platform = -1;
       long country = -1;
       if(countryStr != null) {
         country = Long.parseLong(countryStr);
       }
-      return (segmentMatcher.matchSegments(logger, slot, sasParams.categories, country, targetingPlatform, siteRating, platform, osId));
+      return (segmentMatcher.matchSegments(logger, slot, sasParams.categories, country, targetingPlatform, siteRating, osId));
     } catch (NumberFormatException exception) {
       logger.error("Error parsing required arguments " + exception.getMessage());
       return null;
@@ -1119,7 +1108,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     try {
       MimeMessage message = new MimeMessage(session);
       message.setFrom(new InternetAddress(config.getString("sender")));
-      List recipients = config.getList("recipients");
+      List<String> recipients = config.getList("recipients");
       javax.mail.internet.InternetAddress[] addressTo = new javax.mail.internet.InternetAddress[recipients.size()];
 
       for (int index = 0; index < recipients.size(); index++) {
@@ -1150,7 +1139,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     try {
       StringBuilder updates = new StringBuilder();
       updates.append("Successfully changed Config!!!!!!!!!!!!!!!!!\n").append("The changes are\n");
-      Iterator itr = jObj.keys();
+      Iterator<String> itr = jObj.keys();
       while (itr.hasNext()) {
         String configKey = itr.next().toString();
         if(configKey.startsWith("adapter") && adapterConfig.containsKey(configKey.replace("adapter.", ""))) {
