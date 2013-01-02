@@ -433,6 +433,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       if(segments.size() == 0) {
         logger.debug("No succesfull configuration of adapter ");
         sendNoAdResponse(e);
+        return;
       }
         
       rankList = Filters.rankAdapters(segments, logger, config);
