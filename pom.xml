@@ -40,42 +40,42 @@
          <url>http://maven.scm.corp.inmobi.com/content/repositories/releases/</url>
       </repository>
    </repositories>
-<!--   <build>
-      <plugins>
-         <plugin>
+   <build>
+       <plugins>
+        <plugin>
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.5</version>
-            <configuration>
-               <skip>true</skip>
-            </configuration>
-         </plugin>
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-release-plugin</artifactId>
-            <version>2.3.2</version>
-            <configuration>
-               <autoVersionSubmodules>true</autoVersionSubmodules>
-            </configuration>
-         </plugin>
-         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <version>1.7</version>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <version>2.9.1</version>
             <executions>
-               <execution>
-                  <phase>generate-sources</phase>
-                  <goals>
-                     <goal>add-source</goal>
-                  </goals>
-                  <configuration>
-                     <sources>
-                        <source>target/generated-sources</source>
-                     </sources>
-                  </configuration>
-               </execution>
+                <execution>
+                    <phase>compile</phase>
+                    <goals>
+                        <goal>check</goal>
+                    </goals>
+                    <configuration>
+                                <violationSeverity>error</violationSeverity>
+                                <maxAllowedViolations>7000</maxAllowedViolations>
+                                <failOnViolation>false</failOnViolation>
+                                <failsOnError>false</failsOnError>
+                    </configuration>
+                </execution>
             </executions>
-         </plugin>
-      </plugins>
-   </build-->
+            <dependencies>
+            </dependencies>
+        </plugin>
+        </plugins>
+   </build>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>2.9.1</version>
+        <configuration>
+		<enableRulesSummary>true</enableRulesSummary>
+        <excludes>**/generated-sources/**/*.java</excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>
