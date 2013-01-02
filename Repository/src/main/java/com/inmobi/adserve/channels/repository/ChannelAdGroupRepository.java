@@ -80,11 +80,15 @@ public class ChannelAdGroupRepository extends AbstractHashDBUpdatableRepository<
           boolean allTags = rs.getBoolean("all_tags");
           int targetingPlatform = rs.getInt("targeting_platform");
           String osVersionTargeting = rs.getString("os_version_targeting");
+          String siteExclIncl = rs.getString("site_exclusion_inclusion");
+          boolean zipCodeRequired = rs.getBoolean("is_zip_code_required");
           ArrayList<Integer> osIds = parseOsIds(osVersionTargeting);
+          ArrayList<String> siteIds = getSiteIdList(siteExclIncl);
+          boolean siteExclusion = isSiteExlusion(siteExclIncl);
 
           ChannelSegmentEntity thirdPartyNetwork = new ChannelSegmentEntity(advertiserId, adgroupId, adId, channelId,
               platformTargeting, rcList, tags, status, isTestMode, externalSiteKey, modified_on, campaignId, slotIds, incId,
-              allTags, pricingModel, siteRatings, targetingPlatform, osIds);
+              allTags, pricingModel, siteRatings, targetingPlatform, osIds, siteIds, siteExclusion);
           ChannelSegmentEntity oldEntity = entitySet.get(adgroupId);
           entitySet.put(adgroupId, thirdPartyNetwork);
           if(null != oldEntity) {
@@ -121,6 +125,34 @@ public class ChannelAdGroupRepository extends AbstractHashDBUpdatableRepository<
     InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.entityCurrentlyLoaded, entitySet.size());
     InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.isUpdating, 0);
     return thirdPartyNetworks;
+  }
+
+  private boolean isSiteExlusion(String siteExclIncl) {
+    boolean isSiteExcl = false;
+    try {
+      if(siteExclIncl != null) {
+        isSiteExcl = new JSONObject(siteExclIncl).getBoolean("is_site_exclusion");
+      }
+    } catch (JSONException e) {
+      // Do Nothing
+    }
+    return isSiteExcl;
+  }
+
+  private ArrayList<String> getSiteIdList(String siteExclIncl) {
+    ArrayList<String> siteIds = null;
+    try {
+      if(siteExclIncl != null) {
+        JSONArray siteIdsJson = new JSONObject(siteExclIncl).getJSONArray("site_ids");
+        siteIds = new ArrayList<String>(siteIdsJson.length());
+        for (int index = 0; index < siteIdsJson.length(); ++index) {
+          siteIds.add(siteIdsJson.getString(index));
+        }
+      }
+    } catch (JSONException e) {
+      // Do Nothing
+    }
+    return siteIds;
   }
 
   // Made protected for testing visibility.
@@ -273,14 +305,14 @@ public class ChannelAdGroupRepository extends AbstractHashDBUpdatableRepository<
                 for (Integer id : entity.getOsIds()) {
                   insertEntity(slotId, -1 /* All categories */, -1, targetingPlatform, siteRating, entity, id);
                 }
-            }else {
-              for(Long country : entity.getRcList())
-              if(entity.getOsIds() == null || entity.getOsIds().size() == 0) {
-                insertEntity(slotId, -1 /* All categories */, country, targetingPlatform, siteRating, entity, -1);
-              } else
-                for (Integer id : entity.getOsIds()) {
-                  insertEntity(slotId, -1 /* All categories */, country, targetingPlatform, siteRating, entity, id);
-                }
+            } else {
+              for (Long country : entity.getRcList())
+                if(entity.getOsIds() == null || entity.getOsIds().size() == 0) {
+                  insertEntity(slotId, -1 /* All categories */, country, targetingPlatform, siteRating, entity, -1);
+                } else
+                  for (Integer id : entity.getOsIds()) {
+                    insertEntity(slotId, -1 /* All categories */, country, targetingPlatform, siteRating, entity, id);
+                  }
             }
           } else {
             for (Long category : entity.getTags()) {
@@ -291,14 +323,14 @@ public class ChannelAdGroupRepository extends AbstractHashDBUpdatableRepository<
                   for (Integer id : entity.getOsIds()) {
                     insertEntity(slotId, category, -1, targetingPlatform, siteRating, entity, id);
                   }
-              }else {
-                for(Long country : entity.getRcList())
-                if(entity.getOsIds() == null || entity.getOsIds().size() == 0) {
-                  insertEntity(slotId, category, country, targetingPlatform, siteRating, entity, -1);
-                } else
-                  for (Integer id : entity.getOsIds()) {
-                    insertEntity(slotId, category, country, targetingPlatform, siteRating, entity, id);
-                  }
+              } else {
+                for (Long country : entity.getRcList())
+                  if(entity.getOsIds() == null || entity.getOsIds().size() == 0) {
+                    insertEntity(slotId, category, country, targetingPlatform, siteRating, entity, -1);
+                  } else
+                    for (Integer id : entity.getOsIds()) {
+                      insertEntity(slotId, category, country, targetingPlatform, siteRating, entity, id);
+                    }
               }
             }
           }
