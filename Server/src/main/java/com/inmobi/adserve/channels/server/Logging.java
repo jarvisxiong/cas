@@ -16,7 +16,6 @@ import org.json.JSONObject;
 import com.inmobi.adserve.channels.api.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.inmobi.adserve.channels.server.HttpRequestHandler.ChannelSegment;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.log.channel.AdResponse;
@@ -128,7 +127,7 @@ public class Logging {
   }
 
   // Writing rrlogs
-  public static void rrLogging(JSONObject jObject, HttpRequestHandler.ChannelSegment channelSegment, DebugLogger logger, Configuration config,
+  public static void rrLogging(JSONObject jObject, ChannelSegment channelSegment, DebugLogger logger, Configuration config,
       SASRequestParameters sasParams, String terminationReason) throws JSONException, TException  {
     Logger rrLogger = Logger.getLogger(config.getString("rr"));
     boolean isTerminated = false;

@@ -15,7 +15,6 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.repository.*;
-import com.inmobi.adserve.channels.server.HttpRequestHandler.ChannelSegment;
 
 /**
  * 

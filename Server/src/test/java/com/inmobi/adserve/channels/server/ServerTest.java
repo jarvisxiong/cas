@@ -58,8 +58,7 @@ public class ServerTest extends TestCase {
     DebugLogger.init(mockConfig);
     logger = new DebugLogger();
     InspectorStats.initializeWorkflow("WorkFlow");
-    HttpRequestHandler.init(config, (ChannelAdGroupRepository) null, (ClientBootstrap) null, (ClientBootstrap) null, null, null,
-        null);
+    HttpRequestHandler.init(config, (ClientBootstrap) null, (ClientBootstrap) null, null);
     httpRequestHandler = new HttpRequestHandler();
     AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
     Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-channel", "cas-advertisement", mockConfig);
@@ -171,7 +170,8 @@ public class ServerTest extends TestCase {
   public void testGetCategory() throws Exception {
     JSONObject jsonObject = prepareParameters();
     long category[] = { 1, 2 };
-    assertTrue("Category are expected to be equal", Arrays.equals(RequestParser.getCategory(jsonObject, new DebugLogger()), category));
+    assertTrue("Category are expected to be equal",
+        Arrays.equals(RequestParser.getCategory(jsonObject, new DebugLogger()), category));
   }
 
   @Test

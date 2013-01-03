@@ -111,8 +111,7 @@ public class ChannelServer {
     // Configure the netty server.
     try {
       // Initialising request handler
-      HttpRequestHandler.init(config, channelAdGroupRepository, clientBootstrap, rtbClientBootstrap, channelRepository,
-          channelFeedbackRepository, channelSegmentFeedbackRepository);
+      HttpRequestHandler.init(config, clientBootstrap, rtbClientBootstrap, repositoryHelper);
       SegmentFactory.init(repositoryHelper);
       ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
       Timer timer = new HashedWheelTimer();
