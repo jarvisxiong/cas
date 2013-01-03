@@ -263,7 +263,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
       Map<String, List<String>> params = queryStringDecoder.getParameters();
       extractParams(params);
-      sasParams = parseRequestParameters(jObject);
+      sasParams = RequestParser.parseRequest(jObject, logger);
 
       if(random.nextInt(100) >= percentRollout) {
         logger.debug("Request not being served because of limited percentage rollout");
@@ -895,166 +895,13 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     }
   }
 
-  // parse the parameters received from nginx
-  private SASRequestParameters parseRequestParameters(JSONObject jObject) {
-    SASRequestParameters params = new SASRequestParameters();
-    logger.debug("inside parameter parser");
-    if(null == jObject) {
-      logger.debug("Returning null as jObject is null.");
-      return null;
-    }
-    params.allParametersJson = jObject.toString();
-    params.remoteHostIp = stringify(jObject, "w-s-carrier");
-    params.userAgent = stringify(jObject, "rq-x-inmobi-phone-useragent");
-    if(null == params.userAgent) {
-      params.userAgent = stringify(jObject, "rq-h-user-agent");
-    }
-    params.locSrc = stringify(jObject, "loc-src");
-    params.latLong = stringify(jObject, "latlong");
-    params.siteId = stringify(jObject, "rq-mk-siteid");
-    params.source = stringify(jObject, "source");
-    params.country = parseArray(jObject, "carrier", 2);
-    params.area = parseArray(jObject, "carrier", 4);
-    params.slot = stringify(jObject, "slot-served");
-    params.sdkVersion = stringify(jObject, "sdk-version");
-    params.siteType = stringify(jObject, "site-type");
-    params.adcode = stringify(jObject, "adcode");
-    params.platformOsId = jObject.optInt("os-id", -1);
-    if(params.siteType != null) {
-      params.siteType = params.siteType.toUpperCase();
-    }
-    params.categories = getCategory(jObject);
-    params.allowBannerAds = jObject.opt("site-allowBanner") == null ? true : (Boolean) (jObject.opt("site-allowBanner"));
-    params.siteFloor = jObject.opt("site-floor") == null ? 0.0 : Double.parseDouble(jObject.opt("site-floor").toString());
-    if(logger.isDebugEnabled()) {
-      logger.debug("country obtained is " + params.country);
-      logger.debug("site floor is " + params.siteFloor);
-      logger.debug("osId is " + params.platformOsId);
-    }
-    params = getUserParams(params, jObject);
-    params = getUserIdParams(params, jObject);
-    try {
-      JSONArray siteInfo = jObject.getJSONArray("site");
-      if(siteInfo != null && siteInfo.length() > 0) {
-        params.siteIncId = siteInfo.getLong(0);
-      }
-    } catch (JSONException exception) {
-      logger.debug("site object not found in request");
-      params.siteIncId = 0;
-    }
-    if(null == params.uid || params.uid.isEmpty()) {
-      params.uid = stringify(jObject, "u-id");
-    }
-    logger.debug("successfully parsed params");
-    return params;
-  }
-
-  public String parseArray(JSONObject jObject, String param, int index) {
-    try {
-      JSONArray jArray = jObject.getJSONArray(param);
-      return (jArray.getString(index));
-    } catch (JSONException e) {
-      return null;
-    } catch (NullPointerException e) {
-      return null;
-    }
-  }
-
-  public long[] getCategory(JSONObject jObject) {
-    try {
-      JSONArray categories = jObject.getJSONArray("category");
-      long[] category = new long[categories.length()];
-      for (int index = 0; index < categories.length(); index++) {
-        category[index] = categories.getLong(index);
-      }
-      return category;
-    } catch (JSONException e) {
-      logger.error("error while reading category array");
-      return null;
-    }
-  }
+  
 
   public String getImpressionId(JSONObject jObject, long adId) {
     String uuidIntKey = (WilburyUUID.setIntKey(WilburyUUID.getUUID().toString(), (int) adId)).toString();
     String uuidMachineKey = (WilburyUUID.setMachineId(uuidIntKey, ChannelServer.hostIdCode)).toString();
     return (WilburyUUID.setDataCenterId(uuidMachineKey, ChannelServer.dataCenterIdCode)).toString();
-  }
-
-  // convert the json values to string values
-  public String stringify(JSONObject jObject, String field) throws NullPointerException {
-    String fieldValue = "";
-    try {
-      fieldValue = (String) jObject.get(field);
-    } catch (JSONException e) {
-      return null;
-    }
-    if(logger.isDebugEnabled())
-      logger.debug("Retrived from json " + field + " = " + fieldValue);
-    return fieldValue;
-  }
-
-  // Get user specific params
-  public SASRequestParameters getUserParams(SASRequestParameters parameter, JSONObject jObject) {
-    logger.debug("inside parsing user params");
-    try {
-      JSONObject userMap = (JSONObject) jObject.get("uparams");
-      parameter.age = stringify(userMap, "u-age");
-      parameter.gender = stringify(userMap, "u-gender");
-      parameter.uid = stringify(userMap, "u-id");
-      parameter.postalCode = stringify(userMap, "u-postalcode");
-      if(!StringUtils.isEmpty(parameter.postalCode))
-        parameter.postalCode = parameter.postalCode.replaceAll(" ", "");
-      parameter.userLocation = stringify(userMap, "u-location");
-      parameter.genderOrig = stringify(userMap, "u-gender-orig");
-      if(logger.isDebugEnabled()) {
-        logger.debug("uid is " + parameter.uid + ",postalCode is " + parameter.postalCode + ",gender is " + parameter.gender);
-        logger.debug("age is " + parameter.age + ",location is " + parameter.userLocation + ",genderorig is " + parameter.genderOrig);
-      }
-    } catch (JSONException exception) {
-      parameter.age = null;
-      parameter.gender = null;
-      parameter.uid = null;
-      parameter.postalCode = null;
-      parameter.userLocation = null;
-      parameter.genderOrig = null;
-      logger.error("uparams missing in the request");
-    } catch (NullPointerException exception) {
-      parameter.age = null;
-      parameter.gender = null;
-      parameter.uid = null;
-      parameter.postalCode = null;
-      parameter.userLocation = null;
-      parameter.genderOrig = null;
-      logger.error("uparams missing in the request");
-    }
-    return parameter;
-  }
-
-  // Get user id params
-  public SASRequestParameters getUserIdParams(SASRequestParameters parameter, JSONObject jObject) {
-    if(logger.isDebugEnabled())
-      logger.debug("inside parsing userid params");
-    try {
-      JSONObject userIdMap = (JSONObject) jObject.get("u-id-params");
-      String o1Uid = stringify(userIdMap, "SO1");
-      parameter.uidO1 = (o1Uid != null) ? o1Uid : stringify(userIdMap, "O1");
-      parameter.uidMd5 = stringify(userIdMap, "UM5");
-      parameter.uidIFA = ("iphone".equalsIgnoreCase(parameter.source)) ? stringify(userIdMap, "IDA") : null;
-
-    } catch (JSONException exception) {
-      setNullValueForUid(parameter);
-    } catch (NullPointerException exception) {
-      setNullValueForUid(parameter);
-    }
-    return parameter;
-  }
-
-  private void setNullValueForUid(SASRequestParameters parameter) {
-    parameter.uidO1 = null;
-    parameter.uidMd5 = null;
-    parameter.uidIFA = null;
-    logger.error("uidparams missing in the request");
-  }
+  }  
 
   // select channel segment based on specified rules
   private HashMap<String, HashMap<String, ChannelSegmentEntity>> matchSegments(JSONObject args) {

@@ -30,7 +30,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
   private Integer[] siteRatings;
   private List<Integer> osIds;
   private List<String> siteIds;
-  private boolean excludeSites;
+  private boolean siteExclusion;
   private boolean udidRequired;
   private boolean zipCodeRequired;
   private boolean richMediEnabled;
@@ -38,7 +38,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
   public ChannelSegmentEntity(final String advertiserId, final String adgroupId, final String adId, final String channelId,
       long platformTargeting, Long[] rcList, Long[] tags, boolean status, boolean isTestMode, String externalSiteKey,
       Timestamp modified_on, String campaignId, Long[] slotIds, long incId, boolean allTags, String pricingModel,
-      Integer[] siteRatings, int targetingPlatform, ArrayList<Integer> osIds, List<String> siteIds, boolean excludeSites,
+      Integer[] siteRatings, int targetingPlatform, ArrayList<Integer> osIds, List<String> siteIds, boolean siteExclusion,
       boolean udidRequired, boolean zipCodeRequired, boolean richMediaEnabled) {
     this.advertiserId = advertiserId;
     this.adgroupId = adgroupId;
@@ -63,7 +63,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
     this.siteRatings = siteRatings;
     this.osIds = osIds;
     this.siteIds = siteIds;
-    this.excludeSites = excludeSites;
+    this.siteExclusion  = siteExclusion;
     this.udidRequired = udidRequired;
     this.zipCodeRequired = zipCodeRequired;
     this.richMediEnabled = richMediaEnabled;
@@ -85,8 +85,8 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
     return siteIds;
   }
 
-  public boolean isExcludeSites() {
-    return excludeSites;
+  public boolean isSiteExclusion() {
+    return siteExclusion;
   }
 
   public boolean isUdidRequired() {
