@@ -498,10 +498,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       if(logger.isDebugEnabled()) {
         sendMail(exception.getMessage(), sw.toString());
       }
-    } finally {
-      // cleanUp();
-      // e.getChannel().close();
-    }
+    } 
     if(logger.isDebugEnabled()) {
       if(rankList != null) {
         for (int index = 0; index < rankList.size(); ++index) {
