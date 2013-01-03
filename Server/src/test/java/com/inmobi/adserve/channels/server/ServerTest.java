@@ -136,9 +136,9 @@ public class ServerTest extends TestCase {
 
   @Test
   public void testStringify() throws Exception {
-    httpRequestHandler.logger = new DebugLogger();
+    DebugLogger logger = new DebugLogger();
     JSONObject jsonObject = prepareParameters();
-    assertEquals(httpRequestHandler.stringify(jsonObject, "remoteHostIp"), "10.14.110.100");
+    assertEquals(RequestParser.stringify(jsonObject, "remoteHostIp", logger), "10.14.110.100");
   }
 
   @Test
@@ -149,15 +149,15 @@ public class ServerTest extends TestCase {
   @Test
   public void testParseArray() throws Exception {
     JSONObject jsonObject = prepareParameters();
-    assertEquals(httpRequestHandler.parseArray(jsonObject, "testarr", 1), "2");
+    assertEquals(RequestParser.parseArray(jsonObject, "testarr", 1), "2");
   }
 
   @Test
   public void testGetUserParams() throws Exception {
     JSONObject jsonObject = prepareParameters();
     SASRequestParameters params = new SASRequestParameters();
-    httpRequestHandler.logger = new DebugLogger();
-    params = httpRequestHandler.getUserParams(params, jsonObject);
+    DebugLogger logger = new DebugLogger();
+    params = RequestParser.getUserParams(params, jsonObject, logger);
     assertEquals(params.age, "35");
   }
 
@@ -171,7 +171,7 @@ public class ServerTest extends TestCase {
   public void testGetCategory() throws Exception {
     JSONObject jsonObject = prepareParameters();
     long category[] = { 1, 2 };
-    assertTrue("Category are expected to be equal", Arrays.equals(httpRequestHandler.getCategory(jsonObject), category));
+    assertTrue("Category are expected to be equal", Arrays.equals(RequestParser.getCategory(jsonObject, new DebugLogger()), category));
   }
 
   @Test

@@ -11,7 +11,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -30,7 +29,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.thrift.TException;
 import org.jboss.netty.bootstrap.ClientBootstrap;
@@ -47,7 +45,6 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.jboss.netty.handler.timeout.IdleStateEvent;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -82,8 +79,8 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     public double lowerPriorityRange;
     public double higherPriorityRange;
 
-    public ChannelSegment(ChannelSegmentEntity channelSegmentEntity, AdNetworkInterface adNetworkInterface, ChannelEntity channelEntity,
-        ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity) {
+    public ChannelSegment(ChannelSegmentEntity channelSegmentEntity, AdNetworkInterface adNetworkInterface,
+        ChannelEntity channelEntity, ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity) {
       this.channelSegmentEntity = channelSegmentEntity;
       this.adNetworkInterface = adNetworkInterface;
       this.channelEntity = channelEntity;
@@ -108,8 +105,9 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
   private static final String noAdXhtml = "<AdResponse><Ads></Ads></AdResponse>";
   private static final String noAdHtml = "<!-- mKhoj: No advt for this position -->";
   private static final String noAdJsAdcode = "<html><head><title></title><style type=\"text/css\">"
-      + " body {margin: 0; overflow: hidden; background-color: transparent}" + " </style></head><body class=\"nofill\"><!-- NO FILL -->"
-      + "<script type=\"text/javascript\" charset=\"utf-8\">" + "parent.postMessage('{\"topic\":\"nfr\",\"container\" : \"%s\"}', '*');</script></body></html>";
+      + " body {margin: 0; overflow: hidden; background-color: transparent}"
+      + " </style></head><body class=\"nofill\"><!-- NO FILL -->" + "<script type=\"text/javascript\" charset=\"utf-8\">"
+      + "parent.postMessage('{\"topic\":\"nfr\",\"container\" : \"%s\"}', '*');</script></body></html>";
   private static int rollCount = 0;
   private static int percentRollout;
   private long totalTime;
@@ -136,9 +134,9 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
   private static final String CLOSED_CHANNEL_EXCEPTION = "java.nio.channels.ClosedChannelException";
   private static final String CONNECTION_RESET_PEER = "java.io.IOException: Connection reset by peer";
 
-  public static void init(ConfigurationLoader config, ChannelAdGroupRepository channelAdGroupRepo, ClientBootstrap clientBootstrap,
-      ClientBootstrap rtbClientBootstrap, ChannelRepository channelRepository, ChannelFeedbackRepository channelFeedbackRepository,
-      ChannelSegmentFeedbackRepository channelSegmentFeedbackRepository) {
+  public static void init(ConfigurationLoader config, ChannelAdGroupRepository channelAdGroupRepo,
+      ClientBootstrap clientBootstrap, ClientBootstrap rtbClientBootstrap, ChannelRepository channelRepository,
+      ChannelFeedbackRepository channelFeedbackRepository, ChannelSegmentFeedbackRepository channelSegmentFeedbackRepository) {
     HttpRequestHandler.rtbConfig = config.rtbConfiguration();
     HttpRequestHandler.loggerConfig = config.loggerConfiguration();
     HttpRequestHandler.config = config.serverConfiguration();
@@ -150,7 +148,6 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     HttpRequestHandler.rtbClientBootstrap = rtbClientBootstrap;
     HttpRequestHandler.channelRepository = channelRepository;
     HttpRequestHandler.channelSegmentFeedbackRepository = channelSegmentFeedbackRepository;
-    allowedSiteTypes = HttpRequestHandler.config.getList("allowedSiteTypes");
     percentRollout = HttpRequestHandler.config.getInt("percentRollout", 100);
     InspectorStats.setWorkflowStats(InspectorStrings.percentRollout, Long.valueOf(percentRollout));
   }
@@ -262,8 +259,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
 
       InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
       Map<String, List<String>> params = queryStringDecoder.getParameters();
-      extractParams(params);
-      sasParams = RequestParser.parseRequest(jObject, logger);
+      sasParams = RequestParser.parseRequest(params, logger);
 
       if(random.nextInt(100) >= percentRollout) {
         logger.debug("Request not being served because of limited percentage rollout");
@@ -294,8 +290,8 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
 
       if(sasParams.sdkVersion != null) {
         try {
-          if((sasParams.sdkVersion.substring(0, 1).equalsIgnoreCase("i") || sasParams.sdkVersion.substring(0, 1).equalsIgnoreCase("a"))
-              && Integer.parseInt(sasParams.sdkVersion.substring(1, 2)) < 3) {
+          if((sasParams.sdkVersion.substring(0, 1).equalsIgnoreCase("i") || sasParams.sdkVersion.substring(0, 1)
+              .equalsIgnoreCase("a")) && Integer.parseInt(sasParams.sdkVersion.substring(1, 2)) < 3) {
             logger.error("Terminating request as sdkVersion is less than 3");
             terminationReason = lowSdkVersion;
             InspectorStats.incrementStatCount(InspectorStrings.lowSdkVersion, InspectorStrings.count);
@@ -323,7 +319,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       }
 
       // getting the selected third party site details
-      HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments = matchSegments(jObject);
+      HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments = new MatchSegments(logger).matchSegments(sasParams);
 
       if(matchedSegments == null) {
         sendNoAdResponse(e);
@@ -374,8 +370,8 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
         isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled", false);
         logger.debug("isRtbEnabled is " + isRtbEnabled);
 
-        AdNetworkInterface network = SegmentFactory.getChannel(row.getId(), row.getChannelId(), HttpRequestHandler.adapterConfig, clientBootstrap,
-            rtbClientBootstrap, this, e, advertiserSet, logger, isRtbEnabled);
+        AdNetworkInterface network = SegmentFactory.getChannel(row.getId(), row.getChannelId(), HttpRequestHandler.adapterConfig,
+            clientBootstrap, rtbClientBootstrap, this, e, advertiserSet, logger, isRtbEnabled);
         if(null == network) {
           if(logger.isDebugEnabled()) {
             logger.debug("No adapter found for adGroup: " + row.getAdgroupId());
@@ -420,13 +416,15 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
           InspectorStats.incrementStatCount(network.getName(), InspectorStrings.successfulConfigure);
           ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = channelSegmentFeedbackRepository.query(row.getAdgroupId());
           if(null == channelSegmentFeedbackEntity)
-            channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(row.getId(), row.getAdgroupId(), config.getDouble("default.ecpm"),
-                config.getDouble("default.fillratio"));
+            channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(row.getId(), row.getAdgroupId(),
+                config.getDouble("default.ecpm"), config.getDouble("default.fillratio"));
           if(network.isRtbPartner()) {
-            rtbSegments.add(new ChannelSegment(row, network, channelRepository.query(row.getChannelId()), channelSegmentFeedbackEntity));
+            rtbSegments.add(new ChannelSegment(row, network, channelRepository.query(row.getChannelId()),
+                channelSegmentFeedbackEntity));
             logger.debug(network.getName() + " is a rtb partner so adding this network to rtb ranklist");
           } else
-            segments.add(new ChannelSegment(row, network, channelRepository.query(row.getChannelId()), channelSegmentFeedbackEntity));
+            segments.add(new ChannelSegment(row, network, channelRepository.query(row.getChannelId()),
+                channelSegmentFeedbackEntity));
         }
       }
 
@@ -435,21 +433,20 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
         sendNoAdResponse(e);
         return;
       }
-        
+
       rankList = Filters.rankAdapters(segments, logger, config);
       rankList = Filters.ensureGuaranteedDelivery(rankList, adapterConfig, logger);
-      
 
       int successfullCalls = 0;
-      Iterator<ChannelSegment> itr = rankList.iterator(); 
-      while(itr.hasNext()) {
+      Iterator<ChannelSegment> itr = rankList.iterator();
+      while (itr.hasNext()) {
         logger.debug("in for loop");
         ChannelSegment channelSegment = itr.next();
         InspectorStats.incrementStatCount(channelSegment.adNetworkInterface.getName(), InspectorStrings.totalInvocations);
         if(channelSegment.adNetworkInterface.makeAsyncRequest()) {
           if(logger.isDebugEnabled())
-            logger.debug("Successfully sent request to channel of  advertiser id " + channelSegment.channelSegmentEntity.getId() + "and channel id "
-                + channelSegment.channelSegmentEntity.getChannelId());
+            logger.debug("Successfully sent request to channel of  advertiser id " + channelSegment.channelSegmentEntity.getId()
+                + "and channel id " + channelSegment.channelSegmentEntity.getChannelId());
           successfullCalls++;
         } else {
           itr.remove();
@@ -498,7 +495,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       if(logger.isDebugEnabled()) {
         sendMail(exception.getMessage(), sw.toString());
       }
-    } 
+    }
     if(logger.isDebugEnabled()) {
       if(rankList != null) {
         for (int index = 0; index < rankList.size(); ++index) {
@@ -714,8 +711,8 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
         rankList.get(index).adNetworkInterface.cleanUp();
       } catch (Exception exception) {
         if(logger.isDebugEnabled()) {
-          logger.debug("Error in closing channel for index: " + index + " Name: " + rankList.get(index).adNetworkInterface.getName() + " Exception: "
-              + exception.getLocalizedMessage());
+          logger.debug("Error in closing channel for index: " + index + " Name: "
+              + rankList.get(index).adNetworkInterface.getName() + " Exception: " + exception.getLocalizedMessage());
         }
       }
     }
@@ -768,7 +765,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     if(getResponseFormat().equals("xhtml")) {
       sendResponse(noAdXhtml, event);
     } else if(isJsAdRequest()) {
-      sendResponse(String.format(noAdJsAdcode, stringify(jObject, "rq-iframe")), event);
+      sendResponse(String.format(noAdJsAdcode, sasParams.rqIframe), event);
     } else {
       sendResponse(noAdHtml, event);
     }
@@ -779,8 +776,8 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     if(null == jObject) {
       return false;
     }
-    String adCode = stringify(jObject, "adcode");
-    String rqIframe = stringify(jObject, "rq-iframe");
+    String adCode = sasParams.adcode;
+    String rqIframe = sasParams.rqIframe;
     if(adCode != null && rqIframe != null && adCode.equalsIgnoreCase("JS")) {
       return true;
     }
@@ -790,7 +787,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
   // return the response format
   public String getResponseFormat() {
     String responseFormat = "html";
-    if(jObject == null || (responseFormat = stringify(jObject, "r-format")) == null) {
+    if(jObject == null || (responseFormat = sasParams.rFormat) == null) {
       return "html";
     }
     if(responseFormat.equalsIgnoreCase("axml")) {
@@ -895,52 +892,10 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     }
   }
 
-  
-
   public String getImpressionId(JSONObject jObject, long adId) {
     String uuidIntKey = (WilburyUUID.setIntKey(WilburyUUID.getUUID().toString(), (int) adId)).toString();
     String uuidMachineKey = (WilburyUUID.setMachineId(uuidIntKey, ChannelServer.hostIdCode)).toString();
     return (WilburyUUID.setDataCenterId(uuidMachineKey, ChannelServer.dataCenterIdCode)).toString();
-  }  
-
-  // select channel segment based on specified rules
-  private HashMap<String, HashMap<String, ChannelSegmentEntity>> matchSegments(JSONObject args) {
-    MatchSegments segmentMatcher = new MatchSegments(logger);
-    String slotStr = stringify(args, "slot-served");
-    String countryStr = parseArray(args, "carrier", 1);
-    int osId = jObject.optInt("os-id", -1);
-    String sourceStr = stringify(args, "source");
-    String siteRatingStr = stringify(args, "site-type");
-    Integer targetingPlatform = (sourceStr == null || sourceStr.equalsIgnoreCase("wap")) ? 2 : 1 /* app */;
-    Integer siteRating = -1;
-    if(null == siteRatingStr) {
-      return null;
-    }
-    if(siteRatingStr.equalsIgnoreCase("performance")) {
-      siteRating = 0;
-    } else if(siteRatingStr.equalsIgnoreCase("mature")) {
-      siteRating = 1;
-    } else if(siteRatingStr.equalsIgnoreCase("family_safe")) {
-      siteRating = 2;
-    }
-    if(slotStr == null || Arrays.equals(sasParams.categories, null)) {
-      return null;
-    }
-    try {
-      if(logger.isDebugEnabled()) {
-        logger.debug("Request# slot: " + slotStr + " country: " + countryStr + " categories: " + sasParams.categories 
-            + " targetingPlatform: " + targetingPlatform + " siteRating: " + siteRating + " osId" + osId);
-      }
-      long slot = Long.parseLong(slotStr);
-      long country = -1;
-      if(countryStr != null) {
-        country = Long.parseLong(countryStr);
-      }
-      return (segmentMatcher.matchSegments(logger, slot, sasParams.categories, country, targetingPlatform, siteRating, osId));
-    } catch (NumberFormatException exception) {
-      logger.error("Error parsing required arguments " + exception.getMessage());
-      return null;
-    }
   }
 
   // send Mail if channel server crashes
@@ -1043,7 +998,8 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       if(rtbSegments.get(i).adNetworkInterface.getBidprice() < maxPrice) {
         secondHighestBidNumber = i;
         break;
-      } else if(rtbSegments.get(i).adNetworkInterface.getLatency() < rtbSegments.get(lowestLatency).adNetworkInterface.getLatency())
+      } else if(rtbSegments.get(i).adNetworkInterface.getLatency() < rtbSegments.get(lowestLatency).adNetworkInterface
+          .getLatency())
         lowestLatency = i;
     }
     if(secondHighestBidNumber != 1) {
