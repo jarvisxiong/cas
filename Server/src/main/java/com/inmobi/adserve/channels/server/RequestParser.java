@@ -16,18 +16,12 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 
 public class RequestParser {
 
-  public static SASRequestParameters parseRequest(Map<String, List<String>> jsonParmeters, DebugLogger logger) throws Exception {
-    JSONObject jObject = extractParams(jsonParmeters, logger);
-    SASRequestParameters sasRequestParameters = parseRequestParameters(jObject, logger);
-    return sasRequestParameters;
-  }
-
-  private static JSONObject extractParams(Map<String, List<String>> params, DebugLogger logger) throws Exception {
+  public static JSONObject extractParams(Map<String, List<String>> params, DebugLogger logger) throws Exception {
     return extractParams(params, "args", logger);
   }
 
   // Extracting params.
-  private static JSONObject extractParams(Map<String, List<String>> params, String jsonKey, DebugLogger logger) throws Exception {
+  public static JSONObject extractParams(Map<String, List<String>> params, String jsonKey, DebugLogger logger) throws Exception, JSONException{
     JSONObject jObject = null;
     if(!params.isEmpty()) {
       for (Entry<String, List<String>> p : params.entrySet()) {
@@ -50,7 +44,7 @@ public class RequestParser {
     return jObject;
   }
 
-  private static SASRequestParameters parseRequestParameters(JSONObject jObject, DebugLogger logger) {
+  public static SASRequestParameters parseRequestParameters(JSONObject jObject, DebugLogger logger) {
     SASRequestParameters params = new SASRequestParameters();
     logger.debug("inside parameter parser");
     if(null == jObject) {

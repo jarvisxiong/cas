@@ -252,14 +252,15 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
 
       if(queryStringDecoder.getPath().equalsIgnoreCase("/configChange")) {
         Map<String, List<String>> params = queryStringDecoder.getParameters();
-        extractParams(params, "update");
+        RequestParser.extractParams(params, "update", logger);
         changeConfig(e, jObject);
         return;
       }
 
       InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
       Map<String, List<String>> params = queryStringDecoder.getParameters();
-      sasParams = RequestParser.parseRequest(params, logger);
+      jObject = RequestParser.extractParams(params, logger);
+      sasParams = RequestParser.parseRequestParameters(jObject, logger);
 
       if(random.nextInt(100) >= percentRollout) {
         logger.debug("Request not being served because of limited percentage rollout");
