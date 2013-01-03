@@ -224,14 +224,28 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
 
       if(queryStringDecoder.getPath().equalsIgnoreCase("/configChange")) {
         Map<String, List<String>> params = queryStringDecoder.getParameters();
-        RequestParser.extractParams(params, "update", logger);
+        try {
+          jObject = RequestParser.extractParams(params, "update", logger);
+        } catch (JSONException exeption) {
+          jObject = new JSONObject();
+          logger.debug("Encountered Json Error while creating json object inside HttpRequest Handler");
+          terminationReason = jsonParsingError;
+          InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
+        }
         changeConfig(e, jObject);
         return;
       }
 
       InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
       Map<String, List<String>> params = queryStringDecoder.getParameters();
-      jObject = RequestParser.extractParams(params, logger);
+      try {
+        jObject = RequestParser.extractParams(params, logger);
+      } catch (JSONException exeption) {
+        jObject = new JSONObject();
+        logger.debug("Encountered Json Error while creating json object inside HttpRequest Handler");
+        terminationReason = jsonParsingError;
+        InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
+      }
       sasParams = RequestParser.parseRequestParameters(jObject, logger);
 
       if(random.nextInt(100) >= percentRollout) {
@@ -351,7 +365,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       rankList = Filters.ensureGuaranteedDelivery(rankList, adapterConfig, logger);
 
       rankList = AsyncRequestMaker.makeAsyncRequests(rankList, logger, this, e);
-      
+
       if(logger.isDebugEnabled()) {
         logger.debug("Number of tpans whose request was successfully completed " + rankList.size());
       }
@@ -420,32 +434,6 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     InspectorStats.setWorkflowStats(InspectorStrings.percentRollout, Long.valueOf(percentRollout));
     logger.debug("new roll out percentage is " + percentRollout);
     sendResponse("OK", e);
-  }
-
-  public void extractParams(Map<String, List<String>> params) throws Exception {
-    extractParams(params, "args");
-  }
-
-  // Extracting params.
-  public void extractParams(Map<String, List<String>> params, String jsonKey) throws Exception {
-    if(!params.isEmpty()) {
-      for (Entry<String, List<String>> p : params.entrySet()) {
-        String key = p.getKey();
-        List<String> vals = p.getValue();
-        for (String val : vals) {
-          if(key.equalsIgnoreCase(jsonKey)) {
-            try {
-              jObject = new JSONObject(val);
-            } catch (JSONException ex) {
-              jObject = new JSONObject();
-              logger.debug("Encountered Json Error while creating json object inside HttpRequest Handler");
-              terminationReason = jsonParsingError;
-              InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
-            }
-          }
-        }
-      }
-    }
   }
 
   public void disableLbStatus(MessageEvent e, String host) {

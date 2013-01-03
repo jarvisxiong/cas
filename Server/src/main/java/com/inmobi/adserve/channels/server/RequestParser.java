@@ -21,7 +21,8 @@ public class RequestParser {
   }
 
   // Extracting params.
-  public static JSONObject extractParams(Map<String, List<String>> params, String jsonKey, DebugLogger logger) throws Exception, JSONException{
+  public static JSONObject extractParams(Map<String, List<String>> params, String jsonKey, DebugLogger logger) throws Exception,
+      JSONException {
     JSONObject jObject = null;
     if(!params.isEmpty()) {
       for (Entry<String, List<String>> p : params.entrySet()) {
@@ -29,14 +30,7 @@ public class RequestParser {
         List<String> vals = p.getValue();
         for (String val : vals) {
           if(key.equalsIgnoreCase(jsonKey)) {
-            try {
-              jObject = new JSONObject(val);
-            } catch (JSONException ex) {
-              jObject = new JSONObject();
-              logger.debug("Encountered Json Error while creating json object inside HttpRequest Handler");
-              //TODO terminationReason = jsonParsingError;
-              InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
-            }
+            jObject = new JSONObject(val);
           }
         }
       }

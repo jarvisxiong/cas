@@ -87,10 +87,11 @@ public class ChannelAdGroupRepository extends AbstractHashDBUpdatableRepository<
           boolean udidReq = rs.getBoolean("is_udid_required");
           boolean zipCodeReq = rs.getBoolean("is_zipcode_required");
           boolean richMediaEnabled = rs.getBoolean("rich_media_enabled");
-          
+
           ChannelSegmentEntity thirdPartyNetwork = new ChannelSegmentEntity(advertiserId, adgroupId, adId, channelId,
               platformTargeting, rcList, tags, status, isTestMode, externalSiteKey, modified_on, campaignId, slotIds, incId,
-              allTags, pricingModel, siteRatings, targetingPlatform, osIds, siteIds, siteExclusion, udidReq, zipCodeReq, richMediaEnabled);
+              allTags, pricingModel, siteRatings, targetingPlatform, osIds, siteIds, siteExclusion, udidReq, zipCodeReq,
+              richMediaEnabled);
           ChannelSegmentEntity oldEntity = entitySet.get(adgroupId);
           entitySet.put(adgroupId, thirdPartyNetwork);
           if(null != oldEntity) {

@@ -63,7 +63,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
     this.siteRatings = siteRatings;
     this.osIds = osIds;
     this.siteIds = siteIds;
-    this.siteExclusion  = siteExclusion;
+    this.siteExclusion = siteExclusion;
     this.udidRequired = udidRequired;
     this.zipCodeRequired = zipCodeRequired;
     this.richMediEnabled = richMediaEnabled;
