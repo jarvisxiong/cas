@@ -19,20 +19,20 @@
 
     <dependencyManagement>
       <dependencies>
-
-       </dependencies>
+      </dependencies>
     </dependencyManagement>
 
-<properties>
-               <maven-release-plugin>2.3.2</maven-release-plugin>
-        </properties>
+    <properties>
+      <maven-release-plugin>2.3.2</maven-release-plugin>
+    </properties>
  
-        <scm>
-               <connection>scm:git:https://github.corp.inmobi.com/channel-adserve/cas.git</connection>
-               <url>scm:git:https://github.corp.inmobi.com/channel-adserve/cas.git</url>
-               <developerConnection>scm:git:https://github.corp.inmobi.com/channel-adserve/cas.git</developerConnection>
-               <tag>HEAD</tag>
-        </scm>
+    <scm>
+      <connection>scm:git:https://github.corp.inmobi.com/channel-adserve/cas.git</connection>
+      <url>scm:git:https://github.corp.inmobi.com/channel-adserve/cas.git</url>
+      <developerConnection>scm:git:https://github.corp.inmobi.com/channel-adserve/cas.git</developerConnection>
+      <tag>HEAD</tag>
+    </scm>
+    
     <repositories>
       <repository>
          <id>releases</id>
@@ -40,6 +40,7 @@
          <url>http://maven.scm.corp.inmobi.com/content/repositories/releases/</url>
       </repository>
    </repositories>
+   
    <build>
        <plugins>
         <plugin>
