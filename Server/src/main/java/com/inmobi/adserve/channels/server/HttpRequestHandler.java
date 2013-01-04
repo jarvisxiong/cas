@@ -439,7 +439,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
         return;
       }
 
-      List<ChannelSegment> tempRankList = new ArrayList<ChannelSegment>();
+      List<ChannelSegment> tempRankList;
       tempRankList = Filters.rankAdapters(segments, logger, config);
       tempRankList = Filters.ensureGuaranteedDelivery(tempRankList, adapterConfig, logger);
 
@@ -760,8 +760,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
 
   // send No Ad Response
   @Override
-  public void sendNoAdResponse(ChannelEvent event) throws NullPointerException {
-    synchronized (this) {
+  public synchronized void sendNoAdResponse(ChannelEvent event) throws NullPointerException {
       // Making sure response is sent only once
       if(responseSent) {
         return;
@@ -777,7 +776,6 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
       } else {
         sendResponse(noAdHtml, event);
       }
-    }
   }
 
   // Return true if request contains Iframe Id and is a request from js adcode.
@@ -852,32 +850,30 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
   }
 
   // send Ad Response
-  public void sendAdResponse(String responseString, MessageEvent event) throws NullPointerException {
-    synchronized (this) {
-      // Making sure response is sent only once
-      if(responseSent) {
-        return;
-      }
-      responseSent = true;
-      logger.debug("ad received so trying to send ad response");
-      if(getResponseFormat().equals("xhtml")) {
-        if(logger.isDebugEnabled()) {
-          logger.debug("slot served is " + sasParams.slot);
-        }
-
-        if(sasParams.slot != null && SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot)) != null) {
-          Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot));
-          String startElement = String.format(startTags, (int) dim.getWidth(), (int) dim.getHeight());
-          responseString = startElement + responseString + endTags;
-          InspectorStats.incrementStatCount(InspectorStrings.totalFills);
-        } else {
-          logger.error("invalid slot, so not returning response, even though we got an ad");
-          responseString = noAdXhtml;
-          InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
-        }
-      }
-      sendResponse(responseString, event);
+  public synchronized void sendAdResponse(String responseString, MessageEvent event) throws NullPointerException {
+    // Making sure response is sent only once
+    if(responseSent) {
+      return;
     }
+    responseSent = true;
+    logger.debug("ad received so trying to send ad response");
+    if(getResponseFormat().equals("xhtml")) {
+      if(logger.isDebugEnabled()) {
+        logger.debug("slot served is " + sasParams.slot);
+      }
+
+      if(sasParams.slot != null && SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot)) != null) {
+        Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot));
+        String startElement = String.format(startTags, (int) dim.getWidth(), (int) dim.getHeight());
+        responseString = startElement + responseString + endTags;
+        InspectorStats.incrementStatCount(InspectorStrings.totalFills);
+      } else {
+        logger.error("invalid slot, so not returning response, even though we got an ad");
+        responseString = noAdXhtml;
+        InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
+      }
+    }
+    sendResponse(responseString, event);
   }
 
   // send response to the caller
