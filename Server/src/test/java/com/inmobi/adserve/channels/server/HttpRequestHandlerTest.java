@@ -77,7 +77,7 @@ public class HttpRequestHandlerTest extends TestCase {
     ChannelSegment channelSegment2 = new ChannelSegment(null, adNetworkInterface2, null, null);
     httpRequestHandler.rtbSegments.add(channelSegment1);
     httpRequestHandler.rtbSegments.add(channelSegment2);
-    AdNetworkInterface adNetworkInterfaceResult = httpRequestHandler.runRtbSecondPriceAuctionEngine();
+    AdNetworkInterface adNetworkInterfaceResult = httpRequestHandler.responseSender.runRtbSecondPriceAuctionEngine();
     assertEquals(4, adNetworkInterfaceResult.getLatency());
   }
 
@@ -90,14 +90,14 @@ public class HttpRequestHandlerTest extends TestCase {
     replay(adNetworkInterface1);
     ChannelSegment channelSegment1 = new ChannelSegment(null, adNetworkInterface1, null, null);
     httpRequestHandler.rtbSegments.add(channelSegment1);
-    AdNetworkInterface adNetworkInterfaceResult = httpRequestHandler.runRtbSecondPriceAuctionEngine();
+    AdNetworkInterface adNetworkInterfaceResult = httpRequestHandler.responseSender.runRtbSecondPriceAuctionEngine();
     assertEquals(2, adNetworkInterfaceResult.getLatency());
   }
 
   @Test
   public void testrunRtbSecondPriceAuctionEngineTotalsegmentZero() {
     HttpRequestHandler httpRequestHandler = new HttpRequestHandler();
-    AdNetworkInterface adNetworkInterfaceResult = httpRequestHandler.runRtbSecondPriceAuctionEngine();
+    AdNetworkInterface adNetworkInterfaceResult = httpRequestHandler.responseSender.runRtbSecondPriceAuctionEngine();
     assertEquals(null, adNetworkInterfaceResult);
   }
 
@@ -122,7 +122,7 @@ public class HttpRequestHandlerTest extends TestCase {
     httpRequestHandler.rtbSegments.add(channelSegment1);
     httpRequestHandler.rtbSegments.add(channelSegment2);
     httpRequestHandler.rtbSegments.add(channelSegment3);
-    AdNetworkInterface adNetworkInterfaceResult = httpRequestHandler.runRtbSecondPriceAuctionEngine();
+    AdNetworkInterface adNetworkInterfaceResult = httpRequestHandler.responseSender.runRtbSecondPriceAuctionEngine();
     assertEquals(1, adNetworkInterfaceResult.getLatency());
   }
 
@@ -147,7 +147,7 @@ public class HttpRequestHandlerTest extends TestCase {
     httpRequestHandler.rtbSegments.add(channelSegment1);
     httpRequestHandler.rtbSegments.add(channelSegment2);
     httpRequestHandler.rtbSegments.add(channelSegment3);
-    AdNetworkInterface adNetworkInterfaceResult = httpRequestHandler.runRtbSecondPriceAuctionEngine();
+    AdNetworkInterface adNetworkInterfaceResult = httpRequestHandler.responseSender.runRtbSecondPriceAuctionEngine();
     assertEquals(2, adNetworkInterfaceResult.getLatency());
   }
 
@@ -172,7 +172,7 @@ public class HttpRequestHandlerTest extends TestCase {
     httpRequestHandler.rtbSegments.add(channelSegment1);
     httpRequestHandler.rtbSegments.add(channelSegment2);
     httpRequestHandler.rtbSegments.add(channelSegment3);
-    AdNetworkInterface adNetworkInterfaceResult = httpRequestHandler.runRtbSecondPriceAuctionEngine();
+    AdNetworkInterface adNetworkInterfaceResult = httpRequestHandler.responseSender.runRtbSecondPriceAuctionEngine();
     assertEquals(2, adNetworkInterfaceResult.getLatency());
   }
 

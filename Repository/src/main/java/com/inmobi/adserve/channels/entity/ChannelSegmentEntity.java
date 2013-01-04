@@ -29,17 +29,16 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
   private ArrayList<Integer> targetingPlatform = new ArrayList<Integer>();
   private Integer[] siteRatings;
   private List<Integer> osIds;
-  private List<String> siteIds;
-  private boolean siteExclusion;
   private boolean udidRequired;
   private boolean zipCodeRequired;
   private boolean richMediEnabled;
+  private boolean latlongRequired;
 
   public ChannelSegmentEntity(final String advertiserId, final String adgroupId, final String adId, final String channelId,
       long platformTargeting, Long[] rcList, Long[] tags, boolean status, boolean isTestMode, String externalSiteKey,
       Timestamp modified_on, String campaignId, Long[] slotIds, long incId, boolean allTags, String pricingModel,
-      Integer[] siteRatings, int targetingPlatform, ArrayList<Integer> osIds, List<String> siteIds, boolean siteExclusion,
-      boolean udidRequired, boolean zipCodeRequired, boolean richMediaEnabled) {
+      Integer[] siteRatings, int targetingPlatform, ArrayList<Integer> osIds, boolean udidRequired, boolean zipCodeRequired,
+      boolean richMediaEnabled, boolean latlonRequired) {
     this.advertiserId = advertiserId;
     this.adgroupId = adgroupId;
     this.adId = adId;
@@ -62,11 +61,10 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
       this.targetingPlatform.add(2);
     this.siteRatings = siteRatings;
     this.osIds = osIds;
-    this.siteIds = siteIds;
-    this.siteExclusion = siteExclusion;
     this.udidRequired = udidRequired;
     this.zipCodeRequired = zipCodeRequired;
     this.richMediEnabled = richMediaEnabled;
+    this.latlongRequired = latlonRequired;
   }
 
   public static long getSerialversionuid() {
@@ -81,12 +79,8 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
     return modified_on;
   }
 
-  public List<String> getSiteIds() {
-    return siteIds;
-  }
-
-  public boolean isSiteExclusion() {
-    return siteExclusion;
+  public boolean isLatlonRequired() {
+    return latlongRequired;
   }
 
   public boolean isUdidRequired() {

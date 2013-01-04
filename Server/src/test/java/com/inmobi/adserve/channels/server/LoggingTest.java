@@ -61,7 +61,7 @@ public class LoggingTest extends TestCase {
     Integer[] siteRatings = null;
     ChannelSegmentEntity channelSegmentEntity = new ChannelSegmentEntity("advertiserId", "adgroupId", "adId", "channelId",
         (long) 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true,
-        "pricingModel", siteRatings, 1, null, null, true, false, false, false);
+        "pricingModel", siteRatings, 1, null, false, false, false, false);
     List<ChannelSegment> rankList = createMock(ArrayList.class);
     AdNetworkInterface mockAdnetworkInterface = createMock(DCPTapitAdNetwork.class);
     ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
@@ -89,7 +89,7 @@ public class LoggingTest extends TestCase {
     Integer[] siteRatings = null;
     ChannelSegmentEntity channelSegmentEntity = new ChannelSegmentEntity("advertiserId", "adgroupId", "adId", "channelId",
         (long) 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true,
-        "pricingModel", siteRatings, 1, null, null, true, false, false, false);
+        "pricingModel", siteRatings, 1, null, false, false, false, false);
     List<ChannelSegment> rankList = createMock(ArrayList.class);
     AdNetworkInterface mockAdnetworkInterface = createMock(DCPTapitAdNetwork.class);
     ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
@@ -117,7 +117,7 @@ public class LoggingTest extends TestCase {
     Integer[] siteRatings = null;
     ChannelSegmentEntity channelSegmentEntity = new ChannelSegmentEntity("advertiserId", "adgroupId", "adId", "channelId",
         (long) 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true,
-        "pricingModel", siteRatings, 1, null, null, true, false, false, false);
+        "pricingModel", siteRatings, 1, null, false, false, false, false);
     List<ChannelSegment> rankList = createMock(ArrayList.class);
     AdNetworkInterface mockAdnetworkInterface = createMock(DCPTapitAdNetwork.class);
     ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
@@ -145,7 +145,7 @@ public class LoggingTest extends TestCase {
     Integer[] siteRatings = null;
     ChannelSegmentEntity channelSegmentEntity = new ChannelSegmentEntity("advertiserId", "adgroupId", "adId", "channelId",
         (long) 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true,
-        "pricingModel", siteRatings, 1, null, null, true, false, false, false);
+        "pricingModel", siteRatings, 1, null, false, false, false, false);
     List<ChannelSegment> rankList = createMock(ArrayList.class);
     AdNetworkInterface mockAdnetworkInterface = createMock(DCPTapitAdNetwork.class);
     ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();

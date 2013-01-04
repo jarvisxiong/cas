@@ -142,7 +142,7 @@ public class ServerTest extends TestCase {
 
   @Test
   public void testResponseFormat() throws Exception {
-    assertEquals(httpRequestHandler.getResponseFormat(), "html");
+    assertEquals(httpRequestHandler.responseSender.getResponseFormat(), "html");
   }
 
   @Test
