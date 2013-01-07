@@ -45,7 +45,6 @@ import org.jboss.netty.handler.timeout.IdleStateEvent;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.inmobi.adserve.channels.api.ChannelsClientHandler;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
@@ -72,7 +71,6 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
   public ChannelSegment rtbResponse;
   private String terminationReason = "NO";
   private long totalTime;
-  private List<ChannelSegment> rankList = null;
   private static Configuration config;
   private static Configuration rtbConfig;
   private static Configuration adapterConfig;
@@ -88,7 +86,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
   private static List<String> allowedSiteTypes;
   private int rankIndexToProcess = 0;
   private int selectedAdIndex = 0;
-  public DebugLogger logger;
+  public DebugLogger logger = null;;
   public ThirdPartyAdResponse adResponse = null;
   public ResponseSender responseSender;
 
@@ -121,7 +119,8 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
   }
 
   public HttpRequestHandler() {
-    responseSender = new ResponseSender(this, logger, System.currentTimeMillis(), rankList, rtbSegments, adResponse,
+    logger = new DebugLogger();
+    responseSender = new ResponseSender(this, logger, System.currentTimeMillis(), null, rtbSegments, adResponse,
         false, sasParams, 0, 0, rankIndexToProcess, false);
   }
 
@@ -137,6 +136,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
     HttpRequestHandler.rtbClientBootstrap = rtbClientBootstrap;
     HttpRequestHandler.repositoryHelper = repositoryHelper;
     percentRollout = HttpRequestHandler.config.getInt("percentRollout", 100);
+    allowedSiteTypes = HttpRequestHandler.config.getList("allowedSiteTypes");
     InspectorStats.setWorkflowStats(InspectorStrings.percentRollout, Long.valueOf(percentRollout));
   }
 
@@ -192,21 +192,23 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
   @Override
   public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
     try {
-      logger = new DebugLogger();
       bidFloor = rtbConfig.getDouble("bidFloor", 0.0);
       logger.debug("bidFloor is " + bidFloor);
       totalTime = System.currentTimeMillis();
       HttpRequest request = (HttpRequest) e.getMessage();
 
       QueryStringDecoder queryStringDecoder = new QueryStringDecoder(request.getUri());
-
+      logger.debug(queryStringDecoder.getPath());
+      
       ServletFactory servletFactory = ServletHandler.servletMap.get(queryStringDecoder.getPath());
       if(servletFactory != null) {
+        logger.debug("Got the servlet ");
         Servlet servlet = servletFactory.getServlet();
+        logger.debug(servlet.getName());
         servlet.handleRequest(this, queryStringDecoder, e, logger);
         return;
       }
-
+      logger.debug("No servlet");
       InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
       
       Map<String, List<String>> params = queryStringDecoder.getParameters();
@@ -220,8 +222,6 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
         InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
       }
       sasParams = RequestParser.parseRequestParameters(jObject, logger);
-      responseSender = new ResponseSender(this, logger, totalTime, rankList, rtbSegments, adResponse, false, sasParams,
-          bidFloor, bidFloor, rankIndexToProcess, false);
 
       if(random.nextInt(100) >= percentRollout) {
         logger.debug("Request not being served because of limited percentage rollout");
@@ -336,17 +336,20 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
         responseSender.sendNoAdResponse(e);
         return;
       }
+      
+      List<ChannelSegment> tempRankList;
+      tempRankList = Filters.rankAdapters(segments, logger, config);
+      tempRankList = Filters.ensureGuaranteedDelivery(tempRankList, adapterConfig, logger);
 
-      rankList = Filters.rankAdapters(segments, logger, config);
-      rankList = Filters.ensureGuaranteedDelivery(rankList, adapterConfig, logger);
-
-      rankList = AsyncRequestMaker.makeAsyncRequests(rankList, logger, responseSender, e);
+      tempRankList = AsyncRequestMaker.makeAsyncRequests(tempRankList, logger, responseSender, e);
+      
+      responseSender.setRankList(tempRankList);
 
       if(logger.isDebugEnabled()) {
-        logger.debug("Number of tpans whose request was successfully completed " + rankList.size());
+        logger.debug("Number of tpans whose request was successfully completed " + responseSender.getRankList().size());
       }
       // if none of the async request succeed, we return "NO_AD"
-      if(rankList.size() == 0) {
+      if(responseSender.getRankList().size() == 0) {
         logger.debug("No calls");
         responseSender.sendNoAdResponse(e);
         return;
@@ -354,22 +357,22 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
 
       // Resetting the rankIndexToProcess for already completed adapters.
       rankIndexToProcess = responseSender.getRankIndexToProcess();
-      ChannelSegment segment = rankList.get(rankIndexToProcess);
+      ChannelSegment segment = responseSender.getRankList().get(rankIndexToProcess);
       while (segment.adNetworkInterface.isRequestCompleted()) {
         if(segment.adNetworkInterface.getResponseAd().responseStatus == ResponseStatus.SUCCESS) {
           responseSender.sendAdResponse(segment.adNetworkInterface, e);
           break;
         }
         rankIndexToProcess++;
-        if(rankIndexToProcess >= rankList.size()) {
+        if(rankIndexToProcess >= responseSender.getRankList().size()) {
           responseSender.sendNoAdResponse(e);
           break;
         }
-        segment = rankList.get(rankIndexToProcess);
+        segment = responseSender.getRankList().get(rankIndexToProcess);
       }
 
       if(logger.isDebugEnabled()) {
-        logger.debug("retunrd from send Response, ranklist size is " + rankList.size());
+        logger.debug("retunrd from send Response, ranklist size is " + responseSender.getRankList().size());
       }
     } catch (Exception exception) {
       terminationReason = processingError;
@@ -388,10 +391,10 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
       }
     }
     if(logger.isDebugEnabled()) {
-      if(rankList != null) {
-        for (int index = 0; index < rankList.size(); ++index) {
+      if(responseSender.getRankList() != null) {
+        for (int index = 0; index < responseSender.getRankList().size(); ++index) {
           logger.debug("RankList: ChannelSegment @ " + index + " is "
-              + rankList.get(index).adNetworkInterface.getName());
+              + responseSender.getRankList().get(index).adNetworkInterface.getName());
         }
       } else {
         logger.debug("RankList is empty");
@@ -401,8 +404,8 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
 
   public void writeLogs() {
     List<ChannelSegment> list = new ArrayList<ChannelSegment>();
-    if(null != rankList)
-      list.addAll(rankList);
+    if(null != responseSender.getRankList())
+      list.addAll(responseSender.getRankList());
     if(null != rtbSegments)
       list.addAll(rtbSegments);
     if(totalTime > 2000)
@@ -416,7 +419,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
       } else {
         Logging.channelLogline(list, adResponse.clickUrl, logger, loggerConfig, sasParams, totalTime, jObject);
         if(rtbResponse == null)
-          Logging.rrLogging(jObject, rankList.get(selectedAdIndex), logger, loggerConfig, sasParams, terminationReason);
+          Logging.rrLogging(jObject, responseSender.getRankList().get(selectedAdIndex), logger, loggerConfig, sasParams, terminationReason);
         else
           Logging.rrLogging(jObject, rtbResponse, logger, loggerConfig, sasParams, terminationReason);
         Logging.advertiserLogging(list, logger, loggerConfig);

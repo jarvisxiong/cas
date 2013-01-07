@@ -49,6 +49,14 @@ public class ResponseSender extends HttpRequestHandlerBase {
   private double bidFloor;
   private int rankIndexToProcess;
 
+  public List<ChannelSegment> getRankList() {
+    return rankList;
+  }
+
+  public void setRankList(List<ChannelSegment> rankList) {
+    this.rankList = rankList;
+  }
+
   public int getRankIndexToProcess() {
     return rankIndexToProcess;
   }

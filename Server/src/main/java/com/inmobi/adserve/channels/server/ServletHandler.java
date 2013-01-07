@@ -22,6 +22,24 @@ public class ServletHandler {
   
   public static void init() {
     
+    servletMap.put("/stat", new ServletFactory() {      
+      @Override
+      public Servlet getServlet() {
+        return new Servlet() {          
+          @Override
+          public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
+              DebugLogger logger) throws Exception {
+            logger.debug("Inside stat servelet");
+            hrh.responseSender.sendResponse(InspectorStats.getStats(BootstrapCreation.getMaxConnections(), BootstrapCreation.getDroppedConnections()), e);            
+          }          
+          @Override
+          public String getName() {
+            return "stat";
+          }
+        };
+      }
+    });
+    
     servletMap.put("/mapsizes", new ServletFactory() {      
       @Override
       public Servlet getServlet() {
@@ -37,6 +55,10 @@ public class ServletHandler {
             mapsizes.put("MaxConnections", BootstrapCreation.getMaxConnections());
             mapsizes.put("DroppedConnections", BootstrapCreation.getDroppedConnections());
             hrh.responseSender.sendResponse(mapsizes.toString(), e);
+          }
+          @Override
+          public String getName() {
+            return "mapsizes";
           }
         };
       }
@@ -59,6 +81,10 @@ public class ServletHandler {
             logger.debug("new roll out percentage is " + HttpRequestHandler.getPercentRollout());
             hrh.responseSender.sendResponse("OK", e);
           }
+          @Override
+          public String getName() {
+            return "changerollout";
+          }
         };
       }
     });
@@ -72,6 +98,10 @@ public class ServletHandler {
               DebugLogger logger) throws Exception {
             hrh.sendLbStatus(e);
         }
+          @Override
+          public String getName() {
+            return "lbstatus";
+          }
       };
     }
   });
@@ -93,6 +123,10 @@ public class ServletHandler {
           } else {
             hrh.responseSender.sendResponse("NOT AUTHORIZED", e);
           }
+        }
+        @Override
+        public String getName() {
+          return "disablelbstatus";
         }
       };
       }
@@ -116,6 +150,10 @@ public class ServletHandler {
               hrh.responseSender.sendResponse("NOT AUTHORIZED", e);
             }
           }
+          @Override
+          public String getName() {
+            return "enaablelbstatus";
+          }
         };
       }
     });
@@ -138,6 +176,10 @@ public class ServletHandler {
               InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
             }
             hrh.changeConfig(e, jObject);            
+          }
+          @Override
+          public String getName() {
+            return "configchange";
           }
         };
       }

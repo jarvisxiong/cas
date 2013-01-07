@@ -112,6 +112,7 @@ public class ChannelServer {
     try {
       // Initialising request handler
       HttpRequestHandler.init(config, clientBootstrap, rtbClientBootstrap, repositoryHelper);
+      ServletHandler.init();
       SegmentFactory.init(repositoryHelper);
       ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
       Timer timer = new HashedWheelTimer();
