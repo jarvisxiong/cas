@@ -248,36 +248,40 @@ public class ChannelAdGroupRepository extends AbstractHashDBUpdatableRepository<
             if(entity.getRcList() == null || entity.getRcList().length == 0) {
               if(entity.getOsIds() == null || entity.getOsIds().size() == 0) {
                 removeEntity(slotId, -1 /* All categories */, -1, targetingPlatform, siteRating, entity, -1);
-              } else
+              } else {
                 for (Integer id : entity.getOsIds()) {
                   removeEntity(slotId, -1 /* All categories */, -1, targetingPlatform, siteRating, entity, id);
                 }
+              }
             } else {
               for (Long country : entity.getRcList())
                 if(entity.getOsIds() == null || entity.getOsIds().size() == 0) {
                   removeEntity(slotId, -1 /* All categories */, country, targetingPlatform, siteRating, entity, -1);
-                } else
+                } else {
                   for (Integer id : entity.getOsIds()) {
                     removeEntity(slotId, -1 /* All categories */, country, targetingPlatform, siteRating, entity, id);
                   }
+                }
             }
           } else {
             for (Long category : entity.getTags()) {
               if(entity.getRcList() == null || entity.getRcList().length == 0) {
                 if(entity.getOsIds() == null || entity.getOsIds().size() == 0) {
                   removeEntity(slotId, category, -1, targetingPlatform, siteRating, entity, -1);
-                } else
+                } else {
                   for (Integer id : entity.getOsIds()) {
                     removeEntity(slotId, category, -1, targetingPlatform, siteRating, entity, id);
                   }
+                }
               } else {
                 for (Long country : entity.getRcList())
                   if(entity.getOsIds() == null || entity.getOsIds().size() == 0) {
                     removeEntity(slotId, category, country, targetingPlatform, siteRating, entity, -1);
-                  } else
+                  } else {
                     for (Integer id : entity.getOsIds()) {
                       removeEntity(slotId, category, country, targetingPlatform, siteRating, entity, id);
                     }
+                  }
               }
             }
           }

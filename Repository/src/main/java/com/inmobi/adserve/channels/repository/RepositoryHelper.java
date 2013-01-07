@@ -10,7 +10,8 @@ public class RepositoryHelper {
   private ChannelSegmentFeedbackRepository channelSegmentFeedbackRepository;
 
   public RepositoryHelper(ChannelRepository channelRepository, ChannelAdGroupRepository channelAdGroupRepository,
-      ChannelFeedbackRepository channelFeedbackRepository, ChannelSegmentFeedbackRepository channelSegmentFeedbackRepository) {
+      ChannelFeedbackRepository channelFeedbackRepository,
+      ChannelSegmentFeedbackRepository channelSegmentFeedbackRepository) {
     this.channelRepository = channelRepository;
     this.channelAdGroupRepository = channelAdGroupRepository;
     this.channelFeedbackRepository = channelFeedbackRepository;

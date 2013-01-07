@@ -24,7 +24,8 @@ import com.inmobi.phoenix.data.RepositoryQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
 import com.inmobi.phoenix.exception.UnpreparedException;
 
-public class ChannelSegmentFeedbackRepository extends AbstractHashDBUpdatableRepository<ChannelSegmentFeedbackEntity, String> implements RepositoryManager {
+public class ChannelSegmentFeedbackRepository extends
+    AbstractHashDBUpdatableRepository<ChannelSegmentFeedbackEntity, String> implements RepositoryManager {
   private long startTime = 0L;
   private long endTime = 0L;
   private boolean updating = false;
@@ -57,35 +58,43 @@ public class ChannelSegmentFeedbackRepository extends AbstractHashDBUpdatableRep
           double eCPM = rs.getDouble("ecpm");
           double fillRatio = rs.getDouble("fill_ratio");
 
-          ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(advertiserId, adGroupId, eCPM, fillRatio);
+          ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(advertiserId,
+              adGroupId, eCPM, fillRatio);
 
           channelSegmentFeedbackEntities.add(channelSegmentFeedbackEntity);
           if(logger.isDebugEnabled())
             logger.debug("adgroup id for the loaded channelSegmentFeedbackEntity is " + adGroupId);
         } catch (SQLException e) {
           logger.error("exception in rs" + e.getMessage());
-          InspectorStats.incrementRepoStatCount("ChannelSegmentFeedbackRepository", InspectorStrings.entityFailedtoLoad, increment);
-          InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.lastUnsuccessfulUpdate, System.currentTimeMillis());
+          InspectorStats.incrementRepoStatCount("ChannelSegmentFeedbackRepository",
+              InspectorStrings.entityFailedtoLoad, increment);
+          InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.lastUnsuccessfulUpdate,
+              System.currentTimeMillis());
         }
       }
     } catch (SQLException e) {
       logger.error("exception in rs" + e.getMessage());
-      InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.lastUnsuccessfulUpdate, System.currentTimeMillis());
+      InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.lastUnsuccessfulUpdate,
+          System.currentTimeMillis());
     }
 
     if(updated != 0)
-      InspectorStats.incrementRepoStatCount("ChannelSegmentFeedbackRepository", InspectorStrings.successfulUpdates, increment);
+      InspectorStats.incrementRepoStatCount("ChannelSegmentFeedbackRepository", InspectorStrings.successfulUpdates,
+          increment);
     else
-      InspectorStats.incrementRepoStatCount("ChannelSegmentFeedbackRepository", InspectorStrings.unSuccessfulUpdates, increment);
+      InspectorStats.incrementRepoStatCount("ChannelSegmentFeedbackRepository", InspectorStrings.unSuccessfulUpdates,
+          increment);
 
     updating = false;
     endTime = System.currentTimeMillis();
     successfulupdates++;
     updateTime = endTime - startTime;
 
-    InspectorStats.incrementRepoStatCount("ChannelSegmentFeedbackRepository", InspectorStrings.updateLatency, updateTime);
+    InspectorStats.incrementRepoStatCount("ChannelSegmentFeedbackRepository", InspectorStrings.updateLatency,
+        updateTime);
     InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.lastSuccessfulUpdate, endTime);
-    InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.entityCurrentlyLoaded, entitySet.size());
+    InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.entityCurrentlyLoaded,
+        entitySet.size());
     InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.isUpdating, 0);
 
     return channelSegmentFeedbackEntities;
@@ -101,7 +110,8 @@ public class ChannelSegmentFeedbackRepository extends AbstractHashDBUpdatableRep
   }
 
   @Override
-  public ChannelSegmentFeedbackEntity queryUniqueResult(RepositoryQuery arg0) throws RepositoryException, UnpreparedException {
+  public ChannelSegmentFeedbackEntity queryUniqueResult(RepositoryQuery arg0) throws RepositoryException,
+      UnpreparedException {
     // TODO Auto-generated method stub
     return null;
   }
@@ -157,9 +167,10 @@ public class ChannelSegmentFeedbackRepository extends AbstractHashDBUpdatableRep
     formatter
         .format(
             " \"%s\": { \"stats\": { \"age\": %d, \"lastSuccessfulUpdate\"  : %d, \"timeForUpdate\"  : %d, \"entities\": %d, \"refreshTime\"  : %d, \"updatedEntities\" : %d, \"skippedEntities\"  : %d, \"repoSource\"  : %s, \"query/path\"  : %s, \"isUpdating\"  : %s, \"No_of_Updates\"  : %d, \"no_of_successful_updates\"  : %d, \"no_of_unsuccessful_updates\"  : %d,} } ",
-            super.getInstanceName(), super.getLastUpdateTime(), super.getLastSuccessfulUpdateTime(), getTimeForUpdate(), super.getEntityCount(),
-            super.getRefreshTime(), getUpdatedEntityCount(), getSkippedEntityCount(), super.getRepoSource(), super.getRepoSourceDesc(), isUpdating(),
-            getUpdates(), getSuccessfulUpdates(), getUnSuccessfulUpdates());
+            super.getInstanceName(), super.getLastUpdateTime(), super.getLastSuccessfulUpdateTime(),
+            getTimeForUpdate(), super.getEntityCount(), super.getRefreshTime(), getUpdatedEntityCount(),
+            getSkippedEntityCount(), super.getRepoSource(), super.getRepoSourceDesc(), isUpdating(), getUpdates(),
+            getSuccessfulUpdates(), getUnSuccessfulUpdates());
     return formatter.toString();
   }
 }

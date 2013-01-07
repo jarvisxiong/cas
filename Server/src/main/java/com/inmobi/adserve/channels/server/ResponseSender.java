@@ -48,6 +48,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
   private double secondBidPrice;
   private double bidFloor;
   private int rankIndexToProcess;
+  private int selectedAdIndex;
+  private boolean requestCleaned;
 
   public List<ChannelSegment> getRankList() {
     return rankList;
@@ -60,32 +62,43 @@ public class ResponseSender extends HttpRequestHandlerBase {
   public int getRankIndexToProcess() {
     return rankIndexToProcess;
   }
+  
+  public void setRankIndexToProcess(int rankIndexToProcess) {
+    this.rankIndexToProcess = rankIndexToProcess;
+  }
+  
+  public ThirdPartyAdResponse getAdResponse() {
+    return this.adResponse;
+  }
 
-  private boolean requestCleaned;
+  public int getSelectedAdIndex() {
+    return this.selectedAdIndex;
+  }
+ 
+  public long getTotalTime() {
+    return this.totalTime;
+  }
 
-  public ResponseSender(HttpRequestHandler hrh, DebugLogger logger, long totalTime, List<ChannelSegment> rankList,
-      List<ChannelSegment> rtbSegments, ThirdPartyAdResponse adResponse, boolean responseSent,
-      SASRequestParameters sasParams, double secondBidPrice, double bidFloor, int rankIndexToProcess,
-      boolean requestCleaned) {
-    super();
+  public ResponseSender(HttpRequestHandler hrh, DebugLogger logger) {
     this.hrh = hrh;
     this.logger = logger;
-    this.totalTime = totalTime;
-    this.rankList = rankList;
-    this.rtbSegments = rtbSegments;
-    this.adResponse = adResponse;
-    this.responseSent = responseSent;
-    this.sasParams = sasParams;
-    this.secondBidPrice = secondBidPrice;
-    this.bidFloor = bidFloor;
-    this.rankIndexToProcess = rankIndexToProcess;
-    this.requestCleaned = requestCleaned;
+    this.totalTime = System.currentTimeMillis();
+    this.rankList = null;
+    this.rtbSegments = null;
+    this.adResponse = null;
+    this.responseSent = false;
+    this.sasParams = null;
+    this.bidFloor = HttpRequestHandler.rtbConfig.getDouble("bidFloor", 0.0);
+    this.secondBidPrice = bidFloor;
+    this.rankIndexToProcess = 0;
+    this.selectedAdIndex = 0;
+    this.requestCleaned = false;
   }
 
   @Override
   public void sendAdResponse(AdNetworkInterface selectedAdNetwork, MessageEvent event) {
     adResponse = selectedAdNetwork.getResponseAd();
-    hrh.setSelectedAdIndex(getRankIndex(selectedAdNetwork));
+    selectedAdIndex = getRankIndex(selectedAdNetwork);
     sendAdResponse(adResponse.response, event);
     InspectorStats.incrementStatCount(selectedAdNetwork.getName(), InspectorStrings.serverImpression);
   }

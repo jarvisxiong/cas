@@ -34,11 +34,11 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
   private boolean richMediEnabled;
   private boolean latlongRequired;
 
-  public ChannelSegmentEntity(final String advertiserId, final String adgroupId, final String adId, final String channelId,
-      long platformTargeting, Long[] rcList, Long[] tags, boolean status, boolean isTestMode, String externalSiteKey,
-      Timestamp modified_on, String campaignId, Long[] slotIds, long incId, boolean allTags, String pricingModel,
-      Integer[] siteRatings, int targetingPlatform, ArrayList<Integer> osIds, boolean udidRequired, boolean zipCodeRequired,
-      boolean richMediaEnabled, boolean latlonRequired) {
+  public ChannelSegmentEntity(final String advertiserId, final String adgroupId, final String adId,
+      final String channelId, long platformTargeting, Long[] rcList, Long[] tags, boolean status, boolean isTestMode,
+      String externalSiteKey, Timestamp modified_on, String campaignId, Long[] slotIds, long incId, boolean allTags,
+      String pricingModel, Integer[] siteRatings, int targetingPlatform, ArrayList<Integer> osIds,
+      boolean udidRequired, boolean zipCodeRequired, boolean richMediaEnabled, boolean latlonRequired) {
     this.advertiserId = advertiserId;
     this.adgroupId = adgroupId;
     this.adId = adId;
