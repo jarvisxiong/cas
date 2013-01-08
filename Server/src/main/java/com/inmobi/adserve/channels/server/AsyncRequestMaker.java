@@ -25,14 +25,21 @@ import com.inmobi.phoenix.batteries.util.WilburyUUID;
 
 public class AsyncRequestMaker {
 
+  private static ClientBootstrap clientBootstrap;
+  private static ClientBootstrap rtbClientBootstrap;
+  
+  public static void init(ClientBootstrap clientBootstrap, ClientBootstrap rtbClientBootstrap) {
+    AsyncRequestMaker.clientBootstrap = clientBootstrap;
+    AsyncRequestMaker.rtbClientBootstrap = rtbClientBootstrap;
+  }
   /**
    * For each channel we configure the parameters and make the async request if
    * the async request is successful we add it to segment list else we drop it
    */
   public static List<ChannelSegment> prepareForAsyncRequest(ChannelSegmentEntity[] rows, DebugLogger logger,
-      Configuration config, Configuration rtbConfig, Configuration adapterConfig, ClientBootstrap clientBootstrap,
-      ClientBootstrap rtbClientBootstrap, HttpRequestHandlerBase base, Set<String> advertiserSet, MessageEvent e,
+      Configuration config, Configuration rtbConfig, Configuration adapterConfig, HttpRequestHandlerBase base, Set<String> advertiserSet, MessageEvent e,
       RepositoryHelper repositoryHelper, JSONObject jObject, SASRequestParameters sasParams) throws Exception {
+    
 
     List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
     List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();

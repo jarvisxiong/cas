@@ -41,7 +41,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
   private DebugLogger logger;
   private long totalTime;
   private List<ChannelSegment> rankList;
-  private List<ChannelSegment> rtbSegments;
+  public List<ChannelSegment> rtbSegments;
   private ThirdPartyAdResponse adResponse;
   private boolean responseSent;
   private SASRequestParameters sasParams;
@@ -50,9 +50,14 @@ public class ResponseSender extends HttpRequestHandlerBase {
   private int rankIndexToProcess;
   private int selectedAdIndex;
   private boolean requestCleaned;
+  private ChannelSegment rtbResponse;
 
+  public List<ChannelSegment> getRtbSegments() {
+    return this.rtbSegments;
+  }
+  
   public List<ChannelSegment> getRankList() {
-    return rankList;
+    return this.rankList;
   }
 
   public void setRankList(List<ChannelSegment> rankList) {
@@ -69,6 +74,10 @@ public class ResponseSender extends HttpRequestHandlerBase {
   
   public ThirdPartyAdResponse getAdResponse() {
     return this.adResponse;
+  }
+  
+  public ChannelSegment getRtbResponse() {
+    return this.rtbResponse;
   }
 
   public int getSelectedAdIndex() {
@@ -88,11 +97,12 @@ public class ResponseSender extends HttpRequestHandlerBase {
     this.adResponse = null;
     this.responseSent = false;
     this.sasParams = null;
-    this.bidFloor = HttpRequestHandler.rtbConfig.getDouble("bidFloor", 0.0);
+    this.bidFloor = ServletHandler.rtbConfig.getDouble("bidFloor", 0.0);
     this.secondBidPrice = bidFloor;
     this.rankIndexToProcess = 0;
     this.selectedAdIndex = 0;
     this.requestCleaned = false;
+    this.rtbResponse = null;
   }
 
   @Override
@@ -173,10 +183,10 @@ public class ResponseSender extends HttpRequestHandlerBase {
   public AdNetworkInterface runRtbSecondPriceAuctionEngine() {
 
     if(rtbSegments.size() == 0) {
-      hrh.rtbResponse = null;
+      rtbResponse = null;
       return null;
     } else if(rtbSegments.size() == 1) {
-      hrh.rtbResponse = rtbSegments.get(0);
+      rtbResponse = rtbSegments.get(0);
       secondBidPrice = bidFloor;
       return rtbSegments.get(0).adNetworkInterface;
     }
@@ -210,7 +220,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         secondBidPrice = secondHighestBidPrice;
     } else
       secondBidPrice = rtbSegments.get(1).adNetworkInterface.getBidprice();
-    hrh.rtbResponse = rtbSegments.get(lowestLatency);
+    rtbResponse = rtbSegments.get(lowestLatency);
     return rtbSegments.get(lowestLatency).adNetworkInterface;
   }
 
