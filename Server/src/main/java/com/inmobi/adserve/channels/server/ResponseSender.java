@@ -44,7 +44,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
   public List<ChannelSegment> rtbSegments;
   private ThirdPartyAdResponse adResponse;
   private boolean responseSent;
-  private SASRequestParameters sasParams;
+  public SASRequestParameters sasParams;
   private double secondBidPrice;
   private double bidFloor;
   private int rankIndexToProcess;
@@ -364,6 +364,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
     hrh.writeLogs();
   }
+  
+  
 
   private int getRankIndex(AdNetworkInterface adNetwork) {
     int index = 0;

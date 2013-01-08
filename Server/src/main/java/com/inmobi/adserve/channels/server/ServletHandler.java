@@ -24,6 +24,10 @@ public class ServletHandler {
   public static int percentRollout;
   public static List<String> allowedSiteTypes;
   public static int rollCount = 0;
+  
+  public Configuration getRtbConfig() {
+    return ServletHandler.rtbConfig;
+  }
 
   public static HashMap<String, ServletFactory> servletMap = new HashMap<String, ServletFactory>();
 

@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.server;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.util.ArrayList;
 
 import org.apache.commons.configuration.Configuration;
 import org.jboss.netty.bootstrap.ClientBootstrap;
@@ -23,8 +24,15 @@ import static org.easymock.classextension.EasyMock.replay;
 import static org.easymock.EasyMock.expect;
 
 public class HttpRequestHandlerTest extends TestCase {
+  
+  private static ConfigurationLoader config;
 
   public void setUp() throws Exception {
+    
+    config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
+    InspectorStats.initializeWorkflow("WorkFlow");
+    ServletHandler.init(config, null);
+    
     Configuration loggerConfig = createMock(Configuration.class);
     expect(loggerConfig.getString("channel")).andReturn("channel").anyTimes();
     expect(loggerConfig.getString("rr")).andReturn("rr").anyTimes();
@@ -74,6 +82,7 @@ public class HttpRequestHandlerTest extends TestCase {
     replay(adNetworkInterface2);
     ChannelSegment channelSegment1 = new ChannelSegment(null, adNetworkInterface1, null, null);
     ChannelSegment channelSegment2 = new ChannelSegment(null, adNetworkInterface2, null, null);
+    httpRequestHandler.rtbSegments = new ArrayList<ChannelSegment>();
     httpRequestHandler.rtbSegments.add(channelSegment1);
     httpRequestHandler.rtbSegments.add(channelSegment2);
     AdNetworkInterface adNetworkInterfaceResult = httpRequestHandler.runRtbSecondPriceAuctionEngine();
@@ -88,6 +97,7 @@ public class HttpRequestHandlerTest extends TestCase {
     expect(adNetworkInterface1.getLatency()).andReturn((long) 2).anyTimes();
     replay(adNetworkInterface1);
     ChannelSegment channelSegment1 = new ChannelSegment(null, adNetworkInterface1, null, null);
+    httpRequestHandler.rtbSegments = new ArrayList<ChannelSegment>();
     httpRequestHandler.rtbSegments.add(channelSegment1);
     AdNetworkInterface adNetworkInterfaceResult = httpRequestHandler.runRtbSecondPriceAuctionEngine();
     assertEquals(2, adNetworkInterfaceResult.getLatency());
@@ -118,6 +128,7 @@ public class HttpRequestHandlerTest extends TestCase {
     ChannelSegment channelSegment1 = new ChannelSegment(null, adNetworkInterface1, null, null);
     ChannelSegment channelSegment2 = new ChannelSegment(null, adNetworkInterface2, null, null);
     ChannelSegment channelSegment3 = new ChannelSegment(null, adNetworkInterface3, null, null);
+    httpRequestHandler.rtbSegments = new ArrayList<ChannelSegment>();
     httpRequestHandler.rtbSegments.add(channelSegment1);
     httpRequestHandler.rtbSegments.add(channelSegment2);
     httpRequestHandler.rtbSegments.add(channelSegment3);
@@ -143,6 +154,7 @@ public class HttpRequestHandlerTest extends TestCase {
     ChannelSegment channelSegment1 = new ChannelSegment(null, adNetworkInterface1, null, null);
     ChannelSegment channelSegment2 = new ChannelSegment(null, adNetworkInterface2, null, null);
     ChannelSegment channelSegment3 = new ChannelSegment(null, adNetworkInterface3, null, null);
+    httpRequestHandler.rtbSegments = new ArrayList<ChannelSegment>();
     httpRequestHandler.rtbSegments.add(channelSegment1);
     httpRequestHandler.rtbSegments.add(channelSegment2);
     httpRequestHandler.rtbSegments.add(channelSegment3);
@@ -152,7 +164,7 @@ public class HttpRequestHandlerTest extends TestCase {
 
   @Test
   public void testrunRtbSecondPriceAuctionEngineSecondHighestBidAtSecondPlace() {
-    ResponseSender httpRequestHandler = new ResponseSender(new HttpRequestHandler(), new DebugLogger());
+    ResponseSender rs = new ResponseSender(new HttpRequestHandler(), new DebugLogger());
     AdNetworkInterface adNetworkInterface1 = createMock(RtbAdNetwork.class);
     expect(adNetworkInterface1.getBidprice()).andReturn((double) 2).anyTimes();
     expect(adNetworkInterface1.getLatency()).andReturn((long) 2).anyTimes();
@@ -168,10 +180,14 @@ public class HttpRequestHandlerTest extends TestCase {
     ChannelSegment channelSegment1 = new ChannelSegment(null, adNetworkInterface1, null, null);
     ChannelSegment channelSegment2 = new ChannelSegment(null, adNetworkInterface2, null, null);
     ChannelSegment channelSegment3 = new ChannelSegment(null, adNetworkInterface3, null, null);
-    httpRequestHandler.rtbSegments.add(channelSegment1);
-    httpRequestHandler.rtbSegments.add(channelSegment2);
-    httpRequestHandler.rtbSegments.add(channelSegment3);
-    AdNetworkInterface adNetworkInterfaceResult = httpRequestHandler.runRtbSecondPriceAuctionEngine();
+    rs.rtbSegments = new ArrayList<ChannelSegment>();
+    rs.rtbSegments.add(channelSegment1);
+    rs.rtbSegments.add(channelSegment2);
+    if(rs == null) System.out.println("\n\n\n\n\n\n\nrs");
+    if(rs.rtbSegments == null) System.out.println("\n\n\n\n\n\n\nrs.rtbsegments");
+    if(channelSegment3 == null) System.out.println("\n\n\n\n\n\n\nchannel3");
+    rs.rtbSegments.add(channelSegment3);
+    AdNetworkInterface adNetworkInterfaceResult = rs.runRtbSecondPriceAuctionEngine();
     assertEquals(2, adNetworkInterfaceResult.getLatency());
   }
 
@@ -196,6 +212,7 @@ public class HttpRequestHandlerTest extends TestCase {
     ChannelSegment channelSegment1 = new ChannelSegment(null, adNetworkInterface1, null, null);
     ChannelSegment channelSegment2 = new ChannelSegment(null, adNetworkInterface2, null, null);
     ChannelSegment channelSegment3 = new ChannelSegment(null, adNetworkInterface3, null, null);
+    httpRequestHandler.rtbSegments = new ArrayList<ChannelSegment>();
     httpRequestHandler.rtbSegments.add(channelSegment1);
     httpRequestHandler.rtbSegments.add(channelSegment2);
     httpRequestHandler.rtbSegments.add(channelSegment3);
@@ -224,6 +241,7 @@ public class HttpRequestHandlerTest extends TestCase {
     ChannelSegment channelSegment1 = new ChannelSegment(null, adNetworkInterface1, null, null);
     ChannelSegment channelSegment2 = new ChannelSegment(null, adNetworkInterface2, null, null);
     ChannelSegment channelSegment3 = new ChannelSegment(null, adNetworkInterface3, null, null);
+    httpRequestHandler.rtbSegments = new ArrayList<ChannelSegment>();
     httpRequestHandler.rtbSegments.add(channelSegment1);
     httpRequestHandler.rtbSegments.add(channelSegment2);
     httpRequestHandler.rtbSegments.add(channelSegment3);
@@ -260,6 +278,7 @@ public class HttpRequestHandlerTest extends TestCase {
     replay(channelSegmentEntity);
     ChannelSegment channelSegment1 = new ChannelSegment(channelSegmentEntity, adNetworkInterface1, null, null);
     httpRequestHandlerbase.logger = new DebugLogger();
+    httpRequestHandlerbase.responseSender.rtbSegments = new ArrayList<ChannelSegment>();
     httpRequestHandlerbase.responseSender.rtbSegments.add(channelSegment1);
     httpRequestHandlerbase.writeLogs();
   }

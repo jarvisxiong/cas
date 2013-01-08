@@ -51,13 +51,14 @@ public class ServerTest extends TestCase {
   public void setUp() throws Exception {
     if(count == 0) {
       prepareLogging();
-      config = ConfigurationLoader.getInstance("target/channel-server.properties");
+      config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
       count++;
     }
     prepareConfig();
     DebugLogger.init(mockConfig);
     logger = new DebugLogger();
     InspectorStats.initializeWorkflow("WorkFlow");
+    ServletHandler.init(config, null);
     httpRequestHandler = new HttpRequestHandler();
     AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
     Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-channel", "cas-advertisement", mockConfig);

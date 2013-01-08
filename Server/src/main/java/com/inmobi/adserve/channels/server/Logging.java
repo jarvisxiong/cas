@@ -64,6 +64,46 @@ public class Logging {
     totalCount = config.getInt("sampledadvertisercount");
   }
 
+  public void writeLogs(ResponseSender responseSender, DebugLogger logger) {
+    List<ChannelSegment> list = new ArrayList<ChannelSegment>();
+    if(null != responseSender.getRankList())
+      list.addAll(responseSender.getRankList());
+    if(null != responseSender.getRtbSegments())
+      list.addAll(responseSender.getRtbSegments());
+    long totalTime = responseSender.getTotalTime();
+    if(totalTime > 2000)
+      totalTime = 0;
+    try {
+      if(responseSender.getAdResponse() == null) {
+        Logging.channelLogline(list, null, logger, ServletHandler.loggerConfig, responseSender.sasParams, totalTime);
+        Logging.rrLogging(null, logger, ServletHandler.loggerConfig, responseSender.sasParams, terminationReason);
+        Logging.advertiserLogging(list, logger, ServletHandler.loggerConfig);
+        Logging.sampledAdvertiserLogging(list, logger, ServletHandler.loggerConfig);
+      } else {
+        Logging.channelLogline(list, responseSender.getAdResponse().clickUrl, logger, ServletHandler.loggerConfig,
+            responseSender.sasParams, totalTime);
+        if(responseSender.getRtbResponse() == null)
+          Logging.rrLogging(responseSender.getRankList().get(responseSender.getSelectedAdIndex()), logger,
+              ServletHandler.loggerConfig, responseSender.sasParams,, terminationReason);
+        else
+          Logging.rrLogging(responseSender.getRtbResponse(), logger, ServletHandler.loggerConfig, responseSender.sasParams, terminationReason);
+        Logging.advertiserLogging(list, logger, ServletHandler.loggerConfig);
+        Logging.sampledAdvertiserLogging(list, logger, ServletHandler.loggerConfig);
+
+      }
+    } catch (JSONException exception) {
+      logger.error("Error while writing logs " + exception.getMessage());
+      System.out.println("stack trace is ");
+      exception.printStackTrace();
+      return;
+    } catch (TException exception) {
+      logger.error("Error while writing logs " + exception.getMessage());
+      System.out.println("stack trace is ");
+      exception.printStackTrace();
+      return;
+    }
+    logger.debug("done with logging");
+  }
   // convert the json values to string values
   private static String stringify(JSONObject jObject, String field) {
     String fieldValue = "";
@@ -127,7 +167,7 @@ public class Logging {
   }
 
   // Writing rrlogs
-  public static void rrLogging(JSONObject jObject, ChannelSegment channelSegment, DebugLogger logger, Configuration config,
+  public static void rrLogging(ChannelSegment channelSegment, DebugLogger logger, Configuration config,
       SASRequestParameters sasParams, String terminationReason) throws JSONException, TException  {
     Logger rrLogger = Logger.getLogger(config.getString("rr"));
     boolean isTerminated = false;
@@ -301,7 +341,7 @@ public class Logging {
   }
 
   // Write Channel Logs
-  public static void channelLogline(List<ChannelSegment> rankList, String clickUrl, DebugLogger logger, Configuration config, SASRequestParameters sasParams, long totalTime, JSONObject jObject) throws JSONException, TException {
+  public static void channelLogline(List<ChannelSegment> rankList, String clickUrl, DebugLogger logger, Configuration config, SASRequestParameters sasParams, long totalTime) throws JSONException, TException {
     logger.debug("came inside channel log line");
     Logger debugLogger = Logger.getLogger(config.getString("channel"));
     logger.debug("got logger handle for cas logs");

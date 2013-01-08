@@ -337,47 +337,6 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
     }
   }
 
-  public void writeLogs() {
-    List<ChannelSegment> list = new ArrayList<ChannelSegment>();
-    if(null != responseSender.getRankList())
-      list.addAll(responseSender.getRankList());
-    if(null != responseSender.getRtbSegments())
-      list.addAll(responseSender.getRtbSegments());
-    long totalTime = responseSender.getTotalTime();
-    if(totalTime > 2000)
-      totalTime = 0;
-    try {
-      if(responseSender.getAdResponse() == null) {
-        Logging.channelLogline(list, null, logger, ServletHandler.loggerConfig, sasParams, totalTime, jObject);
-        Logging.rrLogging(jObject, null, logger, ServletHandler.loggerConfig, sasParams, terminationReason);
-        Logging.advertiserLogging(list, logger, ServletHandler.loggerConfig);
-        Logging.sampledAdvertiserLogging(list, logger, ServletHandler.loggerConfig);
-      } else {
-        Logging.channelLogline(list, responseSender.getAdResponse().clickUrl, logger, ServletHandler.loggerConfig,
-            sasParams, totalTime, jObject);
-        if(responseSender.getRtbResponse() == null)
-          Logging.rrLogging(jObject, responseSender.getRankList().get(responseSender.getSelectedAdIndex()), logger,
-              ServletHandler.loggerConfig, sasParams, terminationReason);
-        else
-          Logging.rrLogging(jObject, responseSender.getRtbResponse(), logger, ServletHandler.loggerConfig, sasParams, terminationReason);
-        Logging.advertiserLogging(list, logger, ServletHandler.loggerConfig);
-        Logging.sampledAdvertiserLogging(list, logger, ServletHandler.loggerConfig);
-
-      }
-    } catch (JSONException exception) {
-      logger.error("Error while writing logs " + exception.getMessage());
-      System.out.println("stack trace is ");
-      exception.printStackTrace();
-      return;
-    } catch (TException exception) {
-      logger.error("Error while writing logs " + exception.getMessage());
-      System.out.println("stack trace is ");
-      exception.printStackTrace();
-      return;
-    }
-    logger.debug("done with logging");
-  }
-
   // send Mail if channel server crashes
   public static void sendMail(String errorMessage, String stackTrace) {
     // logger.error("Error in the main thread, so sending mail " +
