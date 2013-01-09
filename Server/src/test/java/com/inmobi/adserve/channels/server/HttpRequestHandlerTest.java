@@ -1,18 +1,14 @@
 package com.inmobi.adserve.channels.server;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.util.ArrayList;
 
 import org.apache.commons.configuration.Configuration;
-import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
@@ -183,9 +179,6 @@ public class HttpRequestHandlerTest extends TestCase {
     rs.rtbSegments = new ArrayList<ChannelSegment>();
     rs.rtbSegments.add(channelSegment1);
     rs.rtbSegments.add(channelSegment2);
-    if(rs == null) System.out.println("\n\n\n\n\n\n\nrs");
-    if(rs.rtbSegments == null) System.out.println("\n\n\n\n\n\n\nrs.rtbsegments");
-    if(channelSegment3 == null) System.out.println("\n\n\n\n\n\n\nchannel3");
     rs.rtbSegments.add(channelSegment3);
     AdNetworkInterface adNetworkInterfaceResult = rs.runRtbSecondPriceAuctionEngine();
     assertEquals(2, adNetworkInterfaceResult.getLatency());
@@ -252,8 +245,7 @@ public class HttpRequestHandlerTest extends TestCase {
   @Test
   public void testWriteLogsBothListNull() {
     HttpRequestHandler httpRequestHandler = new HttpRequestHandler();
-    httpRequestHandler.logger = new DebugLogger();
-    httpRequestHandler.writeLogs();
+    httpRequestHandler.writeLogs(httpRequestHandler.responseSender, httpRequestHandler.logger);
   }
 
   @Test
@@ -277,10 +269,9 @@ public class HttpRequestHandlerTest extends TestCase {
     expect(channelSegmentEntity.getId()).andReturn("extId").anyTimes();
     replay(channelSegmentEntity);
     ChannelSegment channelSegment1 = new ChannelSegment(channelSegmentEntity, adNetworkInterface1, null, null);
-    httpRequestHandlerbase.logger = new DebugLogger();
     httpRequestHandlerbase.responseSender.rtbSegments = new ArrayList<ChannelSegment>();
     httpRequestHandlerbase.responseSender.rtbSegments.add(channelSegment1);
-    httpRequestHandlerbase.writeLogs();
+    httpRequestHandlerbase.writeLogs(httpRequestHandlerbase.responseSender, httpRequestHandlerbase.logger);
   }
 
 }

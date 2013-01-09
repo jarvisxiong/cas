@@ -11,8 +11,6 @@ import org.json.JSONObject;
 
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
 
 public class RequestParser {
 
@@ -21,8 +19,8 @@ public class RequestParser {
   }
 
   // Extracting params.
-  public static JSONObject extractParams(Map<String, List<String>> params, String jsonKey, DebugLogger logger) throws Exception,
-      JSONException {
+  public static JSONObject extractParams(Map<String, List<String>> params, String jsonKey, DebugLogger logger)
+      throws Exception, JSONException {
     JSONObject jObject = null;
     if(!params.isEmpty()) {
       for (Entry<String, List<String>> p : params.entrySet()) {
@@ -59,6 +57,7 @@ public class RequestParser {
     params.countryStr = parseArray(jObject, "carrier", 1);
     params.area = parseArray(jObject, "carrier", 4);
     params.slot = stringify(jObject, "slot-served", logger);
+    params.rqMkSlot = stringify(jObject, "rq-mk-ad-slot", logger);
     params.sdkVersion = stringify(jObject, "sdk-version", logger);
     params.siteType = stringify(jObject, "site-type", logger);
     params.adcode = stringify(jObject, "adcode", logger);
@@ -69,13 +68,19 @@ public class RequestParser {
     params.categories = getCategory(jObject, logger);
     params.rqIframe = stringify(jObject, "rq-iframe", logger);
     params.rFormat = stringify(jObject, "r-format", logger);
-    params.allowBannerAds = jObject.opt("site-allowBanner") == null ? true : (Boolean) (jObject.opt("site-allowBanner"));
-    params.siteFloor = jObject.opt("site-floor") == null ? 0.0 : Double.parseDouble(jObject.opt("site-floor").toString());
+    params.rqMkAdcount = stringify(jObject, "rq-mk-adcount", logger);
+    params.tid = stringify(jObject, "tid", logger);
+    params.tp = stringify(jObject, "tp", logger);
+    params.allowBannerAds = jObject.opt("site-allowBanner") == null ? true
+        : (Boolean) (jObject.opt("site-allowBanner"));
+    params.siteFloor = jObject.opt("site-floor") == null ? 0.0 : Double.parseDouble(jObject.opt("site-floor")
+        .toString());
     if(logger.isDebugEnabled()) {
       logger.debug("country obtained is " + params.country);
       logger.debug("site floor is " + params.siteFloor);
       logger.debug("osId is " + params.platformOsId);
     }
+    params.uidParams = stringify(jObject, "u-id-params", logger);
     params = getUserParams(params, jObject, logger);
     params = getUserIdParams(params, jObject, logger);
     try {
@@ -86,6 +91,16 @@ public class RequestParser {
     } catch (JSONException exception) {
       logger.debug("site object not found in request");
       params.siteIncId = 0;
+    }
+    try {
+      params.handset = jObject.getJSONArray("handset");
+    } catch (JSONException e) {
+      logger.debug("Handset array not found");
+    }
+    try {
+      params.carrier = jObject.getJSONArray("carrier");
+    } catch (JSONException e) {
+      logger.debug("carrier array not found");
     }
     if(null == params.uid || params.uid.isEmpty()) {
       params.uid = stringify(jObject, "u-id", logger);
@@ -98,7 +113,11 @@ public class RequestParser {
   public static String stringify(JSONObject jObject, String field, DebugLogger logger) throws NullPointerException {
     String fieldValue = "";
     try {
-      fieldValue = (String) jObject.get(field);
+      try {
+        fieldValue = (String) jObject.get(field);
+      } catch (ClassCastException e) {
+        fieldValue = jObject.get(field).toString();
+      }
     } catch (JSONException e) {
       return null;
     }
@@ -132,8 +151,9 @@ public class RequestParser {
     }
   }
 
-  //Get user specific params
-  public static SASRequestParameters getUserParams(SASRequestParameters parameter, JSONObject jObject, DebugLogger logger) {
+  // Get user specific params
+  public static SASRequestParameters getUserParams(SASRequestParameters parameter, JSONObject jObject,
+      DebugLogger logger) {
     logger.debug("inside parsing user params");
     try {
       JSONObject userMap = (JSONObject) jObject.get("uparams");
@@ -146,7 +166,8 @@ public class RequestParser {
       parameter.userLocation = stringify(userMap, "u-location", logger);
       parameter.genderOrig = stringify(userMap, "u-gender-orig", logger);
       if(logger.isDebugEnabled()) {
-        logger.debug("uid is " + parameter.uid + ",postalCode is " + parameter.postalCode + ",gender is " + parameter.gender);
+        logger.debug("uid is " + parameter.uid + ",postalCode is " + parameter.postalCode + ",gender is "
+            + parameter.gender);
         logger.debug("age is " + parameter.age + ",location is " + parameter.userLocation + ",genderorig is "
             + parameter.genderOrig);
       }
@@ -171,7 +192,8 @@ public class RequestParser {
   }
 
   // Get user id params
-  public static SASRequestParameters getUserIdParams(SASRequestParameters parameter, JSONObject jObject, DebugLogger logger) {
+  public static SASRequestParameters getUserIdParams(SASRequestParameters parameter, JSONObject jObject,
+      DebugLogger logger) {
     if(logger.isDebugEnabled())
       logger.debug("inside parsing userid params");
     try {

@@ -5,6 +5,7 @@ import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 import java.awt.Dimension;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
@@ -93,7 +94,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     this.logger = logger;
     this.totalTime = System.currentTimeMillis();
     this.rankList = null;
-    this.rtbSegments = null;
+    this.rtbSegments = new ArrayList<ChannelSegment>();
     this.adResponse = null;
     this.responseSent = false;
     this.sasParams = null;
@@ -362,7 +363,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
       logger.debug("adstatus map size is :" + ChannelsClientHandler.adStatusMap.size());
       logger.debug("status map size is:" + ChannelsClientHandler.statusMap.size());
     }
-    hrh.writeLogs();
+    hrh.writeLogs(this, logger);
   }
   
   

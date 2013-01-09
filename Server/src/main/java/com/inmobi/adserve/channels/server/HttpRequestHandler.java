@@ -48,14 +48,11 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
   private static final String lowSdkVersion = "LSDK";
   private static final String CLOSED_CHANNEL_EXCEPTION = "java.nio.channels.ClosedChannelException";
   private static final String CONNECTION_RESET_PEER = "java.io.IOException: Connection reset by peer";
-  private static int percentRollout;
   public String terminationReason = "NO";
   
-  private static RepositoryHelper repositoryHelper;
   private SASRequestParameters sasParams = new SASRequestParameters();
   private JSONObject jObject = null;
   private static Random random = new Random();
-  private static List<String> allowedSiteTypes;
   public DebugLogger logger = null;
   public ResponseSender responseSender;
 
@@ -67,13 +64,6 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
     this.terminationReason = terminationReason;
   }
 
-  public static int getPercentRollout() {
-    return percentRollout;
-  }
-
-  public static void setPercentRollout(int percentRollout) {
-    HttpRequestHandler.percentRollout = percentRollout;
-  }
 
   public HttpRequestHandler() {
     logger = new DebugLogger();
@@ -155,15 +145,15 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
         terminationReason = jsonParsingError;
         InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
       }
-      sasParams = RequestParser.parseRequestParameters(jObject, logger);
+      responseSender.sasParams = RequestParser.parseRequestParameters(jObject, logger);
 
-      if(random.nextInt(100) >= percentRollout) {
+      if(random.nextInt(100) >= ServletHandler.percentRollout) {
         logger.debug("Request not being served because of limited percentage rollout");
         InspectorStats.incrementStatCount(InspectorStrings.droppedRollout, InspectorStrings.count);
         responseSender.sendNoAdResponse(e);
       }
 
-      if(null == sasParams || null == sasParams.siteId) {
+      if(null == responseSender.sasParams || null == responseSender.sasParams.siteId) {
         logger.debug("Terminating request as site id was missing");
         terminationReason = missingSiteId;
         InspectorStats.incrementStatCount(InspectorStrings.missingSiteId, InspectorStrings.count);
@@ -171,12 +161,12 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
         return;
       }
 
-      if(!sasParams.allowBannerAds || sasParams.siteFloor > 5) {
+      if(!responseSender.sasParams.allowBannerAds || responseSender.sasParams.siteFloor > 5) {
         logger.debug("Request not being served because of banner not allowed or site floor above threshold");
         responseSender.sendNoAdResponse(e);
         return;
       }
-      if(sasParams.siteType != null && !allowedSiteTypes.contains(sasParams.siteType)) {
+      if(responseSender.sasParams.siteType != null && !ServletHandler.allowedSiteTypes.contains(responseSender.sasParams.siteType)) {
         logger.error("Terminating request as incompatible content type");
         terminationReason = incompatibleSiteType;
         InspectorStats.incrementStatCount(InspectorStrings.incompatibleSiteType, InspectorStrings.count);
@@ -184,17 +174,17 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
         return;
       }
 
-      if(sasParams.sdkVersion != null) {
+      if(responseSender.sasParams.sdkVersion != null) {
         try {
-          if((sasParams.sdkVersion.substring(0, 1).equalsIgnoreCase("i") || sasParams.sdkVersion.substring(0, 1)
-              .equalsIgnoreCase("a")) && Integer.parseInt(sasParams.sdkVersion.substring(1, 2)) < 3) {
+          if((responseSender.sasParams.sdkVersion.substring(0, 1).equalsIgnoreCase("i") || responseSender.sasParams.sdkVersion.substring(0, 1)
+              .equalsIgnoreCase("a")) && Integer.parseInt(responseSender.sasParams.sdkVersion.substring(1, 2)) < 3) {
             logger.error("Terminating request as sdkVersion is less than 3");
             terminationReason = lowSdkVersion;
             InspectorStats.incrementStatCount(InspectorStrings.lowSdkVersion, InspectorStrings.count);
             responseSender.sendNoAdResponse(e);
             return;
           } else
-            logger.debug("sdk-version : " + sasParams.sdkVersion);
+            logger.debug("sdk-version : " + responseSender.sasParams.sdkVersion);
         } catch (StringIndexOutOfBoundsException e2) {
           logger.debug("Invalid sdkversion " + e2.getMessage());
         } catch (NumberFormatException e3) {
@@ -207,7 +197,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
       // in whitelist, else send no ad.
       if(ServletHandler.config.getBoolean("sendOnlyToWhitelist") == true) {
         List<String> whitelist = ServletHandler.config.getList("whitelist");
-        if(null == whitelist || !whitelist.contains(sasParams.siteId)) {
+        if(null == whitelist || !whitelist.contains(responseSender.sasParams.siteId)) {
           logger.debug("site id not present in whitelist, so sending no ad response");
           responseSender.sendNoAdResponse(e);
           return;
@@ -216,7 +206,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
 
       // getting the selected third party site details
       HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments = new MatchSegments(logger)
-          .matchSegments(sasParams);
+          .matchSegments(responseSender.sasParams);
 
       if(matchedSegments == null) {
         responseSender.sendNoAdResponse(e);
@@ -264,7 +254,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
 
       segments = AsyncRequestMaker.prepareForAsyncRequest(rows, logger, ServletHandler.config,
           ServletHandler.rtbConfig, ServletHandler.adapterConfig, responseSender,
-          advertiserSet, e, repositoryHelper, jObject, sasParams);
+          advertiserSet, e, ServletHandler.repositoryHelper, jObject, responseSender.sasParams);
 
       if(segments.size() == 0) {
         logger.debug("No succesfull configuration of adapter ");
@@ -337,6 +327,49 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
     }
   }
 
+  
+  public void writeLogs(ResponseSender responseSender, DebugLogger logger) {
+    List<ChannelSegment> list = new ArrayList<ChannelSegment>();
+    if(null != responseSender.getRankList())
+      list.addAll(responseSender.getRankList());
+    if(null != responseSender.getRtbSegments())
+      list.addAll(responseSender.getRtbSegments());
+    long totalTime = responseSender.getTotalTime();
+    if(totalTime > 2000)
+      totalTime = 0;
+    try {
+      if(responseSender.getAdResponse() == null) {
+        Logging.channelLogline(list, null, logger, ServletHandler.loggerConfig, responseSender.sasParams, totalTime);
+        Logging.rrLogging(null, logger, ServletHandler.loggerConfig, responseSender.sasParams, terminationReason);
+        Logging.advertiserLogging(list, logger, ServletHandler.loggerConfig);
+        Logging.sampledAdvertiserLogging(list, logger, ServletHandler.loggerConfig);
+      } else {
+        Logging.channelLogline(list, responseSender.getAdResponse().clickUrl, logger, ServletHandler.loggerConfig,
+            responseSender.sasParams, totalTime);
+        if(responseSender.getRtbResponse() == null)
+          Logging.rrLogging(responseSender.getRankList().get(responseSender.getSelectedAdIndex()), logger,
+              ServletHandler.loggerConfig, responseSender.sasParams, terminationReason);
+        else
+          Logging.rrLogging(responseSender.getRtbResponse(), logger, ServletHandler.loggerConfig, responseSender.sasParams, terminationReason);
+        Logging.advertiserLogging(list, logger, ServletHandler.loggerConfig);
+        Logging.sampledAdvertiserLogging(list, logger, ServletHandler.loggerConfig);
+
+      }
+    } catch (JSONException exception) {
+      logger.error("Error while writing logs " + exception.getMessage());
+      System.out.println("stack trace is ");
+      exception.printStackTrace();
+      return;
+    } catch (TException exception) {
+      logger.error("Error while writing logs " + exception.getMessage());
+      System.out.println("stack trace is ");
+      exception.printStackTrace();
+      return;
+    }
+    logger.debug("done with logging");
+  }
+  
+  
   // send Mail if channel server crashes
   public static void sendMail(String errorMessage, String stackTrace) {
     // logger.error("Error in the main thread, so sending mail " +
@@ -356,7 +389,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
 
       message.setRecipients(Message.RecipientType.TO, addressTo);
       InetAddress addr = InetAddress.getLocalHost();
-      message.setSubject("Channel  Ad Server Crashed on Host " + addr.getHostName());
+      message.setSubject("Channel Ad Server Crashed on Host " + addr.getHostName());
       message.setText(errorMessage + stackTrace);
       Transport.send(message);
     } catch (MessagingException mex) {

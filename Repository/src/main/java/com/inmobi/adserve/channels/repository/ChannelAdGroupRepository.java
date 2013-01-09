@@ -239,7 +239,7 @@ public class ChannelAdGroupRepository extends AbstractHashDBUpdatableRepository<
   }
 
   private void cleanupEntity(ChannelSegmentEntity entity) {
-    // Family safe, Maturei
+ // Family safe, Maturei
     for (Integer siteRating : entity.getSiteRatings()) {
       // Wap, APP
       for (Integer targetingPlatform : entity.getTargetingPlatform()) {
@@ -302,7 +302,7 @@ public class ChannelAdGroupRepository extends AbstractHashDBUpdatableRepository<
   }
 
   private void insertEntityToHashMap(ChannelSegmentEntity entity) {
-    // Family safe, Maturei
+ // Family safe, Maturei
     for (Integer siteRating : entity.getSiteRatings()) {
       // Wap, APP
       for (Integer targetingPlatform : entity.getTargetingPlatform()) {

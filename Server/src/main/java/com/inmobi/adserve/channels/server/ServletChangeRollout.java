@@ -20,8 +20,8 @@ public class ServletChangeRollout implements Servlet{
       logger.error("invalid attempt to change rollout percentage " + ex);
       hrh.responseSender.sendResponse("INVALIDPERCENT", e);
     }
-    InspectorStats.setWorkflowStats(InspectorStrings.percentRollout, Long.valueOf(HttpRequestHandler.getPercentRollout()));
-    logger.debug("new roll out percentage is " + HttpRequestHandler.getPercentRollout());
+    InspectorStats.setWorkflowStats(InspectorStrings.percentRollout, Long.valueOf(ServletHandler.percentRollout));
+    logger.debug("new roll out percentage is " + ServletHandler.percentRollout);
     hrh.responseSender.sendResponse("OK", e);
   }
   @Override
