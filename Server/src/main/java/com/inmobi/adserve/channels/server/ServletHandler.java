@@ -3,6 +3,7 @@ package com.inmobi.adserve.channels.server;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.commons.configuration.Configuration;
 import org.jboss.netty.handler.codec.http.HttpRequest;
@@ -14,16 +15,26 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 
 public class ServletHandler {
 
+  public static final String jsonParsingError = "EJSON";
+  public static final String processingError = "ESERVER";
+  public static final String missingSiteId = "NOSITE";
+  public static final String incompatibleSiteType = "ESITE";
+  public static final String lowSdkVersion = "LSDK";
+  public static final String CLOSED_CHANNEL_EXCEPTION = "java.nio.channels.ClosedChannelException";
+  public static final String CONNECTION_RESET_PEER = "java.io.IOException: Connection reset by peer";
+  
   public static Configuration config;
   public static Configuration rtbConfig;
   public static Configuration adapterConfig;
   public static Configuration loggerConfig;
   public static Configuration log4jConfig;
   public static Configuration databaseConfig;
+  
   public static RepositoryHelper repositoryHelper;
   public static int percentRollout;
   public static List<String> allowedSiteTypes;
   public static int rollCount = 0;
+  public static Random random = new Random();
   
   public Configuration getRtbConfig() {
     return ServletHandler.rtbConfig;
@@ -89,6 +100,13 @@ public class ServletHandler {
       @Override
       public Servlet getServlet() {
         return new ServletChangeConfig();
+      }
+    });
+    
+    servletMap.put("/backfill", new ServletFactory() {      
+      @Override
+      public Servlet getServlet() {
+       return new ServletBackFill();
       }
     });
 

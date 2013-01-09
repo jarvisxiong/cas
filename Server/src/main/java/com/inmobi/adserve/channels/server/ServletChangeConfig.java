@@ -25,7 +25,7 @@ public class ServletChangeConfig implements Servlet{
     } catch (JSONException exeption) {
       jObject = new JSONObject();
       logger.debug("Encountered Json Error while creating json object inside HttpRequest Handler");
-      hrh.setTerminationReason(HttpRequestHandler.jsonParsingError);
+      hrh.setTerminationReason(ServletHandler.jsonParsingError);
       InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
     }
     if(null == jObject) {
@@ -57,7 +57,7 @@ public class ServletChangeConfig implements Servlet{
       hrh.responseSender.sendResponse(updates.toString(), e);
     } catch (JSONException ex) {
       logger.debug("Encountered Json Error while creating json object inside HttpRequest Handler for config change");
-      hrh.terminationReason = HttpRequestHandler.jsonParsingError;
+      hrh.terminationReason = ServletHandler.jsonParsingError;
     }            
   }
   @Override
