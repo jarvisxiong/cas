@@ -916,7 +916,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     params.locSrc = stringify(jObject, "loc-src");
     params.latLong = stringify(jObject, "latlong");
     params.siteId = stringify(jObject, "rq-mk-siteid");
-    params.siteSegmentId = stringify(jObject, "sel_seg_id");
+    params.siteSegmentId = stringify(jObject, "sel-seg-id");
     params.source = stringify(jObject, "source");
     params.country = parseArray(jObject, "carrier", 2);
     params.area = parseArray(jObject, "carrier", 4);
