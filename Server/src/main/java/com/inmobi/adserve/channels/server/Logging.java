@@ -386,6 +386,7 @@ public class Logging {
     }
 
     logger.debug("finished writing cas logs");
+    logger.debug(log.toString());
     if(enableFileLogging)
       debugLogger.info(log.toString());
     CasChannelLog channelLog = new CasChannelLog(totalTime, clickUrl, sasParams == null ? null : sasParams.siteId, new RequestTpan(responseList),
