@@ -110,6 +110,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
 
       QueryStringDecoder queryStringDecoder = new QueryStringDecoder(request.getUri());
       logger.debug(queryStringDecoder.getPath());
+      
 
       ServletFactory servletFactory = ServletHandler.servletMap.get(queryStringDecoder.getPath());
       if(servletFactory != null) {
@@ -193,6 +194,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
     }
     logger.debug("done with logging");
   }
+
 
   // send Mail if channel server crashes
   public static void sendMail(String errorMessage, String stackTrace) {

@@ -238,7 +238,13 @@ public class Logging {
       log.append(sasParams.uidParams);
     else
       log.append("{}");
-    logger.debug("finally writing to rr log" + log.toString());
+    
+    if (null != sasParams && null != sasParams.siteSegmentId)
+      log.append(separator).append("sel_seg_id=\"").append(sasParams.siteSegmentId).append("\"");
+    
+    if (logger.isDebugEnabled())
+      logger.debug("finally writing to rr log" + log.toString());
+    
     if(enableFileLogging)
       rrLogger.info(log.toString());
     else
@@ -253,6 +259,9 @@ public class Logging {
     request.setUser(user);
     if(requestSlot != null)
       request.setSlot_requested(slotRequested);
+    if (null != sasParams && null != sasParams.siteSegmentId)
+      request.setSegmentId(sasParams.siteSegmentId);
+    
     List<Impression> impressions = null;
     if(null != impression) {
       impressions = new ArrayList<Impression>();
