@@ -125,6 +125,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
 
       //invalid request
       HttpResponse response = new DefaultHttpResponse(HTTP_1_1, NOT_FOUND);
+      ServerStatusInfo.statusString = "Page not Found";
       response.setContent(ChannelBuffers.copiedBuffer(ServerStatusInfo.statusString, Charset.forName("UTF-8").name()));
       if(e != null) {
         Channel channel = e.getChannel();
