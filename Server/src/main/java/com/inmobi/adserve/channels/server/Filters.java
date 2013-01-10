@@ -324,7 +324,7 @@ public class Filters {
     // Arraylist will contain the order in which we will wait for response
     // of the third party ad networks
     ArrayList<ChannelSegment> rankedList = new ArrayList<ChannelSegment>();
-    if(segment.size() < 1)
+    if(segment.isEmpty())
       return rankedList;
     while (segment.size() > 1) {
       double totalPriority = 0.0;

@@ -150,7 +150,7 @@ public class ServletBackFill implements Servlet {
         ServletHandler.adapterConfig, hrh.responseSender, advertiserSet, e, ServletHandler.repositoryHelper,
         hrh.jObject, hrh.responseSender.sasParams);
 
-    if(segments.size() == 0) {
+    if(segments.isEmpty()) {
       logger.debug("No succesfull configuration of adapter ");
       hrh.responseSender.sendNoAdResponse(e);
       return;
@@ -169,7 +169,7 @@ public class ServletBackFill implements Servlet {
           + hrh.responseSender.getRankList().size());
     }
     // if none of the async request succeed, we return "NO_AD"
-    if(hrh.responseSender.getRankList().size() == 0) {
+    if(hrh.responseSender.getRankList().isEmpty()) {
       logger.debug("No calls");
       hrh.responseSender.sendNoAdResponse(e);
       return;
