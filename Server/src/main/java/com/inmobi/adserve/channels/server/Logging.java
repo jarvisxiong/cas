@@ -275,7 +275,7 @@ public class Logging {
       log.append("{}");
     
     if (null != sasParams.siteSegmentId)
-      log.append(separator).append("sel_seg_id=\"").append(sasParams.siteSegmentId).append("\"");
+      log.append(separator).append("sel-seg-id=").append(sasParams.siteSegmentId);
     
     if (logger.isDebugEnabled())
       logger.debug("finally writing to rr log" + log.toString());
