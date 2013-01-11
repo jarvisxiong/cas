@@ -21,10 +21,18 @@ BEGIN
 				revenue,
 				today_impressions,
 				modified_on
-			from    (select account_id , 
-					max(revenue) as revenue 
-				from earnings_dcp_feedback 
-				where served_on > (now()-15) group by account_id)
+			from    (select account_id,
+				         max(revenue) as revenue 
+				 from 	(select account_id,
+						 sum(revenue)as revenue 
+					 from (select distinct segment_id,
+								 account_id, 
+								 revenue,
+								 served_on 
+					        from earnings_dcp_feedback
+						where served_on > (now()-15))
+					group by account_id,served_on) 
+				group by account_id)
 			as revenue_feedback 	 
 			full outer join
 				(select advertiser_id,
