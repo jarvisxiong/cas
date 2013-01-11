@@ -916,6 +916,12 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     params.locSrc = stringify(jObject, "loc-src");
     params.latLong = stringify(jObject, "latlong");
     params.siteId = stringify(jObject, "rq-mk-siteid");
+    try {
+      params.siteSegmentId = jObject.getInt("sel-seg-id");
+      logger.debug("Site segment id is " + params.siteSegmentId);
+    } catch (JSONException e) {
+      logger.debug("Site segment id is not present in the request");
+    }
     params.source = stringify(jObject, "source");
     params.country = parseArray(jObject, "carrier", 2);
     params.area = parseArray(jObject, "carrier", 4);
@@ -992,6 +998,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
     } catch (JSONException e) {
       return null;
     }
+    
     if(logger.isDebugEnabled())
       logger.debug("Retrived from json " + field + " = " + fieldValue);
     return fieldValue;

@@ -215,28 +215,50 @@ public class ChannelAdGroupRepository extends AbstractHashDBUpdatableRepository<
   }
   
   private void cleanupEntity(ChannelSegmentEntity entity) {
-    long country = -1; // All countries.
-    if(entity.getRcList().length > 0) {
-      country = entity.getRcList()[0];
-    }
-    // Family safe, Mature
+ // Family safe, Maturei
     for (Integer siteRating : entity.getSiteRatings()) {
       // Wap, APP
       for (Integer targetingPlatform : entity.getTargetingPlatform()) {
         for (Long slotId : entity.getSlotIds()) {
           if(entity.getAllTags()) {
-            if(entity.getOsIds() == null || entity.getOsIds().size() == 0)
-              removeEntity(slotId, -1 /* All categories */, country, targetingPlatform, siteRating, entity, -1);
-            else
-              for(Integer id : entity.getOsIds())
-                removeEntity(slotId, -1 /* All categories */, country, targetingPlatform, siteRating, entity, id);
+            if(entity.getRcList() == null || entity.getRcList().length == 0) {
+              if(entity.getOsIds() == null || entity.getOsIds().size() == 0) {
+                removeEntity(slotId, -1 /* All categories */, -1, targetingPlatform, siteRating, entity, -1);
+              } else {
+                for (Integer id : entity.getOsIds()) {
+                  removeEntity(slotId, -1 /* All categories */, -1, targetingPlatform, siteRating, entity, id);
+                }
+              }
+            } else {
+              for (Long country : entity.getRcList())
+                if(entity.getOsIds() == null || entity.getOsIds().size() == 0) {
+                  removeEntity(slotId, -1 /* All categories */, country, targetingPlatform, siteRating, entity, -1);
+                } else {
+                  for (Integer id : entity.getOsIds()) {
+                    removeEntity(slotId, -1 /* All categories */, country, targetingPlatform, siteRating, entity, id);
+                  }
+                }
+            }
           } else {
             for (Long category : entity.getTags()) {
-              if(entity.getOsIds() == null || entity.getOsIds().size() == 0)
-                insertEntity(slotId, category, country, targetingPlatform, siteRating, entity, -1);
-                else
-                  for(Integer id : entity.getOsIds())
-                    insertEntity(slotId, category , country, targetingPlatform, siteRating, entity, id);
+              if(entity.getRcList() == null || entity.getRcList().length == 0) {
+                if(entity.getOsIds() == null || entity.getOsIds().size() == 0) {
+                  removeEntity(slotId, category, -1, targetingPlatform, siteRating, entity, -1);
+                } else {
+                  for (Integer id : entity.getOsIds()) {
+                    removeEntity(slotId, category, -1, targetingPlatform, siteRating, entity, id);
+                  }
+                }
+              } else {
+                for (Long country : entity.getRcList())
+                  if(entity.getOsIds() == null || entity.getOsIds().size() == 0) {
+                    removeEntity(slotId, category, country, targetingPlatform, siteRating, entity, -1);
+                  } else {
+                    for (Integer id : entity.getOsIds()) {
+                      removeEntity(slotId, category, country, targetingPlatform, siteRating, entity, id);
+                    }
+                  }
+              }
             }
           }
         }
@@ -255,28 +277,46 @@ public class ChannelAdGroupRepository extends AbstractHashDBUpdatableRepository<
   }
 
   private void insertEntityToHashMap(ChannelSegmentEntity entity) {
-    long country = -1; // All countries.
-    if(entity.getRcList().length > 0) {
-      country = entity.getRcList()[0];
-    }
-    // Family safe, Maturei
+ // Family safe, Maturei
     for (Integer siteRating : entity.getSiteRatings()) {
       // Wap, APP
       for (Integer targetingPlatform : entity.getTargetingPlatform()) {
         for (Long slotId : entity.getSlotIds()) {
           if(entity.getAllTags()) {
-            if(entity.getOsIds() == null || entity.getOsIds().size() == 0)
-              insertEntity(slotId, -1 /* All categories */, country, targetingPlatform, siteRating, entity, -1);
-            else
-              for(Integer id : entity.getOsIds())
-                insertEntity(slotId, -1 /* All categories */, country, targetingPlatform, siteRating, entity, id);
+            if(entity.getRcList() == null || entity.getRcList().length == 0) {
+              if(entity.getOsIds() == null || entity.getOsIds().size() == 0) {
+                insertEntity(slotId, -1 /* All categories */, -1, targetingPlatform, siteRating, entity, -1);
+              } else
+                for (Integer id : entity.getOsIds()) {
+                  insertEntity(slotId, -1 /* All categories */, -1, targetingPlatform, siteRating, entity, id);
+                }
+            } else {
+              for (Long country : entity.getRcList())
+                if(entity.getOsIds() == null || entity.getOsIds().size() == 0) {
+                  insertEntity(slotId, -1 /* All categories */, country, targetingPlatform, siteRating, entity, -1);
+                } else
+                  for (Integer id : entity.getOsIds()) {
+                    insertEntity(slotId, -1 /* All categories */, country, targetingPlatform, siteRating, entity, id);
+                  }
+            }
           } else {
             for (Long category : entity.getTags()) {
-              if(entity.getOsIds() == null || entity.getOsIds().size() == 0)
-              insertEntity(slotId, category, country, targetingPlatform, siteRating, entity, -1);
-              else
-                for(Integer id : entity.getOsIds())
-                  insertEntity(slotId, category , country, targetingPlatform, siteRating, entity, id);
+              if(entity.getRcList() == null || entity.getRcList().length == 0) {
+                if(entity.getOsIds() == null || entity.getOsIds().size() == 0) {
+                  insertEntity(slotId, category, -1, targetingPlatform, siteRating, entity, -1);
+                } else
+                  for (Integer id : entity.getOsIds()) {
+                    insertEntity(slotId, category, -1, targetingPlatform, siteRating, entity, id);
+                  }
+              } else {
+                for (Long country : entity.getRcList())
+                  if(entity.getOsIds() == null || entity.getOsIds().size() == 0) {
+                    insertEntity(slotId, category, country, targetingPlatform, siteRating, entity, -1);
+                  } else
+                    for (Integer id : entity.getOsIds()) {
+                      insertEntity(slotId, category, country, targetingPlatform, siteRating, entity, id);
+                    }
+              }
             }
           }
         }
