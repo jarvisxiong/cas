@@ -101,46 +101,29 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
     }
   }
 
+  
   // Invoked when message is received over the connection
   @Override
   public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
     try {
-
       HttpRequest request = (HttpRequest) e.getMessage();
-
       QueryStringDecoder queryStringDecoder = new QueryStringDecoder(request.getUri());
       logger.debug(queryStringDecoder.getPath());
-      
-
       ServletFactory servletFactory = ServletHandler.servletMap.get(queryStringDecoder.getPath());
-      if(servletFactory != null) {
-        logger.debug("Got the servlet ");
-        Servlet servlet = servletFactory.getServlet();
-        logger.debug(servlet.getName());
-        servlet.handleRequest(this, queryStringDecoder, e, logger);
-        return;
+      Servlet servlet;
+      if(servletFactory == null) {
+        servlet = new ServletInvalid();
       }
-
-      logger.debug("No servlet");
-
-      //invalid request
-      HttpResponse response = new DefaultHttpResponse(HTTP_1_1, NOT_FOUND);
-      ServerStatusInfo.statusString = "Page not Found";
-      response.setContent(ChannelBuffers.copiedBuffer(ServerStatusInfo.statusString, Charset.forName("UTF-8").name()));
-      if(e != null) {
-        Channel channel = e.getChannel();
-        if(channel != null && channel.isWritable()) {
-          ChannelFuture future = channel.write(response);
-          future.addListener(ChannelFutureListener.CLOSE);
-        }
-      }
+      servlet = servletFactory.getServlet();
+      logger.debug("Got the servlet " + servlet.getName());
+      servlet.handleRequest(this, queryStringDecoder, e, logger);
+      return;
       
     } catch (Exception exception) {
       terminationReason = ServletHandler.processingError;
       InspectorStats.incrementStatCount(InspectorStrings.processingError, InspectorStrings.count);
       responseSender.sendNoAdResponse(e);
       String exceptionClass = exception.getClass().getSimpleName();
-
       // incrementing the count of the number of exceptions thrown in the
       // server code
       InspectorStats.incrementStatCount(exceptionClass, InspectorStrings.count);
@@ -180,7 +163,6 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
               responseSender.sasParams, terminationReason);
         Logging.advertiserLogging(list, logger, ServletHandler.loggerConfig);
         Logging.sampledAdvertiserLogging(list, logger, ServletHandler.loggerConfig);
-
       }
     } catch (JSONException exception) {
       logger.error("Error while writing logs " + exception.getMessage());
@@ -195,7 +177,6 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
     }
     logger.debug("done with logging");
   }
-
 
   // send Mail if channel server crashes
   public static void sendMail(String errorMessage, String stackTrace) {
@@ -227,5 +208,5 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
       ex.printStackTrace();
     }
   }
-  
+
 }

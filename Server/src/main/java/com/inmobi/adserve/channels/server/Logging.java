@@ -94,7 +94,6 @@ public class Logging {
       isTerminated = true;
     logger.info("Obtained the handle to rr logger");
     char separator = 0x01;
-    String tempParam = "";
     StringBuilder log = new StringBuilder();
     short adsServed = 0;
     String host = null;
@@ -119,11 +118,10 @@ public class Logging {
     if(null != sasParams && null != sasParams.siteId)
       log.append(separator + "rq-mk-siteid=\"" + sasParams.siteId + "\"");
     if(null != sasParams && null != sasParams.rqMkAdcount)
-      log.append(separator + "rq-mk-adcount=\"" + tempParam + "\"");
+      log.append(separator + "rq-mk-adcount=\"" + sasParams.rqMkAdcount + "\"");
     if(null != sasParams && null != sasParams.tid)
-      log.append(separator + "tid=\"" + tempParam + "\"");
+      log.append(separator + "tid=\"" + sasParams.tid + "\"");
 
-    String taskId = tempParam;
     InventoryType inventory = getInventoryType(sasParams);
     String timestamp = ReportTime.getTTime();
     log.append(separator + "ttime=\"" + timestamp + "\"");
@@ -238,19 +236,20 @@ public class Logging {
       log.append(sasParams.uidParams);
     else
       log.append("{}");
-    
-    if (null != sasParams && null != sasParams.siteSegmentId)
+
+    if(null != sasParams && null != sasParams.siteSegmentId)
       log.append(separator).append("sel_seg_id=\"").append(sasParams.siteSegmentId).append("\"");
-    
-    if (logger.isDebugEnabled())
+
+    if(logger.isDebugEnabled())
       logger.debug("finally writing to rr log" + log.toString());
-    
+
     if(enableFileLogging)
       rrLogger.info(log.toString());
     else
       logger.debug("file logging is not enabled");
     short adRequested = 1;
-    Request request = new Request(adRequested, adsServed, sasParams == null ? null : sasParams.siteId, taskId);
+    Request request = new Request(adRequested, adsServed, sasParams == null ? null : sasParams.siteId,
+        sasParams == null ? null : sasParams.tid);
     if(slotServed != null)
       request.setSlot_served(Integer.valueOf(slotServed).shortValue());
     request.setIP(geo);
@@ -259,9 +258,9 @@ public class Logging {
     request.setUser(user);
     if(requestSlot != null)
       request.setSlot_requested(slotRequested);
-    if (null != sasParams && null != sasParams.siteSegmentId)
+    if(null != sasParams && null != sasParams.siteSegmentId)
       request.setSegmentId(sasParams.siteSegmentId);
-    
+
     List<Impression> impressions = null;
     if(null != impression) {
       impressions = new ArrayList<Impression>();
@@ -369,20 +368,21 @@ public class Logging {
     }
 
     SiteParams siteParams = new SiteParams(categ, siteType);
-    RequestParams requestParams = (sasParams == null? null : new RequestParams(sasParams.remoteHostIp, sasParams.source, sasParams.userAgent));
+    RequestParams requestParams = sasParams == null ? new RequestParams(null, null, null) : new RequestParams(
+        sasParams.remoteHostIp, sasParams.source, sasParams.userAgent);
 
     if(null != sasParams && null != sasParams.remoteHostIp)
       log.append("rq-params={\"host\":\"").append(sasParams.remoteHostIp).append("\"");
     JSONArray carrier = null;
-    if(null != sasParams ) {
-    if(sasParams.source != null)
-      log.append(",\"src\":\"").append(sasParams.source).append("\"");
-    log.append("}").append(sep).append("rq-h-user-agent=\"");
-    log.append(sasParams.userAgent).append("\"").append(sep).append("rq-site-params=[{\"categ\":");
-    log.append(sasParams.categories.toString()).append("},{\"type\":\"" + sasParams.siteType + "\"}]");
-    carrier = sasParams.carrier;
+    if(null != sasParams) {
+      if(sasParams.source != null)
+        log.append(",\"src\":\"").append(sasParams.source).append("\"");
+      log.append("}").append(sep).append("rq-h-user-agent=\"");
+      log.append(sasParams.userAgent).append("\"").append(sep).append("rq-site-params=[{\"categ\":");
+      log.append(sasParams.categories.toString()).append("},{\"type\":\"" + sasParams.siteType + "\"}]");
+      carrier = sasParams.carrier;
     }
-     
+
     Geo geo = null;
     if(null != carrier) {
       log.append(sep).append("carrier=").append(carrier);
@@ -397,8 +397,8 @@ public class Logging {
     logger.debug(log.toString());
     if(enableFileLogging)
       debugLogger.info(log.toString());
-    CasChannelLog channelLog = new CasChannelLog(totalTime, clickUrl, sasParams == null ? null : sasParams.siteId, new RequestTpan(responseList),
-        siteParams, requestParams, timestamp);
+    CasChannelLog channelLog = new CasChannelLog(totalTime, clickUrl, sasParams == null ? null : sasParams.siteId,
+        new RequestTpan(responseList), siteParams, requestParams, timestamp);
     if(null != geo)
       channelLog.setIP(geo);
     if(enableDatabusLogging) {
@@ -562,7 +562,7 @@ public class Logging {
   }
 
   public static Gender getGender(SASRequestParameters sasParams) {
-    if(sasParams ==  null) 
+    if(sasParams == null)
       return null;
     if(sasParams.gender.equalsIgnoreCase("m"))
       return Gender.MALE;
