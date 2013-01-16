@@ -13,7 +13,6 @@
     </parent>
 
     <modules>
-         <module>Repository</module>
          <module>Server</module>
     </modules>
 

@@ -417,7 +417,7 @@ public class HttpRequestHandler extends HttpRequestHandlerBase {
           logger.debug("external site key is " + row.getExternalSiteKey());
         }
 
-        if(network.configureParameters(sasParams, row.getExternalSiteKey(), clickUrl, beaconUrl)) {
+        if(network.configureParameters(sasParams, row, clickUrl, beaconUrl)) {
           InspectorStats.incrementStatCount(network.getName(), InspectorStrings.successfulConfigure);
           ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = channelSegmentFeedbackRepository.query(row.getAdgroupId());
           if(null == channelSegmentFeedbackEntity)
