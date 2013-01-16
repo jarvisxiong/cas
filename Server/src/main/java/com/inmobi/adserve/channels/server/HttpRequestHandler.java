@@ -101,7 +101,6 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
     }
   }
 
-  
   // Invoked when message is received over the connection
   @Override
   public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
@@ -118,7 +117,6 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
       logger.debug("Got the servlet " + servlet.getName());
       servlet.handleRequest(this, queryStringDecoder, e, logger);
       return;
-      
     } catch (Exception exception) {
       terminationReason = ServletHandler.processingError;
       InspectorStats.incrementStatCount(InspectorStrings.processingError, InspectorStrings.count);
