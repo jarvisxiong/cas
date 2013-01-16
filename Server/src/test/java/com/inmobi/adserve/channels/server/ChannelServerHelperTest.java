@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import com.inmobi.adserve.channels.util.LoggerFactory;
 
 public class ChannelServerHelperTest extends TestCase {
 
@@ -25,8 +24,7 @@ public class ChannelServerHelperTest extends TestCase {
     expect(mockConfig.getString("loggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties").anyTimes();
     replay(mockConfig);
     config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
-    LoggerFactory.init(mockConfig);
-    channelServerHelper = new ChannelServerHelper(LoggerFactory.getlogger());
+    channelServerHelper = new ChannelServerHelper(Logger.getLogger(config.loggerConfiguration().getString("debug")));
   }
 
   @Test
