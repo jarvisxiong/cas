@@ -20,7 +20,9 @@ import com.inmobi.adserve.channels.adnetworks.openx.OpenxAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.siquis.DCPSiquisAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.tapit.DCPTapitAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.verve.DCPVerveAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.webmoblink.WebmobLinkAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.xad.DCPxAdAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
@@ -49,24 +51,30 @@ public class SegmentFactory {
       ClientBootstrap rtbClientBootstrap, HttpRequestHandlerBase base, MessageEvent serverEvent, Set<String> advertiserSet, DebugLogger logger,
       boolean isRtbEnabled) {
     ChannelEntity channelEntity = repositoryHelper.queryChannelRepository(channelId);
-    //once we have values in Db use the following declaration
-    //if(isRtbEnabled && channelEntity != null && channelEntity.isRtb()) {
+    // once we have values in Db use the following declaration
+    // if(isRtbEnabled && channelEntity != null && channelEntity.isRtb()) {
     if(isRtbEnabled) {
-      //following code will be enabled once we have entries in DB
+      // following code will be enabled once we have entries in DB
       logger.debug("Creating RTB adapter instance for advertiser id : " + advertiserId);
-      
-      //RtbAdNetwork rtbAdNetwork = new RtbAdNetwork(logger, config, rtbClientBootstrap, base, serverEvent, channelEntity.getUrlBase(),
-      //    channelEntity.getUrlArg(), channelEntity.getRtbMethod(), channelEntity.getRtbVer(), channelEntity.getWnUrl(), channelEntity.getAccountId(), channelEntity.isWnRequied(), channelEntity.isWnFromClient());
-      //return rtbAdNetwork;
+
+      // RtbAdNetwork rtbAdNetwork = new RtbAdNetwork(logger, config,
+      // rtbClientBootstrap, base, serverEvent, channelEntity.getUrlBase(),
+      // channelEntity.getUrlArg(), channelEntity.getRtbMethod(),
+      // channelEntity.getRtbVer(), channelEntity.getWnUrl(),
+      // channelEntity.getAccountId(), channelEntity.isWnRequied(),
+      // channelEntity.isWnFromClient());
+      // return rtbAdNetwork;
       //
-      
-      if((advertiserId.equalsIgnoreCase(config.getString("rtbAdvertiserName.advertiserId"))) && (null==advertiserSet || advertiserSet.isEmpty() || advertiserSet.contains("rtbAdvertiserName"))
+
+      if((advertiserId.equalsIgnoreCase(config.getString("rtbAdvertiserName.advertiserId")))
+          && (null == advertiserSet || advertiserSet.isEmpty() || advertiserSet.contains("rtbAdvertiserName"))
           && (config.getString("rtbAdvertiserName.status").equalsIgnoreCase("on"))) {
         RtbAdNetwork rtbAdNetwork = new RtbAdNetwork(logger, config, rtbClientBootstrap, base, serverEvent, config.getString("rtbAdvertiserName.urlBase"),
-            config.getString("rtbAdvertiserName.urlArg"), config.getString("rtbAdvertiserName.rtbMethod"), config.getString("rtbAdvertiserName.rtbVer"), 
-            config.getString("rtbAdvertiserName.wnUrlback"), config.getString("rtbAdvertiserName.accountId"), config.getBoolean("rtbAdvertiserName.isWnRequired"), config.getBoolean("rtbAdvertiserName.isWinFromClient"));
-        return rtbAdNetwork; 
-      } 
+            config.getString("rtbAdvertiserName.urlArg"), config.getString("rtbAdvertiserName.rtbMethod"), config.getString("rtbAdvertiserName.rtbVer"),
+            config.getString("rtbAdvertiserName.wnUrlback"), config.getString("rtbAdvertiserName.accountId"),
+            config.getBoolean("rtbAdvertiserName.isWnRequired"), config.getBoolean("rtbAdvertiserName.isWinFromClient"));
+        return rtbAdNetwork;
+      }
     }
 
     if((advertiserId.equals(config.getString("atnt.advertiserId"))) && (advertiserSet.isEmpty() || advertiserSet.contains("atnt"))
@@ -105,26 +113,35 @@ public class SegmentFactory {
     } else if((advertiserId.equals(config.getString("httpool.advertiserId"))) && (advertiserSet.isEmpty() || advertiserSet.contains("httpool"))
         && (config.getString("httpool.status").equals("on"))) {
       return new DCPHttPoolAdNetwork(logger, config, clientBootstrap, base, serverEvent);
-    } 
-    
-//    else {
-//      logger.debug("going in generic adapter for advId" + advertiserId);
-//      String advertiserName = "";
-//      Iterator itr = config.getKeys();
-//      while (itr.hasNext()) {
-//        String key = itr.next().toString();
-//        if(config.getString(key).equals(advertiserId) && key.endsWith(".advertiserId")) {
-//          advertiserName = key.replace(".advertiserId", "");
-//          break;
-//        }
-//      }
-//      if(!advertiserName.equals("") && config.getString(advertiserName + ".status").equals("on")
-//          && (advertiserSet.isEmpty() || advertiserSet.contains(advertiserName))) {
-//        return new GenericAdapter(logger, config, clientBootstrap, base, serverEvent, advertiserName);
-//      }
-//    }
-//    logger.debug("no genric adapter");
-    
+    } else if((advertiserId.equals(config.getString("xad.advertiserId"))) && (advertiserSet.isEmpty() || advertiserSet.contains("xad"))
+        && (config.getString("xad.status").equals("on"))) {
+      return new DCPxAdAdNetwork(logger, config, clientBootstrap, base, serverEvent);
+    } else if((advertiserId.equals(config.getString("verve.advertiserId"))) && (advertiserSet.isEmpty() || advertiserSet.contains("verve"))
+        && (config.getString("verve.status").equals("on"))) {
+      return new DCPVerveAdNetwork(logger, config, clientBootstrap, base, serverEvent);
+    }
+
+    // else {
+    // logger.debug("going in generic adapter for advId" + advertiserId);
+    // String advertiserName = "";
+    // Iterator itr = config.getKeys();
+    // while (itr.hasNext()) {
+    // String key = itr.next().toString();
+    // if(config.getString(key).equals(advertiserId) &&
+    // key.endsWith(".advertiserId")) {
+    // advertiserName = key.replace(".advertiserId", "");
+    // break;
+    // }
+    // }
+    // if(!advertiserName.equals("") && config.getString(advertiserName +
+    // ".status").equals("on")
+    // && (advertiserSet.isEmpty() || advertiserSet.contains(advertiserName))) {
+    // return new GenericAdapter(logger, config, clientBootstrap, base,
+    // serverEvent, advertiserName);
+    // }
+    // }
+    // logger.debug("no genric adapter");
+
     return null;
   }
 }

@@ -3,13 +3,10 @@ package com.inmobi.adserve.channels.server;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
-import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -17,91 +14,34 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.inmobi.adserve.channels.api.*;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
-import java.net.*;
-import java.nio.ByteBuffer;
-import org.apache.commons.codec.binary.Base64;
 
-import org.apache.commons.configuration.Configuration;
-import org.json.JSONArray;
 import com.inmobi.adserve.channels.server.HttpRequestHandler.ChannelSegment;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.log.channel.AdResponse;
-import com.inmobi.log.channel.CasChannelLog;
-import com.inmobi.log.channel.RequestParams;
-import com.inmobi.log.channel.RequestTpan;
-import com.inmobi.log.channel.SiteParams;
+import com.inmobi.casthrift.AdResponse;
+import com.inmobi.casthrift.CasChannelLog;
+import com.inmobi.casthrift.RequestParams;
+import com.inmobi.casthrift.RequestTpan;
+import com.inmobi.casthrift.SiteParams;
 import com.inmobi.messaging.Message;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
-import com.inmobi.types.Ad;
-import com.inmobi.types.AdIdChain;
-import com.inmobi.types.AdMeta;
-import com.inmobi.types.ContentRating;
-import com.inmobi.types.Gender;
-import com.inmobi.types.Geo;
-import com.inmobi.types.HandsetMeta;
-import com.inmobi.types.InventoryType;
-import com.inmobi.types.PricingModel;
-import com.inmobi.types.adserving.AdRR;
-import com.inmobi.types.adserving.Impression;
-import com.inmobi.types.adserving.Request;
-import com.inmobi.types.adserving.RequestSource;
-import com.inmobi.types.adserving.User;
+import com.inmobi.casthrift.Ad;
+import com.inmobi.casthrift.AdIdChain;
+import com.inmobi.casthrift.AdMeta;
+import com.inmobi.casthrift.ContentRating;
+import com.inmobi.casthrift.Gender;
+import com.inmobi.casthrift.Geo;
+import com.inmobi.casthrift.HandsetMeta;
+import com.inmobi.casthrift.InventoryType;
+import com.inmobi.casthrift.PricingModel;
+import com.inmobi.casthrift.AdRR;
+import com.inmobi.casthrift.Impression;
+import com.inmobi.casthrift.Request;
+import com.inmobi.casthrift.User;
 
-import com.inmobi.messaging.Message;
-import com.inmobi.messaging.publisher.AbstractMessagePublisher;
-import com.inmobi.log.advertisement.CasAdvertisementLog;
-import com.inmobi.log.channel.AdResponse;
-import com.inmobi.log.channel.CasChannelLog;
-import com.inmobi.log.channel.RequestParams;
-import com.inmobi.log.channel.RequestTpan;
-import com.inmobi.log.channel.SiteParams;
-import com.google.gson.Gson;
-import com.inmobi.types.ContentRating;
-import com.inmobi.types.Geo;
-import com.inmobi.types.Gender;
-import com.inmobi.types.HandsetMeta;
-import com.inmobi.types.AdIdChain;
-import com.inmobi.types.AdMeta;
-import com.inmobi.types.Ad;
-import com.inmobi.types.adserving.AdRR;
-import com.inmobi.types.adserving.Impression;
-import com.inmobi.types.InventoryType;
-import com.inmobi.types.PricingModel;
-import com.inmobi.types.adserving.Request;
-import com.inmobi.types.adserving.RequestSource;
-import com.inmobi.types.adserving.User;
-import org.apache.thrift.*;
-import org.apache.thrift.protocol.*;
+import com.inmobi.casthrift.CasAdvertisementLog;
 
-import com.inmobi.messaging.Message;
-import com.inmobi.messaging.publisher.AbstractMessagePublisher;
-import com.inmobi.log.advertisement.CasAdvertisementLog;
-import com.inmobi.log.channel.AdResponse;
-import com.inmobi.log.channel.CasChannelLog;
-import com.inmobi.log.channel.RequestParams;
-import com.inmobi.log.channel.RequestTpan;
-import com.inmobi.log.channel.SiteParams;
-import com.google.gson.Gson;
-import com.inmobi.types.ContentRating;
-import com.inmobi.types.Geo;
-import com.inmobi.types.Gender;
-import com.inmobi.types.HandsetMeta;
-import com.inmobi.types.AdIdChain;
-import com.inmobi.types.AdMeta;
-import com.inmobi.types.Ad;
-import com.inmobi.types.adserving.AdRR;
-import com.inmobi.types.adserving.Impression;
-import com.inmobi.types.InventoryType;
-import com.inmobi.types.PricingModel;
-import com.inmobi.types.adserving.Request;
-import com.inmobi.types.adserving.RequestSource;
-import com.inmobi.types.adserving.User;
-import org.apache.thrift.*;
-import org.apache.thrift.protocol.*;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 public class Logging {
@@ -232,7 +172,7 @@ public class Logging {
     log.append(separator + "rq-src=[\"uk\",\"uk\",\"uk\",\"uk\",");
     String tp = stringify(jObject, "tp");
     if(null != tp)
-      log.append("\"" + tempParam + "\"]");
+      log.append("\"" + tp + "\"]");
     else
       log.append("\"dir\"]");
 
@@ -304,7 +244,6 @@ public class Logging {
     if(null != slotServed) {
       log.append(separator).append("slot-served=").append(slotServed);
     }
-    RequestSource requestSource = new RequestSource("uk", "uk", "uk", tp);
 
     User user = new User();
     log.append(separator + "uparams={");
@@ -334,7 +273,13 @@ public class Logging {
       log.append(jObject.optJSONObject("u-id-params").toString());
     else 
       log.append("{}");
-    logger.debug("finally writing to rr log" + log.toString());
+    
+    if (null != sasParams.siteSegmentId)
+      log.append(separator).append("sel-seg-id=").append(sasParams.siteSegmentId);
+    
+    if (logger.isDebugEnabled())
+      logger.debug("finally writing to rr log" + log.toString());
+    
     if(enableFileLogging)
       rrLogger.info(log.toString());
     else
@@ -349,6 +294,9 @@ public class Logging {
     request.setUser(user);
     if(requestSlot != null)
       request.setSlot_requested(slotRequested);
+    if (null != sasParams.siteSegmentId)
+      request.setSegmentId(sasParams.siteSegmentId);
+    
     List<Impression> impressions = null;
     if(null != impression) {
       impressions = new ArrayList<Impression>();
@@ -363,8 +311,7 @@ public class Logging {
   }
 
   // Write Channel Logs
-  public static void channelLogline(List<ChannelSegment> rankList, String clickUrl, DebugLogger logger, Configuration config, InspectorStats inspectorStat,
-      SASRequestParameters sasParams, long totalTime, JSONObject jObject) throws JSONException, TException {
+  public static void channelLogline(List<ChannelSegment> rankList, String clickUrl, DebugLogger logger, Configuration config, SASRequestParameters sasParams, long totalTime, JSONObject jObject) throws JSONException, TException {
     logger.debug("came inside channel log line");
     Logger debugLogger = Logger.getLogger(config.getString("channel"));
     logger.debug("got logger handle for cas logs");
@@ -377,6 +324,9 @@ public class Logging {
 
     String timestamp = ReportTime.getUTCTimestamp();
     log.append(sep).append("ttime=\"").append(timestamp).append("\"");
+    String tempParam = "";
+    if(null != (tempParam = stringify(jObject, "tid")))
+    log.append(sep).append("tid=\"").append(tempParam).append("\"");
     if(clickUrl != null)
       log.append(sep + "clurl=\"" + clickUrl + "\"");
     log.append(sep).append("rq-tpan=[");
@@ -494,7 +444,6 @@ public class Logging {
       String partnerName = adNetworkInterface.getName();
       log.append(partnerName);
       log.append(sep).append(adResponse.adStatus);
-      String adStatus = adResponse.adStatus;
       String response = "";
       String requestUrl = "";
       if(adResponse.adStatus.equalsIgnoreCase("AD")) {

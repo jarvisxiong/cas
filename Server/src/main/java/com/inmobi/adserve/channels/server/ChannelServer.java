@@ -89,12 +89,12 @@ public class ChannelServer {
     channelSegmentFeedbackRepository = new ChannelSegmentFeedbackRepository();
     repositoryHelper = new RepositoryHelper(channelRepository, channelAdGroupRepository, channelFeedbackRepository, channelSegmentFeedbackRepository);
 
-    MatchSegments.init(channelAdGroupRepository, repositoryHelper, inspectorStat);
+    MatchSegments.init(channelAdGroupRepository, inspectorStat);
     InspectorStats.initializeRepoStats("ChannelAdGroupRepository");
     InspectorStats.initializeRepoStats("ChannelFeedbackRepository");
     InspectorStats.initializeRepoStats("ChannelSegmentFeedbackRepository");
     instantiateRepository(logger, config);
-    Filters.init(config.adapterConfiguration(), repositoryHelper, inspectorStat);
+    Filters.init(config.adapterConfiguration(), repositoryHelper);
 
     // Creating netty client for out-bound calls.
     ClientBootstrap clientBootstrap = BootstrapCreation.createBootstrap(logger, config.serverConfiguration());
@@ -111,7 +111,7 @@ public class ChannelServer {
     // Configure the netty server.
     try {
       // Initialising request handler
-      HttpRequestHandler.init(config, channelAdGroupRepository, inspectorStat, clientBootstrap, rtbClientBootstrap, channelRepository,
+      HttpRequestHandler.init(config, channelAdGroupRepository, clientBootstrap, rtbClientBootstrap, channelRepository,
           channelFeedbackRepository, channelSegmentFeedbackRepository);
       SegmentFactory.init(repositoryHelper);
       ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
@@ -126,8 +126,6 @@ public class ChannelServer {
       bootstrap.bind(new InetSocketAddress(8800));
       // If client bootstrap is not present throwing exception which will set
       // lbStatus as NOT_OK.
-      if(clientBootstrap == null)
-        throw new NullPointerException("Client bootstrap not initialized.");
     } catch (Exception exception) {
       ServerStatusInfo.statusString = getMyStackTrace(exception);
       ServerStatusInfo.statusCode = 404;
@@ -191,7 +189,7 @@ public class ChannelServer {
       channelFeedbackRepository.init(logger, config.cacheConfiguration().subset("ChannelFeedbackRepository"), "ChannelFeedbackRepository");
       channelSegmentFeedbackRepository.init(logger, config.cacheConfiguration().subset("ChannelSegmentFeedbackRepository"), "ChannelSegmentFeedbackRepository");
 
-      logger.debug("* * * * Instantiating repository completed * * * *");
+      logger.error("* * * * Instantiating repository completed * * * *");
     } catch (NamingException exception) {
       logger.error("failed to creatre binding for postgresql data source " + exception.getMessage());
       ServerStatusInfo.statusCode = 404;

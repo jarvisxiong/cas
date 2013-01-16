@@ -25,11 +25,6 @@ import static org.easymock.EasyMock.expect;
 
 public class HttpRequestHandlerTest extends TestCase{
   
-  private static ConfigurationLoader config;
-  private static String rrFile = "";
-  private static String channelFile = "";
-  private static String debugFile  = "";
-  private static int count = 0;
   
   public void setUp() throws Exception {
     Configuration loggerConfig = createMock(Configuration.class);
@@ -64,7 +59,7 @@ public class HttpRequestHandlerTest extends TestCase{
     replay(mockConfig);
     DebugLogger.init(mockConfig);
     InspectorStats.initializeWorkflow("WorkFlow");
-    HttpRequestHandler.init(mockConfigLoader, (ChannelAdGroupRepository) null, (InspectorStats) null, (ClientBootstrap) null, (ClientBootstrap) null, null, null,
+    HttpRequestHandler.init(mockConfigLoader, (ChannelAdGroupRepository) null, (ClientBootstrap) null, (ClientBootstrap) null, null, null,
         null);
     AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
     Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-channel", "cas-advertisement", mockServerConfig);
@@ -237,6 +232,7 @@ public class HttpRequestHandlerTest extends TestCase{
   @Test
   public void testWriteLogsBothListNull() {
     HttpRequestHandler httpRequestHandler = new HttpRequestHandler();
+    httpRequestHandler.logger = new DebugLogger();
     httpRequestHandler.writeLogs();
   }
   
@@ -261,6 +257,7 @@ public class HttpRequestHandlerTest extends TestCase{
     expect(channelSegmentEntity.getId()).andReturn("extId").anyTimes();
     replay(channelSegmentEntity);
     ChannelSegment channelSegment1 = httpRequestHandlerbase.new ChannelSegment(channelSegmentEntity, adNetworkInterface1, null, null);  
+    httpRequestHandlerbase.logger = new DebugLogger();
     httpRequestHandlerbase.rtbSegments.add(channelSegment1);
     httpRequestHandlerbase.writeLogs();
   }
