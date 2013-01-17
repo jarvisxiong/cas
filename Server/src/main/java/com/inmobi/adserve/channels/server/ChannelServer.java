@@ -31,7 +31,6 @@ import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.LoggerFactory;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import com.inmobi.messaging.publisher.MessagePublisherFactory;
 import com.inmobi.phoenix.exception.InitializationException;
@@ -62,8 +61,7 @@ public class ChannelServer {
     DebugLogger.init(config.loggerConfiguration());
     SlotSizeMapping.init();
 
-    LoggerFactory.init(config.loggerConfiguration());
-    logger = LoggerFactory.getlogger();
+    logger = Logger.getLogger(config.loggerConfiguration().getString("debug"));
     logger.info("Initializing logger completed");
     // parsing the data center id given in the vm parameters
     ChannelServerHelper channelServerHelper = new ChannelServerHelper(logger);
@@ -189,7 +187,7 @@ public class ChannelServer {
       channelFeedbackRepository.init(logger, config.cacheConfiguration().subset("ChannelFeedbackRepository"), "ChannelFeedbackRepository");
       channelSegmentFeedbackRepository.init(logger, config.cacheConfiguration().subset("ChannelSegmentFeedbackRepository"), "ChannelSegmentFeedbackRepository");
 
-      logger.debug("* * * * Instantiating repository completed * * * *");
+      logger.error("* * * * Instantiating repository completed * * * *");
     } catch (NamingException exception) {
       logger.error("failed to creatre binding for postgresql data source " + exception.getMessage());
       ServerStatusInfo.statusCode = 404;

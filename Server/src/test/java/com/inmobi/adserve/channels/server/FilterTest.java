@@ -117,17 +117,17 @@ public class FilterTest extends TestCase {
     Long[] slotIds = null;
     Integer[] siteRatings = null;
     channelSegmentEntity1 = new ChannelSegmentEntity("advertiserId1", "adgroupId1", "adId", "channelId1", (long) 1, rcList, tags, true, true,
-        "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null);
+        "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
     channelSegmentEntity2 = new ChannelSegmentEntity("advertiserId1", "adgroupId2", "adId", "channelId1", (long) 0, rcList, tags, false, true,
-        "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null);
+        "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
     channelSegmentEntity3 = new ChannelSegmentEntity("advertiserId1", "adgroupId3", "adId", "channelId1", (long) 1, rcList, tags, false, false,
-        "externalSiteKey", modified_on, "campaignId", slotIds, (long) 0, false, "pricingModel", siteRatings, 0, null);
+        "externalSiteKey", modified_on, "campaignId", slotIds, (long) 0, false, "pricingModel", siteRatings, 0, null, false, false, false, false);
     channelSegmentEntity4 = new ChannelSegmentEntity("advertiserId2", "adgroupId4", "adId", "channelId2", (long) 1, rcList, tags, true, true,
-        "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null);
+        "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
     channelSegmentEntity5 = new ChannelSegmentEntity("advertiserId2", "adgroupId5", "adId", "channelId2", (long) 1, rcList, tags, true, true,
-        "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null);
+        "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
     channelSegmentEntity6 = new ChannelSegmentEntity("advertiserId3", "adgroupId6", "adId", "channelId3", (long) 1, rcList, tags, true, true,
-        "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null);
+        "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
 
     expect(repositoryHelper.queryChannelAdGroupRepository("adgroupId1")).andReturn(channelSegmentEntity1).anyTimes();
     expect(repositoryHelper.queryChannelAdGroupRepository("adgroupId2")).andReturn(channelSegmentEntity2).anyTimes();
@@ -151,17 +151,17 @@ public class FilterTest extends TestCase {
     Long[] slotIds = null;
     Integer[] siteRatings = null;
     ChannelSegmentEntity channelSegmentEntity1 = new ChannelSegmentEntity("advertiserId1", "adgroupId1", "adId", "channelId1", (long) 1, rcList, tags, true,
-        true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null);
+        true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
     ChannelSegmentEntity channelSegmentEntity2 = new ChannelSegmentEntity("advertiserId1", "adgroupId2", "adId", "channelId1", (long) 0, rcList, tags, false,
-        true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null);
+        true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
     ChannelSegmentEntity channelSegmentEntity3 = new ChannelSegmentEntity("advertiserId1", "adgroupId3", "adId", "channelId1", (long) 1, rcList, tags, false,
-        false, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 0, false, "pricingModel", siteRatings, 0, null);
+        false, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 0, false, "pricingModel", siteRatings, 0, null, false, false, false, false);
     ChannelSegmentEntity channelSegmentEntity4 = new ChannelSegmentEntity("advertiserId2", "adgroupId4", "adId", "channelId2", (long) 1, rcList, tags, true,
-        true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null);
+        true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
     ChannelSegmentEntity channelSegmentEntity5 = new ChannelSegmentEntity("advertiserId2", "adgroupId5", "adId", "channelId2", (long) 1, rcList, tags, true,
-        true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null);
+        true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
     ChannelSegmentEntity channelSegmentEntity6 = new ChannelSegmentEntity("advertiserId3", "adgroupId5", "adId", "channelId3", (long) 1, rcList, tags, true,
-        true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null);
+        true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
 
     HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments = new HashMap<String, HashMap<String, ChannelSegmentEntity>>();
     HashMap<String, ChannelSegmentEntity> adv1 = new HashMap<String, ChannelSegmentEntity>();
@@ -193,17 +193,17 @@ public class FilterTest extends TestCase {
     Long[] slotIds = null;
     Integer[] siteRatings = null;
     ChannelSegmentEntity channelSegmentEntity1 = new ChannelSegmentEntity("advertiserId1", "adgroupId1", "adId", "channelId", (long) 1, rcList, tags, true,
-        true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null);
+        true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
     ChannelSegmentEntity channelSegmentEntity2 = new ChannelSegmentEntity("advertiserId1", "adgroupId2", "adId", "channelId", (long) 0, rcList, tags, false,
-        true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null);
+        true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
     ChannelSegmentEntity channelSegmentEntity3 = new ChannelSegmentEntity("advertiserId1", "adgroupId3", "adId", "channelId", (long) 1, rcList, tags, false,
-        false, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 0, false, "pricingModel", siteRatings, 0, null);
+        false, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 0, false, "pricingModel", siteRatings, 0, null, false, false, false, false);
     ChannelSegmentEntity channelSegmentEntity4 = new ChannelSegmentEntity("advertiserId2", "adgroupId4", "adId", "channelId", (long) 1, rcList, tags, true,
-        true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null);
+        true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
     ChannelSegmentEntity channelSegmentEntity5 = new ChannelSegmentEntity("advertiserId2", "adgroupId5", "adId", "channelId", (long) 1, rcList, tags, true,
-        true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null);
+        true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
     ChannelSegmentEntity channelSegmentEntity6 = new ChannelSegmentEntity("advertiserId3", "adgroupId6", "adId", "channelId", (long) 1, rcList, tags, true,
-        true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null);
+        true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
 
     HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments = new HashMap<String, HashMap<String, ChannelSegmentEntity>>();
     HashMap<String, ChannelSegmentEntity> adv1 = new HashMap<String, ChannelSegmentEntity>();

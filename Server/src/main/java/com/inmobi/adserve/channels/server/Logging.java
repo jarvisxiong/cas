@@ -19,28 +19,28 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.inmobi.adserve.channels.server.HttpRequestHandler.ChannelSegment;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.log.channel.AdResponse;
-import com.inmobi.log.channel.CasChannelLog;
-import com.inmobi.log.channel.RequestParams;
-import com.inmobi.log.channel.RequestTpan;
-import com.inmobi.log.channel.SiteParams;
+import com.inmobi.casthrift.AdResponse;
+import com.inmobi.casthrift.CasChannelLog;
+import com.inmobi.casthrift.RequestParams;
+import com.inmobi.casthrift.RequestTpan;
+import com.inmobi.casthrift.SiteParams;
 import com.inmobi.messaging.Message;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
-import com.inmobi.types.Ad;
-import com.inmobi.types.AdIdChain;
-import com.inmobi.types.AdMeta;
-import com.inmobi.types.ContentRating;
-import com.inmobi.types.Gender;
-import com.inmobi.types.Geo;
-import com.inmobi.types.HandsetMeta;
-import com.inmobi.types.InventoryType;
-import com.inmobi.types.PricingModel;
-import com.inmobi.types.adserving.AdRR;
-import com.inmobi.types.adserving.Impression;
-import com.inmobi.types.adserving.Request;
-import com.inmobi.types.adserving.User;
+import com.inmobi.casthrift.Ad;
+import com.inmobi.casthrift.AdIdChain;
+import com.inmobi.casthrift.AdMeta;
+import com.inmobi.casthrift.ContentRating;
+import com.inmobi.casthrift.Gender;
+import com.inmobi.casthrift.Geo;
+import com.inmobi.casthrift.HandsetMeta;
+import com.inmobi.casthrift.InventoryType;
+import com.inmobi.casthrift.PricingModel;
+import com.inmobi.casthrift.AdRR;
+import com.inmobi.casthrift.Impression;
+import com.inmobi.casthrift.Request;
+import com.inmobi.casthrift.User;
 
-import com.inmobi.log.advertisement.CasAdvertisementLog;
+import com.inmobi.casthrift.CasAdvertisementLog;
 
 import com.inmobi.adserve.channels.util.DebugLogger;
 
@@ -273,7 +273,13 @@ public class Logging {
       log.append(jObject.optJSONObject("u-id-params").toString());
     else 
       log.append("{}");
-    logger.debug("finally writing to rr log" + log.toString());
+    
+    if (null != sasParams.siteSegmentId)
+      log.append(separator).append("sel-seg-id=").append(sasParams.siteSegmentId);
+    
+    if (logger.isDebugEnabled())
+      logger.debug("finally writing to rr log" + log.toString());
+    
     if(enableFileLogging)
       rrLogger.info(log.toString());
     else
@@ -288,6 +294,9 @@ public class Logging {
     request.setUser(user);
     if(requestSlot != null)
       request.setSlot_requested(slotRequested);
+    if (null != sasParams.siteSegmentId)
+      request.setSegmentId(sasParams.siteSegmentId);
+    
     List<Impression> impressions = null;
     if(null != impression) {
       impressions = new ArrayList<Impression>();
