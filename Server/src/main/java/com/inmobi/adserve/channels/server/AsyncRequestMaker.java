@@ -79,24 +79,33 @@ public class AsyncRequestMaker {
       logger.debug("impression id is " + sasParams.impressionId);
 
       if((network.isClickUrlRequired() || network.isBeaconUrlRequired()) && null != sasParams.impressionId) {
-        boolean isCpc = false;
-        if(null != row.getPricingModel() && row.getPricingModel().equalsIgnoreCase("cpc"))
-          isCpc = true;
-        ClickUrlMakerV6 clickUrlMakerV6 = setClickParams(logger, isCpc, config, sasParams, jObject);
-        Map<String, String> clickGetParams = new HashMap<String, String>();
-        clickGetParams.put("ds", "1");
-        Map<String, String> beaconGetParams = new HashMap<String, String>();
-        beaconGetParams.put("ds", "1");
-        beaconGetParams.put("event", "beacon");
-        if(jObject.optBoolean("rich-media", false))
-          beaconGetParams.put("m", "1");
-        clickUrlMakerV6.createClickUrls();
-        clickUrl = clickUrlMakerV6.getClickUrl(clickGetParams);
-        beaconUrl = clickUrlMakerV6.getBeaconUrl(beaconGetParams);
-        if(logger.isDebugEnabled()) {
-          logger.debug("click url formed is " + clickUrl);
+        if(config.getInt("clickmaker.version", 6) == 4) {
+          ClickUrlMaker clickUrlMaker = new ClickUrlMaker(config, jObject, sasParams, logger);
+          TrackingUrls trackingUrls = clickUrlMaker.getClickUrl(row.getPricingModel());
+          clickUrl = trackingUrls.getClickUrl();
+          beaconUrl = trackingUrls.getBeaconUrl();
+          if(logger.isDebugEnabled()) {
+            logger.debug("click url formed is", clickUrl);
+            logger.debug("beacon url :", beaconUrl);
+          }
+        } else {
+          boolean isCpc = false;
+          if(null != row.getPricingModel() && row.getPricingModel().equalsIgnoreCase("cpc"))
+            isCpc = true;
+          ClickUrlMakerV6 clickUrlMakerV6 = setClickParams(logger, isCpc, config, sasParams, jObject);
+          Map<String, String> clickGetParams = new HashMap<String, String>();
+          clickGetParams.put("ds", "1");
+          Map<String, String> beaconGetParams = new HashMap<String, String>();
+          beaconGetParams.put("ds", "1");
+          beaconGetParams.put("event", "beacon");
+          clickUrlMakerV6.createClickUrls();
+          clickUrl = clickUrlMakerV6.getClickUrl(clickGetParams);
+          beaconUrl = clickUrlMakerV6.getBeaconUrl(beaconGetParams);
+          if(logger.isDebugEnabled()) {
+            logger.debug("click url formed is " + clickUrl);
+            logger.debug("beacon url : " + beaconUrl);
+          }
         }
-        logger.debug("beacon url : " + beaconUrl);
       }
 
       logger.debug("Sending request to Channel of Id", row.getId());
@@ -166,12 +175,9 @@ public class AsyncRequestMaker {
     }
     if(null != carrierId)
       clickUrlMakerV6.setCarrierId(carrierId);
-    if(null != sasParams.country)
-      try {
-        clickUrlMakerV6.setCountryId((Integer) jObject.getJSONArray("carrier").get(1));
-      } catch (JSONException e) {
-        logger.error("CountryId is not present in the sasParams");
-      }
+    if(null != sasParams.countryStr) {
+      clickUrlMakerV6.setCountryId(Integer.parseInt(sasParams.countryStr));
+    }
     try {
       if(null != jObject.getJSONArray("handset"))
         try {

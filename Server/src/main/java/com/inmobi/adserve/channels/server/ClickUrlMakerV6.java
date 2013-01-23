@@ -1,14 +1,9 @@
 package com.inmobi.adserve.channels.server;
 
-import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.zip.CRC32;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -244,10 +239,6 @@ public class ClickUrlMakerV6 {
 
   public void createClickUrls() {
     logger.debug("inside getClickurl");
-    String unhashableString = "UM5,IUDS1,IDA,GID";
-    List<String> unhashableKeys = Arrays.asList(unhashableString.split(","));
-    for (String key : unhashableKeys)
-      unhashable.add(key.trim().toUpperCase());
     StringBuilder adUrlSuffix = new StringBuilder(100);
     // 1st URL component: url format version info
     adUrlSuffix.append(URLVERSIONINITSTR);
@@ -382,27 +373,6 @@ public class ClickUrlMakerV6 {
 
     }
     return;
-  }
-
-  public String cryptoHashGenerator(String url, String cryptoKeyType, String cryptoSecretKey, DebugLogger logger) {
-    if(mac == null) {
-      try {
-        sk = new SecretKeySpec(cryptoSecretKey.getBytes(), "HmacMD5");
-        mac = Mac.getInstance("HmacMD5");
-        mac.init(sk);
-      } catch (NoSuchAlgorithmException e) {
-        logger.error("Got no such algorithm exception");
-        return null;
-      } catch (InvalidKeyException e) {
-        logger.error("got invalid key exception");
-        return null;
-      }
-    }
-    CRC32 crc = new CRC32();
-    crc.update(mac.doFinal(url.getBytes()));
-    if(logger.isDebugEnabled())
-      logger.debug("got the hash inside crypto hash generator");
-    return Long.toHexString(crc.getValue());
   }
 
   public String getIdBase36(Long id) {
