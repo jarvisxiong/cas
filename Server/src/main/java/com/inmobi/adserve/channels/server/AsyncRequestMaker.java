@@ -234,9 +234,9 @@ public class AsyncRequestMaker {
     clickUrlMakerV6.setBeaconEnabledOnSite(true);// do not know
     clickUrlMakerV6.setTestMode(false);
     clickUrlMakerV6.setRmAd(jObject.optBoolean("rich-media", false));
-    clickUrlMakerV6.setRmBeaconURLPrefix(config.getString("clickmaker.clickURLPrefix"));
+    clickUrlMakerV6.setRmBeaconURLPrefix(config.getString("clickmaker.beaconURLPrefix"));
     clickUrlMakerV6.setClickURLPrefix(config.getString("clickmaker.clickURLPrefix"));
-    clickUrlMakerV6.setImageBeaconURLPrefix(config.getString("clickmaker.clickURLPrefix"));
+    clickUrlMakerV6.setImageBeaconURLPrefix(config.getString("clickmaker.beaconURLPrefix"));
     return clickUrlMakerV6;
   }
 }
