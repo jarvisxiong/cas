@@ -10,24 +10,23 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
 import org.testng.annotations.Test;
 
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class ChannelServerHelperTest extends TestCase {
 
   private ChannelServerHelper channelServerHelper;
-  private static ConfigurationLoader config;
   private Configuration mockConfig = null;
 
   public void setUp() throws Exception {
+    ConfigurationLoader c = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
+    ServletHandler.init(c, new RepositoryHelper(null, null, null, null));
     mockConfig = createMock(Configuration.class);
     expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
     expect(mockConfig.getString("loggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties").anyTimes();
     replay(mockConfig);
-    config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
-    DebugLogger.init(mockConfig);
-    channelServerHelper = new ChannelServerHelper(Logger.getLogger(mockConfig.getString("debug")));
+    channelServerHelper = new ChannelServerHelper(Logger.getLogger(ServletHandler.loggerConfig.getString("debug")));
   }
 
   @Test

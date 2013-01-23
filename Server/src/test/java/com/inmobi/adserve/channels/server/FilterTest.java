@@ -4,8 +4,6 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -18,11 +16,7 @@ import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.entity.*;
 import com.inmobi.adserve.channels.repository.*;
-import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.phoenix.exception.RepositoryException;
-import com.inmobi.adserve.channels.server.HttpRequestHandler.ChannelSegment;
 import junit.framework.TestCase;
 
 public class FilterTest extends TestCase {

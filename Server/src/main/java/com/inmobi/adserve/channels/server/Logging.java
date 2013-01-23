@@ -16,7 +16,6 @@ import org.json.JSONObject;
 import com.inmobi.adserve.channels.api.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.inmobi.adserve.channels.server.HttpRequestHandler.ChannelSegment;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.casthrift.AdResponse;
@@ -55,7 +54,8 @@ public class Logging {
   public static ConcurrentHashMap<String, String> sampledAdvertiserLogNos = new ConcurrentHashMap<String, String>(2000);
   private static int totalCount;
 
-  public static void init(AbstractMessagePublisher dataBusPublisher, String rrLogKey, String channelLogKey, String advertisementLogKey, Configuration config) {
+  public static void init(AbstractMessagePublisher dataBusPublisher, String rrLogKey, String channelLogKey,
+      String advertisementLogKey, Configuration config) {
     Logging.dataBusPublisher = dataBusPublisher;
     Logging.rrLogKey = rrLogKey;
     Logging.channelLogKey = channelLogKey;
@@ -63,19 +63,6 @@ public class Logging {
     enableFileLogging = config.getBoolean("enableFileLogging");
     enableDatabusLogging = config.getBoolean("enableDatabusLogging");
     totalCount = config.getInt("sampledadvertisercount");
-  }
-
-  // convert the json values to string values
-  private static String stringify(JSONObject jObject, String field) {
-    String fieldValue = "";
-    try {
-      fieldValue = (String)jObject.get(field);
-    } catch (JSONException e) {
-      return null;
-    } catch (NullPointerException exception) {
-      return null;
-    }
-    return fieldValue;
   }
 
   public static JSONArray getCarrier(JSONObject jObject) {
@@ -98,45 +85,15 @@ public class Logging {
     }
   }
 
-  // get comma separated categories for logging
-  private static String getCategories(JSONObject jObject, DebugLogger logger) {
-    try {
-      JSONArray carrier = jObject.getJSONArray("category");
-      logger.debug("got category");
-      return (carrier.toString());
-    } catch (JSONException e) {
-      logger.debug("category is not found in sasParams");
-      return "[]";
-    } catch (NullPointerException exception) {
-      logger.error("sasparams is null");
-      return "[]";
-    }
-  }
-
-  private static JSONArray getCategory(JSONObject jObject, DebugLogger logger) {
-    try {
-      JSONArray carrier = jObject.getJSONArray("category");
-      logger.debug("got category");
-      return (carrier);
-    } catch (JSONException e) {
-      logger.debug("category is not found in sasParams");
-      return null;
-    } catch (NullPointerException exception) {
-      logger.error("sasparams is null");
-      return null;
-    }
-  }
-
   // Writing rrlogs
-  public static void rrLogging(JSONObject jObject, HttpRequestHandler.ChannelSegment channelSegment, DebugLogger logger, Configuration config,
-      SASRequestParameters sasParams, String terminationReason) throws JSONException, TException  {
+  public static void rrLogging(ChannelSegment channelSegment, DebugLogger logger, Configuration config,
+      SASRequestParameters sasParams, String terminationReason) throws JSONException, TException {
     Logger rrLogger = Logger.getLogger(config.getString("rr"));
     boolean isTerminated = false;
     if(terminationReason.equalsIgnoreCase("no"))
       isTerminated = true;
     logger.info("Obtained the handle to rr logger");
     char separator = 0x01;
-    String tempParam = "";
     StringBuilder log = new StringBuilder();
     short adsServed = 0;
     String host = null;
@@ -158,21 +115,19 @@ public class Logging {
     if(logger.isDebugEnabled())
       logger.debug("is sas params null here " + (sasParams == null));
 
-    if(null != sasParams.siteId)
+    if(null != sasParams && null != sasParams.siteId)
       log.append(separator + "rq-mk-siteid=\"" + sasParams.siteId + "\"");
-    if(null != (tempParam = stringify(jObject, "rq-mk-adcount")))
-      log.append(separator + "rq-mk-adcount=\"" + tempParam + "\"");
-    if(null != (tempParam = stringify(jObject, "tid")))
-      log.append(separator + "tid=\"" + tempParam + "\"");
+    if(null != sasParams && null != sasParams.rqMkAdcount)
+      log.append(separator + "rq-mk-adcount=\"" + sasParams.rqMkAdcount + "\"");
+    if(null != sasParams && null != sasParams.tid)
+      log.append(separator + "tid=\"" + sasParams.tid + "\"");
 
-    String taskId = tempParam;
     InventoryType inventory = getInventoryType(sasParams);
     String timestamp = ReportTime.getTTime();
     log.append(separator + "ttime=\"" + timestamp + "\"");
     log.append(separator + "rq-src=[\"uk\",\"uk\",\"uk\",\"uk\",");
-    String tp = stringify(jObject, "tp");
-    if(null != tp)
-      log.append("\"" + tp + "\"]");
+    if(null != sasParams && null != sasParams.tp)
+      log.append("\"" + sasParams.tp + "\"]");
     else
       log.append("\"dir\"]");
 
@@ -186,9 +141,9 @@ public class Logging {
       log.append("{\"ad\":[");
       log.append(channelSegment.channelSegmentEntity.getIncId()).append(",");
       log.append("\"\",\"");
-      adChain = new AdIdChain(channelSegment.channelSegmentEntity.getAdId(), channelSegment.channelSegmentEntity.getAdgroupId(),
-          channelSegment.channelSegmentEntity.getCampaignId(), channelSegment.channelSegmentEntity.getId(),
-          channelSegment.channelSegmentEntity.getExternalSiteKey());
+      adChain = new AdIdChain(channelSegment.channelSegmentEntity.getAdId(),
+          channelSegment.channelSegmentEntity.getAdgroupId(), channelSegment.channelSegmentEntity.getCampaignId(),
+          channelSegment.channelSegmentEntity.getId(), channelSegment.channelSegmentEntity.getExternalSiteKey());
       log.append(channelSegment.channelSegmentEntity.getAdId()).append("\",\"");
       log.append(channelSegment.channelSegmentEntity.getAdgroupId()).append("\",\"");
       log.append(channelSegment.channelSegmentEntity.getCampaignId()).append("\",\"");
@@ -202,7 +157,7 @@ public class Logging {
       log.append(channelSegment.channelSegmentEntity.getExternalSiteKey()).append("\"],\"impid\":\"");
       log.append(channelSegment.adNetworkInterface.getImpressionId()).append("\"");
       double winBid = channelSegment.adNetworkInterface.getBidprice();
-      if (winBid != -1) {
+      if(winBid != -1) {
         log.append(",\"" + "winBid" + "\":\"" + winBid + "\"");
         ad.setWinBid(winBid);
       }
@@ -210,17 +165,24 @@ public class Logging {
     }
     log.append("]");
 
-    JSONArray handset = getHandset(jObject);
+    JSONArray handset = null;
+    JSONArray carrier = null;
+    String requestSlot = null;
+    String slotServed = null;
+    if(null != sasParams) {
+      handset = sasParams.handset;
+      carrier = sasParams.carrier;
+      requestSlot = sasParams.rqMkSlot;
+      slotServed = sasParams.slot;
+    }
     HandsetMeta handsetMeta = new HandsetMeta();
     if(null != handset)
       log.append(separator).append("handset=").append(handset);
     if(null != handset && handset.length() > 3) {
       handsetMeta.setId(handset.getInt(3));
       handsetMeta.setManufacturer(handset.getInt(2));
-    }else
-      if(jObject != null)
-      handsetMeta.setOsId(jObject.optInt("os-id", -1));    
-    JSONArray carrier = getCarrier(jObject);
+    } else if(null != sasParams && sasParams.osId != 0)
+      handsetMeta.setOsId(sasParams.osId);
     Geo geo = null;
     if(null != carrier) {
       log.append(separator).append("carrier=").append(carrier);
@@ -231,7 +193,6 @@ public class Logging {
         geo.setCity(carrier.getInt(4));
     }
 
-    String requestSlot = stringify(jObject, "rq-mk-ad-slot");
     short slotRequested = -1;
     if(null != requestSlot) {
       log.append(separator).append("rq-mk-ad-slot=\"").append(requestSlot).append("\"");
@@ -240,52 +201,55 @@ public class Logging {
       else
         logger.error("wrong value for request slot is " + requestSlot);
     }
-    String slotServed = stringify(jObject, "slot-served");
+
     if(null != slotServed) {
       log.append(separator).append("slot-served=").append(slotServed);
     }
 
     User user = new User();
     log.append(separator + "uparams={");
-    if(null != sasParams.age) {
-      log.append("\"u-age\":\"").append(sasParams.age).append("\",");
-      if(sasParams.age.matches("^\\d+$"))
-        user.setAge(Short.valueOf(sasParams.age));
+    if(null != sasParams) {
+      if(null != sasParams.age) {
+        log.append("\"u-age\":\"").append(sasParams.age).append("\",");
+        if(sasParams.age.matches("^\\d+$"))
+          user.setAge(Short.valueOf(sasParams.age));
+      }
+      if(null != sasParams.gender) {
+        log.append("\"u-gender\":\"").append(sasParams.gender).append("\",");
+        user.setGender(getGender(sasParams));
+      }
+      if(null != sasParams.genderOrig)
+        log.append("\"u-gender-orig\":\"").append(sasParams.genderOrig).append("\",");
+      if(null != sasParams.uid) {
+        log.append("\"u-id\":\"").append(sasParams.uid).append("\",");
+        user.setId(sasParams.uid);
+      }
+      if(null != sasParams.userLocation)
+        log.append("\"u-location\":\"").append(sasParams.userLocation).append("\",");
+      if(null != sasParams.postalCode)
+        log.append("\"u-postalcode\":\"").append(sasParams.postalCode).append("\"");
     }
-    if(null != sasParams.gender) {
-      log.append("\"u-gender\":\"").append(sasParams.gender).append("\",");
-      user.setGender(getGender(sasParams));
-    }
-    if(null != sasParams.genderOrig)
-      log.append("\"u-gender-orig\":\"").append(sasParams.genderOrig).append("\",");
-    if(null != sasParams.uid) {
-      log.append("\"u-id\":\"").append(sasParams.uid).append("\",");
-      user.setId(sasParams.uid);
-    }
-    if(null != sasParams.userLocation)
-      log.append("\"u-location\":\"").append(sasParams.userLocation).append("\",");
-    if(null != sasParams.postalCode)
-      log.append("\"u-postalcode\":\"").append(sasParams.postalCode).append("\"");
     if(log.charAt(log.length() - 1) == ',')
       log.deleteCharAt(log.length() - 1);
     log.append("}").append(separator).append("u-id-params=");
-    if(null != jObject && null != jObject.optJSONObject("u-id-params"))
-      log.append(jObject.optJSONObject("u-id-params").toString());
-    else 
+    if(null != sasParams && null != sasParams.uidParams)
+      log.append(sasParams.uidParams);
+    else
       log.append("{}");
-    
-    if (null != sasParams.siteSegmentId)
+
+    if(null != sasParams && null != sasParams.siteSegmentId)
       log.append(separator).append("sel-seg-id=").append(sasParams.siteSegmentId);
-    
-    if (logger.isDebugEnabled())
+
+    if(logger.isDebugEnabled())
       logger.debug("finally writing to rr log" + log.toString());
-    
+
     if(enableFileLogging)
       rrLogger.info(log.toString());
     else
       logger.debug("file logging is not enabled");
     short adRequested = 1;
-    Request request = new Request(adRequested, adsServed, sasParams.siteId, taskId);
+    Request request = new Request(adRequested, adsServed, sasParams == null ? null : sasParams.siteId,
+        sasParams == null ? null : sasParams.tid);
     if(slotServed != null)
       request.setSlot_served(Integer.valueOf(slotServed).shortValue());
     request.setIP(geo);
@@ -294,9 +258,9 @@ public class Logging {
     request.setUser(user);
     if(requestSlot != null)
       request.setSlot_requested(slotRequested);
-    if (null != sasParams.siteSegmentId)
+    if(null != sasParams && null != sasParams.siteSegmentId)
       request.setSegmentId(sasParams.siteSegmentId);
-    
+
     List<Impression> impressions = null;
     if(null != impression) {
       impressions = new ArrayList<Impression>();
@@ -311,7 +275,8 @@ public class Logging {
   }
 
   // Write Channel Logs
-  public static void channelLogline(List<ChannelSegment> rankList, String clickUrl, DebugLogger logger, Configuration config, SASRequestParameters sasParams, long totalTime, JSONObject jObject) throws JSONException, TException {
+  public static void channelLogline(List<ChannelSegment> rankList, String clickUrl, DebugLogger logger,
+      Configuration config, SASRequestParameters sasParams, long totalTime) throws JSONException, TException {
     logger.debug("came inside channel log line");
     Logger debugLogger = Logger.getLogger(config.getString("channel"));
     logger.debug("got logger handle for cas logs");
@@ -319,14 +284,13 @@ public class Logging {
     StringBuilder log = new StringBuilder();
     log.append("trtt=").append(totalTime);
     InspectorStats.incrementStatCount(InspectorStrings.latency, totalTime);
-    if(sasParams.siteId != null)
+    if(null != sasParams && sasParams.siteId != null)
       log.append(sep + "rq-mk-siteid=\"").append(sasParams.siteId).append("\"");
 
     String timestamp = ReportTime.getUTCTimestamp();
     log.append(sep).append("ttime=\"").append(timestamp).append("\"");
-    String tempParam = "";
-    if(null != (tempParam = stringify(jObject, "tid")))
-    log.append(sep).append("tid=\"").append(tempParam).append("\"");
+    if(null != sasParams && sasParams.tid != null)
+      log.append(sep).append("tid=\"").append(sasParams.tid).append("\"");
     if(clickUrl != null)
       log.append(sep + "clurl=\"" + clickUrl + "\"");
     log.append(sep).append("rq-tpan=[");
@@ -339,16 +303,22 @@ public class Logging {
       JSONObject logLine = null;
       ThirdPartyAdResponse adResponse = ((ChannelSegment) rankList.get(index)).adNetworkInterface.getResponseStruct();
       try {
-        InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).adNetworkInterface.getName(), InspectorStrings.totalRequests);
-        InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).adNetworkInterface.getName(), InspectorStrings.latency, adResponse.latency);
+        InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).adNetworkInterface.getName(),
+            InspectorStrings.totalRequests);
+        InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).adNetworkInterface.getName(),
+            InspectorStrings.latency, adResponse.latency);
         if(adResponse.adStatus.equals("AD"))
-          InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).adNetworkInterface.getName(), InspectorStrings.totalFills);
+          InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).adNetworkInterface.getName(),
+              InspectorStrings.totalFills);
         else if(adResponse.adStatus.equals("NO_AD"))
-          InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).adNetworkInterface.getName(), InspectorStrings.totalNoFills);
+          InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).adNetworkInterface.getName(),
+              InspectorStrings.totalNoFills);
         else if(adResponse.adStatus.equals("TIME_OUT"))
-          InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).adNetworkInterface.getName(), InspectorStrings.totalTimeout);
+          InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).adNetworkInterface.getName(),
+              InspectorStrings.totalTimeout);
         else
-          InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).adNetworkInterface.getName(), InspectorStrings.totalTerminate);
+          InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).adNetworkInterface.getName(),
+              InspectorStrings.totalTerminate);
         logLine = new JSONObject();
         String advertiserId = ((ChannelSegment) rankList.get(index)).adNetworkInterface.getId();
         String externalSiteKey = ((ChannelSegment) rankList.get(index)).channelSegmentEntity.getExternalSiteKey();
@@ -389,24 +359,30 @@ public class Logging {
     // ArrayList.class);
     ContentRating siteType = getContentRating(sasParams);
 
-    JSONArray category = getCategory(jObject, logger);
     List<Integer> categ = null;
-    if(category != null) {
+    if(null != sasParams && sasParams.categories != null) {
       categ = new ArrayList<Integer>();
-      for (int index = 0; index < category.length(); index++)
-        categ.add(category.getInt(index));
+      for (long cat : sasParams.categories) {
+        categ.add((int) cat);
+      }
     }
 
     SiteParams siteParams = new SiteParams(categ, siteType);
-    RequestParams requestParams = new RequestParams(sasParams.remoteHostIp, sasParams.source, sasParams.userAgent);
+    RequestParams requestParams = sasParams == null ? new RequestParams(null, null, null) : new RequestParams(
+        sasParams.remoteHostIp, sasParams.source, sasParams.userAgent);
 
-    log.append("rq-params={\"host\":\"").append(sasParams.remoteHostIp).append("\"");
-    if(sasParams.source != null)
-      log.append(",\"src\":\"").append(sasParams.source).append("\"");
-    log.append("}").append(sep).append("rq-h-user-agent=\"");
-    log.append(sasParams.userAgent).append("\"").append(sep).append("rq-site-params=[{\"categ\":");
-    log.append(getCategories(jObject, logger)).append("},{\"type\":\"" + sasParams.siteType + "\"}]");
-    JSONArray carrier = getCarrier(jObject);
+    if(null != sasParams && null != sasParams.remoteHostIp)
+      log.append("rq-params={\"host\":\"").append(sasParams.remoteHostIp).append("\"");
+    JSONArray carrier = null;
+    if(null != sasParams) {
+      if(sasParams.source != null)
+        log.append(",\"src\":\"").append(sasParams.source).append("\"");
+      log.append("}").append(sep).append("rq-h-user-agent=\"");
+      log.append(sasParams.userAgent).append("\"").append(sep).append("rq-site-params=[{\"categ\":");
+      log.append(sasParams.categories.toString()).append("},{\"type\":\"" + sasParams.siteType + "\"}]");
+      carrier = sasParams.carrier;
+    }
+
     Geo geo = null;
     if(null != carrier) {
       log.append(sep).append("carrier=").append(carrier);
@@ -418,9 +394,11 @@ public class Logging {
     }
 
     logger.debug("finished writing cas logs");
+    logger.debug(log.toString());
     if(enableFileLogging)
       debugLogger.info(log.toString());
-    CasChannelLog channelLog = new CasChannelLog(totalTime, clickUrl, sasParams.siteId, new RequestTpan(responseList), siteParams, requestParams, timestamp);
+    CasChannelLog channelLog = new CasChannelLog(totalTime, clickUrl, sasParams == null ? null : sasParams.siteId,
+        new RequestTpan(responseList), siteParams, requestParams, timestamp);
     if(null != geo)
       channelLog.setIP(geo);
     if(enableDatabusLogging) {
@@ -526,7 +504,8 @@ public class Logging {
       if(enableDatabusLogging) {
         if(count >= totalCount)
           continue;
-        CasAdvertisementLog casAdvertisementLog = new CasAdvertisementLog(partnerName, requestUrl, response, adstatus, extsiteKey, advertiserId);
+        CasAdvertisementLog casAdvertisementLog = new CasAdvertisementLog(partnerName, requestUrl, response, adstatus,
+            extsiteKey, advertiserId);
         Message msg = null;
         try {
           TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
@@ -551,6 +530,8 @@ public class Logging {
   }
 
   public static ContentRating getContentRating(SASRequestParameters sasParams) {
+    if(sasParams == null)
+      return null;
     if(sasParams.siteType == null)
       return null;
     if(sasParams.siteType.equalsIgnoreCase("performance"))
@@ -575,12 +556,14 @@ public class Logging {
   }
 
   public static InventoryType getInventoryType(SASRequestParameters sasParams) {
-    if(sasParams.sdkVersion != null && sasParams.sdkVersion.equalsIgnoreCase("0"))
+    if(null != sasParams && sasParams.sdkVersion != null && sasParams.sdkVersion.equalsIgnoreCase("0"))
       return InventoryType.BROWSER;
     return InventoryType.APP;
   }
 
   public static Gender getGender(SASRequestParameters sasParams) {
+    if(sasParams == null)
+      return null;
     if(sasParams.gender.equalsIgnoreCase("m"))
       return Gender.MALE;
     else

@@ -60,8 +60,9 @@ public class ChannelServer {
     // Setting up the logger factory and SlotSizeMapping for the project.
     DebugLogger.init(config.loggerConfiguration());
     SlotSizeMapping.init();
-
+    
     logger = Logger.getLogger(config.loggerConfiguration().getString("debug"));
+
     logger.info("Initializing logger completed");
     // parsing the data center id given in the vm parameters
     ChannelServerHelper channelServerHelper = new ChannelServerHelper(logger);
@@ -109,8 +110,8 @@ public class ChannelServer {
     // Configure the netty server.
     try {
       // Initialising request handler
-      HttpRequestHandler.init(config, channelAdGroupRepository, clientBootstrap, rtbClientBootstrap, channelRepository,
-          channelFeedbackRepository, channelSegmentFeedbackRepository);
+      AsyncRequestMaker.init(clientBootstrap, rtbClientBootstrap);
+      ServletHandler.init(config, repositoryHelper);
       SegmentFactory.init(repositoryHelper);
       ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
       Timer timer = new HashedWheelTimer();
