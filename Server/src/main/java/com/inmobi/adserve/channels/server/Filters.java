@@ -68,6 +68,7 @@ public class Filters {
 
     if(System.currentTimeMillis() - lastRefresh > ServletHandler.config.getInt("whiteListedSitesRefreshtime", 300000)) {
       refreshWhiteListedSites();
+      lastRefresh = System.currentTimeMillis();
     }
 
     return segmentsPerRequestFilter(
