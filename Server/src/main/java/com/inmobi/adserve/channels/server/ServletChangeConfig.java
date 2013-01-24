@@ -23,10 +23,11 @@ public class ServletChangeConfig implements Servlet{
     try {
       jObject = RequestParser.extractParams(params, "update", logger);
     } catch (JSONException exeption) {
-      jObject = new JSONObject();
-      logger.debug("Encountered Json Error while creating json object inside HttpRequest Handler");
+      logger.debug("Encountered Json Error while creating json object inside servlet"); 
       hrh.setTerminationReason(ServletHandler.jsonParsingError);
       InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
+      hrh.responseSender.sendResponse("Incorrect Json", e);
+      return;
     }
     if(null == jObject) {
       hrh.responseSender.sendResponse("Incorrect Json", e);

@@ -1,13 +1,9 @@
 package com.inmobi.adserve.channels.server;
 
-import static org.jboss.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
-import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -19,16 +15,10 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.thrift.TException;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.jboss.netty.handler.timeout.IdleStateAwareChannelUpstreamHandler;
 import org.jboss.netty.handler.timeout.IdleStateEvent;
@@ -112,8 +102,9 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
       Servlet servlet;
       if(servletFactory == null) {
         servlet = new ServletInvalid();
+      } else {
+        servlet = servletFactory.getServlet();
       }
-      servlet = servletFactory.getServlet();
       logger.debug("Got the servlet " + servlet.getName());
       servlet.handleRequest(this, queryStringDecoder, e, logger);
       return;
