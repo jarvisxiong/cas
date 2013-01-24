@@ -1,6 +1,5 @@
 package com.inmobi.adserve.channels.server;
 
-import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
@@ -9,7 +8,6 @@ import org.jboss.netty.channel.MessageEvent;
 
 import com.inmobi.adserve.channels.adnetworks.atnt.ATNTAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.drawbridge.DrawBridgeAdNetwork;
-import com.inmobi.adserve.channels.adnetworks.generic.GenericAdapter;
 import com.inmobi.adserve.channels.adnetworks.httpool.DCPHttPoolAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.huntmads.DCPHuntmadsAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.ifc.IFCAdNetwork;
@@ -25,11 +23,8 @@ import com.inmobi.adserve.channels.adnetworks.webmoblink.WebmobLinkAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.xad.DCPxAdAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.entity.ChannelEntity;
-import com.inmobi.adserve.channels.repository.ChannelRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.phoenix.exception.RepositoryException;
 
 public class SegmentFactory {
 
@@ -50,29 +45,23 @@ public class SegmentFactory {
   public static AdNetworkInterface getChannel(String advertiserId, String channelId, Configuration config, ClientBootstrap clientBootstrap,
       ClientBootstrap rtbClientBootstrap, HttpRequestHandlerBase base, MessageEvent serverEvent, Set<String> advertiserSet, DebugLogger logger,
       boolean isRtbEnabled) {
-    ChannelEntity channelEntity = repositoryHelper.queryChannelRepository(channelId);
-    // once we have values in Db use the following declaration
-    // if(isRtbEnabled && channelEntity != null && channelEntity.isRtb()) {
     if(isRtbEnabled) {
-      // following code will be enabled once we have entries in DB
       logger.debug("Creating RTB adapter instance for advertiser id : " + advertiserId);
-
-      // RtbAdNetwork rtbAdNetwork = new RtbAdNetwork(logger, config,
-      // rtbClientBootstrap, base, serverEvent, channelEntity.getUrlBase(),
-      // channelEntity.getUrlArg(), channelEntity.getRtbMethod(),
-      // channelEntity.getRtbVer(), channelEntity.getWnUrl(),
-      // channelEntity.getAccountId(), channelEntity.isWnRequied(),
-      // channelEntity.isWnFromClient());
-      // return rtbAdNetwork;
-      //
-
       if((advertiserId.equalsIgnoreCase(config.getString("rtbAdvertiserName.advertiserId")))
           && (null == advertiserSet || advertiserSet.isEmpty() || advertiserSet.contains("rtbAdvertiserName"))
           && (config.getString("rtbAdvertiserName.status").equalsIgnoreCase("on"))) {
-        RtbAdNetwork rtbAdNetwork = new RtbAdNetwork(logger, config, rtbClientBootstrap, base, serverEvent, config.getString("rtbAdvertiserName.urlBase"),
-            config.getString("rtbAdvertiserName.urlArg"), config.getString("rtbAdvertiserName.rtbMethod"), config.getString("rtbAdvertiserName.rtbVer"),
-            config.getString("rtbAdvertiserName.wnUrlback"), config.getString("rtbAdvertiserName.accountId"),
-            config.getBoolean("rtbAdvertiserName.isWnRequired"), config.getBoolean("rtbAdvertiserName.isWinFromClient"));
+        String urlBase = config.getString("rtbAdvertiserName.host." + ChannelServer.dataCentreName, config.getString("rtbAdvertiserName.host.default", null));
+        if (null == urlBase) {
+          logger.debug("Default urlBase is not defined in config so returning null");
+          return null;
+        }
+        String targetingParamString = config.getString("rtbAdvertiserName.targetingParams");
+        String[] targetingParams = targetingParamString == null ? null : targetingParamString.split(",");
+        RtbAdNetwork rtbAdNetwork = new RtbAdNetwork(logger, config, rtbClientBootstrap, base, serverEvent, urlBase,
+            config.getString("rtbAdvertiserName.urlArg"), config.getString("rtbAdvertiserName.rtbMethod"),
+            config.getString("rtbAdvertiserName.rtbVer"), config.getString("rtbAdvertiserName.wnUrlback"),
+            config.getString("rtbAdvertiserName.accountId"), config.getBoolean("rtbAdvertiserName.isWnRequired"),
+            config.getBoolean("rtbAdvertiserName.isWinFromClient"), targetingParams);
         return rtbAdNetwork;
       }
     }

@@ -96,7 +96,9 @@ public class SegmentFactoryTest extends TestCase {
     expect(adaptorConfig.getString("rtbAdvertiserName.rtbVer")).andReturn("2").anyTimes();
     expect(adaptorConfig.getBoolean("rtbAdvertiserName.isWnRequired")).andReturn(true).anyTimes();
     expect(adaptorConfig.getBoolean("rtbAdvertiserName.isWinFromClient")).andReturn(true).anyTimes();
-    expect(adaptorConfig.getString("rtbAdvertiserName.urlBase")).andReturn("http://localhost:10005").anyTimes();
+    expect(adaptorConfig.getString("rtbAdvertiserName.host.default", null)).andReturn("http://localhost:10005").anyTimes();
+    expect(adaptorConfig.getString("rtbAdvertiserName.host.null", "http://localhost:10005")).andReturn("http://localhost:10005").anyTimes();
+    expect(adaptorConfig.getString("rtbAdvertiserName.targetingParams")).andReturn(null).anyTimes();
     replay(adaptorConfig);
   }
   
