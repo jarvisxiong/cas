@@ -109,6 +109,13 @@ public class ServletHandler {
        return new ServletBackFill();
       }
     });
+    
+    servletMap.put("/getsegments", new ServletFactory() {      
+      @Override
+      public Servlet getServlet() {
+        return new ServletGetSegment();
+      }
+    });
 
   }
 

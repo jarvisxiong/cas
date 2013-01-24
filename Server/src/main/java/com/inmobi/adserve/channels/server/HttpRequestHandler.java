@@ -112,8 +112,9 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
       Servlet servlet;
       if(servletFactory == null) {
         servlet = new ServletInvalid();
+      } else {
+        servlet = servletFactory.getServlet();
       }
-      servlet = servletFactory.getServlet();
       logger.debug("Got the servlet " + servlet.getName());
       servlet.handleRequest(this, queryStringDecoder, e, logger);
       return;
