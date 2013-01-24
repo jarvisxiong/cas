@@ -35,7 +35,8 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
   public JSONObject jObject = null;
   public DebugLogger logger = null;
   public ResponseSender responseSender;
-
+  public int lowestEcpm;
+  
   public String getTerminationReason() {
     return terminationReason;
   }

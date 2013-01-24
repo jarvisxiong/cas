@@ -45,7 +45,7 @@ public class AsyncRequestMaker {
   public static List<ChannelSegment> prepareForAsyncRequest(ChannelSegmentEntity[] rows, DebugLogger logger,
       Configuration config, Configuration rtbConfig, Configuration adapterConfig, HttpRequestHandlerBase base,
       Set<String> advertiserSet, MessageEvent e, RepositoryHelper repositoryHelper, JSONObject jObject,
-      SASRequestParameters sasParams) throws Exception {
+      SASRequestParameters sasParams, double lowestEcpm) throws Exception {
 
     List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
     List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
@@ -58,7 +58,7 @@ public class AsyncRequestMaker {
       logger.debug("isRtbEnabled is " + isRtbEnabled);
 
       AdNetworkInterface network = SegmentFactory.getChannel(row.getId(), row.getChannelId(), adapterConfig,
-          clientBootstrap, rtbClientBootstrap, base, e, advertiserSet, logger, isRtbEnabled);
+          clientBootstrap, rtbClientBootstrap, base, e, advertiserSet, logger, isRtbEnabled, lowestEcpm);
       if(null == network) {
         logger.debug("No adapter found for adGroup:", row.getAdgroupId());
         continue;

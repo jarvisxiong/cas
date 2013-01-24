@@ -133,10 +133,10 @@ public class SegmentFactoryTest extends TestCase {
     ServletHandler.rtbConfig = rtbConfig;
     SegmentFactory.setRepositoryHelper(repoHelper);
     AdNetworkInterface adNetworkInterface = SegmentFactory.getChannel("advertiserId", "channelTest", config.adapterConfiguration(), null, null, null, null,
-        null, logger, false);
+        null, logger, false, 0.0);
     assertEquals(null, adNetworkInterface);
     AdNetworkInterface adNetworkInterface2 = SegmentFactory.getChannel("advertiserId", "channelTest", adaptorConfig, null, null, null, null,
-        null, logger, true);
+        null, logger, true, 0.0);
     assertNotNull(adNetworkInterface2);
     assertEquals(true, adNetworkInterface2 instanceof RtbAdNetwork);
   }

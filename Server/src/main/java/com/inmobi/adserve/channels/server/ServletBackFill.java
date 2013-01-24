@@ -145,10 +145,13 @@ public class ServletBackFill implements Servlet {
     }
 
     logger.debug("Total channels available for sending requests " + rows.length);
-
+    double lowestEcpm = getLowestEcpm(rows, logger);
+    if (logger.isDebugEnabled()) {
+      logger.debug("Lowest ecpm is " + lowestEcpm);
+    }
     segments = AsyncRequestMaker.prepareForAsyncRequest(rows, logger, ServletHandler.config, ServletHandler.rtbConfig,
         ServletHandler.adapterConfig, hrh.responseSender, advertiserSet, e, ServletHandler.repositoryHelper,
-        hrh.jObject, hrh.responseSender.sasParams);
+        hrh.jObject, hrh.responseSender.sasParams, lowestEcpm);
 
     if(segments.isEmpty()) {
       logger.debug("No succesfull configuration of adapter ");
@@ -201,4 +204,22 @@ public class ServletBackFill implements Servlet {
     return "BackFill";
   }
 
+  private static double getLowestEcpm(ChannelSegmentEntity[] channelSegmentEntities, DebugLogger logger) {
+    double lowestEcpm = 0;
+    for (ChannelSegmentEntity channelSegmentEntity : channelSegmentEntities) {
+      if (null == ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(
+          channelSegmentEntity.getAdgroupId())) {
+        if (logger.isDebugEnabled())
+          logger.debug("ChannelSegmentfeedback entity is null for adgpid id " + channelSegmentEntity.getAdgroupId());
+        continue;
+      }
+      if (logger.isDebugEnabled())
+        logger.debug("ecpm is " + ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(
+          channelSegmentEntity.getAdgroupId()).geteCPM());
+      lowestEcpm = lowestEcpm > ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(
+          channelSegmentEntity.getAdgroupId()).geteCPM() ? ServletHandler.repositoryHelper
+          .queryChannelSegmentFeedbackRepository(channelSegmentEntity.getAdgroupId()).geteCPM() : lowestEcpm;
+    }
+    return lowestEcpm;
+  }
 }
