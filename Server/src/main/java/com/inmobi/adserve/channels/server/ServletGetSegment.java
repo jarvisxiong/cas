@@ -34,67 +34,79 @@ public class ServletGetSegment implements Servlet {
       hrh.responseSender.sendResponse("Incorrect Json", e);
       return;
     }
-    
+
     if(null == jObject) {
       hrh.responseSender.sendResponse("Incorrect Json", e);
       return;
     }
-    
+
     Map<String, HashMap<String, String>> segmentInfo = new HashMap<String, HashMap<String, String>>();
     JSONArray segmentList = jObject.getJSONArray("segment-list");
-    
+
     for (int i = 0; i < segmentList.length(); i++) {
       JSONObject segment = segmentList.getJSONObject(i);
       String id = segment.getString("id");
       String repoName = segment.getString("repo-name");
       String key = id + "_" + repoName;
       segmentInfo.put(key, new HashMap<String, String>());
-      
+
       if(repoName != null && repoName.equalsIgnoreCase("channel")) {
         ChannelEntity entity = ServletHandler.repositoryHelper.queryChannelRepository(id);
         if(entity == null)
           continue;
-        for(Method method : entity.getClass().getMethods()) {
+        for (Method method : entity.getClass().getMethods()) {
           if(method.getName().startsWith("get")) {
-            segmentInfo.get(key).put(method.getName(), method.invoke(entity, (Object[])null).toString());
+            segmentInfo.get(key).put(
+                method.getName(),
+                null == method.invoke(entity, (Object[]) null) ? "null" : method.invoke(entity, (Object[]) null)
+                    .toString());
           }
         }
       }
-      
+
       if(repoName != null && repoName.equalsIgnoreCase("channelsegment")) {
         ChannelSegmentEntity entity = ServletHandler.repositoryHelper.queryChannelAdGroupRepository(id);
         if(entity == null)
           continue;
-        for(Method method : entity.getClass().getMethods()) {
+        for (Method method : entity.getClass().getMethods()) {
           if(method.getName().startsWith("get")) {
-            segmentInfo.get(key).put(method.getName(), method.invoke(entity, (Object[])null).toString());
+            segmentInfo.get(key).put(
+                method.getName(),
+                null == method.invoke(entity, (Object[]) null) ? "null" : method.invoke(entity, (Object[]) null)
+                    .toString());
           }
         }
       }
-      
+
       if(repoName != null && repoName.equalsIgnoreCase("channelfeedback")) {
         ChannelFeedbackEntity entity = ServletHandler.repositoryHelper.queryChannelFeedbackRepository(id);
         if(entity == null)
           continue;
-        for(Method method : entity.getClass().getMethods()) {
+        for (Method method : entity.getClass().getMethods()) {
           if(method.getName().startsWith("get")) {
-            segmentInfo.get(key).put(method.getName(), method.invoke(entity, (Object[])null).toString());
+            segmentInfo.get(key).put(
+                method.getName(),
+                null == method.invoke(entity, (Object[]) null) ? "null" : method.invoke(entity, (Object[]) null)
+                    .toString());
           }
         }
       }
-      
+
       if(repoName != null && repoName.equalsIgnoreCase("channelsegmentfeedback")) {
         ChannelSegmentFeedbackEntity entity = ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(id);
         if(entity == null)
           continue;
-        for(Method method : entity.getClass().getMethods()) {
+        for (Method method : entity.getClass().getMethods()) {
           if(method.getName().startsWith("get")) {
-            segmentInfo.get(key).put(method.getName(), method.invoke(entity, (Object[])null).toString());
+            segmentInfo.get(key).put(
+                method.getName(),
+                null == method.invoke(entity, (Object[]) null) ? "null" : method.invoke(entity, (Object[]) null)
+                    .toString());
           }
         }
       }
     }
-    
+
     hrh.responseSender.sendResponse(segmentInfo.toString(), e);
     return;
   }
