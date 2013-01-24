@@ -49,19 +49,17 @@ public class SegmentFactory {
       logger.debug("Creating RTB adapter instance for advertiser id : " + advertiserId);
       if((advertiserId.equalsIgnoreCase(config.getString("rtbAdvertiserName.advertiserId")))
           && (null == advertiserSet || advertiserSet.isEmpty() || advertiserSet.contains("rtbAdvertiserName"))
-          && (config.getString("rtbAdvertiserName.status").equalsIgnoreCase("on"))) {
+          && (config.getString("rtbAdvertiserName.status").equalsIgnoreCase("on") && config.getBoolean("rtbAdvertiserName.isRtb", false) == true)) {
         String urlBase = config.getString("rtbAdvertiserName.host." + ChannelServer.dataCentreName, config.getString("rtbAdvertiserName.host.default", null));
         if (null == urlBase) {
           logger.debug("Default urlBase is not defined in config so returning null");
           return null;
         }
-        String targetingParamString = config.getString("rtbAdvertiserName.targetingParams");
-        String[] targetingParams = targetingParamString == null ? null : targetingParamString.split(",");
         RtbAdNetwork rtbAdNetwork = new RtbAdNetwork(logger, config, rtbClientBootstrap, base, serverEvent, urlBase,
             config.getString("rtbAdvertiserName.urlArg"), config.getString("rtbAdvertiserName.rtbMethod"),
             config.getString("rtbAdvertiserName.rtbVer"), config.getString("rtbAdvertiserName.wnUrlback"),
             config.getString("rtbAdvertiserName.accountId"), config.getBoolean("rtbAdvertiserName.isWnRequired"),
-            config.getBoolean("rtbAdvertiserName.isWinFromClient"), targetingParams);
+            config.getBoolean("rtbAdvertiserName.isWinFromClient"), config.getBoolean("rtbAdvertiserName.siteBlinded", false));
         return rtbAdNetwork;
       }
     }
