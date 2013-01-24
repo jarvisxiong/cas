@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.server;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
@@ -19,10 +20,17 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
+/**
+ * 
+ * @author devashish To see the state of currently loaded entries in all
+ *         repository
+ */
+
 public class ServletGetSegment implements Servlet {
   @Override
   public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
       DebugLogger logger) throws Exception {
+
     Map<String, List<String>> params = queryStringDecoder.getParameters();
     JSONObject jObject;
     try {
@@ -40,71 +48,34 @@ public class ServletGetSegment implements Servlet {
       return;
     }
 
-    Map<String, HashMap<String, String>> segmentInfo = new HashMap<String, HashMap<String, String>>();
+    HashMap<String, HashMap<String, String>> segmentInfo = new HashMap<String, HashMap<String, String>>();
     JSONArray segmentList = jObject.getJSONArray("segment-list");
 
     for (int i = 0; i < segmentList.length(); i++) {
+
       JSONObject segment = segmentList.getJSONObject(i);
       String id = segment.getString("id");
       String repoName = segment.getString("repo-name");
       String key = id + "_" + repoName;
       segmentInfo.put(key, new HashMap<String, String>());
-
+      Object entity = null;
+      
       if(repoName != null && repoName.equalsIgnoreCase("channel")) {
-        ChannelEntity entity = ServletHandler.repositoryHelper.queryChannelRepository(id);
-        if(entity == null)
-          continue;
-        for (Method method : entity.getClass().getMethods()) {
-          if(method.getName().startsWith("get")) {
-            segmentInfo.get(key).put(
-                method.getName(),
-                null == method.invoke(entity, (Object[]) null) ? "null" : method.invoke(entity, (Object[]) null)
-                    .toString());
-          }
-        }
+        entity = ServletHandler.repositoryHelper.queryChannelRepository(id);
       }
 
       if(repoName != null && repoName.equalsIgnoreCase("channelsegment")) {
-        ChannelSegmentEntity entity = ServletHandler.repositoryHelper.queryChannelAdGroupRepository(id);
-        if(entity == null)
-          continue;
-        for (Method method : entity.getClass().getMethods()) {
-          if(method.getName().startsWith("get")) {
-            segmentInfo.get(key).put(
-                method.getName(),
-                null == method.invoke(entity, (Object[]) null) ? "null" : method.invoke(entity, (Object[]) null)
-                    .toString());
-          }
-        }
+        entity = ServletHandler.repositoryHelper.queryChannelAdGroupRepository(id);
       }
 
       if(repoName != null && repoName.equalsIgnoreCase("channelfeedback")) {
-        ChannelFeedbackEntity entity = ServletHandler.repositoryHelper.queryChannelFeedbackRepository(id);
-        if(entity == null)
-          continue;
-        for (Method method : entity.getClass().getMethods()) {
-          if(method.getName().startsWith("get")) {
-            segmentInfo.get(key).put(
-                method.getName(),
-                null == method.invoke(entity, (Object[]) null) ? "null" : method.invoke(entity, (Object[]) null)
-                    .toString());
-          }
-        }
+        entity = ServletHandler.repositoryHelper.queryChannelFeedbackRepository(id);
       }
 
       if(repoName != null && repoName.equalsIgnoreCase("channelsegmentfeedback")) {
-        ChannelSegmentFeedbackEntity entity = ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(id);
-        if(entity == null)
-          continue;
-        for (Method method : entity.getClass().getMethods()) {
-          if(method.getName().startsWith("get")) {
-            segmentInfo.get(key).put(
-                method.getName(),
-                null == method.invoke(entity, (Object[]) null) ? "null" : method.invoke(entity, (Object[]) null)
-                    .toString());
-          }
-        }
+        entity = ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(id);
       }
+      getSegments(key, entity, segmentInfo);
     }
 
     hrh.responseSender.sendResponse(segmentInfo.toString(), e);
@@ -114,6 +85,21 @@ public class ServletGetSegment implements Servlet {
   @Override
   public String getName() {
     return "getSegment";
+  }
+
+  public void getSegments(String key, Object entity, HashMap<String, HashMap<String, String>> segmentInfo)
+      throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+    if(entity == null)
+      return;
+    for (Method method : entity.getClass().getMethods()) {
+      if(method.getName().startsWith("get")) {
+        segmentInfo.get(key)
+            .put(
+                method.getName(),
+                null == method.invoke(entity, (Object[]) null) ? "null" : method.invoke(entity, (Object[]) null)
+                    .toString());
+      }
+    }
   }
 
 }
