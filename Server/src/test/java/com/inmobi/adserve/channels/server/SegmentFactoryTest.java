@@ -128,7 +128,7 @@ public class SegmentFactoryTest extends TestCase {
     Configuration rtbConfig = createMock(Configuration.class);
     expect(rtbConfig.getBoolean("isRtbEnabled")).andReturn(true).anyTimes();
     replay(rtbConfig);
-    HttpRequestHandler.setRtbConfig(rtbConfig);
+    ServletHandler.rtbConfig = rtbConfig;
     SegmentFactory.setRepositoryHelper(repoHelper);
     AdNetworkInterface adNetworkInterface = SegmentFactory.getChannel("advertiserId", "channelTest", config.adapterConfiguration(), null, null, null, null,
         null, logger, false);
