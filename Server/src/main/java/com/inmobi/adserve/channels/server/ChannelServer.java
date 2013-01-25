@@ -27,6 +27,7 @@ import com.inmobi.adserve.channels.repository.ChannelRepository;
 import com.inmobi.adserve.channels.repository.ChannelFeedbackRepository;
 import com.inmobi.adserve.channels.repository.ChannelSegmentFeedbackRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
@@ -41,6 +42,7 @@ public class ChannelServer {
   private static ChannelRepository channelRepository;
   private static ChannelFeedbackRepository channelFeedbackRepository;
   private static ChannelSegmentFeedbackRepository channelSegmentFeedbackRepository;
+  private static SiteMetaDataRepository siteMetaDataRepository;
   private static RepositoryHelper repositoryHelper;
   private static InspectorStats inspectorStat;
   private static final String configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
@@ -89,12 +91,14 @@ public class ChannelServer {
     channelRepository = new ChannelRepository();
     channelFeedbackRepository = new ChannelFeedbackRepository();
     channelSegmentFeedbackRepository = new ChannelSegmentFeedbackRepository();
-    repositoryHelper = new RepositoryHelper(channelRepository, channelAdGroupRepository, channelFeedbackRepository, channelSegmentFeedbackRepository);
+    siteMetaDataRepository = new SiteMetaDataRepository();
+    repositoryHelper = new RepositoryHelper(channelRepository, channelAdGroupRepository, channelFeedbackRepository, channelSegmentFeedbackRepository, siteMetaDataRepository);
 
     MatchSegments.init(channelAdGroupRepository, inspectorStat);
     InspectorStats.initializeRepoStats("ChannelAdGroupRepository");
     InspectorStats.initializeRepoStats("ChannelFeedbackRepository");
     InspectorStats.initializeRepoStats("ChannelSegmentFeedbackRepository");
+    InspectorStats.initializeRepoStats("SiteMetaDataRepository");
     instantiateRepository(logger, config);
     Filters.init(config.adapterConfiguration(), repositoryHelper);
 
@@ -183,14 +187,19 @@ public class ChannelServer {
       InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.query, segmentFeedbackConfig.getString("query"));
       InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.refreshInterval, segmentFeedbackConfig.getString("refreshTime"));
 
+      InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.isUpdating, 0);
+      InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.repoSource, databaseConfig.getString("database"));
+      InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.query, repoConfig.getString("query"));
+      InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.refreshInterval, repoConfig.getString("refreshTime"));
+
       initialContext.bind("java:comp/env/jdbc", dataSource);
 
       // Reusing the repository from phoenix adsering framework.
+      siteMetaDataRepository.init(logger, config.cacheConfiguration().subset("SiteMetaDataRepository"), "SiteMetaDataRepository");
       channelAdGroupRepository.init(logger, config.cacheConfiguration().subset("ChannelAdGroupRepository"), "ChannelAdGroupRepository");
       channelRepository.init(logger, config.cacheConfiguration().subset("ChannelRepository"), "ChannelRepository");
       channelFeedbackRepository.init(logger, config.cacheConfiguration().subset("ChannelFeedbackRepository"), "ChannelFeedbackRepository");
       channelSegmentFeedbackRepository.init(logger, config.cacheConfiguration().subset("ChannelSegmentFeedbackRepository"), "ChannelSegmentFeedbackRepository");
-
       logger.error("* * * * Instantiating repository completed * * * *");
     } catch (NamingException exception) {
       logger.error("failed to creatre binding for postgresql data source " + exception.getMessage());
