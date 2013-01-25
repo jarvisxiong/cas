@@ -12,9 +12,11 @@ import com.inmobi.adserve.channels.adnetworks.httpool.DCPHttPoolAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.huntmads.DCPHuntmadsAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.ifc.IFCAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.ifd.IFDAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.lomark.DCPLomarkAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mobilecommerce.MobileCommerceAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mullahmedia.MullahMediaNetwork;
 import com.inmobi.adserve.channels.adnetworks.openx.OpenxAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.pubmatic.DCPPubmaticAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.siquis.DCPSiquisAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.tapit.DCPTapitAdNetwork;
@@ -106,29 +108,13 @@ public class SegmentFactory {
     } else if((advertiserId.equals(config.getString("verve.advertiserId"))) && (advertiserSet.isEmpty() || advertiserSet.contains("verve"))
         && (config.getString("verve.status").equals("on"))) {
       return new DCPVerveAdNetwork(logger, config, clientBootstrap, base, serverEvent);
+    } else if((advertiserId.equals(config.getString("lomark.advertiserId"))) && (advertiserSet.isEmpty() || advertiserSet.contains("lomark"))
+        && (config.getString("lomark.status").equals("on"))) {
+      return new DCPLomarkAdNetwork(logger, config, clientBootstrap, base, serverEvent);
+    } else if((advertiserId.equals(config.getString("pubmatic.advertiserId"))) && (advertiserSet.isEmpty() || advertiserSet.contains("pubmatic"))
+            && (config.getString("pubmatic.status").equals("on"))) {
+        return new DCPPubmaticAdNetwork(logger, config, clientBootstrap, base, serverEvent);
     }
-
-    // else {
-    // logger.debug("going in generic adapter for advId" + advertiserId);
-    // String advertiserName = "";
-    // Iterator itr = config.getKeys();
-    // while (itr.hasNext()) {
-    // String key = itr.next().toString();
-    // if(config.getString(key).equals(advertiserId) &&
-    // key.endsWith(".advertiserId")) {
-    // advertiserName = key.replace(".advertiserId", "");
-    // break;
-    // }
-    // }
-    // if(!advertiserName.equals("") && config.getString(advertiserName +
-    // ".status").equals("on")
-    // && (advertiserSet.isEmpty() || advertiserSet.contains(advertiserName))) {
-    // return new GenericAdapter(logger, config, clientBootstrap, base,
-    // serverEvent, advertiserName);
-    // }
-    // }
-    // logger.debug("no genric adapter");
-
     return null;
   }
 }
