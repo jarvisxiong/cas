@@ -53,7 +53,7 @@ public class Filters {
 
         String sites = adapterConfiguration.getString(str.replace(".advertiserId", ".whiteListedSites"));
         HashSet<String> siteSet = new HashSet<String>();
-        if(sites != null)
+        if(sites != null && !sites.isEmpty())
           siteSet.addAll(Arrays.asList(sites.split(",")));
         whiteListedSites.put(adapterConfiguration.getString(str), siteSet);
       }
@@ -157,7 +157,8 @@ public class Filters {
               + repositoryHelper.queryChannelFeedbackRepository(advertiserId).getRevenue() * revenueWindow);
       }
 
-      if(!whiteListedSites.get(advertiserId).isEmpty() && !whiteListedSites.get(advertiserId).contains(siteId)) {
+      if(whiteListedSites.containsKey(advertiserId) && !whiteListedSites.get(advertiserId).isEmpty()
+          && !whiteListedSites.get(advertiserId).contains(siteId)) {
         InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
             InspectorStrings.droppedInSiteInclusionExclusionFilter);
         continue;

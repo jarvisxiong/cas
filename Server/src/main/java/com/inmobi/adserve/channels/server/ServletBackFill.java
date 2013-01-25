@@ -114,7 +114,7 @@ public class ServletBackFill implements Servlet {
 
     // applying all the filters
     ChannelSegmentEntity[] rows = Filters.filter(matchedSegments, logger, 0.0, ServletHandler.config,
-        ServletHandler.adapterConfig, hrh.responseSender.sasParams.siteId);
+        ServletHandler.adapterConfig, new Long(hrh.responseSender.sasParams.siteIncId).toString());
 
     if(rows == null || rows.length == 0) {
       hrh.responseSender.sendNoAdResponse(e);
