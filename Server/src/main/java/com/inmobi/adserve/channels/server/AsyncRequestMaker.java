@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.hadoop.hdfs.server.namenode.status_jsp;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 import org.json.JSONException;
@@ -32,10 +33,12 @@ public class AsyncRequestMaker {
 
   private static ClientBootstrap clientBootstrap;
   private static ClientBootstrap rtbClientBootstrap;
+  private static RepositoryHelper repositoryHelper;
 
   public static void init(ClientBootstrap clientBootstrap, ClientBootstrap rtbClientBootstrap) {
     AsyncRequestMaker.clientBootstrap = clientBootstrap;
     AsyncRequestMaker.rtbClientBootstrap = rtbClientBootstrap;
+    AsyncRequestMaker.repositoryHelper = repositoryHelper;
   }
 
   /**
@@ -52,6 +55,9 @@ public class AsyncRequestMaker {
 
     logger.debug("Total channels available for sending requests", rows.length + "");
 
+    if (null != sasParams.siteId)
+      sasParams.blockedCategories = repositoryHelper.querySiteMetaDetaRepository(sasParams.siteId).getBlockedCategories();
+    
     for (ChannelSegmentEntity row : rows) {
       boolean isRtbEnabled = false;
       isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled", false);
