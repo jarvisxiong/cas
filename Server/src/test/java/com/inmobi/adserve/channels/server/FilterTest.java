@@ -81,6 +81,9 @@ public class FilterTest extends TestCase {
     expect(mockAdapterConfig.getInt("openx.partnerSegmentNo",2)).andReturn(2).anyTimes();
     expect(mockAdapterConfig.getInt("atnt.partnerSegmentNo",2)).andReturn(2).anyTimes();
     expect(mockAdapterConfig.getInt("tapit.partnerSegmentNo",2)).andReturn(2).anyTimes();
+    expect(mockAdapterConfig.getString("openx.whiteListedSites")).andReturn("null").anyTimes();
+    expect(mockAdapterConfig.getString("atnt.whiteListedSites")).andReturn("null").anyTimes();
+    expect(mockAdapterConfig.getString("tapit.whiteListedSites")).andReturn("null").anyTimes();
     replay(mockAdapterConfig);
 
     expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
@@ -172,7 +175,7 @@ public class FilterTest extends TestCase {
     matchedSegments.put(channelSegmentEntity4.getId(), adv2);
     matchedSegments.put(channelSegmentEntity6.getId(), adv3);
 
-    matchedSegments = Filters.impressionBurnFilter(matchedSegments, logger, mockConfig);
+    matchedSegments = Filters.impressionBurnFilter(matchedSegments, logger, mockConfig, "null");
 
     assertEquals(false, matchedSegments.containsKey(channelSegmentEntity1.getId()));
     assertEquals(false, matchedSegments.containsKey(channelSegmentEntity4.getId()));

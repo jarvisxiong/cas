@@ -5,8 +5,10 @@ import java.util.HashMap;
 import org.apache.commons.configuration.Configuration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -34,6 +36,8 @@ public class Filters {
 
   private static RepositoryHelper repositoryHelper;
   public static HashMap<String, String> advertiserIdtoNameMapping = new HashMap<String, String>();
+  public static HashMap<String, HashSet<String>> whiteListedSites = new HashMap<String, HashSet<String>>();
+  public static long lastRefresh;
 
   // To boost ecpm of a parnter to meet the impression floor
 
@@ -46,16 +50,31 @@ public class Filters {
       String str = itr.next();
       if(str.endsWith(".advertiserId")) {
         advertiserIdtoNameMapping.put(adapterConfiguration.getString(str), str.replace(".advertiserId", ""));
+
+        String sites = adapterConfiguration.getString(str.replace(".advertiserId", ".whiteListedSites"));
+        HashSet<String> siteSet = new HashSet<String>();
+        if(sites != null && !sites.isEmpty())
+          siteSet.addAll(Arrays.asList(sites.split(",")));
+        whiteListedSites.put(adapterConfiguration.getString(str), siteSet);
       }
     }
+
+    lastRefresh = System.currentTimeMillis();
   }
 
   public static ChannelSegmentEntity[] filter(HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments,
-      DebugLogger logger, Double siteFloor, Configuration serverConfiguration, Configuration adapterConfiguration) {
+      DebugLogger logger, Double siteFloor, Configuration serverConfiguration, Configuration adapterConfiguration,
+      String siteId) {
+
+    if(System.currentTimeMillis() - lastRefresh > ServletHandler.config.getInt("whiteListedSitesRefreshtime", 300000)) {
+      refreshWhiteListedSites();
+      lastRefresh = System.currentTimeMillis();
+    }
+
     return segmentsPerRequestFilter(
         matchedSegments,
         convertToSegmentsArray(Filters.partnerSegmentCountFilter(
-            Filters.impressionBurnFilter(matchedSegments, logger, serverConfiguration), siteFloor, logger,
+            Filters.impressionBurnFilter(matchedSegments, logger, serverConfiguration, siteId), siteFloor, logger,
             serverConfiguration, adapterConfiguration), logger), logger, serverConfiguration);
   }
 
@@ -69,7 +88,7 @@ public class Filters {
    */
   public static HashMap<String, HashMap<String, ChannelSegmentEntity>> impressionBurnFilter(
       HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments, DebugLogger logger,
-      Configuration serverConfiguration) {
+      Configuration serverConfiguration, String siteId) {
 
     logger.debug("Inside impressionBurnFilter");
     long todayImpressions;
@@ -110,7 +129,8 @@ public class Filters {
             + advertiserId);
       else {
         if(todayImpressions > impressionCeil) {
-          // dropping advertiser(all segments) if todays impression is greater than impression ceiling
+          // dropping advertiser(all segments) if todays impression is greater
+          // than impression ceiling
           logger.debug("Impression limit exceeded by advertiser " + advertiserId);
           if(advertiserIdtoNameMapping.containsKey(advertiserId))
             InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
@@ -124,7 +144,8 @@ public class Filters {
         logger.debug("Repo Exception/No entry in ChannelFeedbackRepository for advertiserID " + advertiserId);
       else {
         if(balance < revenue * revenueWindow) {
-          // dropping advertiser(all segments) if balance is less than 10*revenue of that channel(advertiser)
+          // dropping advertiser(all segments) if balance is less than
+          // 10*revenue of that channel(advertiser)
           logger.debug("Burn limit exceeded by advertiser " + advertiserId);
           if(advertiserIdtoNameMapping.containsKey(advertiserId))
             InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
@@ -136,6 +157,12 @@ public class Filters {
               + repositoryHelper.queryChannelFeedbackRepository(advertiserId).getRevenue() * revenueWindow);
       }
 
+      if(whiteListedSites.containsKey(advertiserId) && !whiteListedSites.get(advertiserId).isEmpty()
+          && !whiteListedSites.get(advertiserId).contains(siteId)) {
+        InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
+            InspectorStrings.droppedInSiteInclusionExclusionFilter);
+        continue;
+      }
       // otherwise adding the advertiser to the list
       rows.put(advertiserId, matchedSegments.get(advertiserId));
     }
@@ -415,6 +442,20 @@ public class Filters {
     }
     logger.debug("New ranklist size :" + newRankList.size());
     return newRankList;
+  }
+
+  public static void refreshWhiteListedSites() {
+    Iterator<String> itr = ServletHandler.adapterConfig.getKeys();
+    while (null != itr && itr.hasNext()) {
+      String str = itr.next();
+      if(str.endsWith(".advertiserId")) {
+        String sites = ServletHandler.adapterConfig.getString(str.replace(".advertiserId", ".whiteListedSites"));
+        HashSet<String> siteSet = new HashSet<String>();
+        if(sites != null)
+          siteSet.addAll(Arrays.asList(sites.split(",")));
+        whiteListedSites.put(ServletHandler.adapterConfig.getString(str), siteSet);
+      }
+    }
   }
 
 }
