@@ -67,7 +67,7 @@ public class AsyncRequestMaker {
       logger.debug("isRtbEnabled is " + isRtbEnabled);
 
       AdNetworkInterface network = SegmentFactory.getChannel(row.getId(), row.getChannelId(), adapterConfig,
-          clientBootstrap, rtbClientBootstrap, base, e, advertiserSet, logger, isRtbEnabled, sasParams.lowestEcpm);
+          clientBootstrap, rtbClientBootstrap, base, e, advertiserSet, logger, isRtbEnabled, 0.0);
       if(null == network) {
         logger.debug("No adapter found for adGroup:", row.getAdgroupId());
         continue;
@@ -84,7 +84,6 @@ public class AsyncRequestMaker {
       String beaconUrl = null;
       sasParams.impressionId = getImpressionId(row.getIncId());
       sasParams.adIncId = row.getIncId();
-      sasParams.segmentCategories = row.getTags();
       logger.debug("impression id is " + sasParams.impressionId);
 
       if((network.isClickUrlRequired() || network.isBeaconUrlRequired()) && null != sasParams.impressionId) {
