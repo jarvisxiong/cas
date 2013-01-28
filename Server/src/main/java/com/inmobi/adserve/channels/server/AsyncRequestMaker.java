@@ -111,7 +111,7 @@ public class AsyncRequestMaker {
       logger.debug("Sending request to Channel of Id", row.getId());
       logger.debug("external site key is", row.getExternalSiteKey());
 
-      if(network.configureParameters(sasParams, row.getExternalSiteKey(), clickUrl, beaconUrl)) {
+      if(network.configureParameters(sasParams, row, clickUrl, beaconUrl)) {
         InspectorStats.incrementStatCount(network.getName(), InspectorStrings.successfulConfigure);
         ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = repositoryHelper
             .queryChannelSegmentFeedbackRepository(row.getAdgroupId());
