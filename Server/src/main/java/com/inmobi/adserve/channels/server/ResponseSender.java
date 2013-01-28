@@ -192,9 +192,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
    */
   @Override
   public AdNetworkInterface runRtbSecondPriceAuctionEngine() {
-    bidFloor = sasParams.siteFloor > sasParams.lowestEcpm ? sasParams.siteFloor : sasParams.lowestEcpm;
-    if (logger.isDebugEnabled())
-      logger.debug("Bid Floor is " + bidFloor);
     if(rtbSegments.size() == 0) {
       rtbResponse = null;
       return null;

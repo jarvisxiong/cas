@@ -61,7 +61,7 @@ public class SegmentFactory {
             config.getString("rtbAdvertiserName.urlArg"), config.getString("rtbAdvertiserName.rtbMethod"),
             config.getString("rtbAdvertiserName.rtbVer"), config.getString("rtbAdvertiserName.wnUrlback"),
             config.getString("rtbAdvertiserName.accountId"), config.getBoolean("rtbAdvertiserName.isWnRequired"),
-            config.getBoolean("rtbAdvertiserName.isWinFromClient"), config.getBoolean("rtbAdvertiserName.siteBlinded", false), lowestEcpm);
+            config.getBoolean("rtbAdvertiserName.isWinFromClient"));
         return rtbAdNetwork;
       }
     }

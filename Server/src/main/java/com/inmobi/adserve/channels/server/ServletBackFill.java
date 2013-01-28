@@ -145,10 +145,6 @@ public class ServletBackFill implements Servlet {
     }
 
     logger.debug("Total channels available for sending requests " + rows.length);
-    hrh.responseSender.sasParams.lowestEcpm = getLowestEcpm(rows, logger);
-    if (logger.isDebugEnabled()) {
-      logger.debug("Lowest ecpm is " + hrh.responseSender.sasParams.lowestEcpm);
-    }
     segments = AsyncRequestMaker.prepareForAsyncRequest(rows, logger, ServletHandler.config, ServletHandler.rtbConfig,
         ServletHandler.adapterConfig, hrh.responseSender, advertiserSet, e, ServletHandler.repositoryHelper,
         hrh.jObject, hrh.responseSender.sasParams);
