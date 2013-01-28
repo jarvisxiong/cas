@@ -53,6 +53,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
   private int selectedAdIndex;
   private boolean requestCleaned;
   private ChannelSegment rtbResponse;
+  public CasInternalRequestParameters casInternalRequestParameters;
 
   public List<ChannelSegment> getRtbSegments() {
     return this.rtbSegments;
@@ -198,7 +199,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
       return null;
     } else if(rtbSegments.size() == 1) {
       rtbResponse = rtbSegments.get(0);
-      secondBidPrice = sasParams.siteFloor;
+      secondBidPrice = sasParams.siteFloor > casInternalRequestParameters.lowestEcpm ? sasParams.siteFloor : casInternalRequestParameters.lowestEcpm;
       return rtbSegments.get(0).adNetworkInterface;
     }
 

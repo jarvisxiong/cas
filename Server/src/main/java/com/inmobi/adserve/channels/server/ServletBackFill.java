@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.server;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -152,11 +153,16 @@ public class ServletBackFill implements Servlet {
     if(null != hrh.responseSender.sasParams.siteId) {
       logger.debug("SiteId is", hrh.responseSender.sasParams.siteId);
       SiteMetaDataEntity siteMetaDataEntity = ServletHandler.repositoryHelper.querySiteMetaDetaRepository(hrh.responseSender.sasParams.siteId);
-      if(null != siteMetaDataEntity)
+      if(null != siteMetaDataEntity) {
        casInternalRequestParameters.blockedCategories  = siteMetaDataEntity.getBlockedCategories();
-       logger.debug("Site id is", hrh.responseSender.sasParams.siteId, "and id is", siteMetaDataEntity.getId(),"no of blocked categories are", new Integer(siteMetaDataEntity.getBlockedCategories().length).toString());
+       logger.debug("Site id is", hrh.responseSender.sasParams.siteId, "and id is", siteMetaDataEntity.getEntityId(),"no of blocked categories are");
+      }
+      else
+        logger.debug("No blockedCategory for this site id");
     }
     
+    hrh.responseSender.casInternalRequestParameters = casInternalRequestParameters;
+
     logger.debug("Total channels available for sending requests " + rows.length);
     segments = AsyncRequestMaker.prepareForAsyncRequest(rows, logger, ServletHandler.config, ServletHandler.rtbConfig,
         ServletHandler.adapterConfig, hrh.responseSender, advertiserSet, e, ServletHandler.repositoryHelper,
