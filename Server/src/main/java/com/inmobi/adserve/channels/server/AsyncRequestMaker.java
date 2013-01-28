@@ -22,6 +22,7 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
+import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ClickUrlMaker.TrackingUrls;
 import com.inmobi.adserve.channels.util.DebugLogger;
@@ -33,12 +34,10 @@ public class AsyncRequestMaker {
 
   private static ClientBootstrap clientBootstrap;
   private static ClientBootstrap rtbClientBootstrap;
-  private static RepositoryHelper repositoryHelper;
 
   public static void init(ClientBootstrap clientBootstrap, ClientBootstrap rtbClientBootstrap) {
     AsyncRequestMaker.clientBootstrap = clientBootstrap;
     AsyncRequestMaker.rtbClientBootstrap = rtbClientBootstrap;
-    AsyncRequestMaker.repositoryHelper = repositoryHelper;
   }
 
   /**
@@ -55,8 +54,12 @@ public class AsyncRequestMaker {
 
     logger.debug("Total channels available for sending requests", rows.length + "");
 
-    if (null != sasParams.siteId)
-      sasParams.blockedCategories = repositoryHelper.querySiteMetaDetaRepository(sasParams.siteId).getBlockedCategories();
+    if(null != sasParams.siteId) {
+      logger.debug("SiteId is " + sasParams.siteId);
+      SiteMetaDataEntity siteMetaDataEntity = repositoryHelper.querySiteMetaDetaRepository(sasParams.siteId);
+      if(null != siteMetaDataEntity)
+        sasParams.blockedCategories = siteMetaDataEntity.getBlockedCategories();
+    }
     
     for (ChannelSegmentEntity row : rows) {
       boolean isRtbEnabled = false;
