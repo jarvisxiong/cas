@@ -214,8 +214,9 @@ public class AsyncRequestMaker {
     if(null == userIdMap && null != sasParams.uid)
       uidMap.put("U-ID", sasParams.uid);
     else {
-      while (userIdMap.keys().hasNext()) {
-        String key = (String) userIdMap.keys().next();
+      Iterator userMapIterator = userIdMap.keys();
+      while(userMapIterator.hasNext()) {
+        String key = (String)userMapIterator.next();
         String value = null;
         try {
           value = (String) userIdMap.get(key);
