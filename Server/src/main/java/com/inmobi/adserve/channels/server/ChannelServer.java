@@ -31,7 +31,6 @@ import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.LoggerFactory;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import com.inmobi.messaging.publisher.MessagePublisherFactory;
 import com.inmobi.phoenix.exception.InitializationException;
@@ -47,8 +46,10 @@ public class ChannelServer {
   private static final String configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
   private static String DATACENTERIDKEY = "dc.id";
   private static String HOSTNAMEKEY = "host.name";
+  private static String DATACENTRENAMEKEY ="dc.name";
   public static byte dataCenterIdCode;
   public static short hostIdCode;
+  public static String dataCentreName;
 
   public static void main(String[] args) throws Exception {
 
@@ -61,14 +62,15 @@ public class ChannelServer {
     // Setting up the logger factory and SlotSizeMapping for the project.
     DebugLogger.init(config.loggerConfiguration());
     SlotSizeMapping.init();
+    
+    logger = Logger.getLogger(config.loggerConfiguration().getString("debug"));
 
-    LoggerFactory.init(config.loggerConfiguration());
-    logger = LoggerFactory.getlogger();
     logger.info("Initializing logger completed");
     // parsing the data center id given in the vm parameters
     ChannelServerHelper channelServerHelper = new ChannelServerHelper(logger);
     dataCenterIdCode = channelServerHelper.getDataCenterId(DATACENTERIDKEY);
     hostIdCode = channelServerHelper.getHostId(HOSTNAMEKEY);
+    dataCentreName = channelServerHelper.getDataCentreName(DATACENTRENAMEKEY);
     // Initialising Internal logger factory for Netty
     InternalLoggerFactory.setDefaultFactory(new Log4JLoggerFactory());
 
@@ -111,8 +113,8 @@ public class ChannelServer {
     // Configure the netty server.
     try {
       // Initialising request handler
-      HttpRequestHandler.init(config, channelAdGroupRepository, clientBootstrap, rtbClientBootstrap, channelRepository,
-          channelFeedbackRepository, channelSegmentFeedbackRepository);
+      AsyncRequestMaker.init(clientBootstrap, rtbClientBootstrap);
+      ServletHandler.init(config, repositoryHelper);
       SegmentFactory.init(repositoryHelper);
       ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
       Timer timer = new HashedWheelTimer();
@@ -189,7 +191,7 @@ public class ChannelServer {
       channelFeedbackRepository.init(logger, config.cacheConfiguration().subset("ChannelFeedbackRepository"), "ChannelFeedbackRepository");
       channelSegmentFeedbackRepository.init(logger, config.cacheConfiguration().subset("ChannelSegmentFeedbackRepository"), "ChannelSegmentFeedbackRepository");
 
-      logger.debug("* * * * Instantiating repository completed * * * *");
+      logger.error("* * * * Instantiating repository completed * * * *");
     } catch (NamingException exception) {
       logger.error("failed to creatre binding for postgresql data source " + exception.getMessage());
       ServerStatusInfo.statusCode = 404;

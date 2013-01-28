@@ -96,7 +96,9 @@ public class SegmentFactoryTest extends TestCase {
     expect(adaptorConfig.getString("rtbAdvertiserName.rtbVer")).andReturn("2").anyTimes();
     expect(adaptorConfig.getBoolean("rtbAdvertiserName.isWnRequired")).andReturn(true).anyTimes();
     expect(adaptorConfig.getBoolean("rtbAdvertiserName.isWinFromClient")).andReturn(true).anyTimes();
-    expect(adaptorConfig.getString("rtbAdvertiserName.urlBase")).andReturn("http://localhost:10005").anyTimes();
+    expect(adaptorConfig.getString("rtbAdvertiserName.host.default", null)).andReturn("http://localhost:10005").anyTimes();
+    expect(adaptorConfig.getString("rtbAdvertiserName.host.null", "http://localhost:10005")).andReturn("http://localhost:10005").anyTimes();
+    expect(adaptorConfig.getString("rtbAdvertiserName.targetingParams")).andReturn(null).anyTimes();
     replay(adaptorConfig);
   }
   
@@ -128,13 +130,13 @@ public class SegmentFactoryTest extends TestCase {
     Configuration rtbConfig = createMock(Configuration.class);
     expect(rtbConfig.getBoolean("isRtbEnabled")).andReturn(true).anyTimes();
     replay(rtbConfig);
-    HttpRequestHandler.setRtbConfig(rtbConfig);
+    ServletHandler.rtbConfig = rtbConfig;
     SegmentFactory.setRepositoryHelper(repoHelper);
     AdNetworkInterface adNetworkInterface = SegmentFactory.getChannel("advertiserId", "channelTest", config.adapterConfiguration(), null, null, null, null,
-        null, logger, false);
+        null, logger, false, 0.0);
     assertEquals(null, adNetworkInterface);
     AdNetworkInterface adNetworkInterface2 = SegmentFactory.getChannel("advertiserId", "channelTest", adaptorConfig, null, null, null, null,
-        null, logger, true);
+        null, logger, true, 0.0);
     assertNotNull(adNetworkInterface2);
     assertEquals(true, adNetworkInterface2 instanceof RtbAdNetwork);
   }

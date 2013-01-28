@@ -92,7 +92,7 @@ public class ClickUrlMaker {
     adUrlSuffix.append(appendSeparator(twoPieceRm));
     adUrlSuffix.append(appendSeparator(config.getString("clickmaker.clickURLHashingSecretKeyVersion")));
 
-    String clickUrlHash = cryptoHashGenerator(adUrlSuffix.toString(), config.getString("clickmaker.key.2.type"), config.getString("clickmaker.key.2.value"));
+    String clickUrlHash = cryptoHashGenerator(adUrlSuffix.toString(), config.getString("clickmaker.key.1.type"), config.getString("clickmaker.key.1.value"));
     if(null == clickUrlHash)
       return null;
     adUrlSuffix.append(appendSeparator(clickUrlHash));

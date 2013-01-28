@@ -51,15 +51,14 @@ public class ServerTest extends TestCase {
   public void setUp() throws Exception {
     if(count == 0) {
       prepareLogging();
-      config = ConfigurationLoader.getInstance("target/channel-server.properties");
+      config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
       count++;
     }
     prepareConfig();
     DebugLogger.init(mockConfig);
     logger = new DebugLogger();
     InspectorStats.initializeWorkflow("WorkFlow");
-    HttpRequestHandler.init(config, (ChannelAdGroupRepository) null, (ClientBootstrap) null, (ClientBootstrap) null, null, null,
-        null);
+    ServletHandler.init(config, null);
     httpRequestHandler = new HttpRequestHandler();
     AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
     Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-channel", "cas-advertisement", mockConfig);
@@ -136,28 +135,28 @@ public class ServerTest extends TestCase {
 
   @Test
   public void testStringify() throws Exception {
-    httpRequestHandler.logger = new DebugLogger();
+    DebugLogger logger = new DebugLogger();
     JSONObject jsonObject = prepareParameters();
-    assertEquals(httpRequestHandler.stringify(jsonObject, "remoteHostIp"), "10.14.110.100");
+    assertEquals(RequestParser.stringify(jsonObject, "remoteHostIp", logger), "10.14.110.100");
   }
 
   @Test
   public void testResponseFormat() throws Exception {
-    assertEquals(httpRequestHandler.getResponseFormat(), "html");
+    assertEquals(httpRequestHandler.responseSender.getResponseFormat(), "html");
   }
 
   @Test
   public void testParseArray() throws Exception {
     JSONObject jsonObject = prepareParameters();
-    assertEquals(httpRequestHandler.parseArray(jsonObject, "testarr", 1), "2");
+    assertEquals(RequestParser.parseArray(jsonObject, "testarr", 1), "2");
   }
 
   @Test
   public void testGetUserParams() throws Exception {
     JSONObject jsonObject = prepareParameters();
     SASRequestParameters params = new SASRequestParameters();
-    httpRequestHandler.logger = new DebugLogger();
-    params = httpRequestHandler.getUserParams(params, jsonObject);
+    DebugLogger logger = new DebugLogger();
+    params = RequestParser.getUserParams(params, jsonObject, logger);
     assertEquals(params.age, "35");
   }
 
@@ -171,7 +170,8 @@ public class ServerTest extends TestCase {
   public void testGetCategory() throws Exception {
     JSONObject jsonObject = prepareParameters();
     long category[] = { 1, 2 };
-    assertTrue("Category are expected to be equal", Arrays.equals(httpRequestHandler.getCategory(jsonObject), category));
+    assertTrue("Category are expected to be equal",
+        Arrays.equals(RequestParser.getCategory(jsonObject, new DebugLogger()), category));
   }
 
   @Test

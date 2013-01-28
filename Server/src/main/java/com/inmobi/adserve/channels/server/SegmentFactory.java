@@ -1,6 +1,5 @@
 package com.inmobi.adserve.channels.server;
 
-import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
@@ -9,14 +8,15 @@ import org.jboss.netty.channel.MessageEvent;
 
 import com.inmobi.adserve.channels.adnetworks.atnt.ATNTAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.drawbridge.DrawBridgeAdNetwork;
-import com.inmobi.adserve.channels.adnetworks.generic.GenericAdapter;
 import com.inmobi.adserve.channels.adnetworks.httpool.DCPHttPoolAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.huntmads.DCPHuntmadsAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.ifc.IFCAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.ifd.IFDAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.lomark.DCPLomarkAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mobilecommerce.MobileCommerceAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mullahmedia.MullahMediaNetwork;
 import com.inmobi.adserve.channels.adnetworks.openx.OpenxAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.pubmatic.DCPPubmaticAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.siquis.DCPSiquisAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.tapit.DCPTapitAdNetwork;
@@ -25,11 +25,8 @@ import com.inmobi.adserve.channels.adnetworks.webmoblink.WebmobLinkAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.xad.DCPxAdAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.entity.ChannelEntity;
-import com.inmobi.adserve.channels.repository.ChannelRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.phoenix.exception.RepositoryException;
 
 public class SegmentFactory {
 
@@ -49,30 +46,22 @@ public class SegmentFactory {
 
   public static AdNetworkInterface getChannel(String advertiserId, String channelId, Configuration config, ClientBootstrap clientBootstrap,
       ClientBootstrap rtbClientBootstrap, HttpRequestHandlerBase base, MessageEvent serverEvent, Set<String> advertiserSet, DebugLogger logger,
-      boolean isRtbEnabled) {
-    ChannelEntity channelEntity = repositoryHelper.queryChannelRepository(channelId);
-    // once we have values in Db use the following declaration
-    // if(isRtbEnabled && channelEntity != null && channelEntity.isRtb()) {
+      boolean isRtbEnabled, double lowestEcpm) {
     if(isRtbEnabled) {
-      // following code will be enabled once we have entries in DB
       logger.debug("Creating RTB adapter instance for advertiser id : " + advertiserId);
-
-      // RtbAdNetwork rtbAdNetwork = new RtbAdNetwork(logger, config,
-      // rtbClientBootstrap, base, serverEvent, channelEntity.getUrlBase(),
-      // channelEntity.getUrlArg(), channelEntity.getRtbMethod(),
-      // channelEntity.getRtbVer(), channelEntity.getWnUrl(),
-      // channelEntity.getAccountId(), channelEntity.isWnRequied(),
-      // channelEntity.isWnFromClient());
-      // return rtbAdNetwork;
-      //
-
       if((advertiserId.equalsIgnoreCase(config.getString("rtbAdvertiserName.advertiserId")))
           && (null == advertiserSet || advertiserSet.isEmpty() || advertiserSet.contains("rtbAdvertiserName"))
-          && (config.getString("rtbAdvertiserName.status").equalsIgnoreCase("on"))) {
-        RtbAdNetwork rtbAdNetwork = new RtbAdNetwork(logger, config, rtbClientBootstrap, base, serverEvent, config.getString("rtbAdvertiserName.urlBase"),
-            config.getString("rtbAdvertiserName.urlArg"), config.getString("rtbAdvertiserName.rtbMethod"), config.getString("rtbAdvertiserName.rtbVer"),
-            config.getString("rtbAdvertiserName.wnUrlback"), config.getString("rtbAdvertiserName.accountId"),
-            config.getBoolean("rtbAdvertiserName.isWnRequired"), config.getBoolean("rtbAdvertiserName.isWinFromClient"));
+          && (config.getString("rtbAdvertiserName.status").equalsIgnoreCase("on") && config.getBoolean("rtbAdvertiserName.isRtb", false) == true)) {
+        String urlBase = config.getString("rtbAdvertiserName.host." + ChannelServer.dataCentreName, config.getString("rtbAdvertiserName.host.default", null));
+        if (null == urlBase) {
+          logger.debug("Default urlBase is not defined in config so returning null");
+          return null;
+        }
+        RtbAdNetwork rtbAdNetwork = new RtbAdNetwork(logger, config, rtbClientBootstrap, base, serverEvent, urlBase,
+            config.getString("rtbAdvertiserName.urlArg"), config.getString("rtbAdvertiserName.rtbMethod"),
+            config.getString("rtbAdvertiserName.rtbVer"), config.getString("rtbAdvertiserName.wnUrlback"),
+            config.getString("rtbAdvertiserName.accountId"), config.getBoolean("rtbAdvertiserName.isWnRequired"),
+            config.getBoolean("rtbAdvertiserName.isWinFromClient"));
         return rtbAdNetwork;
       }
     }
@@ -119,29 +108,13 @@ public class SegmentFactory {
     } else if((advertiserId.equals(config.getString("verve.advertiserId"))) && (advertiserSet.isEmpty() || advertiserSet.contains("verve"))
         && (config.getString("verve.status").equals("on"))) {
       return new DCPVerveAdNetwork(logger, config, clientBootstrap, base, serverEvent);
+    } else if((advertiserId.equals(config.getString("lomark.advertiserId"))) && (advertiserSet.isEmpty() || advertiserSet.contains("lomark"))
+        && (config.getString("lomark.status").equals("on"))) {
+      return new DCPLomarkAdNetwork(logger, config, clientBootstrap, base, serverEvent);
+    } else if((advertiserId.equals(config.getString("pubmatic.advertiserId"))) && (advertiserSet.isEmpty() || advertiserSet.contains("pubmatic"))
+            && (config.getString("pubmatic.status").equals("on"))) {
+        return new DCPPubmaticAdNetwork(logger, config, clientBootstrap, base, serverEvent);
     }
-
-    // else {
-    // logger.debug("going in generic adapter for advId" + advertiserId);
-    // String advertiserName = "";
-    // Iterator itr = config.getKeys();
-    // while (itr.hasNext()) {
-    // String key = itr.next().toString();
-    // if(config.getString(key).equals(advertiserId) &&
-    // key.endsWith(".advertiserId")) {
-    // advertiserName = key.replace(".advertiserId", "");
-    // break;
-    // }
-    // }
-    // if(!advertiserName.equals("") && config.getString(advertiserName +
-    // ".status").equals("on")
-    // && (advertiserSet.isEmpty() || advertiserSet.contains(advertiserName))) {
-    // return new GenericAdapter(logger, config, clientBootstrap, base,
-    // serverEvent, advertiserName);
-    // }
-    // }
-    // logger.debug("no genric adapter");
-
     return null;
   }
 }

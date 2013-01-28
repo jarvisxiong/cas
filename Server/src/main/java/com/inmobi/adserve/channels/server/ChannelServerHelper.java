@@ -50,4 +50,8 @@ public class ChannelServerHelper {
       logger.debug("hostid is " + hostId);
     return hostId;
   }
+  
+  public String getDataCentreName(String key) {
+    return System.getProperty(key);
+  }
 }
