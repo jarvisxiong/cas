@@ -24,6 +24,7 @@ import com.inmobi.adserve.channels.adnetworks.verve.DCPVerveAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.webmoblink.WebmobLinkAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.xad.DCPxAdAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.DebugLogger;
@@ -46,7 +47,7 @@ public class SegmentFactory {
 
   public static AdNetworkInterface getChannel(String advertiserId, String channelId, Configuration config, ClientBootstrap clientBootstrap,
       ClientBootstrap rtbClientBootstrap, HttpRequestHandlerBase base, MessageEvent serverEvent, Set<String> advertiserSet, DebugLogger logger,
-      boolean isRtbEnabled, double lowestEcpm) {
+      boolean isRtbEnabled, CasInternalRequestParameters casInternalRequestParameters) {
     if(isRtbEnabled) {
       logger.debug("Creating RTB adapter instance for advertiser id : " + advertiserId);
       if((advertiserId.equalsIgnoreCase(config.getString("rtbAdvertiserName.advertiserId")))
@@ -61,7 +62,7 @@ public class SegmentFactory {
             config.getString("rtbAdvertiserName.urlArg"), config.getString("rtbAdvertiserName.rtbMethod"),
             config.getString("rtbAdvertiserName.rtbVer"), config.getString("rtbAdvertiserName.wnUrlback"),
             config.getString("rtbAdvertiserName.accountId"), config.getBoolean("rtbAdvertiserName.isWnRequired"),
-            config.getBoolean("rtbAdvertiserName.isWinFromClient"));
+            config.getBoolean("rtbAdvertiserName.isWinFromClient"), config.getBoolean("siteBlinded"), casInternalRequestParameters);
         return rtbAdNetwork;
       }
     }

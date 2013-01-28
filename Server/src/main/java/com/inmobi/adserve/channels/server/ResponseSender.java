@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.ChannelsClientHandler;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;

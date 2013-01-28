@@ -12,8 +12,10 @@ import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -143,11 +145,22 @@ public class ServletBackFill implements Servlet {
         advertiserSet.add(advertiserList[i]);
       }
     }
-
+    CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+    casInternalRequestParameters.lowestEcpm = getLowestEcpm(rows, logger);
+    logger.debug("Lowest Ecpm is", new Double(casInternalRequestParameters.lowestEcpm).toString());
+    
+    if(null != hrh.responseSender.sasParams.siteId) {
+      logger.debug("SiteId is", hrh.responseSender.sasParams.siteId);
+      SiteMetaDataEntity siteMetaDataEntity = ServletHandler.repositoryHelper.querySiteMetaDetaRepository(hrh.responseSender.sasParams.siteId);
+      if(null != siteMetaDataEntity)
+       casInternalRequestParameters.blockedCategories  = siteMetaDataEntity.getBlockedCategories();
+       logger.debug("Site id is", hrh.responseSender.sasParams.siteId, "and id is", siteMetaDataEntity.getId(),"no of blocked categories are", new Integer(siteMetaDataEntity.getBlockedCategories().length).toString());
+    }
+    
     logger.debug("Total channels available for sending requests " + rows.length);
     segments = AsyncRequestMaker.prepareForAsyncRequest(rows, logger, ServletHandler.config, ServletHandler.rtbConfig,
         ServletHandler.adapterConfig, hrh.responseSender, advertiserSet, e, ServletHandler.repositoryHelper,
-        hrh.jObject, hrh.responseSender.sasParams);
+        hrh.jObject, hrh.responseSender.sasParams, casInternalRequestParameters);
 
     if(segments.isEmpty()) {
       logger.debug("No succesfull configuration of adapter ");

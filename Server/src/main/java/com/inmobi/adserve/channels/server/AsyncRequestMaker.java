@@ -17,6 +17,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
@@ -47,27 +48,20 @@ public class AsyncRequestMaker {
   public static List<ChannelSegment> prepareForAsyncRequest(ChannelSegmentEntity[] rows, DebugLogger logger,
       Configuration config, Configuration rtbConfig, Configuration adapterConfig, HttpRequestHandlerBase base,
       Set<String> advertiserSet, MessageEvent e, RepositoryHelper repositoryHelper, JSONObject jObject,
-      SASRequestParameters sasParams) throws Exception {
+      SASRequestParameters sasParams, CasInternalRequestParameters casInternalRequestParameters) throws Exception {
 
     List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
     List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
     logger.debug("Total channels available for sending requests", rows.length + "");
-
-    if(null != sasParams.siteId) {
-      logger.debug("SiteId is " + sasParams.siteId);
-      SiteMetaDataEntity siteMetaDataEntity = repositoryHelper.querySiteMetaDetaRepository(sasParams.siteId);
-      if(null != siteMetaDataEntity)
-        sasParams.blockedCategories = siteMetaDataEntity.getBlockedCategories();
-    }
-    
+   
     for (ChannelSegmentEntity row : rows) {
       boolean isRtbEnabled = false;
       isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled", false);
       logger.debug("isRtbEnabled is " + isRtbEnabled);
 
       AdNetworkInterface network = SegmentFactory.getChannel(row.getId(), row.getChannelId(), adapterConfig,
-          clientBootstrap, rtbClientBootstrap, base, e, advertiserSet, logger, isRtbEnabled, 0.0);
+          clientBootstrap, rtbClientBootstrap, base, e, advertiserSet, logger, isRtbEnabled, casInternalRequestParameters);
       if(null == network) {
         logger.debug("No adapter found for adGroup:", row.getAdgroupId());
         continue;
