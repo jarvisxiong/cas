@@ -75,6 +75,12 @@ public class RequestParser {
         : (Boolean) (jObject.opt("site-allowBanner"));
     params.siteFloor = jObject.opt("site-floor") == null ? 0.0 : Double.parseDouble(jObject.opt("site-floor")
         .toString());
+    try {
+      params.siteSegmentId = jObject.getInt("sel-seg-id");
+      logger.debug("Site segment id is " + params.siteSegmentId);
+    } catch (JSONException e) {
+     logger.debug("Site segment id is not present in the request");
+    }
     if(logger.isDebugEnabled()) {
       logger.debug("country obtained is " + params.country);
       logger.debug("site floor is " + params.siteFloor);
