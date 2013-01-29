@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 import com.inmobi.adserve.channels.entity.*;
 import com.inmobi.adserve.channels.util.DebugLogger;
@@ -38,6 +39,7 @@ public class Filters {
   public static HashMap<String, String> advertiserIdtoNameMapping = new HashMap<String, String>();
   public static HashMap<String, HashSet<String>> whiteListedSites = new HashMap<String, HashSet<String>>();
   public static long lastRefresh;
+  public static Random random;
 
   // To boost ecpm of a parnter to meet the impression floor
 
@@ -60,6 +62,7 @@ public class Filters {
     }
 
     lastRefresh = System.currentTimeMillis();
+    random = new Random(100);
   }
 
   public static ChannelSegmentEntity[] filter(HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments,
@@ -158,7 +161,7 @@ public class Filters {
       }
 
       if(whiteListedSites.containsKey(advertiserId) && !whiteListedSites.get(advertiserId).isEmpty()
-          && !whiteListedSites.get(advertiserId).contains(siteId)) {
+          && !whiteListedSites.get(advertiserId).contains(siteId) && random.nextInt() > 94) {
         InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
             InspectorStrings.droppedInSiteInclusionExclusionFilter);
         continue;
