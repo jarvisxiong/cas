@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -103,6 +104,9 @@ public class ChannelServer {
     Filters.init(config.adapterConfiguration(), repositoryHelper);
 
     // Creating netty client for out-bound calls.
+    Timer timer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
+    BootstrapCreation.init(timer);
+    RtbBootstrapCreation.init(timer);
     ClientBootstrap clientBootstrap = BootstrapCreation.createBootstrap(logger, config.serverConfiguration());
     ClientBootstrap rtbClientBootstrap = RtbBootstrapCreation.createBootstrap(logger, config.rtbConfiguration());
     if(null == clientBootstrap) {
@@ -121,8 +125,8 @@ public class ChannelServer {
       ServletHandler.init(config, repositoryHelper);
       SegmentFactory.init(repositoryHelper);
       ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
-      Timer timer = new HashedWheelTimer();
-      bootstrap.setPipelineFactory(new ChannelServerPipelineFactory(timer, config.serverConfiguration()));
+      Timer servertimer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
+      bootstrap.setPipelineFactory(new ChannelServerPipelineFactory(servertimer, config.serverConfiguration()));
       bootstrap.setOption("child.keepAlive", true);
       bootstrap.setOption("child.tcpNoDelay", true);
       bootstrap.setOption("child.reuseAddress", true);
