@@ -52,7 +52,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
   private int rankIndexToProcess;
   private int selectedAdIndex;
   private boolean requestCleaned;
-  private ChannelSegment rtbResponse;
+  public ChannelSegment rtbResponse;
   public CasInternalRequestParameters casInternalRequestParameters;
 
   public List<ChannelSegment> getRtbSegments() {
