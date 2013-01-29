@@ -46,8 +46,10 @@ public class ChannelServer {
   private static final String configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
   private static String DATACENTERIDKEY = "dc.id";
   private static String HOSTNAMEKEY = "host.name";
+  private static String DATACENTRENAMEKEY ="dc.name";
   public static byte dataCenterIdCode;
   public static short hostIdCode;
+  public static String dataCentreName;
 
   public static void main(String[] args) throws Exception {
 
@@ -68,6 +70,7 @@ public class ChannelServer {
     ChannelServerHelper channelServerHelper = new ChannelServerHelper(logger);
     dataCenterIdCode = channelServerHelper.getDataCenterId(DATACENTERIDKEY);
     hostIdCode = channelServerHelper.getHostId(HOSTNAMEKEY);
+    dataCentreName = channelServerHelper.getDataCentreName(DATACENTRENAMEKEY);
     // Initialising Internal logger factory for Netty
     InternalLoggerFactory.setDefaultFactory(new Log4JLoggerFactory());
 

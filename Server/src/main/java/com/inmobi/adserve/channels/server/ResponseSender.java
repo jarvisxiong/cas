@@ -179,16 +179,25 @@ public class ResponseSender extends HttpRequestHandlerBase {
   public double getSecondBidPrice() {
     return secondBidPrice;
   }
-
+  
+  /***
+   * RunRtbSecondPriceAuctionEngine returns the adnetwork selected after
+   * auctioning If no of rtb segments selected after filtering is zero it
+   * returns the null If no of rtb segments selected after filtering is one it
+   * returns the rtb adapter for the segment BidFloor is maximum of lowestEcpm
+   * and siteFloor If only 2 rtb are selected, highest bid will win and would be
+   * charged the secondHighest price If only 1 rtb is selected, it will be
+   * selected for sending response and will be charged the highest of
+   * secondHighest price or 90% of bidFloor
+   */
   @Override
   public AdNetworkInterface runRtbSecondPriceAuctionEngine() {
-
     if(rtbSegments.size() == 0) {
       rtbResponse = null;
       return null;
     } else if(rtbSegments.size() == 1) {
       rtbResponse = rtbSegments.get(0);
-      secondBidPrice = bidFloor;
+      secondBidPrice = sasParams.siteFloor;
       return rtbSegments.get(0).adNetworkInterface;
     }
 

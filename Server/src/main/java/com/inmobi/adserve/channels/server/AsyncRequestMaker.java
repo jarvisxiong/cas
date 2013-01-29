@@ -58,7 +58,7 @@ public class AsyncRequestMaker {
       logger.debug("isRtbEnabled is " + isRtbEnabled);
 
       AdNetworkInterface network = SegmentFactory.getChannel(row.getId(), row.getChannelId(), adapterConfig,
-          clientBootstrap, rtbClientBootstrap, base, e, advertiserSet, logger, isRtbEnabled);
+          clientBootstrap, rtbClientBootstrap, base, e, advertiserSet, logger, isRtbEnabled, 0.0);
       if(null == network) {
         logger.debug("No adapter found for adGroup:", row.getAdgroupId());
         continue;
@@ -75,7 +75,6 @@ public class AsyncRequestMaker {
       String beaconUrl = null;
       sasParams.impressionId = getImpressionId(row.getIncId());
       sasParams.adIncId = row.getIncId();
-      sasParams.segmentCategories = row.getTags();
       logger.debug("impression id is " + sasParams.impressionId);
 
       if((network.isClickUrlRequired() || network.isBeaconUrlRequired()) && null != sasParams.impressionId) {
@@ -212,8 +211,9 @@ public class AsyncRequestMaker {
     if(null == userIdMap && null != sasParams.uid)
       uidMap.put("U-ID", sasParams.uid);
     else {
-      while (userIdMap.keys().hasNext()) {
-        String key = (String) userIdMap.keys().next();
+      Iterator userMapIterator = userIdMap.keys();
+      while(userMapIterator.hasNext()) {
+        String key = (String)userMapIterator.next();
         String value = null;
         try {
           value = (String) userIdMap.get(key);
