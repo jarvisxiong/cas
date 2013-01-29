@@ -77,7 +77,7 @@ public class RequestParser {
         .toString());
     try {
       params.siteSegmentId = jObject.getInt("sel-seg-id");
-      logger.debug("Site segment id is " + params.siteSegmentId);
+      logger.debug("Site segment id is", params.siteSegmentId.toString());
     } catch (JSONException e) {
      logger.debug("Site segment id is not present in the request");
     }
