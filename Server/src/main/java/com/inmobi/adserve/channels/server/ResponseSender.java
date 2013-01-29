@@ -6,6 +6,7 @@ import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 import java.awt.Dimension;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
@@ -194,6 +195,12 @@ public class ResponseSender extends HttpRequestHandlerBase {
    */
   @Override
   public AdNetworkInterface runRtbSecondPriceAuctionEngine() {
+    List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
+    for (int i=0; i < this.rtbSegments.size() ; i++) {
+      if (this.rtbSegments.get(0).adNetworkInterface.getAdStatus().equalsIgnoreCase("AD")) {
+        rtbSegments.add(this.rtbSegments.get(i));
+      }
+    }
     if(rtbSegments.size() == 0) {
       rtbResponse = null;
       return null;

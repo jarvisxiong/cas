@@ -167,7 +167,6 @@ public class ServletBackFill implements Servlet {
 
     logger.debug("Total channels available for sending requests " + rows.length);
     List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
-    long startTime = System.currentTimeMillis();
     segments = AsyncRequestMaker.prepareForAsyncRequest(rows, logger, ServletHandler.config, ServletHandler.rtbConfig,
         ServletHandler.adapterConfig, hrh.responseSender, advertiserSet, e, ServletHandler.repositoryHelper,
         hrh.jObject, hrh.responseSender.sasParams, casInternalRequestParameters, rtbSegments);
@@ -202,24 +201,31 @@ public class ServletBackFill implements Servlet {
       return;
     }
 
-    // Resetting the rankIndexToProcess for already completed adapters.
-    int rankIndexToProcess = hrh.responseSender.getRankIndexToProcess();
-    ChannelSegment segment = hrh.responseSender.getRankList().get(rankIndexToProcess);
-    while (segment.adNetworkInterface.isRequestCompleted()) {
-      if(segment.adNetworkInterface.getResponseAd().responseStatus == ResponseStatus.SUCCESS) {
-        hrh.responseSender.sendAdResponse(segment.adNetworkInterface, e);
-        break;
+    if (hrh.responseSender.isAllRtbComplete()) {
+      AdNetworkInterface adNetworkInterface = hrh.responseSender.runRtbSecondPriceAuctionEngine();
+      if(null != adNetworkInterface) {
+        hrh.responseSender.sendAdResponse(adNetworkInterface, e);
+        return;
       }
-      rankIndexToProcess++;
-      if(rankIndexToProcess >= hrh.responseSender.getRankList().size()) {
-        hrh.responseSender.sendNoAdResponse(e);
-        break;
+      // Resetting the rankIndexToProcess for already completed adapters.
+      int rankIndexToProcess = hrh.responseSender.getRankIndexToProcess();
+      ChannelSegment segment = hrh.responseSender.getRankList().get(rankIndexToProcess);
+      while (segment.adNetworkInterface.isRequestCompleted()) {
+        if(segment.adNetworkInterface.getResponseAd().responseStatus == ResponseStatus.SUCCESS) {
+          hrh.responseSender.sendAdResponse(segment.adNetworkInterface, e);
+          break;
+        }
+        rankIndexToProcess++;
+        if(rankIndexToProcess >= hrh.responseSender.getRankList().size()) {
+          hrh.responseSender.sendNoAdResponse(e);
+          break;
+        }
+        segment = hrh.responseSender.getRankList().get(rankIndexToProcess);
       }
-      segment = hrh.responseSender.getRankList().get(rankIndexToProcess);
-    }
-    hrh.responseSender.setRankIndexToProcess(rankIndexToProcess);
-    if(logger.isDebugEnabled()) {
-      logger.debug("retunrd from send Response, ranklist size is " + hrh.responseSender.getRankList().size());
+      hrh.responseSender.setRankIndexToProcess(rankIndexToProcess);
+      if(logger.isDebugEnabled()) {
+        logger.debug("retunrd from send Response, ranklist size is " + hrh.responseSender.getRankList().size());
+      }
     }
   }
 
