@@ -161,7 +161,7 @@ public class Filters {
       }
 
       if(whiteListedSites.containsKey(advertiserId) && !whiteListedSites.get(advertiserId).isEmpty()
-          && !whiteListedSites.get(advertiserId).contains(siteId) && random.nextInt() > 94) {
+          && !whiteListedSites.get(advertiserId).contains(siteId) && random.nextInt() < 95) {
         InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
             InspectorStrings.droppedInSiteInclusionExclusionFilter);
         continue;
