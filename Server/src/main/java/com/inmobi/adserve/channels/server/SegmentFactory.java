@@ -53,7 +53,13 @@ public class SegmentFactory {
       if((advertiserId.equalsIgnoreCase(config.getString("rtbAdvertiserName.advertiserId")))
           && (null == advertiserSet || advertiserSet.isEmpty() || advertiserSet.contains("rtbAdvertiserName"))
           && (config.getString("rtbAdvertiserName.status").equalsIgnoreCase("on") && config.getBoolean("rtbAdvertiserName.isRtb", false) == true)) {
-        String urlBase = config.getString("rtbAdvertiserName.host." + ChannelServer.dataCentreName, config.getString("rtbAdvertiserName.host.default", null));
+        String urlBase = config.getString("rtbAdvertiserName.host." + ChannelServer.dataCentreName);
+        if(urlBase.equalsIgnoreCase("NA")) {
+          logger.debug("RTB requests are disabled for", ChannelServer.dataCentreName.toString(), "colo so returning null");
+          return null;
+        } else {
+          urlBase = config.getString("rtbAdvertiserName.host.default", null);
+        }
         if (null == urlBase) {
           logger.debug("Default urlBase is not defined in config so returning null");
           return null;
