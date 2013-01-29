@@ -155,8 +155,8 @@ public class ServletBackFill implements Servlet {
       logger.debug("SiteId is", hrh.responseSender.sasParams.siteId);
       SiteMetaDataEntity siteMetaDataEntity = ServletHandler.repositoryHelper
           .querySiteMetaDetaRepository(hrh.responseSender.sasParams.siteId);
-      if(null != siteMetaDataEntity) {
-        casInternalRequestParameters.blockedCategories = siteMetaDataEntity.getBlockedCategories();
+      if(null != siteMetaDataEntity && siteMetaDataEntity.getBlockedCategories() != null) {
+        casInternalRequestParameters.blockedCategories = Arrays.asList(siteMetaDataEntity.getBlockedCategories());
         logger.debug("Site id is", hrh.responseSender.sasParams.siteId, "and id is", siteMetaDataEntity.getEntityId(),
             "no of blocked categories are");
       } else

@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.hadoop.hdfs.server.namenode.status_jsp;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 import org.json.JSONException;
@@ -23,7 +22,6 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
-import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ClickUrlMaker.TrackingUrls;
 import com.inmobi.adserve.channels.util.DebugLogger;
@@ -55,7 +53,7 @@ public class AsyncRequestMaker {
     logger.debug("Total channels available for sending requests", rows.length + "");
     boolean isRtbEnabled = false;
     isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled", false);
-    logger.debug("isRtbEnabled is " + isRtbEnabled);
+    logger.debug("isRtbEnabled is", new Boolean(isRtbEnabled).toString());
    
     for (ChannelSegmentEntity row : rows) {
       AdNetworkInterface network = SegmentFactory.getChannel(row.getId(), row.getChannelId(), adapterConfig,

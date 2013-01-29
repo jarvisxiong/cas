@@ -61,7 +61,7 @@ public class RequestParserTest extends TestCase {
     assertEquals(sasRequestParameters.slot, "9");
     assertEquals(sasRequestParameters.rFormat, "xhtml");
     assertEquals(sasRequestParameters.allowBannerAds, new Boolean(true));
-    assertEquals(Arrays.toString(sasRequestParameters.categories), "[13, 8, 19, 4, 17, 16, 14, 3, 11, 29, 23]");
+    assertEquals(sasRequestParameters.categories.toString(), "[13, 8, 19, 4, 17, 16, 14, 3, 11, 29, 23]");
     assertEquals(sasRequestParameters.source, "APP");
     assertEquals(sasRequestParameters.adcode, "NON-JS");
     assertEquals(sasRequestParameters.sdkVersion, "i357");
