@@ -145,12 +145,15 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
       } else {
         Logging.channelLogline(list, responseSender.getAdResponse().clickUrl, logger, ServletHandler.loggerConfig,
             responseSender.sasParams, totalTime);
-        if(responseSender.getRtbResponse() == null)
+        if(responseSender.getRtbResponse() == null) {
+          logger.debug("rtb response is null so logging dcp response in rr");
           Logging.rrLogging(responseSender.getRankList().get(responseSender.getSelectedAdIndex()), logger,
               ServletHandler.loggerConfig, responseSender.sasParams, terminationReason);
-        else
+        } else {
+          logger.debug("rtb response is not null so logging rtb response in rr");
           Logging.rrLogging(responseSender.getRtbResponse(), logger, ServletHandler.loggerConfig,
               responseSender.sasParams, terminationReason);
+        }
         Logging.advertiserLogging(list, logger, ServletHandler.loggerConfig);
         Logging.sampledAdvertiserLogging(list, logger, ServletHandler.loggerConfig);
       }

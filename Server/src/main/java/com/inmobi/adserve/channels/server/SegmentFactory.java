@@ -49,12 +49,11 @@ public class SegmentFactory {
       ClientBootstrap rtbClientBootstrap, HttpRequestHandlerBase base, MessageEvent serverEvent, Set<String> advertiserSet, DebugLogger logger,
       boolean isRtbEnabled, CasInternalRequestParameters casInternalRequestParameters) {
     if(isRtbEnabled) {
-      logger.debug("Creating RTB adapter instance for advertiser id : " + advertiserId);
       if((advertiserId.equalsIgnoreCase(config.getString("rtbAdvertiserName.advertiserId")))
           && (null == advertiserSet || advertiserSet.isEmpty() || advertiserSet.contains("rtbAdvertiserName"))
           && (config.getString("rtbAdvertiserName.status").equalsIgnoreCase("on") && config.getBoolean("rtbAdvertiserName.isRtb", false) == true)) {
         String urlBase = config.getString("rtbAdvertiserName.host." + ChannelServer.dataCentreName);
-        if(urlBase.equalsIgnoreCase("NA")) {
+        if(urlBase != null && urlBase.equalsIgnoreCase("NA")) {
           logger.debug("RTB requests are disabled for", ChannelServer.dataCentreName.toString(), "colo so returning null");
           return null;
         } else {
@@ -67,8 +66,9 @@ public class SegmentFactory {
         RtbAdNetwork rtbAdNetwork = new RtbAdNetwork(logger, config, rtbClientBootstrap, base, serverEvent, urlBase,
             config.getString("rtbAdvertiserName.urlArg"), config.getString("rtbAdvertiserName.rtbMethod"),
             config.getString("rtbAdvertiserName.rtbVer"), config.getString("rtbAdvertiserName.wnUrlback"),
-            config.getString("rtbAdvertiserName.accountId"), config.getBoolean("rtbAdvertiserName.isWnRequired"),
+            config.getString("rtbAdvertiserName.advertiserId"), config.getBoolean("rtbAdvertiserName.isWnRequired"),
             config.getBoolean("rtbAdvertiserName.isWinFromClient"), config.getBoolean("rtbAdvertiserName.siteBlinded"), casInternalRequestParameters);
+        logger.debug("Created RTB adapter instance for advertiser id : " + advertiserId);
         return rtbAdNetwork;
       }
     }
