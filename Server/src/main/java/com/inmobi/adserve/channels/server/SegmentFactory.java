@@ -63,11 +63,7 @@ public class SegmentFactory {
           logger.debug("Default urlBase is not defined in config so returning null");
           return null;
         }
-        RtbAdNetwork rtbAdNetwork = new RtbAdNetwork(logger, config, rtbClientBootstrap, base, serverEvent, urlBase,
-            config.getString("rtbAdvertiserName.urlArg"), config.getString("rtbAdvertiserName.rtbMethod"),
-            config.getString("rtbAdvertiserName.rtbVer"), config.getString("rtbAdvertiserName.wnUrlback"),
-            config.getString("rtbAdvertiserName.advertiserId"), config.getBoolean("rtbAdvertiserName.isWnRequired"),
-            config.getBoolean("rtbAdvertiserName.isWinFromClient"), config.getBoolean("rtbAdvertiserName.siteBlinded"), casInternalRequestParameters);
+        RtbAdNetwork rtbAdNetwork = new RtbAdNetwork(logger, config, rtbClientBootstrap, base, serverEvent, urlBase, "rtbAdvertiserName", casInternalRequestParameters);
         logger.debug("Created RTB adapter instance for advertiser id : " + advertiserId);
         return rtbAdNetwork;
       }
