@@ -447,7 +447,7 @@ public class Filters {
 
   public synchronized static void refreshWhiteListedSites(Configuration adapterConfiguration) {
 
-    if(System.currentTimeMillis() - lastRefresh < adapterConfiguration.getInt("whiteListedSitesRefreshtime", 30000))
+    if(System.currentTimeMillis() - lastRefresh < adapterConfiguration.getInt("whiteListedSitesRefreshtime", 300000))
       return;
 
     Iterator<String> itr = adapterConfiguration.getKeys();
