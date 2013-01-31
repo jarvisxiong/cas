@@ -81,9 +81,9 @@ public class FilterTest extends TestCase {
     expect(mockAdapterConfig.getInt("openx.partnerSegmentNo",2)).andReturn(2).anyTimes();
     expect(mockAdapterConfig.getInt("atnt.partnerSegmentNo",2)).andReturn(2).anyTimes();
     expect(mockAdapterConfig.getInt("tapit.partnerSegmentNo",2)).andReturn(2).anyTimes();
-    expect(mockAdapterConfig.getString("openx.whiteListedSites")).andReturn("null").anyTimes();
-    expect(mockAdapterConfig.getString("atnt.whiteListedSites")).andReturn("null").anyTimes();
-    expect(mockAdapterConfig.getString("tapit.whiteListedSites")).andReturn("null").anyTimes();
+    expect(mockAdapterConfig.getString("openx.whiteListedSites")).andReturn("").anyTimes();
+    expect(mockAdapterConfig.getString("atnt.whiteListedSites")).andReturn("").anyTimes();
+    expect(mockAdapterConfig.getString("tapit.whiteListedSites")).andReturn("").anyTimes();
     replay(mockAdapterConfig);
 
     expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
@@ -277,9 +277,16 @@ public class FilterTest extends TestCase {
      * " AdgroupId " + channelSegment.channelSegmentFeedbackEntity.getId() +
      * " ecpm " + channelSegment.channelSegmentFeedbackEntity.geteCPM() +
      * " Pecpm " +
-     * channelSegment.channelSegmentFeedbackEntity.getPrioritisedECPM() +
+     * channelSegment.channelSegmentFeedbackEntity.getPrioritirefreshWhiteListedSitessedECPM() +
      * " Low priority range " + channelSegment.lowerPriorityRange +
      * " high priority range " + channelSegment.higherPriorityRange); }
      */
+  }
+  
+  @Test
+  public void testSiteWhiteListingLoading() {
+    assertEquals(false, Filters.whiteListedSites.containsKey("advertiserId1")); 
+    assertEquals(false, Filters.whiteListedSites.containsKey("advertiserId2")); 
+    assertEquals(true, Filters.whiteListedSites.containsKey("advertiserId3")); 
   }
 }

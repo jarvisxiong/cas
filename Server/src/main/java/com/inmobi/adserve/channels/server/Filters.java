@@ -55,9 +55,10 @@ public class Filters {
 
         String sites = adapterConfiguration.getString(str.replace(".advertiserId", ".whiteListedSites"));
         HashSet<String> siteSet = new HashSet<String>();
-        if(sites != null && !sites.isEmpty())
+        if(sites != null && !sites.isEmpty()) {
           siteSet.addAll(Arrays.asList(sites.split(",")));
-        whiteListedSites.put(adapterConfiguration.getString(str), siteSet);
+          whiteListedSites.put(adapterConfiguration.getString(str), siteSet);
+        }
       }
     }
 
@@ -69,10 +70,7 @@ public class Filters {
       DebugLogger logger, Double siteFloor, Configuration serverConfiguration, Configuration adapterConfiguration,
       String siteId) {
 
-    if(System.currentTimeMillis() - lastRefresh > ServletHandler.config.getInt("whiteListedSitesRefreshtime", 300000)) {
-      refreshWhiteListedSites();
-      lastRefresh = System.currentTimeMillis();
-    }
+    refreshWhiteListedSites(adapterConfiguration);
 
     return segmentsPerRequestFilter(
         matchedSegments,
@@ -447,18 +445,29 @@ public class Filters {
     return newRankList;
   }
 
-  public static void refreshWhiteListedSites() {
-    Iterator<String> itr = ServletHandler.adapterConfig.getKeys();
+  public synchronized static void refreshWhiteListedSites(Configuration adapterConfiguration) {
+
+    if(System.currentTimeMillis() - lastRefresh < adapterConfiguration.getInt("whiteListedSitesRefreshtime", 30000))
+      return;
+
+    Iterator<String> itr = adapterConfiguration.getKeys();
     while (null != itr && itr.hasNext()) {
+
       String str = itr.next();
       if(str.endsWith(".advertiserId")) {
-        String sites = ServletHandler.adapterConfig.getString(str.replace(".advertiserId", ".whiteListedSites"));
+        String sites = adapterConfiguration.getString(str.replace(".advertiserId", ".whiteListedSites"));
         HashSet<String> siteSet = new HashSet<String>();
-        if(sites != null)
-          siteSet.addAll(Arrays.asList(sites.split(",")));
-        whiteListedSites.put(ServletHandler.adapterConfig.getString(str), siteSet);
+        if(sites != null) {
+          if(sites.isEmpty()) {
+            whiteListedSites.remove(adapterConfiguration.getString(str));
+          } else {
+            siteSet.addAll(Arrays.asList(sites.split(",")));
+            whiteListedSites.put(adapterConfiguration.getString(str), siteSet);
+          }
+        }
+
       }
     }
+    lastRefresh = System.currentTimeMillis();
   }
-
 }
