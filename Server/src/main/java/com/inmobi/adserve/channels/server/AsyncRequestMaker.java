@@ -132,36 +132,30 @@ public class AsyncRequestMaker {
 
   public static List<ChannelSegment> makeAsyncRequests(List<ChannelSegment> rankList, DebugLogger logger,
       HttpRequestHandlerBase base, MessageEvent e, List<ChannelSegment> rtbSegments) {
-    if(!rankList.isEmpty()) {
-      Iterator<ChannelSegment> itr = rankList.iterator();
-      while (itr.hasNext()) {
-        ChannelSegment channelSegment = itr.next();
-        InspectorStats.incrementStatCount(channelSegment.adNetworkInterface.getName(),
-            InspectorStrings.totalInvocations);
-        if(channelSegment.adNetworkInterface.makeAsyncRequest()) {
-          if(logger.isDebugEnabled())
-            logger.debug("Successfully sent request to channel of  advertiser id",
-                channelSegment.channelSegmentEntity.getId(), "and channel id",
-                channelSegment.channelSegmentEntity.getChannelId());
-        } else {
-          itr.remove();
-        }
+    Iterator<ChannelSegment> itr = rankList.iterator();
+    while (itr.hasNext()) {
+      ChannelSegment channelSegment = itr.next();
+      InspectorStats.incrementStatCount(channelSegment.adNetworkInterface.getName(), InspectorStrings.totalInvocations);
+      if(channelSegment.adNetworkInterface.makeAsyncRequest()) {
+        if(logger.isDebugEnabled())
+          logger.debug("Successfully sent request to channel of  advertiser id",
+              channelSegment.channelSegmentEntity.getId(), "and channel id",
+              channelSegment.channelSegmentEntity.getChannelId());
+      } else {
+        itr.remove();
       }
     }
-    if(null != rtbSegments && !rtbSegments.isEmpty()) {
-      Iterator<ChannelSegment> rtbItr = rtbSegments.iterator();
-      while (rtbItr.hasNext()) {
-        ChannelSegment channelSegment = rtbItr.next();
-        InspectorStats.incrementStatCount(channelSegment.adNetworkInterface.getName(),
-            InspectorStrings.totalInvocations);
-        if(channelSegment.adNetworkInterface.makeAsyncRequest()) {
-          if(logger.isDebugEnabled())
-            logger.debug("Successfully sent request to channel of  advertiser id",
-                channelSegment.channelSegmentEntity.getId(), "and channel id",
-                channelSegment.channelSegmentEntity.getChannelId());
-        } else {
-          rtbItr.remove();
-        }
+    Iterator<ChannelSegment> rtbItr = rtbSegments.iterator();
+    while (rtbItr.hasNext()) {
+      ChannelSegment channelSegment = rtbItr.next();
+      InspectorStats.incrementStatCount(channelSegment.adNetworkInterface.getName(), InspectorStrings.totalInvocations);
+      if(channelSegment.adNetworkInterface.makeAsyncRequest()) {
+        if(logger.isDebugEnabled())
+          logger.debug("Successfully sent request to rtb channel of  advertiser id",
+              channelSegment.channelSegmentEntity.getId(), "and channel id",
+              channelSegment.channelSegmentEntity.getChannelId());
+      } else {
+        rtbItr.remove();
       }
     }
     logger.debug("Number of tpans whose request was successfully completed", rankList.size() + "");

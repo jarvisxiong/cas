@@ -147,22 +147,11 @@ public class ServletBackFill implements Servlet {
         advertiserSet.add(advertiserList[i]);
       }
     }
+    
     CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
     casInternalRequestParameters.lowestEcpm = getLowestEcpm(rows, logger);
     logger.debug("Lowest Ecpm is", new Double(casInternalRequestParameters.lowestEcpm).toString());
-
-    if(null != hrh.responseSender.sasParams.siteId) {
-      logger.debug("SiteId is", hrh.responseSender.sasParams.siteId);
-      SiteMetaDataEntity siteMetaDataEntity = ServletHandler.repositoryHelper
-          .querySiteMetaDetaRepository(hrh.responseSender.sasParams.siteId);
-      if(null != siteMetaDataEntity && siteMetaDataEntity.getBlockedCategories() != null) {
-        casInternalRequestParameters.blockedCategories = Arrays.asList(siteMetaDataEntity.getBlockedCategories());
-        logger.debug("Site id is", hrh.responseSender.sasParams.siteId, "and id is", siteMetaDataEntity.getEntityId(),
-            "no of blocked categories are");
-      } else
-        logger.debug("No blockedCategory for this site id");
-    }
-
+    casInternalRequestParameters.blockedCategories = getBlockedCategories(hrh, logger);
     hrh.responseSender.casInternalRequestParameters = casInternalRequestParameters;
 
     logger.debug("Total channels available for sending requests " + rows.length);
@@ -252,5 +241,21 @@ public class ServletBackFill implements Servlet {
           .queryChannelSegmentFeedbackRepository(channelSegmentEntity.getAdgroupId()).geteCPM() : lowestEcpm;
     }
     return lowestEcpm;
+  }
+  
+  private static List<Long> getBlockedCategories(HttpRequestHandler hrh, DebugLogger logger) {
+    List<Long> blockedCategories = null;
+    if(null != hrh.responseSender.sasParams.siteId) {
+      logger.debug("SiteId is", hrh.responseSender.sasParams.siteId);
+      SiteMetaDataEntity siteMetaDataEntity = ServletHandler.repositoryHelper
+          .querySiteMetaDetaRepository(hrh.responseSender.sasParams.siteId);
+      if(null != siteMetaDataEntity && siteMetaDataEntity.getBlockedCategories() != null) {
+        blockedCategories = Arrays.asList(siteMetaDataEntity.getBlockedCategories());
+        logger.debug("Site id is", hrh.responseSender.sasParams.siteId, "and id is", siteMetaDataEntity.getEntityId(),
+            "no of blocked categories are");
+      } else
+        logger.debug("No blockedCategory for this site id");
+    }
+    return blockedCategories;
   }
 }
