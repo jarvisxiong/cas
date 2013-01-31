@@ -55,6 +55,7 @@ public class FilterTest extends TestCase {
     temp.put("atnt.partnerSegmentNo", "");
     temp.put("tapit.advertiserId", "");
     temp.put("tapit.partnerSegmentNo", "");
+    temp.put("mullahmedia.advertiserId", "");
     Iterator<String> itr = temp.keySet().iterator();
 
     repositoryHelper = createMock(RepositoryHelper.class);
@@ -78,12 +79,14 @@ public class FilterTest extends TestCase {
     expect(mockAdapterConfig.getString("openx.advertiserId")).andReturn("advertiserId1").anyTimes();
     expect(mockAdapterConfig.getString("atnt.advertiserId")).andReturn("advertiserId2").anyTimes();
     expect(mockAdapterConfig.getString("tapit.advertiserId")).andReturn("advertiserId3").anyTimes();
+    expect(mockAdapterConfig.getString("mullahmedia.advertiserId")).andReturn("advertiserId4").anyTimes();
     expect(mockAdapterConfig.getInt("openx.partnerSegmentNo",2)).andReturn(2).anyTimes();
     expect(mockAdapterConfig.getInt("atnt.partnerSegmentNo",2)).andReturn(2).anyTimes();
     expect(mockAdapterConfig.getInt("tapit.partnerSegmentNo",2)).andReturn(2).anyTimes();
     expect(mockAdapterConfig.getString("openx.whiteListedSites")).andReturn("").anyTimes();
     expect(mockAdapterConfig.getString("atnt.whiteListedSites")).andReturn("").anyTimes();
     expect(mockAdapterConfig.getString("tapit.whiteListedSites")).andReturn("").anyTimes();
+    expect(mockAdapterConfig.getString("mullahmedia.whiteListedSites")).andReturn("123,321").anyTimes();
     replay(mockAdapterConfig);
 
     expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
@@ -287,6 +290,46 @@ public class FilterTest extends TestCase {
   public void testSiteWhiteListingLoading() {
     assertEquals(false, Filters.whiteListedSites.containsKey("advertiserId1")); 
     assertEquals(false, Filters.whiteListedSites.containsKey("advertiserId2")); 
-    assertEquals(true, Filters.whiteListedSites.containsKey("advertiserId3")); 
+    assertEquals(false, Filters.whiteListedSites.containsKey("advertiserId3")); 
+    assertEquals(true, Filters.whiteListedSites.containsKey("advertiserId4")); 
+    assertEquals(true, Filters.whiteListedSites.get("advertiserId4").contains("123"));
+    assertEquals(true, Filters.whiteListedSites.get("advertiserId4").contains("321"));
+    assertEquals(false, Filters.whiteListedSites.get("advertiserId4").contains("78"));
+    
+    Configuration newConfig = createMock(Configuration.class);
+    
+    HashMap<String, String> temp = new HashMap<String, String>();
+    temp.put("openx.advertiserId", "");
+    temp.put("openx.partnerSegmentNo", "");
+    temp.put("atnt.advertiserId", "");
+    temp.put("atnt.partnerSegmentNo", "");
+    temp.put("tapit.advertiserId", "");
+    temp.put("tapit.partnerSegmentNo", "");
+    temp.put("mullahmedia.advertiserId", "");
+    Iterator<String> itr = temp.keySet().iterator();
+    
+    expect(newConfig.getKeys()).andReturn(itr).anyTimes();
+    expect(newConfig.getString("openx.advertiserId")).andReturn("advertiserId1").anyTimes();
+    expect(newConfig.getString("atnt.advertiserId")).andReturn("advertiserId2").anyTimes();
+    expect(newConfig.getString("tapit.advertiserId")).andReturn("advertiserId3").anyTimes();
+    expect(newConfig.getString("mullahmedia.advertiserId")).andReturn("advertiserId4").anyTimes();
+    expect(newConfig.getInt("openx.partnerSegmentNo",2)).andReturn(2).anyTimes();
+    expect(newConfig.getInt("atnt.partnerSegmentNo",2)).andReturn(2).anyTimes();
+    expect(newConfig.getInt("tapit.partnerSegmentNo",2)).andReturn(2).anyTimes();
+    expect(newConfig.getString("openx.whiteListedSites")).andReturn("").anyTimes();
+    expect(newConfig.getString("atnt.whiteListedSites")).andReturn("").anyTimes();
+    expect(newConfig.getString("tapit.whiteListedSites")).andReturn("123,321").anyTimes();
+    expect(newConfig.getString("mullahmedia.whiteListedSites")).andReturn("").anyTimes();
+    expect(newConfig.getInt("whiteListedSitesRefreshtime", 30000)).andReturn(0).anyTimes();
+    replay(newConfig);
+    
+    Filters.refreshWhiteListedSites(newConfig);
+    assertEquals(false, Filters.whiteListedSites.containsKey("advertiserId4"));
+    assertEquals(true, Filters.whiteListedSites.containsKey("advertiserId3"));
+    assertEquals(true, Filters.whiteListedSites.get("advertiserId3").contains("123"));
+    assertEquals(true, Filters.whiteListedSites.get("advertiserId3").contains("321"));
+    assertEquals(false, Filters.whiteListedSites.get("advertiserId3").contains("78"));
   }
+  
+  
 }
