@@ -320,10 +320,10 @@ public class FilterTest extends TestCase {
     expect(newConfig.getString("atnt.whiteListedSites")).andReturn("").anyTimes();
     expect(newConfig.getString("tapit.whiteListedSites")).andReturn("123,321").anyTimes();
     expect(newConfig.getString("mullahmedia.whiteListedSites")).andReturn("").anyTimes();
-    expect(newConfig.getInt("whiteListedSitesRefreshtime", 30000)).andReturn(0).anyTimes();
+    expect(newConfig.getInt("whiteListedSitesRefreshtime", 1000 * 300)).andReturn(0).anyTimes();
     replay(newConfig);
     
-    Filters.refreshWhiteListedSites(newConfig);
+    Filters.refreshWhiteListedSites(newConfig, new DebugLogger());
     assertEquals(false, Filters.whiteListedSites.containsKey("advertiserId4"));
     assertEquals(true, Filters.whiteListedSites.containsKey("advertiserId3"));
     assertEquals(true, Filters.whiteListedSites.get("advertiserId3").contains("123"));
