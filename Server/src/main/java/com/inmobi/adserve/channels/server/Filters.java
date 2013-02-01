@@ -73,7 +73,7 @@ public class Filters {
       DebugLogger logger, Double siteFloor, Configuration serverConfiguration, Configuration adapterConfiguration,
       String siteId) {
 
-    refreshWhiteListedSites(adapterConfiguration, logger);
+    refreshWhiteListedSites(serverConfiguration, adapterConfiguration, logger);
 
     return segmentsPerRequestFilter(
         matchedSegments,
@@ -501,9 +501,9 @@ public class Filters {
     return newRankList;
   }
 
-  public synchronized static void refreshWhiteListedSites(Configuration adapterConfiguration, DebugLogger logger) {
+  public synchronized static void refreshWhiteListedSites(Configuration serverConfiguration, Configuration adapterConfiguration, DebugLogger logger) {
 
-    if(System.currentTimeMillis() - lastRefresh < adapterConfiguration
+    if(System.currentTimeMillis() - lastRefresh < serverConfiguration
         .getInt("whiteListedSitesRefreshtime", 1000 * 300))
       return;
 

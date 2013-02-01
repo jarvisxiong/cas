@@ -97,6 +97,7 @@ public class FilterTest extends TestCase {
     expect(mockConfig.getDouble("ecpmShift", 0.1)).andReturn(0.0).anyTimes();
     expect(mockConfig.getDouble("feedbackPower", 2.0)).andReturn(1.0).anyTimes();
     expect(mockConfig.getInt("partnerSegmentNo", 2)).andReturn(2).anyTimes();
+    expect(mockConfig.getInt("whiteListedSitesRefreshtime", 1000 * 300)).andReturn(0).anyTimes();
     expect(repositoryHelper.queryChannelRepository("channelId1")).andReturn(cE1).anyTimes();
     expect(repositoryHelper.queryChannelRepository("channelId2")).andReturn(cE2).anyTimes();
     expect(repositoryHelper.queryChannelRepository("channelId3")).andReturn(cE3).anyTimes();
@@ -323,7 +324,7 @@ public class FilterTest extends TestCase {
     expect(newConfig.getInt("whiteListedSitesRefreshtime", 1000 * 300)).andReturn(0).anyTimes();
     replay(newConfig);
     
-    Filters.refreshWhiteListedSites(newConfig, new DebugLogger());
+    Filters.refreshWhiteListedSites(mockConfig, newConfig, new DebugLogger());
     assertEquals(false, Filters.whiteListedSites.containsKey("advertiserId4"));
     assertEquals(true, Filters.whiteListedSites.containsKey("advertiserId3"));
     assertEquals(true, Filters.whiteListedSites.get("advertiserId3").contains("123"));
