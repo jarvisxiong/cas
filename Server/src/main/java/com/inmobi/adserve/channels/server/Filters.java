@@ -66,7 +66,7 @@ public class Filters {
     }
 
     lastRefresh = System.currentTimeMillis();
-    random = new Random(100);
+    random = new Random();
   }
 
   public static ChannelSegmentEntity[] filter(HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments,
@@ -162,7 +162,7 @@ public class Filters {
       }
 
       if(whiteListedSites.containsKey(advertiserId) && !whiteListedSites.get(advertiserId).contains(siteId)
-          && random.nextInt() < 95) {
+          && random.nextInt(100) < 95) {
         logger.debug("Dropped in site inclusion-exclusion");
         InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
             InspectorStrings.droppedInSiteInclusionExclusionFilter);
@@ -410,30 +410,29 @@ public class Filters {
         segment.get(index).higherPriorityRange = totalPriority;
         logger.debug("total priority here is " + totalPriority);
       }
-      
+
       double randomNumber = Math.random() * totalPriority;
-      
-      
+
       for (int index = 0; index < segment.size(); index++) {
-        
+
         if(randomNumber >= segment.get(index).lowerPriorityRange
             && randomNumber <= segment.get(index).higherPriorityRange) {
-          
+
           if(logger.isDebugEnabled())
             logger.debug("rank " + rank++ + " adapter has channel id " + segment.get(index).adNetworkInterface.getId());
-          
+
           rankedList.add(segment.get(index));
           segment.remove(index);
           break;
         }
-        
+
       }
-      
+
     }
-    
+
     if(logger.isDebugEnabled())
       logger.debug("rank " + rank++ + " adapter has channel id " + segment.get(0).adNetworkInterface.getId());
-    
+
     rankedList.add(segment.get(0));
     logger.info("Ranked candidate adapters randomly");
     return rankedList;
@@ -442,17 +441,17 @@ public class Filters {
   private static ChannelSegmentEntity[] convertToSegmentsArray(
       HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments, DebugLogger logger) {
     ArrayList<ChannelSegmentEntity> rows = new ArrayList<ChannelSegmentEntity>();
-    
+
     for (String advertiserId : matchedSegments.keySet()) {
-    
+
       for (String adgroupId : matchedSegments.get(advertiserId).keySet()) {
         rows.add(matchedSegments.get(advertiserId).get(adgroupId));
         logger.debug("ChannelSegmentEntity Added to array for advertiserid : " + advertiserId + " and adgroupid "
             + adgroupId);
       }
-      
+
     }
-    
+
     return (ChannelSegmentEntity[]) rows.toArray(new ChannelSegmentEntity[0]);
   }
 
@@ -484,27 +483,27 @@ public class Filters {
     logger.debug("Inside guaranteed delivery filter");
     List<ChannelSegment> newRankList = new ArrayList<ChannelSegment>();
     newRankList.add(rankList.get(0));
-    
+
     for (int rank = 1; rank < rankList.size(); rank++) {
       ChannelSegment rankedSegment = rankList.get(rank);
-      
+
       if(!adapterConfiguration.getString(rankedSegment.adNetworkInterface.getName() + ".gauranteedDelivery", "false")
           .equals("true")) {
         newRankList.add(rankedSegment);
       } else
         logger.debug("Dropping partner" + rankedSegment.adNetworkInterface.getName() + "rank " + rank
             + "due to guarnteed delivery");
-      
+
     }
-    
+
     logger.debug("New ranklist size :" + newRankList.size());
     return newRankList;
   }
 
-  public synchronized static void refreshWhiteListedSites(Configuration serverConfiguration, Configuration adapterConfiguration, DebugLogger logger) {
+  public synchronized static void refreshWhiteListedSites(Configuration serverConfiguration,
+      Configuration adapterConfiguration, DebugLogger logger) {
 
-    if(System.currentTimeMillis() - lastRefresh < serverConfiguration
-        .getInt("whiteListedSitesRefreshtime", 1000 * 300))
+    if(System.currentTimeMillis() - lastRefresh < serverConfiguration.getInt("whiteListedSitesRefreshtime", 1000 * 300))
       return;
 
     logger.debug("refreshing whiteListedSites");
