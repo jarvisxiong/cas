@@ -27,6 +27,7 @@ import com.inmobi.adserve.channels.repository.ChannelRepository;
 import com.inmobi.adserve.channels.repository.ChannelFeedbackRepository;
 import com.inmobi.adserve.channels.repository.ChannelSegmentFeedbackRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
@@ -41,12 +42,13 @@ public class ChannelServer {
   private static ChannelRepository channelRepository;
   private static ChannelFeedbackRepository channelFeedbackRepository;
   private static ChannelSegmentFeedbackRepository channelSegmentFeedbackRepository;
+  private static SiteTaxonomyRepository siteTaxonomyRepository;
   private static RepositoryHelper repositoryHelper;
   private static InspectorStats inspectorStat;
   private static final String configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
   private static String DATACENTERIDKEY = "dc.id";
   private static String HOSTNAMEKEY = "host.name";
-  private static String DATACENTRENAMEKEY ="dc.name";
+  private static String DATACENTRENAMEKEY = "dc.name";
   public static byte dataCenterIdCode;
   public static short hostIdCode;
   public static String dataCentreName;
@@ -62,7 +64,7 @@ public class ChannelServer {
     // Setting up the logger factory and SlotSizeMapping for the project.
     DebugLogger.init(config.loggerConfiguration());
     SlotSizeMapping.init();
-    
+
     logger = Logger.getLogger(config.loggerConfiguration().getString("debug"));
 
     logger.info("Initializing logger completed");
@@ -89,12 +91,15 @@ public class ChannelServer {
     channelRepository = new ChannelRepository();
     channelFeedbackRepository = new ChannelFeedbackRepository();
     channelSegmentFeedbackRepository = new ChannelSegmentFeedbackRepository();
-    repositoryHelper = new RepositoryHelper(channelRepository, channelAdGroupRepository, channelFeedbackRepository, channelSegmentFeedbackRepository);
+    siteTaxonomyRepository = new SiteTaxonomyRepository();
+    repositoryHelper = new RepositoryHelper(channelRepository, channelAdGroupRepository, channelFeedbackRepository,
+        channelSegmentFeedbackRepository, siteTaxonomyRepository);
 
-    MatchSegments.init(channelAdGroupRepository, inspectorStat);
+    MatchSegments.init(channelAdGroupRepository, repositoryHelper);
     InspectorStats.initializeRepoStats("ChannelAdGroupRepository");
     InspectorStats.initializeRepoStats("ChannelFeedbackRepository");
     InspectorStats.initializeRepoStats("ChannelSegmentFeedbackRepository");
+    InspectorStats.initializeRepoStats("SiteTaxonomyRepository");
     instantiateRepository(logger, config);
     Filters.init(config.adapterConfiguration(), repositoryHelper);
 
@@ -116,7 +121,8 @@ public class ChannelServer {
       AsyncRequestMaker.init(clientBootstrap, rtbClientBootstrap);
       ServletHandler.init(config, repositoryHelper);
       SegmentFactory.init(repositoryHelper);
-      ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
+      ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(
+          Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
       Timer timer = new HashedWheelTimer();
       bootstrap.setPipelineFactory(new ChannelServerPipelineFactory(timer, config.serverConfiguration()));
       bootstrap.setOption("child.keepAlive", true);
@@ -168,28 +174,49 @@ public class ChannelServer {
       Configuration repoConfig = config.repoConfiguration();
       Configuration feedbackConfig = config.feedBackConfiguration();
       Configuration segmentFeedbackConfig = config.segmentFeedBackConfiguration();
+      Configuration siteTaxonomyConfig = config.siteTaxonomyConfiguration();
       InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.isUpdating, 0);
-      InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.repoSource, databaseConfig.getString("database"));
+      InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.repoSource,
+          databaseConfig.getString("database"));
       InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.query, repoConfig.getString("query"));
-      InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.refreshInterval, repoConfig.getString("refreshTime"));
+      InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.refreshInterval,
+          repoConfig.getString("refreshTime"));
 
       InspectorStats.setStats("ChannelFeedbackRepository", InspectorStrings.isUpdating, 0);
-      InspectorStats.setStats("ChannelFeedbackRepository", InspectorStrings.repoSource, databaseConfig.getString("database"));
+      InspectorStats.setStats("ChannelFeedbackRepository", InspectorStrings.repoSource,
+          databaseConfig.getString("database"));
       InspectorStats.setStats("ChannelFeedbackRepository", InspectorStrings.query, feedbackConfig.getString("query"));
-      InspectorStats.setStats("ChannelFeedbackRepository", InspectorStrings.refreshInterval, feedbackConfig.getString("refreshTime"));
+      InspectorStats.setStats("ChannelFeedbackRepository", InspectorStrings.refreshInterval,
+          feedbackConfig.getString("refreshTime"));
 
       InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.isUpdating, 0);
-      InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.repoSource, databaseConfig.getString("database"));
-      InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.query, segmentFeedbackConfig.getString("query"));
-      InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.refreshInterval, segmentFeedbackConfig.getString("refreshTime"));
+      InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.repoSource,
+          databaseConfig.getString("database"));
+      InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.query,
+          segmentFeedbackConfig.getString("query"));
+      InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.refreshInterval,
+          segmentFeedbackConfig.getString("refreshTime"));
+      
+      InspectorStats.setStats("SiteTaxonomyRepository", InspectorStrings.isUpdating, 0);
+      InspectorStats.setStats("SiteTaxonomyRepository", InspectorStrings.repoSource,
+          databaseConfig.getString("database"));
+      InspectorStats.setStats("SiteTaxonomyRepository", InspectorStrings.query,
+          siteTaxonomyConfig.getString("query"));
+      InspectorStats.setStats("SiteTaxonomyRepository", InspectorStrings.refreshInterval,
+          siteTaxonomyConfig.getString("refreshTime"));
 
       initialContext.bind("java:comp/env/jdbc", dataSource);
 
       // Reusing the repository from phoenix adsering framework.
-      channelAdGroupRepository.init(logger, config.cacheConfiguration().subset("ChannelAdGroupRepository"), "ChannelAdGroupRepository");
+      channelAdGroupRepository.init(logger, config.cacheConfiguration().subset("ChannelAdGroupRepository"),
+          "ChannelAdGroupRepository");
       channelRepository.init(logger, config.cacheConfiguration().subset("ChannelRepository"), "ChannelRepository");
-      channelFeedbackRepository.init(logger, config.cacheConfiguration().subset("ChannelFeedbackRepository"), "ChannelFeedbackRepository");
-      channelSegmentFeedbackRepository.init(logger, config.cacheConfiguration().subset("ChannelSegmentFeedbackRepository"), "ChannelSegmentFeedbackRepository");
+      channelFeedbackRepository.init(logger, config.cacheConfiguration().subset("ChannelFeedbackRepository"),
+          "ChannelFeedbackRepository");
+      channelSegmentFeedbackRepository.init(logger,
+          config.cacheConfiguration().subset("ChannelSegmentFeedbackRepository"), "ChannelSegmentFeedbackRepository");
+      siteTaxonomyRepository.init(logger, config.cacheConfiguration().subset("SiteTaxonomyRepository"),
+          "SiteTaxonomyRepository");
 
       logger.error("* * * * Instantiating repository completed * * * *");
     } catch (NamingException exception) {
@@ -222,14 +249,16 @@ public class ChannelServer {
     if(advertiserLogFolder != null)
       advertiserLogFolder = advertiserLogFolder.substring(0, advertiserLogFolder.lastIndexOf('/') + 1);
     if(sampledAdvertiserLogFolder != null)
-      sampledAdvertiserLogFolder = sampledAdvertiserLogFolder.substring(0, sampledAdvertiserLogFolder.lastIndexOf('/') + 1);
+      sampledAdvertiserLogFolder = sampledAdvertiserLogFolder.substring(0,
+          sampledAdvertiserLogFolder.lastIndexOf('/') + 1);
     File rrFolder = new File(rrLogFolder);
     File channelFolder = new File(channelLogFolder);
     File debugFolder = new File(debugLogFolder);
     File advertiserFolder = new File(advertiserLogFolder);
     File sampledAdvertiserFolder = new File(sampledAdvertiserLogFolder);
-    if(rrFolder != null && rrFolder.exists() && channelFolder != null && channelFolder.exists() && debugFolder != null && debugFolder.exists()
-        && advertiserFolder != null && advertiserFolder.exists() && sampledAdvertiserFolder != null && sampledAdvertiserFolder.exists())
+    if(rrFolder != null && rrFolder.exists() && channelFolder != null && channelFolder.exists() && debugFolder != null
+        && debugFolder.exists() && advertiserFolder != null && advertiserFolder.exists()
+        && sampledAdvertiserFolder != null && sampledAdvertiserFolder.exists())
       return true;
     ServerStatusInfo.statusCode = 404;
     ServerStatusInfo.statusString = "StackTrace is: one or more log folders missing";

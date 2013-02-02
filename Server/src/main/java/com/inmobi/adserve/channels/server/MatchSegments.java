@@ -4,28 +4,27 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import org.apache.commons.configuration.Configuration;
+import java.util.HashSet;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.configuration.Configuration;
 
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
-import com.inmobi.adserve.channels.repository.ChannelRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.phoenix.exception.RepositoryException;
 
 public class MatchSegments {
   private DebugLogger logger;
   private static ChannelAdGroupRepository channelAdGroupRepository;
-  private static InspectorStats inspectorStat;
+  private static RepositoryHelper repositoryHelper;
 
-  public static void init(ChannelAdGroupRepository channelAdGroupRepository, InspectorStats inspectorStat) {
+  public static void init(ChannelAdGroupRepository channelAdGroupRepository, RepositoryHelper repositoryHelper) {
     MatchSegments.channelAdGroupRepository = channelAdGroupRepository;
-    MatchSegments.inspectorStat = inspectorStat;
+    MatchSegments.repositoryHelper = repositoryHelper;
   }
 
   public MatchSegments(DebugLogger logger) {
@@ -33,7 +32,7 @@ public class MatchSegments {
 
   }
 
-  //select channel segment based on specified rules
+  // select channel segment based on specified rules
   public HashMap<String, HashMap<String, ChannelSegmentEntity>> matchSegments(SASRequestParameters sasParams) {
     String slotStr = sasParams.slot;
     String countryStr = sasParams.countryStr;
@@ -65,19 +64,69 @@ public class MatchSegments {
       if(countryStr != null) {
         country = Long.parseLong(countryStr);
       }
-      return (matchSegments(logger, slot, sasParams.categories, country, targetingPlatform, siteRating, osId));
+      return (matchSegments(logger, slot, getCategories(sasParams, ServletHandler.config), country, targetingPlatform, siteRating, osId));
     } catch (NumberFormatException exception) {
       logger.error("Error parsing required arguments " + exception.getMessage());
       return null;
     }
   }
 
+  /**
+   * Method which computes categories according to new category taxonomy and
+   * returns the category list (old or new) depending upon the config
+   * 
+   * @param sasParams
+   * @return
+   */
+  public long[] getCategories(SASRequestParameters sasParams, Configuration serverConfig) {
+    /**
+     * Computing all the parents for categories in the new category list from
+     * the request
+     */
+    HashSet<Long> newCategories = new HashSet<Long>();
+
+    for (long cat : sasParams.newCategories) {
+      String parentId = new Long(cat).toString();
+
+      while (parentId != null) {
+        newCategories.add(Long.parseLong(parentId));
+        SiteTaxonomyEntity entity = repositoryHelper.querySiteTaxonomyRepository(parentId);
+
+        if(entity == null) {
+          break;
+        }
+
+        parentId = entity.getParentId();
+      }
+
+    }
+
+    long[] newCat = new long[newCategories.size()];
+    int index = 0;
+
+    for (Long cat : newCategories) {
+      newCat[index++] = cat;
+    }
+
+    // setting newCategories field in sasParams to contain their parentids as
+    // well
+    sasParams.newCategories = newCat;
+
+    if(serverConfig.getBoolean("isNewCategory",false)) {
+      return sasParams.newCategories;
+    }
+
+    return sasParams.categories;
+  }
+  
+  
+
   private HashMap<String, HashMap<String, ChannelSegmentEntity>> matchSegments(DebugLogger logger, long slotId,
       long[] categories, long country, Integer targetingPlatform, Integer siteRating, int osId) {
     HashMap<String /* advertiserId */, HashMap<String /* adGroupId */, ChannelSegmentEntity>> result = new HashMap<String /* advertiserId */, HashMap<String /* adGroupId */, ChannelSegmentEntity>>();
 
-    ArrayList<ChannelSegmentEntity> filteredAllCategoriesEntities = loadEntities(slotId, -1, country, targetingPlatform,
-        siteRating, osId);
+    ArrayList<ChannelSegmentEntity> filteredAllCategoriesEntities = loadEntities(slotId, -1, country,
+        targetingPlatform, siteRating, osId);
 
     // Makes sure that there is exactly one entry from each Advertiser.
     for (ChannelSegmentEntity entity : filteredAllCategoriesEntities) {
@@ -109,8 +158,8 @@ public class MatchSegments {
 
     // Does OR for the categories.
     for (long category : categories) {
-      ArrayList<ChannelSegmentEntity> filteredEntities = loadEntities(slotId, category, country, targetingPlatform, siteRating,
-          osId);
+      ArrayList<ChannelSegmentEntity> filteredEntities = loadEntities(slotId, category, country, targetingPlatform,
+          siteRating, osId);
       // Makes sure that there is exactly one entry from each Advertiser.
       for (ChannelSegmentEntity entity : filteredEntities) {
         if(entity.getStatus())
@@ -121,8 +170,8 @@ public class MatchSegments {
 
       if(country != -1) {
         // Load Data for all countries
-        ArrayList<ChannelSegmentEntity> allCountryEntities = loadEntities(slotId, category, -1, targetingPlatform, siteRating,
-            osId);
+        ArrayList<ChannelSegmentEntity> allCountryEntities = loadEntities(slotId, category, -1, targetingPlatform,
+            siteRating, osId);
 
         // Makes sure that there is exactly one entry from each Advertiser for
         // all countries.
@@ -134,7 +183,8 @@ public class MatchSegments {
         }
       }
       if(logger.isDebugEnabled())
-        logger.debug("Number of entries in result: " + result.size() + "for " + slotId + "_" + country + "_" + categories);
+        logger.debug("Number of entries in result: " + result.size() + "for " + slotId + "_" + country + "_"
+            + categories);
     }
     if(result.size() == 0)
       logger.debug("No matching records for the request - slot: " + slotId + " country: " + country + " categories: "
@@ -146,8 +196,8 @@ public class MatchSegments {
   }
 
   // Loads entities and updates cache if required.
-  private ArrayList<ChannelSegmentEntity> loadEntities(long slotId, long category, long country, Integer targetingPlatform,
-      Integer siteRating, int osId) {
+  private ArrayList<ChannelSegmentEntity> loadEntities(long slotId, long category, long country,
+      Integer targetingPlatform, Integer siteRating, int osId) {
     if(logger.isDebugEnabled())
       logger.debug("Loading entities for slot: " + slotId + " category: " + category + " country: " + country
           + " targetingPlatform: " + targetingPlatform + " siteRating: " + siteRating + " osId: " + osId);
@@ -182,7 +232,8 @@ public class MatchSegments {
 
   }
 
-  public static void printSegments(HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments, DebugLogger logger) {
+  public static void printSegments(HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments,
+      DebugLogger logger) {
     if(logger.isDebugEnabled())
       logger.debug("Segments are :");
     for (String adkey : matchedSegments.keySet()) {

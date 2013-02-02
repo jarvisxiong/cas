@@ -15,16 +15,18 @@ import org.apache.log4j.Logger;
 import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
+import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.ChannelRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
-/*
-public class MatchSegmentsTest extends TestCase {
 
+public class MatchSegmentsTest extends TestCase {
+/*
   MatchSegments segments;
   ChannelSegmentCache cache;
   private DebugLogger logger;
@@ -129,7 +131,7 @@ public class MatchSegmentsTest extends TestCase {
     expect(cache.query(logger, 1, 1, -1, 1, 1, 1, -1)).andReturn(emptyEntityArray);
     expect(cache.query(logger, 1, -1, -1, 1, 1, 1, -1)).andReturn(emptyEntityArray);
     expect(cache.query(logger, 1, 2, 1, 1, 1, 1, -1)).andReturn(emptyEntityArray);
-    expect(cache.query(logger, 1, 2, -1, 1, 1, 1, -1)).andReturn(emptyEntityArray);
+    expect(cache.query(logger, 1, 2, -1, ServletHandler.config1, 1, 1, -1)).andReturn(emptyEntityArray);
     cache.addOrUpdate(logger, 1, 1, 1, 1, 1, 1, -1, emptyEntityArray);
     EasyMock.expectLastCall();
     ArrayList<ChannelSegmentEntity> nonEmptyArray = new ArrayList<ChannelSegmentEntity>();
@@ -162,5 +164,36 @@ public class MatchSegmentsTest extends TestCase {
         channelAdGroupRepository1.parseOsIds(
             "{\"os\": [{\"id\": 1,\"min\": 2.2, \"max\": 4, \"incl\" : true },{\"id\": 1,\"min\": 2.2, \"max\": 4, \"incl\" : true }] }").size(), 2);
   }
+  */
+  
+  @Test
+  public void testGetCategories() {
+    Configuration mockConfig = createMock(Configuration.class);
+    SASRequestParameters sasRequestParameters = new SASRequestParameters();
+    expect(mockConfig.getBoolean("isNewCategory")).andReturn(true).anyTimes();
+    expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
+    expect(mockConfig.getString("loggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties").anyTimes();
+    replay(mockConfig);
+    long [] newCat = {1,2,3};
+    sasRequestParameters.newCategories = newCat;
+    
+    RepositoryHelper repositoryHelper = createMock(RepositoryHelper.class);
+    SiteTaxonomyEntity s1 = new SiteTaxonomyEntity("1", "name", "4");
+    SiteTaxonomyEntity s2 = new SiteTaxonomyEntity("2", "name", null);
+    SiteTaxonomyEntity s3 = new SiteTaxonomyEntity("3", "name", "4");
+    SiteTaxonomyEntity s4 =new SiteTaxonomyEntity("4", "name", null);
+    expect(repositoryHelper.querySiteTaxonomyRepository("1")).andReturn(s1).anyTimes();
+    expect(repositoryHelper.querySiteTaxonomyRepository("2")).andReturn(s2).anyTimes();
+    expect(repositoryHelper.querySiteTaxonomyRepository("3")).andReturn(s3).anyTimes();
+    expect(repositoryHelper.querySiteTaxonomyRepository("4")).andReturn(s4).anyTimes();
+    replay(repositoryHelper);
+    
+    MatchSegments.init(null, repositoryHelper);
+    DebugLogger.init(mockConfig);
+    MatchSegments matchSegments = new MatchSegments(new DebugLogger());
+
+    long [] cat = matchSegments.getCategories(sasRequestParameters, mockConfig);
+    System.out.println(cat);
+  }
 }
-*/
+

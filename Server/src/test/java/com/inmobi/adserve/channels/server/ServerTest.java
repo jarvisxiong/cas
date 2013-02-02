@@ -171,7 +171,7 @@ public class ServerTest extends TestCase {
     JSONObject jsonObject = prepareParameters();
     long category[] = { 1, 2 };
     assertTrue("Category are expected to be equal",
-        Arrays.equals(RequestParser.getCategory(jsonObject, new DebugLogger()), category));
+        Arrays.equals(RequestParser.getCategory(jsonObject, new DebugLogger(), "category"), category));
   }
 
   @Test

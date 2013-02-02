@@ -116,7 +116,7 @@ public class AsyncRequestMaker {
             .queryChannelSegmentFeedbackRepository(row.getAdgroupId());
         if(null == channelSegmentFeedbackEntity)
           channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(row.getId(), row.getAdgroupId(),
-              config.getDouble("default.ecpm"), config.getDouble("default.fillratio"));
+              config.getDouble("default.ecpm"), config.getDouble("default.fillratio"), 0, 0, 0, 0);
         ChannelEntity channelEntity = repositoryHelper.queryChannelRepository(row.getChannelId());
         if(channelEntity != null) {
           if(network.isRtbPartner()) {
