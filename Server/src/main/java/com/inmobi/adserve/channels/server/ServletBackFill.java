@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.server;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -12,8 +13,11 @@ import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -143,13 +147,21 @@ public class ServletBackFill implements Servlet {
         advertiserSet.add(advertiserList[i]);
       }
     }
+    
+    CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+    casInternalRequestParameters.lowestEcpm = getLowestEcpm(rows, logger);
+    logger.debug("Lowest Ecpm is", new Double(casInternalRequestParameters.lowestEcpm).toString());
+    casInternalRequestParameters.blockedCategories = getBlockedCategories(hrh, logger);
+    hrh.responseSender.casInternalRequestParameters = casInternalRequestParameters;
 
     logger.debug("Total channels available for sending requests " + rows.length);
+    List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
     segments = AsyncRequestMaker.prepareForAsyncRequest(rows, logger, ServletHandler.config, ServletHandler.rtbConfig,
         ServletHandler.adapterConfig, hrh.responseSender, advertiserSet, e, ServletHandler.repositoryHelper,
-        hrh.jObject, hrh.responseSender.sasParams);
+        hrh.jObject, hrh.responseSender.sasParams, casInternalRequestParameters, rtbSegments);
 
-    if(segments.isEmpty()) {
+    logger.debug("rtb rankList size is", new Integer(rtbSegments.size()).toString());
+    if(segments.isEmpty() && rtbSegments.isEmpty()) {
       logger.debug("No succesfull configuration of adapter ");
       hrh.responseSender.sendNoAdResponse(e);
       return;
@@ -157,41 +169,52 @@ public class ServletBackFill implements Servlet {
 
     List<ChannelSegment> tempRankList;
     tempRankList = Filters.rankAdapters(segments, logger, ServletHandler.config);
-    tempRankList = Filters.ensureGuaranteedDelivery(tempRankList, ServletHandler.adapterConfig, logger);
 
-    tempRankList = AsyncRequestMaker.makeAsyncRequests(tempRankList, logger, hrh.responseSender, e);
+    if(!tempRankList.isEmpty()) {
+      tempRankList = Filters.ensureGuaranteedDelivery(tempRankList, ServletHandler.adapterConfig, logger);
+    }
+    tempRankList = AsyncRequestMaker.makeAsyncRequests(tempRankList, logger, hrh.responseSender, e, rtbSegments);
 
     hrh.responseSender.setRankList(tempRankList);
-
+    hrh.responseSender.rtbSegments = rtbSegments;
     if(logger.isDebugEnabled()) {
       logger.debug("Number of tpans whose request was successfully completed "
           + hrh.responseSender.getRankList().size());
+      logger.debug("Number of rtb tpans whose request was successfully completed "
+          + hrh.responseSender.rtbSegments.size());
     }
     // if none of the async request succeed, we return "NO_AD"
-    if(hrh.responseSender.getRankList().isEmpty()) {
+    if(hrh.responseSender.getRankList().isEmpty() && hrh.responseSender.rtbSegments.isEmpty()) {
       logger.debug("No calls");
       hrh.responseSender.sendNoAdResponse(e);
       return;
     }
 
-    // Resetting the rankIndexToProcess for already completed adapters.
-    int rankIndexToProcess = hrh.responseSender.getRankIndexToProcess();
-    ChannelSegment segment = hrh.responseSender.getRankList().get(rankIndexToProcess);
-    while (segment.adNetworkInterface.isRequestCompleted()) {
-      if(segment.adNetworkInterface.getResponseAd().responseStatus == ResponseStatus.SUCCESS) {
-        hrh.responseSender.sendAdResponse(segment.adNetworkInterface, e);
-        break;
+    if (hrh.responseSender.isAllRtbComplete()) {
+      AdNetworkInterface adNetworkInterface = hrh.responseSender.runRtbSecondPriceAuctionEngine();
+      if(null != adNetworkInterface) {
+        hrh.responseSender.sendAdResponse(adNetworkInterface, e);
+        return;
       }
-      rankIndexToProcess++;
-      if(rankIndexToProcess >= hrh.responseSender.getRankList().size()) {
-        hrh.responseSender.sendNoAdResponse(e);
-        break;
+      // Resetting the rankIndexToProcess for already completed adapters.
+      int rankIndexToProcess = hrh.responseSender.getRankIndexToProcess();
+      ChannelSegment segment = hrh.responseSender.getRankList().get(rankIndexToProcess);
+      while (segment.adNetworkInterface.isRequestCompleted()) {
+        if(segment.adNetworkInterface.getResponseAd().responseStatus == ResponseStatus.SUCCESS) {
+          hrh.responseSender.sendAdResponse(segment.adNetworkInterface, e);
+          break;
+        }
+        rankIndexToProcess++;
+        if(rankIndexToProcess >= hrh.responseSender.getRankList().size()) {
+          hrh.responseSender.sendNoAdResponse(e);
+          break;
+        }
+        segment = hrh.responseSender.getRankList().get(rankIndexToProcess);
       }
-      segment = hrh.responseSender.getRankList().get(rankIndexToProcess);
-    }
-    hrh.responseSender.setRankIndexToProcess(rankIndexToProcess);
-    if(logger.isDebugEnabled()) {
-      logger.debug("retunrd from send Response, ranklist size is " + hrh.responseSender.getRankList().size());
+      hrh.responseSender.setRankIndexToProcess(rankIndexToProcess);
+      if(logger.isDebugEnabled()) {
+        logger.debug("retunrd from send Response, ranklist size is " + hrh.responseSender.getRankList().size());
+      }
     }
   }
 
@@ -203,19 +226,36 @@ public class ServletBackFill implements Servlet {
   private static double getLowestEcpm(ChannelSegmentEntity[] channelSegmentEntities, DebugLogger logger) {
     double lowestEcpm = 0;
     for (ChannelSegmentEntity channelSegmentEntity : channelSegmentEntities) {
-      if (null == ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(
-          channelSegmentEntity.getAdgroupId())) {
-        if (logger.isDebugEnabled())
+      if(null == ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(channelSegmentEntity
+          .getAdgroupId())) {
+        if(logger.isDebugEnabled())
           logger.debug("ChannelSegmentfeedback entity is null for adgpid id " + channelSegmentEntity.getAdgroupId());
         continue;
       }
-      if (logger.isDebugEnabled())
-        logger.debug("ecpm is " + ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(
-          channelSegmentEntity.getAdgroupId()).geteCPM());
+      if(logger.isDebugEnabled())
+        logger.debug("ecpm is "
+            + ServletHandler.repositoryHelper
+                .queryChannelSegmentFeedbackRepository(channelSegmentEntity.getAdgroupId()).geteCPM());
       lowestEcpm = lowestEcpm > ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(
           channelSegmentEntity.getAdgroupId()).geteCPM() ? ServletHandler.repositoryHelper
           .queryChannelSegmentFeedbackRepository(channelSegmentEntity.getAdgroupId()).geteCPM() : lowestEcpm;
     }
     return lowestEcpm;
+  }
+  
+  private static List<Long> getBlockedCategories(HttpRequestHandler hrh, DebugLogger logger) {
+    List<Long> blockedCategories = null;
+    if(null != hrh.responseSender.sasParams.siteId) {
+      logger.debug("SiteId is", hrh.responseSender.sasParams.siteId);
+      SiteMetaDataEntity siteMetaDataEntity = ServletHandler.repositoryHelper
+          .querySiteMetaDetaRepository(hrh.responseSender.sasParams.siteId);
+      if(null != siteMetaDataEntity && siteMetaDataEntity.getBlockedCategories() != null) {
+        blockedCategories = Arrays.asList(siteMetaDataEntity.getBlockedCategories());
+        logger.debug("Site id is", hrh.responseSender.sasParams.siteId, "and id is", siteMetaDataEntity.getEntityId(),
+            "no of blocked categories are");
+      } else
+        logger.debug("No blockedCategory for this site id");
+    }
+    return blockedCategories;
   }
 }

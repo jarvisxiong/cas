@@ -38,7 +38,7 @@ public class ChannelServerPipelineFactory implements ChannelPipelineFactory {
     pipeline.addLast("decoder", new HttpRequestDecoder());
     pipeline.addLast("encoder", new HttpResponseEncoder());
     pipeline.addLast("executionHandler", executionHandler);
-    pipeline.addLast("idleStateHandler", idleStateHandler);
+    pipeline.addLast("idleStateHandler", new IdleStateHandler(this.timer, 0, 0, serverTimeoutMillis, TimeUnit.MILLISECONDS));
     pipeline.addLast("handler", new HttpRequestHandler());    
     return pipeline;
   }

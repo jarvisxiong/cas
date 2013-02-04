@@ -16,6 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
@@ -45,20 +46,20 @@ public class AsyncRequestMaker {
   public static List<ChannelSegment> prepareForAsyncRequest(ChannelSegmentEntity[] rows, DebugLogger logger,
       Configuration config, Configuration rtbConfig, Configuration adapterConfig, HttpRequestHandlerBase base,
       Set<String> advertiserSet, MessageEvent e, RepositoryHelper repositoryHelper, JSONObject jObject,
-      SASRequestParameters sasParams) throws Exception {
+      SASRequestParameters sasParams, CasInternalRequestParameters casInternalRequestParameters,
+      List<ChannelSegment> rtbSegments) throws Exception {
 
     List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
-    List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
     logger.debug("Total channels available for sending requests", rows.length + "");
+    boolean isRtbEnabled = false;
+    isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled", false);
+    logger.debug("isRtbEnabled is", new Boolean(isRtbEnabled).toString());
 
     for (ChannelSegmentEntity row : rows) {
-      boolean isRtbEnabled = false;
-      isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled", false);
-      logger.debug("isRtbEnabled is " + isRtbEnabled);
-
       AdNetworkInterface network = SegmentFactory.getChannel(row.getId(), row.getChannelId(), adapterConfig,
-          clientBootstrap, rtbClientBootstrap, base, e, advertiserSet, logger, isRtbEnabled, 0.0);
+          clientBootstrap, rtbClientBootstrap, base, e, advertiserSet, logger, isRtbEnabled,
+          casInternalRequestParameters);
       if(null == network) {
         logger.debug("No adapter found for adGroup:", row.getAdgroupId());
         continue;
@@ -132,7 +133,7 @@ public class AsyncRequestMaker {
   }
 
   public static List<ChannelSegment> makeAsyncRequests(List<ChannelSegment> rankList, DebugLogger logger,
-      HttpRequestHandlerBase base, MessageEvent e) {
+      HttpRequestHandlerBase base, MessageEvent e, List<ChannelSegment> rtbSegments) {
     Iterator<ChannelSegment> itr = rankList.iterator();
     while (itr.hasNext()) {
       ChannelSegment channelSegment = itr.next();
@@ -146,7 +147,21 @@ public class AsyncRequestMaker {
         itr.remove();
       }
     }
+    Iterator<ChannelSegment> rtbItr = rtbSegments.iterator();
+    while (rtbItr.hasNext()) {
+      ChannelSegment channelSegment = rtbItr.next();
+      InspectorStats.incrementStatCount(channelSegment.adNetworkInterface.getName(), InspectorStrings.totalInvocations);
+      if(channelSegment.adNetworkInterface.makeAsyncRequest()) {
+        if(logger.isDebugEnabled())
+          logger.debug("Successfully sent request to rtb channel of  advertiser id",
+              channelSegment.channelSegmentEntity.getId(), "and channel id",
+              channelSegment.channelSegmentEntity.getChannelId());
+      } else {
+        rtbItr.remove();
+      }
+    }
     logger.debug("Number of tpans whose request was successfully completed", rankList.size() + "");
+    logger.debug("Number of rtb tpans whose request was successfully completed", rtbSegments.size() + "");
     return rankList;
   }
 
@@ -212,8 +227,8 @@ public class AsyncRequestMaker {
       uidMap.put("U-ID", sasParams.uid);
     else {
       Iterator userMapIterator = userIdMap.keys();
-      while(userMapIterator.hasNext()) {
-        String key = (String)userMapIterator.next();
+      while (userMapIterator.hasNext()) {
+        String key = (String) userMapIterator.next();
         String value = null;
         try {
           value = (String) userIdMap.get(key);

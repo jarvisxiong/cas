@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -27,6 +28,7 @@ import com.inmobi.adserve.channels.repository.ChannelRepository;
 import com.inmobi.adserve.channels.repository.ChannelFeedbackRepository;
 import com.inmobi.adserve.channels.repository.ChannelSegmentFeedbackRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
 import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
@@ -42,6 +44,7 @@ public class ChannelServer {
   private static ChannelRepository channelRepository;
   private static ChannelFeedbackRepository channelFeedbackRepository;
   private static ChannelSegmentFeedbackRepository channelSegmentFeedbackRepository;
+  private static SiteMetaDataRepository siteMetaDataRepository;
   private static SiteTaxonomyRepository siteTaxonomyRepository;
   private static RepositoryHelper repositoryHelper;
   private static InspectorStats inspectorStat;
@@ -91,19 +94,24 @@ public class ChannelServer {
     channelRepository = new ChannelRepository();
     channelFeedbackRepository = new ChannelFeedbackRepository();
     channelSegmentFeedbackRepository = new ChannelSegmentFeedbackRepository();
+    siteMetaDataRepository = new SiteMetaDataRepository();
     siteTaxonomyRepository = new SiteTaxonomyRepository();
     repositoryHelper = new RepositoryHelper(channelRepository, channelAdGroupRepository, channelFeedbackRepository,
-        channelSegmentFeedbackRepository, siteTaxonomyRepository);
+        channelSegmentFeedbackRepository, siteMetaDataRepository, siteTaxonomyRepository);
 
     MatchSegments.init(channelAdGroupRepository, repositoryHelper);
     InspectorStats.initializeRepoStats("ChannelAdGroupRepository");
     InspectorStats.initializeRepoStats("ChannelFeedbackRepository");
     InspectorStats.initializeRepoStats("ChannelSegmentFeedbackRepository");
+    InspectorStats.initializeRepoStats("SiteMetaDataRepository");
     InspectorStats.initializeRepoStats("SiteTaxonomyRepository");
     instantiateRepository(logger, config);
     Filters.init(config.adapterConfiguration(), repositoryHelper);
 
     // Creating netty client for out-bound calls.
+    Timer timer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
+    BootstrapCreation.init(timer);
+    RtbBootstrapCreation.init(timer);
     ClientBootstrap clientBootstrap = BootstrapCreation.createBootstrap(logger, config.serverConfiguration());
     ClientBootstrap rtbClientBootstrap = RtbBootstrapCreation.createBootstrap(logger, config.rtbConfiguration());
     if(null == clientBootstrap) {
@@ -123,8 +131,8 @@ public class ChannelServer {
       SegmentFactory.init(repositoryHelper);
       ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(
           Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
-      Timer timer = new HashedWheelTimer();
-      bootstrap.setPipelineFactory(new ChannelServerPipelineFactory(timer, config.serverConfiguration()));
+      Timer servertimer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
+      bootstrap.setPipelineFactory(new ChannelServerPipelineFactory(servertimer, config.serverConfiguration()));
       bootstrap.setOption("child.keepAlive", true);
       bootstrap.setOption("child.tcpNoDelay", true);
       bootstrap.setOption("child.reuseAddress", true);
@@ -197,6 +205,13 @@ public class ChannelServer {
       InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.refreshInterval,
           segmentFeedbackConfig.getString("refreshTime"));
       
+      InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.isUpdating, 0);
+      InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.repoSource,
+          databaseConfig.getString("database"));
+      InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.query, repoConfig.getString("query"));
+      InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.refreshInterval,
+          repoConfig.getString("refreshTime"));
+      
       InspectorStats.setStats("SiteTaxonomyRepository", InspectorStrings.isUpdating, 0);
       InspectorStats.setStats("SiteTaxonomyRepository", InspectorStrings.repoSource,
           databaseConfig.getString("database"));
@@ -217,6 +232,8 @@ public class ChannelServer {
           config.cacheConfiguration().subset("ChannelSegmentFeedbackRepository"), "ChannelSegmentFeedbackRepository");
       siteTaxonomyRepository.init(logger, config.cacheConfiguration().subset("SiteTaxonomyRepository"),
           "SiteTaxonomyRepository");
+      siteMetaDataRepository.init(logger, config.cacheConfiguration().subset("SiteMetaDataRepository"),
+          "SiteMetaDataRepository");
 
       logger.error("* * * * Instantiating repository completed * * * *");
     } catch (NamingException exception) {

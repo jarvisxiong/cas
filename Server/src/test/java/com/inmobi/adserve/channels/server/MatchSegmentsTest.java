@@ -7,6 +7,7 @@ import static org.easymock.classextension.EasyMock.verify;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -170,11 +171,14 @@ public class MatchSegmentsTest extends TestCase {
   public void testGetCategories() {
     Configuration mockConfig = createMock(Configuration.class);
     SASRequestParameters sasRequestParameters = new SASRequestParameters();
-    expect(mockConfig.getBoolean("isNewCategory")).andReturn(true).anyTimes();
+    expect(mockConfig.getBoolean("isNewCategory", false)).andReturn(true).anyTimes();
     expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
     expect(mockConfig.getString("loggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties").anyTimes();
     replay(mockConfig);
-    long [] newCat = {1,2,3};
+    List<Long> newCat = new ArrayList<Long>();
+    newCat.add(1L);
+    newCat.add(2L);
+    newCat.add(3L);
     sasRequestParameters.newCategories = newCat;
     
     RepositoryHelper repositoryHelper = createMock(RepositoryHelper.class);
@@ -192,8 +196,8 @@ public class MatchSegmentsTest extends TestCase {
     DebugLogger.init(mockConfig);
     MatchSegments matchSegments = new MatchSegments(new DebugLogger());
 
-    long [] cat = matchSegments.getCategories(sasRequestParameters, mockConfig);
-    System.out.println(cat);
+    //long [] cat = matchSegments.getCategories(sasRequestParameters, mockConfig);
+    System.out.println(matchSegments.getCategories(sasRequestParameters, mockConfig));
   }
 }
 

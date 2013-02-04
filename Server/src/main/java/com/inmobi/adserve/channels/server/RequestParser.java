@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.server;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -144,14 +145,14 @@ public class RequestParser {
     }
   }
 
-  public static long[] getCategory(JSONObject jObject, DebugLogger logger, String oldORnew) {
+  public static List<Long> getCategory(JSONObject jObject, DebugLogger logger, String oldORnew) {
     try {
       JSONArray categories = jObject.getJSONArray(oldORnew);
-      long[] category = new long[categories.length()];
+      Long[] category = new Long[categories.length()];
       for (int index = 0; index < categories.length(); index++) {
         category[index] = categories.getLong(index);
       }
-      return category;
+      return Arrays.asList(category);
     } catch (JSONException e) {
       logger.error("error while reading category array");
       return null;

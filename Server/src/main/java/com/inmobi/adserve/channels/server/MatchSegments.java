@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
 
@@ -51,7 +52,7 @@ public class MatchSegments {
     } else if(siteRatingStr.equalsIgnoreCase("family_safe")) {
       siteRating = 2;
     }
-    if(slotStr == null || Arrays.equals(sasParams.categories, null)) {
+    if(slotStr == null || sasParams.categories == null || sasParams.categories.isEmpty()) {
       return null;
     }
     try {
@@ -78,15 +79,15 @@ public class MatchSegments {
    * @param sasParams
    * @return
    */
-  public long[] getCategories(SASRequestParameters sasParams, Configuration serverConfig) {
+  public List<Long> getCategories(SASRequestParameters sasParams, Configuration serverConfig) {
     /**
      * Computing all the parents for categories in the new category list from
      * the request
      */
     HashSet<Long> newCategories = new HashSet<Long>();
 
-    for (long cat : sasParams.newCategories) {
-      String parentId = new Long(cat).toString();
+    for (Long cat : sasParams.newCategories) {
+      String parentId = cat.toString();
 
       while (parentId != null) {
         newCategories.add(Long.parseLong(parentId));
@@ -110,7 +111,9 @@ public class MatchSegments {
 
     // setting newCategories field in sasParams to contain their parentids as
     // well
-    sasParams.newCategories = newCat;
+    List<Long> temp = new ArrayList<Long>();
+    temp.addAll(newCategories);
+    sasParams.newCategories = temp;
 
     if(serverConfig.getBoolean("isNewCategory",false)) {
       return sasParams.newCategories;
@@ -122,7 +125,7 @@ public class MatchSegments {
   
 
   private HashMap<String, HashMap<String, ChannelSegmentEntity>> matchSegments(DebugLogger logger, long slotId,
-      long[] categories, long country, Integer targetingPlatform, Integer siteRating, int osId) {
+      List<Long> categories, long country, Integer targetingPlatform, Integer siteRating, int osId) {
     HashMap<String /* advertiserId */, HashMap<String /* adGroupId */, ChannelSegmentEntity>> result = new HashMap<String /* advertiserId */, HashMap<String /* adGroupId */, ChannelSegmentEntity>>();
 
     ArrayList<ChannelSegmentEntity> filteredAllCategoriesEntities = loadEntities(slotId, -1, country,
