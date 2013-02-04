@@ -102,13 +102,6 @@ public class MatchSegments {
 
     }
 
-    long[] newCat = new long[newCategories.size()];
-    int index = 0;
-
-    for (Long cat : newCategories) {
-      newCat[index++] = cat;
-    }
-
     // setting newCategories field in sasParams to contain their parentids as
     // well
     List<Long> temp = new ArrayList<Long>();
