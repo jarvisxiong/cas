@@ -46,7 +46,8 @@ public class AsyncRequestMaker {
   public static List<ChannelSegment> prepareForAsyncRequest(ChannelSegmentEntity[] rows, DebugLogger logger,
       Configuration config, Configuration rtbConfig, Configuration adapterConfig, HttpRequestHandlerBase base,
       Set<String> advertiserSet, MessageEvent e, RepositoryHelper repositoryHelper, JSONObject jObject,
-      SASRequestParameters sasParams, CasInternalRequestParameters casInternalRequestParameters, List<ChannelSegment> rtbSegments) throws Exception {
+      SASRequestParameters sasParams, CasInternalRequestParameters casInternalRequestParameters,
+      List<ChannelSegment> rtbSegments) throws Exception {
 
     List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
 
@@ -54,10 +55,11 @@ public class AsyncRequestMaker {
     boolean isRtbEnabled = false;
     isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled", false);
     logger.debug("isRtbEnabled is", new Boolean(isRtbEnabled).toString());
-   
+
     for (ChannelSegmentEntity row : rows) {
       AdNetworkInterface network = SegmentFactory.getChannel(row.getId(), row.getChannelId(), adapterConfig,
-          clientBootstrap, rtbClientBootstrap, base, e, advertiserSet, logger, isRtbEnabled, casInternalRequestParameters);
+          clientBootstrap, rtbClientBootstrap, base, e, advertiserSet, logger, isRtbEnabled,
+          casInternalRequestParameters);
       if(null == network) {
         logger.debug("No adapter found for adGroup:", row.getAdgroupId());
         continue;
@@ -225,8 +227,8 @@ public class AsyncRequestMaker {
       uidMap.put("U-ID", sasParams.uid);
     else {
       Iterator userMapIterator = userIdMap.keys();
-      while(userMapIterator.hasNext()) {
-        String key = (String)userMapIterator.next();
+      while (userMapIterator.hasNext()) {
+        String key = (String) userMapIterator.next();
         String value = null;
         try {
           value = (String) userIdMap.get(key);
