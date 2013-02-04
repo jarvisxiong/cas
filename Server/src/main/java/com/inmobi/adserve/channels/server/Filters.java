@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.*;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
@@ -71,7 +72,7 @@ public class Filters {
 
   public static ChannelSegmentEntity[] filter(HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments,
       DebugLogger logger, Double siteFloor, Configuration serverConfiguration, Configuration adapterConfiguration,
-      String siteId) {
+      String siteId, SASRequestParameters sasParams) {
 
     refreshWhiteListedSites(serverConfiguration, adapterConfiguration, logger);
 
@@ -79,7 +80,7 @@ public class Filters {
         matchedSegments,
         convertToSegmentsArray(Filters.partnerSegmentCountFilter(
             Filters.impressionBurnFilter(matchedSegments, logger, serverConfiguration, siteId), siteFloor, logger,
-            serverConfiguration, adapterConfiguration), logger), logger, serverConfiguration);
+            serverConfiguration, adapterConfiguration, sasParams), logger), logger, serverConfiguration);
   }
 
   /**
@@ -190,7 +191,7 @@ public class Filters {
    */
   public static HashMap<String, HashMap<String, ChannelSegmentEntity>> partnerSegmentCountFilter(
       HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments, Double siteFloor, DebugLogger logger,
-      Configuration serverConfiguration, Configuration adapterConfiguration) {
+      Configuration serverConfiguration, Configuration adapterConfiguration, SASRequestParameters sasParams) {
 
     logger.debug("Inside PartnerSegmentCountFilter");
     HashMap<String, HashMap<String, ChannelSegmentEntity>> rows = new HashMap<String, HashMap<String, ChannelSegmentEntity>>();
@@ -202,6 +203,12 @@ public class Filters {
       // Creating a sorted list of segments based on their ecpm
       for (String adgroupId : matchedSegments.get(advertiserId).keySet()) {
         ChannelSegmentEntity channelSegmentEntity = matchedSegments.get(advertiserId).get(adgroupId);
+
+        if(!segmentPropertyFilter(channelSegmentEntity, sasParams, logger)) {
+          continue;
+        }
+
+        logger.debug("Passed in control enrichment");
         ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = repositoryHelper
             .queryChannelSegmentFeedbackRepository(adgroupId);
 
@@ -215,8 +222,9 @@ public class Filters {
         if(channelSegmentFeedbackEntity.geteCPM() >= siteFloor) {
           logger.debug("sitefloor filter passed by adgroup " + channelSegmentFeedbackEntity.getId());
           hashMapList.add(channelSegmentFeedbackEntity);
-        } else
+        } else {
           logger.debug("sitefloor filter failed by adgroup " + channelSegmentFeedbackEntity.getId());
+        }
       }
 
       if(hashMapList.isEmpty())
@@ -256,6 +264,15 @@ public class Filters {
     return rows;
 
   }
+
+  private static boolean segmentPropertyFilter(ChannelSegmentEntity channelSegmentEntity,
+      SASRequestParameters sasParams, DebugLogger logger) {
+    boolean udidFilter =  (!channelSegmentEntity.isUdidRequired() || !StringUtils.isEmpty(sasParams.uidParams));
+    boolean zipCodeFilter = (!channelSegmentEntity.isZipCodeRequired() || !StringUtils.isEmpty(sasParams.postalCode));
+    boolean latLongFilter = (!channelSegmentEntity.isLatlonRequired() || !StringUtils.isEmpty(sasParams.latLong));
+    boolean richMediaFilter =  (!channelSegmentEntity.isUdidRequired() || !StringUtils.isEmpty(sasParams.locSrc));
+    return udidFilter && zipCodeFilter && latLongFilter && richMediaFilter;
+      }
 
   /**
    * 

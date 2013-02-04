@@ -14,6 +14,7 @@ import java.util.List;
 import org.apache.commons.configuration.Configuration;
 import org.testng.annotations.Test;
 
+import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.*;
 import com.inmobi.adserve.channels.repository.*;
 import com.inmobi.adserve.channels.util.DebugLogger;
@@ -221,7 +222,7 @@ public class FilterTest extends TestCase {
     matchedSegments.put(channelSegmentEntity4.getId(), adv2);
     matchedSegments.put(channelSegmentEntity6.getId(), adv3);
 
-    matchedSegments = Filters.partnerSegmentCountFilter(matchedSegments, 0.3, logger, mockConfig, mockAdapterConfig);
+    matchedSegments = Filters.partnerSegmentCountFilter(matchedSegments, 0.3, logger, mockConfig, mockAdapterConfig, new SASRequestParameters());
 
     assertEquals(false, matchedSegments.get("advertiserId1").containsKey("adgroupId1"));
     assertEquals(2, matchedSegments.get("advertiserId1").size());
