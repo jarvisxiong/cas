@@ -6,9 +6,11 @@ import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 import java.awt.Dimension;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.ChannelsClientHandler;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
@@ -46,12 +48,14 @@ public class ResponseSender extends HttpRequestHandlerBase {
   private ThirdPartyAdResponse adResponse;
   private boolean responseSent;
   public SASRequestParameters sasParams;
+  private boolean auctionComplete = false;
   private double secondBidPrice;
   private double bidFloor;
   private int rankIndexToProcess;
   private int selectedAdIndex;
   private boolean requestCleaned;
-  private ChannelSegment rtbResponse;
+  public ChannelSegment rtbResponse;
+  public CasInternalRequestParameters casInternalRequestParameters;
 
   public List<ChannelSegment> getRtbSegments() {
     return this.rtbSegments;
@@ -109,6 +113,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
   @Override
   public void sendAdResponse(AdNetworkInterface selectedAdNetwork, MessageEvent event) {
     adResponse = selectedAdNetwork.getResponseAd();
+    logger.debug("response inside sendadresponse adapter is", adResponse.response);
     selectedAdIndex = getRankIndex(selectedAdNetwork);
     sendAdResponse(adResponse.response, event);
     InspectorStats.incrementStatCount(selectedAdNetwork.getName(), InspectorStrings.serverImpression);
@@ -120,6 +125,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     if(responseSent) {
       return;
     }
+    logger.debug("response inside response is", responseString);
     responseSent = true;
     logger.debug("ad received so trying to send ad response");
     if(getResponseFormat().equals("xhtml")) {
@@ -143,6 +149,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
   //send response to the caller
   public void sendResponse(String responseString, ChannelEvent event) throws NullPointerException {
+    logger.debug("response string inside sendResponse is", responseString);
     HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
     response.setContent(ChannelBuffers.copiedBuffer(responseString, Charset.forName("UTF-8").name()));
     if(event != null) {
@@ -192,12 +199,24 @@ public class ResponseSender extends HttpRequestHandlerBase {
    */
   @Override
   public AdNetworkInterface runRtbSecondPriceAuctionEngine() {
+    auctionComplete = true;
+    logger.debug("Inside RTB auction engine");
+    List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
+    logger.debug("No of rtb partners who sent response are", new Integer(this.rtbSegments.size()).toString());
+    for (int i=0; i < this.rtbSegments.size() ; i++) {
+      if (this.rtbSegments.get(0).adNetworkInterface.getAdStatus().equalsIgnoreCase("AD")) {
+        rtbSegments.add(this.rtbSegments.get(i));
+      }
+    }
+    logger.debug("No of rtb partners who sent AD response are", new Integer(rtbSegments.size()).toString());
     if(rtbSegments.size() == 0) {
       rtbResponse = null;
+      logger.debug("returning from auction engine , winner is null");
       return null;
     } else if(rtbSegments.size() == 1) {
       rtbResponse = rtbSegments.get(0);
-      secondBidPrice = sasParams.siteFloor;
+      secondBidPrice = sasParams.siteFloor > casInternalRequestParameters.lowestEcpm ? sasParams.siteFloor : casInternalRequestParameters.lowestEcpm;
+      logger.debug("completed auction and winner is", rtbSegments.get(0).adNetworkInterface.getName());
       return rtbSegments.get(0).adNetworkInterface;
     }
 
@@ -231,6 +250,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     } else
       secondBidPrice = rtbSegments.get(1).adNetworkInterface.getBidprice();
     rtbResponse = rtbSegments.get(lowestLatency);
+    logger.debug("completed auction and winner is", rtbSegments.get(lowestLatency).adNetworkInterface.getName());
     return rtbSegments.get(lowestLatency).adNetworkInterface;
   }
 
@@ -399,4 +419,13 @@ public class ResponseSender extends HttpRequestHandlerBase {
     return responseFormat;
   }
 
+  @Override
+  public boolean isAuctionComplete() {
+    return auctionComplete;
+  }
+
+  @Override
+  public boolean isRtbResponseNull() {
+    return this.rtbResponse == null ? true : false;
+  }
 }
