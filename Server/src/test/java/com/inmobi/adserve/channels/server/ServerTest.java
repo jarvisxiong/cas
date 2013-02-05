@@ -96,10 +96,10 @@ public class ServerTest extends TestCase {
     expect(mockConfig.getString("debug")).andReturn(debug).anyTimes();
     expect(mockConfig.getInt("clickmaker.ipFileVersion")).andReturn(ipFileVersion).anyTimes();
     expect(mockConfig.getString("clickmaker.clickURLHashingSecretKeyVersion")).andReturn(secretKeyVersion).anyTimes();
-    expect(mockConfig.getString("clickmaker.key.2.value")).andReturn(keyValue).anyTimes();
+    expect(mockConfig.getString("clickmaker.key.1.value")).andReturn(keyValue).anyTimes();
     expect(mockConfig.getString("clickmaker.clickURLPrefix")).andReturn(clickURLPrefix).anyTimes();
     expect(mockConfig.getString("clickmaker.beaconURLPrefix")).andReturn(beaconURLPrefix).anyTimes();
-    expect(mockConfig.getString("clickmaker.key.2.type")).andReturn(keyType).anyTimes();
+    expect(mockConfig.getString("clickmaker.key.1.type")).andReturn(keyType).anyTimes();
     expect(mockConfig.getString("clickmaker.key")).andReturn(key).anyTimes();
     expect(mockConfig.getString("loggerConf")).andReturn(loggerConf).anyTimes();
     expect(mockConfig.getString("rr")).andReturn("rr").anyTimes();

@@ -6,16 +6,7 @@ import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 import java.awt.Dimension;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-
-import com.inmobi.adserve.channels.api.AdNetworkInterface;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.ChannelsClientHandler;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
@@ -25,6 +16,14 @@ import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponse;
+
+import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.ChannelsClientHandler;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -113,7 +112,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
   @Override
   public void sendAdResponse(AdNetworkInterface selectedAdNetwork, MessageEvent event) {
     adResponse = selectedAdNetwork.getResponseAd();
-    logger.debug("response inside sendadresponse adapter is", adResponse.response);
     selectedAdIndex = getRankIndex(selectedAdNetwork);
     sendAdResponse(adResponse.response, event);
     InspectorStats.incrementStatCount(selectedAdNetwork.getName(), InspectorStrings.serverImpression);
@@ -125,7 +123,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
     if(responseSent) {
       return;
     }
-    logger.debug("response inside response is", responseString);
     responseSent = true;
     logger.debug("ad received so trying to send ad response");
     if(getResponseFormat().equals("xhtml")) {
@@ -149,7 +146,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
   //send response to the caller
   public void sendResponse(String responseString, ChannelEvent event) throws NullPointerException {
-    logger.debug("response string inside sendResponse is", responseString);
     HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
     response.setContent(ChannelBuffers.copiedBuffer(responseString, Charset.forName("UTF-8").name()));
     if(event != null) {
@@ -215,8 +211,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
       return null;
     } else if(rtbSegments.size() == 1) {
       rtbResponse = rtbSegments.get(0);
-      secondBidPrice = sasParams.siteFloor > casInternalRequestParameters.lowestEcpm ? sasParams.siteFloor : casInternalRequestParameters.lowestEcpm;
-      logger.debug("completed auction and winner is", rtbSegments.get(0).adNetworkInterface.getName());
+      secondBidPrice = sasParams.siteFloor > casInternalRequestParameters.highestEcpm ? sasParams.siteFloor : casInternalRequestParameters.highestEcpm + 0.01;
+      rtbResponse.adNetworkInterface.setSecondBidPrice(secondBidPrice);
+      logger.debug("completed auction and winner is", rtbSegments.get(0).adNetworkInterface.getName() + " and secondBidPrice is " + secondBidPrice);
       return rtbSegments.get(0).adNetworkInterface;
     }
 
@@ -243,14 +240,16 @@ public class ResponseSender extends HttpRequestHandlerBase {
     if(secondHighestBidNumber != 1) {
       double secondHighestBidPrice = rtbSegments.get(secondHighestBidNumber).adNetworkInterface.getBidprice();
       double price = maxPrice * 0.9;
-      if(price > secondHighestBidPrice)
-        secondBidPrice = price;
-      else
-        secondBidPrice = secondHighestBidPrice;
+      if(price > secondHighestBidPrice) {
+        secondBidPrice = price + 0.01;
+      } else {
+        secondBidPrice = secondHighestBidPrice + 0.01;
+      }
     } else
-      secondBidPrice = rtbSegments.get(1).adNetworkInterface.getBidprice();
+      secondBidPrice = rtbSegments.get(1).adNetworkInterface.getBidprice() + 0.01;
     rtbResponse = rtbSegments.get(lowestLatency);
-    logger.debug("completed auction and winner is", rtbSegments.get(lowestLatency).adNetworkInterface.getName());
+    rtbResponse.adNetworkInterface.setSecondBidPrice(secondBidPrice);
+    logger.debug("completed auction and winner is", rtbSegments.get(lowestLatency).adNetworkInterface.getName() + " and secondBidPrice is " + secondBidPrice);
     return rtbSegments.get(lowestLatency).adNetworkInterface;
   }
 

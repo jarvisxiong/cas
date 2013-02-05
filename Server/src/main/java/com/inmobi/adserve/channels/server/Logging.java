@@ -156,7 +156,7 @@ public class Logging {
       log.append(channelSegment.channelSegmentEntity.getPricingModel()).append("\",\"BANNER\", \"");
       log.append(channelSegment.channelSegmentEntity.getExternalSiteKey()).append("\"],\"impid\":\"");
       log.append(channelSegment.adNetworkInterface.getImpressionId()).append("\"");
-      double winBid = channelSegment.adNetworkInterface.getBidprice();
+      double winBid = channelSegment.adNetworkInterface.getSecondBidPrice();
       if(winBid != -1) {
         log.append(",\"" + "winBid" + "\":\"" + winBid + "\"");
         ad.setWinBid(winBid);
