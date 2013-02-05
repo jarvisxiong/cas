@@ -178,6 +178,7 @@ public class ChannelServer {
       Configuration repoConfig = config.repoConfiguration();
       Configuration feedbackConfig = config.feedBackConfiguration();
       Configuration segmentFeedbackConfig = config.segmentFeedBackConfiguration();
+      Configuration siteMetaDataConfig = config.siteMetaDataConfiguration();
       InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.isUpdating, 0);
       InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.repoSource,
           databaseConfig.getString("database"));
@@ -203,9 +204,9 @@ public class ChannelServer {
       InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.isUpdating, 0);
       InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.repoSource,
           databaseConfig.getString("database"));
-      InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.query, repoConfig.getString("query"));
+      InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.query, siteMetaDataConfig.getString("query"));
       InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.refreshInterval,
-          repoConfig.getString("refreshTime"));
+          siteMetaDataConfig.getString("refreshTime"));
 
       initialContext.bind("java:comp/env/jdbc", dataSource);
 
