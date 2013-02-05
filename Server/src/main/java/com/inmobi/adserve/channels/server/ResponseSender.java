@@ -8,13 +8,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.inmobi.adserve.channels.api.AdNetworkInterface;
-import com.inmobi.adserve.channels.api.ChannelsClientHandler;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelEvent;
@@ -23,6 +16,14 @@ import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponse;
+
+import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.ChannelsClientHandler;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -46,12 +47,13 @@ public class ResponseSender extends HttpRequestHandlerBase {
   private ThirdPartyAdResponse adResponse;
   private boolean responseSent;
   public SASRequestParameters sasParams;
+  private boolean auctionComplete = false;
   private double secondBidPrice;
-  private double bidFloor;
   private int rankIndexToProcess;
   private int selectedAdIndex;
   private boolean requestCleaned;
-  private ChannelSegment rtbResponse;
+  public ChannelSegment rtbResponse;
+  public CasInternalRequestParameters casInternalRequestParameters;
 
   public List<ChannelSegment> getRtbSegments() {
     return this.rtbSegments;
@@ -98,8 +100,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
     this.adResponse = null;
     this.responseSent = false;
     this.sasParams = null;
-    this.bidFloor = ServletHandler.rtbConfig.getDouble("bidFloor", 0.0);
-    this.secondBidPrice = bidFloor;
     this.rankIndexToProcess = 0;
     this.selectedAdIndex = 0;
     this.requestCleaned = false;
@@ -192,12 +192,25 @@ public class ResponseSender extends HttpRequestHandlerBase {
    */
   @Override
   public AdNetworkInterface runRtbSecondPriceAuctionEngine() {
+    auctionComplete = true;
+    logger.debug("Inside RTB auction engine");
+    List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
+    logger.debug("No of rtb partners who sent response are", new Integer(this.rtbSegments.size()).toString());
+    for (int i=0; i < this.rtbSegments.size() ; i++) {
+      if (this.rtbSegments.get(0).adNetworkInterface.getAdStatus().equalsIgnoreCase("AD")) {
+        rtbSegments.add(this.rtbSegments.get(i));
+      }
+    }
+    logger.debug("No of rtb partners who sent AD response are", new Integer(rtbSegments.size()).toString());
     if(rtbSegments.size() == 0) {
       rtbResponse = null;
+      logger.debug("returning from auction engine , winner is null");
       return null;
     } else if(rtbSegments.size() == 1) {
       rtbResponse = rtbSegments.get(0);
-      secondBidPrice = sasParams.siteFloor;
+      secondBidPrice = sasParams.siteFloor > casInternalRequestParameters.highestEcpm ? sasParams.siteFloor : casInternalRequestParameters.highestEcpm + 0.01;
+      rtbResponse.adNetworkInterface.setSecondBidPrice(secondBidPrice);
+      logger.debug("completed auction and winner is", rtbSegments.get(0).adNetworkInterface.getName() + " and secondBidPrice is " + secondBidPrice);
       return rtbSegments.get(0).adNetworkInterface;
     }
 
@@ -224,13 +237,16 @@ public class ResponseSender extends HttpRequestHandlerBase {
     if(secondHighestBidNumber != 1) {
       double secondHighestBidPrice = rtbSegments.get(secondHighestBidNumber).adNetworkInterface.getBidprice();
       double price = maxPrice * 0.9;
-      if(price > secondHighestBidPrice)
-        secondBidPrice = price;
-      else
-        secondBidPrice = secondHighestBidPrice;
+      if(price > secondHighestBidPrice) {
+        secondBidPrice = price + 0.01;
+      } else {
+        secondBidPrice = secondHighestBidPrice + 0.01;
+      }
     } else
-      secondBidPrice = rtbSegments.get(1).adNetworkInterface.getBidprice();
+      secondBidPrice = rtbSegments.get(1).adNetworkInterface.getBidprice() + 0.01;
     rtbResponse = rtbSegments.get(lowestLatency);
+    rtbResponse.adNetworkInterface.setSecondBidPrice(secondBidPrice);
+    logger.debug("completed auction and winner is", rtbSegments.get(lowestLatency).adNetworkInterface.getName() + " and secondBidPrice is " + secondBidPrice);
     return rtbSegments.get(lowestLatency).adNetworkInterface;
   }
 
@@ -399,4 +415,13 @@ public class ResponseSender extends HttpRequestHandlerBase {
     return responseFormat;
   }
 
+  @Override
+  public boolean isAuctionComplete() {
+    return auctionComplete;
+  }
+
+  @Override
+  public boolean isRtbResponseNull() {
+    return this.rtbResponse == null ? true : false;
+  }
 }

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
+
 import org.apache.commons.configuration.Configuration;
 
 import org.apache.log4j.Logger;
@@ -52,7 +54,7 @@ public class MatchSegments {
     } else if(siteRatingStr.equalsIgnoreCase("family_safe")) {
       siteRating = 2;
     }
-    if(slotStr == null || Arrays.equals(sasParams.categories, null)) {
+    if(slotStr == null || sasParams.categories == null || sasParams.categories.isEmpty()) {
       return null;
     }
     try {
@@ -73,7 +75,7 @@ public class MatchSegments {
   }
 
   private HashMap<String, HashMap<String, ChannelSegmentEntity>> matchSegments(DebugLogger logger, long slotId,
-      long[] categories, long country, Integer targetingPlatform, Integer siteRating, int osId) {
+      List<Long> categories, long country, Integer targetingPlatform, Integer siteRating, int osId) {
     HashMap<String /* advertiserId */, HashMap<String /* adGroupId */, ChannelSegmentEntity>> result = new HashMap<String /* advertiserId */, HashMap<String /* adGroupId */, ChannelSegmentEntity>>();
 
     ArrayList<ChannelSegmentEntity> filteredAllCategoriesEntities = loadEntities(slotId, -1, country, targetingPlatform,

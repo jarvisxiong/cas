@@ -96,10 +96,10 @@ public class ServerTest extends TestCase {
     expect(mockConfig.getString("debug")).andReturn(debug).anyTimes();
     expect(mockConfig.getInt("clickmaker.ipFileVersion")).andReturn(ipFileVersion).anyTimes();
     expect(mockConfig.getString("clickmaker.clickURLHashingSecretKeyVersion")).andReturn(secretKeyVersion).anyTimes();
-    expect(mockConfig.getString("clickmaker.key.2.value")).andReturn(keyValue).anyTimes();
+    expect(mockConfig.getString("clickmaker.key.1.value")).andReturn(keyValue).anyTimes();
     expect(mockConfig.getString("clickmaker.clickURLPrefix")).andReturn(clickURLPrefix).anyTimes();
     expect(mockConfig.getString("clickmaker.beaconURLPrefix")).andReturn(beaconURLPrefix).anyTimes();
-    expect(mockConfig.getString("clickmaker.key.2.type")).andReturn(keyType).anyTimes();
+    expect(mockConfig.getString("clickmaker.key.1.type")).andReturn(keyType).anyTimes();
     expect(mockConfig.getString("clickmaker.key")).andReturn(key).anyTimes();
     expect(mockConfig.getString("loggerConf")).andReturn(loggerConf).anyTimes();
     expect(mockConfig.getString("rr")).andReturn("rr").anyTimes();
@@ -169,9 +169,9 @@ public class ServerTest extends TestCase {
   @Test
   public void testGetCategory() throws Exception {
     JSONObject jsonObject = prepareParameters();
-    long category[] = { 1, 2 };
+    Long[] category = { 1l, 2l };
     assertTrue("Category are expected to be equal",
-        Arrays.equals(RequestParser.getCategory(jsonObject, new DebugLogger()), category));
+        RequestParser.getCategory(jsonObject, new DebugLogger()).equals(Arrays.asList(category)));
   }
 
   @Test

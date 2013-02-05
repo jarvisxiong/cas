@@ -22,6 +22,7 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.jboss.netty.handler.timeout.IdleStateAwareChannelUpstreamHandler;
 import org.jboss.netty.handler.timeout.IdleStateEvent;
+import org.jboss.netty.util.CharsetUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -97,6 +98,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
   public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
     try {
       HttpRequest request = (HttpRequest) e.getMessage();
+      logger.debug(request.getContent().toString(CharsetUtil.UTF_8));
       QueryStringDecoder queryStringDecoder = new QueryStringDecoder(request.getUri());
       logger.debug(queryStringDecoder.getPath());
       ServletFactory servletFactory = ServletHandler.servletMap.get(queryStringDecoder.getPath());
@@ -145,12 +147,15 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
       } else {
         Logging.channelLogline(list, responseSender.getAdResponse().clickUrl, logger, ServletHandler.loggerConfig,
             responseSender.sasParams, totalTime);
-        if(responseSender.getRtbResponse() == null)
+        if(responseSender.getRtbResponse() == null) {
+          logger.debug("rtb response is null so logging dcp response in rr");
           Logging.rrLogging(responseSender.getRankList().get(responseSender.getSelectedAdIndex()), logger,
               ServletHandler.loggerConfig, responseSender.sasParams, terminationReason);
-        else
+        } else {
+          logger.debug("rtb response is not null so logging rtb response in rr");
           Logging.rrLogging(responseSender.getRtbResponse(), logger, ServletHandler.loggerConfig,
               responseSender.sasParams, terminationReason);
+        }
         Logging.advertiserLogging(list, logger, ServletHandler.loggerConfig);
         Logging.sampledAdvertiserLogging(list, logger, ServletHandler.loggerConfig);
       }

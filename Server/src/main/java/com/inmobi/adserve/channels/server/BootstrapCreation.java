@@ -22,9 +22,12 @@ import com.inmobi.adserve.channels.api.ChannelsClientHandler;
 class BootstrapCreation {
   public static ClientBootstrap bootstrap;
   private static ChannelsClientHandler channelHandler;
-  private static Timer timer = new HashedWheelTimer();
+  private static Timer timer;
   private static ConnectionLimitUpstreamHandler connectionLimitUpstreamHandler;
 
+  public static void init(Timer timer) {
+    BootstrapCreation.timer = timer;
+  }
   public static ClientBootstrap createBootstrap(Logger logger, final Configuration config) {
     // make the bootstrap object
     try {
