@@ -49,7 +49,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
   public SASRequestParameters sasParams;
   private boolean auctionComplete = false;
   private double secondBidPrice;
-  private double bidFloor;
   private int rankIndexToProcess;
   private int selectedAdIndex;
   private boolean requestCleaned;
@@ -101,8 +100,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
     this.adResponse = null;
     this.responseSent = false;
     this.sasParams = null;
-    this.bidFloor = ServletHandler.rtbConfig.getDouble("bidFloor", 0.0);
-    this.secondBidPrice = bidFloor;
     this.rankIndexToProcess = 0;
     this.selectedAdIndex = 0;
     this.requestCleaned = false;
