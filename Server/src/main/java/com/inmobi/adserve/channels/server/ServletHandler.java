@@ -116,6 +116,13 @@ public class ServletHandler {
         return new ServletGetSegment();
       }
     });
+    
+    servletMap.put("/whitelisting", new ServletFactory() {
+      @Override
+      public Servlet getServlet() {
+        return new ServletWhiteListSites();
+      }
+    });
 
   }
 
