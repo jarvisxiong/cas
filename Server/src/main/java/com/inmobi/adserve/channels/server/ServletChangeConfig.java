@@ -1,11 +1,10 @@
 package com.inmobi.adserve.channels.server;
 
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
+import org.jboss.netty.util.CharsetUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,10 +17,10 @@ public class ServletChangeConfig implements Servlet{
   @Override
   public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
       DebugLogger logger) throws Exception{
-    Map<String, List<String>> params = queryStringDecoder.getParameters();
-    JSONObject jObject;
+    HttpRequest request = (HttpRequest) e.getMessage();
+    JSONObject jObject = null;
     try {
-      jObject = RequestParser.extractParams(params, "update", logger);
+      jObject = new JSONObject(request.getContent().toString(CharsetUtil.UTF_8));
     } catch (JSONException exeption) {
       logger.debug("Encountered Json Error while creating json object inside servlet"); 
       hrh.setTerminationReason(ServletHandler.jsonParsingError);
@@ -29,10 +28,7 @@ public class ServletChangeConfig implements Servlet{
       hrh.responseSender.sendResponse("Incorrect Json", e);
       return;
     }
-    if(null == jObject) {
-      hrh.responseSender.sendResponse("Incorrect Json", e);
-      return;
-    }
+    
     logger.debug("Successfully got json for config change");
     try {
       StringBuilder updates = new StringBuilder();

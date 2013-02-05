@@ -149,8 +149,8 @@ public class ServletBackFill implements Servlet {
     }
     
     CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-    casInternalRequestParameters.lowestEcpm = getLowestEcpm(rows, logger);
-    logger.debug("Lowest Ecpm is", new Double(casInternalRequestParameters.lowestEcpm).toString());
+    casInternalRequestParameters.highestEcpm = getHighestEcpm(rows, logger);
+    logger.debug("Highest Ecpm is", new Double(casInternalRequestParameters.highestEcpm).toString());
     casInternalRequestParameters.blockedCategories = getBlockedCategories(hrh, logger);
     hrh.responseSender.casInternalRequestParameters = casInternalRequestParameters;
 
@@ -191,9 +191,11 @@ public class ServletBackFill implements Servlet {
     }
 
     if (hrh.responseSender.isAllRtbComplete()) {
-      AdNetworkInterface adNetworkInterface = hrh.responseSender.runRtbSecondPriceAuctionEngine();
-      if(null != adNetworkInterface) {
-        hrh.responseSender.sendAdResponse(adNetworkInterface, e);
+      AdNetworkInterface highestBid = hrh.responseSender.runRtbSecondPriceAuctionEngine();
+      if(null != highestBid) {
+        logger.debug("Sending rtb response of", highestBid.getName());
+        hrh.responseSender.sendAdResponse(highestBid, e);
+        //highestBid.impressionCallback();
         return;
       }
       // Resetting the rankIndexToProcess for already completed adapters.
@@ -223,7 +225,7 @@ public class ServletBackFill implements Servlet {
     return "BackFill";
   }
 
-  private static double getLowestEcpm(ChannelSegmentEntity[] channelSegmentEntities, DebugLogger logger) {
+  private static double getHighestEcpm(ChannelSegmentEntity[] channelSegmentEntities, DebugLogger logger) {
     double lowestEcpm = 0;
     for (ChannelSegmentEntity channelSegmentEntity : channelSegmentEntities) {
       if(null == ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(channelSegmentEntity
@@ -236,7 +238,7 @@ public class ServletBackFill implements Servlet {
         logger.debug("ecpm is "
             + ServletHandler.repositoryHelper
                 .queryChannelSegmentFeedbackRepository(channelSegmentEntity.getAdgroupId()).geteCPM());
-      lowestEcpm = lowestEcpm > ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(
+      lowestEcpm = lowestEcpm < ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(
           channelSegmentEntity.getAdgroupId()).geteCPM() ? ServletHandler.repositoryHelper
           .queryChannelSegmentFeedbackRepository(channelSegmentEntity.getAdgroupId()).geteCPM() : lowestEcpm;
     }
