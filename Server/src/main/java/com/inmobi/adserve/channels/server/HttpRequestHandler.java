@@ -22,6 +22,7 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.jboss.netty.handler.timeout.IdleStateAwareChannelUpstreamHandler;
 import org.jboss.netty.handler.timeout.IdleStateEvent;
+import org.jboss.netty.util.CharsetUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -97,6 +98,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
   public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
     try {
       HttpRequest request = (HttpRequest) e.getMessage();
+      logger.debug(request.getContent().toString(CharsetUtil.UTF_8));
       QueryStringDecoder queryStringDecoder = new QueryStringDecoder(request.getUri());
       logger.debug(queryStringDecoder.getPath());
       ServletFactory servletFactory = ServletHandler.servletMap.get(queryStringDecoder.getPath());

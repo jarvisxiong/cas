@@ -73,7 +73,7 @@ public class Filters {
       DebugLogger logger, Double siteFloor, Configuration serverConfiguration, Configuration adapterConfiguration,
       String siteId) {
 
-    //refreshWhiteListedSites(serverConfiguration, adapterConfiguration, logger);
+    refreshWhiteListedSites(serverConfiguration, adapterConfiguration, logger);
 
     return segmentsPerRequestFilter(
         matchedSegments,
