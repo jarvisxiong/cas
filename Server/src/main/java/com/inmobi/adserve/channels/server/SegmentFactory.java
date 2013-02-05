@@ -15,6 +15,7 @@ import com.inmobi.adserve.channels.adnetworks.ifd.IFDAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.lomark.DCPLomarkAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mobilecommerce.MobileCommerceAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mullahmedia.MullahMediaNetwork;
+import com.inmobi.adserve.channels.adnetworks.nexage.DCPNexageAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.openx.OpenxAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.pubmatic.DCPPubmaticAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
@@ -116,7 +117,10 @@ public class SegmentFactory {
       return new DCPLomarkAdNetwork(logger, config, clientBootstrap, base, serverEvent);
     } else if((advertiserId.equals(config.getString("pubmatic.advertiserId"))) && (advertiserSet.isEmpty() || advertiserSet.contains("pubmatic"))
             && (config.getString("pubmatic.status").equals("on"))) {
-        return new DCPPubmaticAdNetwork(logger, config, clientBootstrap, base, serverEvent);
+      return new DCPPubmaticAdNetwork(logger, config, clientBootstrap, base, serverEvent);
+    } else if((advertiserId.equals(config.getString("nexage.advertiserId"))) && (advertiserSet.isEmpty() || advertiserSet.contains("nexage"))
+        && (config.getString("nexage.status").equals("on"))) {
+      return new DCPNexageAdNetwork(logger, config, clientBootstrap, base, serverEvent);
     }
     return null;
   }
