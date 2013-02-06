@@ -1,8 +1,11 @@
 package com.inmobi.adserve.channels.server;
 
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.log4j.Logger;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 
@@ -33,7 +36,7 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 public class SegmentFactory {
 
   private static RepositoryHelper repositoryHelper;
-
+  private static Set<String> rtbAdaptersNames = new HashSet<String>();
   public static RepositoryHelper getRepositoryHelper() {
     return repositoryHelper;
   }
@@ -42,31 +45,53 @@ public class SegmentFactory {
     SegmentFactory.repositoryHelper = repositoryHelper;
   }
 
-  public static void init(RepositoryHelper repositoryHelper) {
+  public static void init(RepositoryHelper repositoryHelper, Configuration adapterConfiguration, Logger logger) {
     SegmentFactory.repositoryHelper = repositoryHelper;
+    SegmentFactory.populateRTBAdapterNames(adapterConfiguration, logger);
   }
 
+  private static void populateRTBAdapterNames(Configuration adapterConfiguration, Logger logger) {
+    Iterator<String> itr = adapterConfiguration.getKeys();
+    while (null != itr && itr.hasNext()) {
+      String str = itr.next();
+      if(str.endsWith(".advertiserId")) {
+        if(adapterConfiguration.getBoolean(str.replace(".advertiserId", ".isRtb"), false)) {
+          rtbAdaptersNames.add(str.replace(".advertiserId", ""));
+        }
+      }
+    }
+    logger.debug("RTB adapters in the config are" + rtbAdaptersNames.toString());
+  }
+    
   public static AdNetworkInterface getChannel(String advertiserId, String channelId, Configuration config, ClientBootstrap clientBootstrap,
       ClientBootstrap rtbClientBootstrap, HttpRequestHandlerBase base, MessageEvent serverEvent, Set<String> advertiserSet, DebugLogger logger,
       boolean isRtbEnabled, CasInternalRequestParameters casInternalRequestParameters) {
     if(isRtbEnabled) {
-      if((advertiserId.equalsIgnoreCase(config.getString("rtbAdvertiserName.advertiserId")))
-          && (null == advertiserSet || advertiserSet.isEmpty() || advertiserSet.contains("rtbAdvertiserName"))
-          && (config.getString("rtbAdvertiserName.status").equalsIgnoreCase("on") && config.getBoolean("rtbAdvertiserName.isRtb", false) == true)) {
-        String urlBase = config.getString("rtbAdvertiserName.host." + ChannelServer.dataCentreName);
-        if(urlBase != null && urlBase.equalsIgnoreCase("NA")) {
-          logger.debug("RTB requests are disabled for", ChannelServer.dataCentreName.toString(), "colo so returning null");
-          return null;
-        } else {
-          urlBase = config.getString("rtbAdvertiserName.host.default", null);
+      for (String partnerName : rtbAdaptersNames) {
+        if((advertiserId.equalsIgnoreCase(config.getString(partnerName + ".advertiserId")))
+            && (null == advertiserSet || advertiserSet.isEmpty() || advertiserSet.contains(partnerName))
+            && (config.getString(partnerName + ".status").equalsIgnoreCase("on") && config.getBoolean(partnerName
+                + ".isRtb", false))) {
+          String urlBase = config.getString(partnerName + ".host." + ChannelServer.dataCentreName);
+          // Disabled request for a particular colo will be drpped here.
+          if(urlBase != null && urlBase.equalsIgnoreCase("NA")) {
+            logger.debug("RTB requests are disabled for", ChannelServer.dataCentreName.toString(),
+                "colo so returning null");
+            return null;
+          }
+          // Use default host if colo specific host is not specified in the
+          // config. Return null if default is also not specified.
+          if(null == urlBase && config.getString(partnerName + ".host.default", null) == null) {
+            logger.debug("Default urlBase is not defined in config so returning null");
+            return null;
+          } else {
+            urlBase = config.getString(partnerName + ".host.default", null);
+          }
+          RtbAdNetwork rtbAdNetwork = new RtbAdNetwork(logger, config, rtbClientBootstrap, base, serverEvent, urlBase,
+              partnerName, casInternalRequestParameters);
+          logger.debug("Created RTB adapter instance for advertiser id : " + advertiserId);
+          return rtbAdNetwork;
         }
-        if (null == urlBase) {
-          logger.debug("Default urlBase is not defined in config so returning null");
-          return null;
-        }
-        RtbAdNetwork rtbAdNetwork = new RtbAdNetwork(logger, config, rtbClientBootstrap, base, serverEvent, urlBase, "rtbAdvertiserName", casInternalRequestParameters);
-        logger.debug("Created RTB adapter instance for advertiser id : " + advertiserId);
-        return rtbAdNetwork;
       }
     }
 
