@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+import com.inmobi.adserve.channels.api.ChannelSegment;
 import com.inmobi.adserve.channels.entity.*;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;

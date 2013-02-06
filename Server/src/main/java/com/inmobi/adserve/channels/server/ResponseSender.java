@@ -24,6 +24,7 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.api.ChannelSegment;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -59,6 +60,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     return this.rtbSegments;
   }
   
+  @Override
   public List<ChannelSegment> getRankList() {
     return this.rankList;
   }
@@ -67,10 +69,12 @@ public class ResponseSender extends HttpRequestHandlerBase {
     this.rankList = rankList;
   }
 
+  @Override
   public int getRankIndexToProcess() {
     return rankIndexToProcess;
   }
   
+  @Override
   public void setRankIndexToProcess(int rankIndexToProcess) {
     this.rankIndexToProcess = rankIndexToProcess;
   }
@@ -203,17 +207,20 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
     logger.debug("No of rtb partners who sent AD response are", new Integer(rtbSegments.size()).toString());
     if(rtbSegments.size() == 0) {
+      logger.debug("rtb segments are " + rtbSegments.size());
       rtbResponse = null;
       logger.debug("returning from auction engine , winner is null");
       return null;
     } else if(rtbSegments.size() == 1) {
+      logger.debug("rtb segments are " + rtbSegments.size());
       rtbResponse = rtbSegments.get(0);
       secondBidPrice = sasParams.siteFloor > casInternalRequestParameters.highestEcpm ? sasParams.siteFloor : casInternalRequestParameters.highestEcpm + 0.01;
       rtbResponse.adNetworkInterface.setSecondBidPrice(secondBidPrice);
       logger.debug("completed auction and winner is", rtbSegments.get(0).adNetworkInterface.getName() + " and secondBidPrice is " + secondBidPrice);
       return rtbSegments.get(0).adNetworkInterface;
     }
-
+    
+    logger.debug("rtb segments are " + rtbSegments.size());
     for (int i = 0; i < rtbSegments.size(); i++) {
       for (int j = i + 1; j < rtbSegments.size(); j++) {
         if(rtbSegments.get(i).adNetworkInterface.getBidprice() < rtbSegments.get(j).adNetworkInterface.getBidprice()) {

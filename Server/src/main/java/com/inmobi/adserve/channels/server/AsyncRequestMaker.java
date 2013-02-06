@@ -17,6 +17,7 @@ import org.json.JSONObject;
 
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.ChannelSegment;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
@@ -52,8 +53,7 @@ public class AsyncRequestMaker {
     List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
 
     logger.debug("Total channels available for sending requests", rows.length + "");
-    boolean isRtbEnabled = false;
-    isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled", false);
+    boolean isRtbEnabled =  rtbConfig.getBoolean("isRtbEnabled", false);
     logger.debug("isRtbEnabled is", new Boolean(isRtbEnabled).toString());
 
     for (ChannelSegmentEntity row : rows) {

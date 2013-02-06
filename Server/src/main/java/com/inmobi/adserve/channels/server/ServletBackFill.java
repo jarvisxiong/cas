@@ -15,6 +15,7 @@ import org.json.JSONObject;
 
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.ChannelSegment;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
