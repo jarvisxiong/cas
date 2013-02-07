@@ -102,7 +102,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     this.logger = logger;
     this.totalTime = System.currentTimeMillis();
     this.rankList = null;
-    this.rtbSegments = new ArrayList<ChannelSegment>();
+    this.rtbSegments = null;
     this.adResponse = null;
     this.responseSent = false;
     this.sasParams = null;
@@ -172,6 +172,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
   @Override
   public boolean isAllRtbComplete() {
+    if(rtbSegments == null)
+      return false;
     if(rtbSegments.size() == 0)
       return true;
     for (ChannelSegment channelSegment : rtbSegments) {
