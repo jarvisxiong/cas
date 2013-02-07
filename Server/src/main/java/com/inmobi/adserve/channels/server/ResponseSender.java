@@ -24,7 +24,7 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.api.ChannelSegment;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -44,7 +44,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
   private DebugLogger logger;
   private long totalTime;
   private List<ChannelSegment> rankList;
-  public List<ChannelSegment> rtbSegments;
+  private List<ChannelSegment> rtbSegments;
   private ThirdPartyAdResponse adResponse;
   private boolean responseSent;
   public SASRequestParameters sasParams;
@@ -60,7 +60,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
     return this.rtbSegments;
   }
   
-  @Override
+  public void setRtbSegments(List<ChannelSegment>  rtbSegments) {
+    this.rtbSegments = rtbSegments;
+    return;
+  }
+  
   public List<ChannelSegment> getRankList() {
     return this.rankList;
   }
@@ -69,12 +73,10 @@ public class ResponseSender extends HttpRequestHandlerBase {
     this.rankList = rankList;
   }
 
-  @Override
   public int getRankIndexToProcess() {
     return rankIndexToProcess;
   }
   
-  @Override
   public void setRankIndexToProcess(int rankIndexToProcess) {
     this.rankIndexToProcess = rankIndexToProcess;
   }
@@ -430,5 +432,52 @@ public class ResponseSender extends HttpRequestHandlerBase {
   @Override
   public boolean isRtbResponseNull() {
     return this.rtbResponse == null ? true : false;
+  }
+  
+  @Override
+  public void processDcpList(ThirdPartyAdResponse adResponse, MessageEvent serverEvent, AdNetworkInterface adNetworkInterface) {
+    // There would always be rtb partner before going to dcp list
+    // So will iterate over the dcp list once.
+    if(adNetworkInterface.isRtbPartner()) {
+      logger.debug(adNetworkInterface.getName(), "is the last rtb partner");
+      if(this.getRankList().isEmpty()) {
+        logger.debug("dcp list is empty so sending NoAd");
+        this.sendNoAdResponse(serverEvent);
+        return;
+      }
+      int rankIndexToProcess = this.getRankIndexToProcess();
+      ChannelSegment segment = this.getRankList().get(rankIndexToProcess);
+      while (segment.adNetworkInterface.isRequestCompleted()) {
+        if(segment.adNetworkInterface.getResponseAd().responseStatus == ResponseStatus.SUCCESS) {
+          this.sendAdResponse(segment.adNetworkInterface, serverEvent);
+          break;
+        }
+        rankIndexToProcess++;
+        if(rankIndexToProcess >= this.getRankList().size()) {
+          this.sendNoAdResponse(serverEvent);
+          break;
+        }
+        segment = getRankList().get(rankIndexToProcess);
+      }
+      this.setRankIndexToProcess(rankIndexToProcess);
+      return;
+    }
+    if(!this.isEligibleForProcess(adNetworkInterface)) {
+      logger.debug(adNetworkInterface.getName(), "is not eligible for processing");
+      return;
+    }
+    logger.debug("the channel is eligible for processing");
+    if(adResponse.responseStatus == ThirdPartyAdResponse.ResponseStatus.SUCCESS) {
+      sendAdResponse(adNetworkInterface, serverEvent);
+      cleanUp();
+      return;
+    } else if(isLastEntry(adNetworkInterface)) {
+      sendNoAdResponse(serverEvent);
+      cleanUp();
+      return;
+    } else {
+      reassignRanks(adNetworkInterface, serverEvent);
+      return;
+    }
   }
 }

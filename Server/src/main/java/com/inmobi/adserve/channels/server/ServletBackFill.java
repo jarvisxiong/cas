@@ -15,7 +15,6 @@ import org.json.JSONObject;
 
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.ChannelSegment;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
@@ -177,15 +176,15 @@ public class ServletBackFill implements Servlet {
     tempRankList = AsyncRequestMaker.makeAsyncRequests(tempRankList, logger, hrh.responseSender, e, rtbSegments);
 
     hrh.responseSender.setRankList(tempRankList);
-    hrh.responseSender.rtbSegments = rtbSegments;
+    hrh.responseSender.setRtbSegments(rtbSegments);
     if(logger.isDebugEnabled()) {
       logger.debug("Number of tpans whose request was successfully completed "
           + hrh.responseSender.getRankList().size());
       logger.debug("Number of rtb tpans whose request was successfully completed "
-          + hrh.responseSender.rtbSegments.size());
+          + hrh.responseSender.getRtbSegments().size());
     }
     // if none of the async request succeed, we return "NO_AD"
-    if(hrh.responseSender.getRankList().isEmpty() && hrh.responseSender.rtbSegments.isEmpty()) {
+    if(hrh.responseSender.getRankList().isEmpty() && hrh.responseSender.getRtbSegments().isEmpty()) {
       logger.debug("No calls");
       hrh.responseSender.sendNoAdResponse(e);
       return;
