@@ -437,33 +437,41 @@ public class ResponseSender extends HttpRequestHandlerBase {
   }
   
   @Override
-  public void processDcpList(ThirdPartyAdResponse adResponse, MessageEvent serverEvent, AdNetworkInterface adNetworkInterface) {
+  public void processLastRtbPartner(MessageEvent serverEvent, AdNetworkInterface adNetworkInterface) {
     // There would always be rtb partner before going to dcp list
     // So will iterate over the dcp list once.
-    if(adNetworkInterface.isRtbPartner()) {
-      logger.debug(adNetworkInterface.getName(), "is the last rtb partner");
-      if(this.getRankList().isEmpty()) {
-        logger.debug("dcp list is empty so sending NoAd");
-        this.sendNoAdResponse(serverEvent);
-        return;
-      }
-      int rankIndexToProcess = this.getRankIndexToProcess();
-      ChannelSegment segment = this.getRankList().get(rankIndexToProcess);
-      while (segment.adNetworkInterface.isRequestCompleted()) {
-        if(segment.adNetworkInterface.getResponseAd().responseStatus == ResponseStatus.SUCCESS) {
-          this.sendAdResponse(segment.adNetworkInterface, serverEvent);
-          break;
-        }
-        rankIndexToProcess++;
-        if(rankIndexToProcess >= this.getRankList().size()) {
-          this.sendNoAdResponse(serverEvent);
-          break;
-        }
-        segment = getRankList().get(rankIndexToProcess);
-      }
-      this.setRankIndexToProcess(rankIndexToProcess);
+    logger.debug(adNetworkInterface.getName(), "is the last rtb partner");
+    if(this.getRankList().isEmpty()) {
+      logger.debug("dcp list is empty so sending NoAd");
+      this.sendNoAdResponse(serverEvent);
       return;
+    } else {
+      processDcpList(serverEvent);
     }
+  }
+  
+  @Override
+  public void processDcpList(MessageEvent serverEvent) {
+    int rankIndexToProcess = this.getRankIndexToProcess();
+    ChannelSegment segment = this.getRankList().get(rankIndexToProcess);
+    while (segment.adNetworkInterface.isRequestCompleted()) {
+      if(segment.adNetworkInterface.getResponseAd().responseStatus == ResponseStatus.SUCCESS) {
+        this.sendAdResponse(segment.adNetworkInterface, serverEvent);
+        break;
+      }
+      rankIndexToProcess++;
+      if(rankIndexToProcess >= this.getRankList().size()) {
+        this.sendNoAdResponse(serverEvent);
+        break;
+      }
+      segment = getRankList().get(rankIndexToProcess);
+    }
+    this.setRankIndexToProcess(rankIndexToProcess);
+    return;
+  }
+  
+  @Override
+  public void processDcpPartner(MessageEvent serverEvent, AdNetworkInterface adNetworkInterface) {
     if(!this.isEligibleForProcess(adNetworkInterface)) {
       logger.debug(adNetworkInterface.getName(), "is not eligible for processing");
       return;

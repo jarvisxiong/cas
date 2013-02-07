@@ -199,21 +199,7 @@ public class ServletBackFill implements Servlet {
         return;
       }
       // Resetting the rankIndexToProcess for already completed adapters.
-      int rankIndexToProcess = hrh.responseSender.getRankIndexToProcess();
-      ChannelSegment segment = hrh.responseSender.getRankList().get(rankIndexToProcess);
-      while (segment.adNetworkInterface.isRequestCompleted()) {
-        if(segment.adNetworkInterface.getResponseAd().responseStatus == ResponseStatus.SUCCESS) {
-          hrh.responseSender.sendAdResponse(segment.adNetworkInterface, e);
-          break;
-        }
-        rankIndexToProcess++;
-        if(rankIndexToProcess >= hrh.responseSender.getRankList().size()) {
-          hrh.responseSender.sendNoAdResponse(e);
-          break;
-        }
-        segment = hrh.responseSender.getRankList().get(rankIndexToProcess);
-      }
-      hrh.responseSender.setRankIndexToProcess(rankIndexToProcess);
+      hrh.responseSender.processDcpList(e);
       if(logger.isDebugEnabled()) {
         logger.debug("retunrd from send Response, ranklist size is " + hrh.responseSender.getRankList().size());
       }
