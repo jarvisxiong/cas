@@ -198,51 +198,51 @@ public class ResponseSender extends HttpRequestHandlerBase {
   public AdNetworkInterface runRtbSecondPriceAuctionEngine() {
     auctionComplete = true;
     logger.debug("Inside RTB auction engine");
-    List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
+    List<ChannelSegment> rtbList = new ArrayList<ChannelSegment>();
     logger.debug("No of rtb partners who sent response are", new Integer(this.rtbSegments.size()).toString());
     for (int i=0; i < this.rtbSegments.size() ; i++) {
       if (this.rtbSegments.get(0).adNetworkInterface.getAdStatus().equalsIgnoreCase("AD")) {
-        rtbSegments.add(this.rtbSegments.get(i));
+        rtbList.add(this.rtbSegments.get(i));
       }
     }
-    logger.debug("No of rtb partners who sent AD response are", new Integer(rtbSegments.size()).toString());
-    if(rtbSegments.size() == 0) {
-      logger.debug("rtb segments are " + rtbSegments.size());
+    logger.debug("No of rtb partners who sent AD response are", new Integer(rtbList.size()).toString());
+    if(rtbList.size() == 0) {
+      logger.debug("rtb segments are " + rtbList.size());
       rtbResponse = null;
       logger.debug("returning from auction engine , winner is null");
       return null;
-    } else if(rtbSegments.size() == 1) {
-      logger.debug("rtb segments are " + rtbSegments.size());
-      rtbResponse = rtbSegments.get(0);
+    } else if(rtbList.size() == 1) {
+      logger.debug("rtb segments are " + rtbList.size());
+      rtbResponse = rtbList.get(0);
       secondBidPrice = sasParams.siteFloor > casInternalRequestParameters.highestEcpm ? sasParams.siteFloor : casInternalRequestParameters.highestEcpm + 0.01;
       rtbResponse.adNetworkInterface.setSecondBidPrice(secondBidPrice);
-      logger.debug("completed auction and winner is", rtbSegments.get(0).adNetworkInterface.getName() + " and secondBidPrice is " + secondBidPrice);
-      return rtbSegments.get(0).adNetworkInterface;
+      logger.debug("completed auction and winner is", rtbList.get(0).adNetworkInterface.getName() + " and secondBidPrice is " + secondBidPrice);
+      return rtbList.get(0).adNetworkInterface;
     }
     
-    logger.debug("rtb segments are " + rtbSegments.size());
-    for (int i = 0; i < rtbSegments.size(); i++) {
-      for (int j = i + 1; j < rtbSegments.size(); j++) {
-        if(rtbSegments.get(i).adNetworkInterface.getBidprice() < rtbSegments.get(j).adNetworkInterface.getBidprice()) {
-          ChannelSegment channelSegment = rtbSegments.get(i);
-          rtbSegments.set(i, rtbSegments.get(j));
-          rtbSegments.set(j, channelSegment);
+    logger.debug("rtb segments are " + rtbList.size());
+    for (int i = 0; i < rtbList.size(); i++) {
+      for (int j = i + 1; j < rtbList.size(); j++) {
+        if(rtbList.get(i).adNetworkInterface.getBidprice() < rtbList.get(j).adNetworkInterface.getBidprice()) {
+          ChannelSegment channelSegment = rtbList.get(i);
+          rtbList.set(i, rtbList.get(j));
+          rtbList.set(j, channelSegment);
         }
       }
     }
-    double maxPrice = rtbSegments.get(0).adNetworkInterface.getBidprice();
+    double maxPrice = rtbList.get(0).adNetworkInterface.getBidprice();
     int secondHighestBidNumber = 1;
     int lowestLatency = 0;
-    for (int i = 1; i < rtbSegments.size(); i++) {
-      if(rtbSegments.get(i).adNetworkInterface.getBidprice() < maxPrice) {
+    for (int i = 1; i < rtbList.size(); i++) {
+      if(rtbList.get(i).adNetworkInterface.getBidprice() < maxPrice) {
         secondHighestBidNumber = i;
         break;
-      } else if(rtbSegments.get(i).adNetworkInterface.getLatency() < rtbSegments.get(lowestLatency).adNetworkInterface
+      } else if(rtbList.get(i).adNetworkInterface.getLatency() < rtbList.get(lowestLatency).adNetworkInterface
           .getLatency())
         lowestLatency = i;
     }
     if(secondHighestBidNumber != 1) {
-      double secondHighestBidPrice = rtbSegments.get(secondHighestBidNumber).adNetworkInterface.getBidprice();
+      double secondHighestBidPrice = rtbList.get(secondHighestBidNumber).adNetworkInterface.getBidprice();
       double price = maxPrice * 0.9;
       if(price > secondHighestBidPrice) {
         secondBidPrice = price + 0.01;
@@ -250,11 +250,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
         secondBidPrice = secondHighestBidPrice + 0.01;
       }
     } else
-      secondBidPrice = rtbSegments.get(1).adNetworkInterface.getBidprice() + 0.01;
-    rtbResponse = rtbSegments.get(lowestLatency);
+      secondBidPrice = rtbList.get(1).adNetworkInterface.getBidprice() + 0.01;
+    rtbResponse = rtbList.get(lowestLatency);
     rtbResponse.adNetworkInterface.setSecondBidPrice(secondBidPrice);
-    logger.debug("completed auction and winner is", rtbSegments.get(lowestLatency).adNetworkInterface.getName() + " and secondBidPrice is " + secondBidPrice);
-    return rtbSegments.get(lowestLatency).adNetworkInterface;
+    logger.debug("completed auction and winner is", rtbList.get(lowestLatency).adNetworkInterface.getName() + " and secondBidPrice is " + secondBidPrice);
+    return rtbList.get(lowestLatency).adNetworkInterface;
   }
 
   @Override
