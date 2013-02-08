@@ -202,7 +202,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
   public synchronized AdNetworkInterface runRtbSecondPriceAuctionEngine() {
     //Do not run auction 2 times.
     if(auctionComplete)
-      return rtbResponse.adNetworkInterface;
+      return rtbResponse == null ? null : rtbResponse.adNetworkInterface;
     
     auctionComplete = true;
     logger.debug("Inside RTB auction engine");
