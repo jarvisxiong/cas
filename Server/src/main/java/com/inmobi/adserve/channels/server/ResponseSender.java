@@ -128,6 +128,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
         responseString = noAdXhtml;
         InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
       }
+    } else {
+      InspectorStats.incrementStatCount(InspectorStrings.totalFills);
     }
     sendResponse(responseString, event);
   }
