@@ -41,7 +41,7 @@ public class ServletBackFill implements Servlet {
       InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
     }
     hrh.responseSender.sasParams = RequestParser.parseRequestParameters(hrh.jObject, logger);
-
+    hrh.responseSender.getAuctionEngine().sasParams = hrh.responseSender.sasParams;
     if(ServletHandler.random.nextInt(100) >= ServletHandler.percentRollout) {
       logger.debug("Request not being served because of limited percentage rollout");
       InspectorStats.incrementStatCount(InspectorStrings.droppedRollout, InspectorStrings.count);
@@ -153,7 +153,7 @@ public class ServletBackFill implements Servlet {
     logger.debug("Highest Ecpm is", new Double(casInternalRequestParameters.highestEcpm).toString());
     casInternalRequestParameters.blockedCategories = getBlockedCategories(hrh, logger);
     hrh.responseSender.casInternalRequestParameters = casInternalRequestParameters;
-
+    hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternalRequestParameters;
     logger.debug("Total channels available for sending requests " + rows.length);
     List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
     segments = AsyncRequestMaker.prepareForAsyncRequest(rows, logger, ServletHandler.config, ServletHandler.rtbConfig,
@@ -176,22 +176,22 @@ public class ServletBackFill implements Servlet {
     tempRankList = AsyncRequestMaker.makeAsyncRequests(tempRankList, logger, hrh.responseSender, e, rtbSegments);
 
     hrh.responseSender.setRankList(tempRankList);
-    hrh.responseSender.setRtbSegments(rtbSegments);
+    hrh.responseSender.getAuctionEngine().setRtbSegments(rtbSegments);
     if(logger.isDebugEnabled()) {
       logger.debug("Number of tpans whose request was successfully completed "
           + hrh.responseSender.getRankList().size());
       logger.debug("Number of rtb tpans whose request was successfully completed "
-          + hrh.responseSender.getRtbSegments().size());
+          + hrh.responseSender.getAuctionEngine().getRtbSegments().size());
     }
     // if none of the async request succeed, we return "NO_AD"
-    if(hrh.responseSender.getRankList().isEmpty() && hrh.responseSender.getRtbSegments().isEmpty()) {
+    if(hrh.responseSender.getRankList().isEmpty() && hrh.responseSender.getAuctionEngine().getRtbSegments().isEmpty()) {
       logger.debug("No calls");
       hrh.responseSender.sendNoAdResponse(e);
       return;
     }
 
-    if (hrh.responseSender.isAllRtbComplete()) {
-      AdNetworkInterface highestBid = hrh.responseSender.runRtbSecondPriceAuctionEngine();
+    if (hrh.responseSender.getAuctionEngine().isAllRtbComplete()) {
+      AdNetworkInterface highestBid = hrh.responseSender.getAuctionEngine().runRtbSecondPriceAuctionEngine();
       if(null != highestBid) {
         logger.debug("Sending rtb response of", highestBid.getName());
         hrh.responseSender.sendAdResponse(highestBid, e);
