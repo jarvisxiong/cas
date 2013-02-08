@@ -103,7 +103,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
     adResponse = selectedAdNetwork.getResponseAd();
     selectedAdIndex = getRankIndex(selectedAdNetwork);
     sendAdResponse(adResponse.response, event);
-    InspectorStats.incrementStatCount(selectedAdNetwork.getName(), InspectorStrings.serverImpression);
   }
 
   // send Ad Response
