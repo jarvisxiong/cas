@@ -51,12 +51,12 @@ public class AuctionEngine implements AuctionEngineInterface {
     }
     logger.debug("No of rtb partners who sent AD response are", new Integer(rtbList.size()).toString());
     if(rtbList.size() == 0) {
-      logger.debug("rtb segments are " + rtbList.size());
+      logger.debug("rtb segments are", new Integer(rtbList.size()).toString());
       rtbResponse = null;
       logger.debug("returning from auction engine , winner is null");
       return null;
     } else if(rtbList.size() == 1) {
-      logger.debug("rtb segments are " + rtbList.size());
+      logger.debug("rtb segments are", new Integer(rtbList.size()).toString());
       rtbResponse = rtbList.get(0);
       secondBidPrice = sasParams.siteFloor > casInternalRequestParameters.highestEcpm ? sasParams.siteFloor : casInternalRequestParameters.highestEcpm + 0.01;
       rtbResponse.adNetworkInterface.setSecondBidPrice(secondBidPrice);
@@ -64,7 +64,7 @@ public class AuctionEngine implements AuctionEngineInterface {
       return rtbList.get(0).adNetworkInterface;
     }
     
-    logger.debug("rtb segments are " + rtbList.size());
+    logger.debug("rtb segments are", new Integer(rtbList.size()).toString());
     for (int i = 0; i < rtbList.size(); i++) {
       for (int j = i + 1; j < rtbList.size(); j++) {
         if(rtbList.get(i).adNetworkInterface.getBidprice() < rtbList.get(j).adNetworkInterface.getBidprice()) {
