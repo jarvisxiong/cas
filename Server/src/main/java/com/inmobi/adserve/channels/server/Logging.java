@@ -137,6 +137,7 @@ public class Logging {
     Ad ad = null;
     Impression impression = null;
     if(channelSegment != null) {
+      InspectorStats.incrementStatCount(channelSegment.adNetworkInterface.getName(), InspectorStrings.serverImpression);
       adsServed = 1;
       log.append("{\"ad\":[");
       log.append(channelSegment.channelSegmentEntity.getIncId()).append(",");

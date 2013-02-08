@@ -133,8 +133,8 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
     List<ChannelSegment> list = new ArrayList<ChannelSegment>();
     if(null != responseSender.getRankList())
       list.addAll(responseSender.getRankList());
-    if(null != responseSender.getRtbSegments())
-      list.addAll(responseSender.getRtbSegments());
+    if(null != responseSender.getAuctionEngine().getRtbSegments())
+      list.addAll(responseSender.getAuctionEngine().getRtbSegments());
     long totalTime = responseSender.getTotalTime();
     if(totalTime > 2000)
       totalTime = 0;
