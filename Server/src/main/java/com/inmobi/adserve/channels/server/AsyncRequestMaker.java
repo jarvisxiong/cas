@@ -159,8 +159,6 @@ public class AsyncRequestMaker {
         rtbItr.remove();
       }
     }
-    logger.debug("Number of tpans whose request was successfully completed", rankList.size() + "");
-    logger.debug("Number of rtb tpans whose request was successfully completed", rtbSegments.size() + "");
     return rankList;
   }
 

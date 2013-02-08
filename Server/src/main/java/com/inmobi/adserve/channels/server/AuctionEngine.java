@@ -4,15 +4,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.AuctionEngineInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
-public class AuctionEngine {
+/***
+ * Auction Engine to run different types of auctions in rtb.
+ * @author Devi Chand(devi.chand@inmobi.com)
+ */
+public class AuctionEngine implements AuctionEngineInterface {
   private boolean auctionComplete = false;
   private ChannelSegment rtbResponse;
   private double secondBidPrice;
+  public SASRequestParameters sasParams;
+  public CasInternalRequestParameters casInternalRequestParameters;
+  private List<ChannelSegment> rtbSegments;
+  private DebugLogger logger;
   
+  public AuctionEngine(DebugLogger logger) {
+    this.logger = logger;
+  }
   /***
    * RunRtbSecondPriceAuctionEngine returns the adnetwork selected after
    * auctioning If no of rtb segments selected after filtering is zero it
@@ -23,7 +35,7 @@ public class AuctionEngine {
    * selected for sending response and will be charged the highest of
    * secondHighest price or 90% of bidFloor
    */
-  public synchronized AdNetworkInterface runRtbSecondPriceAuctionEngine(DebugLogger logger, List<ChannelSegment> rtbSegments, SASRequestParameters sasParams, CasInternalRequestParameters casInternalRequestParameters) {
+  public synchronized AdNetworkInterface runRtbSecondPriceAuctionEngine() {
     //Do not run auction 2 times.
     if(auctionComplete)
       return rtbResponse == null ? null : rtbResponse.adNetworkInterface;
@@ -33,7 +45,7 @@ public class AuctionEngine {
     List<ChannelSegment> rtbList = new ArrayList<ChannelSegment>();
     logger.debug("No of rtb partners who sent response are", new Integer(rtbSegments.size()).toString());
     for (int i=0; i < rtbSegments.size() ; i++) {
-      if (rtbSegments.get(0).adNetworkInterface.getAdStatus().equalsIgnoreCase("AD")) {
+      if (rtbSegments.get(i).adNetworkInterface.getAdStatus().equalsIgnoreCase("AD")) {
         rtbList.add(rtbSegments.get(i));
       }
     }
@@ -99,5 +111,31 @@ public class AuctionEngine {
 
   public double getSecondBidPrice() {
     return secondBidPrice;
+  }
+  
+  @Override
+  public boolean isAllRtbComplete() {
+    if(rtbSegments == null)
+      return false;
+    if(rtbSegments.size() == 0)
+      return true;
+    for (ChannelSegment channelSegment : rtbSegments) {
+      if(!channelSegment.adNetworkInterface.isRequestCompleted())
+        return false;
+    }
+    return true;
+  }
+  
+  @Override
+  public boolean isRtbResponseNull() {
+    return rtbResponse == null ? true : false;
+  }
+  
+  public List<ChannelSegment> getRtbSegments() {
+    return rtbSegments;
+  }
+  
+  public void setRtbSegments(List<ChannelSegment> rtbSegments) {
+    this.rtbSegments = rtbSegments;    
   }
 }

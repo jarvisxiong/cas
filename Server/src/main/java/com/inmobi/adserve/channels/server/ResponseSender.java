@@ -43,7 +43,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
   private DebugLogger logger;
   private long totalTime;
   private List<ChannelSegment> rankList;
-  private List<ChannelSegment> rtbSegments;
   private ThirdPartyAdResponse adResponse;
   private boolean responseSent;
   public SASRequestParameters sasParams;
@@ -53,15 +52,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
   public CasInternalRequestParameters casInternalRequestParameters;
   private AuctionEngine auctionEngine;
 
-  public List<ChannelSegment> getRtbSegments() {
-    return this.rtbSegments;
-  }
-  
-  public void setRtbSegments(List<ChannelSegment>  rtbSegments) {
-    this.rtbSegments = rtbSegments;
-    return;
-  }
-  
   public List<ChannelSegment> getRankList() {
     return this.rankList;
   }
@@ -99,14 +89,13 @@ public class ResponseSender extends HttpRequestHandlerBase {
     this.logger = logger;
     this.totalTime = System.currentTimeMillis();
     this.rankList = null;
-    this.rtbSegments = null;
     this.adResponse = null;
     this.responseSent = false;
     this.sasParams = null;
     this.rankIndexToProcess = 0;
     this.selectedAdIndex = 0;
     this.requestCleaned = false;
-    this.auctionEngine = new AuctionEngine();
+    this.auctionEngine = new AuctionEngine(logger);
   }
 
   @Override
@@ -168,36 +157,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
   }
 
   @Override
-  public boolean isAllRtbComplete() {
-    if(rtbSegments == null)
-      return false;
-    if(rtbSegments.size() == 0)
-      return true;
-    for (ChannelSegment channelSegment : rtbSegments) {
-      if(!channelSegment.adNetworkInterface.isRequestCompleted())
-        return false;
-    }
-    return true;
-  }
-
-  @Override
-  public double getSecondBidPrice() {
-    return auctionEngine.getSecondBidPrice();
-  }
-  
-  /***
-   * RunRtbSecondPriceAuctionEngine returns the adnetwork selected after
-   * auctioning If no of rtb segments selected after filtering is zero it
-   * returns the null If no of rtb segments selected after filtering is one it
-   * returns the rtb adapter for the segment BidFloor is maximum of lowestEcpm
-   * and siteFloor If only 2 rtb are selected, highest bid will win and would be
-   * charged the secondHighest price If only 1 rtb is selected, it will be
-   * selected for sending response and will be charged the highest of
-   * secondHighest price or 90% of bidFloor
-   */
-  @Override
-  public synchronized AdNetworkInterface runRtbSecondPriceAuctionEngine() {
-    return auctionEngine.runRtbSecondPriceAuctionEngine(logger, rtbSegments, sasParams, casInternalRequestParameters);
+  public AuctionEngine getAuctionEngine() {
+    return auctionEngine;
   }
 
   @Override
@@ -366,16 +327,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
   }
 
   @Override
-  public boolean isAuctionComplete() {
-    return auctionEngine.isAuctionComplete();
-  }
-
-  @Override
-  public boolean isRtbResponseNull() {
-    return this.auctionEngine.getRtbResponse() == null ? true : false;
-  }
-  
-  @Override
   public void processDcpList(MessageEvent serverEvent) {
     // There would always be rtb partner before going to dcp list
     // So will iterate over the dcp list once.
@@ -421,9 +372,5 @@ public class ResponseSender extends HttpRequestHandlerBase {
       reassignRanks(adNetworkInterface, serverEvent);
       return;
     }
-  }
-
-  public AuctionEngine getAuctionEngine() {
-    return auctionEngine;
   }
 }
