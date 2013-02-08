@@ -199,7 +199,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
    * secondHighest price or 90% of bidFloor
    */
   @Override
-  public AdNetworkInterface runRtbSecondPriceAuctionEngine() {
+  public synchronized AdNetworkInterface runRtbSecondPriceAuctionEngine() {
+    //Do not run auction 2 times.
+    if(auctionComplete)
+      return rtbResponse.adNetworkInterface;
+    
     auctionComplete = true;
     logger.debug("Inside RTB auction engine");
     List<ChannelSegment> rtbList = new ArrayList<ChannelSegment>();
@@ -437,21 +441,14 @@ public class ResponseSender extends HttpRequestHandlerBase {
   }
   
   @Override
-  public void processLastRtbPartner(MessageEvent serverEvent, AdNetworkInterface adNetworkInterface) {
+  public void processDcpList(MessageEvent serverEvent) {
     // There would always be rtb partner before going to dcp list
     // So will iterate over the dcp list once.
-    logger.debug(adNetworkInterface.getName(), "is the last rtb partner");
     if(this.getRankList().isEmpty()) {
       logger.debug("dcp list is empty so sending NoAd");
       this.sendNoAdResponse(serverEvent);
       return;
-    } else {
-      processDcpList(serverEvent);
-    }
-  }
-  
-  @Override
-  public void processDcpList(MessageEvent serverEvent) {
+    } 
     int rankIndexToProcess = this.getRankIndexToProcess();
     ChannelSegment segment = this.getRankList().get(rankIndexToProcess);
     while (segment.adNetworkInterface.isRequestCompleted()) {
@@ -477,7 +474,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
       return;
     }
     logger.debug("the channel is eligible for processing");
-    if(adResponse.responseStatus == ThirdPartyAdResponse.ResponseStatus.SUCCESS) {
+    if(adNetworkInterface.getResponseAd().responseStatus == ThirdPartyAdResponse.ResponseStatus.SUCCESS) {
       sendAdResponse(adNetworkInterface, serverEvent);
       cleanUp();
       return;
