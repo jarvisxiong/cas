@@ -122,13 +122,13 @@ public class ResponseSender extends HttpRequestHandlerBase {
         Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot));
         String startElement = String.format(startTags, (int) dim.getWidth(), (int) dim.getHeight());
         responseString = startElement + responseString + endTags;
+        InspectorStats.incrementStatCount(InspectorStrings.totalFills);
       } else {
         logger.error("invalid slot, so not returning response, even though we got an ad");
         responseString = noAdXhtml;
         InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
       }
     }
-    InspectorStats.incrementStatCount(InspectorStrings.totalFills);
     sendResponse(responseString, event);
   }
 
