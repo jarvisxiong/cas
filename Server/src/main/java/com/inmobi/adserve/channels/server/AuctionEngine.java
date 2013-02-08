@@ -1,0 +1,103 @@
+package com.inmobi.adserve.channels.server;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.util.DebugLogger;
+
+public class AuctionEngine {
+  private boolean auctionComplete = false;
+  private ChannelSegment rtbResponse;
+  private double secondBidPrice;
+  
+  /***
+   * RunRtbSecondPriceAuctionEngine returns the adnetwork selected after
+   * auctioning If no of rtb segments selected after filtering is zero it
+   * returns the null If no of rtb segments selected after filtering is one it
+   * returns the rtb adapter for the segment BidFloor is maximum of lowestEcpm
+   * and siteFloor If only 2 rtb are selected, highest bid will win and would be
+   * charged the secondHighest price If only 1 rtb is selected, it will be
+   * selected for sending response and will be charged the highest of
+   * secondHighest price or 90% of bidFloor
+   */
+  public synchronized AdNetworkInterface runRtbSecondPriceAuctionEngine(DebugLogger logger, List<ChannelSegment> rtbSegments, SASRequestParameters sasParams, CasInternalRequestParameters casInternalRequestParameters) {
+    //Do not run auction 2 times.
+    if(auctionComplete)
+      return rtbResponse == null ? null : rtbResponse.adNetworkInterface;
+    
+    auctionComplete = true;
+    logger.debug("Inside RTB auction engine");
+    List<ChannelSegment> rtbList = new ArrayList<ChannelSegment>();
+    logger.debug("No of rtb partners who sent response are", new Integer(rtbSegments.size()).toString());
+    for (int i=0; i < rtbSegments.size() ; i++) {
+      if (rtbSegments.get(0).adNetworkInterface.getAdStatus().equalsIgnoreCase("AD")) {
+        rtbList.add(rtbSegments.get(i));
+      }
+    }
+    logger.debug("No of rtb partners who sent AD response are", new Integer(rtbList.size()).toString());
+    if(rtbList.size() == 0) {
+      logger.debug("rtb segments are " + rtbList.size());
+      rtbResponse = null;
+      logger.debug("returning from auction engine , winner is null");
+      return null;
+    } else if(rtbList.size() == 1) {
+      logger.debug("rtb segments are " + rtbList.size());
+      rtbResponse = rtbList.get(0);
+      secondBidPrice = sasParams.siteFloor > casInternalRequestParameters.highestEcpm ? sasParams.siteFloor : casInternalRequestParameters.highestEcpm + 0.01;
+      rtbResponse.adNetworkInterface.setSecondBidPrice(secondBidPrice);
+      logger.debug("completed auction and winner is", rtbList.get(0).adNetworkInterface.getName() + " and secondBidPrice is " + secondBidPrice);
+      return rtbList.get(0).adNetworkInterface;
+    }
+    
+    logger.debug("rtb segments are " + rtbList.size());
+    for (int i = 0; i < rtbList.size(); i++) {
+      for (int j = i + 1; j < rtbList.size(); j++) {
+        if(rtbList.get(i).adNetworkInterface.getBidprice() < rtbList.get(j).adNetworkInterface.getBidprice()) {
+          ChannelSegment channelSegment = rtbList.get(i);
+          rtbList.set(i, rtbList.get(j));
+          rtbList.set(j, channelSegment);
+        }
+      }
+    }
+    double maxPrice = rtbList.get(0).adNetworkInterface.getBidprice();
+    int secondHighestBidNumber = 1;
+    int lowestLatency = 0;
+    for (int i = 1; i < rtbList.size(); i++) {
+      if(rtbList.get(i).adNetworkInterface.getBidprice() < maxPrice) {
+        secondHighestBidNumber = i;
+        break;
+      } else if(rtbList.get(i).adNetworkInterface.getLatency() < rtbList.get(lowestLatency).adNetworkInterface
+          .getLatency())
+        lowestLatency = i;
+    }
+    if(secondHighestBidNumber != 1) {
+      double secondHighestBidPrice = rtbList.get(secondHighestBidNumber).adNetworkInterface.getBidprice();
+      double price = maxPrice * 0.9;
+      if(price > secondHighestBidPrice) {
+        secondBidPrice = price + 0.01;
+      } else {
+        secondBidPrice = secondHighestBidPrice + 0.01;
+      }
+    } else
+      secondBidPrice = rtbList.get(1).adNetworkInterface.getBidprice() + 0.01;
+    rtbResponse = rtbList.get(lowestLatency);
+    rtbResponse.adNetworkInterface.setSecondBidPrice(secondBidPrice);
+    logger.debug("completed auction and winner is", rtbList.get(lowestLatency).adNetworkInterface.getName() + " and secondBidPrice is " + secondBidPrice);
+    return rtbList.get(lowestLatency).adNetworkInterface;
+  }
+
+  public boolean isAuctionComplete() {
+    return auctionComplete;
+  }
+
+  public ChannelSegment getRtbResponse() {
+    return rtbResponse;
+  }
+
+  public double getSecondBidPrice() {
+    return secondBidPrice;
+  }
+}
