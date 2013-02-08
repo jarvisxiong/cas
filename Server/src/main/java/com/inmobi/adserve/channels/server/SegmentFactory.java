@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
@@ -72,21 +73,24 @@ public class SegmentFactory {
             && (null == advertiserSet || advertiserSet.isEmpty() || advertiserSet.contains(partnerName))
             && (config.getString(partnerName + ".status").equalsIgnoreCase("on") && config.getBoolean(partnerName
                 + ".isRtb", false))) {
-          String urlBase = config.getString(partnerName + ".host." + ChannelServer.dataCentreName);
+          String dcname = ChannelServer.dataCentreName;
+          String urlBase = config.getString(partnerName + ".host." + dcname);
           // Disabled request for a particular colo will be drpped here.
           if(urlBase != null && urlBase.equalsIgnoreCase("NA")) {
-            logger.debug("RTB requests are disabled for", ChannelServer.dataCentreName.toString(),
-                "colo so returning null");
+            logger.debug("RTB requests are disabled for", dcname.toString(), "colo so returning null");
             return null;
           }
           // Use default host if colo specific host is not specified in the
           // config. Return null if default is also not specified.
-          if(null == urlBase && config.getString(partnerName + ".host.default", null) == null) {
-            logger.debug("Default urlBase is not defined in config so returning null");
-            return null;
-          } else {
+          if(StringUtils.isEmpty(urlBase)) {
             urlBase = config.getString(partnerName + ".host.default", null);
-          }
+            logger.debug("Using Default urlBase as colo specific is not defined in config");
+            if (StringUtils.isEmpty(urlBase)) {
+              logger.debug("Default urlBase is not defined in the config");
+              return null;
+            }
+          } 
+          logger.debug("dcname is ",dcname, "and urlBase is " + urlBase);
           RtbAdNetwork rtbAdNetwork = new RtbAdNetwork(logger, config, rtbClientBootstrap, base, serverEvent, urlBase,
               partnerName, casInternalRequestParameters);
           logger.debug("Created RTB adapter instance for advertiser id : " + advertiserId);
