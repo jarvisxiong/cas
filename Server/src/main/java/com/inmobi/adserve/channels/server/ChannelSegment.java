@@ -2,22 +2,36 @@ package com.inmobi.adserve.channels.server;
 
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
+import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
 
 public class ChannelSegment {
   public ChannelSegmentEntity channelSegmentEntity;
-  public AdNetworkInterface adNetworkInterface;
   public ChannelEntity channelEntity;
+  public ChannelFeedbackEntity channelFeedbackEntity;
   public ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity;
+  public ChannelSegmentFeedbackEntity channelSegmentCitrusLeafFeedbackEntity;  
+  public AdNetworkInterface adNetworkInterface;
   public double lowerPriorityRange;
   public double higherPriorityRange;
-
-  public ChannelSegment(ChannelSegmentEntity channelSegmentEntity, AdNetworkInterface adNetworkInterface, ChannelEntity channelEntity,
-      ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity) {
+  
+  
+  public ChannelSegment(ChannelSegmentEntity channelSegmentEntity, ChannelEntity channelEntity,
+      ChannelFeedbackEntity channelFeedbackEntity, ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity,
+      ChannelSegmentFeedbackEntity channelSegmentCitrusLeafFeedbackEntity, AdNetworkInterface adNetworkInterface,
+      double lowerPriorityRange, double higherPriorityRange) {
     this.channelSegmentEntity = channelSegmentEntity;
-    this.adNetworkInterface = adNetworkInterface;
     this.channelEntity = channelEntity;
+    this.channelFeedbackEntity = channelFeedbackEntity;
     this.channelSegmentFeedbackEntity = channelSegmentFeedbackEntity;
+    this.channelSegmentCitrusLeafFeedbackEntity = channelSegmentCitrusLeafFeedbackEntity;
+    this.adNetworkInterface = adNetworkInterface;
+    this.lowerPriorityRange = lowerPriorityRange;
+    this.higherPriorityRange = higherPriorityRange;
   }
+  
+  
+
+ 
 }

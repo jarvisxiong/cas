@@ -10,7 +10,11 @@ import java.util.List;
 import org.apache.commons.configuration.Configuration;
 
 import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.entity.ChannelEntity;
+import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
+import com.inmobi.adserve.channels.entity.SiteFeedbackEntity;
 import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
@@ -20,17 +24,18 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 
 public class MatchSegments {
   private DebugLogger logger;
+  private RepositoryHelper repositoryHelper;
+  private SASRequestParameters sasParams;
   private static ChannelAdGroupRepository channelAdGroupRepository;
-  private static RepositoryHelper repositoryHelper;
 
   public static void init(ChannelAdGroupRepository channelAdGroupRepository, RepositoryHelper repositoryHelper) {
     MatchSegments.channelAdGroupRepository = channelAdGroupRepository;
-    MatchSegments.repositoryHelper = repositoryHelper;
   }
 
-  public MatchSegments(DebugLogger logger) {
+  public MatchSegments(RepositoryHelper repositoryHelper, SASRequestParameters sasParams, DebugLogger logger) {
+    this.repositoryHelper = repositoryHelper;
+    this.sasParams = sasParams;
     this.logger = logger;
-
   }
 
   // select channel segment based on specified rules
@@ -65,7 +70,8 @@ public class MatchSegments {
       if(countryStr != null) {
         country = Long.parseLong(countryStr);
       }
-      return (matchSegments(logger, slot, getCategories(sasParams, ServletHandler.config), country, targetingPlatform, siteRating, osId));
+      return (matchSegments(logger, slot, getCategories(sasParams, ServletHandler.config), country, targetingPlatform,
+          siteRating, osId));
     } catch (NumberFormatException exception) {
       logger.error("Error parsing required arguments " + exception.getMessage());
       return null;
@@ -108,14 +114,12 @@ public class MatchSegments {
     temp.addAll(newCategories);
     sasParams.newCategories = temp;
 
-    if(serverConfig.getBoolean("isNewCategory",false)) {
+    if(serverConfig.getBoolean("isNewCategory", false)) {
       return sasParams.newCategories;
     }
 
     return sasParams.categories;
   }
-  
-  
 
   private HashMap<String, HashMap<String, ChannelSegmentEntity>> matchSegments(DebugLogger logger, long slotId,
       List<Long> categories, long country, Integer targetingPlatform, Integer siteRating, int osId) {
@@ -127,7 +131,7 @@ public class MatchSegments {
     // Makes sure that there is exactly one entry from each Advertiser.
     for (ChannelSegmentEntity entity : filteredAllCategoriesEntities) {
       if(entity.getStatus())
-        insertEntityToResultSet(result, entity);
+        insertChannelSegmentToResultSet(result, entity);
       else if(logger.isDebugEnabled())
         logger.debug("AdGroup Dropped due to status - Id: " + entity.getAdgroupId());
     }
@@ -144,7 +148,7 @@ public class MatchSegments {
       // countries.
       for (ChannelSegmentEntity entity : allCategoriesAllCountryEntities) {
         if(entity.getStatus())
-          insertEntityToResultSet(result, entity);
+          insertChannelSegmentToResultSet(result, entity);
         else if(logger.isDebugEnabled())
           logger.debug("AdGroup Dropped due to status - Id: " + entity.getAdgroupId());
       }
@@ -159,7 +163,7 @@ public class MatchSegments {
       // Makes sure that there is exactly one entry from each Advertiser.
       for (ChannelSegmentEntity entity : filteredEntities) {
         if(entity.getStatus())
-          insertEntityToResultSet(result, entity);
+          insertChannelSegmentToResultSet(result, entity);
         else if(logger.isDebugEnabled())
           logger.debug("AdGroup Dropped due to status - Id: " + entity.getAdgroupId());
       }
@@ -173,7 +177,7 @@ public class MatchSegments {
         // all countries.
         for (ChannelSegmentEntity entity : allCountryEntities) {
           if(entity.getStatus())
-            insertEntityToResultSet(result, entity);
+            insertChannelSegmentToResultSet(result, entity);
           else if(logger.isDebugEnabled())
             logger.debug("AdGroup Dropped due to status - Id: " + entity.getAdgroupId());
         }
@@ -197,7 +201,7 @@ public class MatchSegments {
     if(logger.isDebugEnabled())
       logger.debug("Loading entities for slot: " + slotId + " category: " + category + " country: " + country
           + " targetingPlatform: " + targetingPlatform + " siteRating: " + siteRating + " osId: " + osId);
-    ArrayList<ChannelSegmentEntity> filteredEntities = new ArrayList();
+    ArrayList<ChannelSegmentEntity> filteredEntities = new ArrayList<ChannelSegmentEntity>();
     Collection<ChannelSegmentEntity> entitiesAllOs = channelAdGroupRepository.getEntities(slotId, category, country,
         targetingPlatform, siteRating, -1);
     Collection<ChannelSegmentEntity> entities = channelAdGroupRepository.getEntities(slotId, category, country,
@@ -208,7 +212,7 @@ public class MatchSegments {
 
   }
 
-  private void insertEntityToResultSet(HashMap<String, HashMap<String, ChannelSegmentEntity>> result,
+  private void insertChannelSegmentToResultSet(HashMap<String, HashMap<String, ChannelSegment>> result,
       ChannelSegmentEntity channelSegmentEntity) {
     if(Filters.advertiserIdtoNameMapping.containsKey(channelSegmentEntity.getId())) {
       InspectorStats.initializeFilterStats(Filters.advertiserIdtoNameMapping.get(channelSegmentEntity.getId()));
@@ -216,16 +220,34 @@ public class MatchSegments {
           InspectorStrings.totalMatchedSegments);
     }
 
+    ChannelSegment channelSegment = createSegment(channelSegmentEntity);
+
     if(result.get(channelSegmentEntity.getId()) == null) {
-      HashMap<String, ChannelSegmentEntity> hashMap = new HashMap<String, ChannelSegmentEntity>();
-      hashMap.put(channelSegmentEntity.getAdgroupId(), channelSegmentEntity);
+      HashMap<String, ChannelSegment> hashMap = new HashMap<String, ChannelSegment>();
+      hashMap.put(channelSegmentEntity.getAdgroupId(), channelSegment);
       result.put(channelSegmentEntity.getId(), hashMap);
     } else {
-      HashMap<String, ChannelSegmentEntity> hashMap = result.get(channelSegmentEntity.getId());
-      hashMap.put(channelSegmentEntity.getAdgroupId(), channelSegmentEntity);
+      HashMap<String, ChannelSegment> hashMap = result.get(channelSegmentEntity.getId());
+      hashMap.put(channelSegmentEntity.getAdgroupId(), channelSegment);
       result.put(channelSegmentEntity.getId(), hashMap);
     }
 
+  }
+
+  private ChannelSegment createSegment(ChannelSegmentEntity channelSegmentEntity) {
+    ChannelEntity channelEntity = repositoryHelper.queryChannelRepository(channelSegmentEntity.getChannelId());
+    ChannelFeedbackEntity channelFeedbackEntity = repositoryHelper.queryChannelFeedbackRepository(channelSegmentEntity
+        .getAdvertiserId());
+    ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = repositoryHelper
+        .queryChannelSegmentFeedbackRepository(channelSegmentEntity.getAdgroupId());
+    SiteFeedbackEntity siteFeedbackEntity = repositoryHelper.querySiteCitrusLeafFeedbackRepository(sasParams.siteId,
+        new Long(sasParams.siteIncId).toString(), logger);
+    ChannelSegmentFeedbackEntity channelSegmentCitrusLeafFeedbackEntity = null;
+    if(siteFeedbackEntity != null)
+      channelSegmentCitrusLeafFeedbackEntity = siteFeedbackEntity.getAdGroupFeedbackMap().get(
+          channelSegmentEntity.getAdgroupId());
+    return new ChannelSegment(channelSegmentEntity, channelEntity, channelFeedbackEntity, channelSegmentFeedbackEntity,
+        channelSegmentCitrusLeafFeedbackEntity, null, 0, 0);
   }
 
   public static void printSegments(HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments,

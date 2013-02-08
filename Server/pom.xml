@@ -68,7 +68,7 @@
         <dependency>
           <groupId>inmobi.adserve.channels</groupId>
           <artifactId>integrationCas</artifactId>
-          <version>1.45-SNAPSHOT</version>
+          <version>1.47-SNAPSHOT</version>
         </dependency>
         <dependency>
           <groupId>com.inmobi.messaging</groupId>

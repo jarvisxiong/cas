@@ -28,12 +28,14 @@ import com.inmobi.adserve.channels.repository.ChannelRepository;
 import com.inmobi.adserve.channels.repository.ChannelFeedbackRepository;
 import com.inmobi.adserve.channels.repository.ChannelSegmentFeedbackRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.repository.SiteCitrusLeafFeedbackRepository;
 import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
 import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.casthrift.DataCenter;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import com.inmobi.messaging.publisher.MessagePublisherFactory;
 import com.inmobi.phoenix.exception.InitializationException;
@@ -46,8 +48,8 @@ public class ChannelServer {
   private static ChannelSegmentFeedbackRepository channelSegmentFeedbackRepository;
   private static SiteMetaDataRepository siteMetaDataRepository;
   private static SiteTaxonomyRepository siteTaxonomyRepository;
+  private static SiteCitrusLeafFeedbackRepository siteCitrusLeafFeedbackRepository;
   private static RepositoryHelper repositoryHelper;
-  private static InspectorStats inspectorStat;
   private static final String configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
   private static String DATACENTERIDKEY = "dc.id";
   private static String HOSTNAMEKEY = "host.name";
@@ -89,15 +91,16 @@ public class ChannelServer {
     // Initialising Internal logger factory for Netty
     InternalLoggerFactory.setDefaultFactory(new Log4JLoggerFactory());
 
-    inspectorStat = new InspectorStats();
     channelAdGroupRepository = new ChannelAdGroupRepository();
     channelRepository = new ChannelRepository();
     channelFeedbackRepository = new ChannelFeedbackRepository();
     channelSegmentFeedbackRepository = new ChannelSegmentFeedbackRepository();
     siteMetaDataRepository = new SiteMetaDataRepository();
     siteTaxonomyRepository = new SiteTaxonomyRepository();
+    siteCitrusLeafFeedbackRepository = new SiteCitrusLeafFeedbackRepository();
+    
     repositoryHelper = new RepositoryHelper(channelRepository, channelAdGroupRepository, channelFeedbackRepository,
-        channelSegmentFeedbackRepository, siteMetaDataRepository, siteTaxonomyRepository);
+        channelSegmentFeedbackRepository, siteMetaDataRepository, siteTaxonomyRepository, siteCitrusLeafFeedbackRepository);
 
     MatchSegments.init(channelAdGroupRepository, repositoryHelper);
     InspectorStats.initializeRepoStats("ChannelAdGroupRepository");
@@ -234,6 +237,7 @@ public class ChannelServer {
           "SiteTaxonomyRepository");
       siteMetaDataRepository.init(logger, config.cacheConfiguration().subset("SiteMetaDataRepository"),
           "SiteMetaDataRepository");
+      siteCitrusLeafFeedbackRepository.init(config.serverConfiguration(), DataCenter.GLOBAL);
 
       logger.error("* * * * Instantiating repository completed * * * *");
     } catch (NamingException exception) {
