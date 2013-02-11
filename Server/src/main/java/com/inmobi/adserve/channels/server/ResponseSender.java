@@ -113,20 +113,20 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
     responseSent = true;
     logger.debug("ad received so trying to send ad response");
-    if(getResponseFormat().equals("xhtml")) {
-      if(logger.isDebugEnabled()) {
-        logger.debug("slot served is " + sasParams.slot);
-      }
 
-      if(sasParams.slot != null && SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot)) != null) {
+    if(sasParams.slot != null && SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot)) != null) {
+      logger.debug("slot served is", sasParams.slot);
+      InspectorStats.incrementStatCount(InspectorStrings.totalFills);
+      if(getResponseFormat().equals("xhtml")) {
         Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot));
         String startElement = String.format(startTags, (int) dim.getWidth(), (int) dim.getHeight());
         responseString = startElement + responseString + endTags;
-        InspectorStats.incrementStatCount(InspectorStrings.totalFills);
-      } else {
-        logger.error("invalid slot, so not returning response, even though we got an ad");
+      }
+    } else {
+      logger.error("invalid slot, so not returning response, even though we got an ad");
+      InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
+      if(getResponseFormat().equals("xhtml")) {
         responseString = noAdXhtml;
-        InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
       }
     }
     sendResponse(responseString, event);
