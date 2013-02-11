@@ -98,9 +98,10 @@ public class ChannelServer {
     siteMetaDataRepository = new SiteMetaDataRepository();
     siteTaxonomyRepository = new SiteTaxonomyRepository();
     siteCitrusLeafFeedbackRepository = new SiteCitrusLeafFeedbackRepository();
-    
+
     repositoryHelper = new RepositoryHelper(channelRepository, channelAdGroupRepository, channelFeedbackRepository,
-        channelSegmentFeedbackRepository, siteMetaDataRepository, siteTaxonomyRepository, siteCitrusLeafFeedbackRepository);
+        channelSegmentFeedbackRepository, siteMetaDataRepository, siteTaxonomyRepository,
+        siteCitrusLeafFeedbackRepository);
 
     MatchSegments.init(channelAdGroupRepository);
     InspectorStats.initializeRepoStats("ChannelAdGroupRepository");
@@ -109,7 +110,7 @@ public class ChannelServer {
     InspectorStats.initializeRepoStats("SiteMetaDataRepository");
     InspectorStats.initializeRepoStats("SiteTaxonomyRepository");
     instantiateRepository(logger, config);
-    Filters.init(config.adapterConfiguration(), repositoryHelper);
+    Filters.init(config.adapterConfiguration());
 
     // Creating netty client for out-bound calls.
     Timer timer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
@@ -185,11 +186,8 @@ public class ChannelServer {
       Configuration repoConfig = config.repoConfiguration();
       Configuration feedbackConfig = config.feedBackConfiguration();
       Configuration segmentFeedbackConfig = config.segmentFeedBackConfiguration();
-<<<<<<< HEAD
       Configuration siteTaxonomyConfig = config.siteTaxonomyConfiguration();
-=======
       Configuration siteMetaDataConfig = config.siteMetaDataConfiguration();
->>>>>>> develop
       InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.isUpdating, 0);
       InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.repoSource,
           databaseConfig.getString("database"));
@@ -211,25 +209,19 @@ public class ChannelServer {
           segmentFeedbackConfig.getString("query"));
       InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.refreshInterval,
           segmentFeedbackConfig.getString("refreshTime"));
-      
+
       InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.isUpdating, 0);
       InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.repoSource,
           databaseConfig.getString("database"));
       InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.query, siteMetaDataConfig.getString("query"));
       InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.refreshInterval,
-<<<<<<< HEAD
-          repoConfig.getString("refreshTime"));
-      
+          siteMetaDataConfig.getString("refreshTime"));
       InspectorStats.setStats("SiteTaxonomyRepository", InspectorStrings.isUpdating, 0);
       InspectorStats.setStats("SiteTaxonomyRepository", InspectorStrings.repoSource,
           databaseConfig.getString("database"));
-      InspectorStats.setStats("SiteTaxonomyRepository", InspectorStrings.query,
-          siteTaxonomyConfig.getString("query"));
+      InspectorStats.setStats("SiteTaxonomyRepository", InspectorStrings.query, siteTaxonomyConfig.getString("query"));
       InspectorStats.setStats("SiteTaxonomyRepository", InspectorStrings.refreshInterval,
           siteTaxonomyConfig.getString("refreshTime"));
-=======
-          siteMetaDataConfig.getString("refreshTime"));
->>>>>>> develop
 
       initialContext.bind("java:comp/env/jdbc", dataSource);
 

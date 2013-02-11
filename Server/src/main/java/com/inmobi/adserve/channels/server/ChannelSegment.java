@@ -11,29 +11,21 @@ public class ChannelSegment {
   public ChannelEntity channelEntity;
   public ChannelFeedbackEntity channelFeedbackEntity;
   public ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity;
-  public ChannelSegmentFeedbackEntity channelSegmentCitrusLeafFeedbackEntity;  
+  public ChannelSegmentFeedbackEntity channelSegmentCitrusLeafFeedbackEntity;
   public AdNetworkInterface adNetworkInterface;
   public double prioritisedECPM;
-  public double lowerPriorityRange;
-  public double higherPriorityRange;
-  
-  
+
   public ChannelSegment(ChannelSegmentEntity channelSegmentEntity, ChannelEntity channelEntity,
       ChannelFeedbackEntity channelFeedbackEntity, ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity,
       ChannelSegmentFeedbackEntity channelSegmentCitrusLeafFeedbackEntity, AdNetworkInterface adNetworkInterface,
-      double lowerPriorityRange, double higherPriorityRange) {
+      double prioritisedECPM) {
     this.channelSegmentEntity = channelSegmentEntity;
     this.channelEntity = channelEntity;
     this.channelFeedbackEntity = channelFeedbackEntity;
     this.channelSegmentFeedbackEntity = channelSegmentFeedbackEntity;
     this.channelSegmentCitrusLeafFeedbackEntity = channelSegmentCitrusLeafFeedbackEntity;
     this.adNetworkInterface = adNetworkInterface;
-    this.lowerPriorityRange = lowerPriorityRange;
-    this.higherPriorityRange = higherPriorityRange;
-    this.prioritisedECPM = 0.0;
+    this.prioritisedECPM = prioritisedECPM;
   }
-  
-  
 
- 
 }

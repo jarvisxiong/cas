@@ -69,17 +69,18 @@ public class MatchSegments {
       if(countryStr != null) {
         country = Long.parseLong(countryStr);
       }
-      return (matchSegments(logger, slot, getCategories(ServletHandler.config), country, targetingPlatform,
-          siteRating, osId));
+      return (matchSegments(logger, slot, getCategories(ServletHandler.config), country, targetingPlatform, siteRating,
+          osId));
     } catch (NumberFormatException exception) {
       logger.error("Error parsing required arguments " + exception.getMessage());
       return null;
     }
   }
 
-  /**repositoryHelper
-   * Method which computes categories according to new category taxonomy and
-   * returns the category list (old or new) depending upon the config
+  /**
+   * repositoryHelper Method which computes categories according to new category
+   * taxonomy and returns the category list (old or new) depending upon the
+   * config
    * 
    * @param sasParams
    * @return
@@ -120,8 +121,7 @@ public class MatchSegments {
 
   private HashMap<String, HashMap<String, ChannelSegment>> matchSegments(DebugLogger logger, long slotId,
       List<Long> categories, long country, Integer targetingPlatform, Integer siteRating, int osId) {
-    HashMap<String /* advertiserId */, HashMap<String /* adGroupId */, ChannelSegment>> result 
-              = new HashMap<String /* advertiserId */, HashMap<String /* adGroupId */, ChannelSegment>>();
+    HashMap<String /* advertiserId */, HashMap<String /* adGroupId */, ChannelSegment>> result = new HashMap<String /* advertiserId */, HashMap<String /* adGroupId */, ChannelSegment>>();
 
     ArrayList<ChannelSegmentEntity> filteredAllCategoriesEntities = loadEntities(slotId, -1, country,
         targetingPlatform, siteRating, osId);
@@ -241,13 +241,13 @@ public class MatchSegments {
     SiteFeedbackEntity siteFeedbackEntity = repositoryHelper.querySiteCitrusLeafFeedbackRepository(sasParams.siteId,
         new Long(sasParams.siteIncId).toString(), logger);
     ChannelSegmentFeedbackEntity channelSegmentCitrusLeafFeedbackEntity = null;
-    
+
     if(siteFeedbackEntity != null)
       channelSegmentCitrusLeafFeedbackEntity = siteFeedbackEntity.getAdGroupFeedbackMap().get(
           channelSegmentEntity.getAdgroupId());
-    
+
     return new ChannelSegment(channelSegmentEntity, channelEntity, channelFeedbackEntity, channelSegmentFeedbackEntity,
-        channelSegmentCitrusLeafFeedbackEntity, null, 0, 0);
+        channelSegmentCitrusLeafFeedbackEntity, null, 0);
   }
 
   public static void printSegments(HashMap<String, HashMap<String, ChannelSegment>> matchedSegments, DebugLogger logger) {

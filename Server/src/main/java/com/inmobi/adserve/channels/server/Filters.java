@@ -14,10 +14,6 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 
 import com.inmobi.adserve.channels.entity.ChannelEntity;
-import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -34,12 +30,10 @@ public class Filters {
 
   private static Comparator<ChannelSegment> COMPARATOR = new Comparator<ChannelSegment>() {
     public int compare(ChannelSegment o1, ChannelSegment o2) {
-      return o1.channelSegmentFeedbackEntity.getPrioritisedECPM()
-          - o2.channelSegmentFeedbackEntity.getPrioritisedECPM() > 0.0 ? -1 : 1;
+      return o1.prioritisedECPM - o2.prioritisedECPM > 0.0 ? -1 : 1;
     }
   };
 
-  private static RepositoryHelper repositoryHelper;
   public static HashMap<String, String> advertiserIdtoNameMapping = new HashMap<String, String>();
   public static HashMap<String, HashSet<String>> whiteListedSites = new HashMap<String, HashSet<String>>();
   public static long lastRefresh;
@@ -47,8 +41,7 @@ public class Filters {
 
   // To boost ecpm of a parnter to meet the impression floor
 
-  public static void init(Configuration adapterConfiguration, RepositoryHelper repositoryHelper) {
-    Filters.repositoryHelper = repositoryHelper;
+  public static void init(Configuration adapterConfiguration) {
     Iterator<String> itr = adapterConfiguration.getKeys();
 
     while (null != itr && itr.hasNext()) {
@@ -126,8 +119,9 @@ public class Filters {
         }
 
         logger.debug("Burn limit filter passed by advertiser " + advertiserId);
-        
-        if(channelSegment.channelFeedbackEntity.getTodayImpressions() > channelSegment.channelEntity.getImpressionCeil()) {
+
+        if(channelSegment.channelFeedbackEntity.getTodayImpressions() > channelSegment.channelEntity
+            .getImpressionCeil()) {
           // dropping advertiser(all segments) if todays impression is greater
           // than impression ceiling
           logger.debug("Impression limit exceeded by advertiser " + advertiserId);
@@ -138,7 +132,7 @@ public class Filters {
         }
 
         logger.debug("Impression limit filter passed by advertiserId " + advertiserId);
-      }      
+      }
 
       if(whiteListedSites.containsKey(advertiserId) && !whiteListedSites.get(advertiserId).contains(siteId)
           && random.nextInt(100) < 95) {
@@ -184,14 +178,13 @@ public class Filters {
         ChannelSegment channelSegment = matchedSegments.get(advertiserId).get(adgroupId);
 
         if(null == channelSegment.channelSegmentFeedbackEntity) {
-          logger.debug("Error in retreiving from repo so setting ecpm to default value");
-          channelSegment.channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(
-              channelSegment.channelSegmentEntity.getId(), channelSegment.channelSegmentEntity.getAdgroupId(),
-              serverConfiguration.getDouble("default.ecpm"), serverConfiguration.getDouble("default.fillratio"), 0, 0,
-              0, 0);
+          logger.debug("ChannelSegmentFeedbackEntity is null for adgroup " + adgroupId + " so not setting pecpm");
+        } else {
+          channelSegment.prioritisedECPM = channelSegment.channelSegmentFeedbackEntity.geteCPM();
         }
 
-        if(channelSegment.channelSegmentFeedbackEntity.geteCPM() >= siteFloor) {
+        if((channelSegment.channelSegmentFeedbackEntity != null ? channelSegment.channelSegmentFeedbackEntity.geteCPM()
+            : 1.0) >= siteFloor) {
           logger.debug("sitefloor filter passed by adgroup " + channelSegment.channelSegmentFeedbackEntity.getId());
           segmentListToBeSorted.add(channelSegment);
         } else
@@ -251,9 +244,7 @@ public class Filters {
       Configuration serverConfiguration) {
 
     logger.debug("Inside SegmentsPerRequestFilter");
-    double eCPMShift = serverConfiguration.getDouble("ecpmShift", 0.1);
-    double feedbackPower = serverConfiguration.getDouble("feedbackPower", 2.0);
-    List<ChannelSegment> hashMapList = new ArrayList<ChannelSegment>();
+    List<ChannelSegment> listToBeSorted = new ArrayList<ChannelSegment>();
     List<ChannelSegment> shortlistedRow = new ArrayList<ChannelSegment>();
 
     // Creating a sorted list of segments based on their ecpm
@@ -261,38 +252,29 @@ public class Filters {
 
       if(null == row.channelSegmentFeedbackEntity) {
         if(logger.isDebugEnabled())
-          logger.debug("Error in retreiving from repo for adgprid " + row.channelSegmentEntity.getAdgroupId()
-              + " and advertiserid " + row.channelSegmentEntity.getId() + " so setting ecpm to default");
-        row.channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(row.channelSegmentEntity.getId(),
-            row.channelSegmentEntity.getAdgroupId(), serverConfiguration.getDouble("default.ecpm"),
-            serverConfiguration.getDouble("default.fillratio"), 0, 0, 0, 0);
+          logger.debug("ChannelSegmentFeedbackEntity is null for adgroup " + row.channelSegmentEntity.getAdgroupId()
+              + " so not setting pecpm");
       }
 
       // setting prioritisedECPM to take control of
       // shorlisting
-
       if(null == row.channelEntity) {
         logger.debug("channelid not found setting priority to 10");
         row.channelEntity = new ChannelEntity();
         row.channelEntity.setPriority(serverConfiguration.getInt("default.priority"));
       }
 
-      row.channelSegmentFeedbackEntity.setPrioritisedECPM(Math.pow(
-          (row.channelSegmentFeedbackEntity.geteCPM() + eCPMShift), feedbackPower)
-          * (row.channelEntity.getPriority() < 5 ? 5 - row.channelEntity.getPriority() : 1)
-          * getECPMBoostFactor(row.channelSegmentEntity.getId(), row.channelSegmentEntity.getChannelId(),
-              row.channelSegmentEntity.getAdgroupId()));
-
-      hashMapList.add(row);
+      row.prioritisedECPM = getPrioritisedECPM(row, serverConfiguration);
+      listToBeSorted.add(row);
     }
 
-    Collections.sort(hashMapList, COMPARATOR);
+    Collections.sort(listToBeSorted, COMPARATOR);
     // choosing top segments from the sorted list
     int totalSegments = 0;
     int totalSegmentNo = serverConfiguration.getInt("totalSegmentNo");
 
-    for (int i = 0; i < hashMapList.size(); i++) {
-      ChannelSegment channelSegment = hashMapList.get(i);
+    for (int i = 0; i < listToBeSorted.size(); i++) {
+      ChannelSegment channelSegment = listToBeSorted.get(i);
       if(totalSegments < totalSegmentNo) {
         shortlistedRow.add(channelSegment);
         totalSegments++;
@@ -308,15 +290,28 @@ public class Filters {
 
     for (int i = 0; i < shortlistedRow.size(); i++) {
 
-      if(logger.isDebugEnabled())
-        logger.debug("Segment with advertiserid "
-            + shortlistedRow.get(i).channelSegmentFeedbackEntity.getAdvertiserId() + " adroupid "
-            + shortlistedRow.get(i).channelSegmentFeedbackEntity.getId() + " Pecpm "
-            + shortlistedRow.get(i).channelSegmentFeedbackEntity.getPrioritisedECPM());
-
+      if(logger.isDebugEnabled()) {
+        logger.debug("Segment with advertiserid " + shortlistedRow.get(i).channelSegmentEntity.getAdvertiserId()
+            + " adroupid " + shortlistedRow.get(i).channelSegmentEntity.getAdgroupId() + " Pecpm "
+            + shortlistedRow.get(i).prioritisedECPM);
+      }
     }
 
     return (ChannelSegment[]) shortlistedRow.toArray(new ChannelSegment[0]);
+  }
+
+  private static double getPrioritisedECPM(ChannelSegment channelSegment, Configuration config) {
+
+    double ecpm = channelSegment.channelSegmentFeedbackEntity != null ? channelSegment.channelSegmentFeedbackEntity
+        .geteCPM() : config.getDouble("default.ecpm");
+    double eCPMShift = config.getDouble("ecpmShift", 0.1);
+    double feedbackPower = config.getDouble("feedbackPower", 2.0);
+    int priority = channelSegment.channelEntity != null ? 
+        (channelSegment.channelEntity.getPriority() < 5 ? 5 - channelSegment.channelEntity.getPriority() : 1) : 3;
+
+    return (Math.pow((ecpm + eCPMShift), feedbackPower) * (priority) * getECPMBoostFactor(
+        channelSegment.channelSegmentEntity.getId(), channelSegment.channelSegmentEntity.getChannelId(),
+        channelSegment.channelSegmentEntity.getAdgroupId()));
   }
 
   public static void printSegments(HashMap<String, HashMap<String, ChannelSegment>> matchedSegments, DebugLogger logger) {
@@ -331,7 +326,7 @@ public class Filters {
           if(logger.isDebugEnabled())
             logger.debug("Advertiser is " + matchedSegments.get(adkey).get(gpkey).channelSegmentEntity.getId()
                 + " and AdGp is " + matchedSegments.get(adkey).get(gpkey).channelSegmentEntity.getAdgroupId()
-                + " \tecpm is " + repositoryHelper.queryChannelSegmentFeedbackRepository(gpkey).geteCPM());
+                + " \tecpm is " + matchedSegments.get(adkey).get(gpkey).prioritisedECPM);
 
         } catch (NullPointerException e) {
           logger.debug("Repo Exception/No entry in ChannelSegmentFeedbackRepository for adgrpId : " + gpkey);
@@ -344,45 +339,37 @@ public class Filters {
 
   }
 
-  // creating ranks of shortlisted channelsegments ased on weighted random mean
+  // creating ranks of shortlisted channelsegments based on weighted random mean
   // of their prioritised ecpm
   public static ArrayList<ChannelSegment> rankAdapters(List<ChannelSegment> segment, DebugLogger logger,
       Configuration serverConfiguration) {
 
     int rank = 0;
-    double eCPMShift = serverConfiguration.getDouble("ecpmShift", 0.1);
-    double feedbackPower = serverConfiguration.getDouble("feedbackPower", 2.0);
 
     // Arraylist will contain the order in which we will wait for response
     // of the third party ad networks
     ArrayList<ChannelSegment> rankedList = new ArrayList<ChannelSegment>();
 
-    if(segment.isEmpty())
+    if(segment.isEmpty()) {
       return rankedList;
+    }
 
     while (segment.size() > 1) {
       double totalPriority = 0.0;
 
       for (int index = 0; index < segment.size(); index++) {
         // setting the prioritised ecpm for this segment
-        segment.get(index).channelSegmentFeedbackEntity.setPrioritisedECPM((Math.pow(
-            (segment.get(index).channelSegmentFeedbackEntity.geteCPM() + eCPMShift), feedbackPower) * (segment
-            .get(index).channelEntity.getPriority() < 5 ? (5 - segment.get(index).channelEntity.getPriority()) : 1))
-            * getECPMBoostFactor(segment.get(index).channelSegmentEntity.getId(),
-                segment.get(index).channelSegmentEntity.getChannelId(),
-                segment.get(index).channelSegmentEntity.getAdgroupId()));
-        segment.get(index).lowerPriorityRange = totalPriority;
-        totalPriority += segment.get(index).channelSegmentFeedbackEntity.getPrioritisedECPM();
-        segment.get(index).higherPriorityRange = totalPriority;
-        logger.debug("total priority here is " + totalPriority);
+        totalPriority += segment.get(index).prioritisedECPM;
+
       }
 
       double randomNumber = Math.random() * totalPriority;
 
       for (int index = 0; index < segment.size(); index++) {
 
-        if(randomNumber >= segment.get(index).lowerPriorityRange
-            && randomNumber <= segment.get(index).higherPriorityRange) {
+        if(randomNumber > segment.get(index).prioritisedECPM) {
+          randomNumber -= segment.get(index).prioritisedECPM;
+        } else {
 
           if(logger.isDebugEnabled())
             logger.debug("rank " + rank++ + " adapter has channel id " + segment.get(index).adNetworkInterface.getId());
