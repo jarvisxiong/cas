@@ -102,7 +102,7 @@ public class ChannelServer {
     repositoryHelper = new RepositoryHelper(channelRepository, channelAdGroupRepository, channelFeedbackRepository,
         channelSegmentFeedbackRepository, siteMetaDataRepository, siteTaxonomyRepository, siteCitrusLeafFeedbackRepository);
 
-    MatchSegments.init(channelAdGroupRepository, repositoryHelper);
+    MatchSegments.init(channelAdGroupRepository);
     InspectorStats.initializeRepoStats("ChannelAdGroupRepository");
     InspectorStats.initializeRepoStats("ChannelFeedbackRepository");
     InspectorStats.initializeRepoStats("ChannelSegmentFeedbackRepository");

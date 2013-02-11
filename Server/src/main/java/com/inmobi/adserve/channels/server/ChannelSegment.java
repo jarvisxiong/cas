@@ -13,6 +13,7 @@ public class ChannelSegment {
   public ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity;
   public ChannelSegmentFeedbackEntity channelSegmentCitrusLeafFeedbackEntity;  
   public AdNetworkInterface adNetworkInterface;
+  public double prioritisedECPM;
   public double lowerPriorityRange;
   public double higherPriorityRange;
   
@@ -29,6 +30,7 @@ public class ChannelSegment {
     this.adNetworkInterface = adNetworkInterface;
     this.lowerPriorityRange = lowerPriorityRange;
     this.higherPriorityRange = higherPriorityRange;
+    this.prioritisedECPM = 0.0;
   }
   
   

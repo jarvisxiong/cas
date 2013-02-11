@@ -108,7 +108,8 @@ public class ServletBackFill implements Servlet {
     }
 
     // getting the selected third party site details
-    HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments = new MatchSegments(logger)
+    HashMap<String, HashMap<String, ChannelSegment>> matchedSegments = new MatchSegments(
+        ServletHandler.repositoryHelper, hrh.responseSender.sasParams, logger)
         .matchSegments(hrh.responseSender.sasParams);
 
     if(matchedSegments == null) {
@@ -117,7 +118,7 @@ public class ServletBackFill implements Servlet {
     }
 
     // applying all the filters
-    ChannelSegmentEntity[] rows = Filters.filter(matchedSegments, logger, 0.0, ServletHandler.config,
+    ChannelSegment[] rows = Filters.filter(matchedSegments, logger, 0.0, ServletHandler.config,
         ServletHandler.adapterConfig, new Long(hrh.responseSender.sasParams.siteIncId).toString());
 
     if(rows == null || rows.length == 0) {
@@ -147,7 +148,7 @@ public class ServletBackFill implements Servlet {
         advertiserSet.add(advertiserList[i]);
       }
     }
-    
+
     CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
     casInternalRequestParameters.highestEcpm = getHighestEcpm(rows, logger);
     logger.debug("Highest Ecpm is", new Double(casInternalRequestParameters.highestEcpm).toString());
@@ -190,12 +191,12 @@ public class ServletBackFill implements Servlet {
       return;
     }
 
-    if (hrh.responseSender.isAllRtbComplete()) {
+    if(hrh.responseSender.isAllRtbComplete()) {
       AdNetworkInterface highestBid = hrh.responseSender.runRtbSecondPriceAuctionEngine();
       if(null != highestBid) {
         logger.debug("Sending rtb response of", highestBid.getName());
         hrh.responseSender.sendAdResponse(highestBid, e);
-        //highestBid.impressionCallback();
+        // highestBid.impressionCallback();
         return;
       }
       // Resetting the rankIndexToProcess for already completed adapters.
@@ -225,26 +226,26 @@ public class ServletBackFill implements Servlet {
     return "BackFill";
   }
 
-  private static double getHighestEcpm(ChannelSegmentEntity[] channelSegmentEntities, DebugLogger logger) {
+  private static double getHighestEcpm(ChannelSegment[] channelSegments, DebugLogger logger) {
     double lowestEcpm = 0;
-    for (ChannelSegmentEntity channelSegmentEntity : channelSegmentEntities) {
-      if(null == ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(channelSegmentEntity
+    for (ChannelSegment channelSegment : channelSegments) {
+      if(null == ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(channelSegment.channelSegmentEntity
           .getAdgroupId())) {
         if(logger.isDebugEnabled())
-          logger.debug("ChannelSegmentfeedback entity is null for adgpid id " + channelSegmentEntity.getAdgroupId());
+          logger.debug("ChannelSegmentfeedback entity is null for adgpid id " + channelSegment.channelSegmentEntity.getAdgroupId());
         continue;
       }
       if(logger.isDebugEnabled())
         logger.debug("ecpm is "
             + ServletHandler.repositoryHelper
-                .queryChannelSegmentFeedbackRepository(channelSegmentEntity.getAdgroupId()).geteCPM());
+                .queryChannelSegmentFeedbackRepository(channelSegment.channelSegmentEntity.getAdgroupId()).geteCPM());
       lowestEcpm = lowestEcpm < ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(
-          channelSegmentEntity.getAdgroupId()).geteCPM() ? ServletHandler.repositoryHelper
-          .queryChannelSegmentFeedbackRepository(channelSegmentEntity.getAdgroupId()).geteCPM() : lowestEcpm;
+          channelSegment.channelSegmentEntity.getAdgroupId()).geteCPM() ? ServletHandler.repositoryHelper
+          .queryChannelSegmentFeedbackRepository(channelSegment.channelSegmentEntity.getAdgroupId()).geteCPM() : lowestEcpm;
     }
     return lowestEcpm;
   }
-  
+
   private static List<Long> getBlockedCategories(HttpRequestHandler hrh, DebugLogger logger) {
     List<Long> blockedCategories = null;
     if(null != hrh.responseSender.sasParams.siteId) {

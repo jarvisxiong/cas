@@ -1,7 +1,6 @@
 package com.inmobi.adserve.channels.server;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,7 +27,7 @@ public class MatchSegments {
   private SASRequestParameters sasParams;
   private static ChannelAdGroupRepository channelAdGroupRepository;
 
-  public static void init(ChannelAdGroupRepository channelAdGroupRepository, RepositoryHelper repositoryHelper) {
+  public static void init(ChannelAdGroupRepository channelAdGroupRepository) {
     MatchSegments.channelAdGroupRepository = channelAdGroupRepository;
   }
 
@@ -39,7 +38,7 @@ public class MatchSegments {
   }
 
   // select channel segment based on specified rules
-  public HashMap<String, HashMap<String, ChannelSegmentEntity>> matchSegments(SASRequestParameters sasParams) {
+  public HashMap<String, HashMap<String, ChannelSegment>> matchSegments(SASRequestParameters sasParams) {
     String slotStr = sasParams.slot;
     String countryStr = sasParams.countryStr;
     int osId = sasParams.osId;
@@ -70,7 +69,7 @@ public class MatchSegments {
       if(countryStr != null) {
         country = Long.parseLong(countryStr);
       }
-      return (matchSegments(logger, slot, getCategories(sasParams, ServletHandler.config), country, targetingPlatform,
+      return (matchSegments(logger, slot, getCategories(ServletHandler.config), country, targetingPlatform,
           siteRating, osId));
     } catch (NumberFormatException exception) {
       logger.error("Error parsing required arguments " + exception.getMessage());
@@ -78,18 +77,16 @@ public class MatchSegments {
     }
   }
 
-  /**
+  /**repositoryHelper
    * Method which computes categories according to new category taxonomy and
    * returns the category list (old or new) depending upon the config
    * 
    * @param sasParams
    * @return
    */
-  public List<Long> getCategories(SASRequestParameters sasParams, Configuration serverConfig) {
-    /**
-     * Computing all the parents for categories in the new category list from
-     * the request
-     */
+  public List<Long> getCategories(Configuration serverConfig) {
+    // Computing all the parents for categories in the new category list from
+    // the request
     HashSet<Long> newCategories = new HashSet<Long>();
 
     for (Long cat : sasParams.newCategories) {
@@ -121,9 +118,10 @@ public class MatchSegments {
     return sasParams.categories;
   }
 
-  private HashMap<String, HashMap<String, ChannelSegmentEntity>> matchSegments(DebugLogger logger, long slotId,
+  private HashMap<String, HashMap<String, ChannelSegment>> matchSegments(DebugLogger logger, long slotId,
       List<Long> categories, long country, Integer targetingPlatform, Integer siteRating, int osId) {
-    HashMap<String /* advertiserId */, HashMap<String /* adGroupId */, ChannelSegmentEntity>> result = new HashMap<String /* advertiserId */, HashMap<String /* adGroupId */, ChannelSegmentEntity>>();
+    HashMap<String /* advertiserId */, HashMap<String /* adGroupId */, ChannelSegment>> result 
+              = new HashMap<String /* advertiserId */, HashMap<String /* adGroupId */, ChannelSegment>>();
 
     ArrayList<ChannelSegmentEntity> filteredAllCategoriesEntities = loadEntities(slotId, -1, country,
         targetingPlatform, siteRating, osId);
@@ -243,22 +241,23 @@ public class MatchSegments {
     SiteFeedbackEntity siteFeedbackEntity = repositoryHelper.querySiteCitrusLeafFeedbackRepository(sasParams.siteId,
         new Long(sasParams.siteIncId).toString(), logger);
     ChannelSegmentFeedbackEntity channelSegmentCitrusLeafFeedbackEntity = null;
+    
     if(siteFeedbackEntity != null)
       channelSegmentCitrusLeafFeedbackEntity = siteFeedbackEntity.getAdGroupFeedbackMap().get(
           channelSegmentEntity.getAdgroupId());
+    
     return new ChannelSegment(channelSegmentEntity, channelEntity, channelFeedbackEntity, channelSegmentFeedbackEntity,
         channelSegmentCitrusLeafFeedbackEntity, null, 0, 0);
   }
 
-  public static void printSegments(HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments,
-      DebugLogger logger) {
+  public static void printSegments(HashMap<String, HashMap<String, ChannelSegment>> matchedSegments, DebugLogger logger) {
     if(logger.isDebugEnabled())
       logger.debug("Segments are :");
     for (String adkey : matchedSegments.keySet()) {
       for (String gpkey : matchedSegments.get(adkey).keySet()) {
         if(logger.isDebugEnabled())
-          logger.debug("Advertiser is " + matchedSegments.get(adkey).get(gpkey).getId() + " and AdGp is "
-              + matchedSegments.get(adkey).get(gpkey).getAdgroupId());
+          logger.debug("Advertiser is " + matchedSegments.get(adkey).get(gpkey).channelSegmentEntity.getId()
+              + " and AdGp is " + matchedSegments.get(adkey).get(gpkey).channelSegmentEntity.getAdgroupId());
       }
     }
   }

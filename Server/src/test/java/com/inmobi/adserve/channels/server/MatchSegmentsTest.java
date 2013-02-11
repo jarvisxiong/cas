@@ -192,12 +192,12 @@ public class MatchSegmentsTest extends TestCase {
     expect(repositoryHelper.querySiteTaxonomyRepository("4")).andReturn(s4).anyTimes();
     replay(repositoryHelper);
     
-    MatchSegments.init(null, repositoryHelper);
+    MatchSegments.init(null);
     DebugLogger.init(mockConfig);
-    MatchSegments matchSegments = new MatchSegments(new DebugLogger());
+    MatchSegments matchSegments = new MatchSegments(repositoryHelper, sasRequestParameters, new DebugLogger());
 
     //long [] cat = matchSegments.getCategories(sasRequestParameters, mockConfig);
-    System.out.println(matchSegments.getCategories(sasRequestParameters, mockConfig));
+    System.out.println(matchSegments.getCategories(mockConfig));
   }
 }
 
