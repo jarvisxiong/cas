@@ -52,8 +52,7 @@ public class AsyncRequestMaker {
     List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
 
     logger.debug("Total channels available for sending requests", rows.length + "");
-    boolean isRtbEnabled = false;
-    isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled", false);
+    boolean isRtbEnabled =  rtbConfig.getBoolean("isRtbEnabled", false);
     logger.debug("isRtbEnabled is", new Boolean(isRtbEnabled).toString());
 
     for (ChannelSegment row : rows) {
@@ -161,8 +160,6 @@ public class AsyncRequestMaker {
         rtbItr.remove();
       }
     }
-    logger.debug("Number of tpans whose request was successfully completed", rankList.size() + "");
-    logger.debug("Number of rtb tpans whose request was successfully completed", rtbSegments.size() + "");
     return rankList;
   }
 

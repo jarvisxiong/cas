@@ -131,7 +131,7 @@ public class ChannelServer {
       // Initialising request handler
       AsyncRequestMaker.init(clientBootstrap, rtbClientBootstrap);
       ServletHandler.init(config, repositoryHelper);
-      SegmentFactory.init(repositoryHelper);
+      SegmentFactory.init(repositoryHelper, config.adapterConfiguration(), logger);
       ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(
           Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
       Timer servertimer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
@@ -185,7 +185,11 @@ public class ChannelServer {
       Configuration repoConfig = config.repoConfiguration();
       Configuration feedbackConfig = config.feedBackConfiguration();
       Configuration segmentFeedbackConfig = config.segmentFeedBackConfiguration();
+<<<<<<< HEAD
       Configuration siteTaxonomyConfig = config.siteTaxonomyConfiguration();
+=======
+      Configuration siteMetaDataConfig = config.siteMetaDataConfiguration();
+>>>>>>> develop
       InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.isUpdating, 0);
       InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.repoSource,
           databaseConfig.getString("database"));
@@ -211,8 +215,9 @@ public class ChannelServer {
       InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.isUpdating, 0);
       InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.repoSource,
           databaseConfig.getString("database"));
-      InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.query, repoConfig.getString("query"));
+      InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.query, siteMetaDataConfig.getString("query"));
       InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.refreshInterval,
+<<<<<<< HEAD
           repoConfig.getString("refreshTime"));
       
       InspectorStats.setStats("SiteTaxonomyRepository", InspectorStrings.isUpdating, 0);
@@ -222,6 +227,9 @@ public class ChannelServer {
           siteTaxonomyConfig.getString("query"));
       InspectorStats.setStats("SiteTaxonomyRepository", InspectorStrings.refreshInterval,
           siteTaxonomyConfig.getString("refreshTime"));
+=======
+          siteMetaDataConfig.getString("refreshTime"));
+>>>>>>> develop
 
       initialContext.bind("java:comp/env/jdbc", dataSource);
 
