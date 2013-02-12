@@ -28,15 +28,23 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
+import com.ning.http.client.AsyncHttpClient;
 
 public class AsyncRequestMaker {
 
   private static ClientBootstrap clientBootstrap;
   private static ClientBootstrap rtbClientBootstrap;
+  private static AsyncHttpClient asyncHttpClient;
 
-  public static void init(ClientBootstrap clientBootstrap, ClientBootstrap rtbClientBootstrap) {
+  public static AsyncHttpClient getAsyncHttpClient() {
+    return asyncHttpClient;
+  }
+
+  public static void init(ClientBootstrap clientBootstrap, ClientBootstrap rtbClientBootstrap,
+      AsyncHttpClient asyncHttpClient) {
     AsyncRequestMaker.clientBootstrap = clientBootstrap;
     AsyncRequestMaker.rtbClientBootstrap = rtbClientBootstrap;
+    AsyncRequestMaker.asyncHttpClient = asyncHttpClient;
   }
 
   /**
@@ -52,7 +60,7 @@ public class AsyncRequestMaker {
     List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
 
     logger.debug("Total channels available for sending requests", rows.length + "");
-    boolean isRtbEnabled =  rtbConfig.getBoolean("isRtbEnabled", false);
+    boolean isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled", false);
     logger.debug("isRtbEnabled is", new Boolean(isRtbEnabled).toString());
 
     for (ChannelSegmentEntity row : rows) {
@@ -116,7 +124,7 @@ public class AsyncRequestMaker {
             .queryChannelSegmentFeedbackRepository(row.getAdgroupId());
         if(null == channelSegmentFeedbackEntity)
           channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(row.getId(), row.getAdgroupId(),
-              config.getDouble("default.ecpm"), config.getDouble("default.fillratio"));
+              config.getDouble("default.ecpm"), config.getDouble("default.fillratio"), 0, 0, 0, 0);
         ChannelEntity channelEntity = repositoryHelper.queryChannelRepository(row.getChannelId());
         if(channelEntity != null) {
           if(network.isRtbPartner()) {
