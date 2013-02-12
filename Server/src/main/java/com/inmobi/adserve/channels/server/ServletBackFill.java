@@ -156,6 +156,7 @@ public class ServletBackFill implements Servlet {
     hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternalRequestParameters;
     logger.debug("Total channels available for sending requests " + rows.length);
     List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
+    
     segments = AsyncRequestMaker.prepareForAsyncRequest(rows, logger, ServletHandler.config, ServletHandler.rtbConfig,
         ServletHandler.adapterConfig, hrh.responseSender, advertiserSet, e, ServletHandler.repositoryHelper,
         hrh.jObject, hrh.responseSender.sasParams, casInternalRequestParameters, rtbSegments);

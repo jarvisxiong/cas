@@ -112,9 +112,9 @@ public class ChannelServer {
     RtbBootstrapCreation.init(timer);
     ClientBootstrap clientBootstrap = BootstrapCreation.createBootstrap(logger, config.serverConfiguration());
     ClientBootstrap rtbClientBootstrap = RtbBootstrapCreation.createBootstrap(logger, config.rtbConfiguration());
-    AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder().setRequestTimeoutInMs(
-        config.serverConfiguration().getInt("readTimeout", 700)).setConnectionTimeoutInMs(50).build();
-    AsyncHttpClient asyncHttpClient = new AsyncHttpClient(asyncHttpClientConfig);
+    //AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder().setRequestTimeoutInMs(
+     //   config.serverConfiguration().getInt("readTimeout", 700)).setConnectionTimeoutInMs(50).build();
+    AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
     if(null == clientBootstrap) {
       ServerStatusInfo.statusCode = 404;
       ServerStatusInfo.statusString = "StackTrace is: failed to create bootstrap";
