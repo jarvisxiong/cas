@@ -211,7 +211,7 @@ public class Filters {
           logger.debug("Error in retreiving from repo so setting ecpm to default value");
           channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(channelSegmentEntity.getId(),
               channelSegmentEntity.getAdgroupId(), serverConfiguration.getDouble("default.ecpm"),
-              serverConfiguration.getDouble("default.fillratio"));
+              serverConfiguration.getDouble("default.fillratio"), siteFloor, 0, 0, 0);
         }
 
         if(channelSegmentFeedbackEntity.geteCPM() >= siteFloor) {
@@ -290,7 +290,7 @@ public class Filters {
           logger.debug("Error in retreiving from repo for adgprid " + row.getAdgroupId() + " and advertiserid "
               + row.getId() + " so setting ecpm to default");
         channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(row.getId(), row.getAdgroupId(),
-            serverConfiguration.getDouble("default.ecpm"), serverConfiguration.getDouble("default.fillratio"));
+            serverConfiguration.getDouble("default.ecpm"), serverConfiguration.getDouble("default.fillratio"), feedbackPower, 0, 0, 0);
       }
 
       // setting prioritisedECPM to take control of

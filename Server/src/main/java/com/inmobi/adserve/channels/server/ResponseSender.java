@@ -27,6 +27,7 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.ning.http.client.AsyncHttpClient;
 
 public class ResponseSender extends HttpRequestHandlerBase {
 
@@ -51,6 +52,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
   private boolean requestCleaned;
   public CasInternalRequestParameters casInternalRequestParameters;
   private AuctionEngine auctionEngine;
+  
 
   public List<ChannelSegment> getRankList() {
     return this.rankList;
@@ -371,5 +373,10 @@ public class ResponseSender extends HttpRequestHandlerBase {
       reassignRanks(adNetworkInterface, serverEvent);
       return;
     }
+  }
+  
+  @Override
+  public AsyncHttpClient getAsyncClient() {
+    return AsyncRequestMaker.getAsyncHttpClient();
   }
 }
