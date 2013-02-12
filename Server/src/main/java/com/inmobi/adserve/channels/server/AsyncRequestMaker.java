@@ -44,7 +44,7 @@ public class AsyncRequestMaker {
       AsyncHttpClient asyncHttpClient) {
     AsyncRequestMaker.clientBootstrap = clientBootstrap;
     AsyncRequestMaker.rtbClientBootstrap = rtbClientBootstrap;
-    AsyncRequestMaker.asyncHttpClient = AsyncRequestMaker.asyncHttpClient;
+    AsyncRequestMaker.asyncHttpClient = asyncHttpClient;
   }
 
   /**
