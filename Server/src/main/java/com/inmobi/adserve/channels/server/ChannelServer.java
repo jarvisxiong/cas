@@ -37,6 +37,7 @@ import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import com.inmobi.messaging.publisher.MessagePublisherFactory;
 import com.inmobi.phoenix.exception.InitializationException;
 import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
 
 public class ChannelServer {
   private static Logger logger;
@@ -111,7 +112,9 @@ public class ChannelServer {
     RtbBootstrapCreation.init(timer);
     ClientBootstrap clientBootstrap = BootstrapCreation.createBootstrap(logger, config.serverConfiguration());
     ClientBootstrap rtbClientBootstrap = RtbBootstrapCreation.createBootstrap(logger, config.rtbConfiguration());
-    AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
+    AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder().setRequestTimeoutInMs(
+        config.serverConfiguration().getInt("readTimeout", 700)).setConnectionTimeoutInMs(50).build();
+    AsyncHttpClient asyncHttpClient = new AsyncHttpClient(asyncHttpClientConfig);
     if(null == clientBootstrap) {
       ServerStatusInfo.statusCode = 404;
       ServerStatusInfo.statusString = "StackTrace is: failed to create bootstrap";
