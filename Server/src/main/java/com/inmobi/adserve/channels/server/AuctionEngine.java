@@ -59,6 +59,7 @@ public class AuctionEngine implements AuctionEngineInterface {
       logger.debug("rtb segments are", new Integer(rtbList.size()).toString());
       rtbResponse = rtbList.get(0);
       secondBidPrice = sasParams.siteFloor > casInternalRequestParameters.highestEcpm ? sasParams.siteFloor : casInternalRequestParameters.highestEcpm + 0.01;
+      secondBidPrice = Math.min(secondBidPrice, rtbResponse.adNetworkInterface.getBidprice());
       rtbResponse.adNetworkInterface.setSecondBidPrice(secondBidPrice);
       logger.debug("completed auction and winner is", rtbList.get(0).adNetworkInterface.getName() + " and secondBidPrice is " + secondBidPrice);
       return rtbList.get(0).adNetworkInterface;
@@ -89,13 +90,15 @@ public class AuctionEngine implements AuctionEngineInterface {
       double secondHighestBidPrice = rtbList.get(secondHighestBidNumber).adNetworkInterface.getBidprice();
       double price = maxPrice * 0.9;
       if(price > secondHighestBidPrice) {
-        secondBidPrice = price + 0.01;
+        secondBidPrice = price;
       } else {
         secondBidPrice = secondHighestBidPrice + 0.01;
       }
-    } else
+    } else {
       secondBidPrice = rtbList.get(1).adNetworkInterface.getBidprice() + 0.01;
+    }
     rtbResponse = rtbList.get(lowestLatency);
+    secondBidPrice = Math.min(secondBidPrice, rtbResponse.adNetworkInterface.getBidprice());
     rtbResponse.adNetworkInterface.setSecondBidPrice(secondBidPrice);
     logger.debug("completed auction and winner is", rtbList.get(lowestLatency).adNetworkInterface.getName() + " and secondBidPrice is " + secondBidPrice);
     return rtbList.get(lowestLatency).adNetworkInterface;
