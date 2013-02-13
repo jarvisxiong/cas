@@ -113,7 +113,7 @@ public class ChannelServer {
     ClientBootstrap clientBootstrap = BootstrapCreation.createBootstrap(logger, config.serverConfiguration());
     ClientBootstrap rtbClientBootstrap = RtbBootstrapCreation.createBootstrap(logger, config.rtbConfiguration());
     AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder().setRequestTimeoutInMs(
-        config.serverConfiguration().getInt("readTimeout", 700)).setConnectionTimeoutInMs(50).build();
+        config.serverConfiguration().getInt("readtimeoutMillis") - 100).setConnectionTimeoutInMs(600).build();
     AsyncHttpClient asyncHttpClient = new AsyncHttpClient(asyncHttpClientConfig);
     if(null == clientBootstrap) {
       ServerStatusInfo.statusCode = 404;
