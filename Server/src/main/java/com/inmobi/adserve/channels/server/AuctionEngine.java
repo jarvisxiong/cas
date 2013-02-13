@@ -58,8 +58,7 @@ public class AuctionEngine implements AuctionEngineInterface {
     } else if(rtbList.size() == 1) {
       logger.debug("rtb segments are", new Integer(rtbList.size()).toString());
       rtbResponse = rtbList.get(0);
-      secondBidPrice = sasParams.siteFloor > casInternalRequestParameters.highestEcpm ? sasParams.siteFloor : casInternalRequestParameters.highestEcpm + 0.01;
-      secondBidPrice = Math.min(secondBidPrice, rtbResponse.adNetworkInterface.getBidprice());
+      secondBidPrice = Math.min(casInternalRequestParameters.bidFloor, rtbResponse.adNetworkInterface.getBidprice());
       rtbResponse.adNetworkInterface.setSecondBidPrice(secondBidPrice);
       logger.debug("completed auction and winner is", rtbList.get(0).adNetworkInterface.getName() + " and secondBidPrice is " + secondBidPrice);
       return rtbList.get(0).adNetworkInterface;
