@@ -15,6 +15,7 @@ import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponse;
+import org.jboss.netty.handler.timeout.IdleStateEvent;
 
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -105,6 +106,12 @@ public class ResponseSender extends HttpRequestHandlerBase {
     selectedAdIndex = getRankIndex(selectedAdNetwork);
     sendAdResponse(adResponse.response, event);
   }
+  
+  public void sendAdResponse(AdNetworkInterface selectedAdNetwork, IdleStateEvent event) {
+    adResponse = selectedAdNetwork.getResponseAd();
+    selectedAdIndex = getRankIndex(selectedAdNetwork);
+    sendAdResponse(adResponse.response, event);
+  }
 
   // send Ad Response
   public synchronized void sendAdResponse(String responseString, MessageEvent event) throws NullPointerException {
@@ -132,6 +139,34 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
     sendResponse(responseString, event);
   }
+  
+//send Ad Response
+ public synchronized void sendAdResponse(String responseString, IdleStateEvent event) throws NullPointerException {
+   // Making sure response is sent only once
+   if(responseSent) {
+     return;
+   }
+   responseSent = true;
+   logger.debug("ad received so trying to send ad response");
+
+   if(sasParams.slot != null && SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot)) != null) {
+     logger.debug("slot served is", sasParams.slot);
+     InspectorStats.incrementStatCount(InspectorStrings.totalFills);
+     if(getResponseFormat().equals("xhtml")) {
+       Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot));
+       String startElement = String.format(startTags, (int) dim.getWidth(), (int) dim.getHeight());
+       responseString = startElement + responseString + endTags;
+     }
+   } else {
+     logger.error("invalid slot, so not returning response, even though we got an ad");
+     InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
+     if(getResponseFormat().equals("xhtml")) {
+       responseString = noAdXhtml;
+     }
+   }
+   sendResponse(responseString, event);
+ }
+
 
   // send response to the caller
   public void sendResponse(String responseString, ChannelEvent event) throws NullPointerException {

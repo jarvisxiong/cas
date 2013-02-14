@@ -37,7 +37,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
   public DebugLogger logger = null;
   public ResponseSender responseSender;
   public int lowestEcpm;
-  
+
   public String getTerminationReason() {
     return terminationReason;
   }
@@ -81,9 +81,19 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
   public void channelIdle(ChannelHandlerContext ctx, IdleStateEvent e) {
     if(e.getChannel().isOpen()) {
       logger.debug("Channel is open in channelIdle handler");
+      if(responseSender.getRankList() != null) {
+        for (ChannelSegment channelSegment : responseSender.getRankList()) {
+          if(channelSegment.adNetworkInterface.getAdStatus() == "AD") {
+            logger.debug("Got Ad from", channelSegment.adNetworkInterface.getName(), "Top Rank was", responseSender
+                .getRankList().get(0).adNetworkInterface.getName());
+            responseSender.sendAdResponse(channelSegment.adNetworkInterface, e);
+            return;
+          }
+        }
+      }
       responseSender.sendNoAdResponse(e);
     }
-    // Whenever channel is Wrter_idle, increment the totalTimeout. It means
+    // Whenever channel is Write_idle, increment the totalTimeout. It means
     // server
     // could not write the response with in 800 ms
     logger.debug("inside channel idle event handler for Request channel ID: " + e.getChannel().getId());
