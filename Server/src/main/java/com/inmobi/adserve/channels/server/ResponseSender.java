@@ -100,14 +100,14 @@ public class ResponseSender extends HttpRequestHandlerBase {
   }
 
   @Override
-  public void sendAdResponse(AdNetworkInterface selectedAdNetwork, MessageEvent event) {
+  public void sendAdResponse(AdNetworkInterface selectedAdNetwork, ChannelEvent event) {
     adResponse = selectedAdNetwork.getResponseAd();
     selectedAdIndex = getRankIndex(selectedAdNetwork);
     sendAdResponse(adResponse.response, event);
   }
 
   // send Ad Response
-  public synchronized void sendAdResponse(String responseString, MessageEvent event) throws NullPointerException {
+  public synchronized void sendAdResponse(String responseString, ChannelEvent event) throws NullPointerException {
     // Making sure response is sent only once
     if(responseSent) {
       return;
