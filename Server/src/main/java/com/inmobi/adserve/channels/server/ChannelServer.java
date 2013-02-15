@@ -39,6 +39,8 @@ import com.inmobi.casthrift.DataCenter;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import com.inmobi.messaging.publisher.MessagePublisherFactory;
 import com.inmobi.phoenix.exception.InitializationException;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
 
 public class ChannelServer {
   private static Logger logger;
@@ -118,6 +120,9 @@ public class ChannelServer {
     RtbBootstrapCreation.init(timer);
     ClientBootstrap clientBootstrap = BootstrapCreation.createBootstrap(logger, config.serverConfiguration());
     ClientBootstrap rtbClientBootstrap = RtbBootstrapCreation.createBootstrap(logger, config.rtbConfiguration());
+    AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder().setRequestTimeoutInMs(
+        config.serverConfiguration().getInt("readtimeoutMillis") - 100).setConnectionTimeoutInMs(600).build();
+    AsyncHttpClient asyncHttpClient = new AsyncHttpClient(asyncHttpClientConfig);
     if(null == clientBootstrap) {
       ServerStatusInfo.statusCode = 404;
       ServerStatusInfo.statusString = "StackTrace is: failed to create bootstrap";
@@ -130,7 +135,7 @@ public class ChannelServer {
     // Configure the netty server.
     try {
       // Initialising request handler
-      AsyncRequestMaker.init(clientBootstrap, rtbClientBootstrap);
+      AsyncRequestMaker.init(clientBootstrap, rtbClientBootstrap, asyncHttpClient);
       ServletHandler.init(config, repositoryHelper);
       SegmentFactory.init(repositoryHelper, config.adapterConfiguration(), logger);
       ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(

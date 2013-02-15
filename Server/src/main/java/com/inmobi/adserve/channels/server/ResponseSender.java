@@ -27,6 +27,7 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.ning.http.client.AsyncHttpClient;
 
 public class ResponseSender extends HttpRequestHandlerBase {
 
@@ -63,15 +64,15 @@ public class ResponseSender extends HttpRequestHandlerBase {
   public int getRankIndexToProcess() {
     return rankIndexToProcess;
   }
-  
+
   public void setRankIndexToProcess(int rankIndexToProcess) {
     this.rankIndexToProcess = rankIndexToProcess;
   }
-  
+
   public ThirdPartyAdResponse getAdResponse() {
     return this.adResponse;
   }
-  
+
   public ChannelSegment getRtbResponse() {
     return auctionEngine.getRtbResponse();
   }
@@ -79,7 +80,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
   public int getSelectedAdIndex() {
     return this.selectedAdIndex;
   }
- 
+
   public long getTotalTime() {
     return this.totalTime;
   }
@@ -113,26 +114,26 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
     responseSent = true;
     logger.debug("ad received so trying to send ad response");
-    if(getResponseFormat().equals("xhtml")) {
-      if(logger.isDebugEnabled()) {
-        logger.debug("slot served is " + sasParams.slot);
-      }
 
-      if(sasParams.slot != null && SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot)) != null) {
+    if(sasParams.slot != null && SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot)) != null) {
+      logger.debug("slot served is", sasParams.slot);
+      InspectorStats.incrementStatCount(InspectorStrings.totalFills);
+      if(getResponseFormat().equals("xhtml")) {
         Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot));
         String startElement = String.format(startTags, (int) dim.getWidth(), (int) dim.getHeight());
         responseString = startElement + responseString + endTags;
-        InspectorStats.incrementStatCount(InspectorStrings.totalFills);
-      } else {
-        logger.error("invalid slot, so not returning response, even though we got an ad");
+      }
+    } else {
+      logger.error("invalid slot, so not returning response, even though we got an ad");
+      InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
+      if(getResponseFormat().equals("xhtml")) {
         responseString = noAdXhtml;
-        InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
       }
     }
     sendResponse(responseString, event);
   }
 
-  //send response to the caller
+  // send response to the caller
   public void sendResponse(String responseString, ChannelEvent event) throws NullPointerException {
     HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
     response.setContent(ChannelBuffers.copiedBuffer(responseString, Charset.forName("UTF-8").name()));
@@ -179,7 +180,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
   }
 
-  //Return true if request contains Iframe Id and is a request from js adcode.
+  // Return true if request contains Iframe Id and is a request from js adcode.
   public boolean isJsAdRequest() {
     if(null == sasParams) {
       return false;
@@ -220,7 +221,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     return false;
   }
 
-  //Iterates over the complete rank list and set the new value for
+  // Iterates over the complete rank list and set the new value for
   // rankIndexToProcess.
   @Override
   public void reassignRanks(AdNetworkInterface adNetworkCaller, MessageEvent event) {
@@ -288,9 +289,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
       }
     }
     for (int index = 0; rankList != null && index < rankList.size(); index++) {
-      ChannelsClientHandler.responseMap.remove(rankList.get(index).adNetworkInterface.getChannelId());
-      ChannelsClientHandler.statusMap.remove(rankList.get(index).adNetworkInterface.getChannelId());
-      ChannelsClientHandler.adStatusMap.remove(rankList.get(index).adNetworkInterface.getChannelId());
+      if(null != rankList.get(index).adNetworkInterface.getChannelId()) {
+        ChannelsClientHandler.responseMap.remove(rankList.get(index).adNetworkInterface.getChannelId());
+        ChannelsClientHandler.statusMap.remove(rankList.get(index).adNetworkInterface.getChannelId());
+        ChannelsClientHandler.adStatusMap.remove(rankList.get(index).adNetworkInterface.getChannelId());
+      }
     }
     if(logger.isDebugEnabled()) {
       logger.debug("done with closing channels");
@@ -300,8 +303,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
     hrh.writeLogs(this, logger);
   }
-  
-  
 
   private int getRankIndex(AdNetworkInterface adNetwork) {
     int index = 0;
@@ -333,7 +334,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
       logger.debug("dcp list is empty so sending NoAd");
       this.sendNoAdResponse(serverEvent);
       return;
-    } 
+    }
     int rankIndexToProcess = this.getRankIndexToProcess();
     ChannelSegment segment = this.getRankList().get(rankIndexToProcess);
     while (segment.adNetworkInterface.isRequestCompleted()) {
@@ -351,7 +352,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     this.setRankIndexToProcess(rankIndexToProcess);
     return;
   }
-  
+
   @Override
   public void processDcpPartner(MessageEvent serverEvent, AdNetworkInterface adNetworkInterface) {
     if(!this.isEligibleForProcess(adNetworkInterface)) {
@@ -371,5 +372,10 @@ public class ResponseSender extends HttpRequestHandlerBase {
       reassignRanks(adNetworkInterface, serverEvent);
       return;
     }
+  }
+
+  @Override
+  public AsyncHttpClient getAsyncClient() {
+    return AsyncRequestMaker.getAsyncHttpClient();
   }
 }
