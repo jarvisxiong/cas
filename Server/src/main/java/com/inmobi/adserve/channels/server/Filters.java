@@ -1,25 +1,27 @@
 package com.inmobi.adserve.channels.server;
 
-import java.util.HashMap;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.entity.*;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+
+import com.inmobi.adserve.channels.entity.ChannelEntity;
+import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.repository.*;
 
 /**
  * 
@@ -216,7 +218,7 @@ public class Filters {
           logger.debug("Error in retreiving from repo so setting ecpm to default value");
           channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(channelSegmentEntity.getId(),
               channelSegmentEntity.getAdgroupId(), serverConfiguration.getDouble("default.ecpm"),
-              serverConfiguration.getDouble("default.fillratio"));
+              serverConfiguration.getDouble("default.fillratio"), siteFloor, 0, 0, 0);
         }
 
         if(channelSegmentFeedbackEntity.geteCPM() >= siteFloor) {
@@ -267,12 +269,12 @@ public class Filters {
 
   private static boolean segmentPropertyFilter(ChannelSegmentEntity channelSegmentEntity,
       SASRequestParameters sasParams, DebugLogger logger) {
-    boolean udidFilter =  (!channelSegmentEntity.isUdidRequired() || !StringUtils.isEmpty(sasParams.uidParams));
+    boolean udidFilter = (!channelSegmentEntity.isUdidRequired() || !StringUtils.isEmpty(sasParams.uidParams));
     boolean zipCodeFilter = (!channelSegmentEntity.isZipCodeRequired() || !StringUtils.isEmpty(sasParams.postalCode));
     boolean latLongFilter = (!channelSegmentEntity.isLatlonRequired() || !StringUtils.isEmpty(sasParams.latLong));
-    boolean richMediaFilter =  (!channelSegmentEntity.isUdidRequired() || !StringUtils.isEmpty(sasParams.locSrc));
+    boolean richMediaFilter = (!channelSegmentEntity.isUdidRequired() || !StringUtils.isEmpty(sasParams.locSrc));
     return udidFilter && zipCodeFilter && latLongFilter && richMediaFilter;
-      }
+  }
 
   /**
    * 
@@ -305,7 +307,8 @@ public class Filters {
           logger.debug("Error in retreiving from repo for adgprid " + row.getAdgroupId() + " and advertiserid "
               + row.getId() + " so setting ecpm to default");
         channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(row.getId(), row.getAdgroupId(),
-            serverConfiguration.getDouble("default.ecpm"), serverConfiguration.getDouble("default.fillratio"));
+            serverConfiguration.getDouble("default.ecpm"), serverConfiguration.getDouble("default.fillratio"),
+            feedbackPower, 0, 0, 0);
       }
 
       // setting prioritisedECPM to take control of

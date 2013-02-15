@@ -36,6 +36,8 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import com.inmobi.messaging.publisher.MessagePublisherFactory;
 import com.inmobi.phoenix.exception.InitializationException;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
 
 public class ChannelServer {
   private static Logger logger;
@@ -94,7 +96,7 @@ public class ChannelServer {
     channelSegmentFeedbackRepository = new ChannelSegmentFeedbackRepository();
     siteMetaDataRepository = new SiteMetaDataRepository();
     repositoryHelper = new RepositoryHelper(channelRepository, channelAdGroupRepository, channelFeedbackRepository,
-        channelSegmentFeedbackRepository, siteMetaDataRepository);
+        channelSegmentFeedbackRepository, siteMetaDataRepository, null, null);
 
     MatchSegments.init(channelAdGroupRepository, inspectorStat);
     InspectorStats.initializeRepoStats("ChannelAdGroupRepository");
@@ -110,6 +112,9 @@ public class ChannelServer {
     RtbBootstrapCreation.init(timer);
     ClientBootstrap clientBootstrap = BootstrapCreation.createBootstrap(logger, config.serverConfiguration());
     ClientBootstrap rtbClientBootstrap = RtbBootstrapCreation.createBootstrap(logger, config.rtbConfiguration());
+    AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder().setRequestTimeoutInMs(
+        config.serverConfiguration().getInt("readtimeoutMillis") - 100).setConnectionTimeoutInMs(600).build();
+    AsyncHttpClient asyncHttpClient = new AsyncHttpClient(asyncHttpClientConfig);
     if(null == clientBootstrap) {
       ServerStatusInfo.statusCode = 404;
       ServerStatusInfo.statusString = "StackTrace is: failed to create bootstrap";
@@ -122,9 +127,9 @@ public class ChannelServer {
     // Configure the netty server.
     try {
       // Initialising request handler
-      AsyncRequestMaker.init(clientBootstrap, rtbClientBootstrap);
+      AsyncRequestMaker.init(clientBootstrap, rtbClientBootstrap, asyncHttpClient);
       ServletHandler.init(config, repositoryHelper);
-      SegmentFactory.init(repositoryHelper);
+      SegmentFactory.init(repositoryHelper, config.adapterConfiguration(), logger);
       ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(
           Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
       Timer servertimer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
@@ -178,6 +183,7 @@ public class ChannelServer {
       Configuration repoConfig = config.repoConfiguration();
       Configuration feedbackConfig = config.feedBackConfiguration();
       Configuration segmentFeedbackConfig = config.segmentFeedBackConfiguration();
+      Configuration siteMetaDataConfig = config.siteMetaDataConfiguration();
       InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.isUpdating, 0);
       InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.repoSource,
           databaseConfig.getString("database"));
@@ -203,9 +209,9 @@ public class ChannelServer {
       InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.isUpdating, 0);
       InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.repoSource,
           databaseConfig.getString("database"));
-      InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.query, repoConfig.getString("query"));
+      InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.query, siteMetaDataConfig.getString("query"));
       InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.refreshInterval,
-          repoConfig.getString("refreshTime"));
+          siteMetaDataConfig.getString("refreshTime"));
 
       initialContext.bind("java:comp/env/jdbc", dataSource);
 

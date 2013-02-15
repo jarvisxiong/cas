@@ -5,17 +5,7 @@ import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 import java.awt.Dimension;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-
-import com.inmobi.adserve.channels.api.AdNetworkInterface;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.ChannelsClientHandler;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
@@ -25,9 +15,19 @@ import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponse;
+
+import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.ChannelsClientHandler;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.ning.http.client.AsyncHttpClient;
 
 public class ResponseSender extends HttpRequestHandlerBase {
 
@@ -44,23 +44,15 @@ public class ResponseSender extends HttpRequestHandlerBase {
   private DebugLogger logger;
   private long totalTime;
   private List<ChannelSegment> rankList;
-  public List<ChannelSegment> rtbSegments;
   private ThirdPartyAdResponse adResponse;
   private boolean responseSent;
   public SASRequestParameters sasParams;
-  private boolean auctionComplete = false;
-  private double secondBidPrice;
-  private double bidFloor;
   private int rankIndexToProcess;
   private int selectedAdIndex;
   private boolean requestCleaned;
-  public ChannelSegment rtbResponse;
   public CasInternalRequestParameters casInternalRequestParameters;
+  private AuctionEngine auctionEngine;
 
-  public List<ChannelSegment> getRtbSegments() {
-    return this.rtbSegments;
-  }
-  
   public List<ChannelSegment> getRankList() {
     return this.rankList;
   }
@@ -72,23 +64,23 @@ public class ResponseSender extends HttpRequestHandlerBase {
   public int getRankIndexToProcess() {
     return rankIndexToProcess;
   }
-  
+
   public void setRankIndexToProcess(int rankIndexToProcess) {
     this.rankIndexToProcess = rankIndexToProcess;
   }
-  
+
   public ThirdPartyAdResponse getAdResponse() {
     return this.adResponse;
   }
-  
+
   public ChannelSegment getRtbResponse() {
-    return this.rtbResponse;
+    return auctionEngine.getRtbResponse();
   }
 
   public int getSelectedAdIndex() {
     return this.selectedAdIndex;
   }
- 
+
   public long getTotalTime() {
     return this.totalTime;
   }
@@ -98,25 +90,20 @@ public class ResponseSender extends HttpRequestHandlerBase {
     this.logger = logger;
     this.totalTime = System.currentTimeMillis();
     this.rankList = null;
-    this.rtbSegments = new ArrayList<ChannelSegment>();
     this.adResponse = null;
     this.responseSent = false;
     this.sasParams = null;
-    this.bidFloor = ServletHandler.rtbConfig.getDouble("bidFloor", 0.0);
-    this.secondBidPrice = bidFloor;
     this.rankIndexToProcess = 0;
     this.selectedAdIndex = 0;
     this.requestCleaned = false;
-    this.rtbResponse = null;
+    this.auctionEngine = new AuctionEngine(logger);
   }
 
   @Override
   public void sendAdResponse(AdNetworkInterface selectedAdNetwork, MessageEvent event) {
     adResponse = selectedAdNetwork.getResponseAd();
-    logger.debug("response inside sendadresponse adapter is", adResponse.response);
     selectedAdIndex = getRankIndex(selectedAdNetwork);
     sendAdResponse(adResponse.response, event);
-    InspectorStats.incrementStatCount(selectedAdNetwork.getName(), InspectorStrings.serverImpression);
   }
 
   // send Ad Response
@@ -125,31 +112,29 @@ public class ResponseSender extends HttpRequestHandlerBase {
     if(responseSent) {
       return;
     }
-    logger.debug("response inside response is", responseString);
     responseSent = true;
     logger.debug("ad received so trying to send ad response");
-    if(getResponseFormat().equals("xhtml")) {
-      if(logger.isDebugEnabled()) {
-        logger.debug("slot served is " + sasParams.slot);
-      }
 
-      if(sasParams.slot != null && SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot)) != null) {
+    if(sasParams.slot != null && SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot)) != null) {
+      logger.debug("slot served is", sasParams.slot);
+      InspectorStats.incrementStatCount(InspectorStrings.totalFills);
+      if(getResponseFormat().equals("xhtml")) {
         Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot));
         String startElement = String.format(startTags, (int) dim.getWidth(), (int) dim.getHeight());
         responseString = startElement + responseString + endTags;
-        InspectorStats.incrementStatCount(InspectorStrings.totalFills);
-      } else {
-        logger.error("invalid slot, so not returning response, even though we got an ad");
+      }
+    } else {
+      logger.error("invalid slot, so not returning response, even though we got an ad");
+      InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
+      if(getResponseFormat().equals("xhtml")) {
         responseString = noAdXhtml;
-        InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
       }
     }
     sendResponse(responseString, event);
   }
 
-  //send response to the caller
+  // send response to the caller
   public void sendResponse(String responseString, ChannelEvent event) throws NullPointerException {
-    logger.debug("response string inside sendResponse is", responseString);
     HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
     response.setContent(ChannelBuffers.copiedBuffer(responseString, Charset.forName("UTF-8").name()));
     if(event != null) {
@@ -172,86 +157,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
   }
 
   @Override
-  public boolean isAllRtbComplete() {
-    if(rtbSegments.size() == 0)
-      return true;
-    for (ChannelSegment channelSegment : rtbSegments) {
-      if(!channelSegment.adNetworkInterface.isRequestCompleted())
-        return false;
-    }
-    return true;
-  }
-
-  @Override
-  public double getSecondBidPrice() {
-    return secondBidPrice;
-  }
-  
-  /***
-   * RunRtbSecondPriceAuctionEngine returns the adnetwork selected after
-   * auctioning If no of rtb segments selected after filtering is zero it
-   * returns the null If no of rtb segments selected after filtering is one it
-   * returns the rtb adapter for the segment BidFloor is maximum of lowestEcpm
-   * and siteFloor If only 2 rtb are selected, highest bid will win and would be
-   * charged the secondHighest price If only 1 rtb is selected, it will be
-   * selected for sending response and will be charged the highest of
-   * secondHighest price or 90% of bidFloor
-   */
-  @Override
-  public AdNetworkInterface runRtbSecondPriceAuctionEngine() {
-    auctionComplete = true;
-    logger.debug("Inside RTB auction engine");
-    List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
-    logger.debug("No of rtb partners who sent response are", new Integer(this.rtbSegments.size()).toString());
-    for (int i=0; i < this.rtbSegments.size() ; i++) {
-      if (this.rtbSegments.get(0).adNetworkInterface.getAdStatus().equalsIgnoreCase("AD")) {
-        rtbSegments.add(this.rtbSegments.get(i));
-      }
-    }
-    logger.debug("No of rtb partners who sent AD response are", new Integer(rtbSegments.size()).toString());
-    if(rtbSegments.size() == 0) {
-      rtbResponse = null;
-      logger.debug("returning from auction engine , winner is null");
-      return null;
-    } else if(rtbSegments.size() == 1) {
-      rtbResponse = rtbSegments.get(0);
-      secondBidPrice = sasParams.siteFloor > casInternalRequestParameters.lowestEcpm ? sasParams.siteFloor : casInternalRequestParameters.lowestEcpm;
-      logger.debug("completed auction and winner is", rtbSegments.get(0).adNetworkInterface.getName());
-      return rtbSegments.get(0).adNetworkInterface;
-    }
-
-    for (int i = 0; i < rtbSegments.size(); i++) {
-      for (int j = i + 1; j < rtbSegments.size(); j++) {
-        if(rtbSegments.get(i).adNetworkInterface.getBidprice() < rtbSegments.get(j).adNetworkInterface.getBidprice()) {
-          ChannelSegment channelSegment = rtbSegments.get(i);
-          rtbSegments.set(i, rtbSegments.get(j));
-          rtbSegments.set(j, channelSegment);
-        }
-      }
-    }
-    double maxPrice = rtbSegments.get(0).adNetworkInterface.getBidprice();
-    int secondHighestBidNumber = 1;
-    int lowestLatency = 0;
-    for (int i = 1; i < rtbSegments.size(); i++) {
-      if(rtbSegments.get(i).adNetworkInterface.getBidprice() < maxPrice) {
-        secondHighestBidNumber = i;
-        break;
-      } else if(rtbSegments.get(i).adNetworkInterface.getLatency() < rtbSegments.get(lowestLatency).adNetworkInterface
-          .getLatency())
-        lowestLatency = i;
-    }
-    if(secondHighestBidNumber != 1) {
-      double secondHighestBidPrice = rtbSegments.get(secondHighestBidNumber).adNetworkInterface.getBidprice();
-      double price = maxPrice * 0.9;
-      if(price > secondHighestBidPrice)
-        secondBidPrice = price;
-      else
-        secondBidPrice = secondHighestBidPrice;
-    } else
-      secondBidPrice = rtbSegments.get(1).adNetworkInterface.getBidprice();
-    rtbResponse = rtbSegments.get(lowestLatency);
-    logger.debug("completed auction and winner is", rtbSegments.get(lowestLatency).adNetworkInterface.getName());
-    return rtbSegments.get(lowestLatency).adNetworkInterface;
+  public AuctionEngine getAuctionEngine() {
+    return auctionEngine;
   }
 
   @Override
@@ -273,7 +180,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
   }
 
-  //Return true if request contains Iframe Id and is a request from js adcode.
+  // Return true if request contains Iframe Id and is a request from js adcode.
   public boolean isJsAdRequest() {
     if(null == sasParams) {
       return false;
@@ -314,7 +221,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     return false;
   }
 
-  //Iterates over the complete rank list and set the new value for
+  // Iterates over the complete rank list and set the new value for
   // rankIndexToProcess.
   @Override
   public void reassignRanks(AdNetworkInterface adNetworkCaller, MessageEvent event) {
@@ -382,9 +289,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
       }
     }
     for (int index = 0; rankList != null && index < rankList.size(); index++) {
-      ChannelsClientHandler.responseMap.remove(rankList.get(index).adNetworkInterface.getChannelId());
-      ChannelsClientHandler.statusMap.remove(rankList.get(index).adNetworkInterface.getChannelId());
-      ChannelsClientHandler.adStatusMap.remove(rankList.get(index).adNetworkInterface.getChannelId());
+      if(null != rankList.get(index).adNetworkInterface.getChannelId()) {
+        ChannelsClientHandler.responseMap.remove(rankList.get(index).adNetworkInterface.getChannelId());
+        ChannelsClientHandler.statusMap.remove(rankList.get(index).adNetworkInterface.getChannelId());
+        ChannelsClientHandler.adStatusMap.remove(rankList.get(index).adNetworkInterface.getChannelId());
+      }
     }
     if(logger.isDebugEnabled()) {
       logger.debug("done with closing channels");
@@ -394,8 +303,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
     hrh.writeLogs(this, logger);
   }
-  
-  
 
   private int getRankIndex(AdNetworkInterface adNetwork) {
     int index = 0;
@@ -420,12 +327,55 @@ public class ResponseSender extends HttpRequestHandlerBase {
   }
 
   @Override
-  public boolean isAuctionComplete() {
-    return auctionComplete;
+  public void processDcpList(MessageEvent serverEvent) {
+    // There would always be rtb partner before going to dcp list
+    // So will iterate over the dcp list once.
+    if(this.getRankList().isEmpty()) {
+      logger.debug("dcp list is empty so sending NoAd");
+      this.sendNoAdResponse(serverEvent);
+      return;
+    }
+    int rankIndexToProcess = this.getRankIndexToProcess();
+    ChannelSegment segment = this.getRankList().get(rankIndexToProcess);
+    while (segment.adNetworkInterface.isRequestCompleted()) {
+      if(segment.adNetworkInterface.getResponseAd().responseStatus == ResponseStatus.SUCCESS) {
+        this.sendAdResponse(segment.adNetworkInterface, serverEvent);
+        break;
+      }
+      rankIndexToProcess++;
+      if(rankIndexToProcess >= this.getRankList().size()) {
+        this.sendNoAdResponse(serverEvent);
+        break;
+      }
+      segment = getRankList().get(rankIndexToProcess);
+    }
+    this.setRankIndexToProcess(rankIndexToProcess);
+    return;
   }
 
   @Override
-  public boolean isRtbResponseNull() {
-    return this.rtbResponse == null ? true : false;
+  public void processDcpPartner(MessageEvent serverEvent, AdNetworkInterface adNetworkInterface) {
+    if(!this.isEligibleForProcess(adNetworkInterface)) {
+      logger.debug(adNetworkInterface.getName(), "is not eligible for processing");
+      return;
+    }
+    logger.debug("the channel is eligible for processing");
+    if(adNetworkInterface.getResponseAd().responseStatus == ThirdPartyAdResponse.ResponseStatus.SUCCESS) {
+      sendAdResponse(adNetworkInterface, serverEvent);
+      cleanUp();
+      return;
+    } else if(isLastEntry(adNetworkInterface)) {
+      sendNoAdResponse(serverEvent);
+      cleanUp();
+      return;
+    } else {
+      reassignRanks(adNetworkInterface, serverEvent);
+      return;
+    }
+  }
+
+  @Override
+  public AsyncHttpClient getAsyncClient() {
+    return AsyncRequestMaker.getAsyncHttpClient();
   }
 }

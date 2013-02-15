@@ -41,7 +41,7 @@ public class ServletBackFill implements Servlet {
       InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
     }
     hrh.responseSender.sasParams = RequestParser.parseRequestParameters(hrh.jObject, logger);
-
+    hrh.responseSender.getAuctionEngine().sasParams = hrh.responseSender.sasParams;
     if(ServletHandler.random.nextInt(100) >= ServletHandler.percentRollout) {
       logger.debug("Request not being served because of limited percentage rollout");
       InspectorStats.incrementStatCount(InspectorStrings.droppedRollout, InspectorStrings.count);
@@ -149,13 +149,14 @@ public class ServletBackFill implements Servlet {
     }
     
     CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-    casInternalRequestParameters.lowestEcpm = getLowestEcpm(rows, logger);
-    logger.debug("Lowest Ecpm is", new Double(casInternalRequestParameters.lowestEcpm).toString());
+    casInternalRequestParameters.highestEcpm = getHighestEcpm(rows, logger);
+    logger.debug("Highest Ecpm is", new Double(casInternalRequestParameters.highestEcpm).toString());
     casInternalRequestParameters.blockedCategories = getBlockedCategories(hrh, logger);
     hrh.responseSender.casInternalRequestParameters = casInternalRequestParameters;
-
+    hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternalRequestParameters;
     logger.debug("Total channels available for sending requests " + rows.length);
     List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
+    
     segments = AsyncRequestMaker.prepareForAsyncRequest(rows, logger, ServletHandler.config, ServletHandler.rtbConfig,
         ServletHandler.adapterConfig, hrh.responseSender, advertiserSet, e, ServletHandler.repositoryHelper,
         hrh.jObject, hrh.responseSender.sasParams, casInternalRequestParameters, rtbSegments);
@@ -176,42 +177,30 @@ public class ServletBackFill implements Servlet {
     tempRankList = AsyncRequestMaker.makeAsyncRequests(tempRankList, logger, hrh.responseSender, e, rtbSegments);
 
     hrh.responseSender.setRankList(tempRankList);
-    hrh.responseSender.rtbSegments = rtbSegments;
+    hrh.responseSender.getAuctionEngine().setRtbSegments(rtbSegments);
     if(logger.isDebugEnabled()) {
       logger.debug("Number of tpans whose request was successfully completed "
           + hrh.responseSender.getRankList().size());
       logger.debug("Number of rtb tpans whose request was successfully completed "
-          + hrh.responseSender.rtbSegments.size());
+          + hrh.responseSender.getAuctionEngine().getRtbSegments().size());
     }
     // if none of the async request succeed, we return "NO_AD"
-    if(hrh.responseSender.getRankList().isEmpty() && hrh.responseSender.rtbSegments.isEmpty()) {
+    if(hrh.responseSender.getRankList().isEmpty() && hrh.responseSender.getAuctionEngine().getRtbSegments().isEmpty()) {
       logger.debug("No calls");
       hrh.responseSender.sendNoAdResponse(e);
       return;
     }
 
-    if (hrh.responseSender.isAllRtbComplete()) {
-      AdNetworkInterface adNetworkInterface = hrh.responseSender.runRtbSecondPriceAuctionEngine();
-      if(null != adNetworkInterface) {
-        hrh.responseSender.sendAdResponse(adNetworkInterface, e);
+    if (hrh.responseSender.getAuctionEngine().isAllRtbComplete()) {
+      AdNetworkInterface highestBid = hrh.responseSender.getAuctionEngine().runRtbSecondPriceAuctionEngine();
+      if(null != highestBid) {
+        logger.debug("Sending rtb response of", highestBid.getName());
+        hrh.responseSender.sendAdResponse(highestBid, e);
+        //highestBid.impressionCallback();
         return;
       }
       // Resetting the rankIndexToProcess for already completed adapters.
-      int rankIndexToProcess = hrh.responseSender.getRankIndexToProcess();
-      ChannelSegment segment = hrh.responseSender.getRankList().get(rankIndexToProcess);
-      while (segment.adNetworkInterface.isRequestCompleted()) {
-        if(segment.adNetworkInterface.getResponseAd().responseStatus == ResponseStatus.SUCCESS) {
-          hrh.responseSender.sendAdResponse(segment.adNetworkInterface, e);
-          break;
-        }
-        rankIndexToProcess++;
-        if(rankIndexToProcess >= hrh.responseSender.getRankList().size()) {
-          hrh.responseSender.sendNoAdResponse(e);
-          break;
-        }
-        segment = hrh.responseSender.getRankList().get(rankIndexToProcess);
-      }
-      hrh.responseSender.setRankIndexToProcess(rankIndexToProcess);
+      hrh.responseSender.processDcpList(e);
       if(logger.isDebugEnabled()) {
         logger.debug("retunrd from send Response, ranklist size is " + hrh.responseSender.getRankList().size());
       }
@@ -223,7 +212,7 @@ public class ServletBackFill implements Servlet {
     return "BackFill";
   }
 
-  private static double getLowestEcpm(ChannelSegmentEntity[] channelSegmentEntities, DebugLogger logger) {
+  private static double getHighestEcpm(ChannelSegmentEntity[] channelSegmentEntities, DebugLogger logger) {
     double lowestEcpm = 0;
     for (ChannelSegmentEntity channelSegmentEntity : channelSegmentEntities) {
       if(null == ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(channelSegmentEntity
@@ -236,7 +225,7 @@ public class ServletBackFill implements Servlet {
         logger.debug("ecpm is "
             + ServletHandler.repositoryHelper
                 .queryChannelSegmentFeedbackRepository(channelSegmentEntity.getAdgroupId()).geteCPM());
-      lowestEcpm = lowestEcpm > ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(
+      lowestEcpm = lowestEcpm < ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(
           channelSegmentEntity.getAdgroupId()).geteCPM() ? ServletHandler.repositoryHelper
           .queryChannelSegmentFeedbackRepository(channelSegmentEntity.getAdgroupId()).geteCPM() : lowestEcpm;
     }
