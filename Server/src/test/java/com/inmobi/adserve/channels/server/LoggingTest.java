@@ -67,9 +67,7 @@ public class LoggingTest extends TestCase {
     expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
     expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("DummyResponsecontent").anyTimes();
     replay(mockAdnetworkInterface);
-    ChannelSegment channelSegment = createMock(ChannelSegment.class);
-    channelSegment.adNetworkInterface = mockAdnetworkInterface;
-    channelSegment.channelSegmentEntity = channelSegmentEntity;
+    ChannelSegment channelSegment = new ChannelSegment(channelSegmentEntity, null, null, null, null, mockAdnetworkInterface, 0);
     expect(rankList.get(0)).andReturn(channelSegment).anyTimes();
     expect(rankList.size()).andReturn(1).anyTimes();
     replay(rankList);
@@ -95,9 +93,7 @@ public class LoggingTest extends TestCase {
     expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
     expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("").anyTimes();
     replay(mockAdnetworkInterface);
-    ChannelSegment channelSegment = createMock(ChannelSegment.class);
-    channelSegment.adNetworkInterface = mockAdnetworkInterface;
-    channelSegment.channelSegmentEntity = channelSegmentEntity;
+    ChannelSegment channelSegment = new ChannelSegment(channelSegmentEntity, null, null, null, null, mockAdnetworkInterface, 0);
     expect(rankList.get(0)).andReturn(channelSegment).anyTimes();
     expect(rankList.size()).andReturn(1).anyTimes();
     replay(rankList);
@@ -123,9 +119,7 @@ public class LoggingTest extends TestCase {
     expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
     expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("").anyTimes();
     replay(mockAdnetworkInterface);
-    ChannelSegment channelSegment = createMock(ChannelSegment.class);
-    channelSegment.adNetworkInterface = mockAdnetworkInterface;
-    channelSegment.channelSegmentEntity = channelSegmentEntity;
+    ChannelSegment channelSegment = new ChannelSegment(channelSegmentEntity, null, null, null, null, mockAdnetworkInterface, 0);
     expect(rankList.get(0)).andReturn(channelSegment).anyTimes();
     expect(rankList.size()).andReturn(1).anyTimes();
     replay(rankList);
@@ -151,9 +145,7 @@ public class LoggingTest extends TestCase {
     expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
     expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("response").anyTimes();
     replay(mockAdnetworkInterface);
-    ChannelSegment channelSegment = createMock(ChannelSegment.class);
-    channelSegment.adNetworkInterface = mockAdnetworkInterface;
-    channelSegment.channelSegmentEntity = channelSegmentEntity;
+    ChannelSegment channelSegment = new ChannelSegment(channelSegmentEntity, null, null, null, null, mockAdnetworkInterface, 0);
     expect(rankList.get(0)).andReturn(channelSegment).anyTimes();
     expect(rankList.get(1)).andReturn(channelSegment).anyTimes();
     expect(rankList.get(2)).andReturn(channelSegment).anyTimes();

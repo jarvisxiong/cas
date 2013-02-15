@@ -137,27 +137,27 @@ public class Logging {
     Ad ad = null;
     Impression impression = null;
     if(channelSegment != null) {
-      InspectorStats.incrementStatCount(channelSegment.adNetworkInterface.getName(), InspectorStrings.serverImpression);
+      InspectorStats.incrementStatCount(channelSegment.getAdNetworkInterface().getName(), InspectorStrings.serverImpression);
       adsServed = 1;
       log.append("{\"ad\":[");
-      log.append(channelSegment.channelSegmentEntity.getIncId()).append(",");
+      log.append(channelSegment.getChannelSegmentEntity().getIncId()).append(",");
       log.append("\"\",\"");
-      adChain = new AdIdChain(channelSegment.channelSegmentEntity.getAdId(),
-          channelSegment.channelSegmentEntity.getAdgroupId(), channelSegment.channelSegmentEntity.getCampaignId(),
-          channelSegment.channelSegmentEntity.getId(), channelSegment.channelSegmentEntity.getExternalSiteKey());
-      log.append(channelSegment.channelSegmentEntity.getAdId()).append("\",\"");
-      log.append(channelSegment.channelSegmentEntity.getAdgroupId()).append("\",\"");
-      log.append(channelSegment.channelSegmentEntity.getCampaignId()).append("\",\"");
-      log.append(channelSegment.channelSegmentEntity.getId()).append("\",\"");
+      adChain = new AdIdChain(channelSegment.getChannelSegmentEntity().getAdId(),
+          channelSegment.getChannelSegmentEntity().getAdgroupId(), channelSegment.getChannelSegmentEntity().getCampaignId(),
+          channelSegment.getChannelSegmentEntity().getId(), channelSegment.getChannelSegmentEntity().getExternalSiteKey());
+      log.append(channelSegment.getChannelSegmentEntity().getAdId()).append("\",\"");
+      log.append(channelSegment.getChannelSegmentEntity().getAdgroupId()).append("\",\"");
+      log.append(channelSegment.getChannelSegmentEntity().getCampaignId()).append("\",\"");
+      log.append(channelSegment.getChannelSegmentEntity().getId()).append("\",\"");
       ContentRating contentRating = getContentRating(sasParams);
-      PricingModel pricingModel = getPricingModel(channelSegment.channelSegmentEntity.getPricingModel());
+      PricingModel pricingModel = getPricingModel(channelSegment.getChannelSegmentEntity().getPricingModel());
       adMeta = new AdMeta(contentRating, pricingModel, "BANNER");
       ad = new Ad(adChain, adMeta);
-      impression = new Impression(channelSegment.adNetworkInterface.getImpressionId(), ad);
-      log.append(channelSegment.channelSegmentEntity.getPricingModel()).append("\",\"BANNER\", \"");
-      log.append(channelSegment.channelSegmentEntity.getExternalSiteKey()).append("\"],\"impid\":\"");
-      log.append(channelSegment.adNetworkInterface.getImpressionId()).append("\"");
-      double winBid = channelSegment.adNetworkInterface.getSecondBidPrice();
+      impression = new Impression(channelSegment.getAdNetworkInterface().getImpressionId(), ad);
+      log.append(channelSegment.getChannelSegmentEntity().getPricingModel()).append("\",\"BANNER\", \"");
+      log.append(channelSegment.getChannelSegmentEntity().getExternalSiteKey()).append("\"],\"impid\":\"");
+      log.append(channelSegment.getAdNetworkInterface().getImpressionId()).append("\"");
+      double winBid = channelSegment.getAdNetworkInterface().getSecondBidPrice();
       if(winBid != -1) {
         log.append(",\"" + "winBid" + "\":\"" + winBid + "\"");
         ad.setWinBid(winBid);
@@ -302,28 +302,28 @@ public class Logging {
     // Writing inspector stats and getting log line from adapters
     for (int index = 0; rankList != null && index < rankList.size(); index++) {
       JSONObject logLine = null;
-      ThirdPartyAdResponse adResponse = ((ChannelSegment) rankList.get(index)).adNetworkInterface.getResponseStruct();
+      ThirdPartyAdResponse adResponse = ((ChannelSegment) rankList.get(index)).getAdNetworkInterface().getResponseStruct();
       try {
-        InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).adNetworkInterface.getName(),
+        InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).getAdNetworkInterface().getName(),
             InspectorStrings.totalRequests);
-        InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).adNetworkInterface.getName(),
+        InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).getAdNetworkInterface().getName(),
             InspectorStrings.latency, adResponse.latency);
         if(adResponse.adStatus.equals("AD"))
-          InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).adNetworkInterface.getName(),
+          InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).getAdNetworkInterface().getName(),
               InspectorStrings.totalFills);
         else if(adResponse.adStatus.equals("NO_AD"))
-          InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).adNetworkInterface.getName(),
+          InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).getAdNetworkInterface().getName(),
               InspectorStrings.totalNoFills);
         else if(adResponse.adStatus.equals("TIME_OUT"))
-          InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).adNetworkInterface.getName(),
+          InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).getAdNetworkInterface().getName(),
               InspectorStrings.totalTimeout);
         else
-          InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).adNetworkInterface.getName(),
+          InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).getAdNetworkInterface().getName(),
               InspectorStrings.totalTerminate);
         logLine = new JSONObject();
-        String advertiserId = ((ChannelSegment) rankList.get(index)).adNetworkInterface.getId();
-        String externalSiteKey = ((ChannelSegment) rankList.get(index)).channelSegmentEntity.getExternalSiteKey();
-        double bid = ((ChannelSegment) rankList.get(index)).adNetworkInterface.getBidprice();
+        String advertiserId = ((ChannelSegment) rankList.get(index)).getAdNetworkInterface().getId();
+        String externalSiteKey = ((ChannelSegment) rankList.get(index)).getChannelSegmentEntity().getExternalSiteKey();
+        double bid = ((ChannelSegment) rankList.get(index)).getAdNetworkInterface().getBidprice();
         String resp = adResponse.adStatus;
         long latency = adResponse.latency;
         logLine.put("adv", advertiserId);
@@ -418,7 +418,7 @@ public class Logging {
     StringBuilder log = new StringBuilder();
     logger.debug("got logger handle for advertiser logs");
     for (int index = 0; rankList != null && index < rankList.size(); index++) {
-      AdNetworkInterface adNetworkInterface = ((ChannelSegment) rankList.get(index)).adNetworkInterface;
+      AdNetworkInterface adNetworkInterface = ((ChannelSegment) rankList.get(index)).getAdNetworkInterface();
       ThirdPartyAdResponse adResponse = adNetworkInterface.getResponseStruct();
       String partnerName = adNetworkInterface.getName();
       log.append(partnerName);
@@ -452,14 +452,14 @@ public class Logging {
     logger.debug("got logger handle for sampledAdvertiser logs");
 
     for (int index = 0; rankList != null && index < rankList.size(); index++) {
-      AdNetworkInterface adNetworkInterface = ((ChannelSegment) rankList.get(index)).adNetworkInterface;
+      AdNetworkInterface adNetworkInterface = ((ChannelSegment) rankList.get(index)).getAdNetworkInterface();
       ThirdPartyAdResponse adResponse = adNetworkInterface.getResponseStruct();
       String adstatus = adResponse.adStatus;
       if(!adstatus.equalsIgnoreCase("AD"))
         continue;
       String partnerName = adNetworkInterface.getName();
-      String extsiteKey = rankList.get(index).channelSegmentEntity.getExternalSiteKey();
-      String advertiserId = rankList.get(index).channelSegmentEntity.getId();
+      String extsiteKey = rankList.get(index).getChannelSegmentEntity().getExternalSiteKey();
+      String advertiserId = rankList.get(index).getChannelSegmentEntity().getId();
       String requestUrl = "";
       String response = "";
       if(sampledAdvertiserLogNos.get(partnerName + extsiteKey) == null) {
@@ -476,7 +476,7 @@ public class Logging {
             continue;
           if(index > 0 && partnerName.length() > 0 && log.length() > 0)
             log.append("\n");
-          log.append(partnerName).append(sep).append(rankList.get(index).channelSegmentEntity.getExternalSiteKey());
+          log.append(partnerName).append(sep).append(rankList.get(index).getChannelSegmentEntity().getExternalSiteKey());
           log.append(sep).append(requestUrl).append(sep).append(adResponse.adStatus);
           log.append(sep).append(response).append(sep).append(advertiserId);
           count++;
@@ -496,7 +496,7 @@ public class Logging {
         }
         if(index > 0 && partnerName.length() > 0 && log.length() > 0)
           log.append("\n");
-        log.append(partnerName).append(sep).append(rankList.get(index).channelSegmentEntity.getExternalSiteKey());
+        log.append(partnerName).append(sep).append(rankList.get(index).getChannelSegmentEntity().getExternalSiteKey());
         log.append(sep).append(requestUrl).append(sep).append(adResponse.adStatus);
         log.append(sep).append(response).append(sep).append(advertiserId);
         count++;

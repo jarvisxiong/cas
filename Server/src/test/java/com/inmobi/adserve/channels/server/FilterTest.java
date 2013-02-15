@@ -240,17 +240,17 @@ public class FilterTest extends TestCase {
     HashMap<String, ChannelSegment> adv3 = new HashMap<String, ChannelSegment>();
 
     adv1.put(channelSegmentEntity1.getAdgroupId(), new ChannelSegment(channelSegmentEntity1, cE1, cFE1, cSFE1, null,
-        null, 0));
+        null, cSFE1.geteCPM()));
     adv1.put(channelSegmentEntity2.getAdgroupId(), new ChannelSegment(channelSegmentEntity2, cE1, cFE1, cSFE2, null,
-        null, 0));
+        null, cSFE2.geteCPM()));
     adv1.put(channelSegmentEntity3.getAdgroupId(), new ChannelSegment(channelSegmentEntity3, cE1, cFE1, cSFE3, null,
-        null, 0));
+        null, cSFE3.geteCPM()));
     adv2.put(channelSegmentEntity4.getAdgroupId(), new ChannelSegment(channelSegmentEntity4, cE2, cFE2, cSFE4, null,
-        null, 0));
+        null, cSFE4.geteCPM()));
     adv2.put(channelSegmentEntity5.getAdgroupId(), new ChannelSegment(channelSegmentEntity5, cE2, cFE2, cSFE5, null,
-        null, 0));
+        null, cSFE5.geteCPM()));
     adv3.put(channelSegmentEntity6.getAdgroupId(), new ChannelSegment(channelSegmentEntity6, cE3, cFE3, cSFE6, null,
-        null, 0));
+        null, cSFE6.geteCPM()));
     matchedSegments.put(channelSegmentEntity1.getId(), adv1);
     matchedSegments.put(channelSegmentEntity4.getId(), adv2);
     matchedSegments.put(channelSegmentEntity6.getId(), adv3);
@@ -261,12 +261,11 @@ public class FilterTest extends TestCase {
         rows.add(matchedSegments.get(advertiserId).get(adgroupId));
       }
     }
-    ChannelSegment[] finalRow = (ChannelSegment[]) rows.toArray(new ChannelSegment[0]);
-    finalRow = Filters.segmentsPerRequestFilter(matchedSegments, finalRow, logger, mockConfig);
+    List<ChannelSegment> finalRow = Filters.segmentsPerRequestFilter(matchedSegments, rows, logger, mockConfig);
 
-    assertEquals(5, finalRow.length);
-    assertEquals("adgroupId2", finalRow[0].channelSegmentEntity.getAdgroupId());
-    assertEquals("adgroupId1", finalRow[4].channelSegmentEntity.getAdgroupId());
+    assertEquals(5, finalRow.size());
+    assertEquals("adgroupId2", finalRow.get(0).getChannelSegmentEntity().getAdgroupId());
+    assertEquals("adgroupId1", finalRow.get(4).getChannelSegmentEntity().getAdgroupId());
   }
 
   @Test

@@ -7,13 +7,13 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
 
 public class ChannelSegment {
-  public ChannelSegmentEntity channelSegmentEntity;
-  public ChannelEntity channelEntity;
-  public ChannelFeedbackEntity channelFeedbackEntity;
-  public ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity;
-  public ChannelSegmentFeedbackEntity channelSegmentCitrusLeafFeedbackEntity;
-  public AdNetworkInterface adNetworkInterface;
-  public double prioritisedECPM;
+  private ChannelSegmentEntity channelSegmentEntity;
+  private ChannelEntity channelEntity;
+  private ChannelFeedbackEntity channelFeedbackEntity;
+  private ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity;
+  private ChannelSegmentFeedbackEntity channelSegmentCitrusLeafFeedbackEntity;
+  private AdNetworkInterface adNetworkInterface;
+  private double prioritisedECPM;
 
   public ChannelSegment(ChannelSegmentEntity channelSegmentEntity, ChannelEntity channelEntity,
       ChannelFeedbackEntity channelFeedbackEntity, ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity,
@@ -28,4 +28,37 @@ public class ChannelSegment {
     this.prioritisedECPM = prioritisedECPM;
   }
 
+  public ChannelSegmentEntity getChannelSegmentEntity() {
+    return channelSegmentEntity;
+  }
+
+  public ChannelEntity getChannelEntity() {
+    return channelEntity;
+  }
+
+  public ChannelFeedbackEntity getChannelFeedbackEntity() {
+    return channelFeedbackEntity;
+  }
+
+  public ChannelSegmentFeedbackEntity getChannelSegmentFeedbackEntity() {
+    return channelSegmentFeedbackEntity;
+  }
+
+  public ChannelSegmentFeedbackEntity getChannelSegmentCitrusLeafFeedbackEntity() {
+    return channelSegmentCitrusLeafFeedbackEntity;
+  }
+
+  public AdNetworkInterface getAdNetworkInterface() {
+    return adNetworkInterface;
+  }
+
+  public double getPrioritisedECPM() {
+    return prioritisedECPM;
+  }
+
+  public void setAdNetworkInterface(AdNetworkInterface adNetworkInterface) {
+    this.adNetworkInterface = adNetworkInterface;
+  }
+
+  
 }

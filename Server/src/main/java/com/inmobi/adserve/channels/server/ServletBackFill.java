@@ -118,10 +118,10 @@ public class ServletBackFill implements Servlet {
     }
 
     // applying all the filters
-    ChannelSegment[] rows = Filters.filter(matchedSegments, logger, 0.0, ServletHandler.config,
+    List<ChannelSegment> rows = Filters.filter(matchedSegments, logger, 0.0, ServletHandler.config,
         ServletHandler.adapterConfig, new Long(hrh.responseSender.sasParams.siteIncId).toString());
 
-    if(rows == null || rows.length == 0) {
+    if(rows == null || rows.size() == 0) {
       hrh.responseSender.sendNoAdResponse(e);
       logger.debug("No Entities matching the request.");
       return;
@@ -155,9 +155,9 @@ public class ServletBackFill implements Servlet {
     casInternalRequestParameters.blockedCategories = getBlockedCategories(hrh, logger);
     hrh.responseSender.casInternalRequestParameters = casInternalRequestParameters;
     hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternalRequestParameters;
-    logger.debug("Total channels available for sending requests " + rows.length);
+    logger.debug("Total channels available for sending requests " + rows.size());
     List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
-    
+
     segments = AsyncRequestMaker.prepareForAsyncRequest(rows, logger, ServletHandler.config, ServletHandler.rtbConfig,
         ServletHandler.adapterConfig, hrh.responseSender, advertiserSet, e, ServletHandler.repositoryHelper,
         hrh.jObject, hrh.responseSender.sasParams, casInternalRequestParameters, rtbSegments);
@@ -192,7 +192,7 @@ public class ServletBackFill implements Servlet {
       return;
     }
 
-    if (hrh.responseSender.getAuctionEngine().isAllRtbComplete()) {
+    if(hrh.responseSender.getAuctionEngine().isAllRtbComplete()) {
       AdNetworkInterface highestBid = hrh.responseSender.getAuctionEngine().runRtbSecondPriceAuctionEngine();
       if(null != highestBid) {
         logger.debug("Sending rtb response of", highestBid.getName());
@@ -213,22 +213,13 @@ public class ServletBackFill implements Servlet {
     return "BackFill";
   }
 
-  private static double getHighestEcpm(ChannelSegment[] channelSegments, DebugLogger logger) {
+  private static double getHighestEcpm(List<ChannelSegment> channelSegments, DebugLogger logger) {
     double lowestEcpm = 0;
     for (ChannelSegment channelSegment : channelSegments) {
-      if(null == ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(channelSegment.channelSegmentEntity
-          .getAdgroupId())) {
-        if(logger.isDebugEnabled())
-          logger.debug("ChannelSegmentfeedback entity is null for adgpid id " + channelSegment.channelSegmentEntity.getAdgroupId());
-        continue;
-      }
       if(logger.isDebugEnabled())
-        logger.debug("ecpm is "
-            + ServletHandler.repositoryHelper
-                .queryChannelSegmentFeedbackRepository(channelSegment.channelSegmentEntity.getAdgroupId()).geteCPM());
-      lowestEcpm = lowestEcpm < ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(
-          channelSegment.channelSegmentEntity.getAdgroupId()).geteCPM() ? ServletHandler.repositoryHelper
-          .queryChannelSegmentFeedbackRepository(channelSegment.channelSegmentEntity.getAdgroupId()).geteCPM() : lowestEcpm;
+        logger.debug("ecpm is", channelSegment.getChannelSegmentFeedbackEntity().geteCPM());
+      lowestEcpm = lowestEcpm < channelSegment.getChannelSegmentFeedbackEntity().geteCPM() ? channelSegment
+          .getChannelSegmentFeedbackEntity().geteCPM() : lowestEcpm;
     }
     return lowestEcpm;
   }
