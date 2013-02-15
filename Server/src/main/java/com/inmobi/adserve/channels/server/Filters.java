@@ -101,32 +101,35 @@ public class Filters {
 
       channelSegment = ((ChannelSegment[]) matchedSegments.get(advertiserId).values().toArray(new ChannelSegment[0]))[0];
 
+      // dropping advertiser(all segments) if balance is less than revenue of
+      // that channel(advertiser)
       if(channelSegment.getChannelFeedbackEntity().getBalance() < channelSegment.getChannelFeedbackEntity()
           .getRevenue() * revenueWindow) {
-        // dropping advertiser(all segments) if balance is less than
-        // 10*revenue of that channel(advertiser)
         logger.debug("Burn limit exceeded by advertiser " + advertiserId);
+
         if(advertiserIdtoNameMapping.containsKey(advertiserId))
           InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
               InspectorStrings.droppedInburnFilter);
+
         continue;
       }
-
       logger.debug("Burn limit filter passed by advertiser " + advertiserId);
 
+      // dropping advertiser(all segments) if todays impression is greater
+      // than impression ceiling
       if(channelSegment.getChannelFeedbackEntity().getTodayImpressions() > channelSegment.getChannelEntity()
           .getImpressionCeil()) {
-        // dropping advertiser(all segments) if todays impression is greater
-        // than impression ceiling
         logger.debug("Impression limit exceeded by advertiser " + advertiserId);
+
         if(advertiserIdtoNameMapping.containsKey(advertiserId))
           InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
               InspectorStrings.droppedInImpressionFilter);
+
         continue;
       }
-
       logger.debug("Impression limit filter passed by advertiserId " + advertiserId);
 
+      // dropping advertiser if the site is not in its whiltelist
       if(whiteListedSites.containsKey(advertiserId) && !whiteListedSites.get(advertiserId).contains(siteId)
           && random.nextInt(100) < 95) {
         logger.debug("Dropped in site inclusion-exclusion");
@@ -171,12 +174,11 @@ public class Filters {
         ChannelSegment channelSegment = matchedSegments.get(advertiserId).get(adgroupId);
 
         if(channelSegment.getChannelSegmentFeedbackEntity().geteCPM() >= siteFloor) {
-          logger
-              .debug("sitefloor filter passed by adgroup " + channelSegment.getChannelSegmentFeedbackEntity().getId());
+          logger.debug("sitefloor filter passed by adgroup", channelSegment.getChannelSegmentFeedbackEntity().getId());
           segmentListToBeSorted.add(channelSegment);
         } else
-          logger
-              .debug("sitefloor filter failed by adgroup " + channelSegment.getChannelSegmentFeedbackEntity().getId());
+          logger.debug("sitefloor filter failed by adgroup", channelSegment.getChannelSegmentFeedbackEntity().getId());
+
       }
 
       if(segmentListToBeSorted.isEmpty())
@@ -242,6 +244,7 @@ public class Filters {
 
     for (int i = 0; i < rows.size(); i++) {
       ChannelSegment channelSegment = rows.get(i);
+
       if(totalSegments < totalSegmentNo) {
         shortlistedRow.add(channelSegment);
         totalSegments++;
@@ -284,19 +287,9 @@ public class Filters {
     for (String adkey : matchedSegments.keySet()) {
 
       for (String gpkey : matchedSegments.get(adkey).keySet()) {
-
-        try {
-
-          if(logger.isDebugEnabled())
-            logger.debug("Advertiser is " + matchedSegments.get(adkey).get(gpkey).getChannelSegmentEntity().getId()
-                + " and AdGp is " + matchedSegments.get(adkey).get(gpkey).getChannelSegmentEntity().getAdgroupId()
-                + " \tecpm is " + matchedSegments.get(adkey).get(gpkey).getPrioritisedECPM());
-
-        } catch (NullPointerException e) {
-          logger.debug("Repo Exception/No entry in ChannelSegmentFeedbackRepository for adgrpId : " + gpkey);
-          continue;
-        }
-
+        logger.debug("Advertiser is", matchedSegments.get(adkey).get(gpkey).getChannelSegmentEntity().getId(),
+            "and AdGp is", matchedSegments.get(adkey).get(gpkey).getChannelSegmentEntity().getAdgroupId(), "ecpm is",
+            matchedSegments.get(adkey).get(gpkey).getPrioritisedECPM());
       }
 
     }
@@ -309,8 +302,7 @@ public class Filters {
       Configuration serverConfiguration) {
 
     int rank = 0;
-
-    // Arraylist will contain the order in which we will wait for response
+    // Arraylist that will contain the order in which we will wait for response
     // of the third party ad networks
     ArrayList<ChannelSegment> rankedList = new ArrayList<ChannelSegment>();
 
@@ -334,11 +326,7 @@ public class Filters {
         if(randomNumber > segment.get(index).getPrioritisedECPM()) {
           randomNumber -= segment.get(index).getPrioritisedECPM();
         } else {
-
-          if(logger.isDebugEnabled())
-            logger.debug("rank " + rank++ + " adapter has channel id "
-                + segment.get(index).getAdNetworkInterface().getId());
-
+          logger.debug("rank", rank++, "adapter has channel id", segment.get(index).getAdNetworkInterface().getId());
           rankedList.add(segment.get(index));
           segment.remove(index);
           break;
@@ -348,9 +336,7 @@ public class Filters {
 
     }
 
-    if(logger.isDebugEnabled())
-      logger.debug("rank " + rank++ + " adapter has channel id " + segment.get(0).getAdNetworkInterface().getId());
-
+    logger.debug("rank", rank++, "adapter has channel id", segment.get(0).getAdNetworkInterface().getId());
     rankedList.add(segment.get(0));
     logger.info("Ranked candidate adapters randomly");
     return rankedList;
@@ -364,8 +350,7 @@ public class Filters {
 
       for (String adgroupId : matchedSegments.get(advertiserId).keySet()) {
         segmentList.add(matchedSegments.get(advertiserId).get(adgroupId));
-        logger.debug("ChannelSegmentEntity Added to array for advertiserid : " + advertiserId + " and adgroupid "
-            + adgroupId);
+        logger.debug("ChannelSegment Added to list for advertiserid :", advertiserId, "and adgroupid", adgroupId);
       }
 
     }
@@ -396,6 +381,16 @@ public class Filters {
     return 1;
   }
 
+  /**
+   * Guaranteed delivery Filter to drop drop an advertiser if it has guaranteed
+   * delivery enabled and not on top in ranklist
+   * 
+   * @param rankList
+   *          : List containing ranked segments
+   * @param adapterConfiguration
+   * @param logger
+   * @return
+   */
   public static List<ChannelSegment> ensureGuaranteedDelivery(List<ChannelSegment> rankList,
       Configuration adapterConfiguration, DebugLogger logger) {
     logger.debug("Inside guaranteed delivery filter");
@@ -408,9 +403,10 @@ public class Filters {
       if(!adapterConfiguration.getString(rankedSegment.getAdNetworkInterface().getName() + ".gauranteedDelivery",
           "false").equals("true")) {
         newRankList.add(rankedSegment);
-      } else
-        logger.debug("Dropping partner" + rankedSegment.getAdNetworkInterface().getName() + "rank " + rank
-            + "due to guarnteed delivery");
+      } else {
+        logger.debug("Dropping partner", rankedSegment.getAdNetworkInterface().getName(), "rank", rank,
+            "due to guarnteed delivery");
+      }
 
     }
 
