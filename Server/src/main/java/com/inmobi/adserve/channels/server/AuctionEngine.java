@@ -53,7 +53,7 @@ public class AuctionEngine implements AuctionEngineInterface {
     } else if(rtbList.size() == 1) {
       logger.debug("rtb segments are", new Integer(rtbList.size()).toString());
       rtbResponse = rtbList.get(0);
-      secondBidPrice = Math.min(casInternalRequestParameters.bidFloor, rtbResponse.adNetworkInterface.getBidprice()*0.9);
+      secondBidPrice = Math.min(casInternalRequestParameters.rtbBidFloor, rtbResponse.adNetworkInterface.getBidprice()*0.9);
       rtbResponse.adNetworkInterface.setSecondBidPrice(secondBidPrice);
       logger.debug("completed auction and winner is", rtbList.get(0).adNetworkInterface.getName() + " and secondBidPrice is " + secondBidPrice);
       return rtbList.get(0).adNetworkInterface;
@@ -111,7 +111,7 @@ public class AuctionEngine implements AuctionEngineInterface {
     logger.debug("No of rtb partners who sent AD response are", new Integer(rtbList.size()).toString());
     //BidFloor filter.
     for (int i=0; i < rtbList.size() ; i++) {
-      if (rtbList.get(i).adNetworkInterface.getBidprice() < casInternalRequestParameters.bidFloor) {
+      if (rtbList.get(i).adNetworkInterface.getBidprice() < casInternalRequestParameters.rtbBidFloor) {
         logger.debug("Dropped in bidfloor filter", rtbList.get(i).adNetworkInterface.getName());
         rtbList.remove(rtbList.get(i));
       }
