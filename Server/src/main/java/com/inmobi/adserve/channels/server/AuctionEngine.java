@@ -43,13 +43,8 @@ public class AuctionEngine implements AuctionEngineInterface {
     auctionComplete = true;
     logger.debug("Inside RTB auction engine");
     List<ChannelSegment> rtbList = new ArrayList<ChannelSegment>();
-    logger.debug("No of rtb partners who sent response are", new Integer(rtbSegments.size()).toString());
-    for (int i=0; i < rtbSegments.size() ; i++) {
-      if (rtbSegments.get(i).adNetworkInterface.getAdStatus().equalsIgnoreCase("AD")) {
-        rtbList.add(rtbSegments.get(i));
-      }
-    }
-    logger.debug("No of rtb partners who sent AD response are", new Integer(rtbList.size()).toString());
+    //Apply rtb filters.
+    rtbList = rtbFilters(rtbSegments);
     if(rtbList.size() == 0) {
       logger.debug("rtb segments are", new Integer(rtbList.size()).toString());
       rtbResponse = null;
@@ -58,7 +53,7 @@ public class AuctionEngine implements AuctionEngineInterface {
     } else if(rtbList.size() == 1) {
       logger.debug("rtb segments are", new Integer(rtbList.size()).toString());
       rtbResponse = rtbList.get(0);
-      secondBidPrice = sasParams.siteFloor > casInternalRequestParameters.highestEcpm ? sasParams.siteFloor : casInternalRequestParameters.highestEcpm + 0.01;
+      secondBidPrice = Math.min(casInternalRequestParameters.rtbBidFloor, rtbResponse.adNetworkInterface.getBidprice()*0.9);
       rtbResponse.adNetworkInterface.setSecondBidPrice(secondBidPrice);
       logger.debug("completed auction and winner is", rtbList.get(0).adNetworkInterface.getName() + " and secondBidPrice is " + secondBidPrice);
       return rtbList.get(0).adNetworkInterface;
@@ -89,16 +84,49 @@ public class AuctionEngine implements AuctionEngineInterface {
       double secondHighestBidPrice = rtbList.get(secondHighestBidNumber).adNetworkInterface.getBidprice();
       double price = maxPrice * 0.9;
       if(price > secondHighestBidPrice) {
-        secondBidPrice = price + 0.01;
+        secondBidPrice = price;
       } else {
         secondBidPrice = secondHighestBidPrice + 0.01;
       }
-    } else
+    } else {
       secondBidPrice = rtbList.get(1).adNetworkInterface.getBidprice() + 0.01;
+    }
     rtbResponse = rtbList.get(lowestLatency);
+    secondBidPrice = Math.min(secondBidPrice, rtbResponse.adNetworkInterface.getBidprice());
     rtbResponse.adNetworkInterface.setSecondBidPrice(secondBidPrice);
     logger.debug("completed auction and winner is", rtbList.get(lowestLatency).adNetworkInterface.getName() + " and secondBidPrice is " + secondBidPrice);
     return rtbList.get(lowestLatency).adNetworkInterface;
+  }
+  
+  public List<ChannelSegment> rtbFilters(List<ChannelSegment> rtbSegments) {
+    List<ChannelSegment> rtbList = new ArrayList<ChannelSegment>();
+    logger.debug("No of rtb partners who sent response are", new Integer(rtbSegments.size()).toString());
+    //Ad filter.
+    for (int i=0; i < rtbSegments.size() ; i++) {
+      if (rtbSegments.get(i).adNetworkInterface.getAdStatus().equalsIgnoreCase("AD")) {
+        logger.debug("Dropped in NO AD filter", rtbSegments.get(i).adNetworkInterface.getName());
+        rtbList.add(rtbSegments.get(i));
+      }
+    }
+    logger.debug("No of rtb partners who sent AD response are", new Integer(rtbList.size()).toString());
+    //BidFloor filter.
+    for (int i=0; i < rtbList.size() ; i++) {
+      if (rtbList.get(i).adNetworkInterface.getBidprice() < casInternalRequestParameters.rtbBidFloor) {
+        logger.debug("Dropped in bidfloor filter", rtbList.get(i).adNetworkInterface.getName());
+        rtbList.remove(rtbList.get(i));
+      }
+    }
+    logger.debug("No of rtb partners who sent AD response with bid more than bidFloor", new Integer(rtbList.size()).toString());
+    //Bid not zero filter.
+    for (int i=0; i < rtbList.size() ; i++) {
+      if (rtbList.get(i).adNetworkInterface.getBidprice() <= 0) {
+        logger.debug("Dropped in bid is zero filter", rtbList.get(i).adNetworkInterface.getName());
+        rtbList.remove(rtbList.get(i));
+      }
+    }
+    logger.debug("No of rtb partners who sent AD response with bid more than 0", new Integer(rtbList.size()).toString());
+    return rtbList;
+
   }
 
   public boolean isAuctionComplete() {
