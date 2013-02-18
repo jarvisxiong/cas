@@ -20,7 +20,6 @@ import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ClickUrlMaker.TrackingUrls;
@@ -51,7 +50,7 @@ public class AsyncRequestMaker {
    * For each channel we configure the parameters and make the async request if
    * the async request is successful we add it to segment list else we drop it
    */
-  public static List<ChannelSegment> prepareForAsyncRequest(ChannelSegmentEntity[] rows, DebugLogger logger,
+  public static List<ChannelSegment> prepareForAsyncRequest(List<ChannelSegment> rows, DebugLogger logger,
       Configuration config, Configuration rtbConfig, Configuration adapterConfig, HttpRequestHandlerBase base,
       Set<String> advertiserSet, MessageEvent e, RepositoryHelper repositoryHelper, JSONObject jObject,
       SASRequestParameters sasParams, CasInternalRequestParameters casInternalRequestParameters,
@@ -59,21 +58,21 @@ public class AsyncRequestMaker {
 
     List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
 
-    logger.debug("Total channels available for sending requests", rows.length + "");
+    logger.debug("Total channels available for sending requests", rows.size() + "");
     boolean isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled", false);
     logger.debug("isRtbEnabled is", new Boolean(isRtbEnabled).toString());
 
-    for (ChannelSegmentEntity row : rows) {
-      AdNetworkInterface network = SegmentFactory.getChannel(row.getId(), row.getChannelId(), adapterConfig,
+    for (ChannelSegment row : rows) {
+      AdNetworkInterface network = SegmentFactory.getChannel(row.getChannelSegmentEntity().getId(), row.getChannelSegmentEntity().getChannelId(), adapterConfig,
           clientBootstrap, rtbClientBootstrap, base, e, advertiserSet, logger, isRtbEnabled,
           casInternalRequestParameters);
       if(null == network) {
-        logger.debug("No adapter found for adGroup:", row.getAdgroupId());
+        logger.debug("No adapter found for adGroup:", row.getChannelSegmentEntity().getAdgroupId());
         continue;
       }
-      logger.debug("adapter found for adGroup:", row.getAdgroupId(), "advertiserid is", row.getId());
-      if(null == repositoryHelper.queryChannelRepository(row.getChannelId())) {
-        logger.debug("No channel entity found for channel id:", row.getChannelId());
+      logger.debug("adapter found for adGroup:", row.getChannelSegmentEntity().getAdgroupId(), "advertiserid is", row.getChannelSegmentEntity().getId());
+      if(null == repositoryHelper.queryChannelRepository(row.getChannelSegmentEntity().getChannelId())) {
+        logger.debug("No channel entity found for channel id:", row.getChannelSegmentEntity().getChannelId());
         continue;
       }
 
@@ -81,14 +80,14 @@ public class AsyncRequestMaker {
 
       String clickUrl = null;
       String beaconUrl = null;
-      sasParams.impressionId = getImpressionId(row.getIncId());
-      sasParams.adIncId = row.getIncId();
+      sasParams.impressionId = getImpressionId(row.getChannelSegmentEntity().getIncId());
+      sasParams.adIncId = row.getChannelSegmentEntity().getIncId();
       logger.debug("impression id is " + sasParams.impressionId);
 
       if((network.isClickUrlRequired() || network.isBeaconUrlRequired()) && null != sasParams.impressionId) {
         if(config.getInt("clickmaker.version", 6) == 4) {
           ClickUrlMaker clickUrlMaker = new ClickUrlMaker(config, jObject, sasParams, logger);
-          TrackingUrls trackingUrls = clickUrlMaker.getClickUrl(row.getPricingModel());
+          TrackingUrls trackingUrls = clickUrlMaker.getClickUrl(row.getChannelSegmentEntity().getPricingModel());
           clickUrl = trackingUrls.getClickUrl();
           beaconUrl = trackingUrls.getBeaconUrl();
           if(logger.isDebugEnabled()) {
@@ -97,7 +96,7 @@ public class AsyncRequestMaker {
           }
         } else {
           boolean isCpc = false;
-          if(null != row.getPricingModel() && row.getPricingModel().equalsIgnoreCase("cpc"))
+          if(null != row.getChannelSegmentEntity().getPricingModel() && row.getChannelSegmentEntity().getPricingModel().equalsIgnoreCase("cpc"))
             isCpc = true;
           ClickUrlMakerV6 clickUrlMakerV6 = setClickParams(logger, isCpc, config, sasParams, jObject);
           Map<String, String> clickGetParams = new HashMap<String, String>();
@@ -115,23 +114,24 @@ public class AsyncRequestMaker {
         }
       }
 
-      logger.debug("Sending request to Channel of Id", row.getId());
-      logger.debug("external site key is", row.getExternalSiteKey());
+      logger.debug("Sending request to Channel of Id", row.getChannelSegmentEntity().getId());
+      logger.debug("external site key is", row.getChannelSegmentEntity().getExternalSiteKey());
 
-      if(network.configureParameters(sasParams, row, clickUrl, beaconUrl)) {
+      if(network.configureParameters(sasParams, row.getChannelSegmentEntity(), clickUrl, beaconUrl)) {
         InspectorStats.incrementStatCount(network.getName(), InspectorStrings.successfulConfigure);
         ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = repositoryHelper
-            .queryChannelSegmentFeedbackRepository(row.getAdgroupId());
+            .queryChannelSegmentFeedbackRepository(row.getChannelSegmentEntity().getAdgroupId());
         if(null == channelSegmentFeedbackEntity)
-          channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(row.getId(), row.getAdgroupId(),
+          channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(row.getChannelSegmentEntity().getId(), row.getChannelSegmentEntity().getAdgroupId(),
               config.getDouble("default.ecpm"), config.getDouble("default.fillratio"), 0, 0, 0, 0);
-        ChannelEntity channelEntity = repositoryHelper.queryChannelRepository(row.getChannelId());
+        ChannelEntity channelEntity = repositoryHelper.queryChannelRepository(row.getChannelSegmentEntity().getChannelId());
         if(channelEntity != null) {
+          row.setAdNetworkInterface(network);
           if(network.isRtbPartner()) {
-            rtbSegments.add(new ChannelSegment(row, network, channelEntity, channelSegmentFeedbackEntity));
+            rtbSegments.add(row);
             logger.debug(network.getName(), "is a rtb partner so adding this network to rtb ranklist");
           } else {
-            segments.add(new ChannelSegment(row, network, channelEntity, channelSegmentFeedbackEntity));
+            segments.add(row);
           }
         }
       }
@@ -144,12 +144,12 @@ public class AsyncRequestMaker {
     Iterator<ChannelSegment> itr = rankList.iterator();
     while (itr.hasNext()) {
       ChannelSegment channelSegment = itr.next();
-      InspectorStats.incrementStatCount(channelSegment.adNetworkInterface.getName(), InspectorStrings.totalInvocations);
-      if(channelSegment.adNetworkInterface.makeAsyncRequest()) {
+      InspectorStats.incrementStatCount(channelSegment.getAdNetworkInterface().getName(), InspectorStrings.totalInvocations);
+      if(channelSegment.getAdNetworkInterface().makeAsyncRequest()) {
         if(logger.isDebugEnabled())
           logger.debug("Successfully sent request to channel of  advertiser id",
-              channelSegment.channelSegmentEntity.getId(), "and channel id",
-              channelSegment.channelSegmentEntity.getChannelId());
+              channelSegment.getChannelSegmentEntity().getId(), "and channel id",
+              channelSegment.getChannelSegmentEntity().getChannelId());
       } else {
         itr.remove();
       }
@@ -157,12 +157,12 @@ public class AsyncRequestMaker {
     Iterator<ChannelSegment> rtbItr = rtbSegments.iterator();
     while (rtbItr.hasNext()) {
       ChannelSegment channelSegment = rtbItr.next();
-      InspectorStats.incrementStatCount(channelSegment.adNetworkInterface.getName(), InspectorStrings.totalInvocations);
-      if(channelSegment.adNetworkInterface.makeAsyncRequest()) {
+      InspectorStats.incrementStatCount(channelSegment.getAdNetworkInterface().getName(), InspectorStrings.totalInvocations);
+      if(channelSegment.getAdNetworkInterface().makeAsyncRequest()) {
         if(logger.isDebugEnabled())
           logger.debug("Successfully sent request to rtb channel of  advertiser id",
-              channelSegment.channelSegmentEntity.getId(), "and channel id",
-              channelSegment.channelSegmentEntity.getChannelId());
+              channelSegment.getChannelSegmentEntity().getId(), "and channel id",
+              channelSegment.getChannelSegmentEntity().getChannelId());
       } else {
         rtbItr.remove();
       }

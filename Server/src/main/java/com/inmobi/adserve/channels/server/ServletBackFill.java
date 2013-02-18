@@ -15,7 +15,6 @@ import org.json.JSONObject;
 
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
@@ -108,7 +107,8 @@ public class ServletBackFill implements Servlet {
     }
 
     // getting the selected third party site details
-    HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments = new MatchSegments(logger)
+    HashMap<String, HashMap<String, ChannelSegment>> matchedSegments = new MatchSegments(
+        ServletHandler.repositoryHelper, hrh.responseSender.sasParams, logger)
         .matchSegments(hrh.responseSender.sasParams);
 
     if(matchedSegments == null) {
@@ -117,10 +117,10 @@ public class ServletBackFill implements Servlet {
     }
 
     // applying all the filters
-    ChannelSegmentEntity[] rows = Filters.filter(matchedSegments, logger, 0.0, ServletHandler.config,
+    List<ChannelSegment> rows = Filters.filter(matchedSegments, logger, 0.0, ServletHandler.config,
         ServletHandler.adapterConfig, new Long(hrh.responseSender.sasParams.siteIncId).toString());
 
-    if(rows == null || rows.length == 0) {
+    if(rows == null || rows.size() == 0) {
       hrh.responseSender.sendNoAdResponse(e);
       logger.debug("No Entities matching the request.");
       return;
@@ -147,16 +147,17 @@ public class ServletBackFill implements Servlet {
         advertiserSet.add(advertiserList[i]);
       }
     }
-    
+
     CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
     casInternalRequestParameters.highestEcpm = getHighestEcpm(rows, logger);
     logger.debug("Highest Ecpm is", new Double(casInternalRequestParameters.highestEcpm).toString());
     casInternalRequestParameters.blockedCategories = getBlockedCategories(hrh, logger);
+    casInternalRequestParameters.rtbBidFloor = hrh.responseSender.sasParams.siteFloor > casInternalRequestParameters.highestEcpm ? hrh.responseSender.sasParams.siteFloor : casInternalRequestParameters.highestEcpm + 0.01;
     hrh.responseSender.casInternalRequestParameters = casInternalRequestParameters;
     hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternalRequestParameters;
-    logger.debug("Total channels available for sending requests " + rows.length);
+    logger.debug("Total channels available for sending requests " + rows.size());
     List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
-    
+
     segments = AsyncRequestMaker.prepareForAsyncRequest(rows, logger, ServletHandler.config, ServletHandler.rtbConfig,
         ServletHandler.adapterConfig, hrh.responseSender, advertiserSet, e, ServletHandler.repositoryHelper,
         hrh.jObject, hrh.responseSender.sasParams, casInternalRequestParameters, rtbSegments);
@@ -191,12 +192,12 @@ public class ServletBackFill implements Servlet {
       return;
     }
 
-    if (hrh.responseSender.getAuctionEngine().isAllRtbComplete()) {
+    if(hrh.responseSender.getAuctionEngine().isAllRtbComplete()) {
       AdNetworkInterface highestBid = hrh.responseSender.getAuctionEngine().runRtbSecondPriceAuctionEngine();
       if(null != highestBid) {
         logger.debug("Sending rtb response of", highestBid.getName());
         hrh.responseSender.sendAdResponse(highestBid, e);
-        //highestBid.impressionCallback();
+        // highestBid.impressionCallback();
         return;
       }
       // Resetting the rankIndexToProcess for already completed adapters.
@@ -212,26 +213,17 @@ public class ServletBackFill implements Servlet {
     return "BackFill";
   }
 
-  private static double getHighestEcpm(ChannelSegmentEntity[] channelSegmentEntities, DebugLogger logger) {
+  private static double getHighestEcpm(List<ChannelSegment> channelSegments, DebugLogger logger) {
     double lowestEcpm = 0;
-    for (ChannelSegmentEntity channelSegmentEntity : channelSegmentEntities) {
-      if(null == ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(channelSegmentEntity
-          .getAdgroupId())) {
-        if(logger.isDebugEnabled())
-          logger.debug("ChannelSegmentfeedback entity is null for adgpid id " + channelSegmentEntity.getAdgroupId());
-        continue;
-      }
+    for (ChannelSegment channelSegment : channelSegments) {
       if(logger.isDebugEnabled())
-        logger.debug("ecpm is "
-            + ServletHandler.repositoryHelper
-                .queryChannelSegmentFeedbackRepository(channelSegmentEntity.getAdgroupId()).geteCPM());
-      lowestEcpm = lowestEcpm < ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(
-          channelSegmentEntity.getAdgroupId()).geteCPM() ? ServletHandler.repositoryHelper
-          .queryChannelSegmentFeedbackRepository(channelSegmentEntity.getAdgroupId()).geteCPM() : lowestEcpm;
+        logger.debug("ecpm is", channelSegment.getChannelSegmentFeedbackEntity().geteCPM());
+      lowestEcpm = lowestEcpm < channelSegment.getChannelSegmentFeedbackEntity().geteCPM() ? channelSegment
+          .getChannelSegmentFeedbackEntity().geteCPM() : lowestEcpm;
     }
     return lowestEcpm;
   }
-  
+
   private static List<Long> getBlockedCategories(HttpRequestHandler hrh, DebugLogger logger) {
     List<Long> blockedCategories = null;
     if(null != hrh.responseSender.sasParams.siteId) {
