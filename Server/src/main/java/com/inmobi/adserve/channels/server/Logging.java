@@ -391,6 +391,8 @@ public class Logging {
       if(carrier.length() >= 5 && carrier.get(4) != null)
         geo.setCity(carrier.getInt(4));
     }
+    if(null != sasParams && null != sasParams.siteSegmentId)
+        log.append(sep).append("sel-seg-id=").append(sasParams.siteSegmentId);
 
     logger.debug("finished writing cas logs");
     logger.debug(log.toString());
