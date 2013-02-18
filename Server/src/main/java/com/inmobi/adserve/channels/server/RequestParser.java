@@ -83,6 +83,7 @@ public class RequestParser {
     } catch (JSONException e) {
      logger.debug("Site segment id is not present in the request");
     }
+    params.ipFileVersion = jObject.optInt("rq-ip-file-ver", 1);
     if(logger.isDebugEnabled()) {
       logger.debug("country obtained is " + params.country);
       logger.debug("site floor is " + params.siteFloor);
