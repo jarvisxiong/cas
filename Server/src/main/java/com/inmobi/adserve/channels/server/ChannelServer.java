@@ -243,7 +243,7 @@ public class ChannelServer {
           "SiteTaxonomyRepository");
       siteMetaDataRepository.init(logger, config.cacheConfiguration().subset("SiteMetaDataRepository"),
           "SiteMetaDataRepository");
-      siteCitrusLeafFeedbackRepository.init(config.serverConfiguration(), DataCenter.GLOBAL);
+      //siteCitrusLeafFeedbackRepository.init(config.serverConfiguration().subset("citrusleaf"), DataCenter.GLOBAL);
 
       logger.error("* * * * Instantiating repository completed * * * *");
     } catch (NamingException exception) {
