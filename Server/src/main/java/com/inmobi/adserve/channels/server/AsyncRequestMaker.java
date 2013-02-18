@@ -214,7 +214,7 @@ public class AsyncRequestMaker {
     } else {
       clickUrlMakerV6.setImpressionId(sasParams.impressionId);
     }
-    clickUrlMakerV6.setIpFileVersion(sasParams.ipFileVersion);
+    clickUrlMakerV6.setIpFileVersion(sasParams.ipFileVersion.longValue());
     clickUrlMakerV6.setIsBillableDemog(false);
     if(null != sasParams.area)
       clickUrlMakerV6.setLocation(Integer.parseInt(sasParams.area));
