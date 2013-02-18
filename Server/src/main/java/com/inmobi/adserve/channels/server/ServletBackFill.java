@@ -15,7 +15,6 @@ import org.json.JSONObject;
 
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
@@ -153,6 +152,7 @@ public class ServletBackFill implements Servlet {
     casInternalRequestParameters.highestEcpm = getHighestEcpm(rows, logger);
     logger.debug("Highest Ecpm is", new Double(casInternalRequestParameters.highestEcpm).toString());
     casInternalRequestParameters.blockedCategories = getBlockedCategories(hrh, logger);
+    casInternalRequestParameters.rtbBidFloor = hrh.responseSender.sasParams.siteFloor > casInternalRequestParameters.highestEcpm ? hrh.responseSender.sasParams.siteFloor : casInternalRequestParameters.highestEcpm + 0.01;
     hrh.responseSender.casInternalRequestParameters = casInternalRequestParameters;
     hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternalRequestParameters;
     logger.debug("Total channels available for sending requests " + rows.size());
