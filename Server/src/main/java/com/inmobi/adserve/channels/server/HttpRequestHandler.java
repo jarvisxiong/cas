@@ -83,10 +83,10 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
       logger.debug("Channel is open in channelIdle handler");
       if(responseSender.getRankList() != null) {
         for (ChannelSegment channelSegment : responseSender.getRankList()) {
-          if(channelSegment.adNetworkInterface.getAdStatus() == "AD") {
-            logger.debug("Got Ad from", channelSegment.adNetworkInterface.getName(), "Top Rank was", responseSender
-                .getRankList().get(0).adNetworkInterface.getName());
-            responseSender.sendAdResponse(channelSegment.adNetworkInterface, e);
+          if(channelSegment.getAdNetworkInterface().getAdStatus() == "AD") {
+            logger.debug("Got Ad from", channelSegment.getAdNetworkInterface().getName(), "Top Rank was", responseSender
+                .getRankList().get(0).getAdNetworkInterface().getName());
+            responseSender.sendAdResponse(channelSegment.getAdNetworkInterface(), e);
             return;
           }
         }

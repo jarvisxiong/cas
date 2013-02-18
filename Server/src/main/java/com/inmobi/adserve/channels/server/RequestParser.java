@@ -1,6 +1,5 @@
 package com.inmobi.adserve.channels.server;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +66,8 @@ public class RequestParser {
     if(params.siteType != null) {
       params.siteType = params.siteType.toUpperCase();
     }
-    params.categories = getCategory(jObject, logger);
+    params.categories = getCategory(jObject, logger, "category");
+    params.newCategories = getCategory(jObject, logger, "new-category");
     params.rqIframe = stringify(jObject, "rq-iframe", logger);
     params.rFormat = stringify(jObject, "r-format", logger);
     params.rqMkAdcount = stringify(jObject, "rq-mk-adcount", logger);
@@ -145,9 +145,9 @@ public class RequestParser {
     }
   }
 
-  public static List<Long> getCategory(JSONObject jObject, DebugLogger logger) {
+  public static List<Long> getCategory(JSONObject jObject, DebugLogger logger, String oldORnew) {
     try {
-      JSONArray categories = jObject.getJSONArray("category");
+      JSONArray categories = jObject.getJSONArray(oldORnew);
       Long[] category = new Long[categories.length()];
       for (int index = 0; index < categories.length(); index++) {
         category[index] = categories.getLong(index);
