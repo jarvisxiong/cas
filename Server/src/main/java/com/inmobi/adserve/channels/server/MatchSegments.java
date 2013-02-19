@@ -223,22 +223,22 @@ public class MatchSegments {
 
   private void insertChannelSegmentToResultSet(HashMap<String, HashMap<String, ChannelSegment>> result,
       ChannelSegmentEntity channelSegmentEntity) {
-    if(Filters.advertiserIdtoNameMapping.containsKey(channelSegmentEntity.getId())) {
-      InspectorStats.initializeFilterStats(Filters.advertiserIdtoNameMapping.get(channelSegmentEntity.getId()));
-      InspectorStats.incrementStatCount(Filters.advertiserIdtoNameMapping.get(channelSegmentEntity.getId()),
+    if(Filters.advertiserIdtoNameMapping.containsKey(channelSegmentEntity.getAdvertiserId())) {
+      InspectorStats.initializeFilterStats(Filters.advertiserIdtoNameMapping.get(channelSegmentEntity.getAdvertiserId()));
+      InspectorStats.incrementStatCount(Filters.advertiserIdtoNameMapping.get(channelSegmentEntity.getAdvertiserId()),
           InspectorStrings.totalMatchedSegments);
     }
 
     ChannelSegment channelSegment = createSegment(channelSegmentEntity);
 
-    if(result.get(channelSegmentEntity.getId()) == null) {
+    if(result.get(channelSegmentEntity.getAdvertiserId()) == null) {
       HashMap<String, ChannelSegment> hashMap = new HashMap<String, ChannelSegment>();
       hashMap.put(channelSegmentEntity.getAdgroupId(), channelSegment);
-      result.put(channelSegmentEntity.getId(), hashMap);
+      result.put(channelSegmentEntity.getAdvertiserId(), hashMap);
     } else {
-      HashMap<String, ChannelSegment> hashMap = result.get(channelSegmentEntity.getId());
+      HashMap<String, ChannelSegment> hashMap = result.get(channelSegmentEntity.getAdvertiserId());
       hashMap.put(channelSegmentEntity.getAdgroupId(), channelSegment);
-      result.put(channelSegmentEntity.getId(), hashMap);
+      result.put(channelSegmentEntity.getAdvertiserId(), hashMap);
     }
 
   }
@@ -291,7 +291,7 @@ public class MatchSegments {
     for (String adkey : matchedSegments.keySet()) {
       for (String gpkey : matchedSegments.get(adkey).keySet()) {
         if(logger.isDebugEnabled())
-          logger.debug("Advertiser is " + matchedSegments.get(adkey).get(gpkey).getChannelSegmentEntity().getId()
+          logger.debug("Advertiser is " + matchedSegments.get(adkey).get(gpkey).getChannelSegmentEntity().getAdvertiserId()
               + " and AdGp is " + matchedSegments.get(adkey).get(gpkey).getChannelSegmentEntity().getAdgroupId());
       }
     }

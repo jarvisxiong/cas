@@ -116,27 +116,19 @@ public class AsyncRequestMaker {
         }
       }
 
-      logger.debug("Sending request to Channel of Id", row.getChannelSegmentEntity().getId());
+      logger.debug("Sending request to Channel of Id", row.getChannelSegmentEntity().getChannelId());
       logger.debug("external site key is", row.getChannelSegmentEntity().getExternalSiteKey());
 
       if(network.configureParameters(sasParams, row.getChannelSegmentEntity(), clickUrl, beaconUrl)) {
         InspectorStats.incrementStatCount(network.getName(), InspectorStrings.successfulConfigure);
-        ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = repositoryHelper
-            .queryChannelSegmentFeedbackRepository(row.getChannelSegmentEntity().getAdgroupId());
-        if(null == channelSegmentFeedbackEntity)
-          channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(row.getChannelSegmentEntity().getId(), row
-              .getChannelSegmentEntity().getAdgroupId(), config.getDouble("default.ecpm"),
-              config.getDouble("default.fillratio"), 0, 0, 0, 0);
         ChannelEntity channelEntity = repositoryHelper.queryChannelRepository(row.getChannelSegmentEntity()
             .getChannelId());
-        if(channelEntity != null) {
-          row.setAdNetworkInterface(network);
-          if(network.isRtbPartner()) {
-            rtbSegments.add(row);
-            logger.debug(network.getName(), "is a rtb partner so adding this network to rtb ranklist");
-          } else {
-            segments.add(row);
-          }
+        row.setAdNetworkInterface(network);
+        if(network.isRtbPartner()) {
+          rtbSegments.add(row);
+          logger.debug(network.getName(), "is a rtb partner so adding this network to rtb ranklist");
+        } else {
+          segments.add(row);
         }
       }
     }
