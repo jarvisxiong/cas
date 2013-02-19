@@ -287,7 +287,7 @@ public class Filters {
     for (String adkey : matchedSegments.keySet()) {
 
       for (String gpkey : matchedSegments.get(adkey).keySet()) {
-        logger.debug("Advertiser is", matchedSegments.get(adkey).get(gpkey).getChannelSegmentEntity().getId(),
+        logger.debug("Advertiser is", matchedSegments.get(adkey).get(gpkey).getChannelSegmentEntity().getAdvertiserId(),
             "and AdGp is", matchedSegments.get(adkey).get(gpkey).getChannelSegmentEntity().getAdgroupId(), "ecpm is",
             matchedSegments.get(adkey).get(gpkey).getPrioritisedECPM());
       }

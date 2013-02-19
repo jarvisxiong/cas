@@ -139,15 +139,15 @@ public class FilterTest extends TestCase {
         null, 0));
     adv3.put(channelSegmentEntity6.getAdgroupId(), new ChannelSegment(channelSegmentEntity6, cE3, cFE3, cSFE6, null,
         null, 0));
-    matchedSegments.put(channelSegmentEntity1.getId(), adv1);
-    matchedSegments.put(channelSegmentEntity4.getId(), adv2);
-    matchedSegments.put(channelSegmentEntity6.getId(), adv3);
+    matchedSegments.put(channelSegmentEntity1.getAdvertiserId(), adv1);
+    matchedSegments.put(channelSegmentEntity4.getAdvertiserId(), adv2);
+    matchedSegments.put(channelSegmentEntity6.getAdvertiserId(), adv3);
 
     matchedSegments = Filters.impressionBurnFilter(matchedSegments, logger, mockConfig, "null");
 
-    assertEquals(false, matchedSegments.containsKey(channelSegmentEntity1.getId()));
-    assertEquals(false, matchedSegments.containsKey(channelSegmentEntity4.getId()));
-    assertEquals(true, matchedSegments.containsKey(channelSegmentEntity6.getId()));
+    assertEquals(false, matchedSegments.containsKey(channelSegmentEntity1.getAdvertiserId()));
+    assertEquals(false, matchedSegments.containsKey(channelSegmentEntity4.getAdvertiserId()));
+    assertEquals(true, matchedSegments.containsKey(channelSegmentEntity6.getAdvertiserId()));
   }
 
   @Test
@@ -193,9 +193,9 @@ public class FilterTest extends TestCase {
         null, 0));
     adv3.put(channelSegmentEntity6.getAdgroupId(), new ChannelSegment(channelSegmentEntity6, cE3, cFE3, cSFE6, null,
         null, 0));
-    matchedSegments.put(channelSegmentEntity1.getId(), adv1);
-    matchedSegments.put(channelSegmentEntity4.getId(), adv2);
-    matchedSegments.put(channelSegmentEntity6.getId(), adv3);
+    matchedSegments.put(channelSegmentEntity1.getAdvertiserId(), adv1);
+    matchedSegments.put(channelSegmentEntity4.getAdvertiserId(), adv2);
+    matchedSegments.put(channelSegmentEntity6.getAdvertiserId(), adv3);
 
     matchedSegments = Filters.partnerSegmentCountFilter(matchedSegments, 0.3, logger, mockConfig, mockAdapterConfig);
 
@@ -251,9 +251,9 @@ public class FilterTest extends TestCase {
         null, cSFE5.geteCPM()));
     adv3.put(channelSegmentEntity6.getAdgroupId(), new ChannelSegment(channelSegmentEntity6, cE3, cFE3, cSFE6, null,
         null, cSFE6.geteCPM()));
-    matchedSegments.put(channelSegmentEntity1.getId(), adv1);
-    matchedSegments.put(channelSegmentEntity4.getId(), adv2);
-    matchedSegments.put(channelSegmentEntity6.getId(), adv3);
+    matchedSegments.put(channelSegmentEntity1.getAdvertiserId(), adv1);
+    matchedSegments.put(channelSegmentEntity4.getAdvertiserId(), adv2);
+    matchedSegments.put(channelSegmentEntity6.getAdvertiserId(), adv3);
 
     List<ChannelSegment> rows = new ArrayList<ChannelSegment>();
     for (String advertiserId : matchedSegments.keySet()) {
