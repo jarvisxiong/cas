@@ -28,11 +28,14 @@ import com.inmobi.adserve.channels.repository.ChannelRepository;
 import com.inmobi.adserve.channels.repository.ChannelFeedbackRepository;
 import com.inmobi.adserve.channels.repository.ChannelSegmentFeedbackRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.repository.SiteCitrusLeafFeedbackRepository;
 import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
+import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.casthrift.DataCenter;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import com.inmobi.messaging.publisher.MessagePublisherFactory;
 import com.inmobi.phoenix.exception.InitializationException;
@@ -46,8 +49,9 @@ public class ChannelServer {
   private static ChannelFeedbackRepository channelFeedbackRepository;
   private static ChannelSegmentFeedbackRepository channelSegmentFeedbackRepository;
   private static SiteMetaDataRepository siteMetaDataRepository;
+  private static SiteTaxonomyRepository siteTaxonomyRepository;
+  private static SiteCitrusLeafFeedbackRepository siteCitrusLeafFeedbackRepository;
   private static RepositoryHelper repositoryHelper;
-  private static InspectorStats inspectorStat;
   private static final String configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
   private static String DATACENTERIDKEY = "dc.id";
   private static String HOSTNAMEKEY = "host.name";
@@ -89,22 +93,26 @@ public class ChannelServer {
     // Initialising Internal logger factory for Netty
     InternalLoggerFactory.setDefaultFactory(new Log4JLoggerFactory());
 
-    inspectorStat = new InspectorStats();
     channelAdGroupRepository = new ChannelAdGroupRepository();
     channelRepository = new ChannelRepository();
     channelFeedbackRepository = new ChannelFeedbackRepository();
     channelSegmentFeedbackRepository = new ChannelSegmentFeedbackRepository();
     siteMetaDataRepository = new SiteMetaDataRepository();
-    repositoryHelper = new RepositoryHelper(channelRepository, channelAdGroupRepository, channelFeedbackRepository,
-        channelSegmentFeedbackRepository, siteMetaDataRepository, null, null);
+    siteTaxonomyRepository = new SiteTaxonomyRepository();
+    siteCitrusLeafFeedbackRepository = new SiteCitrusLeafFeedbackRepository();
 
-    MatchSegments.init(channelAdGroupRepository, inspectorStat);
+    repositoryHelper = new RepositoryHelper(channelRepository, channelAdGroupRepository, channelFeedbackRepository,
+        channelSegmentFeedbackRepository, siteMetaDataRepository, siteTaxonomyRepository,
+        null);
+
+    MatchSegments.init(channelAdGroupRepository);
     InspectorStats.initializeRepoStats("ChannelAdGroupRepository");
     InspectorStats.initializeRepoStats("ChannelFeedbackRepository");
     InspectorStats.initializeRepoStats("ChannelSegmentFeedbackRepository");
     InspectorStats.initializeRepoStats("SiteMetaDataRepository");
+    InspectorStats.initializeRepoStats("SiteTaxonomyRepository");
     instantiateRepository(logger, config);
-    Filters.init(config.adapterConfiguration(), repositoryHelper);
+    Filters.init(config.adapterConfiguration());
 
     // Creating netty client for out-bound calls.
     Timer timer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
@@ -112,8 +120,9 @@ public class ChannelServer {
     RtbBootstrapCreation.init(timer);
     ClientBootstrap clientBootstrap = BootstrapCreation.createBootstrap(logger, config.serverConfiguration());
     ClientBootstrap rtbClientBootstrap = RtbBootstrapCreation.createBootstrap(logger, config.rtbConfiguration());
-    AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder().setRequestTimeoutInMs(
-        config.serverConfiguration().getInt("readtimeoutMillis") - 100).setConnectionTimeoutInMs(600).build();
+    AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder()
+        .setRequestTimeoutInMs(config.serverConfiguration().getInt("readtimeoutMillis") - 100)
+        .setConnectionTimeoutInMs(600).build();
     AsyncHttpClient asyncHttpClient = new AsyncHttpClient(asyncHttpClientConfig);
     if(null == clientBootstrap) {
       ServerStatusInfo.statusCode = 404;
@@ -183,6 +192,7 @@ public class ChannelServer {
       Configuration repoConfig = config.repoConfiguration();
       Configuration feedbackConfig = config.feedBackConfiguration();
       Configuration segmentFeedbackConfig = config.segmentFeedBackConfiguration();
+      Configuration siteTaxonomyConfig = config.siteTaxonomyConfiguration();
       Configuration siteMetaDataConfig = config.siteMetaDataConfiguration();
       InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.isUpdating, 0);
       InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.repoSource,
@@ -212,12 +222,16 @@ public class ChannelServer {
       InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.query, siteMetaDataConfig.getString("query"));
       InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.refreshInterval,
           siteMetaDataConfig.getString("refreshTime"));
+      InspectorStats.setStats("SiteTaxonomyRepository", InspectorStrings.isUpdating, 0);
+      InspectorStats.setStats("SiteTaxonomyRepository", InspectorStrings.repoSource,
+          databaseConfig.getString("database"));
+      InspectorStats.setStats("SiteTaxonomyRepository", InspectorStrings.query, siteTaxonomyConfig.getString("query"));
+      InspectorStats.setStats("SiteTaxonomyRepository", InspectorStrings.refreshInterval,
+          siteTaxonomyConfig.getString("refreshTime"));
 
       initialContext.bind("java:comp/env/jdbc", dataSource);
 
       // Reusing the repository from phoenix adsering framework.
-      siteMetaDataRepository.init(logger, config.cacheConfiguration().subset("SiteMetaDataRepository"),
-          "SiteMetaDataRepository");
       channelAdGroupRepository.init(logger, config.cacheConfiguration().subset("ChannelAdGroupRepository"),
           "ChannelAdGroupRepository");
       channelRepository.init(logger, config.cacheConfiguration().subset("ChannelRepository"), "ChannelRepository");
@@ -225,6 +239,12 @@ public class ChannelServer {
           "ChannelFeedbackRepository");
       channelSegmentFeedbackRepository.init(logger,
           config.cacheConfiguration().subset("ChannelSegmentFeedbackRepository"), "ChannelSegmentFeedbackRepository");
+      siteTaxonomyRepository.init(logger, config.cacheConfiguration().subset("SiteTaxonomyRepository"),
+          "SiteTaxonomyRepository");
+      siteMetaDataRepository.init(logger, config.cacheConfiguration().subset("SiteMetaDataRepository"),
+          "SiteMetaDataRepository");
+      //siteCitrusLeafFeedbackRepository.init(config.serverConfiguration().subset("citrusleaf"), DataCenter.GLOBAL);
+
       logger.error("* * * * Instantiating repository completed * * * *");
     } catch (NamingException exception) {
       logger.error("failed to creatre binding for postgresql data source " + exception.getMessage());

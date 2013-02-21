@@ -1,6 +1,5 @@
 package com.inmobi.adserve.channels.server;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +66,8 @@ public class RequestParser {
     if(params.siteType != null) {
       params.siteType = params.siteType.toUpperCase();
     }
-    params.categories = getCategory(jObject, logger);
+    params.categories = getCategory(jObject, logger, "category");
+    params.newCategories = getCategory(jObject, logger, "new-category");
     params.rqIframe = stringify(jObject, "rq-iframe", logger);
     params.rFormat = stringify(jObject, "r-format", logger);
     params.rqMkAdcount = stringify(jObject, "rq-mk-adcount", logger);
@@ -83,6 +83,7 @@ public class RequestParser {
     } catch (JSONException e) {
      logger.debug("Site segment id is not present in the request");
     }
+    params.ipFileVersion = jObject.optInt("rq-ip-file-ver", 1);
     if(logger.isDebugEnabled()) {
       logger.debug("country obtained is " + params.country);
       logger.debug("site floor is " + params.siteFloor);
@@ -114,6 +115,7 @@ public class RequestParser {
       params.uid = stringify(jObject, "u-id", logger);
     }
     params.osId = jObject.optInt("os-id", -1);
+    params.isRichMedia = jObject.optBoolean("rich-media",false);
     logger.debug("successfully parsed params");
     return params;
   }
@@ -145,9 +147,9 @@ public class RequestParser {
     }
   }
 
-  public static List<Long> getCategory(JSONObject jObject, DebugLogger logger) {
+  public static List<Long> getCategory(JSONObject jObject, DebugLogger logger, String oldORnew) {
     try {
-      JSONArray categories = jObject.getJSONArray("category");
+      JSONArray categories = jObject.getJSONArray(oldORnew);
       Long[] category = new Long[categories.length()];
       for (int index = 0; index < categories.length(); index++) {
         category[index] = categories.getLong(index);

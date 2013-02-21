@@ -100,14 +100,14 @@ public class ResponseSender extends HttpRequestHandlerBase {
   }
 
   @Override
-  public void sendAdResponse(AdNetworkInterface selectedAdNetwork, MessageEvent event) {
+  public void sendAdResponse(AdNetworkInterface selectedAdNetwork, ChannelEvent event) {
     adResponse = selectedAdNetwork.getResponseAd();
     selectedAdIndex = getRankIndex(selectedAdNetwork);
     sendAdResponse(adResponse.response, event);
   }
 
   // send Ad Response
-  public synchronized void sendAdResponse(String responseString, MessageEvent event) throws NullPointerException {
+  public synchronized void sendAdResponse(String responseString, ChannelEvent event) throws NullPointerException {
     // Making sure response is sent only once
     if(responseSent) {
       return;
@@ -232,7 +232,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
     while (index < rankList.size()) {
       ChannelSegment channel = rankList.get(index);
-      AdNetworkInterface adNetwork = channel.adNetworkInterface;
+      AdNetworkInterface adNetwork = channel.getAdNetworkInterface();
 
       if(logger.isDebugEnabled()) {
         logger.debug("reassignRanks iterating for " + adNetwork.getName() + " and index is " + index);
@@ -277,22 +277,22 @@ public class ResponseSender extends HttpRequestHandlerBase {
     // closing unclosed channels
     for (int index = 0; rankList != null && index < rankList.size(); index++) {
       if(logger.isDebugEnabled()) {
-        logger.debug("calling clean up for channel " + rankList.get(index).adNetworkInterface.getId());
+        logger.debug("calling clean up for channel " + rankList.get(index).getAdNetworkInterface().getId());
       }
       try {
-        rankList.get(index).adNetworkInterface.cleanUp();
+        rankList.get(index).getAdNetworkInterface().cleanUp();
       } catch (Exception exception) {
         if(logger.isDebugEnabled()) {
           logger.debug("Error in closing channel for index: " + index + " Name: "
-              + rankList.get(index).adNetworkInterface.getName() + " Exception: " + exception.getLocalizedMessage());
+              + rankList.get(index).getAdNetworkInterface().getName() + " Exception: " + exception.getLocalizedMessage());
         }
       }
     }
     for (int index = 0; rankList != null && index < rankList.size(); index++) {
-      if(null != rankList.get(index).adNetworkInterface.getChannelId()) {
-        ChannelsClientHandler.responseMap.remove(rankList.get(index).adNetworkInterface.getChannelId());
-        ChannelsClientHandler.statusMap.remove(rankList.get(index).adNetworkInterface.getChannelId());
-        ChannelsClientHandler.adStatusMap.remove(rankList.get(index).adNetworkInterface.getChannelId());
+      if(null != rankList.get(index).getAdNetworkInterface().getChannelId()) {
+        ChannelsClientHandler.responseMap.remove(rankList.get(index).getAdNetworkInterface().getChannelId());
+        ChannelsClientHandler.statusMap.remove(rankList.get(index).getAdNetworkInterface().getChannelId());
+        ChannelsClientHandler.adStatusMap.remove(rankList.get(index).getAdNetworkInterface().getChannelId());
       }
     }
     if(logger.isDebugEnabled()) {
@@ -307,7 +307,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
   private int getRankIndex(AdNetworkInterface adNetwork) {
     int index = 0;
     for (index = 0; index < rankList.size(); index++) {
-      if(rankList.get(index).adNetworkInterface.getImpressionId().equals(adNetwork.getImpressionId())) {
+      if(rankList.get(index).getAdNetworkInterface().getImpressionId().equals(adNetwork.getImpressionId())) {
         break;
       }
     }
@@ -337,9 +337,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
     int rankIndexToProcess = this.getRankIndexToProcess();
     ChannelSegment segment = this.getRankList().get(rankIndexToProcess);
-    while (segment.adNetworkInterface.isRequestCompleted()) {
-      if(segment.adNetworkInterface.getResponseAd().responseStatus == ResponseStatus.SUCCESS) {
-        this.sendAdResponse(segment.adNetworkInterface, serverEvent);
+    while (segment.getAdNetworkInterface().isRequestCompleted()) {
+      if(segment.getAdNetworkInterface().getResponseAd().responseStatus == ResponseStatus.SUCCESS) {
+        this.sendAdResponse(segment.getAdNetworkInterface(), serverEvent);
         break;
       }
       rankIndexToProcess++;
@@ -378,4 +378,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
   public AsyncHttpClient getAsyncClient() {
     return AsyncRequestMaker.getAsyncHttpClient();
   }
+
+  
 }
