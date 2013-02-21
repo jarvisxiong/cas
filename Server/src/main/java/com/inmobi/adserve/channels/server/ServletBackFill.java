@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.print.attribute.standard.Severity;
+
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.json.JSONException;
@@ -15,7 +17,6 @@ import org.json.JSONObject;
 
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
@@ -116,9 +117,11 @@ public class ServletBackFill implements Servlet {
       return;
     }
 
+    hrh.responseSender.sasParams.siteFloor = 0.0;
+    Filters filter = new Filters(matchedSegments, ServletHandler.config, ServletHandler.adapterConfig,
+        hrh.responseSender.sasParams, logger);
     // applying all the filters
-    List<ChannelSegment> rows = Filters.filter(matchedSegments, logger, 0.0, ServletHandler.config,
-        ServletHandler.adapterConfig, new Long(hrh.responseSender.sasParams.siteIncId).toString());
+    List<ChannelSegment> rows = filter.applyFilters();
 
     if(rows == null || rows.size() == 0) {
       hrh.responseSender.sendNoAdResponse(e);
@@ -152,7 +155,8 @@ public class ServletBackFill implements Servlet {
     casInternalRequestParameters.highestEcpm = getHighestEcpm(rows, logger);
     logger.debug("Highest Ecpm is", new Double(casInternalRequestParameters.highestEcpm).toString());
     casInternalRequestParameters.blockedCategories = getBlockedCategories(hrh, logger);
-    casInternalRequestParameters.rtbBidFloor = hrh.responseSender.sasParams.siteFloor > casInternalRequestParameters.highestEcpm ? hrh.responseSender.sasParams.siteFloor : casInternalRequestParameters.highestEcpm + 0.01;
+    casInternalRequestParameters.rtbBidFloor = hrh.responseSender.sasParams.siteFloor > casInternalRequestParameters.highestEcpm ? hrh.responseSender.sasParams.siteFloor
+        : casInternalRequestParameters.highestEcpm + 0.01;
     hrh.responseSender.casInternalRequestParameters = casInternalRequestParameters;
     hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternalRequestParameters;
     logger.debug("Total channels available for sending requests " + rows.size());
@@ -170,10 +174,10 @@ public class ServletBackFill implements Servlet {
     }
 
     List<ChannelSegment> tempRankList;
-    tempRankList = Filters.rankAdapters(segments, logger, ServletHandler.config);
+    tempRankList = filter.rankAdapters(segments);
 
     if(!tempRankList.isEmpty()) {
-      tempRankList = Filters.ensureGuaranteedDelivery(tempRankList, ServletHandler.adapterConfig, logger);
+      tempRankList = filter.ensureGuaranteedDelivery(tempRankList);
     }
     tempRankList = AsyncRequestMaker.makeAsyncRequests(tempRankList, logger, hrh.responseSender, e, rtbSegments);
 

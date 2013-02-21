@@ -115,6 +115,7 @@ public class RequestParser {
       params.uid = stringify(jObject, "u-id", logger);
     }
     params.osId = jObject.optInt("os-id", -1);
+    params.isRichMedia = jObject.optBoolean("rich-media",false);
     logger.debug("successfully parsed params");
     return params;
   }

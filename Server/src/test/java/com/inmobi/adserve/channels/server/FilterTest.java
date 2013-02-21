@@ -6,16 +6,16 @@ import static org.easymock.classextension.EasyMock.replay;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.commons.configuration.Configuration;
 import org.testng.annotations.Test;
 
+import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.*;
-import com.inmobi.adserve.channels.repository.*;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import junit.framework.TestCase;
 
@@ -36,11 +36,22 @@ public class FilterTest extends TestCase {
   private ChannelSegmentFeedbackEntity cSFE4;
   private ChannelSegmentFeedbackEntity cSFE5;
   private ChannelSegmentFeedbackEntity cSFE6;
+  private ChannelSegmentEntity channelSegmentEntity1;
+  private ChannelSegmentEntity channelSegmentEntity2;
+  private ChannelSegmentEntity channelSegmentEntity3;
+  private ChannelSegmentEntity channelSegmentEntity4;
+  private ChannelSegmentEntity channelSegmentEntity5;
+  private ChannelSegmentEntity channelSegmentEntity6;
+  private ChannelSegment channelSegment1;
+  private ChannelSegment channelSegment2;
+  private ChannelSegment channelSegment3;
+  private ChannelSegment channelSegment4;
+  private ChannelSegment channelSegment5;
+  private ChannelSegment channelSegment6;
 
   public void setUp() throws IOException {
     mockConfig = createMock(Configuration.class);
     mockAdapterConfig = createMock(Configuration.class);
-
     HashMap<String, String> temp = new HashMap<String, String>();
     temp.put("openx.advertiserId", "");
     temp.put("openx.partnerSegmentNo", "");
@@ -50,23 +61,56 @@ public class FilterTest extends TestCase {
     temp.put("tapit.partnerSegmentNo", "");
     temp.put("mullahmedia.advertiserId", "");
     Iterator<String> itr = temp.keySet().iterator();
-
     cE1 = new ChannelEntity();
-    cE1.setId("advertiserId1").setPriority(1).setImpressionCeil(90).setName("name1");
+    cE1.setId("advertiserId1").setPriority(1).setImpressionCeil(90).setName("name1").setRequestCap(100);
     cE2 = new ChannelEntity();
-    cE2.setId("advertiserId2").setPriority(1).setImpressionCeil(90).setName("name2");
+    cE2.setId("advertiserId2").setPriority(1).setImpressionCeil(90).setName("name2").setRequestCap(100);
     cE3 = new ChannelEntity();
-    cE3.setId("advertiserId3").setPriority(1).setImpressionCeil(90).setName("name3");
-    cFE1 = new ChannelFeedbackEntity("advertiserId1", 100.0, 50.0, 50.0, 100, 95, 1.0, 4.0);
-    cFE2 = new ChannelFeedbackEntity("advertiserId2", 100.0, 95.0, 5.0, 100, 55, 2.0, 0.6);
-    cFE3 = new ChannelFeedbackEntity("advertiserId2", 100.0, 50.0, 50.0, 100, 55, 1.0, 4.0);
+    cE3.setId("advertiserId3").setPriority(1).setImpressionCeil(90).setName("name3").setRequestCap(100);
+    cFE1 = new ChannelFeedbackEntity("advertiserId1", 100.0, 50.0, 50.0, 100, 95, 120, 1.0, 4.0);
+    cFE2 = new ChannelFeedbackEntity("advertiserId2", 100.0, 95.0, 5.0, 100, 55, 120, 2.0, 0.6);
+    cFE3 = new ChannelFeedbackEntity("advertiserId2", 100.0, 50.0, 50.0, 100, 55, 0, 1.0, 4.0);
     cSFE1 = new ChannelSegmentFeedbackEntity("advertiserId1", "adgroupId1", 0.29, 0.1, 0, 0, 0, 0);
     cSFE2 = new ChannelSegmentFeedbackEntity("advertiserId1", "adgroupId2", 0.9, 0.1, 0, 0, 0, 0);
     cSFE3 = new ChannelSegmentFeedbackEntity("advertiserId1", "adgroupId3", 0.4, 0.1, 0, 0, 0, 0);
     cSFE4 = new ChannelSegmentFeedbackEntity("advertiserId2", "adgroupId4", 0.2, 0.1, 0, 0, 0, 0);
     cSFE5 = new ChannelSegmentFeedbackEntity("advertiserId2", "adgroupId5", 0.5, 0.1, 0, 0, 0, 0);
     cSFE6 = new ChannelSegmentFeedbackEntity("advertiserId3", "adgroupId6", 0.7, 0.1, 0, 0, 0, 0);
-
+    Long[] rcList = null;
+    Long[] tags = null;
+    Timestamp modified_on = null;
+    Long[] slotIds = null;
+    Integer[] siteRatings = null;
+    channelSegmentEntity1 = new ChannelSegmentEntity("advertiserId1", "adgroupId1", "adId", "channelId1", (long) 1,
+        rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true,
+        "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, false, false, false, false,
+        null);
+    channelSegmentEntity2 = new ChannelSegmentEntity("advertiserId1", "adgroupId2", "adId", "channelId1", (long) 0,
+        rcList, tags, false, true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true,
+        "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, false, false, false, false,
+        null);
+    channelSegmentEntity3 = new ChannelSegmentEntity("advertiserId1", "adgroupId3", "adId", "channelId1", (long) 1,
+        rcList, tags, false, false, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 0, false,
+        "pricingModel", siteRatings, 0, null, false, false, false, false, false, false, false, false, false, false,
+        null);
+    channelSegmentEntity4 = new ChannelSegmentEntity("advertiserId2", "adgroupId4", "adId", "channelId2", (long) 1,
+        rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true,
+        "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, false, false, false, false,
+        null);
+    channelSegmentEntity5 = new ChannelSegmentEntity("advertiserId2", "adgroupId5", "adId", "channelId2", (long) 1,
+        rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true,
+        "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, false, false, false, false,
+        null);
+    channelSegmentEntity6 = new ChannelSegmentEntity("advertiserId3", "adgroupId5", "adId", "channelId3", (long) 1,
+        rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true,
+        "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, false, false, false, false,
+        null);
+    channelSegment1 = new ChannelSegment(channelSegmentEntity1, cE1, cFE1, cSFE1, null, null, cSFE1.geteCPM());
+    channelSegment2 = new ChannelSegment(channelSegmentEntity2, cE1, cFE1, cSFE2, null, null, cSFE2.geteCPM());
+    channelSegment3 = new ChannelSegment(channelSegmentEntity3, cE1, cFE1, cSFE3, null, null, cSFE3.geteCPM());
+    channelSegment4 = new ChannelSegment(channelSegmentEntity4, cE2, cFE2, cSFE4, null, null, cSFE4.geteCPM());
+    channelSegment5 = new ChannelSegment(channelSegmentEntity5, cE2, cFE2, cSFE5, null, null, cSFE5.geteCPM());
+    channelSegment6 = new ChannelSegment(channelSegmentEntity6, cE3, cFE3, cSFE6, null, null, cSFE6.geteCPM());
     expect(mockAdapterConfig.getKeys()).andReturn(itr).anyTimes();
     expect(mockAdapterConfig.getString("openx.advertiserId")).andReturn("advertiserId1").anyTimes();
     expect(mockAdapterConfig.getString("atnt.advertiserId")).andReturn("advertiserId2").anyTimes();
@@ -80,10 +124,8 @@ public class FilterTest extends TestCase {
     expect(mockAdapterConfig.getString("tapit.whiteListedSites")).andReturn("").anyTimes();
     expect(mockAdapterConfig.getString("mullahmedia.whiteListedSites")).andReturn("123,321").anyTimes();
     replay(mockAdapterConfig);
-
     expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
     expect(mockConfig.getString("loggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties").anyTimes();
-    // expect(mockConfig.getInt("partnerSegmentNo", 3)).andReturn(2).anyTimes();
     expect(mockConfig.getInt("totalSegmentNo")).andReturn(5).anyTimes();
     expect(mockConfig.getDouble("revenueWindow", 0.33)).andReturn(10.0).anyTimes();
     expect(mockConfig.getDouble("ecpmShift", 0.1)).andReturn(0.0).anyTimes();
@@ -97,108 +139,122 @@ public class FilterTest extends TestCase {
   }
 
   @Test
-  public void testImpressionBurnFilter() {
-    Long[] rcList = null;
-    Long[] tags = null;
-    Timestamp modified_on = null;
-    Long[] slotIds = null;
-    Integer[] siteRatings = null;
-    ChannelSegmentEntity channelSegmentEntity1 = new ChannelSegmentEntity("advertiserId1", "adgroupId1", "adId",
-        "channelId1", (long) 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds,
-        (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
-    ChannelSegmentEntity channelSegmentEntity2 = new ChannelSegmentEntity("advertiserId1", "adgroupId2", "adId",
-        "channelId1", (long) 0, rcList, tags, false, true, "externalSiteKey", modified_on, "campaignId", slotIds,
-        (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
-    ChannelSegmentEntity channelSegmentEntity3 = new ChannelSegmentEntity("advertiserId1", "adgroupId3", "adId",
-        "channelId1", (long) 1, rcList, tags, false, false, "externalSiteKey", modified_on, "campaignId", slotIds,
-        (long) 0, false, "pricingModel", siteRatings, 0, null, false, false, false, false);
-    ChannelSegmentEntity channelSegmentEntity4 = new ChannelSegmentEntity("advertiserId2", "adgroupId4", "adId",
-        "channelId2", (long) 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds,
-        (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
-    ChannelSegmentEntity channelSegmentEntity5 = new ChannelSegmentEntity("advertiserId2", "adgroupId5", "adId",
-        "channelId2", (long) 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds,
-        (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
-    ChannelSegmentEntity channelSegmentEntity6 = new ChannelSegmentEntity("advertiserId3", "adgroupId5", "adId",
-        "channelId3", (long) 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds,
-        (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
+  public void testIsBurnLimitExceeded() {
+    Filters filter = new Filters(null, mockConfig, mockAdapterConfig, null, logger);
+    assertEquals(false, filter.isBurnLimitExceeded(channelSegment1));
+    assertEquals(true, filter.isBurnLimitExceeded(channelSegment4));
+    assertEquals(false, filter.isBurnLimitExceeded(channelSegment6));
+  }
 
+  @Test
+  public void testIsDailyImpressionCeilingExceeded() {
+    Filters filter = new Filters(null, mockConfig, mockAdapterConfig, null, logger);
+    assertEquals(true, filter.isDailyImpressionCeilingExceeded(channelSegment1));
+    assertEquals(false, filter.isDailyImpressionCeilingExceeded(channelSegment4));
+    assertEquals(false, filter.isDailyImpressionCeilingExceeded(channelSegment6));
+  }
+  
+  @Test
+  public void testIsDailyRequestCapExceeded() {
+    Filters filter = new Filters(null, mockConfig, mockAdapterConfig, null, logger);
+    assertEquals(true, filter.isDailyRequestCapExceeded(channelSegment1));
+    assertEquals(true, filter.isDailyRequestCapExceeded(channelSegment4));
+    assertEquals(false, filter.isDailyRequestCapExceeded(channelSegment6));
+  }
+
+  @Test
+  public void TestIsSiteAbsentInWhiteList() {
+    SASRequestParameters sasParams = new SASRequestParameters();
+    sasParams.siteIncId = 123;
+    Random random = createMock(Random.class);
+    expect(random.nextInt(95)).andReturn(50).anyTimes();
+    Filters filter = new Filters(null, mockConfig, mockAdapterConfig, sasParams, logger);
+    assertEquals(false, filter.isSiteAbsentInWhiteList("advertiserId1", random));
+    assertEquals(false, filter.isSiteAbsentInWhiteList("advertiserId2", random));
+    assertEquals(false, filter.isSiteAbsentInWhiteList("advertiserId3", random));
+    assertEquals(false, filter.isSiteAbsentInWhiteList("advertiserId4", random));
+  }
+
+  @Test
+  public void testAdvertiserLevelFilter() {
     HashMap<String, HashMap<String, ChannelSegment>> matchedSegments = new HashMap<String, HashMap<String, ChannelSegment>>();
     HashMap<String, ChannelSegment> adv1 = new HashMap<String, ChannelSegment>();
     HashMap<String, ChannelSegment> adv2 = new HashMap<String, ChannelSegment>();
     HashMap<String, ChannelSegment> adv3 = new HashMap<String, ChannelSegment>();
-
-    adv1.put(channelSegmentEntity1.getAdgroupId(), new ChannelSegment(channelSegmentEntity1, cE1, cFE1, cSFE1, null,
-        null, 0));
-    adv1.put(channelSegmentEntity2.getAdgroupId(), new ChannelSegment(channelSegmentEntity2, cE1, cFE1, cSFE2, null,
-        null, 0));
-    adv1.put(channelSegmentEntity3.getAdgroupId(), new ChannelSegment(channelSegmentEntity3, cE1, cFE1, cSFE3, null,
-        null, 0));
-    adv2.put(channelSegmentEntity4.getAdgroupId(), new ChannelSegment(channelSegmentEntity4, cE2, cFE2, cSFE4, null,
-        null, 0));
-    adv2.put(channelSegmentEntity5.getAdgroupId(), new ChannelSegment(channelSegmentEntity5, cE2, cFE2, cSFE5, null,
-        null, 0));
-    adv3.put(channelSegmentEntity6.getAdgroupId(), new ChannelSegment(channelSegmentEntity6, cE3, cFE3, cSFE6, null,
-        null, 0));
+    adv1.put(channelSegmentEntity1.getAdgroupId(), channelSegment1);
+    adv1.put(channelSegmentEntity2.getAdgroupId(), channelSegment2);
+    adv1.put(channelSegmentEntity3.getAdgroupId(), channelSegment3);
+    adv2.put(channelSegmentEntity4.getAdgroupId(), channelSegment4);
+    adv2.put(channelSegmentEntity5.getAdgroupId(), channelSegment5);
+    adv3.put(channelSegmentEntity6.getAdgroupId(), channelSegment6);
     matchedSegments.put(channelSegmentEntity1.getAdvertiserId(), adv1);
     matchedSegments.put(channelSegmentEntity4.getAdvertiserId(), adv2);
     matchedSegments.put(channelSegmentEntity6.getAdvertiserId(), adv3);
-
-    matchedSegments = Filters.impressionBurnFilter(matchedSegments, logger, mockConfig, "null");
-
+    Filters f1 = new Filters(matchedSegments, mockConfig, mockAdapterConfig, null, logger);
+    matchedSegments = f1.advertiserLevelFiltering();
     assertEquals(false, matchedSegments.containsKey(channelSegmentEntity1.getAdvertiserId()));
     assertEquals(false, matchedSegments.containsKey(channelSegmentEntity4.getAdvertiserId()));
     assertEquals(true, matchedSegments.containsKey(channelSegmentEntity6.getAdvertiserId()));
   }
 
   @Test
-  public void testPartnerSegmentCountFilter() {
-    Long[] rcList = null;
-    Long[] tags = null;
-    Timestamp modified_on = null;
-    Long[] slotIds = null;
-    Integer[] siteRatings = null;
-    ChannelSegmentEntity channelSegmentEntity1 = new ChannelSegmentEntity("advertiserId1", "adgroupId1", "adId",
-        "channelId1", (long) 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds,
-        (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
-    ChannelSegmentEntity channelSegmentEntity2 = new ChannelSegmentEntity("advertiserId1", "adgroupId2", "adId",
-        "channelId1", (long) 0, rcList, tags, false, true, "externalSiteKey", modified_on, "campaignId", slotIds,
-        (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
-    ChannelSegmentEntity channelSegmentEntity3 = new ChannelSegmentEntity("advertiserId1", "adgroupId3", "adId",
-        "channelId1", (long) 1, rcList, tags, false, false, "externalSiteKey", modified_on, "campaignId", slotIds,
-        (long) 0, false, "pricingModel", siteRatings, 0, null, false, false, false, false);
-    ChannelSegmentEntity channelSegmentEntity4 = new ChannelSegmentEntity("advertiserId2", "adgroupId4", "adId",
-        "channelId2", (long) 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds,
-        (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
-    ChannelSegmentEntity channelSegmentEntity5 = new ChannelSegmentEntity("advertiserId2", "adgroupId5", "adId",
-        "channelId2", (long) 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds,
-        (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
-    ChannelSegmentEntity channelSegmentEntity6 = new ChannelSegmentEntity("advertiserId3", "adgroupId5", "adId",
-        "channelId3", (long) 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds,
-        (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
+  public void TestIsAnySegmentPropertyViolated() {
+    SASRequestParameters sasParams = new SASRequestParameters();
+    sasParams.uidParams = "xxx";
+    sasParams.postalCode = "110051";
+    sasParams.latLong = "11.35&12.56";
+    sasParams.isRichMedia = true;
+    Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, logger);
+    ChannelSegmentEntity s1 = createMock(ChannelSegmentEntity.class);
+    expect(s1.isUdIdRequired()).andReturn(false);
+    expect(s1.isZipCodeRequired()).andReturn(false);
+    expect(s1.isLatlongRequired()).andReturn(false);
+    expect(s1.isRestrictedToRichMediaOnly()).andReturn(false);
+    replay(s1);
+    ChannelSegmentEntity s2 = createMock(ChannelSegmentEntity.class);
+    expect(s2.isUdIdRequired()).andReturn(true).anyTimes();
+    expect(s2.isZipCodeRequired()).andReturn(true).anyTimes();
+    expect(s2.isLatlongRequired()).andReturn(true).anyTimes();
+    expect(s2.isRestrictedToRichMediaOnly()).andReturn(true).anyTimes();
+    expect(s2.getAdvertiserId()).andReturn("advertiserId1").anyTimes();
+    replay(s2);
+    assertEquals(false, f1.isAnySegmentPropertyViolated(s1));
+    assertEquals(false, f1.isAnySegmentPropertyViolated(s2));
+    sasParams.uidParams = null;
+    assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
+    sasParams.uidParams = "xxx";
+    sasParams.postalCode = null;
+    assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
+    sasParams.uidParams = "xxx";
+    sasParams.postalCode = "110051";
+    sasParams.latLong = null;
+    assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
+    sasParams.uidParams = "xxx";
+    sasParams.postalCode = "110051";
+    sasParams.latLong = "11.35&12.56";
+    sasParams.isRichMedia = false;
+    assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
+  }
 
+  @Test
+  public void testAdGroupLevelFiltering() {
     HashMap<String, HashMap<String, ChannelSegment>> matchedSegments = new HashMap<String, HashMap<String, ChannelSegment>>();
     HashMap<String, ChannelSegment> adv1 = new HashMap<String, ChannelSegment>();
     HashMap<String, ChannelSegment> adv2 = new HashMap<String, ChannelSegment>();
     HashMap<String, ChannelSegment> adv3 = new HashMap<String, ChannelSegment>();
-
-    adv1.put(channelSegmentEntity1.getAdgroupId(), new ChannelSegment(channelSegmentEntity1, cE1, cFE1, cSFE1, null,
-        null, 0));
-    adv1.put(channelSegmentEntity2.getAdgroupId(), new ChannelSegment(channelSegmentEntity2, cE1, cFE1, cSFE2, null,
-        null, 0));
-    adv1.put(channelSegmentEntity3.getAdgroupId(), new ChannelSegment(channelSegmentEntity3, cE1, cFE1, cSFE3, null,
-        null, 0));
-    adv2.put(channelSegmentEntity4.getAdgroupId(), new ChannelSegment(channelSegmentEntity4, cE2, cFE2, cSFE4, null,
-        null, 0));
-    adv2.put(channelSegmentEntity5.getAdgroupId(), new ChannelSegment(channelSegmentEntity5, cE2, cFE2, cSFE5, null,
-        null, 0));
-    adv3.put(channelSegmentEntity6.getAdgroupId(), new ChannelSegment(channelSegmentEntity6, cE3, cFE3, cSFE6, null,
-        null, 0));
+    adv1.put(channelSegmentEntity1.getAdgroupId(), channelSegment1);
+    adv1.put(channelSegmentEntity2.getAdgroupId(), channelSegment2);
+    adv1.put(channelSegmentEntity3.getAdgroupId(), channelSegment3);
+    adv2.put(channelSegmentEntity4.getAdgroupId(), channelSegment4);
+    adv2.put(channelSegmentEntity5.getAdgroupId(), channelSegment5);
+    adv3.put(channelSegmentEntity6.getAdgroupId(), channelSegment6);
     matchedSegments.put(channelSegmentEntity1.getAdvertiserId(), adv1);
     matchedSegments.put(channelSegmentEntity4.getAdvertiserId(), adv2);
     matchedSegments.put(channelSegmentEntity6.getAdvertiserId(), adv3);
-
-    matchedSegments = Filters.partnerSegmentCountFilter(matchedSegments, 0.3, logger, mockConfig, mockAdapterConfig);
-
+    SASRequestParameters sasParams = new SASRequestParameters();
+    sasParams.siteFloor = 0.3;
+    Filters f1 = new Filters(matchedSegments, mockConfig, mockAdapterConfig, sasParams, logger);
+    matchedSegments = f1.adGroupLevelFiltering();
     assertEquals(false, matchedSegments.get("advertiserId1").containsKey("adgroupId1"));
     assertEquals(2, matchedSegments.get("advertiserId1").size());
     assertEquals(1, matchedSegments.get("advertiserId2").size());
@@ -208,61 +264,24 @@ public class FilterTest extends TestCase {
   }
 
   @Test
-  public void testSegmentsPerRequestFilter() {
-
-    Long[] rcList = null;
-    Long[] tags = null;
-    Timestamp modified_on = null;
-    Long[] slotIds = null;
-    Integer[] siteRatings = null;
-    ChannelSegmentEntity channelSegmentEntity1 = new ChannelSegmentEntity("advertiserId1", "adgroupId1", "adId",
-        "channelId1", (long) 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds,
-        (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
-    ChannelSegmentEntity channelSegmentEntity2 = new ChannelSegmentEntity("advertiserId1", "adgroupId2", "adId",
-        "channelId1", (long) 0, rcList, tags, false, true, "externalSiteKey", modified_on, "campaignId", slotIds,
-        (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
-    ChannelSegmentEntity channelSegmentEntity3 = new ChannelSegmentEntity("advertiserId1", "adgroupId3", "adId",
-        "channelId1", (long) 1, rcList, tags, false, false, "externalSiteKey", modified_on, "campaignId", slotIds,
-        (long) 0, false, "pricingModel", siteRatings, 0, null, false, false, false, false);
-    ChannelSegmentEntity channelSegmentEntity4 = new ChannelSegmentEntity("advertiserId2", "adgroupId4", "adId",
-        "channelId2", (long) 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds,
-        (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
-    ChannelSegmentEntity channelSegmentEntity5 = new ChannelSegmentEntity("advertiserId2", "adgroupId5", "adId",
-        "channelId2", (long) 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds,
-        (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
-    ChannelSegmentEntity channelSegmentEntity6 = new ChannelSegmentEntity("advertiserId3", "adgroupId5", "adId",
-        "channelId3", (long) 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds,
-        (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false);
-
+  public void testSelectTopAdgroupsForRequest() {
     HashMap<String, HashMap<String, ChannelSegment>> matchedSegments = new HashMap<String, HashMap<String, ChannelSegment>>();
     HashMap<String, ChannelSegment> adv1 = new HashMap<String, ChannelSegment>();
     HashMap<String, ChannelSegment> adv2 = new HashMap<String, ChannelSegment>();
     HashMap<String, ChannelSegment> adv3 = new HashMap<String, ChannelSegment>();
-
-    adv1.put(channelSegmentEntity1.getAdgroupId(), new ChannelSegment(channelSegmentEntity1, cE1, cFE1, cSFE1, null,
-        null, cSFE1.geteCPM()));
-    adv1.put(channelSegmentEntity2.getAdgroupId(), new ChannelSegment(channelSegmentEntity2, cE1, cFE1, cSFE2, null,
-        null, cSFE2.geteCPM()));
-    adv1.put(channelSegmentEntity3.getAdgroupId(), new ChannelSegment(channelSegmentEntity3, cE1, cFE1, cSFE3, null,
-        null, cSFE3.geteCPM()));
-    adv2.put(channelSegmentEntity4.getAdgroupId(), new ChannelSegment(channelSegmentEntity4, cE2, cFE2, cSFE4, null,
-        null, cSFE4.geteCPM()));
-    adv2.put(channelSegmentEntity5.getAdgroupId(), new ChannelSegment(channelSegmentEntity5, cE2, cFE2, cSFE5, null,
-        null, cSFE5.geteCPM()));
-    adv3.put(channelSegmentEntity6.getAdgroupId(), new ChannelSegment(channelSegmentEntity6, cE3, cFE3, cSFE6, null,
-        null, cSFE6.geteCPM()));
+    adv1.put(channelSegmentEntity1.getAdgroupId(), channelSegment1);
+    adv1.put(channelSegmentEntity2.getAdgroupId(), channelSegment2);
+    adv1.put(channelSegmentEntity3.getAdgroupId(), channelSegment3);
+    adv2.put(channelSegmentEntity4.getAdgroupId(), channelSegment4);
+    adv2.put(channelSegmentEntity5.getAdgroupId(), channelSegment5);
+    adv3.put(channelSegmentEntity6.getAdgroupId(), channelSegment6);
     matchedSegments.put(channelSegmentEntity1.getAdvertiserId(), adv1);
     matchedSegments.put(channelSegmentEntity4.getAdvertiserId(), adv2);
     matchedSegments.put(channelSegmentEntity6.getAdvertiserId(), adv3);
-
-    List<ChannelSegment> rows = new ArrayList<ChannelSegment>();
-    for (String advertiserId : matchedSegments.keySet()) {
-      for (String adgroupId : matchedSegments.get(advertiserId).keySet()) {
-        rows.add(matchedSegments.get(advertiserId).get(adgroupId));
-      }
-    }
-    List<ChannelSegment> finalRow = Filters.segmentsPerRequestFilter(matchedSegments, rows, logger, mockConfig);
-
+    Filters f1 = new Filters(matchedSegments, mockConfig, mockAdapterConfig, null, logger);
+    List<ChannelSegment> finalRow = f1.convertToSegmentsList(matchedSegments);
+    assertEquals(6, finalRow.size());
+    finalRow = f1.selectTopAdgroupsForRequest(finalRow);
     assertEquals(5, finalRow.size());
     assertEquals("adgroupId2", finalRow.get(0).getChannelSegmentEntity().getAdgroupId());
     assertEquals("adgroupId1", finalRow.get(4).getChannelSegmentEntity().getAdgroupId());
@@ -277,9 +296,7 @@ public class FilterTest extends TestCase {
     assertEquals(true, Filters.whiteListedSites.get("advertiserId4").contains("123"));
     assertEquals(true, Filters.whiteListedSites.get("advertiserId4").contains("321"));
     assertEquals(false, Filters.whiteListedSites.get("advertiserId4").contains("78"));
-
     Configuration newConfig = createMock(Configuration.class);
-
     HashMap<String, String> temp = new HashMap<String, String>();
     temp.put("openx.advertiserId", "");
     temp.put("openx.partnerSegmentNo", "");
@@ -289,7 +306,6 @@ public class FilterTest extends TestCase {
     temp.put("tapit.partnerSegmentNo", "");
     temp.put("mullahmedia.advertiserId", "");
     Iterator<String> itr = temp.keySet().iterator();
-
     expect(newConfig.getKeys()).andReturn(itr).anyTimes();
     expect(newConfig.getString("openx.advertiserId")).andReturn("advertiserId1").anyTimes();
     expect(newConfig.getString("atnt.advertiserId")).andReturn("advertiserId2").anyTimes();
@@ -304,7 +320,6 @@ public class FilterTest extends TestCase {
     expect(newConfig.getString("mullahmedia.whiteListedSites")).andReturn("").anyTimes();
     expect(newConfig.getInt("whiteListedSitesRefreshtime", 1000 * 300)).andReturn(0).anyTimes();
     replay(newConfig);
-
     Filters.refreshWhiteListedSites(mockConfig, newConfig, new DebugLogger());
     assertEquals(false, Filters.whiteListedSites.containsKey("advertiserId4"));
     assertEquals(true, Filters.whiteListedSites.containsKey("advertiserId3"));
