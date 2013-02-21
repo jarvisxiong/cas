@@ -320,13 +320,14 @@ public class Filters {
   }
 
   void printSegments(HashMap<String, HashMap<String, ChannelSegment>> matchedSegments) {
-    logger.debug("Segments are :");
-    for (String adkey : matchedSegments.keySet()) {
-      for (String gpkey : matchedSegments.get(adkey).keySet()) {
-        logger.debug("Advertiser is",
-            matchedSegments.get(adkey).get(gpkey).getChannelSegmentEntity().getAdvertiserId(), "and AdGp is",
-            matchedSegments.get(adkey).get(gpkey).getChannelSegmentEntity().getAdgroupId(), "ecpm is", matchedSegments
-                .get(adkey).get(gpkey).getPrioritisedECPM());
+    if(logger.isDebugEnabled()) {
+      logger.debug("Segments are :");
+      for (String adkey : matchedSegments.keySet()) {
+        for (String gpkey : matchedSegments.get(adkey).keySet()) {
+          logger.debug("Advertiser is", matchedSegments.get(adkey).get(gpkey).getChannelSegmentEntity()
+              .getAdvertiserId(), "and AdGp is", matchedSegments.get(adkey).get(gpkey).getChannelSegmentEntity()
+              .getAdgroupId(), "ecpm is", matchedSegments.get(adkey).get(gpkey).getPrioritisedECPM());
+        }
       }
     }
   }
