@@ -35,7 +35,7 @@ public class MatchSegments {
     MatchSegments.channelAdGroupRepository = channelAdGroupRepository;
     MatchSegments.defaultChannelEntity = (new ChannelEntity()).setImpressionCeil(Long.MAX_VALUE).setImpressionFloor(0)
         .setPriority(3).setRequestCap(Long.MAX_VALUE);
-    MatchSegments.defaultChannelFeedbackEntity = new ChannelFeedbackEntity(null, 0, 0, 0, 0, 0, 0, 0, Double.MAX_VALUE);
+    MatchSegments.defaultChannelFeedbackEntity = new ChannelFeedbackEntity(null, 0, 0, Double.MAX_VALUE, 0, 0, 0, 0, 0);
     MatchSegments.defaultChannelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(null, null, 1.0, 0.5, 0, 0, 0,
         0);
     MatchSegments.defaultChannelSegmentCitrusLeafFeedbackEntity = new ChannelSegmentFeedbackEntity(null, null, 1.0,

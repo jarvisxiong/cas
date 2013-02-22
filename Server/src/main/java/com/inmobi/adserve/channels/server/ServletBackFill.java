@@ -113,6 +113,7 @@ public class ServletBackFill implements Servlet {
         .matchSegments(hrh.responseSender.sasParams);
 
     if(matchedSegments == null) {
+      logger.debug("No Entities matching the request.");
       hrh.responseSender.sendNoAdResponse(e);
       return;
     }
@@ -125,7 +126,7 @@ public class ServletBackFill implements Servlet {
 
     if(rows == null || rows.size() == 0) {
       hrh.responseSender.sendNoAdResponse(e);
-      logger.debug("No Entities matching the request.");
+      logger.debug("All segments dropped in filters");
       return;
     }
 
