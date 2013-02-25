@@ -93,7 +93,7 @@ public class ServletGetSegment implements Servlet {
     if(entity == null)
       return;
     for (Method method : entity.getClass().getMethods()) {
-      if(method.getName().startsWith("get")) {
+      if(method.getName().startsWith("get") || method.getName().startsWith("is")) {
         segmentInfo.get(key)
             .put(
                 method.getName(),

@@ -54,7 +54,7 @@ public class AsyncRequestMaker {
   public static List<ChannelSegment> prepareForAsyncRequest(List<ChannelSegment> rows, DebugLogger logger,
       Configuration config, Configuration rtbConfig, Configuration adapterConfig, HttpRequestHandlerBase base,
       Set<String> advertiserSet, MessageEvent e, RepositoryHelper repositoryHelper, JSONObject jObject,
-      SASRequestParameters sasParams, CasInternalRequestParameters casInternalRequestParameters,
+      SASRequestParameters sasParams, CasInternalRequestParameters casInternalRequestParams,
       List<ChannelSegment> rtbSegments) throws Exception {
 
     List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
@@ -67,7 +67,7 @@ public class AsyncRequestMaker {
       ChannelSegmentEntity channelSegmentEntity = row.getChannelSegmentEntity();
       AdNetworkInterface network = SegmentFactory.getChannel(channelSegmentEntity.getAdvertiserId(), row
           .getChannelSegmentEntity().getChannelId(), adapterConfig, clientBootstrap, rtbClientBootstrap, base, e,
-          advertiserSet, logger, isRtbEnabled, casInternalRequestParameters);
+          advertiserSet, logger, isRtbEnabled);
       if(null == network) {
         logger.debug("No adapter found for adGroup:", channelSegmentEntity.getAdgroupId());
         continue;
@@ -84,9 +84,8 @@ public class AsyncRequestMaker {
       String clickUrl = null;
       String beaconUrl = null;
       sasParams.impressionId = getImpressionId(channelSegmentEntity.getIncId());
-      casInternalRequestParameters.udid = sasParams.uid;
-      casInternalRequestParameters.zipCode = sasParams.postalCode;
-      casInternalRequestParameters.latLong = sasParams.latLong;
+      CasInternalRequestParameters casInternalRequestParameters = getCasInternalRequestParameters(sasParams,
+          casInternalRequestParams);
       controlEnrichment(casInternalRequestParameters, channelSegmentEntity);
       sasParams.adIncId = channelSegmentEntity.getIncId();
       logger.debug("impression id is " + sasParams.impressionId);
@@ -125,7 +124,8 @@ public class AsyncRequestMaker {
       logger.debug("Sending request to Channel of Id", channelSegmentEntity.getChannelId());
       logger.debug("external site key is", channelSegmentEntity.getExternalSiteKey());
 
-      if(network.configureParameters(sasParams,casInternalRequestParameters, channelSegmentEntity, clickUrl, beaconUrl)) {
+      if(network
+          .configureParameters(sasParams, casInternalRequestParameters, channelSegmentEntity, clickUrl, beaconUrl)) {
         InspectorStats.incrementStatCount(network.getName(), InspectorStrings.successfulConfigure);
         row.setAdNetworkInterface(network);
         if(network.isRtbPartner()) {
@@ -139,11 +139,31 @@ public class AsyncRequestMaker {
     return segments;
   }
 
+  private static CasInternalRequestParameters getCasInternalRequestParameters(SASRequestParameters sasParams,
+      CasInternalRequestParameters casInternalRequestParams) {
+    CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+    casInternalRequestParameters.blockedCategories = casInternalRequestParams.blockedCategories;
+    casInternalRequestParameters.highestEcpm = casInternalRequestParameters.highestEcpm;
+    casInternalRequestParameters.rtbBidFloor = casInternalRequestParams.rtbBidFloor;
+    casInternalRequestParameters.uidParams = sasParams.uidParams;
+    casInternalRequestParameters.uid = sasParams.uid;
+    casInternalRequestParameters.uidO1 = sasParams.uidO1;
+    casInternalRequestParameters.uidMd5 = sasParams.uidMd5;
+    casInternalRequestParameters.uidIFA = sasParams.uidIFA;
+    casInternalRequestParameters.zipCode = sasParams.postalCode;
+    casInternalRequestParameters.latLong = sasParams.latLong;
+    return casInternalRequestParameters;
+  }
+
   private static void controlEnrichment(CasInternalRequestParameters casInternalRequestParameters,
       ChannelSegmentEntity channelSegmentEntity) {
     casInternalRequestParameters.impressionId = getImpressionId(channelSegmentEntity.getIncId());
     if(channelSegmentEntity.isStripUdId()) {
-      casInternalRequestParameters.udid = null;
+      casInternalRequestParameters.uidParams = null;
+      casInternalRequestParameters.uid = null;
+      casInternalRequestParameters.uidO1 = null;
+      casInternalRequestParameters.uidMd5 = null;
+      casInternalRequestParameters.uidIFA = null;
     }
     if(channelSegmentEntity.isStripLatlong()) {
       casInternalRequestParameters.zipCode = null;
@@ -154,7 +174,7 @@ public class AsyncRequestMaker {
     if(!channelSegmentEntity.isAppUrlEnabled()) {
       casInternalRequestParameters.appUrl = null;
     }
-      
+
   }
 
   public static List<ChannelSegment> makeAsyncRequests(List<ChannelSegment> rankList, DebugLogger logger,
