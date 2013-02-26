@@ -81,7 +81,7 @@ public class RequestParser {
       params.siteSegmentId = jObject.getInt("sel-seg-id");
       logger.debug("Site segment id is", params.siteSegmentId.toString());
     } catch (JSONException e) {
-     logger.debug("Site segment id is not present in the request");
+      logger.debug("Site segment id is not present in the request");
     }
     params.ipFileVersion = jObject.optInt("rq-ip-file-ver", 1);
     if(logger.isDebugEnabled()) {
@@ -90,8 +90,8 @@ public class RequestParser {
       logger.debug("osId is " + params.platformOsId);
     }
     params.uidParams = stringify(jObject, "u-id-params", logger);
-    params = getUserParams(params, jObject, logger);
     params = getUserIdParams(params, jObject, logger);
+    params = getUserParams(params, jObject, logger);
     try {
       JSONArray siteInfo = jObject.getJSONArray("site");
       if(siteInfo != null && siteInfo.length() > 0) {
@@ -115,7 +115,8 @@ public class RequestParser {
       params.uid = stringify(jObject, "u-id", logger);
     }
     params.osId = jObject.optInt("os-id", -1);
-    params.isRichMedia = jObject.optBoolean("rich-media",false);
+    params.isRichMedia = jObject.optBoolean("rich-media", false);
+    params.rqAdType = stringify(jObject, "rq-adtype", logger);
     logger.debug("successfully parsed params");
     return params;
   }
@@ -169,7 +170,9 @@ public class RequestParser {
       JSONObject userMap = (JSONObject) jObject.get("uparams");
       parameter.age = stringify(userMap, "u-age", logger);
       parameter.gender = stringify(userMap, "u-gender", logger);
-      parameter.uid = stringify(userMap, "u-id", logger);
+      if(StringUtils.isEmpty(parameter.uid)) {
+        parameter.uid = stringify(userMap, "u-id", logger);
+      }
       parameter.postalCode = stringify(userMap, "u-postalcode", logger);
       if(!StringUtils.isEmpty(parameter.postalCode))
         parameter.postalCode = parameter.postalCode.replaceAll(" ", "");
@@ -209,6 +212,7 @@ public class RequestParser {
     try {
       JSONObject userIdMap = (JSONObject) jObject.get("u-id-params");
       String o1Uid = stringify(userIdMap, "SO1", logger);
+      parameter.uid = stringify(userIdMap, "u-id", logger);
       parameter.uidO1 = (o1Uid != null) ? o1Uid : stringify(userIdMap, "O1", logger);
       parameter.uidMd5 = stringify(userIdMap, "UM5", logger);
       parameter.uidIFA = ("iphone".equalsIgnoreCase(parameter.source)) ? stringify(userIdMap, "IDA", logger) : null;

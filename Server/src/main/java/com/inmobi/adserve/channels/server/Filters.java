@@ -129,7 +129,7 @@ public class Filters {
       logger.debug("Request Cap exceeded by advertiser", advertiserId);
       if(advertiserIdtoNameMapping.containsKey(advertiserId)) {
         InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
-            InspectorStrings.droppedInImpressionFilter);
+            InspectorStrings.droppedInRequestCapFilter);
       }
     } else {
       logger.debug("Request Cap filter passed by advertiser", advertiserId);
@@ -259,6 +259,16 @@ public class Filters {
     if(channelSegmentEntity.isRestrictedToRichMediaOnly() && !sasParams.isRichMedia) {
       InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegmentEntity.getAdvertiserId()),
           InspectorStrings.droppedInLatLongFilter);
+      return true;
+    }
+    if(channelSegmentEntity.isInterstitialOnly() && (sasParams.rqAdType == null || !sasParams.rqAdType.equals("int"))) {
+      InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegmentEntity.getAdvertiserId()),
+          InspectorStrings.droppedInOnlyInterstitialFilter);
+      return true;
+    }
+    if(channelSegmentEntity.isNonInterstitialOnly() && sasParams.rqAdType != null && sasParams.rqAdType.equals("int")) {
+      InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegmentEntity.getAdvertiserId()),
+          InspectorStrings.droppedInOnlyNonInterstitialFilter);
       return true;
     }
     return false;
