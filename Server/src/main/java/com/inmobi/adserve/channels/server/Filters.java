@@ -241,7 +241,8 @@ public class Filters {
    * @return
    */
   boolean isAnySegmentPropertyViolated(ChannelSegmentEntity channelSegmentEntity) {
-    if(channelSegmentEntity.isUdIdRequired() && StringUtils.isEmpty(sasParams.uidParams)) {
+    if(channelSegmentEntity.isUdIdRequired()
+        && (StringUtils.isEmpty(sasParams.uidParams) || sasParams.uidParams.equals("{}"))) {
       InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegmentEntity.getAdvertiserId()),
           InspectorStrings.droppedInUdidFilter);
       return true;
@@ -251,6 +252,7 @@ public class Filters {
           InspectorStrings.droppedInZipcodeFilter);
       return true;
     }
+    logger.debug(channelSegmentEntity.isLatlongRequired());
     if(channelSegmentEntity.isLatlongRequired() && StringUtils.isEmpty(sasParams.latLong)) {
       InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegmentEntity.getAdvertiserId()),
           InspectorStrings.droppedInLatLongFilter);
