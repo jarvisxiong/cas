@@ -123,6 +123,13 @@ public class ServletHandler {
         return new ServletWhiteListSites();
       }
     });
+    
+    servletMap.put("/logParser", new ServletFactory() {
+      @Override
+      public Servlet getServlet() {
+        return new ServletLogParser();
+      }
+    });
 
   }
 
