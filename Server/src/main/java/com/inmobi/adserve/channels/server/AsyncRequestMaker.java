@@ -19,8 +19,7 @@ import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.entity.ChannelEntity;
-import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ClickUrlMaker.TrackingUrls;
 import com.inmobi.adserve.channels.util.DebugLogger;
@@ -53,7 +52,7 @@ public class AsyncRequestMaker {
   public static List<ChannelSegment> prepareForAsyncRequest(List<ChannelSegment> rows, DebugLogger logger,
       Configuration config, Configuration rtbConfig, Configuration adapterConfig, HttpRequestHandlerBase base,
       Set<String> advertiserSet, MessageEvent e, RepositoryHelper repositoryHelper, JSONObject jObject,
-      SASRequestParameters sasParams, CasInternalRequestParameters casInternalRequestParameters,
+      SASRequestParameters sasParams, CasInternalRequestParameters casInternalRequestParams,
       List<ChannelSegment> rtbSegments) throws Exception {
 
     List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
@@ -63,17 +62,18 @@ public class AsyncRequestMaker {
     logger.debug("isRtbEnabled is", new Boolean(isRtbEnabled).toString());
 
     for (ChannelSegment row : rows) {
-      AdNetworkInterface network = SegmentFactory.getChannel(row.getChannelSegmentEntity().getAdvertiserId(), row
+      ChannelSegmentEntity channelSegmentEntity = row.getChannelSegmentEntity();
+      AdNetworkInterface network = SegmentFactory.getChannel(channelSegmentEntity.getAdvertiserId(), row
           .getChannelSegmentEntity().getChannelId(), adapterConfig, clientBootstrap, rtbClientBootstrap, base, e,
-          advertiserSet, logger, isRtbEnabled, casInternalRequestParameters);
+          advertiserSet, logger, isRtbEnabled);
       if(null == network) {
-        logger.debug("No adapter found for adGroup:", row.getChannelSegmentEntity().getAdgroupId());
+        logger.debug("No adapter found for adGroup:", channelSegmentEntity.getAdgroupId());
         continue;
       }
-      logger.debug("adapter found for adGroup:", row.getChannelSegmentEntity().getAdgroupId(), "advertiserid is", row
+      logger.debug("adapter found for adGroup:", channelSegmentEntity.getAdgroupId(), "advertiserid is", row
           .getChannelSegmentEntity().getAdvertiserId());
-      if(null == repositoryHelper.queryChannelRepository(row.getChannelSegmentEntity().getChannelId())) {
-        logger.debug("No channel entity found for channel id:", row.getChannelSegmentEntity().getChannelId());
+      if(null == repositoryHelper.queryChannelRepository(channelSegmentEntity.getChannelId())) {
+        logger.debug("No channel entity found for channel id:", channelSegmentEntity.getChannelId());
         continue;
       }
 
@@ -81,14 +81,17 @@ public class AsyncRequestMaker {
 
       String clickUrl = null;
       String beaconUrl = null;
-      sasParams.impressionId = getImpressionId(row.getChannelSegmentEntity().getIncId());
-      sasParams.adIncId = row.getChannelSegmentEntity().getIncId();
+      sasParams.impressionId = getImpressionId(channelSegmentEntity.getIncId());
+      CasInternalRequestParameters casInternalRequestParameters = getCasInternalRequestParameters(sasParams,
+          casInternalRequestParams);
+      controlEnrichment(casInternalRequestParameters, channelSegmentEntity);
+      sasParams.adIncId = channelSegmentEntity.getIncId();
       logger.debug("impression id is " + sasParams.impressionId);
 
       if((network.isClickUrlRequired() || network.isBeaconUrlRequired()) && null != sasParams.impressionId) {
         if(config.getInt("clickmaker.version", 6) == 4) {
           ClickUrlMaker clickUrlMaker = new ClickUrlMaker(config, jObject, sasParams, logger);
-          TrackingUrls trackingUrls = clickUrlMaker.getClickUrl(row.getChannelSegmentEntity().getPricingModel());
+          TrackingUrls trackingUrls = clickUrlMaker.getClickUrl(channelSegmentEntity.getPricingModel());
           clickUrl = trackingUrls.getClickUrl();
           beaconUrl = trackingUrls.getBeaconUrl();
           if(logger.isDebugEnabled()) {
@@ -97,8 +100,8 @@ public class AsyncRequestMaker {
           }
         } else {
           boolean isCpc = false;
-          if(null != row.getChannelSegmentEntity().getPricingModel()
-              && row.getChannelSegmentEntity().getPricingModel().equalsIgnoreCase("cpc"))
+          if(null != channelSegmentEntity.getPricingModel()
+              && channelSegmentEntity.getPricingModel().equalsIgnoreCase("cpc"))
             isCpc = true;
           ClickUrlMakerV6 clickUrlMakerV6 = setClickParams(logger, isCpc, config, sasParams, jObject);
           Map<String, String> clickGetParams = new HashMap<String, String>();
@@ -116,13 +119,12 @@ public class AsyncRequestMaker {
         }
       }
 
-      logger.debug("Sending request to Channel of Id", row.getChannelSegmentEntity().getChannelId());
-      logger.debug("external site key is", row.getChannelSegmentEntity().getExternalSiteKey());
+      logger.debug("Sending request to Channel of Id", channelSegmentEntity.getChannelId());
+      logger.debug("external site key is", channelSegmentEntity.getExternalSiteKey());
 
-      if(network.configureParameters(sasParams, row.getChannelSegmentEntity(), clickUrl, beaconUrl)) {
+      if(network
+          .configureParameters(sasParams, casInternalRequestParameters, channelSegmentEntity, clickUrl, beaconUrl)) {
         InspectorStats.incrementStatCount(network.getName(), InspectorStrings.successfulConfigure);
-        ChannelEntity channelEntity = repositoryHelper.queryChannelRepository(row.getChannelSegmentEntity()
-            .getChannelId());
         row.setAdNetworkInterface(network);
         if(network.isRtbPartner()) {
           rtbSegments.add(row);
@@ -133,6 +135,44 @@ public class AsyncRequestMaker {
       }
     }
     return segments;
+  }
+
+  private static CasInternalRequestParameters getCasInternalRequestParameters(SASRequestParameters sasParams,
+      CasInternalRequestParameters casInternalRequestParams) {
+    CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+    casInternalRequestParameters.blockedCategories = casInternalRequestParams.blockedCategories;
+    casInternalRequestParameters.highestEcpm = casInternalRequestParameters.highestEcpm;
+    casInternalRequestParameters.rtbBidFloor = casInternalRequestParams.rtbBidFloor;
+    casInternalRequestParameters.uidParams = sasParams.uidParams;
+    casInternalRequestParameters.uid = sasParams.uid;
+    casInternalRequestParameters.uidO1 = sasParams.uidO1;
+    casInternalRequestParameters.uidMd5 = sasParams.uidMd5;
+    casInternalRequestParameters.uidIFA = sasParams.uidIFA;
+    casInternalRequestParameters.zipCode = sasParams.postalCode;
+    casInternalRequestParameters.latLong = sasParams.latLong;
+    return casInternalRequestParameters;
+  }
+
+  private static void controlEnrichment(CasInternalRequestParameters casInternalRequestParameters,
+      ChannelSegmentEntity channelSegmentEntity) {
+    casInternalRequestParameters.impressionId = getImpressionId(channelSegmentEntity.getIncId());
+    if(channelSegmentEntity.isStripUdId()) {
+      casInternalRequestParameters.uidParams = null;
+      casInternalRequestParameters.uid = null;
+      casInternalRequestParameters.uidO1 = null;
+      casInternalRequestParameters.uidMd5 = null;
+      casInternalRequestParameters.uidIFA = null;
+    }
+    if(channelSegmentEntity.isStripLatlong()) {
+      casInternalRequestParameters.zipCode = null;
+    }
+    if(channelSegmentEntity.isStripLatlong()) {
+      casInternalRequestParameters.latLong = null;
+    }
+    if(!channelSegmentEntity.isAppUrlEnabled()) {
+      casInternalRequestParameters.appUrl = null;
+    }
+
   }
 
   public static List<ChannelSegment> makeAsyncRequests(List<ChannelSegment> rankList, DebugLogger logger,

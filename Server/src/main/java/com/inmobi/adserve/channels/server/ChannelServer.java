@@ -113,7 +113,6 @@ public class ChannelServer {
     InspectorStats.initializeRepoStats("SiteTaxonomyRepository");
     instantiateRepository(logger, config);
     Filters.init(config.adapterConfiguration());
-
     // Creating netty client for out-bound calls.
     Timer timer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
     BootstrapCreation.init(timer);

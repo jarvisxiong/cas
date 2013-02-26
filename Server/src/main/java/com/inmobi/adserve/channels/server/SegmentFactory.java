@@ -29,7 +29,6 @@ import com.inmobi.adserve.channels.adnetworks.verve.DCPVerveAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.webmoblink.WebmobLinkAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.xad.DCPxAdAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.DebugLogger;
@@ -66,7 +65,7 @@ public class SegmentFactory {
     
   public static AdNetworkInterface getChannel(String advertiserId, String channelId, Configuration config, ClientBootstrap clientBootstrap,
       ClientBootstrap rtbClientBootstrap, HttpRequestHandlerBase base, MessageEvent serverEvent, Set<String> advertiserSet, DebugLogger logger,
-      boolean isRtbEnabled, CasInternalRequestParameters casInternalRequestParameters) {
+      boolean isRtbEnabled) {
     if(isRtbEnabled) {
       for (String partnerName : rtbAdaptersNames) {
         if((advertiserId.equalsIgnoreCase(config.getString(partnerName + ".advertiserId")))
@@ -92,7 +91,7 @@ public class SegmentFactory {
           } 
           logger.debug("dcname is ",dcname, "and urlBase is " + urlBase);
           RtbAdNetwork rtbAdNetwork = new RtbAdNetwork(logger, config, rtbClientBootstrap, base, serverEvent, urlBase,
-              partnerName, casInternalRequestParameters);
+              partnerName);
           logger.debug("Created RTB adapter instance for advertiser id : " + advertiserId);
           return rtbAdNetwork;
         }

@@ -59,6 +59,10 @@ public class ChannelSegment {
   public void setAdNetworkInterface(AdNetworkInterface adNetworkInterface) {
     this.adNetworkInterface = adNetworkInterface;
   }
+  
+  public void setPrioritisedECPM(double prioritisedECPM) {
+    this.prioritisedECPM = prioritisedECPM;
+  }
 
   
 }
