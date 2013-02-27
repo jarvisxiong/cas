@@ -219,8 +219,13 @@ public class AsyncRequestMaker {
     Set<String> unhashable = new HashSet<String>();
     unhashable.addAll(Arrays.asList(config.getStringArray("clickmaker.unhashable")));
     ClickUrlMakerV6 clickUrlMakerV6 = new ClickUrlMakerV6(logger, unhashable);
-    if(null != sasParams.age)
-      clickUrlMakerV6.setAge(Integer.parseInt(sasParams.age));
+    try {
+      if(null != sasParams.age) {
+        clickUrlMakerV6.setAge(Integer.parseInt(sasParams.age));
+      }
+    } catch (NumberFormatException e) {
+      logger.error("Wrong format for Age");
+    }
     if(null != sasParams.gender)
       clickUrlMakerV6.setGender(sasParams.gender);
     clickUrlMakerV6.setCPC(pricingModel);
@@ -232,8 +237,12 @@ public class AsyncRequestMaker {
     }
     if(null != carrierId)
       clickUrlMakerV6.setCarrierId(carrierId);
-    if(null != sasParams.countryStr) {
-      clickUrlMakerV6.setCountryId(Integer.parseInt(sasParams.countryStr));
+    try {
+      if(null != sasParams.countryStr) {
+        clickUrlMakerV6.setCountryId(Integer.parseInt(sasParams.countryStr));
+      }
+    } catch (NumberFormatException e) {
+      logger.error("Wrong format for CountryString");
     }
     try {
       if(null != jObject.getJSONArray("handset"))
@@ -254,8 +263,13 @@ public class AsyncRequestMaker {
     }
     clickUrlMakerV6.setIpFileVersion(sasParams.ipFileVersion.longValue());
     clickUrlMakerV6.setIsBillableDemog(false);
-    if(null != sasParams.area)
-      clickUrlMakerV6.setLocation(Integer.parseInt(sasParams.area));
+    try {
+      if(null != sasParams.area) {
+        clickUrlMakerV6.setLocation(Integer.parseInt(sasParams.area));
+      }
+    } catch (NumberFormatException e) {
+      logger.error("Wrong format for Area");
+    }
     if(null != sasParams.siteSegmentId)
       clickUrlMakerV6.setSegmentId(sasParams.siteSegmentId);
     clickUrlMakerV6.setSiteIncId(sasParams.siteIncId);
