@@ -130,6 +130,13 @@ public class ServletHandler {
         return new ServletLogParser();
       }
     });
+    
+    servletMap.put("/repoRefresh", new ServletFactory() {
+      @Override
+      public Servlet getServlet() {
+        return new ServletRepoRefresh();
+      }
+    });
 
   }
 
