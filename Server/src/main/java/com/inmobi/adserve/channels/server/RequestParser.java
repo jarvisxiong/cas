@@ -182,6 +182,13 @@ public class RequestParser {
         parameter.postalCode = parameter.postalCode.replaceAll(" ", "");
       parameter.userLocation = stringify(userMap, "u-location", logger);
       parameter.genderOrig = stringify(userMap, "u-gender-orig", logger);
+      try {
+        parameter.age = URLEncoder.encode(parameter.age.trim(), utf8);
+        parameter.gender = URLEncoder.encode(parameter.gender.trim(), utf8);
+        parameter.postalCode = URLEncoder.encode(parameter.postalCode.trim(), utf8);
+      } catch (UnsupportedEncodingException e) {
+        logger.error("Error in encoding u params", e.getMessage());
+      }
       if(logger.isDebugEnabled()) {
         logger.debug("uid is " + parameter.uid + ",postalCode is " + parameter.postalCode + ",gender is "
             + parameter.gender);
@@ -204,13 +211,6 @@ public class RequestParser {
       parameter.userLocation = null;
       parameter.genderOrig = null;
       logger.error("uparams missing in the request");
-    }
-    try {
-      parameter.age = URLEncoder.encode(parameter.age.trim(), utf8);
-      parameter.gender = URLEncoder.encode(parameter.gender.trim(), utf8);
-      parameter.postalCode = URLEncoder.encode(parameter.postalCode.trim(), utf8);
-    } catch (UnsupportedEncodingException e) {
-      logger.error("Error in encoding u params", e.getMessage());
     }
     return parameter;
   }
