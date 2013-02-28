@@ -25,7 +25,7 @@ public class ServletRepoRefresh implements Servlet {
     String requestParam = params.get("args").toString();
     JSONArray jsonArray = new JSONArray(requestParam);
     JSONObject jObject = jsonArray.getJSONObject(0);
-    hrh.logger.debug("requestParam",requestParam,"jObject",jObject);
+    hrh.logger.debug("requestParam", requestParam, "jObject", jObject);
     String repoName = jObject.get("repoName").toString();
     hrh.logger.debug("RepoName is", repoName);
     if(repoName == null) {
@@ -47,26 +47,14 @@ public class ServletRepoRefresh implements Servlet {
         Statement statement = con.createStatement();
         if(repoName.equalsIgnoreCase("ChannelAdGroupRepository")) {
           ResultSet resultSet = statement.executeQuery(config.cacheConfiguration().subset("ChannelAdGroupRepository")
-              .getString("query").replace("'${last_update}'", "now() -interval '1 HOUR'"));
+              .getString("query").replace("'${last_update}'", "now() -interval '1 MINUTE'"));
           ServletHandler.repositoryHelper.getChannelAdGroupRepository().newUpdateFromResultSetToOptimizeUpdate(
               resultSet);
-         hrh.logger.debug("query is", config.cacheConfiguration().subset("ChannelAdGroupRepository")
-              .getString("query").replace("'${last_update}'", "now() -interval '1 MINUTE'"));
-          while (resultSet.next()) {
-            hrh.logger.debug("Resultset is not null");
-            for (int i = 1; i <= 15; i++) {
-              if (i > 1) hrh.logger.debug(",  ");
-              String columnValue = resultSet.getString(i);
-              hrh.logger.debug(columnValue);
-            }
-            hrh.logger.debug(" ");
-          }
         } else if(repoName.equalsIgnoreCase("ChannelRepository")) {
           ResultSet resultSet = statement.executeQuery(config.cacheConfiguration().subset("ChannelRepository")
               .getString("query").replace("'${last_update}'", "now() -interval '1 HOUR'"));
           ServletHandler.repositoryHelper.getChannelAdGroupRepository().newUpdateFromResultSetToOptimizeUpdate(
               resultSet);
-
         }
         con.close();
       } catch (SQLException e1) {
