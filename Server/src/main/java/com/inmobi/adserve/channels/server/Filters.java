@@ -89,7 +89,6 @@ public class Filters {
    * @return returns a list of filtered channel segments
    */
   public List<ChannelSegment> applyFilters() {
-    Filters.refreshWhiteListedSites(serverConfiguration, adapterConfiguration, logger);
     matchedSegments = advertiserLevelFiltering();
     matchedSegments = adGroupLevelFiltering();
     List<ChannelSegment> channelSegments = convertToSegmentsList(matchedSegments);
@@ -207,7 +206,7 @@ public class Filters {
       else {
         result = !advertisersIncludedbyPublisher.isEmpty() && !advertisersIncludedbyPublisher.contains(advertiserId);
       }
-    }
+    }else logger.debug("null");
     if(result) {
       logger.debug("Site/publisher inclusion list does not contain advertiser", advertiserId);
       if(advertiserIdtoNameMapping.containsKey(advertiserId)) {

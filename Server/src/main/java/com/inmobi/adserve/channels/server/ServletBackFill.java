@@ -120,7 +120,7 @@ public class ServletBackFill implements Servlet {
 
     hrh.responseSender.sasParams.siteFloor = 0.0;
     Filters filter = new Filters(matchedSegments, ServletHandler.config, ServletHandler.adapterConfig,
-        hrh.responseSender.sasParams, logger);
+        hrh.responseSender.sasParams, ServletHandler.repositoryHelper, logger);
     // applying all the filters
     List<ChannelSegment> rows = filter.applyFilters();
 
@@ -237,8 +237,7 @@ public class ServletBackFill implements Servlet {
           .querySiteMetaDetaRepository(hrh.responseSender.sasParams.siteId);
       if(null != siteMetaDataEntity && siteMetaDataEntity.getBlockedCategories() != null) {
         blockedCategories = Arrays.asList(siteMetaDataEntity.getBlockedCategories());
-        logger.debug("Site id is", hrh.responseSender.sasParams.siteId, "and id is", siteMetaDataEntity.getEntityId(),
-            "no of blocked categories are");
+        logger.debug("Site id is", hrh.responseSender.sasParams.siteId, "no of blocked categories are");
       } else
         logger.debug("No blockedCategory for this site id");
     }
