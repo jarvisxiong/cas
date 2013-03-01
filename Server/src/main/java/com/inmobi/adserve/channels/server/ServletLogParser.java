@@ -41,20 +41,12 @@ public class ServletLogParser implements Servlet {
         }
       }
     }
-    hrh.logger.debug("targetStrings is", targetStrings);
-    hrh.logger.debug("logFilePath is", logFilePath);
     if(logFilePath == null)
       logFilePath = "/opt/mkhoj/logs/cas/debug/";
 
-    ProcessBuilder pb = new ProcessBuilder("/opt/bin/mkhoj/parser.sh", "-t", targetStrings, "-l", logFilePath);
+    ProcessBuilder pb = new ProcessBuilder(ServletHandler.config.getString("logParserScript"), "-t", targetStrings, "-l", logFilePath);
     Process process = pb.start();
-    BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
-    String line = "";
-    while ((line = br.readLine()) != null) {
-      hrh.logger.debug(line);
-    }
     int exitStatus = process.waitFor();
-
     if(exitStatus == 0)
       hrh.responseSender.sendResponse("PASS", e);
     else
