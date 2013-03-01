@@ -1,5 +1,8 @@
 package com.inmobi.adserve.channels.server;
 
+import java.beans.Encoder;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -166,6 +169,7 @@ public class RequestParser {
   public static SASRequestParameters getUserParams(SASRequestParameters parameter, JSONObject jObject,
       DebugLogger logger) {
     logger.debug("inside parsing user params");
+    String utf8 = "UTF-8";
     try {
       JSONObject userMap = (JSONObject) jObject.get("uparams");
       parameter.age = stringify(userMap, "u-age", logger);
@@ -178,6 +182,13 @@ public class RequestParser {
         parameter.postalCode = parameter.postalCode.replaceAll(" ", "");
       parameter.userLocation = stringify(userMap, "u-location", logger);
       parameter.genderOrig = stringify(userMap, "u-gender-orig", logger);
+      try {
+        parameter.age = URLEncoder.encode(parameter.age.trim(), utf8);
+        parameter.gender = URLEncoder.encode(parameter.gender.trim(), utf8);
+        parameter.postalCode = URLEncoder.encode(parameter.postalCode.trim(), utf8);
+      } catch (UnsupportedEncodingException e) {
+        logger.error("Error in encoding u params", e.getMessage());
+      }
       if(logger.isDebugEnabled()) {
         logger.debug("uid is " + parameter.uid + ",postalCode is " + parameter.postalCode + ",gender is "
             + parameter.gender);

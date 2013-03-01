@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>com.inmobi.channels</groupId>
 		<artifactId>cas</artifactId>
-		<version>1.58-SNAPSHOT</version>
+		<version>1.59-SNAPSHOT</version>
 	</parent>
 
 	<repositories>

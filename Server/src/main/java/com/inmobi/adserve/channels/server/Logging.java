@@ -310,6 +310,7 @@ public class Logging {
       try {
         InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalRequests);
         InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.latency, adResponse.latency);
+        InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.connectionLatency, adNetwork.getConnectionLatency());
         if(adResponse.adStatus.equals("AD"))
           InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalFills);
         else if(adResponse.adStatus.equals("NO_AD"))
