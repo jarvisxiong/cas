@@ -243,7 +243,7 @@ public class MatchSegments {
     ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = repositoryHelper
         .queryChannelSegmentFeedbackRepository(channelSegmentEntity.getAdgroupId());
     SiteFeedbackEntity siteFeedbackEntity = repositoryHelper.querySiteCitrusLeafFeedbackRepository(sasParams.siteId,
-        new Long(sasParams.siteIncId).toString(), logger);
+        Long.valueOf(sasParams.siteIncId).toString(), logger);
     ChannelSegmentFeedbackEntity channelSegmentCitrusLeafFeedbackEntity = null;
 
     if(channelEntity == null) {

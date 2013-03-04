@@ -165,7 +165,7 @@ public class ServletBackFill implements Servlet {
         ServletHandler.adapterConfig, hrh.responseSender, advertiserSet, e, ServletHandler.repositoryHelper,
         hrh.jObject, hrh.responseSender.sasParams, casInternalRequestParameters, rtbSegments);
 
-    logger.debug("rtb rankList size is", new Integer(rtbSegments.size()).toString());
+    logger.debug("rtb rankList size is", Integer.valueOf(rtbSegments.size()));
     if(segments.isEmpty() && rtbSegments.isEmpty()) {
       logger.debug("No succesfull configuration of adapter ");
       hrh.responseSender.sendNoAdResponse(e);

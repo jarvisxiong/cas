@@ -266,22 +266,32 @@ public class ChannelServer {
     String debugLogFolder = config.getString("appender.debug.File");
     String advertiserLogFolder = config.getString("appender.advertiser.File");
     String sampledAdvertiserLogFolder = config.getString("appender.sampledadvertiser.File");
-    if(rrLogFolder != null)
+    File rrFolder = null;
+    File channelFolder = null;
+    File debugFolder = null;
+    File advertiserFolder = null;
+    File sampledAdvertiserFolder = null;
+    if(rrLogFolder != null) {
       rrLogFolder = rrLogFolder.substring(0, rrLogFolder.lastIndexOf('/') + 1);
-    if(channelLogFolder != null)
+      rrFolder = new File(rrLogFolder);
+    }
+    if(channelLogFolder != null) {
       channelLogFolder = channelLogFolder.substring(0, channelLogFolder.lastIndexOf('/') + 1);
-    if(debugLogFolder != null)
+      channelFolder = new File(channelLogFolder);
+    }
+    if(debugLogFolder != null) {
       debugLogFolder = debugLogFolder.substring(0, debugLogFolder.lastIndexOf('/') + 1);
-    if(advertiserLogFolder != null)
+      debugFolder = new File(debugLogFolder);
+    }
+    if(advertiserLogFolder != null) {
       advertiserLogFolder = advertiserLogFolder.substring(0, advertiserLogFolder.lastIndexOf('/') + 1);
-    if(sampledAdvertiserLogFolder != null)
+      advertiserFolder = new File(advertiserLogFolder);
+    }
+    if(sampledAdvertiserLogFolder != null) {
       sampledAdvertiserLogFolder = sampledAdvertiserLogFolder.substring(0,
           sampledAdvertiserLogFolder.lastIndexOf('/') + 1);
-    File rrFolder = new File(rrLogFolder);
-    File channelFolder = new File(channelLogFolder);
-    File debugFolder = new File(debugLogFolder);
-    File advertiserFolder = new File(advertiserLogFolder);
-    File sampledAdvertiserFolder = new File(sampledAdvertiserLogFolder);
+      sampledAdvertiserFolder = new File(sampledAdvertiserLogFolder);
+    }
     if(rrFolder != null && rrFolder.exists() && channelFolder != null && channelFolder.exists()) {
       if(debugFolder != null && debugFolder.exists() && advertiserFolder != null && advertiserFolder.exists()) {
         if(sampledAdvertiserFolder != null && sampledAdvertiserFolder.exists()) {
