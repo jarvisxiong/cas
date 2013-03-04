@@ -130,7 +130,7 @@ public class ServletBackFill implements Servlet {
       return;
     }
 
-    List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
+    List<ChannelSegment> segments;
 
     String advertisers = "";
     String[] advertiserList = null;

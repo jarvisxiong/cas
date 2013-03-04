@@ -510,7 +510,7 @@ public class Filters {
         }
       }
     }
-    logger.debug("rank", rank++, "adapter has channel id", segment.get(0).getAdNetworkInterface().getId());
+    logger.debug("rank", rank, "adapter has channel id", segment.get(0).getAdNetworkInterface().getId());
     rankedList.add(segment.get(0));
     logger.info("Ranked candidate adapters randomly");
     return rankedList;

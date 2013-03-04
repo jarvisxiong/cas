@@ -486,7 +486,6 @@ public class Logging {
         }
       } else {
         logger.debug("creating new sampledadvertiser logs");
-        time = System.currentTimeMillis();
         count = 0;
         sampledAdvertiserLogNos.put(partnerName + extsiteKey, System.currentTimeMillis() + "_" + 0);
         time = Long.parseLong(sampledAdvertiserLogNos.get(partnerName + extsiteKey).split("_")[0]);

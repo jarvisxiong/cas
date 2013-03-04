@@ -28,10 +28,6 @@ public class ServletRepoRefresh implements Servlet {
     hrh.logger.debug("requestParam", requestParam, "jObject", jObject);
     String repoName = jObject.get("repoName").toString();
     hrh.logger.debug("RepoName is", repoName);
-    if(repoName == null) {
-      hrh.responseSender.sendResponse("NOTOK", e);
-      return;
-    }
 
     try {
       String dbHost = jObject.get("DBHost").toString();

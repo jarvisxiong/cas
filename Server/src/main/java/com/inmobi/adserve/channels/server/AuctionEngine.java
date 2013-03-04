@@ -44,7 +44,7 @@ public class AuctionEngine implements AuctionEngineInterface {
 
     auctionComplete = true;
     logger.debug("Inside RTB auction engine");
-    List<ChannelSegment> rtbList = new ArrayList<ChannelSegment>();
+    List<ChannelSegment> rtbList;
     // Apply rtb filters.
     rtbList = rtbFilters(rtbSegments);
     if(rtbList.size() == 0) {

@@ -333,18 +333,12 @@ public class ClickUrlMakerV6 {
       adUrlSuffix.append(appendSeparator(ClickUrlMakerV6.clickURLHashingSecretKeyTestModeVersionBase36));
       CryptoHashGenerator cryptoHashGenerator = new CryptoHashGenerator(testCryptoSecretKey, logger);
       String clickUrlHash = cryptoHashGenerator.generateHash(adUrlSuffix.toString());
-      if(null == clickUrlHash)
-        return;
       adUrlSuffix.append(appendSeparator(clickUrlHash));
 
     } else {
       adUrlSuffix.append(appendSeparator(ClickUrlMakerV6.clickURLHashingSecretKeyVersionBase36));
       CryptoHashGenerator cryptoHashGenerator = new CryptoHashGenerator(cryptoSecretKey, logger);
       String clickUrlHash = cryptoHashGenerator.generateHash(adUrlSuffix.toString());
-      if(null == clickUrlHash) {
-        logger.debug("clickUrlHash is null so returning");
-        return;
-      }
       adUrlSuffix.append(appendSeparator(clickUrlHash));
     }
     if(null != clickURLPrefix)
