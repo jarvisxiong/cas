@@ -48,12 +48,12 @@ public class AuctionEngine implements AuctionEngineInterface {
     // Apply rtb filters.
     rtbList = rtbFilters(rtbSegments);
     if(rtbList.size() == 0) {
-      logger.debug("rtb segments are", new Integer(rtbList.size()).toString());
+      logger.debug("rtb segments are", Integer.valueOf(rtbList.size()));
       rtbResponse = null;
       logger.debug("returning from auction engine , winner is null");
       return null;
     } else if(rtbList.size() == 1) {
-      logger.debug("rtb segments are", new Integer(rtbList.size()).toString());
+      logger.debug("rtb segments are", Integer.valueOf(rtbList.size()));
       rtbResponse = rtbList.get(0);
       secondBidPrice = Math.min(casInternalRequestParameters.rtbBidFloor, rtbResponse.getAdNetworkInterface()
           .getBidprice() * 0.9);
@@ -63,7 +63,7 @@ public class AuctionEngine implements AuctionEngineInterface {
       return rtbList.get(0).getAdNetworkInterface();
     }
 
-    logger.debug("rtb segments are", new Integer(rtbList.size()).toString());
+    logger.debug("rtb segments are", Integer.valueOf(rtbList.size()));
     for (int i = 0; i < rtbList.size(); i++) {
       for (int j = i + 1; j < rtbList.size(); j++) {
         if(rtbList.get(i).getAdNetworkInterface().getBidprice() < rtbList.get(j).getAdNetworkInterface().getBidprice()) {
@@ -105,7 +105,7 @@ public class AuctionEngine implements AuctionEngineInterface {
 
   public List<ChannelSegment> rtbFilters(List<ChannelSegment> rtbSegments) {
     List<ChannelSegment> rtbList = new ArrayList<ChannelSegment>();
-    logger.debug("No of rtb partners who sent response are", new Integer(rtbSegments.size()).toString());
+    logger.debug("No of rtb partners who sent response are", Integer.valueOf(rtbList.size()));
     // Ad filter.
     for (int i = 0; i < rtbSegments.size(); i++) {
       if(rtbSegments.get(i).getAdNetworkInterface().getAdStatus().equalsIgnoreCase("AD")) {
@@ -113,7 +113,7 @@ public class AuctionEngine implements AuctionEngineInterface {
         rtbList.add(rtbSegments.get(i));
       }
     }
-    logger.debug("No of rtb partners who sent AD response are", new Integer(rtbList.size()).toString());
+    logger.debug("No of rtb partners who sent AD response are", Integer.valueOf(rtbList.size()));
     // BidFloor filter.
     for (int i = 0; i < rtbList.size(); i++) {
       if(rtbList.get(i).getAdNetworkInterface().getBidprice() < casInternalRequestParameters.rtbBidFloor) {
@@ -121,8 +121,8 @@ public class AuctionEngine implements AuctionEngineInterface {
         rtbList.remove(rtbList.get(i));
       }
     }
-    logger.debug("No of rtb partners who sent AD response with bid more than bidFloor",
-        new Integer(rtbList.size()).toString());
+    logger
+        .debug("No of rtb partners who sent AD response with bid more than bidFloor", Integer.valueOf(rtbList.size()));
     // Bid not zero filter.
     for (int i = 0; i < rtbList.size(); i++) {
       if(rtbList.get(i).getAdNetworkInterface().getBidprice() <= 0) {
@@ -130,8 +130,7 @@ public class AuctionEngine implements AuctionEngineInterface {
         rtbList.remove(rtbList.get(i));
       }
     }
-    logger
-        .debug("No of rtb partners who sent AD response with bid more than 0", new Integer(rtbList.size()).toString());
+    logger.debug("No of rtb partners who sent AD response with bid more than 0", Integer.valueOf(rtbList.size()));
     return rtbList;
 
   }

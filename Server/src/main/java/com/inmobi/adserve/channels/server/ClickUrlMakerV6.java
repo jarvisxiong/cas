@@ -74,11 +74,11 @@ public class ClickUrlMakerV6 {
       StringBuilder stringBuilder = new StringBuilder();
       stringBuilder.append("?");
       int i = 1;
-      for (String key : getParams.keySet()) {
+      for (Map.Entry<String, String> entry: getParams.entrySet()) {
         if(i < getParams.size())
-          stringBuilder.append(key).append("=").append(getParams.get(key)).append("&");
+          stringBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
         else
-          stringBuilder.append(key).append("=").append(getParams.get(key));
+          stringBuilder.append(entry.getKey()).append("=").append(entry.getValue());
         i++;
       }
       if(logger.isDebugEnabled())
@@ -100,11 +100,12 @@ public class ClickUrlMakerV6 {
       StringBuilder stringBuilder = new StringBuilder();
       stringBuilder.append("?");
       int i = 1;
-      for (String key : getParams.keySet()) {
+      for (Map.Entry<String, String> entry: getParams.entrySet()) {
         if(i < getParams.size())
-          stringBuilder.append(key).append("=").append(getParams.get(key)).append("&");
+          stringBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
         else
-          stringBuilder.append(key).append("=").append(getParams.get(key));
+          stringBuilder.append(entry.getKey()).append("=").append(entry.getValue());
+        i++;
       }
       if(logger.isDebugEnabled())
         logger.debug("clickUrl is " + clickUrl + stringBuilder.toString());
