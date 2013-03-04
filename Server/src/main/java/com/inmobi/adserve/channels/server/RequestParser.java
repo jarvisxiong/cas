@@ -46,79 +46,79 @@ public class RequestParser {
       logger.debug("Returning null as jObject is null.");
       return null;
     }
-    params.allParametersJson = jObject.toString();
-    params.remoteHostIp = stringify(jObject, "w-s-carrier", logger);
-    params.userAgent = stringify(jObject, "rq-x-inmobi-phone-useragent", logger);
-    if(null == params.userAgent) {
-      params.userAgent = stringify(jObject, "rq-h-user-agent", logger);
+    params.setAllParametersJson(jObject.toString());
+    params.setRemoteHostIp(stringify(jObject, "w-s-carrier", logger));
+    params.setUserAgent(stringify(jObject, "rq-x-inmobi-phone-useragent", logger));
+    if(null == params.getUserAgent()) {
+      params.setUserAgent(stringify(jObject, "rq-h-user-agent", logger));
     }
-    params.locSrc = stringify(jObject, "loc-src", logger);
-    params.latLong = stringify(jObject, "latlong", logger);
-    params.siteId = stringify(jObject, "rq-mk-siteid", logger);
-    params.source = stringify(jObject, "source", logger);
-    params.country = parseArray(jObject, "carrier", 2);
-    params.countryStr = parseArray(jObject, "carrier", 1);
-    params.area = parseArray(jObject, "carrier", 4);
-    params.slot = stringify(jObject, "slot-served", logger);
-    params.rqMkSlot = stringify(jObject, "rq-mk-ad-slot", logger);
-    params.sdkVersion = stringify(jObject, "sdk-version", logger);
-    params.siteType = stringify(jObject, "site-type", logger);
-    params.adcode = stringify(jObject, "adcode", logger);
-    params.platformOsId = jObject.optInt("os-id", -1);
-    if(params.siteType != null) {
-      params.siteType = params.siteType.toUpperCase();
+    params.setLocSrc(stringify(jObject, "loc-src", logger));
+    params.setLatLong(stringify(jObject, "latlong", logger));
+    params.setSiteId(stringify(jObject, "rq-mk-siteid", logger));
+    params.setSource(stringify(jObject, "source", logger));
+    params.setCountry(parseArray(jObject, "carrier", 2));
+    params.setCountryStr(parseArray(jObject, "carrier", 1));
+    params.setArea(parseArray(jObject, "carrier", 4));
+    params.setSlot(stringify(jObject, "slot-served", logger));
+    params.setRqMkSlot(stringify(jObject, "rq-mk-ad-slot", logger));
+    params.setSdkVersion(stringify(jObject, "sdk-version", logger));
+    params.setSiteType(stringify(jObject, "site-type", logger));
+    params.setAdcode(stringify(jObject, "adcode", logger));
+    params.setPlatformOsId(jObject.optInt("os-id", -1));
+    if(params.getSiteType() != null) {
+      params.setSiteType(params.getSiteType().toUpperCase());
     }
-    params.categories = getCategory(jObject, logger, "category");
-    params.newCategories = getCategory(jObject, logger, "new-category");
-    params.rqIframe = stringify(jObject, "rq-iframe", logger);
-    params.rFormat = stringify(jObject, "r-format", logger);
-    params.rqMkAdcount = stringify(jObject, "rq-mk-adcount", logger);
-    params.tid = stringify(jObject, "tid", logger);
-    params.tp = stringify(jObject, "tp", logger);
-    params.allowBannerAds = jObject.opt("site-allowBanner") == null ? true
-        : (Boolean) (jObject.opt("site-allowBanner"));
-    params.siteFloor = jObject.opt("site-floor") == null ? 0.0 : Double.parseDouble(jObject.opt("site-floor")
-        .toString());
+    params.setCategories(getCategory(jObject, logger, "category"));
+    params.setNewCategories(getCategory(jObject, logger, "new-category"));
+    params.setRqIframe(stringify(jObject, "rq-iframe", logger));
+    params.setRFormat(stringify(jObject, "r-format", logger));
+    params.setRqMkAdcount(stringify(jObject, "rq-mk-adcount", logger));
+    params.setTid(stringify(jObject, "tid", logger));
+    params.setTp(stringify(jObject, "tp", logger));
+    params.setAllowBannerAds(jObject.opt("site-allowBanner") == null ? true
+        : (Boolean) (jObject.opt("site-allowBanner")));
+    params.setSiteFloor(jObject.opt("site-floor") == null ? 0.0 : Double.parseDouble(jObject.opt("site-floor")
+        .toString()));
     try {
-      params.siteSegmentId = jObject.getInt("sel-seg-id");
-      logger.debug("Site segment id is", params.siteSegmentId.toString());
+      params.setSiteSegmentId(jObject.getInt("sel-seg-id"));
+      logger.debug("Site segment id is", params.getSiteSegmentId().toString());
     } catch (JSONException e) {
       logger.debug("Site segment id is not present in the request");
     }
-    params.ipFileVersion = jObject.optInt("rq-ip-file-ver", 1);
+    params.setIpFileVersion(jObject.optInt("rq-ip-file-ver", 1));
     if(logger.isDebugEnabled()) {
-      logger.debug("country obtained is " + params.country);
-      logger.debug("site floor is " + params.siteFloor);
-      logger.debug("osId is " + params.platformOsId);
+      logger.debug("country obtained is " + params.getCountry());
+      logger.debug("site floor is " + params.getSiteFloor());
+      logger.debug("osId is " + params.getPlatformOsId());
     }
-    params.uidParams = stringify(jObject, "u-id-params", logger);
+    params.setUidParams(stringify(jObject, "u-id-params", logger));
     params = getUserIdParams(params, jObject, logger);
     params = getUserParams(params, jObject, logger);
     try {
       JSONArray siteInfo = jObject.getJSONArray("site");
       if(siteInfo != null && siteInfo.length() > 0) {
-        params.siteIncId = siteInfo.getLong(0);
+        params.setSiteIncId(siteInfo.getLong(0));
       }
     } catch (JSONException exception) {
       logger.debug("site object not found in request");
-      params.siteIncId = 0;
+      params.setSiteIncId(0);
     }
     try {
-      params.handset = jObject.getJSONArray("handset");
+      params.setHandset(jObject.getJSONArray("handset"));
     } catch (JSONException e) {
       logger.debug("Handset array not found");
     }
     try {
-      params.carrier = jObject.getJSONArray("carrier");
+      params.setCarrier(jObject.getJSONArray("carrier"));
     } catch (JSONException e) {
       logger.debug("carrier array not found");
     }
-    if(null == params.uid || params.uid.isEmpty()) {
-      params.uid = stringify(jObject, "u-id", logger);
+    if(null == params.getUid() || params.getUid().isEmpty()) {
+      params.setUid(stringify(jObject, "u-id", logger));
     }
-    params.osId = jObject.optInt("os-id", -1);
-    params.isRichMedia = jObject.optBoolean("rich-media", false);
-    params.rqAdType = stringify(jObject, "rq-adtype", logger);
+    params.setOsId(jObject.optInt("os-id", -1));
+    params.setRichMedia(jObject.optBoolean("rich-media", false));
+    params.setRqAdType(stringify(jObject, "rq-adtype", logger));
     logger.debug("successfully parsed params");
     return params;
   }
@@ -171,31 +171,25 @@ public class RequestParser {
     String utf8 = "UTF-8";
     try {
       JSONObject userMap = (JSONObject) jObject.get("uparams");
-      parameter.age = stringify(userMap, "u-age", logger);
-      parameter.gender = stringify(userMap, "u-gender", logger);
-      if(StringUtils.isEmpty(parameter.uid)) {
-        parameter.uid = stringify(userMap, "u-id", logger);
+      parameter.setAge(stringify(userMap, "u-age", logger));
+      parameter.setGender(stringify(userMap, "u-gender", logger));
+      if(StringUtils.isEmpty(parameter.getUid())) {
+        parameter.setUid(stringify(userMap, "u-id", logger));
       }
-      parameter.postalCode = stringify(userMap, "u-postalcode", logger);
-      if(!StringUtils.isEmpty(parameter.postalCode))
-        parameter.postalCode = parameter.postalCode.replaceAll(" ", "");
-      parameter.userLocation = stringify(userMap, "u-location", logger);
-      parameter.genderOrig = stringify(userMap, "u-gender-orig", logger);
+      parameter.setPostalCode(stringify(userMap, "u-postalcode", logger));
+      if(!StringUtils.isEmpty(parameter.getPostalCode()))
+        parameter.setPostalCode(parameter.getPostalCode().replaceAll(" ", ""));
+      parameter.setUserLocation(stringify(userMap, "u-location", logger));
+      parameter.setGenderOrig(stringify(userMap, "u-gender-orig", logger));
       try {
-        parameter.age = URLEncoder.encode(parameter.age.trim(), utf8);
-        parameter.gender = URLEncoder.encode(parameter.gender.trim(), utf8);
-        parameter.postalCode = URLEncoder.encode(parameter.postalCode.trim(), utf8);
+        parameter.setAge(URLEncoder.encode(parameter.getAge().trim(), utf8));
+        parameter.setGender(URLEncoder.encode(parameter.getGender().trim(), utf8));
+        parameter.setPostalCode(URLEncoder.encode(parameter.getPostalCode().trim(), utf8));
       } catch (UnsupportedEncodingException e) {
         logger.error("Error in encoding u params", e.getMessage());
       }
     } catch (JSONException exception) {
-      parameter.age = null;
-      parameter.gender = null;
-      parameter.uid = null;
-      parameter.postalCode = null;
-      parameter.userLocation = null;
-      parameter.genderOrig = null;
-      logger.error("json exception in parsing u params",exception);
+      logger.error("json exception in parsing u params", exception);
     }
     return parameter;
   }
@@ -208,10 +202,10 @@ public class RequestParser {
     try {
       JSONObject userIdMap = (JSONObject) jObject.get("u-id-params");
       String o1Uid = stringify(userIdMap, "SO1", logger);
-      parameter.uid = stringify(userIdMap, "u-id", logger);
-      parameter.uidO1 = (o1Uid != null) ? o1Uid : stringify(userIdMap, "O1", logger);
-      parameter.uidMd5 = stringify(userIdMap, "UM5", logger);
-      parameter.uidIFA = ("iphone".equalsIgnoreCase(parameter.source)) ? stringify(userIdMap, "IDA", logger) : null;
+      parameter.setUid(stringify(userIdMap, "u-id", logger));
+      parameter.setUidO1((o1Uid != null) ? o1Uid : stringify(userIdMap, "O1", logger));
+      parameter.setUidMd5(stringify(userIdMap, "UM5", logger));
+      parameter.setUidIFA(("iphone".equalsIgnoreCase(parameter.getSource())) ? stringify(userIdMap, "IDA", logger) : null);
 
     } catch (JSONException exception) {
       setNullValueForUid(parameter, logger);
@@ -222,9 +216,9 @@ public class RequestParser {
   }
 
   private static void setNullValueForUid(SASRequestParameters parameter, DebugLogger logger) {
-    parameter.uidO1 = null;
-    parameter.uidMd5 = null;
-    parameter.uidIFA = null;
+    parameter.setUidO1(null);
+    parameter.setUidMd5(null);
+    parameter.setUidIFA(null);
     logger.error("uidparams missing in the request");
   }
 }

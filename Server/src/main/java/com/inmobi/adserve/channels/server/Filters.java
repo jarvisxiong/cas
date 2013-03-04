@@ -173,7 +173,7 @@ public class Filters {
    */
   boolean isSiteAbsentInWhiteList(String advertiserId, Random random) {
     boolean result = whiteListedSites.containsKey(advertiserId)
-        && !whiteListedSites.get(advertiserId).contains(new Long(sasParams.siteIncId).toString())
+        && !whiteListedSites.get(advertiserId).contains(new Long(sasParams.getSiteIncId()).toString())
         && random.nextInt(100) < 95;
     if(result) {
       logger.debug("Dropped in site whiteList filter advertiserId", advertiserId);
@@ -194,7 +194,7 @@ public class Filters {
   boolean isAdvertiserExcluded(ChannelSegment channelSegment) {
     boolean result = false;
     String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
-    SiteMetaDataEntity siteMetaDataEntity = repositoryHelper.querySiteMetaDetaRepository(sasParams.siteId);
+    SiteMetaDataEntity siteMetaDataEntity = repositoryHelper.querySiteMetaDetaRepository(sasParams.getSiteId());
     if(siteMetaDataEntity != null) {
       Set<String> advertisersIncludedbySite = siteMetaDataEntity.getAdvertisersIncludedBySite();
       Set<String> advertisersIncludedbyPublisher = siteMetaDataEntity.getAdvertisersIncludedByPublisher();
@@ -230,7 +230,7 @@ public class Filters {
   boolean isSiteExcludedByAdvertiser(ChannelSegment channelSegment) {
     boolean result = false;
     String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
-    if(channelSegment.getChannelEntity().getSitesIE().contains(sasParams.siteId)) {
+    if(channelSegment.getChannelEntity().getSitesIE().contains(sasParams.getSiteId())) {
       result = !channelSegment.getChannelEntity().isSiteInclusion();
     } else {
       result = channelSegment.getChannelEntity().isSiteInclusion();
@@ -258,7 +258,7 @@ public class Filters {
     boolean result = false;
     String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
     String adGroupId = channelSegment.getChannelSegmentEntity().getAdgroupId();
-    if(channelSegment.getChannelSegmentEntity().getSitesIE().contains(sasParams.siteId)) {
+    if(channelSegment.getChannelSegmentEntity().getSitesIE().contains(sasParams.getSiteId())) {
       result = !channelSegment.getChannelSegmentEntity().isSiteInclusion();
     } else {
       result = channelSegment.getChannelSegmentEntity().isSiteInclusion();
@@ -320,7 +320,7 @@ public class Filters {
       for (String adgroupId : matchedSegments.get(advertiserId).keySet()) {
         ChannelSegment channelSegment = matchedSegments.get(advertiserId).get(adgroupId);
         // applying siteFloor filter
-        if(channelSegment.getChannelSegmentFeedbackEntity().geteCPM() < sasParams.siteFloor) {
+        if(channelSegment.getChannelSegmentFeedbackEntity().geteCPM() < sasParams.getSiteFloor()) {
           logger.debug("sitefloor filter failed by adgroup", channelSegment.getChannelSegmentFeedbackEntity().getId());
           continue;
         } else {
@@ -376,32 +376,32 @@ public class Filters {
    */
   boolean isAnySegmentPropertyViolated(ChannelSegmentEntity channelSegmentEntity) {
     if(channelSegmentEntity.isUdIdRequired()
-        && (StringUtils.isEmpty(sasParams.uidParams) || sasParams.uidParams.equals("{}"))) {
+        && (StringUtils.isEmpty(sasParams.getUidParams()) || sasParams.getUidParams().equals("{}"))) {
       InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegmentEntity.getAdvertiserId()),
           InspectorStrings.droppedInUdidFilter);
       return true;
     }
-    if(channelSegmentEntity.isZipCodeRequired() && StringUtils.isEmpty(sasParams.postalCode)) {
+    if(channelSegmentEntity.isZipCodeRequired() && StringUtils.isEmpty(sasParams.getPostalCode())) {
       InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegmentEntity.getAdvertiserId()),
           InspectorStrings.droppedInZipcodeFilter);
       return true;
     }
-    if(channelSegmentEntity.isLatlongRequired() && StringUtils.isEmpty(sasParams.latLong)) {
+    if(channelSegmentEntity.isLatlongRequired() && StringUtils.isEmpty(sasParams.getLatLong())) {
       InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegmentEntity.getAdvertiserId()),
           InspectorStrings.droppedInLatLongFilter);
       return true;
     }
-    if(channelSegmentEntity.isRestrictedToRichMediaOnly() && !sasParams.isRichMedia) {
+    if(channelSegmentEntity.isRestrictedToRichMediaOnly() && !sasParams.isRichMedia()) {
       InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegmentEntity.getAdvertiserId()),
           InspectorStrings.droppedInLatLongFilter);
       return true;
     }
-    if(channelSegmentEntity.isInterstitialOnly() && (sasParams.rqAdType == null || !sasParams.rqAdType.equals("int"))) {
+    if(channelSegmentEntity.isInterstitialOnly() && (sasParams.getRqAdType() == null || !sasParams.getRqAdType().equals("int"))) {
       InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegmentEntity.getAdvertiserId()),
           InspectorStrings.droppedInOnlyInterstitialFilter);
       return true;
     }
-    if(channelSegmentEntity.isNonInterstitialOnly() && sasParams.rqAdType != null && sasParams.rqAdType.equals("int")) {
+    if(channelSegmentEntity.isNonInterstitialOnly() && sasParams.getRqAdType() != null && sasParams.getRqAdType().equals("int")) {
       InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegmentEntity.getAdvertiserId()),
           InspectorStrings.droppedInOnlyNonInterstitialFilter);
       return true;
