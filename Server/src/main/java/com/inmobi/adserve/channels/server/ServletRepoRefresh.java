@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.dbutils.DbUtils;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.json.JSONArray;
@@ -62,15 +64,9 @@ public class ServletRepoRefresh implements Servlet {
       hrh.logger.error("error is", e2.getMessage());
       hrh.responseSender.sendResponse("NOTOK", e);
     } finally {
-      if(null != resultSet) {
-        resultSet.close();
-      }
-      if(null != statement) {
-        statement.close();
-      }
-      if(null != con) {
-        con.close();
-      }
+      DbUtils.closeQuietly(resultSet);
+      DbUtils.closeQuietly(statement);
+      DbUtils.closeQuietly(con);
     }
   }
 
