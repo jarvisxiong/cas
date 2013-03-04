@@ -106,9 +106,8 @@ public class ServletBackFill implements Servlet {
     }
 
     // getting the selected third party site details
-    Map<String, HashMap<String, ChannelSegment>> matchedSegments = new MatchSegments(
-        ServletHandler.repositoryHelper, hrh.responseSender.sasParams, logger)
-        .matchSegments(hrh.responseSender.sasParams);
+    Map<String, HashMap<String, ChannelSegment>> matchedSegments = new MatchSegments(ServletHandler.repositoryHelper,
+        hrh.responseSender.sasParams, logger).matchSegments(hrh.responseSender.sasParams);
 
     if(matchedSegments == null) {
       logger.debug("No Entities matching the request.");
@@ -165,7 +164,7 @@ public class ServletBackFill implements Servlet {
         ServletHandler.adapterConfig, hrh.responseSender, advertiserSet, e, ServletHandler.repositoryHelper,
         hrh.jObject, hrh.responseSender.sasParams, casInternalRequestParameters, rtbSegments);
 
-    logger.debug("rtb rankList size is", new Integer(rtbSegments.size()).toString());
+    logger.debug("rtb rankList size is", Integer.valueOf(rtbSegments.size()));
     if(segments.isEmpty() && rtbSegments.isEmpty()) {
       logger.debug("No succesfull configuration of adapter ");
       hrh.responseSender.sendNoAdResponse(e);
