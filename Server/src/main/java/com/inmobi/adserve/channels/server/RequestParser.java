@@ -1,6 +1,5 @@
 package com.inmobi.adserve.channels.server;
 
-import java.beans.Encoder;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Arrays;
@@ -189,12 +188,6 @@ public class RequestParser {
       } catch (UnsupportedEncodingException e) {
         logger.error("Error in encoding u params", e.getMessage());
       }
-      if(logger.isDebugEnabled()) {
-        logger.debug("uid is " + parameter.uid + ",postalCode is " + parameter.postalCode + ",gender is "
-            + parameter.gender);
-        logger.debug("age is " + parameter.age + ",location is " + parameter.userLocation + ",genderorig is "
-            + parameter.genderOrig);
-      }
     } catch (JSONException exception) {
       parameter.age = null;
       parameter.gender = null;
@@ -202,15 +195,7 @@ public class RequestParser {
       parameter.postalCode = null;
       parameter.userLocation = null;
       parameter.genderOrig = null;
-      logger.error("uparams missing in the request");
-    } catch (NullPointerException exception) {
-      parameter.age = null;
-      parameter.gender = null;
-      parameter.uid = null;
-      parameter.postalCode = null;
-      parameter.userLocation = null;
-      parameter.genderOrig = null;
-      logger.error("uparams missing in the request");
+      logger.error("json exception in parsing u params",exception);
     }
     return parameter;
   }
