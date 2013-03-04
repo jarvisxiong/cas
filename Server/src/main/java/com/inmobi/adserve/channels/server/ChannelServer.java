@@ -282,10 +282,13 @@ public class ChannelServer {
     File debugFolder = new File(debugLogFolder);
     File advertiserFolder = new File(advertiserLogFolder);
     File sampledAdvertiserFolder = new File(sampledAdvertiserLogFolder);
-    if(rrFolder != null && rrFolder.exists() && channelFolder != null && channelFolder.exists() && debugFolder != null
-        && debugFolder.exists() && advertiserFolder != null && advertiserFolder.exists()
-        && sampledAdvertiserFolder != null && sampledAdvertiserFolder.exists())
-      return true;
+    if(rrFolder != null && rrFolder.exists() && channelFolder != null && channelFolder.exists()) {
+      if(debugFolder != null && debugFolder.exists() && advertiserFolder != null && advertiserFolder.exists()) {
+        if(sampledAdvertiserFolder != null && sampledAdvertiserFolder.exists()) {
+          return true;
+        }
+      }
+    }
     ServerStatusInfo.statusCode = 404;
     ServerStatusInfo.statusString = "StackTrace is: one or more log folders missing";
     return false;

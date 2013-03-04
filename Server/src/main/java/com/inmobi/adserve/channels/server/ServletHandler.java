@@ -40,7 +40,7 @@ public class ServletHandler {
     return ServletHandler.rtbConfig;
   }
 
-  public static HashMap<String, ServletFactory> servletMap = new HashMap<String, ServletFactory>();
+  public static Map<String, ServletFactory> servletMap = new HashMap<String, ServletFactory>();
 
   public static void init(ConfigurationLoader config, RepositoryHelper repositoryHelper) {
     ServletHandler.rtbConfig = config.rtbConfiguration();
