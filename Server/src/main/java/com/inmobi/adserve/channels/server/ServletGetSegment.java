@@ -45,7 +45,7 @@ public class ServletGetSegment implements Servlet {
       return;
     }
 
-    HashMap<String, HashMap<String, String>> segmentInfo = new HashMap<String, HashMap<String, String>>();
+    Map<String, HashMap<String, String>> segmentInfo = new HashMap<String, HashMap<String, String>>();
     JSONArray segmentList = jObject.getJSONArray("segment-list");
 
     for (int i = 0; i < segmentList.length(); i++) {
@@ -84,7 +84,7 @@ public class ServletGetSegment implements Servlet {
     return "getSegment";
   }
 
-  public void getSegments(String key, Object entity, HashMap<String, HashMap<String, String>> segmentInfo)
+  public void getSegments(String key, Object entity, Map<String, HashMap<String, String>> segmentInfo)
       throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
     if(entity == null)
       return;

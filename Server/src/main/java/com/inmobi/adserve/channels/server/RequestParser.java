@@ -75,8 +75,8 @@ public class RequestParser {
     params.setRqMkAdcount(stringify(jObject, "rq-mk-adcount", logger));
     params.setTid(stringify(jObject, "tid", logger));
     params.setTp(stringify(jObject, "tp", logger));
-    params.setAllowBannerAds(jObject.opt("site-allowBanner") == null ? true
-        : (Boolean) (jObject.opt("site-allowBanner")));
+    
+    params.setAllowBannerAds(jObject.optBoolean("site-allowBanner", true));
     params.setSiteFloor(jObject.opt("site-floor") == null ? 0.0 : Double.parseDouble(jObject.opt("site-floor")
         .toString()));
     try {

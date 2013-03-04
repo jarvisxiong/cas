@@ -76,7 +76,7 @@ public class SegmentFactory {
           String urlBase = config.getString(partnerName + ".host." + dcname);
           // Disabled request for a particular colo will be drpped here.
           if(urlBase != null && urlBase.equalsIgnoreCase("NA")) {
-            logger.debug("RTB requests are disabled for", dcname.toString(), "colo so returning null");
+            logger.debug("RTB requests are disabled for", dcname, "colo so returning null");
             return null;
           }
           // Use default host if colo specific host is not specified in the

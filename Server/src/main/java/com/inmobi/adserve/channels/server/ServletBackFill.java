@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.print.attribute.standard.Severity;
-
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.json.JSONException;
@@ -54,38 +52,38 @@ public class ServletBackFill implements Servlet {
       hrh.responseSender.sendNoAdResponse(e);
       return;
     }
-    if(null == hrh.responseSender.sasParams.siteId) {
+    if(null == hrh.responseSender.sasParams.getSiteId()) {
       logger.debug("Terminating request as site id was missing");
       hrh.setTerminationReason(ServletHandler.missingSiteId);
       InspectorStats.incrementStatCount(InspectorStrings.missingSiteId, InspectorStrings.count);
       hrh.responseSender.sendNoAdResponse(e);
       return;
     }
-    if(!hrh.responseSender.sasParams.allowBannerAds || hrh.responseSender.sasParams.siteFloor > 5) {
+    if(!hrh.responseSender.sasParams.getAllowBannerAds() || hrh.responseSender.sasParams.getSiteFloor() > 5) {
       logger.debug("Request not being served because of banner not allowed or site floor above threshold");
       hrh.responseSender.sendNoAdResponse(e);
       return;
     }
-    if(hrh.responseSender.sasParams.siteType != null
-        && !ServletHandler.allowedSiteTypes.contains(hrh.responseSender.sasParams.siteType)) {
+    if(hrh.responseSender.sasParams.getSiteType() != null
+        && !ServletHandler.allowedSiteTypes.contains(hrh.responseSender.sasParams.getSiteType())) {
       logger.error("Terminating request as incompatible content type");
       hrh.setTerminationReason(ServletHandler.incompatibleSiteType);
       InspectorStats.incrementStatCount(InspectorStrings.incompatibleSiteType, InspectorStrings.count);
       hrh.responseSender.sendNoAdResponse(e);
       return;
     }
-    if(hrh.responseSender.sasParams.sdkVersion != null) {
+    if(hrh.responseSender.sasParams.getSdkVersion() != null) {
       try {
-        if((hrh.responseSender.sasParams.sdkVersion.substring(0, 1).equalsIgnoreCase("i") || hrh.responseSender.sasParams.sdkVersion
+        if((hrh.responseSender.sasParams.getSdkVersion().substring(0, 1).equalsIgnoreCase("i") || hrh.responseSender.sasParams.getSdkVersion()
             .substring(0, 1).equalsIgnoreCase("a"))
-            && Integer.parseInt(hrh.responseSender.sasParams.sdkVersion.substring(1, 2)) < 3) {
+            && Integer.parseInt(hrh.responseSender.sasParams.getSdkVersion().substring(1, 2)) < 3) {
           logger.error("Terminating request as sdkVersion is less than 3");
           hrh.setTerminationReason(ServletHandler.lowSdkVersion);
           InspectorStats.incrementStatCount(InspectorStrings.lowSdkVersion, InspectorStrings.count);
           hrh.responseSender.sendNoAdResponse(e);
           return;
         } else
-          logger.debug("sdk-version : " + hrh.responseSender.sasParams.sdkVersion);
+          logger.debug("sdk-version : " + hrh.responseSender.sasParams.getSdkVersion());
       } catch (StringIndexOutOfBoundsException e2) {
         logger.debug("Invalid sdkversion " + e2.getMessage());
       } catch (NumberFormatException e3) {
@@ -98,9 +96,9 @@ public class ServletBackFill implements Servlet {
      * if sendonlytowhitelist flag is true, check if site id is present in
      * whitelist, else send no ad.
      */
-    if(ServletHandler.config.getBoolean("sendOnlyToWhitelist") == true) {
+    if(ServletHandler.config.getBoolean("sendOnlyToWhitelist")) {
       List<String> whitelist = ServletHandler.config.getList("whitelist");
-      if(null == whitelist || !whitelist.contains(hrh.responseSender.sasParams.siteId)) {
+      if(null == whitelist || !whitelist.contains(hrh.responseSender.sasParams.getSiteId())) {
         logger.debug("site id not present in whitelist, so sending no ad response");
         hrh.responseSender.sendNoAdResponse(e);
         return;
@@ -108,9 +106,8 @@ public class ServletBackFill implements Servlet {
     }
 
     // getting the selected third party site details
-    HashMap<String, HashMap<String, ChannelSegment>> matchedSegments = new MatchSegments(
-        ServletHandler.repositoryHelper, hrh.responseSender.sasParams, logger)
-        .matchSegments(hrh.responseSender.sasParams);
+    Map<String, HashMap<String, ChannelSegment>> matchedSegments = new MatchSegments(ServletHandler.repositoryHelper,
+        hrh.responseSender.sasParams, logger).matchSegments(hrh.responseSender.sasParams);
 
     if(matchedSegments == null) {
       logger.debug("No Entities matching the request.");
@@ -118,7 +115,7 @@ public class ServletBackFill implements Servlet {
       return;
     }
 
-    hrh.responseSender.sasParams.siteFloor = 0.0;
+    hrh.responseSender.sasParams.setSiteFloor(0.0);
     Filters filter = new Filters(matchedSegments, ServletHandler.config, ServletHandler.adapterConfig,
         hrh.responseSender.sasParams, ServletHandler.repositoryHelper, logger);
     // applying all the filters
@@ -154,9 +151,9 @@ public class ServletBackFill implements Servlet {
 
     CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
     casInternalRequestParameters.highestEcpm = getHighestEcpm(rows, logger);
-    logger.debug("Highest Ecpm is", new Double(casInternalRequestParameters.highestEcpm).toString());
+    logger.debug("Highest Ecpm is", Double.valueOf(casInternalRequestParameters.highestEcpm));
     casInternalRequestParameters.blockedCategories = getBlockedCategories(hrh, logger);
-    casInternalRequestParameters.rtbBidFloor = hrh.responseSender.sasParams.siteFloor > casInternalRequestParameters.highestEcpm ? hrh.responseSender.sasParams.siteFloor
+    casInternalRequestParameters.rtbBidFloor = hrh.responseSender.sasParams.getSiteFloor() > casInternalRequestParameters.highestEcpm ? hrh.responseSender.sasParams.getSiteFloor()
         : casInternalRequestParameters.highestEcpm + 0.01;
     hrh.responseSender.casInternalRequestParameters = casInternalRequestParameters;
     hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternalRequestParameters;
@@ -167,7 +164,7 @@ public class ServletBackFill implements Servlet {
         ServletHandler.adapterConfig, hrh.responseSender, advertiserSet, e, ServletHandler.repositoryHelper,
         hrh.jObject, hrh.responseSender.sasParams, casInternalRequestParameters, rtbSegments);
 
-    logger.debug("rtb rankList size is", new Integer(rtbSegments.size()).toString());
+    logger.debug("rtb rankList size is", Integer.valueOf(rtbSegments.size()));
     if(segments.isEmpty() && rtbSegments.isEmpty()) {
       logger.debug("No succesfull configuration of adapter ");
       hrh.responseSender.sendNoAdResponse(e);
@@ -231,13 +228,13 @@ public class ServletBackFill implements Servlet {
 
   private static List<Long> getBlockedCategories(HttpRequestHandler hrh, DebugLogger logger) {
     List<Long> blockedCategories = null;
-    if(null != hrh.responseSender.sasParams.siteId) {
-      logger.debug("SiteId is", hrh.responseSender.sasParams.siteId);
+    if(null != hrh.responseSender.sasParams.getSiteId()) {
+      logger.debug("SiteId is", hrh.responseSender.sasParams.getSiteId());
       SiteMetaDataEntity siteMetaDataEntity = ServletHandler.repositoryHelper
-          .querySiteMetaDetaRepository(hrh.responseSender.sasParams.siteId);
+          .querySiteMetaDetaRepository(hrh.responseSender.sasParams.getSiteId());
       if(null != siteMetaDataEntity && siteMetaDataEntity.getBlockedCategories() != null) {
         blockedCategories = Arrays.asList(siteMetaDataEntity.getBlockedCategories());
-        logger.debug("Site id is", hrh.responseSender.sasParams.siteId, "no of blocked categories are");
+        logger.debug("Site id is", hrh.responseSender.sasParams.getSiteId(), "no of blocked categories are");
       } else
         logger.debug("No blockedCategory for this site id");
     }

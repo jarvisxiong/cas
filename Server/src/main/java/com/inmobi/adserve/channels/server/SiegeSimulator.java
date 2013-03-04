@@ -53,6 +53,7 @@ public class SiegeSimulator {
       out.close();
     } catch (IOException e) {
       e.printStackTrace();
+      return;
     }
 
   }
@@ -117,8 +118,9 @@ public class SiegeSimulator {
 
     @Override
     public void run() {
-      for (int i = 0; i < r; i++)
+      for (int i = 0; i < r; i++) {
         makeRequest();
+      }
     }
 
   }

@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
@@ -149,10 +148,6 @@ public class FilterTest extends TestCase {
     expect(mockAdapterConfig.getInt("openx.partnerSegmentNo", 2)).andReturn(2).anyTimes();
     expect(mockAdapterConfig.getInt("atnt.partnerSegmentNo", 2)).andReturn(2).anyTimes();
     expect(mockAdapterConfig.getInt("tapit.partnerSegmentNo", 2)).andReturn(2).anyTimes();
-    expect(mockAdapterConfig.getString("openx.whiteListedSites")).andReturn("").anyTimes();
-    expect(mockAdapterConfig.getString("atnt.whiteListedSites")).andReturn("").anyTimes();
-    expect(mockAdapterConfig.getString("tapit.whiteListedSites")).andReturn("").anyTimes();
-    expect(mockAdapterConfig.getString("mullahmedia.whiteListedSites")).andReturn("123,321").anyTimes();
     replay(mockAdapterConfig);
     expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
     expect(mockConfig.getString("loggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties").anyTimes();
@@ -188,12 +183,12 @@ public class FilterTest extends TestCase {
     expect(s2.getAdvertiserId()).andReturn("advertiserId1").anyTimes();
     replay(s2);
     sasParams = new SASRequestParameters();
-    sasParams.uidParams = "xxx";
-    sasParams.postalCode = "110051";
-    sasParams.latLong = "11.35&12.56";
-    sasParams.isRichMedia = true;
-    sasParams.rqAdType = "int";
-    sasParams.siteId = "siteid";
+    sasParams.setUidParams("xxx");
+    sasParams.setPostalCode("110051");
+    sasParams.setLatLong("11.35&12.56");
+    sasParams.setRichMedia(true);
+    sasParams.setRqAdType("int");
+    sasParams.setSiteId("siteid");
     DebugLogger.init(mockConfig);
     logger = new DebugLogger();
     Filters.init(mockAdapterConfig);
@@ -224,20 +219,6 @@ public class FilterTest extends TestCase {
   }
 
   @Test
-  public void testIsSiteAbsentInWhiteList() {
-    SASRequestParameters sasParams = new SASRequestParameters();
-    sasParams.siteIncId = 123;
-    sasParams.siteId = "siteid";
-    Random random = createMock(Random.class);
-    expect(random.nextInt(95)).andReturn(50).anyTimes();
-    Filters filter = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
-    assertEquals(false, filter.isSiteAbsentInWhiteList("advertiserId1", random));
-    assertEquals(false, filter.isSiteAbsentInWhiteList("advertiserId2", random));
-    assertEquals(false, filter.isSiteAbsentInWhiteList("advertiserId3", random));
-    assertEquals(false, filter.isSiteAbsentInWhiteList("advertiserId4", random));
-  }
-
-  @Test
   public void testAdvertiserLevelFilter() {
     HashMap<String, HashMap<String, ChannelSegment>> matchedSegments = new HashMap<String, HashMap<String, ChannelSegment>>();
     HashMap<String, ChannelSegment> adv1 = new HashMap<String, ChannelSegment>();
@@ -253,12 +234,12 @@ public class FilterTest extends TestCase {
     matchedSegments.put(channelSegmentEntity4.getAdvertiserId(), adv2);
     matchedSegments.put(channelSegmentEntity6.getAdvertiserId(), adv3);
     SASRequestParameters sasParams = new SASRequestParameters();
-    sasParams.siteId = "siteid";
+    sasParams.setSiteId("siteid");
     Filters f1 = new Filters(matchedSegments, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
-    matchedSegments = f1.advertiserLevelFiltering();
-    assertEquals(false, matchedSegments.containsKey(channelSegmentEntity1.getAdvertiserId()));
-    assertEquals(false, matchedSegments.containsKey(channelSegmentEntity4.getAdvertiserId()));
-    assertEquals(true, matchedSegments.containsKey(channelSegmentEntity6.getAdvertiserId()));
+    f1.advertiserLevelFiltering();
+    assertEquals(false, f1.getMatchedSegments().containsKey(channelSegmentEntity1.getAdvertiserId()));
+    assertEquals(false, f1.getMatchedSegments().containsKey(channelSegmentEntity4.getAdvertiserId()));
+    assertEquals(true, f1.getMatchedSegments().containsKey(channelSegmentEntity6.getAdvertiserId()));
   }
 
   @Test
@@ -271,7 +252,7 @@ public class FilterTest extends TestCase {
   public void testIsAnySegmentPropertyViolatedWhenUdIdFlagSet() {
     Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
     assertEquals(false, f1.isAnySegmentPropertyViolated(s2));
-    sasParams.uidParams = null;
+    sasParams.setUidParams(null);
     assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
   }
   
@@ -279,7 +260,7 @@ public class FilterTest extends TestCase {
   public void testIsAnySegmentPropertyViolatedWhenZipCodeFlagSet() {
     Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
     
-    sasParams.postalCode = null;
+    sasParams.setPostalCode(null);
     assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
   }
   
@@ -287,7 +268,7 @@ public class FilterTest extends TestCase {
   public void testIsAnySegmentPropertyViolatedLatlongFlagSet() {
     Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
     
-    sasParams.latLong = null;
+    sasParams.setLatLong(null);
     assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
   }
   
@@ -295,7 +276,7 @@ public class FilterTest extends TestCase {
   public void testIsAnySegmentPropertyViolatedRichMediaFlagSet() {
     Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
     assertEquals(false, f1.isAnySegmentPropertyViolated(s2));
-    sasParams.isRichMedia = false;
+    sasParams.setRichMedia(false);
     assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
   }
   
@@ -303,7 +284,7 @@ public class FilterTest extends TestCase {
   public void testIsAnySegmentPropertyViolatedInterstitialFlagSet() {
     Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
     assertEquals(false, f1.isAnySegmentPropertyViolated(s2));
-    sasParams.rqAdType = null;
+    sasParams.setRqAdType(null);
     assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
   }
   
@@ -320,7 +301,7 @@ public class FilterTest extends TestCase {
     replay(s2);
     Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
     assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
-    sasParams.rqAdType = null;
+    sasParams.setRqAdType(null);
     assertEquals(false, f1.isAnySegmentPropertyViolated(s2));
   }
 
@@ -340,15 +321,15 @@ public class FilterTest extends TestCase {
     matchedSegments.put(channelSegmentEntity4.getAdvertiserId(), adv2);
     matchedSegments.put(channelSegmentEntity6.getAdvertiserId(), adv3);
     SASRequestParameters sasParams = new SASRequestParameters();
-    sasParams.siteFloor = 0.3;
+    sasParams.setSiteFloor(0.3);
     Filters f1 = new Filters(matchedSegments, mockConfig, mockAdapterConfig, sasParams, null, logger);
-    matchedSegments = f1.adGroupLevelFiltering();
-    assertEquals(false, matchedSegments.get("advertiserId1").containsKey("adgroupId1"));
-    assertEquals(2, matchedSegments.get("advertiserId1").size());
-    assertEquals(1, matchedSegments.get("advertiserId2").size());
-    assertEquals(1, matchedSegments.get("advertiserId3").size());
-    assertEquals(false, matchedSegments.get("advertiserId1").containsKey("adgroupId1"));
-    assertEquals(false, matchedSegments.get("advertiserId2").containsKey("adgroupId4"));
+    f1.adGroupLevelFiltering();
+    assertEquals(false, f1.getMatchedSegments().get("advertiserId1").containsKey("adgroupId1"));
+    assertEquals(2, f1.getMatchedSegments().get("advertiserId1").size());
+    assertEquals(1, f1.getMatchedSegments().get("advertiserId2").size());
+    assertEquals(1, f1.getMatchedSegments().get("advertiserId3").size());
+    assertEquals(false, f1.getMatchedSegments().get("advertiserId1").containsKey("adgroupId1"));
+    assertEquals(false, f1.getMatchedSegments().get("advertiserId2").containsKey("adgroupId4"));
   }
 
   @Test
@@ -449,47 +430,6 @@ public class FilterTest extends TestCase {
     assertEquals(false, f1.isSiteExcludedByAdvertiser(channelSegment1));
     emptySet.add("siteid");
     assertEquals(true, f1.isSiteExcludedByAdvertiser(channelSegment1));
-  }
-
-  @Test
-  public void testSiteWhiteListingLoading() {
-    assertEquals(false, Filters.whiteListedSites.containsKey("advertiserId1"));
-    assertEquals(false, Filters.whiteListedSites.containsKey("advertiserId2"));
-    assertEquals(false, Filters.whiteListedSites.containsKey("advertiserId3"));
-    assertEquals(true, Filters.whiteListedSites.containsKey("advertiserId4"));
-    assertEquals(true, Filters.whiteListedSites.get("advertiserId4").contains("123"));
-    assertEquals(true, Filters.whiteListedSites.get("advertiserId4").contains("321"));
-    assertEquals(false, Filters.whiteListedSites.get("advertiserId4").contains("78"));
-    Configuration newConfig = createMock(Configuration.class);
-    HashMap<String, String> temp = new HashMap<String, String>();
-    temp.put("openx.advertiserId", "");
-    temp.put("openx.partnerSegmentNo", "");
-    temp.put("atnt.advertiserId", "");
-    temp.put("atnt.partnerSegmentNo", "");
-    temp.put("tapit.advertiserId", "");
-    temp.put("tapit.partnerSegmentNo", "");
-    temp.put("mullahmedia.advertiserId", "");
-    Iterator<String> itr = temp.keySet().iterator();
-    expect(newConfig.getKeys()).andReturn(itr).anyTimes();
-    expect(newConfig.getString("openx.advertiserId")).andReturn("advertiserId1").anyTimes();
-    expect(newConfig.getString("atnt.advertiserId")).andReturn("advertiserId2").anyTimes();
-    expect(newConfig.getString("tapit.advertiserId")).andReturn("advertiserId3").anyTimes();
-    expect(newConfig.getString("mullahmedia.advertiserId")).andReturn("advertiserId4").anyTimes();
-    expect(newConfig.getInt("openx.partnerSegmentNo", 2)).andReturn(2).anyTimes();
-    expect(newConfig.getInt("atnt.partnerSegmentNo", 2)).andReturn(2).anyTimes();
-    expect(newConfig.getInt("tapit.partnerSegmentNo", 2)).andReturn(2).anyTimes();
-    expect(newConfig.getString("openx.whiteListedSites")).andReturn("").anyTimes();
-    expect(newConfig.getString("atnt.whiteListedSites")).andReturn("").anyTimes();
-    expect(newConfig.getString("tapit.whiteListedSites")).andReturn("123,321").anyTimes();
-    expect(newConfig.getString("mullahmedia.whiteListedSites")).andReturn("").anyTimes();
-    expect(newConfig.getInt("whiteListedSitesRefreshtime", 1000 * 300)).andReturn(0).anyTimes();
-    replay(newConfig);
-    Filters.refreshWhiteListedSites(mockConfig, newConfig, new DebugLogger());
-    assertEquals(false, Filters.whiteListedSites.containsKey("advertiserId4"));
-    assertEquals(true, Filters.whiteListedSites.containsKey("advertiserId3"));
-    assertEquals(true, Filters.whiteListedSites.get("advertiserId3").contains("123"));
-    assertEquals(true, Filters.whiteListedSites.get("advertiserId3").contains("321"));
-    assertEquals(false, Filters.whiteListedSites.get("advertiserId3").contains("78"));
   }
 
 }
