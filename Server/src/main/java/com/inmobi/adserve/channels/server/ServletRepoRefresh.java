@@ -43,12 +43,14 @@ public class ServletRepoRefresh implements Servlet {
       con = DriverManager.getConnection(connectionString, dbUser, dbPassword);
       statement = con.createStatement();
       if(repoName.equalsIgnoreCase("ChannelAdGroupRepository")) {
-        resultSet = statement.executeQuery(config.cacheConfiguration().subset("ChannelAdGroupRepository")
-            .getString("query").replace("'${last_update}'", "now() -interval '1 MINUTE'"));
+        final String query = config.cacheConfiguration().subset("ChannelAdGroupRepository")
+            .getString("query").replace("'${last_update}'", "now() -interval '1 MINUTE'");
+        resultSet = statement.executeQuery(query);
         ServletHandler.repositoryHelper.getChannelAdGroupRepository().newUpdateFromResultSetToOptimizeUpdate(resultSet);
       } else if(repoName.equalsIgnoreCase("ChannelRepository")) {
-        resultSet = statement.executeQuery(config.cacheConfiguration().subset("ChannelRepository").getString("query")
-            .replace("'${last_update}'", "now() -interval '1 HOUR'"));
+        final String query = config.cacheConfiguration().subset("ChannelRepository").getString("query")
+            .replace("'${last_update}'", "now() -interval '1 MINUTE'");
+        resultSet = statement.executeQuery(query);
         ServletHandler.repositoryHelper.getChannelAdGroupRepository().newUpdateFromResultSetToOptimizeUpdate(resultSet);
       }
       hrh.logger.debug("Successfully updated repository");
