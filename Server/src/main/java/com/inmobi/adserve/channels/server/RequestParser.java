@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.server;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -166,6 +168,7 @@ public class RequestParser {
   public static SASRequestParameters getUserParams(SASRequestParameters parameter, JSONObject jObject,
       DebugLogger logger) {
     logger.debug("inside parsing user params");
+    String utf8 = "UTF-8";
     try {
       JSONObject userMap = (JSONObject) jObject.get("uparams");
       parameter.age = stringify(userMap, "u-age", logger);
@@ -178,11 +181,12 @@ public class RequestParser {
         parameter.postalCode = parameter.postalCode.replaceAll(" ", "");
       parameter.userLocation = stringify(userMap, "u-location", logger);
       parameter.genderOrig = stringify(userMap, "u-gender-orig", logger);
-      if(logger.isDebugEnabled()) {
-        logger.debug("uid is " + parameter.uid + ",postalCode is " + parameter.postalCode + ",gender is "
-            + parameter.gender);
-        logger.debug("age is " + parameter.age + ",location is " + parameter.userLocation + ",genderorig is "
-            + parameter.genderOrig);
+      try {
+        parameter.age = URLEncoder.encode(parameter.age.trim(), utf8);
+        parameter.gender = URLEncoder.encode(parameter.gender.trim(), utf8);
+        parameter.postalCode = URLEncoder.encode(parameter.postalCode.trim(), utf8);
+      } catch (UnsupportedEncodingException e) {
+        logger.error("Error in encoding u params", e.getMessage());
       }
     } catch (JSONException exception) {
       parameter.age = null;
@@ -191,15 +195,7 @@ public class RequestParser {
       parameter.postalCode = null;
       parameter.userLocation = null;
       parameter.genderOrig = null;
-      logger.error("uparams missing in the request");
-    } catch (NullPointerException exception) {
-      parameter.age = null;
-      parameter.gender = null;
-      parameter.uid = null;
-      parameter.postalCode = null;
-      parameter.userLocation = null;
-      parameter.genderOrig = null;
-      logger.error("uparams missing in the request");
+      logger.error("json exception in parsing u params",exception);
     }
     return parameter;
   }

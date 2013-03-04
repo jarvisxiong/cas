@@ -206,7 +206,8 @@ public class Filters {
       else {
         result = !advertisersIncludedbyPublisher.isEmpty() && !advertisersIncludedbyPublisher.contains(advertiserId);
       }
-    }else logger.debug("null");
+    } else
+      logger.debug("null");
     if(result) {
       logger.debug("Site/publisher inclusion list does not contain advertiser", advertiserId);
       if(advertiserIdtoNameMapping.containsKey(advertiserId)) {
@@ -293,8 +294,7 @@ public class Filters {
       // that advertiser OR if todays impression is greater than impression
       // ceiling OR site is not present in advertiser's whiteList
       if(isBurnLimitExceeded(channelSegment) || isDailyImpressionCeilingExceeded(channelSegment)
-          || isDailyRequestCapExceeded(channelSegment) || isAdvertiserExcluded(channelSegment)
-          || isSiteExcludedByAdvertiser(channelSegment)) {
+          || isDailyRequestCapExceeded(channelSegment) || isAdvertiserExcluded(channelSegment)) {
         continue;
       }
       // otherwise adding the advertiser to the list
@@ -330,8 +330,14 @@ public class Filters {
         if(isAnySegmentPropertyViolated(channelSegment.getChannelSegmentEntity())) {
           continue;
         }
-        if(isSiteExcludedByAdGroup(channelSegment)) {
-          continue;
+        if(channelSegment.getChannelSegmentEntity().getSitesIE().isEmpty()) {
+          if(isSiteExcludedByAdvertiser(channelSegment)) {
+            continue;
+          }
+        } else {
+          if(isSiteExcludedByAdGroup(channelSegment)) {
+            continue;
+          }
         }
         channelSegment.setPrioritisedECPM(getPrioritisedECPM(channelSegment));
         segmentListToBeSorted.add(channelSegment);
