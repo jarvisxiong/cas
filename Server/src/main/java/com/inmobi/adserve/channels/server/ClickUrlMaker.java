@@ -8,7 +8,6 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,8 +56,8 @@ public class ClickUrlMaker {
   private SASRequestParameters params;
   private DebugLogger logger;
   private String twoPieceRm = "-1";
-  private static Mac mac = null;
-  private static SecretKeySpec sk = null;
+  private Mac mac = null;
+  private SecretKeySpec sk = null;
 
   public ClickUrlMaker(Configuration config, JSONObject jObject, SASRequestParameters params, DebugLogger logger) {
     this.config = config;
