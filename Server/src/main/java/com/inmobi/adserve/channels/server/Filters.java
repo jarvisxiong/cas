@@ -47,10 +47,11 @@ public class Filters {
   private double revenueWindow;
   private RepositoryHelper repositoryHelper;
   private DebugLogger logger;
-  
+
   public static Map<String, String> getAdvertiserIdToNameMapping() {
     return advertiserIdtoNameMapping;
   }
+
   public Map<String, HashMap<String, ChannelSegment>> getMatchedSegments() {
     return matchedSegments;
   }
@@ -263,7 +264,8 @@ public class Filters {
       if(advertiserIdtoNameMapping.containsKey(advertiserId)) {
         InspectorStats.initializeFilterStats(advertiserIdtoNameMapping.get(advertiserId));
       }
-      channelSegment = ((ChannelSegment[]) advertiserEntry.getValue().values().toArray(new ChannelSegment[0]))[0];
+      channelSegment = ((ChannelSegment[]) advertiserEntry.getValue().values()
+          .toArray(new ChannelSegment[advertiserEntry.getValue().values().size()]))[0];
       // dropping advertiser if balance is less than revenue of
       // that advertiser OR if todays impression is greater than impression
       // ceiling OR site is not present in advertiser's whiteList
