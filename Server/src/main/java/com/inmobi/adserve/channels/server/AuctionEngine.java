@@ -37,11 +37,12 @@ public class AuctionEngine implements AuctionEngineInterface {
    * selected for sending response and will be charged the highest of
    * secondHighest price or 90% of bidFloor
    */
-  public synchronized AdNetworkInterface runRtbSecondPriceAuctionEngine() {
+  public AdNetworkInterface runRtbSecondPriceAuctionEngine() {
     // Do not run auction 2 times.
-    if(auctionComplete)
-      return rtbResponse == null ? null : rtbResponse.getAdNetworkInterface();
-
+    synchronized (this) {
+      if(auctionComplete)
+        return rtbResponse == null ? null : rtbResponse.getAdNetworkInterface();
+    }
     auctionComplete = true;
     logger.debug("Inside RTB auction engine");
     List<ChannelSegment> rtbList;

@@ -35,33 +35,35 @@ public class ServletRepoRefresh implements Servlet {
     String dbUser = jObject.get("DBUser").toString();
     String dbPassword = jObject.get("DBPassword").toString();
     String connectionString = "jdbc:postgresql://" + dbHost + ":" + dbPort + "/" + dbName;
+    Connection con = null;
+    Statement statement = null;
+    ResultSet resultSet = null;
     try {
-      Connection con;
       ConfigurationLoader config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
       con = DriverManager.getConnection(connectionString, dbUser, dbPassword);
-      Statement statement = con.createStatement();
+      statement = con.createStatement();
       if(repoName.equalsIgnoreCase("ChannelAdGroupRepository")) {
-        ResultSet resultSet = statement.executeQuery(config.cacheConfiguration().subset("ChannelAdGroupRepository")
+        resultSet = statement.executeQuery(config.cacheConfiguration().subset("ChannelAdGroupRepository")
             .getString("query").replace("'${last_update}'", "now() -interval '1 MINUTE'"));
         ServletHandler.repositoryHelper.getChannelAdGroupRepository().newUpdateFromResultSetToOptimizeUpdate(resultSet);
       } else if(repoName.equalsIgnoreCase("ChannelRepository")) {
-        ResultSet resultSet = statement.executeQuery(config.cacheConfiguration().subset("ChannelRepository")
-            .getString("query").replace("'${last_update}'", "now() -interval '1 HOUR'"));
+        resultSet = statement.executeQuery(config.cacheConfiguration().subset("ChannelRepository").getString("query")
+            .replace("'${last_update}'", "now() -interval '1 HOUR'"));
         ServletHandler.repositoryHelper.getChannelAdGroupRepository().newUpdateFromResultSetToOptimizeUpdate(resultSet);
       }
-      statement.close();
-      con.close();
+      hrh.logger.debug("Successfully updated repository");
+      hrh.responseSender.sendResponse("OK", e);
     } catch (SQLException e1) {
       hrh.logger.error("error is", e1.getMessage());
       hrh.responseSender.sendResponse("NOTOK", e);
-      return;
     } catch (RepositoryException e2) {
       hrh.logger.error("error is", e2.getMessage());
       hrh.responseSender.sendResponse("NOTOK", e);
-      return;
+    } finally {
+      resultSet.close();
+      statement.close();
+      con.close();
     }
-    hrh.logger.debug("Successfully updated repository");
-    hrh.responseSender.sendResponse("OK", e);
   }
 
   @Override
