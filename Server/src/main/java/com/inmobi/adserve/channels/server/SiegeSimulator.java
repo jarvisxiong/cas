@@ -53,6 +53,7 @@ public class SiegeSimulator {
       out.close();
     } catch (IOException e) {
       e.printStackTrace();
+      return;
     }
 
   }

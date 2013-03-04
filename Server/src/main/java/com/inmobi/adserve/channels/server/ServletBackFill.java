@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.print.attribute.standard.Severity;
-
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.json.JSONException;
@@ -154,7 +152,7 @@ public class ServletBackFill implements Servlet {
 
     CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
     casInternalRequestParameters.highestEcpm = getHighestEcpm(rows, logger);
-    logger.debug("Highest Ecpm is", new Double(casInternalRequestParameters.highestEcpm).toString());
+    logger.debug("Highest Ecpm is", Double.valueOf(casInternalRequestParameters.highestEcpm));
     casInternalRequestParameters.blockedCategories = getBlockedCategories(hrh, logger);
     casInternalRequestParameters.rtbBidFloor = hrh.responseSender.sasParams.siteFloor > casInternalRequestParameters.highestEcpm ? hrh.responseSender.sasParams.siteFloor
         : casInternalRequestParameters.highestEcpm + 0.01;

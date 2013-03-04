@@ -114,23 +114,23 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
     responseSent = true;
     logger.debug("ad received so trying to send ad response");
-
+    String finalReponse = responseString;
     if(sasParams.slot != null && SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot)) != null) {
       logger.debug("slot served is", sasParams.slot);
       InspectorStats.incrementStatCount(InspectorStrings.totalFills);
       if(getResponseFormat().equals("xhtml")) {
         Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot));
         String startElement = String.format(startTags, (int) dim.getWidth(), (int) dim.getHeight());
-        responseString = startElement + responseString + endTags;
+        finalReponse = startElement + finalReponse + endTags;
       }
     } else {
       logger.error("invalid slot, so not returning response, even though we got an ad");
       InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
       if(getResponseFormat().equals("xhtml")) {
-        responseString = noAdXhtml;
+        finalReponse = noAdXhtml;
       }
     }
-    sendResponse(responseString, event);
+    sendResponse(finalReponse, event);
   }
 
   // send response to the caller
@@ -316,7 +316,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
   // return the response format
   public String getResponseFormat() {
     String responseFormat = sasParams.rFormat;
-    if(null == sasParams || null == responseFormat) {
+    if(null == responseFormat) {
       return "html";
     }
     if(responseFormat.equalsIgnoreCase("axml")) {

@@ -49,6 +49,7 @@ public class ServletRepoRefresh implements Servlet {
             .getString("query").replace("'${last_update}'", "now() -interval '1 HOUR'"));
         ServletHandler.repositoryHelper.getChannelAdGroupRepository().newUpdateFromResultSetToOptimizeUpdate(resultSet);
       }
+      statement.close();
       con.close();
     } catch (SQLException e1) {
       hrh.logger.error("error is", e1.getMessage());
