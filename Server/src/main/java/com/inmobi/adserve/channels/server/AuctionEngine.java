@@ -42,8 +42,9 @@ public class AuctionEngine implements AuctionEngineInterface {
     synchronized (this) {
       if(auctionComplete)
         return rtbResponse == null ? null : rtbResponse.getAdNetworkInterface();
+      auctionComplete = true;
     }
-    auctionComplete = true;
+    
     logger.debug("Inside RTB auction engine");
     List<ChannelSegment> rtbList;
     // Apply rtb filters.
