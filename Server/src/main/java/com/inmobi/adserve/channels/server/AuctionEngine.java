@@ -122,7 +122,7 @@ public class AuctionEngine implements AuctionEngineInterface {
       }
     }
     logger.debug("No of rtb partners who sent AD response with bid more than bidFloor",
-        new Integer(rtbList.size()));
+        Integer.valueOf(rtbList.size()));
     // Bid not zero filter.
     for (int i = 0; i < rtbList.size(); i++) {
       if(rtbList.get(i).getAdNetworkInterface().getBidprice() <= 0) {
