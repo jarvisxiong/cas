@@ -280,9 +280,8 @@ public class AsyncRequestMaker {
     } catch (JSONException e) {
       logger.debug("u-id-params is not present in the request");
     }
-    if(null == userIdMap && null != sasParams.uid)
-      uidMap.put("U-ID", sasParams.uid);
-    else {
+    
+    if(null != userIdMap) {
       Iterator userMapIterator = userIdMap.keys();
       while (userMapIterator.hasNext()) {
         String key = (String) userMapIterator.next();
@@ -295,6 +294,8 @@ public class AsyncRequestMaker {
         if(null != value)
           uidMap.put(key.toUpperCase(), value);
       }
+    } else if(null != sasParams.uid) {
+      uidMap.put("U-ID", sasParams.uid);
     }
 
     clickUrlMakerV6.setUdIdVal(uidMap);
