@@ -77,8 +77,7 @@ public class RequestParser {
     params.setTp(stringify(jObject, "tp", logger));
     
     params.setAllowBannerAds(jObject.optBoolean("site-allowBanner", true));
-    params.setSiteFloor(jObject.opt("site-floor") == null ? 0.0 : Double.parseDouble(jObject.opt("site-floor")
-        .toString()));
+    params.setSiteFloor(jObject.optDouble("site-floor", 0.0));
     try {
       params.setSiteSegmentId(jObject.getInt("sel-seg-id"));
       logger.debug("Site segment id is", params.getSiteSegmentId().toString());
