@@ -48,7 +48,6 @@ public class clickUrlMakerV6Test extends TestCase {
     updMap.put("UDID", "uidvalue");
     clickUrlMaker.setUdIdVal(updMap);
     clickUrlMaker.setIpFileVersion((long) 1);
-    clickUrlMaker.setCryptoKeyType("");
     clickUrlMaker.setCryptoSecretKey("clickmaker.key.1.value");
     clickUrlMaker.createClickUrls();
     assertEquals("clickUrl", clickUrlMaker.getBeaconUrl(null));

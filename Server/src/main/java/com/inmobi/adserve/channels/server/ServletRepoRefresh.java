@@ -29,43 +29,35 @@ public class ServletRepoRefresh implements Servlet {
     String repoName = jObject.get("repoName").toString();
     hrh.logger.debug("RepoName is", repoName);
 
+    String dbHost = jObject.get("DBHost").toString();
+    String dbPort = jObject.get("DBPort").toString();
+    String dbName = jObject.get("DBSnapshot").toString();
+    String dbUser = jObject.get("DBUser").toString();
+    String dbPassword = jObject.get("DBPassword").toString();
+    String connectionString = "jdbc:postgresql://" + dbHost + ":" + dbPort + "/" + dbName;
     try {
-      String dbHost = jObject.get("DBHost").toString();
-      String dbPort = jObject.get("DBPort").toString();
-      String dbName = jObject.get("DBSnapshot").toString();
-      String dbUser = jObject.get("DBUser").toString();
-      String dbPassword = jObject.get("DBPassword").toString();
-      String connectionString = "jdbc:postgresql://" + dbHost + ":" + dbPort + "/" + dbName;
-      try {
-        Connection con;
-        ConfigurationLoader config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
-        con = DriverManager.getConnection(connectionString, dbUser, dbPassword);
-        Statement statement = con.createStatement();
-        if(repoName.equalsIgnoreCase("ChannelAdGroupRepository")) {
-          ResultSet resultSet = statement.executeQuery(config.cacheConfiguration().subset("ChannelAdGroupRepository")
-              .getString("query").replace("'${last_update}'", "now() -interval '1 MINUTE'"));
-          ServletHandler.repositoryHelper.getChannelAdGroupRepository().newUpdateFromResultSetToOptimizeUpdate(
-              resultSet);
-        } else if(repoName.equalsIgnoreCase("ChannelRepository")) {
-          ResultSet resultSet = statement.executeQuery(config.cacheConfiguration().subset("ChannelRepository")
-              .getString("query").replace("'${last_update}'", "now() -interval '1 HOUR'"));
-          ServletHandler.repositoryHelper.getChannelAdGroupRepository().newUpdateFromResultSetToOptimizeUpdate(
-              resultSet);
-        }
-        con.close();
-      } catch (SQLException e1) {
-        hrh.logger.error("error is", e1.getMessage());
-        e1.printStackTrace();
-        hrh.responseSender.sendResponse("NOTOK", e);
-      } catch (RepositoryException e2) {
-        hrh.logger.error("error is", e2.getMessage());
-        e2.printStackTrace();
-        hrh.responseSender.sendResponse("NOTOK", e);
+      Connection con;
+      ConfigurationLoader config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
+      con = DriverManager.getConnection(connectionString, dbUser, dbPassword);
+      Statement statement = con.createStatement();
+      if(repoName.equalsIgnoreCase("ChannelAdGroupRepository")) {
+        ResultSet resultSet = statement.executeQuery(config.cacheConfiguration().subset("ChannelAdGroupRepository")
+            .getString("query").replace("'${last_update}'", "now() -interval '1 MINUTE'"));
+        ServletHandler.repositoryHelper.getChannelAdGroupRepository().newUpdateFromResultSetToOptimizeUpdate(resultSet);
+      } else if(repoName.equalsIgnoreCase("ChannelRepository")) {
+        ResultSet resultSet = statement.executeQuery(config.cacheConfiguration().subset("ChannelRepository")
+            .getString("query").replace("'${last_update}'", "now() -interval '1 HOUR'"));
+        ServletHandler.repositoryHelper.getChannelAdGroupRepository().newUpdateFromResultSetToOptimizeUpdate(resultSet);
       }
-    } catch (Exception e1) {
+      con.close();
+    } catch (SQLException e1) {
       hrh.logger.error("error is", e1.getMessage());
-      e1.printStackTrace();
       hrh.responseSender.sendResponse("NOTOK", e);
+      return;
+    } catch (RepositoryException e2) {
+      hrh.logger.error("error is", e2.getMessage());
+      hrh.responseSender.sendResponse("NOTOK", e);
+      return;
     }
     hrh.logger.debug("Successfully updated repository");
     hrh.responseSender.sendResponse("OK", e);

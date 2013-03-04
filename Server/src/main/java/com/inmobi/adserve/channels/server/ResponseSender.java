@@ -239,8 +239,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
       }
 
       if(adNetwork.isRequestCompleted()) {
-        ThirdPartyAdResponse adResponse = adNetwork.getResponseAd();
-        if(adResponse.responseStatus == ThirdPartyAdResponse.ResponseStatus.SUCCESS) {
+        if(adNetwork.getResponseAd().responseStatus == ThirdPartyAdResponse.ResponseStatus.SUCCESS) {
           // Sends the response if request is completed for the
           // specific adapter.
           sendAdResponse(adNetwork, event);
@@ -316,8 +315,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
   // return the response format
   public String getResponseFormat() {
-    String responseFormat = "html";
-    if(sasParams == null || (responseFormat = sasParams.rFormat) == null) {
+    String responseFormat = sasParams.rFormat;
+    if(null == sasParams || null == responseFormat) {
       return "html";
     }
     if(responseFormat.equalsIgnoreCase("axml")) {
@@ -335,21 +334,21 @@ public class ResponseSender extends HttpRequestHandlerBase {
       this.sendNoAdResponse(serverEvent);
       return;
     }
-    int rankIndexToProcess = this.getRankIndexToProcess();
-    ChannelSegment segment = this.getRankList().get(rankIndexToProcess);
+    int rankIndex = this.getRankIndexToProcess();
+    ChannelSegment segment = this.getRankList().get(rankIndex);
     while (segment.getAdNetworkInterface().isRequestCompleted()) {
       if(segment.getAdNetworkInterface().getResponseAd().responseStatus == ResponseStatus.SUCCESS) {
         this.sendAdResponse(segment.getAdNetworkInterface(), serverEvent);
         break;
       }
-      rankIndexToProcess++;
-      if(rankIndexToProcess >= this.getRankList().size()) {
+      rankIndex++;
+      if(rankIndex >= this.getRankList().size()) {
         this.sendNoAdResponse(serverEvent);
         break;
       }
-      segment = getRankList().get(rankIndexToProcess);
+      segment = getRankList().get(rankIndex);
     }
-    this.setRankIndexToProcess(rankIndexToProcess);
+    this.setRankIndexToProcess(rankIndex);
     return;
   }
 
