@@ -55,17 +55,18 @@ public class ServletRepoRefresh implements Servlet {
         con.close();
       } catch (SQLException e1) {
         hrh.logger.error("error is", e1.getMessage());
-        e1.printStackTrace();
         hrh.responseSender.sendResponse("NOTOK", e);
+        return;
       } catch (RepositoryException e2) {
         hrh.logger.error("error is", e2.getMessage());
-        e2.printStackTrace();
         hrh.responseSender.sendResponse("NOTOK", e);
+        return;
       }
     } catch (Exception e1) {
       hrh.logger.error("error is", e1.getMessage());
       e1.printStackTrace();
       hrh.responseSender.sendResponse("NOTOK", e);
+      return;
     }
     hrh.logger.debug("Successfully updated repository");
     hrh.responseSender.sendResponse("OK", e);

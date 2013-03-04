@@ -303,7 +303,7 @@ public class ClickUrlMakerV6 {
       }
       return;
     }
-    if(null == uidMapUpperCase || uidMapUpperCase.isEmpty())
+    if(uidMapUpperCase.isEmpty())
       adUrlSuffix.append(appendSeparator(DEFAULT_UDID_VALUE));
     else
       adUrlSuffix.append(appendSeparator(getEncodedJson(uidMapUpperCase, logger)));

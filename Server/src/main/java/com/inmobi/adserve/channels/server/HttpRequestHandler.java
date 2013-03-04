@@ -171,12 +171,12 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
       }
     } catch (JSONException exception) {
       logger.error("Error while writing logs " + exception.getMessage());
-      System.out.println("stack trace is ");
+      logger.debug("stack trace is ");
       exception.printStackTrace();
       return;
     } catch (TException exception) {
       logger.error("Error while writing logs " + exception.getMessage());
-      System.out.println("stack trace is ");
+      logger.debug("stack trace is ");
       exception.printStackTrace();
       return;
     }

@@ -98,7 +98,7 @@ public class ServletBackFill implements Servlet {
      * if sendonlytowhitelist flag is true, check if site id is present in
      * whitelist, else send no ad.
      */
-    if(ServletHandler.config.getBoolean("sendOnlyToWhitelist") == true) {
+    if(ServletHandler.config.getBoolean("sendOnlyToWhitelist")) {
       List<String> whitelist = ServletHandler.config.getList("whitelist");
       if(null == whitelist || !whitelist.contains(hrh.responseSender.sasParams.siteId)) {
         logger.debug("site id not present in whitelist, so sending no ad response");
