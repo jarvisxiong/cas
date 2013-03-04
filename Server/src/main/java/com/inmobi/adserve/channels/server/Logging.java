@@ -53,7 +53,12 @@ public class Logging {
   private static String sampledAdvertisementLogKey;
   private static boolean enableFileLogging;
   private static boolean enableDatabusLogging;
-  public static ConcurrentHashMap<String, String> sampledAdvertiserLogNos = new ConcurrentHashMap<String, String>(2000);
+  private final static ConcurrentHashMap<String, String> sampledAdvertiserLogNos = new ConcurrentHashMap<String, String>(2000);
+  
+  public static ConcurrentHashMap<String, String> getSampledadvertiserlognos() {
+    return sampledAdvertiserLogNos;
+  }
+
   private static int totalCount;
 
   public static void init(AbstractMessagePublisher dataBusPublisher, String rrLogKey, String channelLogKey,
@@ -72,8 +77,6 @@ public class Logging {
       return (jObject.getJSONArray("carrier"));
     } catch (JSONException e) {
       return null;
-    } catch (NullPointerException exception) {
-      return null;
     }
   }
 
@@ -82,11 +85,15 @@ public class Logging {
       return (jObject.getJSONArray("handset"));
     } catch (JSONException e) {
       return null;
-    } catch (NullPointerException exception) {
-      return null;
     }
   }
 
+  void appendToLog(StringBuilder log, String separator, String key, String value) {
+    if(value == null) {
+      return;
+    }
+    log.append(separator).append(key).append(value);
+  }
   // Writing rrlogs
   public static void rrLogging(ChannelSegment channelSegment, DebugLogger logger, Configuration config,
       SASRequestParameters sasParams, String terminationReason) throws JSONException, TException {
