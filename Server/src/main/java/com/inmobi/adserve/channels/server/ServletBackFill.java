@@ -108,7 +108,7 @@ public class ServletBackFill implements Servlet {
     }
 
     // getting the selected third party site details
-    HashMap<String, HashMap<String, ChannelSegment>> matchedSegments = new MatchSegments(
+    Map<String, HashMap<String, ChannelSegment>> matchedSegments = new MatchSegments(
         ServletHandler.repositoryHelper, hrh.responseSender.sasParams, logger)
         .matchSegments(hrh.responseSender.sasParams);
 

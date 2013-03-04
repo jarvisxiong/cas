@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -40,12 +41,12 @@ public class Filters {
     }
   };
 
-  public static HashMap<String/* advertiserId */, String/* advertiserName */> advertiserIdtoNameMapping = new HashMap<String, String>();
-  public static HashMap<String/* advertiserId */, HashSet<String/* siteIncId */>> whiteListedSites = new HashMap<String, HashSet<String>>();
+  public static Map<String/* advertiserId */, String/* advertiserName */> advertiserIdtoNameMapping = new HashMap<String, String>();
+  public static Map<String/* advertiserId */, HashSet<String/* siteIncId */>> whiteListedSites = new HashMap<String, HashSet<String>>();
   public static long lastRefresh;
   public static Random random;
 
-  private HashMap<String, HashMap<String, ChannelSegment>> matchedSegments;
+  private Map<String, HashMap<String, ChannelSegment>> matchedSegments;
   private Configuration serverConfiguration;
   private Configuration adapterConfiguration;
   private SASRequestParameters sasParams;
@@ -53,7 +54,7 @@ public class Filters {
   private RepositoryHelper repositoryHelper;
   private DebugLogger logger;
 
-  public Filters(HashMap<String, HashMap<String, ChannelSegment>> matchedSegments, Configuration serverConfiguration,
+  public Filters(Map<String, HashMap<String, ChannelSegment>> matchedSegments, Configuration serverConfiguration,
       Configuration adapterConfiguration, SASRequestParameters sasParams, RepositoryHelper repositoryHelper,
       DebugLogger logger) {
     this.matchedSegments = matchedSegments;
@@ -516,7 +517,7 @@ public class Filters {
     return rankedList;
   }
 
-  List<ChannelSegment> convertToSegmentsList(HashMap<String, HashMap<String, ChannelSegment>> matchedSegments) {
+  List<ChannelSegment> convertToSegmentsList(Map<String, HashMap<String, ChannelSegment>> matchedSegments) {
     ArrayList<ChannelSegment> segmentList = new ArrayList<ChannelSegment>();
     for (String advertiserId : matchedSegments.keySet()) {
       for (String adgroupId : matchedSegments.get(advertiserId).keySet()) {

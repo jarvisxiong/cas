@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.configuration.Configuration;
 
@@ -49,7 +50,7 @@ public class MatchSegments {
   }
 
   // select channel segment based on specified rules
-  public HashMap<String, HashMap<String, ChannelSegment>> matchSegments(SASRequestParameters sasParams) {
+  public Map<String, HashMap<String, ChannelSegment>> matchSegments(SASRequestParameters sasParams) {
     String slotStr = sasParams.slot;
     String countryStr = sasParams.countryStr;
     int osId = sasParams.osId;
@@ -122,11 +123,11 @@ public class MatchSegments {
     return sasParams.categories;
   }
 
-  private HashMap<String, HashMap<String, ChannelSegment>> matchSegments(DebugLogger logger, long slotId,
+  private Map<String, HashMap<String, ChannelSegment>> matchSegments(DebugLogger logger, long slotId,
       List<Long> categories, long country, Integer targetingPlatform, Integer siteRating, int osId) {
     HashMap<String /* advertiserId */, HashMap<String /* adGroupId */, ChannelSegment>> result = new HashMap<String /* advertiserId */, HashMap<String /* adGroupId */, ChannelSegment>>();
 
-    ArrayList<ChannelSegmentEntity> filteredAllCategoriesEntities = loadEntities(slotId, -1, country,
+    List<ChannelSegmentEntity> filteredAllCategoriesEntities = loadEntities(slotId, -1, country,
         targetingPlatform, siteRating, osId);
 
     // Makes sure that there is exactly one entry from each Advertiser.
@@ -142,7 +143,7 @@ public class MatchSegments {
 
     if(country != -1) {
       // Load Data for all countries
-      ArrayList<ChannelSegmentEntity> allCategoriesAllCountryEntities = loadEntities(slotId, -1, -1, targetingPlatform,
+      List<ChannelSegmentEntity> allCategoriesAllCountryEntities = loadEntities(slotId, -1, -1, targetingPlatform,
           siteRating, osId);
 
       // Makes sure that there is exactly one entry from each Advertiser for all
@@ -159,7 +160,7 @@ public class MatchSegments {
 
     // Does OR for the categories.
     for (long category : categories) {
-      ArrayList<ChannelSegmentEntity> filteredEntities = loadEntities(slotId, category, country, targetingPlatform,
+      List<ChannelSegmentEntity> filteredEntities = loadEntities(slotId, category, country, targetingPlatform,
           siteRating, osId);
       // Makes sure that there is exactly one entry from each Advertiser.
       for (ChannelSegmentEntity entity : filteredEntities) {
@@ -171,7 +172,7 @@ public class MatchSegments {
 
       if(country != -1) {
         // Load Data for all countries
-        ArrayList<ChannelSegmentEntity> allCountryEntities = loadEntities(slotId, category, -1, targetingPlatform,
+        List<ChannelSegmentEntity> allCountryEntities = loadEntities(slotId, category, -1, targetingPlatform,
             siteRating, osId);
 
         // Makes sure that there is exactly one entry from each Advertiser for
@@ -197,7 +198,7 @@ public class MatchSegments {
   }
 
   // Loads entities and updates cache if required.
-  private ArrayList<ChannelSegmentEntity> loadEntities(long slotId, long category, long country,
+  private List<ChannelSegmentEntity> loadEntities(long slotId, long category, long country,
       Integer targetingPlatform, Integer siteRating, int osId) {
     if(logger.isDebugEnabled())
       logger.debug("Loading entities for slot: " + slotId + " category: " + category + " country: " + country
@@ -213,7 +214,7 @@ public class MatchSegments {
 
   }
 
-  private void insertChannelSegmentToResultSet(HashMap<String, HashMap<String, ChannelSegment>> result,
+  private void insertChannelSegmentToResultSet(Map<String, HashMap<String, ChannelSegment>> result,
       ChannelSegmentEntity channelSegmentEntity) {
     if(Filters.advertiserIdtoNameMapping.containsKey(channelSegmentEntity.getAdvertiserId())) {
       InspectorStats.initializeFilterStats(Filters.advertiserIdtoNameMapping.get(channelSegmentEntity.getAdvertiserId()));
@@ -277,7 +278,7 @@ public class MatchSegments {
         channelSegmentCitrusLeafFeedbackEntity, null, pECPM);
   }
 
-  public static void printSegments(HashMap<String, HashMap<String, ChannelSegment>> matchedSegments, DebugLogger logger) {
+  public static void printSegments(Map<String, HashMap<String, ChannelSegment>> matchedSegments, DebugLogger logger) {
     if(logger.isDebugEnabled())
       logger.debug("Segments are :");
     for (String adkey : matchedSegments.keySet()) {
