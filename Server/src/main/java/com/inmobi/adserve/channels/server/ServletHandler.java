@@ -117,13 +117,6 @@ public class ServletHandler {
       }
     });
     
-    servletMap.put("/whitelisting", new ServletFactory() {
-      @Override
-      public Servlet getServlet() {
-        return new ServletWhiteListSites();
-      }
-    });
-    
     servletMap.put("/logParser", new ServletFactory() {
       @Override
       public Servlet getServlet() {
