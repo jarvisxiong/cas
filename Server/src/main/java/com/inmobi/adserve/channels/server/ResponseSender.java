@@ -315,8 +315,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
   // return the response format
   public String getResponseFormat() {
-    String responseFormat = "html";
-    if(sasParams == null || (responseFormat = sasParams.rFormat) == null) {
+    String responseFormat = sasParams.rFormat;
+    if(null == sasParams || null == responseFormat) {
       return "html";
     }
     if(responseFormat.equalsIgnoreCase("axml")) {

@@ -117,8 +117,9 @@ public class SiegeSimulator {
 
     @Override
     public void run() {
-      for (int i = 0; i < r; i++)
+      for (int i = 0; i < r; i++) {
         makeRequest();
+      }
     }
 
   }

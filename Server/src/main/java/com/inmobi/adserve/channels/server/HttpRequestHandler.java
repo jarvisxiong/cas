@@ -36,7 +36,6 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
   public JSONObject jObject = null;
   public DebugLogger logger = null;
   public ResponseSender responseSender;
-  public int lowestEcpm;
 
   public String getTerminationReason() {
     return terminationReason;
@@ -83,7 +82,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
       logger.debug("Channel is open in channelIdle handler");
       if(responseSender.getRankList() != null) {
         for (ChannelSegment channelSegment : responseSender.getRankList()) {
-          if(channelSegment.getAdNetworkInterface().getAdStatus() == "AD") {
+          if(channelSegment.getAdNetworkInterface().getAdStatus().equals("AD")) {
             logger.debug("Got Ad from", channelSegment.getAdNetworkInterface().getName(), "Top Rank was", responseSender
                 .getRankList().get(0).getAdNetworkInterface().getName());
             responseSender.sendAdResponse(channelSegment.getAdNetworkInterface(), e);

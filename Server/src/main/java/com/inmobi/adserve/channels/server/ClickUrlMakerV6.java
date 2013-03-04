@@ -4,9 +4,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Set;
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 
@@ -29,24 +26,10 @@ public class ClickUrlMakerV6 {
   private static Long clickURLHashingSecretKeyTestModeVersion = (long) 2;
   private static String clickURLHashingSecretKeyTestModeVersionBase36 = Long.toString(
       ClickUrlMakerV6.clickURLHashingSecretKeyTestModeVersion, 36);
-  private static Mac mac = null;
-  private static SecretKeySpec sk = null;
 
   public ClickUrlMakerV6(DebugLogger logger, Set<String> unhashable) {
     this.logger = logger;
     this.unhashable = unhashable;
-  }
-
-  private String cryptoKeyType;
-
-  public void setCryptoKeyType(String cryptoKeyType) {
-    this.cryptoKeyType = cryptoKeyType;
-  }
-
-  private String testCryptoKeyType;
-
-  public void setTestCryptoKeyType(String testCryptoKeyType) {
-    this.testCryptoKeyType = testCryptoKeyType;
   }
 
   private String testCryptoSecretKey = "qqq";

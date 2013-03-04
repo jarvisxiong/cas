@@ -6,10 +6,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.hadoop.util.StringUtils;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 import org.json.JSONException;
@@ -27,6 +29,7 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
 import com.ning.http.client.AsyncHttpClient;
+import com.vladium.util.Strings;
 
 public class AsyncRequestMaker {
 
@@ -59,7 +62,7 @@ public class AsyncRequestMaker {
 
     logger.debug("Total channels available for sending requests", rows.size() + "");
     boolean isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled", false);
-    logger.debug("isRtbEnabled is", new Boolean(isRtbEnabled).toString());
+    logger.debug("isRtbEnabled is", Boolean.valueOf(isRtbEnabled));
 
     for (ChannelSegment row : rows) {
       ChannelSegmentEntity channelSegmentEntity = row.getChannelSegmentEntity();
@@ -141,7 +144,7 @@ public class AsyncRequestMaker {
       CasInternalRequestParameters casInternalRequestParams) {
     CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
     casInternalRequestParameters.blockedCategories = casInternalRequestParams.blockedCategories;
-    casInternalRequestParameters.highestEcpm = casInternalRequestParameters.highestEcpm;
+    casInternalRequestParameters.highestEcpm = casInternalRequestParams.highestEcpm;
     casInternalRequestParameters.rtbBidFloor = casInternalRequestParams.rtbBidFloor;
     casInternalRequestParameters.uidParams = sasParams.uidParams;
     casInternalRequestParameters.uid = sasParams.uid;
@@ -292,15 +295,13 @@ public class AsyncRequestMaker {
           logger.debug("value corresponding to uid key is not present in the uidMap");
         }
         if(null != value)
-          uidMap.put(key.toUpperCase(), value);
+          uidMap.put(key.toUpperCase(Locale.ENGLISH), value);
       }
     } else if(null != sasParams.uid) {
       uidMap.put("U-ID", sasParams.uid);
     }
 
     clickUrlMakerV6.setUdIdVal(uidMap);
-    clickUrlMakerV6.setCryptoKeyType(config.getString("clickmaker.key.1.type"));
-    clickUrlMakerV6.setTestCryptoKeyType(config.getString("clickmaker.key.2.type"));
     clickUrlMakerV6.setCryptoSecretKey(config.getString("clickmaker.key.1.value"));
     clickUrlMakerV6.setTestCryptoSecretKey(config.getString("clickmaker.key.2.value"));
     clickUrlMakerV6.setImageBeaconFlag(true);// true/false
