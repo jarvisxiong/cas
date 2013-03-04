@@ -60,9 +60,15 @@ public class ServletRepoRefresh implements Servlet {
       hrh.logger.error("error is", e2.getMessage());
       hrh.responseSender.sendResponse("NOTOK", e);
     } finally {
-      resultSet.close();
-      statement.close();
-      con.close();
+      if(null != resultSet) {
+        resultSet.close();
+      }
+      if(null != statement) {
+        statement.close();
+      }
+      if(null != con) {
+        con.close();
+      }
     }
   }
 
