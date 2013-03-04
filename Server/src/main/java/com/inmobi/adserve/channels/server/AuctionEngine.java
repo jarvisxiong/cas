@@ -37,11 +37,12 @@ public class AuctionEngine implements AuctionEngineInterface {
    * selected for sending response and will be charged the highest of
    * secondHighest price or 90% of bidFloor
    */
-  public synchronized AdNetworkInterface runRtbSecondPriceAuctionEngine() {
+  public AdNetworkInterface runRtbSecondPriceAuctionEngine() {
     // Do not run auction 2 times.
-    if(auctionComplete)
-      return rtbResponse == null ? null : rtbResponse.getAdNetworkInterface();
-
+    synchronized (this) {
+      if(auctionComplete)
+        return rtbResponse == null ? null : rtbResponse.getAdNetworkInterface();
+    }
     auctionComplete = true;
     logger.debug("Inside RTB auction engine");
     List<ChannelSegment> rtbList;
@@ -121,8 +122,8 @@ public class AuctionEngine implements AuctionEngineInterface {
         rtbList.remove(rtbList.get(i));
       }
     }
-    logger.debug("No of rtb partners who sent AD response with bid more than bidFloor",
-        Integer.valueOf(rtbList.size()));
+    logger
+        .debug("No of rtb partners who sent AD response with bid more than bidFloor", Integer.valueOf(rtbList.size()));
     // Bid not zero filter.
     for (int i = 0; i < rtbList.size(); i++) {
       if(rtbList.get(i).getAdNetworkInterface().getBidprice() <= 0) {
@@ -130,8 +131,7 @@ public class AuctionEngine implements AuctionEngineInterface {
         rtbList.remove(rtbList.get(i));
       }
     }
-    logger
-        .debug("No of rtb partners who sent AD response with bid more than 0", Integer.valueOf(rtbList.size()));
+    logger.debug("No of rtb partners who sent AD response with bid more than 0", Integer.valueOf(rtbList.size()));
     return rtbList;
 
   }
