@@ -181,9 +181,15 @@ public class RequestParser {
       parameter.setUserLocation(stringify(userMap, "u-location", logger));
       parameter.setGenderOrig(stringify(userMap, "u-gender-orig", logger));
       try {
-        parameter.setAge(URLEncoder.encode(parameter.getAge().trim(), utf8));
-        parameter.setGender(URLEncoder.encode(parameter.getGender().trim(), utf8));
-        parameter.setPostalCode(URLEncoder.encode(parameter.getPostalCode().trim(), utf8));
+        if (null != parameter.getAge()) {
+          parameter.setAge(URLEncoder.encode(parameter.getAge(), utf8));
+        }
+        if (null != parameter.getGender()) {
+          parameter.setGender(URLEncoder.encode(parameter.getGender(), utf8));
+        }
+        if (null != parameter.getPostalCode()) {
+          parameter.setPostalCode(URLEncoder.encode(parameter.getPostalCode(), utf8));
+        }
       } catch (UnsupportedEncodingException e) {
         logger.error("Error in encoding u params", e.getMessage());
       }
