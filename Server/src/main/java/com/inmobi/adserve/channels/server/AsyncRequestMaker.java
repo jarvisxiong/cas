@@ -84,14 +84,14 @@ public class AsyncRequestMaker {
 
       String clickUrl = null;
       String beaconUrl = null;
-      sasParams.impressionId = getImpressionId(channelSegmentEntity.getIncId());
+      sasParams.setImpressionId(getImpressionId(channelSegmentEntity.getIncId()));
       CasInternalRequestParameters casInternalRequestParameters = getCasInternalRequestParameters(sasParams,
           casInternalRequestParams);
       controlEnrichment(casInternalRequestParameters, channelSegmentEntity);
-      sasParams.adIncId = channelSegmentEntity.getIncId();
-      logger.debug("impression id is " + sasParams.impressionId);
+      sasParams.setAdIncId(channelSegmentEntity.getIncId());
+      logger.debug("impression id is " + sasParams.getImpressionId());
 
-      if((network.isClickUrlRequired() || network.isBeaconUrlRequired()) && null != sasParams.impressionId) {
+      if((network.isClickUrlRequired() || network.isBeaconUrlRequired()) && null != sasParams.getImpressionId()) {
         if(config.getInt("clickmaker.version", 6) == 4) {
           ClickUrlMaker clickUrlMaker = new ClickUrlMaker(config, jObject, sasParams, logger);
           TrackingUrls trackingUrls = clickUrlMaker.getClickUrl(channelSegmentEntity.getPricingModel());
@@ -146,13 +146,13 @@ public class AsyncRequestMaker {
     casInternalRequestParameters.blockedCategories = casInternalRequestParams.blockedCategories;
     casInternalRequestParameters.highestEcpm = casInternalRequestParams.highestEcpm;
     casInternalRequestParameters.rtbBidFloor = casInternalRequestParams.rtbBidFloor;
-    casInternalRequestParameters.uidParams = sasParams.uidParams;
-    casInternalRequestParameters.uid = sasParams.uid;
-    casInternalRequestParameters.uidO1 = sasParams.uidO1;
-    casInternalRequestParameters.uidMd5 = sasParams.uidMd5;
-    casInternalRequestParameters.uidIFA = sasParams.uidIFA;
-    casInternalRequestParameters.zipCode = sasParams.postalCode;
-    casInternalRequestParameters.latLong = sasParams.latLong;
+    casInternalRequestParameters.uidParams = sasParams.getUidParams();
+    casInternalRequestParameters.uid = sasParams.getUid();
+    casInternalRequestParameters.uidO1 = sasParams.getUidO1();
+    casInternalRequestParameters.uidMd5 = sasParams.getUidMd5();
+    casInternalRequestParameters.uidIFA = sasParams.getUidIFA();
+    casInternalRequestParameters.zipCode = sasParams.getPostalCode();
+    casInternalRequestParameters.latLong = sasParams.getLatLong();
     return casInternalRequestParameters;
   }
 
@@ -223,14 +223,14 @@ public class AsyncRequestMaker {
     unhashable.addAll(Arrays.asList(config.getStringArray("clickmaker.unhashable")));
     ClickUrlMakerV6 clickUrlMakerV6 = new ClickUrlMakerV6(logger, unhashable);
     try {
-      if(null != sasParams.age) {
-        clickUrlMakerV6.setAge(Integer.parseInt(sasParams.age));
+      if(null != sasParams.getAge()) {
+        clickUrlMakerV6.setAge(Integer.parseInt(sasParams.getAge()));
       }
     } catch (NumberFormatException e) {
       logger.error("Wrong format for Age");
     }
-    if(null != sasParams.gender)
-      clickUrlMakerV6.setGender(sasParams.gender);
+    if(null != sasParams.getGender())
+      clickUrlMakerV6.setGender(sasParams.getGender());
     clickUrlMakerV6.setCPC(pricingModel);
     Integer carrierId = null;
     try {
@@ -241,8 +241,8 @@ public class AsyncRequestMaker {
     if(null != carrierId)
       clickUrlMakerV6.setCarrierId(carrierId);
     try {
-      if(null != sasParams.countryStr) {
-        clickUrlMakerV6.setCountryId(Integer.parseInt(sasParams.countryStr));
+      if(null != sasParams.getCountryStr()) {
+        clickUrlMakerV6.setCountryId(Integer.parseInt(sasParams.getCountryStr()));
       }
     } catch (NumberFormatException e) {
       logger.error("Wrong format for CountryString");
@@ -259,23 +259,23 @@ public class AsyncRequestMaker {
     } catch (JSONException e) {
       e.printStackTrace();
     }
-    if(null == sasParams.impressionId) {
+    if(null == sasParams.getImpressionId()) {
       logger.debug("impression id is null");
     } else {
-      clickUrlMakerV6.setImpressionId(sasParams.impressionId);
+      clickUrlMakerV6.setImpressionId(sasParams.getImpressionId());
     }
-    clickUrlMakerV6.setIpFileVersion(sasParams.ipFileVersion.longValue());
+    clickUrlMakerV6.setIpFileVersion(sasParams.getIpFileVersion().longValue());
     clickUrlMakerV6.setIsBillableDemog(false);
     try {
-      if(null != sasParams.area) {
-        clickUrlMakerV6.setLocation(Integer.parseInt(sasParams.area));
+      if(null != sasParams.getArea()) {
+        clickUrlMakerV6.setLocation(Integer.parseInt(sasParams.getArea()));
       }
     } catch (NumberFormatException e) {
       logger.error("Wrong format for Area");
     }
-    if(null != sasParams.siteSegmentId)
-      clickUrlMakerV6.setSegmentId(sasParams.siteSegmentId);
-    clickUrlMakerV6.setSiteIncId(sasParams.siteIncId);
+    if(null != sasParams.getSiteSegmentId())
+      clickUrlMakerV6.setSegmentId(sasParams.getSiteSegmentId());
+    clickUrlMakerV6.setSiteIncId(sasParams.getSiteIncId());
     Map<String, String> uidMap = new HashMap<String, String>();
     JSONObject userIdMap = null;
     try {
@@ -297,8 +297,8 @@ public class AsyncRequestMaker {
         if(null != value)
           uidMap.put(key.toUpperCase(Locale.ENGLISH), value);
       }
-    } else if(null != sasParams.uid) {
-      uidMap.put("U-ID", sasParams.uid);
+    } else if(null != sasParams.getUid()) {
+      uidMap.put("U-ID", sasParams.getUid());
     }
 
     clickUrlMakerV6.setUdIdVal(uidMap);

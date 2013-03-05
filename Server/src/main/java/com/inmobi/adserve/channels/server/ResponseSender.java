@@ -115,11 +115,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
     responseSent = true;
     logger.debug("ad received so trying to send ad response");
     String finalReponse = responseString;
-    if(sasParams.slot != null && SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot)) != null) {
-      logger.debug("slot served is", sasParams.slot);
+    if(sasParams.getSlot() != null && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
+      logger.debug("slot served is", sasParams.getSlot());
       InspectorStats.incrementStatCount(InspectorStrings.totalFills);
       if(getResponseFormat().equals("xhtml")) {
-        Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot));
+        Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
         String startElement = String.format(startTags, (int) dim.getWidth(), (int) dim.getHeight());
         finalReponse = startElement + finalReponse + endTags;
       }
@@ -174,7 +174,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     if(getResponseFormat().equals("xhtml")) {
       sendResponse(noAdXhtml, event);
     } else if(isJsAdRequest()) {
-      sendResponse(String.format(noAdJsAdcode, sasParams.rqIframe), event);
+      sendResponse(String.format(noAdJsAdcode, sasParams.getRqIframe()), event);
     } else {
       sendResponse(noAdHtml, event);
     }
@@ -185,8 +185,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
     if(null == sasParams) {
       return false;
     }
-    String adCode = sasParams.adcode;
-    String rqIframe = sasParams.rqIframe;
+    String adCode = sasParams.getAdcode();
+    String rqIframe = sasParams.getRqIframe();
     if(adCode != null && rqIframe != null && adCode.equalsIgnoreCase("JS")) {
       return true;
     }
@@ -315,7 +315,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
   // return the response format
   public String getResponseFormat() {
-    String responseFormat = sasParams.rFormat;
+    String responseFormat = sasParams.getRFormat();
     if(null == responseFormat) {
       return "html";
     }

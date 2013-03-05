@@ -87,7 +87,7 @@ public class ClickUrlMaker {
     adUrlSuffix.append(appendSeparator("0"));
     adUrlSuffix.append(appendSeparator(getUid()));
 
-    adUrlSuffix.append(appendSeparator(params.impressionId));
+    adUrlSuffix.append(appendSeparator(params.getImpressionId()));
     adUrlSuffix.append(appendSeparator(twoPieceRm));
     adUrlSuffix.append(appendSeparator(config.getString("clickmaker.clickURLHashingSecretKeyVersion")));
 
@@ -159,25 +159,25 @@ public class ClickUrlMaker {
 
   private String getGender() {
     logger.debug("getting gender");
-    if(params.gender == null)
+    if(params.getGender() == null)
       return "u";
     else
-      return (params.gender);
+      return (params.getGender());
   }
 
   private String getAge() {
     logger.debug("getting age");
-    if(params.age == null || !params.age.matches("\\d+"))
+    if(params.getAge() == null || !params.getAge().matches("\\d+"))
       return "0";
-    int age = Integer.parseInt(params.age);
+    int age = Integer.parseInt(params.getAge());
     return (Long.toString(age, 36));
   }
 
   private String getUid() {
     logger.debug("getting uid");
-    if(params.uid == null)
+    if(params.getUid() == null)
       return "x";
-    return params.uid;
+    return params.getUid();
   }
 
   public String cryptoHashGenerator(String url, String keyType, String secretKey) {

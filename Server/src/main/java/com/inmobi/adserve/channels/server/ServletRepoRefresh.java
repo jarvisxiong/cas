@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
+
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.json.JSONArray;
@@ -43,12 +44,14 @@ public class ServletRepoRefresh implements Servlet {
       con = DriverManager.getConnection(connectionString, dbUser, dbPassword);
       statement = con.createStatement();
       if(repoName.equalsIgnoreCase("ChannelAdGroupRepository")) {
-        resultSet = statement.executeQuery(config.cacheConfiguration().subset("ChannelAdGroupRepository")
-            .getString("query").replace("'${last_update}'", "now() -interval '1 MINUTE'"));
+        final String query = config.cacheConfiguration().subset("ChannelAdGroupRepository")
+            .getString("query").replace("'${last_update}'", "now() -interval '1 MINUTE'");
+        resultSet = statement.executeQuery(query);
         ServletHandler.repositoryHelper.getChannelAdGroupRepository().newUpdateFromResultSetToOptimizeUpdate(resultSet);
       } else if(repoName.equalsIgnoreCase("ChannelRepository")) {
-        resultSet = statement.executeQuery(config.cacheConfiguration().subset("ChannelRepository").getString("query")
-            .replace("'${last_update}'", "now() -interval '1 HOUR'"));
+        final String query = config.cacheConfiguration().subset("ChannelRepository").getString("query")
+            .replace("'${last_update}'", "now() -interval '1 MINUTE'");
+        resultSet = statement.executeQuery(query);
         ServletHandler.repositoryHelper.getChannelAdGroupRepository().newUpdateFromResultSetToOptimizeUpdate(resultSet);
       }
       hrh.logger.debug("Successfully updated repository");
@@ -60,9 +63,15 @@ public class ServletRepoRefresh implements Servlet {
       hrh.logger.error("error is", e2.getMessage());
       hrh.responseSender.sendResponse("NOTOK", e);
     } finally {
-      resultSet.close();
-      statement.close();
-      con.close();
+      //DbUtils.closeQuietly(resultSet);
+      //DbUtils.closeQuietly(statement);
+      //DbUtils.closeQuietly(con);
+      if(null != statement) {
+        statement.close();
+      }
+      if(null != con) {
+        con.close();
+      }
     }
   }
 

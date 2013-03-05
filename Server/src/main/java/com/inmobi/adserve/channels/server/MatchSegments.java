@@ -56,11 +56,11 @@ public class MatchSegments {
 
   // select channel segment based on specified rules
   public Map<String, HashMap<String, ChannelSegment>> matchSegments(SASRequestParameters sasParams) {
-    String slotStr = sasParams.slot;
-    String countryStr = sasParams.countryStr;
-    int osId = sasParams.osId;
-    String sourceStr = sasParams.source;
-    String siteRatingStr = sasParams.siteType;
+    String slotStr = sasParams.getSlot();
+    String countryStr = sasParams.getCountryStr();
+    int osId = sasParams.getOsId();
+    String sourceStr = sasParams.getSource();
+    String siteRatingStr = sasParams.getSiteType();
     Integer targetingPlatform = (sourceStr == null || sourceStr.equalsIgnoreCase("wap")) ? 2 : 1 /* app */;
     Integer siteRating = -1;
     if(null == siteRatingStr) {
@@ -73,12 +73,12 @@ public class MatchSegments {
     } else if(siteRatingStr.equalsIgnoreCase("family_safe")) {
       siteRating = 2;
     }
-    if(slotStr == null || sasParams.categories == null || sasParams.categories.isEmpty()) {
+    if(slotStr == null || sasParams.getCategories() == null || sasParams.getCategories().isEmpty()) {
       return null;
     }
     try {
       if(logger.isDebugEnabled()) {
-        logger.debug("Request# slot: " + slotStr + " country: " + countryStr + " categories: " + sasParams.categories
+        logger.debug("Request# slot: " + slotStr + " country: " + countryStr + " categories: " + sasParams.getCategories()
             + " targetingPlatform: " + targetingPlatform + " siteRating: " + siteRating + " osId" + osId);
       }
       long slot = Long.parseLong(slotStr);
@@ -106,7 +106,7 @@ public class MatchSegments {
     // Computing all the parents for categories in the new category list from
     // the request
     HashSet<Long> newCategories = new HashSet<Long>();
-    for (Long cat : sasParams.newCategories) {
+    for (Long cat : sasParams.getNewCategories()) {
       String parentId = cat.toString();
       while (parentId != null) {
         newCategories.add(Long.parseLong(parentId));
@@ -121,11 +121,11 @@ public class MatchSegments {
     // well
     List<Long> temp = new ArrayList<Long>();
     temp.addAll(newCategories);
-    sasParams.newCategories = temp;
+    sasParams.setNewCategories(temp);
     if(serverConfig.getBoolean("isNewCategory", false)) {
-      return sasParams.newCategories;
+      return sasParams.getNewCategories();
     }
-    return sasParams.categories;
+    return sasParams.getCategories();
   }
 
   private Map<String, HashMap<String, ChannelSegment>> matchSegments(DebugLogger logger, long slotId,
@@ -248,8 +248,8 @@ public class MatchSegments {
         .getAdvertiserId());
     ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = repositoryHelper
         .queryChannelSegmentFeedbackRepository(channelSegmentEntity.getAdgroupId());
-    SiteFeedbackEntity siteFeedbackEntity = repositoryHelper.querySiteCitrusLeafFeedbackRepository(sasParams.siteId,
-        Long.valueOf(sasParams.siteIncId).toString(), logger);
+    SiteFeedbackEntity siteFeedbackEntity = repositoryHelper.querySiteCitrusLeafFeedbackRepository(sasParams.getSiteId(),
+        Long.valueOf(sasParams.getSiteIncId()).toString(), logger);
     ChannelSegmentFeedbackEntity channelSegmentCitrusLeafFeedbackEntity = null;
 
     if(channelEntity == null) {

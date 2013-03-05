@@ -183,12 +183,12 @@ public class FilterTest extends TestCase {
     expect(s2.getAdvertiserId()).andReturn("advertiserId1").anyTimes();
     replay(s2);
     sasParams = new SASRequestParameters();
-    sasParams.uidParams = "xxx";
-    sasParams.postalCode = "110051";
-    sasParams.latLong = "11.35&12.56";
-    sasParams.isRichMedia = true;
-    sasParams.rqAdType = "int";
-    sasParams.siteId = "siteid";
+    sasParams.setUidParams("xxx");
+    sasParams.setPostalCode("110051");
+    sasParams.setLatLong("11.35&12.56");
+    sasParams.setRichMedia(true);
+    sasParams.setRqAdType("int");
+    sasParams.setSiteId("siteid");
     DebugLogger.init(mockConfig);
     logger = new DebugLogger();
     Filters.init(mockAdapterConfig);
@@ -234,7 +234,7 @@ public class FilterTest extends TestCase {
     matchedSegments.put(channelSegmentEntity4.getAdvertiserId(), adv2);
     matchedSegments.put(channelSegmentEntity6.getAdvertiserId(), adv3);
     SASRequestParameters sasParams = new SASRequestParameters();
-    sasParams.siteId = "siteid";
+    sasParams.setSiteId("siteid");
     Filters f1 = new Filters(matchedSegments, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
     f1.advertiserLevelFiltering();
     assertEquals(false, f1.getMatchedSegments().containsKey(channelSegmentEntity1.getAdvertiserId()));
@@ -252,7 +252,7 @@ public class FilterTest extends TestCase {
   public void testIsAnySegmentPropertyViolatedWhenUdIdFlagSet() {
     Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
     assertEquals(false, f1.isAnySegmentPropertyViolated(s2));
-    sasParams.uidParams = null;
+    sasParams.setUidParams(null);
     assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
   }
   
@@ -260,7 +260,7 @@ public class FilterTest extends TestCase {
   public void testIsAnySegmentPropertyViolatedWhenZipCodeFlagSet() {
     Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
     
-    sasParams.postalCode = null;
+    sasParams.setPostalCode(null);
     assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
   }
   
@@ -268,7 +268,7 @@ public class FilterTest extends TestCase {
   public void testIsAnySegmentPropertyViolatedLatlongFlagSet() {
     Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
     
-    sasParams.latLong = null;
+    sasParams.setLatLong(null);
     assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
   }
   
@@ -276,7 +276,7 @@ public class FilterTest extends TestCase {
   public void testIsAnySegmentPropertyViolatedRichMediaFlagSet() {
     Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
     assertEquals(false, f1.isAnySegmentPropertyViolated(s2));
-    sasParams.isRichMedia = false;
+    sasParams.setRichMedia(false);
     assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
   }
   
@@ -284,7 +284,7 @@ public class FilterTest extends TestCase {
   public void testIsAnySegmentPropertyViolatedInterstitialFlagSet() {
     Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
     assertEquals(false, f1.isAnySegmentPropertyViolated(s2));
-    sasParams.rqAdType = null;
+    sasParams.setRqAdType(null);
     assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
   }
   
@@ -301,7 +301,7 @@ public class FilterTest extends TestCase {
     replay(s2);
     Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
     assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
-    sasParams.rqAdType = null;
+    sasParams.setRqAdType(null);
     assertEquals(false, f1.isAnySegmentPropertyViolated(s2));
   }
 
@@ -321,7 +321,7 @@ public class FilterTest extends TestCase {
     matchedSegments.put(channelSegmentEntity4.getAdvertiserId(), adv2);
     matchedSegments.put(channelSegmentEntity6.getAdvertiserId(), adv3);
     SASRequestParameters sasParams = new SASRequestParameters();
-    sasParams.siteFloor = 0.3;
+    sasParams.setSiteFloor(0.3);
     Filters f1 = new Filters(matchedSegments, mockConfig, mockAdapterConfig, sasParams, null, logger);
     f1.adGroupLevelFiltering();
     assertEquals(false, f1.getMatchedSegments().get("advertiserId1").containsKey("adgroupId1"));

@@ -124,19 +124,19 @@ public class Logging {
     if(logger.isDebugEnabled())
       logger.debug("is sas params null here " + (sasParams == null));
 
-    if(null != sasParams && null != sasParams.siteId)
-      log.append(separator + "rq-mk-siteid=\"" + sasParams.siteId + "\"");
-    if(null != sasParams && null != sasParams.rqMkAdcount)
-      log.append(separator + "rq-mk-adcount=\"" + sasParams.rqMkAdcount + "\"");
-    if(null != sasParams && null != sasParams.tid)
-      log.append(separator + "tid=\"" + sasParams.tid + "\"");
+    if(null != sasParams && null != sasParams.getSiteId())
+      log.append(separator + "rq-mk-siteid=\"" + sasParams.getSiteId() + "\"");
+    if(null != sasParams && null != sasParams.getRqMkAdcount())
+      log.append(separator + "rq-mk-adcount=\"" + sasParams.getRqMkAdcount() + "\"");
+    if(null != sasParams && null != sasParams.getTid())
+      log.append(separator + "tid=\"" + sasParams.getTid() + "\"");
 
     InventoryType inventory = getInventoryType(sasParams);
     String timestamp = ReportTime.getTTime();
     log.append(separator + "ttime=\"" + timestamp + "\"");
     log.append(separator + "rq-src=[\"uk\",\"uk\",\"uk\",\"uk\",");
-    if(null != sasParams && null != sasParams.tp)
-      log.append("\"" + sasParams.tp + "\"]");
+    if(null != sasParams && null != sasParams.getTp())
+      log.append("\"" + sasParams.getTp() + "\"]");
     else
       log.append("\"dir\"]");
 
@@ -181,10 +181,10 @@ public class Logging {
     String requestSlot = null;
     String slotServed = null;
     if(null != sasParams) {
-      handset = sasParams.handset;
-      carrier = sasParams.carrier;
-      requestSlot = sasParams.rqMkSlot;
-      slotServed = sasParams.slot;
+      handset = sasParams.getHandset();
+      carrier = sasParams.getCarrier();
+      requestSlot = sasParams.getRqMkSlot();
+      slotServed = sasParams.getSlot();
     }
     HandsetMeta handsetMeta = new HandsetMeta();
     if(null != handset)
@@ -192,8 +192,8 @@ public class Logging {
     if(null != handset && handset.length() > 3) {
       handsetMeta.setId(handset.getInt(3));
       handsetMeta.setManufacturer(handset.getInt(2));
-    } else if(null != sasParams && sasParams.osId != 0)
-      handsetMeta.setOsId(sasParams.osId);
+    } else if(null != sasParams && sasParams.getOsId() != 0)
+      handsetMeta.setOsId(sasParams.getOsId());
     Geo geo = null;
     if(null != carrier) {
       log.append(separator).append("carrier=").append(carrier);
@@ -220,36 +220,36 @@ public class Logging {
     User user = new User();
     log.append(separator + "uparams={");
     if(null != sasParams) {
-      if(null != sasParams.age) {
-        log.append("\"u-age\":\"").append(sasParams.age).append("\",");
-        if(sasParams.age.matches("^\\d+$"))
-          user.setAge(Short.valueOf(sasParams.age));
+      if(null != sasParams.getAge()) {
+        log.append("\"u-age\":\"").append(sasParams.getAge()).append("\",");
+        if(sasParams.getAge().matches("^\\d+$"))
+          user.setAge(Short.valueOf(sasParams.getAge()));
       }
-      if(null != sasParams.gender) {
-        log.append("\"u-gender\":\"").append(sasParams.gender).append("\",");
+      if(null != sasParams.getGender()) {
+        log.append("\"u-gender\":\"").append(sasParams.getGender()).append("\",");
         user.setGender(getGender(sasParams));
       }
-      if(null != sasParams.genderOrig)
-        log.append("\"u-gender-orig\":\"").append(sasParams.genderOrig).append("\",");
-      if(null != sasParams.uid) {
-        log.append("\"u-id\":\"").append(sasParams.uid).append("\",");
-        user.setId(sasParams.uid);
+      if(null != sasParams.getGenderOrig())
+        log.append("\"u-gender-orig\":\"").append(sasParams.getGenderOrig()).append("\",");
+      if(null != sasParams.getUid()) {
+        log.append("\"u-id\":\"").append(sasParams.getUid()).append("\",");
+        user.setId(sasParams.getUid());
       }
-      if(null != sasParams.userLocation)
-        log.append("\"u-location\":\"").append(sasParams.userLocation).append("\",");
-      if(null != sasParams.postalCode)
-        log.append("\"u-postalcode\":\"").append(sasParams.postalCode).append("\"");
+      if(null != sasParams.getUserLocation())
+        log.append("\"u-location\":\"").append(sasParams.getUserLocation()).append("\",");
+      if(null != sasParams.getPostalCode())
+        log.append("\"u-postalcode\":\"").append(sasParams.getPostalCode()).append("\"");
     }
     if(log.charAt(log.length() - 1) == ',')
       log.deleteCharAt(log.length() - 1);
     log.append("}").append(separator).append("u-id-params=");
-    if(null != sasParams && null != sasParams.uidParams)
-      log.append(sasParams.uidParams);
+    if(null != sasParams && null != sasParams.getUidParams())
+      log.append(sasParams.getUidParams());
     else
       log.append("{}");
 
-    if(null != sasParams && null != sasParams.siteSegmentId)
-      log.append(separator).append("sel-seg-id=").append(sasParams.siteSegmentId);
+    if(null != sasParams && null != sasParams.getSiteSegmentId())
+      log.append(separator).append("sel-seg-id=").append(sasParams.getSiteSegmentId());
 
     if(logger.isDebugEnabled())
       logger.debug("finally writing to rr log" + log.toString());
@@ -259,8 +259,8 @@ public class Logging {
     else
       logger.debug("file logging is not enabled");
     short adRequested = 1;
-    Request request = new Request(adRequested, adsServed, sasParams == null ? null : sasParams.siteId,
-        sasParams == null ? null : sasParams.tid);
+    Request request = new Request(adRequested, adsServed, sasParams == null ? null : sasParams.getSiteId(),
+        sasParams == null ? null : sasParams.getTid());
     if(slotServed != null)
       request.setSlot_served(Integer.valueOf(slotServed).shortValue());
     request.setIP(geo);
@@ -269,8 +269,8 @@ public class Logging {
     request.setUser(user);
     if(requestSlot != null)
       request.setSlot_requested(slotRequested);
-    if(null != sasParams && null != sasParams.siteSegmentId)
-      request.setSegmentId(sasParams.siteSegmentId);
+    if(null != sasParams && null != sasParams.getSiteSegmentId())
+      request.setSegmentId(sasParams.getSiteSegmentId());
 
     List<Impression> impressions = null;
     if(null != impression) {
@@ -295,13 +295,13 @@ public class Logging {
     StringBuilder log = new StringBuilder();
     log.append("trtt=").append(totalTime);
     InspectorStats.incrementStatCount(InspectorStrings.latency, totalTime);
-    if(null != sasParams && sasParams.siteId != null)
-      log.append(sep + "rq-mk-siteid=\"").append(sasParams.siteId).append("\"");
+    if(null != sasParams && sasParams.getSiteId() != null)
+      log.append(sep + "rq-mk-siteid=\"").append(sasParams.getSiteId()).append("\"");
 
     String timestamp = ReportTime.getUTCTimestamp();
     log.append(sep).append("ttime=\"").append(timestamp).append("\"");
-    if(null != sasParams && sasParams.tid != null)
-      log.append(sep).append("tid=\"").append(sasParams.tid).append("\"");
+    if(null != sasParams && sasParams.getTid() != null)
+      log.append(sep).append("tid=\"").append(sasParams.getTid()).append("\"");
     if(clickUrl != null)
       log.append(sep + "clurl=\"" + clickUrl + "\"");
     log.append(sep).append("rq-tpan=[");
@@ -367,27 +367,27 @@ public class Logging {
     ContentRating siteType = getContentRating(sasParams);
 
     List<Integer> categ = null;
-    if(null != sasParams && sasParams.categories != null) {
+    if(null != sasParams && sasParams.getCategories() != null) {
       categ = new ArrayList<Integer>();
-      for (long cat : sasParams.categories) {
+      for (long cat : sasParams.getCategories()) {
         categ.add((int) cat);
       }
     }
 
     SiteParams siteParams = new SiteParams(categ, siteType);
     RequestParams requestParams = sasParams == null ? new RequestParams(null, null, null) : new RequestParams(
-        sasParams.remoteHostIp, sasParams.source, sasParams.userAgent);
+        sasParams.getRemoteHostIp(), sasParams.getSource(), sasParams.getUserAgent());
 
-    if(null != sasParams && null != sasParams.remoteHostIp)
-      log.append("rq-params={\"host\":\"").append(sasParams.remoteHostIp).append("\"");
+    if(null != sasParams && null != sasParams.getRemoteHostIp())
+      log.append("rq-params={\"host\":\"").append(sasParams.getRemoteHostIp()).append("\"");
     JSONArray carrier = null;
     if(null != sasParams) {
-      if(sasParams.source != null)
-        log.append(",\"src\":\"").append(sasParams.source).append("\"");
+      if(sasParams.getSource() != null)
+        log.append(",\"src\":\"").append(sasParams.getSource()).append("\"");
       log.append("}").append(sep).append("rq-h-user-agent=\"");
-      log.append(sasParams.userAgent).append("\"").append(sep).append("rq-site-params=[{\"categ\":");
-      log.append(sasParams.categories.toString()).append("},{\"type\":\"" + sasParams.siteType + "\"}]");
-      carrier = sasParams.carrier;
+      log.append(sasParams.getUserAgent()).append("\"").append(sep).append("rq-site-params=[{\"categ\":");
+      log.append(sasParams.getCategories().toString()).append("},{\"type\":\"" + sasParams.getSiteType() + "\"}]");
+      carrier = sasParams.getCarrier();
     }
 
     Geo geo = null;
@@ -399,14 +399,14 @@ public class Logging {
       if(carrier.length() >= 5 && carrier.get(4) != null)
         geo.setCity(carrier.getInt(4));
     }
-    if(null != sasParams && null != sasParams.siteSegmentId)
-        log.append(sep).append("sel-seg-id=").append(sasParams.siteSegmentId);
+    if(null != sasParams && null != sasParams.getSiteSegmentId())
+        log.append(sep).append("sel-seg-id=").append(sasParams.getSiteSegmentId());
 
     logger.debug("finished writing cas logs");
     logger.debug(log.toString());
     if(enableFileLogging)
       debugLogger.info(log.toString());
-    CasChannelLog channelLog = new CasChannelLog(totalTime, clickUrl, sasParams == null ? null : sasParams.siteId,
+    CasChannelLog channelLog = new CasChannelLog(totalTime, clickUrl, sasParams == null ? null : sasParams.getSiteId(),
         new RequestTpan(responseList), siteParams, requestParams, timestamp);
     if(null != geo)
       channelLog.setIP(geo);
@@ -541,13 +541,13 @@ public class Logging {
   public static ContentRating getContentRating(SASRequestParameters sasParams) {
     if(sasParams == null)
       return null;
-    if(sasParams.siteType == null)
+    if(sasParams.getSiteType() == null)
       return null;
-    if(sasParams.siteType.equalsIgnoreCase("performance"))
+    if(sasParams.getSiteType().equalsIgnoreCase("performance"))
       return ContentRating.PERFORMANCE;
-    if(sasParams.siteType.equalsIgnoreCase("FAMILY_SAFE"))
+    if(sasParams.getSiteType().equalsIgnoreCase("FAMILY_SAFE"))
       return ContentRating.FAMILY_SAFE;
-    if(sasParams.siteType.equalsIgnoreCase("MATURE"))
+    if(sasParams.getSiteType().equalsIgnoreCase("MATURE"))
       return ContentRating.MATURE;
     else
       return null;
@@ -565,7 +565,8 @@ public class Logging {
   }
 
   public static InventoryType getInventoryType(SASRequestParameters sasParams) {
-    if(null != sasParams && sasParams.sdkVersion != null && sasParams.sdkVersion.equalsIgnoreCase("0"))
+    if(null != sasParams && sasParams.getSdkVersion() != null 
+    	&& sasParams.getSdkVersion().equalsIgnoreCase("0"))
       return InventoryType.BROWSER;
     return InventoryType.APP;
   }
@@ -573,7 +574,7 @@ public class Logging {
   public static Gender getGender(SASRequestParameters sasParams) {
     if(sasParams == null)
       return null;
-    if(sasParams.gender.equalsIgnoreCase("m"))
+    if(sasParams.getGender().equalsIgnoreCase("m"))
       return Gender.MALE;
     else
       return Gender.FEMALE;
