@@ -72,6 +72,18 @@ public class ServletGetSegment implements Servlet {
       if(repoName != null && repoName.equalsIgnoreCase("channelsegmentfeedback")) {
         entity = ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(id);
       }
+      
+      if(repoName != null && repoName.equalsIgnoreCase("sitemetadata")) {
+        entity = ServletHandler.repositoryHelper.querySiteMetaDetaRepository(id);
+      }
+      
+      if(repoName != null && repoName.equalsIgnoreCase("siteTaxononmy")) {
+        entity = ServletHandler.repositoryHelper.querySiteTaxonomyRepository(id);
+      }
+      
+      if(repoName != null && repoName.equalsIgnoreCase("sitecitrusleaffeedback")) {
+        entity = ServletHandler.repositoryHelper.querySiteCitrusLeafFeedbackRepository(id.split("_")[0], id.split("_")[1], logger);
+      }
       getSegments(key, entity, segmentInfo);
     }
 
