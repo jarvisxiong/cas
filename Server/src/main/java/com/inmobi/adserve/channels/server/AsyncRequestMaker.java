@@ -6,10 +6,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.hadoop.util.StringUtils;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 import org.json.JSONException;
@@ -27,6 +29,7 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
 import com.ning.http.client.AsyncHttpClient;
+import com.vladium.util.Strings;
 
 public class AsyncRequestMaker {
 
@@ -59,7 +62,7 @@ public class AsyncRequestMaker {
 
     logger.debug("Total channels available for sending requests", rows.size() + "");
     boolean isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled", false);
-    logger.debug("isRtbEnabled is", new Boolean(isRtbEnabled).toString());
+    logger.debug("isRtbEnabled is", Boolean.valueOf(isRtbEnabled));
 
     for (ChannelSegment row : rows) {
       ChannelSegmentEntity channelSegmentEntity = row.getChannelSegmentEntity();
@@ -81,14 +84,14 @@ public class AsyncRequestMaker {
 
       String clickUrl = null;
       String beaconUrl = null;
-      sasParams.impressionId = getImpressionId(channelSegmentEntity.getIncId());
+      sasParams.setImpressionId(getImpressionId(channelSegmentEntity.getIncId()));
       CasInternalRequestParameters casInternalRequestParameters = getCasInternalRequestParameters(sasParams,
           casInternalRequestParams);
       controlEnrichment(casInternalRequestParameters, channelSegmentEntity);
-      sasParams.adIncId = channelSegmentEntity.getIncId();
-      logger.debug("impression id is " + sasParams.impressionId);
+      sasParams.setAdIncId(channelSegmentEntity.getIncId());
+      logger.debug("impression id is " + sasParams.getImpressionId());
 
-      if((network.isClickUrlRequired() || network.isBeaconUrlRequired()) && null != sasParams.impressionId) {
+      if((network.isClickUrlRequired() || network.isBeaconUrlRequired()) && null != sasParams.getImpressionId()) {
         if(config.getInt("clickmaker.version", 6) == 4) {
           ClickUrlMaker clickUrlMaker = new ClickUrlMaker(config, jObject, sasParams, logger);
           TrackingUrls trackingUrls = clickUrlMaker.getClickUrl(channelSegmentEntity.getPricingModel());
@@ -141,15 +144,15 @@ public class AsyncRequestMaker {
       CasInternalRequestParameters casInternalRequestParams) {
     CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
     casInternalRequestParameters.blockedCategories = casInternalRequestParams.blockedCategories;
-    casInternalRequestParameters.highestEcpm = casInternalRequestParameters.highestEcpm;
+    casInternalRequestParameters.highestEcpm = casInternalRequestParams.highestEcpm;
     casInternalRequestParameters.rtbBidFloor = casInternalRequestParams.rtbBidFloor;
-    casInternalRequestParameters.uidParams = sasParams.uidParams;
-    casInternalRequestParameters.uid = sasParams.uid;
-    casInternalRequestParameters.uidO1 = sasParams.uidO1;
-    casInternalRequestParameters.uidMd5 = sasParams.uidMd5;
-    casInternalRequestParameters.uidIFA = sasParams.uidIFA;
-    casInternalRequestParameters.zipCode = sasParams.postalCode;
-    casInternalRequestParameters.latLong = sasParams.latLong;
+    casInternalRequestParameters.uidParams = sasParams.getUidParams();
+    casInternalRequestParameters.uid = sasParams.getUid();
+    casInternalRequestParameters.uidO1 = sasParams.getUidO1();
+    casInternalRequestParameters.uidMd5 = sasParams.getUidMd5();
+    casInternalRequestParameters.uidIFA = sasParams.getUidIFA();
+    casInternalRequestParameters.zipCode = sasParams.getPostalCode();
+    casInternalRequestParameters.latLong = sasParams.getLatLong();
     return casInternalRequestParameters;
   }
 
@@ -220,14 +223,14 @@ public class AsyncRequestMaker {
     unhashable.addAll(Arrays.asList(config.getStringArray("clickmaker.unhashable")));
     ClickUrlMakerV6 clickUrlMakerV6 = new ClickUrlMakerV6(logger, unhashable);
     try {
-      if(null != sasParams.age) {
-        clickUrlMakerV6.setAge(Integer.parseInt(sasParams.age));
+      if(null != sasParams.getAge()) {
+        clickUrlMakerV6.setAge(Integer.parseInt(sasParams.getAge()));
       }
     } catch (NumberFormatException e) {
       logger.error("Wrong format for Age");
     }
-    if(null != sasParams.gender)
-      clickUrlMakerV6.setGender(sasParams.gender);
+    if(null != sasParams.getGender())
+      clickUrlMakerV6.setGender(sasParams.getGender());
     clickUrlMakerV6.setCPC(pricingModel);
     Integer carrierId = null;
     try {
@@ -238,8 +241,8 @@ public class AsyncRequestMaker {
     if(null != carrierId)
       clickUrlMakerV6.setCarrierId(carrierId);
     try {
-      if(null != sasParams.countryStr) {
-        clickUrlMakerV6.setCountryId(Integer.parseInt(sasParams.countryStr));
+      if(null != sasParams.getCountryStr()) {
+        clickUrlMakerV6.setCountryId(Integer.parseInt(sasParams.getCountryStr()));
       }
     } catch (NumberFormatException e) {
       logger.error("Wrong format for CountryString");
@@ -256,23 +259,23 @@ public class AsyncRequestMaker {
     } catch (JSONException e) {
       e.printStackTrace();
     }
-    if(null == sasParams.impressionId) {
+    if(null == sasParams.getImpressionId()) {
       logger.debug("impression id is null");
     } else {
-      clickUrlMakerV6.setImpressionId(sasParams.impressionId);
+      clickUrlMakerV6.setImpressionId(sasParams.getImpressionId());
     }
-    clickUrlMakerV6.setIpFileVersion(sasParams.ipFileVersion.longValue());
+    clickUrlMakerV6.setIpFileVersion(sasParams.getIpFileVersion().longValue());
     clickUrlMakerV6.setIsBillableDemog(false);
     try {
-      if(null != sasParams.area) {
-        clickUrlMakerV6.setLocation(Integer.parseInt(sasParams.area));
+      if(null != sasParams.getArea()) {
+        clickUrlMakerV6.setLocation(Integer.parseInt(sasParams.getArea()));
       }
     } catch (NumberFormatException e) {
       logger.error("Wrong format for Area");
     }
-    if(null != sasParams.siteSegmentId)
-      clickUrlMakerV6.setSegmentId(sasParams.siteSegmentId);
-    clickUrlMakerV6.setSiteIncId(sasParams.siteIncId);
+    if(null != sasParams.getSiteSegmentId())
+      clickUrlMakerV6.setSegmentId(sasParams.getSiteSegmentId());
+    clickUrlMakerV6.setSiteIncId(sasParams.getSiteIncId());
     Map<String, String> uidMap = new HashMap<String, String>();
     JSONObject userIdMap = null;
     try {
@@ -280,9 +283,8 @@ public class AsyncRequestMaker {
     } catch (JSONException e) {
       logger.debug("u-id-params is not present in the request");
     }
-    if(null == userIdMap && null != sasParams.uid)
-      uidMap.put("U-ID", sasParams.uid);
-    else {
+    
+    if(null != userIdMap) {
       Iterator userMapIterator = userIdMap.keys();
       while (userMapIterator.hasNext()) {
         String key = (String) userMapIterator.next();
@@ -293,13 +295,13 @@ public class AsyncRequestMaker {
           logger.debug("value corresponding to uid key is not present in the uidMap");
         }
         if(null != value)
-          uidMap.put(key.toUpperCase(), value);
+          uidMap.put(key.toUpperCase(Locale.ENGLISH), value);
       }
+    } else if(null != sasParams.getUid()) {
+      uidMap.put("U-ID", sasParams.getUid());
     }
 
     clickUrlMakerV6.setUdIdVal(uidMap);
-    clickUrlMakerV6.setCryptoKeyType(config.getString("clickmaker.key.1.type"));
-    clickUrlMakerV6.setTestCryptoKeyType(config.getString("clickmaker.key.2.type"));
     clickUrlMakerV6.setCryptoSecretKey(config.getString("clickmaker.key.1.value"));
     clickUrlMakerV6.setTestCryptoSecretKey(config.getString("clickmaker.key.2.value"));
     clickUrlMakerV6.setImageBeaconFlag(true);// true/false

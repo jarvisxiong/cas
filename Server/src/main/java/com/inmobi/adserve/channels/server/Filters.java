@@ -1,21 +1,22 @@
 package com.inmobi.adserve.channels.server;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
+import java.util.Map;
+import java.util.Set;
 
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -24,37 +25,46 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
  * 
  * @author devashish
  * 
- *         Filter class to filter the segments selected by MatchSegment class
+ *         Filters class to filter the Channel Segments selected by MatchSegment
+ *         class
  * 
  */
 
 public class Filters {
 
-  private static Comparator<ChannelSegment> COMPARATOR = new Comparator<ChannelSegment>() {
+  private final static Comparator<ChannelSegment> COMPARATOR = new Comparator<ChannelSegment>() {
     public int compare(ChannelSegment o1, ChannelSegment o2) {
       return o1.getPrioritisedECPM() > o2.getPrioritisedECPM() ? -1 : 1;
     }
   };
 
-  public static HashMap<String/* advertiserId */, String/* advertiserName */> advertiserIdtoNameMapping = new HashMap<String, String>();
-  public static HashMap<String/* advertiserId */, HashSet<String/* siteIncId */>> whiteListedSites = new HashMap<String, HashSet<String>>();
-  public static long lastRefresh;
-  public static Random random;
-
-  private HashMap<String, HashMap<String, ChannelSegment>> matchedSegments;
+  final static Map<String/* advertiserId */, String/* advertiserName */> advertiserIdtoNameMapping = new HashMap<String, String>();
+  private final static String ENDS_WITH_ADVERTISER_ID = ".advertiserId";
+  private Map<String, HashMap<String, ChannelSegment>> matchedSegments;
   private Configuration serverConfiguration;
   private Configuration adapterConfiguration;
   private SASRequestParameters sasParams;
   private double revenueWindow;
+  private RepositoryHelper repositoryHelper;
   private DebugLogger logger;
 
-  public Filters(HashMap<String, HashMap<String, ChannelSegment>> matchedSegments, Configuration serverConfiguration,
-      Configuration adapterConfiguration, SASRequestParameters sasParams, DebugLogger logger) {
+  public static Map<String, String> getAdvertiserIdToNameMapping() {
+    return advertiserIdtoNameMapping;
+  }
+
+  public Map<String, HashMap<String, ChannelSegment>> getMatchedSegments() {
+    return matchedSegments;
+  }
+
+  public Filters(Map<String, HashMap<String, ChannelSegment>> matchedSegments, Configuration serverConfiguration,
+      Configuration adapterConfiguration, SASRequestParameters sasParams, RepositoryHelper repositoryHelper,
+      DebugLogger logger) {
     this.matchedSegments = matchedSegments;
     this.serverConfiguration = serverConfiguration;
     this.adapterConfiguration = adapterConfiguration;
     this.sasParams = sasParams;
     this.revenueWindow = serverConfiguration.getDouble("revenueWindow", 0.33);
+    this.repositoryHelper = repositoryHelper;
     this.logger = logger;
   }
 
@@ -62,18 +72,10 @@ public class Filters {
     Iterator<String> itr = adapterConfiguration.getKeys();
     while (null != itr && itr.hasNext()) {
       String str = itr.next();
-      if(str.endsWith(".advertiserId")) {
-        advertiserIdtoNameMapping.put(adapterConfiguration.getString(str), str.replace(".advertiserId", ""));
-        String sites = adapterConfiguration.getString(str.replace(".advertiserId", ".whiteListedSites"));
-        HashSet<String> siteSet = new HashSet<String>();
-        if(!StringUtils.isEmpty(sites)) {
-          siteSet.addAll(Arrays.asList(sites.split(",")));
-          whiteListedSites.put(adapterConfiguration.getString(str), siteSet);
-        }
+      if(str.endsWith(ENDS_WITH_ADVERTISER_ID)) {
+        advertiserIdtoNameMapping.put(adapterConfiguration.getString(str), str.replace(ENDS_WITH_ADVERTISER_ID, ""));
       }
     }
-    lastRefresh = System.currentTimeMillis();
-    random = new Random();
   }
 
   /**
@@ -82,13 +84,19 @@ public class Filters {
    * @return returns a list of filtered channel segments
    */
   public List<ChannelSegment> applyFilters() {
-    Filters.refreshWhiteListedSites(serverConfiguration, adapterConfiguration, logger);
-    matchedSegments = advertiserLevelFiltering();
-    matchedSegments = adGroupLevelFiltering();
+    advertiserLevelFiltering();
+    adGroupLevelFiltering();
     List<ChannelSegment> channelSegments = convertToSegmentsList(matchedSegments);
     return selectTopAdgroupsForRequest(channelSegments);
   }
 
+  /**
+   * Returns true if advertiser has balance remaining less than its max revenue
+   * of last fifteen days times 3
+   * 
+   * @param channelSegment
+   * @return
+   */
   boolean isBurnLimitExceeded(ChannelSegment channelSegment) {
     boolean result = channelSegment.getChannelFeedbackEntity().getBalance() < channelSegment.getChannelFeedbackEntity()
         .getRevenue() * revenueWindow;
@@ -105,6 +113,12 @@ public class Filters {
     return result;
   }
 
+  /**
+   * Returns true if advertiser has served more impressions than its daily limit
+   * 
+   * @param channelSegment
+   * @return
+   */
   boolean isDailyImpressionCeilingExceeded(ChannelSegment channelSegment) {
     boolean result = channelSegment.getChannelFeedbackEntity().getTodayImpressions() > channelSegment
         .getChannelEntity().getImpressionCeil();
@@ -121,6 +135,13 @@ public class Filters {
     return result;
   }
 
+  /**
+   * Returns true if request sent to advetiser today is greater than its daily
+   * request cap
+   * 
+   * @param channelSegment
+   * @return
+   */
   boolean isDailyRequestCapExceeded(ChannelSegment channelSegment) {
     boolean result = channelSegment.getChannelFeedbackEntity().getTodayRequests() > channelSegment.getChannelEntity()
         .getRequestCap();
@@ -137,14 +158,93 @@ public class Filters {
     return result;
   }
 
-  boolean isSiteAbsentInWhiteList(String advertiserId, Random random) {
-    boolean result = whiteListedSites.containsKey(advertiserId)
-        && !whiteListedSites.get(advertiserId).contains(new Long(sasParams.siteIncId).toString())
-        && random.nextInt(100) < 95;
+  /**
+   * Returns true if advertiser is not present in site's advertiser inclusion
+   * list OR if advertiser is not present in publisher's advertiser inclusion
+   * list when site doesnt have advertiser inclusion list
+   * 
+   * @param channelSegment
+   * @return
+   */
+  boolean isAdvertiserExcluded(ChannelSegment channelSegment) {
+    boolean result = false;
+    String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
+    SiteMetaDataEntity siteMetaDataEntity = repositoryHelper.querySiteMetaDetaRepository(sasParams.getSiteId());
+    if(siteMetaDataEntity != null) {
+      Set<String> advertisersIncludedbySite = siteMetaDataEntity.getAdvertisersIncludedBySite();
+      Set<String> advertisersIncludedbyPublisher = siteMetaDataEntity.getAdvertisersIncludedByPublisher();
+      // checking if site has advertiser inclusion list
+      if(!advertisersIncludedbySite.isEmpty()) {
+        result = !advertisersIncludedbySite.contains(advertiserId);
+      }
+      // else checking in publisher advertiser inclusion list if any
+      else {
+        result = !advertisersIncludedbyPublisher.isEmpty() && !advertisersIncludedbyPublisher.contains(advertiserId);
+      }
+    }
     if(result) {
-      logger.debug("Dropped in site whiteList filter advertiserId", advertiserId);
-      InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
-          InspectorStrings.droppedInSiteInclusionExclusionFilter);
+      logger.debug("Site/publisher inclusion list does not contain advertiser", advertiserId);
+      if(advertiserIdtoNameMapping.containsKey(advertiserId)) {
+        InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
+            InspectorStrings.droppedinAdvertiserInclusionFilter);
+      }
+    } else {
+      logger.debug("Advertiser Inclusion filter passed by advertiser", advertiserId);
+    }
+    return result;
+  }
+
+  /**
+   * Returns true in case of site is not present in advertiser's inclusion list
+   * OR site is present in advertiser's exclusion list
+   * 
+   * @param channelSegment
+   * @return
+   */
+  boolean isSiteExcludedByAdvertiser(ChannelSegment channelSegment) {
+    boolean result = false;
+    String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
+    if(channelSegment.getChannelEntity().getSitesIE().contains(sasParams.getSiteId())) {
+      result = !channelSegment.getChannelEntity().isSiteInclusion();
+    } else {
+      result = channelSegment.getChannelEntity().isSiteInclusion();
+    }
+    if(result) {
+      logger.debug("Dropping as site not present in inclusion list of advertiser", advertiserId);
+      if(advertiserIdtoNameMapping.containsKey(advertiserId)) {
+        InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
+            InspectorStrings.droppedinSiteInclusionFilter);
+      }
+    } else {
+      logger.debug("Site inclusion exclusion passed by advertiser", advertiserId);
+    }
+    return result;
+  }
+
+  /**
+   * Returns true in case of site is not present in adgroup's inclusion list OR
+   * site is present in adgroup's exclusion list
+   * 
+   * @param channelSegment
+   * @return
+   */
+  boolean isSiteExcludedByAdGroup(ChannelSegment channelSegment) {
+    boolean result = false;
+    String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
+    String adGroupId = channelSegment.getChannelSegmentEntity().getAdgroupId();
+    if(channelSegment.getChannelSegmentEntity().getSitesIE().contains(sasParams.getSiteId())) {
+      result = !channelSegment.getChannelSegmentEntity().isSiteInclusion();
+    } else {
+      result = channelSegment.getChannelSegmentEntity().isSiteInclusion();
+    }
+    if(result) {
+      logger.debug("Dropping as site not present in inclusion list of adroup", adGroupId);
+      if(advertiserIdtoNameMapping.containsKey(advertiserId)) {
+        InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
+            InspectorStrings.droppedinSiteInclusionFilter);
+      }
+    } else {
+      logger.debug("Site inclusion exclusion passed by adgroup", adGroupId);
     }
     return result;
   }
@@ -155,28 +255,29 @@ public class Filters {
    * 
    * @return returns the map containing advertisers who has passed the filters
    */
-  HashMap<String, HashMap<String, ChannelSegment>> advertiserLevelFiltering() {
+  void advertiserLevelFiltering() {
     logger.debug("Inside advertiserLevelFiltering");
-    HashMap<String, HashMap<String, ChannelSegment>> rows = new HashMap<String, HashMap<String, ChannelSegment>>();
+    Map<String, HashMap<String, ChannelSegment>> rows = new HashMap<String, HashMap<String, ChannelSegment>>();
     ChannelSegment channelSegment;
-    for (String advertiserId : matchedSegments.keySet()) {
+    for (Map.Entry<String, HashMap<String, ChannelSegment>> advertiserEntry : matchedSegments.entrySet()) {
+      String advertiserId = advertiserEntry.getKey();
       if(advertiserIdtoNameMapping.containsKey(advertiserId)) {
         InspectorStats.initializeFilterStats(advertiserIdtoNameMapping.get(advertiserId));
       }
-      channelSegment = ((ChannelSegment[]) matchedSegments.get(advertiserId).values().toArray(new ChannelSegment[0]))[0];
+      channelSegment = ((ChannelSegment[]) advertiserEntry.getValue().values()
+          .toArray(new ChannelSegment[advertiserEntry.getValue().values().size()]))[0];
       // dropping advertiser if balance is less than revenue of
       // that advertiser OR if todays impression is greater than impression
       // ceiling OR site is not present in advertiser's whiteList
       if(isBurnLimitExceeded(channelSegment) || isDailyImpressionCeilingExceeded(channelSegment)
-          || isDailyRequestCapExceeded(channelSegment)
-          || isSiteAbsentInWhiteList(channelSegment.getChannelSegmentEntity().getAdvertiserId(), random)) {
+          || isDailyRequestCapExceeded(channelSegment) || isAdvertiserExcluded(channelSegment)) {
         continue;
       }
       // otherwise adding the advertiser to the list
       rows.put(advertiserId, matchedSegments.get(advertiserId));
     }
     printSegments(rows);
-    return rows;
+    matchedSegments = rows;
   }
 
   /**
@@ -186,16 +287,18 @@ public class Filters {
    * @return returns the map containing adgroups left after filter and
    *         shortlisting
    */
-  HashMap<String, HashMap<String, ChannelSegment>> adGroupLevelFiltering() {
+  void adGroupLevelFiltering() {
     logger.debug("Inside adGroupLevelFiltering");
-    HashMap<String, HashMap<String, ChannelSegment>> rows = new HashMap<String, HashMap<String, ChannelSegment>>();
-    for (String advertiserId : matchedSegments.keySet()) {
+    Map<String, HashMap<String, ChannelSegment>> rows = new HashMap<String, HashMap<String, ChannelSegment>>();
+    for (Map.Entry<String, HashMap<String, ChannelSegment>> advertiserEntry : matchedSegments.entrySet()) {
+      String advertiserId = advertiserEntry.getKey();
       HashMap<String, ChannelSegment> hashMap = new HashMap<String, ChannelSegment>();
       List<ChannelSegment> segmentListToBeSorted = new ArrayList<ChannelSegment>();
-      for (String adgroupId : matchedSegments.get(advertiserId).keySet()) {
-        ChannelSegment channelSegment = matchedSegments.get(advertiserId).get(adgroupId);
+      Map<String, ChannelSegment> adGroups = advertiserEntry.getValue();
+      for (Map.Entry<String, ChannelSegment> adGroupEntry : adGroups.entrySet()) {
+        ChannelSegment channelSegment = adGroupEntry.getValue();
         // applying siteFloor filter
-        if(channelSegment.getChannelSegmentFeedbackEntity().geteCPM() < sasParams.siteFloor) {
+        if(channelSegment.getChannelSegmentFeedbackEntity().geteCPM() < sasParams.getSiteFloor()) {
           logger.debug("sitefloor filter failed by adgroup", channelSegment.getChannelSegmentFeedbackEntity().getId());
           continue;
         } else {
@@ -205,11 +308,21 @@ public class Filters {
         if(isAnySegmentPropertyViolated(channelSegment.getChannelSegmentEntity())) {
           continue;
         }
+        if(channelSegment.getChannelSegmentEntity().getSitesIE().isEmpty()) {
+          if(isSiteExcludedByAdvertiser(channelSegment)) {
+            continue;
+          }
+        } else {
+          if(isSiteExcludedByAdGroup(channelSegment)) {
+            continue;
+          }
+        }
         channelSegment.setPrioritisedECPM(getPrioritisedECPM(channelSegment));
         segmentListToBeSorted.add(channelSegment);
       }
-      if(segmentListToBeSorted.isEmpty())
+      if(segmentListToBeSorted.isEmpty()) {
         continue;
+      }
       Collections.sort(segmentListToBeSorted, COMPARATOR);
       // choosing top segments from the sorted list
       int adGpCount = 1;
@@ -231,7 +344,7 @@ public class Filters {
       rows.put(advertiserId, hashMap);
     }
     printSegments(rows);
-    return rows;
+    matchedSegments = rows;
   }
 
   /**
@@ -242,32 +355,32 @@ public class Filters {
    */
   boolean isAnySegmentPropertyViolated(ChannelSegmentEntity channelSegmentEntity) {
     if(channelSegmentEntity.isUdIdRequired()
-        && (StringUtils.isEmpty(sasParams.uidParams) || sasParams.uidParams.equals("{}"))) {
+        && (StringUtils.isEmpty(sasParams.getUidParams()) || sasParams.getUidParams().equals("{}"))) {
       InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegmentEntity.getAdvertiserId()),
           InspectorStrings.droppedInUdidFilter);
       return true;
     }
-    if(channelSegmentEntity.isZipCodeRequired() && StringUtils.isEmpty(sasParams.postalCode)) {
+    if(channelSegmentEntity.isZipCodeRequired() && StringUtils.isEmpty(sasParams.getPostalCode())) {
       InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegmentEntity.getAdvertiserId()),
           InspectorStrings.droppedInZipcodeFilter);
       return true;
     }
-    if(channelSegmentEntity.isLatlongRequired() && StringUtils.isEmpty(sasParams.latLong)) {
+    if(channelSegmentEntity.isLatlongRequired() && StringUtils.isEmpty(sasParams.getLatLong())) {
       InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegmentEntity.getAdvertiserId()),
           InspectorStrings.droppedInLatLongFilter);
       return true;
     }
-    if(channelSegmentEntity.isRestrictedToRichMediaOnly() && !sasParams.isRichMedia) {
+    if(channelSegmentEntity.isRestrictedToRichMediaOnly() && !sasParams.isRichMedia()) {
       InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegmentEntity.getAdvertiserId()),
           InspectorStrings.droppedInLatLongFilter);
       return true;
     }
-    if(channelSegmentEntity.isInterstitialOnly() && (sasParams.rqAdType == null || !sasParams.rqAdType.equals("int"))) {
+    if(channelSegmentEntity.isInterstitialOnly() && (sasParams.getRqAdType() == null || !sasParams.getRqAdType().equals("int"))) {
       InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegmentEntity.getAdvertiserId()),
           InspectorStrings.droppedInOnlyInterstitialFilter);
       return true;
     }
-    if(channelSegmentEntity.isNonInterstitialOnly() && sasParams.rqAdType != null && sasParams.rqAdType.equals("int")) {
+    if(channelSegmentEntity.isNonInterstitialOnly() && sasParams.getRqAdType() != null && sasParams.getRqAdType().equals("int")) {
       InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegmentEntity.getAdvertiserId()),
           InspectorStrings.droppedInOnlyNonInterstitialFilter);
       return true;
@@ -303,7 +416,7 @@ public class Filters {
             InspectorStrings.droppedInSegmentPerRequestFilter);
       }
     }
-    logger.debug("Number of  ShortListed Segments are : " + shortlistedRow.size());
+    logger.debug("Number of  ShortListed Segments are :", Integer.valueOf(shortlistedRow.size()).toString());
     for (int i = 0; i < shortlistedRow.size(); i++) {
       if(logger.isDebugEnabled()) {
         logger.debug("Segment with advertiserid " + shortlistedRow.get(i).getChannelSegmentEntity().getAdvertiserId()
@@ -330,14 +443,15 @@ public class Filters {
     return (Math.pow((ecpm + eCPMShift), feedbackPower) * (priority) * getECPMBoostFactor(channelSegment));
   }
 
-  void printSegments(HashMap<String, HashMap<String, ChannelSegment>> matchedSegments) {
+  void printSegments(Map<String, HashMap<String, ChannelSegment>> matchedSegments) {
     if(logger.isDebugEnabled()) {
       logger.debug("Segments are :");
-      for (String adkey : matchedSegments.keySet()) {
-        for (String gpkey : matchedSegments.get(adkey).keySet()) {
-          logger.debug("Advertiser is", matchedSegments.get(adkey).get(gpkey).getChannelSegmentEntity()
-              .getAdvertiserId(), "and AdGp is", matchedSegments.get(adkey).get(gpkey).getChannelSegmentEntity()
-              .getAdgroupId(), "ecpm is", matchedSegments.get(adkey).get(gpkey).getPrioritisedECPM());
+      for (Map.Entry<String, HashMap<String, ChannelSegment>> advertiserEntry : matchedSegments.entrySet()) {
+        Map<String, ChannelSegment> adGroups = advertiserEntry.getValue();
+        for (Map.Entry<String, ChannelSegment> adGroupEntry : adGroups.entrySet()) {
+          ChannelSegment channelSegment = adGroupEntry.getValue();
+          logger.debug("Advertiser is", channelSegment.getChannelSegmentEntity().getAdvertiserId(), "and AdGp is",
+              channelSegment.getChannelSegmentEntity().getAdgroupId(), "ecpm is", channelSegment.getPrioritisedECPM());
         }
       }
     }
@@ -350,7 +464,7 @@ public class Filters {
    *          list to be ranked
    * @return returns the ranked list
    */
-  public ArrayList<ChannelSegment> rankAdapters(List<ChannelSegment> segment) {
+  public List<ChannelSegment> rankAdapters(List<ChannelSegment> segment) {
     int rank = 0;
     // Arraylist that will contain the order in which we will wait for response
     // of the third party ad networks
@@ -376,18 +490,21 @@ public class Filters {
         }
       }
     }
-    logger.debug("rank", rank++, "adapter has channel id", segment.get(0).getAdNetworkInterface().getId());
+    logger.debug("rank", rank, "adapter has channel id", segment.get(0).getAdNetworkInterface().getId());
     rankedList.add(segment.get(0));
     logger.info("Ranked candidate adapters randomly");
     return rankedList;
   }
 
-  List<ChannelSegment> convertToSegmentsList(HashMap<String, HashMap<String, ChannelSegment>> matchedSegments) {
+  List<ChannelSegment> convertToSegmentsList(Map<String, HashMap<String, ChannelSegment>> matchedSegments) {
     ArrayList<ChannelSegment> segmentList = new ArrayList<ChannelSegment>();
-    for (String advertiserId : matchedSegments.keySet()) {
-      for (String adgroupId : matchedSegments.get(advertiserId).keySet()) {
-        segmentList.add(matchedSegments.get(advertiserId).get(adgroupId));
-        logger.debug("ChannelSegment Added to list for advertiserid :", advertiserId, "and adgroupid", adgroupId);
+    for (Map.Entry<String, HashMap<String, ChannelSegment>> advertiserEntry : matchedSegments.entrySet()) {
+      Map<String, ChannelSegment> adGroups = advertiserEntry.getValue();
+      for (Map.Entry<String, ChannelSegment> adGroupEntry : adGroups.entrySet()) {
+        ChannelSegment channelSegment = adGroupEntry.getValue();
+        segmentList.add(channelSegment);
+        logger.debug("ChannelSegment Added to list for advertiserid :", channelSegment.getChannelSegmentEntity()
+            .getAdvertiserId(), "and adgroupid", channelSegment.getChannelSegmentEntity().getAdgroupId());
       }
     }
     return segmentList;
@@ -443,28 +560,6 @@ public class Filters {
     }
     logger.debug("New ranklist size :" + newRankList.size());
     return newRankList;
-  }
-
-  public synchronized static void refreshWhiteListedSites(Configuration serverConfiguration,
-      Configuration adapterConfiguration, DebugLogger logger) {
-    if(System.currentTimeMillis() - lastRefresh < serverConfiguration.getInt("whiteListedSitesRefreshtime", 1000 * 300))
-      return;
-    logger.debug("refreshing whiteListedSites");
-    Iterator<String> itr = adapterConfiguration.getKeys();
-    while (null != itr && itr.hasNext()) {
-      String str = itr.next();
-      if(str.endsWith(".advertiserId")) {
-        String sites = adapterConfiguration.getString(str.replace(".advertiserId", ".whiteListedSites"));
-        HashSet<String> siteSet = new HashSet<String>();
-        if(StringUtils.isEmpty(sites)) {
-          whiteListedSites.remove(adapterConfiguration.getString(str));
-        } else {
-          siteSet.addAll(Arrays.asList(sites.split(",")));
-          whiteListedSites.put(adapterConfiguration.getString(str), siteSet);
-        }
-      }
-    }
-    lastRefresh = System.currentTimeMillis();
   }
 
 }

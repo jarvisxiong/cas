@@ -114,23 +114,23 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
     responseSent = true;
     logger.debug("ad received so trying to send ad response");
-
-    if(sasParams.slot != null && SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot)) != null) {
-      logger.debug("slot served is", sasParams.slot);
+    String finalReponse = responseString;
+    if(sasParams.getSlot() != null && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
+      logger.debug("slot served is", sasParams.getSlot());
       InspectorStats.incrementStatCount(InspectorStrings.totalFills);
       if(getResponseFormat().equals("xhtml")) {
-        Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.slot));
+        Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
         String startElement = String.format(startTags, (int) dim.getWidth(), (int) dim.getHeight());
-        responseString = startElement + responseString + endTags;
+        finalReponse = startElement + finalReponse + endTags;
       }
     } else {
       logger.error("invalid slot, so not returning response, even though we got an ad");
       InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
       if(getResponseFormat().equals("xhtml")) {
-        responseString = noAdXhtml;
+        finalReponse = noAdXhtml;
       }
     }
-    sendResponse(responseString, event);
+    sendResponse(finalReponse, event);
   }
 
   // send response to the caller
@@ -174,7 +174,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     if(getResponseFormat().equals("xhtml")) {
       sendResponse(noAdXhtml, event);
     } else if(isJsAdRequest()) {
-      sendResponse(String.format(noAdJsAdcode, sasParams.rqIframe), event);
+      sendResponse(String.format(noAdJsAdcode, sasParams.getRqIframe()), event);
     } else {
       sendResponse(noAdHtml, event);
     }
@@ -185,8 +185,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
     if(null == sasParams) {
       return false;
     }
-    String adCode = sasParams.adcode;
-    String rqIframe = sasParams.rqIframe;
+    String adCode = sasParams.getAdcode();
+    String rqIframe = sasParams.getRqIframe();
     if(adCode != null && rqIframe != null && adCode.equalsIgnoreCase("JS")) {
       return true;
     }
@@ -239,8 +239,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
       }
 
       if(adNetwork.isRequestCompleted()) {
-        ThirdPartyAdResponse adResponse = adNetwork.getResponseAd();
-        if(adResponse.responseStatus == ThirdPartyAdResponse.ResponseStatus.SUCCESS) {
+        if(adNetwork.getResponseAd().responseStatus == ThirdPartyAdResponse.ResponseStatus.SUCCESS) {
           // Sends the response if request is completed for the
           // specific adapter.
           sendAdResponse(adNetwork, event);
@@ -316,14 +315,16 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
   // return the response format
   public String getResponseFormat() {
-    String responseFormat = "html";
-    if(sasParams == null || (responseFormat = sasParams.rFormat) == null) {
-      return "html";
+    if(null != sasParams) {
+      String responseFormat = sasParams.getRFormat();
+      if(null == responseFormat) {
+        return "html";
+      } else if("axml".equalsIgnoreCase(responseFormat)) {
+        responseFormat = "xhtml";
+      }
+      return responseFormat;
     }
-    if(responseFormat.equalsIgnoreCase("axml")) {
-      responseFormat = "xhtml";
-    }
-    return responseFormat;
+    return "html";
   }
 
   @Override
@@ -335,21 +336,21 @@ public class ResponseSender extends HttpRequestHandlerBase {
       this.sendNoAdResponse(serverEvent);
       return;
     }
-    int rankIndexToProcess = this.getRankIndexToProcess();
-    ChannelSegment segment = this.getRankList().get(rankIndexToProcess);
+    int rankIndex = this.getRankIndexToProcess();
+    ChannelSegment segment = this.getRankList().get(rankIndex);
     while (segment.getAdNetworkInterface().isRequestCompleted()) {
       if(segment.getAdNetworkInterface().getResponseAd().responseStatus == ResponseStatus.SUCCESS) {
         this.sendAdResponse(segment.getAdNetworkInterface(), serverEvent);
         break;
       }
-      rankIndexToProcess++;
-      if(rankIndexToProcess >= this.getRankList().size()) {
+      rankIndex++;
+      if(rankIndex >= this.getRankList().size()) {
         this.sendNoAdResponse(serverEvent);
         break;
       }
-      segment = getRankList().get(rankIndexToProcess);
+      segment = getRankList().get(rankIndex);
     }
-    this.setRankIndexToProcess(rankIndexToProcess);
+    this.setRankIndexToProcess(rankIndex);
     return;
   }
 

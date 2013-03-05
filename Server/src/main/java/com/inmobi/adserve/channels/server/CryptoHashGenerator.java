@@ -39,9 +39,6 @@ public class CryptoHashGenerator {
   public CryptoHashGenerator(String secretKey, DebugLogger logger) {
     this.logger = logger;
     mac = new ThreadSafeMac(secretKey);
-    if(null == mac) {
-      // TODO: go kill yourself
-    }
   }
 
   public String generateHash(String url) {

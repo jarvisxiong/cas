@@ -16,7 +16,7 @@ public class ServletMapsizes implements Servlet {
     mapsizes.put("ResponseMap", ChannelsClientHandler.responseMap.size());
     mapsizes.put("StatusMap", ChannelsClientHandler.responseMap.size());
     mapsizes.put("AdStatusMap", ChannelsClientHandler.responseMap.size());
-    mapsizes.put("SampledAdvertiserLog", Logging.sampledAdvertiserLogNos.size());
+    mapsizes.put("SampledAdvertiserLog", Logging.getSampledadvertiserlognos().size());
     mapsizes.put("ActiveOutboundConnections", BootstrapCreation.getActiveOutboundConnections());
     mapsizes.put("MaxConnections", BootstrapCreation.getMaxConnections());
     mapsizes.put("DroppedConnections", BootstrapCreation.getDroppedConnections());
