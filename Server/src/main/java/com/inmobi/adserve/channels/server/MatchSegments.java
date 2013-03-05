@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
 
@@ -33,9 +34,12 @@ public class MatchSegments {
   private static ChannelSegmentFeedbackEntity defaultChannelSegmentCitrusLeafFeedbackEntity;
 
   public static void init(ChannelAdGroupRepository channelAdGroupRepository) {
+    Set<String> emptySet = new HashSet<String>();
     MatchSegments.channelAdGroupRepository = channelAdGroupRepository;
     MatchSegments.defaultChannelEntity = (new ChannelEntity()).setImpressionCeil(Long.MAX_VALUE).setImpressionFloor(0)
         .setPriority(3).setRequestCap(Long.MAX_VALUE);
+    MatchSegments.defaultChannelEntity.setSiteInclusion(false);
+    MatchSegments.defaultChannelEntity.setSitesIE(emptySet);
     MatchSegments.defaultChannelFeedbackEntity = new ChannelFeedbackEntity("default", 0, 0, Double.MAX_VALUE, 0, 0, 0,
         0, 0);
     MatchSegments.defaultChannelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity("default", "default", 1.0,
