@@ -315,13 +315,15 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
   // return the response format
   public String getResponseFormat() {
-    if (null != sasParams) {
+    if(null != sasParams) {
       String responseFormat = sasParams.getRFormat();
-      if(null != responseFormat && "axml".equalsIgnoreCase(responseFormat)) {
+      if(null == responseFormat) {
+        return "html";
+      } else if("axml".equalsIgnoreCase(responseFormat)) {
         responseFormat = "xhtml";
       }
       return responseFormat;
-      }
+    }
     return "html";
   }
 
