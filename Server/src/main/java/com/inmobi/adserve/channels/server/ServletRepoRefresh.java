@@ -66,8 +66,12 @@ public class ServletRepoRefresh implements Servlet {
       //DbUtils.closeQuietly(resultSet);
       //DbUtils.closeQuietly(statement);
       //DbUtils.closeQuietly(con);
-      statement.close();
-      con.close();
+      if(null != statement) {
+        statement.close();
+      }
+      if(null != con) {
+        con.close();
+      }
     }
   }
 
