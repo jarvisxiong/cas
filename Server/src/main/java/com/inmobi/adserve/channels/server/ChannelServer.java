@@ -103,7 +103,7 @@ public class ChannelServer {
 
     repositoryHelper = new RepositoryHelper(channelRepository, channelAdGroupRepository, channelFeedbackRepository,
         channelSegmentFeedbackRepository, siteMetaDataRepository, siteTaxonomyRepository,
-        null);
+        siteCitrusLeafFeedbackRepository);
 
     MatchSegments.init(channelAdGroupRepository);
     InspectorStats.initializeRepoStats("ChannelAdGroupRepository");
@@ -242,7 +242,7 @@ public class ChannelServer {
           "SiteTaxonomyRepository");
       siteMetaDataRepository.init(logger, config.cacheConfiguration().subset("SiteMetaDataRepository"),
           "SiteMetaDataRepository");
-      //siteCitrusLeafFeedbackRepository.init(config.serverConfiguration().subset("citrusleaf"), DataCenter.GLOBAL);
+      siteCitrusLeafFeedbackRepository.init(config.serverConfiguration().subset("citrusleaf"), DataCenter.ALL);
 
       logger.error("* * * * Instantiating repository completed * * * *");
     } catch (NamingException exception) {
