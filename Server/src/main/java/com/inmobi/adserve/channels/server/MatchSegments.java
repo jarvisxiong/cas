@@ -78,8 +78,9 @@ public class MatchSegments {
     }
     try {
       if(logger.isDebugEnabled()) {
-        logger.debug("Request# slot: " + slotStr + " country: " + countryStr + " categories: " + sasParams.getCategories()
-            + " targetingPlatform: " + targetingPlatform + " siteRating: " + siteRating + " osId" + osId);
+        logger.debug("Request# slot: " + slotStr + " country: " + countryStr + " categories: "
+            + sasParams.getCategories() + " targetingPlatform: " + targetingPlatform + " siteRating: " + siteRating
+            + " osId" + osId);
       }
       long slot = Long.parseLong(slotStr);
       long country = -1;
@@ -248,10 +249,9 @@ public class MatchSegments {
         .getAdvertiserId());
     ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = repositoryHelper
         .queryChannelSegmentFeedbackRepository(channelSegmentEntity.getAdgroupId());
-    SiteFeedbackEntity siteFeedbackEntity = repositoryHelper.querySiteCitrusLeafFeedbackRepository(sasParams.getSiteId(),
-        Long.valueOf(sasParams.getSiteIncId()).toString(), logger);
+    SiteFeedbackEntity siteFeedbackEntity = repositoryHelper.querySiteCitrusLeafFeedbackRepository(
+        sasParams.getSiteId(), Long.valueOf(sasParams.getSiteIncId()).toString(), logger);
     ChannelSegmentFeedbackEntity channelSegmentCitrusLeafFeedbackEntity = null;
-
     if(channelEntity == null) {
       logger.debug("No channelEntity for advertiserID", channelSegmentEntity.getAdvertiserId());
       channelEntity = MatchSegments.defaultChannelEntity;
