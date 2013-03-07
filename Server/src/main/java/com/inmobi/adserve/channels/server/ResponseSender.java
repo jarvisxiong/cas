@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.server;
 
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.jboss.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 import java.awt.Dimension;
@@ -15,6 +16,7 @@ import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponse;
+import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -33,6 +35,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
   private static final String startTags = "<AdResponse><Ads number=\"1\"><Ad type=\"rm\" width=\"%s\" height=\"%s\"><![CDATA[";
   private static final String endTags = " ]]></Ad></Ads></AdResponse>";
+  private static final String adImaiStartTags = "<!DOCTYPE html>";  
+  private static final String noAdImai = "";  
   private static final String noAdXhtml = "<AdResponse><Ads></Ads></AdResponse>";
   private static final String noAdHtml = "<!-- mKhoj: No advt for this position -->";
   private static final String noAdJsAdcode = "<html><head><title></title><style type=\"text/css\">"
@@ -122,6 +126,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
         Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
         String startElement = String.format(startTags, (int) dim.getWidth(), (int) dim.getHeight());
         finalReponse = startElement + finalReponse + endTags;
+      } else if(getResponseFormat().equals("imai")) {
+        finalReponse = adImaiStartTags + finalReponse;
+        sendResponse(OK, finalReponse, event);
       }
     } else {
       logger.error("invalid slot, so not returning response, even though we got an ad");
@@ -134,8 +141,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
   }
 
   // send response to the caller
-  public void sendResponse(String responseString, ChannelEvent event) throws NullPointerException {
-    HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
+  public void sendResponse(HttpResponseStatus status, String responseString, ChannelEvent event) throws NullPointerException {
+    HttpResponse response = new DefaultHttpResponse(HTTP_1_1, status);
+    response.addHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    response.addHeader("Expires", "-1");
+    response.addHeader("Pragma", "no-cache");
     response.setContent(ChannelBuffers.copiedBuffer(responseString, Charset.forName("UTF-8").name()));
     if(event != null) {
       logger.debug("event not null inside send Response");
@@ -154,6 +164,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
       cleanUp();
       logger.debug("successfully called cleanUp()");
     }
+  }
+  
+  // send response to the caller
+  public void sendResponse(String responseString, ChannelEvent event) throws NullPointerException {
+    sendResponse(HttpResponseStatus.OK, responseString, event);
   }
 
   @Override
@@ -175,7 +190,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
       sendResponse(noAdXhtml, event);
     } else if(isJsAdRequest()) {
       sendResponse(String.format(noAdJsAdcode, sasParams.getRqIframe()), event);
-    } else {
+    } else if (getResponseFormat().equals("imai")) {
+      sendResponse(NO_CONTENT, noAdImai, event); 
+    } else{
       sendResponse(noAdHtml, event);
     }
   }
