@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.server;
 
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.jboss.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 import java.awt.Dimension;
@@ -33,6 +34,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
   private static final String startTags = "<AdResponse><Ads number=\"1\"><Ad type=\"rm\" width=\"%s\" height=\"%s\"><![CDATA[";
   private static final String endTags = " ]]></Ad></Ads></AdResponse>";
+  private static final String adImaiStartTags = "<!DOCTYPE html>";  
+  private static final String noAdImai = "<!-- mKhoj: No advt for this position -->";  
   private static final String noAdXhtml = "<AdResponse><Ads></Ads></AdResponse>";
   private static final String noAdHtml = "<!-- mKhoj: No advt for this position -->";
   private static final String noAdJsAdcode = "<html><head><title></title><style type=\"text/css\">"
@@ -155,6 +158,28 @@ public class ResponseSender extends HttpRequestHandlerBase {
       logger.debug("successfully called cleanUp()");
     }
   }
+  
+  // send response to the caller
+  public void sendResponse(HttpResponse httpResponse, String responseString, ChannelEvent event) throws NullPointerException {
+    httpResponse.setContent(ChannelBuffers.copiedBuffer(responseString, Charset.forName("UTF-8").name()));
+    if(event != null) {
+      logger.debug("event not null inside send Response");
+      Channel channel = event.getChannel();
+      if(channel != null && channel.isWritable()) {
+        logger.debug("channel not null inside send Response");
+        ChannelFuture future = channel.write(httpResponse);
+        future.addListener(ChannelFutureListener.CLOSE);
+      } else {
+        logger.debug("Request Channel is null or channel is not writeable.");
+      }
+    }
+    totalTime = System.currentTimeMillis() - totalTime;
+    logger.debug("successfully sent response");
+    if(null != sasParams) {
+      cleanUp();
+      logger.debug("successfully called cleanUp()");
+    }
+  }
 
   @Override
   public AuctionEngine getAuctionEngine() {
@@ -175,7 +200,10 @@ public class ResponseSender extends HttpRequestHandlerBase {
       sendResponse(noAdXhtml, event);
     } else if(isJsAdRequest()) {
       sendResponse(String.format(noAdJsAdcode, sasParams.getRqIframe()), event);
-    } else {
+    } else if (getResponseFormat().equals("imai")) {
+      HttpResponse httpResponse = new DefaultHttpResponse(HTTP_1_1, NO_CONTENT);
+      sendResponse(httpResponse, noAdImai, event); 
+    } else{
       sendResponse(noAdHtml, event);
     }
   }

@@ -219,7 +219,6 @@ public class ServletBackFill implements Servlet {
     double lowestEcpm = 0;
     for (ChannelSegment channelSegment : channelSegments) {
       if(logger.isDebugEnabled())
-        logger.debug("ecpm is", channelSegment.getChannelSegmentFeedbackEntity().geteCPM());
       lowestEcpm = lowestEcpm < channelSegment.getChannelSegmentFeedbackEntity().geteCPM() ? channelSegment
           .getChannelSegmentFeedbackEntity().geteCPM() : lowestEcpm;
     }
@@ -233,9 +232,11 @@ public class ServletBackFill implements Servlet {
       SiteMetaDataEntity siteMetaDataEntity = ServletHandler.repositoryHelper
           .querySiteMetaDetaRepository(hrh.responseSender.sasParams.getSiteId());
       if(null != siteMetaDataEntity && siteMetaDataEntity.getBlockedCategories() != null) {
+        if (!siteMetaDataEntity.isExpired() && siteMetaDataEntity.getRuleType() == 4) {
         blockedCategories = Arrays.asList(siteMetaDataEntity.getBlockedCategories());
         logger.debug("Site id is", hrh.responseSender.sasParams.getSiteId(), "no of blocked categories are");
-      } else
+      
+        }} else
         logger.debug("No blockedCategory for this site id");
     }
     return blockedCategories;
