@@ -36,7 +36,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
   private static final String startTags = "<AdResponse><Ads number=\"1\"><Ad type=\"rm\" width=\"%s\" height=\"%s\"><![CDATA[";
   private static final String endTags = " ]]></Ad></Ads></AdResponse>";
   private static final String adImaiStartTags = "<!DOCTYPE html>";  
-  private static final String noAdImai = "<!-- mKhoj: No advt for this position -->";  
+  private static final String noAdImai = "";  
   private static final String noAdXhtml = "<AdResponse><Ads></Ads></AdResponse>";
   private static final String noAdHtml = "<!-- mKhoj: No advt for this position -->";
   private static final String noAdJsAdcode = "<html><head><title></title><style type=\"text/css\">"
