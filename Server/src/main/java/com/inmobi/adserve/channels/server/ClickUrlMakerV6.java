@@ -4,9 +4,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Set;
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 
@@ -29,24 +26,10 @@ public class ClickUrlMakerV6 {
   private static Long clickURLHashingSecretKeyTestModeVersion = (long) 2;
   private static String clickURLHashingSecretKeyTestModeVersionBase36 = Long.toString(
       ClickUrlMakerV6.clickURLHashingSecretKeyTestModeVersion, 36);
-  private static Mac mac = null;
-  private static SecretKeySpec sk = null;
 
   public ClickUrlMakerV6(DebugLogger logger, Set<String> unhashable) {
     this.logger = logger;
     this.unhashable = unhashable;
-  }
-
-  private String cryptoKeyType;
-
-  public void setCryptoKeyType(String cryptoKeyType) {
-    this.cryptoKeyType = cryptoKeyType;
-  }
-
-  private String testCryptoKeyType;
-
-  public void setTestCryptoKeyType(String testCryptoKeyType) {
-    this.testCryptoKeyType = testCryptoKeyType;
   }
 
   private String testCryptoSecretKey = "qqq";
@@ -91,11 +74,11 @@ public class ClickUrlMakerV6 {
       StringBuilder stringBuilder = new StringBuilder();
       stringBuilder.append("?");
       int i = 1;
-      for (String key : getParams.keySet()) {
+      for (Map.Entry<String, String> entry: getParams.entrySet()) {
         if(i < getParams.size())
-          stringBuilder.append(key).append("=").append(getParams.get(key)).append("&");
+          stringBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
         else
-          stringBuilder.append(key).append("=").append(getParams.get(key));
+          stringBuilder.append(entry.getKey()).append("=").append(entry.getValue());
         i++;
       }
       if(logger.isDebugEnabled())
@@ -117,11 +100,12 @@ public class ClickUrlMakerV6 {
       StringBuilder stringBuilder = new StringBuilder();
       stringBuilder.append("?");
       int i = 1;
-      for (String key : getParams.keySet()) {
+      for (Map.Entry<String, String> entry: getParams.entrySet()) {
         if(i < getParams.size())
-          stringBuilder.append(key).append("=").append(getParams.get(key)).append("&");
+          stringBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
         else
-          stringBuilder.append(key).append("=").append(getParams.get(key));
+          stringBuilder.append(entry.getKey()).append("=").append(entry.getValue());
+        i++;
       }
       if(logger.isDebugEnabled())
         logger.debug("clickUrl is " + clickUrl + stringBuilder.toString());
@@ -303,7 +287,7 @@ public class ClickUrlMakerV6 {
       }
       return;
     }
-    if(null == uidMapUpperCase || uidMapUpperCase.isEmpty())
+    if(uidMapUpperCase.isEmpty())
       adUrlSuffix.append(appendSeparator(DEFAULT_UDID_VALUE));
     else
       adUrlSuffix.append(appendSeparator(getEncodedJson(uidMapUpperCase, logger)));
@@ -333,18 +317,12 @@ public class ClickUrlMakerV6 {
       adUrlSuffix.append(appendSeparator(ClickUrlMakerV6.clickURLHashingSecretKeyTestModeVersionBase36));
       CryptoHashGenerator cryptoHashGenerator = new CryptoHashGenerator(testCryptoSecretKey, logger);
       String clickUrlHash = cryptoHashGenerator.generateHash(adUrlSuffix.toString());
-      if(null == clickUrlHash)
-        return;
       adUrlSuffix.append(appendSeparator(clickUrlHash));
 
     } else {
       adUrlSuffix.append(appendSeparator(ClickUrlMakerV6.clickURLHashingSecretKeyVersionBase36));
       CryptoHashGenerator cryptoHashGenerator = new CryptoHashGenerator(cryptoSecretKey, logger);
       String clickUrlHash = cryptoHashGenerator.generateHash(adUrlSuffix.toString());
-      if(null == clickUrlHash) {
-        logger.debug("clickUrlHash is null so returning");
-        return;
-      }
       adUrlSuffix.append(appendSeparator(clickUrlHash));
     }
     if(null != clickURLPrefix)

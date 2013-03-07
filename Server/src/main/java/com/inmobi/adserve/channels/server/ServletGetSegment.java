@@ -12,17 +12,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.inmobi.adserve.channels.entity.ChannelEntity;
-import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
 /**
  * 
- * @author devashish To see the state of currently loaded entries in all
+ * @author devashish 
+ * To see the state of currently loaded entries in all
  *         repository
  */
 
@@ -48,7 +45,7 @@ public class ServletGetSegment implements Servlet {
       return;
     }
 
-    HashMap<String, HashMap<String, String>> segmentInfo = new HashMap<String, HashMap<String, String>>();
+    Map<String, HashMap<String, String>> segmentInfo = new HashMap<String, HashMap<String, String>>();
     JSONArray segmentList = jObject.getJSONArray("segment-list");
 
     for (int i = 0; i < segmentList.length(); i++) {
@@ -75,6 +72,18 @@ public class ServletGetSegment implements Servlet {
       if(repoName != null && repoName.equalsIgnoreCase("channelsegmentfeedback")) {
         entity = ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(id);
       }
+      
+      if(repoName != null && repoName.equalsIgnoreCase("sitemetadata")) {
+        entity = ServletHandler.repositoryHelper.querySiteMetaDetaRepository(id);
+      }
+      
+      if(repoName != null && repoName.equalsIgnoreCase("siteTaxononmy")) {
+        entity = ServletHandler.repositoryHelper.querySiteTaxonomyRepository(id);
+      }
+      
+      if(repoName != null && repoName.equalsIgnoreCase("sitecitrusleaffeedback")) {
+        entity = ServletHandler.repositoryHelper.querySiteCitrusLeafFeedbackRepository(id.split("_")[0], id.split("_")[1], logger);
+      }
       getSegments(key, entity, segmentInfo);
     }
 
@@ -87,12 +96,12 @@ public class ServletGetSegment implements Servlet {
     return "getSegment";
   }
 
-  public void getSegments(String key, Object entity, HashMap<String, HashMap<String, String>> segmentInfo)
+  public void getSegments(String key, Object entity, Map<String, HashMap<String, String>> segmentInfo)
       throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
     if(entity == null)
       return;
     for (Method method : entity.getClass().getMethods()) {
-      if(method.getName().startsWith("get")) {
+      if(method.getName().startsWith("get") || method.getName().startsWith("is")) {
         segmentInfo.get(key)
             .put(
                 method.getName(),

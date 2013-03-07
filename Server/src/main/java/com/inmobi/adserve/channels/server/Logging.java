@@ -14,6 +14,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.inmobi.adserve.channels.util.InspectorStats;
@@ -51,7 +53,12 @@ public class Logging {
   private static String sampledAdvertisementLogKey;
   private static boolean enableFileLogging;
   private static boolean enableDatabusLogging;
-  public static ConcurrentHashMap<String, String> sampledAdvertiserLogNos = new ConcurrentHashMap<String, String>(2000);
+  private final static ConcurrentHashMap<String, String> sampledAdvertiserLogNos = new ConcurrentHashMap<String, String>(2000);
+  
+  public static ConcurrentHashMap<String, String> getSampledadvertiserlognos() {
+    return sampledAdvertiserLogNos;
+  }
+
   private static int totalCount;
 
   public static void init(AbstractMessagePublisher dataBusPublisher, String rrLogKey, String channelLogKey,
@@ -70,8 +77,6 @@ public class Logging {
       return (jObject.getJSONArray("carrier"));
     } catch (JSONException e) {
       return null;
-    } catch (NullPointerException exception) {
-      return null;
     }
   }
 
@@ -80,11 +85,15 @@ public class Logging {
       return (jObject.getJSONArray("handset"));
     } catch (JSONException e) {
       return null;
-    } catch (NullPointerException exception) {
-      return null;
     }
   }
 
+  void appendToLog(StringBuilder log, String separator, String key, String value) {
+    if(value == null) {
+      return;
+    }
+    log.append(separator).append(key).append(value);
+  }
   // Writing rrlogs
   public static void rrLogging(ChannelSegment channelSegment, DebugLogger logger, Configuration config,
       SASRequestParameters sasParams, String terminationReason) throws JSONException, TException {
@@ -115,19 +124,19 @@ public class Logging {
     if(logger.isDebugEnabled())
       logger.debug("is sas params null here " + (sasParams == null));
 
-    if(null != sasParams && null != sasParams.siteId)
-      log.append(separator + "rq-mk-siteid=\"" + sasParams.siteId + "\"");
-    if(null != sasParams && null != sasParams.rqMkAdcount)
-      log.append(separator + "rq-mk-adcount=\"" + sasParams.rqMkAdcount + "\"");
-    if(null != sasParams && null != sasParams.tid)
-      log.append(separator + "tid=\"" + sasParams.tid + "\"");
+    if(null != sasParams && null != sasParams.getSiteId())
+      log.append(separator + "rq-mk-siteid=\"" + sasParams.getSiteId() + "\"");
+    if(null != sasParams && null != sasParams.getRqMkAdcount())
+      log.append(separator + "rq-mk-adcount=\"" + sasParams.getRqMkAdcount() + "\"");
+    if(null != sasParams && null != sasParams.getTid())
+      log.append(separator + "tid=\"" + sasParams.getTid() + "\"");
 
     InventoryType inventory = getInventoryType(sasParams);
     String timestamp = ReportTime.getTTime();
     log.append(separator + "ttime=\"" + timestamp + "\"");
     log.append(separator + "rq-src=[\"uk\",\"uk\",\"uk\",\"uk\",");
-    if(null != sasParams && null != sasParams.tp)
-      log.append("\"" + sasParams.tp + "\"]");
+    if(null != sasParams && null != sasParams.getTp())
+      log.append("\"" + sasParams.getTp() + "\"]");
     else
       log.append("\"dir\"]");
 
@@ -137,27 +146,28 @@ public class Logging {
     Ad ad = null;
     Impression impression = null;
     if(channelSegment != null) {
-      InspectorStats.incrementStatCount(channelSegment.adNetworkInterface.getName(), InspectorStrings.serverImpression);
+      InspectorStats.incrementStatCount(channelSegment.getAdNetworkInterface().getName(),
+          InspectorStrings.serverImpression);
       adsServed = 1;
+      ChannelSegmentEntity channelSegmentEntity = channelSegment.getChannelSegmentEntity();
       log.append("{\"ad\":[");
-      log.append(channelSegment.channelSegmentEntity.getIncId()).append(",");
+      log.append(channelSegmentEntity.getIncId()).append(",");
       log.append("\"\",\"");
-      adChain = new AdIdChain(channelSegment.channelSegmentEntity.getAdId(),
-          channelSegment.channelSegmentEntity.getAdgroupId(), channelSegment.channelSegmentEntity.getCampaignId(),
-          channelSegment.channelSegmentEntity.getId(), channelSegment.channelSegmentEntity.getExternalSiteKey());
-      log.append(channelSegment.channelSegmentEntity.getAdId()).append("\",\"");
-      log.append(channelSegment.channelSegmentEntity.getAdgroupId()).append("\",\"");
-      log.append(channelSegment.channelSegmentEntity.getCampaignId()).append("\",\"");
-      log.append(channelSegment.channelSegmentEntity.getId()).append("\",\"");
+      adChain = new AdIdChain(channelSegmentEntity.getAdId(), channelSegmentEntity.getAdgroupId(),
+          channelSegmentEntity.getCampaignId(), channelSegmentEntity.getAdvertiserId(), channelSegmentEntity.getExternalSiteKey());
+      log.append(channelSegmentEntity.getAdId()).append("\",\"");
+      log.append(channelSegmentEntity.getAdgroupId()).append("\",\"");
+      log.append(channelSegmentEntity.getCampaignId()).append("\",\"");
+      log.append(channelSegmentEntity.getAdvertiserId()).append("\",\"");
       ContentRating contentRating = getContentRating(sasParams);
-      PricingModel pricingModel = getPricingModel(channelSegment.channelSegmentEntity.getPricingModel());
+      PricingModel pricingModel = getPricingModel(channelSegmentEntity.getPricingModel());
       adMeta = new AdMeta(contentRating, pricingModel, "BANNER");
       ad = new Ad(adChain, adMeta);
-      impression = new Impression(channelSegment.adNetworkInterface.getImpressionId(), ad);
-      log.append(channelSegment.channelSegmentEntity.getPricingModel()).append("\",\"BANNER\", \"");
-      log.append(channelSegment.channelSegmentEntity.getExternalSiteKey()).append("\"],\"impid\":\"");
-      log.append(channelSegment.adNetworkInterface.getImpressionId()).append("\"");
-      double winBid = channelSegment.adNetworkInterface.getSecondBidPrice();
+      impression = new Impression(channelSegment.getAdNetworkInterface().getImpressionId(), ad);
+      log.append(channelSegmentEntity.getPricingModel()).append("\",\"BANNER\", \"");
+      log.append(channelSegmentEntity.getExternalSiteKey()).append("\"],\"impid\":\"");
+      log.append(channelSegment.getAdNetworkInterface().getImpressionId()).append("\"");
+      double winBid = channelSegment.getAdNetworkInterface().getSecondBidPrice();
       if(winBid != -1) {
         log.append(",\"" + "winBid" + "\":\"" + winBid + "\"");
         ad.setWinBid(winBid);
@@ -171,10 +181,10 @@ public class Logging {
     String requestSlot = null;
     String slotServed = null;
     if(null != sasParams) {
-      handset = sasParams.handset;
-      carrier = sasParams.carrier;
-      requestSlot = sasParams.rqMkSlot;
-      slotServed = sasParams.slot;
+      handset = sasParams.getHandset();
+      carrier = sasParams.getCarrier();
+      requestSlot = sasParams.getRqMkSlot();
+      slotServed = sasParams.getSlot();
     }
     HandsetMeta handsetMeta = new HandsetMeta();
     if(null != handset)
@@ -182,8 +192,8 @@ public class Logging {
     if(null != handset && handset.length() > 3) {
       handsetMeta.setId(handset.getInt(3));
       handsetMeta.setManufacturer(handset.getInt(2));
-    } else if(null != sasParams && sasParams.osId != 0)
-      handsetMeta.setOsId(sasParams.osId);
+    } else if(null != sasParams && sasParams.getOsId() != 0)
+      handsetMeta.setOsId(sasParams.getOsId());
     Geo geo = null;
     if(null != carrier) {
       log.append(separator).append("carrier=").append(carrier);
@@ -210,36 +220,36 @@ public class Logging {
     User user = new User();
     log.append(separator + "uparams={");
     if(null != sasParams) {
-      if(null != sasParams.age) {
-        log.append("\"u-age\":\"").append(sasParams.age).append("\",");
-        if(sasParams.age.matches("^\\d+$"))
-          user.setAge(Short.valueOf(sasParams.age));
+      if(null != sasParams.getAge()) {
+        log.append("\"u-age\":\"").append(sasParams.getAge()).append("\",");
+        if(sasParams.getAge().matches("^\\d+$"))
+          user.setAge(Short.valueOf(sasParams.getAge()));
       }
-      if(null != sasParams.gender) {
-        log.append("\"u-gender\":\"").append(sasParams.gender).append("\",");
+      if(null != sasParams.getGender()) {
+        log.append("\"u-gender\":\"").append(sasParams.getGender()).append("\",");
         user.setGender(getGender(sasParams));
       }
-      if(null != sasParams.genderOrig)
-        log.append("\"u-gender-orig\":\"").append(sasParams.genderOrig).append("\",");
-      if(null != sasParams.uid) {
-        log.append("\"u-id\":\"").append(sasParams.uid).append("\",");
-        user.setId(sasParams.uid);
+      if(null != sasParams.getGenderOrig())
+        log.append("\"u-gender-orig\":\"").append(sasParams.getGenderOrig()).append("\",");
+      if(null != sasParams.getUid()) {
+        log.append("\"u-id\":\"").append(sasParams.getUid()).append("\",");
+        user.setId(sasParams.getUid());
       }
-      if(null != sasParams.userLocation)
-        log.append("\"u-location\":\"").append(sasParams.userLocation).append("\",");
-      if(null != sasParams.postalCode)
-        log.append("\"u-postalcode\":\"").append(sasParams.postalCode).append("\"");
+      if(null != sasParams.getUserLocation())
+        log.append("\"u-location\":\"").append(sasParams.getUserLocation()).append("\",");
+      if(null != sasParams.getPostalCode())
+        log.append("\"u-postalcode\":\"").append(sasParams.getPostalCode()).append("\"");
     }
     if(log.charAt(log.length() - 1) == ',')
       log.deleteCharAt(log.length() - 1);
     log.append("}").append(separator).append("u-id-params=");
-    if(null != sasParams && null != sasParams.uidParams)
-      log.append(sasParams.uidParams);
+    if(null != sasParams && null != sasParams.getUidParams())
+      log.append(sasParams.getUidParams());
     else
       log.append("{}");
 
-    if(null != sasParams && null != sasParams.siteSegmentId)
-      log.append(separator).append("sel-seg-id=").append(sasParams.siteSegmentId);
+    if(null != sasParams && null != sasParams.getSiteSegmentId())
+      log.append(separator).append("sel-seg-id=").append(sasParams.getSiteSegmentId());
 
     if(logger.isDebugEnabled())
       logger.debug("finally writing to rr log" + log.toString());
@@ -249,8 +259,8 @@ public class Logging {
     else
       logger.debug("file logging is not enabled");
     short adRequested = 1;
-    Request request = new Request(adRequested, adsServed, sasParams == null ? null : sasParams.siteId,
-        sasParams == null ? null : sasParams.tid);
+    Request request = new Request(adRequested, adsServed, sasParams == null ? null : sasParams.getSiteId(),
+        sasParams == null ? null : sasParams.getTid());
     if(slotServed != null)
       request.setSlot_served(Integer.valueOf(slotServed).shortValue());
     request.setIP(geo);
@@ -259,8 +269,8 @@ public class Logging {
     request.setUser(user);
     if(requestSlot != null)
       request.setSlot_requested(slotRequested);
-    if(null != sasParams && null != sasParams.siteSegmentId)
-      request.setSegmentId(sasParams.siteSegmentId);
+    if(null != sasParams && null != sasParams.getSiteSegmentId())
+      request.setSegmentId(sasParams.getSiteSegmentId());
 
     List<Impression> impressions = null;
     if(null != impression) {
@@ -285,13 +295,13 @@ public class Logging {
     StringBuilder log = new StringBuilder();
     log.append("trtt=").append(totalTime);
     InspectorStats.incrementStatCount(InspectorStrings.latency, totalTime);
-    if(null != sasParams && sasParams.siteId != null)
-      log.append(sep + "rq-mk-siteid=\"").append(sasParams.siteId).append("\"");
+    if(null != sasParams && sasParams.getSiteId() != null)
+      log.append(sep + "rq-mk-siteid=\"").append(sasParams.getSiteId()).append("\"");
 
     String timestamp = ReportTime.getUTCTimestamp();
     log.append(sep).append("ttime=\"").append(timestamp).append("\"");
-    if(null != sasParams && sasParams.tid != null)
-      log.append(sep).append("tid=\"").append(sasParams.tid).append("\"");
+    if(null != sasParams && sasParams.getTid() != null)
+      log.append(sep).append("tid=\"").append(sasParams.getTid()).append("\"");
     if(clickUrl != null)
       log.append(sep + "clurl=\"" + clickUrl + "\"");
     log.append(sep).append("rq-tpan=[");
@@ -302,28 +312,24 @@ public class Logging {
     // Writing inspector stats and getting log line from adapters
     for (int index = 0; rankList != null && index < rankList.size(); index++) {
       JSONObject logLine = null;
-      ThirdPartyAdResponse adResponse = ((ChannelSegment) rankList.get(index)).adNetworkInterface.getResponseStruct();
+      AdNetworkInterface adNetwork = ((ChannelSegment) rankList.get(index)).getAdNetworkInterface();
+      ThirdPartyAdResponse adResponse = adNetwork.getResponseStruct();
       try {
-        InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).adNetworkInterface.getName(),
-            InspectorStrings.totalRequests);
-        InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).adNetworkInterface.getName(),
-            InspectorStrings.latency, adResponse.latency);
+        InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalRequests);
+        InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.latency, adResponse.latency);
+        InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.connectionLatency, adNetwork.getConnectionLatency());
         if(adResponse.adStatus.equals("AD"))
-          InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).adNetworkInterface.getName(),
-              InspectorStrings.totalFills);
+          InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalFills);
         else if(adResponse.adStatus.equals("NO_AD"))
-          InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).adNetworkInterface.getName(),
-              InspectorStrings.totalNoFills);
+          InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalNoFills);
         else if(adResponse.adStatus.equals("TIME_OUT"))
-          InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).adNetworkInterface.getName(),
-              InspectorStrings.totalTimeout);
+          InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalTimeout);
         else
-          InspectorStats.incrementStatCount(((ChannelSegment) rankList.get(index)).adNetworkInterface.getName(),
-              InspectorStrings.totalTerminate);
+          InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalTerminate);
         logLine = new JSONObject();
-        String advertiserId = ((ChannelSegment) rankList.get(index)).adNetworkInterface.getId();
-        String externalSiteKey = ((ChannelSegment) rankList.get(index)).channelSegmentEntity.getExternalSiteKey();
-        double bid = ((ChannelSegment) rankList.get(index)).adNetworkInterface.getBidprice();
+        String advertiserId = adNetwork.getId();
+        String externalSiteKey = ((ChannelSegment) rankList.get(index)).getChannelSegmentEntity().getExternalSiteKey();
+        double bid = adNetwork.getBidprice();
         String resp = adResponse.adStatus;
         long latency = adResponse.latency;
         logLine.put("adv", advertiserId);
@@ -361,27 +367,27 @@ public class Logging {
     ContentRating siteType = getContentRating(sasParams);
 
     List<Integer> categ = null;
-    if(null != sasParams && sasParams.categories != null) {
+    if(null != sasParams && sasParams.getCategories() != null) {
       categ = new ArrayList<Integer>();
-      for (long cat : sasParams.categories) {
+      for (long cat : sasParams.getCategories()) {
         categ.add((int) cat);
       }
     }
 
     SiteParams siteParams = new SiteParams(categ, siteType);
     RequestParams requestParams = sasParams == null ? new RequestParams(null, null, null) : new RequestParams(
-        sasParams.remoteHostIp, sasParams.source, sasParams.userAgent);
+        sasParams.getRemoteHostIp(), sasParams.getSource(), sasParams.getUserAgent());
 
-    if(null != sasParams && null != sasParams.remoteHostIp)
-      log.append("rq-params={\"host\":\"").append(sasParams.remoteHostIp).append("\"");
+    if(null != sasParams && null != sasParams.getRemoteHostIp())
+      log.append("rq-params={\"host\":\"").append(sasParams.getRemoteHostIp()).append("\"");
     JSONArray carrier = null;
     if(null != sasParams) {
-      if(sasParams.source != null)
-        log.append(",\"src\":\"").append(sasParams.source).append("\"");
+      if(sasParams.getSource() != null)
+        log.append(",\"src\":\"").append(sasParams.getSource()).append("\"");
       log.append("}").append(sep).append("rq-h-user-agent=\"");
-      log.append(sasParams.userAgent).append("\"").append(sep).append("rq-site-params=[{\"categ\":");
-      log.append(sasParams.categories.toString()).append("},{\"type\":\"" + sasParams.siteType + "\"}]");
-      carrier = sasParams.carrier;
+      log.append(sasParams.getUserAgent()).append("\"").append(sep).append("rq-site-params=[{\"categ\":");
+      log.append(sasParams.getCategories().toString()).append("},{\"type\":\"" + sasParams.getSiteType() + "\"}]");
+      carrier = sasParams.getCarrier();
     }
 
     Geo geo = null;
@@ -393,12 +399,14 @@ public class Logging {
       if(carrier.length() >= 5 && carrier.get(4) != null)
         geo.setCity(carrier.getInt(4));
     }
+    if(null != sasParams && null != sasParams.getSiteSegmentId())
+        log.append(sep).append("sel-seg-id=").append(sasParams.getSiteSegmentId());
 
     logger.debug("finished writing cas logs");
     logger.debug(log.toString());
     if(enableFileLogging)
       debugLogger.info(log.toString());
-    CasChannelLog channelLog = new CasChannelLog(totalTime, clickUrl, sasParams == null ? null : sasParams.siteId,
+    CasChannelLog channelLog = new CasChannelLog(totalTime, clickUrl, sasParams == null ? null : sasParams.getSiteId(),
         new RequestTpan(responseList), siteParams, requestParams, timestamp);
     if(null != geo)
       channelLog.setIP(geo);
@@ -418,7 +426,7 @@ public class Logging {
     StringBuilder log = new StringBuilder();
     logger.debug("got logger handle for advertiser logs");
     for (int index = 0; rankList != null && index < rankList.size(); index++) {
-      AdNetworkInterface adNetworkInterface = ((ChannelSegment) rankList.get(index)).adNetworkInterface;
+      AdNetworkInterface adNetworkInterface = ((ChannelSegment) rankList.get(index)).getAdNetworkInterface();
       ThirdPartyAdResponse adResponse = adNetworkInterface.getResponseStruct();
       String partnerName = adNetworkInterface.getName();
       log.append(partnerName);
@@ -452,14 +460,14 @@ public class Logging {
     logger.debug("got logger handle for sampledAdvertiser logs");
 
     for (int index = 0; rankList != null && index < rankList.size(); index++) {
-      AdNetworkInterface adNetworkInterface = ((ChannelSegment) rankList.get(index)).adNetworkInterface;
+      AdNetworkInterface adNetworkInterface = ((ChannelSegment) rankList.get(index)).getAdNetworkInterface();
       ThirdPartyAdResponse adResponse = adNetworkInterface.getResponseStruct();
       String adstatus = adResponse.adStatus;
       if(!adstatus.equalsIgnoreCase("AD"))
         continue;
       String partnerName = adNetworkInterface.getName();
-      String extsiteKey = rankList.get(index).channelSegmentEntity.getExternalSiteKey();
-      String advertiserId = rankList.get(index).channelSegmentEntity.getId();
+      String extsiteKey = rankList.get(index).getChannelSegmentEntity().getExternalSiteKey();
+      String advertiserId = rankList.get(index).getChannelSegmentEntity().getAdvertiserId();
       String requestUrl = "";
       String response = "";
       if(sampledAdvertiserLogNos.get(partnerName + extsiteKey) == null) {
@@ -476,7 +484,8 @@ public class Logging {
             continue;
           if(index > 0 && partnerName.length() > 0 && log.length() > 0)
             log.append("\n");
-          log.append(partnerName).append(sep).append(rankList.get(index).channelSegmentEntity.getExternalSiteKey());
+          log.append(partnerName).append(sep)
+              .append(rankList.get(index).getChannelSegmentEntity().getExternalSiteKey());
           log.append(sep).append(requestUrl).append(sep).append(adResponse.adStatus);
           log.append(sep).append(response).append(sep).append(advertiserId);
           count++;
@@ -484,7 +493,6 @@ public class Logging {
         }
       } else {
         logger.debug("creating new sampledadvertiser logs");
-        time = System.currentTimeMillis();
         count = 0;
         sampledAdvertiserLogNos.put(partnerName + extsiteKey, System.currentTimeMillis() + "_" + 0);
         time = Long.parseLong(sampledAdvertiserLogNos.get(partnerName + extsiteKey).split("_")[0]);
@@ -496,7 +504,7 @@ public class Logging {
         }
         if(index > 0 && partnerName.length() > 0 && log.length() > 0)
           log.append("\n");
-        log.append(partnerName).append(sep).append(rankList.get(index).channelSegmentEntity.getExternalSiteKey());
+        log.append(partnerName).append(sep).append(rankList.get(index).getChannelSegmentEntity().getExternalSiteKey());
         log.append(sep).append(requestUrl).append(sep).append(adResponse.adStatus);
         log.append(sep).append(response).append(sep).append(advertiserId);
         count++;
@@ -533,13 +541,13 @@ public class Logging {
   public static ContentRating getContentRating(SASRequestParameters sasParams) {
     if(sasParams == null)
       return null;
-    if(sasParams.siteType == null)
+    if(sasParams.getSiteType() == null)
       return null;
-    if(sasParams.siteType.equalsIgnoreCase("performance"))
+    if(sasParams.getSiteType().equalsIgnoreCase("performance"))
       return ContentRating.PERFORMANCE;
-    if(sasParams.siteType.equalsIgnoreCase("FAMILY_SAFE"))
+    if(sasParams.getSiteType().equalsIgnoreCase("FAMILY_SAFE"))
       return ContentRating.FAMILY_SAFE;
-    if(sasParams.siteType.equalsIgnoreCase("MATURE"))
+    if(sasParams.getSiteType().equalsIgnoreCase("MATURE"))
       return ContentRating.MATURE;
     else
       return null;
@@ -557,7 +565,8 @@ public class Logging {
   }
 
   public static InventoryType getInventoryType(SASRequestParameters sasParams) {
-    if(null != sasParams && sasParams.sdkVersion != null && sasParams.sdkVersion.equalsIgnoreCase("0"))
+    if(null != sasParams && sasParams.getSdkVersion() != null 
+    	&& sasParams.getSdkVersion().equalsIgnoreCase("0"))
       return InventoryType.BROWSER;
     return InventoryType.APP;
   }
@@ -565,7 +574,7 @@ public class Logging {
   public static Gender getGender(SASRequestParameters sasParams) {
     if(sasParams == null)
       return null;
-    if(sasParams.gender.equalsIgnoreCase("m"))
+    if(sasParams.getGender().equalsIgnoreCase("m"))
       return Gender.MALE;
     else
       return Gender.FEMALE;

@@ -115,9 +115,9 @@ public class ServerTest extends TestCase {
   public JSONObject prepareParameters() throws Exception {
     JSONObject args = new JSONObject();
     sasParam = new SASRequestParameters();
-    sasParam.age = "35";
-    sasParam.gender = "m";
-    sasParam.impressionId = "4f8d98e2-4bbd-40bc-8729-22da000900f9";
+    sasParam.setAge("35");
+    sasParam.setGender("m");
+    sasParam.setImpressionId("4f8d98e2-4bbd-40bc-8729-22da000900f9");
     int myarr[] = { 1, 2 };
     long category[] = { 1, 2 };
     long site[] = { 334, 50 };
@@ -157,7 +157,7 @@ public class ServerTest extends TestCase {
     SASRequestParameters params = new SASRequestParameters();
     DebugLogger logger = new DebugLogger();
     params = RequestParser.getUserParams(params, jsonObject, logger);
-    assertEquals(params.age, "35");
+    assertEquals(params.getAge(), "35");
   }
 
   /*
@@ -171,7 +171,7 @@ public class ServerTest extends TestCase {
     JSONObject jsonObject = prepareParameters();
     Long[] category = { 1l, 2l };
     assertTrue("Category are expected to be equal",
-        RequestParser.getCategory(jsonObject, new DebugLogger()).equals(Arrays.asList(category)));
+        RequestParser.getCategory(jsonObject, new DebugLogger(), "category").equals(Arrays.asList(category)));
   }
 
   @Test

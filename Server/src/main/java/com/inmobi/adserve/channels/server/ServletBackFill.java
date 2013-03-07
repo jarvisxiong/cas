@@ -15,7 +15,6 @@ import org.json.JSONObject;
 
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
@@ -53,38 +52,38 @@ public class ServletBackFill implements Servlet {
       hrh.responseSender.sendNoAdResponse(e);
       return;
     }
-    if(null == hrh.responseSender.sasParams.siteId) {
+    if(null == hrh.responseSender.sasParams.getSiteId()) {
       logger.debug("Terminating request as site id was missing");
       hrh.setTerminationReason(ServletHandler.missingSiteId);
       InspectorStats.incrementStatCount(InspectorStrings.missingSiteId, InspectorStrings.count);
       hrh.responseSender.sendNoAdResponse(e);
       return;
     }
-    if(!hrh.responseSender.sasParams.allowBannerAds || hrh.responseSender.sasParams.siteFloor > 5) {
+    if(!hrh.responseSender.sasParams.getAllowBannerAds() || hrh.responseSender.sasParams.getSiteFloor() > 5) {
       logger.debug("Request not being served because of banner not allowed or site floor above threshold");
       hrh.responseSender.sendNoAdResponse(e);
       return;
     }
-    if(hrh.responseSender.sasParams.siteType != null
-        && !ServletHandler.allowedSiteTypes.contains(hrh.responseSender.sasParams.siteType)) {
+    if(hrh.responseSender.sasParams.getSiteType() != null
+        && !ServletHandler.allowedSiteTypes.contains(hrh.responseSender.sasParams.getSiteType())) {
       logger.error("Terminating request as incompatible content type");
       hrh.setTerminationReason(ServletHandler.incompatibleSiteType);
       InspectorStats.incrementStatCount(InspectorStrings.incompatibleSiteType, InspectorStrings.count);
       hrh.responseSender.sendNoAdResponse(e);
       return;
     }
-    if(hrh.responseSender.sasParams.sdkVersion != null) {
+    if(hrh.responseSender.sasParams.getSdkVersion() != null) {
       try {
-        if((hrh.responseSender.sasParams.sdkVersion.substring(0, 1).equalsIgnoreCase("i") || hrh.responseSender.sasParams.sdkVersion
+        if((hrh.responseSender.sasParams.getSdkVersion().substring(0, 1).equalsIgnoreCase("i") || hrh.responseSender.sasParams.getSdkVersion()
             .substring(0, 1).equalsIgnoreCase("a"))
-            && Integer.parseInt(hrh.responseSender.sasParams.sdkVersion.substring(1, 2)) < 3) {
+            && Integer.parseInt(hrh.responseSender.sasParams.getSdkVersion().substring(1, 2)) < 3) {
           logger.error("Terminating request as sdkVersion is less than 3");
           hrh.setTerminationReason(ServletHandler.lowSdkVersion);
           InspectorStats.incrementStatCount(InspectorStrings.lowSdkVersion, InspectorStrings.count);
           hrh.responseSender.sendNoAdResponse(e);
           return;
         } else
-          logger.debug("sdk-version : " + hrh.responseSender.sasParams.sdkVersion);
+          logger.debug("sdk-version : " + hrh.responseSender.sasParams.getSdkVersion());
       } catch (StringIndexOutOfBoundsException e2) {
         logger.debug("Invalid sdkversion " + e2.getMessage());
       } catch (NumberFormatException e3) {
@@ -97,9 +96,9 @@ public class ServletBackFill implements Servlet {
      * if sendonlytowhitelist flag is true, check if site id is present in
      * whitelist, else send no ad.
      */
-    if(ServletHandler.config.getBoolean("sendOnlyToWhitelist") == true) {
+    if(ServletHandler.config.getBoolean("sendOnlyToWhitelist")) {
       List<String> whitelist = ServletHandler.config.getList("whitelist");
-      if(null == whitelist || !whitelist.contains(hrh.responseSender.sasParams.siteId)) {
+      if(null == whitelist || !whitelist.contains(hrh.responseSender.sasParams.getSiteId())) {
         logger.debug("site id not present in whitelist, so sending no ad response");
         hrh.responseSender.sendNoAdResponse(e);
         return;
@@ -107,25 +106,28 @@ public class ServletBackFill implements Servlet {
     }
 
     // getting the selected third party site details
-    HashMap<String, HashMap<String, ChannelSegmentEntity>> matchedSegments = new MatchSegments(logger)
-        .matchSegments(hrh.responseSender.sasParams);
+    Map<String, HashMap<String, ChannelSegment>> matchedSegments = new MatchSegments(ServletHandler.repositoryHelper,
+        hrh.responseSender.sasParams, logger).matchSegments(hrh.responseSender.sasParams);
 
     if(matchedSegments == null) {
-      hrh.responseSender.sendNoAdResponse(e);
-      return;
-    }
-
-    // applying all the filters
-    ChannelSegmentEntity[] rows = Filters.filter(matchedSegments, logger, 0.0, ServletHandler.config,
-        ServletHandler.adapterConfig, new Long(hrh.responseSender.sasParams.siteIncId).toString());
-
-    if(rows == null || rows.length == 0) {
-      hrh.responseSender.sendNoAdResponse(e);
       logger.debug("No Entities matching the request.");
+      hrh.responseSender.sendNoAdResponse(e);
       return;
     }
 
-    List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
+    hrh.responseSender.sasParams.setSiteFloor(0.0);
+    Filters filter = new Filters(matchedSegments, ServletHandler.config, ServletHandler.adapterConfig,
+        hrh.responseSender.sasParams, ServletHandler.repositoryHelper, logger);
+    // applying all the filters
+    List<ChannelSegment> rows = filter.applyFilters();
+
+    if(rows == null || rows.size() == 0) {
+      hrh.responseSender.sendNoAdResponse(e);
+      logger.debug("All segments dropped in filters");
+      return;
+    }
+
+    List<ChannelSegment> segments;
 
     String advertisers = "";
     String[] advertiserList = null;
@@ -146,22 +148,23 @@ public class ServletBackFill implements Servlet {
         advertiserSet.add(advertiserList[i]);
       }
     }
-    
+
     CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
     casInternalRequestParameters.highestEcpm = getHighestEcpm(rows, logger);
-    logger.debug("Highest Ecpm is", new Double(casInternalRequestParameters.highestEcpm).toString());
+    logger.debug("Highest Ecpm is", Double.valueOf(casInternalRequestParameters.highestEcpm));
     casInternalRequestParameters.blockedCategories = getBlockedCategories(hrh, logger);
-    casInternalRequestParameters.rtbBidFloor = hrh.responseSender.sasParams.siteFloor > casInternalRequestParameters.highestEcpm ? hrh.responseSender.sasParams.siteFloor : casInternalRequestParameters.highestEcpm + 0.01;
+    casInternalRequestParameters.rtbBidFloor = hrh.responseSender.sasParams.getSiteFloor() > casInternalRequestParameters.highestEcpm ? hrh.responseSender.sasParams.getSiteFloor()
+        : casInternalRequestParameters.highestEcpm + 0.01;
     hrh.responseSender.casInternalRequestParameters = casInternalRequestParameters;
     hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternalRequestParameters;
-    logger.debug("Total channels available for sending requests " + rows.length);
+    logger.debug("Total channels available for sending requests " + rows.size());
     List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
-    
+
     segments = AsyncRequestMaker.prepareForAsyncRequest(rows, logger, ServletHandler.config, ServletHandler.rtbConfig,
         ServletHandler.adapterConfig, hrh.responseSender, advertiserSet, e, ServletHandler.repositoryHelper,
         hrh.jObject, hrh.responseSender.sasParams, casInternalRequestParameters, rtbSegments);
 
-    logger.debug("rtb rankList size is", new Integer(rtbSegments.size()).toString());
+    logger.debug("rtb rankList size is", Integer.valueOf(rtbSegments.size()));
     if(segments.isEmpty() && rtbSegments.isEmpty()) {
       logger.debug("No succesfull configuration of adapter ");
       hrh.responseSender.sendNoAdResponse(e);
@@ -169,10 +172,10 @@ public class ServletBackFill implements Servlet {
     }
 
     List<ChannelSegment> tempRankList;
-    tempRankList = Filters.rankAdapters(segments, logger, ServletHandler.config);
+    tempRankList = filter.rankAdapters(segments);
 
     if(!tempRankList.isEmpty()) {
-      tempRankList = Filters.ensureGuaranteedDelivery(tempRankList, ServletHandler.adapterConfig, logger);
+      tempRankList = filter.ensureGuaranteedDelivery(tempRankList);
     }
     tempRankList = AsyncRequestMaker.makeAsyncRequests(tempRankList, logger, hrh.responseSender, e, rtbSegments);
 
@@ -191,12 +194,12 @@ public class ServletBackFill implements Servlet {
       return;
     }
 
-    if (hrh.responseSender.getAuctionEngine().isAllRtbComplete()) {
+    if(hrh.responseSender.getAuctionEngine().isAllRtbComplete()) {
       AdNetworkInterface highestBid = hrh.responseSender.getAuctionEngine().runRtbSecondPriceAuctionEngine();
       if(null != highestBid) {
         logger.debug("Sending rtb response of", highestBid.getName());
         hrh.responseSender.sendAdResponse(highestBid, e);
-        //highestBid.impressionCallback();
+        // highestBid.impressionCallback();
         return;
       }
       // Resetting the rankIndexToProcess for already completed adapters.
@@ -212,36 +215,26 @@ public class ServletBackFill implements Servlet {
     return "BackFill";
   }
 
-  private static double getHighestEcpm(ChannelSegmentEntity[] channelSegmentEntities, DebugLogger logger) {
+  private static double getHighestEcpm(List<ChannelSegment> channelSegments, DebugLogger logger) {
     double lowestEcpm = 0;
-    for (ChannelSegmentEntity channelSegmentEntity : channelSegmentEntities) {
-      if(null == ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(channelSegmentEntity
-          .getAdgroupId())) {
-        if(logger.isDebugEnabled())
-          logger.debug("ChannelSegmentfeedback entity is null for adgpid id " + channelSegmentEntity.getAdgroupId());
-        continue;
-      }
+    for (ChannelSegment channelSegment : channelSegments) {
       if(logger.isDebugEnabled())
-        logger.debug("ecpm is "
-            + ServletHandler.repositoryHelper
-                .queryChannelSegmentFeedbackRepository(channelSegmentEntity.getAdgroupId()).geteCPM());
-      lowestEcpm = lowestEcpm < ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(
-          channelSegmentEntity.getAdgroupId()).geteCPM() ? ServletHandler.repositoryHelper
-          .queryChannelSegmentFeedbackRepository(channelSegmentEntity.getAdgroupId()).geteCPM() : lowestEcpm;
+        logger.debug("ecpm is", channelSegment.getChannelSegmentFeedbackEntity().geteCPM());
+      lowestEcpm = lowestEcpm < channelSegment.getChannelSegmentFeedbackEntity().geteCPM() ? channelSegment
+          .getChannelSegmentFeedbackEntity().geteCPM() : lowestEcpm;
     }
     return lowestEcpm;
   }
-  
+
   private static List<Long> getBlockedCategories(HttpRequestHandler hrh, DebugLogger logger) {
     List<Long> blockedCategories = null;
-    if(null != hrh.responseSender.sasParams.siteId) {
-      logger.debug("SiteId is", hrh.responseSender.sasParams.siteId);
+    if(null != hrh.responseSender.sasParams.getSiteId()) {
+      logger.debug("SiteId is", hrh.responseSender.sasParams.getSiteId());
       SiteMetaDataEntity siteMetaDataEntity = ServletHandler.repositoryHelper
-          .querySiteMetaDetaRepository(hrh.responseSender.sasParams.siteId);
+          .querySiteMetaDetaRepository(hrh.responseSender.sasParams.getSiteId());
       if(null != siteMetaDataEntity && siteMetaDataEntity.getBlockedCategories() != null) {
         blockedCategories = Arrays.asList(siteMetaDataEntity.getBlockedCategories());
-        logger.debug("Site id is", hrh.responseSender.sasParams.siteId, "and id is", siteMetaDataEntity.getEntityId(),
-            "no of blocked categories are");
+        logger.debug("Site id is", hrh.responseSender.sasParams.getSiteId(), "no of blocked categories are");
       } else
         logger.debug("No blockedCategory for this site id");
     }
