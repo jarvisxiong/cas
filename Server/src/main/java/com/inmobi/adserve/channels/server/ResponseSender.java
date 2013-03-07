@@ -209,6 +209,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
       sendResponse(String.format(noAdJsAdcode, sasParams.getRqIframe()), event);
     } else if (getResponseFormat().equals("imai")) {
       HttpResponse httpResponse = new DefaultHttpResponse(HTTP_1_1, NO_CONTENT);
+      httpResponse.addHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+      httpResponse.addHeader("Expires", "-1");
+      httpResponse.addHeader("Pragma", "no-cache");
       sendResponse(httpResponse, noAdImai, event); 
     } else{
       sendResponse(noAdHtml, event);
