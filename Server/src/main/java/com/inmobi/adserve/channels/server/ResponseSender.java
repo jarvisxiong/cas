@@ -16,6 +16,7 @@ import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponse;
+import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -126,12 +127,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
         String startElement = String.format(startTags, (int) dim.getWidth(), (int) dim.getHeight());
         finalReponse = startElement + finalReponse + endTags;
       } else if(getResponseFormat().equals("imai")) {
-        HttpResponse httpResponse = new DefaultHttpResponse(HTTP_1_1, OK);
-        httpResponse.addHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-        httpResponse.addHeader("Expires", "-1");
-        httpResponse.addHeader("Pragma", "no-cache");
         finalReponse = adImaiStartTags + finalReponse;
-        sendResponse(httpResponse, finalReponse, event);
+        sendResponse(OK, finalReponse, event);
       }
     } else {
       logger.error("invalid slot, so not returning response, even though we got an ad");
@@ -144,8 +141,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
   }
 
   // send response to the caller
-  public void sendResponse(String responseString, ChannelEvent event) throws NullPointerException {
-    HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
+  public void sendResponse(HttpResponseStatus status, String responseString, ChannelEvent event) throws NullPointerException {
+    HttpResponse response = new DefaultHttpResponse(HTTP_1_1, status);
+    response.addHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    response.addHeader("Expires", "-1");
+    response.addHeader("Pragma", "no-cache");
     response.setContent(ChannelBuffers.copiedBuffer(responseString, Charset.forName("UTF-8").name()));
     if(event != null) {
       logger.debug("event not null inside send Response");
@@ -167,25 +167,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
   }
   
   // send response to the caller
-  public void sendResponse(HttpResponse httpResponse, String responseString, ChannelEvent event) throws NullPointerException {
-    httpResponse.setContent(ChannelBuffers.copiedBuffer(responseString, Charset.forName("UTF-8").name()));
-    if(event != null) {
-      logger.debug("event not null inside send Response");
-      Channel channel = event.getChannel();
-      if(channel != null && channel.isWritable()) {
-        logger.debug("channel not null inside send Response");
-        ChannelFuture future = channel.write(httpResponse);
-        future.addListener(ChannelFutureListener.CLOSE);
-      } else {
-        logger.debug("Request Channel is null or channel is not writeable.");
-      }
-    }
-    totalTime = System.currentTimeMillis() - totalTime;
-    logger.debug("successfully sent response");
-    if(null != sasParams) {
-      cleanUp();
-      logger.debug("successfully called cleanUp()");
-    }
+  public void sendResponse(String responseString, ChannelEvent event) throws NullPointerException {
+    sendResponse(HttpResponseStatus.OK, responseString, event);
   }
 
   @Override
@@ -208,11 +191,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     } else if(isJsAdRequest()) {
       sendResponse(String.format(noAdJsAdcode, sasParams.getRqIframe()), event);
     } else if (getResponseFormat().equals("imai")) {
-      HttpResponse httpResponse = new DefaultHttpResponse(HTTP_1_1, NO_CONTENT);
-      httpResponse.addHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-      httpResponse.addHeader("Expires", "-1");
-      httpResponse.addHeader("Pragma", "no-cache");
-      sendResponse(httpResponse, noAdImai, event); 
+      sendResponse(NO_CONTENT, noAdImai, event); 
     } else{
       sendResponse(noAdHtml, event);
     }
