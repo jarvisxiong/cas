@@ -73,9 +73,9 @@ public class ChannelServer {
     logger.info("Initializing logger completed");
     // parsing the data center id given in the vm parameters
     ChannelServerHelper channelServerHelper = new ChannelServerHelper(logger);
-    dataCenterIdCode = channelServerHelper.getDataCenterId(StringLiterals.DATACENTERIDKEY);
-    hostIdCode = channelServerHelper.getHostId(StringLiterals.HOSTNAMEKEY);
-    dataCentreName = channelServerHelper.getDataCentreName(StringLiterals.DATACENTRENAMEKEY);
+    dataCenterIdCode = channelServerHelper.getDataCenterId(ChannelServerStringLiterals.DATACENTERIDKEY);
+    hostIdCode = channelServerHelper.getHostId(ChannelServerStringLiterals.HOSTNAMEKEY);
+    dataCentreName = channelServerHelper.getDataCentreName(ChannelServerStringLiterals.DATACENTRENAMEKEY);
     // Initialising Internal logger factory for Netty
     InternalLoggerFactory.setDefaultFactory(new Log4JLoggerFactory());
 
@@ -102,11 +102,11 @@ public class ChannelServer {
         null);
 
     MatchSegments.init(channelAdGroupRepository);
-    InspectorStats.initializeRepoStats(StringLiterals.CHANNELADGROUPREPOSITORY);
-    InspectorStats.initializeRepoStats(StringLiterals.CHANNELFEEDBACKREPOSITORY);
-    InspectorStats.initializeRepoStats(StringLiterals.CHANNELSEGMENTFEEDBACKREPOSITORY);
-    InspectorStats.initializeRepoStats(StringLiterals.SITEMETADATAREPOSITORY);
-    InspectorStats.initializeRepoStats(StringLiterals.SITETAXONOMYREPOSITORY);
+    InspectorStats.initializeRepoStats(ChannelServerStringLiterals.CHANNELADGROUPREPOSITORY);
+    InspectorStats.initializeRepoStats(ChannelServerStringLiterals.CHANNELFEEDBACKREPOSITORY);
+    InspectorStats.initializeRepoStats(ChannelServerStringLiterals.CHANNELSEGMENTFEEDBACKREPOSITORY);
+    InspectorStats.initializeRepoStats(ChannelServerStringLiterals.SITEMETADATAREPOSITORY);
+    InspectorStats.initializeRepoStats(ChannelServerStringLiterals.SITETAXONOMYREPOSITORY);
     instantiateRepository(logger, config);
     Filters.init(config.adapterConfiguration());
     // Creating netty client for out-bound calls.
@@ -181,7 +181,7 @@ public class ChannelServer {
       Jdbc3PoolingDataSource dataSource = new Jdbc3PoolingDataSource();
       dataSource.setServerName(databaseConfig.getString("host"));
       dataSource.setPortNumber(databaseConfig.getInt("port"));
-      dataSource.setDatabaseName(databaseConfig.getString(StringLiterals.DATABASE));
+      dataSource.setDatabaseName(databaseConfig.getString(ChannelServerStringLiterals.DATABASE));
       dataSource.setUser(databaseConfig.getString("username"));
       dataSource.setPassword(databaseConfig.getString("password"));
       Configuration repoConfig = config.repoConfiguration();
@@ -189,55 +189,55 @@ public class ChannelServer {
       Configuration segmentFeedbackConfig = config.segmentFeedBackConfiguration();
       Configuration siteTaxonomyConfig = config.siteTaxonomyConfiguration();
       Configuration siteMetaDataConfig = config.siteMetaDataConfiguration();
-      InspectorStats.setStats(StringLiterals.CHANNELADGROUPREPOSITORY, InspectorStrings.isUpdating, 0);
-      InspectorStats.setStats(StringLiterals.CHANNELADGROUPREPOSITORY, InspectorStrings.repoSource,
-          databaseConfig.getString(StringLiterals.DATABASE));
-      InspectorStats.setStats(StringLiterals.CHANNELADGROUPREPOSITORY, InspectorStrings.query, repoConfig.getString(StringLiterals.QUERY));
-      InspectorStats.setStats(StringLiterals.CHANNELADGROUPREPOSITORY, InspectorStrings.refreshInterval,
-          repoConfig.getString(StringLiterals.REFRESHTIME));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNELADGROUPREPOSITORY, InspectorStrings.isUpdating, 0);
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNELADGROUPREPOSITORY, InspectorStrings.repoSource,
+          databaseConfig.getString(ChannelServerStringLiterals.DATABASE));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNELADGROUPREPOSITORY, InspectorStrings.query, repoConfig.getString(ChannelServerStringLiterals.QUERY));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNELADGROUPREPOSITORY, InspectorStrings.refreshInterval,
+          repoConfig.getString(ChannelServerStringLiterals.REFRESHTIME));
 
-      InspectorStats.setStats(StringLiterals.CHANNELFEEDBACKREPOSITORY, InspectorStrings.isUpdating, 0);
-      InspectorStats.setStats(StringLiterals.CHANNELFEEDBACKREPOSITORY, InspectorStrings.repoSource,
-          databaseConfig.getString(StringLiterals.DATABASE));
-      InspectorStats.setStats(StringLiterals.CHANNELFEEDBACKREPOSITORY, InspectorStrings.query, feedbackConfig.getString(StringLiterals.QUERY));
-      InspectorStats.setStats(StringLiterals.CHANNELFEEDBACKREPOSITORY, InspectorStrings.refreshInterval,
-          feedbackConfig.getString(StringLiterals.REFRESHTIME));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNELFEEDBACKREPOSITORY, InspectorStrings.isUpdating, 0);
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNELFEEDBACKREPOSITORY, InspectorStrings.repoSource,
+          databaseConfig.getString(ChannelServerStringLiterals.DATABASE));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNELFEEDBACKREPOSITORY, InspectorStrings.query, feedbackConfig.getString(ChannelServerStringLiterals.QUERY));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNELFEEDBACKREPOSITORY, InspectorStrings.refreshInterval,
+          feedbackConfig.getString(ChannelServerStringLiterals.REFRESHTIME));
 
-      InspectorStats.setStats(StringLiterals.CHANNELSEGMENTFEEDBACKREPOSITORY, InspectorStrings.isUpdating, 0);
-      InspectorStats.setStats(StringLiterals.CHANNELSEGMENTFEEDBACKREPOSITORY, InspectorStrings.repoSource,
-          databaseConfig.getString(StringLiterals.DATABASE));
-      InspectorStats.setStats(StringLiterals.CHANNELSEGMENTFEEDBACKREPOSITORY, InspectorStrings.query,
-          segmentFeedbackConfig.getString(StringLiterals.QUERY));
-      InspectorStats.setStats(StringLiterals.CHANNELSEGMENTFEEDBACKREPOSITORY, InspectorStrings.refreshInterval,
-          segmentFeedbackConfig.getString(StringLiterals.REFRESHTIME));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNELSEGMENTFEEDBACKREPOSITORY, InspectorStrings.isUpdating, 0);
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNELSEGMENTFEEDBACKREPOSITORY, InspectorStrings.repoSource,
+          databaseConfig.getString(ChannelServerStringLiterals.DATABASE));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNELSEGMENTFEEDBACKREPOSITORY, InspectorStrings.query,
+          segmentFeedbackConfig.getString(ChannelServerStringLiterals.QUERY));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNELSEGMENTFEEDBACKREPOSITORY, InspectorStrings.refreshInterval,
+          segmentFeedbackConfig.getString(ChannelServerStringLiterals.REFRESHTIME));
 
-      InspectorStats.setStats(StringLiterals.SITEMETADATAREPOSITORY, InspectorStrings.isUpdating, 0);
-      InspectorStats.setStats(StringLiterals.SITEMETADATAREPOSITORY, InspectorStrings.repoSource,
-          databaseConfig.getString(StringLiterals.DATABASE));
-      InspectorStats.setStats(StringLiterals.SITEMETADATAREPOSITORY, InspectorStrings.query, siteMetaDataConfig.getString(StringLiterals.QUERY));
-      InspectorStats.setStats(StringLiterals.SITEMETADATAREPOSITORY, InspectorStrings.refreshInterval,
-          siteMetaDataConfig.getString(StringLiterals.REFRESHTIME));
-      InspectorStats.setStats(StringLiterals.SITETAXONOMYREPOSITORY, InspectorStrings.isUpdating, 0);
-      InspectorStats.setStats(StringLiterals.SITETAXONOMYREPOSITORY, InspectorStrings.repoSource,
-          databaseConfig.getString(StringLiterals.DATABASE));
-      InspectorStats.setStats(StringLiterals.SITETAXONOMYREPOSITORY, InspectorStrings.query, siteTaxonomyConfig.getString(StringLiterals.QUERY));
-      InspectorStats.setStats(StringLiterals.SITETAXONOMYREPOSITORY, InspectorStrings.refreshInterval,
-          siteTaxonomyConfig.getString(StringLiterals.REFRESHTIME));
+      InspectorStats.setStats(ChannelServerStringLiterals.SITEMETADATAREPOSITORY, InspectorStrings.isUpdating, 0);
+      InspectorStats.setStats(ChannelServerStringLiterals.SITEMETADATAREPOSITORY, InspectorStrings.repoSource,
+          databaseConfig.getString(ChannelServerStringLiterals.DATABASE));
+      InspectorStats.setStats(ChannelServerStringLiterals.SITEMETADATAREPOSITORY, InspectorStrings.query, siteMetaDataConfig.getString(ChannelServerStringLiterals.QUERY));
+      InspectorStats.setStats(ChannelServerStringLiterals.SITEMETADATAREPOSITORY, InspectorStrings.refreshInterval,
+          siteMetaDataConfig.getString(ChannelServerStringLiterals.REFRESHTIME));
+      InspectorStats.setStats(ChannelServerStringLiterals.SITETAXONOMYREPOSITORY, InspectorStrings.isUpdating, 0);
+      InspectorStats.setStats(ChannelServerStringLiterals.SITETAXONOMYREPOSITORY, InspectorStrings.repoSource,
+          databaseConfig.getString(ChannelServerStringLiterals.DATABASE));
+      InspectorStats.setStats(ChannelServerStringLiterals.SITETAXONOMYREPOSITORY, InspectorStrings.query, siteTaxonomyConfig.getString(ChannelServerStringLiterals.QUERY));
+      InspectorStats.setStats(ChannelServerStringLiterals.SITETAXONOMYREPOSITORY, InspectorStrings.refreshInterval,
+          siteTaxonomyConfig.getString(ChannelServerStringLiterals.REFRESHTIME));
 
       initialContext.bind("java:comp/env/jdbc", dataSource);
 
       // Reusing the repository from phoenix adsering framework.
-      channelAdGroupRepository.init(logger, config.cacheConfiguration().subset(StringLiterals.CHANNELREPOSITORY),
-          StringLiterals.CHANNELREPOSITORY);
-      channelRepository.init(logger, config.cacheConfiguration().subset(StringLiterals.CHANNELREPOSITORY), StringLiterals.CHANNELREPOSITORY);
-      channelFeedbackRepository.init(logger, config.cacheConfiguration().subset(StringLiterals.CHANNELFEEDBACKREPOSITORY),
-          StringLiterals.CHANNELFEEDBACKREPOSITORY);
+      channelAdGroupRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNELREPOSITORY),
+          ChannelServerStringLiterals.CHANNELREPOSITORY);
+      channelRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNELREPOSITORY), ChannelServerStringLiterals.CHANNELREPOSITORY);
+      channelFeedbackRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNELFEEDBACKREPOSITORY),
+          ChannelServerStringLiterals.CHANNELFEEDBACKREPOSITORY);
       channelSegmentFeedbackRepository.init(logger,
-          config.cacheConfiguration().subset(StringLiterals.CHANNELSEGMENTFEEDBACKREPOSITORY), StringLiterals.CHANNELSEGMENTFEEDBACKREPOSITORY);
-      siteTaxonomyRepository.init(logger, config.cacheConfiguration().subset(StringLiterals.SITETAXONOMYREPOSITORY),
-          StringLiterals.SITETAXONOMYREPOSITORY);
-      siteMetaDataRepository.init(logger, config.cacheConfiguration().subset(StringLiterals.SITEMETADATAREPOSITORY),
-          StringLiterals.SITEMETADATAREPOSITORY);
+          config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNELSEGMENTFEEDBACKREPOSITORY), ChannelServerStringLiterals.CHANNELSEGMENTFEEDBACKREPOSITORY);
+      siteTaxonomyRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.SITETAXONOMYREPOSITORY),
+          ChannelServerStringLiterals.SITETAXONOMYREPOSITORY);
+      siteMetaDataRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.SITEMETADATAREPOSITORY),
+          ChannelServerStringLiterals.SITEMETADATAREPOSITORY);
       //siteCitrusLeafFeedbackRepository.init(config.serverConfiguration().subset("citrusleaf"), DataCenter.GLOBAL);
 
       logger.error("* * * * Instantiating repository completed * * * *");

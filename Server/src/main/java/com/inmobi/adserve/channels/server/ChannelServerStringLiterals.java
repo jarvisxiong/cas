@@ -1,6 +1,6 @@
 package com.inmobi.adserve.channels.server;
 
-public class StringLiterals {
+public class ChannelServerStringLiterals {
   public static final String CHANNELREPOSITORY = "ChannelRepository";
   public static final String CHANNELADGROUPREPOSITORY = "ChannelAdGroupRepository";
   public static final String CHANNELFEEDBACKREPOSITORY = "ChannelFeedbackRepository";
