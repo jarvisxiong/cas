@@ -18,8 +18,8 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.phoenix.exception.RepositoryException;
 
 public class ServletRepoRefresh implements Servlet {
-  private static final String LASTUPDATE = "'${last_update}'";
-  private static final String REPLACESTRING = "now() -interval '1 MINUTE'";
+  private static final String LAST_UPDATE = "'${last_update}'";
+  private static final String REPLACE_STRING = "now() -interval '1 MINUTE'";
 
   @Override
   public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
@@ -47,34 +47,34 @@ public class ServletRepoRefresh implements Servlet {
       statement = con.createStatement();
       if(repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY)) {
         final String query = config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY)
-            .getString(ChannelServerStringLiterals.QUERY).replace(LASTUPDATE, REPLACESTRING);
+            .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
         resultSet = statement.executeQuery(query);
         ServletHandler.repositoryHelper.getChannelAdGroupRepository().newUpdateFromResultSetToOptimizeUpdate(resultSet);
       } else if(repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_REPOSITORY)) {
         final String query = config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_REPOSITORY)
-            .getString(ChannelServerStringLiterals.QUERY).replace(LASTUPDATE, REPLACESTRING);
+            .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
         resultSet = statement.executeQuery(query);
         ServletHandler.repositoryHelper.getChannelAdGroupRepository().newUpdateFromResultSetToOptimizeUpdate(resultSet);
       } else if(repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY)) {
         final String query = config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY)
-            .getString(ChannelServerStringLiterals.QUERY).replace(LASTUPDATE, REPLACESTRING);
+            .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
         resultSet = statement.executeQuery(query);
         ServletHandler.repositoryHelper.getChannelFeedbackRepository()
             .newUpdateFromResultSetToOptimizeUpdate(resultSet);
       } else if(repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY)) {
         final String query = config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY)
-            .getString(ChannelServerStringLiterals.QUERY).replace(LASTUPDATE, REPLACESTRING);
+            .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
         resultSet = statement.executeQuery(query);
         ServletHandler.repositoryHelper.getChannelSegmentFeedbackRepository().newUpdateFromResultSetToOptimizeUpdate(
             resultSet);
       } else if(repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)) {
         final String query = config.cacheConfiguration().subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)
-            .getString(ChannelServerStringLiterals.QUERY).replace(LASTUPDATE, REPLACESTRING);
+            .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
         resultSet = statement.executeQuery(query);
         ServletHandler.repositoryHelper.getSiteMetaDataRepository().newUpdateFromResultSetToOptimizeUpdate(resultSet);
       } else if(repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY)) {
         final String query = config.cacheConfiguration().subset(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY)
-            .getString(ChannelServerStringLiterals.QUERY).replace(LASTUPDATE, REPLACESTRING);
+            .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
         resultSet = statement.executeQuery(query);
         ServletHandler.repositoryHelper.getSiteTaxonomyRepository().newUpdateFromResultSetToOptimizeUpdate(resultSet);
       }
