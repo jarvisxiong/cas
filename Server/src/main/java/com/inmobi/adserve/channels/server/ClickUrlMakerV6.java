@@ -69,7 +69,7 @@ public class ClickUrlMakerV6 {
       return beaconUrl;
     }
     if(getParams.isEmpty()) {
-      logger.debug("beacon url is " + beaconUrl);
+      logger.debug("beacon url is", beaconUrl);
       return beaconUrl;
     } else {
       StringBuilder stringBuilder = new StringBuilder();
@@ -78,15 +78,12 @@ public class ClickUrlMakerV6 {
       for (Map.Entry<String, String> entry: getParams.entrySet()) {
         if(i < getParams.size()) {
           stringBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
-        }
-        else {
+        } else {
           stringBuilder.append(entry.getKey()).append("=").append(entry.getValue());
         }
         i++;
       }
-      if(logger.isDebugEnabled()) {
-        logger.debug("beacon url is " + beaconUrl + stringBuilder.toString());
-      }
+      logger.debug("beacon url is", beaconUrl, stringBuilder.toString());
       return beaconUrl + stringBuilder.toString();
     }
   }
