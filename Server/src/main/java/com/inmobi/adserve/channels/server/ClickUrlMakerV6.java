@@ -75,7 +75,7 @@ public class ClickUrlMakerV6 {
       StringBuilder stringBuilder = new StringBuilder();
       stringBuilder.append("?");
       int i = 1;
-      for (Map.Entry<String, String> entry: getParams.entrySet()) {
+      for (Map.Entry<String, String> entry : getParams.entrySet()) {
         if(i < getParams.size()) {
           stringBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
         } else {
@@ -101,7 +101,7 @@ public class ClickUrlMakerV6 {
       StringBuilder stringBuilder = new StringBuilder();
       stringBuilder.append("?");
       int i = 1;
-      for (Map.Entry<String, String> entry: getParams.entrySet()) {
+      for (Map.Entry<String, String> entry : getParams.entrySet()) {
         if(i < getParams.size()) {
           stringBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
         } else {
@@ -229,7 +229,7 @@ public class ClickUrlMakerV6 {
     adUrlSuffix.append(URLVERSIONINITSTR);
     // 2nd URL component: CPC/CPM information
     if(isCPC) {
-      adUrlSuffix.append(URLMARKERCPC); 
+      adUrlSuffix.append(URLMARKERCPC);
     } else {
       adUrlSuffix.append(URLMARKERCPM);
     }
@@ -334,14 +334,14 @@ public class ClickUrlMakerV6 {
       clickUrl = this.clickURLPrefix + adUrlSuffix.toString();
     }
     logger.debug("clickURLPrefix is not set so sending clickUrl null");
-    
+
     if(isRmAd) {
       // Incase of rm ads, we need to set both beacon url to indicate rendering
       // and click url to capture the click event.
       logger.debug("Valid beaconing event. Hence need to have both click and beacon URL");
       if(null != rmBeaconURLPrefix) {
         beaconUrl = this.rmBeaconURLPrefix + adUrlSuffix.toString();
-      } 
+      }
       logger.debug("rmBeaconURLPrefix is not set so beacon url is null");
       return;
     }

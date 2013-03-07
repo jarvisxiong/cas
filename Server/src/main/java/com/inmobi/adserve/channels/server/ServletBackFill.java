@@ -244,11 +244,11 @@ public class ServletBackFill implements Servlet {
       SiteMetaDataEntity siteMetaDataEntity = ServletHandler.repositoryHelper
           .querySiteMetaDetaRepository(hrh.responseSender.sasParams.getSiteId());
       if(null != siteMetaDataEntity && siteMetaDataEntity.getBlockedCategories() != null) {
-        if (!siteMetaDataEntity.isExpired() && siteMetaDataEntity.getRuleType() == 4) {
-        blockedCategories = Arrays.asList(siteMetaDataEntity.getBlockedCategories());
-        logger.debug("Site id is", hrh.responseSender.sasParams.getSiteId(), "no of blocked categories are");
-      
-        }} else
+        if(!siteMetaDataEntity.isExpired() && siteMetaDataEntity.getRuleType() == 4) {
+          blockedCategories = Arrays.asList(siteMetaDataEntity.getBlockedCategories());
+          logger.debug("Site id is", hrh.responseSender.sasParams.getSiteId(), "no of blocked categories are");
+        }
+      } else
         logger.debug("No blockedCategory for this site id");
     }
     return blockedCategories;
