@@ -35,6 +35,7 @@ import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.casthrift.DataCenter;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import com.inmobi.messaging.publisher.MessagePublisherFactory;
 import com.inmobi.phoenix.exception.InitializationException;
@@ -99,7 +100,7 @@ public class ChannelServer {
 
     repositoryHelper = new RepositoryHelper(channelRepository, channelAdGroupRepository, channelFeedbackRepository,
         channelSegmentFeedbackRepository, siteMetaDataRepository, siteTaxonomyRepository,
-        null);
+        siteCitrusLeafFeedbackRepository);
 
     MatchSegments.init(channelAdGroupRepository);
     InspectorStats.initializeRepoStats(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY);
@@ -232,14 +233,13 @@ public class ChannelServer {
       channelRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_REPOSITORY), ChannelServerStringLiterals.CHANNEL_REPOSITORY);
       channelFeedbackRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY),
           ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY);
-      channelSegmentFeedbackRepository.init(logger,
-          config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY), ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY);
+      channelSegmentFeedbackRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY), ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY);
       siteTaxonomyRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY),
           ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY);
       siteMetaDataRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY),
           ChannelServerStringLiterals.SITE_METADATA_REPOSITORY);
       //siteCitrusLeafFeedbackRepository.init(config.serverConfiguration().subset("citrusleaf"), DataCenter.GLOBAL);
-
+      siteCitrusLeafFeedbackRepository.init(config.serverConfiguration().subset("citrusleaf"), DataCenter.ALL);
       logger.error("* * * * Instantiating repository completed * * * *");
     } catch (NamingException exception) {
       logger.error("failed to creatre binding for postgresql data source " + exception.getMessage());

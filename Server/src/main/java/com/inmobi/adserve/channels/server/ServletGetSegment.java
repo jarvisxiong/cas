@@ -18,8 +18,7 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 
 /**
  * 
- * @author devashish 
- * To see the state of currently loaded entries in all
+ * @author devashish To see the state of currently loaded entries in all
  *         repository
  */
 
@@ -56,38 +55,29 @@ public class ServletGetSegment implements Servlet {
       String key = id + "_" + repoName;
       segmentInfo.put(key, new HashMap<String, String>());
       Object entity = null;
-      
+
       if(repoName != null && repoName.equalsIgnoreCase("channel")) {
         entity = ServletHandler.repositoryHelper.queryChannelRepository(id);
-      }
-
-      if(repoName != null && repoName.equalsIgnoreCase("channelsegment")) {
+      } else if(repoName != null && repoName.equalsIgnoreCase("channelsegment")) {
         entity = ServletHandler.repositoryHelper.queryChannelAdGroupRepository(id);
-      }
-
-      if(repoName != null && repoName.equalsIgnoreCase("channelfeedback")) {
+      } else if(repoName != null && repoName.equalsIgnoreCase("channelfeedback")) {
         entity = ServletHandler.repositoryHelper.queryChannelFeedbackRepository(id);
-      }
-
-      if(repoName != null && repoName.equalsIgnoreCase("channelsegmentfeedback")) {
+      } else if(repoName != null && repoName.equalsIgnoreCase("channelsegmentfeedback")) {
         entity = ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(id);
-      }
-      
-      if(repoName != null && repoName.equalsIgnoreCase("sitemetadata")) {
+      } else if(repoName != null && repoName.equalsIgnoreCase("sitemetadata")) {
         entity = ServletHandler.repositoryHelper.querySiteMetaDetaRepository(id);
-      }
-      
-      if(repoName != null && repoName.equalsIgnoreCase("siteTaxononmy")) {
+      } else if(repoName != null && repoName.equalsIgnoreCase("siteTaxononmy")) {
         entity = ServletHandler.repositoryHelper.querySiteTaxonomyRepository(id);
-      }
-      
-      if(repoName != null && repoName.equalsIgnoreCase("sitecitrusleaffeedback")) {
-        entity = ServletHandler.repositoryHelper.querySiteCitrusLeafFeedbackRepository(id.split("_")[0], id.split("_")[1], logger);
+      } else if(repoName != null && repoName.equalsIgnoreCase("sitecitrusleaffeedback")) {
+        entity = ServletHandler.repositoryHelper.querySiteCitrusLeafFeedbackRepository(id.split("_")[0],
+            id.split("_")[1], logger);
+        hrh.responseSender.sendResponse(entity.toString(), e);
+        return;
       }
       getSegments(key, entity, segmentInfo);
     }
 
-    hrh.responseSender.sendResponse(segmentInfo.toString(), e);
+    hrh.responseSender.sendResponse(new JSONObject(segmentInfo).toString(), e);
     return;
   }
 
