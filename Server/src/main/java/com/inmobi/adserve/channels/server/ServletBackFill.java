@@ -21,7 +21,9 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
 public class ServletBackFill implements Servlet {
-
+  private static final String imaiViewPort = "<meta name=\"viewport\" content=\"width=device-width, height=device-height,user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/>";
+  private static final String imaiIphoneBase = "<base href=\"http://cdn.inmobi.com/android/\"/>";
+  private static final String imaiAndroidBase = "<base href=\"http://cdn.inmobi.com/android/\"/>";
   @Override
   public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
       DebugLogger logger) throws Exception {
@@ -105,6 +107,19 @@ public class ServletBackFill implements Servlet {
       }
     }
 
+    /**
+     * Set imai content if r-format is imai
+     */
+    String imaiHeadContent = "";
+    if(hrh.responseSender.sasParams.getRFormat().equals("imai")) {
+      if(hrh.responseSender.sasParams.getPlatformOsId() == 3) {
+        imaiHeadContent = imaiViewPort + imaiAndroidBase;
+      } else {
+        imaiHeadContent = imaiViewPort + imaiIphoneBase;
+      }
+    }
+    hrh.responseSender.sasParams.setImaiHeadContent(imaiHeadContent);
+    
     // getting the selected third party site details
     Map<String, HashMap<String, ChannelSegment>> matchedSegments = new MatchSegments(ServletHandler.repositoryHelper,
         hrh.responseSender.sasParams, logger).matchSegments(hrh.responseSender.sasParams);
@@ -205,7 +220,7 @@ public class ServletBackFill implements Servlet {
       // Resetting the rankIndexToProcess for already completed adapters.
       hrh.responseSender.processDcpList(e);
       if(logger.isDebugEnabled()) {
-        logger.debug("retunrd from send Response, ranklist size is " + hrh.responseSender.getRankList().size());
+        logger.debug("returned from send Response, ranklist size is " + hrh.responseSender.getRankList().size());
       }
     }
   }

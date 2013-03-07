@@ -125,6 +125,13 @@ public class ResponseSender extends HttpRequestHandlerBase {
         Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
         String startElement = String.format(startTags, (int) dim.getWidth(), (int) dim.getHeight());
         finalReponse = startElement + finalReponse + endTags;
+      } else if(getResponseFormat().equals("imai")) {
+        HttpResponse httpResponse = new DefaultHttpResponse(HTTP_1_1, OK);
+        httpResponse.addHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        httpResponse.addHeader("Expires", "-1");
+        httpResponse.addHeader("Pragma", "no-cache");
+        finalReponse = adImaiStartTags + finalReponse;
+        sendResponse(httpResponse, finalReponse, event);
       }
     } else {
       logger.error("invalid slot, so not returning response, even though we got an ad");
