@@ -228,8 +228,8 @@ public class ChannelServer {
       initialContext.bind("java:comp/env/jdbc", dataSource);
 
       // Reusing the repository from phoenix adsering framework.
-      channelAdGroupRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_REPOSITORY),
-          ChannelServerStringLiterals.CHANNEL_REPOSITORY);
+      channelAdGroupRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY),
+          ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY);
       channelRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_REPOSITORY), ChannelServerStringLiterals.CHANNEL_REPOSITORY);
       channelFeedbackRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY),
           ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY);
