@@ -108,8 +108,8 @@ public class ServletBackFill implements Servlet {
      * Set imai content if r-format is imai
      */
     String imaiBaseUrl = null;
-    String rFormat = hrh.responseSender.sasParams.getRFormat();
-    if(null != rFormat && rFormat.equalsIgnoreCase("imai")) {
+    String rFormat = hrh.responseSender.getResponseFormat();
+    if(rFormat.equalsIgnoreCase("imai")) {
       if(hrh.responseSender.sasParams.getPlatformOsId() == 3) {
         imaiBaseUrl = ServletHandler.config.getString("androidBaseUrl");
       } else {
