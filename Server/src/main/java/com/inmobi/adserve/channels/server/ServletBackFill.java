@@ -116,7 +116,7 @@ public class ServletBackFill implements Servlet {
       }
     }
     hrh.responseSender.sasParams.setImaiBaseUrl(imaiBaseUrl);
-    logger.debug("imai base url is", imaiBaseUrl);
+    logger.debug("imai base url is", hrh.responseSender.sasParams.getImaiBaseUrl());
     
     // getting the selected third party site details
     Map<String, HashMap<String, ChannelSegment>> matchedSegments = new MatchSegments(ServletHandler.repositoryHelper,
