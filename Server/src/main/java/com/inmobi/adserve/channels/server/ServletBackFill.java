@@ -21,7 +21,6 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
 public class ServletBackFill implements Servlet {
-
   @Override
   public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
       DebugLogger logger) throws Exception {
@@ -105,6 +104,20 @@ public class ServletBackFill implements Servlet {
       }
     }
 
+    /**
+     * Set imai content if r-format is imai
+     */
+    String imaiBaseUrl = null;
+    if(hrh.responseSender.sasParams.getRFormat().equalsIgnoreCase("imai")) {
+      if(hrh.responseSender.sasParams.getPlatformOsId() == 3) {
+        imaiBaseUrl = ServletHandler.config.getString("androidBaseUrl");
+      } else {
+        imaiBaseUrl = ServletHandler.config.getString("iPhoneBaseUrl");
+      }
+    }
+    hrh.responseSender.sasParams.setImaiBaseUrl(imaiBaseUrl);
+    logger.debug("imai base url is", hrh.responseSender.sasParams.getImaiBaseUrl());
+    
     // getting the selected third party site details
     Map<String, HashMap<String, ChannelSegment>> matchedSegments = new MatchSegments(ServletHandler.repositoryHelper,
         hrh.responseSender.sasParams, logger).matchSegments(hrh.responseSender.sasParams);
@@ -205,7 +218,7 @@ public class ServletBackFill implements Servlet {
       // Resetting the rankIndexToProcess for already completed adapters.
       hrh.responseSender.processDcpList(e);
       if(logger.isDebugEnabled()) {
-        logger.debug("retunrd from send Response, ranklist size is " + hrh.responseSender.getRankList().size());
+        logger.debug("returned from send Response, ranklist size is " + hrh.responseSender.getRankList().size());
       }
     }
   }
@@ -219,7 +232,6 @@ public class ServletBackFill implements Servlet {
     double lowestEcpm = 0;
     for (ChannelSegment channelSegment : channelSegments) {
       if(logger.isDebugEnabled())
-        logger.debug("ecpm is", channelSegment.getChannelSegmentFeedbackEntity().geteCPM());
       lowestEcpm = lowestEcpm < channelSegment.getChannelSegmentFeedbackEntity().geteCPM() ? channelSegment
           .getChannelSegmentFeedbackEntity().geteCPM() : lowestEcpm;
     }
@@ -233,8 +245,10 @@ public class ServletBackFill implements Servlet {
       SiteMetaDataEntity siteMetaDataEntity = ServletHandler.repositoryHelper
           .querySiteMetaDetaRepository(hrh.responseSender.sasParams.getSiteId());
       if(null != siteMetaDataEntity && siteMetaDataEntity.getBlockedCategories() != null) {
-        blockedCategories = Arrays.asList(siteMetaDataEntity.getBlockedCategories());
-        logger.debug("Site id is", hrh.responseSender.sasParams.getSiteId(), "no of blocked categories are");
+        if(!siteMetaDataEntity.isExpired() && siteMetaDataEntity.getRuleType() == 4) {
+          blockedCategories = Arrays.asList(siteMetaDataEntity.getBlockedCategories());
+          logger.debug("Site id is", hrh.responseSender.sasParams.getSiteId(), "no of blocked categories are");
+        }
       } else
         logger.debug("No blockedCategory for this site id");
     }

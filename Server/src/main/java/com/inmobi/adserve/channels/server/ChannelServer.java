@@ -53,9 +53,6 @@ public class ChannelServer {
   private static SiteCitrusLeafFeedbackRepository siteCitrusLeafFeedbackRepository;
   private static RepositoryHelper repositoryHelper;
   private static final String configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
-  private static String DATACENTERIDKEY = "dc.id";
-  private static String HOSTNAMEKEY = "host.name";
-  private static String DATACENTRENAMEKEY = "dc.name";
   public static byte dataCenterIdCode;
   public static short hostIdCode;
   public static String dataCentreName;
@@ -77,9 +74,9 @@ public class ChannelServer {
     logger.info("Initializing logger completed");
     // parsing the data center id given in the vm parameters
     ChannelServerHelper channelServerHelper = new ChannelServerHelper(logger);
-    dataCenterIdCode = channelServerHelper.getDataCenterId(DATACENTERIDKEY);
-    hostIdCode = channelServerHelper.getHostId(HOSTNAMEKEY);
-    dataCentreName = channelServerHelper.getDataCentreName(DATACENTRENAMEKEY);
+    dataCenterIdCode = channelServerHelper.getDataCenterId(ChannelServerStringLiterals.DATA_CENTER_ID_KEY);
+    hostIdCode = channelServerHelper.getHostId(ChannelServerStringLiterals.HOST_NAME_KEY);
+    dataCentreName = channelServerHelper.getDataCentreName(ChannelServerStringLiterals.DATA_CENTRE_NAME_KEY);
     // Initialising Internal logger factory for Netty
     InternalLoggerFactory.setDefaultFactory(new Log4JLoggerFactory());
 
@@ -106,11 +103,11 @@ public class ChannelServer {
         null);
 
     MatchSegments.init(channelAdGroupRepository);
-    InspectorStats.initializeRepoStats("ChannelAdGroupRepository");
-    InspectorStats.initializeRepoStats("ChannelFeedbackRepository");
-    InspectorStats.initializeRepoStats("ChannelSegmentFeedbackRepository");
-    InspectorStats.initializeRepoStats("SiteMetaDataRepository");
-    InspectorStats.initializeRepoStats("SiteTaxonomyRepository");
+    InspectorStats.initializeRepoStats(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY);
+    InspectorStats.initializeRepoStats(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY);
+    InspectorStats.initializeRepoStats(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY);
+    InspectorStats.initializeRepoStats(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY);
+    InspectorStats.initializeRepoStats(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY);
     instantiateRepository(logger, config);
     Filters.init(config.adapterConfiguration());
     // Creating netty client for out-bound calls.
@@ -185,7 +182,7 @@ public class ChannelServer {
       Jdbc3PoolingDataSource dataSource = new Jdbc3PoolingDataSource();
       dataSource.setServerName(databaseConfig.getString("host"));
       dataSource.setPortNumber(databaseConfig.getInt("port"));
-      dataSource.setDatabaseName(databaseConfig.getString("database"));
+      dataSource.setDatabaseName(databaseConfig.getString(ChannelServerStringLiterals.DATABASE));
       dataSource.setUser(databaseConfig.getString("username"));
       dataSource.setPassword(databaseConfig.getString("password"));
       Configuration repoConfig = config.repoConfiguration();
@@ -193,57 +190,56 @@ public class ChannelServer {
       Configuration segmentFeedbackConfig = config.segmentFeedBackConfiguration();
       Configuration siteTaxonomyConfig = config.siteTaxonomyConfiguration();
       Configuration siteMetaDataConfig = config.siteMetaDataConfiguration();
-      InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.isUpdating, 0);
-      InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.repoSource,
-          databaseConfig.getString("database"));
-      InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.query, repoConfig.getString("query"));
-      InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.refreshInterval,
-          repoConfig.getString("refreshTime"));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY, InspectorStrings.isUpdating, 0);
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY, InspectorStrings.repoSource,
+          databaseConfig.getString(ChannelServerStringLiterals.DATABASE));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY, InspectorStrings.query, repoConfig.getString(ChannelServerStringLiterals.QUERY));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY, InspectorStrings.refreshInterval,
+          repoConfig.getString(ChannelServerStringLiterals.REFRESH_TIME));
 
-      InspectorStats.setStats("ChannelFeedbackRepository", InspectorStrings.isUpdating, 0);
-      InspectorStats.setStats("ChannelFeedbackRepository", InspectorStrings.repoSource,
-          databaseConfig.getString("database"));
-      InspectorStats.setStats("ChannelFeedbackRepository", InspectorStrings.query, feedbackConfig.getString("query"));
-      InspectorStats.setStats("ChannelFeedbackRepository", InspectorStrings.refreshInterval,
-          feedbackConfig.getString("refreshTime"));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY, InspectorStrings.isUpdating, 0);
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY, InspectorStrings.repoSource,
+          databaseConfig.getString(ChannelServerStringLiterals.DATABASE));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY, InspectorStrings.query, feedbackConfig.getString(ChannelServerStringLiterals.QUERY));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY, InspectorStrings.refreshInterval,
+          feedbackConfig.getString(ChannelServerStringLiterals.REFRESH_TIME));
 
-      InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.isUpdating, 0);
-      InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.repoSource,
-          databaseConfig.getString("database"));
-      InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.query,
-          segmentFeedbackConfig.getString("query"));
-      InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.refreshInterval,
-          segmentFeedbackConfig.getString("refreshTime"));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY, InspectorStrings.isUpdating, 0);
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY, InspectorStrings.repoSource,
+          databaseConfig.getString(ChannelServerStringLiterals.DATABASE));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY, InspectorStrings.query,
+          segmentFeedbackConfig.getString(ChannelServerStringLiterals.QUERY));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY, InspectorStrings.refreshInterval,
+          segmentFeedbackConfig.getString(ChannelServerStringLiterals.REFRESH_TIME));
 
-      InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.isUpdating, 0);
-      InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.repoSource,
-          databaseConfig.getString("database"));
-      InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.query, siteMetaDataConfig.getString("query"));
-      InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.refreshInterval,
-          siteMetaDataConfig.getString("refreshTime"));
-      InspectorStats.setStats("SiteTaxonomyRepository", InspectorStrings.isUpdating, 0);
-      InspectorStats.setStats("SiteTaxonomyRepository", InspectorStrings.repoSource,
-          databaseConfig.getString("database"));
-      InspectorStats.setStats("SiteTaxonomyRepository", InspectorStrings.query, siteTaxonomyConfig.getString("query"));
-      InspectorStats.setStats("SiteTaxonomyRepository", InspectorStrings.refreshInterval,
-          siteTaxonomyConfig.getString("refreshTime"));
+      InspectorStats.setStats(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY, InspectorStrings.isUpdating, 0);
+      InspectorStats.setStats(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY, InspectorStrings.repoSource,
+          databaseConfig.getString(ChannelServerStringLiterals.DATABASE));
+      InspectorStats.setStats(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY, InspectorStrings.query, siteMetaDataConfig.getString(ChannelServerStringLiterals.QUERY));
+      InspectorStats.setStats(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY, InspectorStrings.refreshInterval,
+          siteMetaDataConfig.getString(ChannelServerStringLiterals.REFRESH_TIME));
+      InspectorStats.setStats(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY, InspectorStrings.isUpdating, 0);
+      InspectorStats.setStats(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY, InspectorStrings.repoSource,
+          databaseConfig.getString(ChannelServerStringLiterals.DATABASE));
+      InspectorStats.setStats(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY, InspectorStrings.query, siteTaxonomyConfig.getString(ChannelServerStringLiterals.QUERY));
+      InspectorStats.setStats(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY, InspectorStrings.refreshInterval,
+          siteTaxonomyConfig.getString(ChannelServerStringLiterals.REFRESH_TIME));
 
       initialContext.bind("java:comp/env/jdbc", dataSource);
 
       // Reusing the repository from phoenix adsering framework.
-      channelAdGroupRepository.init(logger, config.cacheConfiguration().subset("ChannelAdGroupRepository"),
-          "ChannelAdGroupRepository");
-      channelRepository.init(logger, config.cacheConfiguration().subset("ChannelRepository"), "ChannelRepository");
-      channelFeedbackRepository.init(logger, config.cacheConfiguration().subset("ChannelFeedbackRepository"),
-          "ChannelFeedbackRepository");
-      channelSegmentFeedbackRepository.init(logger,
-          config.cacheConfiguration().subset("ChannelSegmentFeedbackRepository"), "ChannelSegmentFeedbackRepository");
-      siteTaxonomyRepository.init(logger, config.cacheConfiguration().subset("SiteTaxonomyRepository"),
-          "SiteTaxonomyRepository");
-      siteMetaDataRepository.init(logger, config.cacheConfiguration().subset("SiteMetaDataRepository"),
-          "SiteMetaDataRepository");
+      channelAdGroupRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY),
+          ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY);
+      channelRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_REPOSITORY), ChannelServerStringLiterals.CHANNEL_REPOSITORY);
+      channelFeedbackRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY),
+          ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY);
+      channelSegmentFeedbackRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY), ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY);
+      siteTaxonomyRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY),
+          ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY);
+      siteMetaDataRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY),
+          ChannelServerStringLiterals.SITE_METADATA_REPOSITORY);
       //siteCitrusLeafFeedbackRepository.init(config.serverConfiguration().subset("citrusleaf"), DataCenter.GLOBAL);
-
+      //siteCitrusLeafFeedbackRepository.init(config.serverConfiguration().subset("citrusleaf"), DataCenter.ALL);
       logger.error("* * * * Instantiating repository completed * * * *");
     } catch (NamingException exception) {
       logger.error("failed to creatre binding for postgresql data source " + exception.getMessage());

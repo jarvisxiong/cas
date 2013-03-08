@@ -375,12 +375,14 @@ public class Filters {
           InspectorStrings.droppedInLatLongFilter);
       return true;
     }
-    if(channelSegmentEntity.isInterstitialOnly() && (sasParams.getRqAdType() == null || !sasParams.getRqAdType().equals("int"))) {
+    if(channelSegmentEntity.isInterstitialOnly()
+        && (sasParams.getRqAdType() == null || !sasParams.getRqAdType().equals("int"))) {
       InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegmentEntity.getAdvertiserId()),
           InspectorStrings.droppedInOnlyInterstitialFilter);
       return true;
     }
-    if(channelSegmentEntity.isNonInterstitialOnly() && sasParams.getRqAdType() != null && sasParams.getRqAdType().equals("int")) {
+    if(channelSegmentEntity.isNonInterstitialOnly() && sasParams.getRqAdType() != null
+        && sasParams.getRqAdType().equals("int")) {
       InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegmentEntity.getAdvertiserId()),
           InspectorStrings.droppedInOnlyNonInterstitialFilter);
       return true;
@@ -440,7 +442,8 @@ public class Filters {
     double feedbackPower = serverConfiguration.getDouble("feedbackPower", 2.0);
     int priority = channelSegment.getChannelEntity().getPriority() < 5 ? 5 - channelSegment.getChannelEntity()
         .getPriority() : 1;
-    return (Math.pow((ecpm + eCPMShift), feedbackPower) * (priority) * getECPMBoostFactor(channelSegment));
+    return (Math.pow((ecpm + eCPMShift), feedbackPower) * (priority) * getECPMBoostFactor(channelSegment))
+        * getECPMBoostFactor(channelSegment);
   }
 
   void printSegments(Map<String, HashMap<String, ChannelSegment>> matchedSegments) {
@@ -511,25 +514,9 @@ public class Filters {
   }
 
   private double getECPMBoostFactor(ChannelSegment channelSegment) {
-    /*
-     * long impressions = 0; long floor = 0; double fillRatio = 0; double ecpm =
-     * 0; if(null !=
-     * repositoryHelper.queryChannelFeedbackRepository(advertiserId))
-     * impressions =
-     * repositoryHelper.queryChannelFeedbackRepository(advertiserId
-     * ).getTodayImpressions(); if(null !=
-     * repositoryHelper.queryChannelSegmentFeedbackRepository(adGroupId)) {
-     * fillRatio =
-     * repositoryHelper.queryChannelSegmentFeedbackRepository(adGroupId
-     * ).getFillRatio(); ecpm =
-     * repositoryHelper.queryChannelSegmentFeedbackRepository
-     * (adGroupId).geteCPM(); } if(null !=
-     * repositoryHelper.queryChannelRepository(channelId)) floor =
-     * repositoryHelper.queryChannelRepository(channelId).getImpressionFloor();
-     * long currentHour = (System.currentTimeMillis()%86400000)/3600000;
-     * if(impressions < floor / 24 * currentHour) { return 1 + ((floor -
-     * impressions) / floor) * fillRatio * ecpm * (currentHour + 1); }
-     */
+    //double fillRatio = channelSegment.getChannelSegmentCitrusLeafFeedbackEntity().getFillRatio();
+    //double latency = channelSegment.getChannelSegmentCitrusLeafFeedbackEntity().getLatency();
+    //return (1 + fillRatio) * (1 + (700 - Math.min(latency, 700)) / 700);
     return 1;
   }
 
