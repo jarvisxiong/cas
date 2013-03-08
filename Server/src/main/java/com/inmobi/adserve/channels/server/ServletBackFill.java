@@ -108,7 +108,7 @@ public class ServletBackFill implements Servlet {
      * Set imai content if r-format is imai
      */
     String imaiBaseUrl = null;
-    if(hrh.responseSender.sasParams.getRFormat().equals("imai")) {
+    if(hrh.responseSender.sasParams.getRFormat().equalsIgnoreCase("imai")) {
       if(hrh.responseSender.sasParams.getPlatformOsId() == 3) {
         imaiBaseUrl = ServletHandler.config.getString("androidBaseUrl");
       } else {
@@ -116,6 +116,7 @@ public class ServletBackFill implements Servlet {
       }
     }
     hrh.responseSender.sasParams.setImaiBaseUrl(imaiBaseUrl);
+    logger.debug("imai base url is", imaiBaseUrl);
     
     // getting the selected third party site details
     Map<String, HashMap<String, ChannelSegment>> matchedSegments = new MatchSegments(ServletHandler.repositoryHelper,

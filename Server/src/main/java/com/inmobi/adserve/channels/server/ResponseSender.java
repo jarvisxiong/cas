@@ -126,7 +126,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
         String startElement = String.format(startTags, (int) dim.getWidth(), (int) dim.getHeight());
         finalReponse = startElement + finalReponse + endTags;
-      } else if(getResponseFormat().equals("imai")) {
+      } else if(getResponseFormat().equalsIgnoreCase("imai")) {
         finalReponse = adImaiStartTags + finalReponse;
         sendResponse(OK, finalReponse, event);
       }
@@ -190,7 +190,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
       sendResponse(noAdXhtml, event);
     } else if(isJsAdRequest()) {
       sendResponse(String.format(noAdJsAdcode, sasParams.getRqIframe()), event);
-    } else if (getResponseFormat().equals("imai")) {
+    } else if (getResponseFormat().equalsIgnoreCase("imai")) {
       sendResponse(NO_CONTENT, noAdImai, event); 
     } else{
       sendResponse(noAdHtml, event);
