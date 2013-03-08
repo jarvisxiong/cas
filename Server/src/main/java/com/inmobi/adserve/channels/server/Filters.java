@@ -514,9 +514,10 @@ public class Filters {
   }
 
   private double getECPMBoostFactor(ChannelSegment channelSegment) {
-    double fillRatio = channelSegment.getChannelSegmentCitrusLeafFeedbackEntity().getFillRatio();
-    double latency = channelSegment.getChannelSegmentCitrusLeafFeedbackEntity().getLatency();
-    return (1 + fillRatio) * (1 + (700 - Math.min(latency, 700)) / 700);
+    //double fillRatio = channelSegment.getChannelSegmentCitrusLeafFeedbackEntity().getFillRatio();
+    //double latency = channelSegment.getChannelSegmentCitrusLeafFeedbackEntity().getLatency();
+    //return (1 + fillRatio) * (1 + (700 - Math.min(latency, 700)) / 700);
+    return 1;
   }
 
   /**
