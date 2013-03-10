@@ -242,7 +242,7 @@ public class ChannelServer {
           "SiteTaxonomyRepository");
       siteMetaDataRepository.init(logger, config.cacheConfiguration().subset("SiteMetaDataRepository"),
           "SiteMetaDataRepository");
-      siteCitrusLeafFeedbackRepository.init(config.serverConfiguration().subset("citrusleaf"), DataCenter.ALL);
+      siteCitrusLeafFeedbackRepository.init(config.serverConfiguration().subset("citrusleaf"), getDataCenter());
 
       logger.error("* * * * Instantiating repository completed * * * *");
     } catch (NamingException exception) {
@@ -257,6 +257,22 @@ public class ChannelServer {
       exception.printStackTrace();
       return;
     }
+  }
+
+  private static DataCenter getDataCenter() {
+    DataCenter colo = DataCenter.ALL;
+    if(DataCenter.UA2.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
+      colo = DataCenter.UA2;
+    }else if(DataCenter.UJ1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
+      colo = DataCenter.UJ1;
+    }else if(DataCenter.UJ1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
+      colo = DataCenter.UJ1;
+    }else if(DataCenter.LHR1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
+      colo = DataCenter.LHR1;
+    }else if(DataCenter.HKG1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
+      colo = DataCenter.HKG1;
+    }
+    return colo;
   }
 
   // check if all log folders exists
