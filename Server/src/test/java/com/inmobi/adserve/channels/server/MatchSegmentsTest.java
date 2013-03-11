@@ -196,7 +196,7 @@ public class MatchSegmentsTest extends TestCase {
     MatchSegments matchSegments = new MatchSegments(repositoryHelper, sasRequestParameters, new DebugLogger());
 
     //long [] cat = matchSegments.getCategories(sasRequestParameters, mockConfig);
-    System.out.println(matchSegments.getCategories(mockConfig));
+    System.out.println(matchSegments.getCategories());
   }
 }
 
