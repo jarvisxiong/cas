@@ -22,7 +22,6 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.server.ClickUrlMaker.TrackingUrls;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -90,31 +89,22 @@ public class AsyncRequestMaker {
       logger.debug("impression id is " + sasParams.getImpressionId());
 
       if((network.isClickUrlRequired() || network.isBeaconUrlRequired()) && null != sasParams.getImpressionId()) {
-        if(config.getInt("clickmaker.version", 6) == 4) {
-          ClickUrlMaker clickUrlMaker = new ClickUrlMaker(config, jObject, sasParams, logger);
-          TrackingUrls trackingUrls = clickUrlMaker.getClickUrl(channelSegmentEntity.getPricingModel());
-          clickUrl = trackingUrls.getClickUrl();
-          beaconUrl = trackingUrls.getBeaconUrl();
-          logger.debug("click url :", clickUrl);
-          logger.debug("beacon url :", beaconUrl);
-        } else {
-          boolean isCpc = false;
-          if(null != channelSegmentEntity.getPricingModel()
-              && channelSegmentEntity.getPricingModel().equalsIgnoreCase("cpc")) {
-            isCpc = true;
-          }
-          ClickUrlMakerV6 clickUrlMakerV6 = setClickParams(logger, isCpc, config, sasParams, jObject);
-          Map<String, String> clickGetParams = new HashMap<String, String>();
-          clickGetParams.put("ds", "1");
-          Map<String, String> beaconGetParams = new HashMap<String, String>();
-          beaconGetParams.put("ds", "1");
-          beaconGetParams.put("event", "beacon");
-          clickUrlMakerV6.createClickUrls();
-          clickUrl = clickUrlMakerV6.getClickUrl(clickGetParams);
-          beaconUrl = clickUrlMakerV6.getBeaconUrl(beaconGetParams);
-          logger.debug("click url :", clickUrl);
-          logger.debug("beacon url :", beaconUrl);
+        boolean isCpc = false;
+        if(null != channelSegmentEntity.getPricingModel()
+            && channelSegmentEntity.getPricingModel().equalsIgnoreCase("cpc")) {
+          isCpc = true;
         }
+        ClickUrlMakerV6 clickUrlMakerV6 = setClickParams(logger, isCpc, config, sasParams, jObject);
+        Map<String, String> clickGetParams = new HashMap<String, String>();
+        clickGetParams.put("ds", "1");
+        Map<String, String> beaconGetParams = new HashMap<String, String>();
+        beaconGetParams.put("ds", "1");
+        beaconGetParams.put("event", "beacon");
+        clickUrlMakerV6.createClickUrls();
+        clickUrl = clickUrlMakerV6.getClickUrl(clickGetParams);
+        beaconUrl = clickUrlMakerV6.getBeaconUrl(beaconGetParams);
+        logger.debug("click url :", clickUrl);
+        logger.debug("beacon url :", beaconUrl);
       }
 
       logger.debug("Sending request to Channel of Id", channelSegmentEntity.getChannelId());

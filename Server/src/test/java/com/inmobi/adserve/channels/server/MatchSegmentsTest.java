@@ -179,7 +179,6 @@ public class MatchSegmentsTest extends TestCase {
     newCat.add(1L);
     newCat.add(2L);
     newCat.add(3L);
-    sasRequestParameters.setNewCategories(newCat);
     
     RepositoryHelper repositoryHelper = createMock(RepositoryHelper.class);
     SiteTaxonomyEntity s1 = new SiteTaxonomyEntity("1", "name", "4");
