@@ -252,7 +252,7 @@ public class MatchSegments {
     ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = repositoryHelper
         .queryChannelSegmentFeedbackRepository(channelSegmentEntity.getAdgroupId());
     SiteFeedbackEntity siteFeedbackEntity = repositoryHelper.querySiteCitrusLeafFeedbackRepository(
-        sasParams.getSiteId(), Long.valueOf(sasParams.getSiteIncId()).toString(), logger);
+        sasParams.getSiteId(), sasParams.getSiteSegmentId().toString(), logger);
     ChannelSegmentFeedbackEntity channelSegmentCitrusLeafFeedbackEntity = null;
     if(channelEntity == null) {
       logger.debug("No channelEntity for advertiserID", channelSegmentEntity.getAdvertiserId());
@@ -271,14 +271,20 @@ public class MatchSegments {
     }
 
     if(siteFeedbackEntity != null) {
+      logger.debug("siteFeedbackEntity is", siteFeedbackEntity.getAdGroupFeedbackMap());
       channelSegmentCitrusLeafFeedbackEntity = siteFeedbackEntity.getAdGroupFeedbackMap().get(
-          channelSegmentEntity.getAdgroupId());
+          channelSegmentEntity.getExternalSiteKey());
+    } else {
+      logger.debug("siteFeedbackEntity is null");
     }
 
     if(channelSegmentCitrusLeafFeedbackEntity == null) {
-      logger.debug("No channelSegmentFeedackEntity for advertiserID", channelSegmentEntity.getAdvertiserId(),
-          "and AdgroupId", channelSegmentEntity.getAdgroupId());
+      logger.debug("No channelSegmentCitrusLeafFeedbackEntity for advertiserID", channelSegmentEntity.getAdvertiserId(),
+          "and ExternalSiteKey", channelSegmentEntity.getExternalSiteKey());
       channelSegmentCitrusLeafFeedbackEntity = MatchSegments.defaultChannelSegmentCitrusLeafFeedbackEntity;
+    } else {
+      logger.debug("Found channelSegmentCitrusLeafFeedbackEntity for advertiserID", channelSegmentEntity.getAdvertiserId(),
+          "and ExternalSiteKey", channelSegmentEntity.getExternalSiteKey(), channelSegmentCitrusLeafFeedbackEntity.toString());      
     }
 
     double pECPM = channelSegmentFeedbackEntity.geteCPM();
