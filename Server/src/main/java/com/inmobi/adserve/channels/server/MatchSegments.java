@@ -105,12 +105,12 @@ public class MatchSegments {
    */
   public List<Long> getCategories() {
     // Computing all the parents for categories in the category list from the request
-    HashSet<Long> newCategories = new HashSet<Long>();
+    HashSet<Long> categories = new HashSet<Long>();
     if(null != sasParams.getCategories()) {
       for (Long cat : sasParams.getCategories()) {
         String parentId = cat.toString();
         while (parentId != null) {
-          newCategories.add(Long.parseLong(parentId));
+          categories.add(Long.parseLong(parentId));
           SiteTaxonomyEntity entity = repositoryHelper.querySiteTaxonomyRepository(parentId);
           if(entity == null) {
             break;
@@ -121,7 +121,7 @@ public class MatchSegments {
     }
     // setting Categories field in sasParams to contain their parentids as well
     List<Long> temp = new ArrayList<Long>();
-    temp.addAll(newCategories);
+    temp.addAll(categories);
     sasParams.setCategories(temp);
     return sasParams.getCategories();
   }
