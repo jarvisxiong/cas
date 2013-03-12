@@ -87,7 +87,7 @@ public class MatchSegments {
       if(countryStr != null) {
         country = Long.parseLong(countryStr);
       }
-      return (matchSegments(logger, slot, getCategories(ServletHandler.config), country, targetingPlatform, siteRating,
+      return (matchSegments(logger, slot, getCategories(), country, targetingPlatform, siteRating,
           osId));
     } catch (NumberFormatException exception) {
       logger.error("Error parsing required arguments " + exception.getMessage());
@@ -103,15 +103,14 @@ public class MatchSegments {
    * @param sasParams
    * @return
    */
-  public List<Long> getCategories(Configuration serverConfig) {
-    // Computing all the parents for categories in the new category list from
-    // the request
-    HashSet<Long> newCategories = new HashSet<Long>();
-    if(null != sasParams.getNewCategories()) {
-      for (Long cat : sasParams.getNewCategories()) {
+  public List<Long> getCategories() {
+    // Computing all the parents for categories in the category list from the request
+    HashSet<Long> categories = new HashSet<Long>();
+    if(null != sasParams.getCategories()) {
+      for (Long cat : sasParams.getCategories()) {
         String parentId = cat.toString();
         while (parentId != null) {
-          newCategories.add(Long.parseLong(parentId));
+          categories.add(Long.parseLong(parentId));
           SiteTaxonomyEntity entity = repositoryHelper.querySiteTaxonomyRepository(parentId);
           if(entity == null) {
             break;
@@ -120,14 +119,10 @@ public class MatchSegments {
         }
       }
     }
-    // setting newCategories field in sasParams to contain their parentids as
-    // well
+    // setting Categories field in sasParams to contain their parentids as well
     List<Long> temp = new ArrayList<Long>();
-    temp.addAll(newCategories);
-    sasParams.setNewCategories(temp);
-    if(serverConfig.getBoolean("isNewCategory", false)) {
-      return sasParams.getNewCategories();
-    }
+    temp.addAll(categories);
+    sasParams.setCategories(temp);
     return sasParams.getCategories();
   }
 

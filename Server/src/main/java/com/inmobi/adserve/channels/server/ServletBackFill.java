@@ -119,6 +119,12 @@ public class ServletBackFill implements Servlet {
     hrh.responseSender.sasParams.setImaiBaseUrl(imaiBaseUrl);
     logger.debug("imai base url is", hrh.responseSender.sasParams.getImaiBaseUrl());
     
+    //Send noad if new-category is not present in the request
+    if (null == hrh.responseSender.sasParams.getCategories()) {
+      hrh.logger.debug("new-category field is not present in the request so sending noad");
+      hrh.responseSender.sasParams.setCategories(new ArrayList<Long>());
+      hrh.responseSender.sendNoAdResponse(e);
+    }
     // getting the selected third party site details
     Map<String, HashMap<String, ChannelSegment>> matchedSegments = new MatchSegments(ServletHandler.repositoryHelper,
         hrh.responseSender.sasParams, logger).matchSegments(hrh.responseSender.sasParams);

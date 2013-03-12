@@ -68,8 +68,7 @@ public class RequestParser {
     if(params.getSiteType() != null) {
       params.setSiteType(params.getSiteType().toUpperCase());
     }
-    params.setCategories(getCategory(jObject, logger, "category"));
-    params.setNewCategories(getCategory(jObject, logger, "new-category"));
+    params.setCategories(getCategory(jObject, logger, "new-category"));
     params.setRqIframe(stringify(jObject, "rq-iframe", logger));
     params.setRFormat(stringify(jObject, "r-format", logger));
     params.setRqMkAdcount(stringify(jObject, "rq-mk-adcount", logger));
