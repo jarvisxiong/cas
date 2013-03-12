@@ -123,6 +123,8 @@ public class ServletBackFill implements Servlet {
     if (null == hrh.responseSender.sasParams.getCategories()) {
       hrh.logger.debug("new-category field is not present in the request so sending noad");
       hrh.responseSender.sasParams.setCategories(new ArrayList<Long>());
+      hrh.setTerminationReason(ServletHandler.MISSING_CATEGORY);
+      InspectorStats.incrementStatCount(InspectorStrings.missingCategory, InspectorStrings.count);
       hrh.responseSender.sendNoAdResponse(e);
     }
     // getting the selected third party site details
