@@ -13,14 +13,11 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.log4j.Logger;
-import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.DebugLogger;

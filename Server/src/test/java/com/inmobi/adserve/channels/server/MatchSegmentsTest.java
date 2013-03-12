@@ -3,28 +3,18 @@ package com.inmobi.adserve.channels.server;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.verify;
-
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.log4j.Logger;
-import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.entity.ChannelEntity;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
-import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
-import com.inmobi.adserve.channels.repository.ChannelRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.adserve.channels.util.InspectorStats;
 
 public class MatchSegmentsTest extends TestCase {
 /*
@@ -194,9 +184,7 @@ public class MatchSegmentsTest extends TestCase {
     MatchSegments.init(null);
     DebugLogger.init(mockConfig);
     MatchSegments matchSegments = new MatchSegments(repositoryHelper, sasRequestParameters, new DebugLogger());
-
-    //long [] cat = matchSegments.getCategories(sasRequestParameters, mockConfig);
-    System.out.println(matchSegments.getCategories());
+    assertEquals(new ArrayList<Long>(), matchSegments.getCategories());
   }
 }
 
