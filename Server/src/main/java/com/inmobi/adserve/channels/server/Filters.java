@@ -442,8 +442,7 @@ public class Filters {
     double feedbackPower = serverConfiguration.getDouble("feedbackPower", 2.0);
     int priority = channelSegment.getChannelEntity().getPriority() < 5 ? 5 - channelSegment.getChannelEntity()
         .getPriority() : 1;
-    return (Math.pow((ecpm + eCPMShift), feedbackPower) * (priority) * getECPMBoostFactor(channelSegment))
-        * getECPMBoostFactor(channelSegment);
+    return Math.pow((ecpm + eCPMShift), feedbackPower) * (priority) * getECPMBoostFactor(channelSegment);
   }
 
   void printSegments(Map<String, HashMap<String, ChannelSegment>> matchedSegments) {
