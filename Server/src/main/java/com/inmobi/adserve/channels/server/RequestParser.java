@@ -77,17 +77,13 @@ public class RequestParser {
     
     params.setAllowBannerAds(jObject.optBoolean("site-allowBanner", true));
     params.setSiteFloor(jObject.optDouble("site-floor", 0.0));
-    try {
-      params.setSiteSegmentId(jObject.getInt("sel-seg-id"));
-      logger.debug("Site segment id is", params.getSiteSegmentId().toString());
-    } catch (JSONException e) {
-      logger.debug("Site segment id is not present in the request");
-    }
+    params.setSiteSegmentId(jObject.optInt("sel-seg-id", 0));
+    logger.debug("Site segment id is", params.getSiteSegmentId());
     params.setIpFileVersion(jObject.optInt("rq-ip-file-ver", 1));
     if(logger.isDebugEnabled()) {
-      logger.debug("country obtained is " + params.getCountry());
-      logger.debug("site floor is " + params.getSiteFloor());
-      logger.debug("osId is " + params.getPlatformOsId());
+      logger.debug("country obtained is", params.getCountry());
+      logger.debug("site floor is", params.getSiteFloor());
+      logger.debug("osId is", params.getPlatformOsId());
     }
     params.setUidParams(stringify(jObject, "u-id-params", logger));
     params = getUserIdParams(params, jObject, logger);
