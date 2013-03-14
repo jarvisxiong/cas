@@ -6,25 +6,20 @@ import java.io.FileWriter;
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
-import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
-import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.SegmentFactory;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import com.inmobi.phoenix.exception.RepositoryException;
 import static org.easymock.classextension.EasyMock.replay;
 
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.isA;
 
 public class SegmentFactoryTest extends TestCase {
   Configuration adaptorConfig;
