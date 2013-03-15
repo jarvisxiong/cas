@@ -102,8 +102,6 @@ public class ChannelServer {
     repositoryHelper = new RepositoryHelper(channelRepository, channelAdGroupRepository, channelFeedbackRepository,
         channelSegmentFeedbackRepository, siteMetaDataRepository, siteTaxonomyRepository,
         siteCitrusLeafFeedbackRepository);
-
-    MatchSegments.init(channelAdGroupRepository);
     InspectorStats.initializeRepoStats(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY);
     InspectorStats.initializeRepoStats(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY);
     InspectorStats.initializeRepoStats(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY);
@@ -133,8 +131,9 @@ public class ChannelServer {
     // Configure the netty server.
     try {
       // Initialising request handler
-      AsyncRequestMaker.init(clientBootstrap, rtbClientBootstrap, asyncHttpClient);
       ServletHandler.init(config, repositoryHelper);
+      MatchSegments.init(channelAdGroupRepository);
+      AsyncRequestMaker.init(clientBootstrap, rtbClientBootstrap, asyncHttpClient);
       SegmentFactory.init(repositoryHelper, config.adapterConfiguration(), logger);
       ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(
           Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
