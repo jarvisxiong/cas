@@ -234,8 +234,9 @@ public class ServletBackFill implements Servlet {
   private static double getHighestEcpm(List<ChannelSegment> channelSegments, DebugLogger logger) {
     double highestEcpm = 0;
     for (ChannelSegment channelSegment : channelSegments) {
-      highestEcpm = highestEcpm < channelSegment.getChannelSegmentFeedbackEntity().geteCPM() ? channelSegment
-          .getChannelSegmentFeedbackEntity().geteCPM() : highestEcpm;
+      if(highestEcpm < channelSegment.getChannelSegmentFeedbackEntity().geteCPM()) {
+        highestEcpm = channelSegment.getChannelSegmentFeedbackEntity().geteCPM();
+      }
     }
     return highestEcpm;
   }
@@ -249,7 +250,7 @@ public class ServletBackFill implements Servlet {
       if(null != siteMetaDataEntity && siteMetaDataEntity.getBlockedCategories() != null) {
         if(!siteMetaDataEntity.isExpired() && siteMetaDataEntity.getRuleType() == 4) {
           blockedCategories = Arrays.asList(siteMetaDataEntity.getBlockedCategories());
-          int size = blockedCategories == null ? 0: blockedCategories.size();
+          int size = blockedCategories == null ? 0 : blockedCategories.size();
           logger.debug("Site id is", hrh.responseSender.sasParams.getSiteId(), "no of blocked categories are", size);
         }
       } else {
