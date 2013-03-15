@@ -95,8 +95,8 @@ public class ServletBackFill implements Servlet {
      * if sendonlytowhitelist flag is true, check if site id is present in
      * whitelist, else send no ad.
      */
-    if(ServletHandler.config.getBoolean("sendOnlyToWhitelist")) {
-      List<String> whitelist = ServletHandler.config.getList("whitelist");
+    if(ServletHandler.getServerConfig().getBoolean("sendOnlyToWhitelist")) {
+      List<String> whitelist = ServletHandler.getServerConfig().getList("whitelist");
       if(null == whitelist || !whitelist.contains(hrh.responseSender.sasParams.getSiteId())) {
         logger.debug("site id not present in whitelist, so sending no ad response");
         hrh.responseSender.sendNoAdResponse(e);
@@ -111,9 +111,9 @@ public class ServletBackFill implements Servlet {
     String rFormat = hrh.responseSender.getResponseFormat();
     if(rFormat.equalsIgnoreCase("imai")) {
       if(hrh.responseSender.sasParams.getPlatformOsId() == 3) {
-        imaiBaseUrl = ServletHandler.config.getString("androidBaseUrl");
+        imaiBaseUrl = ServletHandler.getServerConfig().getString("androidBaseUrl");
       } else {
-        imaiBaseUrl = ServletHandler.config.getString("iPhoneBaseUrl");
+        imaiBaseUrl = ServletHandler.getServerConfig().getString("iPhoneBaseUrl");
       }
     }
     hrh.responseSender.sasParams.setImaiBaseUrl(imaiBaseUrl);
@@ -138,7 +138,7 @@ public class ServletBackFill implements Servlet {
     }
 
     hrh.responseSender.sasParams.setSiteFloor(0.0);
-    Filters filter = new Filters(matchedSegments, ServletHandler.config, ServletHandler.adapterConfig,
+    Filters filter = new Filters(matchedSegments, ServletHandler.getServerConfig(), ServletHandler.getAdapterConfig(),
         hrh.responseSender.sasParams, ServletHandler.repositoryHelper, logger);
     // applying all the filters
     List<ChannelSegment> rows = filter.applyFilters();
@@ -182,8 +182,8 @@ public class ServletBackFill implements Servlet {
     logger.debug("Total channels available for sending requests " + rows.size());
     List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
-    segments = AsyncRequestMaker.prepareForAsyncRequest(rows, logger, ServletHandler.config, ServletHandler.rtbConfig,
-        ServletHandler.adapterConfig, hrh.responseSender, advertiserSet, e, ServletHandler.repositoryHelper,
+    segments = AsyncRequestMaker.prepareForAsyncRequest(rows, logger, ServletHandler.getServerConfig(), ServletHandler.getRtbConfig(),
+        ServletHandler.getAdapterConfig(), hrh.responseSender, advertiserSet, e, ServletHandler.repositoryHelper,
         hrh.jObject, hrh.responseSender.sasParams, casInternalRequestParameters, rtbSegments);
 
     logger.debug("rtb rankList size is", Integer.valueOf(rtbSegments.size()));
@@ -203,12 +203,8 @@ public class ServletBackFill implements Servlet {
 
     hrh.responseSender.setRankList(tempRankList);
     hrh.responseSender.getAuctionEngine().setRtbSegments(rtbSegments);
-    if(logger.isDebugEnabled()) {
-      logger.debug("Number of tpans whose request was successfully completed "
-          + hrh.responseSender.getRankList().size());
-      logger.debug("Number of rtb tpans whose request was successfully completed "
-          + hrh.responseSender.getAuctionEngine().getRtbSegments().size());
-    }
+    logger.debug("Number of tpans whose request was successfully completed", hrh.responseSender.getRankList().size());
+    logger.debug("Number of rtb tpans whose request was successfully completed", hrh.responseSender.getAuctionEngine().getRtbSegments().size());
     // if none of the async request succeed, we return "NO_AD"
     if(hrh.responseSender.getRankList().isEmpty() && hrh.responseSender.getAuctionEngine().getRtbSegments().isEmpty()) {
       logger.debug("No calls");
@@ -226,9 +222,7 @@ public class ServletBackFill implements Servlet {
       }
       // Resetting the rankIndexToProcess for already completed adapters.
       hrh.responseSender.processDcpList(e);
-      if(logger.isDebugEnabled()) {
-        logger.debug("returned from send Response, ranklist size is " + hrh.responseSender.getRankList().size());
-      }
+      logger.debug("returned from send Response, ranklist size is", hrh.responseSender.getRankList().size());
     }
   }
 
@@ -238,13 +232,12 @@ public class ServletBackFill implements Servlet {
   }
 
   private static double getHighestEcpm(List<ChannelSegment> channelSegments, DebugLogger logger) {
-    double lowestEcpm = 0;
+    double highestEcpm = 0;
     for (ChannelSegment channelSegment : channelSegments) {
-      if(logger.isDebugEnabled())
-      lowestEcpm = lowestEcpm < channelSegment.getChannelSegmentFeedbackEntity().geteCPM() ? channelSegment
-          .getChannelSegmentFeedbackEntity().geteCPM() : lowestEcpm;
+      highestEcpm = highestEcpm < channelSegment.getChannelSegmentFeedbackEntity().geteCPM() ? channelSegment
+          .getChannelSegmentFeedbackEntity().geteCPM() : highestEcpm;
     }
-    return lowestEcpm;
+    return highestEcpm;
   }
 
   private static List<Long> getBlockedCategories(HttpRequestHandler hrh, DebugLogger logger) {
@@ -256,10 +249,12 @@ public class ServletBackFill implements Servlet {
       if(null != siteMetaDataEntity && siteMetaDataEntity.getBlockedCategories() != null) {
         if(!siteMetaDataEntity.isExpired() && siteMetaDataEntity.getRuleType() == 4) {
           blockedCategories = Arrays.asList(siteMetaDataEntity.getBlockedCategories());
-          logger.debug("Site id is", hrh.responseSender.sasParams.getSiteId(), "no of blocked categories are");
+          int size = blockedCategories == null ? 0: blockedCategories.size();
+          logger.debug("Site id is", hrh.responseSender.sasParams.getSiteId(), "no of blocked categories are", size);
         }
-      } else
+      } else {
         logger.debug("No blockedCategory for this site id");
+      }
     }
     return blockedCategories;
   }

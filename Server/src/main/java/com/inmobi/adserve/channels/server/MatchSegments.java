@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.configuration.Configuration;
-
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
@@ -25,6 +23,7 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 
 public class MatchSegments {
   private DebugLogger logger;
+  private static final String DEFAULT = "default";
   private RepositoryHelper repositoryHelper;
   private SASRequestParameters sasParams;
   private static ChannelAdGroupRepository channelAdGroupRepository;
@@ -40,12 +39,12 @@ public class MatchSegments {
         .setPriority(3).setRequestCap(Long.MAX_VALUE);
     MatchSegments.defaultChannelEntity.setSiteInclusion(false);
     MatchSegments.defaultChannelEntity.setSitesIE(emptySet);
-    MatchSegments.defaultChannelFeedbackEntity = new ChannelFeedbackEntity("default", 0, 0, Double.MAX_VALUE, 0, 0, 0,
+    MatchSegments.defaultChannelFeedbackEntity = new ChannelFeedbackEntity(DEFAULT, 0, 0, Double.MAX_VALUE, 0, 0, 0,
         0, 0);
-    MatchSegments.defaultChannelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity("default", "default", 1.0,
+    MatchSegments.defaultChannelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(DEFAULT, DEFAULT, ServletHandler.getServerConfig().getDouble("default.ecpm"),
         0.5, 0, 0, 0, 0);
-    MatchSegments.defaultChannelSegmentCitrusLeafFeedbackEntity = new ChannelSegmentFeedbackEntity("default",
-        "default", 1.0, 0.5, 0, 0, 0, 0);
+    MatchSegments.defaultChannelSegmentCitrusLeafFeedbackEntity = new ChannelSegmentFeedbackEntity(DEFAULT,
+        DEFAULT, 1.0, 0.5, 0, 0, 0, 0);
   }
 
   public MatchSegments(RepositoryHelper repositoryHelper, SASRequestParameters sasParams, DebugLogger logger) {
@@ -77,11 +76,8 @@ public class MatchSegments {
       return null;
     }
     try {
-      if(logger.isDebugEnabled()) {
-        logger.debug("Request# slot: " + slotStr + " country: " + countryStr + " categories: "
-            + sasParams.getCategories() + " targetingPlatform: " + targetingPlatform + " siteRating: " + siteRating
-            + " osId" + osId);
-      }
+      logger.debug("Request# slot:", slotStr, "country:", countryStr, "categories:", sasParams.getCategories(),
+          "targetingPlatform:", targetingPlatform, "siteRating:", siteRating, "osId", osId);
       long slot = Long.parseLong(slotStr);
       long country = -1;
       if(countryStr != null) {
@@ -186,8 +182,9 @@ public class MatchSegments {
       }
       logger.debug("Number of entries in result:", result.size(), "for", slotId, "_", country, "_", categories);
     }
-    if(result.size() == 0)
+    if(result.size() == 0) {
       logger.debug("No matching records for the request - slot:", slotId, "country:", country, "categories:", categories);
+    }
     logger.debug("final selected list of segments : ");
     printSegments(result, logger);
     return result;

@@ -80,11 +80,9 @@ public class RequestParser {
     params.setSiteSegmentId(jObject.optInt("sel-seg-id", 0));
     logger.debug("Site segment id is", params.getSiteSegmentId());
     params.setIpFileVersion(jObject.optInt("rq-ip-file-ver", 1));
-    if(logger.isDebugEnabled()) {
-      logger.debug("country obtained is", params.getCountry());
-      logger.debug("site floor is", params.getSiteFloor());
-      logger.debug("osId is", params.getPlatformOsId());
-    }
+    logger.debug("country obtained is", params.getCountry());
+    logger.debug("site floor is", params.getSiteFloor());
+    logger.debug("osId is", params.getPlatformOsId());
     params.setUidParams(stringify(jObject, "u-id-params", logger));
     params = getUserIdParams(params, jObject, logger);
     params = getUserParams(params, jObject, logger);
@@ -117,29 +115,32 @@ public class RequestParser {
     return params;
   }
 
-  public static String stringify(JSONObject jObject, String field, DebugLogger logger) throws NullPointerException {
+  public static String stringify(JSONObject jObject, String field, DebugLogger logger) {
     String fieldValue = "";
     try {
-      try {
-        fieldValue = (String) jObject.get(field);
-      } catch (ClassCastException e) {
-        fieldValue = jObject.get(field).toString();
+      Object fieldValueObject = jObject.get(field);
+      if (null != fieldValueObject) {
+        fieldValue = fieldValueObject.toString();
       }
     } catch (JSONException e) {
       return null;
     }
-    if(logger.isDebugEnabled())
-      logger.debug("Retrived from json " + field + " = " + fieldValue);
+    logger.debug("Retrived from json", field, " = ", fieldValue);
     return fieldValue;
   }
 
   public static String parseArray(JSONObject jObject, String param, int index) {
+    if(null == jObject) {
+      return null;
+    }
     try {
       JSONArray jArray = jObject.getJSONArray(param);
-      return (jArray.getString(index));
+      if(null == jArray) {
+        return null;
+      } else {
+        return (jArray.getString(index));
+      }
     } catch (JSONException e) {
-      return null;
-    } catch (NullPointerException e) {
       return null;
     }
   }
@@ -171,8 +172,9 @@ public class RequestParser {
         parameter.setUid(stringify(userMap, "u-id", logger));
       }
       parameter.setPostalCode(stringify(userMap, "u-postalcode", logger));
-      if(!StringUtils.isEmpty(parameter.getPostalCode()))
+      if(!StringUtils.isEmpty(parameter.getPostalCode())) {
         parameter.setPostalCode(parameter.getPostalCode().replaceAll(" ", ""));
+      }
       parameter.setUserLocation(stringify(userMap, "u-location", logger));
       parameter.setGenderOrig(stringify(userMap, "u-gender-orig", logger));
       try {
@@ -197,19 +199,22 @@ public class RequestParser {
   // Get user id params
   public static SASRequestParameters getUserIdParams(SASRequestParameters parameter, JSONObject jObject,
       DebugLogger logger) {
-    if(logger.isDebugEnabled())
-      logger.debug("inside parsing userid params");
+    logger.debug("inside parsing userid params");
+    if (null == jObject) {
+      return parameter;
+    }
     try {
       JSONObject userIdMap = (JSONObject) jObject.get("u-id-params");
+      if (null == userIdMap) {
+        return parameter;
+      }
       String o1Uid = stringify(userIdMap, "SO1", logger);
       parameter.setUid(stringify(userIdMap, "u-id", logger));
       parameter.setUidO1((o1Uid != null) ? o1Uid : stringify(userIdMap, "O1", logger));
       parameter.setUidMd5(stringify(userIdMap, "UM5", logger));
-      parameter.setUidIFA(("iphone".equalsIgnoreCase(parameter.getSource())) ? stringify(userIdMap, "IDA", logger) : null);
-
+      String uidIFA = "iphone".equalsIgnoreCase(parameter.getSource()) ? stringify(userIdMap, "IDA", logger) : null;
+      parameter.setUidIFA(uidIFA);
     } catch (JSONException exception) {
-      setNullValueForUid(parameter, logger);
-    } catch (NullPointerException exception) {
       setNullValueForUid(parameter, logger);
     }
     return parameter;

@@ -26,15 +26,15 @@ public class ServletLbStatus implements Servlet {
       DebugLogger logger) throws Exception {
     // Initializing loggers for expected rotation format
     if(++ServletHandler.rollCount == 20) {
-      Logger rrLogger = Logger.getLogger(ServletHandler.loggerConfig.getString("rr"));
+      Logger rrLogger = Logger.getLogger(ServletHandler.getLoggerConfig().getString("rr"));
       if(null != rrLogger) {
         rrLogger.debug("");
       }
-      Logger advertiserLogger = Logger.getLogger(ServletHandler.loggerConfig.getString("advertiser"));
+      Logger advertiserLogger = Logger.getLogger(ServletHandler.getLoggerConfig().getString("advertiser"));
       if(null != advertiserLogger) {
         advertiserLogger.debug("");
       }
-      Logger channelLogger = Logger.getLogger(ServletHandler.loggerConfig.getString("channel"));
+      Logger channelLogger = Logger.getLogger(ServletHandler.getLoggerConfig().getString("channel"));
       if(null != channelLogger) {
         channelLogger.debug("");
       }
