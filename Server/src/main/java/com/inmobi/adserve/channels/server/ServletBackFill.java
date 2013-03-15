@@ -203,12 +203,8 @@ public class ServletBackFill implements Servlet {
 
     hrh.responseSender.setRankList(tempRankList);
     hrh.responseSender.getAuctionEngine().setRtbSegments(rtbSegments);
-    if(logger.isDebugEnabled()) {
-      logger.debug("Number of tpans whose request was successfully completed "
-          + hrh.responseSender.getRankList().size());
-      logger.debug("Number of rtb tpans whose request was successfully completed "
-          + hrh.responseSender.getAuctionEngine().getRtbSegments().size());
-    }
+    logger.debug("Number of tpans whose request was successfully completed", hrh.responseSender.getRankList().size());
+    logger.debug("Number of rtb tpans whose request was successfully completed", hrh.responseSender.getAuctionEngine().getRtbSegments().size());
     // if none of the async request succeed, we return "NO_AD"
     if(hrh.responseSender.getRankList().isEmpty() && hrh.responseSender.getAuctionEngine().getRtbSegments().isEmpty()) {
       logger.debug("No calls");
@@ -226,9 +222,7 @@ public class ServletBackFill implements Servlet {
       }
       // Resetting the rankIndexToProcess for already completed adapters.
       hrh.responseSender.processDcpList(e);
-      if(logger.isDebugEnabled()) {
-        logger.debug("returned from send Response, ranklist size is " + hrh.responseSender.getRankList().size());
-      }
+      logger.debug("returned from send Response, ranklist size is", hrh.responseSender.getRankList().size());
     }
   }
 
@@ -238,13 +232,12 @@ public class ServletBackFill implements Servlet {
   }
 
   private static double getHighestEcpm(List<ChannelSegment> channelSegments, DebugLogger logger) {
-    double lowestEcpm = 0;
+    double highestEcpm = 0;
     for (ChannelSegment channelSegment : channelSegments) {
-      if(logger.isDebugEnabled())
-      lowestEcpm = lowestEcpm < channelSegment.getChannelSegmentFeedbackEntity().geteCPM() ? channelSegment
-          .getChannelSegmentFeedbackEntity().geteCPM() : lowestEcpm;
+      highestEcpm = highestEcpm < channelSegment.getChannelSegmentFeedbackEntity().geteCPM() ? channelSegment
+          .getChannelSegmentFeedbackEntity().geteCPM() : highestEcpm;
     }
-    return lowestEcpm;
+    return highestEcpm;
   }
 
   private static List<Long> getBlockedCategories(HttpRequestHandler hrh, DebugLogger logger) {
@@ -256,10 +249,12 @@ public class ServletBackFill implements Servlet {
       if(null != siteMetaDataEntity && siteMetaDataEntity.getBlockedCategories() != null) {
         if(!siteMetaDataEntity.isExpired() && siteMetaDataEntity.getRuleType() == 4) {
           blockedCategories = Arrays.asList(siteMetaDataEntity.getBlockedCategories());
-          logger.debug("Site id is", hrh.responseSender.sasParams.getSiteId(), "no of blocked categories are");
+          int size = blockedCategories == null ? 0: blockedCategories.size();
+          logger.debug("Site id is", hrh.responseSender.sasParams.getSiteId(), "no of blocked categories are", size);
         }
-      } else
+      } else {
         logger.debug("No blockedCategory for this site id");
+      }
     }
     return blockedCategories;
   }

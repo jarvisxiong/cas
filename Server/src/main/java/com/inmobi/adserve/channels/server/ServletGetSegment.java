@@ -56,19 +56,19 @@ public class ServletGetSegment implements Servlet {
       segmentInfo.put(key, new HashMap<String, String>());
       Object entity = null;
 
-      if(repoName != null && repoName.equalsIgnoreCase("channel")) {
+      if(repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_REPOSITORY)) {
         entity = ServletHandler.repositoryHelper.queryChannelRepository(id);
-      } else if(repoName != null && repoName.equalsIgnoreCase("channelsegment")) {
+      } else if(repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY)) {
         entity = ServletHandler.repositoryHelper.queryChannelAdGroupRepository(id);
-      } else if(repoName != null && repoName.equalsIgnoreCase("channelfeedback")) {
+      } else if(repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY)) {
         entity = ServletHandler.repositoryHelper.queryChannelFeedbackRepository(id);
-      } else if(repoName != null && repoName.equalsIgnoreCase("channelsegmentfeedback")) {
+      } else if(repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY)) {
         entity = ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(id);
-      } else if(repoName != null && repoName.equalsIgnoreCase("sitemetadata")) {
+      } else if(repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)) {
         entity = ServletHandler.repositoryHelper.querySiteMetaDetaRepository(id);
-      } else if(repoName != null && repoName.equalsIgnoreCase("siteTaxononmy")) {
+      } else if(repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY)) {
         entity = ServletHandler.repositoryHelper.querySiteTaxonomyRepository(id);
-      } else if(repoName != null && repoName.equalsIgnoreCase("sitecitrusleaffeedback")) {
+      } else if(repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CITRUS_LEAF_FEEDBACK)) {
         entity = ServletHandler.repositoryHelper.querySiteCitrusLeafFeedbackRepository(id.split("_")[0],
             id.split("_")[1], logger);
         hrh.responseSender.sendResponse(entity.toString(), e);
@@ -88,8 +88,9 @@ public class ServletGetSegment implements Servlet {
 
   public void getSegments(String key, Object entity, Map<String, HashMap<String, String>> segmentInfo)
       throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-    if(entity == null)
+    if(entity == null) {
       return;
+    }
     for (Method method : entity.getClass().getMethods()) {
       if(method.getName().startsWith("get") || method.getName().startsWith("is")) {
         segmentInfo.get(key)

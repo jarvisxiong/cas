@@ -61,14 +61,15 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
     String exceptionString = e.getClass().getSimpleName();
     InspectorStats.incrementStatCount(InspectorStrings.channelException, exceptionString);
     InspectorStats.incrementStatCount(InspectorStrings.channelException, InspectorStrings.count);
-    if(logger == null)
+    if(logger == null) {
       logger = new DebugLogger();
+    }
     if(exceptionString.equalsIgnoreCase(ServletHandler.CLOSED_CHANNEL_EXCEPTION)
         || exceptionString.equalsIgnoreCase(ServletHandler.CONNECTION_RESET_PEER)) {
       InspectorStats.incrementStatCount(InspectorStrings.totalTerminate);
-      logger.debug("Channel is terminated " + ctx.getChannel().getId());
+      logger.debug("Channel is terminated", ctx.getChannel().getId());
     }
-    logger.error("Getting netty error in HttpRequestHandler: " + e.getCause());
+    logger.error("Getting netty error in HttpRequestHandler:", e.getCause());
     if(e.getChannel().isOpen()) {
       responseSender.sendNoAdResponse(e);
     }
@@ -131,7 +132,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
       StringWriter sw = new StringWriter();
       PrintWriter pw = new PrintWriter(sw);
       exception.printStackTrace(pw);
-      logger.error("stack trace is " + sw.toString());
+      logger.error("stack trace is", sw.toString());
       if(logger.isDebugEnabled()) {
         sendMail(exception.getMessage(), sw.toString());
       }
@@ -140,13 +141,16 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
 
   public void writeLogs(ResponseSender responseSender, DebugLogger logger) {
     List<ChannelSegment> list = new ArrayList<ChannelSegment>();
-    if(null != responseSender.getRankList())
+    if(null != responseSender.getRankList()) {
       list.addAll(responseSender.getRankList());
-    if(null != responseSender.getAuctionEngine().getRtbSegments())
+    }
+    if(null != responseSender.getAuctionEngine().getRtbSegments()) {
       list.addAll(responseSender.getAuctionEngine().getRtbSegments());
+    }
     long totalTime = responseSender.getTotalTime();
-    if(totalTime > 2000)
+    if(totalTime > 2000) {
       totalTime = 0;
+    }
     try {
       if(responseSender.getAdResponse() == null) {
         Logging.channelLogline(list, null, logger, ServletHandler.loggerConfig, responseSender.sasParams, totalTime);

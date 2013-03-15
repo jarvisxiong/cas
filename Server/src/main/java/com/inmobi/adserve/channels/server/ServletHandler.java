@@ -35,13 +35,12 @@ public class ServletHandler {
   public static int percentRollout;
   public static List<String> allowedSiteTypes;
   public static int rollCount = 0;
-  public static Random random = new Random();
+  public static final Random random = new Random();
+  public static final Map<String, ServletFactory> servletMap = new HashMap<String, ServletFactory>();
   
   public Configuration getRtbConfig() {
     return ServletHandler.rtbConfig;
   }
-
-  public static Map<String, ServletFactory> servletMap = new HashMap<String, ServletFactory>();
 
   public static void init(ConfigurationLoader config, RepositoryHelper repositoryHelper) {
     ServletHandler.rtbConfig = config.rtbConfiguration();
