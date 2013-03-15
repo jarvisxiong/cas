@@ -41,7 +41,7 @@ public class MatchSegments {
     MatchSegments.defaultChannelEntity.setSitesIE(emptySet);
     MatchSegments.defaultChannelFeedbackEntity = new ChannelFeedbackEntity(DEFAULT, 0, 0, Double.MAX_VALUE, 0, 0, 0,
         0, 0);
-    MatchSegments.defaultChannelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(DEFAULT, DEFAULT, ServletHandler.config.getDouble("default.ecpm"),
+    MatchSegments.defaultChannelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(DEFAULT, DEFAULT, ServletHandler.getServerConfig().getDouble("default.ecpm"),
         0.5, 0, 0, 0, 0);
     MatchSegments.defaultChannelSegmentCitrusLeafFeedbackEntity = new ChannelSegmentFeedbackEntity(DEFAULT,
         DEFAULT, 1.0, 0.5, 0, 0, 0, 0);

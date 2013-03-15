@@ -95,8 +95,8 @@ public class ServletBackFill implements Servlet {
      * if sendonlytowhitelist flag is true, check if site id is present in
      * whitelist, else send no ad.
      */
-    if(ServletHandler.config.getBoolean("sendOnlyToWhitelist")) {
-      List<String> whitelist = ServletHandler.config.getList("whitelist");
+    if(ServletHandler.getServerConfig().getBoolean("sendOnlyToWhitelist")) {
+      List<String> whitelist = ServletHandler.getServerConfig().getList("whitelist");
       if(null == whitelist || !whitelist.contains(hrh.responseSender.sasParams.getSiteId())) {
         logger.debug("site id not present in whitelist, so sending no ad response");
         hrh.responseSender.sendNoAdResponse(e);
@@ -111,9 +111,9 @@ public class ServletBackFill implements Servlet {
     String rFormat = hrh.responseSender.getResponseFormat();
     if(rFormat.equalsIgnoreCase("imai")) {
       if(hrh.responseSender.sasParams.getPlatformOsId() == 3) {
-        imaiBaseUrl = ServletHandler.config.getString("androidBaseUrl");
+        imaiBaseUrl = ServletHandler.getServerConfig().getString("androidBaseUrl");
       } else {
-        imaiBaseUrl = ServletHandler.config.getString("iPhoneBaseUrl");
+        imaiBaseUrl = ServletHandler.getServerConfig().getString("iPhoneBaseUrl");
       }
     }
     hrh.responseSender.sasParams.setImaiBaseUrl(imaiBaseUrl);
@@ -138,7 +138,7 @@ public class ServletBackFill implements Servlet {
     }
 
     hrh.responseSender.sasParams.setSiteFloor(0.0);
-    Filters filter = new Filters(matchedSegments, ServletHandler.config, ServletHandler.adapterConfig,
+    Filters filter = new Filters(matchedSegments, ServletHandler.getServerConfig(), ServletHandler.getAdapterConfig(),
         hrh.responseSender.sasParams, ServletHandler.repositoryHelper, logger);
     // applying all the filters
     List<ChannelSegment> rows = filter.applyFilters();
@@ -182,8 +182,8 @@ public class ServletBackFill implements Servlet {
     logger.debug("Total channels available for sending requests " + rows.size());
     List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
-    segments = AsyncRequestMaker.prepareForAsyncRequest(rows, logger, ServletHandler.config, ServletHandler.rtbConfig,
-        ServletHandler.adapterConfig, hrh.responseSender, advertiserSet, e, ServletHandler.repositoryHelper,
+    segments = AsyncRequestMaker.prepareForAsyncRequest(rows, logger, ServletHandler.getServerConfig(), ServletHandler.getRtbConfig(),
+        ServletHandler.getAdapterConfig(), hrh.responseSender, advertiserSet, e, ServletHandler.repositoryHelper,
         hrh.jObject, hrh.responseSender.sasParams, casInternalRequestParameters, rtbSegments);
 
     logger.debug("rtb rankList size is", Integer.valueOf(rtbSegments.size()));

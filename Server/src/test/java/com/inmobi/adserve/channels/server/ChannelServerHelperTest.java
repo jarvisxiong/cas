@@ -26,7 +26,7 @@ public class ChannelServerHelperTest extends TestCase {
     expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
     expect(mockConfig.getString("loggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties").anyTimes();
     replay(mockConfig);
-    channelServerHelper = new ChannelServerHelper(Logger.getLogger(ServletHandler.loggerConfig.getString("debug")));
+    channelServerHelper = new ChannelServerHelper(Logger.getLogger(ServletHandler.getLoggerConfig().getString("debug")));
   }
 
   @Test

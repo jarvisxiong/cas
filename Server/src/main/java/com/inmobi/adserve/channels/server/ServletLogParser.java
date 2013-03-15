@@ -44,7 +44,7 @@ public class ServletLogParser implements Servlet {
       logFilePath = "/opt/mkhoj/logs/cas/debug/";
     }
 
-    ProcessBuilder pb = new ProcessBuilder(ServletHandler.config.getString("logParserScript"), "-t", targetStrings, "-l", logFilePath);
+    ProcessBuilder pb = new ProcessBuilder(ServletHandler.getServerConfig().getString("logParserScript"), "-t", targetStrings, "-l", logFilePath);
     Process process = pb.start();
     int exitStatus = process.waitFor();
     if(exitStatus == 0) {

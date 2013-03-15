@@ -153,24 +153,24 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
     }
     try {
       if(responseSender.getAdResponse() == null) {
-        Logging.channelLogline(list, null, logger, ServletHandler.loggerConfig, responseSender.sasParams, totalTime);
-        Logging.rrLogging(null, logger, ServletHandler.loggerConfig, responseSender.sasParams, terminationReason);
-        Logging.advertiserLogging(list, logger, ServletHandler.loggerConfig);
-        Logging.sampledAdvertiserLogging(list, logger, ServletHandler.loggerConfig);
+        Logging.channelLogline(list, null, logger, ServletHandler.getLoggerConfig(), responseSender.sasParams, totalTime);
+        Logging.rrLogging(null, logger, ServletHandler.getLoggerConfig(), responseSender.sasParams, terminationReason);
+        Logging.advertiserLogging(list, logger, ServletHandler.getLoggerConfig());
+        Logging.sampledAdvertiserLogging(list, logger, ServletHandler.getLoggerConfig());
       } else {
-        Logging.channelLogline(list, responseSender.getAdResponse().clickUrl, logger, ServletHandler.loggerConfig,
+        Logging.channelLogline(list, responseSender.getAdResponse().clickUrl, logger, ServletHandler.getLoggerConfig(),
             responseSender.sasParams, totalTime);
         if(responseSender.getRtbResponse() == null) {
           logger.debug("rtb response is null so logging dcp response in rr");
           Logging.rrLogging(responseSender.getRankList().get(responseSender.getSelectedAdIndex()), logger,
-              ServletHandler.loggerConfig, responseSender.sasParams, terminationReason);
+              ServletHandler.getLoggerConfig(), responseSender.sasParams, terminationReason);
         } else {
           logger.debug("rtb response is not null so logging rtb response in rr");
-          Logging.rrLogging(responseSender.getRtbResponse(), logger, ServletHandler.loggerConfig,
+          Logging.rrLogging(responseSender.getRtbResponse(), logger, ServletHandler.getLoggerConfig(),
               responseSender.sasParams, terminationReason);
         }
-        Logging.advertiserLogging(list, logger, ServletHandler.loggerConfig);
-        Logging.sampledAdvertiserLogging(list, logger, ServletHandler.loggerConfig);
+        Logging.advertiserLogging(list, logger, ServletHandler.getLoggerConfig());
+        Logging.sampledAdvertiserLogging(list, logger, ServletHandler.getLoggerConfig());
       }
     } catch (JSONException exception) {
       logger.error("Error while writing logs " + exception.getMessage());
@@ -191,12 +191,12 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
     // logger.error("Error in the main thread, so sending mail " +
     // errorMessage);
     Properties properties = System.getProperties();
-    properties.setProperty("mail.smtp.host", ServletHandler.config.getString("smtpServer"));
+    properties.setProperty("mail.smtp.host", ServletHandler.getServerConfig().getString("smtpServer"));
     Session session = Session.getDefaultInstance(properties);
     try {
       MimeMessage message = new MimeMessage(session);
-      message.setFrom(new InternetAddress(ServletHandler.config.getString("sender")));
-      List<String> recipients = ServletHandler.config.getList("recipients");
+      message.setFrom(new InternetAddress(ServletHandler.getServerConfig().getString("sender")));
+      List<String> recipients = ServletHandler.getServerConfig().getList("recipients");
       javax.mail.internet.InternetAddress[] addressTo = new javax.mail.internet.InternetAddress[recipients.size()];
 
       for (int index = 0; index < recipients.size(); index++) {
