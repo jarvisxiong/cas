@@ -416,7 +416,7 @@ public class Logging {
       }
       log.append("}").append(sep).append("rq-h-user-agent=\"");
       log.append(sasParams.getUserAgent()).append("\"").append(sep).append("rq-site-params=[{\"categ\":");
-      log.append(sasParams.getCategories().toString()).append("},{\"type\":\"" + sasParams.getSiteType() + "\"}]");
+      log.append(sasParams.getCategories().toString()).append("},{\"type\":\"").append(sasParams.getSiteType()).append("\"}]");
       carrier = sasParams.getCarrier();
     }
 
