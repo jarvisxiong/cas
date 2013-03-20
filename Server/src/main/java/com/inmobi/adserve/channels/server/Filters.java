@@ -515,7 +515,8 @@ public class Filters {
   private double getECPMBoostFactor(ChannelSegment channelSegment) {
     double fillRatio = channelSegment.getChannelSegmentCitrusLeafFeedbackEntity().getFillRatio();
     double latency = channelSegment.getChannelSegmentCitrusLeafFeedbackEntity().getLatency();
-    double ecpmBoostFactor = (1 + fillRatio) * (1 + (700 - Math.min(latency, 700)) / 700);
+    int maxLatency = ServletHandler.getServerConfig().getInt("readtimeoutMillis");
+    double ecpmBoostFactor = (1 + fillRatio) * (1 + (maxLatency - Math.min(latency, maxLatency)) / maxLatency);
     logger.debug("Fillratio is", fillRatio, "latency is", latency, "and ecpmBoostFactor is", ecpmBoostFactor);
     return ecpmBoostFactor;
   }

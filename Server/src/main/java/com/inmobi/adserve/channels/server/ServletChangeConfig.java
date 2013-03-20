@@ -37,18 +37,18 @@ public class ServletChangeConfig implements Servlet{
       while (itr.hasNext()) {
         String configKey = itr.next().toString();
         if(configKey.startsWith("adapter")
-            && ServletHandler.adapterConfig.containsKey(configKey.replace("adapter.", ""))) {
-          ServletHandler.adapterConfig.setProperty(configKey.replace("adapter.", ""), jObject.getString(configKey));
+            && ServletHandler.getAdapterConfig().containsKey(configKey.replace("adapter.", ""))) {
+          ServletHandler.getAdapterConfig().setProperty(configKey.replace("adapter.", ""), jObject.getString(configKey));
           updates.append(configKey).append("=")
-              .append(ServletHandler.adapterConfig.getString(configKey.replace("adapter.", ""))).append("\n");
+              .append(ServletHandler.getAdapterConfig().getString(configKey.replace("adapter.", ""))).append("\n");
         }
-        if(configKey.startsWith("server") && ServletHandler.config.containsKey(configKey.replace("server.", ""))) {
-          ServletHandler.config.setProperty(configKey.replace("server.", ""), jObject.getString(configKey));
+        if(configKey.startsWith("server") && ServletHandler.getServerConfig().containsKey(configKey.replace("server.", ""))) {
+          ServletHandler.getServerConfig().setProperty(configKey.replace("server.", ""), jObject.getString(configKey));
           if(configKey.replace("server.", "").equals("maxconnections")) {
-            BootstrapCreation.setMaxConnectionLimit(ServletHandler.config.getInt(configKey.replace("server.", "")));
+            BootstrapCreation.setMaxConnectionLimit(ServletHandler.getServerConfig().getInt(configKey.replace("server.", "")));
           }
           updates.append(configKey).append("=")
-              .append(ServletHandler.config.getString(configKey.replace("server.", ""))).append("\n");
+              .append(ServletHandler.getServerConfig().getString(configKey.replace("server.", ""))).append("\n");
         }
       }
       hrh.responseSender.sendResponse(updates.toString(), e);

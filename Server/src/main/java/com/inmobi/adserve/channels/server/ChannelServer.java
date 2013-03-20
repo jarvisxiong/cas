@@ -60,8 +60,9 @@ public class ChannelServer {
   public static void main(String[] args) throws Exception {
 
     ConfigurationLoader config = ConfigurationLoader.getInstance(configFile);
-    if(!checkLogFolders(config.log4jConfiguration()))
+    if(!checkLogFolders(config.log4jConfiguration())) {
       return;
+    }
     // Set the status code for load balancer status.
     ServerStatusInfo.statusCode = 200;
 
@@ -101,8 +102,6 @@ public class ChannelServer {
     repositoryHelper = new RepositoryHelper(channelRepository, channelAdGroupRepository, channelFeedbackRepository,
         channelSegmentFeedbackRepository, siteMetaDataRepository, siteTaxonomyRepository,
         siteCitrusLeafFeedbackRepository);
-
-    MatchSegments.init(channelAdGroupRepository);
     InspectorStats.initializeRepoStats(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY);
     InspectorStats.initializeRepoStats(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY);
     InspectorStats.initializeRepoStats(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY);
@@ -132,8 +131,9 @@ public class ChannelServer {
     // Configure the netty server.
     try {
       // Initialising request handler
-      AsyncRequestMaker.init(clientBootstrap, rtbClientBootstrap, asyncHttpClient);
       ServletHandler.init(config, repositoryHelper);
+      MatchSegments.init(channelAdGroupRepository);
+      AsyncRequestMaker.init(clientBootstrap, rtbClientBootstrap, asyncHttpClient);
       SegmentFactory.init(repositoryHelper, config.adapterConfiguration(), logger);
       ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(
           Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
@@ -238,8 +238,7 @@ public class ChannelServer {
           ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY);
       siteMetaDataRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY),
           ChannelServerStringLiterals.SITE_METADATA_REPOSITORY);
-      //siteCitrusLeafFeedbackRepository.init(config.serverConfiguration().subset("citrusleaf"), DataCenter.GLOBAL);
-      siteCitrusLeafFeedbackRepository.init(config.serverConfiguration().subset("citrusleaf"), DataCenter.ALL);
+      siteCitrusLeafFeedbackRepository.init(config.serverConfiguration().subset(ChannelServerStringLiterals.CITRUS_LEAF_FEEDBACK), DataCenter.ALL);
       logger.error("* * * * Instantiating repository completed * * * *");
     } catch (NamingException exception) {
       logger.error("failed to creatre binding for postgresql data source " + exception.getMessage());

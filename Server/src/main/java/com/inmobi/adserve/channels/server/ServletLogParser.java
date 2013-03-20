@@ -1,7 +1,5 @@
 package com.inmobi.adserve.channels.server;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.net.URLDecoder;
 import java.util.List;
 import java.util.Map;
@@ -34,23 +32,26 @@ public class ServletLogParser implements Servlet {
         for (Entry<String, List<String>> p : params.entrySet()) {
           String key = p.getKey();
           List<String> vals = p.getValue();
-          if(key.equalsIgnoreCase("search"))
+          if(key.equalsIgnoreCase("search")) {
             targetStrings = vals.get(0);
-          else if(key.equalsIgnoreCase("logFilePath"))
+          } else if(key.equalsIgnoreCase("logFilePath")) {
             logFilePath = vals.get(0);
+          }
         }
       }
     }
-    if(logFilePath == null)
+    if(logFilePath == null) {
       logFilePath = "/opt/mkhoj/logs/cas/debug/";
+    }
 
-    ProcessBuilder pb = new ProcessBuilder(ServletHandler.config.getString("logParserScript"), "-t", targetStrings, "-l", logFilePath);
+    ProcessBuilder pb = new ProcessBuilder(ServletHandler.getServerConfig().getString("logParserScript"), "-t", targetStrings, "-l", logFilePath);
     Process process = pb.start();
     int exitStatus = process.waitFor();
-    if(exitStatus == 0)
+    if(exitStatus == 0) {
       hrh.responseSender.sendResponse("PASS", e);
-    else
+    } else {
       hrh.responseSender.sendResponse("FAIL", e);
+    }
   }
 
   @Override

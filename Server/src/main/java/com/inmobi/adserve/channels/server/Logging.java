@@ -342,13 +342,13 @@ public class Logging {
         InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalRequests);
         InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.latency, adResponse.latency);
         InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.connectionLatency, adNetwork.getConnectionLatency());
-        if(adResponse.adStatus.equals("AD")) {
+        if("AD".equals(adResponse.adStatus)) {
           InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalFills);
         }
-        else if(adResponse.adStatus.equals("NO_AD")) {
+        else if("NO_AD".equals(adResponse.adStatus)) {
           InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalNoFills);
         }
-        else if(adResponse.adStatus.equals("TIME_OUT")) {
+        else if("TIME_OUT".equals(adResponse.adStatus)) {
           InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalTimeout);
         }
         else {
@@ -370,13 +370,10 @@ public class Logging {
           response.setBid(bid);
         }
         responseList.add(response);
-
       } catch (JSONException exception) {
         logger.error("error reading channel log line from the adapters");
-      } catch (NullPointerException exception) {
-        logger.error("error reading channel log line from the adapters", exception.getMessage());
       }
-
+      
       if(logLine != null) {
         log.append(logLine);
         if(index != rankList.size() - 1) {
@@ -419,7 +416,7 @@ public class Logging {
       }
       log.append("}").append(sep).append("rq-h-user-agent=\"");
       log.append(sasParams.getUserAgent()).append("\"").append(sep).append("rq-site-params=[{\"categ\":");
-      log.append(sasParams.getCategories().toString()).append("},{\"type\":\"" + sasParams.getSiteType() + "\"}]");
+      log.append(sasParams.getCategories().toString()).append("},{\"type\":\"").append(sasParams.getSiteType()).append("\"}]");
       carrier = sasParams.getCarrier();
     }
 
@@ -513,7 +510,8 @@ public class Logging {
       String requestUrl = "";
       String response = "";
       if(sampledAdvertiserLogNos.get(partnerName + extsiteKey) == null) {
-        sampledAdvertiserLogNos.put(partnerName + extsiteKey, System.currentTimeMillis() + "_" + 0);
+        String value = System.currentTimeMillis() + "_" + 0;
+        sampledAdvertiserLogNos.put(partnerName + extsiteKey, value);
       }
       Long time = Long.parseLong(sampledAdvertiserLogNos.get(partnerName + extsiteKey).split("_")[0]);
       Integer count = Integer.parseInt(sampledAdvertiserLogNos.get(partnerName + extsiteKey).split("_")[1]);

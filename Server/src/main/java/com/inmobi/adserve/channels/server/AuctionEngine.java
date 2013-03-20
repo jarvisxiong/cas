@@ -40,8 +40,9 @@ public class AuctionEngine implements AuctionEngineInterface {
   public AdNetworkInterface runRtbSecondPriceAuctionEngine() {
     // Do not run auction 2 times.
     synchronized (this) {
-      if(auctionComplete)
+      if(auctionComplete) {
         return rtbResponse == null ? null : rtbResponse.getAdNetworkInterface();
+      }
       auctionComplete = true;
     }
     
@@ -83,8 +84,9 @@ public class AuctionEngine implements AuctionEngineInterface {
         secondHighestBidNumber = i;
         break;
       } else if(rtbList.get(i).getAdNetworkInterface().getLatency() < rtbList.get(lowestLatency)
-          .getAdNetworkInterface().getLatency())
+          .getAdNetworkInterface().getLatency()) {
         lowestLatency = i;
+      }
     }
     if(secondHighestBidNumber != 1) {
       double secondHighestBidPrice = rtbList.get(secondHighestBidNumber).getAdNetworkInterface().getBidprice();
@@ -151,13 +153,16 @@ public class AuctionEngine implements AuctionEngineInterface {
 
   @Override
   public boolean isAllRtbComplete() {
-    if(rtbSegments == null)
+    if(rtbSegments == null) {
       return false;
-    if(rtbSegments.size() == 0)
+    }
+    if(rtbSegments.size() == 0) {
       return true;
+    }
     for (ChannelSegment channelSegment : rtbSegments) {
-      if(!channelSegment.getAdNetworkInterface().isRequestCompleted())
+      if(!channelSegment.getAdNetworkInterface().isRequestCompleted()) {
         return false;
+      }
     }
     return true;
   }

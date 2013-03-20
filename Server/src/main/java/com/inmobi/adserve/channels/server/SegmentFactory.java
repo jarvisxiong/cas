@@ -55,7 +55,8 @@ public class SegmentFactory {
     while (null != itr && itr.hasNext()) {
       String str = itr.next();
       if(str.endsWith(".advertiserId")) {
-        if(adapterConfiguration.getBoolean(str.replace(".advertiserId", ".isRtb"), false)) {
+        String isRtb = str.replace(".advertiserId", ".isRtb");
+        if(adapterConfiguration.getBoolean(isRtb, false)) {
           rtbAdaptersNames.add(str.replace(".advertiserId", ""));
         }
       }
@@ -68,7 +69,8 @@ public class SegmentFactory {
       boolean isRtbEnabled) {
     if(isRtbEnabled) {
       for (String partnerName : rtbAdaptersNames) {
-        if((advertiserId.equalsIgnoreCase(config.getString(partnerName + ".advertiserId")))
+        String advertiserIdString = config.getString(partnerName + ".advertiserId");
+        if((advertiserId.equalsIgnoreCase(advertiserIdString))
             && (null == advertiserSet || advertiserSet.isEmpty() || advertiserSet.contains(partnerName))
             && (config.getString(partnerName + ".status").equalsIgnoreCase("on") && config.getBoolean(partnerName
                 + ".isRtb", false))) {
