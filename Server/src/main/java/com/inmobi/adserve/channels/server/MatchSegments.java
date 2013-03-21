@@ -26,6 +26,7 @@ public class MatchSegments {
   private static final String DEFAULT = "default";
   private RepositoryHelper repositoryHelper;
   private SASRequestParameters sasParams;
+  private SiteFeedbackEntity siteFeedbackEntity;
   private static ChannelAdGroupRepository channelAdGroupRepository;
   private static ChannelEntity defaultChannelEntity;
   private static ChannelFeedbackEntity defaultChannelFeedbackEntity;
@@ -52,6 +53,8 @@ public class MatchSegments {
     this.repositoryHelper = repositoryHelper;
     this.sasParams = sasParams;
     this.logger = logger;
+    this.siteFeedbackEntity = repositoryHelper.querySiteCitrusLeafFeedbackRepository(
+        sasParams.getSiteId(), sasParams.getSiteSegmentId().toString(), logger);
   }
 
   // select channel segment based on specified rules
@@ -235,8 +238,6 @@ public class MatchSegments {
         .getAdvertiserId());
     ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = repositoryHelper
         .queryChannelSegmentFeedbackRepository(channelSegmentEntity.getAdgroupId());
-    SiteFeedbackEntity siteFeedbackEntity = repositoryHelper.querySiteCitrusLeafFeedbackRepository(
-        sasParams.getSiteId(), sasParams.getSiteSegmentId().toString(), logger);
     ChannelSegmentFeedbackEntity channelSegmentCitrusLeafFeedbackEntity = null;
     if(channelEntity == null) {
       logger.debug("No channelEntity for advertiserID", channelSegmentEntity.getAdvertiserId());
