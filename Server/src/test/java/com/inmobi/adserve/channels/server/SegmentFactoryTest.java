@@ -6,6 +6,8 @@ import java.io.FileWriter;
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
@@ -106,7 +108,9 @@ public class SegmentFactoryTest extends TestCase {
     expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
     expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");    replay(mockConfig);
     DebugLogger.init(mockConfig);
-    DebugLogger logger = new DebugLogger();
+    PropertyConfigurator.configure(config.loggerConfiguration().getString("log4jLoggerConf"));
+    Logger logger = Logger.getLogger("repository");
+    DebugLogger debugLogger = new DebugLogger();
     RepositoryHelper repoHelper = createMock(RepositoryHelper.class);
     ChannelEntity channelEntity = createMock(ChannelEntity.class);
     expect(channelEntity.isRtb()).andReturn(true).anyTimes();
@@ -121,17 +125,17 @@ public class SegmentFactoryTest extends TestCase {
     replay(channelEntity);
     expect(repoHelper.queryChannelRepository("channelTest")).andReturn(channelEntity).anyTimes();
     replay(repoHelper);
-    //HttpRequestHandler.init(config, null, null, null, null, null, null, null, null);
     Configuration rtbConfig = createMock(Configuration.class);
     expect(rtbConfig.getBoolean("isRtbEnabled")).andReturn(true).anyTimes();
     replay(rtbConfig);
     ServletHandler.setRtbConfig(rtbConfig);
+    SegmentFactory.init(new RepositoryHelper(null, null, null, null, null, null, null), config.adapterConfiguration(), logger);
     SegmentFactory.setRepositoryHelper(repoHelper);
     AdNetworkInterface adNetworkInterface = SegmentFactory.getChannel("advertiserId", "channelTest", config.adapterConfiguration(), null, null, null, null,
-        null, logger, false);
+        null, debugLogger, false);
     assertEquals(null, adNetworkInterface);
-    AdNetworkInterface adNetworkInterface2 = SegmentFactory.getChannel("advertiserId", "channelTest", adaptorConfig, null, null, null, null,
-        null, logger, true);
+    AdNetworkInterface adNetworkInterface2 = SegmentFactory.getChannel("advertiserId", "channelTest", config.adapterConfiguration(), null, null, null, null,
+        null, debugLogger, true);
     assertNotNull(adNetworkInterface2);
     assertEquals(true, adNetworkInterface2 instanceof RtbAdNetwork);
   }

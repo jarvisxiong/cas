@@ -8,7 +8,6 @@ import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
 
 import org.apache.commons.configuration.Configuration;
-import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.util.DebugLogger;
@@ -28,6 +27,7 @@ public class clickUrlMakerV6Test extends TestCase {
 
   @Override
   public void setUp() throws Exception {
+    prepareMockConfig();
     DebugLogger.init(mockConfig);
     logger = new DebugLogger();
   }
@@ -61,7 +61,7 @@ public class clickUrlMakerV6Test extends TestCase {
     clickUrlMaker.setIpFileVersion((long) 1);
     clickUrlMaker.setCryptoSecretKey("clickmaker.key.1.value");
     clickUrlMaker.createClickUrls();
-    assertEquals("clickUrl", clickUrlMaker.getBeaconUrl(null));
-    assertEquals("clickUrl", clickUrlMaker.getClickUrl(null));
+    assertEquals("http://localhost:8800/6/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/76256371268/0/5l/1/e9805b5e", clickUrlMaker.getBeaconUrl(new HashMap<String, String>()));
+    assertEquals("http://localhost:8800/6/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/76256371268/0/5l/1/e9805b5e", clickUrlMaker.getClickUrl(new HashMap<String, String>()));
   }
 }
