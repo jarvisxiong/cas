@@ -103,8 +103,8 @@ public class SegmentFactoryTest extends TestCase {
     ConfigurationLoader config = ConfigurationLoader.getInstance(configFile);
     Configuration mockConfig = createMock(Configuration.class);
     expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
-    expect(mockConfig.getString("loggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties").anyTimes();
-    replay(mockConfig);
+    expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
+    expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");    replay(mockConfig);
     DebugLogger.init(mockConfig);
     DebugLogger logger = new DebugLogger();
     RepositoryHelper repoHelper = createMock(RepositoryHelper.class);

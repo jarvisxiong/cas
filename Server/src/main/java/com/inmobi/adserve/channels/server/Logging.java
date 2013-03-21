@@ -4,9 +4,10 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.log4j.Logger;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -97,7 +98,7 @@ public class Logging {
   // Writing rrlogs
   public static void rrLogging(ChannelSegment channelSegment, DebugLogger logger, Configuration config,
       SASRequestParameters sasParams, String terminationReason) throws JSONException, TException {
-    Logger rrLogger = Logger.getLogger(config.getString("rr"));
+    Logger rrLogger = LoggerFactory.getLogger(config.getString("rr"));
     boolean isTerminated = false;
     if(terminationReason.equalsIgnoreCase("no")) {
       isTerminated = true;
@@ -310,7 +311,7 @@ public class Logging {
   public static void channelLogline(List<ChannelSegment> rankList, String clickUrl, DebugLogger logger,
       Configuration config, SASRequestParameters sasParams, long totalTime) throws JSONException, TException {
     logger.debug("came inside channel log line");
-    Logger debugLogger = Logger.getLogger(config.getString("channel"));
+    Logger debugLogger = LoggerFactory.getLogger(config.getString("channel"));
     logger.debug("got logger handle for cas logs");
     char sep = 0x01;
     StringBuilder log = new StringBuilder();
@@ -454,7 +455,7 @@ public class Logging {
 
   public static void advertiserLogging(List<ChannelSegment> rankList, DebugLogger logger, Configuration config) {
     logger.debug("came inside advertiser log");
-    Logger advertiserLogger = Logger.getLogger(config.getString("advertiser"));
+    Logger advertiserLogger = LoggerFactory.getLogger(config.getString("advertiser"));
     if(!advertiserLogger.isDebugEnabled()) {
       return;
     }
@@ -482,14 +483,14 @@ public class Logging {
       }
     }
     if(enableFileLogging && log.length() > 0) {
-      advertiserLogger.debug(log);
+      advertiserLogger.debug(log.toString());
       logger.debug("done with advertiser logging");
     }
   }
 
   public static void sampledAdvertiserLogging(List<ChannelSegment> rankList, DebugLogger logger, Configuration config) {
     logger.debug("came inside sampledAdvertiser log");
-    Logger sampledAdvertiserLogger = Logger.getLogger(config.getString("sampledadvertiser"));
+    Logger sampledAdvertiserLogger = LoggerFactory.getLogger(config.getString("sampledadvertiser"));
     if(!sampledAdvertiserLogger.isDebugEnabled()) {
       return;
     }
@@ -577,7 +578,7 @@ public class Logging {
       }
     }
     if(enableFileLogging && log.length() > 0) {
-      sampledAdvertiserLogger.debug(log);
+      sampledAdvertiserLogger.debug(log.toString());
       logger.debug("done with sampledAdvertiser logging");
     }
   }

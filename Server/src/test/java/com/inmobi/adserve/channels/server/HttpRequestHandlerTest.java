@@ -57,8 +57,8 @@ public class HttpRequestHandlerTest extends TestCase {
 
     Configuration mockConfig = createMock(Configuration.class);
     expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
-    expect(mockConfig.getString("loggerConf")).andReturn("/tmp/Channel-server.properties").anyTimes();
-    replay(mockConfig);
+    expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
+    expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");    replay(mockConfig);
     DebugLogger.init(mockConfig);
     InspectorStats.initializeWorkflow("WorkFlow");
     AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);

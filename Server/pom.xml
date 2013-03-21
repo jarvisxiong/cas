@@ -20,7 +20,27 @@
 		</repository>
 	</repositories>
 
-	<dependencies>
+	<properties>
+ <slf4j.version>1.7.2</slf4j.version>
+ <logback.version>1.0.10</logback.version>
+</properties>
+
+<dependencies>
+		<dependency>
+		  <groupId>org.slf4j</groupId>
+		  <artifactId>slf4j-api</artifactId>
+		  <version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+		  <groupId>ch.qos.logback</groupId>
+		  <artifactId>logback-classic</artifactId>
+		  <version>${logback.version}</version>
+		</dependency>
+		<dependency>
+		  <groupId>ch.qos.logback</groupId>
+		  <artifactId>logback-core</artifactId>
+		  <version>${logback.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>com.ning</groupId>
 			<artifactId>async-http-client</artifactId>
@@ -151,8 +171,6 @@
 			<artifactId>commons-configuration</artifactId>
 			<version>1.6</version>
 		</dependency>
-		<!-- <dependency> <groupId>org.slf4j</groupId> <artifactId>slf4j-api</artifactId> 
-			<version>[1.6.1,1.7.0)</version> </dependency> -->
 		<dependency>
 			<groupId>net.sf.ehcache</groupId>
 			<artifactId>ehcache-core</artifactId>

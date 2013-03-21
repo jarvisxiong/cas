@@ -4,7 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.easymock.EasyMock.*;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
+import org.apache.commons.configuration.Configuration;
 import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
@@ -14,13 +17,21 @@ import junit.framework.TestCase;
 
 public class clickUrlMakerV6Test extends TestCase {
   private static DebugLogger logger;
+  private Configuration mockConfig = null;
 
-  static {
-    logger = EasyMock.createMock(DebugLogger.class);
-    expect(logger.isDebugEnabled()).andReturn(false).anyTimes();
-    replay(logger);
+  public void prepareMockConfig() {
+    mockConfig = createMock(Configuration.class);
+    expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
+    expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
+    replay(mockConfig);
   }
 
+  @Override
+  public void setUp() throws Exception {
+    DebugLogger.init(mockConfig);
+    logger = new DebugLogger();
+  }
+  
   @Test
   public void testClickUrlMaker() {
     ClickUrlMakerV6 clickUrlMaker = new ClickUrlMakerV6(logger, null);

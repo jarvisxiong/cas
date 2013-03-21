@@ -40,7 +40,6 @@ public class RequestParserTest extends TestCase {
             + ",\"category\":[13,8,19,4,17,16,14,3,11,29,23],\"source\":\"APP\",\"rich-media\":false,\"adcode\":\"NON-JS\",\"sdk-version\":\"i357\""
             + ",\"pub-id\":\"4028cb9731d7d0ad0131e1d1996101ef\",\"os-id\":6}");
     SASRequestParameters sasRequestParameters = RequestParser.parseRequestParameters(jObject, new DebugLogger());
-    System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n" + sasRequestParameters.getSiteType());
     assertNotNull(sasRequestParameters);
     assertEquals(
         "PE (iPod; U; CPU iPhone OS 4_3_1 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Mobile/8G4".toUpperCase(),

@@ -150,8 +150,8 @@ public class FilterTest extends TestCase {
     expect(mockAdapterConfig.getInt("tapit.partnerSegmentNo", 2)).andReturn(2).anyTimes();
     replay(mockAdapterConfig);
     expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
-    expect(mockConfig.getString("loggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties").anyTimes();
-    expect(mockConfig.getInt("totalSegmentNo")).andReturn(5).anyTimes();
+    expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
+    expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");    expect(mockConfig.getInt("totalSegmentNo")).andReturn(5).anyTimes();
     expect(mockConfig.getDouble("revenueWindow", 0.33)).andReturn(10.0).anyTimes();
     expect(mockConfig.getDouble("ecpmShift", 0.1)).andReturn(0.0).anyTimes();
     expect(mockConfig.getDouble("feedbackPower", 2.0)).andReturn(1.0).anyTimes();
