@@ -45,7 +45,7 @@
        <testSourceDirectory>src/test/java</testSourceDirectory>
        <defaultGoal>install</defaultGoal>
        <directory>target</directory>
-       <finalName>${groupId}-${artifactId}-${version}</finalName>
+
        <plugins>
            <plugin>
            		<groupId>org.apache.maven.plugins</groupId>

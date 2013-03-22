@@ -20,8 +20,6 @@ public class ChannelServerHelperTest extends TestCase {
   private Configuration mockConfig = null;
 
   public void setUp() throws Exception {
-    ConfigurationLoader c = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
-    ServletHandler.init(c, new RepositoryHelper(null, null, null, null, null, null, null));
     mockConfig = createMock(Configuration.class);
     expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
     expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
