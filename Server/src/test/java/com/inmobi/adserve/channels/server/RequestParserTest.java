@@ -1,9 +1,5 @@
 package com.inmobi.adserve.channels.server;
 
-import java.util.Arrays;
-
-import net.sf.ehcache.config.Configuration;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
@@ -16,12 +12,6 @@ import junit.framework.TestCase;
 
 public class RequestParserTest extends TestCase {
 
-  
-  /*  public static void main(String[] args) throws JSONException{ 
-      int a[] = {1,2,3};
-      System.out.println(Arrays.toString(a));
-    }
-   */
   public void setUp() {
     ConfigurationLoader config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
     DebugLogger.init(config.loggerConfiguration());

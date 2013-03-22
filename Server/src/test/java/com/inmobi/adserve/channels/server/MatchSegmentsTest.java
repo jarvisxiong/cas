@@ -14,7 +14,10 @@ import org.testng.annotations.Test;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 
 public class MatchSegmentsTest extends TestCase {
 /*
@@ -159,6 +162,10 @@ public class MatchSegmentsTest extends TestCase {
   
   @Test
   public void testGetCategories() {
+    String configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
+    ConfigurationLoader config = ConfigurationLoader.getInstance(configFile);
+    InspectorStats.initializeWorkflow(InspectorStrings.percentRollout);
+    ServletHandler.init(config, null);
     Configuration mockConfig = createMock(Configuration.class);
     SASRequestParameters sasRequestParameters = new SASRequestParameters();
     expect(mockConfig.getBoolean("isNewCategory", false)).andReturn(true).anyTimes();
