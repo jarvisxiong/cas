@@ -97,8 +97,8 @@ public class ServerTest extends TestCase {
     expect(mockConfig.getString("clickmaker.beaconURLPrefix")).andReturn(beaconURLPrefix).anyTimes();
     expect(mockConfig.getString("clickmaker.key.1.type")).andReturn(keyType).anyTimes();
     expect(mockConfig.getString("clickmaker.key")).andReturn(key).anyTimes();
-    expect(mockConfig.getString("loggerConf")).andReturn(loggerConf).anyTimes();
-    expect(mockConfig.getString("rr")).andReturn("rr").anyTimes();
+    expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
+    expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");    expect(mockConfig.getString("rr")).andReturn("rr").anyTimes();
     expect(mockConfig.getString("channel")).andReturn("channel").anyTimes();
     expect(mockConfig.getInt("percentRollout")).andReturn(percentRollout).anyTimes();
     expect(mockConfig.getList("siteType")).andReturn(siteType).anyTimes();

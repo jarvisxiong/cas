@@ -14,7 +14,10 @@ import org.testng.annotations.Test;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 
 public class MatchSegmentsTest extends TestCase {
 /*
@@ -159,17 +162,24 @@ public class MatchSegmentsTest extends TestCase {
   
   @Test
   public void testGetCategories() {
+    String configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
+    ConfigurationLoader config = ConfigurationLoader.getInstance(configFile);
+    InspectorStats.initializeWorkflow(InspectorStrings.percentRollout);
+    ServletHandler.init(config, null);
     Configuration mockConfig = createMock(Configuration.class);
     SASRequestParameters sasRequestParameters = new SASRequestParameters();
+    sasRequestParameters.setSiteId("1");
+    sasRequestParameters.setSiteSegmentId(2);
     expect(mockConfig.getBoolean("isNewCategory", false)).andReturn(true).anyTimes();
     expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
-    expect(mockConfig.getString("loggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties").anyTimes();
-    replay(mockConfig);
+    expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
+    expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");    replay(mockConfig);
     List<Long> newCat = new ArrayList<Long>();
     newCat.add(1L);
     newCat.add(2L);
     newCat.add(3L);
-    
+    DebugLogger.init(mockConfig);
+    DebugLogger debugLogger = new DebugLogger();
     RepositoryHelper repositoryHelper = createMock(RepositoryHelper.class);
     SiteTaxonomyEntity s1 = new SiteTaxonomyEntity("1", "name", "4");
     SiteTaxonomyEntity s2 = new SiteTaxonomyEntity("2", "name", null);
@@ -179,11 +189,10 @@ public class MatchSegmentsTest extends TestCase {
     expect(repositoryHelper.querySiteTaxonomyRepository("2")).andReturn(s2).anyTimes();
     expect(repositoryHelper.querySiteTaxonomyRepository("3")).andReturn(s3).anyTimes();
     expect(repositoryHelper.querySiteTaxonomyRepository("4")).andReturn(s4).anyTimes();
+    expect(repositoryHelper.querySiteCitrusLeafFeedbackRepository("1","2",debugLogger)).andReturn(null).anyTimes();
     replay(repositoryHelper);
-    
     MatchSegments.init(null);
-    DebugLogger.init(mockConfig);
-    MatchSegments matchSegments = new MatchSegments(repositoryHelper, sasRequestParameters, new DebugLogger());
+    MatchSegments matchSegments = new MatchSegments(repositoryHelper, sasRequestParameters, debugLogger);
     assertEquals(new ArrayList<Long>(), matchSegments.getCategories());
   }
 }
