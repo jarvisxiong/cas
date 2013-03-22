@@ -168,6 +168,8 @@ public class MatchSegmentsTest extends TestCase {
     ServletHandler.init(config, null);
     Configuration mockConfig = createMock(Configuration.class);
     SASRequestParameters sasRequestParameters = new SASRequestParameters();
+    sasRequestParameters.setSiteId("1");
+    sasRequestParameters.setSiteSegmentId(2);
     expect(mockConfig.getBoolean("isNewCategory", false)).andReturn(true).anyTimes();
     expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
     expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
@@ -176,7 +178,8 @@ public class MatchSegmentsTest extends TestCase {
     newCat.add(1L);
     newCat.add(2L);
     newCat.add(3L);
-    
+    DebugLogger.init(mockConfig);
+    DebugLogger debugLogger = new DebugLogger();
     RepositoryHelper repositoryHelper = createMock(RepositoryHelper.class);
     SiteTaxonomyEntity s1 = new SiteTaxonomyEntity("1", "name", "4");
     SiteTaxonomyEntity s2 = new SiteTaxonomyEntity("2", "name", null);
@@ -186,11 +189,10 @@ public class MatchSegmentsTest extends TestCase {
     expect(repositoryHelper.querySiteTaxonomyRepository("2")).andReturn(s2).anyTimes();
     expect(repositoryHelper.querySiteTaxonomyRepository("3")).andReturn(s3).anyTimes();
     expect(repositoryHelper.querySiteTaxonomyRepository("4")).andReturn(s4).anyTimes();
+    expect(repositoryHelper.querySiteCitrusLeafFeedbackRepository("1","2",debugLogger)).andReturn(null).anyTimes();
     replay(repositoryHelper);
-    
     MatchSegments.init(null);
-    DebugLogger.init(mockConfig);
-    MatchSegments matchSegments = new MatchSegments(repositoryHelper, sasRequestParameters, new DebugLogger());
+    MatchSegments matchSegments = new MatchSegments(repositoryHelper, sasRequestParameters, debugLogger);
     assertEquals(new ArrayList<Long>(), matchSegments.getCategories());
   }
 }
