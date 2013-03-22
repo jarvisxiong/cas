@@ -25,7 +25,7 @@ import static org.easymock.EasyMock.expect;
 
 public class SegmentFactoryTest extends TestCase {
   Configuration adaptorConfig;
-  
+
   public void prepareConfig() throws Exception {
     FileWriter fstream = new FileWriter("/tmp/SegmentFactoryChannel-server.properties");
     BufferedWriter out = new BufferedWriter(fstream);
@@ -42,14 +42,14 @@ public class SegmentFactoryTest extends TestCase {
     out.write("log4j.appender.rr.layout=org.apache.log4j.PatternLayout\n");
     out.write("log4j.appender.rr.DatePattern='.'yyyy-MM-dd-HH\n");
     String rrFile = "/tmp/rr.log." + System.currentTimeMillis();
-    System.out.println("here rr file name is " + rrFile);    
+    System.out.println("here rr file name is " + rrFile);
     out.write("log4j.logger.app = DEBUG, debug\n");
     out.write("log4j.additivity.rr.app = false\n");
     out.write("log4j.appender.rr=org.apache.log4j.DailyRollingFileAppender\n");
     out.write("log4j.appender.rr.layout=org.apache.log4j.PatternLayout\n");
     out.write("log4j.appender.rr.DatePattern='.'yyyy-MM-dd-HH\n");
     String debugFile = "/tmp/debug.log." + System.currentTimeMillis();
-    System.out.println("here debug file name is " + debugFile);    
+    System.out.println("here debug file name is " + debugFile);
     out.write("log4j.appender.rr.File = " + rrFile + "\n");
     out.write("log4j.category.debug = DEBUG,debug\n");
     out.write("log4j.category.rr = DEBUG,rr\n");
@@ -69,6 +69,8 @@ public class SegmentFactoryTest extends TestCase {
     out.write("\nrtb.isRtbEnabled = true");
     out.write("\nrtb.bidFloor = 0.1");
     out.write("\nrtb.maxconnections = 2");
+    out.write("\nadapter.rtbAdvertiserName.host.default = http://localhost:10005");
+    out.write("\nadapter.rtbAdvertiserName.isRtb = true");
     out.write("\nadapter.rtbAdvertiserName.status = on");
     out.write("\nadapter.rtbAdvertiserName.advertiserId = advertiserId");
     out.write("\nadapter.rtbAdvertiserName.urlBase = http://localhost:10005");
@@ -78,27 +80,14 @@ public class SegmentFactoryTest extends TestCase {
     out.write("\nadapter.rtbAdvertiserName.accountId = ");
     out.write("\nadapter.rtbAdvertiserName.isWnRequired = true");
     out.write("\nadapter.rtbAdvertiserName.isWinFromClient = false");
+    out.write("\nadapter.rtbAdvertiserName.siteBlinded = false");
     out.close();
   }
-  
+
   public void setUp() throws Exception {
-    prepareConfig();  
-    adaptorConfig = createMock(Configuration.class);
-    expect(adaptorConfig.getString("rtbAdvertiserName.advertiserId")).andReturn("advertiserId").anyTimes();
-    expect(adaptorConfig.getString("rtbAdvertiserName.status")).andReturn("on").anyTimes();
-    expect(adaptorConfig.getString("rtbAdvertiserName.urlArg")).andReturn("query").anyTimes();
-    expect(adaptorConfig.getString("rtbAdvertiserName.wnUrlback")).andReturn("http://localhost:10005").anyTimes();
-    expect(adaptorConfig.getString("rtbAdvertiserName.rtbMethod")).andReturn("post").anyTimes();
-    expect(adaptorConfig.getString("rtbAdvertiserName.accountId")).andReturn("advertiserId").anyTimes();
-    expect(adaptorConfig.getString("rtbAdvertiserName.rtbVer")).andReturn("2").anyTimes();
-    expect(adaptorConfig.getBoolean("rtbAdvertiserName.isWnRequired")).andReturn(true).anyTimes();
-    expect(adaptorConfig.getBoolean("rtbAdvertiserName.isWinFromClient")).andReturn(true).anyTimes();
-    expect(adaptorConfig.getString("rtbAdvertiserName.host.default", null)).andReturn("http://localhost:10005").anyTimes();
-    expect(adaptorConfig.getString("rtbAdvertiserName.host.null", "http://localhost:10005")).andReturn("http://localhost:10005").anyTimes();
-    expect(adaptorConfig.getString("rtbAdvertiserName.targetingParams")).andReturn(null).anyTimes();
-    replay(adaptorConfig);
+    prepareConfig();
   }
-  
+
   @Test
   public void testgetRTBChannel() throws RepositoryException {
     String configFile = "/tmp/SegmentFactoryChannel-server.properties";
@@ -106,7 +95,8 @@ public class SegmentFactoryTest extends TestCase {
     Configuration mockConfig = createMock(Configuration.class);
     expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
     expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
-    expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");    replay(mockConfig);
+    expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
+    replay(mockConfig);
     DebugLogger.init(mockConfig);
     PropertyConfigurator.configure(config.loggerConfiguration().getString("log4jLoggerConf"));
     Logger logger = Logger.getLogger("repository");
@@ -129,14 +119,15 @@ public class SegmentFactoryTest extends TestCase {
     expect(rtbConfig.getBoolean("isRtbEnabled")).andReturn(true).anyTimes();
     replay(rtbConfig);
     ServletHandler.setRtbConfig(rtbConfig);
-    SegmentFactory.init(new RepositoryHelper(null, null, null, null, null, null, null), config.adapterConfiguration(), logger);
+    SegmentFactory.init(new RepositoryHelper(null, null, null, null, null, null, null), config.adapterConfiguration(),
+        logger);
     SegmentFactory.setRepositoryHelper(repoHelper);
-    AdNetworkInterface adNetworkInterface = SegmentFactory.getChannel("advertiserId", "channelTest", config.adapterConfiguration(), null, null, null, null,
-        null, debugLogger, false);
-    assertEquals(null, adNetworkInterface);
-    AdNetworkInterface adNetworkInterface2 = SegmentFactory.getChannel("advertiserId", "channelTest", config.adapterConfiguration(), null, null, null, null,
-        null, debugLogger, true);
+    AdNetworkInterface adNetworkInterface = SegmentFactory.getChannel("advertiserId", "channelTest",
+        config.adapterConfiguration(), null, null, null, null, null, debugLogger, false);
+    assertNull(adNetworkInterface);
+    AdNetworkInterface adNetworkInterface2 = SegmentFactory.getChannel("advertiserId", "channelTest",
+        config.adapterConfiguration(), null, null, null, null, null, debugLogger, true);
     assertNotNull(adNetworkInterface2);
-    assertEquals(true, adNetworkInterface2 instanceof RtbAdNetwork);
+    assertEquals(true, adNetworkInterface2.isRtbPartner());
   }
 }
