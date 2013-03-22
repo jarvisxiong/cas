@@ -33,8 +33,8 @@ public class LoggingTest extends TestCase {
   public void setUp() {
     mockConfig = createMock(Configuration.class);
     expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
-    expect(mockConfig.getString("loggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties").anyTimes();
-    expect(mockConfig.getString("sampledadvertiser")).andReturn("sampledadvertiser").anyTimes();
+    expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
+    expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");    expect(mockConfig.getString("sampledadvertiser")).andReturn("sampledadvertiser").anyTimes();
     expect(mockConfig.getBoolean("enableFileLogging")).andReturn(true).anyTimes();
     expect(mockConfig.getBoolean("enableDatabusLogging")).andReturn(true).anyTimes();
     expect(mockConfig.getInt("sampledadvertisercount")).andReturn(3).anyTimes();

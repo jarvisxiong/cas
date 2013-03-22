@@ -13,6 +13,8 @@ import javax.naming.NamingException;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.spi.LoggerFactory;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
@@ -21,7 +23,6 @@ import org.jboss.netty.logging.Log4JLoggerFactory;
 import org.jboss.netty.util.HashedWheelTimer;
 import org.jboss.netty.util.Timer;
 import org.postgresql.jdbc3.Jdbc3PoolingDataSource;
-
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.ChannelRepository;
@@ -61,6 +62,7 @@ public class ChannelServer {
 
     ConfigurationLoader config = ConfigurationLoader.getInstance(configFile);
     if(!checkLogFolders(config.log4jConfiguration())) {
+      System.out.println("Log folders are not available so exiting..");
       return;
     }
     // Set the status code for load balancer status.
@@ -69,10 +71,10 @@ public class ChannelServer {
     // Setting up the logger factory and SlotSizeMapping for the project.
     DebugLogger.init(config.loggerConfiguration());
     SlotSizeMapping.init();
+    PropertyConfigurator.configure(config.loggerConfiguration().getString("log4jLoggerConf"));
+    logger = Logger.getLogger("repository");
 
-    logger = Logger.getLogger(config.loggerConfiguration().getString("debug"));
-
-    logger.info("Initializing logger completed");
+    logger.debug("Initializing logger completed");
     // parsing the data center id given in the vm parameters
     ChannelServerHelper channelServerHelper = new ChannelServerHelper(logger);
     dataCenterIdCode = channelServerHelper.getDataCenterId(ChannelServerStringLiterals.DATA_CENTER_ID_KEY);
@@ -262,14 +264,20 @@ public class ChannelServer {
     String debugLogFolder = config.getString("appender.debug.File");
     String advertiserLogFolder = config.getString("appender.advertiser.File");
     String sampledAdvertiserLogFolder = config.getString("appender.sampledadvertiser.File");
+    String repositoryLogFolder = config.getString("appender.repository.File");
     File rrFolder = null;
     File channelFolder = null;
     File debugFolder = null;
     File advertiserFolder = null;
     File sampledAdvertiserFolder = null;
+    File repositoryFolder = null;
     if(rrLogFolder != null) {
       rrLogFolder = rrLogFolder.substring(0, rrLogFolder.lastIndexOf('/') + 1);
       rrFolder = new File(rrLogFolder);
+    }
+    if(repositoryLogFolder != null) {
+      repositoryLogFolder = repositoryLogFolder.substring(0, repositoryLogFolder.lastIndexOf('/') + 1);
+      repositoryFolder = new File(repositoryLogFolder);
     }
     if(channelLogFolder != null) {
       channelLogFolder = channelLogFolder.substring(0, channelLogFolder.lastIndexOf('/') + 1);
@@ -290,7 +298,7 @@ public class ChannelServer {
     }
     if(rrFolder != null && rrFolder.exists() && channelFolder != null && channelFolder.exists()) {
       if(debugFolder != null && debugFolder.exists() && advertiserFolder != null && advertiserFolder.exists()) {
-        if(sampledAdvertiserFolder != null && sampledAdvertiserFolder.exists()) {
+        if(sampledAdvertiserFolder != null && sampledAdvertiserFolder.exists() && repositoryFolder != null && repositoryFolder.exists()) {
           return true;
         }
       }

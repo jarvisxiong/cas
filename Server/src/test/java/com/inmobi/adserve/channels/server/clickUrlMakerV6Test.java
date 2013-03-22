@@ -4,8 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.easymock.EasyMock.*;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
-import org.easymock.EasyMock;
+import org.apache.commons.configuration.Configuration;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.util.DebugLogger;
@@ -14,13 +16,22 @@ import junit.framework.TestCase;
 
 public class clickUrlMakerV6Test extends TestCase {
   private static DebugLogger logger;
+  private Configuration mockConfig = null;
 
-  static {
-    logger = EasyMock.createMock(DebugLogger.class);
-    expect(logger.isDebugEnabled()).andReturn(false).anyTimes();
-    replay(logger);
+  public void prepareMockConfig() {
+    mockConfig = createMock(Configuration.class);
+    expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
+    expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
+    replay(mockConfig);
   }
 
+  @Override
+  public void setUp() throws Exception {
+    prepareMockConfig();
+    DebugLogger.init(mockConfig);
+    logger = new DebugLogger();
+  }
+  
   @Test
   public void testClickUrlMaker() {
     ClickUrlMakerV6 clickUrlMaker = new ClickUrlMakerV6(logger, null);
@@ -50,7 +61,7 @@ public class clickUrlMakerV6Test extends TestCase {
     clickUrlMaker.setIpFileVersion((long) 1);
     clickUrlMaker.setCryptoSecretKey("clickmaker.key.1.value");
     clickUrlMaker.createClickUrls();
-    assertEquals("clickUrl", clickUrlMaker.getBeaconUrl(null));
-    assertEquals("clickUrl", clickUrlMaker.getClickUrl(null));
+    assertEquals("http://localhost:8800/6/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/76256371268/0/5l/1/e9805b5e", clickUrlMaker.getBeaconUrl(new HashMap<String, String>()));
+    assertEquals("http://localhost:8800/6/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/76256371268/0/5l/1/e9805b5e", clickUrlMaker.getClickUrl(new HashMap<String, String>()));
   }
 }

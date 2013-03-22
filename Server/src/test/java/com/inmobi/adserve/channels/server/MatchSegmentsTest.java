@@ -163,8 +163,8 @@ public class MatchSegmentsTest extends TestCase {
     SASRequestParameters sasRequestParameters = new SASRequestParameters();
     expect(mockConfig.getBoolean("isNewCategory", false)).andReturn(true).anyTimes();
     expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
-    expect(mockConfig.getString("loggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties").anyTimes();
-    replay(mockConfig);
+    expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
+    expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");    replay(mockConfig);
     List<Long> newCat = new ArrayList<Long>();
     newCat.add(1L);
     newCat.add(2L);
