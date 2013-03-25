@@ -217,10 +217,12 @@ public class AsyncRequestMaker {
     }
     clickUrlMakerV6.setCPC(pricingModel);
     Integer carrierId = null;
-    try {
-      carrierId = jObject.getJSONArray("carrier").getInt(0);
-    } catch (JSONException e) {
-      logger.error("CarrierId is not present in the sasParams");
+    if(null != sasParams.getCarrier()) {
+      try {
+        carrierId = sasParams.getCarrier().getInt(0);
+      } catch (JSONException e) {
+        logger.debug("carrierId is not present in the request");
+      }
     }
     if(null != carrierId) {
       clickUrlMakerV6.setCarrierId(carrierId);
@@ -233,15 +235,13 @@ public class AsyncRequestMaker {
       logger.error("Wrong format for CountryString");
     }
       try {
-        if(null != jObject.getJSONArray("handset")) {
-            clickUrlMakerV6.setHandsetInternalId(Long.parseLong(jObject.getJSONArray("handset").get(0).toString()));
+        if(null != sasParams.getHandset()) {
+            clickUrlMakerV6.setHandsetInternalId(Long.parseLong(sasParams.getHandset().get(0).toString()));
         }
       } catch (NumberFormatException e1) {
-        logger.error("NumberFormatException while parsing handset");
-        logger.error("CountryId is not present in the sasParams");
+        logger.debug("NumberFormatException while parsing handset");
       } catch (JSONException e1) {
-        logger.error("JsonException while parsing handset");
-        logger.error("CountryId is not present in the sasParams");
+        logger.debug("CountryId is not present in the sasParams");
       }
 
     if(null == sasParams.getImpressionId()) {
