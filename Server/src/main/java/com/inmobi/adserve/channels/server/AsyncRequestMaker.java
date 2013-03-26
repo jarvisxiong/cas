@@ -71,7 +71,7 @@ public class AsyncRequestMaker {
         continue;
       }
       logger.debug("adapter found for adGroup:", channelSegmentEntity.getAdgroupId(), "advertiserid is", row
-          .getChannelSegmentEntity().getAdvertiserId());
+          .getChannelSegmentEntity().getAdvertiserId(), "is", network.getName());
       if(null == repositoryHelper.queryChannelRepository(channelSegmentEntity.getChannelId())) {
         logger.debug("No channel entity found for channel id:", channelSegmentEntity.getChannelId());
         continue;
@@ -86,7 +86,7 @@ public class AsyncRequestMaker {
           casInternalRequestParams);
       controlEnrichment(casInternalRequestParameters, channelSegmentEntity);
       sasParams.setAdIncId(channelSegmentEntity.getIncId());
-      logger.debug("impression id is " + sasParams.getImpressionId());
+      logger.debug("impression id is", sasParams.getImpressionId());
 
       if((network.isClickUrlRequired() || network.isBeaconUrlRequired()) && null != sasParams.getImpressionId()) {
         boolean isCpc = false;
@@ -107,7 +107,7 @@ public class AsyncRequestMaker {
         logger.debug("beacon url :", beaconUrl);
       }
 
-      logger.debug("Sending request to Channel of Id", channelSegmentEntity.getChannelId());
+      logger.debug("Sending request to Channel of advsertiserId", channelSegmentEntity.getAdvertiserId());
       logger.debug("external site key is", channelSegmentEntity.getExternalSiteKey());
 
       if(network
@@ -210,17 +210,19 @@ public class AsyncRequestMaker {
         clickUrlMakerV6.setAge(Integer.parseInt(sasParams.getAge()));
       }
     } catch (NumberFormatException e) {
-      logger.error("Wrong format for Age");
+      logger.debug("Wrong format for Age", e.getMessage());
     }
     if(null != sasParams.getGender()) {
       clickUrlMakerV6.setGender(sasParams.getGender());
     }
     clickUrlMakerV6.setCPC(pricingModel);
     Integer carrierId = null;
-    try {
-      carrierId = jObject.getJSONArray("carrier").getInt(0);
-    } catch (JSONException e) {
-      logger.error("CarrierId is not present in the sasParams");
+    if(null != sasParams.getCarrier()) {
+      try {
+        carrierId = sasParams.getCarrier().getInt(0);
+      } catch (JSONException e) {
+        logger.debug("carrierId is not present in the request");
+      }
     }
     if(null != carrierId) {
       clickUrlMakerV6.setCarrierId(carrierId);
@@ -230,18 +232,16 @@ public class AsyncRequestMaker {
         clickUrlMakerV6.setCountryId(Integer.parseInt(sasParams.getCountryStr()));
       }
     } catch (NumberFormatException e) {
-      logger.error("Wrong format for CountryString");
+      logger.debug("Wrong format for CountryString", e.getMessage());
     }
       try {
-        if(null != jObject.getJSONArray("handset")) {
-            clickUrlMakerV6.setHandsetInternalId(Long.parseLong(jObject.getJSONArray("handset").get(0).toString()));
+        if(null != sasParams.getHandset()) {
+            clickUrlMakerV6.setHandsetInternalId(Long.parseLong(sasParams.getHandset().get(0).toString()));
         }
       } catch (NumberFormatException e1) {
-        logger.error("NumberFormatException while parsing handset");
-        logger.error("CountryId is not present in the sasParams");
+        logger.debug("NumberFormatException while parsing handset");
       } catch (JSONException e1) {
-        logger.error("JsonException while parsing handset");
-        logger.error("CountryId is not present in the sasParams");
+        logger.debug("CountryId is not present in the sasParams");
       }
 
     if(null == sasParams.getImpressionId()) {
@@ -256,7 +256,7 @@ public class AsyncRequestMaker {
         clickUrlMakerV6.setLocation(Integer.parseInt(sasParams.getArea()));
       }
     } catch (NumberFormatException e) {
-      logger.error("Wrong format for Area");
+      logger.debug("Wrong format for Area", e.getMessage());
     }
     if(null != sasParams.getSiteSegmentId()) {
       clickUrlMakerV6.setSegmentId(sasParams.getSiteSegmentId());
@@ -284,10 +284,7 @@ public class AsyncRequestMaker {
           uidMap.put(key.toUpperCase(Locale.ENGLISH), value);
         }
       }
-    } else if(null != sasParams.getUid()) {
-      uidMap.put("U-ID", sasParams.getUid());
     }
-
     clickUrlMakerV6.setUdIdVal(uidMap);
     clickUrlMakerV6.setCryptoSecretKey(config.getString("clickmaker.key.1.value"));
     clickUrlMakerV6.setTestCryptoSecretKey(config.getString("clickmaker.key.2.value"));
