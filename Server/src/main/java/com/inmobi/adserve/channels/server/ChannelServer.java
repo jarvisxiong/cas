@@ -89,10 +89,6 @@ public class ChannelServer {
     String channelLogKey = config.serverConfiguration().getString("channelLogKey");
     String advertisementLogKey = config.serverConfiguration().getString("adsLogKey");
     Logging.init(dataBusPublisher, rrLogKey, channelLogKey, advertisementLogKey, config.serverConfiguration());
-
-    // Initialising Internal logger factory for Netty
-    InternalLoggerFactory.setDefaultFactory(new Log4JLoggerFactory());
-
     channelAdGroupRepository = new ChannelAdGroupRepository();
     channelRepository = new ChannelRepository();
     channelFeedbackRepository = new ChannelFeedbackRepository();
