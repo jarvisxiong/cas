@@ -544,6 +544,9 @@ public class Filters {
       } else {
         logger.debug("Dropping partner", rankedSegment.getAdNetworkInterface().getName(), "rank", rank,
             "due to guarnteed delivery");
+        InspectorStats.incrementStatCount(
+            advertiserIdtoNameMapping.get(rankedSegment.getChannelSegmentEntity().getAdvertiserId()),
+            InspectorStrings.droppedInGuaranteedDelivery);
       }
     }
     logger.debug("New ranklist size :" + newRankList.size());
