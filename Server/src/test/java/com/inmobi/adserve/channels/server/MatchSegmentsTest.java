@@ -162,6 +162,7 @@ public class MatchSegmentsTest extends TestCase {
   
   @Test
   public void testGetCategories() {
+    InspectorStats.initializeWorkflow("WorkFlow");
     String configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
     ConfigurationLoader config = ConfigurationLoader.getInstance(configFile);
     InspectorStats.initializeWorkflow(InspectorStrings.percentRollout);
