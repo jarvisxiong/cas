@@ -105,9 +105,6 @@ public class RequestParser {
     } catch (JSONException e) {
       logger.debug("carrier array not found");
     }
-    if(null == params.getUid() || params.getUid().isEmpty()) {
-      params.setUid(stringify(jObject, "u-id", logger));
-    }
     params.setOsId(jObject.optInt("os-id", -1));
     params.setRichMedia(jObject.optBoolean("rich-media", false));
     params.setRqAdType(stringify(jObject, "rq-adtype", logger));
@@ -154,7 +151,7 @@ public class RequestParser {
       }
       return Arrays.asList(category);
     } catch (JSONException e) {
-      logger.error("error while reading category array");
+      logger.error("error while reading category array", e.getMessage());
       return null;
     }
   }
@@ -168,9 +165,6 @@ public class RequestParser {
       JSONObject userMap = (JSONObject) jObject.get("uparams");
       parameter.setAge(stringify(userMap, "u-age", logger));
       parameter.setGender(stringify(userMap, "u-gender", logger));
-      if(StringUtils.isEmpty(parameter.getUid())) {
-        parameter.setUid(stringify(userMap, "u-id", logger));
-      }
       parameter.setPostalCode(stringify(userMap, "u-postalcode", logger));
       if(!StringUtils.isEmpty(parameter.getPostalCode())) {
         parameter.setPostalCode(parameter.getPostalCode().replaceAll(" ", ""));
@@ -199,7 +193,6 @@ public class RequestParser {
   // Get user id params
   public static SASRequestParameters getUserIdParams(SASRequestParameters parameter, JSONObject jObject,
       DebugLogger logger) {
-    logger.debug("inside parsing userid params");
     if (null == jObject) {
       return parameter;
     }
