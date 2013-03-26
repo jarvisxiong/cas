@@ -40,21 +40,21 @@ public class MatchSegments {
         .setPriority(3).setRequestCap(Long.MAX_VALUE);
     MatchSegments.defaultChannelEntity.setSiteInclusion(false);
     MatchSegments.defaultChannelEntity.setSitesIE(emptySet);
-    MatchSegments.defaultChannelFeedbackEntity = new ChannelFeedbackEntity(DEFAULT, 0, 0, Double.MAX_VALUE, 0, 0, 0,
-        0, 0);
+    MatchSegments.defaultChannelFeedbackEntity = new ChannelFeedbackEntity(DEFAULT, 0, 0, Double.MAX_VALUE, 0, 0, 0, 0,
+        0);
     Double defaultEcpm = ServletHandler.getServerConfig().getDouble("default.ecpm", 1);
-    MatchSegments.defaultChannelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(DEFAULT, DEFAULT, Double.valueOf(defaultEcpm),
-        0.5, 0, 0, 0, 0);
-    MatchSegments.defaultChannelSegmentCitrusLeafFeedbackEntity = new ChannelSegmentFeedbackEntity(DEFAULT,
-        DEFAULT, 1.0, 0.5, 0, 0, 0, 0);
+    MatchSegments.defaultChannelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(DEFAULT, DEFAULT,
+        Double.valueOf(defaultEcpm), 0.5, 0, 0, 0, 0);
+    MatchSegments.defaultChannelSegmentCitrusLeafFeedbackEntity = new ChannelSegmentFeedbackEntity(DEFAULT, DEFAULT,
+        1.0, 0.5, 0, 0, 0, 0);
   }
 
   public MatchSegments(RepositoryHelper repositoryHelper, SASRequestParameters sasParams, DebugLogger logger) {
     this.repositoryHelper = repositoryHelper;
     this.sasParams = sasParams;
     this.logger = logger;
-    this.siteFeedbackEntity = repositoryHelper.querySiteCitrusLeafFeedbackRepository(
-        sasParams.getSiteId(), sasParams.getSiteSegmentId().toString(), logger);
+    this.siteFeedbackEntity = repositoryHelper.querySiteCitrusLeafFeedbackRepository(sasParams.getSiteId(), sasParams
+        .getSiteSegmentId().toString(), logger);
   }
 
   // select channel segment based on specified rules
@@ -87,8 +87,7 @@ public class MatchSegments {
       if(countryStr != null) {
         country = Long.parseLong(countryStr);
       }
-      return (matchSegments(logger, slot, getCategories(), country, targetingPlatform, siteRating,
-          osId));
+      return (matchSegments(logger, slot, getCategories(), country, targetingPlatform, siteRating, osId));
     } catch (NumberFormatException exception) {
       logger.error("Error parsing required arguments " + exception.getMessage());
       return null;
@@ -104,7 +103,8 @@ public class MatchSegments {
    * @return
    */
   public List<Long> getCategories() {
-    // Computing all the parents for categories in the category list from the request
+    // Computing all the parents for categories in the category list from the
+    // request
     HashSet<Long> categories = new HashSet<Long>();
     if(null != sasParams.getCategories()) {
       for (Long cat : sasParams.getCategories()) {
@@ -140,7 +140,7 @@ public class MatchSegments {
       }
       logger.debug("AdGroup Dropped due to status - Id:", entity.getAdgroupId());
     }
-    logger.debug("Number of entries from all categories in result:",result.size(), result);
+    logger.debug("Number of entries from all categories in result:", result.size(), result);
 
     if(country != -1) {
       // Load Data for all countries
@@ -152,10 +152,10 @@ public class MatchSegments {
       for (ChannelSegmentEntity entity : allCategoriesAllCountryEntities) {
         if(entity.getStatus()) {
           insertChannelSegmentToResultSet(result, entity);
-        } 
+        }
         logger.debug("AdGroup Dropped due to status - Id:", entity.getAdgroupId());
       }
-        logger.debug("Number of entries from all countries and categories in result:", result.size(), result);
+      logger.debug("Number of entries from all countries and categories in result:", result.size(), result);
     }
 
     // Does OR for the categories.
@@ -166,7 +166,7 @@ public class MatchSegments {
       for (ChannelSegmentEntity entity : filteredEntities) {
         if(entity.getStatus()) {
           insertChannelSegmentToResultSet(result, entity);
-        } 
+        }
         logger.debug("AdGroup Dropped due to status - Id:", entity.getAdgroupId());
       }
 
@@ -187,7 +187,8 @@ public class MatchSegments {
       logger.debug("Number of entries in result:", result.size(), "for", slotId, "_", country, "_", categories);
     }
     if(result.size() == 0) {
-      logger.debug("No matching records for the request - slot:", slotId, "country:", country, "categories:", categories);
+      logger.debug("No matching records for the request - slot:", slotId, "country:", country, "categories:",
+          categories);
     }
     logger.debug("final selected list of segments : ");
     printSegments(result, logger);
@@ -197,7 +198,8 @@ public class MatchSegments {
   // Loads entities and updates cache if required.
   private List<ChannelSegmentEntity> loadEntities(long slotId, long category, long country, Integer targetingPlatform,
       Integer siteRating, int osId) {
-    logger.debug("Loading entities for slot:", slotId, "category:", category, "country:", country, "targetingPlatform:", targetingPlatform, "siteRating:", siteRating, "osId:", osId);
+    logger.debug("Loading entities for slot:", slotId, "category:", category, "country:", country,
+        "targetingPlatform:", targetingPlatform, "siteRating:", siteRating, "osId:", osId);
     ArrayList<ChannelSegmentEntity> filteredEntities = new ArrayList<ChannelSegmentEntity>();
     Collection<ChannelSegmentEntity> entitiesAllOs = channelAdGroupRepository.getEntities(slotId, category, country,
         targetingPlatform, siteRating, -1);
@@ -256,20 +258,22 @@ public class MatchSegments {
     }
 
     if(siteFeedbackEntity != null) {
-      logger.debug("siteFeedbackEntity is", siteFeedbackEntity.getAdGroupFeedbackMap());
-      channelSegmentCitrusLeafFeedbackEntity = siteFeedbackEntity.getAdGroupFeedbackMap().get(
-          channelSegmentEntity.getExternalSiteKey());
+      logger.debug("siteFeedbackEntity is", siteFeedbackEntity);
+      if(siteFeedbackEntity.getAdGroupFeedbackMap() != null)
+        channelSegmentCitrusLeafFeedbackEntity = siteFeedbackEntity.getAdGroupFeedbackMap().get(
+            channelSegmentEntity.getExternalSiteKey());
     } else {
       logger.debug("siteFeedbackEntity is null");
     }
 
     if(channelSegmentCitrusLeafFeedbackEntity == null) {
-      logger.debug("No channelSegmentCitrusLeafFeedbackEntity for advertiserID", channelSegmentEntity.getAdvertiserId(),
-          "and ExternalSiteKey", channelSegmentEntity.getExternalSiteKey());
+      logger.debug("No channelSegmentCitrusLeafFeedbackEntity for advertiserID",
+          channelSegmentEntity.getAdvertiserId(), "and ExternalSiteKey", channelSegmentEntity.getExternalSiteKey());
       channelSegmentCitrusLeafFeedbackEntity = MatchSegments.defaultChannelSegmentCitrusLeafFeedbackEntity;
     } else {
-      logger.debug("Found channelSegmentCitrusLeafFeedbackEntity for advertiserID", channelSegmentEntity.getAdvertiserId(),
-          "and ExternalSiteKey", channelSegmentEntity.getExternalSiteKey(), channelSegmentCitrusLeafFeedbackEntity.toString());      
+      logger.debug("Found channelSegmentCitrusLeafFeedbackEntity for advertiserID",
+          channelSegmentEntity.getAdvertiserId(), "and ExternalSiteKey", channelSegmentEntity.getExternalSiteKey(),
+          channelSegmentCitrusLeafFeedbackEntity.toString());
     }
 
     double pECPM = channelSegmentFeedbackEntity.geteCPM();
