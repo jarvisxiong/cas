@@ -68,8 +68,7 @@ public class RequestParser {
     if(params.getSiteType() != null) {
       params.setSiteType(params.getSiteType().toUpperCase());
     }
-    params.setCategories(getCategory(jObject, logger, "category"));
-    params.setNewCategories(getCategory(jObject, logger, "new-category"));
+    params.setCategories(getCategory(jObject, logger, "new-category"));
     params.setRqIframe(stringify(jObject, "rq-iframe", logger));
     params.setRFormat(stringify(jObject, "r-format", logger));
     params.setRqMkAdcount(stringify(jObject, "rq-mk-adcount", logger));
@@ -78,18 +77,12 @@ public class RequestParser {
     
     params.setAllowBannerAds(jObject.optBoolean("site-allowBanner", true));
     params.setSiteFloor(jObject.optDouble("site-floor", 0.0));
-    try {
-      params.setSiteSegmentId(jObject.getInt("sel-seg-id"));
-      logger.debug("Site segment id is", params.getSiteSegmentId().toString());
-    } catch (JSONException e) {
-      logger.debug("Site segment id is not present in the request");
-    }
+    params.setSiteSegmentId(jObject.optInt("sel-seg-id", 0));
+    logger.debug("Site segment id is", params.getSiteSegmentId());
     params.setIpFileVersion(jObject.optInt("rq-ip-file-ver", 1));
-    if(logger.isDebugEnabled()) {
-      logger.debug("country obtained is " + params.getCountry());
-      logger.debug("site floor is " + params.getSiteFloor());
-      logger.debug("osId is " + params.getPlatformOsId());
-    }
+    logger.debug("country obtained is", params.getCountry());
+    logger.debug("site floor is", params.getSiteFloor());
+    logger.debug("osId is", params.getPlatformOsId());
     params.setUidParams(stringify(jObject, "u-id-params", logger));
     params = getUserIdParams(params, jObject, logger);
     params = getUserParams(params, jObject, logger);
@@ -112,9 +105,6 @@ public class RequestParser {
     } catch (JSONException e) {
       logger.debug("carrier array not found");
     }
-    if(null == params.getUid() || params.getUid().isEmpty()) {
-      params.setUid(stringify(jObject, "u-id", logger));
-    }
     params.setOsId(jObject.optInt("os-id", -1));
     params.setRichMedia(jObject.optBoolean("rich-media", false));
     params.setRqAdType(stringify(jObject, "rq-adtype", logger));
@@ -122,29 +112,32 @@ public class RequestParser {
     return params;
   }
 
-  public static String stringify(JSONObject jObject, String field, DebugLogger logger) throws NullPointerException {
+  public static String stringify(JSONObject jObject, String field, DebugLogger logger) {
     String fieldValue = "";
     try {
-      try {
-        fieldValue = (String) jObject.get(field);
-      } catch (ClassCastException e) {
-        fieldValue = jObject.get(field).toString();
+      Object fieldValueObject = jObject.get(field);
+      if (null != fieldValueObject) {
+        fieldValue = fieldValueObject.toString();
       }
     } catch (JSONException e) {
       return null;
     }
-    if(logger.isDebugEnabled())
-      logger.debug("Retrived from json " + field + " = " + fieldValue);
+    logger.debug("Retrived from json", field, " = ", fieldValue);
     return fieldValue;
   }
 
   public static String parseArray(JSONObject jObject, String param, int index) {
+    if(null == jObject) {
+      return null;
+    }
     try {
       JSONArray jArray = jObject.getJSONArray(param);
-      return (jArray.getString(index));
+      if(null == jArray) {
+        return null;
+      } else {
+        return (jArray.getString(index));
+      }
     } catch (JSONException e) {
-      return null;
-    } catch (NullPointerException e) {
       return null;
     }
   }
@@ -158,7 +151,7 @@ public class RequestParser {
       }
       return Arrays.asList(category);
     } catch (JSONException e) {
-      logger.error("error while reading category array");
+      logger.error("error while reading category array", e.getMessage());
       return null;
     }
   }
@@ -172,12 +165,10 @@ public class RequestParser {
       JSONObject userMap = (JSONObject) jObject.get("uparams");
       parameter.setAge(stringify(userMap, "u-age", logger));
       parameter.setGender(stringify(userMap, "u-gender", logger));
-      if(StringUtils.isEmpty(parameter.getUid())) {
-        parameter.setUid(stringify(userMap, "u-id", logger));
-      }
       parameter.setPostalCode(stringify(userMap, "u-postalcode", logger));
-      if(!StringUtils.isEmpty(parameter.getPostalCode()))
+      if(!StringUtils.isEmpty(parameter.getPostalCode())) {
         parameter.setPostalCode(parameter.getPostalCode().replaceAll(" ", ""));
+      }
       parameter.setUserLocation(stringify(userMap, "u-location", logger));
       parameter.setGenderOrig(stringify(userMap, "u-gender-orig", logger));
       try {
@@ -202,19 +193,21 @@ public class RequestParser {
   // Get user id params
   public static SASRequestParameters getUserIdParams(SASRequestParameters parameter, JSONObject jObject,
       DebugLogger logger) {
-    if(logger.isDebugEnabled())
-      logger.debug("inside parsing userid params");
+    if (null == jObject) {
+      return parameter;
+    }
     try {
       JSONObject userIdMap = (JSONObject) jObject.get("u-id-params");
+      if (null == userIdMap) {
+        return parameter;
+      }
       String o1Uid = stringify(userIdMap, "SO1", logger);
       parameter.setUid(stringify(userIdMap, "u-id", logger));
       parameter.setUidO1((o1Uid != null) ? o1Uid : stringify(userIdMap, "O1", logger));
       parameter.setUidMd5(stringify(userIdMap, "UM5", logger));
-      parameter.setUidIFA(("iphone".equalsIgnoreCase(parameter.getSource())) ? stringify(userIdMap, "IDA", logger) : null);
-
+      String uidIFA = "iphone".equalsIgnoreCase(parameter.getSource()) ? stringify(userIdMap, "IDA", logger) : null;
+      parameter.setUidIFA(uidIFA);
     } catch (JSONException exception) {
-      setNullValueForUid(parameter, logger);
-    } catch (NullPointerException exception) {
       setNullValueForUid(parameter, logger);
     }
     return parameter;

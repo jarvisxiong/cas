@@ -442,8 +442,7 @@ public class Filters {
     double feedbackPower = serverConfiguration.getDouble("feedbackPower", 2.0);
     int priority = channelSegment.getChannelEntity().getPriority() < 5 ? 5 - channelSegment.getChannelEntity()
         .getPriority() : 1;
-    return (Math.pow((ecpm + eCPMShift), feedbackPower) * (priority) * getECPMBoostFactor(channelSegment))
-        * getECPMBoostFactor(channelSegment);
+    return Math.pow((ecpm + eCPMShift), feedbackPower) * (priority) * getECPMBoostFactor(channelSegment);
   }
 
   void printSegments(Map<String, HashMap<String, ChannelSegment>> matchedSegments) {
@@ -516,7 +515,10 @@ public class Filters {
   private double getECPMBoostFactor(ChannelSegment channelSegment) {
     double fillRatio = channelSegment.getChannelSegmentCitrusLeafFeedbackEntity().getFillRatio();
     double latency = channelSegment.getChannelSegmentCitrusLeafFeedbackEntity().getLatency();
-    return (1 + fillRatio) * (1 + (700 - Math.min(latency, 700)) / 700);
+    int maxLatency = ServletHandler.getServerConfig().getInt("readtimeoutMillis");
+    double ecpmBoostFactor = (1 + fillRatio) * (1 + (maxLatency - Math.min(latency, maxLatency)) / maxLatency);
+    logger.debug("Fillratio is", fillRatio, "latency is", latency, "and ecpmBoostFactor is", ecpmBoostFactor);
+    return ecpmBoostFactor;
   }
 
   /**
@@ -542,6 +544,9 @@ public class Filters {
       } else {
         logger.debug("Dropping partner", rankedSegment.getAdNetworkInterface().getName(), "rank", rank,
             "due to guarnteed delivery");
+        InspectorStats.incrementStatCount(
+            advertiserIdtoNameMapping.get(rankedSegment.getChannelSegmentEntity().getAdvertiserId()),
+            InspectorStrings.droppedInGuaranteedDelivery);
       }
     }
     logger.debug("New ranklist size :" + newRankList.size());

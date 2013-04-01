@@ -61,14 +61,15 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
     String exceptionString = e.getClass().getSimpleName();
     InspectorStats.incrementStatCount(InspectorStrings.channelException, exceptionString);
     InspectorStats.incrementStatCount(InspectorStrings.channelException, InspectorStrings.count);
-    if(logger == null)
+    if(logger == null) {
       logger = new DebugLogger();
+    }
     if(exceptionString.equalsIgnoreCase(ServletHandler.CLOSED_CHANNEL_EXCEPTION)
         || exceptionString.equalsIgnoreCase(ServletHandler.CONNECTION_RESET_PEER)) {
       InspectorStats.incrementStatCount(InspectorStrings.totalTerminate);
-      logger.debug("Channel is terminated " + ctx.getChannel().getId());
+      logger.debug("Channel is terminated", ctx.getChannel().getId());
     }
-    logger.error("Getting netty error in HttpRequestHandler: " + e.getCause());
+    logger.error("Getting netty error in HttpRequestHandler:", e.getCause());
     if(e.getChannel().isOpen()) {
       responseSender.sendNoAdResponse(e);
     }
@@ -131,7 +132,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
       StringWriter sw = new StringWriter();
       PrintWriter pw = new PrintWriter(sw);
       exception.printStackTrace(pw);
-      logger.error("stack trace is " + sw.toString());
+      logger.error("stack trace is", sw.toString());
       if(logger.isDebugEnabled()) {
         sendMail(exception.getMessage(), sw.toString());
       }
@@ -140,33 +141,36 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
 
   public void writeLogs(ResponseSender responseSender, DebugLogger logger) {
     List<ChannelSegment> list = new ArrayList<ChannelSegment>();
-    if(null != responseSender.getRankList())
+    if(null != responseSender.getRankList()) {
       list.addAll(responseSender.getRankList());
-    if(null != responseSender.getAuctionEngine().getRtbSegments())
+    }
+    if(null != responseSender.getAuctionEngine().getRtbSegments()) {
       list.addAll(responseSender.getAuctionEngine().getRtbSegments());
+    }
     long totalTime = responseSender.getTotalTime();
-    if(totalTime > 2000)
+    if(totalTime > 2000) {
       totalTime = 0;
+    }
     try {
       if(responseSender.getAdResponse() == null) {
-        Logging.channelLogline(list, null, logger, ServletHandler.loggerConfig, responseSender.sasParams, totalTime);
-        Logging.rrLogging(null, logger, ServletHandler.loggerConfig, responseSender.sasParams, terminationReason);
-        Logging.advertiserLogging(list, logger, ServletHandler.loggerConfig);
-        Logging.sampledAdvertiserLogging(list, logger, ServletHandler.loggerConfig);
+        Logging.channelLogline(list, null, logger, ServletHandler.getLoggerConfig(), responseSender.sasParams, totalTime);
+        Logging.rrLogging(null, logger, ServletHandler.getLoggerConfig(), responseSender.sasParams, terminationReason);
+        Logging.advertiserLogging(list, logger, ServletHandler.getLoggerConfig());
+        Logging.sampledAdvertiserLogging(list, logger, ServletHandler.getLoggerConfig());
       } else {
-        Logging.channelLogline(list, responseSender.getAdResponse().clickUrl, logger, ServletHandler.loggerConfig,
+        Logging.channelLogline(list, responseSender.getAdResponse().clickUrl, logger, ServletHandler.getLoggerConfig(),
             responseSender.sasParams, totalTime);
         if(responseSender.getRtbResponse() == null) {
           logger.debug("rtb response is null so logging dcp response in rr");
           Logging.rrLogging(responseSender.getRankList().get(responseSender.getSelectedAdIndex()), logger,
-              ServletHandler.loggerConfig, responseSender.sasParams, terminationReason);
+              ServletHandler.getLoggerConfig(), responseSender.sasParams, terminationReason);
         } else {
           logger.debug("rtb response is not null so logging rtb response in rr");
-          Logging.rrLogging(responseSender.getRtbResponse(), logger, ServletHandler.loggerConfig,
+          Logging.rrLogging(responseSender.getRtbResponse(), logger, ServletHandler.getLoggerConfig(),
               responseSender.sasParams, terminationReason);
         }
-        Logging.advertiserLogging(list, logger, ServletHandler.loggerConfig);
-        Logging.sampledAdvertiserLogging(list, logger, ServletHandler.loggerConfig);
+        Logging.advertiserLogging(list, logger, ServletHandler.getLoggerConfig());
+        Logging.sampledAdvertiserLogging(list, logger, ServletHandler.getLoggerConfig());
       }
     } catch (JSONException exception) {
       logger.error("Error while writing logs " + exception.getMessage());
@@ -187,12 +191,12 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
     // logger.error("Error in the main thread, so sending mail " +
     // errorMessage);
     Properties properties = System.getProperties();
-    properties.setProperty("mail.smtp.host", ServletHandler.config.getString("smtpServer"));
+    properties.setProperty("mail.smtp.host", ServletHandler.getServerConfig().getString("smtpServer"));
     Session session = Session.getDefaultInstance(properties);
     try {
       MimeMessage message = new MimeMessage(session);
-      message.setFrom(new InternetAddress(ServletHandler.config.getString("sender")));
-      List<String> recipients = ServletHandler.config.getList("recipients");
+      message.setFrom(new InternetAddress(ServletHandler.getServerConfig().getString("sender")));
+      List<String> recipients = ServletHandler.getServerConfig().getList("recipients");
       javax.mail.internet.InternetAddress[] addressTo = new javax.mail.internet.InternetAddress[recipients.size()];
 
       for (int index = 0; index < recipients.size(); index++) {

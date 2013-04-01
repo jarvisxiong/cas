@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.configuration.Configuration;
-
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
@@ -25,8 +23,10 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 
 public class MatchSegments {
   private DebugLogger logger;
+  private static final String DEFAULT = "default";
   private RepositoryHelper repositoryHelper;
   private SASRequestParameters sasParams;
+  private SiteFeedbackEntity siteFeedbackEntity;
   private static ChannelAdGroupRepository channelAdGroupRepository;
   private static ChannelEntity defaultChannelEntity;
   private static ChannelFeedbackEntity defaultChannelFeedbackEntity;
@@ -40,18 +40,21 @@ public class MatchSegments {
         .setPriority(3).setRequestCap(Long.MAX_VALUE);
     MatchSegments.defaultChannelEntity.setSiteInclusion(false);
     MatchSegments.defaultChannelEntity.setSitesIE(emptySet);
-    MatchSegments.defaultChannelFeedbackEntity = new ChannelFeedbackEntity("default", 0, 0, Double.MAX_VALUE, 0, 0, 0,
-        0, 0);
-    MatchSegments.defaultChannelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity("default", "default", 1.0,
-        0.5, 0, 0, 0, 0);
-    MatchSegments.defaultChannelSegmentCitrusLeafFeedbackEntity = new ChannelSegmentFeedbackEntity("default",
-        "default", 1.0, 0.5, 0, 0, 0, 0);
+    MatchSegments.defaultChannelFeedbackEntity = new ChannelFeedbackEntity(DEFAULT, 0, 0, Double.MAX_VALUE, 0, 0, 0, 0,
+        0);
+    Double defaultEcpm = ServletHandler.getServerConfig().getDouble("default.ecpm", 1);
+    MatchSegments.defaultChannelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(DEFAULT, DEFAULT,
+        Double.valueOf(defaultEcpm), 0.5, 0, 0, 0, 0);
+    MatchSegments.defaultChannelSegmentCitrusLeafFeedbackEntity = new ChannelSegmentFeedbackEntity(DEFAULT, DEFAULT,
+        1.0, 0.5, 0, 0, 0, 0);
   }
 
   public MatchSegments(RepositoryHelper repositoryHelper, SASRequestParameters sasParams, DebugLogger logger) {
     this.repositoryHelper = repositoryHelper;
     this.sasParams = sasParams;
     this.logger = logger;
+    this.siteFeedbackEntity = repositoryHelper.querySiteCitrusLeafFeedbackRepository(sasParams.getSiteId(), sasParams
+        .getSiteSegmentId().toString(), logger);
   }
 
   // select channel segment based on specified rules
@@ -77,18 +80,14 @@ public class MatchSegments {
       return null;
     }
     try {
-      if(logger.isDebugEnabled()) {
-        logger.debug("Request# slot: " + slotStr + " country: " + countryStr + " categories: "
-            + sasParams.getCategories() + " targetingPlatform: " + targetingPlatform + " siteRating: " + siteRating
-            + " osId" + osId);
-      }
+      logger.debug("Request# slot:", slotStr, "country:", countryStr, "categories:", sasParams.getCategories(),
+          "targetingPlatform:", targetingPlatform, "siteRating:", siteRating, "osId", osId);
       long slot = Long.parseLong(slotStr);
       long country = -1;
       if(countryStr != null) {
         country = Long.parseLong(countryStr);
       }
-      return (matchSegments(logger, slot, getCategories(ServletHandler.config), country, targetingPlatform, siteRating,
-          osId));
+      return (matchSegments(logger, slot, getCategories(), country, targetingPlatform, siteRating, osId));
     } catch (NumberFormatException exception) {
       logger.error("Error parsing required arguments " + exception.getMessage());
       return null;
@@ -103,29 +102,27 @@ public class MatchSegments {
    * @param sasParams
    * @return
    */
-  public List<Long> getCategories(Configuration serverConfig) {
-    // Computing all the parents for categories in the new category list from
-    // the request
-    HashSet<Long> newCategories = new HashSet<Long>();
-    for (Long cat : sasParams.getNewCategories()) {
-      String parentId = cat.toString();
-      while (parentId != null) {
-        newCategories.add(Long.parseLong(parentId));
-        SiteTaxonomyEntity entity = repositoryHelper.querySiteTaxonomyRepository(parentId);
-        if(entity == null) {
-          break;
+  public List<Long> getCategories() {
+    // Computing all the parents for categories in the category list from the
+    // request
+    HashSet<Long> categories = new HashSet<Long>();
+    if(null != sasParams.getCategories()) {
+      for (Long cat : sasParams.getCategories()) {
+        String parentId = cat.toString();
+        while (parentId != null) {
+          categories.add(Long.parseLong(parentId));
+          SiteTaxonomyEntity entity = repositoryHelper.querySiteTaxonomyRepository(parentId);
+          if(entity == null) {
+            break;
+          }
+          parentId = entity.getParentId();
         }
-        parentId = entity.getParentId();
       }
     }
-    // setting newCategories field in sasParams to contain their parentids as
-    // well
+    // setting Categories field in sasParams to contain their parentids as well
     List<Long> temp = new ArrayList<Long>();
-    temp.addAll(newCategories);
-    sasParams.setNewCategories(temp);
-    if(serverConfig.getBoolean("isNewCategory", false)) {
-      return sasParams.getNewCategories();
-    }
+    temp.addAll(categories);
+    sasParams.setCategories(temp);
     return sasParams.getCategories();
   }
 
@@ -138,14 +135,12 @@ public class MatchSegments {
 
     // Makes sure that there is exactly one entry from each Advertiser.
     for (ChannelSegmentEntity entity : filteredAllCategoriesEntities) {
-      if(entity.getStatus())
+      if(entity.getStatus()) {
         insertChannelSegmentToResultSet(result, entity);
-      else if(logger.isDebugEnabled())
-        logger.debug("AdGroup Dropped due to status - Id: " + entity.getAdgroupId());
+      }
+      logger.debug("AdGroup Dropped due to status - Id:", entity.getAdgroupId());
     }
-
-    if(logger.isDebugEnabled())
-      logger.debug("Number of entries from all categories in result: " + result.size() + result);
+    logger.debug("Number of entries from all categories in result:", result.size(), result);
 
     if(country != -1) {
       // Load Data for all countries
@@ -155,13 +150,12 @@ public class MatchSegments {
       // Makes sure that there is exactly one entry from each Advertiser for all
       // countries.
       for (ChannelSegmentEntity entity : allCategoriesAllCountryEntities) {
-        if(entity.getStatus())
+        if(entity.getStatus()) {
           insertChannelSegmentToResultSet(result, entity);
-        else if(logger.isDebugEnabled())
-          logger.debug("AdGroup Dropped due to status - Id: " + entity.getAdgroupId());
+        }
+        logger.debug("AdGroup Dropped due to status - Id:", entity.getAdgroupId());
       }
-      if(logger.isDebugEnabled())
-        logger.debug("Number of entries from all countries and categories in result: " + result.size() + result);
+      logger.debug("Number of entries from all countries and categories in result:", result.size(), result);
     }
 
     // Does OR for the categories.
@@ -170,10 +164,10 @@ public class MatchSegments {
           siteRating, osId);
       // Makes sure that there is exactly one entry from each Advertiser.
       for (ChannelSegmentEntity entity : filteredEntities) {
-        if(entity.getStatus())
+        if(entity.getStatus()) {
           insertChannelSegmentToResultSet(result, entity);
-        else if(logger.isDebugEnabled())
-          logger.debug("AdGroup Dropped due to status - Id: " + entity.getAdgroupId());
+        }
+        logger.debug("AdGroup Dropped due to status - Id:", entity.getAdgroupId());
       }
 
       if(country != -1) {
@@ -184,20 +178,18 @@ public class MatchSegments {
         // Makes sure that there is exactly one entry from each Advertiser for
         // all countries.
         for (ChannelSegmentEntity entity : allCountryEntities) {
-          if(entity.getStatus())
+          if(entity.getStatus()) {
             insertChannelSegmentToResultSet(result, entity);
-          else if(logger.isDebugEnabled())
-            logger.debug("AdGroup Dropped due to status - Id: " + entity.getAdgroupId());
+          }
+          logger.debug("AdGroup Dropped due to status - Id:", entity.getAdgroupId());
         }
       }
-      if(logger.isDebugEnabled())
-        logger.debug("Number of entries in result: " + result.size() + "for " + slotId + "_" + country + "_"
-            + categories);
+      logger.debug("Number of entries in result:", result.size(), "for", slotId, "_", country, "_", categories);
     }
-    if(result.size() == 0)
-      logger.debug("No matching records for the request - slot: " + slotId + " country: " + country + " categories: "
-          + categories);
-
+    if(result.size() == 0) {
+      logger.debug("No matching records for the request - slot:", slotId, "country:", country, "categories:",
+          categories);
+    }
     logger.debug("final selected list of segments : ");
     printSegments(result, logger);
     return result;
@@ -206,9 +198,8 @@ public class MatchSegments {
   // Loads entities and updates cache if required.
   private List<ChannelSegmentEntity> loadEntities(long slotId, long category, long country, Integer targetingPlatform,
       Integer siteRating, int osId) {
-    if(logger.isDebugEnabled())
-      logger.debug("Loading entities for slot: " + slotId + " category: " + category + " country: " + country
-          + " targetingPlatform: " + targetingPlatform + " siteRating: " + siteRating + " osId: " + osId);
+    logger.debug("Loading entities for slot:", slotId, "category:", category, "country:", country,
+        "targetingPlatform:", targetingPlatform, "siteRating:", siteRating, "osId:", osId);
     ArrayList<ChannelSegmentEntity> filteredEntities = new ArrayList<ChannelSegmentEntity>();
     Collection<ChannelSegmentEntity> entitiesAllOs = channelAdGroupRepository.getEntities(slotId, category, country,
         targetingPlatform, siteRating, -1);
@@ -249,8 +240,6 @@ public class MatchSegments {
         .getAdvertiserId());
     ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = repositoryHelper
         .queryChannelSegmentFeedbackRepository(channelSegmentEntity.getAdgroupId());
-    SiteFeedbackEntity siteFeedbackEntity = repositoryHelper.querySiteCitrusLeafFeedbackRepository(
-        sasParams.getSiteId(), Long.valueOf(sasParams.getSiteIncId()).toString(), logger);
     ChannelSegmentFeedbackEntity channelSegmentCitrusLeafFeedbackEntity = null;
     if(channelEntity == null) {
       logger.debug("No channelEntity for advertiserID", channelSegmentEntity.getAdvertiserId());
@@ -269,14 +258,22 @@ public class MatchSegments {
     }
 
     if(siteFeedbackEntity != null) {
-      channelSegmentCitrusLeafFeedbackEntity = siteFeedbackEntity.getAdGroupFeedbackMap().get(
-          channelSegmentEntity.getAdgroupId());
+      logger.debug("siteFeedbackEntity is", siteFeedbackEntity);
+      if(siteFeedbackEntity.getAdGroupFeedbackMap() != null)
+        channelSegmentCitrusLeafFeedbackEntity = siteFeedbackEntity.getAdGroupFeedbackMap().get(
+            channelSegmentEntity.getExternalSiteKey());
+    } else {
+      logger.debug("siteFeedbackEntity is null");
     }
 
     if(channelSegmentCitrusLeafFeedbackEntity == null) {
-      logger.debug("No channelSegmentFeedackEntity for advertiserID", channelSegmentEntity.getAdvertiserId(),
-          "and AdgroupId", channelSegmentEntity.getAdgroupId());
+      logger.debug("No channelSegmentCitrusLeafFeedbackEntity for advertiserID",
+          channelSegmentEntity.getAdvertiserId(), "and ExternalSiteKey", channelSegmentEntity.getExternalSiteKey());
       channelSegmentCitrusLeafFeedbackEntity = MatchSegments.defaultChannelSegmentCitrusLeafFeedbackEntity;
+    } else {
+      logger.debug("Found channelSegmentCitrusLeafFeedbackEntity for advertiserID",
+          channelSegmentEntity.getAdvertiserId(), "and ExternalSiteKey", channelSegmentEntity.getExternalSiteKey(),
+          channelSegmentCitrusLeafFeedbackEntity.toString());
     }
 
     double pECPM = channelSegmentFeedbackEntity.geteCPM();

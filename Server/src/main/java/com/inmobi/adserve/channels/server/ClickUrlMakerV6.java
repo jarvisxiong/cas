@@ -65,24 +65,23 @@ public class ClickUrlMakerV6 {
   private String beaconUrl;
 
   public String getBeaconUrl(Map<String, String> getParams) {
-    if(null == beaconUrl)
+    if(null == beaconUrl) {
       return beaconUrl;
+    }
     if(getParams.isEmpty()) {
-      logger.debug("beacon url is " + beaconUrl);
       return beaconUrl;
     } else {
       StringBuilder stringBuilder = new StringBuilder();
       stringBuilder.append("?");
       int i = 1;
-      for (Map.Entry<String, String> entry: getParams.entrySet()) {
-        if(i < getParams.size())
+      for (Map.Entry<String, String> entry : getParams.entrySet()) {
+        if(i < getParams.size()) {
           stringBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
-        else
+        } else {
           stringBuilder.append(entry.getKey()).append("=").append(entry.getValue());
+        }
         i++;
       }
-      if(logger.isDebugEnabled())
-        logger.debug("beacon url is " + beaconUrl + stringBuilder.toString());
       return beaconUrl + stringBuilder.toString();
     }
   }
@@ -90,25 +89,24 @@ public class ClickUrlMakerV6 {
   private String clickUrl;
 
   public String getClickUrl(Map<String, String> getParams) {
-    if(null == clickUrl)
+    if(null == clickUrl) {
       return clickUrl;
+    }
     if(getParams.isEmpty()) {
-      if(logger.isDebugEnabled())
-        logger.debug("clickUrl is " + clickUrl);
+      logger.debug("clickUrl is", clickUrl);
       return clickUrl;
     } else {
       StringBuilder stringBuilder = new StringBuilder();
       stringBuilder.append("?");
       int i = 1;
-      for (Map.Entry<String, String> entry: getParams.entrySet()) {
-        if(i < getParams.size())
+      for (Map.Entry<String, String> entry : getParams.entrySet()) {
+        if(i < getParams.size()) {
           stringBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
-        else
+        } else {
           stringBuilder.append(entry.getKey()).append("=").append(entry.getValue());
+        }
         i++;
       }
-      if(logger.isDebugEnabled())
-        logger.debug("clickUrl is " + clickUrl + stringBuilder.toString());
       return clickUrl + stringBuilder.toString();
     }
   }
@@ -222,36 +220,30 @@ public class ClickUrlMakerV6 {
   }
 
   public void createClickUrls() {
-    logger.debug("inside getClickurl");
     StringBuilder adUrlSuffix = new StringBuilder(100);
     // 1st URL component: url format version info
     adUrlSuffix.append(URLVERSIONINITSTR);
     // 2nd URL component: CPC/CPM information
-    if(isCPC)
+    if(isCPC) {
       adUrlSuffix.append(URLMARKERCPC);
-    else
+    } else {
       adUrlSuffix.append(URLMARKERCPM);
+    }
     // 3rd URL component: site inc id
     if(null == siteIncId) {
-      if(logger.isDebugEnabled()) {
-        logger.debug("Site inc id is null so returning");
-      }
+      logger.debug("Site inc id is null so returning");
       return;
     }
     adUrlSuffix.append(appendSeparator(getIdBase36(siteIncId)));
     // 4th URL Component: handset device id
     if(null == handsetInternalId) {
-      if(logger.isDebugEnabled()) {
-        logger.debug("handsetInternaleId is null so returning");
-      }
+      logger.debug("handsetInternaleId is null so returning");
       return;
     }
     adUrlSuffix.append(appendSeparator(getIdBase36(handsetInternalId)));
     // 5th URL Component: ip file version
     if(null == ipFileVersion) {
-      if(logger.isDebugEnabled()) {
-        logger.debug("ipFileVersion is null so returning");
-      }
+      logger.debug("ipFileVersion is null so returning");
       return;
     }
     adUrlSuffix.append(appendSeparator(getIdBase36(ipFileVersion)));
@@ -273,29 +265,28 @@ public class ClickUrlMakerV6 {
     adUrlSuffix.append(appendSeparator(Long.toString(location, 36)));
     // 11th URL Component: Billable Click
     String billable;
-    if(null == isBillableDemog)
+    if(null == isBillableDemog) {
       isBillableDemog = true;
-    if(isBillableDemog)
+    }
+    if(isBillableDemog) {
       billable = "1";
-    else
+    } else {
       billable = "0";
+    }
     adUrlSuffix.append(appendSeparator(billable));
     // 12th URL Component: udid or odin1. Based on PI311
     if(null == uidMapUpperCase) {
-      if(logger.isDebugEnabled()) {
-        logger.debug("uidMapUpperCase is null so returning");
-      }
+      logger.debug("uidMapUpperCase is null so returning");
       return;
     }
-    if(uidMapUpperCase.isEmpty())
+    if(uidMapUpperCase.isEmpty()) {
       adUrlSuffix.append(appendSeparator(DEFAULT_UDID_VALUE));
-    else
+    } else {
       adUrlSuffix.append(appendSeparator(getEncodedJson(uidMapUpperCase, logger)));
+    }
     // impression id
     if(null == impressionId) {
-      if(logger.isDebugEnabled()) {
-        logger.debug("impressionId is null so returning");
-      }
+      logger.debug("impressionId is null so returning");
       return;
     }
     adUrlSuffix.append(appendSeparator(impressionId));
@@ -325,30 +316,31 @@ public class ClickUrlMakerV6 {
       String clickUrlHash = cryptoHashGenerator.generateHash(adUrlSuffix.toString());
       adUrlSuffix.append(appendSeparator(clickUrlHash));
     }
-    if(null != clickURLPrefix)
+    if(null != clickURLPrefix) {
       clickUrl = this.clickURLPrefix + adUrlSuffix.toString();
-    else if(logger.isDebugEnabled())
+    } else {
       logger.debug("clickURLPrefix is not set so sending clickUrl null");
+    }
+
     if(isRmAd) {
       // Incase of rm ads, we need to set both beacon url to indicate rendering
       // and click url to capture the click event.
-      if(logger.isDebugEnabled())
-        logger.debug("Valid beaconing event. Hence need to have both click and beacon URL");
-      if(null != rmBeaconURLPrefix)
+      logger.debug("Valid beaconing event. Hence need to have both click and beacon URL");
+      if(null != rmBeaconURLPrefix) {
         beaconUrl = this.rmBeaconURLPrefix + adUrlSuffix.toString();
-      else if(logger.isDebugEnabled())
+      } else {
         logger.debug("rmBeaconURLPrefix is not set so beacon url is null");
+      }
       return;
     }
 
     if(this.imageBeaconFlag || isBeaconEnabledOnSite) {
-      if(logger.isDebugEnabled())
-        logger.debug("Beacon is enabled for this request. Sending beacon url");
-      if(null != imageBeaconURLPrefix)
+      logger.debug("Beacon is enabled for this request. Sending beacon url");
+      if(null != imageBeaconURLPrefix) {
         beaconUrl = this.imageBeaconURLPrefix + adUrlSuffix.toString();
-      else if(logger.isDebugEnabled())
+      } else {
         logger.debug("ImageBeaconUrlPrefix is not set so beacon url is null");
-
+      }
     }
     return;
   }
@@ -378,11 +370,11 @@ public class ClickUrlMakerV6 {
         StringBuilder hexString = new StringBuilder();
         for (int i = 0; i < uidMessageDigest.length; i++) {
           String hex = Integer.toHexString(0xFF & uidMessageDigest[i]);
-          if(hex.length() == 1)
+          if(hex.length() == 1) {
             hexString.append('0');
+          }
           hexString.append(hex);
         }
-
         hashedUidValue = hexString.toString();
       } catch (NoSuchAlgorithmException nsae) {
         return DEFAULT_UDID_VALUE;
@@ -394,15 +386,9 @@ public class ClickUrlMakerV6 {
   public String getEncodedJson(Map<String, String> clickUidMap, DebugLogger logger) {
     Gson gson = new Gson();
     String temp = gson.toJson(clickUidMap);
-    if(logger.isDebugEnabled())
-      logger.debug("The Json from Click uid map is " + temp);
     byte[] unEncoded = temp.getBytes();
     String encoded = new String(Base64.encodeBase64(unEncoded));
-    if(logger.isDebugEnabled())
-      logger.debug("The encoded json is : " + encoded);
     temp = encoded.replaceAll("\\+", "-").replaceAll("\\/", "_").replaceAll("=", "~");
-    if(logger.isDebugEnabled())
-      logger.debug("The url safe encoded json is : " + temp);
     return temp;
   }
 

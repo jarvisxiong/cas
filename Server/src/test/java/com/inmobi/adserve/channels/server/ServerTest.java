@@ -13,14 +13,11 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.log4j.Logger;
-import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.DebugLogger;
@@ -38,7 +35,6 @@ public class ServerTest extends TestCase {
   private String clickURLPrefix = "http://c2.w.inmobi.com/c.asm";
   private String beaconURLPrefix = "http://c3.w.inmobi.com/c.asm";
   private String secretKeyVersion = "1";
-  private ClickUrlMaker clickUrlMaker;
   private SASRequestParameters sasParam;
   private String loggerConf = "target/channel-server.properties";
   private static String rrFile = "";
@@ -101,8 +97,8 @@ public class ServerTest extends TestCase {
     expect(mockConfig.getString("clickmaker.beaconURLPrefix")).andReturn(beaconURLPrefix).anyTimes();
     expect(mockConfig.getString("clickmaker.key.1.type")).andReturn(keyType).anyTimes();
     expect(mockConfig.getString("clickmaker.key")).andReturn(key).anyTimes();
-    expect(mockConfig.getString("loggerConf")).andReturn(loggerConf).anyTimes();
-    expect(mockConfig.getString("rr")).andReturn("rr").anyTimes();
+    expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
+    expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");    expect(mockConfig.getString("rr")).andReturn("rr").anyTimes();
     expect(mockConfig.getString("channel")).andReturn("channel").anyTimes();
     expect(mockConfig.getInt("percentRollout")).andReturn(percentRollout).anyTimes();
     expect(mockConfig.getList("siteType")).andReturn(siteType).anyTimes();
@@ -172,16 +168,6 @@ public class ServerTest extends TestCase {
     Long[] category = { 1l, 2l };
     assertTrue("Category are expected to be equal",
         RequestParser.getCategory(jsonObject, new DebugLogger(), "category").equals(Arrays.asList(category)));
-  }
-
-  @Test
-  public void testClickUrl() throws Exception {
-    JSONObject jsonObject = prepareParameters();
-    clickUrlMaker = new ClickUrlMaker(mockConfig, jsonObject, sasParam, logger);
-    String expectedClickUrl = "http://c2.w.inmobi.com/c.asm/4/b/9a/0/2/0/0/m/z/0/0/x/4f8d98e2-4bbd-40bc-8729-22da000900f9/-1/1/e5957a68?ds=1";
-    String expectedBeaconUrl = "http://c3.w.inmobi.com/c.asm/4/b/9a/0/2/0/0/m/z/0/0/x/4f8d98e2-4bbd-40bc-8729-22da000900f9/-1/1/e5957a68?ds=1&event=beacon";
-    assertEquals(clickUrlMaker.getClickUrl("CPM").getClickUrl(), expectedClickUrl);
-    assertEquals(clickUrlMaker.getClickUrl("CPM").getBeaconUrl(), expectedBeaconUrl);
   }
 
   /*

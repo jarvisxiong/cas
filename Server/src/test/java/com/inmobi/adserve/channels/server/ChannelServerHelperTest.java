@@ -3,15 +3,10 @@ package com.inmobi.adserve.channels.server;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
-
 import junit.framework.TestCase;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
 import org.testng.annotations.Test;
-
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.util.ConfigurationLoader;
 
 
 public class ChannelServerHelperTest extends TestCase {
@@ -20,13 +15,18 @@ public class ChannelServerHelperTest extends TestCase {
   private Configuration mockConfig = null;
 
   public void setUp() throws Exception {
-    ConfigurationLoader c = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
-    ServletHandler.init(c, new RepositoryHelper(null, null, null, null, null, null, null));
     mockConfig = createMock(Configuration.class);
+    expect(mockConfig.getString("rr")).andReturn("rr").anyTimes();
+    expect(mockConfig.getString("channel")).andReturn("channel").anyTimes();
     expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
-    expect(mockConfig.getString("loggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties").anyTimes();
+    expect(mockConfig.getString("advertiser")).andReturn("advertiser").anyTimes();
+    expect(mockConfig.getString("sampledadvertiser")).andReturn("sampledadvertiser").anyTimes();
+    expect(mockConfig.getString("repository")).andReturn("repository").anyTimes();
+    expect(mockConfig.getString(" logger.sampledadvertisercount")).andReturn("5").anyTimes();
+    expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
+    expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
     replay(mockConfig);
-    channelServerHelper = new ChannelServerHelper(Logger.getLogger(ServletHandler.loggerConfig.getString("debug")));
+    channelServerHelper = new ChannelServerHelper(Logger.getLogger(mockConfig.getString("debug")));
   }
 
   @Test

@@ -45,8 +45,7 @@ public class CryptoHashGenerator {
     CRC32 crc = new CRC32();
     crc.update(mac.get().doFinal(url.getBytes()));
     String hash = Long.toHexString(crc.getValue());
-    if (logger.isDebugEnabled())
-      logger.debug("CryptoHash Generated is " + hash);
+    logger.debug("CryptoHash Generated is", hash);
     return hash;
   }
 }

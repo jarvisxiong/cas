@@ -18,7 +18,10 @@ import org.testng.annotations.Test;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.*;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.adserve.channels.util.InspectorStats;
+
 import junit.framework.TestCase;
 
 public class FilterTest extends TestCase {
@@ -59,6 +62,9 @@ public class FilterTest extends TestCase {
   private SASRequestParameters sasParams;
 
   public void setUp() throws IOException {
+    ConfigurationLoader config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
+    InspectorStats.initializeWorkflow("WorkFlow");
+    ServletHandler.init(config, null);
     mockConfig = createMock(Configuration.class);
     mockAdapterConfig = createMock(Configuration.class);
     HashMap<String, String> temp = new HashMap<String, String>();
@@ -134,12 +140,20 @@ public class FilterTest extends TestCase {
         null);
     channelSegmentEntity6.setSiteInclusion(false);
     channelSegmentEntity6.setSitesIE(emptySet);
-    channelSegment1 = new ChannelSegment(channelSegmentEntity1, cE1, cFE1, cSFE1, null, null, cSFE1.geteCPM());
-    channelSegment2 = new ChannelSegment(channelSegmentEntity2, cE1, cFE1, cSFE2, null, null, cSFE2.geteCPM());
-    channelSegment3 = new ChannelSegment(channelSegmentEntity3, cE1, cFE1, cSFE3, null, null, cSFE3.geteCPM());
-    channelSegment4 = new ChannelSegment(channelSegmentEntity4, cE2, cFE2, cSFE4, null, null, cSFE4.geteCPM());
-    channelSegment5 = new ChannelSegment(channelSegmentEntity5, cE2, cFE2, cSFE5, null, null, cSFE5.geteCPM());
-    channelSegment6 = new ChannelSegment(channelSegmentEntity6, cE3, cFE3, cSFE6, null, null, cSFE6.geteCPM());
+    ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(null, null, 2.1, 60,
+        12, 123, 12, 11);
+    channelSegment1 = new ChannelSegment(channelSegmentEntity1, cE1, cFE1, cSFE1, channelSegmentFeedbackEntity, null,
+        cSFE1.geteCPM());
+    channelSegment2 = new ChannelSegment(channelSegmentEntity2, cE1, cFE1, cSFE2, channelSegmentFeedbackEntity, null,
+        cSFE2.geteCPM());
+    channelSegment3 = new ChannelSegment(channelSegmentEntity3, cE1, cFE1, cSFE3, channelSegmentFeedbackEntity, null,
+        cSFE3.geteCPM());
+    channelSegment4 = new ChannelSegment(channelSegmentEntity4, cE2, cFE2, cSFE4, channelSegmentFeedbackEntity, null,
+        cSFE4.geteCPM());
+    channelSegment5 = new ChannelSegment(channelSegmentEntity5, cE2, cFE2, cSFE5, channelSegmentFeedbackEntity, null,
+        cSFE5.geteCPM());
+    channelSegment6 = new ChannelSegment(channelSegmentEntity6, cE3, cFE3, cSFE6, channelSegmentFeedbackEntity, null,
+        cSFE6.geteCPM());
     expect(mockAdapterConfig.getKeys()).andReturn(itr).anyTimes();
     expect(mockAdapterConfig.getString("openx.advertiserId")).andReturn("advertiserId1").anyTimes();
     expect(mockAdapterConfig.getString("atnt.advertiserId")).andReturn("advertiserId2").anyTimes();
@@ -150,7 +164,8 @@ public class FilterTest extends TestCase {
     expect(mockAdapterConfig.getInt("tapit.partnerSegmentNo", 2)).andReturn(2).anyTimes();
     replay(mockAdapterConfig);
     expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
-    expect(mockConfig.getString("loggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties").anyTimes();
+    expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
+    expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
     expect(mockConfig.getInt("totalSegmentNo")).andReturn(5).anyTimes();
     expect(mockConfig.getDouble("revenueWindow", 0.33)).andReturn(10.0).anyTimes();
     expect(mockConfig.getDouble("ecpmShift", 0.1)).andReturn(0.0).anyTimes();
@@ -178,8 +193,8 @@ public class FilterTest extends TestCase {
     expect(s2.isZipCodeRequired()).andReturn(true).anyTimes();
     expect(s2.isLatlongRequired()).andReturn(true).anyTimes();
     expect(s2.isRestrictedToRichMediaOnly()).andReturn(true).anyTimes();
-    expect(s2.isInterstitialOnly()).andReturn(true).anyTimes();;
-    expect(s2.isNonInterstitialOnly()).andReturn(false).anyTimes();;
+    expect(s2.isInterstitialOnly()).andReturn(true).anyTimes();
+    expect(s2.isNonInterstitialOnly()).andReturn(false).anyTimes();
     expect(s2.getAdvertiserId()).andReturn("advertiserId1").anyTimes();
     replay(s2);
     sasParams = new SASRequestParameters();
@@ -196,7 +211,7 @@ public class FilterTest extends TestCase {
 
   @Test
   public void testIsBurnLimitExceeded() {
-    Filters filter = new Filters(null, mockConfig, mockAdapterConfig, null, null,logger);
+    Filters filter = new Filters(null, mockConfig, mockAdapterConfig, null, null, logger);
     assertEquals(false, filter.isBurnLimitExceeded(channelSegment1));
     assertEquals(true, filter.isBurnLimitExceeded(channelSegment4));
     assertEquals(false, filter.isBurnLimitExceeded(channelSegment6));
@@ -209,7 +224,7 @@ public class FilterTest extends TestCase {
     assertEquals(false, filter.isDailyImpressionCeilingExceeded(channelSegment4));
     assertEquals(false, filter.isDailyImpressionCeilingExceeded(channelSegment6));
   }
-  
+
   @Test
   public void testIsDailyRequestCapExceeded() {
     Filters filter = new Filters(null, mockConfig, mockAdapterConfig, null, null, logger);
@@ -247,7 +262,7 @@ public class FilterTest extends TestCase {
     Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, null, repositoryHelper, logger);
     assertEquals(false, f1.isAnySegmentPropertyViolated(s1));
   }
-  
+
   @Test
   public void testIsAnySegmentPropertyViolatedWhenUdIdFlagSet() {
     Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
@@ -255,23 +270,23 @@ public class FilterTest extends TestCase {
     sasParams.setUidParams(null);
     assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
   }
-  
+
   @Test
   public void testIsAnySegmentPropertyViolatedWhenZipCodeFlagSet() {
     Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
-    
+
     sasParams.setPostalCode(null);
     assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
   }
-  
+
   @Test
   public void testIsAnySegmentPropertyViolatedLatlongFlagSet() {
     Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
-    
+
     sasParams.setLatLong(null);
     assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
   }
-  
+
   @Test
   public void testIsAnySegmentPropertyViolatedRichMediaFlagSet() {
     Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
@@ -279,7 +294,7 @@ public class FilterTest extends TestCase {
     sasParams.setRichMedia(false);
     assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
   }
-  
+
   @Test
   public void testIsAnySegmentPropertyViolatedInterstitialFlagSet() {
     Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
@@ -287,7 +302,7 @@ public class FilterTest extends TestCase {
     sasParams.setRqAdType(null);
     assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
   }
-  
+
   @Test
   public void testIsAnySegmentPropertyViolatedNonInterstitialFlagSet() {
     s2 = createMock(ChannelSegmentEntity.class);
@@ -295,8 +310,10 @@ public class FilterTest extends TestCase {
     expect(s2.isZipCodeRequired()).andReturn(true).anyTimes();
     expect(s2.isLatlongRequired()).andReturn(true).anyTimes();
     expect(s2.isRestrictedToRichMediaOnly()).andReturn(true).anyTimes();
-    expect(s2.isInterstitialOnly()).andReturn(false).anyTimes();;
-    expect(s2.isNonInterstitialOnly()).andReturn(true).anyTimes();;
+    expect(s2.isInterstitialOnly()).andReturn(false).anyTimes();
+    ;
+    expect(s2.isNonInterstitialOnly()).andReturn(true).anyTimes();
+    ;
     expect(s2.getAdvertiserId()).andReturn("advertiserId1").anyTimes();
     replay(s2);
     Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
@@ -355,13 +372,13 @@ public class FilterTest extends TestCase {
     assertEquals("adgroupId2", finalRow.get(0).getChannelSegmentEntity().getAdgroupId());
     assertEquals("adgroupId1", finalRow.get(4).getChannelSegmentEntity().getAdgroupId());
   }
-  
+
   @Test
   public void testIsAdvertiserExcludedWhenSiteInclusionListEmptyPublisherInclusionListEmpty() {
     Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
     assertEquals(false, f1.isAdvertiserExcluded(channelSegment1));
   }
-  
+
   @Test
   public void testIsAdvertiserExcludedWhenSiteInclusionListEmpty() {
     emptySet2.add("123");
@@ -372,7 +389,7 @@ public class FilterTest extends TestCase {
     emptySet2.clear();
     assertEquals(false, f1.isAdvertiserExcluded(channelSegment1));
   }
-  
+
   @Test
   public void testIsAdvertiserExcludedWhenPublisherInclusionListEmpty() {
     emptySet.add("123");
@@ -397,14 +414,14 @@ public class FilterTest extends TestCase {
     emptySet2.add("123");
     assertEquals(true, f1.isAdvertiserExcluded(channelSegment1));
   }
-  
+
   @Test
   public void testIsSiteExcludedByAdvertiserInclusionTrueEmptyList() {
     channelSegment1.getChannelEntity().setSiteInclusion(true);
     Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
     assertEquals(true, f1.isSiteExcludedByAdvertiser(channelSegment1));
   }
-  
+
   @Test
   public void testIsSiteExcludedByAdvertiserInclusionTrueNonEmptyList() {
     channelSegment1.getChannelEntity().setSiteInclusion(true);
@@ -421,7 +438,7 @@ public class FilterTest extends TestCase {
     Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
     assertEquals(false, f1.isSiteExcludedByAdvertiser(channelSegment1));
   }
-  
+
   @Test
   public void testIsSiteExcludedByAdvertiserExclusionTrueNonEmptyList() {
     channelSegment1.getChannelEntity().setSiteInclusion(false);

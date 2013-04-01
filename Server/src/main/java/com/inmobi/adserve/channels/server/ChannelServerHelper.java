@@ -5,6 +5,8 @@ import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 
+
+
 public class ChannelServerHelper {
   private Logger logger;
 
@@ -20,8 +22,9 @@ public class ChannelServerHelper {
       logger.error("NumberFormatException in getDataCenterId");
       dataCenterIdCode = 0;
     }
-    if(logger.isDebugEnabled())
+    if(logger.isDebugEnabled()) {
       logger.debug("dataCenterId is " + dataCenterIdCode);
+    }
     return dataCenterIdCode;
   }
 
@@ -38,16 +41,19 @@ public class ChannelServerHelper {
       }
     }
     try {
-      hostId = Short.parseShort(hostName.substring(3, 7));
-    } catch (NullPointerException e) {
-      logger.error("NullpointerException in getHostId");
+      if(null != hostName) {
+        hostId = Short.parseShort(hostName.substring(3, 7));
+      } else {
+        return hostId;
+      }
     } catch (NumberFormatException e) {
       logger.error("NumberFormatException in getHostId");
     } catch (StringIndexOutOfBoundsException e) {
       logger.error("StringIndexOutOfRangeException in getHostId");
     }
-    if(logger.isDebugEnabled())
+    if(logger.isDebugEnabled()) {
       logger.debug("hostid is " + hostId);
+    }
     return hostId;
   }
   

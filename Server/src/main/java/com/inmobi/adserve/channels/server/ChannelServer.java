@@ -13,6 +13,7 @@ import javax.naming.NamingException;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
@@ -21,7 +22,6 @@ import org.jboss.netty.logging.Log4JLoggerFactory;
 import org.jboss.netty.util.HashedWheelTimer;
 import org.jboss.netty.util.Timer;
 import org.postgresql.jdbc3.Jdbc3PoolingDataSource;
-
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.ChannelRepository;
@@ -53,9 +53,6 @@ public class ChannelServer {
   private static SiteCitrusLeafFeedbackRepository siteCitrusLeafFeedbackRepository;
   private static RepositoryHelper repositoryHelper;
   private static final String configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
-  private static String DATACENTERIDKEY = "dc.id";
-  private static String HOSTNAMEKEY = "host.name";
-  private static String DATACENTRENAMEKEY = "dc.name";
   public static byte dataCenterIdCode;
   public static short hostIdCode;
   public static String dataCentreName;
@@ -63,23 +60,25 @@ public class ChannelServer {
   public static void main(String[] args) throws Exception {
 
     ConfigurationLoader config = ConfigurationLoader.getInstance(configFile);
-    if(!checkLogFolders(config.log4jConfiguration()))
+    if(!checkLogFolders(config.log4jConfiguration())) {
+      System.out.println("Log folders are not available so exiting..");
       return;
+    }
     // Set the status code for load balancer status.
     ServerStatusInfo.statusCode = 200;
 
     // Setting up the logger factory and SlotSizeMapping for the project.
     DebugLogger.init(config.loggerConfiguration());
     SlotSizeMapping.init();
+    PropertyConfigurator.configure(config.loggerConfiguration().getString("log4jLoggerConf"));
+    logger = Logger.getLogger("repository");
 
-    logger = Logger.getLogger(config.loggerConfiguration().getString("debug"));
-
-    logger.info("Initializing logger completed");
+    logger.debug("Initializing logger completed");
     // parsing the data center id given in the vm parameters
     ChannelServerHelper channelServerHelper = new ChannelServerHelper(logger);
-    dataCenterIdCode = channelServerHelper.getDataCenterId(DATACENTERIDKEY);
-    hostIdCode = channelServerHelper.getHostId(HOSTNAMEKEY);
-    dataCentreName = channelServerHelper.getDataCentreName(DATACENTRENAMEKEY);
+    dataCenterIdCode = channelServerHelper.getDataCenterId(ChannelServerStringLiterals.DATA_CENTER_ID_KEY);
+    hostIdCode = channelServerHelper.getHostId(ChannelServerStringLiterals.HOST_NAME_KEY);
+    dataCentreName = channelServerHelper.getDataCentreName(ChannelServerStringLiterals.DATA_CENTRE_NAME_KEY);
     // Initialising Internal logger factory for Netty
     InternalLoggerFactory.setDefaultFactory(new Log4JLoggerFactory());
 
@@ -89,10 +88,6 @@ public class ChannelServer {
     String channelLogKey = config.serverConfiguration().getString("channelLogKey");
     String advertisementLogKey = config.serverConfiguration().getString("adsLogKey");
     Logging.init(dataBusPublisher, rrLogKey, channelLogKey, advertisementLogKey, config.serverConfiguration());
-
-    // Initialising Internal logger factory for Netty
-    InternalLoggerFactory.setDefaultFactory(new Log4JLoggerFactory());
-
     channelAdGroupRepository = new ChannelAdGroupRepository();
     channelRepository = new ChannelRepository();
     channelFeedbackRepository = new ChannelFeedbackRepository();
@@ -104,13 +99,12 @@ public class ChannelServer {
     repositoryHelper = new RepositoryHelper(channelRepository, channelAdGroupRepository, channelFeedbackRepository,
         channelSegmentFeedbackRepository, siteMetaDataRepository, siteTaxonomyRepository,
         siteCitrusLeafFeedbackRepository);
-
-    MatchSegments.init(channelAdGroupRepository);
-    InspectorStats.initializeRepoStats("ChannelAdGroupRepository");
-    InspectorStats.initializeRepoStats("ChannelFeedbackRepository");
-    InspectorStats.initializeRepoStats("ChannelSegmentFeedbackRepository");
-    InspectorStats.initializeRepoStats("SiteMetaDataRepository");
-    InspectorStats.initializeRepoStats("SiteTaxonomyRepository");
+    InspectorStats.initializeRepoStats(ChannelServerStringLiterals.CHANNEL_REPOSITORY);
+    InspectorStats.initializeRepoStats(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY);
+    InspectorStats.initializeRepoStats(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY);
+    InspectorStats.initializeRepoStats(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY);
+    InspectorStats.initializeRepoStats(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY);
+    InspectorStats.initializeRepoStats(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY);
     instantiateRepository(logger, config);
     Filters.init(config.adapterConfiguration());
     // Creating netty client for out-bound calls.
@@ -135,8 +129,9 @@ public class ChannelServer {
     // Configure the netty server.
     try {
       // Initialising request handler
-      AsyncRequestMaker.init(clientBootstrap, rtbClientBootstrap, asyncHttpClient);
       ServletHandler.init(config, repositoryHelper);
+      MatchSegments.init(channelAdGroupRepository);
+      AsyncRequestMaker.init(clientBootstrap, rtbClientBootstrap, asyncHttpClient);
       SegmentFactory.init(repositoryHelper, config.adapterConfiguration(), logger);
       ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(
           Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
@@ -185,7 +180,7 @@ public class ChannelServer {
       Jdbc3PoolingDataSource dataSource = new Jdbc3PoolingDataSource();
       dataSource.setServerName(databaseConfig.getString("host"));
       dataSource.setPortNumber(databaseConfig.getInt("port"));
-      dataSource.setDatabaseName(databaseConfig.getString("database"));
+      dataSource.setDatabaseName(databaseConfig.getString(ChannelServerStringLiterals.DATABASE));
       dataSource.setUser(databaseConfig.getString("username"));
       dataSource.setPassword(databaseConfig.getString("password"));
       Configuration repoConfig = config.repoConfiguration();
@@ -193,57 +188,55 @@ public class ChannelServer {
       Configuration segmentFeedbackConfig = config.segmentFeedBackConfiguration();
       Configuration siteTaxonomyConfig = config.siteTaxonomyConfiguration();
       Configuration siteMetaDataConfig = config.siteMetaDataConfiguration();
-      InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.isUpdating, 0);
-      InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.repoSource,
-          databaseConfig.getString("database"));
-      InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.query, repoConfig.getString("query"));
-      InspectorStats.setStats("ChannelAdGroupRepository", InspectorStrings.refreshInterval,
-          repoConfig.getString("refreshTime"));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY, InspectorStrings.isUpdating, 0);
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY, InspectorStrings.repoSource,
+          databaseConfig.getString(ChannelServerStringLiterals.DATABASE));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY, InspectorStrings.query, repoConfig.getString(ChannelServerStringLiterals.QUERY));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY, InspectorStrings.refreshInterval,
+          repoConfig.getString(ChannelServerStringLiterals.REFRESH_TIME));
 
-      InspectorStats.setStats("ChannelFeedbackRepository", InspectorStrings.isUpdating, 0);
-      InspectorStats.setStats("ChannelFeedbackRepository", InspectorStrings.repoSource,
-          databaseConfig.getString("database"));
-      InspectorStats.setStats("ChannelFeedbackRepository", InspectorStrings.query, feedbackConfig.getString("query"));
-      InspectorStats.setStats("ChannelFeedbackRepository", InspectorStrings.refreshInterval,
-          feedbackConfig.getString("refreshTime"));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY, InspectorStrings.isUpdating, 0);
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY, InspectorStrings.repoSource,
+          databaseConfig.getString(ChannelServerStringLiterals.DATABASE));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY, InspectorStrings.query, feedbackConfig.getString(ChannelServerStringLiterals.QUERY));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY, InspectorStrings.refreshInterval,
+          feedbackConfig.getString(ChannelServerStringLiterals.REFRESH_TIME));
 
-      InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.isUpdating, 0);
-      InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.repoSource,
-          databaseConfig.getString("database"));
-      InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.query,
-          segmentFeedbackConfig.getString("query"));
-      InspectorStats.setStats("ChannelSegmentFeedbackRepository", InspectorStrings.refreshInterval,
-          segmentFeedbackConfig.getString("refreshTime"));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY, InspectorStrings.isUpdating, 0);
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY, InspectorStrings.repoSource,
+          databaseConfig.getString(ChannelServerStringLiterals.DATABASE));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY, InspectorStrings.query,
+          segmentFeedbackConfig.getString(ChannelServerStringLiterals.QUERY));
+      InspectorStats.setStats(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY, InspectorStrings.refreshInterval,
+          segmentFeedbackConfig.getString(ChannelServerStringLiterals.REFRESH_TIME));
 
-      InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.isUpdating, 0);
-      InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.repoSource,
-          databaseConfig.getString("database"));
-      InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.query, siteMetaDataConfig.getString("query"));
-      InspectorStats.setStats("SiteMetaDataRepository", InspectorStrings.refreshInterval,
-          siteMetaDataConfig.getString("refreshTime"));
-      InspectorStats.setStats("SiteTaxonomyRepository", InspectorStrings.isUpdating, 0);
-      InspectorStats.setStats("SiteTaxonomyRepository", InspectorStrings.repoSource,
-          databaseConfig.getString("database"));
-      InspectorStats.setStats("SiteTaxonomyRepository", InspectorStrings.query, siteTaxonomyConfig.getString("query"));
-      InspectorStats.setStats("SiteTaxonomyRepository", InspectorStrings.refreshInterval,
-          siteTaxonomyConfig.getString("refreshTime"));
+      InspectorStats.setStats(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY, InspectorStrings.isUpdating, 0);
+      InspectorStats.setStats(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY, InspectorStrings.repoSource,
+          databaseConfig.getString(ChannelServerStringLiterals.DATABASE));
+      InspectorStats.setStats(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY, InspectorStrings.query, siteMetaDataConfig.getString(ChannelServerStringLiterals.QUERY));
+      InspectorStats.setStats(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY, InspectorStrings.refreshInterval,
+          siteMetaDataConfig.getString(ChannelServerStringLiterals.REFRESH_TIME));
+      InspectorStats.setStats(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY, InspectorStrings.isUpdating, 0);
+      InspectorStats.setStats(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY, InspectorStrings.repoSource,
+          databaseConfig.getString(ChannelServerStringLiterals.DATABASE));
+      InspectorStats.setStats(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY, InspectorStrings.query, siteTaxonomyConfig.getString(ChannelServerStringLiterals.QUERY));
+      InspectorStats.setStats(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY, InspectorStrings.refreshInterval,
+          siteTaxonomyConfig.getString(ChannelServerStringLiterals.REFRESH_TIME));
 
       initialContext.bind("java:comp/env/jdbc", dataSource);
 
       // Reusing the repository from phoenix adsering framework.
-      channelAdGroupRepository.init(logger, config.cacheConfiguration().subset("ChannelAdGroupRepository"),
-          "ChannelAdGroupRepository");
-      channelRepository.init(logger, config.cacheConfiguration().subset("ChannelRepository"), "ChannelRepository");
-      channelFeedbackRepository.init(logger, config.cacheConfiguration().subset("ChannelFeedbackRepository"),
-          "ChannelFeedbackRepository");
-      channelSegmentFeedbackRepository.init(logger,
-          config.cacheConfiguration().subset("ChannelSegmentFeedbackRepository"), "ChannelSegmentFeedbackRepository");
-      siteTaxonomyRepository.init(logger, config.cacheConfiguration().subset("SiteTaxonomyRepository"),
-          "SiteTaxonomyRepository");
-      siteMetaDataRepository.init(logger, config.cacheConfiguration().subset("SiteMetaDataRepository"),
-          "SiteMetaDataRepository");
-      siteCitrusLeafFeedbackRepository.init(config.serverConfiguration().subset("citrusleaf"), getDataCenter());
-
+      channelAdGroupRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY),
+          ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY);
+      channelRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_REPOSITORY), ChannelServerStringLiterals.CHANNEL_REPOSITORY);
+      channelFeedbackRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY),
+          ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY);
+      channelSegmentFeedbackRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY), ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY);
+      siteTaxonomyRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY),
+          ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY);
+      siteMetaDataRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY),
+          ChannelServerStringLiterals.SITE_METADATA_REPOSITORY);
+      siteCitrusLeafFeedbackRepository.init(config.serverConfiguration().subset(ChannelServerStringLiterals.CITRUS_LEAF_FEEDBACK), getDataCenter());
       logger.error("* * * * Instantiating repository completed * * * *");
     } catch (NamingException exception) {
       logger.error("failed to creatre binding for postgresql data source " + exception.getMessage());
@@ -258,6 +251,7 @@ public class ChannelServer {
       return;
     }
   }
+  
 
   private static DataCenter getDataCenter() {
     DataCenter colo = DataCenter.ALL;
@@ -282,14 +276,20 @@ public class ChannelServer {
     String debugLogFolder = config.getString("appender.debug.File");
     String advertiserLogFolder = config.getString("appender.advertiser.File");
     String sampledAdvertiserLogFolder = config.getString("appender.sampledadvertiser.File");
+    String repositoryLogFolder = config.getString("appender.repository.File");
     File rrFolder = null;
     File channelFolder = null;
     File debugFolder = null;
     File advertiserFolder = null;
     File sampledAdvertiserFolder = null;
+    File repositoryFolder = null;
     if(rrLogFolder != null) {
       rrLogFolder = rrLogFolder.substring(0, rrLogFolder.lastIndexOf('/') + 1);
       rrFolder = new File(rrLogFolder);
+    }
+    if(repositoryLogFolder != null) {
+      repositoryLogFolder = repositoryLogFolder.substring(0, repositoryLogFolder.lastIndexOf('/') + 1);
+      repositoryFolder = new File(repositoryLogFolder);
     }
     if(channelLogFolder != null) {
       channelLogFolder = channelLogFolder.substring(0, channelLogFolder.lastIndexOf('/') + 1);
@@ -310,7 +310,7 @@ public class ChannelServer {
     }
     if(rrFolder != null && rrFolder.exists() && channelFolder != null && channelFolder.exists()) {
       if(debugFolder != null && debugFolder.exists() && advertiserFolder != null && advertiserFolder.exists()) {
-        if(sampledAdvertiserFolder != null && sampledAdvertiserFolder.exists()) {
+        if(sampledAdvertiserFolder != null && sampledAdvertiserFolder.exists() && repositoryFolder != null && repositoryFolder.exists()) {
           return true;
         }
       }
