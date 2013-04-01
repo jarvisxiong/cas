@@ -14,7 +14,6 @@ import javax.naming.NamingException;
 import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.apache.log4j.spi.LoggerFactory;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
@@ -253,6 +252,7 @@ public class ChannelServer {
     }
   }
   
+
   private static DataCenter getDataCenter() {
     DataCenter colo = DataCenter.ALL;
     if(DataCenter.UA2.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
