@@ -447,15 +447,15 @@ public class Filters {
     double fillRatio = channelSegmentFeedbackEntity.getFillRatio();
     double latency = channelSegmentFeedbackEntity.getLatency();
     int maxLatency = ServletHandler.getServerConfig().getInt("readtimeoutMillis");
-    double eCPR = eCPM * Math.min(Math.max(fillRatio, 0.01), 1.0);
-    double latencyFactor = 1 + (maxLatency - Math.min(latency, maxLatency)) / maxLatency;
     double eCPMShift = serverConfiguration.getDouble("ecpmShift", 0.1);
     double feedbackPower = serverConfiguration.getDouble("feedbackPower", 2.0);
+    double eCPR = (eCPM + eCPMShift) * Math.min(Math.max(fillRatio, 0.01), 1.0);
+    double latencyFactor = 1 + (maxLatency - Math.min(latency, maxLatency)) / maxLatency;
     int priority = channelSegment.getChannelEntity().getPriority() < 5 ? 5 - channelSegment.getChannelEntity()
         .getPriority() : 1;
     logger.debug("ECPM=", eCPM, "Fill Ratio=", fillRatio, "Latency", latency, "ECPR=", eCPR, "LatencyFactor=",
         latencyFactor, "Priority=", priority, "ECPM Shift", eCPMShift, "FeedbackPower", feedbackPower);
-    double prioritisedECPM = Math.pow(eCPR * latencyFactor + eCPMShift, feedbackPower) * priority;
+    double prioritisedECPM = Math.pow(eCPR * latencyFactor, feedbackPower) * priority;
     logger.debug("PrioritisedECPM=", prioritisedECPM);
     return prioritisedECPM;
   }
