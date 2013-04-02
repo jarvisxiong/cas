@@ -42,11 +42,11 @@ public class MatchSegments {
     MatchSegments.defaultChannelEntity.setSitesIE(emptySet);
     MatchSegments.defaultChannelFeedbackEntity = new ChannelFeedbackEntity(DEFAULT, 0, 0, Double.MAX_VALUE, 0, 0, 0, 0,
         0);
-    Double defaultEcpm = ServletHandler.getServerConfig().getDouble("default.ecpm", 1);
+    Double defaultEcpm = ServletHandler.getServerConfig().getDouble("default.ecpm", 0.1);
     MatchSegments.defaultChannelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(DEFAULT, DEFAULT,
         Double.valueOf(defaultEcpm), 0.5, 0, 0, 0, 0);
     MatchSegments.defaultChannelSegmentCitrusLeafFeedbackEntity = new ChannelSegmentFeedbackEntity(DEFAULT, DEFAULT,
-        1.0, 0.5, 0, 0, 0, 0);
+        0.1, 0.01, 400, 0, 0, 0);
   }
 
   public MatchSegments(RepositoryHelper repositoryHelper, SASRequestParameters sasParams, DebugLogger logger) {
@@ -276,7 +276,7 @@ public class MatchSegments {
           channelSegmentCitrusLeafFeedbackEntity.toString());
     }
 
-    double pECPM = channelSegmentFeedbackEntity.geteCPM();
+    double pECPM = channelSegmentCitrusLeafFeedbackEntity.geteCPM();
     return new ChannelSegment(channelSegmentEntity, channelEntity, channelFeedbackEntity, channelSegmentFeedbackEntity,
         channelSegmentCitrusLeafFeedbackEntity, null, pECPM);
   }
