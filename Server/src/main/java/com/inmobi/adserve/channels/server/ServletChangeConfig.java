@@ -1,6 +1,9 @@
 package com.inmobi.adserve.channels.server;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
@@ -17,10 +20,10 @@ public class ServletChangeConfig implements Servlet{
   @Override
   public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
       DebugLogger logger) throws Exception{
-    HttpRequest request = (HttpRequest) e.getMessage();
+    Map<String, List<String>> params = queryStringDecoder.getParameters();
     JSONObject jObject = null;
     try {
-      jObject = new JSONObject(request.getContent().toString(CharsetUtil.UTF_8));
+      jObject = RequestParser.extractParams(params, "update", logger);
     } catch (JSONException exeption) {
       logger.debug("Encountered Json Error while creating json object inside servlet"); 
       hrh.setTerminationReason(ServletHandler.jsonParsingError);
