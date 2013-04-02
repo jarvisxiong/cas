@@ -52,7 +52,7 @@ public class AsyncRequestMaker {
   public static List<ChannelSegment> prepareForAsyncRequest(List<ChannelSegment> rows, DebugLogger logger,
       Configuration config, Configuration rtbConfig, Configuration adapterConfig, HttpRequestHandlerBase base,
       Set<String> advertiserSet, MessageEvent e, RepositoryHelper repositoryHelper, JSONObject jObject,
-      SASRequestParameters sasParams, CasInternalRequestParameters casInternalRequestParams,
+      SASRequestParameters sasParams, CasInternalRequestParameters casInternalRequestParameterGlobal,
       List<ChannelSegment> rtbSegments) throws Exception {
 
     List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
@@ -83,7 +83,7 @@ public class AsyncRequestMaker {
       String beaconUrl = null;
       sasParams.setImpressionId(getImpressionId(channelSegmentEntity.getIncId()));
       CasInternalRequestParameters casInternalRequestParameters = getCasInternalRequestParameters(sasParams,
-          casInternalRequestParams);
+          casInternalRequestParameterGlobal);
       controlEnrichment(casInternalRequestParameters, channelSegmentEntity);
       sasParams.setAdIncId(channelSegmentEntity.getIncId());
       logger.debug("impression id is", sasParams.getImpressionId());
@@ -126,11 +126,12 @@ public class AsyncRequestMaker {
   }
 
   private static CasInternalRequestParameters getCasInternalRequestParameters(SASRequestParameters sasParams,
-      CasInternalRequestParameters casInternalRequestParams) {
+      CasInternalRequestParameters casInternalRequestParameterGlobal) {
     CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-    casInternalRequestParameters.blockedCategories = casInternalRequestParams.blockedCategories;
-    casInternalRequestParameters.highestEcpm = casInternalRequestParams.highestEcpm;
-    casInternalRequestParameters.rtbBidFloor = casInternalRequestParams.rtbBidFloor;
+    casInternalRequestParameters.impressionId = sasParams.getImpressionId();
+    casInternalRequestParameters.blockedCategories = casInternalRequestParameterGlobal.blockedCategories;
+    casInternalRequestParameters.highestEcpm = casInternalRequestParameterGlobal.highestEcpm;
+    casInternalRequestParameters.rtbBidFloor = casInternalRequestParameterGlobal.rtbBidFloor;
     casInternalRequestParameters.uidParams = sasParams.getUidParams();
     casInternalRequestParameters.uid = sasParams.getUid();
     casInternalRequestParameters.uidO1 = sasParams.getUidO1();
@@ -143,7 +144,6 @@ public class AsyncRequestMaker {
 
   private static void controlEnrichment(CasInternalRequestParameters casInternalRequestParameters,
       ChannelSegmentEntity channelSegmentEntity) {
-    casInternalRequestParameters.impressionId = getImpressionId(channelSegmentEntity.getIncId());
     if(channelSegmentEntity.isStripUdId()) {
       casInternalRequestParameters.uidParams = null;
       casInternalRequestParameters.uid = null;
