@@ -11,6 +11,7 @@ import java.util.Set;
 
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
 import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 
 import org.apache.commons.configuration.Configuration;
@@ -308,16 +309,20 @@ public class Filters {
         if(isAnySegmentPropertyViolated(channelSegment.getChannelSegmentEntity())) {
           continue;
         }
+        // applying site inclusion-exclusion at advertiser level
         if(channelSegment.getChannelSegmentEntity().getSitesIE().isEmpty()) {
           if(isSiteExcludedByAdvertiser(channelSegment)) {
             continue;
           }
-        } else {
+        }
+        // site inclusion exclusion not present at advertiser level so checking
+        // at adgroup level
+        else {
           if(isSiteExcludedByAdGroup(channelSegment)) {
             continue;
           }
         }
-        channelSegment.setPrioritisedECPM(getPrioritisedECPM(channelSegment));
+        channelSegment.setPrioritisedECPM(calculatePrioritisedECPM(channelSegment));
         segmentListToBeSorted.add(channelSegment);
       }
       if(segmentListToBeSorted.isEmpty()) {
@@ -436,13 +441,23 @@ public class Filters {
    * @param config
    * @return
    */
-  double getPrioritisedECPM(ChannelSegment channelSegment) {
-    double ecpm = channelSegment.getChannelSegmentFeedbackEntity().geteCPM();
+  double calculatePrioritisedECPM(ChannelSegment channelSegment) {
+    ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = channelSegment.getChannelSegmentCitrusLeafFeedbackEntity();
+    double eCPM = channelSegmentFeedbackEntity.geteCPM();
+    double fillRatio = channelSegmentFeedbackEntity.getFillRatio();
+    double latency = channelSegmentFeedbackEntity.getLatency();
+    int maxLatency = ServletHandler.getServerConfig().getInt("readtimeoutMillis");
+    double eCPR = eCPM * Math.min(Math.max(fillRatio, 0.01), 1.0);
+    double latencyFactor = 1 + (maxLatency - Math.min(latency, maxLatency)) / maxLatency;
     double eCPMShift = serverConfiguration.getDouble("ecpmShift", 0.1);
     double feedbackPower = serverConfiguration.getDouble("feedbackPower", 2.0);
     int priority = channelSegment.getChannelEntity().getPriority() < 5 ? 5 - channelSegment.getChannelEntity()
         .getPriority() : 1;
-    return Math.pow((ecpm + eCPMShift), feedbackPower) * (priority) * getECPMBoostFactor(channelSegment);
+    logger.debug("ECPM=", eCPM, "Fill Ratio=", fillRatio, "Latency", latency, "ECPR=", eCPR, "LatencyFactor=",
+        latencyFactor, "Priority=", priority, "ECPM Shift", eCPMShift, "FeedbackPower", feedbackPower);
+    double prioritisedECPM = Math.pow(eCPR * latencyFactor + eCPMShift, feedbackPower) * priority;
+    logger.debug("PrioritisedECPM=", prioritisedECPM);
+    return prioritisedECPM;
   }
 
   void printSegments(Map<String, HashMap<String, ChannelSegment>> matchedSegments) {
@@ -510,15 +525,6 @@ public class Filters {
       }
     }
     return segmentList;
-  }
-
-  private double getECPMBoostFactor(ChannelSegment channelSegment) {
-    double fillRatio = channelSegment.getChannelSegmentCitrusLeafFeedbackEntity().getFillRatio();
-    double latency = channelSegment.getChannelSegmentCitrusLeafFeedbackEntity().getLatency();
-    int maxLatency = ServletHandler.getServerConfig().getInt("readtimeoutMillis");
-    double ecpmBoostFactor = (1 + fillRatio) * (1 + (maxLatency - Math.min(latency, maxLatency)) / maxLatency);
-    logger.debug("Fillratio is", fillRatio, "latency is", latency, "and ecpmBoostFactor is", ecpmBoostFactor);
-    return ecpmBoostFactor;
   }
 
   /**
