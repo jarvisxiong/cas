@@ -11,6 +11,7 @@ import java.util.Set;
 
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
 import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 
 import org.apache.commons.configuration.Configuration;
@@ -441,9 +442,10 @@ public class Filters {
    * @return
    */
   double getPrioritisedECPM(ChannelSegment channelSegment) {
-    double eCPM = channelSegment.getPrioritisedECPM();
-    double fillRatio = channelSegment.getChannelSegmentCitrusLeafFeedbackEntity().getFillRatio();
-    double latency = channelSegment.getChannelSegmentCitrusLeafFeedbackEntity().getLatency();
+    ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = channelSegment.getChannelSegmentCitrusLeafFeedbackEntity();
+    double eCPM = channelSegmentFeedbackEntity.geteCPM();
+    double fillRatio = channelSegmentFeedbackEntity.getFillRatio();
+    double latency = channelSegmentFeedbackEntity.getLatency();
     int maxLatency = ServletHandler.getServerConfig().getInt("readtimeoutMillis");
     double eCPR = eCPM * Math.min(Math.max(fillRatio, 0.01), 1.0);
     double latencyFactor = 1 + (maxLatency - Math.min(latency, maxLatency)) / maxLatency;
