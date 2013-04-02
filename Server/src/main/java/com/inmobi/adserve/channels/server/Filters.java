@@ -322,7 +322,7 @@ public class Filters {
             continue;
           }
         }
-        channelSegment.setPrioritisedECPM(getPrioritisedECPM(channelSegment));
+        channelSegment.setPrioritisedECPM(calculatePrioritisedECPM(channelSegment));
         segmentListToBeSorted.add(channelSegment);
       }
       if(segmentListToBeSorted.isEmpty()) {
@@ -441,7 +441,7 @@ public class Filters {
    * @param config
    * @return
    */
-  double getPrioritisedECPM(ChannelSegment channelSegment) {
+  double calculatePrioritisedECPM(ChannelSegment channelSegment) {
     ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = channelSegment.getChannelSegmentCitrusLeafFeedbackEntity();
     double eCPM = channelSegmentFeedbackEntity.geteCPM();
     double fillRatio = channelSegmentFeedbackEntity.getFillRatio();
