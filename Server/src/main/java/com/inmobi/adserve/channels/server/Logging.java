@@ -432,8 +432,10 @@ public class Logging {
         geo.setCity(carrier.getInt(4));
       }
     }
+    Integer segmentId = null;
     if(null != sasParams && null != sasParams.getSiteSegmentId()) {
       log.append(sep).append("sel-seg-id=").append(sasParams.getSiteSegmentId());
+      segmentId = sasParams.getSiteSegmentId();
     }
 
     logger.debug("finished writing cas logs");
@@ -445,6 +447,9 @@ public class Logging {
         new RequestTpan(responseList), siteParams, requestParams, timestamp);
     if(null != geo) {
       channelLog.setIP(geo);
+    }
+    if (null != segmentId) {
+      channelLog.setSegmentId(segmentId);
     }
     if(enableDatabusLogging) {
       TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
