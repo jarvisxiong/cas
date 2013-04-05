@@ -12,16 +12,25 @@ import java.util.List;
 
 import com.inmobi.adserve.channels.adnetworks.tapit.DCPTapitAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.casthrift.CasChannelLog;
 import com.inmobi.messaging.Message;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.thrift.TDeserializer;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.easymock.Capture;
 import org.easymock.EasyMock;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.testng.annotations.Test;
 
 public class LoggingTest extends TestCase {
@@ -34,7 +43,8 @@ public class LoggingTest extends TestCase {
     mockConfig = createMock(Configuration.class);
     expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
     expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
-    expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");    expect(mockConfig.getString("sampledadvertiser")).andReturn("sampledadvertiser").anyTimes();
+    expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
+    expect(mockConfig.getString("sampledadvertiser")).andReturn("sampledadvertiser").anyTimes();
     expect(mockConfig.getBoolean("enableFileLogging")).andReturn(true).anyTimes();
     expect(mockConfig.getBoolean("enableDatabusLogging")).andReturn(true).anyTimes();
     expect(mockConfig.getInt("sampledadvertisercount")).andReturn(3).anyTimes();
@@ -49,15 +59,85 @@ public class LoggingTest extends TestCase {
   }
 
   @Test
+  public void testchannelDatabusLogging() {
+    ConfigurationLoader config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
+    ServletHandler.init(config, null);
+    AbstractMessagePublisher dataBusPublisher = createMock(AbstractMessagePublisher.class);
+    Capture<Message> capturedMessage = new Capture<Message>();
+    Capture<String> capturedStreamName = new Capture<String>();
+    dataBusPublisher.publish(EasyMock.capture(capturedStreamName), EasyMock.capture(capturedMessage));
+    EasyMock.expectLastCall().times(1);
+    replay(dataBusPublisher);
+    Logging.init(dataBusPublisher, "null", "cas_channel", "null", mockConfig);
+    Long[] rcList = null;
+    Long[] tags = null;
+    Timestamp modified_on = null;
+    Long[] slotIds = null;
+    Integer[] siteRatings = null;
+    ChannelSegmentEntity channelSegmentEntity = new ChannelSegmentEntity("advertiserId", "adgroupId", "adId",
+        "channelId", (long) 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds,
+        (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, false, false,
+        false, false, null);
+    List<ChannelSegment> rankList = createMock(ArrayList.class);
+    AdNetworkInterface mockAdnetworkInterface = createMock(DCPTapitAdNetwork.class);
+    ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
+    thirdPartyAdResponse.adStatus = "AD";
+    expect(mockAdnetworkInterface.getResponseStruct()).andReturn(thirdPartyAdResponse).anyTimes();
+    expect(mockAdnetworkInterface.getName()).andReturn("DummyAdNetwork1").anyTimes();
+    expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
+    expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("DummyResponsecontent").anyTimes();
+    expect(mockAdnetworkInterface.getConnectionLatency()).andReturn(20l).anyTimes();
+    expect(mockAdnetworkInterface.getId()).andReturn("2").anyTimes();
+    expect(mockAdnetworkInterface.getBidprice()).andReturn(2d).anyTimes();
+    replay(mockAdnetworkInterface);
+    ChannelSegment channelSegment = new ChannelSegment(channelSegmentEntity, null, null, null, null,
+        mockAdnetworkInterface, 0);
+    expect(rankList.get(0)).andReturn(channelSegment).anyTimes();
+    expect(rankList.size()).andReturn(1).anyTimes();
+    replay(rankList);
+    SASRequestParameters sasParams = new SASRequestParameters();
+    sasParams.setCategories(new ArrayList<Long>());
+    sasParams.setSiteType("performance");
+    sasParams.setCarrier(null);
+    sasParams.setSiteSegmentId(12345);
+    try {
+      Logging.channelLogline(rankList, "clickUrl", logger, ServletHandler.getLoggerConfig(), sasParams, 200l);
+    } catch (JSONException e) {
+      e.printStackTrace();
+      fail();
+    } catch (TException e) {
+      e.printStackTrace();
+      fail();
+    }
+    if(null == capturedMessage.getValue()) {
+      fail();
+    } else {
+      assertTrue(capturedStreamName.getValue().equalsIgnoreCase("cas_channel"));
+      TDeserializer tdeserializer = new TDeserializer(new TBinaryProtocol.Factory());
+      CasChannelLog casChannelLog = new CasChannelLog();
+      byte[] databusChannelLogLine = capturedMessage.getValue().getData().array();
+      try {
+        tdeserializer.deserialize(casChannelLog, databusChannelLogLine);
+      } catch (TException e) {
+        e.printStackTrace();
+        fail();
+      }
+      //Testing segmentId in databus
+      assertEquals(12345, casChannelLog.getSegmentId());
+    }
+  }
+
+  @Test
   public void testsampledAdvertisingLogging() {
     Long[] rcList = null;
     Long[] tags = null;
     Timestamp modified_on = null;
     Long[] slotIds = null;
     Integer[] siteRatings = null;
-    ChannelSegmentEntity channelSegmentEntity = new ChannelSegmentEntity("advertiserId", "adgroupId", "adId", "channelId",
-        (long) 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true,
-        "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, false, false, false, false, null);
+    ChannelSegmentEntity channelSegmentEntity = new ChannelSegmentEntity("advertiserId", "adgroupId", "adId",
+        "channelId", (long) 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds,
+        (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, false, false,
+        false, false, null);
     List<ChannelSegment> rankList = createMock(ArrayList.class);
     AdNetworkInterface mockAdnetworkInterface = createMock(DCPTapitAdNetwork.class);
     ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
@@ -67,7 +147,8 @@ public class LoggingTest extends TestCase {
     expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
     expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("DummyResponsecontent").anyTimes();
     replay(mockAdnetworkInterface);
-    ChannelSegment channelSegment = new ChannelSegment(channelSegmentEntity, null, null, null, null, mockAdnetworkInterface, 0);
+    ChannelSegment channelSegment = new ChannelSegment(channelSegmentEntity, null, null, null, null,
+        mockAdnetworkInterface, 0);
     expect(rankList.get(0)).andReturn(channelSegment).anyTimes();
     expect(rankList.size()).andReturn(1).anyTimes();
     replay(rankList);
@@ -81,9 +162,10 @@ public class LoggingTest extends TestCase {
     Timestamp modified_on = null;
     Long[] slotIds = null;
     Integer[] siteRatings = null;
-    ChannelSegmentEntity channelSegmentEntity = new ChannelSegmentEntity("advertiserId", "adgroupId", "adId", "channelId",
-        (long) 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true,
-        "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, false, false, false, false, null);
+    ChannelSegmentEntity channelSegmentEntity = new ChannelSegmentEntity("advertiserId", "adgroupId", "adId",
+        "channelId", (long) 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds,
+        (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, false, false,
+        false, false, null);
     List<ChannelSegment> rankList = createMock(ArrayList.class);
     AdNetworkInterface mockAdnetworkInterface = createMock(DCPTapitAdNetwork.class);
     ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
@@ -93,7 +175,8 @@ public class LoggingTest extends TestCase {
     expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
     expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("").anyTimes();
     replay(mockAdnetworkInterface);
-    ChannelSegment channelSegment = new ChannelSegment(channelSegmentEntity, null, null, null, null, mockAdnetworkInterface, 0);
+    ChannelSegment channelSegment = new ChannelSegment(channelSegmentEntity, null, null, null, null,
+        mockAdnetworkInterface, 0);
     expect(rankList.get(0)).andReturn(channelSegment).anyTimes();
     expect(rankList.size()).andReturn(1).anyTimes();
     replay(rankList);
@@ -107,9 +190,10 @@ public class LoggingTest extends TestCase {
     Timestamp modified_on = null;
     Long[] slotIds = null;
     Integer[] siteRatings = null;
-    ChannelSegmentEntity channelSegmentEntity = new ChannelSegmentEntity("advertiserId", "adgroupId", "adId", "channelId",
-        (long) 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true,
-        "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, false, false, false, false, null);
+    ChannelSegmentEntity channelSegmentEntity = new ChannelSegmentEntity("advertiserId", "adgroupId", "adId",
+        "channelId", (long) 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds,
+        (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, false, false,
+        false, false, null);
     List<ChannelSegment> rankList = createMock(ArrayList.class);
     AdNetworkInterface mockAdnetworkInterface = createMock(DCPTapitAdNetwork.class);
     ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
@@ -119,7 +203,8 @@ public class LoggingTest extends TestCase {
     expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
     expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("").anyTimes();
     replay(mockAdnetworkInterface);
-    ChannelSegment channelSegment = new ChannelSegment(channelSegmentEntity, null, null, null, null, mockAdnetworkInterface, 0);
+    ChannelSegment channelSegment = new ChannelSegment(channelSegmentEntity, null, null, null, null,
+        mockAdnetworkInterface, 0);
     expect(rankList.get(0)).andReturn(channelSegment).anyTimes();
     expect(rankList.size()).andReturn(1).anyTimes();
     replay(rankList);
@@ -133,9 +218,10 @@ public class LoggingTest extends TestCase {
     Timestamp modified_on = null;
     Long[] slotIds = null;
     Integer[] siteRatings = null;
-    ChannelSegmentEntity channelSegmentEntity = new ChannelSegmentEntity("advertiserId", "adgroupId", "adId", "channelId",
-        (long) 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true,
-        "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, false, false, false, false, null);
+    ChannelSegmentEntity channelSegmentEntity = new ChannelSegmentEntity("advertiserId", "adgroupId", "adId",
+        "channelId", (long) 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds,
+        (long) 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, false, false,
+        false, false, null);
     List<ChannelSegment> rankList = createMock(ArrayList.class);
     AdNetworkInterface mockAdnetworkInterface = createMock(DCPTapitAdNetwork.class);
     ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
@@ -145,7 +231,8 @@ public class LoggingTest extends TestCase {
     expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
     expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("response").anyTimes();
     replay(mockAdnetworkInterface);
-    ChannelSegment channelSegment = new ChannelSegment(channelSegmentEntity, null, null, null, null, mockAdnetworkInterface, 0);
+    ChannelSegment channelSegment = new ChannelSegment(channelSegmentEntity, null, null, null, null,
+        mockAdnetworkInterface, 0);
     expect(rankList.get(0)).andReturn(channelSegment).anyTimes();
     expect(rankList.get(1)).andReturn(channelSegment).anyTimes();
     expect(rankList.get(2)).andReturn(channelSegment).anyTimes();
