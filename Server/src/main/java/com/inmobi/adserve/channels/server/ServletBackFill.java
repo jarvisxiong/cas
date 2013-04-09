@@ -15,6 +15,7 @@ import org.json.JSONObject;
 
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
@@ -37,7 +38,10 @@ public class ServletBackFill implements Servlet {
       hrh.setTerminationReason(ServletHandler.jsonParsingError);
       InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
     }
-    hrh.responseSender.sasParams = RequestParser.parseRequestParameters(hrh.jObject, logger);
+    CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+    SASRequestParameters sasParams = new SASRequestParameters();
+    RequestParser.parseRequestParameters(hrh.jObject, sasParams, casInternalRequestParameters, logger);
+    hrh.responseSender.sasParams = sasParams;
     
     //Send noad if new-category is not present in the request
     if (null == hrh.responseSender.sasParams.getCategories()) {
@@ -173,7 +177,6 @@ public class ServletBackFill implements Servlet {
       }
     }
 
-    CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
     casInternalRequestParameters.highestEcpm = getHighestEcpm(rows, logger);
     logger.debug("Highest Ecpm is", Double.valueOf(casInternalRequestParameters.highestEcpm));
     casInternalRequestParameters.blockedCategories = getBlockedCategories(hrh, logger);

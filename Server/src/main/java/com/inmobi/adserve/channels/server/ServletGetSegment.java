@@ -12,6 +12,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
+import com.inmobi.adserve.channels.entity.SiteFeedbackEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -71,7 +73,7 @@ public class ServletGetSegment implements Servlet {
       } else if(repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CITRUS_LEAF_FEEDBACK)) {
         entity = ServletHandler.repositoryHelper.querySiteCitrusLeafFeedbackRepository(id.split("_")[0],
             id.split("_")[1], logger);
-        hrh.responseSender.sendResponse(entity.toString(), e);
+        hrh.responseSender.sendResponse(((SiteFeedbackEntity)entity).getCSV(), e);
         return;
       }
       getSegments(key, entity, segmentInfo);
