@@ -201,7 +201,8 @@ public class RequestParser {
       if(null == userIdMap) {
         return;
       }
-      parameter.uid = stringify(userIdMap, "u-id", logger);
+      String uid = stringify(userIdMap, "u-id", logger);
+      parameter.uid = (uid != null ? uid : stringify(userIdMap, "UDID", logger));
       parameter.uidO1 = stringify(userIdMap, "O1", logger);
       parameter.uidMd5 = stringify(userIdMap, "UM5", logger);
       parameter.uidIFA = stringify(userIdMap, "IDA", logger);;
@@ -210,7 +211,7 @@ public class RequestParser {
       parameter.uidIDUS1 = stringify(userIdMap, "IDUS1", logger);
       parameter.uidADT = stringify(userIdMap, "u-id-adt", logger);
     } catch (JSONException exception) {
-      logger.error("Error in extracting userid params");
+      logger.info("Error in extracting userid params");
     }
   }
 

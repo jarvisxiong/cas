@@ -38,9 +38,9 @@ public class ServletBackFill implements Servlet {
       hrh.setTerminationReason(ServletHandler.jsonParsingError);
       InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
     }
-    CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+    CasInternalRequestParameters casInternalRequestParametersGlobal = new CasInternalRequestParameters();
     SASRequestParameters sasParams = new SASRequestParameters();
-    RequestParser.parseRequestParameters(hrh.jObject, sasParams, casInternalRequestParameters, logger);
+    RequestParser.parseRequestParameters(hrh.jObject, sasParams, casInternalRequestParametersGlobal, logger);
     hrh.responseSender.sasParams = sasParams;
     
     //Send noad if new-category is not present in the request
@@ -177,19 +177,19 @@ public class ServletBackFill implements Servlet {
       }
     }
 
-    casInternalRequestParameters.highestEcpm = getHighestEcpm(rows, logger);
-    logger.debug("Highest Ecpm is", Double.valueOf(casInternalRequestParameters.highestEcpm));
-    casInternalRequestParameters.blockedCategories = getBlockedCategories(hrh, logger);
-    casInternalRequestParameters.rtbBidFloor = hrh.responseSender.sasParams.getSiteFloor() > casInternalRequestParameters.highestEcpm ? hrh.responseSender.sasParams.getSiteFloor()
-        : casInternalRequestParameters.highestEcpm + 0.01;
-    hrh.responseSender.casInternalRequestParameters = casInternalRequestParameters;
-    hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternalRequestParameters;
+    casInternalRequestParametersGlobal.highestEcpm = getHighestEcpm(rows, logger);
+    logger.debug("Highest Ecpm is", Double.valueOf(casInternalRequestParametersGlobal.highestEcpm));
+    casInternalRequestParametersGlobal.blockedCategories = getBlockedCategories(hrh, logger);
+    casInternalRequestParametersGlobal.rtbBidFloor = hrh.responseSender.sasParams.getSiteFloor() > casInternalRequestParametersGlobal.highestEcpm ? hrh.responseSender.sasParams.getSiteFloor()
+        : casInternalRequestParametersGlobal.highestEcpm + 0.01;
+    hrh.responseSender.casInternalRequestParameters = casInternalRequestParametersGlobal;
+    hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternalRequestParametersGlobal;
     logger.debug("Total channels available for sending requests " + rows.size());
     List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
     segments = AsyncRequestMaker.prepareForAsyncRequest(rows, logger, ServletHandler.getServerConfig(), ServletHandler.getRtbConfig(),
         ServletHandler.getAdapterConfig(), hrh.responseSender, advertiserSet, e, ServletHandler.repositoryHelper,
-        hrh.jObject, hrh.responseSender.sasParams, casInternalRequestParameters, rtbSegments);
+        hrh.jObject, hrh.responseSender.sasParams, casInternalRequestParametersGlobal, rtbSegments);
 
     logger.debug("rtb rankList size is", Integer.valueOf(rtbSegments.size()));
     if(segments.isEmpty() && rtbSegments.isEmpty()) {
@@ -255,7 +255,7 @@ public class ServletBackFill implements Servlet {
       if(null != siteMetaDataEntity && siteMetaDataEntity.getBlockedCategories() != null) {
         if(!siteMetaDataEntity.isExpired() && siteMetaDataEntity.getRuleType() == 4) {
           blockedCategories = Arrays.asList(siteMetaDataEntity.getBlockedCategories());
-          int size = blockedCategories == null ? 0 : blockedCategories.size();
+          int size = (blockedCategories == null ? 0 : blockedCategories.size());
           logger.debug("Site id is", hrh.responseSender.sasParams.getSiteId(), "no of blocked categories are", size);
         }
       } else {
