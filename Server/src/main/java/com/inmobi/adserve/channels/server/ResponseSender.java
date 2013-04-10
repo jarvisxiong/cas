@@ -354,6 +354,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
       return;
     }
     int rankIndex = this.getRankIndexToProcess();
+    if(rankList.size() <= rankIndex) {
+      return;
+    }
     ChannelSegment segment = this.getRankList().get(rankIndex);
     while (segment.getAdNetworkInterface().isRequestCompleted()) {
       if(segment.getAdNetworkInterface().getResponseAd().responseStatus == ResponseStatus.SUCCESS) {
