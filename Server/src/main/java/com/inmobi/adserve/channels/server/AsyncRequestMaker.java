@@ -132,11 +132,14 @@ public class AsyncRequestMaker {
     casInternalRequestParameters.blockedCategories = casInternalRequestParameterGlobal.blockedCategories;
     casInternalRequestParameters.highestEcpm = casInternalRequestParameterGlobal.highestEcpm;
     casInternalRequestParameters.rtbBidFloor = casInternalRequestParameterGlobal.rtbBidFloor;
-    casInternalRequestParameters.uidParams = sasParams.getUidParams();
-    casInternalRequestParameters.uid = sasParams.getUid();
-    casInternalRequestParameters.uidO1 = sasParams.getUidO1();
-    casInternalRequestParameters.uidMd5 = sasParams.getUidMd5();
-    casInternalRequestParameters.uidIFA = sasParams.getUidIFA();
+    casInternalRequestParameters.uid = casInternalRequestParameterGlobal.uid;
+    casInternalRequestParameters.uidO1 = casInternalRequestParameterGlobal.uidO1;
+    casInternalRequestParameters.uidIFA = casInternalRequestParameterGlobal.uidIFA;
+    casInternalRequestParameters.uidIFV = casInternalRequestParameterGlobal.uidIFV;
+    casInternalRequestParameters.uidSO1 = casInternalRequestParameterGlobal.uidSO1;
+    casInternalRequestParameters.uidIDUS1 = casInternalRequestParameterGlobal.uidIDUS1;
+    casInternalRequestParameters.uidMd5 = casInternalRequestParameterGlobal.uidMd5;
+    casInternalRequestParameters.uidADT = casInternalRequestParameterGlobal.uidADT;
     casInternalRequestParameters.zipCode = sasParams.getPostalCode();
     casInternalRequestParameters.latLong = sasParams.getLatLong();
     return casInternalRequestParameters;
@@ -145,11 +148,14 @@ public class AsyncRequestMaker {
   private static void controlEnrichment(CasInternalRequestParameters casInternalRequestParameters,
       ChannelSegmentEntity channelSegmentEntity) {
     if(channelSegmentEntity.isStripUdId()) {
-      casInternalRequestParameters.uidParams = null;
       casInternalRequestParameters.uid = null;
       casInternalRequestParameters.uidO1 = null;
       casInternalRequestParameters.uidMd5 = null;
       casInternalRequestParameters.uidIFA = null;
+      casInternalRequestParameters.uidIFV = null;
+      casInternalRequestParameters.uidIDUS1 = null;
+      casInternalRequestParameters.uidSO1 = null;
+      casInternalRequestParameters.uidADT = null;
     }
     if(channelSegmentEntity.isStripLatlong()) {
       casInternalRequestParameters.zipCode = null;

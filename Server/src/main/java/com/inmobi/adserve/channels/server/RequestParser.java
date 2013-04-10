@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.server;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
@@ -39,12 +41,12 @@ public class RequestParser {
     return jObject;
   }
 
-  public static SASRequestParameters parseRequestParameters(JSONObject jObject, DebugLogger logger) {
-    SASRequestParameters params = new SASRequestParameters();
+  public static void parseRequestParameters(JSONObject jObject, SASRequestParameters params,
+      CasInternalRequestParameters casInternalRequestParameters, DebugLogger logger) {
     logger.debug("inside parameter parser");
     if(null == jObject) {
       logger.debug("Returning null as jObject is null.");
-      return null;
+      params = null;
     }
     params.setAllParametersJson(jObject.toString());
     params.setRemoteHostIp(stringify(jObject, "w-s-carrier", logger));
@@ -74,7 +76,7 @@ public class RequestParser {
     params.setRqMkAdcount(stringify(jObject, "rq-mk-adcount", logger));
     params.setTid(stringify(jObject, "tid", logger));
     params.setTp(stringify(jObject, "tp", logger));
-    
+
     params.setAllowBannerAds(jObject.optBoolean("site-allowBanner", true));
     params.setSiteFloor(jObject.optDouble("site-floor", 0.0));
     params.setSiteSegmentId(jObject.optInt("sel-seg-id", 0));
@@ -83,8 +85,8 @@ public class RequestParser {
     logger.debug("country obtained is", params.getCountry());
     logger.debug("site floor is", params.getSiteFloor());
     logger.debug("osId is", params.getPlatformOsId());
-    params.setUidParams(stringify(jObject, "u-id-params", logger));
-    params = getUserIdParams(params, jObject, logger);
+    params.setUidParams(stringify(jObject, "raw-uid", logger));
+    setUserIdParams(casInternalRequestParameters, jObject, params, logger);
     params = getUserParams(params, jObject, logger);
     try {
       JSONArray siteInfo = jObject.getJSONArray("site");
@@ -109,14 +111,13 @@ public class RequestParser {
     params.setRichMedia(jObject.optBoolean("rich-media", false));
     params.setRqAdType(stringify(jObject, "rq-adtype", logger));
     logger.debug("successfully parsed params");
-    return params;
   }
 
   public static String stringify(JSONObject jObject, String field, DebugLogger logger) {
     String fieldValue = "";
     try {
       Object fieldValueObject = jObject.get(field);
-      if (null != fieldValueObject) {
+      if(null != fieldValueObject) {
         fieldValue = fieldValueObject.toString();
       }
     } catch (JSONException e) {
@@ -172,13 +173,13 @@ public class RequestParser {
       parameter.setUserLocation(stringify(userMap, "u-location", logger));
       parameter.setGenderOrig(stringify(userMap, "u-gender-orig", logger));
       try {
-        if (null != parameter.getAge()) {
+        if(null != parameter.getAge()) {
           parameter.setAge(URLEncoder.encode(parameter.getAge(), utf8));
         }
-        if (null != parameter.getGender()) {
+        if(null != parameter.getGender()) {
           parameter.setGender(URLEncoder.encode(parameter.getGender(), utf8));
         }
-        if (null != parameter.getPostalCode()) {
+        if(null != parameter.getPostalCode()) {
           parameter.setPostalCode(URLEncoder.encode(parameter.getPostalCode(), utf8));
         }
       } catch (UnsupportedEncodingException e) {
@@ -191,32 +192,45 @@ public class RequestParser {
   }
 
   // Get user id params
-  public static SASRequestParameters getUserIdParams(SASRequestParameters parameter, JSONObject jObject,
-      DebugLogger logger) {
-    if (null == jObject) {
-      return parameter;
+  public static void setUserIdParams(CasInternalRequestParameters parameter, JSONObject jObject,
+      SASRequestParameters sasParams, DebugLogger logger) {
+    if(null == jObject) {
+      return;
     }
     try {
-      JSONObject userIdMap = (JSONObject) jObject.get("u-id-params");
-      if (null == userIdMap) {
-        return parameter;
+      JSONObject userIdMap = (JSONObject) jObject.get("raw-uid");
+      if(null == userIdMap) {
+        return;
       }
-      String o1Uid = stringify(userIdMap, "SO1", logger);
-      parameter.setUid(stringify(userIdMap, "u-id", logger));
-      parameter.setUidO1((o1Uid != null) ? o1Uid : stringify(userIdMap, "O1", logger));
-      parameter.setUidMd5(stringify(userIdMap, "UM5", logger));
-      String uidIFA = "iphone".equalsIgnoreCase(parameter.getSource()) ? stringify(userIdMap, "IDA", logger) : null;
-      parameter.setUidIFA(uidIFA);
+      String uid = stringify(userIdMap, "u-id", logger);
+      parameter.uid = (StringUtils.isNotBlank(parameter.uid) ? uid : stringify(userIdMap, "UDID", logger));
+      if(StringUtils.isNotBlank(parameter.uid) && parameter.uid.length() != 32) {
+        parameter.uid = MD5(parameter.uid);
+      }
+      parameter.uidO1 = stringify(userIdMap, "O1", logger);
+      parameter.uidMd5 = stringify(userIdMap, "UM5", logger);
+      parameter.uidIFA = stringify(userIdMap, "IDA", logger);
+      parameter.uidSO1 = stringify(userIdMap, "SO1", logger);
+      parameter.uidIFV = stringify(userIdMap, "IDV", logger);
+      parameter.uidIDUS1 = stringify(userIdMap, "IDUS1", logger);
+      parameter.uidADT = stringify(userIdMap, "u-id-adt", logger);
     } catch (JSONException exception) {
-      setNullValueForUid(parameter, logger);
+      logger.info("Error in extracting userid params");
     }
-    return parameter;
   }
 
-  private static void setNullValueForUid(SASRequestParameters parameter, DebugLogger logger) {
-    parameter.setUidO1(null);
-    parameter.setUidMd5(null);
-    parameter.setUidIFA(null);
-    logger.error("uidparams missing in the request");
+  public static String MD5(String md5) {
+    try {
+      MessageDigest md = MessageDigest.getInstance("MD5");
+      byte[] array = md.digest(md5.getBytes());
+      StringBuffer sb = new StringBuffer();
+      for (int i = 0; i < array.length; ++i) {
+        sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
+      }
+      return sb.toString();
+    } catch (java.security.NoSuchAlgorithmException e) {
+    }
+    return null;
   }
+  
 }
