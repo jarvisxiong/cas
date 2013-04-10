@@ -17,6 +17,7 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.casthrift.CasChannelLog;
 import com.inmobi.messaging.Message;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
@@ -56,6 +57,7 @@ public class LoggingTest extends TestCase {
     EasyMock.expectLastCall().times(3);
     replay(dataBusPublisher);
     Logging.init(dataBusPublisher, "null", "null", "null", mockConfig);
+    InspectorStats.initializeWorkflow("WorkFlow");
   }
 
   @Test
