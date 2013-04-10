@@ -6,6 +6,7 @@ import static org.easymock.classextension.EasyMock.replay;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -448,5 +449,5 @@ public class FilterTest extends TestCase {
     emptySet.add("siteid");
     assertEquals(true, f1.isSiteExcludedByAdvertiser(channelSegment1));
   }
-
+  
 }
