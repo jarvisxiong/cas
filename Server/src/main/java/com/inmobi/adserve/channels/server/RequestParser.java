@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.server;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -202,14 +203,14 @@ public class RequestParser {
         return;
       }
       String uid = stringify(userIdMap, "u-id", logger);
-      parameter.uid = (uid != null ? uid : stringify(userIdMap, "UDID", logger));
-      if(parameter.uid != null && parameter.uid.length() != 32) {
+      parameter.uid = (StringUtils.isNotBlank(parameter.uid) ? uid : stringify(userIdMap, "UDID", logger));
+      if(StringUtils.isNotBlank(parameter.uid) && parameter.uid.length() != 32) {
         parameter.uid = MD5(parameter.uid);
       }
       parameter.uidO1 = stringify(userIdMap, "O1", logger);
       parameter.uidMd5 = stringify(userIdMap, "UM5", logger);
-      parameter.uidIFA = stringify(userIdMap, "IDA", logger);;
-      parameter.uidSO1 = stringify(userIdMap, "SO1", logger);;
+      parameter.uidIFA = stringify(userIdMap, "IDA", logger);
+      parameter.uidSO1 = stringify(userIdMap, "SO1", logger);
       parameter.uidIFV = stringify(userIdMap, "IDV", logger);
       parameter.uidIDUS1 = stringify(userIdMap, "IDUS1", logger);
       parameter.uidADT = stringify(userIdMap, "u-id-adt", logger);
@@ -217,19 +218,19 @@ public class RequestParser {
       logger.info("Error in extracting userid params");
     }
   }
-  
+
   public static String MD5(String md5) {
     try {
-         java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
-         byte[] array = md.digest(md5.getBytes());
-         StringBuffer sb = new StringBuffer();
-         for (int i = 0; i < array.length; ++i) {
-           sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
-        }
-         return sb.toString();
-     } catch (java.security.NoSuchAlgorithmException e) {
-     }
-     return null;
- }
-
+      MessageDigest md = MessageDigest.getInstance("MD5");
+      byte[] array = md.digest(md5.getBytes());
+      StringBuffer sb = new StringBuffer();
+      for (int i = 0; i < array.length; ++i) {
+        sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
+      }
+      return sb.toString();
+    } catch (java.security.NoSuchAlgorithmException e) {
+    }
+    return null;
+  }
+  
 }
