@@ -6,7 +6,6 @@ import static org.easymock.classextension.EasyMock.replay;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
