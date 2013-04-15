@@ -11,6 +11,7 @@ import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 
 import com.inmobi.adserve.channels.adnetworks.atnt.ATNTAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.adelphic.DCPAdelphicAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.drawbridge.DrawBridgeAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.httpool.DCPHttPoolAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.huntmads.DCPHuntmadsAdNetwork;
@@ -151,7 +152,10 @@ public class SegmentFactory {
     } else if((advertiserId.equals(config.getString("nexage.advertiserId"))) && (advertiserSet.isEmpty() || advertiserSet.contains("nexage"))
         && (config.getString("nexage.status").equals("on"))) {
       return new DCPNexageAdNetwork(logger, config, clientBootstrap, base, serverEvent);
-    }
+    } else if((advertiserId.equals(config.getString("adelphic.advertiserId"))) && (advertiserSet.isEmpty() || advertiserSet.contains("adelphic"))
+            && (config.getString("adelphic.status").equals("on"))) {
+        return new DCPAdelphicAdNetwork(logger, config, clientBootstrap, base, serverEvent);
+      }
     return null;
   }
 }

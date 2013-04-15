@@ -203,7 +203,7 @@ public class RequestParser {
         return;
       }
       String uid = stringify(userIdMap, "u-id", logger);
-      parameter.uid = (StringUtils.isNotBlank(parameter.uid) ? uid : stringify(userIdMap, "UDID", logger));
+      parameter.uid = (StringUtils.isNotBlank(uid) ? uid : stringify(userIdMap, "UDID", logger));
       if(StringUtils.isNotBlank(parameter.uid) && parameter.uid.length() != 32) {
         parameter.uid = MD5(parameter.uid);
       }

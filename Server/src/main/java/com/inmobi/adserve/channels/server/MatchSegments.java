@@ -44,9 +44,9 @@ public class MatchSegments {
         0);
     Double defaultEcpm = ServletHandler.getServerConfig().getDouble("default.ecpm", 0.1);
     MatchSegments.defaultChannelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(DEFAULT, DEFAULT,
-        Double.valueOf(defaultEcpm), 0.5, 0, 0, 0, 0);
+        defaultEcpm, 0.5, 0, 0, 0, 0);
     MatchSegments.defaultChannelSegmentCitrusLeafFeedbackEntity = new ChannelSegmentFeedbackEntity(DEFAULT, DEFAULT,
-        0.1, 0.01, 400, 0, 0, 0);
+        defaultEcpm, 0.01, 400, 0, 0, 0);
   }
 
   public MatchSegments(RepositoryHelper repositoryHelper, SASRequestParameters sasParams, DebugLogger logger) {
