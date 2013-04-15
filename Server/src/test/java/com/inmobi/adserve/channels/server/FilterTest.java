@@ -448,5 +448,5 @@ public class FilterTest extends TestCase {
     emptySet.add("siteid");
     assertEquals(true, f1.isSiteExcludedByAdvertiser(channelSegment1));
   }
-
+  
 }
