@@ -87,7 +87,7 @@ public class FilterTest extends TestCase {
     cE2.setSiteInclusion(false);
     cE2.setSitesIE(emptySet);
     cE3 = new ChannelEntity();
-    cE3.setId("advertiserId3").setPriority(1).setImpressionCeil(90).setName("name3").setRequestCap(100);
+    cE3.setId("advertiserId3").setPriority(5).setImpressionCeil(90).setName("name3").setRequestCap(100);
     cE3.setSiteInclusion(false);
     cE3.setSitesIE(emptySet);
     cFE1 = new ChannelFeedbackEntity("advertiserId1", 100.0, 50.0, 50.0, 100, 95, 120, 1.0, 4.0);
@@ -212,25 +212,25 @@ public class FilterTest extends TestCase {
   @Test
   public void testIsBurnLimitExceeded() {
     Filters filter = new Filters(null, mockConfig, mockAdapterConfig, null, null, logger);
-    assertEquals(false, filter.isBurnLimitExceeded(channelSegment1));
-    assertEquals(true, filter.isBurnLimitExceeded(channelSegment4));
-    assertEquals(false, filter.isBurnLimitExceeded(channelSegment6));
+    assertEquals(false, filter.isAdvertiserBurnLimitExceeded(channelSegment1));
+    assertEquals(true, filter.isAdvertiserBurnLimitExceeded(channelSegment4));
+    assertEquals(false, filter.isAdvertiserBurnLimitExceeded(channelSegment6));
   }
 
   @Test
   public void testIsDailyImpressionCeilingExceeded() {
     Filters filter = new Filters(null, mockConfig, mockAdapterConfig, null, null, logger);
-    assertEquals(true, filter.isDailyImpressionCeilingExceeded(channelSegment1));
-    assertEquals(false, filter.isDailyImpressionCeilingExceeded(channelSegment4));
-    assertEquals(false, filter.isDailyImpressionCeilingExceeded(channelSegment6));
+    assertEquals(true, filter.isAdvertiserDailyImpressionCeilingExceeded(channelSegment1));
+    assertEquals(false, filter.isAdvertiserDailyImpressionCeilingExceeded(channelSegment4));
+    assertEquals(false, filter.isAdvertiserDailyImpressionCeilingExceeded(channelSegment6));
   }
 
   @Test
   public void testIsDailyRequestCapExceeded() {
     Filters filter = new Filters(null, mockConfig, mockAdapterConfig, null, null, logger);
-    assertEquals(true, filter.isDailyRequestCapExceeded(channelSegment1));
-    assertEquals(true, filter.isDailyRequestCapExceeded(channelSegment4));
-    assertEquals(false, filter.isDailyRequestCapExceeded(channelSegment6));
+    assertEquals(true, filter.isAdvertiserDailyRequestCapExceeded(channelSegment1));
+    assertEquals(true, filter.isAdvertiserDailyRequestCapExceeded(channelSegment4));
+    assertEquals(false, filter.isAdvertiserDailyRequestCapExceeded(channelSegment6));
   }
 
   @Test
@@ -252,6 +252,7 @@ public class FilterTest extends TestCase {
     sasParams.setSiteId("siteid");
     Filters f1 = new Filters(matchedSegments, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
     f1.advertiserLevelFiltering();
+    assertEquals(1, f1.getMatchedSegments().size());
     assertEquals(false, f1.getMatchedSegments().containsKey(channelSegmentEntity1.getAdvertiserId()));
     assertEquals(false, f1.getMatchedSegments().containsKey(channelSegmentEntity4.getAdvertiserId()));
     assertEquals(true, f1.getMatchedSegments().containsKey(channelSegmentEntity6.getAdvertiserId()));
@@ -447,6 +448,54 @@ public class FilterTest extends TestCase {
     assertEquals(false, f1.isSiteExcludedByAdvertiser(channelSegment1));
     emptySet.add("siteid");
     assertEquals(true, f1.isSiteExcludedByAdvertiser(channelSegment1));
+  }
+  
+  @Test
+  public void testIsSiteExcludedByAdGroupInclusionTrueEmptyList() {
+    channelSegment1.getChannelSegmentEntity().setSiteInclusion(true);
+    Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
+    assertEquals(true, f1.isSiteExcludedByAdGroup(channelSegment1));
+  }
+
+  @Test
+  public void testIsSiteExcludedByAdGroupInclusionTrueNonEmptyList() {
+    channelSegment1.getChannelSegmentEntity().setSiteInclusion(true);
+    emptySet.add("siteid1");
+    Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
+    assertEquals(true, f1.isSiteExcludedByAdGroup(channelSegment1));
+    emptySet.add("siteid");
+    assertEquals(false, f1.isSiteExcludedByAdGroup(channelSegment1));
+  }
+
+  @Test
+  public void testIsSiteExcludedByAdGroupExclusionTrueEmptyList() {
+    channelSegment1.getChannelSegmentEntity().setSiteInclusion(false);
+    Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
+    assertEquals(false, f1.isSiteExcludedByAdGroup(channelSegment1));
+  }
+
+  @Test
+  public void testIsSiteExcludedByAdGroupExclusionTrueNonEmptyList() {
+    channelSegment1.getChannelSegmentEntity().setSiteInclusion(false);
+    emptySet.add("siteid1");
+    Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
+    assertEquals(false, f1.isSiteExcludedByAdGroup(channelSegment1));
+    emptySet.add("siteid");
+    assertEquals(true, f1.isSiteExcludedByAdGroup(channelSegment1));
+  }
+  
+  @Test
+  public void testIsAdGroupDailyImpressionCeilingExceeded() {
+    channelSegmentEntity1.setImpressionCeil(100);
+    cSFE1.setTodayImpressions(200);
+    channelSegmentEntity4.setImpressionCeil(100);
+    cSFE4.setTodayImpressions(50);
+    channelSegmentEntity6.setImpressionCeil(0);
+    cSFE6.setTodayImpressions(0);
+    Filters filter = new Filters(null, mockConfig, mockAdapterConfig, null, null, logger);
+    assertEquals(true, filter.isAdGroupDailyImpressionCeilingExceeded(channelSegment1));
+    assertEquals(false, filter.isAdGroupDailyImpressionCeilingExceeded(channelSegment4));
+    assertEquals(false, filter.isAdGroupDailyImpressionCeilingExceeded(channelSegment6));
   }
   
 }

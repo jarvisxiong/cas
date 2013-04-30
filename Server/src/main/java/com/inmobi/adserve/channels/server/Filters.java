@@ -98,7 +98,7 @@ public class Filters {
    * @param channelSegment
    * @return
    */
-  boolean isBurnLimitExceeded(ChannelSegment channelSegment) {
+  boolean isAdvertiserBurnLimitExceeded(ChannelSegment channelSegment) {
     boolean result = channelSegment.getChannelFeedbackEntity().getBalance() < channelSegment.getChannelFeedbackEntity()
         .getRevenue() * revenueWindow;
     String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
@@ -120,7 +120,7 @@ public class Filters {
    * @param channelSegment
    * @return
    */
-  boolean isDailyImpressionCeilingExceeded(ChannelSegment channelSegment) {
+  boolean isAdvertiserDailyImpressionCeilingExceeded(ChannelSegment channelSegment) {
     boolean result = channelSegment.getChannelFeedbackEntity().getTodayImpressions() > channelSegment
         .getChannelEntity().getImpressionCeil();
     String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
@@ -143,7 +143,7 @@ public class Filters {
    * @param channelSegment
    * @return
    */
-  boolean isDailyRequestCapExceeded(ChannelSegment channelSegment) {
+  boolean isAdvertiserDailyRequestCapExceeded(ChannelSegment channelSegment) {
     boolean result = channelSegment.getChannelFeedbackEntity().getTodayRequests() > channelSegment.getChannelEntity()
         .getRequestCap();
     String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
@@ -250,6 +250,24 @@ public class Filters {
     return result;
   }
 
+  boolean isAdGroupDailyImpressionCeilingExceeded(ChannelSegment channelSegment) {
+    boolean result = channelSegment.getChannelSegmentFeedbackEntity().getTodayImpressions() > channelSegment
+        .getChannelSegmentEntity().getImpressionCeil();
+    String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
+    if(result) {
+      logger.debug("Impression limit exceeded by adgroup", channelSegment.getChannelSegmentEntity().getAdgroupId(),
+          "advertiser", advertiserId);
+      if(advertiserIdtoNameMapping.containsKey(advertiserId)) {
+        InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
+            InspectorStrings.droppedInImpressionFilter);
+      }
+    } else {
+      logger.debug("Impression limit filter passed by adgroup", channelSegment.getChannelSegmentEntity().getAdgroupId(),
+          "advertiser", advertiserId);
+    }
+    return result;
+  }
+
   /**
    * Filter that performs advertiser level filtering Drops all the segment of
    * the advertiser being filtered out
@@ -270,8 +288,8 @@ public class Filters {
       // dropping advertiser if balance is less than revenue of
       // that advertiser OR if todays impression is greater than impression
       // ceiling OR site is not present in advertiser's whiteList
-      if(isBurnLimitExceeded(channelSegment) || isDailyImpressionCeilingExceeded(channelSegment)
-          || isDailyRequestCapExceeded(channelSegment) || isAdvertiserExcluded(channelSegment)) {
+      if(isAdvertiserBurnLimitExceeded(channelSegment) || isAdvertiserDailyImpressionCeilingExceeded(channelSegment)
+          || isAdvertiserDailyRequestCapExceeded(channelSegment) || isAdvertiserExcluded(channelSegment)) {
         continue;
       }
       // otherwise adding the advertiser to the list
@@ -304,6 +322,10 @@ public class Filters {
           continue;
         } else {
           logger.debug("sitefloor filter passed by adgroup", channelSegment.getChannelSegmentFeedbackEntity().getId());
+        }
+        //applying impression cap filter at adgroup level
+        if(isAdGroupDailyImpressionCeilingExceeded(channelSegment)) {
+          continue;
         }
         // applying segment property filter
         if(isAnySegmentPropertyViolated(channelSegment.getChannelSegmentEntity())) {
@@ -442,7 +464,8 @@ public class Filters {
    * @return
    */
   double calculatePrioritisedECPM(ChannelSegment channelSegment) {
-    ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = channelSegment.getChannelSegmentCitrusLeafFeedbackEntity();
+    ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = channelSegment
+        .getChannelSegmentCitrusLeafFeedbackEntity();
     double eCPM = channelSegmentFeedbackEntity.geteCPM();
     double fillRatio = channelSegmentFeedbackEntity.getFillRatio();
     double latency = channelSegmentFeedbackEntity.getLatency();
