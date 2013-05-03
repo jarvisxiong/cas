@@ -22,6 +22,8 @@ import org.jboss.netty.logging.Log4JLoggerFactory;
 import org.jboss.netty.util.HashedWheelTimer;
 import org.jboss.netty.util.Timer;
 import org.postgresql.jdbc3.Jdbc3PoolingDataSource;
+
+import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.ChannelRepository;
@@ -70,6 +72,7 @@ public class ChannelServer {
     // Setting up the logger factory and SlotSizeMapping for the project.
     DebugLogger.init(config.loggerConfiguration());
     SlotSizeMapping.init();
+    Formatter.init();
     PropertyConfigurator.configure(config.loggerConfiguration().getString("log4jLoggerConf"));
     logger = Logger.getLogger("repository");
 
