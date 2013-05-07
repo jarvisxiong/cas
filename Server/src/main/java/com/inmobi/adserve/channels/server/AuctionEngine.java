@@ -60,7 +60,8 @@ public class AuctionEngine implements AuctionEngineInterface {
       rtbResponse = rtbList.get(0);
       secondBidPrice = Math.min(casInternalRequestParameters.rtbBidFloor, rtbResponse.getAdNetworkInterface()
           .getBidprice() * 0.9);
-      rtbResponse.getAdNetworkInterface().setSecondBidPrice(secondBidPrice, getEncryptedBid(secondBidPrice));
+      rtbResponse.getAdNetworkInterface().setEncryptedBid(getEncryptedBid(secondBidPrice));
+      rtbResponse.getAdNetworkInterface().setSecondBidPrice(secondBidPrice);
       logger.debug("completed auction and winner is", rtbList.get(0).getAdNetworkInterface().getName()
           + " and secondBidPrice is " + secondBidPrice);
       return rtbList.get(0).getAdNetworkInterface();
@@ -101,7 +102,8 @@ public class AuctionEngine implements AuctionEngineInterface {
     }
     rtbResponse = rtbList.get(lowestLatency);
     secondBidPrice = Math.min(secondBidPrice, rtbResponse.getAdNetworkInterface().getBidprice());
-    rtbResponse.getAdNetworkInterface().setSecondBidPrice(secondBidPrice, getEncryptedBid(secondBidPrice));
+    rtbResponse.getAdNetworkInterface().setEncryptedBid(getEncryptedBid(secondBidPrice));
+    rtbResponse.getAdNetworkInterface().setSecondBidPrice(secondBidPrice);
     logger.debug("completed auction and winner is", rtbList.get(lowestLatency).getAdNetworkInterface().getName()
         + " and secondBidPrice is " + secondBidPrice);
     return rtbList.get(lowestLatency).getAdNetworkInterface();
