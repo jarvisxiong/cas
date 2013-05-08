@@ -60,6 +60,7 @@ public class AuctionEngine implements AuctionEngineInterface {
       rtbResponse = rtbList.get(0);
       secondBidPrice = Math.min(casInternalRequestParameters.rtbBidFloor, rtbResponse.getAdNetworkInterface()
           .getBidprice() * 0.9);
+      rtbResponse.getAdNetworkInterface().setEncryptedBid(getEncryptedBid(secondBidPrice));
       rtbResponse.getAdNetworkInterface().setSecondBidPrice(secondBidPrice);
       logger.debug("completed auction and winner is", rtbList.get(0).getAdNetworkInterface().getName()
           + " and secondBidPrice is " + secondBidPrice);
@@ -101,6 +102,7 @@ public class AuctionEngine implements AuctionEngineInterface {
     }
     rtbResponse = rtbList.get(lowestLatency);
     secondBidPrice = Math.min(secondBidPrice, rtbResponse.getAdNetworkInterface().getBidprice());
+    rtbResponse.getAdNetworkInterface().setEncryptedBid(getEncryptedBid(secondBidPrice));
     rtbResponse.getAdNetworkInterface().setSecondBidPrice(secondBidPrice);
     logger.debug("completed auction and winner is", rtbList.get(lowestLatency).getAdNetworkInterface().getName()
         + " and secondBidPrice is " + secondBidPrice);
@@ -178,5 +180,10 @@ public class AuctionEngine implements AuctionEngineInterface {
 
   public void setRtbSegments(List<ChannelSegment> rtbSegments) {
     this.rtbSegments = rtbSegments;
+  }
+
+  public String getEncryptedBid(Double bid) {
+    long winBid = (long) (bid * Math.pow(10, 9));
+    return AsyncRequestMaker.getImpressionId(winBid);
   }
 }
