@@ -19,6 +19,7 @@ import com.inmobi.adserve.channels.adnetworks.ifc.IFCAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.ifd.IFDAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.lomark.DCPLomarkAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mobilecommerce.MobileCommerceAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.mopub.DCPMoPubAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mullahmedia.MoolahMediaPremiumAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.mullahmedia.MullahMediaNetwork;
 import com.inmobi.adserve.channels.adnetworks.nexage.DCPNexageAdNetwork;
@@ -159,7 +160,10 @@ public class SegmentFactory {
     } else if((advertiserId.equals(config.getString("mmpremium.advertiserId"))) && (advertiserSet.isEmpty() || advertiserSet.contains("mmpremium"))
           && (config.getString("mmpremium.status").equals("on"))) {
       return new MoolahMediaPremiumAdnetwork(logger, config, clientBootstrap, base, serverEvent);
-    }
+    } else if((advertiserId.equals(config.getString("mopub.advertiserId"))) && (advertiserSet.isEmpty() || advertiserSet.contains("mopub"))
+            && (config.getString("mopub.status").equals("on"))) {
+        return new DCPMoPubAdNetwork(logger, config, clientBootstrap, base, serverEvent);
+      }
     return null;
   }
 }
