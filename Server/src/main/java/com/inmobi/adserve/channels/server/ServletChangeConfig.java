@@ -5,9 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
-import org.jboss.netty.util.CharsetUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,7 +29,12 @@ public class ServletChangeConfig implements Servlet{
       hrh.responseSender.sendResponse("Incorrect Json", e);
       return;
     }
-    
+    if(jObject == null) {
+      logger.debug("jobject is null so returning");
+      hrh.setTerminationReason(ServletHandler.jsonParsingError);
+      hrh.responseSender.sendResponse("Incorrect Json", e);
+      return;
+    }
     logger.debug("Successfully got json for config change");
     try {
       StringBuilder updates = new StringBuilder();

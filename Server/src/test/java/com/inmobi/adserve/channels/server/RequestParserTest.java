@@ -1,12 +1,16 @@
 package com.inmobi.adserve.channels.server;
 
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
+
+import org.apache.commons.configuration.Configuration;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 import junit.framework.TestCase;
@@ -14,8 +18,11 @@ import junit.framework.TestCase;
 public class RequestParserTest extends TestCase {
 
   public void setUp() {
-    ConfigurationLoader config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
-    DebugLogger.init(config.loggerConfiguration());
+    Configuration mockConfig = createMock(Configuration.class);
+    expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
+    expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
+    expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");    replay(mockConfig);
+    DebugLogger.init(mockConfig);
   }
 
   @Test
