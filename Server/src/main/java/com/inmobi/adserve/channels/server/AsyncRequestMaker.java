@@ -142,6 +142,7 @@ public class AsyncRequestMaker {
     casInternalRequestParameters.uidADT = casInternalRequestParameterGlobal.uidADT;
     casInternalRequestParameters.zipCode = sasParams.getPostalCode();
     casInternalRequestParameters.latLong = sasParams.getLatLong();
+    casInternalRequestParameters.appUrl = sasParams.getAppUrl();
     return casInternalRequestParameters;
   }
 
