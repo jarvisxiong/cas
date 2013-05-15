@@ -176,7 +176,7 @@ public class AuctionEngine implements AuctionEngineInterface {
   }
 
   public String getEncryptedBid(Double bid) {
-    long winBid = (long) (bid * Math.pow(10, 9));
+    long winBid = (long) (bid * Math.pow(10, 6));
     return AsyncRequestMaker.getImpressionId(winBid);
   }
 }
