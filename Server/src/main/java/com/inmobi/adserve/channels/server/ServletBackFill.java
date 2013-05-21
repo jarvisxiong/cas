@@ -242,7 +242,8 @@ public class ServletBackFill implements Servlet {
   private static double getHighestEcpm(List<ChannelSegment> channelSegments, DebugLogger logger) {
     double highestEcpm = 0;
     for (ChannelSegment channelSegment : channelSegments) {
-      if(highestEcpm < channelSegment.getChannelSegmentFeedbackEntity().geteCPM()) {
+      if(channelSegment.getChannelSegmentFeedbackEntity().geteCPM() < 10.0 && 
+              highestEcpm < channelSegment.getChannelSegmentFeedbackEntity().geteCPM()) {
         highestEcpm = channelSegment.getChannelSegmentFeedbackEntity().geteCPM();
       }
     }
