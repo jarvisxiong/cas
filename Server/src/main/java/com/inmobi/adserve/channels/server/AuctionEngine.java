@@ -45,10 +45,15 @@ public class AuctionEngine implements AuctionEngineInterface {
       }
       auctionComplete = true;
     }
+    
+    
     logger.debug("Inside RTB auction engine");
     List<ChannelSegment> rtbList;
     // Apply rtb filters.
     rtbList = rtbFilters(rtbSegments);
+    
+    
+    // Send null as auction response in case of 0 rtb responses.
     if(rtbList.size() == 0) {
       logger.debug("RTB segments are", Integer.valueOf(rtbList.size()));
       rtbResponse = null;
@@ -57,14 +62,20 @@ public class AuctionEngine implements AuctionEngineInterface {
     } else if(rtbList.size() == 1) {
       logger.debug("RTB segments are", Integer.valueOf(rtbList.size()));
       rtbResponse = rtbList.get(0);
+      // Take minimum of rtbFloor+0.01 and bid as secondBidprice if no of rtb
+      // response are 1.
       secondBidPrice = Math.min(casInternalRequestParameters.rtbBidFloor + 0.01,
           rtbResponse.getAdNetworkInterface().getBidprice());
+      //Set encrypted bid price.
       rtbResponse.getAdNetworkInterface().setEncryptedBid(getEncryptedBid(secondBidPrice));
       rtbResponse.getAdNetworkInterface().setSecondBidPrice(secondBidPrice);
       logger.debug("Completed auction, winner is", rtbList.get(0).getAdNetworkInterface().getName(), "and secondBidPrice is", secondBidPrice);
+      //Return as there is no need to iterate over the list.
       return rtbList.get(0).getAdNetworkInterface();
     }
 
+    
+    //Sort the list by their bid prices.
     logger.debug("RTB segments are", Integer.valueOf(rtbList.size()));
     for (int i = 0; i < rtbList.size(); i++) {
       for (int j = i + 1; j < rtbList.size(); j++) {
@@ -75,9 +86,12 @@ public class AuctionEngine implements AuctionEngineInterface {
         }
       }
     }
+    
+    
+    //Calculates the max price of all rtb responses.
     double maxPrice = rtbList.get(0).getAdNetworkInterface().getBidprice();
-    int secondHighestBid = 1;
-    int lowestLatencyBid = 0;
+    int secondHighestBid = 1;//Keep secondHighestBidPrice number from rtb response list.
+    int lowestLatencyBid = 0;//Keep winner number from rtb response list.
     for (int i = 1; i < rtbList.size(); i++) {
       if(rtbList.get(i).getAdNetworkInterface().getBidprice() < maxPrice) {
         secondHighestBid = i;
@@ -87,7 +101,12 @@ public class AuctionEngine implements AuctionEngineInterface {
         lowestLatencyBid = i;
       }
     }
+    
+    //Set rtb response for the auction ran.
     rtbResponse = rtbList.get(lowestLatencyBid);
+    
+    
+    //Calculates the secondHighestBidPrice if no of rtb responses are more than 1.
     secondBidPrice = rtbList.get(secondHighestBid).getAdNetworkInterface().getBidprice();
     double winnerBid = rtbList.get(lowestLatencyBid).getAdNetworkInterface().getBidprice();
     if(winnerBid == secondBidPrice) {
@@ -95,6 +114,8 @@ public class AuctionEngine implements AuctionEngineInterface {
     } else {
       secondBidPrice = secondBidPrice + 0.01;
     }
+    
+    //Ensure secondHighestBidPrice never crosses response bid.
     secondBidPrice = Math.min(secondBidPrice, rtbResponse.getAdNetworkInterface().getBidprice());
     rtbResponse.getAdNetworkInterface().setEncryptedBid(getEncryptedBid(secondBidPrice));
     rtbResponse.getAdNetworkInterface().setSecondBidPrice(secondBidPrice);
