@@ -45,29 +45,27 @@ public class AuctionEngine implements AuctionEngineInterface {
       }
       auctionComplete = true;
     }
-    
     logger.debug("Inside RTB auction engine");
     List<ChannelSegment> rtbList;
     // Apply rtb filters.
     rtbList = rtbFilters(rtbSegments);
     if(rtbList.size() == 0) {
-      logger.debug("rtb segments are", Integer.valueOf(rtbList.size()));
+      logger.debug("RTB segments are", Integer.valueOf(rtbList.size()));
       rtbResponse = null;
-      logger.debug("returning from auction engine , winner is null");
+      logger.debug("Returning from auction engine , winner is none");
       return null;
     } else if(rtbList.size() == 1) {
-      logger.debug("rtb segments are", Integer.valueOf(rtbList.size()));
+      logger.debug("RTB segments are", Integer.valueOf(rtbList.size()));
       rtbResponse = rtbList.get(0);
       secondBidPrice = Math.min(casInternalRequestParameters.rtbBidFloor + 0.01,
           rtbResponse.getAdNetworkInterface().getBidprice());
       rtbResponse.getAdNetworkInterface().setEncryptedBid(getEncryptedBid(secondBidPrice));
       rtbResponse.getAdNetworkInterface().setSecondBidPrice(secondBidPrice);
-      logger.debug("completed auction and winner is", rtbList.get(0).getAdNetworkInterface().getName()
-          + " and secondBidPrice is " + secondBidPrice);
+      logger.debug("Completed auction, winner is", rtbList.get(0).getAdNetworkInterface().getName(), "and secondBidPrice is", secondBidPrice);
       return rtbList.get(0).getAdNetworkInterface();
     }
 
-    logger.debug("rtb segments are", Integer.valueOf(rtbList.size()));
+    logger.debug("RTB segments are", Integer.valueOf(rtbList.size()));
     for (int i = 0; i < rtbList.size(); i++) {
       for (int j = i + 1; j < rtbList.size(); j++) {
         if(rtbList.get(i).getAdNetworkInterface().getBidprice() < rtbList.get(j).getAdNetworkInterface().getBidprice()) {
@@ -78,35 +76,31 @@ public class AuctionEngine implements AuctionEngineInterface {
       }
     }
     double maxPrice = rtbList.get(0).getAdNetworkInterface().getBidprice();
-    int secondHighestBidNumber = 1;
-    int lowestLatency = 0;
+    int secondHighestBid = 1;
+    int lowestLatencyBid = 0;
     for (int i = 1; i < rtbList.size(); i++) {
       if(rtbList.get(i).getAdNetworkInterface().getBidprice() < maxPrice) {
-        secondHighestBidNumber = i;
+        secondHighestBid = i;
         break;
-      } else if(rtbList.get(i).getAdNetworkInterface().getLatency() < rtbList.get(lowestLatency)
+      } else if(rtbList.get(i).getAdNetworkInterface().getLatency() < rtbList.get(lowestLatencyBid)
           .getAdNetworkInterface().getLatency()) {
-        lowestLatency = i;
+        lowestLatencyBid = i;
       }
     }
-    if(secondHighestBidNumber != 1) {
-      double secondHighestBidPrice = rtbList.get(secondHighestBidNumber).getAdNetworkInterface().getBidprice();
-      double price = maxPrice * 0.9;
-      if(price > secondHighestBidPrice) {
-        secondBidPrice = price;
-      } else {
-        secondBidPrice = secondHighestBidPrice + 0.01;
-      }
+    rtbResponse = rtbList.get(lowestLatencyBid);
+    secondBidPrice = rtbList.get(secondHighestBid).getAdNetworkInterface().getBidprice();
+    double winnerBid = rtbList.get(lowestLatencyBid).getAdNetworkInterface().getBidprice();
+    if(winnerBid == secondBidPrice) {
+      secondBidPrice = casInternalRequestParameters.rtbBidFloor + 0.01;
     } else {
-      secondBidPrice = rtbList.get(1).getAdNetworkInterface().getBidprice() + 0.01;
+      secondBidPrice = secondBidPrice + 0.01;
     }
-    rtbResponse = rtbList.get(lowestLatency);
     secondBidPrice = Math.min(secondBidPrice, rtbResponse.getAdNetworkInterface().getBidprice());
     rtbResponse.getAdNetworkInterface().setEncryptedBid(getEncryptedBid(secondBidPrice));
     rtbResponse.getAdNetworkInterface().setSecondBidPrice(secondBidPrice);
-    logger.debug("completed auction and winner is", rtbList.get(lowestLatency).getAdNetworkInterface().getName()
-        + " and secondBidPrice is " + secondBidPrice);
-    return rtbList.get(lowestLatency).getAdNetworkInterface();
+    logger.debug("Completed auction, winner is", rtbList.get(lowestLatencyBid).getAdNetworkInterface().getName(),
+        "and secondBidPrice is", secondBidPrice);
+    return rtbList.get(lowestLatencyBid).getAdNetworkInterface();
   }
 
   public List<ChannelSegment> rtbFilters(List<ChannelSegment> rtbSegments) {
