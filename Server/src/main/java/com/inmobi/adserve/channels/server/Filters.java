@@ -582,7 +582,7 @@ public class Filters {
     return newRankList;
   }
 
-  public List<ChannelSegment> guaranteedDeliveryRTBFilter(List<ChannelSegment> rtbSegments, List<ChannelSegment> rankList) {
+  public List<ChannelSegment> ensureGuaranteedDeliveryInCaseOfRTB(List<ChannelSegment> rtbSegments, List<ChannelSegment> rankList) {
     logger.debug("Inside guaranteed delivery RTB filter");
     if(adapterConfiguration.getString(rankList.get(0).getAdNetworkInterface().getName() + ".gauranteedDelivery", "false").equals("true")) {
       rtbSegments.clear();
