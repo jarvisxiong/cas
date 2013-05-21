@@ -204,6 +204,9 @@ public class ServletBackFill implements Servlet {
     if(!tempRankList.isEmpty()) {
       tempRankList = filter.ensureGuaranteedDelivery(tempRankList);
     }
+    if(!rtbSegments.isEmpty()) {
+      rtbSegments = filter.guaranteedDeliveryRTBFilter(rtbSegments, tempRankList);
+    }
     tempRankList = AsyncRequestMaker.makeAsyncRequests(tempRankList, logger, hrh.responseSender, e, rtbSegments);
 
     hrh.responseSender.setRankList(tempRankList);
