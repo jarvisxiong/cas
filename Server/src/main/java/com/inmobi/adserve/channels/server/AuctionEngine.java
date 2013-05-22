@@ -197,7 +197,11 @@ public class AuctionEngine implements AuctionEngineInterface {
   
   public double calculateRTBFloor(double segmentFloor, double countryFloor) {
     double rtbFloor = 0.0;
-    rtbFloor = Math.max(sasParams.getSiteFloor(), casInternalRequestParameters.highestEcpm);
+    double siteFloor = 0.0;
+    if(null != sasParams && null != sasParams.getSiteFloor()) {
+      siteFloor = sasParams.getSiteFloor();
+    }
+    rtbFloor = Math.max(siteFloor, casInternalRequestParameters.highestEcpm);
     rtbFloor = Math.max(rtbFloor, segmentFloor);
     rtbFloor = Math.max(rtbFloor, countryFloor);
     return rtbFloor;
