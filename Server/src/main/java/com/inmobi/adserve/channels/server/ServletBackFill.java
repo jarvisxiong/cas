@@ -180,8 +180,9 @@ public class ServletBackFill implements Servlet {
     casInternalRequestParametersGlobal.highestEcpm = getHighestEcpm(rows, logger);
     logger.debug("Highest Ecpm is", Double.valueOf(casInternalRequestParametersGlobal.highestEcpm));
     casInternalRequestParametersGlobal.blockedCategories = getBlockedCategories(hrh, logger);
-    casInternalRequestParametersGlobal.rtbBidFloor = hrh.responseSender.sasParams.getSiteFloor() > casInternalRequestParametersGlobal.highestEcpm ? hrh.responseSender.sasParams.getSiteFloor()
-        : casInternalRequestParametersGlobal.highestEcpm + 0.01;
+    double countryFloor = 0.5;
+    double segmentFloor = 0.0;
+    casInternalRequestParametersGlobal.rtbBidFloor = hrh.responseSender.getAuctionEngine().calculateRTBFloor(segmentFloor, countryFloor);
     hrh.responseSender.casInternalRequestParameters = casInternalRequestParametersGlobal;
     hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternalRequestParametersGlobal;
     logger.debug("Total channels available for sending requests " + rows.size());

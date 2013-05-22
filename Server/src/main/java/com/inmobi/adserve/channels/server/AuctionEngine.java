@@ -194,4 +194,12 @@ public class AuctionEngine implements AuctionEngineInterface {
     long winBid = (long) (bid * Math.pow(10, 6));
     return AsyncRequestMaker.getImpressionId(winBid);
   }
+  
+  public double calculateRTBFloor(double segmentFloor, double countryFloor) {
+    double rtbFloor = 0.0;
+    rtbFloor = Math.max(sasParams.getSiteFloor(), casInternalRequestParameters.highestEcpm);
+    rtbFloor = Math.max(rtbFloor, segmentFloor);
+    rtbFloor = Math.max(rtbFloor, countryFloor);
+    return rtbFloor;
+  }
 }
