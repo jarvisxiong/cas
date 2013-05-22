@@ -472,13 +472,13 @@ public class Filters {
     int maxLatency = ServletHandler.getServerConfig().getInt("readtimeoutMillis");
     double eCPMShift = serverConfiguration.getDouble("ecpmShift", 0.1);
     double feedbackPower = serverConfiguration.getDouble("feedbackPower", 2.0);
-    double eCPR = (eCPM + eCPMShift) * Math.min(Math.max(fillRatio, 0.01), 1.0);
+    double fillRatioFactor =  Math.min(Math.max(fillRatio, 0.01), 1.0);
     double latencyFactor = 1 + (maxLatency - Math.min(latency, maxLatency)) / maxLatency;
     int priority = channelSegment.getChannelEntity().getPriority() < 5 ? 5 - channelSegment.getChannelEntity()
         .getPriority() : 1;
-    logger.debug("ECPM=", eCPM, "Fill Ratio=", fillRatio, "Latency", latency, "ECPR=", eCPR, "LatencyFactor=",
+    logger.debug("ECPM=", eCPM, "Fill Ratio=", fillRatio, "Latency", latency, "LatencyFactor=",
         latencyFactor, "Priority=", priority, "ECPM Shift", eCPMShift, "FeedbackPower", feedbackPower);
-    double prioritisedECPM = Math.pow(eCPR * latencyFactor, feedbackPower) * priority;
+    double prioritisedECPM = Math.pow(eCPM + eCPMShift, feedbackPower) * fillRatioFactor* latencyFactor * priority;
     logger.debug("PrioritisedECPM=", prioritisedECPM);
     return prioritisedECPM;
   }
@@ -582,4 +582,14 @@ public class Filters {
     return newRankList;
   }
 
+  public List<ChannelSegment> ensureGuaranteedDeliveryInCaseOfRTB(List<ChannelSegment> rtbSegments, List<ChannelSegment> rankList) {
+    logger.debug("Inside guaranteed delivery RTB filter");
+    if(adapterConfiguration.getString(rankList.get(0).getAdNetworkInterface().getName() + ".gauranteedDelivery", "false").equals("true")) {
+      rtbSegments.clear();
+      logger.debug("Dropped all RTB segments due to guaranteed delivery RTB filter");
+    } else {
+      logger.debug("All RTB segments passed guaranteed delivery RTB filter");
+    }
+    return rtbSegments;
+  }
 }
