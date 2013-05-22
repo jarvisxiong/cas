@@ -195,13 +195,9 @@ public class AuctionEngine implements AuctionEngineInterface {
     return AsyncRequestMaker.getImpressionId(winBid);
   }
   
-  public double calculateRTBFloor(double segmentFloor, double countryFloor) {
+  public double calculateRTBFloor(double siteFloor, double highestEcpm, double segmentFloor, double countryFloor) {
     double rtbFloor = 0.0;
-    double siteFloor = 0.0;
-    if(null != sasParams && null != sasParams.getSiteFloor()) {
-      siteFloor = sasParams.getSiteFloor();
-    }
-    rtbFloor = Math.max(siteFloor, casInternalRequestParameters.highestEcpm);
+    rtbFloor = Math.max(siteFloor, highestEcpm);
     rtbFloor = Math.max(rtbFloor, segmentFloor);
     rtbFloor = Math.max(rtbFloor, countryFloor);
     return rtbFloor;

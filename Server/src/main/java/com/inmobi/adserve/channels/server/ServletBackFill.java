@@ -182,7 +182,7 @@ public class ServletBackFill implements Servlet {
     casInternalRequestParametersGlobal.blockedCategories = getBlockedCategories(hrh, logger);
     double countryFloor = 0.5;
     double segmentFloor = 0.0;
-    casInternalRequestParametersGlobal.rtbBidFloor = hrh.responseSender.getAuctionEngine().calculateRTBFloor(segmentFloor, countryFloor);
+    casInternalRequestParametersGlobal.rtbBidFloor = hrh.responseSender.getAuctionEngine().calculateRTBFloor(sasParams.getSiteFloor(), casInternalRequestParametersGlobal.highestEcpm, segmentFloor, countryFloor);
     hrh.responseSender.casInternalRequestParameters = casInternalRequestParametersGlobal;
     hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternalRequestParametersGlobal;
     logger.debug("Total channels available for sending requests " + rows.size());
