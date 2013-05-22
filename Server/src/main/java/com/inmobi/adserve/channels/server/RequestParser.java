@@ -110,6 +110,7 @@ public class RequestParser {
     params.setOsId(jObject.optInt("os-id", -1));
     params.setRichMedia(jObject.optBoolean("rich-media", false));
     params.setRqAdType(stringify(jObject, "rq-adtype", logger));
+    params.setAppUrl(stringify(jObject, "site-url", logger));
     logger.debug("successfully parsed params");
   }
 

@@ -58,8 +58,8 @@ public class AuctionEngine implements AuctionEngineInterface {
     } else if(rtbList.size() == 1) {
       logger.debug("rtb segments are", Integer.valueOf(rtbList.size()));
       rtbResponse = rtbList.get(0);
-      secondBidPrice = Math.min(casInternalRequestParameters.rtbBidFloor, rtbResponse.getAdNetworkInterface()
-          .getBidprice() * 0.9);
+      secondBidPrice = Math.min(casInternalRequestParameters.rtbBidFloor + 0.01,
+          rtbResponse.getAdNetworkInterface().getBidprice());
       rtbResponse.getAdNetworkInterface().setEncryptedBid(getEncryptedBid(secondBidPrice));
       rtbResponse.getAdNetworkInterface().setSecondBidPrice(secondBidPrice);
       logger.debug("completed auction and winner is", rtbList.get(0).getAdNetworkInterface().getName()
@@ -115,8 +115,9 @@ public class AuctionEngine implements AuctionEngineInterface {
     // Ad filter.
     for (int i = 0; i < rtbSegments.size(); i++) {
       if(rtbSegments.get(i).getAdNetworkInterface().getAdStatus().equalsIgnoreCase("AD")) {
-        logger.debug("Dropped in NO AD filter", rtbSegments.get(i).getAdNetworkInterface().getName());
         rtbList.add(rtbSegments.get(i));
+      } else {
+        logger.debug("Dropped in NO AD filter", rtbSegments.get(i).getAdNetworkInterface().getName());
       }
     }
     logger.debug("No of rtb partners who sent AD response are", Integer.valueOf(rtbList.size()));
@@ -127,16 +128,8 @@ public class AuctionEngine implements AuctionEngineInterface {
         rtbList.remove(rtbList.get(i));
       }
     }
-    logger
-        .debug("No of rtb partners who sent AD response with bid more than bidFloor", Integer.valueOf(rtbList.size()));
-    // Bid not zero filter.
-    for (int i = 0; i < rtbList.size(); i++) {
-      if(rtbList.get(i).getAdNetworkInterface().getBidprice() <= 0) {
-        logger.debug("Dropped in bid is zero filter", rtbList.get(i).getAdNetworkInterface().getName());
-        rtbList.remove(rtbList.get(i));
-      }
-    }
-    logger.debug("No of rtb partners who sent AD response with bid more than 0", Integer.valueOf(rtbList.size()));
+    logger.debug("No of rtb partners who sent AD response with bid more than bidFloor", rtbList.size());
+
     return rtbList;
 
   }
