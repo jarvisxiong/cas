@@ -79,7 +79,7 @@ public class ServletBackFill implements Servlet {
     }
     if(hrh.responseSender.sasParams.getSiteType() != null
         && !ServletHandler.allowedSiteTypes.contains(hrh.responseSender.sasParams.getSiteType())) {
-      logger.error("Terminating request as incompatible content type");
+      logger.info("Terminating request as incompatible content type");
       hrh.setTerminationReason(ServletHandler.incompatibleSiteType);
       InspectorStats.incrementStatCount(InspectorStrings.incompatibleSiteType, InspectorStrings.count);
       hrh.responseSender.sendNoAdResponse(e);
@@ -90,7 +90,7 @@ public class ServletBackFill implements Servlet {
         if((hrh.responseSender.sasParams.getSdkVersion().substring(0, 1).equalsIgnoreCase("i") || hrh.responseSender.sasParams.getSdkVersion()
             .substring(0, 1).equalsIgnoreCase("a"))
             && Integer.parseInt(hrh.responseSender.sasParams.getSdkVersion().substring(1, 2)) < 3) {
-          logger.error("Terminating request as sdkVersion is less than 3");
+          logger.debug("Terminating request as sdkVersion is less than 3");
           hrh.setTerminationReason(ServletHandler.lowSdkVersion);
           InspectorStats.incrementStatCount(InspectorStrings.lowSdkVersion, InspectorStrings.count);
           hrh.responseSender.sendNoAdResponse(e);
