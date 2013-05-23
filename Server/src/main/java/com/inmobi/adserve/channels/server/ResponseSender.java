@@ -1,12 +1,13 @@
 package com.inmobi.adserve.channels.server;
 
-import static org.jboss.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static org.jboss.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 import java.awt.Dimension;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.Map;
 
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
@@ -107,18 +108,18 @@ public class ResponseSender extends HttpRequestHandlerBase {
   public void sendAdResponse(AdNetworkInterface selectedAdNetwork, ChannelEvent event) {
     adResponse = selectedAdNetwork.getResponseAd();
     selectedAdIndex = getRankIndex(selectedAdNetwork);
-    sendAdResponse(adResponse.response, event);
+    sendAdResponse(adResponse, event);
   }
 
   // send Ad Response
-  public synchronized void sendAdResponse(String responseString, ChannelEvent event) throws NullPointerException {
+  public synchronized void sendAdResponse(ThirdPartyAdResponse adResponse, ChannelEvent event) throws NullPointerException {
     // Making sure response is sent only once
     if(responseSent) {
       return;
     }
     responseSent = true;
     logger.debug("ad received so trying to send ad response");
-    String finalReponse = responseString;
+    String finalReponse = adResponse.response;
     if(sasParams.getSlot() != null && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
       logger.debug("slot served is", sasParams.getSlot());
       InspectorStats.incrementStatCount(InspectorStrings.totalFills);
@@ -128,7 +129,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         finalReponse = startElement + finalReponse + endTags;
       } else if(getResponseFormat().equalsIgnoreCase("imai")) {
         finalReponse = adImaiStartTags + finalReponse;
-        sendResponse(OK, finalReponse, event);
+        sendResponse(OK, finalReponse, adResponse.responseHeaders, event);
       }
     } else {
       logger.error("invalid slot, so not returning response, even though we got an ad");
@@ -137,15 +138,22 @@ public class ResponseSender extends HttpRequestHandlerBase {
         finalReponse = noAdXhtml;
       }
     }
-    sendResponse(finalReponse, event);
+    sendResponse(OK, finalReponse, adResponse.responseHeaders, event);
   }
 
   // send response to the caller
-  public void sendResponse(HttpResponseStatus status, String responseString, ChannelEvent event) throws NullPointerException {
+  public void sendResponse(HttpResponseStatus status, String responseString, Map responseHeaders, ChannelEvent event) throws NullPointerException {
     HttpResponse response = new DefaultHttpResponse(HTTP_1_1, status);
     response.addHeader("Cache-Control", "no-cache, no-store, must-revalidate");
     response.addHeader("Expires", "-1");
     response.addHeader("Pragma", "no-cache");
+    
+    if (null != responseHeaders) {
+      for (Object key: responseHeaders.keySet()) {
+      	response.addHeader(key.toString(), responseHeaders.get(key));
+      }
+    }
+
     response.setContent(ChannelBuffers.copiedBuffer(responseString, Charset.forName("UTF-8").name()));
     if(event != null) {
       logger.debug("event not null inside send Response");
@@ -168,7 +176,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
   
   // send response to the caller
   public void sendResponse(String responseString, ChannelEvent event) throws NullPointerException {
-    sendResponse(HttpResponseStatus.OK, responseString, event);
+    sendResponse(HttpResponseStatus.OK, responseString, null, event);
   }
 
   @Override
@@ -191,7 +199,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     } else if(isJsAdRequest()) {
       sendResponse(String.format(noAdJsAdcode, sasParams.getRqIframe()), event);
     } else if (getResponseFormat().equalsIgnoreCase("imai")) {
-      sendResponse(NO_CONTENT, noAdImai, event); 
+      sendResponse(NO_CONTENT, noAdImai, null, event); 
     } else{
       sendResponse(noAdHtml, event);
     }
