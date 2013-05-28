@@ -46,28 +46,37 @@ public class AuctionEngine implements AuctionEngineInterface {
       auctionComplete = true;
     }
     
+    
     logger.debug("Inside RTB auction engine");
     List<ChannelSegment> rtbList;
     // Apply rtb filters.
     rtbList = rtbFilters(rtbSegments);
+    
+    
+    // Send null as auction response in case of 0 rtb responses.
     if(rtbList.size() == 0) {
-      logger.debug("rtb segments are", Integer.valueOf(rtbList.size()));
+      logger.debug("RTB segments are", Integer.valueOf(rtbList.size()));
       rtbResponse = null;
-      logger.debug("returning from auction engine , winner is null");
+      logger.debug("Returning from auction engine , winner is none");
       return null;
     } else if(rtbList.size() == 1) {
-      logger.debug("rtb segments are", Integer.valueOf(rtbList.size()));
+      logger.debug("RTB segments are", Integer.valueOf(rtbList.size()));
       rtbResponse = rtbList.get(0);
-      secondBidPrice = Math.min(casInternalRequestParameters.rtbBidFloor, rtbResponse.getAdNetworkInterface()
-          .getBidprice() * 0.9);
+      // Take minimum of rtbFloor+0.01 and bid as secondBidprice if no of rtb
+      // response are 1.
+      secondBidPrice = Math.min(casInternalRequestParameters.rtbBidFloor + 0.01,
+          rtbResponse.getAdNetworkInterface().getBidprice());
+      //Set encrypted bid price.
       rtbResponse.getAdNetworkInterface().setEncryptedBid(getEncryptedBid(secondBidPrice));
       rtbResponse.getAdNetworkInterface().setSecondBidPrice(secondBidPrice);
-      logger.debug("completed auction and winner is", rtbList.get(0).getAdNetworkInterface().getName()
-          + " and secondBidPrice is " + secondBidPrice);
+      logger.debug("Completed auction, winner is", rtbList.get(0).getAdNetworkInterface().getName(), "and secondBidPrice is", secondBidPrice);
+      //Return as there is no need to iterate over the list.
       return rtbList.get(0).getAdNetworkInterface();
     }
 
-    logger.debug("rtb segments are", Integer.valueOf(rtbList.size()));
+    
+    //Sort the list by their bid prices.
+    logger.debug("RTB segments are", Integer.valueOf(rtbList.size()));
     for (int i = 0; i < rtbList.size(); i++) {
       for (int j = i + 1; j < rtbList.size(); j++) {
         if(rtbList.get(i).getAdNetworkInterface().getBidprice() < rtbList.get(j).getAdNetworkInterface().getBidprice()) {
@@ -77,36 +86,42 @@ public class AuctionEngine implements AuctionEngineInterface {
         }
       }
     }
+    
+    
+    //Calculates the max price of all rtb responses.
     double maxPrice = rtbList.get(0).getAdNetworkInterface().getBidprice();
-    int secondHighestBidNumber = 1;
-    int lowestLatency = 0;
+    int secondHighestBid = 1;//Keep secondHighestBidPrice number from rtb response list.
+    int lowestLatencyBid = 0;//Keep winner number from rtb response list.
     for (int i = 1; i < rtbList.size(); i++) {
       if(rtbList.get(i).getAdNetworkInterface().getBidprice() < maxPrice) {
-        secondHighestBidNumber = i;
+        secondHighestBid = i;
         break;
-      } else if(rtbList.get(i).getAdNetworkInterface().getLatency() < rtbList.get(lowestLatency)
+      } else if(rtbList.get(i).getAdNetworkInterface().getLatency() < rtbList.get(lowestLatencyBid)
           .getAdNetworkInterface().getLatency()) {
-        lowestLatency = i;
+        lowestLatencyBid = i;
       }
     }
-    if(secondHighestBidNumber != 1) {
-      double secondHighestBidPrice = rtbList.get(secondHighestBidNumber).getAdNetworkInterface().getBidprice();
-      double price = maxPrice * 0.9;
-      if(price > secondHighestBidPrice) {
-        secondBidPrice = price;
-      } else {
-        secondBidPrice = secondHighestBidPrice + 0.01;
-      }
+    
+    //Set rtb response for the auction ran.
+    rtbResponse = rtbList.get(lowestLatencyBid);
+    
+    
+    //Calculates the secondHighestBidPrice if no of rtb responses are more than 1.
+    secondBidPrice = rtbList.get(secondHighestBid).getAdNetworkInterface().getBidprice();
+    double winnerBid = rtbList.get(lowestLatencyBid).getAdNetworkInterface().getBidprice();
+    if(winnerBid == secondBidPrice) {
+      secondBidPrice = casInternalRequestParameters.rtbBidFloor + 0.01;
     } else {
-      secondBidPrice = rtbList.get(1).getAdNetworkInterface().getBidprice() + 0.01;
+      secondBidPrice = secondBidPrice + 0.01;
     }
-    rtbResponse = rtbList.get(lowestLatency);
+    
+    //Ensure secondHighestBidPrice never crosses response bid.
     secondBidPrice = Math.min(secondBidPrice, rtbResponse.getAdNetworkInterface().getBidprice());
     rtbResponse.getAdNetworkInterface().setEncryptedBid(getEncryptedBid(secondBidPrice));
     rtbResponse.getAdNetworkInterface().setSecondBidPrice(secondBidPrice);
-    logger.debug("completed auction and winner is", rtbList.get(lowestLatency).getAdNetworkInterface().getName()
-        + " and secondBidPrice is " + secondBidPrice);
-    return rtbList.get(lowestLatency).getAdNetworkInterface();
+    logger.debug("Completed auction, winner is", rtbList.get(lowestLatencyBid).getAdNetworkInterface().getName(),
+        "and secondBidPrice is", secondBidPrice);
+    return rtbList.get(lowestLatencyBid).getAdNetworkInterface();
   }
 
   public List<ChannelSegment> rtbFilters(List<ChannelSegment> rtbSegments) {
@@ -115,8 +130,9 @@ public class AuctionEngine implements AuctionEngineInterface {
     // Ad filter.
     for (int i = 0; i < rtbSegments.size(); i++) {
       if(rtbSegments.get(i).getAdNetworkInterface().getAdStatus().equalsIgnoreCase("AD")) {
-        logger.debug("Dropped in NO AD filter", rtbSegments.get(i).getAdNetworkInterface().getName());
         rtbList.add(rtbSegments.get(i));
+      } else {
+        logger.debug("Dropped in NO AD filter", rtbSegments.get(i).getAdNetworkInterface().getName());
       }
     }
     logger.debug("No of rtb partners who sent AD response are", Integer.valueOf(rtbList.size()));
@@ -127,16 +143,8 @@ public class AuctionEngine implements AuctionEngineInterface {
         rtbList.remove(rtbList.get(i));
       }
     }
-    logger
-        .debug("No of rtb partners who sent AD response with bid more than bidFloor", Integer.valueOf(rtbList.size()));
-    // Bid not zero filter.
-    for (int i = 0; i < rtbList.size(); i++) {
-      if(rtbList.get(i).getAdNetworkInterface().getBidprice() <= 0) {
-        logger.debug("Dropped in bid is zero filter", rtbList.get(i).getAdNetworkInterface().getName());
-        rtbList.remove(rtbList.get(i));
-      }
-    }
-    logger.debug("No of rtb partners who sent AD response with bid more than 0", Integer.valueOf(rtbList.size()));
+    logger.debug("No of rtb partners who sent AD response with bid more than bidFloor", rtbList.size());
+
     return rtbList;
 
   }
@@ -183,7 +191,15 @@ public class AuctionEngine implements AuctionEngineInterface {
   }
 
   public String getEncryptedBid(Double bid) {
-    long winBid = (long) (bid * Math.pow(10, 9));
+    long winBid = (long) (bid * Math.pow(10, 6));
     return AsyncRequestMaker.getImpressionId(winBid);
+  }
+  
+  public double calculateRTBFloor(double siteFloor, double highestEcpm, double segmentFloor, double countryFloor) {
+    double rtbFloor = 0.0;
+    rtbFloor = Math.max(siteFloor, highestEcpm);
+    rtbFloor = Math.max(rtbFloor, segmentFloor);
+    rtbFloor = Math.max(rtbFloor, countryFloor);
+    return rtbFloor;
   }
 }
