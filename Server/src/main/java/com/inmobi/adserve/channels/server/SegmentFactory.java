@@ -17,6 +17,7 @@ import com.inmobi.adserve.channels.adnetworks.httpool.DCPHttPoolAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.huntmads.DCPHuntmadsAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.ifc.IFCAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.ifd.IFDAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.logan.DCPLoganAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.lomark.DCPLomarkAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mobilecommerce.MobileCommerceAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mopub.DCPMoPubAdNetwork;
@@ -250,7 +251,15 @@ public class SegmentFactory {
 				&& (config.getString("widerplanet.status").equals("on"))) {
 			return new DCPWiderPlanetAdnetwork(logger, config, clientBootstrap,
 					base, serverEvent);
+		} else if ((advertiserId.equals(config
+				.getString("logan.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet
+						.contains("logan"))
+				&& (config.getString("logan.status").equals("on"))) {
+			return new DCPLoganAdnetwork(logger, config, clientBootstrap,
+					base, serverEvent);
 		}
+
 
 		return null;
 	}
