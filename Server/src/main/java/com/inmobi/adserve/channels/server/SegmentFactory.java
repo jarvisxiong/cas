@@ -69,7 +69,7 @@ public class SegmentFactory {
     
   public static AdNetworkInterface getChannel(String advertiserId, String channelId, Configuration config, ClientBootstrap clientBootstrap,
       ClientBootstrap rtbClientBootstrap, HttpRequestHandlerBase base, MessageEvent serverEvent, Set<String> advertiserSet, DebugLogger logger,
-      boolean isRtbEnabled) {
+      boolean isRtbEnabled, int rtbMaxTimemout) {
     if(isRtbEnabled) {
       for (String partnerName : rtbAdaptersNames) {
         String advertiserIdString = config.getString(partnerName + ".advertiserId");
@@ -96,7 +96,7 @@ public class SegmentFactory {
           } 
           logger.debug("dcname is ",dcname, "and urlBase is " + urlBase);
           RtbAdNetwork rtbAdNetwork = new RtbAdNetwork(logger, config, rtbClientBootstrap, base, serverEvent, urlBase,
-              partnerName);
+              partnerName, rtbMaxTimemout);
           logger.debug("Created RTB adapter instance for advertiser id : " + advertiserId);
           return rtbAdNetwork;
         }
