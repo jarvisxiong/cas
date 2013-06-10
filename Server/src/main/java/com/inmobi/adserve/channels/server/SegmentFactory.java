@@ -77,7 +77,7 @@ public class SegmentFactory {
 			ClientBootstrap clientBootstrap,
 			ClientBootstrap rtbClientBootstrap, HttpRequestHandlerBase base,
 			MessageEvent serverEvent, Set<String> advertiserSet,
-			DebugLogger logger, boolean isRtbEnabled) {
+			DebugLogger logger, boolean isRtbEnabled, int rtbMaxTimemout) {
 		if (isRtbEnabled) {
 			for (String partnerName : rtbAdaptersNames) {
 				String advertiserIdString = config.getString(partnerName
@@ -114,7 +114,7 @@ public class SegmentFactory {
 							+ urlBase);
 					RtbAdNetwork rtbAdNetwork = new RtbAdNetwork(logger,
 							config, rtbClientBootstrap, base, serverEvent,
-							urlBase, partnerName);
+							urlBase, partnerName, rtbMaxTimemout);
 					logger.debug("Created RTB adapter instance for advertiser id : "
 							+ advertiserId);
 					return rtbAdNetwork;
