@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 
+import com.inmobi.adserve.channels.adnetworks.appier.DCPAppierAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.atnt.ATNTAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.adelphic.DCPAdelphicAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.drawbridge.DrawBridgeAdNetwork;
@@ -19,6 +20,7 @@ import com.inmobi.adserve.channels.adnetworks.ifc.IFCAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.ifd.IFDAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.logan.DCPLoganAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.lomark.DCPLomarkAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.madnet.DCPMadNetAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mobilecommerce.MobileCommerceAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mopub.DCPMoPubAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mullahmedia.MoolahMediaPremiumAdnetwork;
@@ -258,8 +260,24 @@ public class SegmentFactory {
 				&& (config.getString("logan.status").equals("on"))) {
 			return new DCPLoganAdnetwork(logger, config, clientBootstrap,
 					base, serverEvent);
+		}else if ((advertiserId.equals(config
+				.getString("madnet.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet
+						.contains("madnet"))
+				&& (config.getString("madnet.status").equals("on"))) {
+			return new DCPMadNetAdNetwork(logger, config, clientBootstrap,
+					base, serverEvent);
+		}
+		else if ((advertiserId.equals(config
+				.getString("appier.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet
+						.contains("appier"))
+				&& (config.getString("appier.status").equals("on"))) {
+			return new DCPAppierAdNetwork(logger, config, clientBootstrap,
+					base, serverEvent);
 		}
 
+		
 
 		return null;
 	}
