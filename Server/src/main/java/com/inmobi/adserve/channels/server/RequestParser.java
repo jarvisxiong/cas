@@ -110,6 +110,7 @@ public class RequestParser {
     params.setOsId(jObject.optInt("os-id", -1));
     params.setRichMedia(jObject.optBoolean("rich-media", false));
     params.setRqAdType(stringify(jObject, "rq-adtype", logger));
+    params.setAppUrl(stringify(jObject, "site-url", logger));
     logger.debug("successfully parsed params");
   }
 
@@ -152,7 +153,7 @@ public class RequestParser {
       }
       return Arrays.asList(category);
     } catch (JSONException e) {
-      logger.error("error while reading category array", e.getMessage());
+      logger.debug("error while reading category array", e.getMessage());
       return null;
     }
   }
@@ -183,10 +184,10 @@ public class RequestParser {
           parameter.setPostalCode(URLEncoder.encode(parameter.getPostalCode(), utf8));
         }
       } catch (UnsupportedEncodingException e) {
-        logger.error("Error in encoding u params", e.getMessage());
+        logger.debug("Error in encoding u params", e.getMessage());
       }
     } catch (JSONException exception) {
-      logger.error("json exception in parsing u params", exception);
+      logger.debug("json exception in parsing u params", exception);
     }
     return parameter;
   }

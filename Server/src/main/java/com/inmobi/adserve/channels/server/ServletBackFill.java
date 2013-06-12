@@ -79,7 +79,7 @@ public class ServletBackFill implements Servlet {
     }
     if(hrh.responseSender.sasParams.getSiteType() != null
         && !ServletHandler.allowedSiteTypes.contains(hrh.responseSender.sasParams.getSiteType())) {
-      logger.error("Terminating request as incompatible content type");
+      logger.info("Terminating request as incompatible content type");
       hrh.setTerminationReason(ServletHandler.incompatibleSiteType);
       InspectorStats.incrementStatCount(InspectorStrings.incompatibleSiteType, InspectorStrings.count);
       hrh.responseSender.sendNoAdResponse(e);
@@ -90,7 +90,7 @@ public class ServletBackFill implements Servlet {
         if((hrh.responseSender.sasParams.getSdkVersion().substring(0, 1).equalsIgnoreCase("i") || hrh.responseSender.sasParams.getSdkVersion()
             .substring(0, 1).equalsIgnoreCase("a"))
             && Integer.parseInt(hrh.responseSender.sasParams.getSdkVersion().substring(1, 2)) < 3) {
-          logger.error("Terminating request as sdkVersion is less than 3");
+          logger.debug("Terminating request as sdkVersion is less than 3");
           hrh.setTerminationReason(ServletHandler.lowSdkVersion);
           InspectorStats.incrementStatCount(InspectorStrings.lowSdkVersion, InspectorStrings.count);
           hrh.responseSender.sendNoAdResponse(e);
@@ -180,8 +180,9 @@ public class ServletBackFill implements Servlet {
     casInternalRequestParametersGlobal.highestEcpm = getHighestEcpm(rows, logger);
     logger.debug("Highest Ecpm is", Double.valueOf(casInternalRequestParametersGlobal.highestEcpm));
     casInternalRequestParametersGlobal.blockedCategories = getBlockedCategories(hrh, logger);
-    casInternalRequestParametersGlobal.rtbBidFloor = hrh.responseSender.sasParams.getSiteFloor() > casInternalRequestParametersGlobal.highestEcpm ? hrh.responseSender.sasParams.getSiteFloor()
-        : casInternalRequestParametersGlobal.highestEcpm + 0.01;
+    double countryFloor = 0.05;
+    double segmentFloor = 0.0;
+    casInternalRequestParametersGlobal.rtbBidFloor = hrh.responseSender.getAuctionEngine().calculateRTBFloor(sasParams.getSiteFloor(), casInternalRequestParametersGlobal.highestEcpm, segmentFloor, countryFloor);
     hrh.responseSender.casInternalRequestParameters = casInternalRequestParametersGlobal;
     hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternalRequestParametersGlobal;
     logger.debug("Total channels available for sending requests " + rows.size());
@@ -203,6 +204,9 @@ public class ServletBackFill implements Servlet {
 
     if(!tempRankList.isEmpty()) {
       tempRankList = filter.ensureGuaranteedDelivery(tempRankList);
+    }
+    if(!rtbSegments.isEmpty()) {
+      rtbSegments = filter.ensureGuaranteedDeliveryInCaseOfRTB(rtbSegments, tempRankList);
     }
     tempRankList = AsyncRequestMaker.makeAsyncRequests(tempRankList, logger, hrh.responseSender, e, rtbSegments);
 
@@ -239,7 +243,8 @@ public class ServletBackFill implements Servlet {
   private static double getHighestEcpm(List<ChannelSegment> channelSegments, DebugLogger logger) {
     double highestEcpm = 0;
     for (ChannelSegment channelSegment : channelSegments) {
-      if(highestEcpm < channelSegment.getChannelSegmentFeedbackEntity().geteCPM()) {
+      if(channelSegment.getChannelSegmentFeedbackEntity().geteCPM() < 10.0 && 
+              highestEcpm < channelSegment.getChannelSegmentFeedbackEntity().geteCPM()) {
         highestEcpm = channelSegment.getChannelSegmentFeedbackEntity().geteCPM();
       }
     }

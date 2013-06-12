@@ -59,13 +59,14 @@ public class AsyncRequestMaker {
 
     logger.debug("Total channels available for sending requests", rows.size() + "");
     boolean isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled", false);
-    logger.debug("isRtbEnabled is", Boolean.valueOf(isRtbEnabled));
+    int rtbMaxTimeOut = rtbConfig.getInt("RTBreadtimeoutMillis", 200);
+    logger.debug("isRtbEnabled is", Boolean.valueOf(isRtbEnabled), " and rtbMaxTimeout is", rtbMaxTimeOut);
 
     for (ChannelSegment row : rows) {
       ChannelSegmentEntity channelSegmentEntity = row.getChannelSegmentEntity();
       AdNetworkInterface network = SegmentFactory.getChannel(channelSegmentEntity.getAdvertiserId(), row
           .getChannelSegmentEntity().getChannelId(), adapterConfig, clientBootstrap, rtbClientBootstrap, base, e,
-          advertiserSet, logger, isRtbEnabled);
+          advertiserSet, logger, isRtbEnabled, rtbMaxTimeOut);
       if(null == network) {
         logger.debug("No adapter found for adGroup:", channelSegmentEntity.getAdgroupId());
         continue;
@@ -142,6 +143,7 @@ public class AsyncRequestMaker {
     casInternalRequestParameters.uidADT = casInternalRequestParameterGlobal.uidADT;
     casInternalRequestParameters.zipCode = sasParams.getPostalCode();
     casInternalRequestParameters.latLong = sasParams.getLatLong();
+    casInternalRequestParameters.appUrl = sasParams.getAppUrl();
     return casInternalRequestParameters;
   }
 
