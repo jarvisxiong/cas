@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.server;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Iterator;
 
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.AuctionEngineInterface;
@@ -137,12 +138,16 @@ public class AuctionEngine implements AuctionEngineInterface {
     }
     logger.debug("No of rtb partners who sent AD response are", Integer.valueOf(rtbList.size()));
     // BidFloor filter.
-    for (int i = 0; i < rtbList.size(); i++) {
-      if(rtbList.get(i).getAdNetworkInterface().getBidprice() < casInternalRequestParameters.rtbBidFloor) {
-        logger.debug("Dropped in bidfloor filter", rtbList.get(i).getAdNetworkInterface().getName());
-        rtbList.remove(rtbList.get(i));
-      }
-    }
+    Iterator<ChannelSegment> rtbListIterator = rtbList.iterator();
+        while (rtbListIterator.hasNext())
+        {
+            ChannelSegment currentChannelSegment = rtbListIterator.next();
+            if (currentChannelSegment.getAdNetworkInterface().getBidprice() < casInternalRequestParameters.rtbBidFloor)
+            {
+                rtbListIterator.remove();
+                logger.debug("Dropped in bidfloor filter ", currentChannelSegment.getAdNetworkInterface().getName());
+            }
+        }
     logger.debug("No of rtb partners who sent AD response with bid more than bidFloor", rtbList.size());
 
     return rtbList;
