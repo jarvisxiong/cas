@@ -347,10 +347,9 @@ public class Filters {
         
         // applying model id filter
         if(!channelSegment.getChannelSegmentEntity().getManufModelTargetingList().isEmpty()
-            && 0 != sasParams.getModelId() && !channelSegment.getChannelSegmentEntity().getManufModelTargetingList().contains(sasParams.getModelId())) {
+            && !channelSegment.getChannelSegmentEntity().getManufModelTargetingList().contains(sasParams.getModelId())) {
           logger.debug(channelSegment.getChannelSegmentEntity().getId(), " dropped in model id filter");
           continue;
-
         }
         channelSegment.setPrioritisedECPM(calculatePrioritisedECPM(channelSegment));
         segmentListToBeSorted.add(channelSegment);
