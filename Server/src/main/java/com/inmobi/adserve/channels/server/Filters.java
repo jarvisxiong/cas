@@ -346,7 +346,7 @@ public class Filters {
         }
         
         // applying model id filter
-        if(!channelSegment.getChannelSegmentEntity().getManufModelTargetingList().isEmpty()
+        if(null != channelSegment.getChannelSegmentEntity().getManufModelTargetingList() && !channelSegment.getChannelSegmentEntity().getManufModelTargetingList().isEmpty()
             && !channelSegment.getChannelSegmentEntity().getManufModelTargetingList().contains(sasParams.getModelId())) {
           logger.debug(channelSegment.getChannelSegmentEntity().getId(), " dropped in model id filter");
           continue;
