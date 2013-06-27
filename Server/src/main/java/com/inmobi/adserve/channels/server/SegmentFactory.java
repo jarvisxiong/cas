@@ -13,6 +13,7 @@ import org.jboss.netty.channel.MessageEvent;
 import com.inmobi.adserve.channels.adnetworks.appier.DCPAppierAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.atnt.ATNTAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.adelphic.DCPAdelphicAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.definiti.DCPDefinitiAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.drawbridge.DrawBridgeAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.httpool.DCPHttPoolAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.huntmads.DCPHuntmadsAdNetwork;
@@ -80,7 +81,7 @@ public class SegmentFactory {
 			ClientBootstrap clientBootstrap,
 			ClientBootstrap rtbClientBootstrap, HttpRequestHandlerBase base,
 			MessageEvent serverEvent, Set<String> advertiserSet,
-			DebugLogger logger, boolean isRtbEnabled) {
+			DebugLogger logger, boolean isRtbEnabled, int rtbMaxTimemout) {
 		if (isRtbEnabled) {
 			for (String partnerName : rtbAdaptersNames) {
 				String advertiserIdString = config.getString(partnerName
@@ -117,7 +118,7 @@ public class SegmentFactory {
 							+ urlBase);
 					RtbAdNetwork rtbAdNetwork = new RtbAdNetwork(logger,
 							config, rtbClientBootstrap, base, serverEvent,
-							urlBase, partnerName);
+							urlBase, partnerName, rtbMaxTimemout);
 					logger.debug("Created RTB adapter instance for advertiser id : "
 							+ advertiserId);
 					return rtbAdNetwork;
@@ -276,8 +277,14 @@ public class SegmentFactory {
 			return new DCPAppierAdNetwork(logger, config, clientBootstrap,
 					base, serverEvent);
 		}
-
-		
+		else if ((advertiserId.equals(config
+				.getString("definiti.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet
+						.contains("definiti"))
+				&& (config.getString("definiti.status").equals("on"))) {
+			return new DCPDefinitiAdnetwork(logger, config, clientBootstrap,
+					base, serverEvent);
+		}
 
 		return null;
 	}
