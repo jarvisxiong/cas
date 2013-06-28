@@ -9,14 +9,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
-import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
+import com.inmobi.adserve.channels.entity.PricingEngineEntity;
+import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
@@ -309,6 +309,18 @@ public class Filters {
   void adGroupLevelFiltering() {
     logger.debug("Inside adGroupLevelFiltering");
     Map<String, HashMap<String, ChannelSegment>> rows = new HashMap<String, HashMap<String, ChannelSegment>>();
+    
+    //Fetching pricing engine entity
+    int country = Integer.parseInt(sasParams.getCountryStr());
+    int os = sasParams.getOsId();
+    PricingEngineEntity pricingEngineEntity = repositoryHelper.queryPricingEngineRepository(country, os, logger);
+    Double dcpFloor = null;
+    Double rtbFloor = null;
+    if(null != pricingEngineEntity) {
+      dcpFloor = pricingEngineEntity.getDcpEcpm();
+      rtbFloor = pricingEngineEntity.getRtbEcpm();
+    }
+    
     for (Map.Entry<String, HashMap<String, ChannelSegment>> advertiserEntry : matchedSegments.entrySet()) {
       String advertiserId = advertiserEntry.getKey();
       HashMap<String, ChannelSegment> hashMap = new HashMap<String, ChannelSegment>();
@@ -323,6 +335,37 @@ public class Filters {
         } else {
           logger.debug("sitefloor filter passed by adgroup", channelSegment.getChannelSegmentFeedbackEntity().getId());
         }
+        
+     // applying dcp floor
+        if(null != dcpFloor) {
+          // applying the boost
+          dcpFloor = dcpFloor + channelSegment.getChannelSegmentEntity().getEcpmBoost();
+          double ecpm = channelSegment.getChannelSegmentCitrusLeafFeedbackEntity().geteCPM();
+          int percentage = 100;
+          if(ecpm > 0.0) {
+            percentage = (int) ((dcpFloor / ecpm) * 100);
+          }
+          
+          //Allow percentage of times any segment
+          if(percentage < 50) {
+            percentage = 5;
+          } else if(percentage < 90) {
+            percentage = 50;
+          } else if(percentage < 99) {
+            percentage = 90;
+          }
+
+          // applying dcp floor
+          if(dcpFloor != 0.0 && ecpm >= dcpFloor) {
+            logger
+                .debug("dcp floor filter passed by adgroup", channelSegment.getChannelSegmentFeedbackEntity().getId());
+          } else if(ServletHandler.random.nextInt(100) < percentage) {
+            logger
+                .debug("dcp floor filter failed by adgroup", channelSegment.getChannelSegmentFeedbackEntity().getId());
+            continue;
+          }
+        }
+        
         //applying impression cap filter at adgroup level
         if(isAdGroupDailyImpressionCeilingExceeded(channelSegment)) {
           continue;
