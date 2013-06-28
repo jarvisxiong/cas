@@ -347,19 +347,21 @@ public class Filters {
           }
           
           //Allow percentage of times any segment
-          if(percentage < 50) {
-            percentage = 5;
-          } else if(percentage < 90) {
+          if(percentage > 100) {
+            percentage = 100;
+          } else if(percentage == 100) {
             percentage = 50;
-          } else if(percentage < 99) {
-            percentage = 90;
+          } else if(percentage >= 80) {
+            percentage = 10;
+          } else {
+            percentage = 1;
           }
 
           // applying dcp floor
-          if(dcpFloor != 0.0 && ecpm >= dcpFloor) {
+          if(ServletHandler.random.nextInt(100) >= percentage) {
             logger
                 .debug("dcp floor filter passed by adgroup", channelSegment.getChannelSegmentFeedbackEntity().getId());
-          } else if(ServletHandler.random.nextInt(100) < percentage) {
+          } else {
             logger
                 .debug("dcp floor filter failed by adgroup", channelSegment.getChannelSegmentFeedbackEntity().getId());
             continue;
