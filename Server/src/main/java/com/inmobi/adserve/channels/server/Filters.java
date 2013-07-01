@@ -313,12 +313,15 @@ public class Filters {
     //Fetching pricing engine entity
     int country = Integer.parseInt(sasParams.getCountryStr());
     int os = sasParams.getOsId();
-    PricingEngineEntity pricingEngineEntity = repositoryHelper.queryPricingEngineRepository(country, os, logger);
+    PricingEngineEntity pricingEngineEntity = null;
+    if (null != repositoryHelper) {
+      pricingEngineEntity = repositoryHelper.queryPricingEngineRepository(country, os, logger);
+    }
     Double dcpFloor = null;
     Double rtbFloor = null;
     if(null != pricingEngineEntity) {
-      dcpFloor = pricingEngineEntity.getDcpEcpm();
-      rtbFloor = pricingEngineEntity.getRtbEcpm();
+      dcpFloor = pricingEngineEntity.getDcpFloor();
+      rtbFloor = pricingEngineEntity.getRtbFloor();
     }
     
     for (Map.Entry<String, HashMap<String, ChannelSegment>> advertiserEntry : matchedSegments.entrySet()) {

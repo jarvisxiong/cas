@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
+import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.api.SASRequestParameters;
@@ -186,6 +187,12 @@ public class FilterTest extends TestCase {
     replay(sMDE);
     repositoryHelper = createMock(RepositoryHelper.class);
     expect(repositoryHelper.querySiteMetaDetaRepository("siteid")).andReturn(sMDE).anyTimes();
+    PricingEngineEntity pricingEngineEntity = new PricingEngineEntity();
+    pricingEngineEntity.setCountryId(1);
+    pricingEngineEntity.setOsId(1);
+    pricingEngineEntity.setDcpFloor(0);
+    pricingEngineEntity.setRtbFloor(0);
+    //expect(repositoryHelper.queryPricingEngineRepository(1, 1, EasyMock.isA(DebugLogger.class))).andReturn(pricingEngineEntity).anyTimes();
     replay(repositoryHelper);
     s1 = createMock(ChannelSegmentEntity.class);
     expect(s1.isUdIdRequired()).andReturn(false).anyTimes();
@@ -347,6 +354,8 @@ public class FilterTest extends TestCase {
     matchedSegments.put(channelSegmentEntity6.getAdvertiserId(), adv3);
     SASRequestParameters sasParams = new SASRequestParameters();
     sasParams.setSiteFloor(0.3);
+    sasParams.setCountryStr("1");
+    sasParams.setOsId(1);
     Filters f1 = new Filters(matchedSegments, mockConfig, mockAdapterConfig, sasParams, null, logger);
     f1.adGroupLevelFiltering();
     assertEquals(false, f1.getMatchedSegments().get("advertiserId1").containsKey("adgroupId1"));
