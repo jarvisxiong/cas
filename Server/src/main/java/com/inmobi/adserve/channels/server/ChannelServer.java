@@ -29,6 +29,7 @@ import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.ChannelRepository;
 import com.inmobi.adserve.channels.repository.ChannelFeedbackRepository;
 import com.inmobi.adserve.channels.repository.ChannelSegmentFeedbackRepository;
+import com.inmobi.adserve.channels.repository.ChannelSegmentMatchingCache;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.repository.SiteCitrusLeafFeedbackRepository;
 import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
@@ -228,6 +229,7 @@ public class ChannelServer {
 
       initialContext.bind("java:comp/env/jdbc", dataSource);
 
+      ChannelSegmentMatchingCache.init(logger);
       // Reusing the repository from phoenix adsering framework.
       channelAdGroupRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY),
           ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY);

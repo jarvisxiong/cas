@@ -317,7 +317,7 @@ public class Filters {
       for (Map.Entry<String, ChannelSegment> adGroupEntry : adGroups.entrySet()) {
         ChannelSegment channelSegment = adGroupEntry.getValue();
         // applying siteFloor filter
-        if(channelSegment.getChannelSegmentFeedbackEntity().geteCPM() < sasParams.getSiteFloor()) {
+        if(channelSegment.getChannelSegmentFeedbackEntity().getECPM() < sasParams.getSiteFloor()) {
           logger.debug("sitefloor filter failed by adgroup", channelSegment.getChannelSegmentFeedbackEntity().getId());
           continue;
         } else {
@@ -466,9 +466,9 @@ public class Filters {
   double calculatePrioritisedECPM(ChannelSegment channelSegment) {
     ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = channelSegment
         .getChannelSegmentCitrusLeafFeedbackEntity();
-    double eCPM = channelSegmentFeedbackEntity.geteCPM();
+    double eCPM = channelSegmentFeedbackEntity.getECPM();
     double fillRatio = channelSegmentFeedbackEntity.getFillRatio();
-    double latency = channelSegmentFeedbackEntity.getLatency();
+    double latency = channelSegmentFeedbackEntity.getLastHourlatency();
     int maxLatency = ServletHandler.getServerConfig().getInt("readtimeoutMillis");
     double eCPMShift = serverConfiguration.getDouble("ecpmShift", 0.1);
     double feedbackPower = serverConfiguration.getDouble("feedbackPower", 2.0);

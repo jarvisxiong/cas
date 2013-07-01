@@ -106,19 +106,6 @@ public class ServletBackFill implements Servlet {
     }
 
     /**
-     * if sendonlytowhitelist flag is true, check if site id is present in
-     * whitelist, else send no ad.
-     */
-    if(ServletHandler.getServerConfig().getBoolean("sendOnlyToWhitelist")) {
-      List<String> whitelist = ServletHandler.getServerConfig().getList("whitelist");
-      if(null == whitelist || !whitelist.contains(hrh.responseSender.sasParams.getSiteId())) {
-        logger.debug("site id not present in whitelist, so sending no ad response");
-        hrh.responseSender.sendNoAdResponse(e);
-        return;
-      }
-    }
-
-    /**
      * Set imai content if r-format is imai
      */
     String imaiBaseUrl = null;
@@ -243,9 +230,9 @@ public class ServletBackFill implements Servlet {
   private static double getHighestEcpm(List<ChannelSegment> channelSegments, DebugLogger logger) {
     double highestEcpm = 0;
     for (ChannelSegment channelSegment : channelSegments) {
-      if(channelSegment.getChannelSegmentFeedbackEntity().geteCPM() < 10.0 && 
-              highestEcpm < channelSegment.getChannelSegmentFeedbackEntity().geteCPM()) {
-        highestEcpm = channelSegment.getChannelSegmentFeedbackEntity().geteCPM();
+      if(channelSegment.getChannelSegmentFeedbackEntity().getECPM() < 10.0 && 
+              highestEcpm < channelSegment.getChannelSegmentFeedbackEntity().getECPM()) {
+        highestEcpm = channelSegment.getChannelSegmentFeedbackEntity().getECPM();
       }
     }
     return highestEcpm;

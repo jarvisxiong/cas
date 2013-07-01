@@ -36,8 +36,14 @@ public class MatchSegments {
   public static void init(ChannelAdGroupRepository channelAdGroupRepository) {
     Set<String> emptySet = new HashSet<String>();
     MatchSegments.channelAdGroupRepository = channelAdGroupRepository;
-    MatchSegments.defaultChannelEntity = (new ChannelEntity()).setImpressionCeil(Long.MAX_VALUE).setImpressionFloor(0)
-        .setPriority(3).setRequestCap(Long.MAX_VALUE);
+    
+    ChannelEntity channelEntity = new ChannelEntity();
+    channelEntity.setImpressionCeil(Long.MAX_VALUE);
+    channelEntity.setImpressionFloor(0);
+    channelEntity.setPriority(3);
+    channelEntity.setRequestCap(Long.MAX_VALUE);
+    MatchSegments.defaultChannelEntity = channelEntity;
+        
     MatchSegments.defaultChannelEntity.setSiteInclusion(false);
     MatchSegments.defaultChannelEntity.setSitesIE(emptySet);
     MatchSegments.defaultChannelFeedbackEntity = new ChannelFeedbackEntity(DEFAULT, 0, 0, Double.MAX_VALUE, 0, 0, 0, 0,
@@ -130,65 +136,37 @@ public class MatchSegments {
       List<Long> categories, long country, Integer targetingPlatform, Integer siteRating, int osId) {
     HashMap<String /* advertiserId */, HashMap<String /* adGroupId */, ChannelSegment>> result = new HashMap<String /* advertiserId */, HashMap<String /* adGroupId */, ChannelSegment>>();
 
-    List<ChannelSegmentEntity> filteredAllCategoriesEntities = loadEntities(slotId, -1, country, targetingPlatform,
-        siteRating, osId);
-
-    // Makes sure that there is exactly one entry from each Advertiser.
-    for (ChannelSegmentEntity entity : filteredAllCategoriesEntities) {
-      if(entity.getStatus()) {
-        insertChannelSegmentToResultSet(result, entity);
-      }
-      logger.debug("AdGroup Dropped due to status - Id:", entity.getAdgroupId());
+    //adding -1 for all categories
+    categories.add(-1l);
+    //adding -1 for all countries
+    long[] countries = {-1};
+    if (country != -1) {
+    	countries = new long[]{-1, country};
     }
-    logger.debug("Number of entries from all categories in result:", result.size(), result);
-
-    if(country != -1) {
-      // Load Data for all countries
-      List<ChannelSegmentEntity> allCategoriesAllCountryEntities = loadEntities(slotId, -1, -1, targetingPlatform,
-          siteRating, osId);
-
-      // Makes sure that there is exactly one entry from each Advertiser for all
-      // countries.
-      for (ChannelSegmentEntity entity : allCategoriesAllCountryEntities) {
-        if(entity.getStatus()) {
-          insertChannelSegmentToResultSet(result, entity);
-        }
-        logger.debug("AdGroup Dropped due to status - Id:", entity.getAdgroupId());
-      }
-      logger.debug("Number of entries from all countries and categories in result:", result.size(), result);
+    //adding -1 for all osids
+    int[] osIds = new int[]{-1, osId};
+    
+    for(long category : categories) {
+    	for (long countryId : countries) {
+    		for (int os : osIds) {
+    			List<ChannelSegmentEntity> filteredEntities = loadEntities(slotId, category, countryId, targetingPlatform,
+    			        siteRating, os);
+    			logger.debug("Found", filteredEntities.size(), "segments for slot:", slotId,  "country:", countryId, "category",
+    			          category, "targetingPlatform", targetingPlatform, "siteRating", siteRating, "osId", os);
+    			logger.debug("Segments are :");
+    			
+    			for (ChannelSegmentEntity entity : filteredEntities) {
+    				logger.debug("AdgroupId", entity.getAdgroupId());
+    		        insertChannelSegmentToResultSet(result, entity);
+    		    }
+    			
+    		}
+    	}
     }
-
-    // Does OR for the categories.
-    for (long category : categories) {
-      List<ChannelSegmentEntity> filteredEntities = loadEntities(slotId, category, country, targetingPlatform,
-          siteRating, osId);
-      // Makes sure that there is exactly one entry from each Advertiser.
-      for (ChannelSegmentEntity entity : filteredEntities) {
-        if(entity.getStatus()) {
-          insertChannelSegmentToResultSet(result, entity);
-        }
-        logger.debug("AdGroup Dropped due to status - Id:", entity.getAdgroupId());
-      }
-
-      if(country != -1) {
-        // Load Data for all countries
-        List<ChannelSegmentEntity> allCountryEntities = loadEntities(slotId, category, -1, targetingPlatform,
-            siteRating, osId);
-
-        // Makes sure that there is exactly one entry from each Advertiser for
-        // all countries.
-        for (ChannelSegmentEntity entity : allCountryEntities) {
-          if(entity.getStatus()) {
-            insertChannelSegmentToResultSet(result, entity);
-          }
-          logger.debug("AdGroup Dropped due to status - Id:", entity.getAdgroupId());
-        }
-      }
-      logger.debug("Number of entries in result:", result.size(), "for", slotId, "_", country, "_", categories);
-    }
+    
     if(result.size() == 0) {
       logger.debug("No matching records for the request - slot:", slotId, "country:", country, "categories:",
-          categories);
+          categories, "targetingPlatform", targetingPlatform, "siteRating", siteRating, "osId", osId);
     }
     logger.debug("final selected list of segments : ");
     printSegments(result, logger);
@@ -201,14 +179,10 @@ public class MatchSegments {
     logger.debug("Loading entities for slot:", slotId, "category:", category, "country:", country,
         "targetingPlatform:", targetingPlatform, "siteRating:", siteRating, "osId:", osId);
     ArrayList<ChannelSegmentEntity> filteredEntities = new ArrayList<ChannelSegmentEntity>();
-    Collection<ChannelSegmentEntity> entitiesAllOs = channelAdGroupRepository.getEntities(slotId, category, country,
-        targetingPlatform, siteRating, -1);
     Collection<ChannelSegmentEntity> entities = channelAdGroupRepository.getEntities(slotId, category, country,
         targetingPlatform, siteRating, osId);
-    filteredEntities.addAll(entitiesAllOs);
     filteredEntities.addAll(entities);
     return filteredEntities;
-
   }
 
   private void insertChannelSegmentToResultSet(Map<String, HashMap<String, ChannelSegment>> result,
@@ -276,7 +250,7 @@ public class MatchSegments {
           channelSegmentCitrusLeafFeedbackEntity.toString());
     }
 
-    double pECPM = channelSegmentCitrusLeafFeedbackEntity.geteCPM();
+    double pECPM = channelSegmentCitrusLeafFeedbackEntity.getECPM();
     return new ChannelSegment(channelSegmentEntity, channelEntity, channelFeedbackEntity, channelSegmentFeedbackEntity,
         channelSegmentCitrusLeafFeedbackEntity, null, pECPM);
   }
