@@ -367,6 +367,8 @@ public class Filters {
           } else {
             logger
                 .debug("dcp floor filter failed by adgroup", channelSegment.getChannelSegmentFeedbackEntity().getId());
+            InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
+                InspectorStrings.droppedinPricingEngineFilter);
             continue;
           }
         }
