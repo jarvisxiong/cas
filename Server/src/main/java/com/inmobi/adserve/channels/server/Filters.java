@@ -344,6 +344,15 @@ public class Filters {
             continue;
           }
         }
+        
+        // applying model id filter
+        if(null != channelSegment.getChannelSegmentEntity().getManufModelTargetingList() && !channelSegment.getChannelSegmentEntity().getManufModelTargetingList().isEmpty()
+            && !channelSegment.getChannelSegmentEntity().getManufModelTargetingList().contains(sasParams.getModelId())) {
+          logger.debug(channelSegment.getChannelSegmentEntity().getId(), " dropped in model id filter");
+          InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegment.getChannelSegmentEntity().getAdvertiserId()),
+              InspectorStrings.droppedinHandsetTargetingFilter);
+          continue;
+        }
         channelSegment.setPrioritisedECPM(calculatePrioritisedECPM(channelSegment));
         segmentListToBeSorted.add(channelSegment);
       }
