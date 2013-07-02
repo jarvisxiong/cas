@@ -13,7 +13,7 @@ import org.jboss.netty.channel.MessageEvent;
 import com.inmobi.adserve.channels.adnetworks.appier.DCPAppierAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.atnt.ATNTAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.adelphic.DCPAdelphicAdNetwork;
-import com.inmobi.adserve.channels.adnetworks.definiti.DCPDefinitiAdnetwork;
+import com.inmobi.adserve.channels.adnetworks.ajillion.DCPAjillionAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.drawbridge.DrawBridgeAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.httpool.DCPHttPoolAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.huntmads.DCPHuntmadsAdNetwork;
@@ -283,8 +283,10 @@ public class SegmentFactory {
 				&& (advertiserSet.isEmpty() || advertiserSet
 						.contains("definiti"))
 				&& (config.getString("definiti.status").equals("on"))) {
-			return new DCPDefinitiAdnetwork(logger, config, clientBootstrap,
+			DCPAjillionAdnetwork adaptor = new DCPAjillionAdnetwork(logger, config, clientBootstrap,
 					base, serverEvent);
+			adaptor.setName("definiti");
+			return adaptor;
 		}
 		else if ((advertiserId.equals(config
 				.getString("paypal.advertiserId")))
