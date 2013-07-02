@@ -80,7 +80,8 @@ public class RequestParser {
     params.setAllowBannerAds(jObject.optBoolean("site-allowBanner", true));
     params.setSiteFloor(jObject.optDouble("site-floor", 0.0));
     params.setSiteSegmentId(jObject.optInt("sel-seg-id", 0));
-    logger.debug("Site segment id is", params.getSiteSegmentId());
+    params.setModelId(jObject.optInt("model-id", 0));
+    logger.debug("Site segment id is", params.getSiteSegmentId(), "and model id is", params.getModelId());
     params.setIpFileVersion(jObject.optInt("rq-ip-file-ver", 1));
     logger.debug("country obtained is", params.getCountry());
     logger.debug("site floor is", params.getSiteFloor());
