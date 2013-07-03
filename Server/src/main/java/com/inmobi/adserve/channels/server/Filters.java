@@ -349,8 +349,10 @@ public class Filters {
         if(null != channelSegment.getChannelSegmentEntity().getManufModelTargetingList() && !channelSegment.getChannelSegmentEntity().getManufModelTargetingList().isEmpty()
             && !channelSegment.getChannelSegmentEntity().getManufModelTargetingList().contains(sasParams.getModelId())) {
           logger.debug(channelSegment.getChannelSegmentEntity().getId(), " dropped in model id filter");
-          InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegment.getChannelSegmentEntity().getAdvertiserId()),
+          if(advertiserIdtoNameMapping.containsKey(advertiserId)) {
+          InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
               InspectorStrings.droppedinHandsetTargetingFilter);
+          }
           continue;
         }
         channelSegment.setPrioritisedECPM(calculatePrioritisedECPM(channelSegment));
