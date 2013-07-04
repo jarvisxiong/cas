@@ -77,8 +77,7 @@ public class ServletBackFill implements Servlet {
       hrh.responseSender.sendNoAdResponse(e);
       return;
     }
-    if(hrh.responseSender.sasParams.getSiteType() != null
-        && !ServletHandler.allowedSiteTypes.contains(hrh.responseSender.sasParams.getSiteType())) {
+    if(hrh.responseSender.sasParams.getSiteType() != null) {
       logger.info("Terminating request as incompatible content type");
       hrh.setTerminationReason(ServletHandler.incompatibleSiteType);
       InspectorStats.incrementStatCount(InspectorStrings.incompatibleSiteType, InspectorStrings.count);

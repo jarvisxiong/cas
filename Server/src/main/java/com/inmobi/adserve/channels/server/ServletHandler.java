@@ -33,7 +33,6 @@ public class ServletHandler {
   
   public static RepositoryHelper repositoryHelper;
   public static int percentRollout;
-  public static List<String> allowedSiteTypes;
   public static int rollCount = 0;
   public static final Random random = new Random();
   public static final Map<String, ServletFactory> servletMap = new HashMap<String, ServletFactory>();
@@ -47,8 +46,7 @@ public class ServletHandler {
     ServletHandler.databaseConfig = config.databaseConfiguration();
     ServletHandler.repositoryHelper = repositoryHelper;
     percentRollout = ServletHandler.serverConfig.getInt("percentRollout", 100);
-    allowedSiteTypes = ServletHandler.serverConfig.getList("allowedSiteTypes");
-    InspectorStats.setWorkflowStats(InspectorStrings.percentRollout, Long.valueOf(percentRollout));
+    InspectorStats.setStats(InspectorStrings.percentRollout, Long.valueOf(percentRollout));
 
     servletMap.put("/stat", new ServletFactory() {
       @Override
