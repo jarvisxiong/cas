@@ -20,7 +20,6 @@ import com.inmobi.adserve.channels.entity.*;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.adserve.channels.util.InspectorStats;
 
 import junit.framework.TestCase;
 
@@ -63,7 +62,6 @@ public class FilterTest extends TestCase {
 
   public void setUp() throws IOException {
     ConfigurationLoader config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
-    InspectorStats.initializeWorkflow("WorkFlow");
     ServletHandler.init(config, null);
     mockConfig = createMock(Configuration.class);
     mockAdapterConfig = createMock(Configuration.class);
@@ -79,15 +77,27 @@ public class FilterTest extends TestCase {
     emptySet = new HashSet<String>();
     emptySet2 = new HashSet<String>();
     cE1 = new ChannelEntity();
-    cE1.setId("advertiserId1").setPriority(1).setImpressionCeil(90).setName("name1").setRequestCap(100);
+    cE1.setChannelId("advertiserId1");
+    cE1.setPriority(1);
+    cE1.setImpressionCeil(90);
+    cE1.setName("name1");
+    cE1.setRequestCap(100);
     cE1.setSiteInclusion(false);
     cE1.setSitesIE(emptySet);
     cE2 = new ChannelEntity();
-    cE2.setId("advertiserId2").setPriority(1).setImpressionCeil(90).setName("name2").setRequestCap(100);
+    cE2.setChannelId("advertiserId2");
+    cE1.setPriority(1);
+    cE1.setImpressionCeil(90);
+    cE1.setName("name2");
+    cE1.setRequestCap(100);
     cE2.setSiteInclusion(false);
     cE2.setSitesIE(emptySet);
     cE3 = new ChannelEntity();
-    cE3.setId("advertiserId3").setPriority(5).setImpressionCeil(90).setName("name3").setRequestCap(100);
+    cE3.setChannelId("advertiserId3");
+    cE1.setPriority(5);
+    cE1.setImpressionCeil(90);
+    cE1.setName("name3");
+    cE1.setRequestCap(100);
     cE3.setSiteInclusion(false);
     cE3.setSitesIE(emptySet);
     cFE1 = new ChannelFeedbackEntity("advertiserId1", 100.0, 50.0, 50.0, 100, 95, 120, 1.0, 4.0);
@@ -143,17 +153,17 @@ public class FilterTest extends TestCase {
     ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(null, null, 2.1, 60,
         12, 123, 12, 11);
     channelSegment1 = new ChannelSegment(channelSegmentEntity1, cE1, cFE1, cSFE1, channelSegmentFeedbackEntity, null,
-        cSFE1.geteCPM());
+        cSFE1.getECPM());
     channelSegment2 = new ChannelSegment(channelSegmentEntity2, cE1, cFE1, cSFE2, channelSegmentFeedbackEntity, null,
-        cSFE2.geteCPM());
+        cSFE2.getECPM());
     channelSegment3 = new ChannelSegment(channelSegmentEntity3, cE1, cFE1, cSFE3, channelSegmentFeedbackEntity, null,
-        cSFE3.geteCPM());
+        cSFE3.getECPM());
     channelSegment4 = new ChannelSegment(channelSegmentEntity4, cE2, cFE2, cSFE4, channelSegmentFeedbackEntity, null,
-        cSFE4.geteCPM());
+        cSFE4.getECPM());
     channelSegment5 = new ChannelSegment(channelSegmentEntity5, cE2, cFE2, cSFE5, channelSegmentFeedbackEntity, null,
-        cSFE5.geteCPM());
+        cSFE5.getECPM());
     channelSegment6 = new ChannelSegment(channelSegmentEntity6, cE3, cFE3, cSFE6, channelSegmentFeedbackEntity, null,
-        cSFE6.geteCPM());
+        cSFE6.getECPM());
     expect(mockAdapterConfig.getKeys()).andReturn(itr).anyTimes();
     expect(mockAdapterConfig.getString("openx.advertiserId")).andReturn("advertiserId1").anyTimes();
     expect(mockAdapterConfig.getString("atnt.advertiserId")).andReturn("advertiserId2").anyTimes();

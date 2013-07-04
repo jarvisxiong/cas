@@ -2,13 +2,23 @@ package com.inmobi.adserve.channels.server;
 
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
-
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+
+import junit.framework.TestCase;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.thrift.TDeserializer;
+import org.apache.thrift.TException;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.easymock.Capture;
+import org.easymock.EasyMock;
+import org.json.JSONException;
+import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.adnetworks.tapit.DCPTapitAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
@@ -17,22 +27,9 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.casthrift.CasChannelLog;
 import com.inmobi.messaging.Message;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
-import junit.framework.TestCase;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.thrift.TDeserializer;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.easymock.Capture;
-import org.easymock.EasyMock;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.testng.annotations.Test;
 
 public class LoggingTest extends TestCase {
   DebugLogger logger;
@@ -57,7 +54,6 @@ public class LoggingTest extends TestCase {
     EasyMock.expectLastCall().times(3);
     replay(dataBusPublisher);
     Logging.init(dataBusPublisher, "null", "null", "null", mockConfig);
-    InspectorStats.initializeWorkflow("WorkFlow");
   }
 
   @Test

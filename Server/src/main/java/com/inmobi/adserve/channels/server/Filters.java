@@ -280,9 +280,6 @@ public class Filters {
     ChannelSegment channelSegment;
     for (Map.Entry<String, HashMap<String, ChannelSegment>> advertiserEntry : matchedSegments.entrySet()) {
       String advertiserId = advertiserEntry.getKey();
-      if(advertiserIdtoNameMapping.containsKey(advertiserId)) {
-        InspectorStats.initializeFilterStats(advertiserIdtoNameMapping.get(advertiserId));
-      }
       channelSegment = ((ChannelSegment[]) advertiserEntry.getValue().values()
           .toArray(new ChannelSegment[advertiserEntry.getValue().values().size()]))[0];
       // dropping advertiser if balance is less than revenue of

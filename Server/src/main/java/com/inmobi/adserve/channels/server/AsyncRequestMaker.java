@@ -78,8 +78,6 @@ public class AsyncRequestMaker {
         continue;
       }
 
-      InspectorStats.initializeNetworkStats(network.getName());
-
       String clickUrl = null;
       String beaconUrl = null;
       sasParams.setImpressionId(getImpressionId(channelSegmentEntity.getIncId()));

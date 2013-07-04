@@ -3,6 +3,7 @@ package com.inmobi.adserve.channels.server;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,17 +17,13 @@ import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
 
 public class MatchSegmentsTest extends TestCase {
 
   @Test
   public void testGetCategories() {
-    InspectorStats.initializeWorkflow("WorkFlow");
     String configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
     ConfigurationLoader config = ConfigurationLoader.getInstance(configFile);
-    InspectorStats.initializeWorkflow(InspectorStrings.percentRollout);
     ServletHandler.init(config, null);
     Configuration mockConfig = createMock(Configuration.class);
     SASRequestParameters sasRequestParameters = new SASRequestParameters();

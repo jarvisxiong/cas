@@ -24,7 +24,6 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.adserve.channels.util.InspectorStats;
 
 public class AuctionEngineTest {
 
@@ -38,7 +37,6 @@ public class AuctionEngineTest {
 	@BeforeMethod
 	public void setUp() throws IOException {
 		ConfigurationLoader config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
-		InspectorStats.initializeWorkflow("WorkFlow");
 		ServletHandler.init(config, null);
 
 		// this is done, to track the encryptedBid variable getting set inside the AuctionEngine.
@@ -184,9 +182,7 @@ public class AuctionEngineTest {
 		casInternalRequestParameters.rtbBidFloor = bidFloorInput;
 		auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
-		// AsyncRequestMaker is being utilized inside AuctionEnginer
-		AsyncRequestMaker asyncRequestMaker = new AsyncRequestMaker();
-		asyncRequestMaker.init(null, null, null);
+		AsyncRequestMaker.init(null, null, null);
 
 		AdNetworkInterface auctionEngineResponse = auctionEngine
 				.runRtbSecondPriceAuctionEngine();
@@ -284,9 +280,7 @@ public class AuctionEngineTest {
 		casInternalRequestParameters.rtbBidFloor = bidFloorInput;
 		auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
-		// AsyncRequestMaker is being utilized inside AuctionEnginer
-		AsyncRequestMaker asyncRequestMaker = new AsyncRequestMaker();
-		asyncRequestMaker.init(null, null, null);
+		AsyncRequestMaker.init(null, null, null);
 
 		AdNetworkInterface auctionEngineResponse = auctionEngine
 				.runRtbSecondPriceAuctionEngine();
@@ -317,9 +311,8 @@ public class AuctionEngineTest {
 		casInternalRequestParameters.rtbBidFloor = bidFloorInput;
 		auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
-		// AsyncRequestMaker is being utilized inside AuctionEnginer
-		AsyncRequestMaker asyncRequestMaker = new AsyncRequestMaker();
-		asyncRequestMaker.init(null, null, null);
+		new AsyncRequestMaker();
+		AsyncRequestMaker.init(null, null, null);
 
 		AdNetworkInterface auctionEngineResponse = auctionEngine .runRtbSecondPriceAuctionEngine();
 
@@ -356,9 +349,7 @@ public class AuctionEngineTest {
 		casInternalRequestParameters.rtbBidFloor = bidFloorInput;
 		auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
-		// AsyncRequestMaker is being utilized inside AuctionEnginer
-		AsyncRequestMaker asyncRequestMaker = new AsyncRequestMaker();
-		asyncRequestMaker.init(null, null, null);
+		AsyncRequestMaker.init(null, null, null);
 
 		AdNetworkInterface auctionEngineResponse = auctionEngine
 				.runRtbSecondPriceAuctionEngine();
@@ -395,9 +386,7 @@ public class AuctionEngineTest {
 		casInternalRequestParameters.rtbBidFloor = bidFloorInput;
 		auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
-		// AsyncRequestMaker is being utilized inside AuctionEnginer
-		AsyncRequestMaker asyncRequestMaker = new AsyncRequestMaker();
-		asyncRequestMaker.init(null, null, null);
+		AsyncRequestMaker.init(null, null, null);
 
 		AdNetworkInterface auctionEngineResponse = auctionEngine
 				.runRtbSecondPriceAuctionEngine();
@@ -428,9 +417,7 @@ public class AuctionEngineTest {
 		casInternalRequestParameters.rtbBidFloor = bidFloorInput;
 		auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
-		// AsyncRequestMaker is being utilized inside AuctionEnginer
-		AsyncRequestMaker asyncRequestMaker = new AsyncRequestMaker();
-		asyncRequestMaker.init(null, null, null);
+		AsyncRequestMaker.init(null, null, null);
 
 		AdNetworkInterface auctionEngineResponse = auctionEngine
 				.runRtbSecondPriceAuctionEngine();

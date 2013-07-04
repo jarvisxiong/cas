@@ -14,7 +14,6 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 
 import junit.framework.TestCase;
@@ -29,7 +28,6 @@ public class HttpRequestHandlerTest extends TestCase {
   public void setUp() throws Exception {
 
     config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
-    InspectorStats.initializeWorkflow("WorkFlow");
     ServletHandler.init(config, null);
 
     Configuration loggerConfig = createMock(Configuration.class);
@@ -63,7 +61,6 @@ public class HttpRequestHandlerTest extends TestCase {
     expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
     expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");    replay(mockConfig);
     DebugLogger.init(mockConfig);
-    InspectorStats.initializeWorkflow("WorkFlow");
     AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
     Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-channel", "cas-advertisement", mockServerConfig);
   }
