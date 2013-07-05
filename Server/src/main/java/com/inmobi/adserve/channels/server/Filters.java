@@ -1,8 +1,10 @@
 package com.inmobi.adserve.channels.server;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -339,38 +341,14 @@ public class Filters {
           logger.debug("sitefloor filter passed by adgroup", channelSegment.getChannelSegmentFeedbackEntity().getId());
         }
         
-     // applying dcp floor
-        if(null != dcpFloor) {
-          // applying the boost
-          dcpFloor = dcpFloor + channelSegment.getChannelSegmentEntity().getEcpmBoost();
-          double ecpm = channelSegment.getChannelSegmentCitrusLeafFeedbackEntity().geteCPM();
-          int percentage = 100;
-          if(ecpm > 0.0) {
-            percentage = (int) ((dcpFloor / ecpm) * 100);
-          }
-          
-          //Allow percentage of times any segment
-          if(percentage > 100) {
-            percentage = 100;
-          } else if(percentage == 100) {
-            percentage = 50;
-          } else if(percentage >= 80) {
-            percentage = 10;
-          } else {
-            percentage = 1;
-          }
-
-          // applying dcp floor
-          if(ServletHandler.random.nextInt(100) >= percentage) {
-            logger
-                .debug("dcp floor filter passed by adgroup", channelSegment.getChannelSegmentFeedbackEntity().getId());
-          } else {
-            logger
-                .debug("dcp floor filter failed by adgroup", channelSegment.getChannelSegmentFeedbackEntity().getId());
-            InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
-                InspectorStrings.droppedinPricingEngineFilter);
-            continue;
-          }
+        //applying pricing engine filter 
+        if(isChannelSegmentFilteredOutByPricingEngine(advertiserId, dcpFloor, channelSegment)) {
+          continue;
+        }
+        
+        //applying timeOfDayTargeting filter
+        if(isTODTargetingFailed(channelSegment)) {
+          continue;
         }
         
         //applying impression cap filter at adgroup level
@@ -431,6 +409,71 @@ public class Filters {
     matchedSegments = rows;
   }
 
+  boolean isTODTargetingFailed(ChannelSegment channelSegment) {
+    if(null == channelSegment.getChannelSegmentEntity().getTod()) {
+      logger.debug(channelSegment.getChannelSegmentEntity().getAdgroupId(),
+          " has all ToD and DoW targeting. Passing the ToD check ");
+      return false;
+    }
+    Calendar now = Calendar.getInstance();
+    int hourOfDay = 1 << now.get(Calendar.HOUR_OF_DAY);
+    Long[] timeOfDayTargetingArray = channelSegment.getChannelSegmentEntity().getTod();
+    logger.debug("ToD array is :  ", timeOfDayTargetingArray);
+    long dayOfWeek = timeOfDayTargetingArray[now.get(Calendar.DAY_OF_WEEK) - 1];
+    long todt = dayOfWeek & hourOfDay;
+    logger.debug("dayOfWeek is :  ", dayOfWeek, "hourOfDay is :  ", hourOfDay, "todt calculated is : ", todt);
+    if(todt == 0) {
+      logger.debug(logger, "Hour of day targeting failed. Returning true");
+      return true;
+    }
+    logger.debug(logger, "Hour of day targeting passed. Returning false");
+    return false;
+
+  }
+  
+  boolean isChannelSegmentFilteredOutByPricingEngine(String advertiserId, Double dcpFloor, ChannelSegment channelSegment) {
+    // applying dcp floor
+    if(null != dcpFloor) {
+      // applying the boost
+      Date ecpmBoostExpiryDate = channelSegment.getChannelSegmentEntity().getEcpmBoostExpiryDate();
+      if(null != ecpmBoostExpiryDate && ecpmBoostExpiryDate.compareTo(new Date()) > 0) {
+        dcpFloor = dcpFloor + channelSegment.getChannelSegmentEntity().getEcpmBoost();
+        logger.debug("EcpmBoost is applied for ", channelSegment.getChannelSegmentEntity().getAdgroupId());
+      }
+      
+      double ecpm = channelSegment.getChannelSegmentCitrusLeafFeedbackEntity().geteCPM();
+      int percentage = 100;
+      if(ecpm > 0.0) {
+        percentage = (int) ((dcpFloor / ecpm) * 100);
+      }
+
+      // Allow percentage of times any segment
+      if(percentage > 100) {
+        percentage = 100;
+      } else if(percentage == 100) {
+        percentage = 50;
+      } else if(percentage >= 80) {
+        percentage = 10;
+      } else {
+        percentage = 1;
+      }
+
+      // applying dcp floor
+      if(ServletHandler.random.nextInt(100) >= percentage) {
+        logger.debug("dcp floor filter passed by adgroup", channelSegment.getChannelSegmentFeedbackEntity().getId());
+        return false;
+      } else {
+        logger.debug("dcp floor filter failed by adgroup", channelSegment.getChannelSegmentFeedbackEntity().getId());
+        if(advertiserIdtoNameMapping.containsKey(advertiserId)) {
+          InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
+              InspectorStrings.droppedinPricingEngineFilter);
+        }
+        return true;
+      }
+    }
+    return false;
+  }
+  
   /**
    * Segment property filter
    * 
