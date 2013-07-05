@@ -83,7 +83,7 @@ public class AuctionEngineTest {
 		ChannelSegmentEntity channelSegmentEntity1 = new ChannelSegmentEntity(advId, "adgroupId", "adId", 
 				channelId, 1, rcList, tags, true, true, externalSiteKey, modified_on, "campaignId", slotIds, 
 				1,true, "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, 
-				false, false, false, false, null);
+				false, false, false, false, null, null, 0.0d, null, null);
 
 		AdNetworkInterface mockAdnetworkInterface = createMock(DCPTapitAdNetwork.class);
 		ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();

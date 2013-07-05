@@ -109,45 +109,39 @@ public class FilterTest extends TestCase {
     channelSegmentEntity1 = new ChannelSegmentEntity("advertiserId1", "adgroupId1", "adId", "channelId1", (long) 1,
         rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true,
         "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, false, false, false, false,
-        null);
+        null, new ArrayList<Integer>(), 0.0d, null, null);
     channelSegmentEntity1.setSiteInclusion(false);
     channelSegmentEntity1.setSitesIE(emptySet);
-    channelSegmentEntity1.setManufModelTargetingList(new ArrayList<Integer>());
     channelSegmentEntity2 = new ChannelSegmentEntity("advertiserId1", "adgroupId2", "adId", "channelId1", (long) 0,
         rcList, tags, false, true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true,
         "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, false, false, false, false,
-        null);
+        null, new ArrayList<Integer>(), 0.0d, null, null);
     channelSegmentEntity2.setSiteInclusion(false);
     channelSegmentEntity2.setSitesIE(emptySet);
-    channelSegmentEntity2.setManufModelTargetingList(new ArrayList<Integer>());
     channelSegmentEntity3 = new ChannelSegmentEntity("advertiserId1", "adgroupId3", "adId", "channelId1", (long) 1,
         rcList, tags, false, false, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 0, false,
         "pricingModel", siteRatings, 0, null, false, false, false, false, false, false, false, false, false, false,
-        null);
+        null, new ArrayList<Integer>(), 0.0d, null, null);
     channelSegmentEntity3.setSiteInclusion(false);
     channelSegmentEntity3.setSitesIE(emptySet);
-    channelSegmentEntity3.setManufModelTargetingList(new ArrayList<Integer>());
     channelSegmentEntity4 = new ChannelSegmentEntity("advertiserId2", "adgroupId4", "adId", "channelId2", (long) 1,
         rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true,
         "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, false, false, false, false,
-        null);
+        null, new ArrayList<Integer>(), 0.0d, null, null);
     channelSegmentEntity4.setSiteInclusion(false);
     channelSegmentEntity4.setSitesIE(emptySet);
-    channelSegmentEntity4.setManufModelTargetingList(new ArrayList<Integer>());
     channelSegmentEntity5 = new ChannelSegmentEntity("advertiserId2", "adgroupId5", "adId", "channelId2", (long) 1,
         rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true,
         "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, false, false, false, false,
-        null);
+        null, new ArrayList<Integer>(), 0.0d, null, null);
     channelSegmentEntity5.setSiteInclusion(false);
     channelSegmentEntity5.setSitesIE(emptySet);
-    channelSegmentEntity5.setManufModelTargetingList(new ArrayList<Integer>());
     channelSegmentEntity6 = new ChannelSegmentEntity("advertiserId3", "adgroupId5", "adId", "channelId3", (long) 1,
         rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds, (long) 1, true,
         "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, false, false, false, false,
-        null);
+        null, new ArrayList<Integer>(), 0.0d, null, null);
     channelSegmentEntity6.setSiteInclusion(false);
     channelSegmentEntity6.setSitesIE(emptySet);
-    channelSegmentEntity6.setManufModelTargetingList(new ArrayList<Integer>());
     ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(null, null, 2.1, 60,
         12, 123, 12, 11);
     channelSegment1 = new ChannelSegment(channelSegmentEntity1, cE1, cFE1, cSFE1, channelSegmentFeedbackEntity, null,
