@@ -13,6 +13,7 @@ import org.jboss.netty.channel.MessageEvent;
 import com.inmobi.adserve.channels.adnetworks.appier.DCPAppierAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.atnt.ATNTAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.adelphic.DCPAdelphicAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.ajillion.DCPAjillionAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.drawbridge.DrawBridgeAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.httpool.DCPHttPoolAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.huntmads.DCPHuntmadsAdNetwork;
@@ -27,6 +28,7 @@ import com.inmobi.adserve.channels.adnetworks.mullahmedia.MoolahMediaPremiumAdne
 import com.inmobi.adserve.channels.adnetworks.mullahmedia.MullahMediaNetwork;
 import com.inmobi.adserve.channels.adnetworks.nexage.DCPNexageAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.openx.OpenxAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.paypal.DCPPayPalAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.pubmatic.DCPPubmaticAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.siquis.DCPSiquisAdNetwork;
@@ -276,8 +278,24 @@ public class SegmentFactory {
 			return new DCPAppierAdNetwork(logger, config, clientBootstrap,
 					base, serverEvent);
 		}
-
-		
+		else if ((advertiserId.equals(config
+				.getString("definiti.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet
+						.contains("definiti"))
+				&& (config.getString("definiti.status").equals("on"))) {
+			DCPAjillionAdnetwork adaptor = new DCPAjillionAdnetwork(logger, config, clientBootstrap,
+					base, serverEvent);
+			adaptor.setName("definiti");
+			return adaptor;
+		}
+		else if ((advertiserId.equals(config
+				.getString("paypal.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet
+						.contains("paypal"))
+				&& (config.getString("paypal.status").equals("on"))) {
+			return new DCPPayPalAdNetwork(logger, config, clientBootstrap,
+					base, serverEvent);
+		}
 
 		return null;
 	}
