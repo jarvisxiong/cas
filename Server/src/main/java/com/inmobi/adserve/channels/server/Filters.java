@@ -456,7 +456,7 @@ public class Filters {
       }
       
       int percentage = 100;
-      if(ecpm > 0.0) {
+      if(dcpFloor > 0.0) {
         percentage = (int) ((ecpm / dcpFloor) * 100);
       }
 
