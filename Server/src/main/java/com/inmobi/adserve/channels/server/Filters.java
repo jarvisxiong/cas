@@ -50,6 +50,8 @@ public class Filters {
   private double revenueWindow;
   private RepositoryHelper repositoryHelper;
   private DebugLogger logger;
+  private Double dcpFloor;
+  private Double rtbFloor;
 
   public static Map<String, String> getAdvertiserIdToNameMapping() {
     return advertiserIdtoNameMapping;
@@ -88,6 +90,7 @@ public class Filters {
    */
   public List<ChannelSegment> applyFilters() {
     advertiserLevelFiltering();
+    fetchPricingEngineFloors();
     adGroupLevelFiltering();
     List<ChannelSegment> channelSegments = convertToSegmentsList(matchedSegments);
     return selectTopAdgroupsForRequest(channelSegments);
@@ -312,23 +315,6 @@ public class Filters {
     logger.debug("Inside adGroupLevelFiltering");
     Map<String, HashMap<String, ChannelSegment>> rows = new HashMap<String, HashMap<String, ChannelSegment>>();
     
-    //Fetching pricing engine entity
-    int country = 0;
-    if(null != sasParams.getCountryStr()) {
-     country = Integer.parseInt(sasParams.getCountryStr());
-    }
-    int os = sasParams.getOsId();
-    PricingEngineEntity pricingEngineEntity = null;
-    if (null != repositoryHelper && country != 0) {
-      pricingEngineEntity = repositoryHelper.queryPricingEngineRepository(country, os, logger);
-    }
-    Double dcpFloor = null;
-    Double rtbFloor = null;
-    if(null != pricingEngineEntity) {
-      dcpFloor = pricingEngineEntity.getDcpFloor();
-      rtbFloor = pricingEngineEntity.getRtbFloor();
-    }
-    
     for (Map.Entry<String, HashMap<String, ChannelSegment>> advertiserEntry : matchedSegments.entrySet()) {
       String advertiserId = advertiserEntry.getKey();
       HashMap<String, ChannelSegment> hashMap = new HashMap<String, ChannelSegment>();
@@ -345,7 +331,7 @@ public class Filters {
         }
         
         //applying pricing engine filter 
-        if(isChannelSegmentFilteredOutByPricingEngine(advertiserId, dcpFloor, channelSegment)) {
+        if(isChannelSegmentFilteredOutByPricingEngine(advertiserId, getDcpFloor(), channelSegment)) {
           continue;
         }
         
@@ -444,6 +430,7 @@ public class Filters {
   
   boolean isChannelSegmentFilteredOutByPricingEngine(String advertiserId, Double dcpFloor, ChannelSegment channelSegment) {
     // applying dcp floor
+    
     if(null != dcpFloor) {
       // applying the boost
       Date ecpmBoostExpiryDate = channelSegment.getChannelSegmentEntity().getEcpmBoostExpiryDate();
@@ -704,5 +691,35 @@ public class Filters {
       logger.debug("All RTB segments passed guaranteed delivery RTB filter");
     }
     return rtbSegments;
+  }
+
+  public void fetchPricingEngineFloors() {
+    // Fetching pricing engine entity
+    int country = 0;
+    if(null != sasParams.getCountryStr()) {
+      country = Integer.parseInt(sasParams.getCountryStr());
+    }
+    int os = sasParams.getOsId();
+    PricingEngineEntity pricingEngineEntity = null;
+    if(null != repositoryHelper && country != 0) {
+      pricingEngineEntity = repositoryHelper.queryPricingEngineRepository(country, os, logger);
+    }
+    Double dcpFloor = null;
+    Double rtbFloor = null;
+    if(null != pricingEngineEntity) {
+      dcpFloor = pricingEngineEntity.getDcpFloor();
+      rtbFloor = pricingEngineEntity.getRtbFloor();
+    }
+    
+    this.dcpFloor = dcpFloor;
+    this.rtbFloor = rtbFloor;
+  }
+  
+  public Double getDcpFloor() {
+    return dcpFloor;
+  }
+
+  public Double getRtbFloor() {
+    return rtbFloor;
   }
 }
