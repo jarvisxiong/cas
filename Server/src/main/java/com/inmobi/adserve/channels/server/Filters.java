@@ -347,7 +347,7 @@ public class Filters {
         }
         
         //applying timeOfDayTargeting filter
-        if(isTODTargetingFailed(channelSegment)) {
+        if(isTODTargetingFailed(advertiserId, channelSegment)) {
           continue;
         }
         
@@ -413,7 +413,7 @@ public class Filters {
     matchedSegments = rows;
   }
 
-  boolean isTODTargetingFailed(ChannelSegment channelSegment) {
+  boolean isTODTargetingFailed(String advertiserId, ChannelSegment channelSegment) {
     if(null == channelSegment.getChannelSegmentEntity().getTod()) {
       logger.debug(channelSegment.getChannelSegmentEntity().getAdgroupId(),
           " has all ToD and DoW targeting. Passing the ToD check ");
@@ -428,6 +428,10 @@ public class Filters {
     logger.debug("dayOfWeek is :  ", dayOfWeek, "hourOfDay is :  ", hourOfDay, "todt calculated is : ", todt);
     if(todt == 0) {
       logger.debug(logger, "Hour of day targeting failed. Returning true");
+      if(advertiserIdtoNameMapping.containsKey(advertiserId)) {
+        InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
+            InspectorStrings.droppedInTODFilter);
+      }
       return true;
     }
     logger.debug(logger, "Hour of day targeting passed. Returning false");
