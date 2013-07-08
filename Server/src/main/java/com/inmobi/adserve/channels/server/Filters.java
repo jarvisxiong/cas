@@ -313,10 +313,13 @@ public class Filters {
     Map<String, HashMap<String, ChannelSegment>> rows = new HashMap<String, HashMap<String, ChannelSegment>>();
     
     //Fetching pricing engine entity
-    int country = Integer.parseInt(sasParams.getCountryStr());
+    int country = 0;
+    if(null != sasParams.getCountryStr()) {
+     country = Integer.parseInt(sasParams.getCountryStr());
+    }
     int os = sasParams.getOsId();
     PricingEngineEntity pricingEngineEntity = null;
-    if (null != repositoryHelper) {
+    if (null != repositoryHelper && country != 0) {
       pricingEngineEntity = repositoryHelper.queryPricingEngineRepository(country, os, logger);
     }
     Double dcpFloor = null;
@@ -444,15 +447,17 @@ public class Filters {
     if(null != dcpFloor) {
       // applying the boost
       Date ecpmBoostExpiryDate = channelSegment.getChannelSegmentEntity().getEcpmBoostExpiryDate();
+      double ecpm = channelSegment.getChannelSegmentCitrusLeafFeedbackEntity().geteCPM();
       if(null != ecpmBoostExpiryDate && ecpmBoostExpiryDate.compareTo(new Date()) > 0) {
-        dcpFloor = dcpFloor + channelSegment.getChannelSegmentEntity().getEcpmBoost();
+        logger.debug("Ecpm before boost is ", ecpm);
+        ecpm = ecpm + channelSegment.getChannelSegmentEntity().getEcpmBoost();
         logger.debug("EcpmBoost is applied for ", channelSegment.getChannelSegmentEntity().getAdgroupId());
+        logger.debug("Ecpm after boost is ", ecpm);
       }
       
-      double ecpm = channelSegment.getChannelSegmentCitrusLeafFeedbackEntity().geteCPM();
       int percentage = 100;
       if(ecpm > 0.0) {
-        percentage = (int) ((dcpFloor / ecpm) * 100);
+        percentage = (int) ((ecpm / dcpFloor) * 100);
       }
 
       // Allow percentage of times any segment
