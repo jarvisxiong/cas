@@ -446,7 +446,7 @@ public class Filters {
       if(dcpFloor > 0.0) {
         percentage = (int) ((ecpm / dcpFloor) * 100);
       } else {
-        percentage = 100;
+        percentage = 150;
       }
 
       // Allow percentage of times any segment
@@ -459,7 +459,8 @@ public class Filters {
       } else {
         percentage = 1;
       }
-
+      
+      logger.debug("pricing engine percentage allowed is " + percentage);
       // applying dcp floor
       if(ServletHandler.random.nextInt(100) >= percentage) {
         logger.debug("dcp floor filter passed by adgroup", channelSegment.getChannelSegmentFeedbackEntity().getId());
