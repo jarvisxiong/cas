@@ -445,6 +445,8 @@ public class Filters {
       int percentage = 100;
       if(dcpFloor > 0.0) {
         percentage = (int) ((ecpm / dcpFloor) * 100);
+      } else {
+        percentage = 100;
       }
 
       // Allow percentage of times any segment
