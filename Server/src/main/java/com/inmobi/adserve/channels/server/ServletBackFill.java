@@ -181,6 +181,8 @@ public class ServletBackFill implements Servlet {
     logger.debug("Highest Ecpm is", Double.valueOf(casInternalRequestParametersGlobal.highestEcpm));
     casInternalRequestParametersGlobal.blockedCategories = getBlockedCategories(hrh, logger);
     casInternalRequestParametersGlobal.blockedAdvertisers = getBlockedAdvertisers(hrh, logger);
+    logger.debug("blockedCategories are", casInternalRequestParametersGlobal.blockedCategories);
+    logger.debug("blockedAdvertisers are", casInternalRequestParametersGlobal.blockedAdvertisers);
     double countryFloor = 0.05;
     double segmentFloor = 0.0;
     casInternalRequestParametersGlobal.rtbBidFloor = hrh.responseSender.getAuctionEngine().calculateRTBFloor(sasParams.getSiteFloor(), casInternalRequestParametersGlobal.highestEcpm, segmentFloor, countryFloor);
@@ -256,16 +258,11 @@ public class ServletBackFill implements Servlet {
   private static List<Long> getBlockedCategories(HttpRequestHandler hrh, DebugLogger logger) {
     List<Long> blockedCategories = null;
     if(null != hrh.responseSender.sasParams.getSiteId()) {
-      logger.debug("SiteId is", hrh.responseSender.sasParams.getSiteId());
       PublisherFilterEntity publisherFilterEntity = ServletHandler.repositoryHelper.queryPublisherFilterRepository(
           hrh.responseSender.sasParams.getSiteId(), 4, logger);
       if(null != publisherFilterEntity && publisherFilterEntity.getBlockedCategories() != null) {
         blockedCategories = Arrays.asList(publisherFilterEntity.getBlockedCategories());
-        int size = (blockedCategories == null ? 0 : blockedCategories.size());
-        logger.debug("Site id is", hrh.responseSender.sasParams.getSiteId(), "no of blocked categories are", size);
-      } else {
-        logger.debug("No blockedCategory for this site id");
-      }
+      } 
     }
     return blockedCategories;
   }
@@ -273,15 +270,10 @@ public class ServletBackFill implements Servlet {
   private static List<String> getBlockedAdvertisers(HttpRequestHandler hrh, DebugLogger logger) {
     List<String> blockedAdvertisers = null;
     if(null != hrh.responseSender.sasParams.getSiteId()) {
-      logger.debug("SiteId is", hrh.responseSender.sasParams.getSiteId());
       PublisherFilterEntity publisherFilterEntity = ServletHandler.repositoryHelper.queryPublisherFilterRepository(
           hrh.responseSender.sasParams.getSiteId(), 6, logger);
       if(null != publisherFilterEntity && publisherFilterEntity.getBlockedAdvertisers() != null) {
         blockedAdvertisers = Arrays.asList(publisherFilterEntity.getBlockedAdvertisers());
-        logger.debug("Site id is", hrh.responseSender.sasParams.getSiteId(), "no of blocked advertisers are",
-            blockedAdvertisers.size());
-      } else {
-        logger.debug("No blockedAdvertiser for this site id");
       }
     }
     return blockedAdvertisers;
