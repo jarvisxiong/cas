@@ -29,6 +29,8 @@ import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.ChannelRepository;
 import com.inmobi.adserve.channels.repository.ChannelFeedbackRepository;
 import com.inmobi.adserve.channels.repository.ChannelSegmentFeedbackRepository;
+import com.inmobi.adserve.channels.repository.PricingEngineRepository;
+import com.inmobi.adserve.channels.repository.PublisherFilterRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.repository.SiteCitrusLeafFeedbackRepository;
 import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
@@ -53,6 +55,8 @@ public class ChannelServer {
   private static SiteMetaDataRepository siteMetaDataRepository;
   private static SiteTaxonomyRepository siteTaxonomyRepository;
   private static SiteCitrusLeafFeedbackRepository siteCitrusLeafFeedbackRepository;
+  private static PricingEngineRepository pricingEngineRepository;
+  private static PublisherFilterRepository publisherFilterRepository;
   private static RepositoryHelper repositoryHelper;
   private static final String configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
   public static byte dataCenterIdCode;
@@ -98,16 +102,20 @@ public class ChannelServer {
     siteMetaDataRepository = new SiteMetaDataRepository();
     siteTaxonomyRepository = new SiteTaxonomyRepository();
     siteCitrusLeafFeedbackRepository = new SiteCitrusLeafFeedbackRepository();
+    pricingEngineRepository = new PricingEngineRepository();
+    publisherFilterRepository = new PublisherFilterRepository();
 
     repositoryHelper = new RepositoryHelper(channelRepository, channelAdGroupRepository, channelFeedbackRepository,
         channelSegmentFeedbackRepository, siteMetaDataRepository, siteTaxonomyRepository,
-        siteCitrusLeafFeedbackRepository);
+        siteCitrusLeafFeedbackRepository, pricingEngineRepository, publisherFilterRepository);
     InspectorStats.initializeRepoStats(ChannelServerStringLiterals.CHANNEL_REPOSITORY);
     InspectorStats.initializeRepoStats(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY);
     InspectorStats.initializeRepoStats(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY);
     InspectorStats.initializeRepoStats(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY);
     InspectorStats.initializeRepoStats(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY);
     InspectorStats.initializeRepoStats(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY);
+    InspectorStats.initializeRepoStats(ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY);
+    InspectorStats.initializeRepoStats(ChannelServerStringLiterals.PUBLISHER_FILTER_REPOSITORY);
     instantiateRepository(logger, config);
     Filters.init(config.adapterConfiguration());
     // Creating netty client for out-bound calls.
@@ -239,6 +247,10 @@ public class ChannelServer {
           ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY);
       siteMetaDataRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY),
           ChannelServerStringLiterals.SITE_METADATA_REPOSITORY);
+      pricingEngineRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY),
+          ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY);
+      publisherFilterRepository.init(logger, config.cacheConfiguration().subset(ChannelServerStringLiterals.PUBLISHER_FILTER_REPOSITORY),
+          ChannelServerStringLiterals.PUBLISHER_FILTER_REPOSITORY);
       siteCitrusLeafFeedbackRepository.init(config.serverConfiguration().subset(ChannelServerStringLiterals.CITRUS_LEAF_FEEDBACK), getDataCenter());
       logger.error("* * * * Instantiating repository completed * * * *");
     } catch (NamingException exception) {
