@@ -70,6 +70,8 @@ public class ServletGetSegment implements Servlet {
         entity = ServletHandler.repositoryHelper.querySiteMetaDetaRepository(id);
       } else if(repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY)) {
         entity = ServletHandler.repositoryHelper.querySiteTaxonomyRepository(id);
+      } else if(repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals.PUBLISHER_FILTER_REPOSITORY)) {
+        entity = ServletHandler.repositoryHelper.queryPublisherFilterRepository(id.split("_")[0], Integer.parseInt(id.split("_")[1]), null);
       } else if(repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CITRUS_LEAF_FEEDBACK)) {
         entity = ServletHandler.repositoryHelper.querySiteCitrusLeafFeedbackRepository(id.split("_")[0],
             id.split("_")[1], logger);
