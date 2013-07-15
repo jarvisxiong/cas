@@ -16,7 +16,7 @@ import org.json.JSONObject;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
+import com.inmobi.adserve.channels.entity.PublisherFilterEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -180,11 +180,15 @@ public class ServletBackFill implements Servlet {
     casInternalRequestParametersGlobal.highestEcpm = getHighestEcpm(rows, logger);
     logger.debug("Highest Ecpm is", Double.valueOf(casInternalRequestParametersGlobal.highestEcpm));
     casInternalRequestParametersGlobal.blockedCategories = getBlockedCategories(hrh, logger);
+    casInternalRequestParametersGlobal.blockedAdvertisers = getBlockedAdvertisers(hrh, logger);
+    logger.debug("blockedCategories are", casInternalRequestParametersGlobal.blockedCategories);
+    logger.debug("blockedAdvertisers are", casInternalRequestParametersGlobal.blockedAdvertisers);
     double countryFloor = 0.05;
     double segmentFloor = 0.0;
     casInternalRequestParametersGlobal.rtbBidFloor = hrh.responseSender.getAuctionEngine().calculateRTBFloor(sasParams.getSiteFloor(), casInternalRequestParametersGlobal.highestEcpm, segmentFloor, countryFloor);
     hrh.responseSender.casInternalRequestParameters = casInternalRequestParametersGlobal;
     hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternalRequestParametersGlobal;
+
     logger.debug("Total channels available for sending requests " + rows.size());
     List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
@@ -254,19 +258,25 @@ public class ServletBackFill implements Servlet {
   private static List<Long> getBlockedCategories(HttpRequestHandler hrh, DebugLogger logger) {
     List<Long> blockedCategories = null;
     if(null != hrh.responseSender.sasParams.getSiteId()) {
-      logger.debug("SiteId is", hrh.responseSender.sasParams.getSiteId());
-      SiteMetaDataEntity siteMetaDataEntity = ServletHandler.repositoryHelper
-          .querySiteMetaDetaRepository(hrh.responseSender.sasParams.getSiteId());
-      if(null != siteMetaDataEntity && siteMetaDataEntity.getBlockedCategories() != null) {
-        if(!siteMetaDataEntity.isExpired() && siteMetaDataEntity.getRuleType() == 4) {
-          blockedCategories = Arrays.asList(siteMetaDataEntity.getBlockedCategories());
-          int size = (blockedCategories == null ? 0 : blockedCategories.size());
-          logger.debug("Site id is", hrh.responseSender.sasParams.getSiteId(), "no of blocked categories are", size);
-        }
-      } else {
-        logger.debug("No blockedCategory for this site id");
-      }
+      PublisherFilterEntity publisherFilterEntity = ServletHandler.repositoryHelper.queryPublisherFilterRepository(
+          hrh.responseSender.sasParams.getSiteId(), 4, logger);
+      if(null != publisherFilterEntity && publisherFilterEntity.getBlockedCategories() != null) {
+        blockedCategories = Arrays.asList(publisherFilterEntity.getBlockedCategories());
+      } 
     }
     return blockedCategories;
   }
+  
+  private static List<String> getBlockedAdvertisers(HttpRequestHandler hrh, DebugLogger logger) {
+    List<String> blockedAdvertisers = null;
+    if(null != hrh.responseSender.sasParams.getSiteId()) {
+      PublisherFilterEntity publisherFilterEntity = ServletHandler.repositoryHelper.queryPublisherFilterRepository(
+          hrh.responseSender.sasParams.getSiteId(), 6, logger);
+      if(null != publisherFilterEntity && publisherFilterEntity.getBlockedAdvertisers() != null) {
+        blockedAdvertisers = Arrays.asList(publisherFilterEntity.getBlockedAdvertisers());
+      }
+    }
+    return blockedAdvertisers;
+  }
+  
 }
