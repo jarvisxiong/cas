@@ -339,11 +339,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
       }
     }
-    for (int index = 0; rankList != null && index < rankList.size(); index++) {
-      if(null != rankList.get(index).getAdNetworkInterface().getChannelId()) {
-        ChannelsClientHandler.responseMap.remove(rankList.get(index).getAdNetworkInterface().getChannelId());
-        ChannelsClientHandler.statusMap.remove(rankList.get(index).getAdNetworkInterface().getChannelId());
-        ChannelsClientHandler.adStatusMap.remove(rankList.get(index).getAdNetworkInterface().getChannelId());
+    for (int index = 0; rtbList != null && index < rtbList.size(); index++) {
+      if(null != rtbList.get(index).getAdNetworkInterface().getChannelId()) {
+        ChannelsClientHandler.responseMap.remove(rtbList.get(index).getAdNetworkInterface().getChannelId());
+        ChannelsClientHandler.statusMap.remove(rtbList.get(index).getAdNetworkInterface().getChannelId());
+        ChannelsClientHandler.adStatusMap.remove(rtbList.get(index).getAdNetworkInterface().getChannelId());
       }
     }
     
