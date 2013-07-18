@@ -6,6 +6,7 @@ import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 import java.awt.Dimension;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -298,7 +299,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
       InspectorStats.incrementStatCount(InspectorStrings.nomatchsegmentcount);
       InspectorStats.incrementStatCount(InspectorStrings.nomatchsegmentlatency, totalTime);
     }
-    // closing unclosed channels
+    
+    
+    // closing unclosed dcp channels
     for (int index = 0; rankList != null && index < rankList.size(); index++) {
       if(logger.isDebugEnabled()) {
         logger.debug("calling clean up for channel " + rankList.get(index).getAdNetworkInterface().getId());
@@ -319,6 +322,31 @@ public class ResponseSender extends HttpRequestHandlerBase {
         ChannelsClientHandler.adStatusMap.remove(rankList.get(index).getAdNetworkInterface().getChannelId());
       }
     }
+    
+    //Closing RTB channels
+    List<ChannelSegment> rtbList = auctionEngine.getRtbSegments();
+    
+    for (int index = 0; rtbList != null && index < rtbList.size(); index++) {
+      if(logger.isDebugEnabled()) {
+        logger.debug("calling clean up for channel " + rtbList.get(index).getAdNetworkInterface().getId());
+      }
+      try {
+          rtbList.get(index).getAdNetworkInterface().cleanUp();
+      } catch (Exception exception) {
+        if(logger.isDebugEnabled()) {
+          logger.debug("Error in closing channel for index: " + index + " Name: "
+              + rtbList.get(index).getAdNetworkInterface().getName() + " Exception: " + exception.getLocalizedMessage());
+        }
+      }
+    }
+    for (int index = 0; rankList != null && index < rankList.size(); index++) {
+      if(null != rankList.get(index).getAdNetworkInterface().getChannelId()) {
+        ChannelsClientHandler.responseMap.remove(rankList.get(index).getAdNetworkInterface().getChannelId());
+        ChannelsClientHandler.statusMap.remove(rankList.get(index).getAdNetworkInterface().getChannelId());
+        ChannelsClientHandler.adStatusMap.remove(rankList.get(index).getAdNetworkInterface().getChannelId());
+      }
+    }
+    
     if(logger.isDebugEnabled()) {
       logger.debug("done with closing channels");
       logger.debug("responsemap size is :" + ChannelsClientHandler.responseMap.size());
