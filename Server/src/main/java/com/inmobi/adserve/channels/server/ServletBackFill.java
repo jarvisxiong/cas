@@ -185,7 +185,9 @@ public class ServletBackFill implements Servlet {
     logger.debug("blockedAdvertisers are", casInternalRequestParametersGlobal.blockedAdvertisers);
     double countryFloor = 0.05;
     double segmentFloor = 0.0;
-    casInternalRequestParametersGlobal.rtbBidFloor = hrh.responseSender.getAuctionEngine().calculateRTBFloor(sasParams.getSiteFloor(), casInternalRequestParametersGlobal.highestEcpm, segmentFloor, countryFloor);
+    //RTB floor is being passed as highestEcpm
+    logger.debug("RTB floor from the pricing engine entity is", filter.getRtbFloor());
+    casInternalRequestParametersGlobal.rtbBidFloor = hrh.responseSender.getAuctionEngine().calculateRTBFloor(sasParams.getSiteFloor(), filter.getRtbFloor(), segmentFloor, countryFloor);
     hrh.responseSender.casInternalRequestParameters = casInternalRequestParametersGlobal;
     hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternalRequestParametersGlobal;
 
