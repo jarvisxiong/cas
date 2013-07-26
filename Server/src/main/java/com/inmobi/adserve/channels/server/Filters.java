@@ -118,6 +118,25 @@ public class Filters {
     }
     return result;
   }
+  
+  boolean isAdvertiserdrppedInRtbBalanceFilter(ChannelSegment channelSegment) {
+	String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
+	boolean isRtbPartner = adapterConfiguration.getBoolean(advertiserIdtoNameMapping.get(advertiserId) + ".isRtb", false);
+	boolean result = false;
+	if (isRtbPartner) {
+	  result = channelSegment.getChannelFeedbackEntity().getBalance() < 500;
+	}
+	if(result) {
+	  logger.debug("Balance is less than 500 dollars for advertiser", advertiserId);
+	  if(advertiserIdtoNameMapping.containsKey(advertiserId)) {
+		InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
+		InspectorStrings.droppedInburnFilter);
+	  }
+	} else {
+	  logger.debug("RTB balance filter passed by advertiser", advertiserId);
+	}
+	return result;
+  }
 
   /**
    * Returns true if advertiser has served more impressions than its daily limit
@@ -294,7 +313,7 @@ public class Filters {
       // that advertiser OR if todays impression is greater than impression
       // ceiling OR site is not present in advertiser's whiteList
       if(isAdvertiserBurnLimitExceeded(channelSegment) || isAdvertiserDailyImpressionCeilingExceeded(channelSegment)
-          || isAdvertiserDailyRequestCapExceeded(channelSegment) || isAdvertiserExcluded(channelSegment)) {
+          || isAdvertiserDailyRequestCapExceeded(channelSegment) || isAdvertiserExcluded(channelSegment) || isAdvertiserdrppedInRtbBalanceFilter(channelSegment)) {
         continue;
       }
       // otherwise adding the advertiser to the list
