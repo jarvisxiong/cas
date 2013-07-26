@@ -119,7 +119,7 @@ public class Filters {
     return result;
   }
   
-  boolean isAdvertiserdrppedInRtbBalanceFilter(ChannelSegment channelSegment) {
+  boolean isAdvertiserdroppedInRtbBalanceFilter(ChannelSegment channelSegment) {
 	String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
 	boolean isRtbPartner = adapterConfiguration.getBoolean(advertiserIdtoNameMapping.get(advertiserId) + ".isRtb", false);
 	boolean result = false;
@@ -313,7 +313,7 @@ public class Filters {
       // that advertiser OR if todays impression is greater than impression
       // ceiling OR site is not present in advertiser's whiteList
       if(isAdvertiserBurnLimitExceeded(channelSegment) || isAdvertiserDailyImpressionCeilingExceeded(channelSegment)
-          || isAdvertiserDailyRequestCapExceeded(channelSegment) || isAdvertiserExcluded(channelSegment) || isAdvertiserdrppedInRtbBalanceFilter(channelSegment)) {
+          || isAdvertiserDailyRequestCapExceeded(channelSegment) || isAdvertiserExcluded(channelSegment) || isAdvertiserdroppedInRtbBalanceFilter(channelSegment)) {
         continue;
       }
       // otherwise adding the advertiser to the list
