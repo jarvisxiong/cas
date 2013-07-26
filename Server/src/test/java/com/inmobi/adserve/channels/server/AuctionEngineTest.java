@@ -21,6 +21,7 @@ import com.inmobi.adserve.channels.adnetworks.tapit.DCPTapitAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
@@ -40,7 +41,7 @@ public class AuctionEngineTest {
 		ConfigurationLoader config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
 		InspectorStats.initializeWorkflow("WorkFlow");
 		ServletHandler.init(config, null);
-
+    Filters.init(config.adapterConfiguration());
 		// this is done, to track the encryptedBid variable getting set inside the AuctionEngine.
 		encryptedBid1 = new Capture<String>();
 
@@ -67,6 +68,7 @@ public class AuctionEngineTest {
 		logger = new DebugLogger();
 
 		casInternalRequestParameters = new CasInternalRequestParameters();
+		casInternalRequestParameters.auctionId = "auctionId";
 
 	}
 
@@ -84,6 +86,8 @@ public class AuctionEngineTest {
 				channelId, 1, rcList, tags, true, true, externalSiteKey, modified_on, "campaignId", slotIds, 
 				1,true, "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, 
 				false, false, false, false, null, null, 0.0d, null, null);
+		ChannelEntity channelEntity = new ChannelEntity();
+		channelEntity.setAccountId("accountId");
 
 		AdNetworkInterface mockAdnetworkInterface = createMock(DCPTapitAdNetwork.class);
 		ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
@@ -99,7 +103,10 @@ public class AuctionEngineTest {
 		expect(mockAdnetworkInterface.getLatency()).andReturn(latencyValue).anyTimes();
 		expect(mockAdnetworkInterface.getBidprice()).andReturn(bidValue).anyTimes();
 		expect(mockAdnetworkInterface.isRtbPartner()).andReturn(true).anyTimes();
-
+		expect(mockAdnetworkInterface.getAuctionId()).andReturn("auctionId").anyTimes();
+		expect(mockAdnetworkInterface.getRtbImpressionId()).andReturn("impressionId").anyTimes();
+		expect(mockAdnetworkInterface.getImpressionId()).andReturn("impressionId").anyTimes();
+		expect(mockAdnetworkInterface.getSeatId()).andReturn(advId).anyTimes();
 		// this is done, to track the encryptedBid variable getting set inside the AuctionEngine.
 		mockAdnetworkInterface.setEncryptedBid(EasyMock.capture(encryptedBid1));
 		EasyMock.expectLastCall().anyTimes();
@@ -110,7 +117,7 @@ public class AuctionEngineTest {
 
 		replay(mockAdnetworkInterface);
 
-		return new ChannelSegment(channelSegmentEntity1, null, null, null, null, mockAdnetworkInterface, 0);
+		return new ChannelSegment(channelSegmentEntity1, channelEntity, null, null, null, mockAdnetworkInterface, 0);
 
 	}
 

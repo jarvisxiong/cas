@@ -128,9 +128,9 @@ public class Filters {
 	}
 	if(result) {
 	  logger.debug("Balance is less than 500 dollars for advertiser", advertiserId);
-	  if(advertiserIdtoNameMapping.containsKey(advertiserId)) {
+	  if (advertiserIdtoNameMapping.containsKey(advertiserId)) {
 		InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
-		InspectorStrings.droppedInburnFilter);
+		InspectorStrings.droppedInRtbBalanceFilter);
 	  }
 	} else {
 	  logger.debug("RTB balance filter passed by advertiser", advertiserId);
