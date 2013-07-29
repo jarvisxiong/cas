@@ -52,6 +52,7 @@ public class Filters {
   private DebugLogger logger;
   private Double dcpFloor;
   private Double rtbFloor;
+  private int rtbBalanceFilterAmount;
 
   public static Map<String, String> getAdvertiserIdToNameMapping() {
     return advertiserIdtoNameMapping;
@@ -71,6 +72,7 @@ public class Filters {
     this.revenueWindow = serverConfiguration.getDouble("revenueWindow", 0.33);
     this.repositoryHelper = repositoryHelper;
     this.logger = logger;
+    rtbBalanceFilterAmount = serverConfiguration.getInt("rtbBalanceFilterAmount", 50);
   }
 
   public static void init(Configuration adapterConfiguration) {
@@ -124,7 +126,7 @@ public class Filters {
 	boolean isRtbPartner = adapterConfiguration.getBoolean(advertiserIdtoNameMapping.get(advertiserId) + ".isRtb", false);
 	boolean result = false;
 	if (isRtbPartner) {
-	  result = channelSegment.getChannelFeedbackEntity().getBalance() < 500;
+	  result = channelSegment.getChannelFeedbackEntity().getBalance() < rtbBalanceFilterAmount;
 	}
 	if(result) {
 	  logger.debug("Balance is less than 500 dollars for advertiser", advertiserId);

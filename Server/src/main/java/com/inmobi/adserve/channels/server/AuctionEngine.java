@@ -142,39 +142,39 @@ public class AuctionEngine implements AuctionEngineInterface {
     // BidFloor filter.
     Iterator<ChannelSegment> rtbListIterator = rtbList.iterator();
     while (rtbListIterator.hasNext()) {
-      ChannelSegment currentChannelSegment = rtbListIterator.next();
+      ChannelSegment channelSegment = rtbListIterator.next();
       logger.debug(Filters.getAdvertiserIdToNameMapping());
-      logger.debug(currentChannelSegment.getChannelEntity().getAccountId());
-      if(currentChannelSegment.getAdNetworkInterface().getBidprice() < casInternalRequestParameters.rtbBidFloor) {
+      logger.debug(channelSegment.getChannelEntity().getAccountId());
+      if(channelSegment.getAdNetworkInterface().getBidprice() < casInternalRequestParameters.rtbBidFloor) {
         rtbListIterator.remove();
-        logger.debug("Dropped in bidfloor filter ", currentChannelSegment.getAdNetworkInterface().getName());
-        if(Filters.getAdvertiserIdToNameMapping().containsKey(currentChannelSegment.getChannelEntity().getAccountId())) {
+        logger.debug("Dropped in bidfloor filter ", channelSegment.getAdNetworkInterface().getName());
+        if(Filters.getAdvertiserIdToNameMapping().containsKey(channelSegment.getChannelEntity().getAccountId())) {
           InspectorStats.incrementStatCount(
-              Filters.getAdvertiserIdToNameMapping().get(currentChannelSegment.getChannelEntity().getAccountId()),
+              Filters.getAdvertiserIdToNameMapping().get(channelSegment.getChannelEntity().getAccountId()),
               InspectorStrings.droppedInRtbBidFloorFilter);
         }
-      } else if (!currentChannelSegment.getChannelEntity().getAccountId().equalsIgnoreCase(currentChannelSegment.getAdNetworkInterface().getSeatId())) {
+      } else if (!channelSegment.getChannelEntity().getAccountId().equalsIgnoreCase(channelSegment.getAdNetworkInterface().getSeatId())) {
         rtbListIterator.remove();
-        logger.debug("Dropped in seat id mismatch filter ", currentChannelSegment.getAdNetworkInterface().getName());
-        if(Filters.getAdvertiserIdToNameMapping().containsKey(currentChannelSegment.getChannelEntity().getAccountId())) {
+        logger.debug("Dropped in seat id mismatch filter ", channelSegment.getAdNetworkInterface().getName());
+        if(Filters.getAdvertiserIdToNameMapping().containsKey(channelSegment.getChannelEntity().getAccountId())) {
           InspectorStats.incrementStatCount(
-              Filters.getAdvertiserIdToNameMapping().get(currentChannelSegment.getChannelEntity().getAccountId()),
+              Filters.getAdvertiserIdToNameMapping().get(channelSegment.getChannelEntity().getAccountId()),
               InspectorStrings.droppedInRtbSeatidMisMatchFilter);
         }
-      } else if (!currentChannelSegment.getAdNetworkInterface().getImpressionId().equalsIgnoreCase(currentChannelSegment.getAdNetworkInterface().getRtbImpressionId())) {
+      } else if (!channelSegment.getAdNetworkInterface().getImpressionId().equalsIgnoreCase(channelSegment.getAdNetworkInterface().getRtbImpressionId())) {
         rtbListIterator.remove();
-        logger.debug("Dropped in impression id mismatch filter ", currentChannelSegment.getAdNetworkInterface().getName());
-        if(Filters.getAdvertiserIdToNameMapping().containsKey(currentChannelSegment.getChannelEntity().getAccountId())) {
+        logger.debug("Dropped in impression id mismatch filter ", channelSegment.getAdNetworkInterface().getName());
+        if(Filters.getAdvertiserIdToNameMapping().containsKey(channelSegment.getChannelEntity().getAccountId())) {
           InspectorStats.incrementStatCount(
-              Filters.getAdvertiserIdToNameMapping().get(currentChannelSegment.getChannelEntity().getAccountId()),
+              Filters.getAdvertiserIdToNameMapping().get(channelSegment.getChannelEntity().getAccountId()),
               InspectorStrings.droppedInRtbImpressionIdMisMatchFilter);
         }
-      } else if (!casInternalRequestParameters.auctionId.equalsIgnoreCase(currentChannelSegment.getAdNetworkInterface().getAuctionId())) {
+      } else if (!casInternalRequestParameters.auctionId.equalsIgnoreCase(channelSegment.getAdNetworkInterface().getAuctionId())) {
         rtbListIterator.remove();
-        logger.debug("Dropped in auction id mismatch filter ", currentChannelSegment.getAdNetworkInterface().getName());
-        if(Filters.getAdvertiserIdToNameMapping().containsKey(currentChannelSegment.getChannelEntity().getAccountId())) {
+        logger.debug("Dropped in auction id mismatch filter ", channelSegment.getAdNetworkInterface().getName());
+        if(Filters.getAdvertiserIdToNameMapping().containsKey(channelSegment.getChannelEntity().getAccountId())) {
           InspectorStats.incrementStatCount(
-              Filters.getAdvertiserIdToNameMapping().get(currentChannelSegment.getChannelEntity().getAccountId()),
+              Filters.getAdvertiserIdToNameMapping().get(channelSegment.getChannelEntity().getAccountId()),
               InspectorStrings.droppedInRtbAuctionIdMisMatchFilter);
         }
       }
