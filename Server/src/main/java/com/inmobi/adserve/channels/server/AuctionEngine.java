@@ -143,8 +143,6 @@ public class AuctionEngine implements AuctionEngineInterface {
     Iterator<ChannelSegment> rtbListIterator = rtbList.iterator();
     while (rtbListIterator.hasNext()) {
       ChannelSegment channelSegment = rtbListIterator.next();
-      logger.debug(Filters.getAdvertiserIdToNameMapping());
-      logger.debug(channelSegment.getChannelEntity().getAccountId());
       if(channelSegment.getAdNetworkInterface().getBidprice() < casInternalRequestParameters.rtbBidFloor) {
         rtbListIterator.remove();
         logger.debug("Dropped in bidfloor filter ", channelSegment.getAdNetworkInterface().getName());
