@@ -129,7 +129,7 @@ public class Filters {
 	  result = channelSegment.getChannelFeedbackEntity().getBalance() < rtbBalanceFilterAmount;
 	}
 	if(result) {
-	  logger.debug("Balance is less than 500 dollars for advertiser", advertiserId);
+	  logger.debug("Balance is less than", rtbBalanceFilterAmount, "dollars for advertiser", advertiserId);
 	  if (advertiserIdtoNameMapping.containsKey(advertiserId)) {
 		InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
 		InspectorStrings.droppedInRtbBalanceFilter);
