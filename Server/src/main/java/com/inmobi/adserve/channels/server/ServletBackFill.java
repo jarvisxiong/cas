@@ -191,6 +191,8 @@ public class ServletBackFill implements Servlet {
         segmentFloor = filter.getRtbFloor();
     }
     casInternalRequestParametersGlobal.rtbBidFloor = hrh.responseSender.getAuctionEngine().calculateRTBFloor(sasParams.getSiteFloor(), 0.0, segmentFloor, minimumRtbFloor);
+    //Generating auction id using site Inc Id
+    casInternalRequestParametersGlobal.auctionId = AsyncRequestMaker.getImpressionId(sasParams.getSiteIncId());
     hrh.responseSender.casInternalRequestParameters = casInternalRequestParametersGlobal;
     hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternalRequestParametersGlobal;
 

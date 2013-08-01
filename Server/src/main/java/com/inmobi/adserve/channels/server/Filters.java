@@ -52,6 +52,7 @@ public class Filters {
   private DebugLogger logger;
   private Double dcpFloor;
   private Double rtbFloor;
+  private int rtbBalanceFilterAmount;
 
   public static Map<String, String> getAdvertiserIdToNameMapping() {
     return advertiserIdtoNameMapping;
@@ -71,6 +72,7 @@ public class Filters {
     this.revenueWindow = serverConfiguration.getDouble("revenueWindow", 0.33);
     this.repositoryHelper = repositoryHelper;
     this.logger = logger;
+    rtbBalanceFilterAmount = serverConfiguration.getInt("rtbBalanceFilterAmount", 50);
   }
 
   public static void init(Configuration adapterConfiguration) {
@@ -117,6 +119,25 @@ public class Filters {
       logger.debug("Burn limit filter passed by advertiser", advertiserId);
     }
     return result;
+  }
+  
+  boolean isAdvertiserdroppedInRtbBalanceFilter(ChannelSegment channelSegment) {
+	String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
+	boolean isRtbPartner = adapterConfiguration.getBoolean(advertiserIdtoNameMapping.get(advertiserId) + ".isRtb", false);
+	boolean result = false;
+	if (isRtbPartner) {
+	  result = channelSegment.getChannelFeedbackEntity().getBalance() < rtbBalanceFilterAmount;
+	}
+	if(result) {
+	  logger.debug("Balance is less than", rtbBalanceFilterAmount, "dollars for advertiser", advertiserId);
+	  if (advertiserIdtoNameMapping.containsKey(advertiserId)) {
+		InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
+		InspectorStrings.droppedInRtbBalanceFilter);
+	  }
+	} else {
+	  logger.debug("RTB balance filter passed by advertiser", advertiserId);
+	}
+	return result;
   }
 
   /**
@@ -294,7 +315,7 @@ public class Filters {
       // that advertiser OR if todays impression is greater than impression
       // ceiling OR site is not present in advertiser's whiteList
       if(isAdvertiserBurnLimitExceeded(channelSegment) || isAdvertiserDailyImpressionCeilingExceeded(channelSegment)
-          || isAdvertiserDailyRequestCapExceeded(channelSegment) || isAdvertiserExcluded(channelSegment)) {
+          || isAdvertiserDailyRequestCapExceeded(channelSegment) || isAdvertiserExcluded(channelSegment) || isAdvertiserdroppedInRtbBalanceFilter(channelSegment)) {
         continue;
       }
       // otherwise adding the advertiser to the list
