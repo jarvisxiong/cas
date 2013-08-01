@@ -9,6 +9,8 @@ import com.inmobi.adserve.channels.api.AuctionEngineInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 
 /***
  * Auction Engine to run different types of auctions in rtb.
@@ -139,19 +141,44 @@ public class AuctionEngine implements AuctionEngineInterface {
     logger.debug("No of rtb partners who sent AD response are", Integer.valueOf(rtbList.size()));
     // BidFloor filter.
     Iterator<ChannelSegment> rtbListIterator = rtbList.iterator();
-        while (rtbListIterator.hasNext())
-        {
-            ChannelSegment currentChannelSegment = rtbListIterator.next();
-            if (currentChannelSegment.getAdNetworkInterface().getBidprice() < casInternalRequestParameters.rtbBidFloor)
-            {
-                rtbListIterator.remove();
-                logger.debug("Dropped in bidfloor filter ", currentChannelSegment.getAdNetworkInterface().getName());
-            }
+    while (rtbListIterator.hasNext()) {
+      ChannelSegment channelSegment = rtbListIterator.next();
+      if(channelSegment.getAdNetworkInterface().getBidprice() < casInternalRequestParameters.rtbBidFloor) {
+        rtbListIterator.remove();
+        logger.debug("Dropped in bidfloor filter ", channelSegment.getAdNetworkInterface().getName());
+        if(Filters.getAdvertiserIdToNameMapping().containsKey(channelSegment.getChannelEntity().getAccountId())) {
+          InspectorStats.incrementStatCount(
+              Filters.getAdvertiserIdToNameMapping().get(channelSegment.getChannelEntity().getAccountId()),
+              InspectorStrings.droppedInRtbBidFloorFilter);
         }
+      } else if (!channelSegment.getChannelEntity().getAccountId().equalsIgnoreCase(channelSegment.getAdNetworkInterface().getSeatId())) {
+        rtbListIterator.remove();
+        logger.debug("Dropped in seat id mismatch filter ", channelSegment.getAdNetworkInterface().getName());
+        if(Filters.getAdvertiserIdToNameMapping().containsKey(channelSegment.getChannelEntity().getAccountId())) {
+          InspectorStats.incrementStatCount(
+              Filters.getAdvertiserIdToNameMapping().get(channelSegment.getChannelEntity().getAccountId()),
+              InspectorStrings.droppedInRtbSeatidMisMatchFilter);
+        }
+      } else if (!channelSegment.getAdNetworkInterface().getImpressionId().equalsIgnoreCase(channelSegment.getAdNetworkInterface().getRtbImpressionId())) {
+        rtbListIterator.remove();
+        logger.debug("Dropped in impression id mismatch filter ", channelSegment.getAdNetworkInterface().getName());
+        if(Filters.getAdvertiserIdToNameMapping().containsKey(channelSegment.getChannelEntity().getAccountId())) {
+          InspectorStats.incrementStatCount(
+              Filters.getAdvertiserIdToNameMapping().get(channelSegment.getChannelEntity().getAccountId()),
+              InspectorStrings.droppedInRtbImpressionIdMisMatchFilter);
+        }
+      } else if (!casInternalRequestParameters.auctionId.equalsIgnoreCase(channelSegment.getAdNetworkInterface().getAuctionId())) {
+        rtbListIterator.remove();
+        logger.debug("Dropped in auction id mismatch filter ", channelSegment.getAdNetworkInterface().getName());
+        if(Filters.getAdvertiserIdToNameMapping().containsKey(channelSegment.getChannelEntity().getAccountId())) {
+          InspectorStats.incrementStatCount(
+              Filters.getAdvertiserIdToNameMapping().get(channelSegment.getChannelEntity().getAccountId()),
+              InspectorStrings.droppedInRtbAuctionIdMisMatchFilter);
+        }
+      }
+    }
     logger.debug("No of rtb partners who sent AD response with bid more than bidFloor", rtbList.size());
-
     return rtbList;
-
   }
 
   public boolean isAuctionComplete() {
