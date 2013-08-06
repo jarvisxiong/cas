@@ -144,13 +144,13 @@ public class ResponseSender extends HttpRequestHandlerBase {
       return;
     }
     if("bf".equalsIgnoreCase(sasParams.getRqSource())) {
-      InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
       sendResponse(OK, finalReponse, adResponse.responseHeaders, event);
     } else {
       JSONObject jsonObject = new JSONObject();
       try {
         jsonObject.put("bid", this.getAuctionEngine().getSecondBidPrice());
         jsonObject.put("adm", finalReponse);
+        InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
         sendResponse(OK, jsonObject.toString(), adResponse.responseHeaders, event);
       } catch (JSONException e) {
         logger.debug("Error while making json object for rule engine " + e.getMessage());
