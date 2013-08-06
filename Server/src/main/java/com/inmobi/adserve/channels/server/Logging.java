@@ -234,7 +234,11 @@ public class Logging {
       if(null != sasParams.getAge()) {
         log.append("\"u-age\":\"").append(sasParams.getAge()).append("\",");
         if(sasParams.getAge().matches("^\\d+$")) {
-          user.setAge(Short.valueOf(sasParams.getAge()));
+          try {
+            user.setAge(Short.valueOf(sasParams.getAge()));
+          } catch(NumberFormatException e) {
+            logger.error("Exception in casting age from string to Short", e);
+          }
         }
       }
       if(null != sasParams.getGender()) {

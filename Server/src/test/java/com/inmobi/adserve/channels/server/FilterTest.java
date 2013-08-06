@@ -160,6 +160,7 @@ public class FilterTest extends TestCase {
     expect(mockAdapterConfig.getString("openx.advertiserId")).andReturn("advertiserId1").anyTimes();
     expect(mockAdapterConfig.getString("atnt.advertiserId")).andReturn("advertiserId2").anyTimes();
     expect(mockAdapterConfig.getString("tapit.advertiserId")).andReturn("advertiserId3").anyTimes();
+    expect(mockAdapterConfig.getBoolean("tapit.isRtb", false)).andReturn(false).anyTimes();
     expect(mockAdapterConfig.getString("mullahmedia.advertiserId")).andReturn("advertiserId4").anyTimes();
     expect(mockAdapterConfig.getInt("openx.partnerSegmentNo", 2)).andReturn(2).anyTimes();
     expect(mockAdapterConfig.getInt("atnt.partnerSegmentNo", 2)).andReturn(2).anyTimes();
@@ -174,6 +175,7 @@ public class FilterTest extends TestCase {
     expect(mockConfig.getDouble("feedbackPower", 2.0)).andReturn(1.0).anyTimes();
     expect(mockConfig.getInt("partnerSegmentNo", 2)).andReturn(2).anyTimes();
     expect(mockConfig.getInt("whiteListedSitesRefreshtime", 1000 * 300)).andReturn(0).anyTimes();
+    expect(mockConfig.getInt("rtbBalanceFilterAmount", 50)).andReturn(0).anyTimes();
     replay(mockConfig);
     sMDE = createMock(SiteMetaDataEntity.class);
     expect(sMDE.getAdvertisersIncludedBySite()).andReturn(emptySet).anyTimes();
