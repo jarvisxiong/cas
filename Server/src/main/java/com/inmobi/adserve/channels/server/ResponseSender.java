@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelEvent;
@@ -138,8 +140,25 @@ public class ResponseSender extends HttpRequestHandlerBase {
       if(getResponseFormat().equals("xhtml")) {
         finalReponse = noAdXhtml;
       }
+      sendResponse(OK, finalReponse, adResponse.responseHeaders, event);
+      return;
     }
-    sendResponse(OK, finalReponse, adResponse.responseHeaders, event);
+    if("bf".equalsIgnoreCase(sasParams.getRqSource())) {
+      InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
+      sendResponse(OK, finalReponse, adResponse.responseHeaders, event);
+    } else {
+      JSONObject jsonObject = new JSONObject();
+      try {
+        jsonObject.put("bid", this.getAuctionEngine().getSecondBidPrice());
+        jsonObject.put("adm", finalReponse);
+        sendResponse(OK, jsonObject.toString(), adResponse.responseHeaders, event);
+      } catch (JSONException e) {
+        logger.debug("Error while making json object for rule engine " + e.getMessage());
+        e.printStackTrace();
+        // Sending NOAD if error making json object
+        sendNoAdResponse(event);
+      }
+    }
   }
 
   // send response to the caller

@@ -82,7 +82,7 @@ public class SegmentFactory {
 			ClientBootstrap clientBootstrap,
 			ClientBootstrap rtbClientBootstrap, HttpRequestHandlerBase base,
 			MessageEvent serverEvent, Set<String> advertiserSet,
-			DebugLogger logger, boolean isRtbEnabled, int rtbMaxTimemout) {
+			DebugLogger logger, boolean isRtbEnabled, int rtbMaxTimemout, String requestSource) {
 		if (isRtbEnabled) {
 			for (String partnerName : rtbAdaptersNames) {
 				String advertiserIdString = config.getString(partnerName
@@ -126,7 +126,11 @@ public class SegmentFactory {
 				}
 			}
 		}
-
+		
+		if ("re".equalsIgnoreCase(requestSource)) {
+		    logger.debug("Request came from rule engine so not going through dcp adapter selection list");
+		    return null;
+		}
 		if ((advertiserId.equals(config.getString("atnt.advertiserId")))
 				&& (advertiserSet.isEmpty() || advertiserSet.contains("atnt"))
 				&& (config.getString("atnt.status").equals("on"))) {

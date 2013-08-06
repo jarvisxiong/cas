@@ -29,7 +29,6 @@ public class ServletBackFill implements Servlet {
     InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
 
     Map<String, List<String>> params = queryStringDecoder.getParameters();
-
     try {
       hrh.jObject = RequestParser.extractParams(params, logger);
     } catch (JSONException exeption) {
@@ -42,6 +41,12 @@ public class ServletBackFill implements Servlet {
     SASRequestParameters sasParams = new SASRequestParameters();
     RequestParser.parseRequestParameters(hrh.jObject, sasParams, casInternalRequestParametersGlobal, logger);
     hrh.responseSender.sasParams = sasParams;
+    
+    // Increment re Request if request came from rule engine
+    if ("re".equalsIgnoreCase(sasParams.getRqSource())) {
+      logger.debug("Request came from rule engin...");
+      InspectorStats.incrementStatCount(InspectorStrings.ruleEngineRequests);
+    }
     
     //Send noad if new-category is not present in the request
     if (null == hrh.responseSender.sasParams.getCategories()) {

@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.server;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.util.Arrays;
@@ -33,7 +34,7 @@ public class RequestParser {
         List<String> vals = p.getValue();
         for (String val : vals) {
           if(key.equalsIgnoreCase(jsonKey)) {
-            jObject = new JSONObject(val);
+            jObject = new JSONObject(URLDecoder.decode(val));
           }
         }
       }
@@ -49,6 +50,9 @@ public class RequestParser {
       params = null;
     }
     params.setAllParametersJson(jObject.toString());
+    String requestSource = stringify(jObject, "rq-src", logger);//either bf or re
+    requestSource = requestSource == null ? "bf" : requestSource;
+    params.setRqSource(requestSource);
     params.setRemoteHostIp(stringify(jObject, "w-s-carrier", logger));
     params.setUserAgent(stringify(jObject, "rq-x-inmobi-phone-useragent", logger));
     if(null == params.getUserAgent()) {
