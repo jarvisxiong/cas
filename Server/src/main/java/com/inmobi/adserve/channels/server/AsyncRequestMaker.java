@@ -137,7 +137,8 @@ public class AsyncRequestMaker {
     casInternalRequestParameters.auctionId = casInternalRequestParameterGlobal.auctionId;
     casInternalRequestParameters.uid = casInternalRequestParameterGlobal.uid;
     casInternalRequestParameters.uidO1 = casInternalRequestParameterGlobal.uidO1;
-    casInternalRequestParameters.uidIFA = casInternalRequestParameterGlobal.uidIFA;
+    casInternalRequestParameters.uidIFA_MD5 = casInternalRequestParameterGlobal.uidIFA_MD5;
+    casInternalRequestParameters.uidIFA_Sha1 = casInternalRequestParameterGlobal.uidIFA_Sha1;
     casInternalRequestParameters.uidIFV = casInternalRequestParameterGlobal.uidIFV;
     casInternalRequestParameters.uidSO1 = casInternalRequestParameterGlobal.uidSO1;
     casInternalRequestParameters.uidIDUS1 = casInternalRequestParameterGlobal.uidIDUS1;
@@ -155,7 +156,8 @@ public class AsyncRequestMaker {
       casInternalRequestParameters.uid = null;
       casInternalRequestParameters.uidO1 = null;
       casInternalRequestParameters.uidMd5 = null;
-      casInternalRequestParameters.uidIFA = null;
+      casInternalRequestParameters.uidIFA_MD5 = null;
+      casInternalRequestParameters.uidIFA_Sha1 = null;
       casInternalRequestParameters.uidIFV = null;
       casInternalRequestParameters.uidIDUS1 = null;
       casInternalRequestParameters.uidSO1 = null;

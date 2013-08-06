@@ -211,7 +211,11 @@ public class RequestParser {
       }
       parameter.uidO1 = stringify(userIdMap, "O1", logger);
       parameter.uidMd5 = stringify(userIdMap, "UM5", logger);
-      parameter.uidIFA = stringify(userIdMap, "IDA", logger);
+      String uidIFA = stringify(userIdMap, "IDA", logger);
+      if (StringUtils.isNotBlank(uidIFA)){
+    	  parameter.uidIFA_MD5 = MD5(uidIFA);
+    	  parameter.uidIFA_Sha1 = SHA1(uidIFA);
+      }
       parameter.uidSO1 = stringify(userIdMap, "SO1", logger);
       parameter.uidIFV = stringify(userIdMap, "IDV", logger);
       parameter.uidIDUS1 = stringify(userIdMap, "IDUS1", logger);
@@ -235,4 +239,17 @@ public class RequestParser {
     return null;
   }
   
+  public static String SHA1(String raw) {
+    try {
+      MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
+      byte[] array = sha1.digest(raw.getBytes());
+      StringBuffer sb = new StringBuffer();
+      for (int i = 0; i < array.length; ++i) {
+        sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
+      }
+      return sb.toString();
+    } catch (java.security.NoSuchAlgorithmException e) {
+    }
+    return null;
+  }
 }
