@@ -148,16 +148,19 @@ public class ResponseSender extends HttpRequestHandlerBase {
     } else {
       JSONObject jsonObject = new JSONObject();
       try {
-        jsonObject.put("secondHighestBidPrice", this.getAuctionEngine().getSecondBidPrice());
+        jsonObject.put("secondHighestBid", this.getAuctionEngine().getRtbResponse().getAdNetworkInterface().getSecondBidPrice());
         jsonObject.put("winnerBid", this.getAuctionEngine().getRtbResponse().getAdNetworkInterface().getBidprice());
         jsonObject.put("adm", finalReponse);
         jsonObject.put("advertiserId", this.auctionEngine.getRtbResponse().getChannelEntity().getAccountId());
-        jsonObject.put("adGroupId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getAdgroupId());
+        jsonObject.put("adgroupId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getAdgroupId());
         jsonObject.put("adIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getAdId());
         jsonObject.put("clickUrl", this.auctionEngine.getRtbResponse().getAdNetworkInterface().getClickUrl());
         jsonObject.put("rtbFloor", casInternalRequestParameters.rtbBidFloor);
         InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
         sendResponse(OK, jsonObject.toString(), adResponse.responseHeaders, event);
+        if(logger.isDebugEnabled()) {
+          logger.debug("RTB reponse json to RE is " + jsonObject.toString());
+        }
       } catch (JSONException e) {
         logger.debug("Error while making json object for rule engine " + e.getMessage());
         // Sending NOAD if error making json object
