@@ -131,8 +131,10 @@ public class AsyncRequestMaker {
     CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
     casInternalRequestParameters.impressionId = sasParams.getImpressionId();
     casInternalRequestParameters.blockedCategories = casInternalRequestParameterGlobal.blockedCategories;
+    casInternalRequestParameters.blockedAdvertisers = casInternalRequestParameterGlobal.blockedAdvertisers;
     casInternalRequestParameters.highestEcpm = casInternalRequestParameterGlobal.highestEcpm;
     casInternalRequestParameters.rtbBidFloor = casInternalRequestParameterGlobal.rtbBidFloor;
+    casInternalRequestParameters.auctionId = casInternalRequestParameterGlobal.auctionId;
     casInternalRequestParameters.uid = casInternalRequestParameterGlobal.uid;
     casInternalRequestParameters.uidO1 = casInternalRequestParameterGlobal.uidO1;
     casInternalRequestParameters.uidIFA = casInternalRequestParameterGlobal.uidIFA;

@@ -36,24 +36,33 @@ public class MatchSegments {
 
   public static void init(ChannelAdGroupRepository channelAdGroupRepository) {
     Set<String> emptySet = new HashSet<String>();
-    MatchSegments.channelAdGroupRepository = channelAdGroupRepository;
-    
-    ChannelEntity channelEntity = new ChannelEntity();
-    channelEntity.setImpressionCeil(Long.MAX_VALUE);
-    channelEntity.setImpressionFloor(0);
-    channelEntity.setPriority(3);
-    channelEntity.setRequestCap(Long.MAX_VALUE);
-    MatchSegments.defaultChannelEntity = channelEntity;
-        
-    MatchSegments.defaultChannelEntity.setSiteInclusion(false);
-    MatchSegments.defaultChannelEntity.setSitesIE(emptySet);
-    MatchSegments.defaultChannelFeedbackEntity = new ChannelFeedbackEntity(DEFAULT, 0, 0, Double.MAX_VALUE, 0, 0, 0, 0,
-        0);
     Double defaultEcpm = ServletHandler.getServerConfig().getDouble("default.ecpm", 0.1);
-    MatchSegments.defaultChannelSegmentFeedbackEntity = new ChannelSegmentFeedbackEntity(DEFAULT, DEFAULT,
-        defaultEcpm, 0.5, 0, 0, 0, 0);
-    MatchSegments.defaultChannelSegmentCitrusLeafFeedbackEntity = new ChannelSegmentFeedbackEntity(DEFAULT, DEFAULT,
-        defaultEcpm, 0.01, 400, 0, 0, 0);
+    MatchSegments.channelAdGroupRepository = channelAdGroupRepository;
+
+    ChannelEntity.Builder channelEntityBuilder = ChannelEntity.newBuilder();
+    channelEntityBuilder.setImpressionCeil(Long.MAX_VALUE);
+    channelEntityBuilder.setImpressionFloor(0);
+    channelEntityBuilder.setPriority(3);
+    channelEntityBuilder.setRequestCap(Long.MAX_VALUE);
+    channelEntityBuilder.setSiteInclusion(false);
+    channelEntityBuilder.setSitesIE(emptySet);
+    ChannelEntity channelEntity = channelEntityBuilder.build();
+    MatchSegments.defaultChannelEntity = channelEntity;
+
+    ChannelFeedbackEntity.Builder channelFeedbackEntityBuilder = ChannelFeedbackEntity.newBuilder();
+    channelFeedbackEntityBuilder.setAdvertiserId(DEFAULT);
+    channelFeedbackEntityBuilder.setBalance(Double.MAX_VALUE);
+    MatchSegments.defaultChannelFeedbackEntity = channelFeedbackEntityBuilder.build();
+
+    ChannelSegmentFeedbackEntity.Builder channelSegmentFeedbackEntityBuilder = ChannelSegmentFeedbackEntity.newBuilder();
+    channelSegmentFeedbackEntityBuilder.setAdvertiserId(DEFAULT);
+    channelSegmentFeedbackEntityBuilder.setAdGroupId(DEFAULT);
+    channelSegmentFeedbackEntityBuilder.setECPM(defaultEcpm);
+    channelSegmentFeedbackEntityBuilder.setFillRatio(0.01);
+    channelSegmentFeedbackEntityBuilder.setLastHourLatency(400);
+    MatchSegments.defaultChannelSegmentFeedbackEntity = channelSegmentFeedbackEntityBuilder.build();
+
+    MatchSegments.defaultChannelSegmentCitrusLeafFeedbackEntity = MatchSegments.defaultChannelSegmentFeedbackEntity;
   }
 
   public MatchSegments(RepositoryHelper repositoryHelper, SASRequestParameters sasParams, DebugLogger logger) {
@@ -106,7 +115,6 @@ public class MatchSegments {
    * taxonomy and returns the category list (old or new) depending upon the
    * config
    * 
-   * @param sasParams
    * @return
    */
   public List<Long> getCategories() {

@@ -7,6 +7,7 @@ import static org.easymock.classextension.EasyMock.replay;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
@@ -21,6 +22,7 @@ import com.inmobi.adserve.channels.adnetworks.tapit.DCPTapitAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 import com.inmobi.adserve.channels.server.requesthandler.AuctionEngine;
@@ -42,7 +44,7 @@ public class AuctionEngineTest {
 	public void setUp() throws IOException {
 		ConfigurationLoader config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
 		ServletHandler.init(config, null);
-
+    Filters.init(config.adapterConfiguration());
 		// this is done, to track the encryptedBid variable getting set inside the AuctionEngine.
 		encryptedBid1 = new Capture<String>();
 
@@ -69,6 +71,7 @@ public class AuctionEngineTest {
 		logger = new DebugLogger();
 
 		casInternalRequestParameters = new CasInternalRequestParameters();
+		casInternalRequestParameters.auctionId = "auctionId";
 
 	}
 
@@ -82,10 +85,15 @@ public class AuctionEngineTest {
 		Timestamp modified_on = null;
 		Long[] slotIds = null;
 		Integer[] siteRatings = null;
-		ChannelSegmentEntity channelSegmentEntity1 = new ChannelSegmentEntity(advId, "adgroupId", "adId", 
+		ChannelSegmentEntity channelSegmentEntity1 = new ChannelSegmentEntity(
+                FilterTest.getChannelSegmentEntityBuilder(advId, "adgroupId", "adId",
 				channelId, 1, rcList, tags, true, true, externalSiteKey, modified_on, "campaignId", slotIds, 
 				1,true, "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, 
-				false, false, false, false, null);
+				false, false, false, false, null, null, 0.0d, null, null, false, new HashSet
+                <String>(), 0));
+        ChannelEntity.Builder builder = ChannelEntity.newBuilder();
+        builder.setAccountId("advId");
+        ChannelEntity channelEntity = builder.build();
 
 		AdNetworkInterface mockAdnetworkInterface = createMock(DCPTapitAdNetwork.class);
 		ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
@@ -101,7 +109,10 @@ public class AuctionEngineTest {
 		expect(mockAdnetworkInterface.getLatency()).andReturn(latencyValue).anyTimes();
 		expect(mockAdnetworkInterface.getBidprice()).andReturn(bidValue).anyTimes();
 		expect(mockAdnetworkInterface.isRtbPartner()).andReturn(true).anyTimes();
-
+		expect(mockAdnetworkInterface.getAuctionId()).andReturn("auctionId").anyTimes();
+		expect(mockAdnetworkInterface.getRtbImpressionId()).andReturn("impressionId").anyTimes();
+		expect(mockAdnetworkInterface.getImpressionId()).andReturn("impressionId").anyTimes();
+		expect(mockAdnetworkInterface.getSeatId()).andReturn(advId).anyTimes();
 		// this is done, to track the encryptedBid variable getting set inside the AuctionEngine.
 		mockAdnetworkInterface.setEncryptedBid(EasyMock.capture(encryptedBid1));
 		EasyMock.expectLastCall().anyTimes();
@@ -112,7 +123,7 @@ public class AuctionEngineTest {
 
 		replay(mockAdnetworkInterface);
 
-		return new ChannelSegment(channelSegmentEntity1, null, null, null, null, mockAdnetworkInterface, 0);
+		return new ChannelSegment(channelSegmentEntity1, channelEntity, null, null, null, mockAdnetworkInterface, 0);
 
 	}
 
