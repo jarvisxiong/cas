@@ -213,8 +213,8 @@ public class RequestParser {
       parameter.uidMd5 = stringify(userIdMap, "UM5", logger);
       String uidIFA = stringify(userIdMap, "IDA", logger);
       if (StringUtils.isNotBlank(uidIFA)){
-    	  parameter.uidIFA_MD5 = MD5(uidIFA);
-    	  parameter.uidIFA_Sha1 = SHA1(uidIFA);
+    	  parameter.uidIFAMD5 = MD5(uidIFA);
+    	  parameter.uidIFASha1 = SHA1(uidIFA);
       }
       parameter.uidSO1 = stringify(userIdMap, "SO1", logger);
       parameter.uidIFV = stringify(userIdMap, "IDV", logger);

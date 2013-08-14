@@ -67,8 +67,8 @@ public class RequestParserTest extends TestCase {
     assertEquals(casInternalRequestParameters.uidO1, "8d10846582eef7c6f5873883b09a5a63");
     assertNull(casInternalRequestParameters.uidSO1);
     assertNull(casInternalRequestParameters.uidMd5);
-    assertNull(casInternalRequestParameters.uidIFA_Sha1);
-    assertNull(casInternalRequestParameters.uidIFA_MD5);
+    assertNull(casInternalRequestParameters.uidIFASha1);
+    assertNull(casInternalRequestParameters.uidIFAMD5);
     assertNull(casInternalRequestParameters.uidIFV);
     assertNull(casInternalRequestParameters.uidIDUS1);
     assertNull(casInternalRequestParameters.uidADT);
