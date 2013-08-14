@@ -296,6 +296,16 @@ public class SegmentFactory {
 			return new DCPPayPalAdNetwork(logger, config, clientBootstrap,
 					base, serverEvent);
 		}
+                else if ((advertiserId.equals(config
+                                .getString("selectmedia.advertiserId")))
+                                && (advertiserSet.isEmpty() || advertiserSet
+                                                .contains("selectmedia"))
+                                && (config.getString("selectmedia.status").equals("on"))) {
+                        DCPAjillionAdnetwork adaptor = new DCPAjillionAdnetwork(logger, config, clientBootstrap,
+                                        base, serverEvent);
+                        adaptor.setName("selectmedia");
+                        return adaptor;
+                }
 
 		return null;
 	}
