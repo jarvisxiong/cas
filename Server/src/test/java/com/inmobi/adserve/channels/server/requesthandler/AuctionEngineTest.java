@@ -92,7 +92,7 @@ public class AuctionEngineTest {
 				false, false, false, false, null, null, 0.0d, null, null, false, new HashSet
                 <String>(), 0));
         ChannelEntity.Builder builder = ChannelEntity.newBuilder();
-        builder.setAccountId("advId");
+        builder.setAccountId(advId);
         ChannelEntity channelEntity = builder.build();
 
 		AdNetworkInterface mockAdnetworkInterface = createMock(DCPTapitAdNetwork.class);
