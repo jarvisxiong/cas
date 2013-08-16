@@ -173,6 +173,11 @@
 			<artifactId>ehcache-core</artifactId>
 			<version>2.4.4</version>
 		</dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>14.0-rc1</version>
+        </dependency>
 	</dependencies>
 	<build>
 		<plugins>
