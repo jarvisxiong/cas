@@ -1,12 +1,6 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import com.inmobi.adserve.channels.entity.PublisherFilterEntity;
 import org.jboss.netty.channel.MessageEvent;
@@ -151,7 +145,7 @@ public class ServletBackFill implements Servlet {
 
     List<ChannelSegment> segments;
 
-    String advertisers = "";
+    String advertisers;
     String[] advertiserList = null;
     try {
       JSONObject uObject = (JSONObject) hrh.jObject.get("uparams");
@@ -166,13 +160,11 @@ public class ServletBackFill implements Servlet {
     Set<String> advertiserSet = new HashSet<String>();
 
     if(advertiserList != null) {
-      for (int i = 0; i < advertiserList.length; i++) {
-        advertiserSet.add(advertiserList[i]);
-      }
+        Collections.addAll(advertiserSet, advertiserList);
     }
 
-    casInternalRequestParametersGlobal.highestEcpm = getHighestEcpm(rows, logger);
-    logger.debug("Highest Ecpm is", Double.valueOf(casInternalRequestParametersGlobal.highestEcpm));
+    casInternalRequestParametersGlobal.highestEcpm = getHighestEcpm(rows);
+    logger.debug("Highest Ecpm is", casInternalRequestParametersGlobal.highestEcpm);
     casInternalRequestParametersGlobal.blockedCategories = getBlockedCategories(hrh, logger);
     casInternalRequestParametersGlobal.blockedAdvertisers = getBlockedAdvertisers(hrh, logger);
     logger.debug("blockedCategories are", casInternalRequestParametersGlobal.blockedCategories);
@@ -197,7 +189,7 @@ public class ServletBackFill implements Servlet {
         ServletHandler.getAdapterConfig(), hrh.responseSender, advertiserSet, e, ServletHandler.repositoryHelper,
         hrh.jObject, hrh.responseSender.sasParams, casInternalRequestParametersGlobal, rtbSegments);
 
-    logger.debug("rtb rankList size is", Integer.valueOf(rtbSegments.size()));
+    logger.debug("rtb rankList size is", rtbSegments.size());
     if(segments.isEmpty() && rtbSegments.isEmpty()) {
       logger.debug("No succesfull configuration of adapter ");
       hrh.responseSender.sendNoAdResponse(e);
@@ -245,7 +237,7 @@ public class ServletBackFill implements Servlet {
     return "BackFill";
   }
 
-  private static double getHighestEcpm(List<ChannelSegment> channelSegments, DebugLogger logger) {
+  private static double getHighestEcpm(List<ChannelSegment> channelSegments) {
     double highestEcpm = 0;
     for (ChannelSegment channelSegment : channelSegments) {
       if(channelSegment.getChannelSegmentFeedbackEntity().getECPM() < 10.0 && 

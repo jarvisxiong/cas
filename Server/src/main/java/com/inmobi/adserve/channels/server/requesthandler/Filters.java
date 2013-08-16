@@ -111,7 +111,7 @@ public class Filters {
         return result;
     }
 
-    boolean isAdvertiserdroppedInRtbBalanceFilter(ChannelSegment channelSegment) {
+    boolean isAdvertiserDroppedInRtbBalanceFilter(ChannelSegment channelSegment) {
         String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
         boolean isRtbPartner = adapterConfiguration.getBoolean(advertiserIdtoNameMapping.get
                 (advertiserId) + ".isRtb", false);
@@ -301,7 +301,7 @@ public class Filters {
             if (isAdvertiserBurnLimitExceeded(channelSegment) ||
                     isAdvertiserDailyImpressionCeilingExceeded(channelSegment)
                     || isAdvertiserDailyRequestCapExceeded(channelSegment) ||
-                    isAdvertiserExcluded(channelSegment) || isAdvertiserdroppedInRtbBalanceFilter
+                    isAdvertiserExcluded(channelSegment) || isAdvertiserDroppedInRtbBalanceFilter
                     (channelSegment)) {
                 continue;
             }

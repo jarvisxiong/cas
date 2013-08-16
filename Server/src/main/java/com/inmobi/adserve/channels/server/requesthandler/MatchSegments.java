@@ -46,8 +46,7 @@ public class MatchSegments {
     channelEntityBuilder.setRequestCap(Long.MAX_VALUE);
     channelEntityBuilder.setSiteInclusion(false);
     channelEntityBuilder.setSitesIE(emptySet);
-    ChannelEntity channelEntity = channelEntityBuilder.build();
-    MatchSegments.defaultChannelEntity = channelEntity;
+    MatchSegments.defaultChannelEntity = channelEntityBuilder.build();
 
     ChannelFeedbackEntity.Builder channelFeedbackEntityBuilder = ChannelFeedbackEntity.newBuilder();
     channelFeedbackEntityBuilder.setAdvertiserId(DEFAULT);
@@ -115,7 +114,6 @@ public class MatchSegments {
    * taxonomy and returns the category list (old or new) depending upon the
    * config
    * 
-   * @return
    */
   public List<Long> getCategories() {
     // Computing all the parents for categories in the category list from the
