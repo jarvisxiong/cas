@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
-import org.easymock.EasyMock;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
 
@@ -397,7 +396,7 @@ public class FilterTest extends TestCase {
     Filters f1 = new Filters(matchedSegments, mockConfig, mockAdapterConfig, null, null, logger);
     List<ChannelSegment> finalRow = f1.convertToSegmentsList(matchedSegments);
     assertEquals(6, finalRow.size());
-    finalRow = f1.selectTopAdgroupsForRequest(finalRow);
+    finalRow = f1.selectTopAdGroupsForRequest(finalRow);
     assertEquals(5, finalRow.size());
     assertEquals("adgroupId2", finalRow.get(0).getChannelSegmentEntity().getAdgroupId());
     assertEquals("adgroupId1", finalRow.get(4).getChannelSegmentEntity().getAdgroupId());

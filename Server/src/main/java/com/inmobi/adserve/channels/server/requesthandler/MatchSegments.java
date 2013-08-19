@@ -150,7 +150,7 @@ public class MatchSegments {
     if (country != -1) {
     	countries = new long[]{-1, country};
     }
-    //adding -1 for all osids
+    //adding -1 for all osIds
     int[] osIds = new int[]{-1, osId};
     
     for(long category : categories) {
