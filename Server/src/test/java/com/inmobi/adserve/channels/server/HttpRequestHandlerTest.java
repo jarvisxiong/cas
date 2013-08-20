@@ -13,9 +13,12 @@ import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
+import com.inmobi.adserve.channels.server.requesthandler.Logging;
+import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
+import com.inmobi.adserve.channels.server.servlet.ServletHandler;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 
 import junit.framework.TestCase;
@@ -26,12 +29,13 @@ import static org.easymock.EasyMock.expect;
 public class HttpRequestHandlerTest extends TestCase {
 
   private static ConfigurationLoader config;
-  private static ChannelEntity channelentity = new ChannelEntity();
+  private static ChannelEntity channelentity;
 
   public void setUp() throws Exception {
-    channelentity.setAccountId("advId");
+    ChannelEntity.Builder builder = ChannelEntity.newBuilder();
+    builder.setAccountId("advId");
+    channelentity = builder.build();
     config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
-    InspectorStats.initializeWorkflow("WorkFlow");
     ServletHandler.init(config, null);
 
     Configuration loggerConfig = createMock(Configuration.class);
@@ -65,7 +69,6 @@ public class HttpRequestHandlerTest extends TestCase {
     expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
     expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");    replay(mockConfig);
     DebugLogger.init(mockConfig);
-    InspectorStats.initializeWorkflow("WorkFlow");
     AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
     Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-channel", "cas-advertisement", mockServerConfig);
   }
