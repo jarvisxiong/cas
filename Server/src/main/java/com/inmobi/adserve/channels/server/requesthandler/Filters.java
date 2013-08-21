@@ -94,12 +94,13 @@ public class Filters {
 
     private void sumUpSiteImpressions() {
         for (HashMap<String, ChannelSegment> advertiserMap
-                : matchedSegments.values()) {
+                : this.matchedSegments.values()) {
             for (ChannelSegment channelSegment : advertiserMap.values()) {
-                 siteImpressions += channelSegment.getChannelSegmentCitrusLeafFeedbackEntity()
+                 this.siteImpressions += channelSegment.getChannelSegmentCitrusLeafFeedbackEntity()
                          .getBeacons();
             }
         }
+        logger.debug("Site impressions:", this.siteImpressions);
     }
 
     /**
@@ -617,9 +618,22 @@ public class Filters {
         ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = channelSegment
                 .getChannelSegmentCitrusLeafFeedbackEntity();
         double eCPM = channelSegmentFeedbackEntity.getECPM();
-        double eCPMBoost =  Math.sqrt(Math.log(
-                this.siteImpressions / channelSegmentFeedbackEntity.getBeacons())) * 1000;
-        double prioritisedECPM = eCPM + eCPMBoost;
+        int impressionsRendered = channelSegmentFeedbackEntity.getBeacons();
+        logger.debug("Impressions Rendered", impressionsRendered, "for adGroup",
+                channelSegment.getChannelSegmentEntity().getAdgroupId());
+        double eCPMBoost;
+        if(this.siteImpressions == 0) {
+            eCPMBoost = 0;
+        } else if(impressionsRendered == 0){
+            eCPMBoost = 1;
+        } else {
+            eCPMBoost = Math.sqrt(Math.log(
+                this.siteImpressions / impressionsRendered)) * 1000;
+        }
+        int manualPriority = channelSegment.getChannelEntity().getPriority();
+        manualPriority = manualPriority > 5 ? 1 : 5 - manualPriority;
+        double prioritisedECPM = (eCPM + eCPMBoost) * manualPriority;
+        logger.debug("Ecpm:", eCPM, "Boost:", eCPMBoost, "Priority:", manualPriority);
         logger.debug("PrioritisedECPM=", prioritisedECPM);
         return prioritisedECPM;
     }
