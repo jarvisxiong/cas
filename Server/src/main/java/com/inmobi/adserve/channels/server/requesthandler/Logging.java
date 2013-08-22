@@ -15,6 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -315,10 +316,15 @@ public class Logging {
       dataBusPublisher.publish(rrLogKey, msg);
     }
     // Logging realtime stats for graphite
+    Integer sasParamsOsId = sasParams.getOsId();
+    String osName = "";
+    if(sasParamsOsId > 0 && sasParamsOsId < 21) {
+        osName = HandSetOS.values()[sasParamsOsId-1].toString();
+      }
     try {
       MetricsManager.updateStats(Integer.parseInt(sasParams.getCountryStr()), sasParams.getCountry(),
-          sasParams.getOsId(), sasParams.getOsId() + "", Filters.getAdvertiserIdToNameMapping().get(advertiserId),
-          false, false, isServerImpression, (long) 0.0, (long) 0.0, (long) impression.getAd().getWinBid());
+          sasParams.getOsId(), osName, Filters.getAdvertiserIdToNameMapping().get(advertiserId),
+          false, false, isServerImpression, 0.0, (long) 0.0, impression.getAd().getWinBid());
     } catch (Exception e) {
       logger.error("error while writting to graphite in channelLog");
     }
@@ -391,10 +397,15 @@ public class Logging {
         }
         responseList.add(response);
         // Logging realtime stats for graphite
+        Integer sasParamsOsId = sasParams.getOsId();
+        String osName = "";
+        if(sasParamsOsId > 0 && sasParamsOsId < 21) {
+            osName = HandSetOS.values()[sasParamsOsId-1].toString();
+          }
         try {
           MetricsManager.updateStats(Integer.parseInt(sasParams.getCountryStr()), sasParams.getCountry(),
-              sasParams.getOsId(), sasParams.getOsId() + "", Filters.getAdvertiserIdToNameMapping().get(advertiserId),
-              isFilled, true, false, (long) bid, latency, (long) 0.0);
+              sasParams.getOsId(), osName, Filters.getAdvertiserIdToNameMapping().get(advertiserId),
+              isFilled, true, false, bid, latency, 0.0);
         } catch (Exception e) {
           logger.error("error while writting to graphite in channelLog");
         }
