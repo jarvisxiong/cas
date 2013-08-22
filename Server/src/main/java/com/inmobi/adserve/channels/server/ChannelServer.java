@@ -86,7 +86,9 @@ public class ChannelServer {
             hostIdCode = channelServerHelper.getHostId(ChannelServerStringLiterals.HOST_NAME_KEY);
             dataCentreName = channelServerHelper
                     .getDataCentreName(ChannelServerStringLiterals.DATA_CENTRE_NAME_KEY);
-
+            if (null == dataCentreName) {
+              dataCentreName = "corp";
+            }
             // Initialising Internal logger factory for Netty
             InternalLoggerFactory.setDefaultFactory(new Log4JLoggerFactory());
 
@@ -101,8 +103,8 @@ public class ChannelServer {
                     config.serverConfiguration());
 
             // Initializing graphite stats
-            MetricsManager.init(config.serverConfiguration().getString("graphiteServer.host"), config.serverConfiguration()
-            .getInt("graphiteServer.port"), config.serverConfiguration().getInt("graphiteServer.intervalInMinutes"),
+            MetricsManager.init(config.serverConfiguration().getString("graphiteServer.host", "mon02.ads.uj1.inmobi.com"), config.serverConfiguration()
+            .getInt("graphiteServer.port", 2003), config.serverConfiguration().getInt("graphiteServer.intervalInMinutes", 1),
             dataCentreName);
             channelAdGroupRepository = new ChannelAdGroupRepository();
             channelRepository = new ChannelRepository();
