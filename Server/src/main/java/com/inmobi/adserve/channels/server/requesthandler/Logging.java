@@ -316,11 +316,13 @@ public class Logging {
       dataBusPublisher.publish(rrLogKey, msg);
     }
     // Logging realtime stats for graphite
-    Integer sasParamsOsId = sasParams.getOsId();
     String osName = "";
-    if(sasParamsOsId > 0 && sasParamsOsId < 21) {
-        osName = HandSetOS.values()[sasParamsOsId-1].toString();
+    if(null != sasParams) {
+      Integer sasParamsOsId = sasParams.getOsId();
+      if(sasParamsOsId > 0 && sasParamsOsId < 21) {
+        osName = HandSetOS.values()[sasParamsOsId - 1].toString();
       }
+    }
     try {
       MetricsManager.updateStats(Integer.parseInt(sasParams.getCountryStr()), sasParams.getCountry(),
           sasParams.getOsId(), osName, Filters.getAdvertiserIdToNameMapping().get(advertiserId),
@@ -397,11 +399,13 @@ public class Logging {
         }
         responseList.add(response);
         // Logging realtime stats for graphite
-        Integer sasParamsOsId = sasParams.getOsId();
         String osName = "";
-        if(sasParamsOsId > 0 && sasParamsOsId < 21) {
-            osName = HandSetOS.values()[sasParamsOsId-1].toString();
+        if(null != sasParams) {
+          Integer sasParamsOsId = sasParams.getOsId();
+          if(sasParamsOsId > 0 && sasParamsOsId < 21) {
+            osName = HandSetOS.values()[sasParamsOsId - 1].toString();
           }
+        }
         try {
           MetricsManager.updateStats(Integer.parseInt(sasParams.getCountryStr()), sasParams.getCountry(),
               sasParams.getOsId(), osName, Filters.getAdvertiserIdToNameMapping().get(advertiserId),
