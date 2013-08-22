@@ -12,6 +12,7 @@ import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
 import com.inmobi.adserve.channels.server.servlet.ServletHandler;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.adserve.channels.util.MetricsManager;
 import com.inmobi.casthrift.DataCenter;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import com.inmobi.messaging.publisher.MessagePublisherFactory;
@@ -99,6 +100,10 @@ public class ChannelServer {
             Logging.init(dataBusPublisher, rrLogKey, channelLogKey, advertisementLogKey,
                     config.serverConfiguration());
 
+            // Initializing graphite stats
+            MetricsManager.init(config.serverConfiguration().getString("graphiteServer.host"), config.serverConfiguration()
+            .getInt("graphiteServer.port"), config.serverConfiguration().getInt("graphiteServer.intervalInMinutes"),
+            dataCentreName);
             channelAdGroupRepository = new ChannelAdGroupRepository();
             channelRepository = new ChannelRepository();
             channelFeedbackRepository = new ChannelFeedbackRepository();
