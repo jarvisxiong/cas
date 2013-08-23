@@ -12,6 +12,7 @@ import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
 import com.inmobi.adserve.channels.server.servlet.ServletHandler;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.adserve.channels.util.MetricsManager;
 import com.inmobi.casthrift.DataCenter;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import com.inmobi.messaging.publisher.MessagePublisherFactory;
@@ -85,7 +86,6 @@ public class ChannelServer {
             hostIdCode = channelServerHelper.getHostId(ChannelServerStringLiterals.HOST_NAME_KEY);
             dataCentreName = channelServerHelper
                     .getDataCentreName(ChannelServerStringLiterals.DATA_CENTRE_NAME_KEY);
-
             // Initialising Internal logger factory for Netty
             InternalLoggerFactory.setDefaultFactory(new Log4JLoggerFactory());
 
@@ -99,6 +99,9 @@ public class ChannelServer {
             Logging.init(dataBusPublisher, rrLogKey, channelLogKey, advertisementLogKey,
                     config.serverConfiguration());
 
+            // Initializing graphite stats
+            MetricsManager.init(config.serverConfiguration().getString("graphiteServer.host", "mon02.ads.uj1.inmobi.com"), config.serverConfiguration()
+            .getInt("graphiteServer.port", 2003), config.serverConfiguration().getInt("graphiteServer.intervalInMinutes", 1));
             channelAdGroupRepository = new ChannelAdGroupRepository();
             channelRepository = new ChannelRepository();
             channelFeedbackRepository = new ChannelFeedbackRepository();
