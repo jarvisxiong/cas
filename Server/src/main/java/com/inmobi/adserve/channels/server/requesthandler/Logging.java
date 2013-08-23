@@ -15,12 +15,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.MetricsManager;
 import com.inmobi.casthrift.AdResponse;
 import com.inmobi.casthrift.CasChannelLog;
 import com.inmobi.casthrift.RequestParams;
@@ -151,9 +153,13 @@ public class Logging {
     AdMeta adMeta = null;
     Ad ad = null;
     Impression impression = null;
+    boolean isServerImpression = false;
+    String advertiserId = null;
     if(channelSegment != null) {
       InspectorStats.incrementStatCount(channelSegment.getAdNetworkInterface().getName(),
           InspectorStrings.serverImpression);
+      isServerImpression = true;
+      advertiserId = channelSegment.getChannelEntity().getAccountId();
       adsServed = 1;
       ChannelSegmentEntity channelSegmentEntity = channelSegment.getChannelSegmentEntity();
       log.append("{\"ad\":[");
@@ -309,6 +315,21 @@ public class Logging {
       Message msg = new Message(tSerializer.serialize(adRR));
       dataBusPublisher.publish(rrLogKey, msg);
     }
+    // Logging realtime stats for graphite
+    String osName = "";
+    if(null != sasParams) {
+      Integer sasParamsOsId = sasParams.getOsId();
+      if(sasParamsOsId > 0 && sasParamsOsId < 21) {
+        osName = HandSetOS.values()[sasParamsOsId - 1].toString();
+      }
+    }
+    try {
+      MetricsManager.updateStats(Integer.parseInt(sasParams.getCountryStr()), sasParams.getCountry(),
+          sasParams.getOsId(), osName, Filters.getAdvertiserIdToNameMapping().get(advertiserId),
+          false, false, isServerImpression, 0.0, (long) 0.0, impression.getAd().getWinBid());
+    } catch (Exception e) {
+      logger.error("error while writting to graphite in channelLog");
+    }
   }
 
   // Write Channel Logs
@@ -343,12 +364,14 @@ public class Logging {
       JSONObject logLine = null;
       AdNetworkInterface adNetwork = ((ChannelSegment) rankList.get(index)).getAdNetworkInterface();
       ThirdPartyAdResponse adResponse = adNetwork.getResponseStruct();
+      boolean isFilled = false;
       try {
         InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalRequests);
         InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.latency, adResponse.latency);
         InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.connectionLatency, adNetwork.getConnectionLatency());
         if("AD".equals(adResponse.adStatus)) {
           InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalFills);
+          isFilled = true;
         }
         else if("NO_AD".equals(adResponse.adStatus)) {
           InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalNoFills);
@@ -375,6 +398,21 @@ public class Logging {
           response.setBid(bid);
         }
         responseList.add(response);
+        // Logging realtime stats for graphite
+        String osName = "";
+        if(null != sasParams) {
+          Integer sasParamsOsId = sasParams.getOsId();
+          if(sasParamsOsId > 0 && sasParamsOsId < 21) {
+            osName = HandSetOS.values()[sasParamsOsId - 1].toString();
+          }
+        }
+        try {
+          MetricsManager.updateStats(Integer.parseInt(sasParams.getCountryStr()), sasParams.getCountry(),
+              sasParams.getOsId(), osName, Filters.getAdvertiserIdToNameMapping().get(advertiserId),
+              isFilled, true, false, bid, latency, 0.0);
+        } catch (Exception e) {
+          logger.error("error while writting to graphite in channelLog");
+        }
       } catch (JSONException exception) {
         logger.error("error reading channel log line from the adapters");
       }
