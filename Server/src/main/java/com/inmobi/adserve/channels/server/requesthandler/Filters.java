@@ -43,6 +43,7 @@ public class Filters {
     private Double rtbFloor;
     private int rtbBalanceFilterAmount;
     private int siteImpressions;
+    private int normalizingFactor;
 
     public static Map<String, String> getAdvertiserIdToNameMapping() {
         return advertiserIdtoNameMapping;
@@ -65,6 +66,7 @@ public class Filters {
         this.repositoryHelper = repositoryHelper;
         this.logger = logger;
         this.rtbBalanceFilterAmount = serverConfiguration.getInt("rtbBalanceFilterAmount", 50);
+        this.normalizingFactor = serverConfiguration.getInt("normalizingFactor", 2);
     }
 
     public static void init(Configuration adapterConfiguration) {
@@ -624,11 +626,13 @@ public class Filters {
         double eCPMBoost;
         if(this.siteImpressions == 0) {
             eCPMBoost = 0;
-        } else if(impressionsRendered == 0){
-            eCPMBoost = 1;
         } else {
-            eCPMBoost = Math.sqrt(Math.log(
-                this.siteImpressions / impressionsRendered)) * 1000;
+            if(impressionsRendered == 0){
+                impressionsRendered = 1;
+            }
+            eCPMBoost = Math.sqrt(this.normalizingFactor * Math.log(this.siteImpressions)
+                    / impressionsRendered);
+
         }
         int manualPriority = channelSegment.getChannelEntity().getPriority();
         manualPriority = manualPriority > 5 ? 1 : 5 - manualPriority;
