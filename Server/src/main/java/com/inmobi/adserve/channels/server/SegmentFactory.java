@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 
+import com.inmobi.adserve.channels.adnetworks.amobee.DCPAmobeeAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.appier.DCPAppierAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.atnt.ATNTAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.adelphic.DCPAdelphicAdNetwork;
@@ -255,57 +256,55 @@ public class SegmentFactory {
 				&& (config.getString("widerplanet.status").equals("on"))) {
 			return new DCPWiderPlanetAdnetwork(logger, config, clientBootstrap,
 					base, serverEvent);
-		} else if ((advertiserId.equals(config
-				.getString("logan.advertiserId")))
-				&& (advertiserSet.isEmpty() || advertiserSet
-						.contains("logan"))
+		} else if ((advertiserId.equals(config.getString("logan.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet.contains("logan"))
 				&& (config.getString("logan.status").equals("on"))) {
-			return new DCPLoganAdnetwork(logger, config, clientBootstrap,
-					base, serverEvent);
-		}else if ((advertiserId.equals(config
-				.getString("madnet.advertiserId")))
-				&& (advertiserSet.isEmpty() || advertiserSet
-						.contains("madnet"))
+			return new DCPLoganAdnetwork(logger, config, clientBootstrap, base,
+					serverEvent);
+		} else if ((advertiserId
+				.equals(config.getString("madnet.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet.contains("madnet"))
 				&& (config.getString("madnet.status").equals("on"))) {
 			return new DCPMadNetAdNetwork(logger, config, clientBootstrap,
 					base, serverEvent);
-		}
-		else if ((advertiserId.equals(config
-				.getString("appier.advertiserId")))
-				&& (advertiserSet.isEmpty() || advertiserSet
-						.contains("appier"))
+		} else if ((advertiserId
+				.equals(config.getString("appier.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet.contains("appier"))
 				&& (config.getString("appier.status").equals("on"))) {
 			return new DCPAppierAdNetwork(logger, config, clientBootstrap,
 					base, serverEvent);
-		}
-		else if ((advertiserId.equals(config
+		} else if ((advertiserId.equals(config
 				.getString("definiti.advertiserId")))
 				&& (advertiserSet.isEmpty() || advertiserSet
 						.contains("definiti"))
 				&& (config.getString("definiti.status").equals("on"))) {
-			DCPAjillionAdnetwork adaptor = new DCPAjillionAdnetwork(logger, config, clientBootstrap,
-					base, serverEvent);
+			DCPAjillionAdnetwork adaptor = new DCPAjillionAdnetwork(logger,
+					config, clientBootstrap, base, serverEvent);
 			adaptor.setName("definiti");
 			return adaptor;
-		}
-		else if ((advertiserId.equals(config
-				.getString("paypal.advertiserId")))
-				&& (advertiserSet.isEmpty() || advertiserSet
-						.contains("paypal"))
+		} else if ((advertiserId
+				.equals(config.getString("paypal.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet.contains("paypal"))
 				&& (config.getString("paypal.status").equals("on"))) {
 			return new DCPPayPalAdNetwork(logger, config, clientBootstrap,
 					base, serverEvent);
+		} else if ((advertiserId.equals(config
+				.getString("selectmedia.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet
+						.contains("selectmedia"))
+				&& (config.getString("selectmedia.status").equals("on"))) {
+			DCPAjillionAdnetwork adaptor = new DCPAjillionAdnetwork(logger,
+					config, clientBootstrap, base, serverEvent);
+			adaptor.setName("selectmedia");
+			return adaptor;
+		} else if ((advertiserId
+				.equals(config.getString("amobee.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet.contains("amobee"))
+				&& (config.getString("amobee.status").equals("on"))) {
+			DCPAmobeeAdnetwork adaptor = new DCPAmobeeAdnetwork(logger, config,
+					clientBootstrap, base, serverEvent);
+			return adaptor;
 		}
-                else if ((advertiserId.equals(config
-                                .getString("selectmedia.advertiserId")))
-                                && (advertiserSet.isEmpty() || advertiserSet
-                                                .contains("selectmedia"))
-                                && (config.getString("selectmedia.status").equals("on"))) {
-                        DCPAjillionAdnetwork adaptor = new DCPAjillionAdnetwork(logger, config, clientBootstrap,
-                                        base, serverEvent);
-                        adaptor.setName("selectmedia");
-                        return adaptor;
-                }
 
 		return null;
 	}
