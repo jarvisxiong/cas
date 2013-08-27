@@ -192,6 +192,7 @@ public class FilterTest extends TestCase {
     expect(mockConfig.getInt("partnerSegmentNo", 2)).andReturn(2).anyTimes();
     expect(mockConfig.getInt("whiteListedSitesRefreshtime", 1000 * 300)).andReturn(0).anyTimes();
     expect(mockConfig.getInt("rtbBalanceFilterAmount", 50)).andReturn(0).anyTimes();
+    expect(mockConfig.getInt("normalizingFactor", 2)).andReturn(2).anyTimes();
     replay(mockConfig);
     sMDE = createMock(SiteMetaDataEntity.class);
     expect(sMDE.getAdvertisersIncludedBySite()).andReturn(emptySet).anyTimes();

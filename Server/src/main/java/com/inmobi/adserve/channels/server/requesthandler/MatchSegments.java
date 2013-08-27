@@ -9,12 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.entity.ChannelEntity;
-import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
-import com.inmobi.adserve.channels.entity.SiteFeedbackEntity;
-import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
+import com.inmobi.adserve.channels.entity.*;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.servlet.ServletHandler;
@@ -27,7 +22,7 @@ public class MatchSegments {
   private static final String DEFAULT = "default";
   private RepositoryHelper repositoryHelper;
   private SASRequestParameters sasParams;
-  private SiteFeedbackEntity siteFeedbackEntity;
+  private SegmentAdGroupFeedbackEntity segmentAdGroupFeedbackEntity;
   private static ChannelAdGroupRepository channelAdGroupRepository;
   private static ChannelEntity defaultChannelEntity;
   private static ChannelFeedbackEntity defaultChannelFeedbackEntity;
@@ -68,8 +63,8 @@ public class MatchSegments {
     this.repositoryHelper = repositoryHelper;
     this.sasParams = sasParams;
     this.logger = logger;
-    this.siteFeedbackEntity = repositoryHelper.querySiteCitrusLeafFeedbackRepository(sasParams.getSiteId(), sasParams
-        .getSiteSegmentId().toString(), logger);
+    this.segmentAdGroupFeedbackEntity = repositoryHelper.querySiteCitrusLeafFeedbackRepository(sasParams.getSiteId(), sasParams
+        .getSiteSegmentId(), logger);
   }
 
   // select channel segment based on specified rules
@@ -236,10 +231,9 @@ public class MatchSegments {
       channelSegmentFeedbackEntity = MatchSegments.defaultChannelSegmentFeedbackEntity;
     }
 
-    if(siteFeedbackEntity != null) {
-      logger.debug("siteFeedbackEntity is", siteFeedbackEntity);
-      if(siteFeedbackEntity.getAdGroupFeedbackMap() != null)
-        channelSegmentCitrusLeafFeedbackEntity = siteFeedbackEntity.getAdGroupFeedbackMap().get(
+    if(segmentAdGroupFeedbackEntity != null) {
+      if(segmentAdGroupFeedbackEntity.getAdGroupFeedbackMap() != null)
+        channelSegmentCitrusLeafFeedbackEntity = segmentAdGroupFeedbackEntity.getAdGroupFeedbackMap().get(
             channelSegmentEntity.getExternalSiteKey());
     } else {
       logger.debug("siteFeedbackEntity is null");

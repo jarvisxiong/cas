@@ -50,7 +50,7 @@ public class MatchSegmentsTest extends TestCase {
     expect(repositoryHelper.querySiteTaxonomyRepository("2")).andReturn(s2).anyTimes();
     expect(repositoryHelper.querySiteTaxonomyRepository("3")).andReturn(s3).anyTimes();
     expect(repositoryHelper.querySiteTaxonomyRepository("4")).andReturn(s4).anyTimes();
-    expect(repositoryHelper.querySiteCitrusLeafFeedbackRepository("1","2",debugLogger)).andReturn(null).anyTimes();
+    expect(repositoryHelper.querySiteCitrusLeafFeedbackRepository("1",2,debugLogger)).andReturn(null).anyTimes();
     replay(repositoryHelper);
     MatchSegments.init(null);
     MatchSegments matchSegments = new MatchSegments(repositoryHelper, sasRequestParameters, debugLogger);

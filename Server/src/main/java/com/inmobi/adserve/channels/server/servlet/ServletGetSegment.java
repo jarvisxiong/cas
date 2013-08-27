@@ -85,11 +85,7 @@ public class ServletGetSegment implements Servlet {
                         ("_")[0], Integer.parseInt(id.split("_")[1]), null);
             } else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals
                     .CITRUS_LEAF_FEEDBACK)) {
-                entity = ServletHandler.repositoryHelper.querySiteCitrusLeafFeedbackRepository(id
-                        .split("_")[0],
-                        id.split("_")[1], logger);
-                hrh.responseSender.sendResponse(((SiteFeedbackEntity) entity).getCSV(), e);
-                return;
+                entity = ServletHandler.repositoryHelper.querySiteCitrusLeafFeedbackRepository(id);
             }
             segmentInfo.put(key, entity);
         }
