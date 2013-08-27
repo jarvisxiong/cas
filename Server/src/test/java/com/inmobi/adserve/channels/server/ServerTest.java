@@ -20,7 +20,6 @@ import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
-import com.inmobi.adserve.channels.server.servlet.ServletHandler;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
 

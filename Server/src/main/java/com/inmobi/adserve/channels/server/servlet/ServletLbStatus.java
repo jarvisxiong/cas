@@ -5,6 +5,8 @@ import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 import java.nio.charset.Charset;
 
+import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.ServletHandler;
 import org.apache.log4j.Logger;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;

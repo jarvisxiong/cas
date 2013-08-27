@@ -1,10 +1,13 @@
-package com.inmobi.adserve.channels.server.servlet;
+package com.inmobi.adserve.channels.server;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.api.ServletFactory;
+import com.inmobi.adserve.channels.server.servlet.*;
 import org.apache.commons.configuration.Configuration;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 

@@ -1,9 +1,10 @@
 package com.inmobi.adserve.channels.server.servlet;
 
 import com.google.gson.Gson;
-import com.inmobi.adserve.channels.entity.SiteFeedbackEntity;
 import com.inmobi.adserve.channels.server.ChannelServerStringLiterals;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.ServletHandler;
 import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;

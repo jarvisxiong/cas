@@ -3,6 +3,8 @@ package com.inmobi.adserve.channels.server.servlet;
 import java.util.*;
 
 import com.inmobi.adserve.channels.entity.PublisherFilterEntity;
+import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.ServletHandler;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.json.JSONException;
@@ -11,7 +13,6 @@ import org.json.JSONObject;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;

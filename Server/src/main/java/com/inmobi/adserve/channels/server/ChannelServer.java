@@ -9,7 +9,6 @@ import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 import com.inmobi.adserve.channels.server.requesthandler.Filters;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
-import com.inmobi.adserve.channels.server.servlet.ServletHandler;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.casthrift.DataCenter;

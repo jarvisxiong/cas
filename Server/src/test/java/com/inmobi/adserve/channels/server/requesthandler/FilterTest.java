@@ -20,7 +20,7 @@ import org.testng.annotations.Test;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.*;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.server.servlet.ServletHandler;
+import com.inmobi.adserve.channels.server.ServletHandler;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
