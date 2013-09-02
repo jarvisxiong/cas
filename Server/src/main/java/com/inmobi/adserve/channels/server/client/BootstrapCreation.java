@@ -40,7 +40,7 @@ public class BootstrapCreation {
       }
       connectionLimitUpstreamHandler = new ConnectionLimitUpstreamHandler(maxConnections);
     } catch (Exception ex) {
-      logger.error("error in building bootstrap " + ex.getMessage());
+      logger.info("error in building bootstrap " + ex.getMessage());
       return null;
     }
     // make the channel pipeline
@@ -57,7 +57,7 @@ public class BootstrapCreation {
         }
       });
     } catch (Exception ex) {
-      logger.error("error in creating pipeline " + ex.getMessage());
+      logger.info("error in creating pipeline " + ex.getMessage());
       return null;
     }
     // set bootstrap options

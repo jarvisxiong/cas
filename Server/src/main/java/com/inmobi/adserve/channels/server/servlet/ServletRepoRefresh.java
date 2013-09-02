@@ -83,10 +83,10 @@ public class ServletRepoRefresh implements Servlet {
       hrh.logger.debug("Successfully updated", repoName);
       hrh.responseSender.sendResponse("OK", e);
     } catch (SQLException e1) {
-      hrh.logger.error("error is", e1.getMessage());
+      hrh.logger.info("error is", e1.getMessage());
       hrh.responseSender.sendResponse("NOTOK", e);
     } catch (RepositoryException e2) {
-      hrh.logger.error("error is", e2.getMessage());
+      hrh.logger.info("error is", e2.getMessage());
       hrh.responseSender.sendResponse("NOTOK", e);
     } finally {
       if(null != statement) {

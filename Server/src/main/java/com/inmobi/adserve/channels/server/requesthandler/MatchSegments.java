@@ -104,7 +104,7 @@ public class MatchSegments {
       }
       return (matchSegments(logger, slot, getCategories(), country, targetingPlatform, siteRating, osId));
     } catch (NumberFormatException exception) {
-      logger.error("Error parsing required arguments " + exception.getMessage());
+      logger.info("Error parsing required arguments " + exception.getMessage());
       return null;
     }
   }
