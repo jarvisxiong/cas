@@ -134,7 +134,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         sendResponse(OK, finalReponse, adResponse.responseHeaders, event);
       }
     } else {
-      logger.error("invalid slot, so not returning response, even though we got an ad");
+      logger.info("invalid slot, so not returning response, even though we got an ad");
       InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
       if(getResponseFormat().equals("xhtml")) {
         finalReponse = noAdXhtml;
