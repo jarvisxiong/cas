@@ -115,12 +115,12 @@ public class Logging {
       host = addr.getHostName();
 
       if(host == null) {
-        logger.error("host cant be empty, abandoning rr logging");
+        logger.info("host cant be empty, abandoning rr logging");
         return;
       }
       log.append("host=\"" + host + "\"");
     } catch (UnknownHostException ex) {
-      logger.error("could not resolve host inside rr logging, so abandoning response");
+      logger.info("could not resolve host inside rr logging, so abandoning response");
       return;
     }
 
@@ -226,7 +226,7 @@ public class Logging {
       if(requestSlot.matches("^\\d+$")) {
         slotRequested = Integer.valueOf(requestSlot).shortValue();
       } else {
-        logger.error("wrong value for request slot is", requestSlot);
+        logger.info("wrong value for request slot is", requestSlot);
       }
     }
 
@@ -243,7 +243,7 @@ public class Logging {
           try {
             user.setAge(Short.valueOf(sasParams.getAge()));
           } catch(NumberFormatException e) {
-            logger.error("Exception in casting age from string to Short", e);
+            logger.info("Exception in casting age from string to Short", e);
           }
         }
       }
@@ -329,7 +329,7 @@ public class Logging {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      logger.error("error while writting to graphite in rrLog", e);
+      logger.info("error while writting to graphite in rrLog", e);
     }
   }
 
@@ -413,10 +413,10 @@ public class Logging {
           }
         } catch (Exception e) {
           e.printStackTrace();
-          logger.error("error while writting to graphite in channelLog", e);
+          logger.info("error while writting to graphite in channelLog", e);
         }
       } catch (JSONException exception) {
-        logger.error("error reading channel log line from the adapters");
+        logger.info("error reading channel log line from the adapters");
       }
       
       if(logLine != null) {

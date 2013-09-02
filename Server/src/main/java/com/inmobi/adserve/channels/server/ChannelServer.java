@@ -145,7 +145,7 @@ public class ChannelServer {
             if (null == clientBootstrap) {
                 ServerStatusInfo.statusCode = 404;
                 ServerStatusInfo.statusString = "StackTrace is: failed to create bootstrap";
-                logger.error("failed to create bootstrap");
+                logger.info("failed to create bootstrap");
                 return;
             }
 
@@ -169,7 +169,7 @@ public class ChannelServer {
         } catch (Exception exception) {
             ServerStatusInfo.statusString = getMyStackTrace(exception);
             ServerStatusInfo.statusCode = 404;
-            logger.error("stack trace is " + getMyStackTrace(exception));
+            logger.info("stack trace is " + getMyStackTrace(exception));
             if (logger.isDebugEnabled()) {
                 logger.debug(exception.getMessage());
                 HttpRequestHandler.sendMail(exception.getMessage(), getMyStackTrace(exception));
@@ -186,7 +186,7 @@ public class ChannelServer {
 
     private static void instantiateRepository(Logger logger, ConfigurationLoader config) {
         try {
-            logger.debug("Starting to instantiate repository");
+            logger.error("Starting to instantiate repository");
             ChannelSegmentMatchingCache.init(logger);
             Configuration databaseConfig = config.databaseConfiguration();
             System.setProperty(Context.INITIAL_CONTEXT_FACTORY,
