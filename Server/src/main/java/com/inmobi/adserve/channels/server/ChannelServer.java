@@ -260,7 +260,7 @@ public class ChannelServer {
             ServerStatusInfo.statusCode = 404;
             ServerStatusInfo.statusString = getMyStackTrace(exception);
             if (logger.isDebugEnabled()) {
-              ChannelServer.getMyStackTrace(exception);
+              logger.debug(ChannelServer.getMyStackTrace(exception));
             }
             return;
         }

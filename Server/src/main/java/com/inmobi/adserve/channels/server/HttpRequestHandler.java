@@ -180,12 +180,12 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
       }
     } catch (JSONException exception) {
       if (logger.isDebugEnabled()) {
-        ChannelServer.getMyStackTrace(exception);
+        logger.debug(ChannelServer.getMyStackTrace(exception));
       }
       return;
     } catch (TException exception) {
       if (logger.isDebugEnabled()) {
-        ChannelServer.getMyStackTrace(exception);
+        logger.debug(ChannelServer.getMyStackTrace(exception));
       }
       return;
     }
