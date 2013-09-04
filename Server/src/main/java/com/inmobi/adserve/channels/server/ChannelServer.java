@@ -177,7 +177,7 @@ public class ChannelServer {
         }
     }
 
-    private static String getMyStackTrace(Exception exception) {
+    public static String getMyStackTrace(Exception exception) {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         exception.printStackTrace(printWriter);
@@ -259,7 +259,9 @@ public class ChannelServer {
             logger.error("failed to initialize repository " + exception.getMessage());
             ServerStatusInfo.statusCode = 404;
             ServerStatusInfo.statusString = getMyStackTrace(exception);
-            exception.printStackTrace();
+            if (logger.isDebugEnabled()) {
+              ChannelServer.getMyStackTrace(exception);
+            }
             return;
         }
     }

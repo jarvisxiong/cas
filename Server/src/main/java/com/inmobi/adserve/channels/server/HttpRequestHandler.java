@@ -80,7 +80,6 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
     if(e.getChannel().isOpen()) {
       responseSender.sendNoAdResponse(e);
     }
-    e.getCause().printStackTrace();
   }
 
   // Invoked when request timeout.
@@ -180,14 +179,14 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
         Logging.sampledAdvertiserLogging(list, logger, ServletHandler.getLoggerConfig());
       }
     } catch (JSONException exception) {
-      logger.info("Error while writing logs " + exception.getMessage());
-      logger.debug("stack trace is ");
-      exception.printStackTrace();
+      if (logger.isDebugEnabled()) {
+        ChannelServer.getMyStackTrace(exception);
+      }
       return;
     } catch (TException exception) {
-      logger.info("Error while writing logs " + exception.getMessage());
-      logger.debug("stack trace is ");
-      exception.printStackTrace();
+      if (logger.isDebugEnabled()) {
+        ChannelServer.getMyStackTrace(exception);
+      }
       return;
     }
     logger.debug("done with logging");
@@ -195,8 +194,6 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
 
   // send Mail if channel server crashes
   public static void sendMail(String errorMessage, String stackTrace) {
-    // logger.info("Error in the main thread, so sending mail " +
-    // errorMessage);
     Properties properties = System.getProperties();
     properties.setProperty("mail.smtp.host", ServletHandler.getServerConfig().getString("smtpServer"));
     Session session = Session.getDefaultInstance(properties);

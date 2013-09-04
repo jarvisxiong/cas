@@ -328,7 +328,6 @@ public class Logging {
             isServerImpression, 0.0, (long) 0.0, impression.getAd().getWinBid());
       }
     } catch (Exception e) {
-      e.printStackTrace();
       logger.info("error while writting to graphite in rrLog", e);
     }
   }
@@ -412,7 +411,6 @@ public class Logging {
                 false, bid, latency, 0.0);
           }
         } catch (Exception e) {
-          e.printStackTrace();
           logger.info("error while writting to graphite in channelLog", e);
         }
       } catch (JSONException exception) {
@@ -615,7 +613,6 @@ public class Logging {
           msg = new Message(tSerializer.serialize(casAdvertisementLog));
         } catch (TException e) {
           logger.debug("Error while creating sampledAdvertiser logs for databus ");
-          e.printStackTrace();
         }
         if(null != msg) {
           dataBusPublisher.publish(sampledAdvertisementLogKey, msg);
