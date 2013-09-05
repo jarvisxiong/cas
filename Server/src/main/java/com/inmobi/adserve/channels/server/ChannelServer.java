@@ -18,6 +18,12 @@ import com.inmobi.phoenix.exception.InitializationException;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.dbcp.ConnectionFactory;
+import org.apache.commons.dbcp.DriverManagerConnectionFactory;
+import org.apache.commons.dbcp.PoolableConnectionFactory;
+import org.apache.commons.dbcp.PoolingDataSource;
+import org.apache.commons.pool.ObjectPool;
+import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.jboss.netty.bootstrap.ClientBootstrap;
@@ -27,7 +33,6 @@ import org.jboss.netty.logging.InternalLoggerFactory;
 import org.jboss.netty.logging.Log4JLoggerFactory;
 import org.jboss.netty.util.HashedWheelTimer;
 import org.jboss.netty.util.Timer;
-import org.postgresql.jdbc3.Jdbc3PoolingDataSource;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -36,6 +41,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetSocketAddress;
+import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -50,7 +56,6 @@ public class ChannelServer {
     private static SiteCitrusLeafFeedbackRepository siteCitrusLeafFeedbackRepository;
     private static PricingEngineRepository pricingEngineRepository;
     private static PublisherFilterRepository publisherFilterRepository;
-    private static RepositoryHelper repositoryHelper;
     private static final String configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
     public static byte dataCenterIdCode;
     public static short hostIdCode;
@@ -108,7 +113,8 @@ public class ChannelServer {
             pricingEngineRepository = new PricingEngineRepository();
             publisherFilterRepository = new PublisherFilterRepository();
 
-            repositoryHelper = new RepositoryHelper(channelRepository, channelAdGroupRepository,
+            RepositoryHelper repositoryHelper = new RepositoryHelper(channelRepository,
+                    channelAdGroupRepository,
                     channelFeedbackRepository,
                     channelSegmentFeedbackRepository, siteMetaDataRepository,
                     siteTaxonomyRepository,
@@ -180,7 +186,8 @@ public class ChannelServer {
         return ("StackTrace is: " + stringWriter.toString());
     }
 
-    private static void instantiateRepository(Logger logger, ConfigurationLoader config) {
+    private static void instantiateRepository(Logger logger, ConfigurationLoader config) throws
+            ClassNotFoundException {
         try {
             logger.debug("Starting to instantiate repository");
             ChannelSegmentMatchingCache.init(logger);
@@ -195,15 +202,23 @@ public class ChannelServer {
             initialContext.createSubcontext("java:comp");
             initialContext.createSubcontext("java:comp/env");
 
-            Jdbc3PoolingDataSource dataSource = new Jdbc3PoolingDataSource();
-            dataSource.setServerName(databaseConfig.getString("host"));
-            dataSource.setPortNumber(databaseConfig.getInt("port"));
-            dataSource.setDatabaseName(databaseConfig.getString(ChannelServerStringLiterals
-                    .DATABASE));
-            dataSource.setUser(databaseConfig.getString("username"));
-            dataSource.setPassword(databaseConfig.getString("password"));
+            Class.forName("org.postgresql.Driver");
+            Properties props = new Properties();
+            props.put("validationQuery", "select version(); ");
+            props.put("testWhileIdle","true");
+            props.put("user", databaseConfig.getString("username"));
+            props.put("password", databaseConfig.getString("password"));
 
-            initialContext.bind("java:comp/env/jdbc", dataSource);
+            final ObjectPool connectionPool = new GenericObjectPool(null);
+            String connectUri = "jdbc:postgresql://" +
+                                databaseConfig.getString("host") + ":" +
+                                databaseConfig.getInt("port") +  "/" +
+                                databaseConfig.getString(ChannelServerStringLiterals .DATABASE);
+            final ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectUri, props);
+            new PoolableConnectionFactory(connectionFactory, connectionPool, null, null, false, true);
+            final PoolingDataSource ds = new PoolingDataSource(connectionPool);
+
+            initialContext.bind("java:comp/env/jdbc", ds);
 
             ChannelSegmentMatchingCache.init(logger);
             // Reusing the repository from phoenix adsering framework.

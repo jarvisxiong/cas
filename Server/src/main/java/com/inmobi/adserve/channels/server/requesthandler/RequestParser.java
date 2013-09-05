@@ -20,12 +20,12 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 public class RequestParser {
 
   public static JSONObject extractParams(Map<String, List<String>> params, DebugLogger logger) throws Exception {
-    return extractParams(params, "args", logger);
+    return extractParams(params, "args");
   }
 
   // Extracting params.
 	public static JSONObject extractParams(Map<String, List<String>> params,
-	    String jsonKey, DebugLogger logger) throws Exception, JSONException {
+	    String jsonKey) throws Exception {
 		JSONObject jObject = null;
 		if (!params.isEmpty()) {
 			for (Entry<String, List<String>> p : params.entrySet()) {
@@ -47,72 +47,73 @@ public class RequestParser {
     if(null == jObject) {
       logger.debug("Returning null as jObject is null.");
       params = null;
-    }
-    params.setAllParametersJson(jObject.toString());
-    params.setRemoteHostIp(stringify(jObject, "w-s-carrier", logger));
-    params.setUserAgent(stringify(jObject, "rq-x-inmobi-phone-useragent", logger));
-    if(null == params.getUserAgent()) {
-      params.setUserAgent(stringify(jObject, "rq-h-user-agent", logger));
-    }
-    params.setLocSrc(stringify(jObject, "loc-src", logger));
-    params.setLatLong(stringify(jObject, "latlong", logger));
-    params.setSiteId(stringify(jObject, "rq-mk-siteid", logger));
-    params.setSource(stringify(jObject, "source", logger));
-    params.setCountry(parseArray(jObject, "carrier", 2));
-    params.setCountryStr(parseArray(jObject, "carrier", 1));
-    params.setArea(parseArray(jObject, "carrier", 4));
-    params.setSlot(stringify(jObject, "slot-served", logger));
-    params.setRqMkSlot(stringify(jObject, "rq-mk-ad-slot", logger));
-    params.setSdkVersion(stringify(jObject, "sdk-version", logger));
-    params.setSiteType(stringify(jObject, "site-type", logger));
-    params.setAdcode(stringify(jObject, "adcode", logger));
-    params.setPlatformOsId(jObject.optInt("os-id", -1));
-    if(params.getSiteType() != null) {
-      params.setSiteType(params.getSiteType().toUpperCase());
-    }
-    params.setCategories(getCategory(jObject, logger, "new-category"));
-    params.setRqIframe(stringify(jObject, "rq-iframe", logger));
-    params.setRFormat(stringify(jObject, "r-format", logger));
-    params.setRqMkAdcount(stringify(jObject, "rq-mk-adcount", logger));
-    params.setTid(stringify(jObject, "tid", logger));
-    params.setTp(stringify(jObject, "tp", logger));
+    } else {
+        params.setAllParametersJson(jObject.toString());
+        params.setRemoteHostIp(stringify(jObject, "w-s-carrier", logger));
+        params.setUserAgent(stringify(jObject, "rq-x-inmobi-phone-useragent", logger));
+        if(null == params.getUserAgent()) {
+          params.setUserAgent(stringify(jObject, "rq-h-user-agent", logger));
+        }
+        params.setLocSrc(stringify(jObject, "loc-src", logger));
+        params.setLatLong(stringify(jObject, "latlong", logger));
+        params.setSiteId(stringify(jObject, "rq-mk-siteid", logger));
+        params.setSource(stringify(jObject, "source", logger));
+        params.setCountry(parseArray(jObject, "carrier", 2));
+        params.setCountryStr(parseArray(jObject, "carrier", 1));
+        params.setArea(parseArray(jObject, "carrier", 4));
+        params.setSlot(stringify(jObject, "slot-served", logger));
+        params.setRqMkSlot(stringify(jObject, "rq-mk-ad-slot", logger));
+        params.setSdkVersion(stringify(jObject, "sdk-version", logger));
+        params.setSiteType(stringify(jObject, "site-type", logger));
+        params.setAdcode(stringify(jObject, "adcode", logger));
+        params.setPlatformOsId(jObject.optInt("os-id", -1));
+        if(params.getSiteType() != null) {
+          params.setSiteType(params.getSiteType().toUpperCase());
+        }
+        params.setCategories(getCategory(jObject, logger, "new-category"));
+        params.setRqIframe(stringify(jObject, "rq-iframe", logger));
+        params.setRFormat(stringify(jObject, "r-format", logger));
+        params.setRqMkAdcount(stringify(jObject, "rq-mk-adcount", logger));
+        params.setTid(stringify(jObject, "tid", logger));
+        params.setTp(stringify(jObject, "tp", logger));
 
-    params.setAllowBannerAds(jObject.optBoolean("site-allowBanner", true));
-    params.setSiteFloor(jObject.optDouble("site-floor", 0.0));
-    params.setSiteSegmentId(jObject.optInt("sel-seg-id", 0));
-    params.setModelId(jObject.optInt("model-id", 0));
-    logger.debug("Site segment id is", params.getSiteSegmentId(), "and model id is", params.getModelId());
-    params.setIpFileVersion(jObject.optInt("rq-ip-file-ver", 1));
-    logger.debug("country obtained is", params.getCountry());
-    logger.debug("site floor is", params.getSiteFloor());
-    logger.debug("osId is", params.getPlatformOsId());
-    params.setUidParams(stringify(jObject, "raw-uid", logger));
-    setUserIdParams(casInternalRequestParameters, jObject, params, logger);
-    params = getUserParams(params, jObject, logger);
-    try {
-      JSONArray siteInfo = jObject.getJSONArray("site");
-      if(siteInfo != null && siteInfo.length() > 0) {
-        params.setSiteIncId(siteInfo.getLong(0));
-      }
-    } catch (JSONException exception) {
-      logger.debug("site object not found in request");
-      params.setSiteIncId(0);
+        params.setAllowBannerAds(jObject.optBoolean("site-allowBanner", true));
+        params.setSiteFloor(jObject.optDouble("site-floor", 0.0));
+        params.setSiteSegmentId(jObject.optInt("sel-seg-id", 0));
+        params.setModelId(jObject.optInt("model-id", 0));
+        logger.debug("Site segment id is", params.getSiteSegmentId(), "and model id is", params.getModelId());
+        params.setIpFileVersion(jObject.optInt("rq-ip-file-ver", 1));
+        logger.debug("country obtained is", params.getCountry());
+        logger.debug("site floor is", params.getSiteFloor());
+        logger.debug("osId is", params.getPlatformOsId());
+        params.setUidParams(stringify(jObject, "raw-uid", logger));
+        setUserIdParams(casInternalRequestParameters, jObject, logger);
+        params = getUserParams(params, jObject, logger);
+        try {
+          JSONArray siteInfo = jObject.getJSONArray("site");
+          if(siteInfo != null && siteInfo.length() > 0) {
+            params.setSiteIncId(siteInfo.getLong(0));
+          }
+        } catch (JSONException exception) {
+          logger.debug("site object not found in request");
+          params.setSiteIncId(0);
+        }
+        try {
+          params.setHandset(jObject.getJSONArray("handset"));
+        } catch (JSONException e) {
+          logger.debug("Handset array not found");
+        }
+        try {
+          params.setCarrier(jObject.getJSONArray("carrier"));
+        } catch (JSONException e) {
+          logger.debug("carrier array not found");
+        }
+        params.setOsId(jObject.optInt("os-id", -1));
+        params.setRichMedia(jObject.optBoolean("rich-media", false));
+        params.setRqAdType(stringify(jObject, "rq-adtype", logger));
+        params.setAppUrl(stringify(jObject, "site-url", logger));
+        logger.debug("successfully parsed params");
     }
-    try {
-      params.setHandset(jObject.getJSONArray("handset"));
-    } catch (JSONException e) {
-      logger.debug("Handset array not found");
-    }
-    try {
-      params.setCarrier(jObject.getJSONArray("carrier"));
-    } catch (JSONException e) {
-      logger.debug("carrier array not found");
-    }
-    params.setOsId(jObject.optInt("os-id", -1));
-    params.setRichMedia(jObject.optBoolean("rich-media", false));
-    params.setRqAdType(stringify(jObject, "rq-adtype", logger));
-    params.setAppUrl(stringify(jObject, "site-url", logger));
-    logger.debug("successfully parsed params");
   }
 
   public static String stringify(JSONObject jObject, String field, DebugLogger logger) {
@@ -195,7 +196,7 @@ public class RequestParser {
 
   // Get user id params
   public static void setUserIdParams(CasInternalRequestParameters parameter, JSONObject jObject,
-      SASRequestParameters sasParams, DebugLogger logger) {
+                                     DebugLogger logger) {
     if(null == jObject) {
       return;
     }
@@ -226,9 +227,9 @@ public class RequestParser {
       MessageDigest md = MessageDigest.getInstance("MD5");
       byte[] array = md.digest(md5.getBytes());
       StringBuffer sb = new StringBuffer();
-      for (int i = 0; i < array.length; ++i) {
-        sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
-      }
+        for (byte anArray : array) {
+            sb.append(Integer.toHexString((anArray & 0xFF) | 0x100).substring(1, 3));
+        }
       return sb.toString();
     } catch (java.security.NoSuchAlgorithmException e) {
     }

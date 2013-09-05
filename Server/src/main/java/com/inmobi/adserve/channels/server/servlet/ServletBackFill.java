@@ -210,7 +210,7 @@ public class ServletBackFill implements Servlet {
     } else {
       tempRankList = dcpSegments;
     }
-    tempRankList = AsyncRequestMaker.makeAsyncRequests(tempRankList, logger, hrh.responseSender, e, rtbSegments);
+    tempRankList = AsyncRequestMaker.makeAsyncRequests(tempRankList, logger, e, rtbSegments);
 
     hrh.responseSender.setRankList(tempRankList);
     hrh.responseSender.getAuctionEngine().setRtbSegments(rtbSegments);

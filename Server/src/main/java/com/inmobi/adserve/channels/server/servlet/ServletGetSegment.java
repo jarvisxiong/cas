@@ -36,7 +36,7 @@ public class ServletGetSegment implements Servlet {
         Map<String, List<String>> params = queryStringDecoder.getParameters();
         JSONObject jObject;
         try {
-            jObject = RequestParser.extractParams(params, "segments", logger);
+            jObject = RequestParser.extractParams(params, "segments");
         } catch (JSONException exeption) {
             logger.debug("Encountered Json Error while creating json object inside servlet");
             hrh.setTerminationReason(ServletHandler.jsonParsingError);

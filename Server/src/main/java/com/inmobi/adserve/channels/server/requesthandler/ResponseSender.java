@@ -214,10 +214,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
     String adCode = sasParams.getAdcode();
     String rqIframe = sasParams.getRqIframe();
-    if(adCode != null && rqIframe != null && adCode.equalsIgnoreCase("JS")) {
-      return true;
-    }
-    return false;
+    return adCode != null && rqIframe != null && adCode.equalsIgnoreCase("JS");
   }
 
   @Override
@@ -229,11 +226,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     if(logger.isDebugEnabled()) {
       logger.debug("inside isEligibleForProcess for " + adNetwork.getName() + " and index is " + index);
     }
-
-    if(index == 0 || index == rankIndexToProcess) {
-      return true;
-    }
-    return false;
+    return index == 0 || index == rankIndexToProcess;
   }
 
   @Override
@@ -242,10 +235,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     if(logger.isDebugEnabled()) {
       logger.debug("inside isLastEntry for " + adNetwork.getName() + " and index is " + index);
     }
-    if(index == rankList.size() - 1) {
-      return true;
-    }
-    return false;
+    return index == rankList.size() - 1;
   }
 
   // Iterates over the complete rank list and set the new value for
@@ -358,7 +348,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
   }
 
   private int getRankIndex(AdNetworkInterface adNetwork) {
-    int index = 0;
+    int index;
     for (index = 0; index < rankList.size(); index++) {
       if(rankList.get(index).getAdNetworkInterface().getImpressionId().equals(adNetwork.getImpressionId())) {
         break;
@@ -408,7 +398,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
       segment = getRankList().get(rankIndex);
     }
     this.setRankIndexToProcess(rankIndex);
-    return;
   }
 
   @Override
@@ -421,14 +410,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
     if(adNetworkInterface.getResponseAd().responseStatus == ThirdPartyAdResponse.ResponseStatus.SUCCESS) {
       sendAdResponse(adNetworkInterface, serverEvent);
       cleanUp();
-      return;
     } else if(isLastEntry(adNetworkInterface)) {
       sendNoAdResponse(serverEvent);
       cleanUp();
-      return;
     } else {
       reassignRanks(adNetworkInterface, serverEvent);
-      return;
     }
   }
 

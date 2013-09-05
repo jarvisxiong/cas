@@ -51,7 +51,7 @@ public class ServletHandler {
     ServletHandler.repositoryHelper = repositoryHelper;
     percentRollout = ServletHandler.serverConfig.getInt("percentRollout", 100);
     allowedSiteTypes = ServletHandler.serverConfig.getList("allowedSiteTypes");
-    InspectorStats.setStats(InspectorStrings.percentRollout, Long.valueOf(percentRollout));
+    InspectorStats.setStats(InspectorStrings.percentRollout, (long) percentRollout);
 
     servletMap.put("/stat", new ServletFactory() {
       @Override
@@ -150,11 +150,11 @@ public class ServletHandler {
     List<Map.Entry<String, String>> headers = request.getHeaders();
     String host = null;
 
-    for (int index = 0; index < headers.size(); index++) {
-      if(((String) ((Map.Entry<String, String>) (headers.get(index))).getKey()).equalsIgnoreCase("Host")) {
-        host = (String) ((Map.Entry<String, String>) (headers.get(index))).getValue();
+      for (Map.Entry<String, String> header : headers) {
+          if (header.getKey().equalsIgnoreCase("Host")) {
+              host = header.getValue();
+          }
       }
-    }
     return host;
   }
 
