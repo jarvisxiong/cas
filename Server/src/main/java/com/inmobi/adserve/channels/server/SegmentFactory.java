@@ -304,6 +304,14 @@ public class SegmentFactory {
 			DCPAmobeeAdnetwork adaptor = new DCPAmobeeAdnetwork(logger, config,
 					clientBootstrap, base, serverEvent);
 			return adaptor;
+		} else if ((advertiserId
+				.equals(config.getString("ybrant.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet.contains("ybrant"))
+				&& (config.getString("ybrant.status").equals("on"))) {
+			DCPAjillionAdnetwork adaptor = new DCPAjillionAdnetwork(logger, config,
+					clientBootstrap, base, serverEvent);
+			adaptor.setName("ybrant");
+			return adaptor;
 		}
 
 		return null;
