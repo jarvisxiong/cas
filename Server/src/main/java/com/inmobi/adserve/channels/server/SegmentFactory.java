@@ -310,6 +310,7 @@ public class SegmentFactory {
 				&& (config.getString("ybrant.status").equals("on"))) {
 			DCPAjillionAdnetwork adaptor = new DCPAjillionAdnetwork(logger, config,
 					clientBootstrap, base, serverEvent);
+			adaptor.setName("ybrant");
 			return adaptor;
 		}
 
