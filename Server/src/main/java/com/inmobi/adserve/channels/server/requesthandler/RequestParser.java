@@ -25,24 +25,6 @@ public class RequestParser {
   }
 
   // Extracting params.
-<<<<<<< HEAD:Server/src/main/java/com/inmobi/adserve/channels/server/RequestParser.java
-  public static JSONObject extractParams(Map<String, List<String>> params, String jsonKey, DebugLogger logger)
-      throws Exception, JSONException {
-    JSONObject jObject = null;
-    if(!params.isEmpty()) {
-      for (Entry<String, List<String>> p : params.entrySet()) {
-        String key = p.getKey();
-        List<String> vals = p.getValue();
-        for (String val : vals) {
-          if(key.equalsIgnoreCase(jsonKey)) {
-            jObject = new JSONObject(URLDecoder.decode(val));
-          }
-        }
-      }
-    }
-    return jObject;
-  }
-=======
 	public static JSONObject extractParams(Map<String, List<String>> params,
 	    String jsonKey, DebugLogger logger) throws Exception, JSONException {
 		JSONObject jObject = null;
@@ -59,7 +41,6 @@ public class RequestParser {
 		}
 		return jObject;
 	}
->>>>>>> develop:Server/src/main/java/com/inmobi/adserve/channels/server/requesthandler/RequestParser.java
 
   public static void parseRequestParameters(JSONObject jObject, SASRequestParameters params,
       CasInternalRequestParameters casInternalRequestParameters, DebugLogger logger) {
