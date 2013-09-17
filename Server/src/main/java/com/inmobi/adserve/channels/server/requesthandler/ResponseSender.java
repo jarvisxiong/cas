@@ -6,7 +6,6 @@ import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 import java.awt.Dimension;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -157,6 +156,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
         jsonObject.put("adIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getAdId());
         jsonObject.put("clickUrl", this.auctionEngine.getRtbResponse().getAdNetworkInterface().getClickUrl());
         jsonObject.put("rtbFloor", casInternalRequestParameters.rtbBidFloor);
+        jsonObject.put("impressionId", this.auctionEngine.getRtbResponse().getAdNetworkInterface().getImpressionId());
+        jsonObject.put("campaignId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getCampaignId());
         InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
         sendResponse(OK, jsonObject.toString(), adResponse.responseHeaders, event);
         if(logger.isDebugEnabled()) {
