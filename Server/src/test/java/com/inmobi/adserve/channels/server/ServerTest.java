@@ -18,8 +18,10 @@ import org.json.JSONObject;
 import org.testng.annotations.Test;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.server.requesthandler.Logging;
+import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
+import com.inmobi.adserve.channels.server.servlet.ServletHandler;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 public class ServerTest extends TestCase {
@@ -36,12 +38,10 @@ public class ServerTest extends TestCase {
   private String beaconURLPrefix = "http://c3.w.inmobi.com/c.asm";
   private String secretKeyVersion = "1";
   private SASRequestParameters sasParam;
-  private String loggerConf = "target/channel-server.properties";
   private static String rrFile = "";
   private static String channelFile = "";
   private static int count = 0;
   private static int percentRollout = 100;
-  private DebugLogger logger;
   private static List<String> siteType = Arrays.asList("FAMILYSAFE", "PERFORMANCE", "MATURE");
 
   public void setUp() throws Exception {
@@ -52,8 +52,6 @@ public class ServerTest extends TestCase {
     }
     prepareConfig();
     DebugLogger.init(mockConfig);
-    logger = new DebugLogger();
-    InspectorStats.initializeWorkflow("WorkFlow");
     ServletHandler.init(config, null);
     httpRequestHandler = new HttpRequestHandler();
     AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
