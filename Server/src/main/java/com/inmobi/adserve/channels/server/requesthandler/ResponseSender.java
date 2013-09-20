@@ -60,6 +60,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
   private boolean requestCleaned;
   public CasInternalRequestParameters casInternalRequestParameters;
   private AuctionEngine auctionEngine;
+  private static final String NO_AD_HEADER = "X-MKHOJ-NOAD";
 
   public List<ChannelSegment> getRankList() {
     return this.rankList;
@@ -153,10 +154,13 @@ public class ResponseSender extends HttpRequestHandlerBase {
         jsonObject.put("adm", finalReponse);
         jsonObject.put("advertiserId", this.auctionEngine.getRtbResponse().getChannelEntity().getAccountId());
         jsonObject.put("adgroupId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getAdgroupId());
-        jsonObject.put("adIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getAdId());
+        jsonObject.put("adgroupIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getAdgroupIncId());
+        jsonObject.put("adIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getIncId());
+        jsonObject.put("adId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getAdId());
         jsonObject.put("clickUrl", this.auctionEngine.getRtbResponse().getAdNetworkInterface().getClickUrl());
         jsonObject.put("rtbFloor", casInternalRequestParameters.rtbBidFloor);
         jsonObject.put("impressionId", this.auctionEngine.getRtbResponse().getAdNetworkInterface().getImpressionId());
+        jsonObject.put("campaignIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getAdgroupIncId()); // TODO Need to send campaign inc id
         jsonObject.put("campaignId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getCampaignId());
         InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
         sendResponse(OK, jsonObject.toString(), adResponse.responseHeaders, event);

@@ -34,7 +34,10 @@ public class RequestParser {
 				List<String> vals = p.getValue();
 				if (key.equalsIgnoreCase(jsonKey)) {
 					if (vals != null && !vals.isEmpty()) {
-						jObject = new JSONObject(vals.iterator().next());
+					  String stringVal = vals.iterator().next();
+					  stringVal = URLDecoder.decode(stringVal, "UTF-8");
+				    logger.debug("inside stringVal jobject is " + stringVal);
+						jObject = new JSONObject(stringVal);
 					}
 				}
 			}
