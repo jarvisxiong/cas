@@ -57,19 +57,19 @@ public class RequestParser {
     requestSource = requestSource == null ? "bf" : requestSource;
     params.setRqSource(requestSource);
     params.setRemoteHostIp(stringify(jObject, "w-s-carrier", logger));
-    params.setUserAgent(stringify(jObject, "rq-x-inmobi-phone-useragent", logger));
+    params.setUserAgent(stringify(jObject, "rqXInmobiPhoneUseragent", logger));
     if(null == params.getUserAgent()) {
-      params.setUserAgent(stringify(jObject, "rq-h-user-agent", logger));
+      params.setUserAgent(stringify(jObject, "rqHUserAgent", logger));
     }
     params.setLocSrc(stringify(jObject, "loc-src", logger));
     params.setLatLong(stringify(jObject, "latlong", logger));
-    params.setSiteId(stringify(jObject, "rq-mk-siteid", logger));
+    params.setSiteId(stringify(jObject, "rqMkSiteid", logger));
     params.setSource(stringify(jObject, "source", logger));
     params.setCountry(parseArray(jObject, "carrier", 2));
     params.setCountryStr(parseArray(jObject, "carrier", 1));
     params.setArea(parseArray(jObject, "carrier", 4));
     params.setSlot(stringify(jObject, "slot-served", logger));
-    params.setRqMkSlot(stringify(jObject, "rq-mk-ad-slot", logger));
+    params.setRqMkSlot(stringify(jObject, "rqMkAdSlot", logger));
     params.setSdkVersion(stringify(jObject, "sdk-version", logger));
     params.setSiteType(stringify(jObject, "site-type", logger));
     params.setAdcode(stringify(jObject, "adcode", logger));
@@ -78,9 +78,9 @@ public class RequestParser {
       params.setSiteType(params.getSiteType().toUpperCase());
     }
     params.setCategories(getCategory(jObject, logger, "new-category"));
-    params.setRqIframe(stringify(jObject, "rq-iframe", logger));
+    params.setRqIframe(stringify(jObject, "rqIframe", logger));
     params.setRFormat(stringify(jObject, "r-format", logger));
-    params.setRqMkAdcount(stringify(jObject, "rq-mk-adcount", logger));
+    params.setRqMkAdcount(stringify(jObject, "rqMkAdcount", logger));
     params.setTid(stringify(jObject, "tid", logger));
     params.setTp(stringify(jObject, "tp", logger));
 
@@ -89,7 +89,7 @@ public class RequestParser {
     params.setSiteSegmentId(jObject.optInt("sel-seg-id", 0));
     params.setModelId(jObject.optInt("model-id", 0));
     logger.debug("Site segment id is", params.getSiteSegmentId(), "and model id is", params.getModelId());
-    params.setIpFileVersion(jObject.optInt("rq-ip-file-ver", 1));
+    params.setIpFileVersion(jObject.optInt("rqIpFileVer", 1));
     logger.debug("country obtained is", params.getCountry());
     logger.debug("site floor is", params.getSiteFloor());
     logger.debug("osId is", params.getPlatformOsId());
@@ -117,7 +117,7 @@ public class RequestParser {
     }
     params.setOsId(jObject.optInt("os-id", -1));
     params.setRichMedia(jObject.optBoolean("rich-media", false));
-    params.setRqAdType(stringify(jObject, "rq-adtype", logger));
+    params.setRqAdType(stringify(jObject, "rqAdtype", logger));
     params.setAppUrl(stringify(jObject, "site-url", logger));
     logger.debug("successfully parsed params");
   }

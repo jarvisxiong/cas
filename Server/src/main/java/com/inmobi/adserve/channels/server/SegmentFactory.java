@@ -22,6 +22,7 @@ import com.inmobi.adserve.channels.adnetworks.ifc.IFCAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.ifd.IFDAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.logan.DCPLoganAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.lomark.DCPLomarkAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.mable.DCPMableAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.madnet.DCPMadNetAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mobilecommerce.MobileCommerceAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mopub.DCPMoPubAdNetwork;
@@ -30,6 +31,7 @@ import com.inmobi.adserve.channels.adnetworks.mullahmedia.MullahMediaNetwork;
 import com.inmobi.adserve.channels.adnetworks.nexage.DCPNexageAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.openx.OpenxAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.paypal.DCPPayPalAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.placeiq.DCPPlaceIQAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.pubmatic.DCPPubmaticAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.siquis.DCPSiquisAdNetwork;
@@ -315,6 +317,20 @@ public class SegmentFactory {
 			DCPAjillionAdnetwork adaptor = new DCPAjillionAdnetwork(logger, config,
 					clientBootstrap, base, serverEvent);
 			adaptor.setName("ybrant");
+			return adaptor;
+		} else if ((advertiserId
+				.equals(config.getString("mable.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet.contains("mable"))
+				&& (config.getString("mable.status").equals("on"))) {
+			DCPMableAdnetwork adaptor = new DCPMableAdnetwork(logger, config,
+					clientBootstrap, base, serverEvent);
+			return adaptor;
+		} else if ((advertiserId
+				.equals(config.getString("placeiq.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet.contains("placeiq"))
+				&& (config.getString("placeiq.status").equals("on"))) {
+			DCPPlaceIQAdnetwork adaptor = new DCPPlaceIQAdnetwork(logger, config,
+					clientBootstrap, base, serverEvent);
 			return adaptor;
 		}
 
