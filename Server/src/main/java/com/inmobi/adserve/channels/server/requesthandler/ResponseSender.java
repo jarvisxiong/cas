@@ -6,6 +6,7 @@ import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 import java.awt.Dimension;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -227,15 +228,21 @@ public class ResponseSender extends HttpRequestHandlerBase {
     responseSent = true;
     logger.debug("no ad received");
     InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
+    
+    Map<String, String> headers = null;
+    if("re".equalsIgnoreCase(sasParams.getRqSource())) {
+      headers = new HashMap<String, String>();
+      headers.put(NO_AD_HEADER, "true");
+    }
 
     if(getResponseFormat().equals("xhtml")) {
-      sendResponse(noAdXhtml, event);
+      sendResponse(OK, noAdXhtml, headers, event);
     } else if(isJsAdRequest()) {
-      sendResponse(String.format(noAdJsAdcode, sasParams.getRqIframe()), event);
+      sendResponse(OK, String.format(noAdJsAdcode, sasParams.getRqIframe()), headers, event);
     } else if (getResponseFormat().equalsIgnoreCase("imai")) {
-      sendResponse(NO_CONTENT, noAdImai, null, event); 
+      sendResponse(NO_CONTENT, noAdImai, headers, event); 
     } else{
-      sendResponse(noAdHtml, event);
+      sendResponse(OK, noAdHtml, headers, event);
     }
   }
 
