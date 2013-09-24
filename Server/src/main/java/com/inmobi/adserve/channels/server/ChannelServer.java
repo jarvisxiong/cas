@@ -206,6 +206,7 @@ public class ChannelServer {
             Properties props = new Properties();
             props.put("validationQuery", "select version(); ");
             props.put("testWhileIdle","true");
+            props.put("testOnBorrow","true");
             props.put("user", databaseConfig.getString("username"));
             props.put("password", databaseConfig.getString("password"));
 
