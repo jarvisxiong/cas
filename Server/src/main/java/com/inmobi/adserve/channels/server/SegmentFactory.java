@@ -37,6 +37,7 @@ import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.siquis.DCPSiquisAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.tapit.DCPTapitAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.verve.DCPVerveAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.wapstart.DCPWapStartAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.webmoblink.WebmobLinkAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.widerplanet.DCPWiderPlanetAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.xad.DCPxAdAdNetwork;
@@ -330,6 +331,13 @@ public class SegmentFactory {
 				&& (advertiserSet.isEmpty() || advertiserSet.contains("placeiq"))
 				&& (config.getString("placeiq.status").equals("on"))) {
 			DCPPlaceIQAdnetwork adaptor = new DCPPlaceIQAdnetwork(logger, config,
+					clientBootstrap, base, serverEvent);
+			return adaptor;
+		} else if ((advertiserId
+				.equals(config.getString("wapstart.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet.contains("wapstart"))
+				&& (config.getString("wapstart.status").equals("on"))) {
+			DCPWapStartAdNetwork adaptor = new DCPWapStartAdNetwork(logger, config,
 					clientBootstrap, base, serverEvent);
 			return adaptor;
 		}
