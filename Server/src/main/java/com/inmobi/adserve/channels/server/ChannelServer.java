@@ -35,7 +35,6 @@ import org.jboss.netty.logging.InternalLoggerFactory;
 import org.jboss.netty.logging.Log4JLoggerFactory;
 import org.jboss.netty.util.HashedWheelTimer;
 import org.jboss.netty.util.Timer;
-import org.postgresql.jdbc3.Jdbc3PoolingDataSource;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
