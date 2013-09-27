@@ -75,11 +75,10 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
       InspectorStats.incrementStatCount(InspectorStrings.totalTerminate);
       logger.debug("Channel is terminated", ctx.getChannel().getId());
     }
-    logger.error("Getting netty error in HttpRequestHandler:", e.getCause());
+    logger.info("Getting netty error in HttpRequestHandler:", e.getCause());
     if(e.getChannel().isOpen()) {
       responseSender.sendNoAdResponse(e);
     }
-    e.getCause().printStackTrace();
   }
 
   // Invoked when request timeout.
@@ -138,7 +137,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
       StringWriter sw = new StringWriter();
       PrintWriter pw = new PrintWriter(sw);
       exception.printStackTrace(pw);
-      logger.error("stack trace is", sw.toString());
+      logger.info("stack trace is", sw.toString());
       if(logger.isDebugEnabled()) {
         sendMail(exception.getMessage(), sw.toString());
       }
@@ -179,14 +178,14 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
         Logging.sampledAdvertiserLogging(list, logger, ServletHandler.getLoggerConfig());
       }
     } catch (JSONException exception) {
-      logger.error("Error while writing logs " + exception.getMessage());
-      logger.debug("stack trace is ");
-      exception.printStackTrace();
+      if (logger.isDebugEnabled()) {
+        logger.debug(ChannelServer.getMyStackTrace(exception));
+      }
       return;
     } catch (TException exception) {
-      logger.error("Error while writing logs " + exception.getMessage());
-      logger.debug("stack trace is ");
-      exception.printStackTrace();
+      if (logger.isDebugEnabled()) {
+        logger.debug(ChannelServer.getMyStackTrace(exception));
+      }
       return;
     }
     logger.debug("done with logging");
@@ -194,8 +193,6 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
 
   // send Mail if channel server crashes
   public static void sendMail(String errorMessage, String stackTrace) {
-    // logger.error("Error in the main thread, so sending mail " +
-    // errorMessage);
     Properties properties = System.getProperties();
     properties.setProperty("mail.smtp.host", ServletHandler.getServerConfig().getString("smtpServer"));
     Session session = Session.getDefaultInstance(properties);

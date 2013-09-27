@@ -44,7 +44,7 @@ public class ServletRepoRefresh implements Servlet {
     String connectionString = "jdbc:postgresql://" + dbHost + ":" + dbPort + "/" + dbName;
     Connection con = null;
     Statement statement = null;
-    ResultSet resultSet = null;
+    ResultSet resultSet;
     try {
       ConfigurationLoader config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
       con = DriverManager.getConnection(connectionString, dbUser, dbPassword);
@@ -58,7 +58,7 @@ public class ServletRepoRefresh implements Servlet {
         final String query = config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_REPOSITORY)
             .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
         resultSet = statement.executeQuery(query);
-        ServletHandler.repositoryHelper.getChannelAdGroupRepository().newUpdateFromResultSetToOptimizeUpdate(resultSet);
+        ServletHandler.repositoryHelper.getChannelRepository().newUpdateFromResultSetToOptimizeUpdate(resultSet);
       } else if(repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY)) {
         final String query = config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY)
             .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
@@ -85,10 +85,10 @@ public class ServletRepoRefresh implements Servlet {
       hrh.logger.debug("Successfully updated", repoName);
       hrh.responseSender.sendResponse("OK", e);
     } catch (SQLException e1) {
-      hrh.logger.error("error is", e1.getMessage());
+      hrh.logger.info("error is", e1.getMessage());
       hrh.responseSender.sendResponse("NOTOK", e);
     } catch (RepositoryException e2) {
-      hrh.logger.error("error is", e2.getMessage());
+      hrh.logger.info("error is", e2.getMessage());
       hrh.responseSender.sendResponse("NOTOK", e);
     } finally {
       if(null != statement) {

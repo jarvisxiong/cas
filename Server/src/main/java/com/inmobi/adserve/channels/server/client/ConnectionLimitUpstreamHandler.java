@@ -25,7 +25,7 @@ public class ConnectionLimitUpstreamHandler extends SimpleChannelHandler {
     if(maxConnections > 0) {
       int currentCount = connections.getAndIncrement();
       if(currentCount + 1 > maxConnections) {
-        logger.error("MaxLimit of connections", maxConnections, "exceeded so closing channel");
+        logger.info("MaxLimit of connections", maxConnections, "exceeded so closing channel");
         ctx.getChannel().close();
         droppedConnections++;
       }

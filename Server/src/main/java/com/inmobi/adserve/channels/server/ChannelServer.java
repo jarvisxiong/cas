@@ -11,6 +11,7 @@ import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.adserve.channels.util.MetricsManager;
 import com.inmobi.casthrift.DataCenter;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import com.inmobi.messaging.publisher.MessagePublisherFactory;
@@ -89,7 +90,6 @@ public class ChannelServer {
             hostIdCode = channelServerHelper.getHostId(ChannelServerStringLiterals.HOST_NAME_KEY);
             dataCentreName = channelServerHelper
                     .getDataCentreName(ChannelServerStringLiterals.DATA_CENTRE_NAME_KEY);
-
             // Initialising Internal logger factory for Netty
             InternalLoggerFactory.setDefaultFactory(new Log4JLoggerFactory());
 
@@ -103,6 +103,9 @@ public class ChannelServer {
             Logging.init(dataBusPublisher, rrLogKey, channelLogKey, advertisementLogKey,
                     config.serverConfiguration());
 
+            // Initializing graphite stats
+            MetricsManager.init(config.serverConfiguration().getString("graphiteServer.host", "mon02.ads.uj1.inmobi.com"), config.serverConfiguration()
+            .getInt("graphiteServer.port", 2003), config.serverConfiguration().getInt("graphiteServer.intervalInMinutes", 1));
             channelAdGroupRepository = new ChannelAdGroupRepository();
             channelRepository = new ChannelRepository();
             channelFeedbackRepository = new ChannelFeedbackRepository();
@@ -147,7 +150,7 @@ public class ChannelServer {
             if (null == clientBootstrap) {
                 ServerStatusInfo.statusCode = 404;
                 ServerStatusInfo.statusString = "StackTrace is: failed to create bootstrap";
-                logger.error("failed to create bootstrap");
+                logger.info("failed to create bootstrap");
                 return;
             }
 
@@ -171,7 +174,7 @@ public class ChannelServer {
         } catch (Exception exception) {
             ServerStatusInfo.statusString = getMyStackTrace(exception);
             ServerStatusInfo.statusCode = 404;
-            logger.error("stack trace is " + getMyStackTrace(exception));
+            logger.info("stack trace is " + getMyStackTrace(exception));
             if (logger.isDebugEnabled()) {
                 logger.debug(exception.getMessage());
                 HttpRequestHandler.sendMail(exception.getMessage(), getMyStackTrace(exception));
@@ -179,7 +182,7 @@ public class ChannelServer {
         }
     }
 
-    private static String getMyStackTrace(Exception exception) {
+    public static String getMyStackTrace(Exception exception) {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         exception.printStackTrace(printWriter);
@@ -205,16 +208,16 @@ public class ChannelServer {
             Class.forName("org.postgresql.Driver");
             Properties props = new Properties();
             props.put("validationQuery", "select version(); ");
-            props.put("testWhileIdle","true");
-            props.put("testOnBorrow","true");
+            props.put("testWhileIdle", "true");
+            props.put("testOnBorrow", "true");
             props.put("user", databaseConfig.getString("username"));
             props.put("password", databaseConfig.getString("password"));
 
             final ObjectPool connectionPool = new GenericObjectPool(null);
             String connectUri = "jdbc:postgresql://" +
-                                databaseConfig.getString("host") + ":" +
-                                databaseConfig.getInt("port") +  "/" +
-                                databaseConfig.getString(ChannelServerStringLiterals .DATABASE);
+                    databaseConfig.getString("host") + ":" +
+                    databaseConfig.getInt("port") +  "/" +
+                    databaseConfig.getString(ChannelServerStringLiterals .DATABASE);
             final ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectUri, props);
             new PoolableConnectionFactory(connectionFactory, connectionPool, null, null, false, true);
             final PoolingDataSource ds = new PoolingDataSource(connectionPool);
@@ -271,7 +274,9 @@ public class ChannelServer {
             logger.error("failed to initialize repository " + exception.getMessage());
             ServerStatusInfo.statusCode = 404;
             ServerStatusInfo.statusString = getMyStackTrace(exception);
-            exception.printStackTrace();
+            if (logger.isDebugEnabled()) {
+              logger.debug(ChannelServer.getMyStackTrace(exception));
+            }
             return;
         }
     }

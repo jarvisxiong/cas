@@ -15,12 +15,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.MetricsManager;
 import com.inmobi.casthrift.AdResponse;
 import com.inmobi.casthrift.CasChannelLog;
 import com.inmobi.casthrift.RequestParams;
@@ -113,12 +115,12 @@ public class Logging {
       host = addr.getHostName();
 
       if(host == null) {
-        logger.error("host cant be empty, abandoning rr logging");
+        logger.info("host cant be empty, abandoning rr logging");
         return;
       }
       log.append("host=\"" + host + "\"");
     } catch (UnknownHostException ex) {
-      logger.error("could not resolve host inside rr logging, so abandoning response");
+      logger.info("could not resolve host inside rr logging, so abandoning response");
       return;
     }
 
@@ -151,9 +153,13 @@ public class Logging {
     AdMeta adMeta = null;
     Ad ad = null;
     Impression impression = null;
+    boolean isServerImpression = false;
+    String advertiserId = null;
     if(channelSegment != null) {
       InspectorStats.incrementStatCount(channelSegment.getAdNetworkInterface().getName(),
           InspectorStrings.serverImpression);
+      isServerImpression = true;
+      advertiserId = channelSegment.getChannelEntity().getAccountId();
       adsServed = 1;
       ChannelSegmentEntity channelSegmentEntity = channelSegment.getChannelSegmentEntity();
       log.append("{\"ad\":[");
@@ -220,7 +226,7 @@ public class Logging {
       if(requestSlot.matches("^\\d+$")) {
         slotRequested = Integer.valueOf(requestSlot).shortValue();
       } else {
-        logger.error("wrong value for request slot is", requestSlot);
+        logger.info("wrong value for request slot is", requestSlot);
       }
     }
 
@@ -237,7 +243,7 @@ public class Logging {
           try {
             user.setAge(Short.valueOf(sasParams.getAge()));
           } catch(NumberFormatException e) {
-            logger.error("Exception in casting age from string to Short", e);
+            logger.info("Exception in casting age from string to Short", e);
           }
         }
       }
@@ -309,6 +315,21 @@ public class Logging {
       Message msg = new Message(tSerializer.serialize(adRR));
       dataBusPublisher.publish(rrLogKey, msg);
     }
+    // Logging realtime stats for graphite
+    String osName = "";
+    try {
+      if(null != sasParams && null != advertiserId && null != impression && null != impression.getAd()) {
+        Integer sasParamsOsId = sasParams.getOsId();
+        if(sasParamsOsId > 0 && sasParamsOsId < 21) {
+          osName = HandSetOS.values()[sasParamsOsId - 1].toString();
+        }
+        MetricsManager.updateStats(Integer.parseInt(sasParams.getCountryStr()), sasParams.getCountry(),
+            sasParams.getOsId(), osName, Filters.getAdvertiserIdToNameMapping().get(advertiserId), false, false,
+            isServerImpression, 0.0, (long) 0.0, impression.getAd().getWinBid());
+      }
+    } catch (Exception e) {
+      logger.info("error while writting to graphite in rrLog", e);
+    }
   }
 
   // Write Channel Logs
@@ -343,12 +364,14 @@ public class Logging {
       JSONObject logLine = null;
       AdNetworkInterface adNetwork = ((ChannelSegment) rankList.get(index)).getAdNetworkInterface();
       ThirdPartyAdResponse adResponse = adNetwork.getResponseStruct();
+      boolean isFilled = false;
       try {
         InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalRequests);
         InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.latency, adResponse.latency);
         InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.connectionLatency, adNetwork.getConnectionLatency());
         if("AD".equals(adResponse.adStatus)) {
           InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalFills);
+          isFilled = true;
         }
         else if("NO_AD".equals(adResponse.adStatus)) {
           InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalNoFills);
@@ -375,8 +398,23 @@ public class Logging {
           response.setBid(bid);
         }
         responseList.add(response);
+        // Logging realtime stats for graphite
+        String osName = "";
+        try {
+          if(null != sasParams && null != advertiserId) {
+            Integer sasParamsOsId = sasParams.getOsId();
+            if(sasParamsOsId > 0 && sasParamsOsId < 21) {
+              osName = HandSetOS.values()[sasParamsOsId - 1].toString();
+            }
+            MetricsManager.updateStats(Integer.parseInt(sasParams.getCountryStr()), sasParams.getCountry(),
+                sasParams.getOsId(), osName, Filters.getAdvertiserIdToNameMapping().get(advertiserId), isFilled, true,
+                false, bid, latency, 0.0);
+          }
+        } catch (Exception e) {
+          logger.info("error while writting to graphite in channelLog", e);
+        }
       } catch (JSONException exception) {
-        logger.error("error reading channel log line from the adapters");
+        logger.info("error reading channel log line from the adapters");
       }
       
       if(logLine != null) {
@@ -575,7 +613,6 @@ public class Logging {
           msg = new Message(tSerializer.serialize(casAdvertisementLog));
         } catch (TException e) {
           logger.debug("Error while creating sampledAdvertiser logs for databus ");
-          e.printStackTrace();
         }
         if(null != msg) {
           dataBusPublisher.publish(sampledAdvertisementLogKey, msg);

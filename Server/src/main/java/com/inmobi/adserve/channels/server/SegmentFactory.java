@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 
+import com.inmobi.adserve.channels.adnetworks.amobee.DCPAmobeeAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.appier.DCPAppierAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.atnt.ATNTAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.adelphic.DCPAdelphicAdNetwork;
@@ -21,6 +22,7 @@ import com.inmobi.adserve.channels.adnetworks.ifc.IFCAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.ifd.IFDAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.logan.DCPLoganAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.lomark.DCPLomarkAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.mable.DCPMableAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.madnet.DCPMadNetAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mobilecommerce.MobileCommerceAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mopub.DCPMoPubAdNetwork;
@@ -29,11 +31,13 @@ import com.inmobi.adserve.channels.adnetworks.mullahmedia.MullahMediaNetwork;
 import com.inmobi.adserve.channels.adnetworks.nexage.DCPNexageAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.openx.OpenxAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.paypal.DCPPayPalAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.placeiq.DCPPlaceIQAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.pubmatic.DCPPubmaticAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.siquis.DCPSiquisAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.tapit.DCPTapitAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.verve.DCPVerveAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.wapstart.DCPWapStartAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.webmoblink.WebmobLinkAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.widerplanet.DCPWiderPlanetAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.xad.DCPxAdAdNetwork;
@@ -255,57 +259,84 @@ public class SegmentFactory {
 				&& (config.getString("widerplanet.status").equals("on"))) {
 			return new DCPWiderPlanetAdnetwork(logger, config, clientBootstrap,
 					base, serverEvent);
-		} else if ((advertiserId.equals(config
-				.getString("logan.advertiserId")))
-				&& (advertiserSet.isEmpty() || advertiserSet
-						.contains("logan"))
+		} else if ((advertiserId.equals(config.getString("logan.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet.contains("logan"))
 				&& (config.getString("logan.status").equals("on"))) {
-			return new DCPLoganAdnetwork(logger, config, clientBootstrap,
-					base, serverEvent);
-		}else if ((advertiserId.equals(config
-				.getString("madnet.advertiserId")))
-				&& (advertiserSet.isEmpty() || advertiserSet
-						.contains("madnet"))
+			return new DCPLoganAdnetwork(logger, config, clientBootstrap, base,
+					serverEvent);
+		} else if ((advertiserId
+				.equals(config.getString("madnet.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet.contains("madnet"))
 				&& (config.getString("madnet.status").equals("on"))) {
 			return new DCPMadNetAdNetwork(logger, config, clientBootstrap,
 					base, serverEvent);
-		}
-		else if ((advertiserId.equals(config
-				.getString("appier.advertiserId")))
-				&& (advertiserSet.isEmpty() || advertiserSet
-						.contains("appier"))
+		} else if ((advertiserId
+				.equals(config.getString("appier.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet.contains("appier"))
 				&& (config.getString("appier.status").equals("on"))) {
 			return new DCPAppierAdNetwork(logger, config, clientBootstrap,
 					base, serverEvent);
-		}
-		else if ((advertiserId.equals(config
+		} else if ((advertiserId.equals(config
 				.getString("definiti.advertiserId")))
 				&& (advertiserSet.isEmpty() || advertiserSet
 						.contains("definiti"))
 				&& (config.getString("definiti.status").equals("on"))) {
-			DCPAjillionAdnetwork adaptor = new DCPAjillionAdnetwork(logger, config, clientBootstrap,
-					base, serverEvent);
+			DCPAjillionAdnetwork adaptor = new DCPAjillionAdnetwork(logger,
+					config, clientBootstrap, base, serverEvent);
 			adaptor.setName("definiti");
 			return adaptor;
-		}
-		else if ((advertiserId.equals(config
-				.getString("paypal.advertiserId")))
-				&& (advertiserSet.isEmpty() || advertiserSet
-						.contains("paypal"))
+		} else if ((advertiserId
+				.equals(config.getString("paypal.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet.contains("paypal"))
 				&& (config.getString("paypal.status").equals("on"))) {
 			return new DCPPayPalAdNetwork(logger, config, clientBootstrap,
 					base, serverEvent);
+		} else if ((advertiserId.equals(config
+				.getString("selectmedia.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet
+						.contains("selectmedia"))
+				&& (config.getString("selectmedia.status").equals("on"))) {
+			DCPAjillionAdnetwork adaptor = new DCPAjillionAdnetwork(logger,
+					config, clientBootstrap, base, serverEvent);
+			adaptor.setName("selectmedia");
+			return adaptor;
+		} else if ((advertiserId
+				.equals(config.getString("amobee.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet.contains("amobee"))
+				&& (config.getString("amobee.status").equals("on"))) {
+			DCPAmobeeAdnetwork adaptor = new DCPAmobeeAdnetwork(logger, config,
+					clientBootstrap, base, serverEvent);
+			return adaptor;
+		} else if ((advertiserId
+				.equals(config.getString("ybrant.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet.contains("ybrant"))
+				&& (config.getString("ybrant.status").equals("on"))) {
+			DCPAjillionAdnetwork adaptor = new DCPAjillionAdnetwork(logger, config,
+					clientBootstrap, base, serverEvent);
+			adaptor.setName("ybrant");
+			return adaptor;
+		} else if ((advertiserId
+				.equals(config.getString("mable.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet.contains("mable"))
+				&& (config.getString("mable.status").equals("on"))) {
+			DCPMableAdnetwork adaptor = new DCPMableAdnetwork(logger, config,
+					clientBootstrap, base, serverEvent);
+			return adaptor;
+		} else if ((advertiserId
+				.equals(config.getString("placeiq.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet.contains("placeiq"))
+				&& (config.getString("placeiq.status").equals("on"))) {
+			DCPPlaceIQAdnetwork adaptor = new DCPPlaceIQAdnetwork(logger, config,
+					clientBootstrap, base, serverEvent);
+			return adaptor;
+		} else if ((advertiserId
+				.equals(config.getString("wapstart.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet.contains("wapstart"))
+				&& (config.getString("wapstart.status").equals("on"))) {
+			DCPWapStartAdNetwork adaptor = new DCPWapStartAdNetwork(logger, config,
+					clientBootstrap, base, serverEvent);
+			return adaptor;
 		}
-                else if ((advertiserId.equals(config
-                                .getString("selectmedia.advertiserId")))
-                                && (advertiserSet.isEmpty() || advertiserSet
-                                                .contains("selectmedia"))
-                                && (config.getString("selectmedia.status").equals("on"))) {
-                        DCPAjillionAdnetwork adaptor = new DCPAjillionAdnetwork(logger, config, clientBootstrap,
-                                        base, serverEvent);
-                        adaptor.setName("selectmedia");
-                        return adaptor;
-                }
 
 		return null;
 	}

@@ -20,7 +20,7 @@ public class ServletChangeRollout implements Servlet {
       List<String> rollout = (queryStringDecoder.getParameters().get("percentRollout"));
       ServletHandler.percentRollout = Integer.parseInt(rollout.get(0));
     } catch (NumberFormatException ex) {
-      logger.error("invalid attempt to change rollout percentage " + ex);
+      logger.info("invalid attempt to change rollout percentage " + ex);
       hrh.responseSender.sendResponse("INVALIDPERCENT", e);
     }
     InspectorStats.setWorkflowStats(InspectorStrings.percentRollout, Long.valueOf(ServletHandler.percentRollout));
