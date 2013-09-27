@@ -340,6 +340,15 @@ public class SegmentFactory {
 			DCPWapStartAdNetwork adaptor = new DCPWapStartAdNetwork(logger, config,
 					clientBootstrap, base, serverEvent);
 			return adaptor;
+		}else if ((advertiserId.equals(config
+				.getString("crimzo.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet
+						.contains("crimzo"))
+				&& (config.getString("crimzo.status").equals("on"))) {
+			DCPAjillionAdnetwork adaptor = new DCPAjillionAdnetwork(logger, config, clientBootstrap,
+					base, serverEvent);
+			adaptor.setName("crimzo");
+			return adaptor;
 		}
 
 		return null;
