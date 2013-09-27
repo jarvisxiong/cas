@@ -158,7 +158,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
         jsonObject.put("adgroupIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getAdgroupIncId());
         jsonObject.put("adIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getIncId());
         jsonObject.put("adId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getAdId());
-        jsonObject.put("clickUrl", this.auctionEngine.getRtbResponse().getAdNetworkInterface().getClickUrl());
         jsonObject.put("rtbFloor", casInternalRequestParameters.rtbBidFloor);
         jsonObject.put("impressionId", this.auctionEngine.getRtbResponse().getAdNetworkInterface().getImpressionId());
         jsonObject.put("campaignIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getAdgroupIncId()); // TODO Need to send campaign inc id
