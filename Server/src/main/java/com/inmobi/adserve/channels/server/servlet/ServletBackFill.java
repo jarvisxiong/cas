@@ -33,7 +33,7 @@ public class ServletBackFill implements Servlet {
     Map<String, List<String>> params = queryStringDecoder.getParameters();
 
     try {
-      hrh.jObject = RequestParser.extractParams(params, logger);
+      hrh.jObject = RequestParser.extractParams(params);
     } catch (JSONException exeption) {
       hrh.jObject = new JSONObject();
       logger.debug("Encountered Json Error while creating json object inside HttpRequest Handler");
