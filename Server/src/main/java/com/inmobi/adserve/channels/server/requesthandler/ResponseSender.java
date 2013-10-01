@@ -145,7 +145,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
       sendResponse(OK, finalReponse, adResponse.responseHeaders, event);
       return;
     }
-    if("bf".equalsIgnoreCase(sasParams.getRqSource())) {
+    if (6 != sasParams.getDst()) {
       sendResponse(OK, finalReponse, adResponse.responseHeaders, event);
     } else {
       JSONObject jsonObject = new JSONObject();
@@ -229,7 +229,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
     
     Map<String, String> headers = null;
-    if("re".equalsIgnoreCase(sasParams.getRqSource())) {
+    if(6 == sasParams.getDst()) {
       headers = new HashMap<String, String>();
       headers.put(NO_AD_HEADER, "true");
     }

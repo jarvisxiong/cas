@@ -45,7 +45,7 @@ public class ServletBackFill implements Servlet {
     logger.debug("site floor is " + sasParams.getSiteFloor());
     
     // Increment re Request if request came from rule engine
-    if ("re".equalsIgnoreCase(sasParams.getRqSource())) {
+    if (6 == sasParams.getDst()) {
       logger.debug("Request came from rule engin...");
       InspectorStats.incrementStatCount(InspectorStrings.ruleEngineRequests);
     }

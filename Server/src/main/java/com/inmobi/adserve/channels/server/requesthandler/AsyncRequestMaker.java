@@ -68,7 +68,7 @@ public class AsyncRequestMaker {
       ChannelSegmentEntity channelSegmentEntity = row.getChannelSegmentEntity();
       AdNetworkInterface network = SegmentFactory.getChannel(channelSegmentEntity.getAdvertiserId(), row
           .getChannelSegmentEntity().getChannelId(), adapterConfig, clientBootstrap, rtbClientBootstrap, base, e,
-          advertiserSet, logger, isRtbEnabled, rtbMaxTimeOut, sasParams.getRqSource());
+          advertiserSet, logger, isRtbEnabled, rtbMaxTimeOut, sasParams.getDst());
       if(null == network) {
         logger.debug("No adapter found for adGroup:", channelSegmentEntity.getAdgroupId());
         continue;

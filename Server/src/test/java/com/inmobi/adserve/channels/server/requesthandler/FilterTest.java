@@ -369,6 +369,7 @@ public class FilterTest extends TestCase {
     sasParams.setSiteFloor(0.3);
     sasParams.setCountryStr("1");
     sasParams.setOsId(1);
+    sasParams.setDst(2);
     Filters f1 = new Filters(matchedSegments, mockConfig, mockAdapterConfig, sasParams, null, logger);
     f1.adGroupLevelFiltering();
     assertEquals(false, f1.getMatchedSegments().get("advertiserId1").containsKey("adgroupId1"));

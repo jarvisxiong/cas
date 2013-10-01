@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.security.sasl.Sasl;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -86,7 +88,7 @@ public class SegmentFactory {
 			ClientBootstrap clientBootstrap,
 			ClientBootstrap rtbClientBootstrap, HttpRequestHandlerBase base,
 			MessageEvent serverEvent, Set<String> advertiserSet,
-			DebugLogger logger, boolean isRtbEnabled, int rtbMaxTimemout, String requestSource) {
+			DebugLogger logger, boolean isRtbEnabled, int rtbMaxTimemout, int dst) {
 		if (isRtbEnabled) {
 			for (String partnerName : rtbAdaptersNames) {
 				String advertiserIdString = config.getString(partnerName
@@ -131,7 +133,7 @@ public class SegmentFactory {
 			}
 		}
 		
-		if ("re".equalsIgnoreCase(requestSource)) {
+		if (6 == dst) {
 		    logger.debug("Request came from rule engine so not going through dcp adapter selection list");
 		    return null;
 		}

@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
@@ -53,9 +54,14 @@ public class RequestParser {
       params = null;
     }
     params.setAllParametersJson(jObject.toString());
-    String requestSource = stringify(jObject, "rq-src", logger);//either bf or re
-    requestSource = requestSource == null ? "bf" : requestSource;
-    params.setRqSource(requestSource);
+    int dst = jObject.optInt("dst", 2);
+    Set<Integer> accountSegments = null;
+    if (null != jObject.opt("segments")) {
+     accountSegments = (Set<Integer>) jObject.opt("segments");
+    }
+    logger.debug("dst type is", dst, "and account segments are", accountSegments);
+    params.setDst(dst);
+    params.setAccountSegment(accountSegments);
     params.setRemoteHostIp(stringify(jObject, "w-s-carrier", logger));
     params.setUserAgent(stringify(jObject, "rqXInmobiPhoneUseragent", logger));
     if(null == params.getUserAgent()) {
