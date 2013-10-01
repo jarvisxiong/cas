@@ -452,7 +452,7 @@ public class Filters {
      * */
     boolean isDroppedInDstFilter(String advertiserId, ChannelSegment channelSegment) {
         if(sasParams.getDst() == 6 && channelSegment.getChannelSegmentEntity().getDst() != sasParams.getDst()) {
-            logger.debug(logger, "dropped in dst filter for advertiser", advertiserId);
+            logger.debug("dropped in dst filter for advertiser", advertiserId);
             if(advertiserIdtoNameMapping.containsKey(advertiserId)) {
                 InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
                         InspectorStrings.droppedInDstFilter);

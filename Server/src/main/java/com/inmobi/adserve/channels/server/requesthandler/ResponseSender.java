@@ -160,7 +160,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         jsonObject.put("adId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getAdId());
         jsonObject.put("rtbFloor", casInternalRequestParameters.rtbBidFloor);
         jsonObject.put("impressionId", this.auctionEngine.getRtbResponse().getAdNetworkInterface().getImpressionId());
-        jsonObject.put("campaignIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getAdgroupIncId()); // TODO Need to send campaign inc id
+        jsonObject.put("campaignIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getCampaignIncId());
         jsonObject.put("campaignId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getCampaignId());
         InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
         sendResponse(OK, jsonObject.toString(), adResponse.responseHeaders, event);

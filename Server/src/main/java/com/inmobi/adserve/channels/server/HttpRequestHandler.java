@@ -76,7 +76,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
       InspectorStats.incrementStatCount(InspectorStrings.totalTerminate);
       logger.debug("Channel is terminated", ctx.getChannel().getId());
     }
-    logger.info("Getting netty error in HttpRequestHandler:", e.getCause());
+    logger.info("Getting netty error in HttpRequestHandler:", e.getCause().getLocalizedMessage());
     if(e.getChannel().isOpen()) {
       responseSender.sendNoAdResponse(e);
     }

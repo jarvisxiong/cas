@@ -5,6 +5,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,7 +15,6 @@ import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.util.DebugLogger;
@@ -55,10 +55,7 @@ public class RequestParser {
     }
     params.setAllParametersJson(jObject.toString());
     int dst = jObject.optInt("dst", 2);
-    Set<Integer> accountSegments = null;
-    if (null != jObject.opt("segments")) {
-     accountSegments = (Set<Integer>) jObject.opt("segments");
-    }
+    Set<Integer> accountSegments = getAcoountSegments(jObject, logger);
     logger.debug("dst type is", dst, "and account segments are", accountSegments);
     params.setDst(dst);
     params.setAccountSegment(accountSegments);
@@ -172,6 +169,20 @@ public class RequestParser {
     }
   }
 
+  public static Set<Integer> getAcoountSegments(JSONObject jObject, DebugLogger logger) {
+      try {
+        JSONArray segments = jObject.getJSONArray("segments");
+        HashSet<Integer> accountSegments = new HashSet<Integer>();
+        for (int index = 0; index < segments.length(); index++) {
+            accountSegments.add(segments.getInt(index));
+        }
+        return accountSegments;
+      } catch (JSONException e) {
+        logger.debug("error while reading account segments array", e.getMessage());
+        return new HashSet<Integer>();
+      }
+    }
+  
   // Get user specific params
   public static SASRequestParameters getUserParams(SASRequestParameters parameter, JSONObject jObject,
       DebugLogger logger) {
