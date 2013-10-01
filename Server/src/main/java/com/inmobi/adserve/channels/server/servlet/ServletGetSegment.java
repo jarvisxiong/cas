@@ -1,9 +1,10 @@
 package com.inmobi.adserve.channels.server.servlet;
 
 import com.google.gson.Gson;
-import com.inmobi.adserve.channels.entity.SiteFeedbackEntity;
 import com.inmobi.adserve.channels.server.ChannelServerStringLiterals;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.ServletHandler;
 import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
@@ -35,7 +36,7 @@ public class ServletGetSegment implements Servlet {
         Map<String, List<String>> params = queryStringDecoder.getParameters();
         JSONObject jObject;
         try {
-            jObject = RequestParser.extractParams(params, "segments", logger);
+            jObject = RequestParser.extractParams(params, "segments");
         } catch (JSONException exeption) {
             logger.debug("Encountered Json Error while creating json object inside servlet");
             hrh.setTerminationReason(ServletHandler.jsonParsingError);
@@ -85,11 +86,7 @@ public class ServletGetSegment implements Servlet {
                         ("_")[0], Integer.parseInt(id.split("_")[1]), null);
             } else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals
                     .CITRUS_LEAF_FEEDBACK)) {
-                entity = ServletHandler.repositoryHelper.querySiteCitrusLeafFeedbackRepository(id
-                        .split("_")[0],
-                        id.split("_")[1], logger);
-                hrh.responseSender.sendResponse(((SiteFeedbackEntity) entity).getCSV(), e);
-                return;
+                entity = ServletHandler.repositoryHelper.querySiteCitrusLeafFeedbackRepository(id);
             }
             segmentInfo.put(key, entity);
         }

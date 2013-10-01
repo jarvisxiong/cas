@@ -3,6 +3,8 @@ package com.inmobi.adserve.channels.server.servlet;
 import java.util.*;
 
 import com.inmobi.adserve.channels.entity.PublisherFilterEntity;
+import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.ServletHandler;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.json.JSONException;
@@ -11,7 +13,6 @@ import org.json.JSONObject;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
@@ -32,7 +33,7 @@ public class ServletBackFill implements Servlet {
     Map<String, List<String>> params = queryStringDecoder.getParameters();
 
     try {
-      hrh.jObject = RequestParser.extractParams(params, logger);
+      hrh.jObject = RequestParser.extractParams(params);
     } catch (JSONException exeption) {
       hrh.jObject = new JSONObject();
       logger.debug("Encountered Json Error while creating json object inside HttpRequest Handler");
@@ -135,15 +136,13 @@ public class ServletBackFill implements Servlet {
     Filters filter = new Filters(matchedSegments, ServletHandler.getServerConfig(), ServletHandler.getAdapterConfig(),
         hrh.responseSender.sasParams, ServletHandler.repositoryHelper, logger);
     // applying all the filters
-    List<ChannelSegment> rows = filter.applyFilters();
+    List<ChannelSegment> filteredSegments = filter.applyFilters();
 
-    if(rows == null || rows.size() == 0) {
+    if(filteredSegments == null || filteredSegments.size() == 0) {
       hrh.responseSender.sendNoAdResponse(e);
       logger.debug("All segments dropped in filters");
       return;
     }
-
-    List<ChannelSegment> segments;
 
     String advertisers;
     String[] advertiserList = null;
@@ -163,7 +162,7 @@ public class ServletBackFill implements Servlet {
         Collections.addAll(advertiserSet, advertiserList);
     }
 
-    casInternalRequestParametersGlobal.highestEcpm = getHighestEcpm(rows);
+    casInternalRequestParametersGlobal.highestEcpm = getHighestEcpm(filteredSegments);
     logger.debug("Highest Ecpm is", casInternalRequestParametersGlobal.highestEcpm);
     casInternalRequestParametersGlobal.blockedCategories = getBlockedCategories(hrh, logger);
     casInternalRequestParametersGlobal.blockedAdvertisers = getBlockedAdvertisers(hrh, logger);
@@ -182,30 +181,36 @@ public class ServletBackFill implements Servlet {
     hrh.responseSender.casInternalRequestParameters = casInternalRequestParametersGlobal;
     hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternalRequestParametersGlobal;
 
-    logger.debug("Total channels available for sending requests " + rows.size());
+    logger.debug("Total channels available for sending requests " + filteredSegments.size());
     List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
+    List<ChannelSegment> dcpSegments;
 
-    segments = AsyncRequestMaker.prepareForAsyncRequest(rows, logger, ServletHandler.getServerConfig(), ServletHandler.getRtbConfig(),
-        ServletHandler.getAdapterConfig(), hrh.responseSender, advertiserSet, e, ServletHandler.repositoryHelper,
-        hrh.jObject, hrh.responseSender.sasParams, casInternalRequestParametersGlobal, rtbSegments);
+    dcpSegments = AsyncRequestMaker.prepareForAsyncRequest(filteredSegments, logger, ServletHandler.getServerConfig(), ServletHandler.getRtbConfig(),
+      ServletHandler.getAdapterConfig(), hrh.responseSender, advertiserSet, e, ServletHandler.repositoryHelper,
+      hrh.jObject, hrh.responseSender.sasParams, casInternalRequestParametersGlobal, rtbSegments);
 
     logger.debug("rtb rankList size is", rtbSegments.size());
-    if(segments.isEmpty() && rtbSegments.isEmpty()) {
-      logger.debug("No succesfull configuration of adapter ");
+    if(dcpSegments.isEmpty() && rtbSegments.isEmpty()) {
+      logger.debug("No successful configuration of adapter ");
       hrh.responseSender.sendNoAdResponse(e);
       return;
     }
 
     List<ChannelSegment> tempRankList;
-    tempRankList = filter.rankAdapters(segments);
 
-    if(!tempRankList.isEmpty()) {
-      tempRankList = filter.ensureGuaranteedDelivery(tempRankList);
+    boolean gDFlag = ServletHandler.getServerConfig().getBoolean("guaranteedDelivery");
+    if (gDFlag) {
+      tempRankList = filter.rankAdapters(dcpSegments);
+      if(!tempRankList.isEmpty()) {
+        tempRankList = filter.ensureGuaranteedDelivery(tempRankList);
+      }
+      if(!rtbSegments.isEmpty()) {
+        rtbSegments = filter.ensureGuaranteedDeliveryInCaseOfRTB(rtbSegments, tempRankList);
+      }
+    } else {
+      tempRankList = dcpSegments;
     }
-    if(!rtbSegments.isEmpty()) {
-      rtbSegments = filter.ensureGuaranteedDeliveryInCaseOfRTB(rtbSegments, tempRankList);
-    }
-    tempRankList = AsyncRequestMaker.makeAsyncRequests(tempRankList, logger, hrh.responseSender, e, rtbSegments);
+    tempRankList = AsyncRequestMaker.makeAsyncRequests(tempRankList, logger, e, rtbSegments);
 
     hrh.responseSender.setRankList(tempRankList);
     hrh.responseSender.getAuctionEngine().setRtbSegments(rtbSegments);
