@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.ServletHandler;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.json.JSONException;
@@ -16,7 +18,7 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
-public class ServletChangeConfig implements Servlet{
+public class ServletChangeConfig implements Servlet {
   
   @Override
   public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
@@ -24,7 +26,7 @@ public class ServletChangeConfig implements Servlet{
     Map<String, List<String>> params = queryStringDecoder.getParameters();
     JSONObject jObject = null;
     try {
-      jObject = RequestParser.extractParams(params, "update", logger);
+      jObject = RequestParser.extractParams(params, "update");
     } catch (JSONException exeption) {
       logger.debug("Encountered Json Error while creating json object inside servlet"); 
       hrh.setTerminationReason(ServletHandler.jsonParsingError);

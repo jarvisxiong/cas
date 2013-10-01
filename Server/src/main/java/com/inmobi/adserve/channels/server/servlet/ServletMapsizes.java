@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import com.inmobi.adserve.channels.server.api.Servlet;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.json.JSONObject;
