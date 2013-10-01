@@ -43,7 +43,7 @@ public class Filters {
     private Double rtbFloor;
     private int rtbBalanceFilterAmount;
     private int siteImpressions;
-    private int normalizingFactor;
+    private double normalizingFactor;
 
     public static Map<String, String> getAdvertiserIdToNameMapping() {
         return advertiserIdtoNameMapping;
@@ -66,7 +66,7 @@ public class Filters {
         this.repositoryHelper = repositoryHelper;
         this.logger = logger;
         this.rtbBalanceFilterAmount = serverConfiguration.getInt("rtbBalanceFilterAmount", 50);
-        this.normalizingFactor = serverConfiguration.getInt("normalizingFactor", 2);
+        this.normalizingFactor = serverConfiguration.getDouble("normalizingFactor", 0.1);
     }
 
     public static void init(Configuration adapterConfiguration) {
