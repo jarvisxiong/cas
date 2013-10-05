@@ -99,7 +99,7 @@
 		<dependency>
 			<groupId>inmobi.adserve.channels</groupId>
 			<artifactId>integrationCas</artifactId>
-			<version>[2.0,3.0)</version>
+			<version>2.111-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.inmobi.messaging</groupId>

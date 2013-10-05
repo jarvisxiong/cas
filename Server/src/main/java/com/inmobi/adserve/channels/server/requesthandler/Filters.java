@@ -412,7 +412,7 @@ public class Filters {
 
                 channelSegment.setPrioritisedECPM(calculatePrioritisedECPM(channelSegment));
 
-                if (!isSupplyAcceptsDemand(channelSegment)) {
+                if (!isDemandAcceptedBySupply(channelSegment)) {
                     continue;
                 }
 
@@ -465,7 +465,7 @@ public class Filters {
         }
     }
 
-    private boolean isSupplyAcceptsDemand(ChannelSegment channelSegment) {
+    private boolean isDemandAcceptedBySupply(ChannelSegment channelSegment) {
         byte demandClass;
         boolean result;
 
