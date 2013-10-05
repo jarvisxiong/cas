@@ -57,6 +57,7 @@ public class ChannelServer {
     private static SiteCitrusLeafFeedbackRepository siteCitrusLeafFeedbackRepository;
     private static PricingEngineRepository pricingEngineRepository;
     private static PublisherFilterRepository publisherFilterRepository;
+    private static SiteEcpmRepository siteEcpmRepository;
     private static final String configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
     public static byte dataCenterIdCode;
     public static short hostIdCode;
@@ -104,8 +105,11 @@ public class ChannelServer {
                     config.serverConfiguration());
 
             // Initializing graphite stats
-            MetricsManager.init(config.serverConfiguration().getString("graphiteServer.host", "mon02.ads.uj1.inmobi.com"), config.serverConfiguration()
-            .getInt("graphiteServer.port", 2003), config.serverConfiguration().getInt("graphiteServer.intervalInMinutes", 1));
+            MetricsManager.init(config.serverConfiguration().getString("graphiteServer.host",
+                    "mon02.ads.uj1.inmobi.com"),
+                                config.serverConfiguration().getInt("graphiteServer.port", 2003),
+                                config.serverConfiguration().getInt("graphiteServer.intervalInMinutes",
+                                1));
             channelAdGroupRepository = new ChannelAdGroupRepository();
             channelRepository = new ChannelRepository();
             channelFeedbackRepository = new ChannelFeedbackRepository();
@@ -115,14 +119,22 @@ public class ChannelServer {
             siteCitrusLeafFeedbackRepository = new SiteCitrusLeafFeedbackRepository();
             pricingEngineRepository = new PricingEngineRepository();
             publisherFilterRepository = new PublisherFilterRepository();
+            siteEcpmRepository = new SiteEcpmRepository();
 
-            RepositoryHelper repositoryHelper = new RepositoryHelper(channelRepository,
-                    channelAdGroupRepository,
-                    channelFeedbackRepository,
-                    channelSegmentFeedbackRepository, siteMetaDataRepository,
-                    siteTaxonomyRepository,
-                    siteCitrusLeafFeedbackRepository, pricingEngineRepository,
-                    publisherFilterRepository);
+
+            RepositoryHelper.Builder repoHelperBuilder = RepositoryHelper.newBuilder();
+            repoHelperBuilder.setChannelRepository(channelRepository);
+            repoHelperBuilder.setChannelAdGroupRepository(channelAdGroupRepository);
+            repoHelperBuilder.setChannelFeedbackRepository(channelFeedbackRepository);
+            repoHelperBuilder.setChannelSegmentFeedbackRepository(channelSegmentFeedbackRepository);
+            repoHelperBuilder.setSiteMetaDataRepository(siteMetaDataRepository);
+            repoHelperBuilder.setSiteTaxonomyRepository(siteTaxonomyRepository);
+            repoHelperBuilder.setSiteCitrusLeafFeedbackRepository(siteCitrusLeafFeedbackRepository);
+            repoHelperBuilder.setPricingEngineRepository(pricingEngineRepository);
+            repoHelperBuilder.setPublisherFilterRepository(publisherFilterRepository);
+            repoHelperBuilder.setSiteEcpmRepository(siteEcpmRepository);
+            RepositoryHelper repositoryHelper = repoHelperBuilder.build();
+
             instantiateRepository(logger, config);
 
             ServletHandler.init(config, repositoryHelper);
@@ -262,6 +274,9 @@ public class ChannelServer {
                     config.serverConfiguration().subset(ChannelServerStringLiterals
                             .CITRUS_LEAF_FEEDBACK),
                     getDataCenter());
+            siteEcpmRepository.init(logger, config.cacheConfiguration().subset
+                    (ChannelServerStringLiterals.SITE_ECPM_REPOSITORY),
+                    ChannelServerStringLiterals.SITE_ECPM_REPOSITORY);
             logger.error("* * * * Instantiating repository completed * * * *");
         } catch (NamingException exception) {
             logger

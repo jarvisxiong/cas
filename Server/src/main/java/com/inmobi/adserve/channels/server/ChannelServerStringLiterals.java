@@ -11,9 +11,9 @@ public class ChannelServerStringLiterals {
   public static final String PUBLISHER_FILTER_REPOSITORY = "PublisherFilterRepository";
   public static final String CITRUS_LEAF_FEEDBACK = "citrusleaf";
   public static final String DATABASE = "database";
-  public static final String REFRESH_TIME = "refreshTime";
   public static final String QUERY = "query";
   public static final String DATA_CENTER_ID_KEY = "dc.id";
   public static final String HOST_NAME_KEY = "host.name";
   public static final String DATA_CENTRE_NAME_KEY = "dc.name";
+  public static final String SITE_ECPM_REPOSITORY = "SiteEcpmRepository";
 }

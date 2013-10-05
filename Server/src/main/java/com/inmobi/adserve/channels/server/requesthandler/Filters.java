@@ -1,10 +1,7 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
-import com.inmobi.adserve.channels.entity.PricingEngineEntity;
-import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
+import com.inmobi.adserve.channels.entity.*;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ServletHandler;
 import com.inmobi.adserve.channels.util.DebugLogger;
@@ -39,11 +36,16 @@ public class Filters {
     private double revenueWindow;
     private RepositoryHelper repositoryHelper;
     private DebugLogger logger;
-    private Double dcpFloor;
-    private Double rtbFloor;
     private int rtbBalanceFilterAmount;
     private int siteImpressions;
     private double normalizingFactor;
+    private PricingEngineEntity pricingEngineEntity;
+    private byte defaultSupplyClass;
+    private byte defaultDemandClass;
+    private String[] supplyClassFloors;
+    private byte supplyClass;
+    private SiteEcpmEntity siteEcpmEntity;
+
 
     public static Map<String, String> getAdvertiserIdToNameMapping() {
         return advertiserIdtoNameMapping;
@@ -67,6 +69,9 @@ public class Filters {
         this.logger = logger;
         this.rtbBalanceFilterAmount = serverConfiguration.getInt("rtbBalanceFilterAmount", 50);
         this.normalizingFactor = serverConfiguration.getDouble("normalizingFactor", 0.1);
+        this.defaultSupplyClass = (byte) (serverConfiguration.getInt("defaultSupplyClass", 10) - 1);
+        this.defaultDemandClass = (byte) (serverConfiguration.getInt("defaultDemandClass", 1) - 1);
+        this.supplyClassFloors = serverConfiguration.getString("supplyClassFloors").split(",");
     }
 
     public static void init(Configuration adapterConfiguration) {
@@ -88,7 +93,7 @@ public class Filters {
     public List<ChannelSegment> applyFilters() {
         sumUpSiteImpressions();
         advertiserLevelFiltering();
-        fetchPricingEngineFloors();
+        fetchPricingEngineEntity();
         adGroupLevelFiltering();
         List<ChannelSegment> channelSegments = convertToSegmentsList(matchedSegments);
         return selectTopAdGroupsForRequest(channelSegments);
@@ -335,7 +340,8 @@ public class Filters {
         logger.debug("Inside adGroupLevelFiltering");
         Map<String, HashMap<String, ChannelSegment>> rows = new HashMap<String, HashMap<String,
                 ChannelSegment>>();
-
+        supplyClass = getSupplyClass(sasParams);
+        logger.debug("Supply class is", supplyClass);
         for (Map.Entry<String, HashMap<String, ChannelSegment>> advertiserEntry : matchedSegments
                 .entrySet()) {
             String advertiserId = advertiserEntry.getKey();
@@ -353,12 +359,6 @@ public class Filters {
                 } else {
                     logger.debug("sitefloor filter passed by adgroup",
                             channelSegment.getChannelSegmentFeedbackEntity().getId());
-                }
-
-                //applying pricing engine filter
-                if (isChannelSegmentFilteredOutByPricingEngine(advertiserId, getDcpFloor(),
-                        channelSegment)) {
-                    continue;
                 }
 
                 //applying timeOfDayTargeting filter
@@ -403,7 +403,19 @@ public class Filters {
                     }
                     continue;
                 }
+                //applying pricing engine filter
+                if (isChannelSegmentFilteredOutByPricingEngine(advertiserId,
+                            pricingEngineEntity == null ? null : pricingEngineEntity.getDcpFloor(),
+                            channelSegment)) {
+                    continue;
+                }
+
                 channelSegment.setPrioritisedECPM(calculatePrioritisedECPM(channelSegment));
+
+                if (!isSupplyAcceptsDemand(channelSegment)) {
+                    continue;
+                }
+
                 segmentListToBeSorted.add(channelSegment);
             }
             if (segmentListToBeSorted.isEmpty()) {
@@ -435,6 +447,70 @@ public class Filters {
         printSegments(rows);
         matchedSegments = rows;
     }
+
+    private byte getSupplyClass(SASRequestParameters sasParams) {
+        siteEcpmEntity = repositoryHelper.querySiteEcpmRepository(
+                                                        sasParams.getSiteId(),
+                                                        Integer.valueOf(sasParams.getCountryStr()),
+                                                        sasParams.getOsId());
+        if (siteEcpmEntity == null) {
+            logger.debug("SiteEcpmEntity is null, thus returning default class");
+            return defaultSupplyClass;
+        } else {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Site ecpm is", siteEcpmEntity.getEcpm(),
+                             "Network ecpm is", siteEcpmEntity.getNetworkEcpm());
+            }
+            return getEcpmClass(siteEcpmEntity.getEcpm(), siteEcpmEntity.getNetworkEcpm());
+        }
+    }
+
+    private boolean isSupplyAcceptsDemand(ChannelSegment channelSegment) {
+        byte demandClass;
+        boolean result;
+
+        if (siteEcpmEntity == null) {
+            demandClass = defaultDemandClass;
+        } else {
+            demandClass = getEcpmClass(channelSegment.getPrioritisedECPM(), siteEcpmEntity.getNetworkEcpm());
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Demand class is ", demandClass, "for adgroup" ,
+                    channelSegment.getChannelSegmentEntity().getAdgroupId());
+        }
+        if (pricingEngineEntity == null) {
+            result = PricingEngineEntity.DEFAULT_SUPPLY_DEMAND_MAPPING[supplyClass][demandClass] == 1;
+        } else {
+            result = pricingEngineEntity.isSupplyAcceptsDemand(supplyClass, demandClass);
+        }
+        String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
+        if (!result) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Supply does not accepts demand");
+            }
+            if (advertiserIdtoNameMapping.containsKey(advertiserId)) {
+                InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
+                        InspectorStrings.droppedInSupplyDemandClassificationFilter);
+            }
+        }
+        return result;
+    }
+
+    private byte getEcpmClass(Double ecpm, Double networkEcpm) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Ecpm is ", ecpm, "network ecpm");
+        }
+        double ratio = ecpm / (networkEcpm > 0 ?networkEcpm : 1);
+        byte ecpmClass = 0;
+        for (String floor : supplyClassFloors) {
+            if (ratio >= Double.valueOf(floor)) {
+                return ecpmClass;
+            }
+            ecpmClass++;
+        }
+        return ecpmClass;
+    }
+
 
     boolean isTODTargetingFailed(String advertiserId, ChannelSegment channelSegment) {
         if (null == channelSegment.getChannelSegmentEntity().getTod()) {
@@ -758,33 +834,19 @@ public class Filters {
         return rtbSegments;
     }
 
-    public void fetchPricingEngineFloors() {
+    public void fetchPricingEngineEntity() {
         // Fetching pricing engine entity
         int country = 0;
         if (null != sasParams.getCountryStr()) {
             country = Integer.parseInt(sasParams.getCountryStr());
         }
         int os = sasParams.getOsId();
-        PricingEngineEntity pricingEngineEntity = null;
         if (null != repositoryHelper && country != 0) {
-            pricingEngineEntity = repositoryHelper.queryPricingEngineRepository(country, os, logger);
+            pricingEngineEntity = repositoryHelper.queryPricingEngineRepository(country, os);
         }
-        Double dcpFloor = null;
-        Double rtbFloor = null;
-        if (null != pricingEngineEntity) {
-            dcpFloor = pricingEngineEntity.getDcpFloor();
-            rtbFloor = pricingEngineEntity.getRtbFloor();
-        }
-
-        this.dcpFloor = dcpFloor;
-        this.rtbFloor = rtbFloor;
-    }
-
-    public Double getDcpFloor() {
-        return dcpFloor;
     }
 
     public Double getRtbFloor() {
-        return rtbFloor;
+        return pricingEngineEntity == null ? null :pricingEngineEntity.getRtbFloor();
     }
 }

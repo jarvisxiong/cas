@@ -257,7 +257,7 @@ public class ServletBackFill implements Servlet {
     List<Long> blockedCategories = null;
     if(null != hrh.responseSender.sasParams.getSiteId()) {
       PublisherFilterEntity publisherFilterEntity = ServletHandler.repositoryHelper.queryPublisherFilterRepository(
-          hrh.responseSender.sasParams.getSiteId(), 4, logger);
+          hrh.responseSender.sasParams.getSiteId(), 4);
       if(null != publisherFilterEntity && publisherFilterEntity.getBlockedCategories() != null) {
         blockedCategories = Arrays.asList(publisherFilterEntity.getBlockedCategories());
       } 
@@ -269,7 +269,7 @@ public class ServletBackFill implements Servlet {
     List<String> blockedAdvertisers = null;
     if(null != hrh.responseSender.sasParams.getSiteId()) {
       PublisherFilterEntity publisherFilterEntity = ServletHandler.repositoryHelper.queryPublisherFilterRepository(
-          hrh.responseSender.sasParams.getSiteId(), 6, logger);
+          hrh.responseSender.sasParams.getSiteId(), 6);
       if(null != publisherFilterEntity && publisherFilterEntity.getBlockedAdvertisers() != null) {
         blockedAdvertisers = Arrays.asList(publisherFilterEntity.getBlockedAdvertisers());
       }

@@ -25,7 +25,7 @@ public class RequestParser {
 
     // Extracting params.
     public static JSONObject extractParams(Map<String, List<String>> params,
-                                           String jsonKey) throws Exception, JSONException {
+                                           String jsonKey) throws Exception {
         JSONObject jObject = null;
         if (!params.isEmpty()) {
             for (Entry<String, List<String>> p : params.entrySet()) {
