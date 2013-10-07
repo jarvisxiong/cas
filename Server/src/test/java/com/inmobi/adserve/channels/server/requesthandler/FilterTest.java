@@ -14,14 +14,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
-import org.easymock.EasyMock;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.*;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.server.servlet.ServletHandler;
+import com.inmobi.adserve.channels.server.ServletHandler;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
@@ -186,13 +185,14 @@ public class FilterTest extends TestCase {
     expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
     expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
     expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
-    expect(mockConfig.getInt("totalSegmentNo")).andReturn(5).anyTimes();
+    expect(mockConfig.getInt("totalSegmentNo", -1)).andReturn(5).anyTimes();
     expect(mockConfig.getDouble("revenueWindow", 0.33)).andReturn(10.0).anyTimes();
     expect(mockConfig.getDouble("ecpmShift", 0.1)).andReturn(0.0).anyTimes();
     expect(mockConfig.getDouble("feedbackPower", 2.0)).andReturn(1.0).anyTimes();
     expect(mockConfig.getInt("partnerSegmentNo", 2)).andReturn(2).anyTimes();
     expect(mockConfig.getInt("whiteListedSitesRefreshtime", 1000 * 300)).andReturn(0).anyTimes();
     expect(mockConfig.getInt("rtbBalanceFilterAmount", 50)).andReturn(0).anyTimes();
+    expect(mockConfig.getDouble("normalizingFactor", 0.1)).andReturn(2.0).anyTimes();
     replay(mockConfig);
     sMDE = createMock(SiteMetaDataEntity.class);
     expect(sMDE.getAdvertisersIncludedBySite()).andReturn(emptySet).anyTimes();
@@ -398,7 +398,7 @@ public class FilterTest extends TestCase {
     Filters f1 = new Filters(matchedSegments, mockConfig, mockAdapterConfig, null, null, logger);
     List<ChannelSegment> finalRow = f1.convertToSegmentsList(matchedSegments);
     assertEquals(6, finalRow.size());
-    finalRow = f1.selectTopAdgroupsForRequest(finalRow);
+    finalRow = f1.selectTopAdGroupsForRequest(finalRow);
     assertEquals(5, finalRow.size());
     assertEquals("adgroupId2", finalRow.get(0).getChannelSegmentEntity().getAdgroupId());
     assertEquals("adgroupId1", finalRow.get(4).getChannelSegmentEntity().getAdgroupId());

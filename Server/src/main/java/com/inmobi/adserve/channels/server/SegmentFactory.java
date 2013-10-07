@@ -14,6 +14,7 @@ import org.jboss.netty.channel.MessageEvent;
 
 import com.inmobi.adserve.channels.adnetworks.amobee.DCPAmobeeAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.appier.DCPAppierAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.appnexus.DCPAppNexusAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.atnt.ATNTAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.adelphic.DCPAdelphicAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.ajillion.DCPAjillionAdnetwork;
@@ -351,7 +352,17 @@ public class SegmentFactory {
 					base, serverEvent);
 			adaptor.setName("crimzo");
 			return adaptor;
+		}else if ((advertiserId.equals(config
+				.getString("merimedia.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet
+						.contains("merimedia"))
+				&& (config.getString("merimedia.status").equals("on"))) {
+			DCPAppNexusAdnetwork adaptor = new DCPAppNexusAdnetwork(logger, config, clientBootstrap,
+					base, serverEvent);
+			adaptor.setName("merimedia");
+			return adaptor;
 		}
+
 
 		return null;
 	}

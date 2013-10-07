@@ -173,8 +173,10 @@ public class AsyncRequestMaker {
 
   }
 
-  public static List<ChannelSegment> makeAsyncRequests(List<ChannelSegment> rankList, DebugLogger logger,
-      HttpRequestHandlerBase base, MessageEvent e, List<ChannelSegment> rtbSegments) {
+  public static List<ChannelSegment> makeAsyncRequests(List<ChannelSegment> rankList,
+                                                       DebugLogger logger,
+                                                       MessageEvent e,
+                                                       List<ChannelSegment> rtbSegments) {
     Iterator<ChannelSegment> itr = rankList.iterator();
     while (itr.hasNext()) {
       ChannelSegment channelSegment = itr.next();

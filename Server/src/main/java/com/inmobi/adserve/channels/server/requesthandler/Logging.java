@@ -202,9 +202,8 @@ public class Logging {
     if(null != handset) {
       log.append(separator).append("handset=").append(handset);
     }
-    if(null != handset && handset.length() > 3) {
-      handsetMeta.setId(handset.getInt(3));
-      handsetMeta.setManufacturer(handset.getInt(2));
+    if(null != handset && handset.length() > 0) {
+      handsetMeta.setId(handset.getInt(0));
     } else if(null != sasParams && sasParams.getOsId() != 0) {
       handsetMeta.setOsId(sasParams.getOsId());
     }

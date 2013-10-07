@@ -58,12 +58,12 @@ public class AuctionEngine implements AuctionEngineInterface {
     
     // Send null as auction response in case of 0 rtb responses.
     if(rtbList.size() == 0) {
-      logger.debug("RTB segments are", Integer.valueOf(rtbList.size()));
+      logger.debug("RTB segments are", rtbList.size());
       rtbResponse = null;
       logger.debug("Returning from auction engine , winner is none");
       return null;
     } else if(rtbList.size() == 1) {
-      logger.debug("RTB segments are", Integer.valueOf(rtbList.size()));
+      logger.debug("RTB segments are", rtbList.size());
       rtbResponse = rtbList.get(0);
       // Take minimum of rtbFloor+0.01 and bid as secondBidprice if no of rtb
       // response are 1.
@@ -79,7 +79,7 @@ public class AuctionEngine implements AuctionEngineInterface {
 
     
     //Sort the list by their bid prices.
-    logger.debug("RTB segments are", Integer.valueOf(rtbList.size()));
+    logger.debug("RTB segments are", rtbList.size());
     for (int i = 0; i < rtbList.size(); i++) {
       for (int j = i + 1; j < rtbList.size(); j++) {
         if(rtbList.get(i).getAdNetworkInterface().getBidprice() < rtbList.get(j).getAdNetworkInterface().getBidprice()) {
@@ -129,16 +129,16 @@ public class AuctionEngine implements AuctionEngineInterface {
 
   public List<ChannelSegment> rtbFilters(List<ChannelSegment> rtbSegments) {
     List<ChannelSegment> rtbList = new ArrayList<ChannelSegment>();
-    logger.debug("No of rtb partners who sent response are", Integer.valueOf(rtbList.size()));
+    logger.debug("No of rtb partners who sent response are", rtbList.size());
     // Ad filter.
-    for (int i = 0; i < rtbSegments.size(); i++) {
-      if(rtbSegments.get(i).getAdNetworkInterface().getAdStatus().equalsIgnoreCase("AD")) {
-        rtbList.add(rtbSegments.get(i));
-      } else {
-        logger.debug("Dropped in NO AD filter", rtbSegments.get(i).getAdNetworkInterface().getName());
+      for (ChannelSegment rtbSegment : rtbSegments) {
+          if (rtbSegment.getAdNetworkInterface().getAdStatus().equalsIgnoreCase("AD")) {
+              rtbList.add(rtbSegment);
+          } else {
+              logger.debug("Dropped in NO AD filter", rtbSegment.getAdNetworkInterface().getName());
+          }
       }
-    }
-    logger.debug("No of rtb partners who sent AD response are", Integer.valueOf(rtbList.size()));
+    logger.debug("No of rtb partners who sent AD response are", rtbList.size());
     // BidFloor filter.
     Iterator<ChannelSegment> rtbListIterator = rtbList.iterator();
     while (rtbListIterator.hasNext()) {
@@ -211,7 +211,7 @@ public class AuctionEngine implements AuctionEngineInterface {
 
   @Override
   public boolean isRtbResponseNull() {
-    return rtbResponse == null ? true : false;
+    return rtbResponse == null;
   }
 
   public List<ChannelSegment> getRtbSegments() {
@@ -228,7 +228,7 @@ public class AuctionEngine implements AuctionEngineInterface {
   }
   
   public double calculateRTBFloor(double siteFloor, double highestEcpm, double segmentFloor, double countryFloor) {
-    double rtbFloor = 0.0;
+    double rtbFloor;
     rtbFloor = Math.max(siteFloor, highestEcpm);
     rtbFloor = Math.max(rtbFloor, segmentFloor);
     rtbFloor = Math.max(rtbFloor, countryFloor);

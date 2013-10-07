@@ -14,6 +14,8 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.api.ServletFactory;
 import org.apache.thrift.TException;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
@@ -29,9 +31,6 @@ import org.json.JSONObject;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
-import com.inmobi.adserve.channels.server.servlet.Servlet;
-import com.inmobi.adserve.channels.server.servlet.ServletFactory;
-import com.inmobi.adserve.channels.server.servlet.ServletHandler;
 import com.inmobi.adserve.channels.server.servlet.ServletInvalid;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;

@@ -24,10 +24,7 @@ import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
-import com.inmobi.adserve.channels.server.requesthandler.AuctionEngine;
-import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
-import com.inmobi.adserve.channels.server.servlet.ServletHandler;
+import com.inmobi.adserve.channels.server.ServletHandler;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
 

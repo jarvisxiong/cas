@@ -9,7 +9,6 @@ import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 import com.inmobi.adserve.channels.server.requesthandler.Filters;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
-import com.inmobi.adserve.channels.server.servlet.ServletHandler;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.MetricsManager;
@@ -58,7 +57,6 @@ public class ChannelServer {
     private static SiteCitrusLeafFeedbackRepository siteCitrusLeafFeedbackRepository;
     private static PricingEngineRepository pricingEngineRepository;
     private static PublisherFilterRepository publisherFilterRepository;
-    private static RepositoryHelper repositoryHelper;
     private static final String configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
     public static byte dataCenterIdCode;
     public static short hostIdCode;
@@ -118,7 +116,8 @@ public class ChannelServer {
             pricingEngineRepository = new PricingEngineRepository();
             publisherFilterRepository = new PublisherFilterRepository();
 
-            repositoryHelper = new RepositoryHelper(channelRepository, channelAdGroupRepository,
+            RepositoryHelper repositoryHelper = new RepositoryHelper(channelRepository,
+                    channelAdGroupRepository,
                     channelFeedbackRepository,
                     channelSegmentFeedbackRepository, siteMetaDataRepository,
                     siteTaxonomyRepository,
