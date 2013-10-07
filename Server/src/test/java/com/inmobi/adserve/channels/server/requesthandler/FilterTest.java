@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.*;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
@@ -7,6 +9,7 @@ import com.inmobi.adserve.channels.server.ServletHandler;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import junit.framework.TestCase;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.configuration.Configuration;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
@@ -135,46 +138,57 @@ public class FilterTest extends TestCase {
         Integer[] siteRatings = null;
         channelSegmentEntity1 = new ChannelSegmentEntity(getChannelSegmentEntityBuilder
                 ("advertiserId1", "adgroupId1", "adId", "channelId1", (long) 1,
-                rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds,
+                        rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId",
+                        slotIds,
                         (long) 1, true,
-                "pricingModel", siteRatings, 1, null, false, false, false, false, false, false,
+                        "pricingModel", siteRatings, 1, null, false, false, false, false, false,
+                        false,
                         false, false, false, false,
-                null, new ArrayList<Integer>(), 0.0d, null, null, true, emptySet, 100));
+                        null, new ArrayList<Integer>(), 0.0d, null, null, true, emptySet, 100));
         channelSegmentEntity2 = new ChannelSegmentEntity(getChannelSegmentEntityBuilder
                 ("advertiserId1", "adgroupId2", "adId", "channelId1", (long) 0,
-                rcList, tags, false, true, "externalSiteKey", modified_on, "campaignId", slotIds,
+                        rcList, tags, false, true, "externalSiteKey", modified_on, "campaignId",
+                        slotIds,
                         (long) 1, true,
-                "pricingModel", siteRatings, 1, null, false, false, false, false, false, false,
+                        "pricingModel", siteRatings, 1, null, false, false, false, false, false,
+                        false,
                         false, false, false, false,
-                null, new ArrayList<Integer>(), 0.0d, null, null, false, emptySet, 0));
+                        null, new ArrayList<Integer>(), 0.0d, null, null, false, emptySet, 0));
         channelSegmentEntity3 = new ChannelSegmentEntity(getChannelSegmentEntityBuilder
                 ("advertiserId1", "adgroupId3", "adId", "channelId1", (long) 1,
-                rcList, tags, false, false, "externalSiteKey", modified_on, "campaignId",
+                        rcList, tags, false, false, "externalSiteKey", modified_on, "campaignId",
                         slotIds, (long) 0, false,
-                "pricingModel", siteRatings, 0, null, false, false, false, false, false, false,
+                        "pricingModel", siteRatings, 0, null, false, false, false, false, false,
+                        false,
                         false, false, false, false,
-                null, new ArrayList<Integer>(), 0.0d, null, null, false, emptySet, 0));
+                        null, new ArrayList<Integer>(), 0.0d, null, null, false, emptySet, 0));
         channelSegmentEntity4 = new ChannelSegmentEntity(getChannelSegmentEntityBuilder
                 ("advertiserId2", "adgroupId4", "adId", "channelId2", (long) 1,
-                rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds,
+                        rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId",
+                        slotIds,
                         (long) 1, true,
-                "pricingModel", siteRatings, 1, null, false, false, false, false, false, false,
+                        "pricingModel", siteRatings, 1, null, false, false, false, false, false,
+                        false,
                         false, false, false, false,
-                null, new ArrayList<Integer>(), 0.0d, null, null, false, emptySet, 100));
+                        null, new ArrayList<Integer>(), 0.0d, null, null, false, emptySet, 100));
         channelSegmentEntity5 = new ChannelSegmentEntity(getChannelSegmentEntityBuilder
                 ("advertiserId2", "adgroupId5", "adId", "channelId2", (long) 1,
-                rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds,
+                        rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId",
+                        slotIds,
                         (long) 1, true,
-                "pricingModel", siteRatings, 1, null, false, false, false, false, false, false,
+                        "pricingModel", siteRatings, 1, null, false, false, false, false, false,
+                        false,
                         false, false, false, false,
-                null, new ArrayList<Integer>(), 0.0d, null, null, false, emptySet, 0));
+                        null, new ArrayList<Integer>(), 0.0d, null, null, false, emptySet, 0));
         channelSegmentEntity6 = new ChannelSegmentEntity(getChannelSegmentEntityBuilder
                 ("advertiserId3", "adgroupId5", "adId", "channelId3", (long) 1,
-                rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds,
+                        rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId",
+                        slotIds,
                         (long) 1, true,
-                "pricingModel", siteRatings, 1, null, false, false, false, false, false, false,
+                        "pricingModel", siteRatings, 1, null, false, false, false, false, false,
+                        false,
                         false, false, false, false,
-                null, new ArrayList<Integer>(), 0.0d, null, null, false, emptySet, 0));
+                        null, new ArrayList<Integer>(), 0.0d, null, null, false, emptySet, 0));
 
         ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = new
                 ChannelSegmentFeedbackEntity(
@@ -215,7 +229,7 @@ public class FilterTest extends TestCase {
         expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
         expect(mockConfig.getString("log4jLoggerConf")).andReturn
                 ("/opt/mkhoj/conf/cas/channel-server" +
-                ".properties");
+                        ".properties");
         expect(mockConfig.getInt("totalSegmentNo", -1)).andReturn(5).anyTimes();
         expect(mockConfig.getDouble("revenueWindow", 0.33)).andReturn(10.0).anyTimes();
         expect(mockConfig.getDouble("ecpmShift", 0.1)).andReturn(0.0).anyTimes();
@@ -227,8 +241,10 @@ public class FilterTest extends TestCase {
         expect(mockConfig.getDouble("normalizingFactor", 0.1)).andReturn(2.0).anyTimes();
         expect(mockConfig.getInt("defaultSupplyClass", 10)).andReturn(10).anyTimes();
         expect(mockConfig.getInt("defaultDemandClass", 1)).andReturn(1).anyTimes();
-        expect(mockConfig.getString("supplyClassFloors")).andReturn("2,1").anyTimes();
+        expect(mockConfig.getString("supplyClassFloors")).andReturn("2.916,2.041,1.429,1.0,0.7," +
+                "0.49,0.343,0.24,0.168").anyTimes();
         replay(mockConfig);
+
         sMDE = createMock(SiteMetaDataEntity.class);
         expect(sMDE.getAdvertisersIncludedBySite()).andReturn(emptySet).anyTimes();
         expect(sMDE.getAdvertisersIncludedByPublisher()).andReturn(emptySet2).anyTimes();
@@ -236,16 +252,8 @@ public class FilterTest extends TestCase {
         repositoryHelper = createMock(RepositoryHelper.class);
         expect(repositoryHelper.querySiteMetaDetaRepository("siteid")).andReturn(sMDE).anyTimes();
         expect(repositoryHelper.querySiteEcpmRepository("siteid", 1, 1)).andReturn(null).anyTimes();
-    /*PricingEngineEntity.Builder pBuilder = PricingEngineEntity.newBuilder();
-    pBuilder.setCountryId(1);
-    pBuilder.setOsId(1);
-    pBuilder.setDcpFloor(0);
-    pBuilder.setRtbFloor(0);
-    PricingEngineEntity pricingEngineEntity = pBuilder.build();
-    //expect(repositoryHelper.queryPricingEngineRepository(1, 1, EasyMock.isA(DebugLogger.class))
-    ).andReturn(pricingEngineEntity).anyTimes();
-    */
         replay(repositoryHelper);
+
         s1 = createMock(ChannelSegmentEntity.class);
         expect(s1.isUdIdRequired()).andReturn(false).anyTimes();
         expect(s1.isZipCodeRequired()).andReturn(false).anyTimes();
@@ -333,16 +341,19 @@ public class FilterTest extends TestCase {
     public void testIsAnySegmentPropertyViolatedWhenNosegmentFlag() {
         Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, null, repositoryHelper,
                 logger);
-        assertEquals(false, f1.isAnySegmentPropertyViolated(s1));
+        assertEquals(false, f1.isAnySegmentPropertyViolated(new ChannelSegment(s1, null, null,
+                null, null, null, 0)));
     }
 
     @Test
     public void testIsAnySegmentPropertyViolatedWhenUdIdFlagSet() {
         Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams,
                 repositoryHelper, logger);
-        assertEquals(false, f1.isAnySegmentPropertyViolated(s2));
+        assertEquals(false, f1.isAnySegmentPropertyViolated(new ChannelSegment(s2, null, null,
+                null, null, null, 0)));
         sasParams.setUidParams(null);
-        assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
+        assertEquals(true, f1.isAnySegmentPropertyViolated(new ChannelSegment(s2, null, null,
+                null, null, null, 0)));
     }
 
     @Test
@@ -351,7 +362,8 @@ public class FilterTest extends TestCase {
                 repositoryHelper, logger);
 
         sasParams.setPostalCode(null);
-        assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
+        assertEquals(true, f1.isAnySegmentPropertyViolated(new ChannelSegment(s2, null, null,
+                null, null, null, 0)));
     }
 
     @Test
@@ -360,25 +372,30 @@ public class FilterTest extends TestCase {
                 repositoryHelper, logger);
 
         sasParams.setLatLong(null);
-        assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
+        assertEquals(true, f1.isAnySegmentPropertyViolated(new ChannelSegment(s2, null, null,
+                null, null, null, 0)));
     }
 
     @Test
     public void testIsAnySegmentPropertyViolatedRichMediaFlagSet() {
         Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams,
                 repositoryHelper, logger);
-        assertEquals(false, f1.isAnySegmentPropertyViolated(s2));
+        assertEquals(false, f1.isAnySegmentPropertyViolated(new ChannelSegment(s2, null, null,
+                null, null, null, 0)));
         sasParams.setRichMedia(false);
-        assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
+        assertEquals(true, f1.isAnySegmentPropertyViolated(new ChannelSegment(s2, null, null,
+                null, null, null, 0)));
     }
 
     @Test
     public void testIsAnySegmentPropertyViolatedInterstitialFlagSet() {
         Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams,
                 repositoryHelper, logger);
-        assertEquals(false, f1.isAnySegmentPropertyViolated(s2));
+        assertEquals(false, f1.isAnySegmentPropertyViolated(new ChannelSegment(s2, null, null,
+                null, null, null, 0)));
         sasParams.setRqAdType(null);
-        assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
+        assertEquals(true, f1.isAnySegmentPropertyViolated(new ChannelSegment(s2, null, null,
+                null, null, null, 0)));
     }
 
     @Test
@@ -394,9 +411,11 @@ public class FilterTest extends TestCase {
         replay(s2);
         Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams,
                 repositoryHelper, logger);
-        assertEquals(true, f1.isAnySegmentPropertyViolated(s2));
+        assertEquals(true, f1.isAnySegmentPropertyViolated(new ChannelSegment(s2, null, null,
+                null, null, null, 0)));
         sasParams.setRqAdType(null);
-        assertEquals(false, f1.isAnySegmentPropertyViolated(s2));
+        assertEquals(false, f1.isAnySegmentPropertyViolated(new ChannelSegment(s2, null, null,
+                null, null, null, 0)));
     }
 
     @Test
@@ -612,6 +631,158 @@ public class FilterTest extends TestCase {
         assertEquals(true, filter.isAdGroupDailyImpressionCeilingExceeded(channelSegment1));
         assertEquals(false, filter.isAdGroupDailyImpressionCeilingExceeded(channelSegment4));
         assertEquals(false, filter.isAdGroupDailyImpressionCeilingExceeded(channelSegment6));
+    }
+
+    @Test
+    public void testGetEpmClass() {
+        Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams,
+                repositoryHelper, logger);
+        assertEquals(0, f1.getEcpmClass(3.0, 1.0));
+        assertEquals(1, f1.getEcpmClass(2.1, 1.0));
+        assertEquals(2, f1.getEcpmClass(1.5, 1.0));
+        assertEquals(3, f1.getEcpmClass(1.1, 1.0));
+        assertEquals(4, f1.getEcpmClass(0.8, 1.0));
+        assertEquals(5, f1.getEcpmClass(0.6, 1.0));
+        assertEquals(6, f1.getEcpmClass(0.4, 1.0));
+        assertEquals(7, f1.getEcpmClass(0.3, 1.0));
+        assertEquals(8, f1.getEcpmClass(0.2, 1.0));
+        assertEquals(9, f1.getEcpmClass(0.1, 1.0));
+    }
+
+    @Test
+    public void testGetSupplyClass() {
+        SiteEcpmEntity.Builder builder = SiteEcpmEntity.newBuilder();
+        builder.setSiteId("siteid");
+        builder.setCountryId(1);
+        builder.setOsId(1);
+        builder.setEcpm(3.0);
+        builder.setNetworkEcpm(1.0);
+        SiteEcpmEntity siteEcpmEntity = builder.build();
+        repositoryHelper = createMock(RepositoryHelper.class);
+        expect(repositoryHelper.querySiteEcpmRepository("siteid", 1, 2))
+                .andReturn(siteEcpmEntity).anyTimes();
+        replay(repositoryHelper);
+        sasParams.setSiteId("siteid");
+        sasParams.setCountryStr("1");
+        sasParams.setOsId(2);
+        Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams,
+                repositoryHelper, logger);
+        assertEquals(0, f1.getSupplyClass(sasParams));
+    }
+
+    @Test
+    public void testIsDemandAcceptedBySupplyWithDefaultSupplyClassDefaultDemandClass() {
+        repositoryHelper = createMock(RepositoryHelper.class);
+        expect(repositoryHelper.queryPricingEngineRepository(1, 2))
+                .andReturn(null).anyTimes();
+        sasParams.setCountryStr("1");
+        sasParams.setOsId(2);
+        Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams,
+                repositoryHelper, logger);
+        assertEquals(true, f1.isDemandAcceptedBySupply(channelSegment1));
+    }
+
+    @Test
+    public void testIsDemandAcceptedBySupplyWithDefaultDemandClass() {
+        SiteEcpmEntity.Builder builder = SiteEcpmEntity.newBuilder();
+        builder.setSiteId("siteid");
+        builder.setCountryId(1);
+        builder.setOsId(1);
+        builder.setEcpm(3.0);
+        builder.setNetworkEcpm(1.0);
+        SiteEcpmEntity siteEcpmEntity = builder.build();
+        repositoryHelper = createMock(RepositoryHelper.class);
+        expect(repositoryHelper.queryPricingEngineRepository(1, 2))
+                .andReturn(null).anyTimes();
+        replay(repositoryHelper);
+        sasParams.setSiteId("siteid");
+        sasParams.setCountryStr("1");
+        sasParams.setOsId(2);
+        Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams,
+                repositoryHelper, logger);
+        f1.setSiteEcpmEntity(siteEcpmEntity);
+        channelSegment1.setPrioritisedECPM(3.0);
+        assertEquals(true, f1.isDemandAcceptedBySupply(channelSegment1));
+    }
+
+    @Test
+    public void testIsDemandAcceptedBySupplyWithDefaultSupplyClass() {
+        repositoryHelper = createMock(RepositoryHelper.class);
+        PricingEngineEntity.Builder builder = PricingEngineEntity.newBuilder();
+        builder.setCountryId(1);
+        builder.setOsId(2);
+        builder.setSupplyToDemandMap(new HashedMap(ImmutableMap.of("1", ImmutableSet.of("2"))));
+        PricingEngineEntity pricingEngineEntity = builder.build();
+        expect(repositoryHelper.queryPricingEngineRepository(1, 2))
+                .andReturn(pricingEngineEntity).anyTimes();
+        replay(repositoryHelper);
+        sasParams.setSiteId("siteid");
+        sasParams.setCountryStr("1");
+        sasParams.setOsId(2);
+        Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams,
+                repositoryHelper, logger);
+        channelSegment1.setPrioritisedECPM(3.0);
+        f1.fetchPricingEngineEntity();
+        assertEquals(true, f1.isDemandAcceptedBySupply(channelSegment1));
+    }
+
+    @Test
+    public void testIsDemandAcceptedBySupplyPass() {
+        SiteEcpmEntity.Builder builder1 = SiteEcpmEntity.newBuilder();
+        builder1.setSiteId("siteid");
+        builder1.setCountryId(1);
+        builder1.setOsId(1);
+        builder1.setEcpm(3.0);
+        builder1.setNetworkEcpm(1.0);
+        SiteEcpmEntity siteEcpmEntity = builder1.build();
+        repositoryHelper = createMock(RepositoryHelper.class);
+        PricingEngineEntity.Builder builder2 = PricingEngineEntity.newBuilder();
+        builder2.setCountryId(1);
+        builder2.setOsId(2);
+        builder2.setSupplyToDemandMap(new HashedMap(ImmutableMap.of("0", ImmutableSet.of("0",
+                "1"))));
+        PricingEngineEntity pricingEngineEntity = builder2.build();
+        expect(repositoryHelper.queryPricingEngineRepository(1, 2))
+                .andReturn(pricingEngineEntity).anyTimes();
+        replay(repositoryHelper);
+        sasParams.setSiteId("siteid");
+        sasParams.setCountryStr("1");
+        sasParams.setOsId(2);
+        Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams,
+                repositoryHelper, logger);
+        f1.fetchPricingEngineEntity();
+        f1.setSiteEcpmEntity(siteEcpmEntity);
+        channelSegment1.setPrioritisedECPM(3.0);
+        assertEquals(true, f1.isDemandAcceptedBySupply(channelSegment1));
+    }
+
+    @Test
+    public void testIsDemandAcceptedBySupplyFail() {
+        SiteEcpmEntity.Builder builder1 = SiteEcpmEntity.newBuilder();
+        builder1.setSiteId("siteid");
+        builder1.setCountryId(1);
+        builder1.setOsId(1);
+        builder1.setEcpm(3.0);
+        builder1.setNetworkEcpm(1.0);
+        SiteEcpmEntity siteEcpmEntity = builder1.build();
+        PricingEngineEntity.Builder builder2 = PricingEngineEntity.newBuilder();
+        builder2.setCountryId(1);
+        builder2.setOsId(2);
+        builder2.setSupplyToDemandMap(new HashedMap(ImmutableMap.of("0", ImmutableSet.of("1"))));
+        PricingEngineEntity pricingEngineEntity = builder2.build();
+        repositoryHelper = createMock(RepositoryHelper.class);
+        expect(repositoryHelper.queryPricingEngineRepository(1, 2))
+                .andReturn(pricingEngineEntity).anyTimes();
+        replay(repositoryHelper);
+        sasParams.setSiteId("siteid");
+        sasParams.setCountryStr("1");
+        sasParams.setOsId(2);
+        Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams,
+                repositoryHelper, logger);
+        f1.fetchPricingEngineEntity();
+        f1.setSiteEcpmEntity(siteEcpmEntity);
+        channelSegment1.setPrioritisedECPM(3.0);
+        assertEquals(false, f1.isDemandAcceptedBySupply(channelSegment1));
     }
 
     public static ChannelSegmentEntity.Builder getChannelSegmentEntityBuilder(
