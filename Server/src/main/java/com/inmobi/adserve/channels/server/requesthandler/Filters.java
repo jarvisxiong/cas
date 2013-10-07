@@ -459,6 +459,14 @@ public class Filters {
             }
             return true;
         }
+        if(sasParams.getDst() == 2 && channelSegment.getChannelSegmentEntity().getDst() != sasParams.getDst() && sasParams.isResponseOnlyFromDcp()) {
+            logger.debug("dropped in dst filter for advertiser", advertiserId);
+            if(advertiserIdtoNameMapping.containsKey(advertiserId)) {
+                InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
+                        InspectorStrings.droppedInDstFilter);
+            }
+            return true;
+        }
         logger.debug(logger, "dst filter passed for advertiser", advertiserId);
         return false;
     }
