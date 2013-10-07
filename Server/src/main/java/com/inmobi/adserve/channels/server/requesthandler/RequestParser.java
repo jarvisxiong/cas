@@ -21,13 +21,13 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 
 public class RequestParser {
 
-    public static JSONObject extractParams(Map<String, List<String>> params, DebugLogger logger) throws Exception {
-        return extractParams(params, "args", logger);
+    public static JSONObject extractParams(Map<String, List<String>> params) throws Exception {
+        return extractParams(params, "args");
     }
 
     // Extracting params.
     public static JSONObject extractParams(Map<String, List<String>> params,
-                                           String jsonKey, DebugLogger logger) throws Exception, JSONException {
+                                           String jsonKey) throws Exception, JSONException {
         JSONObject jObject = null;
         if (!params.isEmpty()) {
             for (Entry<String, List<String>> p : params.entrySet()) {
@@ -37,7 +37,6 @@ public class RequestParser {
                     if (vals != null && !vals.isEmpty()) {
                         String stringVal = vals.iterator().next();
                         stringVal = URLDecoder.decode(stringVal, "UTF-8");
-                        logger.debug("inside stringVal jobject is " + stringVal);
                         jObject = new JSONObject(stringVal);
                     }
                 }
