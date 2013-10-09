@@ -449,7 +449,7 @@ public class Filters {
         int accountSegment = channelSegment.getChannelEntity().getAccountSegment();
         String advertiserId = channelSegment.getChannelEntity().getAccountId();
         if(sasParams.getDst() == 6 && null != sasParams.getAccountSegment()
-                && !sasParams.getAccountSegment().isEmpty() && sasParams.getAccountSegment().contains(accountSegment)) {
+                && !sasParams.getAccountSegment().isEmpty() && !sasParams.getAccountSegment().contains(accountSegment)) {
             if(advertiserIdtoNameMapping.containsKey(advertiserId)) {
                 InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
                         InspectorStrings.droppedInAccountSegmentFilter);
