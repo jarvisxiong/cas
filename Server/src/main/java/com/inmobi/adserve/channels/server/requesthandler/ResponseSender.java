@@ -134,7 +134,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
         finalReponse = startElement + finalReponse + endTags;
       } else if(getResponseFormat().equalsIgnoreCase("imai")) {
         finalReponse = adImaiStartTags + finalReponse;
-        sendResponse(OK, finalReponse, adResponse.responseHeaders, event);
       }
     } else {
       logger.info("invalid slot, so not returning response, even though we got an ad");
