@@ -204,7 +204,8 @@ public class Logging {
     }
     if(null != handset && handset.length() > 0) {
       handsetMeta.setId(handset.getInt(0));
-    } else if(null != sasParams && sasParams.getOsId() != 0) {
+    }
+    if(null != sasParams && sasParams.getOsId() != 0) {
       handsetMeta.setOsId(sasParams.getOsId());
     }
     Geo geo = null;
