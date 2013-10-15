@@ -4,10 +4,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,20 +26,14 @@ public class RequestParser {
 
     // Extracting params.
     public static JSONObject extractParams(Map<String, List<String>> params,
-                                           String jsonKey) throws Exception {
-        JSONObject jObject = null;
+                                           String jsonKey) throws JSONException {
         if (!params.isEmpty()) {
-            for (Entry<String, List<String>> p : params.entrySet()) {
-                String key = p.getKey();
-                List<String> vals = p.getValue();
-                if (key.equalsIgnoreCase(jsonKey)) {
-                    if (vals != null && !vals.isEmpty()) {
-                        jObject = new JSONObject(vals.iterator().next());
-                    }
-                }
+            List<String> values = params.get(jsonKey);
+            if (CollectionUtils.isNotEmpty(values)) {
+                return new JSONObject(values.iterator().next());
             }
         }
-        return jObject;
+        return null;
     }
 
     public static void parseRequestParameters(JSONObject jObject, SASRequestParameters params,
@@ -47,6 +42,7 @@ public class RequestParser {
         if(null == jObject) {
             logger.debug("Returning null as jObject is null.");
             params = null;
+            return;
         }
         params.setAllParametersJson(jObject.toString());
         params.setRemoteHostIp(stringify(jObject, "w-s-carrier", logger));
@@ -87,7 +83,7 @@ public class RequestParser {
         logger.debug("site floor is", params.getSiteFloor());
         logger.debug("osId is", params.getPlatformOsId());
         params.setUidParams(stringify(jObject, "raw-uid", logger));
-        setUserIdParams(casInternalRequestParameters, jObject, params, logger);
+        setUserIdParams(casInternalRequestParameters, jObject, logger);
         params = getUserParams(params, jObject, logger);
         try {
             JSONArray siteInfo = jObject.getJSONArray("site");
@@ -195,7 +191,7 @@ public class RequestParser {
 
     // Get user id params
     public static void setUserIdParams(CasInternalRequestParameters parameter, JSONObject jObject,
-                                       SASRequestParameters sasParams, DebugLogger logger) {
+                                       DebugLogger logger) {
         if(null == jObject) {
             return;
         }
@@ -226,11 +222,11 @@ public class RequestParser {
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] array = md.digest(md5.getBytes());
             StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < array.length; ++i) {
-                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
+            for (byte anArray : array) {
+                sb.append(Integer.toHexString((anArray & 0xFF) | 0x100).substring(1, 3));
             }
             return sb.toString();
-        } catch (java.security.NoSuchAlgorithmException e) {
+        } catch (java.security.NoSuchAlgorithmException ignored) {
         }
         return null;
     }

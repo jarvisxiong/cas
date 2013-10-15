@@ -55,11 +55,7 @@ public class ServletBackFill implements Servlet {
     }
     
     hrh.responseSender.getAuctionEngine().sasParams = hrh.responseSender.sasParams;
-    if(ServletHandler.random.nextInt(100) >= ServletHandler.percentRollout) {
-      logger.debug("Request not being served because of limited percentage rollout");
-      InspectorStats.incrementStatCount(InspectorStrings.droppedRollout, InspectorStrings.count);
-      hrh.responseSender.sendNoAdResponse(e);
-    }
+
     if(null == hrh.responseSender.sasParams) {
       logger.debug("Terminating request as sasParam is null");
       hrh.setTerminationReason(ServletHandler.jsonParsingError);
@@ -89,8 +85,8 @@ public class ServletBackFill implements Servlet {
     }
     if(hrh.responseSender.sasParams.getSdkVersion() != null) {
       try {
-        if((hrh.responseSender.sasParams.getSdkVersion().substring(0, 1).equalsIgnoreCase("i") || hrh.responseSender.sasParams.getSdkVersion()
-            .substring(0, 1).equalsIgnoreCase("a"))
+        if((hrh.responseSender.sasParams.getSdkVersion().substring(0, 1).equalsIgnoreCase("i")
+            || hrh.responseSender.sasParams.getSdkVersion().substring(0, 1).equalsIgnoreCase("a"))
             && Integer.parseInt(hrh.responseSender.sasParams.getSdkVersion().substring(1, 2)) < 3) {
           logger.debug("Terminating request as sdkVersion is less than 3");
           hrh.setTerminationReason(ServletHandler.lowSdkVersion);
@@ -99,12 +95,18 @@ public class ServletBackFill implements Servlet {
           return;
         } else
           logger.debug("sdk-version : " + hrh.responseSender.sasParams.getSdkVersion());
-      } catch (StringIndexOutOfBoundsException e2) {
-        logger.debug("Invalid sdkversion " + e2.getMessage());
-      } catch (NumberFormatException e3) {
-        logger.debug("Invalid sdkversion " + e3.getMessage());
+      } catch (StringIndexOutOfBoundsException exception) {
+        logger.debug("Invalid sdk-version " + exception.getMessage());
+      } catch (NumberFormatException exception) {
+        logger.debug("Invalid sdk-version " + exception.getMessage());
       }
 
+    }
+
+    if(ServletHandler.random.nextInt(100) >= ServletHandler.percentRollout) {
+      logger.debug("Request not being served because of limited percentage rollout");
+      InspectorStats.incrementStatCount(InspectorStrings.droppedRollout, InspectorStrings.count);
+      hrh.responseSender.sendNoAdResponse(e);
     }
 
     /**

@@ -144,6 +144,13 @@ public class ServletHandler {
 			}
 		});
 
+    servletMap.put("/trace", new ServletFactory() {
+          @Override
+          public Servlet getServlet() {
+              return new ServletBackFill();
+          }
+      });
+
   }
 
   public static String getHost(HttpRequest request) {
