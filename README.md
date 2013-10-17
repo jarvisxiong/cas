@@ -35,3 +35,11 @@ http://localhost:8800/configChange?update={"adapter.ifc.status":"off"}
 Ad request
 http://localhost:8800/trace?args={"site":[34093,60],"site-type":"PERFORMANCE","w-s-carrier":"3.54.96.0","rqHUserAgent":"Mozilla/5.0 (Linux; U; Android 4.2.1; en-us; Nexus 7 Build/JOP40D) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Safari/534.30","handset":["46769","google_nexus7_ver1_suban42aosp"],"carrier":[406,94,"US",12328,31118],"new-category":[70,71],"uparams":{"u-id":"202cb962ac59075b964b07152d234b70","u-age":"12","u-postalcode":"123","u-gender":"male"},"rqMkSiteid":"00e3a40cd8e74922b22d52ef6712b43b","rqMkAdSlot":"15","tid":"b3e6fe89-4fcd-4553-a05a-753d02a777ea","os-id":3,"r-format":"xhtml","source":"APP","slot-served":"2","model-id":46188,"sel-seg-id":0,"u-id-params":{"O1":"9e74e1b452e07afded40fd15b45aa9e6","u-id-s":"O1"}}
 
+Jenkins Jobs
+https://build.scm.corp.inmobi.com/view/channel-adserve/
+
+Nexus Repo
+http://maven.scm.corp.inmobi.com/content/repositories/releases/com/inmobi/channels/cas-server/
+
+
+
