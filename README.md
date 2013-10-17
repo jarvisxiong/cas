@@ -41,5 +41,10 @@ https://build.scm.corp.inmobi.com/view/channel-adserve/
 Nexus Repo
 http://maven.scm.corp.inmobi.com/content/repositories/releases/com/inmobi/channels/cas-server/
 
+Production box
+web2000.ads.uj1.inmobi.com
+
+Pilot box
+web2007.ads.uj1.inmobi.com
 
 
