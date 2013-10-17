@@ -3,6 +3,9 @@ cas
 
 Channel Ad Server.
 
+pre-git doc
+http://twiki.corp.inmobi.com/Engineering/CAS
+
 git clone git@github.corp.inmobi.com:channel-adserve/cas.git
 
 mvn clean install
