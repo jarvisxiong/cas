@@ -474,7 +474,8 @@ public class Filters {
             }
             return true;
         }
-        if(sasParams.getDst() == 2 && channelSegment.getChannelSegmentEntity().getDst() != sasParams.getDst() && sasParams.isResponseOnlyFromDcp()) {
+        if(sasParams.getDst() == 2 && sasParams.isResponseOnlyFromDcp() 
+                && channelSegment.getChannelSegmentEntity().getDst() != sasParams.getDst()) {
             logger.debug("dropped in dst filter for advertiser", advertiserId);
             if(advertiserIdtoNameMapping.containsKey(advertiserId)) {
                 InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),

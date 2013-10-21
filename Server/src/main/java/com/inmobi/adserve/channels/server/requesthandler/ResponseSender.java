@@ -149,18 +149,28 @@ public class ResponseSender extends HttpRequestHandlerBase {
     } else {
       JSONObject jsonObject = new JSONObject();
       try {
-        jsonObject.put("secondHighestBid", this.getAuctionEngine().getRtbResponse().getAdNetworkInterface().getSecondBidPrice());
-        jsonObject.put("winnerBid", this.getAuctionEngine().getRtbResponse().getAdNetworkInterface().getBidprice());
+        jsonObject.put("secondHighestBid", this.getAuctionEngine().getRtbResponse().getAdNetworkInterface().
+                getSecondBidPrice());
+        jsonObject.put("winnerBid", this.getAuctionEngine().getRtbResponse().getAdNetworkInterface().
+                getBidprice());
         jsonObject.put("adm", finalReponse);
-        jsonObject.put("advertiserId", this.auctionEngine.getRtbResponse().getChannelEntity().getAccountId());
-        jsonObject.put("adgroupId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getAdgroupId());
-        jsonObject.put("adgroupIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getAdgroupIncId());
-        jsonObject.put("adIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getIncId());
-        jsonObject.put("adId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getAdId());
+        jsonObject.put("advertiserId", this.auctionEngine.getRtbResponse().getChannelEntity().
+                getAccountId());
+        jsonObject.put("adgroupId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().
+                getAdgroupId());
+        jsonObject.put("adgroupIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().
+                getAdgroupIncId());
+        jsonObject.put("adIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().
+                getIncId());
+        jsonObject.put("adId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().
+                getAdId());
         jsonObject.put("rtbFloor", casInternalRequestParameters.rtbBidFloor);
-        jsonObject.put("impressionId", this.auctionEngine.getRtbResponse().getAdNetworkInterface().getImpressionId());
-        jsonObject.put("campaignIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getCampaignIncId());
-        jsonObject.put("campaignId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getCampaignId());
+        jsonObject.put("impressionId", this.auctionEngine.getRtbResponse().getAdNetworkInterface().
+                getImpressionId());
+        jsonObject.put("campaignIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().
+                getCampaignIncId());
+        jsonObject.put("campaignId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().
+                getCampaignId());
         InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
         sendResponse(OK, jsonObject.toString(), adResponse.responseHeaders, event);
         if(logger.isDebugEnabled()) {
@@ -175,7 +185,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
   }
 
   // send response to the caller
-  public void sendResponse(HttpResponseStatus status, String responseString, Map responseHeaders, ChannelEvent event) throws NullPointerException {
+  public void sendResponse(HttpResponseStatus status, String responseString, Map responseHeaders, ChannelEvent event)
+          throws NullPointerException {
     HttpResponse response = new DefaultHttpResponse(HTTP_1_1, status);
     response.addHeader("Cache-Control", "no-cache, no-store, must-revalidate");
     response.addHeader("Expires", "-1");

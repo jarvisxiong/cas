@@ -56,7 +56,8 @@ public class RequestParser {
         int dst = jObject.optInt("dst", 2);
         Set<Integer> accountSegments = getAcoountSegments(jObject, logger);
         boolean isResponseOnlyFromDcp = jObject.optBoolean("isResponseOnlyFromDcp", false);
-        logger.debug("dst type is", dst, "isResponseOnlyFromDcp ", isResponseOnlyFromDcp, "and account segments are", accountSegments);
+        logger.debug("dst type is", dst, "isResponseOnlyFromDcp ", isResponseOnlyFromDcp, 
+                "and account segments are", accountSegments);
         params.setDst(dst);
         params.setResponseOnlyFromDcp(isResponseOnlyFromDcp);
         params.setAccountSegment(accountSegments);

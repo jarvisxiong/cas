@@ -309,9 +309,4 @@ public class AsyncRequestMaker {
     clickUrlMakerV6.setImageBeaconURLPrefix(config.getString("clickmaker.beaconURLPrefix"));
     return clickUrlMakerV6;
   }
-  
-  public static void main(String[] args) {
-	  System.out.println(WilburyUUID.getDataCenterId("54763426-0141-1000-ecca-7df0250200c0"));
-	  //System.out.println(WilburyUUID.getMachineId("ae319977-013f-1000-c493-3eae23450067"));
-  }
 }
