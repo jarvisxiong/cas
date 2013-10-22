@@ -361,7 +361,7 @@ public class Logging {
         casAdChain.setCampaign_inc_id(channelSegment.getChannelSegmentEntity().getCampaignIncId());
         casAdChain.setAdgroup_inc_id(channelSegment.getChannelSegmentEntity().getAdgroupIncId());
         casAdChain.setExternalSiteKey(channelSegment.getChannelSegmentEntity().getExternalSiteKey());
-        casAdChain.setDst(getDst(channelSegment.getChannelSegmentEntity().getDst()));
+        casAdChain.setDst(DemandSourceType.findByValue(channelSegment.getChannelSegmentEntity().getDst()));
         return casAdChain;
     }
 
@@ -372,17 +372,8 @@ public class Logging {
             return AdStatus.NO_AD;
         } else if("TIME_OUT".equals(adStatus)) {
             return AdStatus.TIME_OUT;
-        } else {
-            return AdStatus.DROPPED;
         }
-    }
-
-    public static DemandSourceType getDst(int dst) {
-        if(dst == 6) {
-            return DemandSourceType.RTBD;
-        } else {
-            return DemandSourceType.DCP;
-        }
+        return AdStatus.DROPPED;
     }
   
   // Write Channel Logs
