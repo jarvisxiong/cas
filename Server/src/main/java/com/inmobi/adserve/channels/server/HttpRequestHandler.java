@@ -16,7 +16,6 @@ import javax.mail.internet.MimeMessage;
 
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.api.ServletFactory;
-import com.inmobi.adserve.channels.server.api.TraceLogger;
 import org.apache.thrift.TException;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;

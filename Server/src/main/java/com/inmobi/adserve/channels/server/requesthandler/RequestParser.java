@@ -38,9 +38,9 @@ public class RequestParser {
 
     public static void parseRequestParameters(JSONObject jObject, SASRequestParameters params,
                                               CasInternalRequestParameters casInternalRequestParameters, DebugLogger logger) {
-        logger.debug("inside parameter parser");
+        logger.debug("Inside parameter parser");
         if(null == jObject) {
-            logger.debug("Returning null as jObject is null.");
+            logger.error("Returning null as jObject is null.");
             params = null;
             return;
         }
@@ -91,18 +91,18 @@ public class RequestParser {
                 params.setSiteIncId(siteInfo.getLong(0));
             }
         } catch (JSONException exception) {
-            logger.debug("site object not found in request");
+            logger.error("site object not found in request");
             params.setSiteIncId(0);
         }
         try {
             params.setHandset(jObject.getJSONArray("handset"));
         } catch (JSONException e) {
-            logger.debug("Handset array not found");
+            logger.error("Handset array not found");
         }
         try {
             params.setCarrier(jObject.getJSONArray("carrier"));
         } catch (JSONException e) {
-            logger.debug("carrier array not found");
+            logger.error("carrier array not found");
         }
         params.setOsId(jObject.optInt("os-id", -1));
         params.setRichMedia(jObject.optBoolean("rich-media", false));
@@ -150,7 +150,7 @@ public class RequestParser {
             }
             return Arrays.asList(category);
         } catch (JSONException e) {
-            logger.debug("error while reading category array", e.getMessage());
+            logger.error("error while reading category array", e.getMessage());
             return null;
         }
     }
@@ -213,7 +213,7 @@ public class RequestParser {
             parameter.uidIDUS1 = stringify(userIdMap, "IDUS1", logger);
             parameter.uidADT = stringify(userIdMap, "u-id-adt", logger);
         } catch (JSONException exception) {
-            logger.info("Error in extracting userid params");
+            logger.debug("Error in extracting userid params");
         }
     }
 

@@ -239,10 +239,11 @@ public class FilterTest extends TestCase {
                 1000 * 300)).andReturn(0).anyTimes();
         expect(mockConfig.getInt("rtbBalanceFilterAmount", 50)).andReturn(0).anyTimes();
         expect(mockConfig.getDouble("normalizingFactor", 0.1)).andReturn(2.0).anyTimes();
-        expect(mockConfig.getInt("defaultSupplyClass", 10)).andReturn(10).anyTimes();
-        expect(mockConfig.getInt("defaultDemandClass", 1)).andReturn(1).anyTimes();
-        expect(mockConfig.getString("supplyClassFloors")).andReturn("2.916,2.041,1.429,1.0,0.7," +
-                "0.49,0.343,0.24,0.168").anyTimes();
+        expect(mockConfig.getInt("defaultSupplyClass", 9)).andReturn(9).anyTimes();
+        expect(mockConfig.getInt("defaultDemandClass", 0)).andReturn(0).anyTimes();
+        expect(mockConfig.getStringArray("supplyClassFloors"))
+                .andReturn("2.916,2.041,1.429,1.0,0.7,0.49,0.343,0.24,0.168".split(","))
+                .anyTimes();
         replay(mockConfig);
 
         sMDE = createMock(SiteMetaDataEntity.class);

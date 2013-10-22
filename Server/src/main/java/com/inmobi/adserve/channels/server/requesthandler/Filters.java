@@ -69,9 +69,9 @@ public class Filters {
         this.logger = logger;
         this.rtbBalanceFilterAmount = serverConfiguration.getInt("rtbBalanceFilterAmount", 50);
         this.normalizingFactor = serverConfiguration.getDouble("normalizingFactor", 0.1);
-        this.defaultSupplyClass = (byte) (serverConfiguration.getInt("defaultSupplyClass", 10) - 1);
-        this.defaultDemandClass = (byte) (serverConfiguration.getInt("defaultDemandClass", 1) - 1);
-        this.supplyClassFloors = serverConfiguration.getString("supplyClassFloors").split(",");
+        this.defaultSupplyClass = (byte) (serverConfiguration.getInt("defaultSupplyClass", 9));
+        this.defaultDemandClass = (byte) (serverConfiguration.getInt("defaultDemandClass", 0));
+        this.supplyClassFloors = serverConfiguration.getStringArray("supplyClassFloors");
     }
 
     public static void init(Configuration adapterConfiguration) {
@@ -93,6 +93,10 @@ public class Filters {
     public List<ChannelSegment> applyFilters() {
         sumUpSiteImpressions();
         advertiserLevelFiltering();
+        if (matchedSegments.isEmpty()) {
+            logger.debug("No adGroups left for filtering , so returning empty list");
+            return Collections.emptyList();
+        }
         fetchPricingEngineEntity();
         adGroupLevelFiltering();
         List<ChannelSegment> channelSegments = convertToSegmentsList(matchedSegments);
@@ -208,7 +212,7 @@ public class Filters {
             }
         }
         if (result) {
-            logger.debug("Site/publisher inclusion list does not contain advertiser", advertiserId);
+            logger.debug("Dropping in Advertiser Inclusion Filter, advertiser", advertiserId);
             channelSegment.incrementInspectorStats(InspectorStrings.droppedinAdvertiserInclusionFilter);
         } else {
             logger.debug("Advertiser Inclusion filter passed by advertiser", advertiserId);
@@ -428,6 +432,8 @@ public class Filters {
             return defaultSupplyClass;
         } else {
             if (logger.isDebugEnabled()) {
+                logger.debug("Number of supply classes", supplyClassFloors.length);
+                logger.debug("SupplyClassFloors", Arrays.asList(supplyClassFloors));
                 logger.debug("Site ecpm is", siteEcpmEntity.getEcpm(),
                              "Network ecpm is", siteEcpmEntity.getNetworkEcpm());
             }
@@ -460,10 +466,6 @@ public class Filters {
             if (logger.isDebugEnabled()) {
                 logger.debug("Supply does not accepts demand");
             }
-            if (advertiserIdToNameMapping.containsKey(advertiserId)) {
-                InspectorStats.incrementStatCount(advertiserIdToNameMapping.get(advertiserId),
-                        InspectorStrings.droppedInSupplyDemandClassificationFilter);
-            }
             channelSegment.incrementInspectorStats(
                     InspectorStrings.droppedInSupplyDemandClassificationFilter);
         }
@@ -472,7 +474,7 @@ public class Filters {
 
     byte getEcpmClass(Double ecpm, Double networkEcpm) {
         if (logger.isDebugEnabled()) {
-            logger.debug("Ecpm is ", ecpm, "network ecpm");
+            logger.debug("Ecpm is ", ecpm, "network ecpm", networkEcpm);
         }
         double ratio = ecpm / (networkEcpm > 0 ? networkEcpm : 1);
         byte ecpmClass = 0;
@@ -675,7 +677,7 @@ public class Filters {
 
     void printSegments(Map<String, HashMap<String, ChannelSegment>> matchedSegments) {
         if (logger.isDebugEnabled()) {
-            logger.debug("Segments are :");
+            logger.debug("Remaining AdGroups are :");
             for (Map.Entry<String, HashMap<String, ChannelSegment>> advertiserEntry :
                     matchedSegments.entrySet()) {
                 Map<String, ChannelSegment> adGroups = advertiserEntry.getValue();
@@ -683,8 +685,7 @@ public class Filters {
                     ChannelSegment channelSegment = adGroupEntry.getValue();
                     logger.debug("Advertiser is", channelSegment.getChannelSegmentEntity()
                             .getAdvertiserId(), "and AdGp is",
-                            channelSegment.getChannelSegmentEntity().getAdgroupId(), "ecpm is",
-                            channelSegment.getPrioritisedECPM());
+                            channelSegment.getChannelSegmentEntity().getAdgroupId());
                 }
             }
         }

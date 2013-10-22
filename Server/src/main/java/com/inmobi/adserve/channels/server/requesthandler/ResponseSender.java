@@ -5,13 +5,10 @@ import static org.jboss.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 import java.awt.Dimension;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Charsets;
-import com.inmobi.adserve.channels.server.api.TraceLogger;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelEvent;
@@ -208,9 +205,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
       return;
     }
     responseSent = true;
-    logger.debug("no ad received");
     InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
-
+    logger.debug("Sending No ads");
     if(getResponseFormat().equals("xhtml")) {
       sendResponse(noAdXhtml, event);
     } else if(isJsAdRequest()) {
