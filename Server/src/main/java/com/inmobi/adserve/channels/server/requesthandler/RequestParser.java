@@ -68,7 +68,11 @@ public class RequestParser {
         params.setArea(parseArray(jObject, "carrier", 4));
         params.setSlot(stringify(jObject, "slot-served", logger));
         params.setRqMkSlot(stringify(jObject, "rqMkAdSlot", logger));
-        params.setSdkVersion(stringify(jObject, "sdk-version", logger));
+        String sdkVersion = stringify(jObject, "sdk-version", logger);
+        if (StringUtils.isBlank(sdkVersion) || "null".equalsIgnoreCase(sdkVersion)) {
+            sdkVersion = null;
+        }
+        params.setSdkVersion(sdkVersion);
         params.setSiteType(stringify(jObject, "site-type", logger));
         params.setAdcode(stringify(jObject, "adcode", logger));
         params.setPlatformOsId(jObject.optInt("os-id", -1));
