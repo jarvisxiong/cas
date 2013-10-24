@@ -341,7 +341,7 @@ public class Logging {
   }
 
     public static List<Channel> createChannelsLog(List<ChannelSegment> rankList) {
-        if (null == rankList) {
+        if(null == rankList) {
             return new ArrayList<Channel>();
         }
         List<Channel> channels = new ArrayList<Channel>();
@@ -349,8 +349,11 @@ public class Logging {
             Channel channel = new Channel();
             channel.setAdStatus(getAdStatus(channelSegment.getAdNetworkInterface().getAdStatus()));
             channel.setLatency(channelSegment.getAdNetworkInterface().getLatency());
-            channel.setBid(channelSegment.getAdNetworkInterface().getBidprice());
             channel.setAdChain(createCasAdChain(channelSegment));
+            double bid = channelSegment.getAdNetworkInterface().getBidprice();
+            if(bid > 0) {
+                channel.setBid(bid);
+            }
             channels.add(channel);
         }
         return channels;
