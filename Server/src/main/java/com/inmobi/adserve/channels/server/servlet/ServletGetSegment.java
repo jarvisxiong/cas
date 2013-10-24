@@ -81,41 +81,32 @@ public class ServletGetSegment implements Servlet {
                     .SITE_TAXONOMY_REPOSITORY)) {
                 entity = ServletHandler.repositoryHelper.querySiteTaxonomyRepository(id);
             } else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals
+                    .PRICING_ENGINE_REPOSITORY)) {
+                entity = ServletHandler.repositoryHelper.queryPricingEngineRepository(
+                        Integer.parseInt(id.split("_")[0]), Integer.parseInt(id.split("_")[1]));
+            } else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals
                     .PUBLISHER_FILTER_REPOSITORY)) {
                 entity = ServletHandler.repositoryHelper.queryPublisherFilterRepository(id.split
-                        ("_")[0], Integer.parseInt(id.split("_")[1]), null);
+                        ("_")[0], Integer.parseInt(id.split("_")[1]));
             } else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals
                     .CITRUS_LEAF_FEEDBACK)) {
                 entity = ServletHandler.repositoryHelper.querySiteCitrusLeafFeedbackRepository(id);
+            } else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals
+                    .SITE_ECPM_REPOSITORY)) {
+                entity = ServletHandler.repositoryHelper.querySiteEcpmRepository(
+                                                                id.split("_")[0],
+                                                                Integer.parseInt(id.split("_")[1]),
+                                                                Integer.parseInt(id.split("_")[2]));
             }
             segmentInfo.put(key, entity);
         }
         Gson gson = new Gson();
         hrh.responseSender.sendResponse(gson.toJson(segmentInfo), e);
-        return;
     }
 
     @Override
     public String getName() {
         return "getSegment";
-    }
-
-    public Map<String, String> getSegments(Object entity)
-            throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-        Map<String, String> entityInfo = new HashMap<String, String>();
-        if (entity != null) {
-            for (Method method : entity.getClass().getMethods()) {
-                if (method.getName().startsWith("get") || method.getName().startsWith("is")) {
-                    String key = method.getName().replaceFirst("get", "");
-                    Object value = null == method.invoke(entity, (Object[]) null) ?
-                            "null" : method.invoke(entity, (Object[]) null);
-                    String valueString = value instanceof Object[] ?
-                            Arrays.asList(value).toString() : value.toString();
-                    entityInfo.put(key, valueString);
-                }
-            }
-        }
-        return entityInfo;
     }
 
 }

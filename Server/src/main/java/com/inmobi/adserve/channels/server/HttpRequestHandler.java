@@ -42,8 +42,9 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
   public JSONObject jObject = null;
   public DebugLogger logger = null;
   public ResponseSender responseSender;
+  public boolean isTraceRequest;
 
-  public String getTerminationReason() {
+    public String getTerminationReason() {
     return terminationReason;
   }
 
@@ -115,8 +116,9 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
       HttpRequest request = (HttpRequest) e.getMessage();
       logger.debug(request.getContent().toString(CharsetUtil.UTF_8));
       QueryStringDecoder queryStringDecoder = new QueryStringDecoder(request.getUri());
-      logger.debug(queryStringDecoder.getPath());
-      ServletFactory servletFactory = ServletHandler.servletMap.get(queryStringDecoder.getPath());
+      String path = queryStringDecoder.getPath();
+      logger.debug(path);
+      ServletFactory servletFactory = ServletHandler.servletMap.get(path);
       Servlet servlet;
       if(servletFactory == null) {
         servlet = new ServletInvalid();
@@ -124,6 +126,10 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
         servlet = servletFactory.getServlet();
       }
       logger.debug("Got the servlet " + servlet.getName());
+      if ("/trace".equals(path)) {
+        logger.setTrace();
+        isTraceRequest = true;
+      }
       servlet.handleRequest(this, queryStringDecoder, e, logger);
       return;
     } catch (Exception exception) {

@@ -90,10 +90,13 @@ public class MatchSegments {
             siteRating = 2;
         }
         try {
-            logger.debug("Request# slot:", slotStr, "country:", countryStr, "categories:",
-                    sasParams.getCategories(),
-                    "targetingPlatform:", targetingPlatform, "siteRating:", siteRating, "osId",
-                    osId);
+            logger.debug("Requesting Parameters :",
+                        "slot:", slotStr,
+                        "categories:", sasParams.getCategories(),
+                        "country:", countryStr,
+                        "targetingPlatform:", targetingPlatform,
+                        "siteRating:", siteRating,
+                        "osId", osId);
             long slot = Long.parseLong(slotStr);
             long country = -1;
             if (countryStr != null) {
@@ -144,8 +147,10 @@ public class MatchSegments {
                                                                        Integer targetingPlatform,
                                                                        Integer siteRating,
                                                                        int osId) {
-        HashMap<String, HashMap<String, ChannelSegment>> result =
-                                                new HashMap<String, HashMap<String, ChannelSegment>>();
+        Map<String, HashMap<String, ChannelSegment>> result =
+                                             new HashMap<String, HashMap<String, ChannelSegment>>();
+        Set<ChannelSegmentEntity> allFilteredEntities = new HashSet<ChannelSegmentEntity>();
+
         //adding -1 for all categories
         categories.add(-1l);
         //adding -1 for all countries
@@ -159,55 +164,48 @@ public class MatchSegments {
         for (long category : categories) {
             for (long countryId : countries) {
                 for (int os : osIds) {
-                    List<ChannelSegmentEntity> filteredEntities =
+                    Collection<ChannelSegmentEntity> filteredEntities =
                             loadEntities(slotId, category, countryId,
                                             targetingPlatform, siteRating, os);
-                    logger.debug("Found", filteredEntities.size(), "segments for slot:", slotId,
-                            "country:", countryId, "category",
-                            category, "targetingPlatform", targetingPlatform, "siteRating",
-                            siteRating, "osId", os);
-
-                    logger.debug("Segments are :");
-                    for (ChannelSegmentEntity entity : filteredEntities) {
-                        logger.debug("AdgroupId", entity.getAdgroupId());
-                        insertChannelSegmentToResultSet(result, entity);
-                    }
-
+                    logger.debug("Found", filteredEntities.size(), "adGroups");
+                    allFilteredEntities.addAll(filteredEntities);
                 }
             }
         }
-
-        if (result.size() == 0) {
-            logger.debug("No matching records for the request - slot:", slotId, "country:",
-                    country, "categories:",
-                    categories, "targetingPlatform", targetingPlatform, "siteRating", siteRating,
-                    "osId", osId);
+        if (!allFilteredEntities.isEmpty()) {
+            logger.debug("AdGroups are :");
+            for (ChannelSegmentEntity entity : allFilteredEntities) {
+                logger.debug("AdGroup :", entity.getAdgroupId());
+                insertChannelSegmentToResultSet(result, entity);
+            }
         }
-        logger.debug("final selected list of segments : ");
-        printSegments(result, logger);
+        if (result.size() == 0) {
+            logger.debug("No matching records for the request - slot:", slotId, "categories:",
+                    categories, "country:", country, "targetingPlatform", targetingPlatform,
+                    "siteRating", siteRating, "osId", osId);
+        } else {
+            logger.debug("Final selected list of adGroups : ");
+            printSegments(result, logger);
+        }
         return result;
     }
 
     // Loads entities and updates cache if required.
-    private List<ChannelSegmentEntity> loadEntities(long slotId, long category, long country,
+    private Collection<ChannelSegmentEntity> loadEntities(long slotId, long category, long country,
                                                     Integer targetingPlatform,
                                                     Integer siteRating, int osId) {
-        logger.debug("Loading entities for slot:", slotId, "category:", category, "country:",
-                country,
-                "targetingPlatform:", targetingPlatform, "siteRating:", siteRating, "osId:", osId);
-        ArrayList<ChannelSegmentEntity> filteredEntities = new ArrayList<ChannelSegmentEntity>();
-        Collection<ChannelSegmentEntity> entities = channelAdGroupRepository.getEntities(slotId,
-                category, country,
-                targetingPlatform, siteRating, osId);
-        filteredEntities.addAll(entities);
-        return filteredEntities;
+        logger.debug("Loading adgroups for slot:", slotId, "category:", category, "country:",
+                country, "targetingPlatform:", targetingPlatform, "siteRating:", siteRating,
+                "osId:", osId);
+        return channelAdGroupRepository.getEntities(slotId, category, country, targetingPlatform,
+                siteRating, osId);
     }
 
     private void insertChannelSegmentToResultSet(Map<String, HashMap<String,
             ChannelSegment>> result,
                                                  ChannelSegmentEntity channelSegmentEntity) {
-        if (Filters.advertiserIdtoNameMapping.containsKey(channelSegmentEntity.getAdvertiserId())) {
-            InspectorStats.incrementStatCount(Filters.advertiserIdtoNameMapping.get
+        if (Filters.getAdvertiserIdToNameMapping().containsKey(channelSegmentEntity.getAdvertiserId())) {
+            InspectorStats.incrementStatCount(Filters.getAdvertiserIdToNameMapping().get
                     (channelSegmentEntity.getAdvertiserId()),
                     InspectorStrings.totalMatchedSegments);
         }
@@ -237,21 +235,17 @@ public class MatchSegments {
                 .queryChannelSegmentFeedbackRepository(channelSegmentEntity.getAdgroupId());
         ChannelSegmentFeedbackEntity channelSegmentCitrusLeafFeedbackEntity = null;
         if (channelEntity == null) {
-            logger.debug("No channelEntity for advertiserID",
-                    channelSegmentEntity.getAdvertiserId());
+            logger.debug("No channelEntity for found");
             channelEntity = MatchSegments.defaultChannelEntity;
         }
 
         if (channelFeedbackEntity == null) {
-            logger.debug("No channelFeedbackEntity for advertiserID",
-                    channelSegmentEntity.getAdvertiserId());
+            logger.debug("No channelFeedbackEntity found");
             channelFeedbackEntity = MatchSegments.defaultChannelFeedbackEntity;
         }
 
         if (channelSegmentFeedbackEntity == null) {
-            logger.debug("No channelSegmentFeedackEntity for advertiserID",
-                    channelSegmentEntity.getAdvertiserId(),
-                    "and AdgroupId", channelSegmentEntity.getAdgroupId());
+            logger.debug("No channelSegmentFeedbackEntity found");
             channelSegmentFeedbackEntity = MatchSegments.defaultChannelSegmentFeedbackEntity;
         }
 
@@ -261,41 +255,32 @@ public class MatchSegments {
                         .getAdGroupFeedbackMap().get(
                         channelSegmentEntity.getExternalSiteKey());
         } else {
-            logger.debug("siteFeedbackEntity is null");
+            logger.debug("No segmentAdGroupFeedbackEntity found");
         }
 
         if (channelSegmentCitrusLeafFeedbackEntity == null) {
-            logger.debug("No channelSegmentCitrusLeafFeedbackEntity for advertiserID",
-                    channelSegmentEntity.getAdvertiserId(), "and ExternalSiteKey",
-                    channelSegmentEntity.getExternalSiteKey());
+            logger.debug("No channelSegmentCitrusLeafFeedbackEntity");
             channelSegmentCitrusLeafFeedbackEntity = MatchSegments
                     .defaultChannelSegmentCitrusLeafFeedbackEntity;
-        } else {
-            logger.debug("Found channelSegmentCitrusLeafFeedbackEntity for advertiserID",
-                    channelSegmentEntity.getAdvertiserId(), "and ExternalSiteKey",
-                    channelSegmentEntity.getExternalSiteKey(),
-                    channelSegmentCitrusLeafFeedbackEntity.toString());
         }
-
-        double pECPM = channelSegmentCitrusLeafFeedbackEntity.getECPM();
+        double pEcpm = channelSegmentCitrusLeafFeedbackEntity.getECPM();
         return new ChannelSegment(channelSegmentEntity, channelEntity, channelFeedbackEntity,
                 channelSegmentFeedbackEntity,
-                channelSegmentCitrusLeafFeedbackEntity, null, pECPM);
+                channelSegmentCitrusLeafFeedbackEntity, null, pEcpm);
     }
 
     public static void printSegments(Map<String, HashMap<String,
             ChannelSegment>> matchedSegments, DebugLogger logger) {
         if (logger.isDebugEnabled()) {
-            logger.debug("Segments are :");
             for (Map.Entry<String, HashMap<String, ChannelSegment>> advertiserEntry :
                     matchedSegments.entrySet()) {
                 Map<String, ChannelSegment> adGroups = advertiserEntry.getValue();
                 for (Map.Entry<String, ChannelSegment> adGroupEntry : adGroups.entrySet()) {
                     ChannelSegment channelSegment = adGroupEntry.getValue();
-                    logger.debug("Advertiser is", channelSegment.getChannelSegmentEntity()
-                            .getAdvertiserId(), "and AdGp is",
-                            channelSegment.getChannelSegmentEntity().getAdgroupId(),
-                            "ecpm is", channelSegment.getPrioritisedECPM());
+                    logger.debug("Advertiser :",
+                                channelSegment.getChannelSegmentEntity().getAdvertiserId(),
+                                ", AdGroup :",
+                                channelSegment.getChannelSegmentEntity().getAdgroupId());
                 }
             }
         }

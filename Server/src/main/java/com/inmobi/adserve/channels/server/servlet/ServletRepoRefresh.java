@@ -82,6 +82,18 @@ public class ServletRepoRefresh implements Servlet {
         resultSet = statement.executeQuery(query);
         ServletHandler.repositoryHelper.getSiteTaxonomyRepository().newUpdateFromResultSetToOptimizeUpdate(resultSet);
       }
+      else if(repoName.equalsIgnoreCase(ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY)) {
+          final String query = config.cacheConfiguration().subset(ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY)
+                  .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+          resultSet = statement.executeQuery(query);
+          ServletHandler.repositoryHelper.getPricingEngineRepository().newUpdateFromResultSetToOptimizeUpdate(resultSet);
+      }
+      else if(repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY)) {
+          final String query = config.cacheConfiguration().subset(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY)
+                  .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+          resultSet = statement.executeQuery(query);
+          ServletHandler.repositoryHelper.getSiteEcpmRepository().newUpdateFromResultSetToOptimizeUpdate(resultSet);
+      }
       hrh.logger.debug("Successfully updated", repoName);
       hrh.responseSender.sendResponse("OK", e);
     } catch (SQLException e1) {

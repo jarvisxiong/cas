@@ -8,9 +8,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,30 +26,24 @@ public class RequestParser {
 
     // Extracting params.
     public static JSONObject extractParams(Map<String, List<String>> params,
-                                           String jsonKey) throws Exception, JSONException {
-        JSONObject jObject = null;
+                                           String jsonKey) throws JSONException, UnsupportedEncodingException {
         if (!params.isEmpty()) {
-            for (Entry<String, List<String>> p : params.entrySet()) {
-                String key = p.getKey();
-                List<String> vals = p.getValue();
-                if (key.equalsIgnoreCase(jsonKey)) {
-                    if (vals != null && !vals.isEmpty()) {
-                        String stringVal = vals.iterator().next();
-                        stringVal = URLDecoder.decode(stringVal, "UTF-8");
-                        jObject = new JSONObject(stringVal);
-                    }
-                }
+            List<String> values = params.get(jsonKey);
+            if (CollectionUtils.isNotEmpty(values)) {
+                String stringVal = values.iterator().next();
+                return new JSONObject(URLDecoder.decode(stringVal, "UTF-8"));
             }
         }
-        return jObject;
+        return null;
     }
 
     public static void parseRequestParameters(JSONObject jObject, SASRequestParameters params,
                                               CasInternalRequestParameters casInternalRequestParameters, DebugLogger logger) {
-        logger.debug("inside parameter parser");
+        logger.debug("Inside parameter parser");
         if(null == jObject) {
-            logger.debug("Returning null as jObject is null.");
+            logger.error("Returning null as jObject is null.");
             params = null;
+            return;
         }
         params.setAllParametersJson(jObject.toString());
         int dst = jObject.optInt("dst", 2);
@@ -99,7 +92,7 @@ public class RequestParser {
         logger.debug("site floor is", params.getSiteFloor());
         logger.debug("osId is", params.getPlatformOsId());
         params.setUidParams(stringify(jObject, "raw-uid", logger));
-        setUserIdParams(casInternalRequestParameters, jObject, params, logger);
+        setUserIdParams(casInternalRequestParameters, jObject, logger);
         params = getUserParams(params, jObject, logger);
         try {
             JSONArray siteInfo = jObject.getJSONArray("site");
@@ -107,18 +100,18 @@ public class RequestParser {
                 params.setSiteIncId(siteInfo.getLong(0));
             }
         } catch (JSONException exception) {
-            logger.debug("site object not found in request");
+            logger.error("site object not found in request");
             params.setSiteIncId(0);
         }
         try {
             params.setHandset(jObject.getJSONArray("handset"));
         } catch (JSONException e) {
-            logger.debug("Handset array not found");
+            logger.error("Handset array not found");
         }
         try {
             params.setCarrier(jObject.getJSONArray("carrier"));
         } catch (JSONException e) {
-            logger.debug("carrier array not found");
+            logger.error("carrier array not found");
         }
         params.setOsId(jObject.optInt("os-id", -1));
         params.setRichMedia(jObject.optBoolean("rich-media", false));
@@ -166,7 +159,7 @@ public class RequestParser {
             }
             return Arrays.asList(category);
         } catch (JSONException e) {
-            logger.debug("error while reading category array", e.getMessage());
+            logger.error("error while reading category array", e.getMessage());
             return null;
         }
     }
@@ -221,7 +214,7 @@ public class RequestParser {
 
     // Get user id params
     public static void setUserIdParams(CasInternalRequestParameters parameter, JSONObject jObject,
-                                       SASRequestParameters sasParams, DebugLogger logger) {
+                                       DebugLogger logger) {
         if(null == jObject) {
             return;
         }
@@ -243,7 +236,7 @@ public class RequestParser {
             parameter.uidIDUS1 = stringify(userIdMap, "IDUS1", logger);
             parameter.uidADT = stringify(userIdMap, "u-id-adt", logger);
         } catch (JSONException exception) {
-            logger.info("Error in extracting userid params");
+            logger.debug("Error in extracting userid params");
         }
     }
 
@@ -252,11 +245,11 @@ public class RequestParser {
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] array = md.digest(md5.getBytes());
             StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < array.length; ++i) {
-                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
+            for (byte anArray : array) {
+                sb.append(Integer.toHexString((anArray & 0xFF) | 0x100).substring(1, 3));
             }
             return sb.toString();
-        } catch (java.security.NoSuchAlgorithmException e) {
+        } catch (java.security.NoSuchAlgorithmException ignored) {
         }
         return null;
     }

@@ -53,7 +53,7 @@ public class ServletBackFill implements Servlet {
     
     //Send noad if new-category is not present in the request
     if (null == hrh.responseSender.sasParams.getCategories()) {
-      hrh.logger.debug("new-category field is not present in the request so sending noad");
+      hrh.logger.error("new-category field is not present in the request so sending noad");
       hrh.responseSender.sasParams.setCategories(new ArrayList<Long>());
       hrh.setTerminationReason(ServletHandler.MISSING_CATEGORY);
       InspectorStats.incrementStatCount(InspectorStrings.missingCategory, InspectorStrings.count);
@@ -61,33 +61,29 @@ public class ServletBackFill implements Servlet {
     }
     
     hrh.responseSender.getAuctionEngine().sasParams = hrh.responseSender.sasParams;
-    if(ServletHandler.random.nextInt(100) >= ServletHandler.percentRollout) {
-      logger.debug("Request not being served because of limited percentage rollout");
-      InspectorStats.incrementStatCount(InspectorStrings.droppedRollout, InspectorStrings.count);
-      hrh.responseSender.sendNoAdResponse(e);
-    }
+
     if(null == hrh.responseSender.sasParams) {
-      logger.debug("Terminating request as sasParam is null");
+      logger.error("Terminating request as sasParam is null");
       hrh.setTerminationReason(ServletHandler.jsonParsingError);
       InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
       hrh.responseSender.sendNoAdResponse(e);
       return;
     }
     if(null == hrh.responseSender.sasParams.getSiteId()) {
-      logger.debug("Terminating request as site id was missing");
+      logger.error("Terminating request as site id was missing");
       hrh.setTerminationReason(ServletHandler.missingSiteId);
       InspectorStats.incrementStatCount(InspectorStrings.missingSiteId, InspectorStrings.count);
       hrh.responseSender.sendNoAdResponse(e);
       return;
     }
     if(!hrh.responseSender.sasParams.getAllowBannerAds() || hrh.responseSender.sasParams.getSiteFloor() > 5) {
-      logger.debug("Request not being served because of banner not allowed or site floor above threshold");
+      logger.error("Request not being served because of banner not allowed or site floor above threshold");
       hrh.responseSender.sendNoAdResponse(e);
       return;
     }
     if(hrh.responseSender.sasParams.getSiteType() != null
             && !ServletHandler.allowedSiteTypes.contains(hrh.responseSender.sasParams.getSiteType())) {
-      logger.info("Terminating request as incompatible content type");
+      logger.error("Terminating request as incompatible content type");
       hrh.setTerminationReason(ServletHandler.incompatibleSiteType);
       InspectorStats.incrementStatCount(InspectorStrings.incompatibleSiteType, InspectorStrings.count);
       hrh.responseSender.sendNoAdResponse(e);
@@ -95,22 +91,28 @@ public class ServletBackFill implements Servlet {
     }
     if(hrh.responseSender.sasParams.getSdkVersion() != null) {
       try {
-        if((hrh.responseSender.sasParams.getSdkVersion().substring(0, 1).equalsIgnoreCase("i") || hrh.responseSender.sasParams.getSdkVersion()
-            .substring(0, 1).equalsIgnoreCase("a"))
+        if((hrh.responseSender.sasParams.getSdkVersion().substring(0, 1).equalsIgnoreCase("i")
+            || hrh.responseSender.sasParams.getSdkVersion().substring(0, 1).equalsIgnoreCase("a"))
             && Integer.parseInt(hrh.responseSender.sasParams.getSdkVersion().substring(1, 2)) < 3) {
-          logger.debug("Terminating request as sdkVersion is less than 3");
+          logger.error("Terminating request as sdkVersion is less than 3");
           hrh.setTerminationReason(ServletHandler.lowSdkVersion);
           InspectorStats.incrementStatCount(InspectorStrings.lowSdkVersion, InspectorStrings.count);
           hrh.responseSender.sendNoAdResponse(e);
           return;
         } else
           logger.debug("sdk-version : " + hrh.responseSender.sasParams.getSdkVersion());
-      } catch (StringIndexOutOfBoundsException e2) {
-        logger.debug("Invalid sdkversion " + e2.getMessage());
-      } catch (NumberFormatException e3) {
-        logger.debug("Invalid sdkversion " + e3.getMessage());
+      } catch (StringIndexOutOfBoundsException exception) {
+        logger.error("Invalid sdk-version " + exception.getMessage());
+      } catch (NumberFormatException exception) {
+        logger.error("Invalid sdk-version " + exception.getMessage());
       }
 
+    }
+
+    if(ServletHandler.random.nextInt(100) >= ServletHandler.percentRollout) {
+      logger.debug("Request not being served because of limited percentage rollout");
+      InspectorStats.incrementStatCount(InspectorStrings.droppedRollout, InspectorStrings.count);
+      hrh.responseSender.sendNoAdResponse(e);
     }
 
     /**
@@ -132,7 +134,7 @@ public class ServletBackFill implements Servlet {
     Map<String, HashMap<String, ChannelSegment>> matchedSegments = new MatchSegments(ServletHandler.repositoryHelper,
         hrh.responseSender.sasParams, logger).matchSegments(hrh.responseSender.sasParams);
 
-    if(matchedSegments == null) {
+    if(matchedSegments == null || matchedSegments.isEmpty()) {
       logger.debug("No Entities matching the request.");
       hrh.responseSender.sendNoAdResponse(e);
       return;
@@ -145,8 +147,8 @@ public class ServletBackFill implements Servlet {
     List<ChannelSegment> filteredSegments = filter.applyFilters();
 
     if(filteredSegments == null || filteredSegments.size() == 0) {
-      hrh.responseSender.sendNoAdResponse(e);
       logger.debug("All segments dropped in filters");
+      hrh.responseSender.sendNoAdResponse(e);
       return;
     }
 
@@ -264,7 +266,7 @@ public class ServletBackFill implements Servlet {
     List<Long> blockedCategories = null;
     if(null != hrh.responseSender.sasParams.getSiteId()) {
       PublisherFilterEntity publisherFilterEntity = ServletHandler.repositoryHelper.queryPublisherFilterRepository(
-          hrh.responseSender.sasParams.getSiteId(), 4, logger);
+          hrh.responseSender.sasParams.getSiteId(), 4);
       if(null != publisherFilterEntity && publisherFilterEntity.getBlockedCategories() != null) {
         blockedCategories = Arrays.asList(publisherFilterEntity.getBlockedCategories());
       } 
@@ -276,7 +278,7 @@ public class ServletBackFill implements Servlet {
     List<String> blockedAdvertisers = null;
     if(null != hrh.responseSender.sasParams.getSiteId()) {
       PublisherFilterEntity publisherFilterEntity = ServletHandler.repositoryHelper.queryPublisherFilterRepository(
-          hrh.responseSender.sasParams.getSiteId(), 6, logger);
+          hrh.responseSender.sasParams.getSiteId(), 6);
       if(null != publisherFilterEntity && publisherFilterEntity.getBlockedAdvertisers() != null) {
         blockedAdvertisers = Arrays.asList(publisherFilterEntity.getBlockedAdvertisers());
       }

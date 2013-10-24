@@ -1,10 +1,7 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
-import com.inmobi.adserve.channels.entity.PricingEngineEntity;
-import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
+import com.inmobi.adserve.channels.entity.*;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ServletHandler;
 import com.inmobi.adserve.channels.util.DebugLogger;
@@ -29,8 +26,8 @@ public class Filters {
         }
     };
 
-    final static Map<String/* advertiserId */, String/* advertiserName */>
-            advertiserIdtoNameMapping = new HashMap<String, String>();
+    private final static Map<String/* advertiserId */, String/* advertiserName */>
+            advertiserIdToNameMapping = new HashMap<String, String>();
     private final static String ENDS_WITH_ADVERTISER_ID = ".advertiserId";
     private Map<String, HashMap<String, ChannelSegment>> matchedSegments;
     private Configuration serverConfiguration;
@@ -39,14 +36,19 @@ public class Filters {
     private double revenueWindow;
     private RepositoryHelper repositoryHelper;
     private DebugLogger logger;
-    private Double dcpFloor;
-    private Double rtbFloor;
     private int rtbBalanceFilterAmount;
     private int siteImpressions;
     private double normalizingFactor;
+    private PricingEngineEntity pricingEngineEntity;
+    private byte defaultSupplyClass;
+    private byte defaultDemandClass;
+    private String[] supplyClassFloors;
+    private byte supplyClass;
+    private SiteEcpmEntity siteEcpmEntity;
+
 
     public static Map<String, String> getAdvertiserIdToNameMapping() {
-        return advertiserIdtoNameMapping;
+        return advertiserIdToNameMapping;
     }
 
     public Map<String, HashMap<String, ChannelSegment>> getMatchedSegments() {
@@ -67,6 +69,9 @@ public class Filters {
         this.logger = logger;
         this.rtbBalanceFilterAmount = serverConfiguration.getInt("rtbBalanceFilterAmount", 50);
         this.normalizingFactor = serverConfiguration.getDouble("normalizingFactor", 0.1);
+        this.defaultSupplyClass = (byte) (serverConfiguration.getInt("defaultSupplyClass", 9));
+        this.defaultDemandClass = (byte) (serverConfiguration.getInt("defaultDemandClass", 0));
+        this.supplyClassFloors = serverConfiguration.getStringArray("supplyClassFloors");
     }
 
     public static void init(Configuration adapterConfiguration) {
@@ -74,7 +79,7 @@ public class Filters {
         while (null != itr && itr.hasNext()) {
             String str = itr.next();
             if (str.endsWith(ENDS_WITH_ADVERTISER_ID)) {
-                advertiserIdtoNameMapping.put(adapterConfiguration.getString(str),
+                advertiserIdToNameMapping.put(adapterConfiguration.getString(str),
                         str.replace(ENDS_WITH_ADVERTISER_ID, ""));
             }
         }
@@ -88,7 +93,11 @@ public class Filters {
     public List<ChannelSegment> applyFilters() {
         sumUpSiteImpressions();
         advertiserLevelFiltering();
-        fetchPricingEngineFloors();
+        if (matchedSegments.isEmpty()) {
+            logger.debug("No adGroups left for filtering , so returning empty list");
+            return Collections.emptyList();
+        }
+        fetchPricingEngineEntity();
         adGroupLevelFiltering();
         List<ChannelSegment> channelSegments = convertToSegmentsList(matchedSegments);
         return selectTopAdGroupsForRequest(channelSegments);
@@ -116,10 +125,7 @@ public class Filters {
         String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
         if (result) {
             logger.debug("Burn limit exceeded by advertiser", advertiserId);
-            if (advertiserIdtoNameMapping.containsKey(advertiserId)) {
-                InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
-                        InspectorStrings.droppedInburnFilter);
-            }
+            channelSegment.incrementInspectorStats(InspectorStrings.droppedInburnFilter);
         } else {
             logger.debug("Burn limit filter passed by advertiser", advertiserId);
         }
@@ -128,7 +134,7 @@ public class Filters {
 
     boolean isAdvertiserDroppedInRtbBalanceFilter(ChannelSegment channelSegment) {
         String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
-        boolean isRtbPartner = adapterConfiguration.getBoolean(advertiserIdtoNameMapping.get
+        boolean isRtbPartner = adapterConfiguration.getBoolean(advertiserIdToNameMapping.get
                 (advertiserId) + ".isRtb", false);
         boolean result = false;
         if (isRtbPartner) {
@@ -138,10 +144,7 @@ public class Filters {
         if (result) {
             logger.debug("Balance is less than", rtbBalanceFilterAmount,
                     "dollars for advertiser", advertiserId);
-            if (advertiserIdtoNameMapping.containsKey(advertiserId)) {
-                InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
-                        InspectorStrings.droppedInRtbBalanceFilter);
-            }
+            channelSegment.incrementInspectorStats(InspectorStrings.droppedInRtbBalanceFilter);
         } else {
             logger.debug("RTB balance filter passed by advertiser", advertiserId);
         }
@@ -158,10 +161,7 @@ public class Filters {
         String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
         if (result) {
             logger.debug("Impression limit exceeded by advertiser", advertiserId);
-            if (advertiserIdtoNameMapping.containsKey(advertiserId)) {
-                InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
-                        InspectorStrings.droppedInImpressionFilter);
-            }
+            channelSegment.incrementInspectorStats(InspectorStrings.droppedInImpressionFilter);
         } else {
             logger.debug("Impression limit filter passed by advertiser", advertiserId);
         }
@@ -179,10 +179,7 @@ public class Filters {
         String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
         if (result) {
             logger.debug("Request Cap exceeded by advertiser", advertiserId);
-            if (advertiserIdtoNameMapping.containsKey(advertiserId)) {
-                InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
-                        InspectorStrings.droppedInRequestCapFilter);
-            }
+            channelSegment.incrementInspectorStats(InspectorStrings.droppedInRequestCapFilter);
         } else {
             logger.debug("Request Cap filter passed by advertiser", advertiserId);
         }
@@ -215,11 +212,8 @@ public class Filters {
             }
         }
         if (result) {
-            logger.debug("Site/publisher inclusion list does not contain advertiser", advertiserId);
-            if (advertiserIdtoNameMapping.containsKey(advertiserId)) {
-                InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
-                        InspectorStrings.droppedinAdvertiserInclusionFilter);
-            }
+            logger.debug("Dropping in Advertiser Inclusion Filter, advertiser", advertiserId);
+            channelSegment.incrementInspectorStats(InspectorStrings.droppedinAdvertiserInclusionFilter);
         } else {
             logger.debug("Advertiser Inclusion filter passed by advertiser", advertiserId);
         }
@@ -241,10 +235,7 @@ public class Filters {
         if (result) {
             logger.debug("Dropping as site not present in inclusion list of advertiser",
                     advertiserId);
-            if (advertiserIdtoNameMapping.containsKey(advertiserId)) {
-                InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
-                        InspectorStrings.droppedinSiteInclusionFilter);
-            }
+            channelSegment.incrementInspectorStats(InspectorStrings.droppedinSiteInclusionFilter);
         } else {
             logger.debug("Site inclusion exclusion passed by advertiser", advertiserId);
         }
@@ -266,10 +257,7 @@ public class Filters {
         }
         if (result) {
             logger.debug("Dropping as site not present in inclusion list of adroup", adGroupId);
-            if (advertiserIdtoNameMapping.containsKey(advertiserId)) {
-                InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
-                        InspectorStrings.droppedinSiteInclusionFilter);
-            }
+            channelSegment.incrementInspectorStats(InspectorStrings.droppedinSiteInclusionFilter);
         } else {
             logger.debug("Site inclusion exclusion passed by adgroup", adGroupId);
         }
@@ -285,10 +273,7 @@ public class Filters {
             logger.debug("Impression limit exceeded by adgroup",
                     channelSegment.getChannelSegmentEntity().getAdgroupId(),
                     "advertiser", advertiserId);
-            if (advertiserIdtoNameMapping.containsKey(advertiserId)) {
-                InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
-                        InspectorStrings.droppedInImpressionFilter);
-            }
+            channelSegment.incrementInspectorStats(InspectorStrings.droppedInImpressionFilter);
         } else {
             logger.debug("Impression limit filter passed by adgroup",
                     channelSegment.getChannelSegmentEntity().getAdgroupId(),
@@ -335,7 +320,8 @@ public class Filters {
         logger.debug("Inside adGroupLevelFiltering");
         Map<String, HashMap<String, ChannelSegment>> rows = new HashMap<String, HashMap<String,
                 ChannelSegment>>();
-
+        supplyClass = getSupplyClass(sasParams);
+        logger.debug("Supply class is", supplyClass);
         for (Map.Entry<String, HashMap<String, ChannelSegment>> advertiserEntry : matchedSegments
                 .entrySet()) {
             String advertiserId = advertiserEntry.getKey();
@@ -361,13 +347,14 @@ public class Filters {
                 }
                 
                 //applying pricing engine filter
-                if (isChannelSegmentFilteredOutByPricingEngine(advertiserId, getDcpFloor(),
+                if (isChannelSegmentFilteredOutByPricingEngine(advertiserId,
+                        pricingEngineEntity == null ? null : pricingEngineEntity.getDcpFloor(),
                         channelSegment)) {
-                    continue;
+                continue;
                 }
 
                 //applying timeOfDayTargeting filter
-                if (isTODTargetingFailed(advertiserId, channelSegment)) {
+                if (isTODTargetingFailed(channelSegment)) {
                     continue;
                 }
 
@@ -376,7 +363,7 @@ public class Filters {
                     continue;
                 }
                 // applying segment property filter
-                if (isAnySegmentPropertyViolated(channelSegment.getChannelSegmentEntity())) {
+                if (isAnySegmentPropertyViolated(channelSegment)) {
                     continue;
                 }
                 // applying site inclusion-exclusion at advertiser level
@@ -401,14 +388,23 @@ public class Filters {
                         .contains(sasParams.getModelId())) {
                     logger.debug(channelSegment.getChannelSegmentEntity().getId(),
                             " dropped in model id filter");
-                    if (advertiserIdtoNameMapping.containsKey(advertiserId)) {
-                        InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get
-                                (advertiserId),
-                                InspectorStrings.droppedinHandsetTargetingFilter);
-                    }
+                    channelSegment.incrementInspectorStats(
+                            InspectorStrings.droppedinHandsetTargetingFilter);
                     continue;
                 }
+                //applying pricing engine filter
+                if (isChannelSegmentFilteredOutByPricingEngine(advertiserId,
+                            pricingEngineEntity == null ? null : pricingEngineEntity.getDcpFloor(),
+                            channelSegment)) {
+                    continue;
+                }
+
                 channelSegment.setPrioritisedECPM(calculatePrioritisedECPM(channelSegment));
+
+                if (!isDemandAcceptedBySupply(channelSegment)) {
+                    continue;
+                }
+
                 segmentListToBeSorted.add(channelSegment);
             }
             if (segmentListToBeSorted.isEmpty()) {
@@ -418,7 +414,7 @@ public class Filters {
             // choosing top segments from the sorted list
             int adGpCount = 1;
             int partnerSegmentNo;
-            partnerSegmentNo = adapterConfiguration.getInt(advertiserIdtoNameMapping.get
+            partnerSegmentNo = adapterConfiguration.getInt(advertiserIdToNameMapping.get
                     (advertiserId) + ".partnerSegmentNo",
                     serverConfiguration.getInt("partnerSegmentNo", 2));
             logger.debug("PartnersegmentNo for advertiser", advertiserId,
@@ -430,10 +426,7 @@ public class Filters {
                 hashMap.put(channelSegment.getChannelSegmentFeedbackEntity().getId(),
                         channelSegment);
                 adGpCount++;
-                if (advertiserIdtoNameMapping.containsKey(advertiserId)) {
-                    InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
-                            InspectorStrings.totalSelectedSegments);
-                }
+                channelSegment.incrementInspectorStats(InspectorStrings.totalSelectedSegments);
             }
             rows.put(advertiserId, hashMap);
         }
@@ -450,8 +443,8 @@ public class Filters {
         String advertiserId = channelSegment.getChannelEntity().getAccountId();
         if(sasParams.getDst() == 6 && null != sasParams.getAccountSegment()
                 && !sasParams.getAccountSegment().isEmpty() && !sasParams.getAccountSegment().contains(accountSegment)) {
-            if(advertiserIdtoNameMapping.containsKey(advertiserId)) {
-                InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
+            if(getAdvertiserIdToNameMapping().containsKey(advertiserId)) {
+                InspectorStats.incrementStatCount(getAdvertiserIdToNameMapping().get(advertiserId),
                         InspectorStrings.droppedInAccountSegmentFilter);
             }
             logger.debug("Account segment filter failed by advertiser", advertiserId);
@@ -468,8 +461,8 @@ public class Filters {
     boolean isDroppedInDstFilter(String advertiserId, ChannelSegment channelSegment) {
         if(sasParams.getDst() == 6 && channelSegment.getChannelSegmentEntity().getDst() != sasParams.getDst()) {
             logger.debug("dropped in dst filter for advertiser", advertiserId);
-            if(advertiserIdtoNameMapping.containsKey(advertiserId)) {
-                InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
+            if(getAdvertiserIdToNameMapping().containsKey(advertiserId)) {
+                InspectorStats.incrementStatCount(getAdvertiserIdToNameMapping().get(advertiserId),
                         InspectorStrings.droppedInDstFilter);
             }
             return true;
@@ -477,8 +470,8 @@ public class Filters {
         if(sasParams.getDst() == 2 && sasParams.isResponseOnlyFromDcp() 
                 && channelSegment.getChannelSegmentEntity().getDst() != sasParams.getDst()) {
             logger.debug("dropped in dst filter for advertiser", advertiserId);
-            if(advertiserIdtoNameMapping.containsKey(advertiserId)) {
-                InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
+            if(getAdvertiserIdToNameMapping().containsKey(advertiserId)) {
+                InspectorStats.incrementStatCount(getAdvertiserIdToNameMapping().get(advertiserId),
                         InspectorStrings.droppedInDstFilter);
             }
             return true;
@@ -487,7 +480,73 @@ public class Filters {
         return false;
     }
 
-    boolean isTODTargetingFailed(String advertiserId, ChannelSegment channelSegment) {
+    byte getSupplyClass(SASRequestParameters sasParams) {
+        siteEcpmEntity = repositoryHelper.querySiteEcpmRepository(
+                                                        sasParams.getSiteId(),
+                                                        Integer.valueOf(sasParams.getCountryStr()),
+                                                        sasParams.getOsId());
+        if (siteEcpmEntity == null) {
+            logger.debug("SiteEcpmEntity is null, thus returning default class");
+            return defaultSupplyClass;
+        } else {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Number of supply classes", supplyClassFloors.length);
+                logger.debug("SupplyClassFloors", Arrays.asList(supplyClassFloors));
+                logger.debug("Site ecpm is", siteEcpmEntity.getEcpm(),
+                             "Network ecpm is", siteEcpmEntity.getNetworkEcpm());
+            }
+            return getEcpmClass(siteEcpmEntity.getEcpm(), siteEcpmEntity.getNetworkEcpm());
+        }
+    }
+
+    boolean isDemandAcceptedBySupply(ChannelSegment channelSegment) {
+        byte demandClass;
+        boolean result;
+
+        if (siteEcpmEntity == null) {
+            demandClass = defaultDemandClass;
+        } else {
+            demandClass = getEcpmClass(channelSegment.getPrioritisedECPM(),
+                                       siteEcpmEntity.getNetworkEcpm());
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Demand class is ", demandClass, "for adgroup" ,
+                    channelSegment.getChannelSegmentEntity().getAdgroupId());
+        }
+        if (pricingEngineEntity == null) {
+            result =
+                   PricingEngineEntity.DEFAULT_SUPPLY_DEMAND_MAPPING[supplyClass][demandClass] == 1;
+        } else {
+            result = pricingEngineEntity.isSupplyAcceptsDemand(supplyClass, demandClass);
+        }
+        String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
+        if (!result) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Supply does not accepts demand");
+            }
+            channelSegment.incrementInspectorStats(
+                    InspectorStrings.droppedInSupplyDemandClassificationFilter);
+        }
+        return result;
+    }
+
+    byte getEcpmClass(Double ecpm, Double networkEcpm) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Ecpm is ", ecpm, "network ecpm", networkEcpm);
+        }
+        double ratio = ecpm / (networkEcpm > 0 ? networkEcpm : 1);
+        byte ecpmClass = 0;
+        for (String floor : supplyClassFloors) {
+            if (ratio >= Double.valueOf(floor)) {
+                return ecpmClass;
+            }
+            ecpmClass++;
+        }
+        return ecpmClass;
+    }
+
+
+    boolean isTODTargetingFailed(ChannelSegment channelSegment) {
         if (null == channelSegment.getChannelSegmentEntity().getTod()) {
             logger.debug(channelSegment.getChannelSegmentEntity().getAdgroupId(),
                     " has all ToD and DoW targeting. Passing the ToD check ");
@@ -503,10 +562,7 @@ public class Filters {
                 "todt calculated is : ", todt);
         if (todt == 0) {
             logger.debug(logger, "Hour of day targeting failed. Returning true");
-            if (advertiserIdtoNameMapping.containsKey(advertiserId)) {
-                InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
-                        InspectorStrings.droppedInTODFilter);
-            }
+            channelSegment.incrementInspectorStats(InspectorStrings.droppedInTODFilter);
             return true;
         }
         logger.debug(logger, "Hour of day targeting passed. Returning false");
@@ -559,10 +615,8 @@ public class Filters {
             } else {
                 logger.debug("dcp floor filter failed by adgroup",
                         channelSegment.getChannelSegmentFeedbackEntity().getId());
-                if (advertiserIdtoNameMapping.containsKey(advertiserId)) {
-                    InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(advertiserId),
-                            InspectorStrings.droppedinPricingEngineFilter);
-                }
+                channelSegment.incrementInspectorStats(
+                        InspectorStrings.droppedinPricingEngineFilter);
                 return true;
             }
         }
@@ -573,47 +627,36 @@ public class Filters {
      * Segment property filter
      *
      */
-    boolean isAnySegmentPropertyViolated(ChannelSegmentEntity channelSegmentEntity) {
+    boolean isAnySegmentPropertyViolated(ChannelSegment channelSegment) {
+        ChannelSegmentEntity channelSegmentEntity = channelSegment.getChannelSegmentEntity();
         if (channelSegmentEntity.isUdIdRequired()
                 && (StringUtils.isEmpty(sasParams.getUidParams()) || sasParams.getUidParams()
                 .equals("{}"))) {
-            InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegmentEntity
-                    .getAdvertiserId()),
-                    InspectorStrings.droppedInUdidFilter);
+            channelSegment.incrementInspectorStats(InspectorStrings.droppedInUdidFilter);
             return true;
         }
         if (channelSegmentEntity.isZipCodeRequired() && StringUtils.isEmpty(sasParams
                 .getPostalCode())) {
-            InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegmentEntity
-                    .getAdvertiserId()),
-                    InspectorStrings.droppedInZipcodeFilter);
+            channelSegment.incrementInspectorStats(InspectorStrings.droppedInZipcodeFilter);
             return true;
         }
         if (channelSegmentEntity.isLatlongRequired() && StringUtils.isEmpty(sasParams.getLatLong
                 ())) {
-            InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegmentEntity
-                    .getAdvertiserId()),
-                    InspectorStrings.droppedInLatLongFilter);
+            channelSegment.incrementInspectorStats(InspectorStrings.droppedInLatLongFilter);
             return true;
         }
         if (channelSegmentEntity.isRestrictedToRichMediaOnly() && !sasParams.isRichMedia()) {
-            InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegmentEntity
-                    .getAdvertiserId()),
-                    InspectorStrings.droppedInLatLongFilter);
+            channelSegment.incrementInspectorStats(InspectorStrings.droppedInRichMediaFilter);
             return true;
         }
         if (channelSegmentEntity.isInterstitialOnly()
                 && (sasParams.getRqAdType() == null || !sasParams.getRqAdType().equals("int"))) {
-            InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegmentEntity
-                    .getAdvertiserId()),
-                    InspectorStrings.droppedInOnlyInterstitialFilter);
+            channelSegment.incrementInspectorStats(InspectorStrings.droppedInOnlyInterstitialFilter);
             return true;
         }
         if (channelSegmentEntity.isNonInterstitialOnly() && sasParams.getRqAdType() != null
                 && sasParams.getRqAdType().equals("int")) {
-            InspectorStats.incrementStatCount(advertiserIdtoNameMapping.get(channelSegmentEntity
-                    .getAdvertiserId()),
-                    InspectorStrings.droppedInOnlyNonInterstitialFilter);
+            channelSegment.incrementInspectorStats(InspectorStrings.droppedInOnlyNonInterstitialFilter);
             return true;
         }
         return false;
@@ -641,12 +684,9 @@ public class Filters {
             }
             if (shortlistedRow.size() < totalSegmentNo) {
                 shortlistedRow.add(channelSegment);
-            } else if (advertiserIdtoNameMapping.containsKey(channelSegment
-                    .getChannelSegmentEntity().getAdvertiserId())) {
-                InspectorStats.incrementStatCount(
-                        advertiserIdtoNameMapping.get(channelSegment.getChannelSegmentEntity()
-                                .getAdvertiserId()),
-                        InspectorStrings.droppedInSegmentPerRequestFilter);
+            } else {
+            channelSegment.incrementInspectorStats(
+                    InspectorStrings.droppedInSegmentPerRequestFilter);
             }
         }
         logger.debug("Number of  ShortListed Segments are :", Integer.valueOf(shortlistedRow.size
@@ -695,7 +735,7 @@ public class Filters {
 
     void printSegments(Map<String, HashMap<String, ChannelSegment>> matchedSegments) {
         if (logger.isDebugEnabled()) {
-            logger.debug("Segments are :");
+            logger.debug("Remaining AdGroups are :");
             for (Map.Entry<String, HashMap<String, ChannelSegment>> advertiserEntry :
                     matchedSegments.entrySet()) {
                 Map<String, ChannelSegment> adGroups = advertiserEntry.getValue();
@@ -703,8 +743,7 @@ public class Filters {
                     ChannelSegment channelSegment = adGroupEntry.getValue();
                     logger.debug("Advertiser is", channelSegment.getChannelSegmentEntity()
                             .getAdvertiserId(), "and AdGp is",
-                            channelSegment.getChannelSegmentEntity().getAdgroupId(), "ecpm is",
-                            channelSegment.getPrioritisedECPM());
+                            channelSegment.getChannelSegmentEntity().getAdgroupId());
                 }
             }
         }
@@ -785,10 +824,7 @@ public class Filters {
             } else {
                 logger.debug("Dropping partner", rankedSegment.getAdNetworkInterface().getName(),
                         "rank", rank, "due to guarnteed delivery");
-                InspectorStats.incrementStatCount(
-                        advertiserIdtoNameMapping.get(
-                                rankedSegment.getChannelSegmentEntity().getAdvertiserId()),
-                                InspectorStrings.droppedInGuaranteedDelivery);
+                rankedSegment.incrementInspectorStats(InspectorStrings.droppedInGuaranteedDelivery);
             }
         }
         logger.debug("New ranklist size :" + newRankList.size());
@@ -809,33 +845,24 @@ public class Filters {
         return rtbSegments;
     }
 
-    public void fetchPricingEngineFloors() {
+    void fetchPricingEngineEntity() {
         // Fetching pricing engine entity
         int country = 0;
         if (null != sasParams.getCountryStr()) {
             country = Integer.parseInt(sasParams.getCountryStr());
         }
         int os = sasParams.getOsId();
-        PricingEngineEntity pricingEngineEntity = null;
         if (null != repositoryHelper && country != 0) {
-            pricingEngineEntity = repositoryHelper.queryPricingEngineRepository(country, os, logger);
+            pricingEngineEntity = repositoryHelper.queryPricingEngineRepository(country, os);
         }
-        Double dcpFloor = null;
-        Double rtbFloor = null;
-        if (null != pricingEngineEntity) {
-            dcpFloor = pricingEngineEntity.getDcpFloor();
-            rtbFloor = pricingEngineEntity.getRtbFloor();
-        }
-
-        this.dcpFloor = dcpFloor;
-        this.rtbFloor = rtbFloor;
-    }
-
-    public Double getDcpFloor() {
-        return dcpFloor;
     }
 
     public Double getRtbFloor() {
-        return rtbFloor;
+        return pricingEngineEntity == null ? null :pricingEngineEntity.getRtbFloor();
+    }
+
+    //Please do not call this, this is only for testing
+    void setSiteEcpmEntity(SiteEcpmEntity siteEcpmEntity) {
+        this.siteEcpmEntity = siteEcpmEntity;
     }
 }

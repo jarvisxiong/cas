@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import com.google.common.base.Charsets;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelEvent;
@@ -185,8 +186,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
   }
 
   // send response to the caller
-  public void sendResponse(HttpResponseStatus status, String responseString, Map responseHeaders, ChannelEvent event)
-          throws NullPointerException {
+  public void sendResponse(HttpResponseStatus status, String responseString, Map responseHeaders, ChannelEvent event) throws NullPointerException {
+    if (hrh.isTraceRequest) {
+        status = OK;
+    }
+
     HttpResponse response = new DefaultHttpResponse(HTTP_1_1, status);
     response.addHeader("Cache-Control", "no-cache, no-store, must-revalidate");
     response.addHeader("Expires", "-1");
@@ -197,8 +201,17 @@ public class ResponseSender extends HttpRequestHandlerBase {
       	response.addHeader(key.toString(), responseHeaders.get(key));
       }
     }
+    logger.debug("trace request =", hrh.isTraceRequest);
 
-    response.setContent(ChannelBuffers.copiedBuffer(responseString, Charset.forName("UTF-8").name()));
+    String finalResponse = hrh.isTraceRequest ? logger.getTrace() : responseString;
+    byte[] bytes = finalResponse.getBytes(Charsets.UTF_8);
+
+    if (hrh.isTraceRequest) {
+        response.setHeader("Content-Type", "text/plain; charset=utf-8");
+    }
+    response.setHeader("Content-Length", bytes.length);
+    response.setContent(ChannelBuffers.copiedBuffer(bytes));
+
     if(event != null) {
       logger.debug("event not null inside send Response");
       Channel channel = event.getChannel();
@@ -235,7 +248,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
       return;
     }
     responseSent = true;
-    logger.debug("no ad received");
     InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
     
     Map<String, String> headers = null;
@@ -244,6 +256,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
       headers.put(NO_AD_HEADER, "true");
     }
 
+    logger.debug("Sending No ads");
     if(getResponseFormat().equals("xhtml")) {
       sendResponse(OK, noAdXhtml, headers, event);
     } else if(isJsAdRequest()) {
