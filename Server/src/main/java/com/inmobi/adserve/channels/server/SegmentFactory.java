@@ -356,6 +356,16 @@ public class SegmentFactory {
 			adaptor.setName("merimedia");
 			return adaptor;
 		}
+		else if ((advertiserId.equals(config
+				.getString("inneractive.advertiserId")))
+				&& (advertiserSet.isEmpty() || advertiserSet
+						.contains("inneractive"))
+				&& (config.getString("inneractive.status").equals("on"))) {
+			DCPAjillionAdnetwork adaptor = new DCPAjillionAdnetwork(logger, config, clientBootstrap,
+					base, serverEvent);
+			adaptor.setName("inneractive");
+			return adaptor;
+		}
 
 
 		return null;
