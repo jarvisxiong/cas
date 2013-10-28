@@ -5,9 +5,13 @@ import static org.jboss.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 import java.awt.Dimension;
+import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import com.google.common.base.Charsets;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
@@ -58,6 +62,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
   private boolean requestCleaned;
   public CasInternalRequestParameters casInternalRequestParameters;
   private AuctionEngine auctionEngine;
+  private static final String NO_AD_HEADER = "X-MKHOJ-NOAD";
 
   public List<ChannelSegment> getRankList() {
     return this.rankList;
@@ -130,7 +135,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
         finalReponse = startElement + finalReponse + endTags;
       } else if(getResponseFormat().equalsIgnoreCase("imai")) {
         finalReponse = adImaiStartTags + finalReponse;
-        sendResponse(OK, finalReponse, adResponse.responseHeaders, event);
       }
     } else {
       logger.info("invalid slot, so not returning response, even though we got an ad");
@@ -138,8 +142,47 @@ public class ResponseSender extends HttpRequestHandlerBase {
       if(getResponseFormat().equals("xhtml")) {
         finalReponse = noAdXhtml;
       }
+      sendResponse(OK, finalReponse, adResponse.responseHeaders, event);
+      return;
     }
-    sendResponse(OK, finalReponse, adResponse.responseHeaders, event);
+    if (6 != sasParams.getDst()) {
+      sendResponse(OK, finalReponse, adResponse.responseHeaders, event);
+    } else {
+      JSONObject jsonObject = new JSONObject();
+      try {
+        jsonObject.put("secondHighestBid", this.getAuctionEngine().getRtbResponse().getAdNetworkInterface().
+                getSecondBidPrice());
+        jsonObject.put("winnerBid", this.getAuctionEngine().getRtbResponse().getAdNetworkInterface().
+                getBidprice());
+        jsonObject.put("adm", finalReponse);
+        jsonObject.put("advertiserId", this.auctionEngine.getRtbResponse().getChannelEntity().
+                getAccountId());
+        jsonObject.put("adgroupId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().
+                getAdgroupId());
+        jsonObject.put("adgroupIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().
+                getAdgroupIncId());
+        jsonObject.put("adIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().
+                getIncId());
+        jsonObject.put("adId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().
+                getAdId());
+        jsonObject.put("rtbFloor", casInternalRequestParameters.rtbBidFloor);
+        jsonObject.put("impressionId", this.auctionEngine.getRtbResponse().getAdNetworkInterface().
+                getImpressionId());
+        jsonObject.put("campaignIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().
+                getCampaignIncId());
+        jsonObject.put("campaignId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().
+                getCampaignId());
+        InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
+        sendResponse(OK, jsonObject.toString(), adResponse.responseHeaders, event);
+        if(logger.isDebugEnabled()) {
+          logger.debug("RTB reponse json to RE is " + jsonObject.toString());
+        }
+      } catch (JSONException e) {
+        logger.debug("Error while making json object for rule engine " + e.getMessage());
+        // Sending NOAD if error making json object
+        sendNoAdResponse(event);
+      }
+    }
   }
 
   // send response to the caller
@@ -206,15 +249,22 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
     responseSent = true;
     InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
+    
+    Map<String, String> headers = null;
+    if(6 == sasParams.getDst()) {
+      headers = new HashMap<String, String>();
+      headers.put(NO_AD_HEADER, "true");
+    }
+
     logger.debug("Sending No ads");
     if(getResponseFormat().equals("xhtml")) {
-      sendResponse(noAdXhtml, event);
+      sendResponse(OK, noAdXhtml, headers, event);
     } else if(isJsAdRequest()) {
-      sendResponse(String.format(noAdJsAdcode, sasParams.getRqIframe()), event);
+      sendResponse(OK, String.format(noAdJsAdcode, sasParams.getRqIframe()), headers, event);
     } else if (getResponseFormat().equalsIgnoreCase("imai")) {
-      sendResponse(NO_CONTENT, noAdImai, null, event); 
+      sendResponse(NO_CONTENT, noAdImai, headers, event); 
     } else{
-      sendResponse(noAdHtml, event);
+      sendResponse(OK, noAdHtml, headers, event);
     }
   }
 

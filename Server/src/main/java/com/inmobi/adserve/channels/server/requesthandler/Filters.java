@@ -302,7 +302,7 @@ public class Filters {
                     isAdvertiserDailyImpressionCeilingExceeded(channelSegment)
                     || isAdvertiserDailyRequestCapExceeded(channelSegment) ||
                     isAdvertiserExcluded(channelSegment) || isAdvertiserDroppedInRtbBalanceFilter
-                    (channelSegment)) {
+                    (channelSegment) || isAdvertiserFailedInAccountSegmentFilter(channelSegment)) {
                 continue;
             }
             // otherwise adding the advertiser to the list
@@ -311,7 +311,7 @@ public class Filters {
         printSegments(rows);
         matchedSegments = rows;
     }
-
+    
     /**
      * Filter to perform adgroup level filtering and short list a configurable
      * number of adgroups per advertiser
@@ -339,6 +339,18 @@ public class Filters {
                 } else {
                     logger.debug("sitefloor filter passed by adgroup",
                             channelSegment.getChannelSegmentFeedbackEntity().getId());
+                }
+                
+                //applying dst filter
+                if (isDroppedInDstFilter(advertiserId, channelSegment)) {
+                  continue;
+                }
+                
+                //applying pricing engine filter
+                if (isChannelSegmentFilteredOutByPricingEngine(advertiserId,
+                        pricingEngineEntity == null ? null : pricingEngineEntity.getDcpFloor(),
+                        channelSegment)) {
+                continue;
                 }
 
                 //applying timeOfDayTargeting filter
@@ -420,6 +432,52 @@ public class Filters {
         }
         printSegments(rows);
         matchedSegments = rows;
+    }
+    
+    
+    /*
+     * Filter to perform accountSegment filtering on the basis of dso brand, dso performance and dso programmatic
+     * */
+    boolean isAdvertiserFailedInAccountSegmentFilter(ChannelSegment channelSegment) {
+        int accountSegment = channelSegment.getChannelEntity().getAccountSegment();
+        String advertiserId = channelSegment.getChannelEntity().getAccountId();
+        if(sasParams.getDst() == 6 && null != sasParams.getAccountSegment()
+                && !sasParams.getAccountSegment().isEmpty() && !sasParams.getAccountSegment().contains(accountSegment)) {
+            if(getAdvertiserIdToNameMapping().containsKey(advertiserId)) {
+                InspectorStats.incrementStatCount(getAdvertiserIdToNameMapping().get(advertiserId),
+                        InspectorStrings.droppedInAccountSegmentFilter);
+            }
+            logger.debug("Account segment filter failed by advertiser", advertiserId);
+            return true;
+        }
+        logger.debug("Account segment filter passed by advertiser", advertiserId);
+        return false;
+    }
+    
+    /*
+     * 2 is tpan and 6 is rtbd
+     *  This filter will work only if request come from rule engine
+     * */
+    boolean isDroppedInDstFilter(String advertiserId, ChannelSegment channelSegment) {
+        if(sasParams.getDst() == 6 && channelSegment.getChannelSegmentEntity().getDst() != sasParams.getDst()) {
+            logger.debug("dropped in dst filter for advertiser", advertiserId);
+            if(getAdvertiserIdToNameMapping().containsKey(advertiserId)) {
+                InspectorStats.incrementStatCount(getAdvertiserIdToNameMapping().get(advertiserId),
+                        InspectorStrings.droppedInDstFilter);
+            }
+            return true;
+        }
+        if(sasParams.getDst() == 2 && sasParams.isResponseOnlyFromDcp() 
+                && channelSegment.getChannelSegmentEntity().getDst() != sasParams.getDst()) {
+            logger.debug("dropped in dst filter for advertiser", advertiserId);
+            if(getAdvertiserIdToNameMapping().containsKey(advertiserId)) {
+                InspectorStats.incrementStatCount(getAdvertiserIdToNameMapping().get(advertiserId),
+                        InspectorStrings.droppedInDstFilter);
+            }
+            return true;
+        }
+        logger.debug(logger, "dst filter passed for advertiser", advertiserId);
+        return false;
     }
 
     byte getSupplyClass(SASRequestParameters sasParams) {

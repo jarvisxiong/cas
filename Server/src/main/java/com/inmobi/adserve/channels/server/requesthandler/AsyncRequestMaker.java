@@ -68,7 +68,7 @@ public class AsyncRequestMaker {
       ChannelSegmentEntity channelSegmentEntity = row.getChannelSegmentEntity();
       AdNetworkInterface network = SegmentFactory.getChannel(channelSegmentEntity.getAdvertiserId(), row
           .getChannelSegmentEntity().getChannelId(), adapterConfig, clientBootstrap, rtbClientBootstrap, base, e,
-          advertiserSet, logger, isRtbEnabled, rtbMaxTimeOut);
+          advertiserSet, logger, isRtbEnabled, rtbMaxTimeOut, sasParams.getDst());
       if(null == network) {
         logger.debug("No adapter found for adGroup:", channelSegmentEntity.getAdgroupId());
         continue;
@@ -308,10 +308,5 @@ public class AsyncRequestMaker {
     clickUrlMakerV6.setClickURLPrefix(config.getString("clickmaker.clickURLPrefix"));
     clickUrlMakerV6.setImageBeaconURLPrefix(config.getString("clickmaker.beaconURLPrefix"));
     return clickUrlMakerV6;
-  }
-  
-  public static void main(String[] args) {
-	  System.out.println(WilburyUUID.getDataCenterId("ae319977-013f-1000-c493-3eae23450067"));
-	  System.out.println(WilburyUUID.getMachineId("ae319977-013f-1000-c493-3eae23450067"));
   }
 }
