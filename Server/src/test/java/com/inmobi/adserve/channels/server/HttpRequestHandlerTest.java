@@ -438,6 +438,9 @@ public class HttpRequestHandlerTest extends TestCase {
     ChannelSegmentEntity channelSegmentEntity = createMock(ChannelSegmentEntity.class);
     expect(channelSegmentEntity.getExternalSiteKey()).andReturn("ext").anyTimes();
     expect(channelSegmentEntity.getAdvertiserId()).andReturn("extId").anyTimes();
+    expect(channelSegmentEntity.getCampaignIncId()).andReturn(1l).anyTimes();
+    expect(channelSegmentEntity.getAdgroupIncId()).andReturn(1l).anyTimes();
+    expect(channelSegmentEntity.getDst()).andReturn(2).anyTimes();
     replay(channelSegmentEntity);
     ChannelSegment channelSegment1 = new ChannelSegment(channelSegmentEntity, channelentity, null, null, null, adNetworkInterface1, 0);
     List<ChannelSegment> list = new ArrayList<ChannelSegment>();

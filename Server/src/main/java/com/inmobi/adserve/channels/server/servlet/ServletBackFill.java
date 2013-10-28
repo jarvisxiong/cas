@@ -31,7 +31,6 @@ public class ServletBackFill implements Servlet {
     InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
 
     Map<String, List<String>> params = queryStringDecoder.getParameters();
-
     try {
       hrh.jObject = RequestParser.extractParams(params);
     } catch (JSONException exeption) {
@@ -44,6 +43,13 @@ public class ServletBackFill implements Servlet {
     SASRequestParameters sasParams = new SASRequestParameters();
     RequestParser.parseRequestParameters(hrh.jObject, sasParams, casInternalRequestParametersGlobal, logger);
     hrh.responseSender.sasParams = sasParams;
+    logger.debug("site floor is " + sasParams.getSiteFloor());
+    
+    // Increment re Request if request came from rule engine
+    if (6 == sasParams.getDst()) {
+      logger.debug("Request came from rule engin...");
+      InspectorStats.incrementStatCount(InspectorStrings.ruleEngineRequests);
+    }
     
     //Send noad if new-category is not present in the request
     if (null == hrh.responseSender.sasParams.getCategories()) {
@@ -178,6 +184,7 @@ public class ServletBackFill implements Servlet {
         segmentFloor = filter.getRtbFloor();
     }
     casInternalRequestParametersGlobal.rtbBidFloor = hrh.responseSender.getAuctionEngine().calculateRTBFloor(sasParams.getSiteFloor(), 0.0, segmentFloor, minimumRtbFloor);
+    logger.debug("site floor was " + sasParams.getSiteFloor() + " segmentFloor was " + segmentFloor + " minimum rtb floor " + minimumRtbFloor + " and rtbFloor is " + casInternalRequestParametersGlobal.rtbBidFloor);
     //Generating auction id using site Inc Id
     casInternalRequestParametersGlobal.auctionId = AsyncRequestMaker.getImpressionId(sasParams.getSiteIncId());
     hrh.responseSender.casInternalRequestParameters = casInternalRequestParametersGlobal;

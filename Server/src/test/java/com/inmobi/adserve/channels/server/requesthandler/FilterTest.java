@@ -23,7 +23,6 @@ import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
 
 public class FilterTest extends TestCase {
-
     Configuration mockConfig;
     Configuration mockAdapterConfig;
     private DebugLogger logger;
@@ -439,6 +438,7 @@ public class FilterTest extends TestCase {
         sasParams.setSiteFloor(0.3);
         sasParams.setCountryStr("1");
         sasParams.setOsId(1);
+        sasParams.setDst(2);
         sasParams.setSiteId("siteid");
         Filters f1 = new Filters(matchedSegments, mockConfig, mockAdapterConfig, sasParams,
                 repositoryHelper, logger);
@@ -879,5 +879,4 @@ public class FilterTest extends TestCase {
         builder.setTodayImpressions(todaysImpressions);
         return builder;
     }
-
 }

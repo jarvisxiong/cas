@@ -76,7 +76,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
       InspectorStats.incrementStatCount(InspectorStrings.totalTerminate);
       logger.debug("Channel is terminated", ctx.getChannel().getId());
     }
-    logger.info("Getting netty error in HttpRequestHandler:", e.getCause());
+    logger.info("Getting netty error in HttpRequestHandler:", e.getCause().getLocalizedMessage());
     if(e.getChannel().isOpen()) {
       responseSender.sendNoAdResponse(e);
     }
@@ -165,7 +165,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
     try {
       if(responseSender.getAdResponse() == null) {
         Logging.channelLogline(list, null, logger, ServletHandler.getLoggerConfig(), responseSender.sasParams, totalTime);
-        Logging.rrLogging(null, logger, ServletHandler.getLoggerConfig(), responseSender.sasParams, terminationReason);
+        Logging.rrLogging(null, list, logger, ServletHandler.getLoggerConfig(), responseSender.sasParams, terminationReason);
         Logging.advertiserLogging(list, logger, ServletHandler.getLoggerConfig());
         Logging.sampledAdvertiserLogging(list, logger, ServletHandler.getLoggerConfig());
       } else {
@@ -173,11 +173,11 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
             responseSender.sasParams, totalTime);
         if(responseSender.getRtbResponse() == null) {
           logger.debug("rtb response is null so logging dcp response in rr");
-          Logging.rrLogging(responseSender.getRankList().get(responseSender.getSelectedAdIndex()), logger,
+          Logging.rrLogging(responseSender.getRankList().get(responseSender.getSelectedAdIndex()), list, logger,
               ServletHandler.getLoggerConfig(), responseSender.sasParams, terminationReason);
         } else {
           logger.debug("rtb response is not null so logging rtb response in rr");
-          Logging.rrLogging(responseSender.getRtbResponse(), logger, ServletHandler.getLoggerConfig(),
+          Logging.rrLogging(responseSender.getRtbResponse(), list, logger, ServletHandler.getLoggerConfig(),
               responseSender.sasParams, terminationReason);
         }
         Logging.advertiserLogging(list, logger, ServletHandler.getLoggerConfig());

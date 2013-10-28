@@ -33,7 +33,11 @@ import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import com.inmobi.casthrift.Ad;
 import com.inmobi.casthrift.AdIdChain;
 import com.inmobi.casthrift.AdMeta;
+import com.inmobi.casthrift.AdStatus;
+import com.inmobi.casthrift.CasAdChain;
+import com.inmobi.casthrift.Channel;
 import com.inmobi.casthrift.ContentRating;
+import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.casthrift.Gender;
 import com.inmobi.casthrift.Geo;
 import com.inmobi.casthrift.HandsetMeta;
@@ -98,7 +102,7 @@ public class Logging {
     log.append(separator).append(key).append(value);
   }
   // Writing rrlogs
-  public static void rrLogging(ChannelSegment channelSegment, DebugLogger logger, Configuration config,
+  public static void rrLogging(ChannelSegment channelSegment, List<ChannelSegment> rankList, DebugLogger logger, Configuration config,
       SASRequestParameters sasParams, String terminationReason) throws JSONException, TException {
     Logger rrLogger = LoggerFactory.getLogger(config.getString("rr"));
     boolean isTerminated = false;
@@ -176,6 +180,7 @@ public class Logging {
       adMeta = new AdMeta(contentRating, pricingModel, "BANNER");
       ad = new Ad(adChain, adMeta);
       impression = new Impression(channelSegment.getAdNetworkInterface().getImpressionId(), ad);
+      impression.setAdChain(createCasAdChain(channelSegment));
       log.append(channelSegmentEntity.getPricingModel()).append("\",\"BANNER\", \"");
       log.append(channelSegmentEntity.getExternalSiteKey()).append("\"],\"impid\":\"");
       log.append(channelSegment.getAdNetworkInterface().getImpressionId()).append("\"");
@@ -310,10 +315,13 @@ public class Logging {
       impressions.add(impression);
     }
     AdRR adRR = new AdRR(host, timestamp, request, impressions, isTerminated, terminationReason);
+    List<Channel> channels = createChannelsLog(rankList);
+    adRR.setChannels(channels);
     if(enableDatabusLogging) {
       TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
       Message msg = new Message(tSerializer.serialize(adRR));
       dataBusPublisher.publish(rrLogKey, msg);
+      logger.debug("ADRR is: ", adRR);
     }
     // Logging realtime stats for graphite
     String osName = "";
@@ -332,6 +340,46 @@ public class Logging {
     }
   }
 
+    public static List<Channel> createChannelsLog(List<ChannelSegment> rankList) {
+        if(null == rankList) {
+            return new ArrayList<Channel>();
+        }
+        List<Channel> channels = new ArrayList<Channel>();
+        for (ChannelSegment channelSegment : rankList) {
+            Channel channel = new Channel();
+            channel.setAdStatus(getAdStatus(channelSegment.getAdNetworkInterface().getAdStatus()));
+            channel.setLatency(channelSegment.getAdNetworkInterface().getLatency());
+            channel.setAdChain(createCasAdChain(channelSegment));
+            double bid = channelSegment.getAdNetworkInterface().getBidprice();
+            if(bid > 0) {
+                channel.setBid(bid);
+            }
+            channels.add(channel);
+        }
+        return channels;
+    }
+    
+    public static CasAdChain createCasAdChain(ChannelSegment channelSegment) {
+        CasAdChain casAdChain = new CasAdChain();
+        casAdChain.setAdvertiserId(channelSegment.getChannelEntity().getAccountId());
+        casAdChain.setCampaign_inc_id(channelSegment.getChannelSegmentEntity().getCampaignIncId());
+        casAdChain.setAdgroup_inc_id(channelSegment.getChannelSegmentEntity().getAdgroupIncId());
+        casAdChain.setExternalSiteKey(channelSegment.getChannelSegmentEntity().getExternalSiteKey());
+        casAdChain.setDst(DemandSourceType.findByValue(channelSegment.getChannelSegmentEntity().getDst()));
+        return casAdChain;
+    }
+
+    public static AdStatus getAdStatus(String adStatus) {
+        if("AD".equalsIgnoreCase(adStatus)) {
+            return AdStatus.AD;
+        } else if("NO_AD".equals(adStatus)) {
+            return AdStatus.NO_AD;
+        } else if("TIME_OUT".equals(adStatus)) {
+            return AdStatus.TIME_OUT;
+        }
+        return AdStatus.DROPPED;
+    }
+  
   // Write Channel Logs
   public static void channelLogline(List<ChannelSegment> rankList, String clickUrl, DebugLogger logger,
       Configuration config, SASRequestParameters sasParams, long totalTime) throws JSONException, TException {

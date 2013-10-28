@@ -1,19 +1,19 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.util.DebugLogger;
@@ -26,11 +26,12 @@ public class RequestParser {
 
     // Extracting params.
     public static JSONObject extractParams(Map<String, List<String>> params,
-                                           String jsonKey) throws JSONException {
+                                           String jsonKey) throws JSONException, UnsupportedEncodingException {
         if (!params.isEmpty()) {
             List<String> values = params.get(jsonKey);
             if (CollectionUtils.isNotEmpty(values)) {
-                return new JSONObject(values.iterator().next());
+                String stringVal = values.iterator().next();
+                return new JSONObject(URLDecoder.decode(stringVal, "UTF-8"));
             }
         }
         return null;
@@ -45,6 +46,14 @@ public class RequestParser {
             return;
         }
         params.setAllParametersJson(jObject.toString());
+        int dst = jObject.optInt("dst", 2);
+        Set<Integer> accountSegments = getAcoountSegments(jObject, logger);
+        boolean isResponseOnlyFromDcp = jObject.optBoolean("isResponseOnlyFromDcp", false);
+        logger.debug("dst type is", dst, "isResponseOnlyFromDcp ", isResponseOnlyFromDcp, 
+                "and account segments are", accountSegments);
+        params.setDst(dst);
+        params.setResponseOnlyFromDcp(isResponseOnlyFromDcp);
+        params.setAccountSegment(accountSegments);
         params.setRemoteHostIp(stringify(jObject, "w-s-carrier", logger));
         params.setUserAgent(stringify(jObject, "rqXInmobiPhoneUseragent", logger));
         if(null == params.getUserAgent()) {
@@ -59,7 +68,11 @@ public class RequestParser {
         params.setArea(parseArray(jObject, "carrier", 4));
         params.setSlot(stringify(jObject, "slot-served", logger));
         params.setRqMkSlot(stringify(jObject, "rqMkAdSlot", logger));
-        params.setSdkVersion(stringify(jObject, "sdk-version", logger));
+        String sdkVersion = stringify(jObject, "sdk-version", logger);
+        if (StringUtils.isBlank(sdkVersion) || "null".equalsIgnoreCase(sdkVersion)) {
+            sdkVersion = null;
+        }
+        params.setSdkVersion(sdkVersion);
         params.setSiteType(stringify(jObject, "site-type", logger));
         params.setAdcode(stringify(jObject, "adcode", logger));
         params.setPlatformOsId(jObject.optInt("os-id", -1));
@@ -152,6 +165,20 @@ public class RequestParser {
         } catch (JSONException e) {
             logger.error("error while reading category array", e.getMessage());
             return null;
+        }
+    }
+
+    public static Set<Integer> getAcoountSegments(JSONObject jObject, DebugLogger logger) {
+        try {
+            JSONArray segments = jObject.getJSONArray("segments");
+            HashSet<Integer> accountSegments = new HashSet<Integer>();
+            for (int index = 0; index < segments.length(); index++) {
+                accountSegments.add(segments.getInt(index));
+            }
+            return accountSegments;
+        } catch (JSONException e) {
+            logger.debug("error while reading account segments array", e.getMessage());
+            return new HashSet<Integer>();
         }
     }
 
