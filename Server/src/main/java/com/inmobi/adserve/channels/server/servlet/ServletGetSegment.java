@@ -22,26 +22,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 /**
- * @author devashish To see the state of currently loaded entries in all
- *         repository
+ * @author devashish To see the state of currently loaded entries in all repository
  */
 
-public class ServletGetSegment implements Servlet {
+public class ServletGetSegment implements Servlet
+{
     @Override
-    public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder,
-                              MessageEvent e,
-                              DebugLogger logger) throws Exception {
+    public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
+            DebugLogger logger) throws Exception
+    {
 
         Map<String, List<String>> params = queryStringDecoder.getParameters();
         JSONObject jObject;
         try {
             jObject = RequestParser.extractParams(params, "segments");
-        } catch (JSONException exeption) {
+        }
+        catch (JSONException exeption) {
             logger.debug("Encountered Json Error while creating json object inside servlet");
             hrh.setTerminationReason(ServletHandler.jsonParsingError);
-            InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError,
-                    InspectorStrings.count);
+            InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
             hrh.responseSender.sendResponse("Incorrect Json", e);
             return;
         }
@@ -62,41 +63,45 @@ public class ServletGetSegment implements Servlet {
             String key = id + "_" + repoName;
             Object entity = null;
 
-            if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals
-                    .CHANNEL_REPOSITORY)) {
+            if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_REPOSITORY)) {
                 entity = ServletHandler.repositoryHelper.queryChannelRepository(id);
-            } else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals
-                    .CHANNEL_ADGROUP_REPOSITORY)) {
+            }
+            else if (repoName != null
+                    && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY)) {
                 entity = ServletHandler.repositoryHelper.queryChannelAdGroupRepository(id);
-            } else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals
-                    .CHANNEL_FEEDBACK_REPOSITORY)) {
+            }
+            else if (repoName != null
+                    && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY)) {
                 entity = ServletHandler.repositoryHelper.queryChannelFeedbackRepository(id);
-            } else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals
-                    .CHANNEL_SEGMENT_FEEDBACK_REPOSITORY)) {
+            }
+            else if (repoName != null
+                    && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY)) {
                 entity = ServletHandler.repositoryHelper.queryChannelSegmentFeedbackRepository(id);
-            } else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals
-                    .SITE_METADATA_REPOSITORY)) {
+            }
+            else if (repoName != null
+                    && repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)) {
                 entity = ServletHandler.repositoryHelper.querySiteMetaDetaRepository(id);
-            } else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals
-                    .SITE_TAXONOMY_REPOSITORY)) {
+            }
+            else if (repoName != null
+                    && repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY)) {
                 entity = ServletHandler.repositoryHelper.querySiteTaxonomyRepository(id);
-            } else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals
-                    .PRICING_ENGINE_REPOSITORY)) {
+            }
+            else if (repoName != null
+                    && repoName.equalsIgnoreCase(ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY)) {
                 entity = ServletHandler.repositoryHelper.queryPricingEngineRepository(
-                        Integer.parseInt(id.split("_")[0]), Integer.parseInt(id.split("_")[1]));
-            } else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals
-                    .PUBLISHER_FILTER_REPOSITORY)) {
-                entity = ServletHandler.repositoryHelper.queryPublisherFilterRepository(id.split
-                        ("_")[0], Integer.parseInt(id.split("_")[1]));
-            } else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals
-                    .CITRUS_LEAF_FEEDBACK)) {
+                    Integer.parseInt(id.split("_")[0]), Integer.parseInt(id.split("_")[1]));
+            }
+            else if (repoName != null
+                    && repoName.equalsIgnoreCase(ChannelServerStringLiterals.PUBLISHER_FILTER_REPOSITORY)) {
+                entity = ServletHandler.repositoryHelper.queryPublisherFilterRepository(id.split("_")[0],
+                    Integer.parseInt(id.split("_")[1]));
+            }
+            else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CITRUS_LEAF_FEEDBACK)) {
                 entity = ServletHandler.repositoryHelper.querySiteCitrusLeafFeedbackRepository(id);
-            } else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals
-                    .SITE_ECPM_REPOSITORY)) {
-                entity = ServletHandler.repositoryHelper.querySiteEcpmRepository(
-                                                                id.split("_")[0],
-                                                                Integer.parseInt(id.split("_")[1]),
-                                                                Integer.parseInt(id.split("_")[2]));
+            }
+            else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY)) {
+                entity = ServletHandler.repositoryHelper.querySiteEcpmRepository(id.split("_")[0],
+                    Integer.parseInt(id.split("_")[1]), Integer.parseInt(id.split("_")[2]));
             }
             segmentInfo.put(key, entity);
         }
@@ -105,7 +110,8 @@ public class ServletGetSegment implements Servlet {
     }
 
     @Override
-    public String getName() {
+    public String getName()
+    {
         return "getSegment";
     }
 

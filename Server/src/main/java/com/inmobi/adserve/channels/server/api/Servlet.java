@@ -7,9 +7,12 @@ import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public interface Servlet {
-  
-  void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e, DebugLogger logger) throws Exception;
-  String getName();
+public interface Servlet
+{
+
+    void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e, DebugLogger logger)
+            throws Exception;
+
+    String getName();
 
 }

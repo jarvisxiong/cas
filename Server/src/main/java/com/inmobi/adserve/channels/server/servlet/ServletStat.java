@@ -9,18 +9,23 @@ import com.inmobi.adserve.channels.server.client.BootstrapCreation;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 
-public class ServletStat implements Servlet {
 
-  @Override
-  public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
-      DebugLogger logger) throws Exception {
-    logger.debug("Inside stat servlet");
-    hrh.responseSender.sendResponse(
-        InspectorStats.getStats(BootstrapCreation.getMaxConnections(), BootstrapCreation.getDroppedConnections()), e);
-  }
+public class ServletStat implements Servlet
+{
 
-  @Override
-  public String getName() {
-    return "stat";
-  }
+    @Override
+    public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
+            DebugLogger logger) throws Exception
+    {
+        logger.debug("Inside stat servlet");
+        hrh.responseSender.sendResponse(
+            InspectorStats.getStats(BootstrapCreation.getMaxConnections(), BootstrapCreation.getDroppedConnections()),
+            e);
+    }
+
+    @Override
+    public String getName()
+    {
+        return "stat";
+    }
 }

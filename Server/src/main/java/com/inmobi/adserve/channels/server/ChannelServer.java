@@ -46,24 +46,27 @@ import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class ChannelServer {
-    private static Logger logger;
-    private static ChannelAdGroupRepository channelAdGroupRepository;
-    private static ChannelRepository channelRepository;
-    private static ChannelFeedbackRepository channelFeedbackRepository;
-    private static ChannelSegmentFeedbackRepository channelSegmentFeedbackRepository;
-    private static SiteMetaDataRepository siteMetaDataRepository;
-    private static SiteTaxonomyRepository siteTaxonomyRepository;
-    private static SiteCitrusLeafFeedbackRepository siteCitrusLeafFeedbackRepository;
-    private static PricingEngineRepository pricingEngineRepository;
-    private static PublisherFilterRepository publisherFilterRepository;
-    private static SiteEcpmRepository siteEcpmRepository;
-    private static final String configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
-    public static byte dataCenterIdCode;
-    public static short hostIdCode;
-    public static String dataCentreName;
 
-    public static void main(String[] args) throws Exception {
+public class ChannelServer
+{
+    private static Logger                           logger;
+    private static ChannelAdGroupRepository         channelAdGroupRepository;
+    private static ChannelRepository                channelRepository;
+    private static ChannelFeedbackRepository        channelFeedbackRepository;
+    private static ChannelSegmentFeedbackRepository channelSegmentFeedbackRepository;
+    private static SiteMetaDataRepository           siteMetaDataRepository;
+    private static SiteTaxonomyRepository           siteTaxonomyRepository;
+    private static SiteCitrusLeafFeedbackRepository siteCitrusLeafFeedbackRepository;
+    private static PricingEngineRepository          pricingEngineRepository;
+    private static PublisherFilterRepository        publisherFilterRepository;
+    private static SiteEcpmRepository               siteEcpmRepository;
+    private static final String                     configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
+    public static byte                              dataCenterIdCode;
+    public static short                             hostIdCode;
+    public static String                            dataCentreName;
+
+    public static void main(String[] args) throws Exception
+    {
         try {
             ConfigurationLoader config = ConfigurationLoader.getInstance(configFile);
 
@@ -79,37 +82,32 @@ public class ChannelServer {
             SlotSizeMapping.init();
             Formatter.init();
 
-            PropertyConfigurator.configure(config.loggerConfiguration().getString
-                    ("log4jLoggerConf"));
+            PropertyConfigurator.configure(config.loggerConfiguration().getString("log4jLoggerConf"));
             logger = Logger.getLogger("repository");
             logger.debug("Initializing logger completed");
 
             // parsing the data center id given in the vm parameters
             ChannelServerHelper channelServerHelper = new ChannelServerHelper(logger);
-            dataCenterIdCode = channelServerHelper
-                    .getDataCenterId(ChannelServerStringLiterals.DATA_CENTER_ID_KEY);
+            dataCenterIdCode = channelServerHelper.getDataCenterId(ChannelServerStringLiterals.DATA_CENTER_ID_KEY);
             hostIdCode = channelServerHelper.getHostId(ChannelServerStringLiterals.HOST_NAME_KEY);
-            dataCentreName = channelServerHelper
-                    .getDataCentreName(ChannelServerStringLiterals.DATA_CENTRE_NAME_KEY);
+            dataCentreName = channelServerHelper.getDataCentreName(ChannelServerStringLiterals.DATA_CENTRE_NAME_KEY);
             // Initialising Internal logger factory for Netty
             InternalLoggerFactory.setDefaultFactory(new Log4JLoggerFactory());
 
             // Initialising logging - Write to databus
-            AbstractMessagePublisher dataBusPublisher = (AbstractMessagePublisher)
-                    MessagePublisherFactory
+            AbstractMessagePublisher dataBusPublisher = (AbstractMessagePublisher) MessagePublisherFactory
                     .create(configFile);
             String rrLogKey = config.serverConfiguration().getString("rrLogKey");
             String channelLogKey = config.serverConfiguration().getString("channelLogKey");
             String advertisementLogKey = config.serverConfiguration().getString("adsLogKey");
-            Logging.init(dataBusPublisher, rrLogKey, channelLogKey, advertisementLogKey,
-                    config.serverConfiguration());
+            Logging.init(dataBusPublisher, rrLogKey, channelLogKey, advertisementLogKey, config.serverConfiguration());
 
             // Initializing graphite stats
-            MetricsManager.init(config.serverConfiguration().getString("graphiteServer.host",
-                    "mon02.ads.uj1.inmobi.com"),
-                                config.serverConfiguration().getInt("graphiteServer.port", 2003),
-                                config.serverConfiguration().getInt("graphiteServer.intervalInMinutes",
-                                1));
+            MetricsManager.init(
+                config.serverConfiguration().getString("graphiteServer.host", "mon02.ads.uj1.inmobi.com"), config
+                        .serverConfiguration()
+                            .getInt("graphiteServer.port", 2003),
+                config.serverConfiguration().getInt("graphiteServer.intervalInMinutes", 1));
             channelAdGroupRepository = new ChannelAdGroupRepository();
             channelRepository = new ChannelRepository();
             channelFeedbackRepository = new ChannelFeedbackRepository();
@@ -120,7 +118,6 @@ public class ChannelServer {
             pricingEngineRepository = new PricingEngineRepository();
             publisherFilterRepository = new PublisherFilterRepository();
             siteEcpmRepository = new SiteEcpmRepository();
-
 
             RepositoryHelper.Builder repoHelperBuilder = RepositoryHelper.newBuilder();
             repoHelperBuilder.setChannelRepository(channelRepository);
@@ -146,17 +143,16 @@ public class ChannelServer {
             Timer timer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
             BootstrapCreation.init(timer);
             RtbBootstrapCreation.init(timer);
-            ClientBootstrap clientBootstrap = BootstrapCreation.createBootstrap(logger,
-                    config.serverConfiguration());
-            ClientBootstrap rtbClientBootstrap = RtbBootstrapCreation.createBootstrap(logger,
-                    config.rtbConfiguration());
+            ClientBootstrap clientBootstrap = BootstrapCreation.createBootstrap(logger, config.serverConfiguration());
+            ClientBootstrap rtbClientBootstrap = RtbBootstrapCreation
+                    .createBootstrap(logger, config.rtbConfiguration());
 
             // For some partners netty client does not work thus
             // Creating a ning client for out-bound calls
             AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder()
-                    .setRequestTimeoutInMs(config.serverConfiguration().getInt
-                            ("readtimeoutMillis") - 100)
-                    .setConnectionTimeoutInMs(600).build();
+                    .setRequestTimeoutInMs(config.serverConfiguration().getInt("readtimeoutMillis") - 100)
+                        .setConnectionTimeoutInMs(600)
+                        .build();
             AsyncHttpClient asyncHttpClient = new AsyncHttpClient(asyncHttpClientConfig);
 
             if (null == clientBootstrap) {
@@ -173,8 +169,7 @@ public class ChannelServer {
             ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(
                     Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
             Timer servertimer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
-            bootstrap.setPipelineFactory(new ChannelServerPipelineFactory(servertimer, config
-                    .serverConfiguration()));
+            bootstrap.setPipelineFactory(new ChannelServerPipelineFactory(servertimer, config.serverConfiguration()));
             bootstrap.setOption("child.keepAlive", true);
             bootstrap.setOption("child.tcpNoDelay", true);
             bootstrap.setOption("child.reuseAddress", true);
@@ -183,7 +178,8 @@ public class ChannelServer {
             // If client bootstrap is not present throwing exception which will
             // set
             // lbStatus as NOT_OK.
-        } catch (Exception exception) {
+        }
+        catch (Exception exception) {
             ServerStatusInfo.statusString = getMyStackTrace(exception);
             ServerStatusInfo.statusCode = 404;
             logger.info("stack trace is " + getMyStackTrace(exception));
@@ -194,21 +190,21 @@ public class ChannelServer {
         }
     }
 
-    public static String getMyStackTrace(Exception exception) {
+    public static String getMyStackTrace(Exception exception)
+    {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         exception.printStackTrace(printWriter);
         return ("StackTrace is: " + stringWriter.toString());
     }
 
-    private static void instantiateRepository(Logger logger, ConfigurationLoader config) throws
-            ClassNotFoundException {
+    private static void instantiateRepository(Logger logger, ConfigurationLoader config) throws ClassNotFoundException
+    {
         try {
             logger.debug("Starting to instantiate repository");
             ChannelSegmentMatchingCache.init(logger);
             Configuration databaseConfig = config.databaseConfiguration();
-            System.setProperty(Context.INITIAL_CONTEXT_FACTORY,
-                    "org.apache.naming.java.javaURLContextFactory");
+            System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.apache.naming.java.javaURLContextFactory");
             System.setProperty(Context.URL_PKG_PREFIXES, "org.apache.naming");
 
             // Configuring the dataSource with JDBC
@@ -226,10 +222,9 @@ public class ChannelServer {
             props.put("password", databaseConfig.getString("password"));
 
             final ObjectPool connectionPool = new GenericObjectPool(null);
-            String connectUri = "jdbc:postgresql://" +
-                    databaseConfig.getString("host") + ":" +
-                    databaseConfig.getInt("port") +  "/" +
-                    databaseConfig.getString(ChannelServerStringLiterals .DATABASE);
+            String connectUri = "jdbc:postgresql://" + databaseConfig.getString("host") + ":"
+                    + databaseConfig.getInt("port") + "/"
+                    + databaseConfig.getString(ChannelServerStringLiterals.DATABASE);
             final ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectUri, props);
             new PoolableConnectionFactory(connectionFactory, connectionPool, null, null, false, true);
             final PoolingDataSource ds = new PoolingDataSource(connectionPool);
@@ -239,81 +234,77 @@ public class ChannelServer {
             ChannelSegmentMatchingCache.init(logger);
             // Reusing the repository from phoenix adsering framework.
             channelAdGroupRepository.init(logger,
-                    config.cacheConfiguration()
-                            .subset(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY),
-                    ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY);
+                config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY),
+                ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY);
             channelRepository.init(logger,
-                    config.cacheConfiguration().subset(ChannelServerStringLiterals
-                            .CHANNEL_REPOSITORY),
-                    ChannelServerStringLiterals.CHANNEL_REPOSITORY);
-            channelFeedbackRepository.init(
-                    logger,
-                    config.cacheConfiguration().subset(
-                            ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY),
-                    ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY);
-            channelSegmentFeedbackRepository.init(
-                    logger,
-                    config.cacheConfiguration().subset(
-                            ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY),
-                    ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY);
+                config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_REPOSITORY),
+                ChannelServerStringLiterals.CHANNEL_REPOSITORY);
+            channelFeedbackRepository.init(logger,
+                config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY),
+                ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY);
+            channelSegmentFeedbackRepository.init(logger,
+                config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY),
+                ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY);
             siteTaxonomyRepository.init(logger,
-                    config.cacheConfiguration().subset(ChannelServerStringLiterals
-                            .SITE_TAXONOMY_REPOSITORY),
-                    ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY);
+                config.cacheConfiguration().subset(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY),
+                ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY);
             siteMetaDataRepository.init(logger,
-                    config.cacheConfiguration().subset(ChannelServerStringLiterals
-                            .SITE_METADATA_REPOSITORY),
-                    ChannelServerStringLiterals.SITE_METADATA_REPOSITORY);
-            pricingEngineRepository.init(logger, config.cacheConfiguration().subset
-                    (ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY),
-                    ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY);
-            publisherFilterRepository.init(logger, config.cacheConfiguration().subset
-                    (ChannelServerStringLiterals.PUBLISHER_FILTER_REPOSITORY),
-                    ChannelServerStringLiterals.PUBLISHER_FILTER_REPOSITORY);
+                config.cacheConfiguration().subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY),
+                ChannelServerStringLiterals.SITE_METADATA_REPOSITORY);
+            pricingEngineRepository.init(logger,
+                config.cacheConfiguration().subset(ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY),
+                ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY);
+            publisherFilterRepository.init(logger,
+                config.cacheConfiguration().subset(ChannelServerStringLiterals.PUBLISHER_FILTER_REPOSITORY),
+                ChannelServerStringLiterals.PUBLISHER_FILTER_REPOSITORY);
             siteCitrusLeafFeedbackRepository.init(
-                    config.serverConfiguration().subset(ChannelServerStringLiterals
-                            .CITRUS_LEAF_FEEDBACK),
-                    getDataCenter());
-            siteEcpmRepository.init(logger, config.cacheConfiguration().subset
-                    (ChannelServerStringLiterals.SITE_ECPM_REPOSITORY),
-                    ChannelServerStringLiterals.SITE_ECPM_REPOSITORY);
+                config.serverConfiguration().subset(ChannelServerStringLiterals.CITRUS_LEAF_FEEDBACK), getDataCenter());
+            siteEcpmRepository.init(logger,
+                config.cacheConfiguration().subset(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY),
+                ChannelServerStringLiterals.SITE_ECPM_REPOSITORY);
             logger.error("* * * * Instantiating repository completed * * * *");
-        } catch (NamingException exception) {
-            logger
-                    .error("failed to creatre binding for postgresql data source " + exception
-                            .getMessage());
+        }
+        catch (NamingException exception) {
+            logger.error("failed to creatre binding for postgresql data source " + exception.getMessage());
             ServerStatusInfo.statusCode = 404;
             ServerStatusInfo.statusString = getMyStackTrace(exception);
             return;
-        } catch (InitializationException exception) {
+        }
+        catch (InitializationException exception) {
             logger.error("failed to initialize repository " + exception.getMessage());
             ServerStatusInfo.statusCode = 404;
             ServerStatusInfo.statusString = getMyStackTrace(exception);
             if (logger.isDebugEnabled()) {
-              logger.debug(ChannelServer.getMyStackTrace(exception));
+                logger.debug(ChannelServer.getMyStackTrace(exception));
             }
             return;
         }
     }
 
-    private static DataCenter getDataCenter() {
+    private static DataCenter getDataCenter()
+    {
         DataCenter colo = DataCenter.ALL;
         if (DataCenter.UA2.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
             colo = DataCenter.UA2;
-        } else if (DataCenter.UJ1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
+        }
+        else if (DataCenter.UJ1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
             colo = DataCenter.UJ1;
-        } else if (DataCenter.UJ1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
+        }
+        else if (DataCenter.UJ1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
             colo = DataCenter.UJ1;
-        } else if (DataCenter.LHR1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
+        }
+        else if (DataCenter.LHR1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
             colo = DataCenter.LHR1;
-        } else if (DataCenter.HKG1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
+        }
+        else if (DataCenter.HKG1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
             colo = DataCenter.HKG1;
         }
         return colo;
     }
 
     // check if all log folders exists
-    public static boolean checkLogFolders(Configuration config) {
+    public static boolean checkLogFolders(Configuration config)
+    {
         String rrLogFolder = config.getString("appender.rr.File");
         String channelLogFolder = config.getString("appender.channel.File");
         String debugLogFolder = config.getString("appender.debug.File");
@@ -331,8 +322,7 @@ public class ChannelServer {
             rrFolder = new File(rrLogFolder);
         }
         if (repositoryLogFolder != null) {
-            repositoryLogFolder = repositoryLogFolder.substring(0,
-                    repositoryLogFolder.lastIndexOf('/') + 1);
+            repositoryLogFolder = repositoryLogFolder.substring(0, repositoryLogFolder.lastIndexOf('/') + 1);
             repositoryFolder = new File(repositoryLogFolder);
         }
         if (channelLogFolder != null) {
@@ -344,20 +334,18 @@ public class ChannelServer {
             debugFolder = new File(debugLogFolder);
         }
         if (advertiserLogFolder != null) {
-            advertiserLogFolder = advertiserLogFolder.substring(0,
-                    advertiserLogFolder.lastIndexOf('/') + 1);
+            advertiserLogFolder = advertiserLogFolder.substring(0, advertiserLogFolder.lastIndexOf('/') + 1);
             advertiserFolder = new File(advertiserLogFolder);
         }
         if (sampledAdvertiserLogFolder != null) {
             sampledAdvertiserLogFolder = sampledAdvertiserLogFolder.substring(0,
-                    sampledAdvertiserLogFolder.lastIndexOf('/') + 1);
+                sampledAdvertiserLogFolder.lastIndexOf('/') + 1);
             sampledAdvertiserFolder = new File(sampledAdvertiserLogFolder);
         }
         if (rrFolder != null && rrFolder.exists() && channelFolder != null && channelFolder.exists()) {
-            if (debugFolder != null && debugFolder.exists() && advertiserFolder != null
-                    && advertiserFolder.exists()) {
-                if (sampledAdvertiserFolder != null && sampledAdvertiserFolder.exists()
-                        && repositoryFolder != null && repositoryFolder.exists()) {
+            if (debugFolder != null && debugFolder.exists() && advertiserFolder != null && advertiserFolder.exists()) {
+                if (sampledAdvertiserFolder != null && sampledAdvertiserFolder.exists() && repositoryFolder != null
+                        && repositoryFolder.exists()) {
                     return true;
                 }
             }

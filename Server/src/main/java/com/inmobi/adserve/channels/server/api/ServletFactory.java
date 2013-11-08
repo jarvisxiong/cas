@@ -1,7 +1,8 @@
 package com.inmobi.adserve.channels.server.api;
 
-public interface ServletFactory {
+public interface ServletFactory
+{
 
-  Servlet getServlet();
+    Servlet getServlet();
 
 }
