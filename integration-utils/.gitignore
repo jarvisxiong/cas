@@ -5,8 +5,7 @@
 *.war
 *.ear
 /target
-/bin
+/.externalToolBuilders
 /.settings
 /.classpath
-/velocity.log
 /.project
