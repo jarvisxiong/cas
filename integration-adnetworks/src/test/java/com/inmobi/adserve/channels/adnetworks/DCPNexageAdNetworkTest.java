@@ -30,8 +30,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPNexageAdNetworkTest extends TestCase
-{
+public class DCPNexageAdNetworkTest extends TestCase {
     private Configuration         mockConfig      = null;
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
@@ -44,8 +43,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     private final String          NexageAdvId     = "nexageadv1";
     private final String          NexageTest      = "test";
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("nexage.host")).andReturn(NexageHost).anyTimes();
         expect(mockConfig.getString("nexage.status")).andReturn(NexageStatus).anyTimes();
@@ -58,8 +56,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Override
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File f;
         f = new File(loggerConf);
         if (!f.exists()) {
@@ -76,8 +73,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageConfigureParameters() throws JSONException
-    {
+    public void testDCPNexageConfigureParameters() throws JSONException {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -97,8 +93,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageConfigureParametersWithNoUid() throws JSONException
-    {
+    public void testDCPNexageConfigureParametersWithNoUid() throws JSONException {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -117,8 +112,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageConfigureParametersWithAdditionalParamsNotSet() throws JSONException
-    {
+    public void testDCPNexageConfigureParametersWithAdditionalParamsNotSet() throws JSONException {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -138,8 +132,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageConfigureParametersBlankIP()
-    {
+    public void testDCPNexageConfigureParametersBlankIP() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
@@ -157,8 +150,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testNexageConfigureParametersBlankExtKey()
-    {
+    public void testNexageConfigureParametersBlankExtKey() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -176,8 +168,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageConfigureParametersBlankUA()
-    {
+    public void testDCPNexageConfigureParametersBlankUA() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -194,8 +185,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageRequestUriWithSegmentCategory() throws Exception
-    {
+    public void testDCPNexageRequestUriWithSegmentCategory() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -210,8 +200,7 @@ public class DCPNexageAdNetworkTest extends TestCase
         sasParams.setCategories(cat);
         String externalKey = "8a809449013c3c643cad82cb412b5857";
         SlotSizeMapping.init();
-        Long[] categories = new Long[]
-        { 13l, 15l };
+        Long[] categories = new Long[] { 13l, 15l };
         String burl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
                 + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11"
                 + "?ds=1&event=beacon";
@@ -227,8 +216,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageRequestUriWithRONSegmentSiteCategory() throws Exception
-    {
+    public void testDCPNexageRequestUriWithRONSegmentSiteCategory() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -238,8 +226,7 @@ public class DCPNexageAdNetworkTest extends TestCase
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
         sasParams.setSlot("9");
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 10l, 26l }));
+        sasParams.setCategories(Arrays.asList(new Long[] { 10l, 26l }));
         String externalKey = "8a809449013c3c643cad82cb412b5857";
         SlotSizeMapping.init();
         String burl = "http://c2.w.inmobi.com/c"
@@ -257,8 +244,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageRequestUri() throws Exception
-    {
+    public void testDCPNexageRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -288,8 +274,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageRequestUriforiPad() throws Exception
-    {
+    public void testDCPNexageRequestUriforiPad() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -319,8 +304,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageRequestUriWithBlindedSiteId() throws Exception
-    {
+    public void testDCPNexageRequestUriWithBlindedSiteId() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -351,8 +335,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageRequestUriWithDoubleEncodedUserAgent() throws Exception
-    {
+    public void testDCPNexageRequestUriWithDoubleEncodedUserAgent() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -381,8 +364,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageRequestUriWithEncodedUserAgent() throws Exception
-    {
+    public void testDCPNexageRequestUriWithEncodedUserAgent() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -411,8 +393,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageRequestUriWithCountry() throws Exception
-    {
+    public void testDCPNexageRequestUriWithCountry() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -441,8 +422,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageRequestUriWithoutCountry() throws Exception
-    {
+    public void testDCPNexageRequestUriWithoutCountry() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -470,8 +450,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageRequestUriWithDMA() throws Exception
-    {
+    public void testDCPNexageRequestUriWithDMA() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -500,8 +479,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageRequestUriWithoutDMA() throws Exception
-    {
+    public void testDCPNexageRequestUriWithoutDMA() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -529,8 +507,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageRequestUriWithZip() throws Exception
-    {
+    public void testDCPNexageRequestUriWithZip() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -559,8 +536,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageRequestUriWithoutZip() throws Exception
-    {
+    public void testDCPNexageRequestUriWithoutZip() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -588,8 +564,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageRequestUriWithGender() throws Exception
-    {
+    public void testDCPNexageRequestUriWithGender() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -618,8 +593,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageRequestUriWithoutGender() throws Exception
-    {
+    public void testDCPNexageRequestUriWithoutGender() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -647,8 +621,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageRequestUriWithAge() throws Exception
-    {
+    public void testDCPNexageRequestUriWithAge() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -677,8 +650,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageRequestUriWithoutAge() throws Exception
-    {
+    public void testDCPNexageRequestUriWithoutAge() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -706,8 +678,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageRequestUriSitePerformance() throws Exception
-    {
+    public void testDCPNexageRequestUriSitePerformance() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -736,8 +707,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageRequestUriSiteFamilySafe() throws Exception
-    {
+    public void testDCPNexageRequestUriSiteFamilySafe() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -766,8 +736,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageRequestUriBlankLatLong() throws Exception
-    {
+    public void testDCPNexageRequestUriBlankLatLong() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -795,8 +764,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageRequestUriBlankSlot() throws Exception
-    {
+    public void testDCPNexageRequestUriBlankSlot() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -824,8 +792,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageParseResponseAd() throws Exception
-    {
+    public void testDCPNexageParseResponseAd() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -851,8 +818,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageParseResponseAdWAP() throws Exception
-    {
+    public void testDCPNexageParseResponseAdWAP() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -878,8 +844,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageParseResponseAdApp() throws Exception
-    {
+    public void testDCPNexageParseResponseAdApp() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -904,8 +869,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageParseResponseAdAppIMAI() throws Exception
-    {
+    public void testDCPNexageParseResponseAdAppIMAI() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -932,8 +896,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageGenerateStaticJsAdTag() throws Exception
-    {
+    public void testDCPNexageGenerateStaticJsAdTag() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -962,8 +925,7 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageGenerateStaticJsAdTagMultipleCategories() throws Exception
-    {
+    public void testDCPNexageGenerateStaticJsAdTagMultipleCategories() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -992,16 +954,14 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageParseNoAd() throws Exception
-    {
+    public void testDCPNexageParseNoAd() throws Exception {
         String response = "";
         dcpNexageAdnetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpNexageAdnetwork.getHttpResponseStatusCode(), 500);
     }
 
     @Test
-    public void testDCPNexageParseEmptyResponseCode() throws Exception
-    {
+    public void testDCPNexageParseEmptyResponseCode() throws Exception {
         String response = "";
         dcpNexageAdnetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpNexageAdnetwork.getHttpResponseStatusCode(), 500);
@@ -1009,14 +969,12 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageGetId() throws Exception
-    {
+    public void testDCPNexageGetId() throws Exception {
         assertEquals(dcpNexageAdnetwork.getId(), "nexageadv1");
     }
 
     @Test
-    public void testDCPNexageGetImpressionId() throws Exception
-    {
+    public void testDCPNexageGetImpressionId() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -1035,20 +993,17 @@ public class DCPNexageAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPNexageGetName() throws Exception
-    {
+    public void testDCPNexageGetName() throws Exception {
         assertEquals(dcpNexageAdnetwork.getName(), "nexage");
     }
 
     @Test
-    public void testDCPNexageIsClickUrlReq() throws Exception
-    {
+    public void testDCPNexageIsClickUrlReq() throws Exception {
         assertEquals(dcpNexageAdnetwork.isClickUrlRequired(), false);
     }
 
     @Test
-    public void testDCPNexageIsBeaconUrlReq() throws Exception
-    {
+    public void testDCPNexageIsBeaconUrlReq() throws Exception {
         assertEquals(dcpNexageAdnetwork.isBeaconUrlRequired(), true);
     }
 }

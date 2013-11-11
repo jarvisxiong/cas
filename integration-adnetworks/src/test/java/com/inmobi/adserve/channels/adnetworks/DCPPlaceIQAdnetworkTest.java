@@ -33,8 +33,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPPlaceIQAdnetworkTest extends TestCase
-{
+public class DCPPlaceIQAdnetworkTest extends TestCase {
     private Configuration         mockConfig       = null;
     private final String          debug            = "debug";
     private final String          loggerConf       = "/tmp/channel-server.properties";
@@ -50,8 +49,7 @@ public class DCPPlaceIQAdnetworkTest extends TestCase
     private final String          placeiqPartnerId = "IMB";
     private final String          placeiqFormat    = "xml";
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("placeiq.host")).andReturn(placeiqHost).anyTimes();
         expect(mockConfig.getString("placeiq.status")).andReturn(placeiqStatus).anyTimes();
@@ -67,8 +65,7 @@ public class DCPPlaceIQAdnetworkTest extends TestCase
     }
 
     @Override
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File f;
         f = new File(loggerConf);
         if (!f.exists()) {
@@ -85,8 +82,7 @@ public class DCPPlaceIQAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPPlaceiqConfigureParametersAndroid() throws JSONException
-    {
+    public void testDCPPlaceiqConfigureParametersAndroid() throws JSONException {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -108,8 +104,7 @@ public class DCPPlaceIQAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPPlaceiqConfigureParametersIOS() throws JSONException
-    {
+    public void testDCPPlaceiqConfigureParametersIOS() throws JSONException {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -131,8 +126,7 @@ public class DCPPlaceIQAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPPlaceiqConfigureParametersWap() throws JSONException
-    {
+    public void testDCPPlaceiqConfigureParametersWap() throws JSONException {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -153,8 +147,7 @@ public class DCPPlaceIQAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPPlaceiqConfigureParametersBlankIP()
-    {
+    public void testDCPPlaceiqConfigureParametersBlankIP() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
@@ -173,8 +166,7 @@ public class DCPPlaceIQAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPPlaceiqConfigureParametersBlankUA()
-    {
+    public void testDCPPlaceiqConfigureParametersBlankUA() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -192,12 +184,10 @@ public class DCPPlaceIQAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPPlaceiqRequestUri() throws Exception
-    {
+    public void testDCPPlaceiqRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]
-        { 50l, 51l }));
+        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSource("APP");
@@ -229,12 +219,10 @@ public class DCPPlaceIQAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPPlaceiqRequestUriWithNoCat() throws Exception
-    {
+    public void testDCPPlaceiqRequestUriWithNoCat() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]
-        { 50l, 51l }));
+        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSource("APP");
@@ -266,12 +254,10 @@ public class DCPPlaceIQAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPPlaceiqParseAd() throws Exception
-    {
+    public void testDCPPlaceiqParseAd() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]
-        { 50l, 51l }));
+        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSlot("15");
@@ -298,16 +284,14 @@ public class DCPPlaceIQAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPPlaceiqParseNoAd() throws Exception
-    {
+    public void testDCPPlaceiqParseNoAd() throws Exception {
         String response = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE PLACEIQ_AD_RESPONSE SYSTEM \"http://ads.placeiq.com/1/ad/placeiq_no_ad_response.dtd\"><PLACEIQ><NOAD></NOAD></PLACEIQ>";
         dcpPlaceIQAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(500, dcpPlaceIQAdNetwork.getHttpResponseStatusCode());
     }
 
     @Test
-    public void testDCPPlaceiqParseEmptyResponseCode() throws Exception
-    {
+    public void testDCPPlaceiqParseEmptyResponseCode() throws Exception {
         String response = "";
         dcpPlaceIQAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(500, dcpPlaceIQAdNetwork.getHttpResponseStatusCode());
@@ -315,14 +299,12 @@ public class DCPPlaceIQAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPPlaceiqGetId() throws Exception
-    {
+    public void testDCPPlaceiqGetId() throws Exception {
         assertEquals(placeiqAdvId, dcpPlaceIQAdNetwork.getId());
     }
 
     @Test
-    public void testDCPPlaceiqGetImpressionId() throws Exception
-    {
+    public void testDCPPlaceiqGetImpressionId() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -344,19 +326,16 @@ public class DCPPlaceIQAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPPlaceiqGetName() throws Exception
-    {
+    public void testDCPPlaceiqGetName() throws Exception {
         assertEquals("placeiq", dcpPlaceIQAdNetwork.getName());
     }
 
     @Test
-    public void testDCPPlaceiqIsClickUrlReq() throws Exception
-    {
+    public void testDCPPlaceiqIsClickUrlReq() throws Exception {
         assertEquals(false, dcpPlaceIQAdNetwork.isClickUrlRequired());
     }
 
-    private String getHashedValue(String message, String hashingType)
-    {
+    private String getHashedValue(String message, String hashingType) {
         try {
             MessageDigest md = MessageDigest.getInstance(hashingType);
             byte[] array = md.digest(message.getBytes());

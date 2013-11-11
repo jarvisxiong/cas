@@ -9,8 +9,7 @@ import lombok.Data;
 
 
 @Data
-public class SASRequestParameters
-{
+public class SASRequestParameters {
 
     private String       allParametersJson;
     private String       remoteHostIp;
@@ -72,13 +71,11 @@ public class SASRequestParameters
                                                 // example dso brancd, dso performance etc.
     private boolean      isResponseOnlyFromDcp;
 
-    public SASRequestParameters()
-    {
+    public SASRequestParameters() {
         // Do Nothing.
     }
 
-    public enum HandSetOS
-    {
+    public enum HandSetOS {
         Others(1),
         Linux_Smartphone_OS(2),
         Android(3),
@@ -102,13 +99,11 @@ public class SASRequestParameters
 
         private final int id;
 
-        HandSetOS(int id)
-        {
+        HandSetOS(int id) {
             this.id = id;
         }
 
-        public int getValue()
-        {
+        public int getValue() {
             return id;
         }
     }

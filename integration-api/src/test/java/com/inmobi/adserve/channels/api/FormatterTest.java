@@ -15,15 +15,13 @@ import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import static org.testng.Assert.*;
 
 
-public class FormatterTest
-{
+public class FormatterTest {
 
     private Configuration mockConfig;
     private DebugLogger   logger;
 
     @BeforeTest
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         mockConfig = EasyMock.createMock(Configuration.class);
         expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
         expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
@@ -35,8 +33,7 @@ public class FormatterTest
     }
 
     @Test
-    public void testInit()
-    {
+    public void testInit() {
         try {
             Formatter.init();
         }
@@ -46,8 +43,7 @@ public class FormatterTest
     }
 
     @Test
-    public void testrequestFromSDK360Onwards()
-    {
+    public void testrequestFromSDK360Onwards() {
         SASRequestParameters sasParams = new SASRequestParameters();
         assertEquals(false, Formatter.requestFromSDK360Onwards(sasParams, logger));
         sasParams.setSdkVersion("i350");
@@ -65,8 +61,7 @@ public class FormatterTest
     }
 
     @Test
-    public void testupdateVelocityContextWithNoBeaconUrlAndWapRequest()
-    {
+    public void testupdateVelocityContextWithNoBeaconUrlAndWapRequest() {
         SASRequestParameters sasParams = new SASRequestParameters();
         sasParams.setSource("wap");
         VelocityContext context = new VelocityContext();
@@ -78,8 +73,7 @@ public class FormatterTest
     }
 
     @Test
-    public void testupdateVelocityContextWithBeaconUrlAndAppRequestNonIMAI()
-    {
+    public void testupdateVelocityContextWithBeaconUrlAndAppRequestNonIMAI() {
         SASRequestParameters sasParams = new SASRequestParameters();
         sasParams.setSource("APP");
         sasParams.setSdkVersion("i360");
@@ -92,8 +86,7 @@ public class FormatterTest
     }
 
     @Test
-    public void testupdateVelocityContextWithBeaconUrlAndAppRequestIMAI()
-    {
+    public void testupdateVelocityContextWithBeaconUrlAndAppRequestIMAI() {
         SASRequestParameters sasParams = new SASRequestParameters();
         sasParams.setSource("APP");
         sasParams.setSdkVersion("i360");
@@ -104,40 +97,20 @@ public class FormatterTest
     }
 
     @DataProvider(name = "slot")
-    public Object[][] slot()
-    {
-        return new Object[][]
-        {
-        { "1" },
-        { "1.0" },
-        { "2" },
-        { "2.0" },
-        { "3" },
-        { "3.0" },
-        { "4" },
-        { "4.0" },
-        { "9" },
-        { "9.0" },
-        { "11" },
-        { "11.0" },
-        { "12" },
-        { "12.0" },
-        { "15" },
-        { "15.0" },
-        { "5.0" },
-        { "10.1" } };
+    public Object[][] slot() {
+        return new Object[][] { { "1" }, { "1.0" }, { "2" }, { "2.0" }, { "3" }, { "3.0" }, { "4" }, { "4.0" },
+                { "9" }, { "9.0" }, { "11" }, { "11.0" }, { "12" }, { "12.0" }, { "15" }, { "15.0" }, { "5.0" },
+                { "10.1" } };
     }
 
     @Test(dataProvider = "slot")
-    public void testGetRichTextTemplateForSlot(String slot)
-    {
+    public void testGetRichTextTemplateForSlot(String slot) {
         String template = Formatter.getRichTextTemplateForSlot(slot);
         Double slotType = Double.valueOf(slot);
         if (!slot.equals(slotType.toString()) && slot.equals(slotType.toString() + ".0")) {
             slotType = 0.0;
         }
-        switch (slotType.intValue())
-        {
+        switch (slotType.intValue()) {
             case 1:
                 assertEquals(template, "template_120_20");
                 break;

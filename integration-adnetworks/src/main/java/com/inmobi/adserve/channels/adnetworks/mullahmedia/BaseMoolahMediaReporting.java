@@ -15,8 +15,7 @@ import com.inmobi.adserve.channels.api.ServerException;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public abstract class BaseMoolahMediaReporting extends BaseReportingImpl
-{
+public abstract class BaseMoolahMediaReporting extends BaseReportingImpl {
 
     private final Configuration config;
     private DebugLogger         logger;
@@ -29,15 +28,13 @@ public abstract class BaseMoolahMediaReporting extends BaseReportingImpl
     protected String            host;
     protected String            advertiserName;
 
-    public BaseMoolahMediaReporting(final Configuration config)
-    {
+    public BaseMoolahMediaReporting(final Configuration config) {
         this.config = config;
     }
 
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final ReportTime endTime)
-            throws Exception
-    {
+            throws Exception {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         logger.debug("inside fetch rows of mullah media");
@@ -142,13 +139,11 @@ public abstract class BaseMoolahMediaReporting extends BaseReportingImpl
     // Fetches the report from the TPAN segment wise
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws ServerException
-    {
+            final ReportTime endTime) throws ServerException {
         return null;
     }
 
-    protected boolean decodeBlindedSiteId(String blindedSiteId, ReportResponse.ReportRow row)
-    {
+    protected boolean decodeBlindedSiteId(String blindedSiteId, ReportResponse.ReportRow row) {
         if (blindedSiteId.length() < 36) {
             logger.info("failed to decodeBlindedSiteId for ", getName(), blindedSiteId);
             return false;
@@ -157,8 +152,7 @@ public abstract class BaseMoolahMediaReporting extends BaseReportingImpl
         return super.decodeBlindedSiteId(bSiteId, row);
     }
 
-    public ReportTime getLatestDate() throws Exception
-    {
+    public ReportTime getLatestDate() throws Exception {
         try {
             logger.debug("calculating latest date for mullah media");
             ReportTime reportTime = ReportTime.getUTCTime();
@@ -175,8 +169,7 @@ public abstract class BaseMoolahMediaReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         String url = String.format("%semail=%s&password=%s&from=%s&to=%s", host, email, password, startDate, startDate);
         if (StringUtils.isNotBlank(api)) {
             url += "&site_name=" + api;
@@ -185,32 +178,27 @@ public abstract class BaseMoolahMediaReporting extends BaseReportingImpl
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return -7;
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 22;
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return advertiserName;
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return advertiserId;
     }
 }

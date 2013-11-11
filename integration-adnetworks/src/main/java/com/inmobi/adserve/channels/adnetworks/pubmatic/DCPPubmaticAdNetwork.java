@@ -34,8 +34,7 @@ import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public class DCPPubmaticAdNetwork extends BaseAdNetworkImpl
-{
+public class DCPPubmaticAdNetwork extends BaseAdNetworkImpl {
     private final Configuration          config;
     private transient String             pubId;
     private String                       latlong     = null;
@@ -54,8 +53,7 @@ public class DCPPubmaticAdNetwork extends BaseAdNetworkImpl
     }
 
     public DCPPubmaticAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent)
-    {
+            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
         super(baseRequestHandler, serverEvent, logger);
         this.config = config;
         this.logger = logger;
@@ -63,8 +61,7 @@ public class DCPPubmaticAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public boolean configureParameters()
-    {
+    public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             logger.debug("mandatory parameters missing for pubmatic so exiting adapter");
@@ -114,13 +111,11 @@ public class DCPPubmaticAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "pubmatic";
     }
 
-    public String getRequestParams()
-    {
+    public String getRequestParams() {
         StringBuilder params = new StringBuilder(
                 "timezone=0&frameName=test&inIframe=1&adVisibility=0&adPosition=-1x-1&operId=201&pubId=");
         params.append(pubId);
@@ -161,8 +156,7 @@ public class DCPPubmaticAdNetwork extends BaseAdNetworkImpl
 
     // form httprequest
     @Override
-    public HttpRequest getHttpRequest() throws Exception
-    {
+    public HttpRequest getHttpRequest() throws Exception {
         try {
             URI uri = getRequestUri();
             requestUrl = uri.toString();
@@ -189,14 +183,12 @@ public class DCPPubmaticAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public URI getRequestUri() throws Exception
-    {
+    public URI getRequestUri() throws Exception {
         return new URI(host);
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status)
-    {
+    public void parseResponse(String response, HttpResponseStatus status) {
         logger.debug("response is ", response);
 
         if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
@@ -254,8 +246,7 @@ public class DCPPubmaticAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return (config.getString("pubmatic.advertiserId"));
     }
 }

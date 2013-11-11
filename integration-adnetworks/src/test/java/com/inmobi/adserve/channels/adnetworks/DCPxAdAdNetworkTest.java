@@ -27,8 +27,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPxAdAdNetworkTest extends TestCase
-{
+public class DCPxAdAdNetworkTest extends TestCase {
     private Configuration         mockConfig      = null;
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
@@ -41,8 +40,7 @@ public class DCPxAdAdNetworkTest extends TestCase
     private final String          xAdAdvId        = "xadadv1";
     private final String          xAdTest         = "1";
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("xad.host")).andReturn(xAdHost).anyTimes();
         expect(mockConfig.getString("xad.status")).andReturn(xAdStatus).anyTimes();
@@ -55,8 +53,7 @@ public class DCPxAdAdNetworkTest extends TestCase
     }
 
     @Override
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File f;
         f = new File(loggerConf);
         if (!f.exists()) {
@@ -73,8 +70,7 @@ public class DCPxAdAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPxAdConfigureParameters()
-    {
+    public void testDCPxAdConfigureParameters() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -94,8 +90,7 @@ public class DCPxAdAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPxAdConfigureParametersWithNoUid()
-    {
+    public void testDCPxAdConfigureParametersWithNoUid() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -114,8 +109,7 @@ public class DCPxAdAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPxAdConfigureParametersBlankIP()
-    {
+    public void testDCPxAdConfigureParametersBlankIP() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
@@ -134,8 +128,7 @@ public class DCPxAdAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testxAdConfigureParametersBlankExtKey()
-    {
+    public void testxAdConfigureParametersBlankExtKey() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -154,8 +147,7 @@ public class DCPxAdAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPxAdConfigureParametersBlankUA()
-    {
+    public void testDCPxAdConfigureParametersBlankUA() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -173,16 +165,13 @@ public class DCPxAdAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPxAdRequestUri() throws Exception
-    {
+    public void testDCPxAdRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 9l, 10l, 13l, 30l }));
-        Long[] segmentCategories =
-        { 10l };
+        sasParams.setCategories(Arrays.asList(new Long[] { 9l, 10l, 13l, 30l }));
+        Long[] segmentCategories = { 10l };
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
@@ -204,16 +193,13 @@ public class DCPxAdAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPxAdRequestUriWithMoreCategories() throws Exception
-    {
+    public void testDCPxAdRequestUriWithMoreCategories() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 9l, 10l, 13l, 30l }));
-        Long[] segmentCategories =
-        { 10l };
+        sasParams.setCategories(Arrays.asList(new Long[] { 9l, 10l, 13l, 30l }));
+        Long[] segmentCategories = { 10l };
         List<Long> siteCategories = new ArrayList<Long>();
         siteCategories.add(12l);
         siteCategories.add(13l);
@@ -239,16 +225,13 @@ public class DCPxAdAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPxAdRequestUriWithDerivedLatLong() throws Exception
-    {
+    public void testDCPxAdRequestUriWithDerivedLatLong() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("iPhone");
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 9l, 10l, 13l, 30l }));
-        Long[] segmentCategories =
-        { 10l };
+        sasParams.setCategories(Arrays.asList(new Long[] { 9l, 10l, 13l, 30l }));
+        Long[] segmentCategories = { 10l };
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uidO1 = "202cb962ac59075b964b07152d234b70";
@@ -272,8 +255,7 @@ public class DCPxAdAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPxAdRequestUriBlankLatLong() throws Exception
-    {
+    public void testDCPxAdRequestUriBlankLatLong() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -297,15 +279,13 @@ public class DCPxAdAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPxAdRequestUriNoUdid() throws Exception
-    {
+    public void testDCPxAdRequestUriNoUdid() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         casInternalRequestParameters.latLong = "11.6,-11.87";
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 9l, 10l, 13l, 30l }));
+        sasParams.setCategories(Arrays.asList(new Long[] { 9l, 10l, 13l, 30l }));
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         sasParams.setSlot("15");
         sasParams.setOsId(3);
@@ -327,8 +307,7 @@ public class DCPxAdAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPxAdRequestUriBlankSlot() throws Exception
-    {
+    public void testDCPxAdRequestUriBlankSlot() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -351,8 +330,7 @@ public class DCPxAdAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPxAdParseResponseAd() throws Exception
-    {
+    public void testDCPxAdParseResponseAd() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -379,8 +357,7 @@ public class DCPxAdAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPxAdParseResponseAdWAP() throws Exception
-    {
+    public void testDCPxAdParseResponseAdWAP() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -406,8 +383,7 @@ public class DCPxAdAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPxAdParseResponseAdApp() throws Exception
-    {
+    public void testDCPxAdParseResponseAdApp() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -433,8 +409,7 @@ public class DCPxAdAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPxAdParseResponseAdAppIMAI() throws Exception
-    {
+    public void testDCPxAdParseResponseAdAppIMAI() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -462,16 +437,14 @@ public class DCPxAdAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPxAdParseNoAd() throws Exception
-    {
+    public void testDCPxAdParseNoAd() throws Exception {
         String response = "";
         dcpxAdAdnetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpxAdAdnetwork.getHttpResponseStatusCode(), 500);
     }
 
     @Test
-    public void testDCPxAdParseEmptyResponseCode() throws Exception
-    {
+    public void testDCPxAdParseEmptyResponseCode() throws Exception {
         String response = "";
         dcpxAdAdnetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpxAdAdnetwork.getHttpResponseStatusCode(), 500);
@@ -479,14 +452,12 @@ public class DCPxAdAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPxAdGetId() throws Exception
-    {
+    public void testDCPxAdGetId() throws Exception {
         assertEquals(dcpxAdAdnetwork.getId(), "xadadv1");
     }
 
     @Test
-    public void testDCPxAdGetImpressionId() throws Exception
-    {
+    public void testDCPxAdGetImpressionId() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -505,20 +476,17 @@ public class DCPxAdAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPxAdGetName() throws Exception
-    {
+    public void testDCPxAdGetName() throws Exception {
         assertEquals(dcpxAdAdnetwork.getName(), "xad");
     }
 
     @Test
-    public void testDCPxAdIsClickUrlReq() throws Exception
-    {
+    public void testDCPxAdIsClickUrlReq() throws Exception {
         assertEquals(dcpxAdAdnetwork.isClickUrlRequired(), false);
     }
 
     @Test
-    public void testDCPxAdIsBeaconUrlReq() throws Exception
-    {
+    public void testDCPxAdIsBeaconUrlReq() throws Exception {
         assertEquals(dcpxAdAdnetwork.isBeaconUrlRequired(), true);
     }
 }

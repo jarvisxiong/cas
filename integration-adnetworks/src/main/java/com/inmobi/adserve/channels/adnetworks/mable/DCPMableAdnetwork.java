@@ -36,8 +36,7 @@ import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
 
 
-public class DCPMableAdnetwork extends BaseAdNetworkImpl
-{
+public class DCPMableAdnetwork extends BaseAdNetworkImpl {
     private final Configuration config;
     private int                 width;
     private int                 height;
@@ -53,8 +52,7 @@ public class DCPMableAdnetwork extends BaseAdNetworkImpl
     private Request             ningRequest;
 
     public DCPMableAdnetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent)
-    {
+            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
         super(baseRequestHandler, serverEvent, logger);
         this.config = config;
         this.logger = logger;
@@ -64,8 +62,7 @@ public class DCPMableAdnetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public boolean configureParameters()
-    {
+    public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             logger.debug("mandatory parameters missing for Mable so exiting adapter");
@@ -95,13 +92,11 @@ public class DCPMableAdnetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "mable";
     }
 
-    private String getRequestParams()
-    {
+    private String getRequestParams() {
         JSONObject request = new JSONObject();
         try {
             request.put("imp_beacon", "");
@@ -148,8 +143,7 @@ public class DCPMableAdnetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public URI getRequestUri() throws Exception
-    {
+    public URI getRequestUri() throws Exception {
         try {
             String host = config.getString("mable.host");
             StringBuilder url = new StringBuilder(host);
@@ -162,21 +156,17 @@ public class DCPMableAdnetwork extends BaseAdNetworkImpl
         return null;
     }
 
-    @SuppressWarnings(
-    { "unchecked", "rawtypes" })
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    public boolean makeAsyncRequest()
-    {
+    public boolean makeAsyncRequest() {
         try {
             String uri = getRequestUri().toString();
             requestUrl = uri;
             setNingRequest(requestUrl);
             startTime = System.currentTimeMillis();
-            baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler()
-            {
+            baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
                 @Override
-                public Response onCompleted(Response response) throws Exception
-                {
+                public Response onCompleted(Response response) throws Exception {
                     if (!isRequestCompleted()) {
                         logger.debug("Operation complete for channel partner: ", getName());
                         latency = System.currentTimeMillis() - startTime;
@@ -190,8 +180,7 @@ public class DCPMableAdnetwork extends BaseAdNetworkImpl
                 }
 
                 @Override
-                public void onThrowable(Throwable t)
-                {
+                public void onThrowable(Throwable t) {
                     if (isRequestComplete) {
                         return;
                     }
@@ -219,8 +208,7 @@ public class DCPMableAdnetwork extends BaseAdNetworkImpl
         return true;
     }
 
-    private void setNingRequest(String requestUrl)
-    {
+    private void setNingRequest(String requestUrl) {
         String requestParams = getRequestParams();
         ChannelBuffer buffer = ChannelBuffers.copiedBuffer(requestParams, CharsetUtil.UTF_8);
         ningRequest = new RequestBuilder("POST")
@@ -240,8 +228,7 @@ public class DCPMableAdnetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status)
-    {
+    public void parseResponse(String response, HttpResponseStatus status) {
         logger.debug("response is", response);
         statusCode = status.getCode();
         if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
@@ -269,14 +256,12 @@ public class DCPMableAdnetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return (config.getString("mable.advertiserId"));
     }
 
     @Override
-    public HttpRequest getHttpRequest() throws Exception
-    {
+    public HttpRequest getHttpRequest() throws Exception {
         try {
             URI uri = getRequestUri();
             requestUrl = uri.toString();
@@ -303,8 +288,7 @@ public class DCPMableAdnetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    protected String getUid()
-    {
+    protected String getUid() {
         if (sasParams.getOsId() == HandSetOS.iPhone_OS.getValue()
                 && StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
             uidType = ifaFormat;

@@ -19,8 +19,7 @@ import com.inmobi.adserve.channels.util.DebugLogger;
  * @author thushara
  * 
  */
-public class DCPHuntmadsReporting extends BaseReportingImpl
-{
+public class DCPHuntmadsReporting extends BaseReportingImpl {
     private final Configuration config;
     private final String        token;
     private String              date;
@@ -33,8 +32,7 @@ public class DCPHuntmadsReporting extends BaseReportingImpl
     private static String       reportStartDate  = null;
     private static String       entireReportData = null;
 
-    public DCPHuntmadsReporting(final Configuration config)
-    {
+    public DCPHuntmadsReporting(final Configuration config) {
         this.config = config;
         token = config.getString("huntmads.token");
         baseUrl = config.getString("huntmads.baseUrl");
@@ -42,15 +40,13 @@ public class DCPHuntmadsReporting extends BaseReportingImpl
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 23;
     }
 
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws ClientProtocolException, IOException, ServerException, JSONException
-    {
+            final ReportTime endTime) throws ClientProtocolException, IOException, ServerException, JSONException {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         logger.debug("inside fetch rows of huntmads");
@@ -129,8 +125,7 @@ public class DCPHuntmadsReporting extends BaseReportingImpl
      * @throws JSONException
      */
     private void generateReportRow(final DebugLogger logger, final String key, final ReportResponse reportResponse,
-            final JSONObject reportRow, final String reportDate) throws JSONException
-    {
+            final JSONObject reportRow, final String reportDate) throws JSONException {
         ReportResponse.ReportRow row = new ReportResponse.ReportRow();
         String reqStr = (reportRow.getString("requests") != null && !"null".equalsIgnoreCase(reportRow
                 .getString("requests"))) ? (reportRow.getString("requests").trim()) : "0";
@@ -150,26 +145,22 @@ public class DCPHuntmadsReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return (config.getString("huntmads.advertiserId"));
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "Huntmads";
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         StringBuilder url = new StringBuilder();
         url.append(baseUrl).append("?token=").append(token);
         url.append("&p=start=").append(date).append(";end=").append(endDate);
@@ -179,13 +170,11 @@ public class DCPHuntmadsReporting extends BaseReportingImpl
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return -3;
     }
 
-    public String getEndDate(final String seperator)
-    {
+    public String getEndDate(final String seperator) {
         try {
             logger.debug("calculating end date for huntmads");
             ReportTime reportTime = ReportTime.getUTCTime();
@@ -202,8 +191,7 @@ public class DCPHuntmadsReporting extends BaseReportingImpl
         }
     }
 
-    private ReportResponse addDefaultReportRow(final String key, final ReportResponse reportResponse)
-    {
+    private ReportResponse addDefaultReportRow(final String key, final ReportResponse reportResponse) {
         logger.debug("coming here to get log_date");
         ReportResponse.ReportRow row = new ReportResponse.ReportRow();
         row.request = 0;

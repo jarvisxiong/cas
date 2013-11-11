@@ -26,8 +26,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPAppNexusAdnetworkTest extends TestCase
-{
+public class DCPAppNexusAdnetworkTest extends TestCase {
     private Configuration         mockConfig      = null;
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
@@ -39,8 +38,7 @@ public class DCPAppNexusAdnetworkTest extends TestCase
     private final String          defintiAdvId    = "appNexusAdv1";
     private final String          appNexusTest    = "1";
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("appnexus.host")).andReturn(appNexusHost).anyTimes();
         expect(mockConfig.getString("appnexus.status")).andReturn(appNexusStatus).anyTimes();
@@ -53,8 +51,7 @@ public class DCPAppNexusAdnetworkTest extends TestCase
     }
 
     @Override
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File f;
         f = new File(loggerConf);
         if (!f.exists()) {
@@ -71,8 +68,7 @@ public class DCPAppNexusAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAppNexusConfigureParameters()
-    {
+    public void testDCPAppNexusConfigureParameters() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -93,8 +89,7 @@ public class DCPAppNexusAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAppNexusConfigureParametersBlankIP()
-    {
+    public void testDCPAppNexusConfigureParametersBlankIP() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
@@ -115,8 +110,7 @@ public class DCPAppNexusAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAppNexusConfigureParametersBlankExtKey()
-    {
+    public void testDCPAppNexusConfigureParametersBlankExtKey() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -137,8 +131,7 @@ public class DCPAppNexusAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAppNexusConfigureParametersBlankUA()
-    {
+    public void testDCPAppNexusConfigureParametersBlankUA() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -157,8 +150,7 @@ public class DCPAppNexusAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAppnexusRequestUri() throws Exception
-    {
+    public void testDCPAppnexusRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -168,8 +160,7 @@ public class DCPAppNexusAdnetworkTest extends TestCase
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
         sasParams.setSlot("4");
         sasParams.setSiteType("PERFORMANCE");
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 10l, 13l, 30l }));
+        sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "240";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
@@ -185,15 +176,13 @@ public class DCPAppNexusAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAppNexusParseResponse() throws Exception
-    {
+    public void testDCPAppNexusParseResponse() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setSource("app");
         sasParams.setSdkVersion("i360");
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 10l, 13l, 30l }));
+        sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSlot("4");
@@ -215,8 +204,7 @@ public class DCPAppNexusAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAppNexusParseNoAd() throws Exception
-    {
+    public void testDCPAppNexusParseNoAd() throws Exception {
         String response = "{\"status\": \"ok\",\"ads\": []}";
         dcpAppNexusAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpAppNexusAdNetwork.getHttpResponseStatusCode(), 500);
@@ -224,8 +212,7 @@ public class DCPAppNexusAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAppNexusParseEmptyResponseCode() throws Exception
-    {
+    public void testDCPAppNexusParseEmptyResponseCode() throws Exception {
         String response = "";
         dcpAppNexusAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpAppNexusAdNetwork.getHttpResponseStatusCode(), 500);
@@ -233,14 +220,12 @@ public class DCPAppNexusAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAppNexusGetId() throws Exception
-    {
+    public void testDCPAppNexusGetId() throws Exception {
         assertEquals(dcpAppNexusAdNetwork.getId(), "appNexusAdv1");
     }
 
     @Test
-    public void testDCPAppNexusGetImpressionId() throws Exception
-    {
+    public void testDCPAppNexusGetImpressionId() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -263,14 +248,12 @@ public class DCPAppNexusAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAppNexusGetName() throws Exception
-    {
+    public void testDCPAppNexusGetName() throws Exception {
         assertEquals(dcpAppNexusAdNetwork.getName(), "appnexus");
     }
 
     @Test
-    public void testDCPAppNexusIsClickUrlReq() throws Exception
-    {
+    public void testDCPAppNexusIsClickUrlReq() throws Exception {
         assertTrue(dcpAppNexusAdNetwork.isClickUrlRequired());
     }
 }

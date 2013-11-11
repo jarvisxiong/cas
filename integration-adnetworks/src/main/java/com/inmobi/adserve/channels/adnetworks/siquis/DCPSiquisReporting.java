@@ -21,8 +21,7 @@ import com.inmobi.adserve.channels.api.ServerException;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPSiquisReporting extends BaseReportingImpl
-{
+public class DCPSiquisReporting extends BaseReportingImpl {
     private final Configuration config;
     private final String        partnerId;
     private final String        password;
@@ -32,8 +31,7 @@ public class DCPSiquisReporting extends BaseReportingImpl
     private DebugLogger         logger;
     private Connection          connection;
 
-    public DCPSiquisReporting(final Configuration config, final Connection connection)
-    {
+    public DCPSiquisReporting(final Configuration config, final Connection connection) {
         this.config = config;
         this.connection = connection;
         this.partnerId = config.getString("siquis.partnerId");
@@ -42,15 +40,13 @@ public class DCPSiquisReporting extends BaseReportingImpl
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 40;
     }
 
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws ClientProtocolException, ServerException, IOException, JSONException
-    {
+            final ReportTime endTime) throws ClientProtocolException, ServerException, IOException, JSONException {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         String responseStr = null;
@@ -124,26 +120,22 @@ public class DCPSiquisReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return (config.getString("siquis.advertiserId"));
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "siquis";
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         String url = String.format("%s?partner_id=%s&passwd=%s", this.host, this.partnerId, this.password);
         if (this.startDate != null) {
             url += String.format("&start_date=%s&end_date=%s", this.startDate, this.endDate);
@@ -152,13 +144,11 @@ public class DCPSiquisReporting extends BaseReportingImpl
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return 9;
     }
 
-    public String getEndDate(final String seperator)
-    {
+    public String getEndDate(final String seperator) {
         try {
             logger.debug("calculating end date for siquis");
             ReportTime reportTime = ReportTime.getUTCTime();

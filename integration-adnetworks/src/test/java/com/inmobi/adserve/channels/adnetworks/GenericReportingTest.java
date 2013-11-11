@@ -16,14 +16,12 @@ import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class GenericReportingTest extends TestCase
-{
+public class GenericReportingTest extends TestCase {
     private Configuration    mockConfig     = null;
     private String           advertiserName = "drawbridge";
     private GenericReporting genericReporting;
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
 
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString(advertiserName + ".requestUrl")).andReturn(
@@ -54,8 +52,7 @@ public class GenericReportingTest extends TestCase
         replay(mockConfig);
     }
 
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         prepareMockConfig();
         DebugLogger.init(mockConfig);
         genericReporting = new GenericReporting(mockConfig, advertiserName);
@@ -63,8 +60,7 @@ public class GenericReportingTest extends TestCase
     }
 
     @Test
-    public void testgetRequestUrl()
-    {
+    public void testgetRequestUrl() {
         genericReporting.startDate = "10/11/2012";
         genericReporting.endDate = "14/01/2013";
         genericReporting.key = "111";
@@ -74,8 +70,7 @@ public class GenericReportingTest extends TestCase
     }
 
     @Test
-    public void testparseResonseInCsv()
-    {
+    public void testparseResonseInCsv() {
         genericReporting.responseString = "siteid,requests,clicks,impressions,revenue,ecpm,date\n111,1,1,1,1.0,0.1,2012-11-10";
         genericReporting.key = "111";
         genericReporting.reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
@@ -94,8 +89,7 @@ public class GenericReportingTest extends TestCase
      */
 
     @Test
-    public void testparseResponseInXml()
-    {
+    public void testparseResponseInXml() {
         genericReporting.responseString = "<?xml version=\"1.0\"?><adResponse> <status>0</status> <count>2</count> <reportRow>  <date>08/04/2010</date>  <request>38</request>  <impressions>31</impressions>  <clicks>3</clicks>  <revenue>0.08</revenue> </reportRow> <reportRow>  <date>08/05/2010</date>  <request>0</request>  <impression>0</impression>  <clicks>10</clicks>  <revenue>0.00</revenue> </reportRow></adResponse>";
         genericReporting.reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         genericReporting.key = "111";
@@ -104,8 +98,7 @@ public class GenericReportingTest extends TestCase
         assertEquals(genericReporting.reportResponse.rows.get(1).clicks, 10);
     }
 
-    public void debug(Object... os)
-    {
+    public void debug(Object... os) {
         System.out.println(Arrays.deepToString(os));
     }
 

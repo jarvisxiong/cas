@@ -35,8 +35,7 @@ import com.inmobi.adserve.channels.api.ServerException;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPMadNetReporting extends BaseReportingImpl
-{
+public class DCPMadNetReporting extends BaseReportingImpl {
 
     private final Configuration config;
     private DebugLogger         logger;
@@ -49,8 +48,7 @@ public class DCPMadNetReporting extends BaseReportingImpl
     private String              password       = "";
     private String              accessToken;
 
-    public DCPMadNetReporting(final Configuration config)
-    {
+    public DCPMadNetReporting(final Configuration config) {
         this.config = config;
         reportUrl = config.getString("madnet.reportUrl");
         authUrl = config.getString("madnet.authUrl");
@@ -60,8 +58,7 @@ public class DCPMadNetReporting extends BaseReportingImpl
 
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final ReportTime endTime)
-            throws Exception
-    {
+            throws Exception {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         logger.debug("inside fetch rows of MadNet");
@@ -122,8 +119,7 @@ public class DCPMadNetReporting extends BaseReportingImpl
         return reportResponse;
     }
 
-    private String getAccessToken()
-    {
+    private String getAccessToken() {
         WebDriver wDriver = new HtmlUnitDriver();
         try {
             wDriver.get(authUrl);
@@ -143,8 +139,7 @@ public class DCPMadNetReporting extends BaseReportingImpl
     }
 
     @Override
-    protected boolean decodeBlindedSiteId(String blindedSiteId, ReportResponse.ReportRow row)
-    {
+    protected boolean decodeBlindedSiteId(String blindedSiteId, ReportResponse.ReportRow row) {
         if (blindedSiteId.length() < 36) {
             logger.info("failed to decodeBlindedSiteId for ", getName(), blindedSiteId);
             return false;
@@ -153,8 +148,7 @@ public class DCPMadNetReporting extends BaseReportingImpl
         return super.decodeBlindedSiteId(bSiteId, row);
     }
 
-    public String getEndDate() throws Exception
-    {
+    public String getEndDate() throws Exception {
         try {
             logger.debug("calculating latest date for MadNet");
             ReportTime reportTime = ReportTime.getUTCTime();
@@ -171,69 +165,56 @@ public class DCPMadNetReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         return String.format(reportUrl, startDate, startDate, accessToken);
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return 4;
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 14;
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "MadNet";
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return (config.getString("madnet.advertiserId"));
     }
 
     @Override
     public ReportResponse fetchRows(DebugLogger logger, ReportTime startTime, String key, ReportTime endTime)
-            throws Exception
-    {
+            throws Exception {
         // not applicable so returns null
         return null;
     }
 
     public String invokeHTTPUrl(final String url) throws ServerException, NoSuchAlgorithmException,
-            KeyManagementException, MalformedURLException, IOException
-    {
-        TrustManager[] trustAllCerts = new TrustManager[]
-        { new X509TrustManager()
-        {
+            KeyManagementException, MalformedURLException, IOException {
+        TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
             @Override
-            public java.security.cert.X509Certificate[] getAcceptedIssuers()
-            {
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                 return null;
             }
 
             @Override
-            public void checkClientTrusted(final X509Certificate[] certs, final String authType)
-            {
+            public void checkClientTrusted(final X509Certificate[] certs, final String authType) {
             }
 
             @Override
-            public void checkServerTrusted(final X509Certificate[] certs, final String authType)
-            {
+            public void checkServerTrusted(final X509Certificate[] certs, final String authType) {
             }
         } };
 
@@ -243,11 +224,9 @@ public class DCPMadNetReporting extends BaseReportingImpl
         HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
         // Create all-trusting host name verifier
-        HostnameVerifier allHostsValid = new HostnameVerifier()
-        {
+        HostnameVerifier allHostsValid = new HostnameVerifier() {
             @Override
-            public boolean verify(final String hostname, final SSLSession session)
-            {
+            public boolean verify(final String hostname, final SSLSession session) {
                 return true;
             }
         };

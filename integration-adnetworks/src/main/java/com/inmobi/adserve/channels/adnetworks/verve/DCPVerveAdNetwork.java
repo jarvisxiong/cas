@@ -23,8 +23,7 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public class DCPVerveAdNetwork extends BaseAdNetworkImpl
-{
+public class DCPVerveAdNetwork extends BaseAdNetworkImpl {
     private final Configuration config;
     private transient String    latitude;
     private transient String    longitude;
@@ -40,8 +39,7 @@ public class DCPVerveAdNetwork extends BaseAdNetworkImpl
     private boolean             sendTrueLatLongOnly;
 
     public DCPVerveAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent)
-    {
+            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
         super(baseRequestHandler, serverEvent, logger);
         this.config = config;
         this.logger = logger;
@@ -49,8 +47,7 @@ public class DCPVerveAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public boolean configureParameters()
-    {
+    public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             logger.debug("mandatory parameters missing for verve so exiting adapter");
@@ -122,14 +119,12 @@ public class DCPVerveAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "verve";
     }
 
     @Override
-    public URI getRequestUri() throws Exception
-    {
+    public URI getRequestUri() throws Exception {
         try {
             StringBuilder url = new StringBuilder();
             url.append(host).append("?ip=").append(sasParams.getRemoteHostIp());
@@ -199,8 +194,7 @@ public class DCPVerveAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status)
-    {
+    public void parseResponse(String response, HttpResponseStatus status) {
         logger.debug("response is ", response, "and response length is ", response.length());
         if (status.getCode() != 200 || StringUtils.isBlank(response)) {
             statusCode = status.getCode();
@@ -236,8 +230,7 @@ public class DCPVerveAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return (config.getString("verve.advertiserId"));
     }
 }

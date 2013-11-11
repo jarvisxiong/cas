@@ -16,8 +16,7 @@ import com.inmobi.adserve.channels.api.ServerException;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPWiderPlanetReporting extends BaseReportingImpl
-{
+public class DCPWiderPlanetReporting extends BaseReportingImpl {
     private final Configuration config;
     private final String        userName;
     private final String        password;
@@ -31,8 +30,7 @@ public class DCPWiderPlanetReporting extends BaseReportingImpl
     // private static String entireReportData = null;
     private Connection          connection;
 
-    public DCPWiderPlanetReporting(final Configuration config, final Connection connection)
-    {
+    public DCPWiderPlanetReporting(final Configuration config, final Connection connection) {
 
         this.config = config;
         this.connection = connection;
@@ -45,16 +43,14 @@ public class DCPWiderPlanetReporting extends BaseReportingImpl
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 10;
     }
 
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
             final ReportTime endTime) throws ClientProtocolException, IllegalStateException, ServerException,
-            IOException, JSONException
-    {
+            IOException, JSONException {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         String responseStr = null;
@@ -130,37 +126,31 @@ public class DCPWiderPlanetReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return (config.getString("widerplanet.advertiserId"));
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "widerplanet";
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         return String.format(reportingApiUrl, sessionId, publisherId, date, date);
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return 0;
     }
 
-    public String getEndDate() throws Exception
-    {
+    public String getEndDate() throws Exception {
         try {
             logger.debug("calculating end date for widerplanet");
             ReportTime reportTime = ReportTime.getUTCTime();

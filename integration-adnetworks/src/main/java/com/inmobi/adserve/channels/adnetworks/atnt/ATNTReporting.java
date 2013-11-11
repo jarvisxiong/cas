@@ -17,8 +17,7 @@ import com.inmobi.adserve.channels.api.ServerException;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class ATNTReporting extends BaseReportingImpl
-{
+public class ATNTReporting extends BaseReportingImpl {
     private Configuration config;
     private String        userName;
     private String        password;
@@ -30,8 +29,7 @@ public class ATNTReporting extends BaseReportingImpl
 
     private DebugLogger   logger;
 
-    public ATNTReporting(final Configuration config)
-    {
+    public ATNTReporting(final Configuration config) {
         this.config = config;
         userName = config.getString("atnt.username");
         password = config.getString("atnt.password");
@@ -41,8 +39,7 @@ public class ATNTReporting extends BaseReportingImpl
     // Fetches the report from the TPAN
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime)
-    {
+            final ReportTime endTime) {
         this.logger = logger;
         logger.debug("fetching rows inside atnt reporter");
         String soapMessage = "";
@@ -141,8 +138,7 @@ public class ATNTReporting extends BaseReportingImpl
         return reportResponse;
     }
 
-    public String getEndDate(final ReportTime startTime)
-    {
+    public String getEndDate(final ReportTime startTime) {
         logger.debug("fetching end date of atnt");
         ReportTime reportTime = ReportTime.getPacificTime();
         reportTime = ReportTime.getPreviousDay(reportTime);
@@ -162,25 +158,21 @@ public class ATNTReporting extends BaseReportingImpl
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return -7.0;
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return config.getString("atnt.advertiserId");
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         return config.getString("atnt.server");
     }
 
-    private String getSoapMessage()
-    {
+    private String getSoapMessage() {
 
         String soapMessage = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\""
                 + "\n\n"
@@ -201,20 +193,17 @@ public class ATNTReporting extends BaseReportingImpl
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "ATNT";
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 6;
     }
 }

@@ -29,8 +29,7 @@ import com.inmobi.adserve.channels.api.ServerException;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPLoganReporting extends BaseReportingImpl
-{
+public class DCPLoganReporting extends BaseReportingImpl {
     private final Configuration config;
     private final String        apiKey;
     private String              date;
@@ -48,8 +47,7 @@ public class DCPLoganReporting extends BaseReportingImpl
                                                          + "<networkIds xsi:type=\"rep:ArrayOfInt\"><item xsi:type=\"xsd:int\">%s</item>   </networkIds></rep:getZoneReportByZone></soapenv:Body>"
                                                          + "</soapenv:Envelope>";
 
-    public DCPLoganReporting(final Configuration config)
-    {
+    public DCPLoganReporting(final Configuration config) {
         this.config = config;
         networkId = config.getString("logan.networkId");
         apiKey = config.getString("logan.apiKey");
@@ -58,16 +56,14 @@ public class DCPLoganReporting extends BaseReportingImpl
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 23;
     }
 
     @Override
     public ReportResponse fetchRows(DebugLogger logger, ReportTime startTime, String key, ReportTime endTime)
             throws ClientProtocolException, IOException, ServerException, JSONException, ParserConfigurationException,
-            SAXException
-    {
+            SAXException {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         logger.debug("inside fetch rows of logan");
@@ -132,37 +128,31 @@ public class DCPLoganReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return (config.getString("logan.advertiserId"));
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "Logan";
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         return String.format(requestTemplate, apiKey, date, endDate, networkId);
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return -3;
     }
 
-    public String getEndDate(final String seperator)
-    {
+    public String getEndDate(final String seperator) {
         try {
             logger.debug("calculating end date for logan");
             ReportTime reportTime = ReportTime.getUTCTime();
@@ -178,8 +168,7 @@ public class DCPLoganReporting extends BaseReportingImpl
         }
     }
 
-    public String invokeHTTPUrl(DebugLogger logger) throws ServerException, ClientProtocolException, IOException
-    {
+    public String invokeHTTPUrl(DebugLogger logger) throws ServerException, ClientProtocolException, IOException {
         URL url = new URL(baseUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         String soapMessage = getRequestUrl();

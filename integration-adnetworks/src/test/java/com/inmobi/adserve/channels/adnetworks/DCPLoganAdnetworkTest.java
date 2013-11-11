@@ -25,8 +25,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPLoganAdnetworkTest extends TestCase
-{
+public class DCPLoganAdnetworkTest extends TestCase {
     private Configuration         mockConfig      = null;
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
@@ -38,8 +37,7 @@ public class DCPLoganAdnetworkTest extends TestCase
     private final String          loganAdvId      = "loganadv1";
     private final String          loganTest       = "1";
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("logan.host")).andReturn(loganHost).anyTimes();
         expect(mockConfig.getString("logan.status")).andReturn(loganStatus).anyTimes();
@@ -52,8 +50,7 @@ public class DCPLoganAdnetworkTest extends TestCase
     }
 
     @Override
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File f;
         f = new File(loggerConf);
         if (!f.exists()) {
@@ -69,8 +66,7 @@ public class DCPLoganAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLoganConfigureParameters()
-    {
+    public void testDCPLoganConfigureParameters() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -89,8 +85,7 @@ public class DCPLoganAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLoganConfigureParametersBlankIP()
-    {
+    public void testDCPLoganConfigureParametersBlankIP() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
@@ -109,8 +104,7 @@ public class DCPLoganAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLoganConfigureParametersBlankExtKey()
-    {
+    public void testDCPLoganConfigureParametersBlankExtKey() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -129,8 +123,7 @@ public class DCPLoganAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLoganConfigureParametersBlankUA()
-    {
+    public void testDCPLoganConfigureParametersBlankUA() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -148,8 +141,7 @@ public class DCPLoganAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLoganRequestUri() throws Exception
-    {
+    public void testDCPLoganRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -175,8 +167,7 @@ public class DCPLoganAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLoganRequestUriBlankLatLong() throws Exception
-    {
+    public void testDCPLoganRequestUriBlankLatLong() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -202,8 +193,7 @@ public class DCPLoganAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLoganRequestUriBlankSlot() throws Exception
-    {
+    public void testDCPLoganRequestUriBlankSlot() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -229,8 +219,7 @@ public class DCPLoganAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLoganParseResponseImg() throws Exception
-    {
+    public void testDCPLoganParseResponseImg() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -254,8 +243,7 @@ public class DCPLoganAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLoganParseResponseImgAppSDK360() throws Exception
-    {
+    public void testDCPLoganParseResponseImgAppSDK360() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -280,8 +268,7 @@ public class DCPLoganAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLoganParseResponseTextAdWAP() throws Exception
-    {
+    public void testDCPLoganParseResponseTextAdWAP() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -307,8 +294,7 @@ public class DCPLoganAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLoganParseResponseTextAdAapSDK360() throws Exception
-    {
+    public void testDCPLoganParseResponseTextAdAapSDK360() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -336,16 +322,14 @@ public class DCPLoganAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLoganParseInvalidResponse() throws Exception
-    {
+    public void testDCPLoganParseInvalidResponse() throws Exception {
         String response = "[{\"error\" : \"No ads available\"}];";
         dcpLoganAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpLoganAdNetwork.getHttpResponseStatusCode(), 500);
     }
 
     @Test
-    public void testDCPLoganParseNoAd() throws Exception
-    {
+    public void testDCPLoganParseNoAd() throws Exception {
         String response = "[{\"error\" : \"No ads available\"}];";
         dcpLoganAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpLoganAdNetwork.getHttpResponseStatusCode(), 500);
@@ -353,8 +337,7 @@ public class DCPLoganAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLoganParseEmptyResponseCode() throws Exception
-    {
+    public void testDCPLoganParseEmptyResponseCode() throws Exception {
         String response = "";
         dcpLoganAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpLoganAdNetwork.getHttpResponseStatusCode(), 500);
@@ -362,14 +345,12 @@ public class DCPLoganAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLoganGetId() throws Exception
-    {
+    public void testDCPLoganGetId() throws Exception {
         assertEquals(dcpLoganAdNetwork.getId(), "loganadv1");
     }
 
     @Test
-    public void testDCPLoganGetImpressionId() throws Exception
-    {
+    public void testDCPLoganGetImpressionId() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -388,14 +369,12 @@ public class DCPLoganAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLoganGetName() throws Exception
-    {
+    public void testDCPLoganGetName() throws Exception {
         assertEquals(dcpLoganAdNetwork.getName(), "logan");
     }
 
     @Test
-    public void testDCPLoganIsClickUrlReq() throws Exception
-    {
+    public void testDCPLoganIsClickUrlReq() throws Exception {
         assertEquals(dcpLoganAdNetwork.isClickUrlRequired(), true);
     }
 }

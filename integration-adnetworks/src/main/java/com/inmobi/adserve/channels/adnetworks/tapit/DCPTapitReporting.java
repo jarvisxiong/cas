@@ -19,8 +19,7 @@ import com.inmobi.adserve.channels.api.ServerException;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPTapitReporting extends BaseReportingImpl
-{
+public class DCPTapitReporting extends BaseReportingImpl {
     private final Configuration config;
     private final String        token;
     private String              date;
@@ -29,16 +28,14 @@ public class DCPTapitReporting extends BaseReportingImpl
     private static String       reportStartDate  = null;
     private static String       entireReportData = null;
 
-    public DCPTapitReporting(final Configuration config)
-    {
+    public DCPTapitReporting(final Configuration config) {
         this.config = config;
         token = config.getString("tapit.token");
         baseUrl = config.getString("tapit.baseUrl");
     }
 
     private String invokeHTTPUrl(final String url) throws ServerException, ClientProtocolException, IOException,
-            IllegalStateException
-    {
+            IllegalStateException {
         String retStr = null;
         logger.debug("url inside tapit is ", url);
         DefaultHttpClient httpclient = new DefaultHttpClient();
@@ -59,16 +56,14 @@ public class DCPTapitReporting extends BaseReportingImpl
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 10;
     }
 
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
             final ReportTime endTime) throws ClientProtocolException, IllegalStateException, ServerException,
-            IOException, JSONException
-    {
+            IOException, JSONException {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         String responseStr = null;
@@ -141,37 +136,31 @@ public class DCPTapitReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return (config.getString("tapit.advertiserId"));
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "Tapit";
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         return String.format(baseUrl, token, date);
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return 0;
     }
 
-    public String getEndDate() throws Exception
-    {
+    public String getEndDate() throws Exception {
         try {
             logger.debug("calculating end date for tapit");
             ReportTime reportTime = ReportTime.getUTCTime();

@@ -6,40 +6,35 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 
-public class ReportTime
-{
+public class ReportTime {
 
     private int year;
     private int month;
     private int day;
     private int hour;
 
-    public ReportTime(int year, int month, int day, int hour)
-    {
+    public ReportTime(int year, int month, int day, int hour) {
         this.year = year;
         this.month = month;
         this.day = day;
         this.hour = hour;
     }
 
-    public ReportTime(ReportTime reportTime)
-    {
+    public ReportTime(ReportTime reportTime) {
         this.year = reportTime.year;
         this.month = reportTime.month;
         this.day = reportTime.day;
         this.hour = reportTime.hour;
     }
 
-    public ReportTime(int year, int month, int day)
-    {
+    public ReportTime(int year, int month, int day) {
         this.year = year;
         this.month = month;
         this.day = day;
         this.hour = 0;
     }
 
-    public static long getEpoch(ReportTime reportTime)
-    {
+    public static long getEpoch(ReportTime reportTime) {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.YEAR, reportTime.year);
         cal.set(Calendar.MONTH, reportTime.month - 1);
@@ -48,8 +43,7 @@ public class ReportTime
     }
 
     // Sample Input: 2012-03-12,05
-    public ReportTime(String reportTime, int hour)
-    {
+    public ReportTime(String reportTime, int hour) {
         if (reportTime.contains("-") && (reportTime.length() >= 10)) {
             year = Integer.parseInt(reportTime.substring(0, 4));
             month = Integer.parseInt(reportTime.substring(5, 7));
@@ -64,8 +58,7 @@ public class ReportTime
         }
     }
 
-    public ReportTime(String reportTime, int hour, String separator)
-    {
+    public ReportTime(String reportTime, int hour, String separator) {
         if (reportTime.contains(separator) && (reportTime.length() >= 10)) {
             month = Integer.parseInt(reportTime.substring(0, 2));
             day = Integer.parseInt(reportTime.substring(3, 5));
@@ -74,50 +67,41 @@ public class ReportTime
         }
     }
 
-    public int getYear()
-    {
+    public int getYear() {
         return year;
     }
 
-    public int getMonth()
-    {
+    public int getMonth() {
         return month;
     }
 
-    public int getDay()
-    {
+    public int getDay() {
         return day;
     }
 
-    public int getHour()
-    {
+    public int getHour() {
         return hour;
     }
 
-    public String getStringDate(String separator)
-    {
+    public String getStringDate(String separator) {
         String stringDate = String.format("%04d%s%02d%s%02d", year, separator, month, separator, day);
         return stringDate;
     }
 
-    public String getMullahMediaStringDate()
-    {
+    public String getMullahMediaStringDate() {
         String stringDate = String.format("%02d/%02d/%04d", month, day, year);
         return stringDate;
     }
 
-    public static ReportTime getNextDay(ReportTime reportTime)
-    {
+    public static ReportTime getNextDay(ReportTime reportTime) {
         return getOffsetDay(reportTime, 1);
     }
 
-    public static ReportTime getPreviousDay(ReportTime reportTime)
-    {
+    public static ReportTime getPreviousDay(ReportTime reportTime) {
         return getOffsetDay(reportTime, -1);
     }
 
-    public static ReportTime getPreviousMonth(ReportTime reportTime)
-    {
+    public static ReportTime getPreviousMonth(ReportTime reportTime) {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.YEAR, reportTime.year);
         cal.set(Calendar.MONTH, reportTime.month);
@@ -126,8 +110,7 @@ public class ReportTime
                 reportTime.hour));
     }
 
-    public static ReportTime getOffsetDay(ReportTime reportTime, int offset)
-    {
+    public static ReportTime getOffsetDay(ReportTime reportTime, int offset) {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.YEAR, reportTime.year);
         cal.set(Calendar.MONTH, reportTime.month - 1);
@@ -137,18 +120,15 @@ public class ReportTime
         return nextTime;
     }
 
-    public static ReportTime getPreviousHour(ReportTime reportTime)
-    {
+    public static ReportTime getPreviousHour(ReportTime reportTime) {
         return getOffsetHour(reportTime, -1);
     }
 
-    public static ReportTime getNextHour(ReportTime reportTime)
-    {
+    public static ReportTime getNextHour(ReportTime reportTime) {
         return getOffsetHour(reportTime, 1);
     }
 
-    private static ReportTime getOffsetHour(ReportTime reportTime, int offset)
-    {
+    private static ReportTime getOffsetHour(ReportTime reportTime, int offset) {
         ReportTime offsetHour;
         if ((offset == 1) && (reportTime.hour == 23)) {
             offsetHour = getNextDay(reportTime);
@@ -165,8 +145,7 @@ public class ReportTime
     }
 
     // Returns 1 if arg1 is greater, 0 if both are equal and -1 if arg1 is smaller
-    public static int compareDates(ReportTime arg1, ReportTime arg2)
-    {
+    public static int compareDates(ReportTime arg1, ReportTime arg2) {
         String arg1String = String.format("%04d%02d%02d%02d", arg1.year, arg1.month, arg1.day, arg1.hour);
         String arg2String = String.format("%04d%02d%02d%02d", arg2.year, arg2.month, arg2.day, arg2.hour);
         if (arg1String.compareTo(arg2String) > 0) {
@@ -180,8 +159,7 @@ public class ReportTime
         }
     }
 
-    public static int compareStringDates(String arg1String, String arg2String)
-    {
+    public static int compareStringDates(String arg1String, String arg2String) {
         if (arg1String.compareTo(arg2String) > 0) {
             return 1;
         }
@@ -195,14 +173,12 @@ public class ReportTime
 
     // Returns 1 if calling object is greater, 0 if both are equal and -1 if
     // calling object is smaller
-    public int compareDates(ReportTime arg1)
-    {
+    public int compareDates(ReportTime arg1) {
         return compareDates(this, arg1);
     }
 
     // increment the watermark based on granularity of the adapter
-    public static ReportTime formatWatermark(String watermarkTime, int hour)
-    {
+    public static ReportTime formatWatermark(String watermarkTime, int hour) {
         String[] watermark = watermarkTime.split("_");
         int hr = 0;
         String[] timeArray = null;
@@ -237,13 +213,11 @@ public class ReportTime
         return null;
     }
 
-    public static String getWatermark(ReportTime reportTime)
-    {
+    public static String getWatermark(ReportTime reportTime) {
         return String.format("%04d-%02d-%02d_%02d", reportTime.year, reportTime.month, reportTime.day, reportTime.hour);
     }
 
-    public static ReportTime getStartTime(double timeZoneGap)
-    {
+    public static ReportTime getStartTime(double timeZoneGap) {
         ReportTime reportTime = null;
         if (timeZoneGap == -7) {
             reportTime = ReportTime.getPacificTime();
@@ -257,21 +231,18 @@ public class ReportTime
         return reportTime;
     }
 
-    public static String getMobileCommerceCurrentTime()
-    {
+    public static String getMobileCommerceCurrentTime() {
         Calendar cal = Calendar.getInstance();
         ReportTime currentTime = new ReportTime(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1,
                 cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.HOUR_OF_DAY));
         return (getMobileCommerceDate(currentTime));
     }
 
-    public static String getMobileCommerceDate(ReportTime reportTime)
-    {
+    public static String getMobileCommerceDate(ReportTime reportTime) {
         return String.format("%04d%02d%02d", reportTime.year, reportTime.month, reportTime.day);
     }
 
-    public static ReportTime getUTCTime()
-    {
+    public static ReportTime getUTCTime() {
         java.util.Date date = new java.util.Date();
         DateFormat utcFormatDate = new SimpleDateFormat("yyyyMMdd");
         DateFormat utcFormatTime = new SimpleDateFormat("H");
@@ -281,8 +252,7 @@ public class ReportTime
         return (new ReportTime(utcFormatDate.format(date), Integer.parseInt(utcFormatTime.format(date))));
     }
 
-    public static String getUTCTimestamp()
-    {
+    public static String getUTCTimestamp() {
         java.util.Date date = new java.util.Date();
         DateFormat utcFormatDate = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss-SSS");
         TimeZone utcTime = TimeZone.getTimeZone("GMT");
@@ -290,8 +260,7 @@ public class ReportTime
         return (utcFormatDate.format(date));
     }
 
-    public static String getTTime()
-    {
+    public static String getTTime() {
         java.util.Date date = new java.util.Date();
         DateFormat utcFormatDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         TimeZone utcTime = TimeZone.getTimeZone("GMT");
@@ -299,8 +268,7 @@ public class ReportTime
         return (utcFormatDate.format(date));
     }
 
-    public static ReportTime getPacificTime()
-    {
+    public static ReportTime getPacificTime() {
         java.util.Date date = new java.util.Date();
         DateFormat utcFormatDate = new SimpleDateFormat("yyyyMMdd");
         DateFormat utcFormatTime = new SimpleDateFormat("H");

@@ -8,12 +8,10 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class MullahMediaNetwork extends BaseMoolahMediaNetworkImpl
-{
+public class MullahMediaNetwork extends BaseMoolahMediaNetworkImpl {
 
     public MullahMediaNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent)
-    {
+            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
         super(logger, config, clientBootstrap, baseRequestHandler, serverEvent);
         host = config.getString("mullahmedia.host");
         publisherId = config.getString("mullahmedia.publisherId");

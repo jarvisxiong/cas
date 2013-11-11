@@ -30,8 +30,7 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public class DCPAppierAdNetwork extends BaseAdNetworkImpl
-{
+public class DCPAppierAdNetwork extends BaseAdNetworkImpl {
     private final Configuration config;
     private transient String    latitude;
     private transient String    longitude;
@@ -58,8 +57,7 @@ public class DCPAppierAdNetwork extends BaseAdNetworkImpl
     private static final String FAMILY_SAFE  = "FAMILY_SAFE";
 
     public DCPAppierAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent)
-    {
+            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
         super(baseRequestHandler, serverEvent, logger);
         this.config = config;
         this.logger = logger;
@@ -67,8 +65,7 @@ public class DCPAppierAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public boolean configureParameters()
-    {
+    public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             logger.debug("mandatory parameters missing for appier so exiting adapter");
@@ -101,20 +98,17 @@ public class DCPAppierAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "appier";
     }
 
     @Override
-    public boolean isClickUrlRequired()
-    {
+    public boolean isClickUrlRequired() {
         return true;
     }
 
     @Override
-    public HttpRequest getHttpRequest() throws Exception
-    {
+    public HttpRequest getHttpRequest() throws Exception {
         try {
             URI uri = getRequestUri();
             requestUrl = uri.toString();
@@ -138,13 +132,11 @@ public class DCPAppierAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public URI getRequestUri() throws Exception
-    {
+    public URI getRequestUri() throws Exception {
         return new URI(host);
     }
 
-    private String getRequestParams() throws Exception
-    {
+    private String getRequestParams() throws Exception {
 
         StringBuilder url = new StringBuilder(VERSION).append("=1");
         appendQueryParam(url, REQID, impressionId, false);
@@ -201,8 +193,7 @@ public class DCPAppierAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status)
-    {
+    public void parseResponse(String response, HttpResponseStatus status) {
         logger.debug("response is ", response);
         logger.debug("response is", response);
         statusCode = status.getCode();
@@ -259,8 +250,7 @@ public class DCPAppierAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return (config.getString("appier.advertiserId"));
     }
 

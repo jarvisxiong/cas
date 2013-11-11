@@ -4,12 +4,10 @@ import java.awt.Dimension;
 import java.util.HashMap;
 
 
-public class SlotSizeMapping
-{
+public class SlotSizeMapping {
     public static final HashMap<Long, Dimension> slotMap = new HashMap<Long, Dimension>();
 
-    public static void init()
-    {
+    public static void init() {
         slotMap.put(1l, new Dimension(120, 20));
         slotMap.put(2l, new Dimension(168, 28));
         slotMap.put(3l, new Dimension(216, 36));
@@ -32,8 +30,7 @@ public class SlotSizeMapping
         slotMap.put(26l, new Dimension(300, 30));
     }
 
-    public static Dimension getDimension(Long slot)
-    {
+    public static Dimension getDimension(Long slot) {
         return (slotMap.get(slot));
     }
 }

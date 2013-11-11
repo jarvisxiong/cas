@@ -23,8 +23,7 @@ import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPMoPubReporting extends BaseReportingImpl
-{
+public class DCPMoPubReporting extends BaseReportingImpl {
 
     private final Configuration config;
     private DebugLogger         logger;
@@ -37,8 +36,7 @@ public class DCPMoPubReporting extends BaseReportingImpl
     private String              secretKey         = "";
     private static final String name              = "mopub";
 
-    public DCPMoPubReporting(final Configuration config)
-    {
+    public DCPMoPubReporting(final Configuration config) {
         this.config = config;
         host = config.getString("mopub.reportUrl");
         accountId = config.getString("mopub.accountId");
@@ -47,8 +45,7 @@ public class DCPMoPubReporting extends BaseReportingImpl
 
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws Exception
-    {
+            final ReportTime endTime) throws Exception {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         logger.debug("inside fetch rows of MoPub");
@@ -82,8 +79,7 @@ public class DCPMoPubReporting extends BaseReportingImpl
         return reportResponse;
     }
 
-    public String getEndDate() throws Exception
-    {
+    public String getEndDate() throws Exception {
         try {
             logger.debug("calculating latest date for MoPub");
             ReportTime reportTime = ReportTime.getUTCTime();
@@ -101,8 +97,7 @@ public class DCPMoPubReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         try {
             return String.format(host, accountId, secretKey, startDate, endDate,
                 URLEncoder.encode("date,adunit", "UTF-8"));
@@ -114,37 +109,31 @@ public class DCPMoPubReporting extends BaseReportingImpl
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return -7;
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 10;
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return (config.getString("mopub.advertiserId"));
     }
 
-    private String invokeHTTPUrl(final String url) throws MalformedURLException, IOException
-    {
+    private String invokeHTTPUrl(final String url) throws MalformedURLException, IOException {
         URLConnection conn = new URL(url).openConnection();
         String authStr = accountId + ":" + secretKey;
         String authEncoded = new String(Base64.encodeBase64(authStr.getBytes()));
@@ -174,8 +163,7 @@ public class DCPMoPubReporting extends BaseReportingImpl
     }
 
     private void generateReportResponse(final DebugLogger logger, ReportResponse reportResponse, String response,
-            String key) throws JSONException
-    {
+            String key) throws JSONException {
         Boolean dataFound = false;
         JSONObject responseObject = new JSONObject(response);
         JSONArray responseHeader = responseObject.getJSONArray("columns");

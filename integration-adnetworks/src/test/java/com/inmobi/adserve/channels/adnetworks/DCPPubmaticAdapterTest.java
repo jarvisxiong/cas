@@ -28,8 +28,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPPubmaticAdapterTest extends TestCase
-{
+public class DCPPubmaticAdapterTest extends TestCase {
     private Configuration         mockConfig      = null;
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
@@ -41,8 +40,7 @@ public class DCPPubmaticAdapterTest extends TestCase
     private final String          pubmaticAdvId   = "pubmaticadv1";
     private final String          pubId           = "2685";
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("pubmatic.pubId")).andReturn(pubId).anyTimes();
         expect(mockConfig.getString("pubmatic.host")).andReturn(pubmaticHost).anyTimes();
@@ -55,8 +53,7 @@ public class DCPPubmaticAdapterTest extends TestCase
     }
 
     @Override
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File f;
         f = new File(loggerConf);
         if (!f.exists()) {
@@ -74,8 +71,7 @@ public class DCPPubmaticAdapterTest extends TestCase
     }
 
     @Test
-    public void DCPPubmaticAdapterTestConfigureParameters() throws JSONException
-    {
+    public void DCPPubmaticAdapterTestConfigureParameters() throws JSONException {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -98,8 +94,7 @@ public class DCPPubmaticAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPPubmaticConfigureParametersBlankIP() throws JSONException
-    {
+    public void testDCPPubmaticConfigureParametersBlankIP() throws JSONException {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
@@ -120,8 +115,7 @@ public class DCPPubmaticAdapterTest extends TestCase
     }
 
     @Test
-    public void testpubmaticConfigureParametersBlankExtKey() throws JSONException
-    {
+    public void testpubmaticConfigureParametersBlankExtKey() throws JSONException {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -142,8 +136,7 @@ public class DCPPubmaticAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPPubmaticConfigureParametersBlankUA()
-    {
+    public void testDCPPubmaticConfigureParametersBlankUA() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -163,8 +156,7 @@ public class DCPPubmaticAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPPubmaticRequestUri() throws Exception
-    {
+    public void testDCPPubmaticRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -189,8 +181,7 @@ public class DCPPubmaticAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPPubmaticRequestUriSegmentCategory() throws Exception
-    {
+    public void testDCPPubmaticRequestUriSegmentCategory() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -202,10 +193,8 @@ public class DCPPubmaticAdapterTest extends TestCase
         sasParams.setSource("iphone");
         String externalKey = "33327";
         SlotSizeMapping.init();
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 7l, 8l }));
-        Long[] segmentCategories = new Long[]
-        { 13l, 15l };
+        sasParams.setCategories(Arrays.asList(new Long[] { 7l, 8l }));
+        Long[] segmentCategories = new Long[] { 13l, 15l };
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
             pubmaticAdvId, null, null, null, 0, null, segmentCategories, true, true, externalKey, null, null, null, 0,
@@ -219,8 +208,7 @@ public class DCPPubmaticAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPPubmaticRequestUriSegmentRONSiteCategories() throws Exception
-    {
+    public void testDCPPubmaticRequestUriSegmentRONSiteCategories() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -232,10 +220,8 @@ public class DCPPubmaticAdapterTest extends TestCase
         sasParams.setSource("iphone");
         String externalKey = "33327";
         SlotSizeMapping.init();
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 7l, 8l }));
-        Long[] segmentCategories = new Long[]
-        { 1l };
+        sasParams.setCategories(Arrays.asList(new Long[] { 7l, 8l }));
+        Long[] segmentCategories = new Long[] { 1l };
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
                 + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11" + "?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
@@ -250,8 +236,7 @@ public class DCPPubmaticAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPPubmaticRequestParams() throws Exception
-    {
+    public void testDCPPubmaticRequestParams() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -279,8 +264,7 @@ public class DCPPubmaticAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPPubmaticRequestParamsWithCountry() throws Exception
-    {
+    public void testDCPPubmaticRequestParamsWithCountry() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -309,8 +293,7 @@ public class DCPPubmaticAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPPubmaticRequestParamsBlankLatLong() throws Exception
-    {
+    public void testDCPPubmaticRequestParamsBlankLatLong() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -334,8 +317,7 @@ public class DCPPubmaticAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPPubmaticRequestParamsBlankSlot() throws Exception
-    {
+    public void testDCPPubmaticRequestParamsBlankSlot() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -359,8 +341,7 @@ public class DCPPubmaticAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPPubmaticParseResponseAd() throws Exception
-    {
+    public void testDCPPubmaticParseResponseAd() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -386,8 +367,7 @@ public class DCPPubmaticAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPPubmaticParseResponseAdWAP() throws Exception
-    {
+    public void testDCPPubmaticParseResponseAdWAP() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -413,8 +393,7 @@ public class DCPPubmaticAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPPubmaticParseResponseAdApp() throws Exception
-    {
+    public void testDCPPubmaticParseResponseAdApp() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -440,8 +419,7 @@ public class DCPPubmaticAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPPubmaticParseResponseAdAppIMAI() throws Exception
-    {
+    public void testDCPPubmaticParseResponseAdAppIMAI() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -469,16 +447,14 @@ public class DCPPubmaticAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPPubmaticParseNoAd() throws Exception
-    {
+    public void testDCPPubmaticParseNoAd() throws Exception {
         String response = "";
         dcpPubmaticAdnetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpPubmaticAdnetwork.getHttpResponseStatusCode(), 500);
     }
 
     @Test
-    public void testDCPPubmaticParseEmptyResponseCode() throws Exception
-    {
+    public void testDCPPubmaticParseEmptyResponseCode() throws Exception {
         String response = "";
         dcpPubmaticAdnetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpPubmaticAdnetwork.getHttpResponseStatusCode(), 500);
@@ -486,14 +462,12 @@ public class DCPPubmaticAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPPubmaticGetId() throws Exception
-    {
+    public void testDCPPubmaticGetId() throws Exception {
         assertEquals(dcpPubmaticAdnetwork.getId(), "pubmaticadv1");
     }
 
     @Test
-    public void testDCPPubmaticGetImpressionId() throws Exception
-    {
+    public void testDCPPubmaticGetImpressionId() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -512,14 +486,12 @@ public class DCPPubmaticAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPPubmaticGetName() throws Exception
-    {
+    public void testDCPPubmaticGetName() throws Exception {
         assertEquals(dcpPubmaticAdnetwork.getName(), "pubmatic");
     }
 
     @Test
-    public void testDCPPubmaticIsClickUrlReq() throws Exception
-    {
+    public void testDCPPubmaticIsClickUrlReq() throws Exception {
         assertEquals(dcpPubmaticAdnetwork.isClickUrlRequired(), false);
     }
 }

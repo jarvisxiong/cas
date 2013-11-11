@@ -21,8 +21,7 @@ import com.inmobi.adserve.channels.api.ServerException;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPAppNexusReporting extends BaseReportingImpl
-{
+public class DCPAppNexusReporting extends BaseReportingImpl {
     private final Configuration config;
     private final String        password;
     private String              date;
@@ -39,8 +38,7 @@ public class DCPAppNexusReporting extends BaseReportingImpl
     private boolean             isTokenGenerated   = false;
     private String              token              = null;
 
-    public DCPAppNexusReporting(final Configuration config, final String name)
-    {
+    public DCPAppNexusReporting(final Configuration config, final String name) {
         this.config = config;
         password = config.getString(name + ".password");
         host = config.getString(name + ".host");
@@ -52,15 +50,13 @@ public class DCPAppNexusReporting extends BaseReportingImpl
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 10;
     }
 
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws Exception, JSONException
-    {
+            final ReportTime endTime) throws Exception, JSONException {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
 
@@ -100,37 +96,31 @@ public class DCPAppNexusReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return (config.getString(name + ".advertiserId"));
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         return host;
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return 1;
     }
 
-    public String getEndDate()
-    {
+    public String getEndDate() {
         try {
             logger.debug("calculating end date for ", name);
             ReportTime reportTime = ReportTime.getUTCTime();
@@ -146,8 +136,7 @@ public class DCPAppNexusReporting extends BaseReportingImpl
         }
     }
 
-    private JSONObject getRequestToken() throws JSONException, ServerException
-    {
+    private JSONObject getRequestToken() throws JSONException, ServerException {
 
         JSONObject userParams = new JSONObject();
         userParams.put("password", password);
@@ -157,8 +146,7 @@ public class DCPAppNexusReporting extends BaseReportingImpl
         return authParams;
     }
 
-    private JSONObject getRequestObject(String extSiteKey) throws JSONException
-    {
+    private JSONObject getRequestObject(String extSiteKey) throws JSONException {
         JSONArray columnArray = new JSONArray();
         columnArray.put("day");
         columnArray.put("clicks");
@@ -180,8 +168,7 @@ public class DCPAppNexusReporting extends BaseReportingImpl
         // {"report":{"columns":["day","clicks"],"report_type":"publisher_analytics"}}
     }
 
-    public String invokeUrl(String host, JSONObject queryObject, String token) throws HttpException, IOException
-    {
+    public String invokeUrl(String host, JSONObject queryObject, String token) throws HttpException, IOException {
         URL url = new URL(host);
         HttpURLConnection.setFollowRedirects(false);
         HttpURLConnection hconn = (HttpURLConnection) url.openConnection();
@@ -207,8 +194,7 @@ public class DCPAppNexusReporting extends BaseReportingImpl
         return sBuffer.toString();
     }
 
-    public String invokeUrl(String host, String token) throws HttpException, IOException
-    {
+    public String invokeUrl(String host, String token) throws HttpException, IOException {
         URL url = new URL(host);
         HttpURLConnection.setFollowRedirects(false);
         HttpURLConnection hconn = (HttpURLConnection) url.openConnection();
@@ -229,8 +215,7 @@ public class DCPAppNexusReporting extends BaseReportingImpl
     }
 
     private void generateReportResponse(final DebugLogger logger, ReportResponse reportResponse,
-            String[] responseArray, String extSiteKey) throws ParseException
-    {
+            String[] responseArray, String extSiteKey) throws ParseException {
         if (responseArray.length > 1) {
             int impressionIndex = -1;
             int clicksIndex = -1;

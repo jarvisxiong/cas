@@ -11,11 +11,9 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class ImpressionCallbackHelper
-{
+public class ImpressionCallbackHelper {
     public boolean writeResponse(ClientBootstrap clientBootstrap, final DebugLogger logger, URI uriCallBack,
-            HttpRequest callBackRequest)
-    {
+            HttpRequest callBackRequest) {
         ChannelFuture channelFuture = clientBootstrap.connect(new InetSocketAddress(uriCallBack.getHost(), uriCallBack
                 .getPort() == -1 ? 80 : uriCallBack.getPort()));
         ChannelFuture futureCallBack = null;
@@ -31,11 +29,9 @@ public class ImpressionCallbackHelper
             logger.debug("Could not make callback connection ");
             return false;
         }
-        futureCallBack.addListener(new ChannelFutureListener()
-        {
+        futureCallBack.addListener(new ChannelFutureListener() {
 
-            public void operationComplete(ChannelFuture future) throws Exception
-            {
+            public void operationComplete(ChannelFuture future) throws Exception {
 
                 if (!future.isSuccess()) {
                     logger.info("error sending callback");

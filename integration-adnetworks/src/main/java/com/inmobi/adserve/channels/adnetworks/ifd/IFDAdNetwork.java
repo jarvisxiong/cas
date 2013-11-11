@@ -24,16 +24,14 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class IFDAdNetwork extends BaseAdNetworkImpl
-{
+public class IFDAdNetwork extends BaseAdNetworkImpl {
     // Updates the request parameters according to the Ad Network. Returns true on
     // success.i
 
     private Configuration config;
 
     public IFDAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent)
-    {
+            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
         super(baseRequestHandler, serverEvent, logger);
         this.config = config;
         this.clientBootstrap = clientBootstrap;
@@ -41,31 +39,26 @@ public class IFDAdNetwork extends BaseAdNetworkImpl
     }
 
     // Assign the value to the parameters
-    public boolean configureParameters(final SASRequestParameters param, final String externalSiteKey, String clurl)
-    {
+    public boolean configureParameters(final SASRequestParameters param, final String externalSiteKey, String clurl) {
         return false;
     }
 
     // Assign the value to the parameters
-    public boolean configureParameters()
-    {
+    public boolean configureParameters() {
         return true;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return "ifd";
     }
 
-    public boolean isInternal()
-    {
+    public boolean isInternal() {
         return true;
     }
 
     // forming the url with the available parameter
     @Override
-    public URI getRequestUri() throws Exception
-    {
+    public URI getRequestUri() throws Exception {
         try {
             String url = config.getString("ifd.host") + createIFDParams();
             return (new URI(url));
@@ -79,20 +72,17 @@ public class IFDAdNetwork extends BaseAdNetworkImpl
     // Returns the Channel Id for the TPAN as in our database. This will be
     // hardcoded.
     @Override
-    public String getId()
-    {
+    public String getId() {
         return config.getString("ifd.advertiserId");
     }
 
     // writing channel logs
     @Override
-    public JSONObject getLogline()
-    {
+    public JSONObject getLogline() {
         return null;
     }
 
-    public String createIFDParams() throws Exception
-    {
+    public String createIFDParams() throws Exception {
         String normalizedParms = null;
 
         Map<String, String> paramMap = new HashMap<String, String>();
@@ -171,8 +161,7 @@ public class IFDAdNetwork extends BaseAdNetworkImpl
         return normalizedParms;
     }
 
-    public static String normalizeParameters(final Map<String, String> parameterMap)
-    {
+    public static String normalizeParameters(final Map<String, String> parameterMap) {
         List<String> parameters = new ArrayList<String>();
 
         // parameters in the HTTP POST request body and HTTP GET parameters in the
@@ -208,8 +197,7 @@ public class IFDAdNetwork extends BaseAdNetworkImpl
     }
 
     // parsing the response message to get HTTP response code and httpresponse
-    public void parseResponse(String response)
-    {
+    public void parseResponse(String response) {
         if (response == null || response.contains("<!-- mKhoj: No advt for this position -->")) {
             statusCode = 500;
             return;

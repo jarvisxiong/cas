@@ -21,8 +21,7 @@ import com.inmobi.adserve.channels.api.ServerException;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPMableReporting extends BaseReportingImpl
-{
+public class DCPMableReporting extends BaseReportingImpl {
     private final Configuration config;
     private String              date;
     private String              dbDate;
@@ -32,8 +31,7 @@ public class DCPMableReporting extends BaseReportingImpl
     private String              endDate = "";
     private Connection          connection;
 
-    public DCPMableReporting(final Configuration config, final Connection connection)
-    {
+    public DCPMableReporting(final Configuration config, final Connection connection) {
 
         this.config = config;
         this.connection = connection;
@@ -42,8 +40,7 @@ public class DCPMableReporting extends BaseReportingImpl
     }
 
     private String invokeHTTPUrl(final String url, final String urlParameters) throws ServerException,
-            ClientProtocolException, IOException, IllegalStateException
-    {
+            ClientProtocolException, IOException, IllegalStateException {
         logger.debug("url inside mable is ", url);
         URLConnection conn = new URL(url).openConnection();
         // Setting connection and read timeout to 5 min
@@ -78,15 +75,13 @@ public class DCPMableReporting extends BaseReportingImpl
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 5;
     }
 
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final ReportTime endTime)
-            throws Exception
-    {
+            throws Exception {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         String responseStr = null;
@@ -152,37 +147,31 @@ public class DCPMableReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return (config.getString("mable.advertiserId"));
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "mable";
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         return baseUrl;
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return 0;
     }
 
-    public String getEndDate() throws Exception
-    {
+    public String getEndDate() throws Exception {
         try {
             logger.debug("calculating end date for mable");
             ReportTime reportTime = ReportTime.getUTCTime();
@@ -200,8 +189,7 @@ public class DCPMableReporting extends BaseReportingImpl
 
     @Override
     public ReportResponse fetchRows(DebugLogger logger, ReportTime startTime, String key, ReportTime endTime)
-            throws Exception
-    {
+            throws Exception {
         // TODO Auto-generated method stub
         return null;
     }

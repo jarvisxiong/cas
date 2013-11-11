@@ -29,8 +29,7 @@ import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
  * @author deepak
  * 
  */
-public class DCPMadNetAdNetwork extends BaseAdNetworkImpl
-{
+public class DCPMadNetAdNetwork extends BaseAdNetworkImpl {
     private final Configuration config;
     private int                 width;
     private int                 height;
@@ -38,8 +37,7 @@ public class DCPMadNetAdNetwork extends BaseAdNetworkImpl
     private static final String WAP = "wap";
 
     public DCPMadNetAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent)
-    {
+            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
         super(baseRequestHandler, serverEvent, logger);
         this.config = config;
         this.logger = logger;
@@ -47,8 +45,7 @@ public class DCPMadNetAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public boolean configureParameters()
-    {
+    public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())) {
             logger.debug("mandatory parameters missing for madnet so exiting adapter");
             return false;
@@ -67,14 +64,12 @@ public class DCPMadNetAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "madnet";
     }
 
     @Override
-    public URI getRequestUri() throws Exception
-    {
+    public URI getRequestUri() throws Exception {
         try {
             StringBuilder url = new StringBuilder();
             url.append(host).append("?uuid=0&t=json&html=0&type=text%2Cimage&ip=").append(sasParams.getRemoteHostIp());
@@ -137,8 +132,7 @@ public class DCPMadNetAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status)
-    {
+    public void parseResponse(String response, HttpResponseStatus status) {
         logger.debug("response is ", response, "and response length is ", response.length());
         if (status.getCode() != 200 || StringUtils.isBlank(response)) {
             statusCode = status.getCode();
@@ -210,14 +204,12 @@ public class DCPMadNetAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return (config.getString("madnet.advertiserId"));
     }
 
     @Override
-    public boolean isClickUrlRequired()
-    {
+    public boolean isClickUrlRequired() {
         return true;
     }
 }

@@ -31,8 +31,7 @@ import com.inmobi.adserve.channels.api.ServerException;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPWapStartReporting extends BaseReportingImpl
-{
+public class DCPWapStartReporting extends BaseReportingImpl {
     private final Configuration config;
     private final String        token;
     private String              startDate;
@@ -41,24 +40,21 @@ public class DCPWapStartReporting extends BaseReportingImpl
     private DebugLogger         logger;
     private String              externalSiteId;
 
-    public DCPWapStartReporting(final Configuration config)
-    {
+    public DCPWapStartReporting(final Configuration config) {
         this.config = config;
         token = config.getString("wapstart.token");
         baseUrl = config.getString("wapstart.host");
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 10;
     }
 
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
             final ReportTime endTime) throws ClientProtocolException, IllegalStateException, ServerException,
-            IOException, JSONException
-    {
+            IOException, JSONException {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         String responseStr = null;
@@ -122,37 +118,31 @@ public class DCPWapStartReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return (config.getString("wapstart.advertiserId"));
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "wapstart";
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         return String.format(baseUrl, externalSiteId, token, startDate, endDate);
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return 0;
     }
 
-    public String getEndDate() throws Exception
-    {
+    public String getEndDate() throws Exception {
         try {
             logger.debug("calculating end date for wapstart");
             ReportTime reportTime = ReportTime.getUTCTime();
@@ -169,25 +159,19 @@ public class DCPWapStartReporting extends BaseReportingImpl
     }
 
     public String invokeHTTPUrl(final String url) throws ServerException, NoSuchAlgorithmException,
-            KeyManagementException, MalformedURLException, IOException
-    {
-        TrustManager[] trustAllCerts = new TrustManager[]
-        { new X509TrustManager()
-        {
+            KeyManagementException, MalformedURLException, IOException {
+        TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
             @Override
-            public java.security.cert.X509Certificate[] getAcceptedIssuers()
-            {
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                 return null;
             }
 
             @Override
-            public void checkClientTrusted(final X509Certificate[] certs, final String authType)
-            {
+            public void checkClientTrusted(final X509Certificate[] certs, final String authType) {
             }
 
             @Override
-            public void checkServerTrusted(final X509Certificate[] certs, final String authType)
-            {
+            public void checkServerTrusted(final X509Certificate[] certs, final String authType) {
             }
         } };
 
@@ -197,11 +181,9 @@ public class DCPWapStartReporting extends BaseReportingImpl
         HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
         // Create all-trusting host name verifier
-        HostnameVerifier allHostsValid = new HostnameVerifier()
-        {
+        HostnameVerifier allHostsValid = new HostnameVerifier() {
             @Override
-            public boolean verify(final String hostname, final SSLSession session)
-            {
+            public boolean verify(final String hostname, final SSLSession session) {
                 return true;
             }
         };

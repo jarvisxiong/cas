@@ -37,8 +37,7 @@ import com.inmobi.adserve.channels.api.ServerException;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPPaypalReporting extends BaseReportingImpl
-{
+public class DCPPaypalReporting extends BaseReportingImpl {
 
     private String                     startDate;
     private String                     endDate;
@@ -129,16 +128,14 @@ public class DCPPaypalReporting extends BaseReportingImpl
         reportingKeyMap.put("0770b6793f", "ab13526f");
     }
 
-    public DCPPaypalReporting(final Configuration config)
-    {
+    public DCPPaypalReporting(final Configuration config) {
         this.host = config.getString("paypal.host");
         this.advertiserId = config.getString("paypal.advertiserId");
     }
 
     @Override
     public ReportResponse fetchRows(DebugLogger logger, ReportTime startTime, String key, ReportTime endTime)
-            throws Exception
-    {
+            throws Exception {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         logger.debug("inside fetch rows of paypal");
@@ -218,8 +215,7 @@ public class DCPPaypalReporting extends BaseReportingImpl
         return reportResponse;
     }
 
-    private void addDefaultRow(DebugLogger logger, ReportResponse.ReportRow row, ReportResponse reportResponse)
-    {
+    private void addDefaultRow(DebugLogger logger, ReportResponse.ReportRow row, ReportResponse reportResponse) {
         row.request = 0;
         row.clicks = 0;
         row.impressions = 0;
@@ -233,8 +229,7 @@ public class DCPPaypalReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         String reportingKey = reportingKeyMap.get(externalSiteId);
         if (StringUtils.isNotBlank(reportingKey)) {
             return String.format(host, externalSiteId, reportingKey, startDate, startDate);
@@ -246,37 +241,31 @@ public class DCPPaypalReporting extends BaseReportingImpl
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return 1;
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 5;
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "paypal";
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return (advertiserId);
     }
 
-    public String getEndDate(final String seperator)
-    {
+    public String getEndDate(final String seperator) {
         try {
             logger.debug("calculating end date for paypal");
             ReportTime reportTime = ReportTime.getUTCTime();
@@ -294,25 +283,19 @@ public class DCPPaypalReporting extends BaseReportingImpl
     }
 
     public String invokeHTTPUrl(final String url) throws ServerException, NoSuchAlgorithmException,
-            KeyManagementException, MalformedURLException, IOException
-    {
-        TrustManager[] trustAllCerts = new TrustManager[]
-        { new X509TrustManager()
-        {
+            KeyManagementException, MalformedURLException, IOException {
+        TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
             @Override
-            public java.security.cert.X509Certificate[] getAcceptedIssuers()
-            {
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                 return null;
             }
 
             @Override
-            public void checkClientTrusted(final X509Certificate[] certs, final String authType)
-            {
+            public void checkClientTrusted(final X509Certificate[] certs, final String authType) {
             }
 
             @Override
-            public void checkServerTrusted(final X509Certificate[] certs, final String authType)
-            {
+            public void checkServerTrusted(final X509Certificate[] certs, final String authType) {
             }
         } };
 
@@ -322,11 +305,9 @@ public class DCPPaypalReporting extends BaseReportingImpl
         HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
         // Create all-trusting host name verifier
-        HostnameVerifier allHostsValid = new HostnameVerifier()
-        {
+        HostnameVerifier allHostsValid = new HostnameVerifier() {
             @Override
-            public boolean verify(final String hostname, final SSLSession session)
-            {
+            public boolean verify(final String hostname, final SSLSession session) {
                 return true;
             }
         };

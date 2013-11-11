@@ -30,8 +30,7 @@ import com.inmobi.adserve.channels.util.DebugLogger;
  * @author deepak
  * 
  */
-public class DCPHuntmadsAdNetworksTest extends TestCase
-{
+public class DCPHuntmadsAdNetworksTest extends TestCase {
     private Configuration         mockConfig      = null;
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
@@ -43,8 +42,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase
     private final String          huntmadsAdvId   = "huntadv1";
     private final String          huntmadsTest    = "1";
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("huntmads.host")).andReturn(huntmadsHost).anyTimes();
         expect(mockConfig.getString("huntmads.status")).andReturn(huntmadsStatus).anyTimes();
@@ -57,8 +55,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase
     }
 
     @Override
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File f;
         f = new File(loggerConf);
         if (!f.exists()) {
@@ -74,8 +71,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDCPHuntmadsConfigureParameters()
-    {
+    public void testDCPHuntmadsConfigureParameters() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -95,8 +91,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDCPHuntmadsConfigureParametersBlankIP()
-    {
+    public void testDCPHuntmadsConfigureParametersBlankIP() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
@@ -116,8 +111,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDCPHuntmadsConfigureParametersBlankExtKey()
-    {
+    public void testDCPHuntmadsConfigureParametersBlankExtKey() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -137,8 +131,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDCPHuntmadsConfigureParametersBlankUA()
-    {
+    public void testDCPHuntmadsConfigureParametersBlankUA() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -157,8 +150,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDCPHuntmadsRequestUri() throws Exception
-    {
+    public void testDCPHuntmadsRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -167,8 +159,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
         sasParams.setSlot("15");
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 10l, 13l, 30l }));
+        sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "1324";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
@@ -184,8 +175,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDCPHuntmadsRequestUriWithSpecialFormat() throws Exception
-    {
+    public void testDCPHuntmadsRequestUriWithSpecialFormat() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -194,8 +184,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
         sasParams.setSlot("12");
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 10l, 13l, 30l }));
+        sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "1324";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
@@ -211,8 +200,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDCPHuntmadsRequestUriBlankLatLong() throws Exception
-    {
+    public void testDCPHuntmadsRequestUriBlankLatLong() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -221,8 +209,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
         sasParams.setSlot("15");
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 10l, 13l, 30l }));
+        sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "1324";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
@@ -239,8 +226,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDCPHuntmadsRequestUriBlankSlot() throws Exception
-    {
+    public void testDCPHuntmadsRequestUriBlankSlot() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -249,8 +235,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
         sasParams.setSlot("");
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 10l, 13l, 30l }));
+        sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "1324";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c"
@@ -268,14 +253,12 @@ public class DCPHuntmadsAdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDCPHuntmadsParseResponseImg() throws Exception
-    {
+    public void testDCPHuntmadsParseResponseImg() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 10l, 13l, 30l }));
+        sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c"
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
@@ -294,15 +277,13 @@ public class DCPHuntmadsAdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDCPHuntmadsParseResponseImgAppSDK360() throws Exception
-    {
+    public void testDCPHuntmadsParseResponseImgAppSDK360() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setSource("app");
         sasParams.setSdkVersion("i360");
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 10l, 13l, 30l }));
+        sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
         sasParams.setUserAgent("Mozilla");
         String externalKey = "19100";
@@ -323,16 +304,14 @@ public class DCPHuntmadsAdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDCPHuntmadsParseResponseTextAdWAP() throws Exception
-    {
+    public void testDCPHuntmadsParseResponseTextAdWAP() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSlot("4");
         sasParams.setSource("wap");
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 10l, 13l, 30l }));
+        sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
                 + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11"
@@ -353,8 +332,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDCPHuntmadsParseResponseTextAdAapSDK360() throws Exception
-    {
+    public void testDCPHuntmadsParseResponseTextAdAapSDK360() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -363,8 +341,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase
         sasParams.setSdkVersion("i360");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
         sasParams.setSource("app");
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 10l, 13l, 30l }));
+        sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c"
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
@@ -384,16 +361,14 @@ public class DCPHuntmadsAdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDCPHuntmadsParseInvalidResponse() throws Exception
-    {
+    public void testDCPHuntmadsParseInvalidResponse() throws Exception {
         String response = "HTTP/1.1 20a OK\nServer=Netscape-Enterprise/4.1\n\n[{\"error\" : \"No ads available\"}];";
         dcpHuntmadsAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpHuntmadsAdNetwork.getHttpResponseStatusCode(), 500);
     }
 
     @Test
-    public void testDCPHuntmadsParseNoAd() throws Exception
-    {
+    public void testDCPHuntmadsParseNoAd() throws Exception {
         String response = "[{\"error\" : \"No ads available\"}];";
         dcpHuntmadsAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpHuntmadsAdNetwork.getHttpResponseStatusCode(), 500);
@@ -401,8 +376,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDCPHuntmadsParseEmptyResponseCode() throws Exception
-    {
+    public void testDCPHuntmadsParseEmptyResponseCode() throws Exception {
         String response = "";
         dcpHuntmadsAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpHuntmadsAdNetwork.getHttpResponseStatusCode(), 500);
@@ -410,14 +384,12 @@ public class DCPHuntmadsAdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDCPHuntmadsGetId() throws Exception
-    {
+    public void testDCPHuntmadsGetId() throws Exception {
         assertEquals(dcpHuntmadsAdNetwork.getId(), "huntadv1");
     }
 
     @Test
-    public void testDCPHuntmadsGetImpressionId() throws Exception
-    {
+    public void testDCPHuntmadsGetImpressionId() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -437,14 +409,12 @@ public class DCPHuntmadsAdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDCPHuntmadsGetName() throws Exception
-    {
+    public void testDCPHuntmadsGetName() throws Exception {
         assertEquals(dcpHuntmadsAdNetwork.getName(), "huntmads");
     }
 
     @Test
-    public void testDCPHuntmadsIsClickUrlReq() throws Exception
-    {
+    public void testDCPHuntmadsIsClickUrlReq() throws Exception {
         assertEquals(dcpHuntmadsAdNetwork.isClickUrlRequired(), true);
     }
 }

@@ -25,8 +25,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPWiderPlanetAdNetworkTest extends TestCase
-{
+public class DCPWiderPlanetAdNetworkTest extends TestCase {
     private Configuration           mockConfig        = null;
     private final String            debug             = "debug";
     private final String            loggerConf        = "/tmp/channel-server.properties";
@@ -38,8 +37,7 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase
     private final String            widerPlanetAdvId  = "widerplanetadv1";
     private final String            widerPlanetTest   = "1";
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("widerplanet.host")).andReturn(widerPlanetHost).anyTimes();
         expect(mockConfig.getString("widerplanet.status")).andReturn(widerPlanetStatus).anyTimes();
@@ -52,8 +50,7 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase
     }
 
     @Override
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File f;
         f = new File(loggerConf);
         if (!f.exists()) {
@@ -69,8 +66,7 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWiderPlanetConfigureParameters()
-    {
+    public void testDCPWiderPlanetConfigureParameters() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -92,8 +88,7 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWiderPlanetConfigureParametersNonImucUId()
-    {
+    public void testDCPWiderPlanetConfigureParametersNonImucUId() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -115,8 +110,7 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWiderPlanetConfigureParametersBlankIP()
-    {
+    public void testDCPWiderPlanetConfigureParametersBlankIP() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
@@ -136,8 +130,7 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWiderPlanetConfigureParametersBlankExtKey()
-    {
+    public void testDCPWiderPlanetConfigureParametersBlankExtKey() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -157,8 +150,7 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWiderPlanetConfigureParametersBlankUA()
-    {
+    public void testDCPWiderPlanetConfigureParametersBlankUA() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -177,8 +169,7 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWiderPlanetConfigureParametersApp()
-    {
+    public void testDCPWiderPlanetConfigureParametersApp() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -197,8 +188,7 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWiderPlanetRequestUri() throws Exception
-    {
+    public void testDCPWiderPlanetRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -226,8 +216,7 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWiderPlanetRequestUriWithWC() throws Exception
-    {
+    public void testDCPWiderPlanetRequestUriWithWC() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -255,8 +244,7 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWiderPlanetRequestUriBlankLatLong() throws Exception
-    {
+    public void testDCPWiderPlanetRequestUriBlankLatLong() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -284,8 +272,7 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWiderPlanetParseResponse() throws Exception
-    {
+    public void testDCPWiderPlanetParseResponse() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -312,8 +299,7 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWiderPlanetParseNoAd() throws Exception
-    {
+    public void testDCPWiderPlanetParseNoAd() throws Exception {
         String response = "{response: \"\"}";
         dcpWiderPlanetAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpWiderPlanetAdNetwork.getHttpResponseStatusCode(), 500);
@@ -321,8 +307,7 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWiderPlanetParseEmptyResponseCode() throws Exception
-    {
+    public void testDCPWiderPlanetParseEmptyResponseCode() throws Exception {
         String response = "";
         dcpWiderPlanetAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpWiderPlanetAdNetwork.getHttpResponseStatusCode(), 500);
@@ -330,14 +315,12 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWiderPlanetGetId() throws Exception
-    {
+    public void testDCPWiderPlanetGetId() throws Exception {
         assertEquals(dcpWiderPlanetAdNetwork.getId(), "widerplanetadv1");
     }
 
     @Test
-    public void testDCPWiderPlanetGetImpressionId() throws Exception
-    {
+    public void testDCPWiderPlanetGetImpressionId() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -360,14 +343,12 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWiderPlanetGetName() throws Exception
-    {
+    public void testDCPWiderPlanetGetName() throws Exception {
         assertEquals(dcpWiderPlanetAdNetwork.getName(), "widerplanet");
     }
 
     @Test
-    public void testDCPWiderPlanetIsClickUrlReq() throws Exception
-    {
+    public void testDCPWiderPlanetIsClickUrlReq() throws Exception {
         assertEquals(dcpWiderPlanetAdNetwork.isClickUrlRequired(), true);
     }
 

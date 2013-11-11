@@ -31,8 +31,7 @@ import com.inmobi.adserve.channels.api.ServerException;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class GenericReporting extends BaseReportingImpl
-{
+public class GenericReporting extends BaseReportingImpl {
 
     public Configuration  config;
     public DebugLogger    logger;
@@ -45,8 +44,7 @@ public class GenericReporting extends BaseReportingImpl
     public String         key            = "";
     public ReportTime     startTime;
 
-    public GenericReporting(final Configuration config, final String advertiserName)
-    {
+    public GenericReporting(final Configuration config, final String advertiserName) {
         this.config = config;
         this.advertiserName = advertiserName;
         /*
@@ -58,8 +56,7 @@ public class GenericReporting extends BaseReportingImpl
 
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime)
-    {
+            final ReportTime endTime) {
         this.logger = logger;
         this.key = key;
         this.startTime = startTime;
@@ -104,8 +101,7 @@ public class GenericReporting extends BaseReportingImpl
         }
     }
 
-    public String invokeHTTPUrl(final String url) throws ServerException
-    {
+    public String invokeHTTPUrl(final String url) throws ServerException {
         String retStr = null;
         logger.debug("url inside tapit is " + url);
         DefaultHttpClient httpclient = new DefaultHttpClient();
@@ -136,15 +132,13 @@ public class GenericReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         String requestUrl = config.getString(advertiserName + MacrosAndStrings.REQUEST_URL);
         requestUrl = requestUrl.replace("$startDate", startDate).replace("$endDate", endDate).replace("$key", key);
         return requestUrl;
     }
 
-    public String getEndDate() throws Exception
-    {
+    public String getEndDate() throws Exception {
         try {
             logger.debug("calculating end date for " + advertiserName);
             ReportTime reportTime = ReportTime.getUTCTime();
@@ -161,37 +155,31 @@ public class GenericReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return advertiserName;
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return config.getString(advertiserName + MacrosAndStrings.ADVERTISER_ID);
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return config.getInt(advertiserName + MacrosAndStrings.RR_WINDOW);
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return config.getDouble(advertiserName + MacrosAndStrings.TIMEZONE);
     }
 
-    public ReportResponse parseResponseInCsv()
-    {
+    public ReportResponse parseResponseInCsv() {
         try {
             int externalSiteKeyField = config.getInt(advertiserName + MacrosAndStrings.EXTERNAL_SITE_KEY_FIELD);
             String[] responseArray = responseString.split("\n");
@@ -252,8 +240,7 @@ public class GenericReporting extends BaseReportingImpl
         return reportResponse;
     }
 
-    public ReportResponse parseResponseInJson()
-    {
+    public ReportResponse parseResponseInJson() {
         try {
             String reportRowPath = config.getString(advertiserName + ".reportRowPath");
             String[] reportRowBlocks = reportRowPath.split("/");
@@ -371,8 +358,7 @@ public class GenericReporting extends BaseReportingImpl
         return reportResponse;
     }
 
-    public ReportResponse parseResponseInXml()
-    {
+    public ReportResponse parseResponseInXml() {
         try {
             String externalSiteKeyField = config.getString(advertiserName + MacrosAndStrings.EXTERNAL_SITE_KEY_FIELD);
             String reportRowPath = config.getString(advertiserName + MacrosAndStrings.REPORT_ROW_PATH);
@@ -464,8 +450,7 @@ public class GenericReporting extends BaseReportingImpl
         return reportResponse;
     }
 
-    public void debug(final Object... os)
-    {
+    public void debug(final Object... os) {
         System.out.println(Arrays.deepToString(os));
     }
 }

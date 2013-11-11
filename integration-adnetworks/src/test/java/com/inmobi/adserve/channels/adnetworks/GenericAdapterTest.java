@@ -25,8 +25,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class GenericAdapterTest extends TestCase
-{
+public class GenericAdapterTest extends TestCase {
 
     private String          httpoolHost         = "http://a.mobile.toboads.com/get";
     private String          httpoolAdvertiserId = "9999";
@@ -38,8 +37,7 @@ public class GenericAdapterTest extends TestCase
     private String          advertiserName      = "httpool";
     private DebugLogger     logger;
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString(advertiserName.concat(MacrosAndStrings.HOST))).andReturn(httpoolHost).anyTimes();
         expect(mockConfig.getString(advertiserName.concat(MacrosAndStrings.REQUEST_METHOD)))
@@ -67,8 +65,7 @@ public class GenericAdapterTest extends TestCase
         replay(mockConfig);
     }
 
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File f;
         f = new File("/tmp/channel-server.properties");
         if (!f.exists())
@@ -83,8 +80,7 @@ public class GenericAdapterTest extends TestCase
     }
 
     @Test
-    public void testGenericAdapterConfigureParameters() throws Exception
-    {
+    public void testGenericAdapterConfigureParameters() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -102,8 +98,7 @@ public class GenericAdapterTest extends TestCase
     }
 
     @Test
-    public void testGenericAdapterConfigureParametersNullExtSiteKey() throws Exception
-    {
+    public void testGenericAdapterConfigureParametersNullExtSiteKey() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -121,8 +116,7 @@ public class GenericAdapterTest extends TestCase
     }
 
     @Test
-    public void testGenericAdapterRequestUri() throws Exception
-    {
+    public void testGenericAdapterRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -159,8 +153,7 @@ public class GenericAdapterTest extends TestCase
      */
 
     @Test
-    public void testGenericAdapterParseResponseInJson() throws Exception
-    {
+    public void testGenericAdapterParseResponseInJson() throws Exception {
         String response = "{\"status\":\"1337\",\"ad_type\":\"tpt\",\"content\":\"<!DOCTYPEhtml><htmlxmlns=\\\"http://www.w3.org/1999/xhtml\\\"><head><title>Httpool</title><metahttp-equiv=\\\"Content-type\\\"content=\\\"text/html;charset=utf-8\\\"/></head>n<bodystyle=\\\"margin:0px;padding:0px\\\">n<ahref=\\\"http://a.mobile.toboads.com/click?adh=5d8b189c-6ba8-40ec-883d-f1c1d7d039b4&add=RegibO8TU8mLvGbkwfKZzdOMhDa--dmGlIFZIELVZ5gP1DZXyAiG8N8xDOKctXZ44G33Q4QK38Y.&did=123456789&url=http://labs.httpool.com\\\"><imgsrc=\\\"http://labs.httpool.com/your_ad_here.png\\\"width=\\\"320\\\"height=\\\"50\\\"/></a></body></html>\",\"impression_url\":\"http://a.mobile.toboads.com/impress?adh=5d8b189c-6ba8-40ec-883d-f1c1d7d039b4&add=RegibO8TU8mLvGbkwfKZzdOMhDa--dmGlIFZIELVZ5gP1DZXyAiG8N8xDOKctXZ44G33Q4QK38Y.&did=123456789\",\"extra\":{\"bg_color\":\"#000000\",\"text_color\":\"#FFFFFF\",\"refresh_time\":\"0\",\"transition\":\"0\"}}";
         genericAdapter.parseResponse(response, new HttpResponseStatus(200, "Succcess response"));
         assertEquals(genericAdapter.getHttpResponseStatusCode(), 200);

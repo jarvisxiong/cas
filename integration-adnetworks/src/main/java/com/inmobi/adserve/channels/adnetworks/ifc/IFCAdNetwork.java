@@ -33,8 +33,7 @@ import com.inmobi.adserve.channels.util.DebugLogger;
  * @author Sandeep.Barange
  * 
  */
-public class IFCAdNetwork extends BaseAdNetworkImpl
-{
+public class IFCAdNetwork extends BaseAdNetworkImpl {
 
     private String              requestId;
     private String              deviceOs;           // ******Mandatory Param*******//
@@ -69,8 +68,7 @@ public class IFCAdNetwork extends BaseAdNetworkImpl
 
     public IFCAdNetwork(final DebugLogger logger, final Configuration configuration,
             final ClientBootstrap clientBootstrap, final HttpRequestHandlerBase baseRequestHandler,
-            final MessageEvent serverEvent)
-    {
+            final MessageEvent serverEvent) {
         super(baseRequestHandler, serverEvent, logger);
         this.config = configuration;
         ifcURL = config.getString("ifc.url");
@@ -79,14 +77,12 @@ public class IFCAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public boolean isClickUrlRequired()
-    {
+    public boolean isClickUrlRequired() {
         return true;
     }
 
     @Override
-    public boolean configureParameters()
-    {
+    public boolean configureParameters() {
         JSONObject jsonObject = null;
         try {
             jsonObject = new JSONObject(sasParams.getAllParametersJson());
@@ -181,8 +177,7 @@ public class IFCAdNetwork extends BaseAdNetworkImpl
     }
 
     private Boolean getFlagParams(final JSONObject jsonObject, final String field, final boolean isMandatory)
-            throws JSONException
-    {
+            throws JSONException {
         Boolean booleanVal = null;
         try {
             booleanVal = jsonObject.getBoolean(field);
@@ -197,8 +192,7 @@ public class IFCAdNetwork extends BaseAdNetworkImpl
     }
 
     private String stringifyParam(final JSONObject jObject, final String field, final boolean isMandatory)
-            throws JSONException
-    {
+            throws JSONException {
         try {
             return (String) jObject.get(field);
         }
@@ -215,8 +209,7 @@ public class IFCAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public HttpRequest getHttpRequest()
-    {
+    public HttpRequest getHttpRequest() {
         URI uri;
         try {
             uri = new URI(ifcURL);
@@ -241,15 +234,13 @@ public class IFCAdNetwork extends BaseAdNetworkImpl
     // Returns the Channel Id for the TPAN as in our database. This will be
     // hardcoded.
     @Override
-    public String getId()
-    {
+    public String getId() {
         return config.getString("ifc.advertiserId");
     }
 
     // writing channel logs
     @Override
-    public JSONObject getLogline()
-    {
+    public JSONObject getLogline() {
         try {
             JSONObject log = new JSONObject();
             log.put("adv", getId());
@@ -268,13 +259,11 @@ public class IFCAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    private String getRequestBody()
-    {
+    private String getRequestBody() {
         JsonObject jsonObject = new JsonObject();
 
         jsonObject.addProperty("requestId", requestId);
@@ -331,16 +320,14 @@ public class IFCAdNetwork extends BaseAdNetworkImpl
         return jsonObject.toString();
     }
 
-    private boolean isEmpty(final String str)
-    {
+    private boolean isEmpty(final String str) {
         if (null == str || str.isEmpty()) {
             return true;
         }
         return false;
     }
 
-    private String getCategoryString(final List<Long> categories)
-    {
+    private String getCategoryString(final List<Long> categories) {
         if (null != categories) {
             StringBuilder categoryString = new StringBuilder();
 
@@ -354,8 +341,7 @@ public class IFCAdNetwork extends BaseAdNetworkImpl
         return null;
     }
 
-    private String getHandsetString(final JSONArray handset) throws JSONException
-    {
+    private String getHandsetString(final JSONArray handset) throws JSONException {
         if (null != handset) {
             StringBuilder handsetString = new StringBuilder();
             for (int i = 0; i < handset.length(); i++) {
@@ -366,8 +352,7 @@ public class IFCAdNetwork extends BaseAdNetworkImpl
         return null;
     }
 
-    private String getCarrierString(final JSONArray carrier) throws JSONException
-    {
+    private String getCarrierString(final JSONArray carrier) throws JSONException {
         if (null != carrier) {
             StringBuilder carrierString = new StringBuilder();
             for (int i = 0; i < carrier.length(); i++) {
@@ -379,8 +364,7 @@ public class IFCAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public void parseResponse(final String response, final HttpResponseStatus status)
-    {
+    public void parseResponse(final String response, final HttpResponseStatus status) {
         if (null == response
                 || (null != response && (status.getCode() != 200 || response.startsWith("<!--") || response
                         .trim()

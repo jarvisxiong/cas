@@ -29,8 +29,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPAppierAdnetworkTest extends TestCase
-{
+public class DCPAppierAdnetworkTest extends TestCase {
     private Configuration         mockConfig      = null;
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
@@ -41,8 +40,7 @@ public class DCPAppierAdnetworkTest extends TestCase
     private final String          appierStatus    = "on";
     private final String          appierAdvId     = "appieradv1";
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("appier.host")).andReturn(appierHost).anyTimes();
         expect(mockConfig.getString("appier.status")).andReturn(appierStatus).anyTimes();
@@ -54,8 +52,7 @@ public class DCPAppierAdnetworkTest extends TestCase
     }
 
     @Override
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File f;
         f = new File(loggerConf);
         if (!f.exists()) {
@@ -71,8 +68,7 @@ public class DCPAppierAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAppierConfigureParameters()
-    {
+    public void testDCPAppierConfigureParameters() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -91,8 +87,7 @@ public class DCPAppierAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAppierConfigureParametersBlankIP()
-    {
+    public void testDCPAppierConfigureParametersBlankIP() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
@@ -111,8 +106,7 @@ public class DCPAppierAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAppierConfigureParametersBlankExtKey()
-    {
+    public void testDCPAppierConfigureParametersBlankExtKey() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -131,8 +125,7 @@ public class DCPAppierAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAppierConfigureParametersBlankUA()
-    {
+    public void testDCPAppierConfigureParametersBlankUA() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -150,8 +143,7 @@ public class DCPAppierAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAppierRequestUri() throws Exception
-    {
+    public void testDCPAppierRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -164,13 +156,11 @@ public class DCPAppierAdnetworkTest extends TestCase
         sasParams.setSource("wap");
         sasParams.setOsId(3);
         sasParams.setSiteType("PERFORMANCE");
-        Long[] cat = new Long[]
-        { 15l, 13l };
+        Long[] cat = new Long[] { 15l, 13l };
         sasParams.setCategories(Arrays.asList(cat));
         String externalKey = "test";
         SlotSizeMapping.init();
-        Long[] segmentCategories = new Long[]
-        { 13l, 15l };
+        Long[] segmentCategories = new Long[] { 13l, 15l };
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         String blurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&beacon=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
@@ -186,15 +176,13 @@ public class DCPAppierAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAppierRequestUriBlankLatLong() throws Exception
-    {
+    public void testDCPAppierRequestUriBlankLatLong() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         casInternalRequestParameters.latLong = "";
-        Long[] cat = new Long[]
-        { 15l, 13l };
+        Long[] cat = new Long[] { 15l, 13l };
         sasParams.setCategories(Arrays.asList(cat));
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
@@ -219,8 +207,7 @@ public class DCPAppierAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAppierRequestUriBlankSlot() throws Exception
-    {
+    public void testDCPAppierRequestUriBlankSlot() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -231,8 +218,7 @@ public class DCPAppierAdnetworkTest extends TestCase
         sasParams.setSlot("");
         sasParams.setSiteType("PERFORMANCE");
         String externalKey = "test";
-        Long[] cat = new Long[]
-        { 15l, 13l };
+        Long[] cat = new Long[] { 15l, 13l };
         sasParams.setCategories(Arrays.asList(cat));
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c"
@@ -251,8 +237,7 @@ public class DCPAppierAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAppierParseResponseImg() throws Exception
-    {
+    public void testDCPAppierParseResponseImg() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -276,8 +261,7 @@ public class DCPAppierAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAppierParseResponseImgAppSDK360() throws Exception
-    {
+    public void testDCPAppierParseResponseImgAppSDK360() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -301,8 +285,7 @@ public class DCPAppierAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAppierParseResponseTextAdWAP() throws Exception
-    {
+    public void testDCPAppierParseResponseTextAdWAP() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -328,8 +311,7 @@ public class DCPAppierAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAppierParseResponseTextAdAapSDK360() throws Exception
-    {
+    public void testDCPAppierParseResponseTextAdAapSDK360() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -355,8 +337,7 @@ public class DCPAppierAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAppierParseNoAd() throws Exception
-    {
+    public void testDCPAppierParseNoAd() throws Exception {
         String response = "";
         dcpAppierAdNetwork.parseResponse(response, HttpResponseStatus.NO_CONTENT);
         assertEquals(dcpAppierAdNetwork.getHttpResponseStatusCode(), 500);
@@ -364,14 +345,12 @@ public class DCPAppierAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAppierGetId() throws Exception
-    {
+    public void testDCPAppierGetId() throws Exception {
         assertEquals(dcpAppierAdNetwork.getId(), "appieradv1");
     }
 
     @Test
-    public void testDCPAppierGetImpressionId() throws Exception
-    {
+    public void testDCPAppierGetImpressionId() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -390,14 +369,12 @@ public class DCPAppierAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAppierGetName() throws Exception
-    {
+    public void testDCPAppierGetName() throws Exception {
         assertEquals(dcpAppierAdNetwork.getName(), "appier");
     }
 
     @Test
-    public void testDCPAppierIsClickUrlReq() throws Exception
-    {
+    public void testDCPAppierIsClickUrlReq() throws Exception {
         assertEquals(dcpAppierAdNetwork.isClickUrlRequired(), true);
     }
 }

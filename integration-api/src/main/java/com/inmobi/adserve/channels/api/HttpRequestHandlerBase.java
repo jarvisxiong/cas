@@ -7,8 +7,7 @@ import org.jboss.netty.handler.timeout.IdleStateAwareChannelUpstreamHandler;
 import com.ning.http.client.AsyncHttpClient;
 
 
-public abstract class HttpRequestHandlerBase extends IdleStateAwareChannelUpstreamHandler
-{
+public abstract class HttpRequestHandlerBase extends IdleStateAwareChannelUpstreamHandler {
 
     public abstract void sendAdResponse(AdNetworkInterface selectedAdNetwork, ChannelEvent event);
 

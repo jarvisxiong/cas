@@ -28,8 +28,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPVerveAdapterTest extends TestCase
-{
+public class DCPVerveAdapterTest extends TestCase {
     private Configuration         mockConfig      = null;
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
@@ -40,8 +39,7 @@ public class DCPVerveAdapterTest extends TestCase
     private final String          verveStatus     = "on";
     private final String          verveAdvId      = "verveadv1";
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("verve.host")).andReturn(verveHost).anyTimes();
         expect(mockConfig.getString("verve.status")).andReturn(verveStatus).anyTimes();
@@ -53,8 +51,7 @@ public class DCPVerveAdapterTest extends TestCase
     }
 
     @Override
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File f;
         f = new File(loggerConf);
         if (!f.exists()) {
@@ -71,8 +68,7 @@ public class DCPVerveAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPVerveConfigureParameters()
-    {
+    public void testDCPVerveConfigureParameters() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -93,8 +89,7 @@ public class DCPVerveAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPVerveConfigureParametersIPOnlySet() throws JSONException
-    {
+    public void testDCPVerveConfigureParametersIPOnlySet() throws JSONException {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -115,8 +110,7 @@ public class DCPVerveAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPVerveConfigureParametersTrueLatLongSet() throws JSONException
-    {
+    public void testDCPVerveConfigureParametersTrueLatLongSet() throws JSONException {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -137,8 +131,7 @@ public class DCPVerveAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPVerveConfigureParametersBlankIP()
-    {
+    public void testDCPVerveConfigureParametersBlankIP() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
@@ -157,8 +150,7 @@ public class DCPVerveAdapterTest extends TestCase
     }
 
     @Test
-    public void testVerveConfigureParametersBlankExtKey()
-    {
+    public void testVerveConfigureParametersBlankExtKey() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -177,8 +169,7 @@ public class DCPVerveAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPVerveConfigureParametersBlankUA()
-    {
+    public void testDCPVerveConfigureParametersBlankUA() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -196,8 +187,7 @@ public class DCPVerveAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPVerveConfigureParametersBlockAndroid()
-    {
+    public void testDCPVerveConfigureParametersBlockAndroid() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -216,8 +206,7 @@ public class DCPVerveAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPVerveConfigureParametersUnblockAndroidVersion()
-    {
+    public void testDCPVerveConfigureParametersUnblockAndroidVersion() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -236,8 +225,7 @@ public class DCPVerveAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPVerveRequestUri() throws Exception
-    {
+    public void testDCPVerveRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -263,8 +251,7 @@ public class DCPVerveAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPVerveRequestUriWithIPOnly() throws Exception
-    {
+    public void testDCPVerveRequestUriWithIPOnly() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -290,8 +277,7 @@ public class DCPVerveAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPVerveRequestUriBlankLatLong() throws Exception
-    {
+    public void testDCPVerveRequestUriBlankLatLong() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -317,8 +303,7 @@ public class DCPVerveAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPVerveRequestUriBlankSlot() throws Exception
-    {
+    public void testDCPVerveRequestUriBlankSlot() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -344,8 +329,7 @@ public class DCPVerveAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPVerveParseResponseAd() throws Exception
-    {
+    public void testDCPVerveParseResponseAd() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -368,8 +352,7 @@ public class DCPVerveAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPVerveParseResponseAdWap() throws Exception
-    {
+    public void testDCPVerveParseResponseAdWap() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -393,8 +376,7 @@ public class DCPVerveAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPVerveParseResponseAdApp() throws Exception
-    {
+    public void testDCPVerveParseResponseAdApp() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -420,8 +402,7 @@ public class DCPVerveAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPVerveParseResponseAdAppIMAI() throws Exception
-    {
+    public void testDCPVerveParseResponseAdAppIMAI() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -449,16 +430,14 @@ public class DCPVerveAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPVerveParseNoAd() throws Exception
-    {
+    public void testDCPVerveParseNoAd() throws Exception {
         String response = "";
         dcpVerveAdnetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpVerveAdnetwork.getHttpResponseStatusCode(), 500);
     }
 
     @Test
-    public void testDCPVerveParseEmptyResponseCode() throws Exception
-    {
+    public void testDCPVerveParseEmptyResponseCode() throws Exception {
         String response = "";
         dcpVerveAdnetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpVerveAdnetwork.getHttpResponseStatusCode(), 500);
@@ -466,14 +445,12 @@ public class DCPVerveAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPVerveGetId() throws Exception
-    {
+    public void testDCPVerveGetId() throws Exception {
         assertEquals(dcpVerveAdnetwork.getId(), "verveadv1");
     }
 
     @Test
-    public void testDCPVerveGetImpressionId() throws Exception
-    {
+    public void testDCPVerveGetImpressionId() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -493,14 +470,12 @@ public class DCPVerveAdapterTest extends TestCase
     }
 
     @Test
-    public void testDCPVerveGetName() throws Exception
-    {
+    public void testDCPVerveGetName() throws Exception {
         assertEquals(dcpVerveAdnetwork.getName(), "verve");
     }
 
     @Test
-    public void testDCPVerveIsClickUrlReq() throws Exception
-    {
+    public void testDCPVerveIsClickUrlReq() throws Exception {
         assertEquals(dcpVerveAdnetwork.isClickUrlRequired(), false);
     }
 }

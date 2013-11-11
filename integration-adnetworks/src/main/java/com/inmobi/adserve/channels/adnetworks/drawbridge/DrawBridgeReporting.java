@@ -12,23 +12,20 @@ import com.inmobi.adserve.channels.api.ServerException;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DrawBridgeReporting extends BaseReportingImpl
-{
+public class DrawBridgeReporting extends BaseReportingImpl {
     private Configuration  config;
     private String         startDate = "";
     private String         endDate   = "";
     private DebugLogger    logger;
     private ReportResponse reportResponse;
 
-    public DrawBridgeReporting(final Configuration config)
-    {
+    public DrawBridgeReporting(final Configuration config) {
         this.config = config;
     }
 
     @Override
     public ReportResponse fetchRows(DebugLogger logger, ReportTime startTime, String key, ReportTime endTime)
-            throws Exception
-    {
+            throws Exception {
         // NO OP
         return null;
     }
@@ -36,8 +33,7 @@ public class DrawBridgeReporting extends BaseReportingImpl
     // Fetches the report from the TPAN
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final ReportTime endTime)
-            throws ServerException, JSONException
-    {
+            throws ServerException, JSONException {
         this.logger = logger;
         reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         logger.debug("inside fetch rows of draw bridge");
@@ -69,8 +65,7 @@ public class DrawBridgeReporting extends BaseReportingImpl
     }
 
     // obtain end date for the date range in which data is to be fetched
-    public String getEndDate() throws Exception
-    {
+    public String getEndDate() throws Exception {
         try {
             logger.debug("calculating end date for drawbridge");
             ReportTime reportTime = ReportTime.getUTCTime();
@@ -88,8 +83,7 @@ public class DrawBridgeReporting extends BaseReportingImpl
 
     // Constructs the request url. This is made public for testing purpose.
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         String interval = "day";
         if (getReportGranularity() == ReportGranularity.HOUR) {
             interval = "hour";
@@ -103,39 +97,33 @@ public class DrawBridgeReporting extends BaseReportingImpl
 
     // Returns the time zone(x) GMT+x. For GMT it returns 0. IST it returns 5.5
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return 0.0;
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return config.getString("drawbridge.advertiserId");
     }
 
     // Returns the report format wrt granularity.
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "drawbridge";
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 7;
     }
 
     private void generateReportResponse(final DebugLogger logger, ReportResponse reportResponse, String response)
-            throws JSONException
-    {
+            throws JSONException {
 
         JSONObject responseObject = new JSONObject(response);
         JSONArray responseStatsArray = responseObject.getJSONObject("result").getJSONArray("stats");

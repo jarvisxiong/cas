@@ -16,11 +16,9 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public class Formatter
-{
+public class Formatter {
 
-    public enum TemplateType
-    {
+    public enum TemplateType {
         HTML,
         PLAIN,
         RICH,
@@ -38,8 +36,7 @@ public class Formatter
     private static Template       velocityTemplateRtb;
     private static Template       velocityTemplateJsAdTag;
 
-    public static void init() throws Exception
-    {
+    public static void init() throws Exception {
         velocityEngine = new VelocityEngine();
         velocityEngine.setProperty("file.resource.loader.class", ClasspathResourceLoader.class.getName());
         velocityEngine.init();
@@ -52,8 +49,7 @@ public class Formatter
     }
 
     static void updateVelocityContext(VelocityContext context, SASRequestParameters sasParams, String beaconUrl,
-            DebugLogger logger)
-    {
+            DebugLogger logger) {
         if (StringUtils.isNotBlank(beaconUrl)) {
             context.put(VelocityTemplateFieldConstants.IMBeaconUrl, beaconUrl);
         }
@@ -66,8 +62,7 @@ public class Formatter
         }
     }
 
-    static boolean requestFromSDK360Onwards(SASRequestParameters sasParams, DebugLogger logger)
-    {
+    static boolean requestFromSDK360Onwards(SASRequestParameters sasParams, DebugLogger logger) {
         if (StringUtils.isBlank(sasParams.getSdkVersion())) {
             return false;
         }
@@ -89,12 +84,10 @@ public class Formatter
 
     public static String getResponseFromTemplate(TemplateType type, VelocityContext context,
             SASRequestParameters sasParams, String beaconUrl, DebugLogger logger) throws ResourceNotFoundException,
-            ParseErrorException, MethodInvocationException, IOException
-    {
+            ParseErrorException, MethodInvocationException, IOException {
         updateVelocityContext(context, sasParams, beaconUrl, logger);
         StringWriter writer = new StringWriter();
-        switch (type)
-        {
+        switch (type) {
             case HTML:
                 velocityTemplateHtml.merge(context, writer);
                 break;
@@ -117,8 +110,7 @@ public class Formatter
         return writer.toString();
     }
 
-    public static String getRichTextTemplateForSlot(String slot)
-    {
+    public static String getRichTextTemplateForSlot(String slot) {
         if (slot == null) {
             return null;
         }

@@ -30,8 +30,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPMadNetAdNetworkTest extends TestCase
-{
+public class DCPMadNetAdNetworkTest extends TestCase {
     private Configuration         mockConfig      = null;
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
@@ -43,8 +42,7 @@ public class DCPMadNetAdNetworkTest extends TestCase
     private final String          madnetStatus    = "on";
     private final String          madnetAdvId     = "madnetadv1";
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("madnet.host")).andReturn(madnetHost).anyTimes();
         expect(mockConfig.getString("madnet.status")).andReturn(madnetStatus).anyTimes();
@@ -57,8 +55,7 @@ public class DCPMadNetAdNetworkTest extends TestCase
     }
 
     @Override
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File f;
         f = new File(loggerConf);
         if (!f.exists()) {
@@ -75,8 +72,7 @@ public class DCPMadNetAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPMadNetConfigureParameters() throws JSONException
-    {
+    public void testDCPMadNetConfigureParameters() throws JSONException {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -100,8 +96,7 @@ public class DCPMadNetAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPMadNetConfigureParametersBlankIP()
-    {
+    public void testDCPMadNetConfigureParametersBlankIP() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
@@ -120,8 +115,7 @@ public class DCPMadNetAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPMadNetConfigureParametersBlankUA()
-    {
+    public void testDCPMadNetConfigureParametersBlankUA() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -139,12 +133,10 @@ public class DCPMadNetAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPMadNetRequestUri() throws Exception
-    {
+    public void testDCPMadNetRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]
-        { 50l, 51l }));
+        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSource("APP");
@@ -172,15 +164,13 @@ public class DCPMadNetAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPMadNetRequestUriBlankLatLong() throws Exception
-    {
+    public void testDCPMadNetRequestUriBlankLatLong() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSource("WAP");
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]
-        { 50l, 51l }));
+        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
         casInternalRequestParameters.latLong = "38.5,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
@@ -211,12 +201,10 @@ public class DCPMadNetAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPMadNetParseAdImage() throws Exception
-    {
+    public void testDCPMadNetParseAdImage() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]
-        { 50l, 51l }));
+        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSlot("15");
@@ -242,12 +230,10 @@ public class DCPMadNetAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPMadNetParseAdText() throws Exception
-    {
+    public void testDCPMadNetParseAdText() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]
-        { 50l, 51l }));
+        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSlot("15");
@@ -273,16 +259,14 @@ public class DCPMadNetAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPMadNetParseNoAd() throws Exception
-    {
+    public void testDCPMadNetParseNoAd() throws Exception {
         String response = "";
         dcpMadNetAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(500, dcpMadNetAdNetwork.getHttpResponseStatusCode());
     }
 
     @Test
-    public void testDCPMadNetParseEmptyResponseCode() throws Exception
-    {
+    public void testDCPMadNetParseEmptyResponseCode() throws Exception {
         String response = "";
         dcpMadNetAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(500, dcpMadNetAdNetwork.getHttpResponseStatusCode());
@@ -290,14 +274,12 @@ public class DCPMadNetAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPMadNetGetId() throws Exception
-    {
+    public void testDCPMadNetGetId() throws Exception {
         assertEquals(madnetAdvId, dcpMadNetAdNetwork.getId());
     }
 
     @Test
-    public void testDCPMadNetGetImpressionId() throws Exception
-    {
+    public void testDCPMadNetGetImpressionId() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -318,14 +300,12 @@ public class DCPMadNetAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPMadNetGetName() throws Exception
-    {
+    public void testDCPMadNetGetName() throws Exception {
         assertEquals("madnet", dcpMadNetAdNetwork.getName());
     }
 
     @Test
-    public void testDCPMadNetIsClickUrlReq() throws Exception
-    {
+    public void testDCPMadNetIsClickUrlReq() throws Exception {
         assertTrue(dcpMadNetAdNetwork.isClickUrlRequired());
     }
 }

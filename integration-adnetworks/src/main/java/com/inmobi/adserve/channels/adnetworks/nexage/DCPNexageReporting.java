@@ -31,8 +31,7 @@ import com.inmobi.adserve.channels.util.DebugLogger;
  * @author Deepak
  * 
  */
-public class DCPNexageReporting extends BaseReportingImpl
-{
+public class DCPNexageReporting extends BaseReportingImpl {
     private final Configuration config;
     private final String        companyid;
     private final String        host;
@@ -43,8 +42,7 @@ public class DCPNexageReporting extends BaseReportingImpl
     private String              endDate;
     private String              externalSiteId;
 
-    public DCPNexageReporting(final Configuration config)
-    {
+    public DCPNexageReporting(final Configuration config) {
         this.config = config;
         host = config.getString("nexage.host");
         companyid = config.getString("nexage.companyid");
@@ -53,16 +51,14 @@ public class DCPNexageReporting extends BaseReportingImpl
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 20;
     }
 
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String externalSiteId,
             final ReportTime endTime) throws KeyManagementException, NoSuchAlgorithmException, MalformedURLException,
-            ServerException, IOException, ParserConfigurationException, SAXException
-    {
+            ServerException, IOException, ParserConfigurationException, SAXException {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         this.externalSiteId = externalSiteId;
@@ -120,31 +116,26 @@ public class DCPNexageReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return (config.getString("nexage.advertiserId"));
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "nexage";
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return -5; // EST
     }
 
-    public String getEndDate(final String seperator)
-    {
+    public String getEndDate(final String seperator) {
         try {
             logger.debug("calculating end date for nexage");
             ReportTime reportTime = ReportTime.getUTCTime();
@@ -161,14 +152,11 @@ public class DCPNexageReporting extends BaseReportingImpl
         }
     }
 
-    private String invokeHTTPUrl(String urlString)
-    {
+    private String invokeHTTPUrl(String urlString) {
         StringBuffer sBuffer = new StringBuffer();
         try {
-            Authenticator.setDefault(new Authenticator()
-            {
-                protected PasswordAuthentication getPasswordAuthentication()
-                {
+            Authenticator.setDefault(new Authenticator() {
+                protected PasswordAuthentication getPasswordAuthentication() {
                     return new PasswordAuthentication(accesskey, secretkey.toCharArray());
                 }
             });
@@ -199,8 +187,7 @@ public class DCPNexageReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         return host
                 .replace("$companyId", companyid)
                     .replace("$startDate", startDate)

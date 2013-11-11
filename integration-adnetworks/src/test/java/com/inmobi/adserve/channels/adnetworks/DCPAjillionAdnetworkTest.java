@@ -26,8 +26,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPAjillionAdnetworkTest extends TestCase
-{
+public class DCPAjillionAdnetworkTest extends TestCase {
     private Configuration         mockConfig      = null;
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
@@ -41,8 +40,7 @@ public class DCPAjillionAdnetworkTest extends TestCase
     private final String          placementId     = "240";
     private final String          fsPlacementId   = "230";
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("Ajilion.host")).andReturn(AjilionHost).anyTimes();
         expect(mockConfig.getString("Ajilion.slot_4_p")).andReturn(placementId).anyTimes();
@@ -57,8 +55,7 @@ public class DCPAjillionAdnetworkTest extends TestCase
     }
 
     @Override
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File f;
         f = new File(loggerConf);
         if (!f.exists()) {
@@ -75,8 +72,7 @@ public class DCPAjillionAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAjilionConfigureParameters()
-    {
+    public void testDCPAjilionConfigureParameters() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -97,8 +93,7 @@ public class DCPAjillionAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAjilionConfigureParametersBlankIP()
-    {
+    public void testDCPAjilionConfigureParametersBlankIP() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
@@ -119,8 +114,7 @@ public class DCPAjillionAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAjilionConfigureParametersBlankExtKey()
-    {
+    public void testDCPAjilionConfigureParametersBlankExtKey() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -141,8 +135,7 @@ public class DCPAjillionAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAjilionConfigureParametersBlankUA()
-    {
+    public void testDCPAjilionConfigureParametersBlankUA() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -161,8 +154,7 @@ public class DCPAjillionAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testAjilionRequestUri() throws Exception
-    {
+    public void testAjilionRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -172,8 +164,7 @@ public class DCPAjillionAdnetworkTest extends TestCase
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
         sasParams.setSlot("4");
         sasParams.setSiteType("PERFORMANCE");
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 10l, 13l, 30l }));
+        sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "240";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
@@ -189,8 +180,7 @@ public class DCPAjillionAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testAjilionRequestUriFamilySafe() throws Exception
-    {
+    public void testAjilionRequestUriFamilySafe() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -200,8 +190,7 @@ public class DCPAjillionAdnetworkTest extends TestCase
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
         sasParams.setSlot("4");
         sasParams.setSiteType("FAMILY_SAFE");
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 10l, 13l, 30l }));
+        sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "240";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c"
@@ -219,15 +208,13 @@ public class DCPAjillionAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAjilionParseResponseImg() throws Exception
-    {
+    public void testDCPAjilionParseResponseImg() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSlot("4");
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 10l, 13l, 30l }));
+        sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "19100";
         sasParams.setSiteType("PERFORMANCE");
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
@@ -248,15 +235,13 @@ public class DCPAjillionAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAjilionParseResponseImgAppSDK360() throws Exception
-    {
+    public void testDCPAjilionParseResponseImgAppSDK360() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setSource("app");
         sasParams.setSdkVersion("i360");
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 10l, 13l, 30l }));
+        sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSlot("4");
@@ -278,8 +263,7 @@ public class DCPAjillionAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAjilionParseNoAd() throws Exception
-    {
+    public void testDCPAjilionParseNoAd() throws Exception {
         String response = "{\"success\":\"false\"}";
         dcpAjillionAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpAjillionAdNetwork.getHttpResponseStatusCode(), 500);
@@ -287,8 +271,7 @@ public class DCPAjillionAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAjilionParseEmptyResponseCode() throws Exception
-    {
+    public void testDCPAjilionParseEmptyResponseCode() throws Exception {
         String response = "";
         dcpAjillionAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpAjillionAdNetwork.getHttpResponseStatusCode(), 500);
@@ -296,14 +279,12 @@ public class DCPAjillionAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAjilionGetId() throws Exception
-    {
+    public void testDCPAjilionGetId() throws Exception {
         assertEquals(dcpAjillionAdNetwork.getId(), "Ajilionadv1");
     }
 
     @Test
-    public void testDCPAjilionGetImpressionId() throws Exception
-    {
+    public void testDCPAjilionGetImpressionId() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -326,14 +307,12 @@ public class DCPAjillionAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAjilionGetName() throws Exception
-    {
+    public void testDCPAjilionGetName() throws Exception {
         assertEquals(dcpAjillionAdNetwork.getName(), "Ajilion");
     }
 
     @Test
-    public void testDCPAjilionIsClickUrlReq() throws Exception
-    {
+    public void testDCPAjilionIsClickUrlReq() throws Exception {
         assertTrue(dcpAjillionAdNetwork.isClickUrlRequired());
     }
 }

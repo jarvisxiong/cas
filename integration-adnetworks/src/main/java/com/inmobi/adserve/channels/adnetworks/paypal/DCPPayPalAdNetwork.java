@@ -28,8 +28,7 @@ import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
 
 
-public class DCPPayPalAdNetwork extends BaseAdNetworkImpl
-{
+public class DCPPayPalAdNetwork extends BaseAdNetworkImpl {
     private final Configuration config;
     private String              latitude  = null;
     private String              longitude = null;
@@ -40,8 +39,7 @@ public class DCPPayPalAdNetwork extends BaseAdNetworkImpl
     private Request             ningRequest;
 
     public DCPPayPalAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent)
-    {
+            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
         super(baseRequestHandler, serverEvent, logger);
         this.config = config;
         this.logger = logger;
@@ -49,8 +47,7 @@ public class DCPPayPalAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public boolean configureParameters()
-    {
+    public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             logger.debug("mandatory parameters missing for paypal so exiting adapter");
@@ -88,14 +85,12 @@ public class DCPPayPalAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "paypal";
     }
 
     @Override
-    public URI getRequestUri() throws Exception
-    {
+    public URI getRequestUri() throws Exception {
         try {
             StringBuilder url = new StringBuilder(host);
             url.append("&format=").append(responseFormat);
@@ -156,11 +151,9 @@ public class DCPPayPalAdNetwork extends BaseAdNetworkImpl
         return null;
     }
 
-    @SuppressWarnings(
-    { "unchecked", "rawtypes" })
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    public boolean makeAsyncRequest()
-    {
+    public boolean makeAsyncRequest() {
         logger.debug("In PayPal async");
         try {
             String uri = getRequestUri().toString();
@@ -168,11 +161,9 @@ public class DCPPayPalAdNetwork extends BaseAdNetworkImpl
             setNingRequest(requestUrl);
             logger.debug("Nexage uri :", uri);
             startTime = System.currentTimeMillis();
-            baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler()
-            {
+            baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
                 @Override
-                public Response onCompleted(Response response) throws Exception
-                {
+                public Response onCompleted(Response response) throws Exception {
                     if (!isRequestCompleted()) {
                         logger.debug("Operation complete for channel partner: ", getName());
                         latency = System.currentTimeMillis() - startTime;
@@ -186,8 +177,7 @@ public class DCPPayPalAdNetwork extends BaseAdNetworkImpl
                 }
 
                 @Override
-                public void onThrowable(Throwable t)
-                {
+                public void onThrowable(Throwable t) {
                     if (isRequestComplete) {
                         return;
                     }
@@ -215,8 +205,7 @@ public class DCPPayPalAdNetwork extends BaseAdNetworkImpl
         return true;
     }
 
-    private void setNingRequest(String requestUrl)
-    {
+    private void setNingRequest(String requestUrl) {
         ningRequest = new RequestBuilder()
                 .setUrl(requestUrl)
                     .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
@@ -229,8 +218,7 @@ public class DCPPayPalAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status)
-    {
+    public void parseResponse(String response, HttpResponseStatus status) {
         logger.debug("response is", response);
 
         if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
@@ -276,8 +264,7 @@ public class DCPPayPalAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return (config.getString("paypal.advertiserId"));
     }
 }

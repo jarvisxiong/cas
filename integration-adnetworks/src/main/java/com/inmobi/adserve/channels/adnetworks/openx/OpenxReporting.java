@@ -21,8 +21,7 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 import com.openx.oauth.client.Client;
 
 
-public class OpenxReporting extends BaseReportingImpl
-{
+public class OpenxReporting extends BaseReportingImpl {
     private Configuration    config;
     private DebugLogger      logger;
     private String           startDate        = "";
@@ -32,14 +31,12 @@ public class OpenxReporting extends BaseReportingImpl
     private static String    entireReportData = null;
     private final String     domain;
 
-    public OpenxReporting(final Configuration config)
-    {
+    public OpenxReporting(final Configuration config) {
         this.config = config;
         domain = config.getString("openx.domain");
     }
 
-    private boolean authenticate()
-    {
+    private boolean authenticate() {
         String apiKey = config.getString("openx.apiKey");
         String apiSecret = config.getString("openx.apiSecret");
         String loginUrl = config.getString("openx.loginUrl");
@@ -66,8 +63,7 @@ public class OpenxReporting extends BaseReportingImpl
 
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws ClientProtocolException, IOException, JSONException
-    {
+            final ReportTime endTime) throws ClientProtocolException, IOException, JSONException {
         this.logger = logger;
 
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
@@ -160,15 +156,13 @@ public class OpenxReporting extends BaseReportingImpl
     /**
      * @return
      */
-    private boolean partnerContactFlag()
-    {
+    private boolean partnerContactFlag() {
         return reportStartDate == null || (ReportTime.compareStringDates(reportStartDate, startDate) != 0);
     }
 
     // Constructs the request url. This is made public for testing purpose.
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         String url = domain + "/ox/3.0/a/report/run?report=adunit_sum&start_date=" + startDate
                 + "%2000:00:00&end_date=" + startDate + "%2023:59:59&report_format=json";
         return url;
@@ -176,38 +170,32 @@ public class OpenxReporting extends BaseReportingImpl
 
     // Returns the time zone(x) GMT+x. For GMT it returns 0. IST it returns 5.5
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return -7.0;
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return config.getString("openx.advertiserId");
     }
 
     // Returns the report format wrt granularity.
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "openx";
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 21;
     }
 
-    public String getEndDate() throws Exception
-    {
+    public String getEndDate() throws Exception {
         try {
             logger.debug("calculating end date for openx");
             ReportTime reportTime = ReportTime.getUTCTime();

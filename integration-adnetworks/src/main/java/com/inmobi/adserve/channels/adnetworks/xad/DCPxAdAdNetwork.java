@@ -24,8 +24,7 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public class DCPxAdAdNetwork extends BaseAdNetworkImpl
-{
+public class DCPxAdAdNetwork extends BaseAdNetworkImpl {
     private final Configuration config;
     private String              latitude         = null;
     private String              longitude        = null;
@@ -43,8 +42,7 @@ public class DCPxAdAdNetwork extends BaseAdNetworkImpl
     private static final String IDFA_PLAIN       = "idfa|plain";
 
     public DCPxAdAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent)
-    {
+            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
         super(baseRequestHandler, serverEvent, logger);
         this.config = config;
         this.logger = logger;
@@ -52,8 +50,7 @@ public class DCPxAdAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public boolean configureParameters()
-    {
+    public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             logger.debug("mandatory parameters missing for xad so exiting adapter");
@@ -90,14 +87,12 @@ public class DCPxAdAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "xad";
     }
 
     @Override
-    public URI getRequestUri() throws Exception
-    {
+    public URI getRequestUri() throws Exception {
         try {
             StringBuilder url = new StringBuilder(host);
             url.append("?v=1.1&o_fmt=html5&ip=").append(sasParams.getRemoteHostIp());
@@ -152,8 +147,7 @@ public class DCPxAdAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status)
-    {
+    public void parseResponse(String response, HttpResponseStatus status) {
         logger.debug("response is", response);
 
         if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
@@ -183,8 +177,7 @@ public class DCPxAdAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return (config.getString("xad.advertiserId"));
     }
 
@@ -193,8 +186,7 @@ public class DCPxAdAdNetwork extends BaseAdNetworkImpl
      * 
      * @return
      */
-    private void setDeviceIdandType()
-    {
+    private void setDeviceIdandType() {
         if (sasParams.getOsId() == HandSetOS.iPhone_OS.getValue()) {
             if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
                 deviceId = casInternalRequestParameters.uidIFA;

@@ -32,8 +32,7 @@ import com.inmobi.adserve.channels.util.DebugLogger;
  * @author tushara
  * 
  */
-public class DCPSiquisTest extends TestCase
-{
+public class DCPSiquisTest extends TestCase {
     private Configuration         mockConfig         = null;
     private final String          debug              = "debug";
 
@@ -48,8 +47,7 @@ public class DCPSiquisTest extends TestCase
     private final ClientBootstrap clientBootstrap    = null;
     private static DebugLogger    logger;
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = EasyMock.createMock(Configuration.class);
         expect(mockConfig.getString("siquis.host")).andReturn(siquisHost).anyTimes();
         expect(mockConfig.getString("siquis.status")).andReturn(status).anyTimes();
@@ -64,8 +62,7 @@ public class DCPSiquisTest extends TestCase
     }
 
     @Override
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File f;
         f = new File("/tmp/channel-server.properties");
         if (!f.exists()) {
@@ -81,8 +78,7 @@ public class DCPSiquisTest extends TestCase
     }
 
     @Test
-    public void testSiquisConfigureParameters() throws Exception
-    {
+    public void testSiquisConfigureParameters() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -99,8 +95,7 @@ public class DCPSiquisTest extends TestCase
     }
 
     @Test
-    public void testSiquisConfigureParametersBlankUserAgent() throws Exception
-    {
+    public void testSiquisConfigureParametersBlankUserAgent() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -116,8 +111,7 @@ public class DCPSiquisTest extends TestCase
     }
 
     @Test
-    public void testSiquisConfigureParametersExternalKey() throws Exception
-    {
+    public void testSiquisConfigureParametersExternalKey() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -134,8 +128,7 @@ public class DCPSiquisTest extends TestCase
     }
 
     @Test
-    public void testSiquisRequestUri() throws Exception
-    {
+    public void testSiquisRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -193,8 +186,7 @@ public class DCPSiquisTest extends TestCase
     // }
 
     @Test
-    public void testSiquisResponse() throws Exception
-    {
+    public void testSiquisResponse() throws Exception {
 
         Map<String, String> testMap = Maps.newHashMap();
 

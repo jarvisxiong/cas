@@ -17,8 +17,7 @@ import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPAdelphicReporting extends BaseReportingImpl
-{
+public class DCPAdelphicReporting extends BaseReportingImpl {
 
     private final Configuration config;
     private DebugLogger         logger;
@@ -29,8 +28,7 @@ public class DCPAdelphicReporting extends BaseReportingImpl
     private String              userName       = "";
     private String              password       = "";
 
-    public DCPAdelphicReporting(final Configuration config)
-    {
+    public DCPAdelphicReporting(final Configuration config) {
         this.config = config;
         host = config.getString("adelphic.reportUrl");
         userName = config.getString("adelphic.userName");
@@ -39,8 +37,7 @@ public class DCPAdelphicReporting extends BaseReportingImpl
 
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final ReportTime endTime)
-            throws Exception
-    {
+            throws Exception {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         logger.debug("inside fetch rows of Adelphic");
@@ -77,8 +74,7 @@ public class DCPAdelphicReporting extends BaseReportingImpl
         return reportResponse;
     }
 
-    public String getEndDate() throws Exception
-    {
+    public String getEndDate() throws Exception {
         try {
             logger.debug("calculating latest date for Adelphic");
             ReportTime reportTime = ReportTime.getUTCTime();
@@ -95,44 +91,37 @@ public class DCPAdelphicReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
 
         return String.format(host, userName, password, startDate, startDate);
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return 0;
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 10;
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "Adelphic";
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return (config.getString("adelphic.advertiserId"));
     }
 
-    private String invokeHTTPUrl(final String url) throws MalformedURLException, IOException
-    {
+    private String invokeHTTPUrl(final String url) throws MalformedURLException, IOException {
         URLConnection conn = new URL(url).openConnection();
         String authStr = userName + ":" + password;
         String authEncoded = new String(Base64.encodeBase64(authStr.getBytes()));
@@ -163,14 +152,12 @@ public class DCPAdelphicReporting extends BaseReportingImpl
 
     @Override
     public ReportResponse fetchRows(DebugLogger logger, ReportTime startTime, String key, ReportTime endTime)
-            throws Exception
-    {
+            throws Exception {
         // not applicable so returns null
         return null;
     }
 
-    private void generateReportResponse(final DebugLogger logger, ReportResponse reportResponse, String[] responseArray)
-    {
+    private void generateReportResponse(final DebugLogger logger, ReportResponse reportResponse, String[] responseArray) {
         if (responseArray.length > 1) {
             int impressionIndex = -1;
             int clicksIndex = -1;

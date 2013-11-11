@@ -37,8 +37,7 @@ import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public class DCPWapStartAdNetwork extends BaseAdNetworkImpl
-{
+public class DCPWapStartAdNetwork extends BaseAdNetworkImpl {
     private final Configuration           config;
     private String                        latitude      = null;
     private String                        longitude     = null;
@@ -55,8 +54,7 @@ public class DCPWapStartAdNetwork extends BaseAdNetworkImpl
     }
 
     public DCPWapStartAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent)
-    {
+            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
         super(baseRequestHandler, serverEvent, logger);
         this.config = config;
         this.logger = logger;
@@ -71,8 +69,7 @@ public class DCPWapStartAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public boolean configureParameters()
-    {
+    public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             logger.debug("mandatory parameters missing for wapstart so exiting adapter");
@@ -104,14 +101,12 @@ public class DCPWapStartAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "wapstart";
     }
 
     @Override
-    public URI getRequestUri() throws Exception
-    {
+    public URI getRequestUri() throws Exception {
         try {
             StringBuilder url = new StringBuilder(host);
             url.append("?version=2&encoding=1&area=viewBannerXml&ip=").append(sasParams.getRemoteHostIp());
@@ -145,8 +140,7 @@ public class DCPWapStartAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status)
-    {
+    public void parseResponse(String response, HttpResponseStatus status) {
         logger.debug("response is", response);
 
         if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
@@ -217,21 +211,18 @@ public class DCPWapStartAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return (config.getString("wapstart.advertiserId"));
     }
 
     @Override
-    public boolean isClickUrlRequired()
-    {
+    public boolean isClickUrlRequired() {
         return true;
     }
 
     // form httprequest
     @Override
-    public HttpRequest getHttpRequest() throws Exception
-    {
+    public HttpRequest getHttpRequest() throws Exception {
         try {
             URI uri = getRequestUri();
             requestUrl = uri.toString();

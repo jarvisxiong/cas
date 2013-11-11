@@ -31,8 +31,7 @@ import com.inmobi.adserve.channels.util.DebugLogger;
  * @author tushara
  * 
  */
-public class MullahMediaAdNetworkTest extends TestCase
-{
+public class MullahMediaAdNetworkTest extends TestCase {
 
     private Configuration         mockConfig        = null;
     private final String          debug             = "debug";
@@ -46,8 +45,7 @@ public class MullahMediaAdNetworkTest extends TestCase
     private final String          huntmadsTest      = "1";
     private final String          publisherId       = "1423";
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("mullahmedia.host")).andReturn(mullahMediaHost).anyTimes();
         expect(mockConfig.getString("mullahmedia.status")).andReturn(mullahMediaStatus).anyTimes();
@@ -61,8 +59,7 @@ public class MullahMediaAdNetworkTest extends TestCase
     }
 
     @Override
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File f;
         f = new File(loggerConf);
         if (!f.exists()) {
@@ -78,8 +75,7 @@ public class MullahMediaAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testMullahMediaConfigureParameters()
-    {
+    public void testMullahMediaConfigureParameters() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -99,8 +95,7 @@ public class MullahMediaAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testMullahMediaConfigureParametersBlankIP()
-    {
+    public void testMullahMediaConfigureParametersBlankIP() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
@@ -120,8 +115,7 @@ public class MullahMediaAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testMullahMediaConfigureParametersBlankExtKey()
-    {
+    public void testMullahMediaConfigureParametersBlankExtKey() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -141,8 +135,7 @@ public class MullahMediaAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testMullahMediaConfigureParametersBlankUA()
-    {
+    public void testMullahMediaConfigureParametersBlankUA() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -160,8 +153,7 @@ public class MullahMediaAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testMullahMediaRequestUri() throws Exception
-    {
+    public void testMullahMediaRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -177,8 +169,7 @@ public class MullahMediaAdNetworkTest extends TestCase
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         String blurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&beacon=1";
-        Long[] segmentCategories = new Long[]
-        { 13l, 15l };
+        Long[] segmentCategories = new Long[] { 13l, 15l };
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
             mullahMediaAdvId, null, null, null, 0, null, segmentCategories, true, true, externalKey, null, null, null,
             123456, true, null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
@@ -191,8 +182,7 @@ public class MullahMediaAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testMullahMediaRequestUriRON() throws Exception
-    {
+    public void testMullahMediaRequestUriRON() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -205,14 +195,12 @@ public class MullahMediaAdNetworkTest extends TestCase
         sasParams.setSlot("15");
         String externalKey = "1324";
         sasParams.setSiteIncId(56789);
-        Long[] cat = new Long[]
-        { 15l, 13l };
+        Long[] cat = new Long[] { 15l, 13l };
         sasParams.setCategories(Arrays.asList(cat));
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         String blurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&beacon=1";
-        Long[] segmentCategories = new Long[]
-        { 1l };
+        Long[] segmentCategories = new Long[] { 1l };
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
             mullahMediaAdvId, null, null, null, 0, null, segmentCategories, true, true, externalKey, null, null, null,
             123456, true, null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
@@ -225,8 +213,7 @@ public class MullahMediaAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testMullahMediaRequestUriMisc() throws Exception
-    {
+    public void testMullahMediaRequestUriMisc() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -255,8 +242,7 @@ public class MullahMediaAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testMullahMediaRequestUriBlankLatLong() throws Exception
-    {
+    public void testMullahMediaRequestUriBlankLatLong() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -283,8 +269,7 @@ public class MullahMediaAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testMullahMediaRequestUriBlankSlot() throws Exception
-    {
+    public void testMullahMediaRequestUriBlankSlot() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -314,8 +299,7 @@ public class MullahMediaAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testMullahMediaParseResponse() throws Exception
-    {
+    public void testMullahMediaParseResponse() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -339,16 +323,14 @@ public class MullahMediaAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testMullahMediaParseInvalidResponse() throws Exception
-    {
+    public void testMullahMediaParseInvalidResponse() throws Exception {
         String response = "HTTP/1.1 20a OK\nServer=Netscape-Enterprise/4.1\n\n[{\"error\" : \"No ads available\"}];";
         dcpMMAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpMMAdNetwork.getHttpResponseStatusCode(), 500);
     }
 
     @Test
-    public void testMullahMediaParseNoAd() throws Exception
-    {
+    public void testMullahMediaParseNoAd() throws Exception {
         String response = "{\"error\":\"no ad is available\"}";
         dcpMMAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpMMAdNetwork.getHttpResponseStatusCode(), 500);
@@ -356,8 +338,7 @@ public class MullahMediaAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testMullahMediaParseEmptyResponseCode() throws Exception
-    {
+    public void testMullahMediaParseEmptyResponseCode() throws Exception {
         String response = "";
         dcpMMAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpMMAdNetwork.getHttpResponseStatusCode(), 500);
@@ -365,14 +346,12 @@ public class MullahMediaAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testMullahMediaGetId() throws Exception
-    {
+    public void testMullahMediaGetId() throws Exception {
         assertEquals(dcpMMAdNetwork.getId(), mullahMediaAdvId);
     }
 
     @Test
-    public void testMullahMediaGetImpressionId() throws Exception
-    {
+    public void testMullahMediaGetImpressionId() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -394,14 +373,12 @@ public class MullahMediaAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testMullahMediaGetName() throws Exception
-    {
+    public void testMullahMediaGetName() throws Exception {
         assertEquals(dcpMMAdNetwork.getName(), "mullahmedia");
     }
 
     @Test
-    public void testMullahMediaIsClickUrlReq() throws Exception
-    {
+    public void testMullahMediaIsClickUrlReq() throws Exception {
         assertEquals(dcpMMAdNetwork.isClickUrlRequired(), true);
     }
 }

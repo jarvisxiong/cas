@@ -26,8 +26,7 @@ import com.inmobi.adserve.channels.api.ServerException;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPAjillionReporting extends BaseReportingImpl
-{
+public class DCPAjillionReporting extends BaseReportingImpl {
     private final Configuration config;
     private final String        password;
     private String              date;
@@ -38,8 +37,7 @@ public class DCPAjillionReporting extends BaseReportingImpl
     private String              name;
     private ReportTime          startTime;
 
-    public DCPAjillionReporting(final Configuration config, final String name)
-    {
+    public DCPAjillionReporting(final Configuration config, final String name) {
         this.config = config;
         password = config.getString(name + ".password");
         host = config.getString(name + ".host");
@@ -48,24 +46,21 @@ public class DCPAjillionReporting extends BaseReportingImpl
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 10;
     }
 
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
             final ReportTime endTime) throws KeyManagementException, NoSuchAlgorithmException, MalformedURLException,
-            ServerException, IOException, ParserConfigurationException, SAXException, JSONException
-    {
+            ServerException, IOException, ParserConfigurationException, SAXException, JSONException {
         // NO Op
         return null;
     }
 
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final ReportTime endTime)
-            throws Exception
-    {
+            throws Exception {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
 
@@ -122,37 +117,31 @@ public class DCPAjillionReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return (config.getString(name + ".advertiserId"));
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         return host;
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return 1;
     }
 
-    public String getEndDate()
-    {
+    public String getEndDate() {
         try {
             logger.debug("calculating end date for ", name);
             ReportTime reportTime = ReportTime.getUTCTime();
@@ -168,8 +157,7 @@ public class DCPAjillionReporting extends BaseReportingImpl
         }
     }
 
-    private JSONObject getRequestParams(String methodName, JSONObject params) throws JSONException, ServerException
-    {
+    private JSONObject getRequestParams(String methodName, JSONObject params) throws JSONException, ServerException {
         JSONObject requestParams = new JSONObject();
         requestParams.put("jsonrpc", "2.0");
         requestParams.put("method", methodName);
@@ -178,8 +166,7 @@ public class DCPAjillionReporting extends BaseReportingImpl
         return requestParams;
     }
 
-    private JSONObject getRequestToken() throws JSONException, ServerException
-    {
+    private JSONObject getRequestToken() throws JSONException, ServerException {
 
         JSONObject userParams = new JSONObject();
         userParams.put("password", password);
@@ -187,8 +174,7 @@ public class DCPAjillionReporting extends BaseReportingImpl
         return userParams;
     }
 
-    public String invokeUrl(String host, JSONObject queryObject) throws HttpException, IOException
-    {
+    public String invokeUrl(String host, JSONObject queryObject) throws HttpException, IOException {
         URL url = new URL(host);
         HttpURLConnection.setFollowRedirects(false);
         HttpURLConnection hconn = (HttpURLConnection) url.openConnection();
@@ -210,8 +196,7 @@ public class DCPAjillionReporting extends BaseReportingImpl
     }
 
     private void generateReportResponse(final DebugLogger logger, ReportResponse reportResponse, JSONArray responseArray)
-            throws JSONException
-    {
+            throws JSONException {
 
         for (int i = 0; i < responseArray.length(); i++) {
             JSONObject reportRow = responseArray.getJSONObject(i);

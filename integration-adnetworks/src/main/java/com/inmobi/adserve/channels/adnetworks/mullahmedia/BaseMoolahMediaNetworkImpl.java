@@ -27,8 +27,7 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public abstract class BaseMoolahMediaNetworkImpl extends BaseAdNetworkImpl
-{
+public abstract class BaseMoolahMediaNetworkImpl extends BaseAdNetworkImpl {
 
     protected String                     advertiserId;
     protected String                     publisherId;
@@ -63,16 +62,14 @@ public abstract class BaseMoolahMediaNetworkImpl extends BaseAdNetworkImpl
     }
 
     public BaseMoolahMediaNetworkImpl(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent)
-    {
+            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
         super(baseRequestHandler, serverEvent, logger);
         this.clientBootstrap = clientBootstrap;
         this.logger = logger;
     }
 
     @Override
-    protected boolean configureParameters()
-    {
+    protected boolean configureParameters() {
         if (sasParams.getRemoteHostIp() == null || StringUtils.isEmpty(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             logger.info("mandate parameters missing for mullah media so exiting adapter");
@@ -87,26 +84,22 @@ public abstract class BaseMoolahMediaNetworkImpl extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return advertiserName;
     }
 
     @Override
-    public boolean isClickUrlRequired()
-    {
+    public boolean isClickUrlRequired() {
         return true;
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return advertiserId;
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status)
-    {
+    public void parseResponse(String response, HttpResponseStatus status) {
         if (StringUtils.isBlank(response) || status.getCode() != 200 || !response.startsWith("{")
                 || response.startsWith("{\"error")) {
             statusCode = status.getCode();
@@ -152,8 +145,7 @@ public abstract class BaseMoolahMediaNetworkImpl extends BaseAdNetworkImpl
         logger.debug("response length is ", responseContent.length());
     }
 
-    public String getRequestParameters() throws Exception
-    {
+    public String getRequestParameters() throws Exception {
         StringBuilder sb = new StringBuilder();
         sb.append("user_agent=").append(getURLEncode(sasParams.getUserAgent(), format)).append("&user_ip=");
         sb.append(sasParams.getRemoteHostIp())
@@ -208,8 +200,7 @@ public abstract class BaseMoolahMediaNetworkImpl extends BaseAdNetworkImpl
     }
 
     @Override
-    public URI getRequestUri() throws Exception
-    {
+    public URI getRequestUri() throws Exception {
         try {
             return (new URI(host + "?" + getRequestParameters()));
         }
@@ -220,8 +211,7 @@ public abstract class BaseMoolahMediaNetworkImpl extends BaseAdNetworkImpl
         return null;
     }
 
-    public String getCategory()
-    {
+    public String getCategory() {
         Long[] segmentCategories = entity.getTags();
         if (segmentCategories != null && segmentCategories[0] != 1) {
             for (int index = 0; index < segmentCategories.length; index++) {
@@ -244,8 +234,7 @@ public abstract class BaseMoolahMediaNetworkImpl extends BaseAdNetworkImpl
         return "miscellenous";
     }
 
-    public Integer getCarrierId()
-    {
+    public Integer getCarrierId() {
         try {
             return carrierIdMap.get(sasParams.getCarrier().getInt(0));
         }
@@ -261,8 +250,7 @@ public abstract class BaseMoolahMediaNetworkImpl extends BaseAdNetworkImpl
      * @return
      */
     @Override
-    protected String getUid()
-    {
+    protected String getUid() {
         if (sasParams.getOsId() == HandSetOS.iPhone_OS.getValue()
                 && StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
             return casInternalRequestParameters.uidIFA;

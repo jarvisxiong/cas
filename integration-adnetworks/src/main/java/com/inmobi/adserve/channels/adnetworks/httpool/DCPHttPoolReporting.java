@@ -46,8 +46,7 @@ import com.inmobi.adserve.channels.util.DebugLogger;
  * @author thushara
  * 
  */
-public class DCPHttPoolReporting extends BaseReportingImpl
-{
+public class DCPHttPoolReporting extends BaseReportingImpl {
     private final Configuration config;
     private final String        password;
     private String              date;
@@ -59,8 +58,7 @@ public class DCPHttPoolReporting extends BaseReportingImpl
     private String              endDate;
     private Connection          connection;
 
-    public DCPHttPoolReporting(final Configuration config, final Connection connection)
-    {
+    public DCPHttPoolReporting(final Configuration config, final Connection connection) {
         this.config = config;
         this.connection = connection;
         password = config.getString("httpool.password");
@@ -69,25 +67,19 @@ public class DCPHttPoolReporting extends BaseReportingImpl
     }
 
     public String invokeHTTPUrl(final String url) throws ServerException, NoSuchAlgorithmException,
-            KeyManagementException, MalformedURLException, IOException
-    {
-        TrustManager[] trustAllCerts = new TrustManager[]
-        { new X509TrustManager()
-        {
+            KeyManagementException, MalformedURLException, IOException {
+        TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
             @Override
-            public java.security.cert.X509Certificate[] getAcceptedIssuers()
-            {
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                 return null;
             }
 
             @Override
-            public void checkClientTrusted(final X509Certificate[] certs, final String authType)
-            {
+            public void checkClientTrusted(final X509Certificate[] certs, final String authType) {
             }
 
             @Override
-            public void checkServerTrusted(final X509Certificate[] certs, final String authType)
-            {
+            public void checkServerTrusted(final X509Certificate[] certs, final String authType) {
             }
         } };
 
@@ -97,11 +89,9 @@ public class DCPHttPoolReporting extends BaseReportingImpl
         HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
         // Create all-trusting host name verifier
-        HostnameVerifier allHostsValid = new HostnameVerifier()
-        {
+        HostnameVerifier allHostsValid = new HostnameVerifier() {
             @Override
-            public boolean verify(final String hostname, final SSLSession session)
-            {
+            public boolean verify(final String hostname, final SSLSession session) {
                 return true;
             }
         };
@@ -137,16 +127,14 @@ public class DCPHttPoolReporting extends BaseReportingImpl
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 10;
     }
 
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
             final ReportTime endTime) throws KeyManagementException, NoSuchAlgorithmException, MalformedURLException,
-            ServerException, IOException, ParserConfigurationException, SAXException
-    {
+            ServerException, IOException, ParserConfigurationException, SAXException {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
 
@@ -234,26 +222,22 @@ public class DCPHttPoolReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return (config.getString("httpool.advertiserId"));
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "httpool";
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         StringBuilder url = new StringBuilder();
         url.append(host).append("?token=").append(password);
         url.append("&p=start=").append(date).append(";end=").append(endDate);
@@ -263,13 +247,11 @@ public class DCPHttPoolReporting extends BaseReportingImpl
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return 1;
     }
 
-    public String getEndDate(final String seperator)
-    {
+    public String getEndDate(final String seperator) {
         try {
             logger.debug("calculating end date for httpool");
             ReportTime reportTime = ReportTime.getUTCTime();
@@ -285,8 +267,7 @@ public class DCPHttPoolReporting extends BaseReportingImpl
         }
     }
 
-    private String getHeader() throws UnsupportedEncodingException
-    {
+    private String getHeader() throws UnsupportedEncodingException {
         byte[] nonceB = generateNonce();
         String nonce = base64Encode(nonceB);
         String created = generateTimestamp();
@@ -306,8 +287,7 @@ public class DCPHttPoolReporting extends BaseReportingImpl
         return header.toString();
     }
 
-    private static byte[] generateNonce()
-    {
+    private static byte[] generateNonce() {
         String nonce = Long.toString(new Date().getTime());
         return nonce.getBytes();
     }
@@ -315,14 +295,12 @@ public class DCPHttPoolReporting extends BaseReportingImpl
     /**
      * @return current date and time in required format (W3DTF)
      */
-    private String generateTimestamp()
-    {
+    private String generateTimestamp() {
         SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         return dateFormatter.format(new Date());
     }
 
-    private static synchronized String getBase64Digest(final byte[] nonce, final byte[] created, final byte[] password)
-    {
+    private static synchronized String getBase64Digest(final byte[] nonce, final byte[] created, final byte[] password) {
         try {
             MessageDigest messageDigester = MessageDigest.getInstance("SHA-1");
             // SHA-1 ( nonce + created + password )
@@ -337,8 +315,7 @@ public class DCPHttPoolReporting extends BaseReportingImpl
         }
     }
 
-    private static String base64Encode(final byte[] bytes)
-    {
+    private static String base64Encode(final byte[] bytes) {
         return new String(Base64.encodeBase64(bytes));
     }
 }

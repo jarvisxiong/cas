@@ -30,8 +30,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPAmobeeAdnetworkTest extends TestCase
-{
+public class DCPAmobeeAdnetworkTest extends TestCase {
     private Configuration         mockConfig        = null;
     private final String          debug             = "debug";
     private final String          loggerConf        = "/tmp/channel-server.properties";
@@ -45,8 +44,7 @@ public class DCPAmobeeAdnetworkTest extends TestCase
     private final String          amobeeTest        = "1";
     private final String          amobeeAdNetworkId = "test";
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("amobee.host")).andReturn(amobeeHost).anyTimes();
         expect(mockConfig.getString("amobee.status")).andReturn(amobeeStatus).anyTimes();
@@ -60,8 +58,7 @@ public class DCPAmobeeAdnetworkTest extends TestCase
     }
 
     @Override
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File f;
         f = new File(loggerConf);
         if (!f.exists()) {
@@ -78,8 +75,7 @@ public class DCPAmobeeAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAdelphicConfigureParameters() throws JSONException
-    {
+    public void testDCPAdelphicConfigureParameters() throws JSONException {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -101,8 +97,7 @@ public class DCPAmobeeAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAmobeeConfigureParametersBlankIP()
-    {
+    public void testDCPAmobeeConfigureParametersBlankIP() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
@@ -121,8 +116,7 @@ public class DCPAmobeeAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAmobeeConfigureParametersAdditionalParams()
-    {
+    public void testDCPAmobeeConfigureParametersAdditionalParams() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -141,8 +135,7 @@ public class DCPAmobeeAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAmobeeConfigureParametersBlankUA()
-    {
+    public void testDCPAmobeeConfigureParametersBlankUA() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -160,12 +153,10 @@ public class DCPAmobeeAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAmobeeRequestUri() throws Exception
-    {
+    public void testDCPAmobeeRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]
-        { 50l, 51l }));
+        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSource("APP");
@@ -192,15 +183,13 @@ public class DCPAmobeeAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAmobeeRequestUriBlankLatLong() throws Exception
-    {
+    public void testDCPAmobeeRequestUriBlankLatLong() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSource("WAP");
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]
-        { 50l, 51l }));
+        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
         casInternalRequestParameters.latLong = "38.5,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
@@ -230,12 +219,10 @@ public class DCPAmobeeAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAmobeeParseAd() throws Exception
-    {
+    public void testDCPAmobeeParseAd() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]
-        { 50l, 51l }));
+        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSlot("15");
@@ -259,12 +246,10 @@ public class DCPAmobeeAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAmobeeParseAppAd() throws Exception
-    {
+    public void testDCPAmobeeParseAppAd() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]
-        { 50l, 51l }));
+        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSlot("15");
@@ -289,16 +274,14 @@ public class DCPAmobeeAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAmobeeParseNoAd() throws Exception
-    {
+    public void testDCPAmobeeParseNoAd() throws Exception {
         String response = "";
         dcpAmobeeAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(500, dcpAmobeeAdNetwork.getHttpResponseStatusCode());
     }
 
     @Test
-    public void testDCPAmobeeParseEmptyResponseCode() throws Exception
-    {
+    public void testDCPAmobeeParseEmptyResponseCode() throws Exception {
         String response = "";
         dcpAmobeeAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(500, dcpAmobeeAdNetwork.getHttpResponseStatusCode());
@@ -306,14 +289,12 @@ public class DCPAmobeeAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAmobeeGetId() throws Exception
-    {
+    public void testDCPAmobeeGetId() throws Exception {
         assertEquals(amobeeAdvId, dcpAmobeeAdNetwork.getId());
     }
 
     @Test
-    public void testDCPAmobeeGetImpressionId() throws Exception
-    {
+    public void testDCPAmobeeGetImpressionId() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -335,14 +316,12 @@ public class DCPAmobeeAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAmobeeGetName() throws Exception
-    {
+    public void testDCPAmobeeGetName() throws Exception {
         assertEquals("amobee", dcpAmobeeAdNetwork.getName());
     }
 
     @Test
-    public void testDCPAmobeeIsClickUrlReq() throws Exception
-    {
+    public void testDCPAmobeeIsClickUrlReq() throws Exception {
         assertEquals(false, dcpAmobeeAdNetwork.isClickUrlRequired());
     }
 }

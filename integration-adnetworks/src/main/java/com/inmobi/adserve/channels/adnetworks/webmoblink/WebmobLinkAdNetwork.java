@@ -24,8 +24,7 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class WebmobLinkAdNetwork extends BaseAdNetworkImpl
-{
+public class WebmobLinkAdNetwork extends BaseAdNetworkImpl {
     private Configuration          config;
     private String                 mode;
     private String                 responseFormat;
@@ -57,8 +56,7 @@ public class WebmobLinkAdNetwork extends BaseAdNetworkImpl
 
     public WebmobLinkAdNetwork(final DebugLogger logger, final Configuration config,
             final ClientBootstrap clientBootstrap, final HttpRequestHandlerBase baseRequestHandler,
-            final MessageEvent serverEvent)
-    {
+            final MessageEvent serverEvent) {
         super(baseRequestHandler, serverEvent, logger);
         this.logger = logger;
         this.config = config;
@@ -66,8 +64,7 @@ public class WebmobLinkAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public boolean configureParameters()
-    {
+    public boolean configureParameters() {
         mode = config.getString("webmoblink.mode").toUpperCase();
         responseFormat = config.getString("webmoblink.adformat");
         host = config.getString("webmoblink.host");
@@ -108,26 +105,22 @@ public class WebmobLinkAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return (config.getString("webmoblink.advertiserId"));
     }
 
     @Override
-    public boolean isClickUrlRequired()
-    {
+    public boolean isClickUrlRequired() {
         return true;
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "webmoblink";
     }
 
     @Override
-    public URI getRequestUri() throws Exception
-    {
+    public URI getRequestUri() throws Exception {
         try {
             logger.debug("pid=", externalSiteId, " mo=", mode, ", ua=", sasParams.getUserAgent(), ", ip=",
                 sasParams.getRemoteHostIp(), ", format=", responseFormat, ", result=", result, ", country=", country,
@@ -163,8 +156,7 @@ public class WebmobLinkAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public void parseResponse(final String response, final HttpResponseStatus status)
-    {
+    public void parseResponse(final String response, final HttpResponseStatus status) {
         super.parseResponse(response, status);
         if (statusCode == 200 && !StringUtils.isBlank(responseContent)) {
             logger.debug("Insert beacon url in the Webmoblink ad response.");

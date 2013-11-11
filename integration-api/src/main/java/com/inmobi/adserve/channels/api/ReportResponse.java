@@ -3,11 +3,9 @@ package com.inmobi.adserve.channels.api;
 import java.util.ArrayList;
 
 
-public class ReportResponse
-{
+public class ReportResponse {
 
-    public static class ReportRow
-    {
+    public static class ReportRow {
         public ReportTime                           reportTime;
         public long                                 clicks      = -1;
         public long                                 impressions = -1;
@@ -23,8 +21,7 @@ public class ReportResponse
         public ReportingInterface.ReportGranularity slotSize;
         public boolean                              isSiteData  = false; // not segment level data
 
-        public String toLogLine()
-        {
+        public String toLogLine() {
             StringBuilder logLine = new StringBuilder();
             logLine.append("{");
             logLine.append("\"rDt\":\"").append(reportTime.getStringDate("-")).append('\"');
@@ -55,8 +52,7 @@ public class ReportResponse
         }
     }
 
-    public enum ResponseStatus
-    {
+    public enum ResponseStatus {
         SUCCESS,
         NO_NEW_UPDATE,
         FAIL_SERVER_ERROR,
@@ -67,24 +63,20 @@ public class ReportResponse
     public ArrayList<ReportRow> rows;
     public ResponseStatus       status;
 
-    public ReportResponse(ResponseStatus status)
-    {
+    public ReportResponse(ResponseStatus status) {
         this.status = status;
         rows = new ArrayList<ReportRow>();
     }
 
-    public void addReportRow(ReportRow row)
-    {
+    public void addReportRow(ReportRow row) {
         rows.add(row);
     }
 
-    public ResponseStatus getResponseStatus()
-    {
+    public ResponseStatus getResponseStatus() {
         return status;
     }
 
-    public ArrayList<ReportRow> getReportRows()
-    {
+    public ArrayList<ReportRow> getReportRows() {
         return rows;
     }
 }

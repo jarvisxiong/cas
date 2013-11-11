@@ -9,8 +9,7 @@ import com.inmobi.adserve.channels.api.ServerException;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class MobileCommerceReportingAdapter extends BaseReportingImpl
-{
+public class MobileCommerceReportingAdapter extends BaseReportingImpl {
 
     private Configuration config;
     private DebugLogger   logger;
@@ -25,8 +24,7 @@ public class MobileCommerceReportingAdapter extends BaseReportingImpl
     // private ReportResponse reportResponse;
     private String        responseString = "";
 
-    public MobileCommerceReportingAdapter(final Configuration config)
-    {
+    public MobileCommerceReportingAdapter(final Configuration config) {
         this.config = config;
         pubId = config.getString("mobilecommerce.pubId");
         responseFormat = config.getString("mobilecommerce.responseFormat");
@@ -38,8 +36,7 @@ public class MobileCommerceReportingAdapter extends BaseReportingImpl
     // Fetches the report from the TPAN
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws ServerException
-    {
+            final ReportTime endTime) throws ServerException {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         logger.debug("inside fetch rows of mobile commerce");
@@ -130,8 +127,7 @@ public class MobileCommerceReportingAdapter extends BaseReportingImpl
         return reportResponse;
     }
 
-    public String getEndDate() throws Exception
-    {
+    public String getEndDate() throws Exception {
         try {
             logger.debug("calculating end date for mobile commerce");
             ReportTime reportTime = ReportTime.getPacificTime();
@@ -148,40 +144,34 @@ public class MobileCommerceReportingAdapter extends BaseReportingImpl
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         String url = String.format("%s%s/?pubid=%s&startdate=%s&enddate=%s&currency=%s&display=%s", baseUrl,
             responseFormat, pubId, startDate, endDate, currency, display);
         return url;
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return -7;
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 16;
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "MobileCommerce";
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return (config.getString("mobilecommerce.advertiserId"));
     }
 }

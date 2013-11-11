@@ -34,8 +34,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPLomarkAdnetworkTest extends TestCase
-{
+public class DCPLomarkAdnetworkTest extends TestCase {
     private Configuration         mockConfig      = null;
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
@@ -48,8 +47,7 @@ public class DCPLomarkAdnetworkTest extends TestCase
     private final String          lomarkKey       = "1000";
     private final String          lomarkSecretKey = "SecretKey";
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("lomark.host")).andReturn(lomarkHost).anyTimes();
         expect(mockConfig.getString("lomark.status")).andReturn(lomarkStatus).anyTimes();
@@ -63,8 +61,7 @@ public class DCPLomarkAdnetworkTest extends TestCase
     }
 
     @Override
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File f;
         f = new File(loggerConf);
         if (!f.exists()) {
@@ -81,8 +78,7 @@ public class DCPLomarkAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLomarkConfigureParameters()
-    {
+    public void testDCPLomarkConfigureParameters() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -104,8 +100,7 @@ public class DCPLomarkAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLomarkConfigureParametersAppWithoutUdid()
-    {
+    public void testDCPLomarkConfigureParametersAppWithoutUdid() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -127,8 +122,7 @@ public class DCPLomarkAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLomarkConfigureParametersWAP()
-    {
+    public void testDCPLomarkConfigureParametersWAP() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -150,8 +144,7 @@ public class DCPLomarkAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLomarkConfigureParametersBlankIP()
-    {
+    public void testDCPLomarkConfigureParametersBlankIP() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
@@ -174,8 +167,7 @@ public class DCPLomarkAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testLomarkConfigureParametersBlankExtKey()
-    {
+    public void testLomarkConfigureParametersBlankExtKey() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -200,8 +192,7 @@ public class DCPLomarkAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLomarkConfigureParametersBlankUA()
-    {
+    public void testDCPLomarkConfigureParametersBlankUA() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
 
@@ -224,8 +215,7 @@ public class DCPLomarkAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLomarkRequestUri() throws Exception
-    {
+    public void testDCPLomarkRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("5.63.24.1");
@@ -287,8 +277,7 @@ public class DCPLomarkAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLomarkRequestUriWithSegmentCategory() throws Exception
-    {
+    public void testDCPLomarkRequestUriWithSegmentCategory() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("5.63.24.1");
@@ -305,8 +294,7 @@ public class DCPLomarkAdnetworkTest extends TestCase
         String externalKey = "1324";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
-        Long[] segmentCategories = new Long[]
-        { 11l, 15l };
+        Long[] segmentCategories = new Long[] { 11l, 15l };
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
             lomarkAdvId, null, null, null, 0, null, segmentCategories, true, true, externalKey, null, null, null,
             12121212, true, null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
@@ -351,8 +339,7 @@ public class DCPLomarkAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLomarkRequestUriWithSiteCategorySegmentRON() throws Exception
-    {
+    public void testDCPLomarkRequestUriWithSiteCategorySegmentRON() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("5.63.24.1");
@@ -369,10 +356,8 @@ public class DCPLomarkAdnetworkTest extends TestCase
         String externalKey = "1324";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
-        Long[] segmentCategories = new Long[]
-        { 1l };
-        Long[] cat = new Long[]
-        { 99l, 15l };
+        Long[] segmentCategories = new Long[] { 1l };
+        Long[] cat = new Long[] { 99l, 15l };
         sasParams.setCategories(Arrays.asList(cat));
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
             lomarkAdvId, null, null, null, 0, null, segmentCategories, true, true, externalKey, null, null, null,
@@ -418,8 +403,7 @@ public class DCPLomarkAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLomarkRequestUriBlankLatLong() throws Exception
-    {
+    public void testDCPLomarkRequestUriBlankLatLong() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -478,8 +462,7 @@ public class DCPLomarkAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLomarkParseResponseAdForImageAd() throws Exception
-    {
+    public void testDCPLomarkParseResponseAdForImageAd() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -504,8 +487,7 @@ public class DCPLomarkAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLomarkParseResponseAdForGifAd() throws Exception
-    {
+    public void testDCPLomarkParseResponseAdForGifAd() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -532,16 +514,14 @@ public class DCPLomarkAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLomarkParseNoAd() throws Exception
-    {
+    public void testDCPLomarkParseNoAd() throws Exception {
         String response = "";
         dcpLomarkAdnetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(500, dcpLomarkAdnetwork.getHttpResponseStatusCode());
     }
 
     @Test
-    public void testDCPLomarkParseEmptyResponseCode() throws Exception
-    {
+    public void testDCPLomarkParseEmptyResponseCode() throws Exception {
         String response = "";
         dcpLomarkAdnetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(500, dcpLomarkAdnetwork.getHttpResponseStatusCode());
@@ -549,14 +529,12 @@ public class DCPLomarkAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLomarkGetId() throws Exception
-    {
+    public void testDCPLomarkGetId() throws Exception {
         assertEquals("lomarkadv1", dcpLomarkAdnetwork.getId());
     }
 
     @Test
-    public void testDCPLomarkGetImpressionId() throws Exception
-    {
+    public void testDCPLomarkGetImpressionId() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -577,14 +555,12 @@ public class DCPLomarkAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLomarkGetName() throws Exception
-    {
+    public void testDCPLomarkGetName() throws Exception {
         assertEquals("lomark", dcpLomarkAdnetwork.getName());
     }
 
     @Test
-    public void testDCPLomarkIsClickUrlReq() throws Exception
-    {
+    public void testDCPLomarkIsClickUrlReq() throws Exception {
         assertTrue(dcpLomarkAdnetwork.isClickUrlRequired());
     }
 

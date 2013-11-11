@@ -21,8 +21,7 @@ import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class IFCReportingTest extends TestCase
-{
+public class IFCReportingTest extends TestCase {
 
     private Configuration mockConfig = null;
 
@@ -31,8 +30,7 @@ public class IFCReportingTest extends TestCase
     private final String  debug      = "debug";
     private DebugLogger   logger;
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("ifc.baseUrl"))
                 .andReturn("http://localhost:8080/IFCGateway/admin/v1/billings")
@@ -46,8 +44,7 @@ public class IFCReportingTest extends TestCase
     }
 
     @Override
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File f;
         f = new File("/tmp/channel-server.properties");
         if (!f.exists()) {
@@ -60,8 +57,7 @@ public class IFCReportingTest extends TestCase
         ifcReporting = new IFCReporting(mockConfig);
     }
 
-    public void testFetchRows()
-    {
+    public void testFetchRows() {
         ReportTime reportTime = new ReportTime("2011-08-01", 05);
         ReportResponse reportResponse = ifcReporting.fetchRows(logger, reportTime, null);
         List<ReportRow> reportRows = reportResponse.getReportRows();

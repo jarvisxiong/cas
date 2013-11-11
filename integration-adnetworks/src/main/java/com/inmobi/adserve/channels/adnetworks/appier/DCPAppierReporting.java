@@ -11,8 +11,7 @@ import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPAppierReporting extends BaseReportingImpl
-{
+public class DCPAppierReporting extends BaseReportingImpl {
 
     private final Configuration config;
     private DebugLogger         logger;
@@ -23,8 +22,7 @@ public class DCPAppierReporting extends BaseReportingImpl
     private String              publisherId    = "";
     private String              password       = "";
 
-    public DCPAppierReporting(final Configuration config)
-    {
+    public DCPAppierReporting(final Configuration config) {
         this.config = config;
         host = config.getString("appier.reportUrl");
         publisherId = config.getString("appier.pubId");
@@ -33,8 +31,7 @@ public class DCPAppierReporting extends BaseReportingImpl
 
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final ReportTime endTime)
-            throws Exception
-    {
+            throws Exception {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         logger.debug("inside fetch rows of appier");
@@ -70,8 +67,7 @@ public class DCPAppierReporting extends BaseReportingImpl
         return reportResponse;
     }
 
-    public String getEndDate() throws Exception
-    {
+    public String getEndDate() throws Exception {
         try {
             logger.debug("calculating latest date for appier");
             ReportTime reportTime = ReportTime.getUTCTime();
@@ -88,53 +84,45 @@ public class DCPAppierReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
 
         return String.format(host, publisherId, password, startDate, endDate);
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return -7;
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 18;
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "Appier";
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return (config.getString("appier.advertiserId"));
     }
 
     @Override
     public ReportResponse fetchRows(DebugLogger logger, ReportTime startTime, String key, ReportTime endTime)
-            throws Exception
-    {
+            throws Exception {
         // not applicable so returns null
         return null;
     }
 
     private void generateReportResponse(final DebugLogger logger, ReportResponse reportResponse, JSONArray responseArray)
-            throws JSONException
-    {
+            throws JSONException {
 
         for (int i = 0; i < responseArray.length(); i++) {
             JSONObject reportRow = responseArray.getJSONObject(i);

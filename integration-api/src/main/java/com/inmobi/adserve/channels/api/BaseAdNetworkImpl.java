@@ -35,8 +35,7 @@ import com.inmobi.adserve.channels.util.IABCategoriesMap;
 
 
 // This abstract class have base functionality of TPAN adapters.
-public abstract class BaseAdNetworkImpl implements AdNetworkInterface
-{
+public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     private ChannelFuture                         future;
     protected ClientBootstrap                     clientBootstrap;
@@ -85,27 +84,23 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface
     protected static final String                 COUNTRY                 = "country";
     protected static final String                 GENDER                  = "gender";
 
-    public BaseAdNetworkImpl(HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent, DebugLogger logger)
-    {
+    public BaseAdNetworkImpl(HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent, DebugLogger logger) {
         this.logger = logger;
         this.baseRequestHandler = baseRequestHandler;
         this.serverEvent = serverEvent;
     }
 
     @Override
-    public boolean isRtbPartner()
-    {
+    public boolean isRtbPartner() {
         return isRtbPartner;
     }
 
-    public void setRtbPartner(boolean isRtbPartner)
-    {
+    public void setRtbPartner(boolean isRtbPartner) {
         this.isRtbPartner = isRtbPartner;
     }
 
     @Override
-    public Integer getChannelId()
-    {
+    public Integer getChannelId() {
         if (null == channel) {
             return null;
         }
@@ -114,8 +109,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface
 
     // makes an async request to thirdparty network
     @Override
-    public boolean makeAsyncRequest()
-    {
+    public boolean makeAsyncRequest() {
         if (useJsAdTag()) {
             generateJsAdResponse();
             processResponse();
@@ -148,11 +142,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface
         // waiting for connection to happen and then sending http request
         // through
         // channel
-        future.addListener(new ChannelFutureListener()
-        {
+        future.addListener(new ChannelFutureListener() {
             @Override
-            public void operationComplete(ChannelFuture future) throws Exception
-            {
+            public void operationComplete(ChannelFuture future) throws Exception {
                 connectionLatency = System.currentTimeMillis() - startTime;
                 if (!future.isSuccess()) {
                     latency = System.currentTimeMillis() - startTime;
@@ -166,11 +158,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface
                 if (channel.isWritable()) {
                     channel.write(request);
                 }
-                channel.getCloseFuture().addListener(new ChannelFutureListener()
-                {
+                channel.getCloseFuture().addListener(new ChannelFutureListener() {
                     @Override
-                    public void operationComplete(ChannelFuture future) throws Exception
-                    {
+                    public void operationComplete(ChannelFuture future) throws Exception {
                         latency = System.currentTimeMillis() - startTime;
                         if (!isRequestCompleted()) {
                             logger.debug("Operation complete for channel partner:", getName());
@@ -199,8 +189,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface
         return true;
     }
 
-    public void processResponse()
-    {
+    public void processResponse() {
         logger.debug("Inside process Response for the partner:", getName());
         if (isRequestComplete) {
             logger.debug("Already cleanedup so returning from process response");
@@ -242,8 +231,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface
 
     // form httprequest
     @Override
-    public HttpRequest getHttpRequest() throws Exception
-    {
+    public HttpRequest getHttpRequest() throws Exception {
         try {
             URI uri = getRequestUri();
             requestUrl = uri.toString();
@@ -267,57 +255,48 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface
 
     // request url of each adapter for logging
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         return requestUrl;
     }
 
     // Returns the status code after the request is complete
-    public int getHttpResponseStatusCode()
-    {
+    public int getHttpResponseStatusCode() {
         return statusCode;
     }
 
     // Returns the content of http response.
     @Override
-    public String getHttpResponseContent()
-    {
+    public String getHttpResponseContent() {
         return responseContent;
     }
 
     @Override
-    public Map getResponseHeaders()
-    {
+    public Map getResponseHeaders() {
         return responseHeaders;
     }
 
     // Returns true if request is completed.
     @Override
-    public boolean isRequestCompleted()
-    {
+    public boolean isRequestCompleted() {
         return isRequestComplete;
     }
 
-    public JSONObject getLogline()
-    {
+    public JSONObject getLogline() {
         return null;
     }
 
     @Override
-    public URI getRequestUri() throws Exception
-    {
+    public URI getRequestUri() throws Exception {
         return null;
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return "";
     }
 
     @Override
-    public void cleanUp()
-    {
+    public void cleanUp() {
         if (!isRequestCompleted()) {
             isRequestComplete = true;
             if (channel == null) {
@@ -371,8 +350,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface
     // response
     // message and latency
     @Override
-    public ThirdPartyAdResponse getResponseAd()
-    {
+    public ThirdPartyAdResponse getResponseAd() {
         if (responseStruct != null) {
             return responseStruct;
         }
@@ -408,16 +386,14 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface
         return responseStruct;
     }
 
-    protected boolean configureParameters()
-    {
+    protected boolean configureParameters() {
         return false;
     }
 
     @Override
     public boolean configureParameters(SASRequestParameters param,
             CasInternalRequestParameters casInternalRequestParameters, ChannelSegmentEntity entity, String clickUrl,
-            String beaconUrl)
-    {
+            String beaconUrl) {
         this.sasParams = param;
         this.casInternalRequestParameters = casInternalRequestParameters;
         this.externalSiteId = entity.getExternalSiteKey();
@@ -431,56 +407,47 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface
     }
 
     @Override
-    public boolean isBeaconUrlRequired()
-    {
+    public boolean isBeaconUrlRequired() {
         return true;
     }
 
     @Override
-    public boolean isClickUrlRequired()
-    {
+    public boolean isClickUrlRequired() {
         return false;
     }
 
     @Override
-    public double getBidprice()
-    {
+    public double getBidprice() {
         return -1;
     }
 
     @Override
-    public boolean isInternal()
-    {
+    public boolean isInternal() {
         return false;
     }
 
     @Override
-    public void impressionCallback()
-    {
+    public void impressionCallback() {
         // Do nothing
     }
 
     @Override
-    public void noImpressionCallBack()
-    {
+    public void noImpressionCallBack() {
         // Do Nothing
     }
 
     @Override
-    public ThirdPartyAdResponse getResponseStruct()
-    {
+    public ThirdPartyAdResponse getResponseStruct() {
         return responseStruct;
     }
 
     @Override
-    public String getClickUrl()
-    {
+    public String getClickUrl() {
         return clickUrl;
     }
 
     // parsing the response message to get HTTP response code and httpresponse
-    public void parseResponse(String response, HttpResponseStatus status)
-    {
+    public void parseResponse(String response, HttpResponseStatus status) {
         logger.debug("response is", response);
         if (StringUtils.isBlank(response) || status.getCode() != 200 || response.startsWith("<!--")) {
             statusCode = status.getCode();
@@ -504,24 +471,20 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface
      * @param adGroupIncId
      * @return
      */
-    protected static String getBlindedSiteId(long siteIncId, long adGroupIncId)
-    {
+    protected static String getBlindedSiteId(long siteIncId, long adGroupIncId) {
         return (new UUID(adGroupIncId, siteIncId)).toString();
     }
 
-    protected String getCategories(char seperator)
-    {
+    protected String getCategories(char seperator) {
         return getCategories(seperator, true);
 
     }
 
-    protected String getCategories(char seperator, boolean isAllRequired)
-    {
+    protected String getCategories(char seperator, boolean isAllRequired) {
         return getCategories(seperator, true, false);
     }
 
-    protected String getCategories(char seperator, boolean isAllRequired, boolean isIABCategory)
-    {
+    protected String getCategories(char seperator, boolean isAllRequired, boolean isIABCategory) {
         StringBuilder sb = new StringBuilder();
         Long[] segmentCategories = null;
         boolean allTags = false;
@@ -579,8 +542,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface
      * 
      * @return
      */
-    protected String getUid()
-    {
+    protected String getUid() {
         if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
             return casInternalRequestParameters.uidIFA;
         }
@@ -603,8 +565,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface
      * @param sb
      * @param category
      */
-    private void appendCategories(StringBuilder sb, String category, char seperator)
-    {
+    private void appendCategories(StringBuilder sb, String category, char seperator) {
         logger.debug("category is", category);
         if (category != null) {
             sb.append(category).append(seperator);
@@ -612,19 +573,16 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface
     }
 
     @Override
-    public long getLatency()
-    {
+    public long getLatency() {
         return latency;
     }
 
-    public String getImpressionId()
-    {
+    public String getImpressionId() {
         return impressionId;
     }
 
     // return year of birth
-    protected String getYearofBirth()
-    {
+    protected String getYearofBirth() {
         if (sasParams.getAge() != null && sasParams.getAge().matches("\\d+")) {
             Calendar cal = new GregorianCalendar();
             return (Integer.toString(cal.get(Calendar.YEAR) - Integer.parseInt(sasParams.getAge())));
@@ -633,31 +591,26 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface
     }
 
     @Override
-    public String getAdStatus()
-    {
+    public String getAdStatus() {
         return this.adStatus;
     }
 
     @Override
-    public void setSecondBidPrice(Double price)
-    {
+    public void setSecondBidPrice(Double price) {
         return;
     }
 
     @Override
-    public double getSecondBidPrice()
-    {
+    public double getSecondBidPrice() {
         return -1;
     }
 
     @Override
-    public long getConnectionLatency()
-    {
+    public long getConnectionLatency() {
         return connectionLatency;
     }
 
-    protected String getURLEncode(String param, String format)
-    {
+    protected String getURLEncode(String param, String format) {
         String encodedString = DEFAULT_EMPTY_STRING;
         String decoded = param;
 
@@ -683,13 +636,11 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface
         return encodedString;
     }
 
-    protected String getValueFromListAsString(List<String> list)
-    {
+    protected String getValueFromListAsString(List<String> list) {
         return getValueFromListAsString(list, ',');
     }
 
-    protected String getValueFromListAsString(List<String> list, char seperatar)
-    {
+    protected String getValueFromListAsString(List<String> list, char seperatar) {
         if (list.size() == 0) {
             return "";
         }
@@ -700,24 +651,20 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface
         return s.toString();
     }
 
-    public boolean useJsAdTag()
-    {
+    public boolean useJsAdTag() {
         return false;
     }
 
-    public void generateJsAdResponse()
-    {
+    public void generateJsAdResponse() {
 
     }
 
     @Override
-    public void setEncryptedBid(String encryptedBid)
-    {
+    public void setEncryptedBid(String encryptedBid) {
 
     }
 
-    protected String getHashedValue(String message, String hashingType)
-    {
+    protected String getHashedValue(String message, String hashingType) {
         try {
             MessageDigest md = MessageDigest.getInstance(hashingType);
             byte[] array = md.digest(message.getBytes());
@@ -733,26 +680,22 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface
     }
 
     protected StringBuilder appendQueryParam(final StringBuilder builder, final String paramName,
-            final String paramValue, final boolean isFirstParam)
-    {
+            final String paramValue, final boolean isFirstParam) {
         return builder.append(isFirstParam ? '?' : '&').append(paramName).append('=').append(paramValue);
     }
 
     @Override
-    public String getAuctionId()
-    {
+    public String getAuctionId() {
         return null;
     }
 
     @Override
-    public String getRtbImpressionId()
-    {
+    public String getRtbImpressionId() {
         return null;
     }
 
     @Override
-    public String getSeatId()
-    {
+    public String getSeatId() {
         return null;
     }
 

@@ -38,8 +38,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class AdNetworksTest extends TestCase
-{
+public class AdNetworksTest extends TestCase {
     private final String            atntAdvertiserId         = "2345";
     private final String            atntHost                 = "http://api.yp.com/display/v1/ad?apikey=";
 
@@ -90,8 +89,7 @@ public class AdNetworksTest extends TestCase
     private final String            webmoblinkAdFormat       = "IMG";
     private DebugLogger             logger;
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("ifd.host")).andReturn(ifdHost).anyTimes();
         expect(mockConfig.getString("ifd.advertiserId")).andReturn(ifdAdvertiserId).anyTimes();
@@ -134,8 +132,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Override
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File f;
         f = new File("/tmp/channel-server.properties");
         if (!f.exists()) {
@@ -158,8 +155,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testIFDConfigureParameters()
-    {
+    public void testIFDConfigureParameters() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -178,8 +174,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testAtntConfigureParameters()
-    {
+    public void testAtntConfigureParameters() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -197,8 +192,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDCPTapitConfigureParameters()
-    {
+    public void testDCPTapitConfigureParameters() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -217,8 +211,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDCPTapitConfigureParametersForBlockingOpera()
-    {
+    public void testDCPTapitConfigureParametersForBlockingOpera() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -237,8 +230,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDCPTapitConfigureParametersBlankIP()
-    {
+    public void testDCPTapitConfigureParametersBlankIP() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
@@ -257,8 +249,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDCPTapitConfigureParametersBlankExtKey()
-    {
+    public void testDCPTapitConfigureParametersBlankExtKey() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -277,8 +268,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDCPTapitConfigureParametersBlankUA()
-    {
+    public void testDCPTapitConfigureParametersBlankUA() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -296,8 +286,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testWebmoblinkConfigureParameters() throws JSONException
-    {
+    public void testWebmoblinkConfigureParameters() throws JSONException {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -305,8 +294,7 @@ public class AdNetworksTest extends TestCase
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         JSONArray jsonArray = new JSONArray("[365,0,\"us\",10224,10225]");
         sasParams.setCarrier(jsonArray);
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 10l, 13l, 30l }));
+        sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         String externalSiteKey = "10023";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(webmoblinkAdvId, null,
@@ -318,16 +306,14 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testWebmoblinkConfigureParametersBlankIP()
-    {
+    public void testWebmoblinkConfigureParametersBlankIP() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         sasParams.setAllParametersJson("{\"carrier\": [365,0,\"us\",10224,10225]}");
-        Long[] cats =
-        { 10l, 13l, 30l };
+        Long[] cats = { 10l, 13l, 30l };
         sasParams.setCategories(Arrays.asList(cats));
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         String externalSiteKey = "10023";
@@ -340,16 +326,14 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testWebmoblinkConfigureParametersBlankExtKey()
-    {
+    public void testWebmoblinkConfigureParametersBlankExtKey() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         sasParams.setAllParametersJson("{\"carrier\": [365,0,\"us\",10224,10225]}");
-        Long[] cats =
-        { 10l, 13l, 30l };
+        Long[] cats = { 10l, 13l, 30l };
         sasParams.setCategories(Arrays.asList(cats));
 
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
@@ -363,15 +347,13 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testWebmoblinkConfigureParametersBlankUA()
-    {
+    public void testWebmoblinkConfigureParametersBlankUA() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent(" ");
         sasParams.setAllParametersJson("{\"carrier\": [365,0,\"us\",10224,10225]}");
-        Long[] cats =
-        { 10l, 13l, 30l };
+        Long[] cats = { 10l, 13l, 30l };
         sasParams.setCategories(Arrays.asList(cats));
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         String externalSiteKey = "10023";
@@ -384,8 +366,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testWebmoblinkConfigureParametersBlankCategories() throws JSONException
-    {
+    public void testWebmoblinkConfigureParametersBlankCategories() throws JSONException {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -405,8 +386,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testWebmoblinkConfigureParametersInvalidCarrier() throws JSONException
-    {
+    public void testWebmoblinkConfigureParametersInvalidCarrier() throws JSONException {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -414,8 +394,7 @@ public class AdNetworksTest extends TestCase
         sasParams.setCarrier(jsonArray);
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-        Long[] cats =
-        { 10l, 13l, 30l };
+        Long[] cats = { 10l, 13l, 30l };
         sasParams.setCategories(Arrays.asList(cats));
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
                 + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1" + "/9cddca11?ds=1";
@@ -429,8 +408,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testMobileCommerceConfigureParameters()
-    {
+    public void testMobileCommerceConfigureParameters() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -448,8 +426,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testOpenxRequestUriWithIFA() throws Exception
-    {
+    public void testOpenxRequestUriWithIFA() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -474,8 +451,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testOpenxRequestUriWithO1() throws Exception
-    {
+    public void testOpenxRequestUriWithO1() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -500,8 +476,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testOpenxRequestUri() throws Exception
-    {
+    public void testOpenxRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -524,8 +499,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDrawBridgeConfigureParametersNullUid()
-    {
+    public void testDrawBridgeConfigureParametersNullUid() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
@@ -545,8 +519,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDrawBridgeConfigureParametersWithfilter_iPodNotSet()
-    {
+    public void testDrawBridgeConfigureParametersWithfilter_iPodNotSet() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
@@ -567,8 +540,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDrawBridgeConfigureParametersWithfilter_iPod_1_RequestNoniPodDevice() throws JSONException
-    {
+    public void testDrawBridgeConfigureParametersWithfilter_iPod_1_RequestNoniPodDevice() throws JSONException {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
@@ -589,8 +561,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDrawBridgeConfigureParametersWithfilter_iPod_1_RequestiPodDevice() throws JSONException
-    {
+    public void testDrawBridgeConfigureParametersWithfilter_iPod_1_RequestiPodDevice() throws JSONException {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
@@ -611,8 +582,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDrawBridgeConfigureParametersWithfilter_iPod_2_RequestiPodDevice() throws JSONException
-    {
+    public void testDrawBridgeConfigureParametersWithfilter_iPod_2_RequestiPodDevice() throws JSONException {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
@@ -633,8 +603,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDrawBridgeRequestUri() throws Exception
-    {
+    public void testDrawBridgeRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -660,8 +629,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDrawBridgeRequestUriWithSegmentCategory() throws Exception
-    {
+    public void testDrawBridgeRequestUriWithSegmentCategory() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -673,12 +641,10 @@ public class AdNetworksTest extends TestCase
         sasParams
                 .setAllParametersJson("{\"ctr-file-ver\":\"1.0@2012-11-27 00:15:52.797193\",\"site-type\":\"FAMILY_SAFE\",\"rq-h-user-agent\":\"Mozilla/5.0 (Linux; U; Android 4.0.4; en-us; DROID RAZR Build/6.7.2-180_DHD-16_M4-31) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30\",\"handset\":[45907,\"motorola_droid_razr_ver1_subuano4gics\",5,5,46137418,38281146588463104],\"rq-mk-adcount\":\"1\",\"tp\":\"c_gwhirl\",\"new-category\":[23],\"site-floor\":0.02,\"rq-mk-ad-slot\":\"15\",\"u-id-params\":{\"O1\":\"dac95d86b46afdce78e1b36c082fda03\",\"u-id-s\":\"O1\"},\"carrier\":[406,94,\"US\",11326,11945],\"site-url\":\"https://play.google.com/store/apps/details?id=com.game.JewelsStar\",\"tid\":\"2d965a58-cbac-4d01-bdc9-45085ee0f841\",\"rq-mk-siteid\":\"4028cbff3af511e5013b07c6d64e01f7\",\"site\":[144419,65],\"w-s-carrier\":\"174.65.0.112\",\"loc-src\":\"wifi\",\"slot-served\":\"15\",\"uparams\":{\"u-appdnm\":\"Jewels Star\",\"u-inmobi_androidwebsdkversion\":\"3.5.4\",\"u-appver\":\"2.4\",\"u-key-ver\":\"1\",\"u-income\":\"65000\",\"u-appbid\":\"com.game.JewelsStar\"},\"r-format\":\"xhtml\",\"site-allowBanner\":true,\"category\":[1,13,70,110,224,228,238,249,337,359],\"source\":\"ANDROID\",\"rich-media\":false,\"adcode\":\"NON-JS\",\"sdk-version\":\"a354\",\"pub-id\":\"d24f9e2e04d64829bcd4eae79502045f\"}");
         sasParams.setSiteIncId(121212);
-        Long[] cats = new Long[]
-        { 7l, 8l };
+        Long[] cats = new Long[] { 7l, 8l };
         sasParams.setCategories(Arrays.asList(cats));
         String externalKey = "191000";
-        Long[] segmentCategories = new Long[]
-        { 13l, 15l };
+        Long[] segmentCategories = new Long[] { 13l, 15l };
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(dbAdvertiserId, null,
             null, null, 0, null, segmentCategories, true, true, externalKey, null, null, null, 0, true, null, null, 0,
             null, false, false, false, false, false, false, false, false, false, false, new JSONObject(),
@@ -691,8 +657,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDrawBridgeRequestUriWithSiteCategorySegmentRON() throws Exception
-    {
+    public void testDrawBridgeRequestUriWithSiteCategorySegmentRON() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -704,12 +669,10 @@ public class AdNetworksTest extends TestCase
         sasParams
                 .setAllParametersJson("{\"ctr-file-ver\":\"1.0@2012-11-27 00:15:52.797193\",\"site-type\":\"FAMILY_SAFE\",\"rq-h-user-agent\":\"Mozilla/5.0 (Linux; U; Android 4.0.4; en-us; DROID RAZR Build/6.7.2-180_DHD-16_M4-31) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30\",\"handset\":[45907,\"motorola_droid_razr_ver1_subuano4gics\",5,5,46137418,38281146588463104],\"rq-mk-adcount\":\"1\",\"tp\":\"c_gwhirl\",\"new-category\":[23],\"site-floor\":0.02,\"rq-mk-ad-slot\":\"15\",\"u-id-params\":{\"O1\":\"dac95d86b46afdce78e1b36c082fda03\",\"u-id-s\":\"O1\"},\"carrier\":[406,94,\"US\",11326,11945],\"site-url\":\"https://play.google.com/store/apps/details?id=com.game.JewelsStar\",\"tid\":\"2d965a58-cbac-4d01-bdc9-45085ee0f841\",\"rq-mk-siteid\":\"4028cbff3af511e5013b07c6d64e01f7\",\"site\":[144419,65],\"w-s-carrier\":\"174.65.0.112\",\"loc-src\":\"wifi\",\"slot-served\":\"15\",\"uparams\":{\"u-appdnm\":\"Jewels Star\",\"u-inmobi_androidwebsdkversion\":\"3.5.4\",\"u-appver\":\"2.4\",\"u-key-ver\":\"1\",\"u-income\":\"65000\",\"u-appbid\":\"com.game.JewelsStar\"},\"r-format\":\"xhtml\",\"site-allowBanner\":true,\"category\":[1,13,70,110,224,228,238,249,337,359],\"source\":\"ANDROID\",\"rich-media\":false,\"adcode\":\"NON-JS\",\"sdk-version\":\"a354\",\"pub-id\":\"d24f9e2e04d64829bcd4eae79502045f\"}");
         sasParams.setSiteIncId(121212);
-        Long[] cats = new Long[]
-        { 7l, 8l };
+        Long[] cats = new Long[] { 7l, 8l };
         sasParams.setCategories(Arrays.asList(cats));
         String externalKey = "191000";
-        Long[] segmentCategories = new Long[]
-        { 1l };
+        Long[] segmentCategories = new Long[] { 1l };
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(dbAdvertiserId, null,
             null, null, 0, null, segmentCategories, true, true, externalKey, null, null, null, 0, true, null, null, 0,
             null, false, false, false, false, false, false, false, false, false, false, new JSONObject(),
@@ -722,8 +685,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDrawBridgeRequestUriWithoutAnyCategory() throws Exception
-    {
+    public void testDrawBridgeRequestUriWithoutAnyCategory() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -750,8 +712,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDrawBridgeRequestUriWithIDA() throws Exception
-    {
+    public void testDrawBridgeRequestUriWithIDA() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -779,8 +740,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testAtntRequestUri() throws Exception
-    {
+    public void testAtntRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -803,8 +763,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDCPTapitRequestUri() throws Exception
-    {
+    public void testDCPTapitRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -830,8 +789,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDCPTapitRequestUriBlankLatLong() throws Exception
-    {
+    public void testDCPTapitRequestUriBlankLatLong() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -858,8 +816,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDCPTapitRequestUriBlankSlot() throws Exception
-    {
+    public void testDCPTapitRequestUriBlankSlot() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -885,8 +842,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testWebmoblinkRequestUri() throws Exception
-    {
+    public void testWebmoblinkRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -894,8 +850,7 @@ public class AdNetworksTest extends TestCase
         sasParams.setCarrier(jsonArray);
         sasParams.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29"
                 + "+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-        Long[] cats =
-        { 10l, 13l, 30l };
+        Long[] cats = { 10l, 13l, 30l };
         sasParams.setCategories(Arrays.asList(cats));
         String beaconUrl = "http://c2.w.inmobi.com/c"
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
@@ -913,8 +868,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testWebmoblinkRequestUriBlankCountry() throws Exception
-    {
+    public void testWebmoblinkRequestUriBlankCountry() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -922,8 +876,7 @@ public class AdNetworksTest extends TestCase
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         JSONArray jsonArray = new JSONArray("[365,0,\"us\",10224,10225]");
         sasParams.setCarrier(jsonArray);
-        Long[] cats =
-        { 10l, 13l, 30l };
+        Long[] cats = { 10l, 13l, 30l };
         sasParams.setCategories(Arrays.asList(cats));
         String beaconUrl = "http://c2.w.inmobi.com/c"
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
@@ -940,8 +893,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testWebmoblinkRequestUriBlankChannels() throws Exception
-    {
+    public void testWebmoblinkRequestUriBlankChannels() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -966,8 +918,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testOpenxResponse() throws Exception
-    {
+    public void testOpenxResponse() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -994,8 +945,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testOpenxResponseWap() throws Exception
-    {
+    public void testOpenxResponseWap() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -1023,8 +973,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testOpenxResponseApp() throws Exception
-    {
+    public void testOpenxResponseApp() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -1052,8 +1001,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testOpenxResponseAppIMAI() throws Exception
-    {
+    public void testOpenxResponseAppIMAI() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -1083,8 +1031,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDrawbridgeParseResponseWAP() throws Exception
-    {
+    public void testDrawbridgeParseResponseWAP() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -1112,8 +1059,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDrawbridgeParseResponseApp() throws Exception
-    {
+    public void testDrawbridgeParseResponseApp() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
 
@@ -1141,8 +1087,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testDrawbridgeParseResponseAppIMAI() throws Exception
-    {
+    public void testDrawbridgeParseResponseAppIMAI() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -1171,8 +1116,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testTapitParseResponseBanner() throws Exception
-    {
+    public void testTapitParseResponseBanner() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -1197,8 +1141,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testTapitParseResponseHtmlWap() throws Exception
-    {
+    public void testTapitParseResponseHtmlWap() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -1223,8 +1166,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testTapitParseResponseHtmlApp() throws Exception
-    {
+    public void testTapitParseResponseHtmlApp() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -1249,8 +1191,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testTapitParseResponseHtmlAppIMAI() throws Exception
-    {
+    public void testTapitParseResponseHtmlAppIMAI() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -1277,8 +1218,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testTapitParseResponseTextWap() throws Exception
-    {
+    public void testTapitParseResponseTextWap() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -1303,8 +1243,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testTapitParseResponseTextAppSDK360() throws Exception
-    {
+    public void testTapitParseResponseTextAppSDK360() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -1331,8 +1270,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testMobileCommerceParseResponse() throws Exception
-    {
+    public void testMobileCommerceParseResponse() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -1356,8 +1294,7 @@ public class AdNetworksTest extends TestCase
     }
 
     @Test
-    public void testMobileCommerceParseResponseSDK360O() throws Exception
-    {
+    public void testMobileCommerceParseResponseSDK360O() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -1392,8 +1329,7 @@ public class AdNetworksTest extends TestCase
             final boolean appUrlEnabled, final boolean interstitialOnly, final boolean nonInterstitialOnly,
             final boolean stripUdId, final boolean stripZipCode, final boolean stripLatlong,
             final JSONObject additionalParams, final List<Integer> manufModelTargetingList, final double ecpmBoost,
-            final Timestamp eCPMBoostDate, final Long[] tod, final long adGroupIncId)
-    {
+            final Timestamp eCPMBoostDate, final Long[] tod, final long adGroupIncId) {
         ChannelSegmentEntity.Builder builder = ChannelSegmentEntity.newBuilder();
         builder.setAdvertiserId(advertiserId);
         builder.setAdvertiserId(advertiserId);

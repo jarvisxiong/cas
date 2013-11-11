@@ -20,8 +20,7 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public class OpenxAdNetwork extends BaseAdNetworkImpl
-{
+public class OpenxAdNetwork extends BaseAdNetworkImpl {
     // Updates the request parameters according to the Ad Network. Returns true on
     // success.i
 
@@ -30,8 +29,7 @@ public class OpenxAdNetwork extends BaseAdNetworkImpl
     private final Configuration config;
 
     public OpenxAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent)
-    {
+            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
         super(baseRequestHandler, serverEvent, logger);
         this.logger = logger;
         this.config = config;
@@ -40,8 +38,7 @@ public class OpenxAdNetwork extends BaseAdNetworkImpl
 
     // Configure the request parameters for making the ad call
     @Override
-    public boolean configureParameters()
-    {
+    public boolean configureParameters() {
         if (StringUtils.isBlank(externalSiteId)) {
             logger.debug("mandate parameters missing for openx, so returning from adapter");
             return false;
@@ -58,21 +55,18 @@ public class OpenxAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "openx";
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return (config.getString("openx.advertiserId"));
     }
 
     // get URI
     @Override
-    public URI getRequestUri() throws Exception
-    {
+    public URI getRequestUri() throws Exception {
         StringBuilder finalUrl = new StringBuilder(config.getString("openx.host"));
         finalUrl.append(externalSiteId)
                     .append("&cnt=")
@@ -135,8 +129,7 @@ public class OpenxAdNetwork extends BaseAdNetworkImpl
 
     // parse the response received from openx
     @Override
-    public void parseResponse(String response, HttpResponseStatus status)
-    {
+    public void parseResponse(String response, HttpResponseStatus status) {
         logger.debug("response is", response, "and response length is", response.length());
         if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
             statusCode = status.getCode();

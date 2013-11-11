@@ -67,8 +67,7 @@ import com.inmobi.casthrift.rtb.User;
  * 
  * @author Devi Chand(devi.chand@inmobi.com)
  */
-public class RtbAdNetwork extends BaseAdNetworkImpl
-{
+public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     @Getter
     @Setter
@@ -101,8 +100,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl
     private static final String            DISPLAY_MANAGER_INMOBI_SDK   = "inmobi_sdk";
     private static final String            DISPLAY_MANAGER_INMOBI_JS    = "inmobi_js";
     private final DebugLogger              logger;
-    private final String[]                 currenciesSupported          =
-                                                                        { "USD" };
+    private final String[]                 currenciesSupported          = { "USD" };
     private String                         advertiserId;
     public static ImpressionCallbackHelper impressionCallbackHelper;
     private IABCategoriesInterface         iabCategoriesInterface;
@@ -127,8 +125,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl
 
     public RtbAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
             HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent, String urlBase, String advertiserName,
-            int tmax)
-    {
+            int tmax) {
 
         super(baseRequestHandler, serverEvent, logger);
         this.config = config;
@@ -151,8 +148,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    protected boolean configureParameters()
-    {
+    protected boolean configureParameters() {
 
         logger.debug("inside configureParameters of RTB");
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
@@ -211,8 +207,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl
     }
 
     private boolean createBidRequestObject(List<Impression> impresssionlist, Site site, App app, User user,
-            Device device)
-    {
+            Device device) {
         bidRequest = new BidRequest(casInternalRequestParameters.auctionId, impresssionlist);
         bidRequest.setTmax(tmax);
         bidRequest.setAt(auctionType);
@@ -259,8 +254,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl
         return true;
     }
 
-    private boolean serializeBidRequest()
-    {
+    private boolean serializeBidRequest() {
         TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
         try {
             bidRequestJson = serializer.toString(bidRequest);
@@ -278,8 +272,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl
         return true;
     }
 
-    private Impression createImpressionObject(Banner banner, String displayManager, String displayManagerVersion)
-    {
+    private Impression createImpressionObject(Banner banner, String displayManager, String displayManagerVersion) {
         Impression impression;
         if (null != casInternalRequestParameters.impressionId) {
             impression = new Impression(casInternalRequestParameters.impressionId);
@@ -310,8 +303,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl
         return impression;
     }
 
-    private Banner createBannerObject()
-    {
+    private Banner createBannerObject() {
         Banner banner = new Banner();
         ;
         banner.setId(casInternalRequestParameters.impressionId);
@@ -342,8 +334,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl
         return banner;
     }
 
-    private Geo createGeoObject()
-    {
+    private Geo createGeoObject() {
         Geo geo = new Geo();
         if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
                 && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
@@ -368,8 +359,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl
         return geo;
     }
 
-    private User createUserObject()
-    {
+    private User createUserObject() {
         User user = new User();
         user.setGender(sasParams.getGenderOrig());
         if (casInternalRequestParameters.uid != null) {
@@ -391,8 +381,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl
         return user;
     }
 
-    private Site createSiteObject()
-    {
+    private Site createSiteObject() {
         Site site = null;
         if (siteBlinded) {
             site = new Site(getBlindedSiteId(sasParams.getSiteIncId(), entity.getIncId()));
@@ -409,8 +398,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl
         return site;
     }
 
-    private App createAppObject()
-    {
+    private App createAppObject() {
         App app = null;
         if (siteBlinded) {
             app = new App(getBlindedSiteId(sasParams.getSiteIncId(), entity.getAdgroupIncId()));
@@ -424,8 +412,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl
         return app;
     }
 
-    private Device createDeviceObject(Geo geo)
-    {
+    private Device createDeviceObject(Geo geo) {
         Device device = new Device();
         device.setIp(sasParams.getRemoteHostIp());
         device.setUa(sasParams.getUserAgent());
@@ -478,8 +465,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl
 
     @SuppressWarnings("unused")
     @Override
-    public void impressionCallback()
-    {
+    public void impressionCallback() {
         URI uriCallBack = null;
         this.callbackUrl = replaceRTBMacros(this.callbackUrl, 2);
         logger.debug("Callback url is : ", callbackUrl);
@@ -516,8 +502,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl
     }
 
     @SuppressWarnings("unused")
-    private void setCallbackContent()
-    {
+    private void setCallbackContent() {
         StringBuilder content = new StringBuilder();
         content.append("{\"bidid\"=")
                     .append(bidResponse.bidid)
@@ -532,8 +517,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl
                     .append("}");
     }
 
-    public String replaceRTBMacros(String url, int dst)
-    {
+    public String replaceRTBMacros(String url, int dst) {
         url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_ID), bidResponse.id);
         url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_BID_ID), bidResponse.bidid);
         url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_CURRENCY), bidResponse.cur);
@@ -565,8 +549,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public HttpRequest getHttpRequest() throws Exception
-    {
+    public HttpRequest getHttpRequest() throws Exception {
 
         HttpMethod httpRequestMethod;
         if (rtbMethod.equalsIgnoreCase("get")) {
@@ -601,8 +584,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl
         return request;
     }
 
-    public URI getRequestUri()
-    {
+    public URI getRequestUri() {
         StringBuilder url = null;
         url = new StringBuilder();
         if (rtbMethod.equalsIgnoreCase("get")) {
@@ -615,8 +597,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl
         return (URI.create(url.toString()));
     }
 
-    public void parseResponse(String response, HttpResponseStatus status)
-    {
+    public void parseResponse(String response, HttpResponseStatus status) {
         adStatus = "NO_AD";
         logger.debug("response is ", response);
         if (status.getCode() != 200 || StringUtils.isBlank(response)) {
@@ -688,8 +669,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl
         logger.debug("response length is ", responseContent.length());
     }
 
-    public boolean deserializeReponse(String response)
-    {
+    public boolean deserializeReponse(String response) {
         Gson gson = new Gson();
         try {
             bidResponse = gson.fromJson(response, BidResponse.class);
@@ -711,26 +691,22 @@ public class RtbAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return advertiserId;
     }
 
     @Override
-    public double getBidprice()
-    {
+    public double getBidprice() {
         return bidprice;
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return this.advertiserName;
     }
 
     @Override
-    public void setSecondBidPrice(Double price)
-    {
+    public void setSecondBidPrice(Double price) {
         this.secondBidPrice = price;
         logger.debug("responseContent before replaceMacros is", responseContent);
         this.responseContent = replaceRTBMacros(this.responseContent, sasParams.getDst());
@@ -741,32 +717,27 @@ public class RtbAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public double getSecondBidPrice()
-    {
+    public double getSecondBidPrice() {
         return secondBidPrice;
     }
 
     @Override
-    public void setEncryptedBid(String encryptedBid)
-    {
+    public void setEncryptedBid(String encryptedBid) {
         this.encryptedBid = encryptedBid;
     }
 
     @Override
-    public String getAuctionId()
-    {
+    public String getAuctionId() {
         return responseAuctionId;
     }
 
     @Override
-    public String getRtbImpressionId()
-    {
+    public String getRtbImpressionId() {
         return responseImpressionId;
     }
 
     @Override
-    public String getSeatId()
-    {
+    public String getSeatId() {
         return responseSeatId;
     }
 }

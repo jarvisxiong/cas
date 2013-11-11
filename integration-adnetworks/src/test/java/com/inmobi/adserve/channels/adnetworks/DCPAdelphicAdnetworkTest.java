@@ -29,8 +29,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPAdelphicAdnetworkTest extends TestCase
-{
+public class DCPAdelphicAdnetworkTest extends TestCase {
     private Configuration         mockConfig      = null;
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
@@ -43,8 +42,7 @@ public class DCPAdelphicAdnetworkTest extends TestCase
     private final String          adelphicAdvId   = "adelphicadv1";
     private final String          adelphicTest    = "1";
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("adelphic.host")).andReturn(adelphicHost).anyTimes();
         expect(mockConfig.getString("adelphic.status")).andReturn(adelphicStatus).anyTimes();
@@ -57,8 +55,7 @@ public class DCPAdelphicAdnetworkTest extends TestCase
     }
 
     @Override
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File f;
         f = new File(loggerConf);
         if (!f.exists()) {
@@ -75,8 +72,7 @@ public class DCPAdelphicAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAdelphicConfigureParameters() throws JSONException
-    {
+    public void testDCPAdelphicConfigureParameters() throws JSONException {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -98,8 +94,7 @@ public class DCPAdelphicAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAdelphicConfigureParametersBlankIP()
-    {
+    public void testDCPAdelphicConfigureParametersBlankIP() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
@@ -118,8 +113,7 @@ public class DCPAdelphicAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAdelphicConfigureParametersAdditionalParams()
-    {
+    public void testDCPAdelphicConfigureParametersAdditionalParams() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -138,8 +132,7 @@ public class DCPAdelphicAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAdelphicConfigureParametersBlankUA()
-    {
+    public void testDCPAdelphicConfigureParametersBlankUA() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -157,12 +150,10 @@ public class DCPAdelphicAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAdelphicRequestUri() throws Exception
-    {
+    public void testDCPAdelphicRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]
-        { 50l, 51l }));
+        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSource("APP");
@@ -188,15 +179,13 @@ public class DCPAdelphicAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAdelphicRequestUriBlankLatLong() throws Exception
-    {
+    public void testDCPAdelphicRequestUriBlankLatLong() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSource("WAP");
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]
-        { 50l, 51l }));
+        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
         casInternalRequestParameters.latLong = "38.5,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
@@ -225,12 +214,10 @@ public class DCPAdelphicAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAdelphicParseAd() throws Exception
-    {
+    public void testDCPAdelphicParseAd() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]
-        { 50l, 51l }));
+        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSlot("15");
@@ -254,12 +241,10 @@ public class DCPAdelphicAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAdelphicParseAppAd() throws Exception
-    {
+    public void testDCPAdelphicParseAppAd() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]
-        { 50l, 51l }));
+        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSlot("15");
@@ -284,16 +269,14 @@ public class DCPAdelphicAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAdelphicParseNoAd() throws Exception
-    {
+    public void testDCPAdelphicParseNoAd() throws Exception {
         String response = "";
         dcpAdelphicAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(500, dcpAdelphicAdNetwork.getHttpResponseStatusCode());
     }
 
     @Test
-    public void testDCPAdelphicParseEmptyResponseCode() throws Exception
-    {
+    public void testDCPAdelphicParseEmptyResponseCode() throws Exception {
         String response = "";
         dcpAdelphicAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(500, dcpAdelphicAdNetwork.getHttpResponseStatusCode());
@@ -301,14 +284,12 @@ public class DCPAdelphicAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAdelphicGetId() throws Exception
-    {
+    public void testDCPAdelphicGetId() throws Exception {
         assertEquals(adelphicAdvId, dcpAdelphicAdNetwork.getId());
     }
 
     @Test
-    public void testDCPAdelphicGetImpressionId() throws Exception
-    {
+    public void testDCPAdelphicGetImpressionId() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -330,14 +311,12 @@ public class DCPAdelphicAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPAdelphicGetName() throws Exception
-    {
+    public void testDCPAdelphicGetName() throws Exception {
         assertEquals("adelphic", dcpAdelphicAdNetwork.getName());
     }
 
     @Test
-    public void testDCPAdelphicIsClickUrlReq() throws Exception
-    {
+    public void testDCPAdelphicIsClickUrlReq() throws Exception {
         assertEquals(false, dcpAdelphicAdNetwork.isClickUrlRequired());
     }
 }

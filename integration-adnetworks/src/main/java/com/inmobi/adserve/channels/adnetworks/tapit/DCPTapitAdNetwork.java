@@ -23,8 +23,7 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public class DCPTapitAdNetwork extends BaseAdNetworkImpl
-{
+public class DCPTapitAdNetwork extends BaseAdNetworkImpl {
     private final Configuration config;
 
     private String              latitude;
@@ -33,8 +32,7 @@ public class DCPTapitAdNetwork extends BaseAdNetworkImpl
     private double              height;
 
     public DCPTapitAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent)
-    {
+            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
         super(baseRequestHandler, serverEvent, logger);
         this.config = config;
         this.clientBootstrap = clientBootstrap;
@@ -42,8 +40,7 @@ public class DCPTapitAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public boolean configureParameters()
-    {
+    public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             logger.debug("mandate parameters missing for tapit so exiting adapter");
@@ -71,20 +68,17 @@ public class DCPTapitAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "tapit";
     }
 
     @Override
-    public boolean isClickUrlRequired()
-    {
+    public boolean isClickUrlRequired() {
         return true;
     }
 
     @Override
-    public URI getRequestUri() throws Exception
-    {
+    public URI getRequestUri() throws Exception {
         try {
             StringBuilder url = new StringBuilder();
             url.append(host).append("?format=").append(config.getString("tapit.responseFormat")).append("&ip=");
@@ -134,8 +128,7 @@ public class DCPTapitAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status)
-    {
+    public void parseResponse(String response, HttpResponseStatus status) {
         logger.debug("response is ", response);
         if (StringUtils.isEmpty(response) || status.getCode() != 200 || response.contains("{\"error")) {
             statusCode = status.getCode();
@@ -201,13 +194,11 @@ public class DCPTapitAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return (config.getString("tapit.advertiserId"));
     }
 
-    private String getUidParamNameFromSourceType(String source)
-    {
+    private String getUidParamNameFromSourceType(String source) {
         if ("iphone".equalsIgnoreCase(source)) {
             return "udid";
         }

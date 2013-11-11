@@ -40,8 +40,7 @@ import com.inmobi.adserve.channels.util.DebugLogger;
  * 
  */
 
-public class GenericAdapter extends BaseAdNetworkImpl
-{
+public class GenericAdapter extends BaseAdNetworkImpl {
 
     private String        advertiserName = "";
     private Configuration config;
@@ -49,8 +48,7 @@ public class GenericAdapter extends BaseAdNetworkImpl
     private String        responseFormat = "";
 
     public GenericAdapter(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent, String advertiserName)
-    {
+            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent, String advertiserName) {
         super(baseRequestHandler, serverEvent, logger);
         this.config = config;
         this.clientBootstrap = clientBootstrap;
@@ -63,8 +61,7 @@ public class GenericAdapter extends BaseAdNetworkImpl
     }
 
     @Override
-    public boolean configureParameters()
-    {
+    public boolean configureParameters() {
         if (isMandateParamAbsent()) {
             logger.debug("mandate parameters missing for", advertiserName, "so returning from adapter");
             return false;
@@ -73,8 +70,7 @@ public class GenericAdapter extends BaseAdNetworkImpl
     }
 
     // checking if any of the mandatory parameter is absent
-    public boolean isMandateParamAbsent()
-    {
+    public boolean isMandateParamAbsent() {
         String mandateParams = config.getString(advertiserName.concat(MacrosAndStrings.MANDATORY_PARAMETERS));
         String[] listParams = mandateParams.split("&");
         for (int i = 0; i < listParams.length; i++) {
@@ -85,31 +81,26 @@ public class GenericAdapter extends BaseAdNetworkImpl
         return false;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return advertiserName;
     }
 
-    public boolean isBeaconUrlRequired()
-    {
+    public boolean isBeaconUrlRequired() {
         return config.getString(advertiserName.concat(MacrosAndStrings.IS_BEACON_REQUIRED)).equals(
             MacrosAndStrings.TRUE);
     }
 
-    public boolean isClickUrlRequired()
-    {
+    public boolean isClickUrlRequired() {
         return config
                 .getString(advertiserName.concat(MacrosAndStrings.IS_CLICK_REQUIRED))
                     .equals(MacrosAndStrings.TRUE);
     }
 
-    public String getId()
-    {
+    public String getId() {
         return (config.getString(advertiserName.concat(MacrosAndStrings.ADVERTISER_ID)));
     }
 
-    public HttpRequest getHttpRequest() throws Exception
-    {
+    public HttpRequest getHttpRequest() throws Exception {
         HttpRequest httpRequest = null;
         URI uri;
         try {
@@ -148,8 +139,7 @@ public class GenericAdapter extends BaseAdNetworkImpl
         return httpRequest;
     }
 
-    public URI getRequestUri() throws Exception
-    {
+    public URI getRequestUri() throws Exception {
         String finalUrl = "";
         if (requestMethod.equals(MacrosAndStrings.GET)) {
             finalUrl = host + "?" + getRequestParams();
@@ -168,8 +158,7 @@ public class GenericAdapter extends BaseAdNetworkImpl
         return null;
     }
 
-    public String getRequestParams()
-    {
+    public String getRequestParams() {
         StringBuilder requestParams = new StringBuilder(config.getString(advertiserName
                 + MacrosAndStrings.REQUEST_PARAMETERS));
         String[] urlParams = requestParams.toString().split("&");
@@ -192,8 +181,7 @@ public class GenericAdapter extends BaseAdNetworkImpl
         return requestParams.toString();
     }
 
-    public void parseResponse(String response, HttpResponseStatus status)
-    {
+    public void parseResponse(String response, HttpResponseStatus status) {
         logger.debug("response is", response, "and response length is", response.length());
         if (responseFormat.equals(MacrosAndStrings.JSON)) {
             if (status.getCode() != 200 || StringUtils.isBlank(response)) {
@@ -257,8 +245,7 @@ public class GenericAdapter extends BaseAdNetworkImpl
         logger.debug("response length is", responseContent.length());
     }
 
-    public String expandMacro(String macro)
-    {
+    public String expandMacro(String macro) {
 
         if (macro.equals(MacrosAndStrings.IMPRESSION_ID)) {
             return casInternalRequestParameters.impressionId;
@@ -293,8 +280,7 @@ public class GenericAdapter extends BaseAdNetworkImpl
         }
     }
 
-    public void debug(Object... os)
-    {
+    public void debug(Object... os) {
         System.out.println(Arrays.deepToString(os));
     }
 }

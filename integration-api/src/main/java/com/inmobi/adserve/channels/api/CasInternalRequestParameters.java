@@ -3,8 +3,7 @@ package com.inmobi.adserve.channels.api;
 import java.util.List;
 
 
-public class CasInternalRequestParameters
-{
+public class CasInternalRequestParameters {
     // Rtb Params
     public double       highestEcpm;
     public List<Long>   blockedCategories;

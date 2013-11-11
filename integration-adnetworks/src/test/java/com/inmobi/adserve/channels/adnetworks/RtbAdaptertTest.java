@@ -42,8 +42,7 @@ import com.inmobi.casthrift.rtb.BidResponse;
 import com.inmobi.casthrift.rtb.SeatBid;
 
 
-public class RtbAdaptertTest extends TestCase
-{
+public class RtbAdaptertTest extends TestCase {
 
     private Configuration                mockConfig                   = null;
     private final String                 debug                        = "debug";
@@ -56,8 +55,7 @@ public class RtbAdaptertTest extends TestCase
     private String                       rtbAdvId                     = "id";
     BidResponse                          bidResponse;
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("debug")).andReturn(debug).anyTimes();
         expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
@@ -75,8 +73,7 @@ public class RtbAdaptertTest extends TestCase
     }
 
     @Override
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File f;
         f = new File(loggerConf);
         if (!f.exists()) {
@@ -116,8 +113,7 @@ public class RtbAdaptertTest extends TestCase
     }
 
     @Test
-    public void testImpressionCallback()
-    {
+    public void testImpressionCallback() {
         RtbAdNetwork.impressionCallbackHelper = createMock(ImpressionCallbackHelper.class);
         expect(
             RtbAdNetwork.impressionCallbackHelper.writeResponse(isA(ClientBootstrap.class), isA(DebugLogger.class),
@@ -127,8 +123,7 @@ public class RtbAdaptertTest extends TestCase
     }
 
     @Test
-    public void testGetRequestUri() throws URISyntaxException
-    {
+    public void testGetRequestUri() throws URISyntaxException {
         URI uri = new URI("urlBase");
         rtbAdNetwork.setUrlArg("urlArg");
         rtbAdNetwork.setUrlBase("urlBase");
@@ -136,8 +131,7 @@ public class RtbAdaptertTest extends TestCase
     }
 
     @Test
-    public void testGetHttpRequestBidRequestNull() throws Exception
-    {
+    public void testGetHttpRequestBidRequestNull() throws Exception {
         URI uri = new URI("http://localhost:8800?urlArg=");
         HttpRequest httpRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri.toASCIIString());
         httpRequest.setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json");
@@ -148,8 +142,7 @@ public class RtbAdaptertTest extends TestCase
     }
 
     @Test
-    public void testGetHttpRequestBidRequestNotNull() throws Exception
-    {
+    public void testGetHttpRequestBidRequestNotNull() throws Exception {
         URI uri = new URI("http://localhost:8800");
         HttpRequest httpRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri.toASCIIString());
         httpRequest.setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json");
@@ -190,8 +183,7 @@ public class RtbAdaptertTest extends TestCase
     }
 
     @Test
-    public void testConfigureParameters()
-    {
+    public void testConfigureParameters() {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setSource("wap");
@@ -212,8 +204,7 @@ public class RtbAdaptertTest extends TestCase
     }
 
     @Test
-    public void testConfigureParametersWithAllsasparams()
-    {
+    public void testConfigureParametersWithAllsasparams() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setSiteId("123");
@@ -246,14 +237,12 @@ public class RtbAdaptertTest extends TestCase
     }
 
     @Test
-    public void testRtbGetName() throws Exception
-    {
+    public void testRtbGetName() throws Exception {
         assertEquals(rtbAdNetwork.getName(), "rtb");
     }
 
     @Test
-    public void testReplaceMacros()
-    {
+    public void testReplaceMacros() {
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         String externalSiteKey = "f6wqjq1r5v";
         String beaconUrl = "";
@@ -269,8 +258,7 @@ public class RtbAdaptertTest extends TestCase
     }
 
     @Test
-    public void testReplaceMacrosAllPosibilities()
-    {
+    public void testReplaceMacrosAllPosibilities() {
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         String externalSiteKey = "f6wqjq1r5v";
         String beaconUrl = "";
@@ -294,8 +282,7 @@ public class RtbAdaptertTest extends TestCase
     }
 
     @Test
-    public void testParseResponse() throws TException
-    {
+    public void testParseResponse() throws TException {
         StringBuilder str = new StringBuilder();
         str
                 .append("{\"id\":\"4f8d98e2-4bbd-40bc-8795-22da170700f9\",\"imp\":[{\"id\":\"4f8d98e2-4bbd-40bc-8795-22da170700f9\",\"banner\":{\"w\":120,\"h\":20,\"id\":\"4f8d98e2-4bbd-40bc-8795-22da170700f9\"},\"bidfloorcur\":\"USD\",\"iframebuster\":[\"None\"]}],\"app\":{\"id\":\"0000000000\",\"cat\":[\"IAB1-1\",\"IAB24\",\"IAB5\"]},\"device\":{\"ua\":\"Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334\",\"ip\":\"206.29.182.240\",\"geo\":{\"lat\":37.442901611328125,\"lon\":-122.15139770507812,\"type\":2},\"connectiontype\":2},\"user\":{\"id\":\"1234\",\"buyerid\":\"1234\",\"yob\":1987,\"gender\":\"Male\"},\"at\":2,\"tmax\":200,\"cur\":[\"USD\"]}");

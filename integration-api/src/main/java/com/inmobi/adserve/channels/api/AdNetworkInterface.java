@@ -7,8 +7,7 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 
 
-public interface AdNetworkInterface
-{
+public interface AdNetworkInterface {
 
     // Returns the Adstatus.
     String getAdStatus();

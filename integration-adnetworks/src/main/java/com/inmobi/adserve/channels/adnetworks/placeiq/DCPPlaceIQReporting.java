@@ -21,8 +21,7 @@ import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPPlaceIQReporting extends BaseReportingImpl
-{
+public class DCPPlaceIQReporting extends BaseReportingImpl {
 
     private final Configuration config;
     private DebugLogger         logger;
@@ -36,16 +35,14 @@ public class DCPPlaceIQReporting extends BaseReportingImpl
     private SimpleDateFormat    placeiqDateFormat = new SimpleDateFormat("MM/dd/yy");
     private SimpleDateFormat    dateFormat        = new SimpleDateFormat("yyyy-MM-dd");
 
-    public DCPPlaceIQReporting(final Configuration config)
-    {
+    public DCPPlaceIQReporting(final Configuration config) {
         this.config = config;
         accessKey = config.getString("placeiq.accessKey");
         secretKey = config.getString("placeiq.secretKey");
         bucketName = config.getString("placeiq.bucketName");
     }
 
-    public String getEndDate() throws Exception
-    {
+    public String getEndDate() throws Exception {
         try {
             logger.debug("calculating latest date for PlaceIQ");
             ReportTime reportTime = ReportTime.getUTCTime();
@@ -62,46 +59,39 @@ public class DCPPlaceIQReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
 
         return null;
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return 0;
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 23;
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "PlaceIQ";
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return (config.getString("placeiq.advertiserId"));
     }
 
     @Override
     public ReportResponse fetchRows(DebugLogger logger, ReportTime startTime, String key, ReportTime endTime)
-            throws Exception
-    {
+            throws Exception {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         logger.debug("inside fetch rows of PlaceIQ");
@@ -164,8 +154,7 @@ public class DCPPlaceIQReporting extends BaseReportingImpl
     }
 
     private void generateReportResponse(final DebugLogger logger, ReportResponse reportResponse, String[] responseArray)
-            throws ParseException
-    {
+            throws ParseException {
         if (responseArray.length > 1) {
             int impressionIndex = -1;
             int clicksIndex = -1;
@@ -262,8 +251,7 @@ public class DCPPlaceIQReporting extends BaseReportingImpl
     }
 
     // Combining the comma separated value within '"'
-    private String[] cleanUpEntry(String[] reportEntry)
-    {
+    private String[] cleanUpEntry(String[] reportEntry) {
         boolean isNewEntry = true;
         int pos = 0;
         String[] newVal = new String[15];

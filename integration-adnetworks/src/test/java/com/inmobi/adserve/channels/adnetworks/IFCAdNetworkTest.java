@@ -28,8 +28,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class IFCAdNetworkTest extends TestCase
-{
+public class IFCAdNetworkTest extends TestCase {
     private IFCAdNetwork    ifcAdNetwork;
     private Configuration   mockConfig        = null;
     private String          ifcHostus         = "http://10.14.118.91:8083/IFCPlatform/";
@@ -42,8 +41,7 @@ public class IFCAdNetworkTest extends TestCase
     private String          loggerConf        = "/tmp/channel-server.properties";
     private DebugLogger     logger;
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("ifc.advertiserId")).andReturn(ifcAdvertiserId).anyTimes();
         expect(mockConfig.getString("ifc.responseFormat")).andReturn(ifcResponseFormat).anyTimes();
@@ -57,8 +55,7 @@ public class IFCAdNetworkTest extends TestCase
         replay(mockConfig);
     }
 
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File f;
         f = new File("/tmp/channel-server.properties");
         if (!f.exists())
@@ -73,8 +70,7 @@ public class IFCAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testConfigureParameters() throws Exception
-    {
+    public void testConfigureParameters() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         JSONArray jsonArray = new JSONArray();
@@ -104,8 +100,7 @@ public class IFCAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testConfigureParametersForSdkVersion() throws Exception
-    {
+    public void testConfigureParametersForSdkVersion() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         JSONArray jsonArray = new JSONArray();
@@ -136,8 +131,7 @@ public class IFCAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testConfigureParametersForSdkVersion300() throws Exception
-    {
+    public void testConfigureParametersForSdkVersion300() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         JSONArray jsonArray = new JSONArray();
@@ -168,20 +162,17 @@ public class IFCAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testGetLogline()
-    {
+    public void testGetLogline() {
         assertNotNull(ifcAdNetwork.getLogline());
     }
 
     @Test
-    public void testGetResponseAd()
-    {
+    public void testGetResponseAd() {
         assertNotNull(ifcAdNetwork.getResponseAd());
     }
 
     @Test
-    public void testParseResponse() throws Exception
-    {
+    public void testParseResponse() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         JSONArray jsonArray = new JSONArray();
@@ -221,8 +212,7 @@ public class IFCAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testGetRequestBody() throws JSONException
-    {
+    public void testGetRequestBody() throws JSONException {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         JSONArray jsonArray = new JSONArray();

@@ -21,8 +21,7 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public class MobileCommerceAdNetwork extends BaseAdNetworkImpl
-{
+public class MobileCommerceAdNetwork extends BaseAdNetworkImpl {
 
     private final Configuration config;
 
@@ -32,8 +31,7 @@ public class MobileCommerceAdNetwork extends BaseAdNetworkImpl
 
     public MobileCommerceAdNetwork(final DebugLogger logger, final Configuration config,
             final ClientBootstrap clientBootstrap, final HttpRequestHandlerBase baseRequestHandler,
-            final MessageEvent serverEvent)
-    {
+            final MessageEvent serverEvent) {
         super(baseRequestHandler, serverEvent, logger);
         this.logger = logger;
         this.config = config;
@@ -42,8 +40,7 @@ public class MobileCommerceAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public boolean configureParameters()
-    {
+    public boolean configureParameters() {
         if (sasParams.getRemoteHostIp() == null || sasParams.getUserAgent() == null
                 || StringUtils.isBlank(externalSiteId)) {
             logger.info("mandate parameters missing for mobile commerce so exiting adapter");
@@ -56,26 +53,22 @@ public class MobileCommerceAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "mobilecommerce";
     }
 
     @Override
-    public boolean isClickUrlRequired()
-    {
+    public boolean isClickUrlRequired() {
         return true;
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return (config.getString("mobilecommerce.advertiserId"));
     }
 
     @Override
-    public URI getRequestUri() throws Exception
-    {
+    public URI getRequestUri() throws Exception {
         try {
             StringBuilder url = new StringBuilder();
             url.append(host)
@@ -116,8 +109,7 @@ public class MobileCommerceAdNetwork extends BaseAdNetworkImpl
     }
 
     // get category id specific to inmobi
-    public String getCategoryId()
-    {
+    public String getCategoryId() {
         if (uid.length() == 6 && uid.matches("\\d+")) {
             return (Integer.toString((Integer.parseInt(uid.substring(4, 6)) + 2) / 3));
         }
@@ -125,8 +117,7 @@ public class MobileCommerceAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public void parseResponse(final String response, final HttpResponseStatus status)
-    {
+    public void parseResponse(final String response, final HttpResponseStatus status) {
         logger.debug("response is ", response, "and response length is ", response.length());
         if (status.getCode() != 200 || StringUtils.isBlank(response)) {
             statusCode = status.getCode();
@@ -184,8 +175,7 @@ public class MobileCommerceAdNetwork extends BaseAdNetworkImpl
      * @throws JSONException
      */
     private TemplateType getAdTemplateFromJson(final String response, final VelocityContext context)
-            throws JSONException
-    {
+            throws JSONException {
         TemplateType responseTemplate;
         JSONObject responseJson = new JSONObject(response);
         JSONObject adResponse = responseJson.getJSONObject("ad");
@@ -216,8 +206,7 @@ public class MobileCommerceAdNetwork extends BaseAdNetworkImpl
      * @param adResponse
      * @throws JSONException
      */
-    private void addPartnerBeaconUrls(final VelocityContext context, final JSONObject adResponse) throws JSONException
-    {
+    private void addPartnerBeaconUrls(final VelocityContext context, final JSONObject adResponse) throws JSONException {
         JSONObject partnerBeaconUrls = adResponse.getJSONObject("trackingUrls");
         if (!StringUtils.isEmpty(partnerBeaconUrls.getString("mc"))) {
             context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl1, partnerBeaconUrls.getString("mc"));

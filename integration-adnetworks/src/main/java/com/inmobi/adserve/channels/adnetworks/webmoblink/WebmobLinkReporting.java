@@ -27,8 +27,7 @@ import com.inmobi.adserve.channels.api.ServerException;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class WebmobLinkReporting extends BaseReportingImpl
-{
+public class WebmobLinkReporting extends BaseReportingImpl {
     private DebugLogger         logger;
     private final Configuration config;
     private final String        token;
@@ -39,8 +38,7 @@ public class WebmobLinkReporting extends BaseReportingImpl
     private final DateFormat    webmoblinkFormatDate = new SimpleDateFormat("MM-dd-yyyy");
     private final DateFormat    repTimeFormatDate    = new SimpleDateFormat("yyyyMMdd");
 
-    public WebmobLinkReporting(final Configuration config)
-    {
+    public WebmobLinkReporting(final Configuration config) {
         this.config = config;
         token = config.getString("webmoblink.token");
         baseUrl = config.getString("webmoblink.baseUrl");
@@ -49,16 +47,14 @@ public class WebmobLinkReporting extends BaseReportingImpl
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 3;
     }
 
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
             final ReportTime endTime) throws ParserConfigurationException, DOMException, ParseException, SAXException,
-            IOException
-    {
+            IOException {
         this.logger = logger;
         pubId = key;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
@@ -101,8 +97,7 @@ public class WebmobLinkReporting extends BaseReportingImpl
                 Node statusNode = reportElement.getElementsByTagName("status").item(0);
                 int status = Integer.parseInt(((Element) statusNode).getTextContent());
                 if (status != 0) {
-                    switch (status)
-                    {
+                    switch (status) {
                         case 1:
                             logger.info("Error. Missing mandatory parameters");
                             break;
@@ -161,39 +156,33 @@ public class WebmobLinkReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return (config.getString("webmoblink.advertiserId"));
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "webmoblink";
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         String url = String.format("%s?pid=%s&credential=%s&startdate=%s&enddate=%s", baseUrl, pubId, token, startDate,
             endDate);
         return url;
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return 0;
     }
 
-    public String getEndDate() throws Exception
-    {
+    public String getEndDate() throws Exception {
         try {
             logger.debug("calculating end date for WebmobLink");
             ReportTime reportTime = ReportTime.getUTCTime();

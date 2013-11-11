@@ -25,8 +25,7 @@ import com.inmobi.adserve.channels.util.DebugLogger;
  * @author Sandeep.Barange
  * 
  */
-public class IFCReporting extends BaseReportingImpl
-{
+public class IFCReporting extends BaseReportingImpl {
 
     private static Configuration config;
     private String               startDate      = "";
@@ -36,24 +35,21 @@ public class IFCReporting extends BaseReportingImpl
     private String               responseString = "";
     private DebugLogger          logger;
 
-    public IFCReporting(final Configuration config)
-    {
+    public IFCReporting(final Configuration config) {
         baseUrl = config.getString("ifc.baseUrl");
     }
 
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
             final ReportTime endTime) throws KeyManagementException, NoSuchAlgorithmException, MalformedURLException,
-            ServerException, IOException, ParserConfigurationException, SAXException, JSONException
-    {
+            ServerException, IOException, ParserConfigurationException, SAXException, JSONException {
         // NO Op
         return null;
     }
 
     // Fetches the report from the TPAN
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final ReportTime endTime)
-    {
+    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final ReportTime endTime) {
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         this.logger = logger;
         logger.debug("inside fetch rows of ifc");
@@ -120,13 +116,11 @@ public class IFCReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return (config.getString("ifc.advertiserId"));
     }
 
-    public String getEndDate() throws Exception
-    {
+    public String getEndDate() throws Exception {
         try {
             logger.debug("calculating end date for IFC");
             ReportTime reportTime = ReportTime.getUTCTime();
@@ -143,38 +137,32 @@ public class IFCReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "IFC";
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         String url = String.format("%s/?startDateTime=%s&endDateTime=%s", baseUrl, startDate, endDate);
         return url;
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return 0;
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 16;
     }
 
-    public ReportTime getIFCReportTime(String startTime)
-    {
+    public ReportTime getIFCReportTime(String startTime) {
         try {
             ReportTime reportTime = new ReportTime(startTime, 1);
             return reportTime;

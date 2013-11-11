@@ -1,7 +1,6 @@
 package com.inmobi.adserve.channels.adnetworks.generic;
 
-public class MacrosAndStrings
-{
+public class MacrosAndStrings {
 
     // string constants
     public static final String HOST                    = ".host";

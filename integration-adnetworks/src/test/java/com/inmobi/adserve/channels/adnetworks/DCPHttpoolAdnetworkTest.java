@@ -26,8 +26,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPHttpoolAdnetworkTest extends TestCase
-{
+public class DCPHttpoolAdnetworkTest extends TestCase {
     private Configuration         mockConfig      = null;
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
@@ -40,8 +39,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase
     private final String          httpoolAdvId    = "httpooladv1";
     private final String          httpoolTest     = "1";
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("httpool.host")).andReturn(httpoolHost).anyTimes();
         expect(mockConfig.getString("httpool.status")).andReturn(httpoolStatus).anyTimes();
@@ -54,8 +52,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase
     }
 
     @Override
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File f;
         f = new File(loggerConf);
         if (!f.exists()) {
@@ -71,8 +68,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPHttpoolConfigureParameters()
-    {
+    public void testDCPHttpoolConfigureParameters() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -91,8 +87,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPHttpoolConfigureParametersBlankIP()
-    {
+    public void testDCPHttpoolConfigureParametersBlankIP() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
@@ -111,8 +106,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPHttpoolConfigureParametersBlankExtKey()
-    {
+    public void testDCPHttpoolConfigureParametersBlankExtKey() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -131,8 +125,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPHttpoolConfigureParametersBlankUA()
-    {
+    public void testDCPHttpoolConfigureParametersBlankUA() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -150,8 +143,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPHttpoolRequestUri() throws Exception
-    {
+    public void testDCPHttpoolRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -176,8 +168,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPHttpoolRequestUriMale() throws Exception
-    {
+    public void testDCPHttpoolRequestUriMale() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -203,8 +194,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPHttpoolRequestUriFemale() throws Exception
-    {
+    public void testDCPHttpoolRequestUriFemale() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -231,8 +221,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPHttpoolRequestUriSegmentCategory() throws Exception
-    {
+    public void testDCPHttpoolRequestUriSegmentCategory() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -243,8 +232,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase
         sasParams.setSlot("9");
         sasParams.setCategories(new ArrayList<Long>());
         String externalKey = "1324";
-        Long[] segmentCategories = new Long[]
-        { 13l, 15l };
+        Long[] segmentCategories = new Long[] { 13l, 15l };
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c"
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
@@ -261,8 +249,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPHttpoolRequestUriSiteCategory() throws Exception
-    {
+    public void testDCPHttpoolRequestUriSiteCategory() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -272,8 +259,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
         sasParams.setSlot("9");
         String externalKey = "1324";
-        Long[] cats = new Long[]
-        { 13l, 15l };
+        Long[] cats = new Long[] { 13l, 15l };
         sasParams.setCategories(Arrays.asList(cats));
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c"
@@ -291,8 +277,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPHttpoolRequestUriBlankLatLong() throws Exception
-    {
+    public void testDCPHttpoolRequestUriBlankLatLong() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -319,8 +304,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPHttpoolRequestUriBlankSlot() throws Exception
-    {
+    public void testDCPHttpoolRequestUriBlankSlot() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -346,8 +330,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPHttpoolParseResponseImg() throws Exception
-    {
+    public void testDCPHttpoolParseResponseImg() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -372,8 +355,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPHttpoolParseResponseHtmlTPT() throws Exception
-    {
+    public void testDCPHttpoolParseResponseHtmlTPT() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -398,8 +380,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPHttpoolParseResponseTextAdWap() throws Exception
-    {
+    public void testDCPHttpoolParseResponseTextAdWap() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -424,8 +405,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPHttpoolParseResponseTextAdAppSDK360() throws Exception
-    {
+    public void testDCPHttpoolParseResponseTextAdAppSDK360() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -452,16 +432,14 @@ public class DCPHttpoolAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPHttpoolParseNoAd() throws Exception
-    {
+    public void testDCPHttpoolParseNoAd() throws Exception {
         String response = "{\"status\":0,\"error\":\"No ad available.\"}";
         dcpHttpoolAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(500, dcpHttpoolAdNetwork.getHttpResponseStatusCode());
     }
 
     @Test
-    public void testDCPHttpoolParseEmptyResponseCode() throws Exception
-    {
+    public void testDCPHttpoolParseEmptyResponseCode() throws Exception {
         String response = "";
         dcpHttpoolAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(500, dcpHttpoolAdNetwork.getHttpResponseStatusCode());
@@ -469,14 +447,12 @@ public class DCPHttpoolAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPHttpoolGetId() throws Exception
-    {
+    public void testDCPHttpoolGetId() throws Exception {
         assertEquals(httpoolAdvId, dcpHttpoolAdNetwork.getId());
     }
 
     @Test
-    public void testDCPHttpoolGetImpressionId() throws Exception
-    {
+    public void testDCPHttpoolGetImpressionId() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -495,14 +471,12 @@ public class DCPHttpoolAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPHttpoolGetName() throws Exception
-    {
+    public void testDCPHttpoolGetName() throws Exception {
         assertEquals("httpool", dcpHttpoolAdNetwork.getName());
     }
 
     @Test
-    public void testDCPHttpoolIsClickUrlReq() throws Exception
-    {
+    public void testDCPHttpoolIsClickUrlReq() throws Exception {
         assertEquals(true, dcpHttpoolAdNetwork.isClickUrlRequired());
     }
 }

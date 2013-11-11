@@ -26,8 +26,7 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public class DrawBridgeAdNetwork extends BaseAdNetworkImpl
-{
+public class DrawBridgeAdNetwork extends BaseAdNetworkImpl {
     // Updates the request parameters according to the Ad Network. Returns true on
     // success.i
 
@@ -40,8 +39,7 @@ public class DrawBridgeAdNetwork extends BaseAdNetworkImpl
     private static final String FILTER_IPOD   = "filter_iPod";
 
     public DrawBridgeAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent)
-    {
+            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
         super(baseRequestHandler, serverEvent, logger);
         this.logger = logger;
         this.config = config;
@@ -50,8 +48,7 @@ public class DrawBridgeAdNetwork extends BaseAdNetworkImpl
 
     // Configure the request parameters for making the ad call
     @Override
-    protected boolean configureParameters()
-    {
+    protected boolean configureParameters() {
         if (StringUtils.isEmpty(sasParams.getUserAgent())) {
             logger.debug("Drawbridge : user-agent blank/null, mandatory parameter missing");
             return false;
@@ -79,21 +76,18 @@ public class DrawBridgeAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "drawbridge";
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return (config.getString("drawbridge.advertiserId"));
     }
 
     // get URI
     @Override
-    public URI getRequestUri() throws Exception
-    {
+    public URI getRequestUri() throws Exception {
         StringBuilder finalUrl = new StringBuilder();
         finalUrl.append(config.getString("drawbridge.host"))
                     .append(config.getString("drawbridge.partnerId"))
@@ -176,14 +170,12 @@ public class DrawBridgeAdNetwork extends BaseAdNetworkImpl
 
     // if we need to send click url
     @Override
-    public boolean isClickUrlRequired()
-    {
+    public boolean isClickUrlRequired() {
         return true;
     }
 
     // get 3 letter country name
-    public String getCountry(String country)
-    {
+    public String getCountry(String country) {
         try {
             if (country != null) {
                 return (new Locale("en", country).getISO3Country());
@@ -197,8 +189,7 @@ public class DrawBridgeAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status)
-    {
+    public void parseResponse(String response, HttpResponseStatus status) {
         logger.debug("response is", response, "and response length is", response.length());
         if (status.getCode() != 200 || StringUtils.isBlank(response)) {
             statusCode = status.getCode();
@@ -234,8 +225,7 @@ public class DrawBridgeAdNetwork extends BaseAdNetworkImpl
     }
 
     // Generate sha1 hash of uid
-    public String getSha1Hash(String param)
-    {
+    public String getSha1Hash(String param) {
         if (param != null && param.length() == 32) {
             return param;
         }
@@ -256,8 +246,7 @@ public class DrawBridgeAdNetwork extends BaseAdNetworkImpl
     }
 
     // get ad dimension
-    public Dimension getAdDimension()
-    {
+    public Dimension getAdDimension() {
         if (sasParams.getSlot() != null && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
             return (SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())));
         }
@@ -265,10 +254,8 @@ public class DrawBridgeAdNetwork extends BaseAdNetworkImpl
     }
 
     // convert byte array to hexadecimal value
-    public String bytesToHex(byte[] b)
-    {
-        char hexDigit[] =
-        { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+    public String bytesToHex(byte[] b) {
+        char hexDigit[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
         StringBuffer buf = new StringBuffer();
         for (int j = 0; j < b.length; j++) {
             buf.append(hexDigit[(b[j] >> 4) & 0x0f]);

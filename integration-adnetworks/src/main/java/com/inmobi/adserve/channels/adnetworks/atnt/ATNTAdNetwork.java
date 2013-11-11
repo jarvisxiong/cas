@@ -15,8 +15,7 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class ATNTAdNetwork extends BaseAdNetworkImpl
-{
+public class ATNTAdNetwork extends BaseAdNetworkImpl {
     // Updates the request parameters according to the Ad Network. Returns true on
     // success.
     private String              loc;
@@ -24,8 +23,7 @@ public class ATNTAdNetwork extends BaseAdNetworkImpl
     private final Configuration config;
 
     public ATNTAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent)
-    {
+            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
         super(baseRequestHandler, serverEvent, logger);
         this.logger = logger;
         this.config = config;
@@ -34,8 +32,7 @@ public class ATNTAdNetwork extends BaseAdNetworkImpl
 
     // Assign the value to the parameters
     @Override
-    public boolean configureParameters()
-    {
+    public boolean configureParameters() {
         if (sasParams.getUserAgent() == null || sasParams.getRemoteHostIp() == null
                 || StringUtils.isBlank(externalSiteId)) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MANDATE_PARAM_MISSING;
@@ -54,22 +51,19 @@ public class ATNTAdNetwork extends BaseAdNetworkImpl
     }
 
     // generating random integer for visitorId
-    private String getVisitorId()
-    {
+    private String getVisitorId() {
         Random rand = new Random();
         return (Integer.toString(rand.nextInt(10000)));
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "atnt";
     }
 
     // forming the url with the available parameter
     @Override
-    public URI getRequestUri() throws Exception
-    {
+    public URI getRequestUri() throws Exception {
         try {
             StringBuilder finalUrl = new StringBuilder(config.getString("atnt.host"));
             finalUrl.append(externalSiteId)
@@ -116,14 +110,12 @@ public class ATNTAdNetwork extends BaseAdNetworkImpl
     // Returns the Channel Id for the TPAN as in our database. This will be
     // hardcoded.
     @Override
-    public String getId()
-    {
+    public String getId() {
         return config.getString("atnt.advertiserId");
     }
 
     @Override
-    public boolean isClickUrlRequired()
-    {
+    public boolean isClickUrlRequired() {
         return true;
     }
 }

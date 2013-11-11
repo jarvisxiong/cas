@@ -19,8 +19,7 @@ import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPLomarkReporting extends BaseReportingImpl
-{
+public class DCPLomarkReporting extends BaseReportingImpl {
     private String        startDate;
     private String        endDate;
     private DebugLogger   logger;
@@ -32,8 +31,7 @@ public class DCPLomarkReporting extends BaseReportingImpl
     private static String entireReportData = null;
     private double        fixedCPCRateUSD  = 0;
 
-    public DCPLomarkReporting(final Configuration config)
-    {
+    public DCPLomarkReporting(final Configuration config) {
         this.host = config.getString("lomark.host");
         this.advertiserId = config.getString("lomark.advertiserId");
         this.reportKey = config.getString("lomark.key");
@@ -43,8 +41,7 @@ public class DCPLomarkReporting extends BaseReportingImpl
 
     @Override
     public ReportResponse fetchRows(DebugLogger logger, ReportTime startTime, String key, ReportTime endTime)
-            throws Exception
-    {
+            throws Exception {
         this.logger = logger;
         if (fixedCPCRateUSD <= 0) {
             logger.debug("Fixed CPC rate for lomark should be > 0");
@@ -113,8 +110,7 @@ public class DCPLomarkReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         StringBuilder reportUrl = new StringBuilder(host);
         Map<String, String> requestMap = new HashMap<String, String>();
         requestMap.put("key", reportKey);
@@ -137,37 +133,31 @@ public class DCPLomarkReporting extends BaseReportingImpl
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return 1;
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 1;
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "lomark";
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return (advertiserId);
     }
 
-    public String getEndDate(final String seperator)
-    {
+    public String getEndDate(final String seperator) {
         try {
             logger.debug("calculating end date for lomark");
             ReportTime reportTime = ReportTime.getUTCTime();
@@ -184,8 +174,7 @@ public class DCPLomarkReporting extends BaseReportingImpl
         }
     }
 
-    public static String getSignature(Map<String, String> params, String secret) throws IOException
-    {
+    public static String getSignature(Map<String, String> params, String secret) throws IOException {
         // first sort asc as per the paramter names
         Map<String, String> sortedParams = new TreeMap<String, String>(params);
         Set<Entry<String, String>> entrys = sortedParams.entrySet();

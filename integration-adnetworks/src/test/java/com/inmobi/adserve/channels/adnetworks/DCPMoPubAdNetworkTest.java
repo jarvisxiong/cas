@@ -29,8 +29,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPMoPubAdNetworkTest extends TestCase
-{
+public class DCPMoPubAdNetworkTest extends TestCase {
     private Configuration         mockConfig      = null;
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
@@ -43,8 +42,7 @@ public class DCPMoPubAdNetworkTest extends TestCase
     private final String          mopubAdvId      = "mopubadv1";
     private final String          mopubTest       = "1";
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("mopub.host")).andReturn(mopubHost).anyTimes();
         expect(mockConfig.getString("mopub.status")).andReturn(mopubStatus).anyTimes();
@@ -57,8 +55,7 @@ public class DCPMoPubAdNetworkTest extends TestCase
     }
 
     @Override
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File f;
         f = new File(loggerConf);
         if (!f.exists()) {
@@ -74,8 +71,7 @@ public class DCPMoPubAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPMoPubConfigureParameters() throws JSONException
-    {
+    public void testDCPMoPubConfigureParameters() throws JSONException {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -99,8 +95,7 @@ public class DCPMoPubAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPMoPubConfigureParametersBlankIP()
-    {
+    public void testDCPMoPubConfigureParametersBlankIP() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
@@ -119,8 +114,7 @@ public class DCPMoPubAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPMoPubConfigureParametersAdditionalParams()
-    {
+    public void testDCPMoPubConfigureParametersAdditionalParams() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -139,8 +133,7 @@ public class DCPMoPubAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPMoPubConfigureParametersBlankUA()
-    {
+    public void testDCPMoPubConfigureParametersBlankUA() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -158,12 +151,10 @@ public class DCPMoPubAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPMoPubRequestUri() throws Exception
-    {
+    public void testDCPMoPubRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]
-        { 50l, 51l }));
+        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSource("APP");
@@ -192,15 +183,13 @@ public class DCPMoPubAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPMoPubRequestUriBlankLatLong() throws Exception
-    {
+    public void testDCPMoPubRequestUriBlankLatLong() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSource("WAP");
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]
-        { 50l, 51l }));
+        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
         casInternalRequestParameters.latLong = "38.5,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
@@ -231,12 +220,10 @@ public class DCPMoPubAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPMoPubParseAd() throws Exception
-    {
+    public void testDCPMoPubParseAd() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]
-        { 50l, 51l }));
+        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSlot("15");
@@ -262,16 +249,14 @@ public class DCPMoPubAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPMoPubParseNoAd() throws Exception
-    {
+    public void testDCPMoPubParseNoAd() throws Exception {
         String response = "";
         dcpMoPubAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(500, dcpMoPubAdNetwork.getHttpResponseStatusCode());
     }
 
     @Test
-    public void testDCPMoPubParseEmptyResponseCode() throws Exception
-    {
+    public void testDCPMoPubParseEmptyResponseCode() throws Exception {
         String response = "";
         dcpMoPubAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(500, dcpMoPubAdNetwork.getHttpResponseStatusCode());
@@ -279,14 +264,12 @@ public class DCPMoPubAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPMoPubGetId() throws Exception
-    {
+    public void testDCPMoPubGetId() throws Exception {
         assertEquals(mopubAdvId, dcpMoPubAdNetwork.getId());
     }
 
     @Test
-    public void testDCPMoPubGetImpressionId() throws Exception
-    {
+    public void testDCPMoPubGetImpressionId() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -308,14 +291,12 @@ public class DCPMoPubAdNetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPMoPubGetName() throws Exception
-    {
+    public void testDCPMoPubGetName() throws Exception {
         assertEquals("mopub", dcpMoPubAdNetwork.getName());
     }
 
     @Test
-    public void testDCPMoPubIsClickUrlReq() throws Exception
-    {
+    public void testDCPMoPubIsClickUrlReq() throws Exception {
         assertEquals(false, dcpMoPubAdNetwork.isClickUrlRequired());
     }
 }

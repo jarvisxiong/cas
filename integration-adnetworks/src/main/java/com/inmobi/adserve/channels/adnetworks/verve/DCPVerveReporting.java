@@ -19,8 +19,7 @@ import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPVerveReporting extends BaseReportingImpl
-{
+public class DCPVerveReporting extends BaseReportingImpl {
     private String        startDate;
     private String        endDate;
     private DebugLogger   logger;
@@ -30,8 +29,7 @@ public class DCPVerveReporting extends BaseReportingImpl
     private static String reportStartDate  = null;
     private static String entireReportData = null;
 
-    public DCPVerveReporting(final Configuration config)
-    {
+    public DCPVerveReporting(final Configuration config) {
         this.host = config.getString("verve.host");
         this.advertiserId = config.getString("verve.advertiserId");
         this.token = config.getString("verve.token");
@@ -39,8 +37,7 @@ public class DCPVerveReporting extends BaseReportingImpl
 
     @Override
     public ReportResponse fetchRows(DebugLogger logger, ReportTime startTime, String key, ReportTime endTime)
-            throws Exception
-    {
+            throws Exception {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         logger.debug("inside fetch rows of verve");
@@ -92,8 +89,7 @@ public class DCPVerveReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         StringBuilder reportUrl = new StringBuilder(host);
         reportUrl
                 .append("&by=date|property_keyname&where[date.between]=")
@@ -104,37 +100,31 @@ public class DCPVerveReporting extends BaseReportingImpl
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return 1;
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 19;
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "verve";
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return (advertiserId);
     }
 
-    public String getEndDate(final String seperator)
-    {
+    public String getEndDate(final String seperator) {
         try {
             logger.debug("calculating end date for Verve");
             ReportTime reportTime = ReportTime.getUTCTime();
@@ -152,8 +142,7 @@ public class DCPVerveReporting extends BaseReportingImpl
     }
 
     private String invokeHttpUrl(String requestUrl) throws IOException, NoSuchAlgorithmException,
-            KeyManagementException
-    {
+            KeyManagementException {
 
         URL url = new URL(requestUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();

@@ -21,12 +21,10 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 /*
  * This is a Base class for reporting Adapters for third party Ad networks.
  */
-public abstract class BaseReportingImpl implements ReportingInterface
-{
+public abstract class BaseReportingImpl implements ReportingInterface {
     private static HashMap<String, Double> currencyConversionMap = new HashMap<String, Double>();
 
-    public static String invokeUrl(String url, String soapMessage, DebugLogger logger) throws ServerException
-    {
+    public static String invokeUrl(String url, String soapMessage, DebugLogger logger) throws ServerException {
         String responseString = "";
         try {
             logger.debug("inside invokeUrl with url ", url);
@@ -82,8 +80,7 @@ public abstract class BaseReportingImpl implements ReportingInterface
     }
 
     protected double getCurrencyConversionRate(String currencyId, String queryDate, DebugLogger logger,
-            Connection connection)
-    {
+            Connection connection) {
         String currencyDateKey = currencyId + "_" + queryDate;
         if (currencyConversionMap.containsKey(currencyDateKey)) {
             return currencyConversionMap.get(currencyDateKey);
@@ -110,8 +107,7 @@ public abstract class BaseReportingImpl implements ReportingInterface
     }
 
     protected String invokeHTTPUrl(final String url, DebugLogger logger) throws ServerException,
-            ClientProtocolException, IOException
-    {
+            ClientProtocolException, IOException {
         String retStr = null;
         logger.debug("url is ", url);
         DefaultHttpClient httpclient = new DefaultHttpClient();
@@ -131,14 +127,12 @@ public abstract class BaseReportingImpl implements ReportingInterface
     }
 
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final ReportTime endTime)
-            throws Exception
-    {
+            throws Exception {
         logger.info("Site wise reporting not configured for ", getName());
         return null;
     }
 
-    protected boolean decodeBlindedSiteId(String blindedSiteId, ReportResponse.ReportRow row)
-    {
+    protected boolean decodeBlindedSiteId(String blindedSiteId, ReportResponse.ReportRow row) {
         UUID uuid;
         try {
             uuid = UUID.fromString(blindedSiteId);

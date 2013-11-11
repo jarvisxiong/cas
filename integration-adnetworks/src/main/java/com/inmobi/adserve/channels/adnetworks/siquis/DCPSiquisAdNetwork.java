@@ -26,16 +26,14 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public class DCPSiquisAdNetwork extends BaseAdNetworkImpl
-{
+public class DCPSiquisAdNetwork extends BaseAdNetworkImpl {
 
     private final Configuration config;
     private boolean             isAndroid;
 
     public DCPSiquisAdNetwork(final DebugLogger logger, final Configuration config,
             final ClientBootstrap clientBootstrap, final HttpRequestHandlerBase baseRequestHandler,
-            final MessageEvent serverEvent)
-    {
+            final MessageEvent serverEvent) {
         super(baseRequestHandler, serverEvent, logger);
         this.logger = logger;
         this.config = config;
@@ -43,8 +41,7 @@ public class DCPSiquisAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public boolean configureParameters()
-    {
+    public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             logger.debug("mandatory parameters missing for siquis so exiting adapter");
@@ -59,20 +56,17 @@ public class DCPSiquisAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "siquis";
     }
 
     @Override
-    public boolean isClickUrlRequired()
-    {
+    public boolean isClickUrlRequired() {
         return true;
     }
 
     @Override
-    public URI getRequestUri() throws Exception
-    {
+    public URI getRequestUri() throws Exception {
         try {
             StringBuilder url = new StringBuilder();
             url.append(host).append("&app_id=").append(externalSiteId);
@@ -95,8 +89,7 @@ public class DCPSiquisAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public void parseResponse(final String response, final HttpResponseStatus status)
-    {
+    public void parseResponse(final String response, final HttpResponseStatus status) {
         logger.debug("response is ", response, "and response length is ", response.length());
         if (status.getCode() != 200 || StringUtils.isBlank(response) || !response.startsWith("[{\"")) {
             statusCode = status.getCode();
@@ -165,8 +158,7 @@ public class DCPSiquisAdNetwork extends BaseAdNetworkImpl
      * @param clickUrl
      * @return formatedClickUrl
      */
-    private String reformatClickUr(final String clickUrl)
-    {
+    private String reformatClickUr(final String clickUrl) {
         StringBuilder formattedUrl = new StringBuilder();
 
         try {
@@ -193,8 +185,7 @@ public class DCPSiquisAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return (config.getString("siquis.advertiserId"));
     }
 }

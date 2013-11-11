@@ -20,8 +20,7 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public class DCPAjillionAdnetwork extends BaseAdNetworkImpl
-{
+public class DCPAjillionAdnetwork extends BaseAdNetworkImpl {
     private final Configuration config;
     private final String        FORMAT      = "format";
     private final String        KEYWORD     = "keyword";
@@ -34,8 +33,7 @@ public class DCPAjillionAdnetwork extends BaseAdNetworkImpl
     private String              name;
 
     public DCPAjillionAdnetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent)
-    {
+            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
         super(baseRequestHandler, serverEvent, logger);
         this.config = config;
         this.logger = logger;
@@ -43,8 +41,7 @@ public class DCPAjillionAdnetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public boolean configureParameters()
-    {
+    public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             logger.debug("mandatory parameters missing so exiting adapter ", name);
@@ -63,19 +60,16 @@ public class DCPAjillionAdnetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public void setName(String name)
-    {
+    public void setName(String name) {
         this.name = name;
     }
 
     @Override
-    public URI getRequestUri() throws Exception
-    {
+    public URI getRequestUri() throws Exception {
         try {
             StringBuilder url = new StringBuilder(String.format(host, placementId));
             appendQueryParam(url, FORMAT, "json", true);
@@ -100,8 +94,7 @@ public class DCPAjillionAdnetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status)
-    {
+    public void parseResponse(String response, HttpResponseStatus status) {
         logger.debug("response is", response);
         statusCode = status.getCode();
         if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
@@ -153,14 +146,12 @@ public class DCPAjillionAdnetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return (config.getString(name + ".advertiserId"));
     }
 
     @Override
-    public boolean isClickUrlRequired()
-    {
+    public boolean isClickUrlRequired() {
         return true;
     }
 }

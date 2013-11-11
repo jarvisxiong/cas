@@ -23,8 +23,7 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public class DCPHttPoolAdNetwork extends BaseAdNetworkImpl
-{
+public class DCPHttPoolAdNetwork extends BaseAdNetworkImpl {
     private final Configuration config;
     private transient String    latitude;
     private transient String    longitude;
@@ -32,8 +31,7 @@ public class DCPHttPoolAdNetwork extends BaseAdNetworkImpl
     private boolean             acceptShop = false;
 
     public DCPHttPoolAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent)
-    {
+            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
         super(baseRequestHandler, serverEvent, logger);
         this.config = config;
         this.logger = logger;
@@ -41,8 +39,7 @@ public class DCPHttPoolAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public boolean configureParameters()
-    {
+    public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             logger.debug("mandatory parameters missing for httpool so exiting adapter");
@@ -73,20 +70,17 @@ public class DCPHttPoolAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "httpool";
     }
 
     @Override
-    public boolean isClickUrlRequired()
-    {
+    public boolean isClickUrlRequired() {
         return true;
     }
 
     @Override
-    public URI getRequestUri() throws Exception
-    {
+    public URI getRequestUri() throws Exception {
         try {
             StringBuilder url = new StringBuilder(host);
 
@@ -133,8 +127,7 @@ public class DCPHttPoolAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status)
-    {
+    public void parseResponse(String response, HttpResponseStatus status) {
         logger.debug("response is ", response);
 
         if (StringUtils.isEmpty(response) || status.getCode() != 200) {
@@ -212,8 +205,7 @@ public class DCPHttPoolAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return (config.getString("httpool.advertiserId"));
     }
 }

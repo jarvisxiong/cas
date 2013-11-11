@@ -31,8 +31,7 @@ import com.pubmatic.core.reporting.webservices.ReportingException_Exception;
 import com.pubmatic.core.reporting.webservices.ReportingOptionalParams;
 
 
-public class DCPPubmaticReporting extends BaseReportingImpl
-{
+public class DCPPubmaticReporting extends BaseReportingImpl {
     private final Configuration                    config;
     private String                                 startDate       = "";
     private String                                 endDate         = "";
@@ -47,8 +46,7 @@ public class DCPPubmaticReporting extends BaseReportingImpl
     private final String                           tokenApiHost;
     private final String                           tokenApiUrlParams;
 
-    public DCPPubmaticReporting(final Configuration config)
-    {
+    public DCPPubmaticReporting(final Configuration config) {
         this.config = config;
         accessToken = config.getString("pubmatic.accessToken");
         userName = config.getString("pubmatic.userName");
@@ -61,8 +59,7 @@ public class DCPPubmaticReporting extends BaseReportingImpl
     // Fetches the report from the TPAN
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws ServerException, IOException, JSONException
-    {
+            final ReportTime endTime) throws ServerException, IOException, JSONException {
         this.logger = logger;
         reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         logger.debug("inside fetch rows of draw bridge");
@@ -136,8 +133,7 @@ public class DCPPubmaticReporting extends BaseReportingImpl
     }
 
     // obtain end date for the date range in which data is to be fetched
-    public String getEndDate() throws Exception
-    {
+    public String getEndDate() throws Exception {
         try {
             logger.debug("calculating end date for pubmatic");
             ReportTime reportTime = ReportTime.getUTCTime();
@@ -156,52 +152,44 @@ public class DCPPubmaticReporting extends BaseReportingImpl
 
     // Returns the time zone(x) GMT+x. For GMT it returns 0. IST it returns 5.5
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return 0.0;
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return config.getString("pubmatic.advertiserId");
     }
 
     // Returns the report format wrt granularity.
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "pubmatic";
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 19;
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         return null;
     }
 
-    private String getToken() throws MalformedURLException, IOException, JSONException
-    {
+    private String getToken() throws MalformedURLException, IOException, JSONException {
         String urlParams = String.format(tokenApiUrlParams, accessToken, accessToken);
         String tokenResponse = invokeHTTPUrl(tokenApiHost, urlParams);
         String token = new JSONObject(tokenResponse).getString("access_token");
         return token;
     }
 
-    private String invokeHTTPUrl(final String url, String urlParameters) throws MalformedURLException, IOException
-    {
+    private String invokeHTTPUrl(final String url, String urlParameters) throws MalformedURLException, IOException {
         HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
         String authStr = userName + ":" + password;
         String authEncoded = new String(Base64.encodeBase64(authStr.getBytes()));
@@ -228,8 +216,7 @@ public class DCPPubmaticReporting extends BaseReportingImpl
 
     }
 
-    private void setRequestHeader(String oauthToken, Object port)
-    {
+    private void setRequestHeader(String oauthToken, Object port) {
 
         Map<String, List<String>> headers = new HashMap<String, List<String>>();
         List<String> headList = new ArrayList<String>();

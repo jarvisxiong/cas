@@ -30,8 +30,7 @@ import com.inmobi.adserve.channels.util.DebugLogger;
  * @author thushara
  * 
  */
-public class DCPWapStartAdnetworkTest extends TestCase
-{
+public class DCPWapStartAdnetworkTest extends TestCase {
     private Configuration         mockConfig      = null;
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
@@ -43,8 +42,7 @@ public class DCPWapStartAdnetworkTest extends TestCase
     private final String          wapstartAdvId   = "wapstartadv1";
     private final String          wapstartTest    = "1";
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("wapstart.host")).andReturn(wapstartHost).anyTimes();
         expect(mockConfig.getString("wapstart.status")).andReturn(wapstartStatus).anyTimes();
@@ -57,8 +55,7 @@ public class DCPWapStartAdnetworkTest extends TestCase
     }
 
     @Override
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File f;
         f = new File(loggerConf);
         if (!f.exists()) {
@@ -75,8 +72,7 @@ public class DCPWapStartAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWapstartConfigureParameters()
-    {
+    public void testDCPWapstartConfigureParameters() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -97,8 +93,7 @@ public class DCPWapStartAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWapstartConfigureParametersBlankSlot()
-    {
+    public void testDCPWapstartConfigureParametersBlankSlot() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -118,8 +113,7 @@ public class DCPWapStartAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWapstartConfigureParametersBlankIP()
-    {
+    public void testDCPWapstartConfigureParametersBlankIP() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
@@ -140,8 +134,7 @@ public class DCPWapStartAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWapstartConfigureParametersBlankExtKey()
-    {
+    public void testDCPWapstartConfigureParametersBlankExtKey() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -162,8 +155,7 @@ public class DCPWapStartAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWapstartConfigureParametersBlankUA()
-    {
+    public void testDCPWapstartConfigureParametersBlankUA() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -183,8 +175,7 @@ public class DCPWapStartAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWapstartRequestUri() throws Exception
-    {
+    public void testDCPWapstartRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -193,8 +184,7 @@ public class DCPWapStartAdnetworkTest extends TestCase
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
         sasParams.setSlot("15");
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 10l, 13l, 30l }));
+        sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "1324";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
@@ -210,8 +200,7 @@ public class DCPWapStartAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWapstartRequestUriBlankLatLong() throws Exception
-    {
+    public void testDCPWapstartRequestUriBlankLatLong() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -220,8 +209,7 @@ public class DCPWapStartAdnetworkTest extends TestCase
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
         sasParams.setSlot("15");
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 10l, 13l, 30l }));
+        sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "1324";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
@@ -238,14 +226,12 @@ public class DCPWapStartAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWapstartParseResponseImg() throws Exception
-    {
+    public void testDCPWapstartParseResponseImg() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 10l, 13l, 30l }));
+        sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c"
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
@@ -264,15 +250,13 @@ public class DCPWapStartAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWapstartParseResponseImgAppSDK360() throws Exception
-    {
+    public void testDCPWapstartParseResponseImgAppSDK360() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setSource("app");
         sasParams.setSdkVersion("i360");
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 10l, 13l, 30l }));
+        sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
         sasParams.setUserAgent("Mozilla");
         String externalKey = "19100";
@@ -293,16 +277,14 @@ public class DCPWapStartAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWapstartParseResponseTextAdWAP() throws Exception
-    {
+    public void testDCPWapstartParseResponseTextAdWAP() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSlot("4");
         sasParams.setSource("wap");
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 10l, 13l, 30l }));
+        sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
                 + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11"
@@ -323,8 +305,7 @@ public class DCPWapStartAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWapstartParseResponseTextAdAapSDK360() throws Exception
-    {
+    public void testDCPWapstartParseResponseTextAdAapSDK360() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -333,8 +314,7 @@ public class DCPWapStartAdnetworkTest extends TestCase
         sasParams.setSdkVersion("i360");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
         sasParams.setSource("app");
-        sasParams.setCategories(Arrays.asList(new Long[]
-        { 10l, 13l, 30l }));
+        sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c"
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
@@ -354,8 +334,7 @@ public class DCPWapStartAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWapstartParseNoAd() throws Exception
-    {
+    public void testDCPWapstartParseNoAd() throws Exception {
         String response = "";
         dcpWapstartAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpWapstartAdNetwork.getHttpResponseStatusCode(), 500);
@@ -363,8 +342,7 @@ public class DCPWapStartAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWapstartParseEmptyResponseCode() throws Exception
-    {
+    public void testDCPWapstartParseEmptyResponseCode() throws Exception {
         String response = "";
         dcpWapstartAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpWapstartAdNetwork.getHttpResponseStatusCode(), 500);
@@ -372,14 +350,12 @@ public class DCPWapStartAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWapstartGetId() throws Exception
-    {
+    public void testDCPWapstartGetId() throws Exception {
         assertEquals(dcpWapstartAdNetwork.getId(), "wapstartadv1");
     }
 
     @Test
-    public void testDCPWapstartGetImpressionId() throws Exception
-    {
+    public void testDCPWapstartGetImpressionId() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -400,14 +376,12 @@ public class DCPWapStartAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPWapstartGetName() throws Exception
-    {
+    public void testDCPWapstartGetName() throws Exception {
         assertEquals(dcpWapstartAdNetwork.getName(), "wapstart");
     }
 
     @Test
-    public void testDCPWapstartIsClickUrlReq() throws Exception
-    {
+    public void testDCPWapstartIsClickUrlReq() throws Exception {
         assertEquals(dcpWapstartAdNetwork.isClickUrlRequired(), true);
     }
 }

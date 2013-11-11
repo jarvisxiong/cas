@@ -3,11 +3,9 @@ package com.inmobi.adserve.channels.api;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public interface ReportingInterface
-{
+public interface ReportingInterface {
 
-    public enum ReportGranularity
-    {
+    public enum ReportGranularity {
         HOUR,
         HOUR_LIST,
         DAY,

@@ -29,8 +29,7 @@ import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
 
 
-public class DCPNexageAdNetwork extends BaseAdNetworkImpl
-{
+public class DCPNexageAdNetwork extends BaseAdNetworkImpl {
     // Updates the request parameters according to the Ad Network. Returns true on
     // success.i
 
@@ -55,8 +54,7 @@ public class DCPNexageAdNetwork extends BaseAdNetworkImpl
     }
 
     public DCPNexageAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent)
-    {
+            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
         super(baseRequestHandler, serverEvent, logger);
         this.logger = logger;
         this.config = config;
@@ -65,8 +63,7 @@ public class DCPNexageAdNetwork extends BaseAdNetworkImpl
 
     // Configure the request parameters for making the ad call
     @Override
-    public boolean configureParameters()
-    {
+    public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             logger.debug("mandate parameters missing for nexage, so returning from adapter");
@@ -107,21 +104,18 @@ public class DCPNexageAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "nexage";
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return (config.getString("nexage.advertiserId"));
     }
 
     // get URI
     @Override
-    public URI getRequestUri() throws Exception
-    {
+    public URI getRequestUri() throws Exception {
         StringBuilder finalUrl = new StringBuilder(config.getString("nexage.host"));
         finalUrl.append("pos=").append(pos);
         if (height > 0) {
@@ -198,8 +192,7 @@ public class DCPNexageAdNetwork extends BaseAdNetworkImpl
 
     // parse the response received from nexage
     @Override
-    public void parseResponse(String response, HttpResponseStatus status)
-    {
+    public void parseResponse(String response, HttpResponseStatus status) {
         logger.debug("response is ", response, "and response length is ", response.length());
         if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
             statusCode = status.getCode();
@@ -232,11 +225,9 @@ public class DCPNexageAdNetwork extends BaseAdNetworkImpl
         logger.debug("response length is", responseContent.length());
     }
 
-    @SuppressWarnings(
-    { "unchecked", "rawtypes" })
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    public boolean makeAsyncRequest()
-    {
+    public boolean makeAsyncRequest() {
         logger.debug("In nexage async");
 
         if (useJsAdTag()) {
@@ -251,11 +242,9 @@ public class DCPNexageAdNetwork extends BaseAdNetworkImpl
             setNingRequest(requestUrl);
             logger.debug("Nexage uri :", uri);
             startTime = System.currentTimeMillis();
-            baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler()
-            {
+            baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
                 @Override
-                public Response onCompleted(Response response) throws Exception
-                {
+                public Response onCompleted(Response response) throws Exception {
                     if (!isRequestCompleted()) {
                         logger.debug("Operation complete for channel partner: ", getName());
                         latency = System.currentTimeMillis() - startTime;
@@ -269,8 +258,7 @@ public class DCPNexageAdNetwork extends BaseAdNetworkImpl
                 }
 
                 @Override
-                public void onThrowable(Throwable t)
-                {
+                public void onThrowable(Throwable t) {
                     if (isRequestComplete) {
                         return;
                     }
@@ -299,8 +287,7 @@ public class DCPNexageAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public void generateJsAdResponse()
-    {
+    public void generateJsAdResponse() {
         statusCode = HttpResponseStatus.OK.getCode();
         VelocityContext context = new VelocityContext();
         context.put(POS, pos);
@@ -328,8 +315,7 @@ public class DCPNexageAdNetwork extends BaseAdNetworkImpl
         logger.debug("response length is", responseContent.length());
     }
 
-    private void setNingRequest(String requestUrl)
-    {
+    private void setNingRequest(String requestUrl) {
         ningRequest = new RequestBuilder()
                 .setUrl(requestUrl)
                     .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
@@ -342,8 +328,7 @@ public class DCPNexageAdNetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public boolean useJsAdTag()
-    {
+    public boolean useJsAdTag() {
         return jsAdTag;
     }
 }

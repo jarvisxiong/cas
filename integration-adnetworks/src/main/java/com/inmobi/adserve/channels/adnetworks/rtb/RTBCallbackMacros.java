@@ -1,7 +1,6 @@
 package com.inmobi.adserve.channels.adnetworks.rtb;
 
-public class RTBCallbackMacros
-{
+public class RTBCallbackMacros {
 
     public static final String AUCTION_ID              = "${AUCTION_ID}";
     public static final String AUCTION_BID_ID          = "${AUCTION_BID_ID}";

@@ -34,8 +34,7 @@ import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPxAdReporting extends BaseReportingImpl
-{
+public class DCPxAdReporting extends BaseReportingImpl {
     private final String userId;
     private final String password;
     private String       startDate;
@@ -47,8 +46,7 @@ public class DCPxAdReporting extends BaseReportingImpl
     private boolean      sslFlag = true;
     private final String advertiserId;
 
-    public DCPxAdReporting(final Configuration config)
-    {
+    public DCPxAdReporting(final Configuration config) {
         this.userId = config.getString("xad.userId");
         this.password = config.getString("xad.password");
         this.host = config.getString("xad.host");
@@ -57,8 +55,7 @@ public class DCPxAdReporting extends BaseReportingImpl
 
     @Override
     public ReportResponse fetchRows(DebugLogger logger, ReportTime startTime, String key, ReportTime endTime)
-            throws Exception
-    {
+            throws Exception {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         logger.debug("inside fetch rows of xad");
@@ -141,8 +138,7 @@ public class DCPxAdReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         StringBuilder reportUrl = new StringBuilder();
         reportUrl
                 .append("v=1.0&O_fmt=JSON")
@@ -158,37 +154,31 @@ public class DCPxAdReporting extends BaseReportingImpl
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return 1;
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 20;
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "xad";
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return (advertiserId);
     }
 
-    public String getEndDate(final String seperator)
-    {
+    public String getEndDate(final String seperator) {
         try {
             logger.debug("calculating end date for xad");
             ReportTime reportTime = ReportTime.getUTCTime();
@@ -206,8 +196,7 @@ public class DCPxAdReporting extends BaseReportingImpl
     }
 
     private String getToken() throws IOException, NoSuchAlgorithmException, KeyManagementException,
-            ParserConfigurationException, SAXException
-    {
+            ParserConfigurationException, SAXException {
         StringBuilder authUrlParam = new StringBuilder();
         authUrlParam.append("v=1.0&user=").append(userId).append("&pass=").append(password);
         String tokenOutput = invokeHttpPostUrl(authUrlParam.toString(), host + "/auth");
@@ -219,27 +208,21 @@ public class DCPxAdReporting extends BaseReportingImpl
     }
 
     private String invokeHttpPostUrl(String urlParameters, String hostAddress) throws IOException,
-            NoSuchAlgorithmException, KeyManagementException
-    {
+            NoSuchAlgorithmException, KeyManagementException {
 
         if (sslFlag == true) {
-            TrustManager[] trustAllCerts = new TrustManager[]
-            { new X509TrustManager()
-            {
+            TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
                 @Override
-                public java.security.cert.X509Certificate[] getAcceptedIssuers()
-                {
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                     return null;
                 }
 
                 @Override
-                public void checkClientTrusted(final X509Certificate[] certs, final String authType)
-                {
+                public void checkClientTrusted(final X509Certificate[] certs, final String authType) {
                 }
 
                 @Override
-                public void checkServerTrusted(final X509Certificate[] certs, final String authType)
-                {
+                public void checkServerTrusted(final X509Certificate[] certs, final String authType) {
                 }
             } };
 
@@ -249,11 +232,9 @@ public class DCPxAdReporting extends BaseReportingImpl
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
             // Create all-trusting host name verifier
-            HostnameVerifier allHostsValid = new HostnameVerifier()
-            {
+            HostnameVerifier allHostsValid = new HostnameVerifier() {
                 @Override
-                public boolean verify(final String hostname, final SSLSession session)
-                {
+                public boolean verify(final String hostname, final SSLSession session) {
                     return true;
                 }
             };

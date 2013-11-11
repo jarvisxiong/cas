@@ -34,8 +34,7 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public class DCPPlaceIQAdnetwork extends BaseAdNetworkImpl
-{
+public class DCPPlaceIQAdnetwork extends BaseAdNetworkImpl {
     private final Configuration           config;
     private transient String              latitude;
     private transient String              longitude;
@@ -109,8 +108,7 @@ public class DCPPlaceIQAdnetwork extends BaseAdNetworkImpl
     }
 
     public DCPPlaceIQAdnetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent)
-    {
+            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
         super(baseRequestHandler, serverEvent, logger);
         this.config = config;
         this.logger = logger;
@@ -129,8 +127,7 @@ public class DCPPlaceIQAdnetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public boolean configureParameters()
-    {
+    public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             logger.debug("mandatory parameters missing for placeiq so exiting adapter");
@@ -185,14 +182,12 @@ public class DCPPlaceIQAdnetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "placeiq";
     }
 
     @Override
-    public URI getRequestUri() throws Exception
-    {
+    public URI getRequestUri() throws Exception {
 
         StringBuilder url = new StringBuilder(host);
         appendQueryParam(url, REQUEST_TYPE, requestFormat, true);
@@ -253,8 +248,7 @@ public class DCPPlaceIQAdnetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status)
-    {
+    public void parseResponse(String response, HttpResponseStatus status) {
         logger.debug("response is", response);
         statusCode = status.getCode();
         if (StringUtils.isBlank(response) || status.getCode() != 200
@@ -306,13 +300,11 @@ public class DCPPlaceIQAdnetwork extends BaseAdNetworkImpl
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return (config.getString("placeiq.advertiserId"));
     }
 
-    private String getCategory()
-    {
+    private String getCategory() {
         Long[] segmentCategories = null;
         boolean allTags = false;
         if (entity != null) {

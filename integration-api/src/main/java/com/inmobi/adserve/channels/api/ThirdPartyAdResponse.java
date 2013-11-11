@@ -3,11 +3,9 @@ package com.inmobi.adserve.channels.api;
 import java.util.Map;
 
 
-public class ThirdPartyAdResponse
-{
+public class ThirdPartyAdResponse {
 
-    public enum ResponseStatus
-    {
+    public enum ResponseStatus {
         SUCCESS,
         FAILURE_REQUEST_ERROR,
         FAILURE_NO_AD,
@@ -26,8 +24,7 @@ public class ThirdPartyAdResponse
     public String         response;
     public Map            responseHeaders;
 
-    public enum ResponseFormat
-    {
+    public enum ResponseFormat {
         HTML,
         WML,
         JSON
