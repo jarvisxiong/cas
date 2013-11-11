@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
-public class PublisherFilterQuery implements RepositoryQuery
-{
+public class PublisherFilterQuery implements RepositoryQuery {
 
     private String  siteId;
     private Integer ruleType;

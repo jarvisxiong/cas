@@ -10,22 +10,18 @@ import javax.crypto.spec.SecretKeySpec;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class CryptoHashGenerator
-{
+public class CryptoHashGenerator {
     private ThreadSafeMac mac;
     private DebugLogger   logger;
 
-    private static class ThreadSafeMac extends ThreadLocal<Mac>
-    {
+    private static class ThreadSafeMac extends ThreadLocal<Mac> {
         String secretKey;
 
-        public ThreadSafeMac(String secretKey)
-        {
+        public ThreadSafeMac(String secretKey) {
             this.secretKey = secretKey;
         }
 
-        public Mac initialValue()
-        {
+        public Mac initialValue() {
             Mac mac;
             SecretKeySpec sk;
             try {
@@ -43,14 +39,12 @@ public class CryptoHashGenerator
         }
     }
 
-    public CryptoHashGenerator(String secretKey, DebugLogger logger)
-    {
+    public CryptoHashGenerator(String secretKey, DebugLogger logger) {
         this.logger = logger;
         mac = new ThreadSafeMac(secretKey);
     }
 
-    public String generateHash(String url)
-    {
+    public String generateHash(String url) {
         CRC32 crc = new CRC32();
         crc.update(mac.get().doFinal(url.getBytes()));
         String hash = Long.toHexString(crc.getValue());

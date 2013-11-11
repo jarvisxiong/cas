@@ -8,24 +8,21 @@ import org.jboss.netty.channel.SimpleChannelHandler;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class ConnectionLimitUpstreamHandler extends SimpleChannelHandler
-{
+public class ConnectionLimitUpstreamHandler extends SimpleChannelHandler {
 
     private final AtomicInteger connections = new AtomicInteger(0);
     private int                 maxConnections;
     private int                 droppedConnections;
     private DebugLogger         logger;
 
-    public ConnectionLimitUpstreamHandler(int maxConnections)
-    {
+    public ConnectionLimitUpstreamHandler(int maxConnections) {
         this.maxConnections = maxConnections;
         this.droppedConnections = 0;
         this.logger = new DebugLogger();
     }
 
     @Override
-    public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception
-    {
+    public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
         if (maxConnections > 0) {
             int currentCount = connections.getAndIncrement();
             if (currentCount + 1 > maxConnections) {
@@ -39,8 +36,7 @@ public class ConnectionLimitUpstreamHandler extends SimpleChannelHandler
     }
 
     @Override
-    public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception
-    {
+    public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
         if (maxConnections > 0) {
             connections.decrementAndGet();
         }
@@ -48,25 +44,21 @@ public class ConnectionLimitUpstreamHandler extends SimpleChannelHandler
         super.channelClosed(ctx, e);
     }
 
-    public int getActiveOutboundConnections()
-    {
+    public int getActiveOutboundConnections() {
         return connections.get();
     }
 
-    public void setMaxConnections(int maxConnection)
-    {
+    public void setMaxConnections(int maxConnection) {
         if (maxConnection > 0) {
             maxConnections = maxConnection;
         }
     }
 
-    public int getMaxConnections()
-    {
+    public int getMaxConnections() {
         return maxConnections;
     }
 
-    public int getDroppedConnections()
-    {
+    public int getDroppedConnections() {
         return droppedConnections;
     }
 

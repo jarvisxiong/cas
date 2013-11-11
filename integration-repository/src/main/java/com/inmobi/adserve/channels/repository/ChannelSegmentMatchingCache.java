@@ -7,21 +7,18 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class ChannelSegmentMatchingCache
-{
+public class ChannelSegmentMatchingCache {
 
     private static Logger                                                                     logger;
     private static ConcurrentHashMap<String, ConcurrentHashMap<String, ChannelSegmentEntity>> entityHashMap;
 
-    public static void init(Logger logger)
-    {
+    public static void init(Logger logger) {
         ChannelSegmentMatchingCache.logger = logger;
         entityHashMap = new ConcurrentHashMap<String, ConcurrentHashMap<String, ChannelSegmentEntity>>();
     }
 
     public static Collection<ChannelSegmentEntity> getEntities(long slotId, long category, long country,
-            Integer targetingPlatform, Integer siteRating, Integer osId)
-    {
+            Integer targetingPlatform, Integer siteRating, Integer osId) {
         String key = getKey(slotId, category, country, targetingPlatform, siteRating, osId);
         Map<String, ChannelSegmentEntity> entities = entityHashMap.get(key);
         if (null == entities) {
@@ -34,15 +31,13 @@ public class ChannelSegmentMatchingCache
         return entities.values();
     }
 
-    static void cleanupEntityFromCache(ChannelSegmentEntity entity, List<String> matchingKeys)
-    {
+    static void cleanupEntityFromCache(ChannelSegmentEntity entity, List<String> matchingKeys) {
         for (String key : matchingKeys) {
             removeEntity(key, entity);
         }
     }
 
-    static void removeEntity(String key, ChannelSegmentEntity entity)
-    {
+    static void removeEntity(String key, ChannelSegmentEntity entity) {
         ConcurrentHashMap<String, ChannelSegmentEntity> map = entityHashMap.get(key);
         if (null != map) {
             map.remove(entity.getAdgroupId());
@@ -50,15 +45,13 @@ public class ChannelSegmentMatchingCache
         }
     }
 
-    static void insertEntityToCache(ChannelSegmentEntity entity, List<String> matchingKeys)
-    {
+    static void insertEntityToCache(ChannelSegmentEntity entity, List<String> matchingKeys) {
         for (String key : matchingKeys) {
             insertEntity(key, entity);
         }
     }
 
-    static void insertEntity(String key, ChannelSegmentEntity entity)
-    {
+    static void insertEntity(String key, ChannelSegmentEntity entity) {
         ConcurrentHashMap<String, ChannelSegmentEntity> map = entityHashMap.get(key);
         if (null == map) {
             map = new ConcurrentHashMap<String, ChannelSegmentEntity>();
@@ -68,18 +61,15 @@ public class ChannelSegmentMatchingCache
         logger.debug("Updated channel segment with key: " + key + " and AdGroupId: " + entity.getAdgroupId());
     }
 
-    static List<String> generateMatchingKeys(ChannelSegmentEntity entity)
-    {
+    static List<String> generateMatchingKeys(ChannelSegmentEntity entity) {
         Long[] allowedSlots = entity.getSlotIds();
-        Long[] allowedCategories = (entity.isAllTags()) ? new Long[]
-        { -1L } : entity.getCategoryTaxonomy();
-        Long[] allowedCountries = entity.getRcList() == null || entity.getRcList().length == 0 ? new Long[]
-        { -1L } : entity.getRcList();
+        Long[] allowedCategories = (entity.isAllTags()) ? new Long[] { -1L } : entity.getCategoryTaxonomy();
+        Long[] allowedCountries = entity.getRcList() == null || entity.getRcList().length == 0 ? new Long[] { -1L }
+                : entity.getRcList();
         List<Integer> allowedTargetingPlatform = entity.getTargetingPlatform();
         Integer[] allowedSiteRatings = entity.getSiteRatings();
         List<Integer> allowedOsIds = entity.getOsIds() == null || entity.getOsIds().size() == 0 ? new ArrayList<Integer>(
-                Arrays.asList(new Integer[]
-                { -1 })) : entity.getOsIds();
+                Arrays.asList(new Integer[] { -1 })) : entity.getOsIds();
 
         List<String> matchingKeys = new ArrayList<String>();
         for (Long slot : allowedSlots) {
@@ -100,8 +90,7 @@ public class ChannelSegmentMatchingCache
     }
 
     private static String getKey(long slotId, long category, long country, Integer targetingPlatform,
-            Integer siteRating, Integer osId)
-    {
+            Integer siteRating, Integer osId) {
         return slotId + "_" + category + "_" + country + "_" + targetingPlatform + "_" + siteRating + "_" + osId;
     }
 

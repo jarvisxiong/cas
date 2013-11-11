@@ -17,13 +17,11 @@ import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class ServletLogParser implements Servlet
-{
+public class ServletLogParser implements Servlet {
 
     @Override
     public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
-            DebugLogger logger) throws Exception
-    {
+            DebugLogger logger) throws Exception {
         Map<String, List<String>> params = queryStringDecoder.getParameters();
         HttpRequest request = (HttpRequest) e.getMessage();
         String targetStrings = "";
@@ -67,8 +65,7 @@ public class ServletLogParser implements Servlet
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "LogParser";
     }
 

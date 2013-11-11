@@ -11,15 +11,13 @@ import org.apache.commons.lang.StringUtils;
 import com.yammer.metrics.reporting.GraphiteReporter;
 
 
-public class MetricsManager
-{
+public class MetricsManager {
 
     private static Map<Integer/* country */, ConcurrentHashMap<Integer/* os */, ConcurrentHashMap<String/* advertiserName */, RealTimeStats>>> realTimeCountryOsAdvertiserStats = new ConcurrentHashMap<Integer, ConcurrentHashMap<Integer, ConcurrentHashMap<String, RealTimeStats>>>();
     private static Map<Integer/* country */, ConcurrentHashMap<Integer/* os */, RealTimeStats>>                                                realTimeCountryOsStats           = new ConcurrentHashMap<Integer, ConcurrentHashMap<Integer, RealTimeStats>>();
     private static Map<Integer/* country */, RealTimeStats>                                                                                    realTimeCountryStats             = new ConcurrentHashMap<Integer, RealTimeStats>();
 
-    public static void init(String graphiteServer, int graphitePort, int graphiteInterval)
-    {
+    public static void init(String graphiteServer, int graphitePort, int graphiteInterval) {
         String metricProducer;
         try {
             metricProducer = metricsPrefix(InetAddress.getLocalHost().getHostName().toLowerCase());
@@ -30,15 +28,13 @@ public class MetricsManager
         GraphiteReporter.enable(graphiteInterval, TimeUnit.MINUTES, graphiteServer, graphitePort, metricProducer);
     }
 
-    private static String metricsPrefix(String hostname)
-    {
+    private static String metricsPrefix(String hostname) {
         hostname = StringUtils.removeEnd(hostname, ".inmobi.com");
         return StringUtils.reverseDelimited(hostname, '.');
     }
 
     private static RealTimeStats getRealTimeCountryOsAdvertiserStats(int countryId, String countryName, int osId,
-            String osName, String advertiserName)
-    {
+            String osName, String advertiserName) {
         if (null == realTimeCountryOsAdvertiserStats.get(countryId)) {
             realTimeCountryOsAdvertiserStats.put(countryId,
                 new ConcurrentHashMap<Integer, ConcurrentHashMap<String, RealTimeStats>>());
@@ -53,8 +49,7 @@ public class MetricsManager
         return realTimeCountryOsAdvertiserStats.get(countryId).get(osId).get(advertiserName);
     }
 
-    private static RealTimeStats getRealTimeCountryOsStats(int countryId, String countryName, int osId, String osName)
-    {
+    private static RealTimeStats getRealTimeCountryOsStats(int countryId, String countryName, int osId, String osName) {
         if (null == realTimeCountryOsStats.get(countryId)) {
             realTimeCountryOsStats.put(countryId, new ConcurrentHashMap<Integer, RealTimeStats>());
         }
@@ -65,8 +60,7 @@ public class MetricsManager
         return realTimeCountryOsStats.get(countryId).get(osId);
     }
 
-    private static RealTimeStats getRealTimeCountryStats(int countryId, String countryName)
-    {
+    private static RealTimeStats getRealTimeCountryStats(int countryId, String countryName) {
         if (null == realTimeCountryStats.get(countryId)) {
             RealTimeStats realTimeStats = new RealTimeStats(countryName);
             realTimeCountryStats.put(countryId, realTimeStats);
@@ -75,8 +69,7 @@ public class MetricsManager
     }
 
     public static void updateStats(int countryId, String countryName, int osId, String osName, String advertiserName,
-            boolean fills, boolean requests, boolean serverImpressions, double bids, long latency, double chargedBids)
-    {
+            boolean fills, boolean requests, boolean serverImpressions, double bids, long latency, double chargedBids) {
         RealTimeStats realTimeCountryOsAdvertiserStats = getRealTimeCountryOsAdvertiserStats(countryId, countryName,
             osId, osName, advertiserName);
         RealTimeStats realTimeCountryOsStats = getRealTimeCountryOsStats(countryId, countryName, osId, osName);

@@ -9,8 +9,7 @@ import java.util.Set;
 
 
 @Getter
-public class ChannelEntity implements IdentifiableEntity<String>
-{
+public class ChannelEntity implements IdentifiableEntity<String> {
 
     private static final long serialVersionUID = 1L;
 
@@ -52,8 +51,7 @@ public class ChannelEntity implements IdentifiableEntity<String>
      */
     private final int         accountSegment;
 
-    public ChannelEntity(Builder builder)
-    {
+    public ChannelEntity(Builder builder) {
         this.channelId = builder.channelId;
         this.name = builder.name;
         this.username = builder.username;
@@ -84,14 +82,12 @@ public class ChannelEntity implements IdentifiableEntity<String>
         this.accountSegment = builder.accountSegment;
     }
 
-    public static Builder newBuilder()
-    {
+    public static Builder newBuilder() {
         return new Builder();
     }
 
     @Setter
-    public static class Builder
-    {
+    public static class Builder {
         private String      channelId;
         private String      name;
         private String      username;
@@ -127,21 +123,18 @@ public class ChannelEntity implements IdentifiableEntity<String>
         private boolean     isSiteInclusion;
         private int         accountSegment;
 
-        public ChannelEntity build()
-        {
+        public ChannelEntity build() {
             return new ChannelEntity(this);
         }
     }
 
     @Override
-    public String getJSON()
-    {
+    public String getJSON() {
         return null;
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return channelId;
     }
 

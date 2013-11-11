@@ -37,8 +37,7 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
 
-public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler
-{
+public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
 
     public String         terminationReason = "NO";
     public JSONObject     jObject           = null;
@@ -46,18 +45,15 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler
     public ResponseSender responseSender;
     public boolean        isTraceRequest;
 
-    public String getTerminationReason()
-    {
+    public String getTerminationReason() {
         return terminationReason;
     }
 
-    public void setTerminationReason(String terminationReason)
-    {
+    public void setTerminationReason(String terminationReason) {
         this.terminationReason = terminationReason;
     }
 
-    public HttpRequestHandler()
-    {
+    public HttpRequestHandler() {
         logger = new DebugLogger();
         responseSender = new ResponseSender(this, logger);
     }
@@ -67,8 +63,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler
      * means channel is closed by party who requested for the ad
      */
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception
-    {
+    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
 
         String exceptionString = e.getClass().getSimpleName();
         InspectorStats.incrementStatCount(InspectorStrings.channelException, exceptionString);
@@ -89,8 +84,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler
 
     // Invoked when request timeout.
     @Override
-    public void channelIdle(ChannelHandlerContext ctx, IdleStateEvent e)
-    {
+    public void channelIdle(ChannelHandlerContext ctx, IdleStateEvent e) {
         if (e.getChannel().isOpen()) {
             logger.debug("Channel is open in channelIdle handler");
             if (responseSender.getRankList() != null) {
@@ -118,8 +112,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler
 
     // Invoked when message is received over the connection
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception
-    {
+    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
         try {
             HttpRequest request = (HttpRequest) e.getMessage();
             logger.debug(request.getContent().toString(CharsetUtil.UTF_8));
@@ -160,8 +153,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler
         }
     }
 
-    public void writeLogs(ResponseSender responseSender, DebugLogger logger)
-    {
+    public void writeLogs(ResponseSender responseSender, DebugLogger logger) {
         List<ChannelSegment> list = new ArrayList<ChannelSegment>();
         if (null != responseSender.getRankList()) {
             list.addAll(responseSender.getRankList());
@@ -215,8 +207,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler
     }
 
     // send Mail if channel server crashes
-    public static void sendMail(String errorMessage, String stackTrace)
-    {
+    public static void sendMail(String errorMessage, String stackTrace) {
         Properties properties = System.getProperties();
         properties.setProperty("mail.smtp.host", ServletHandler.getServerConfig().getString("smtpServer"));
         Session session = Session.getDefaultInstance(properties);

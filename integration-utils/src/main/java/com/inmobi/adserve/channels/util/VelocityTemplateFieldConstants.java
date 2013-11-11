@@ -1,7 +1,6 @@
 package com.inmobi.adserve.channels.util;
 
-public class VelocityTemplateFieldConstants
-{
+public class VelocityTemplateFieldConstants {
     public static final String IMAIBaseUrl        = "IMAIBaseUrl";
     public static final String IMBeaconUrl        = "IMBeaconUrl";
     public static final String IMClickUrl         = "IMClickUrl";

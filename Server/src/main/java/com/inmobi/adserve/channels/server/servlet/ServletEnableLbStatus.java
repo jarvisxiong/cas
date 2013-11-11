@@ -12,13 +12,11 @@ import com.inmobi.adserve.channels.server.ServerStatusInfo;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class ServletEnableLbStatus implements Servlet
-{
+public class ServletEnableLbStatus implements Servlet {
 
     @Override
     public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
-            DebugLogger logger) throws JSONException
-    {
+            DebugLogger logger) throws JSONException {
         HttpRequest request = (HttpRequest) e.getMessage();
         String host = ServletHandler.getHost(request);
         if (host != null && host.startsWith("localhost")) {
@@ -33,8 +31,7 @@ public class ServletEnableLbStatus implements Servlet
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "enaablelbstatus";
     }
 

@@ -1,7 +1,6 @@
 package com.inmobi.adserve.channels.util;
 
-public class InspectorStrings
-{
+public class InspectorStrings {
 
     public static final String totalRequests                             = "TotalRequests";
     public static final String ruleEngineRequests                        = "RuleEngineRequests";

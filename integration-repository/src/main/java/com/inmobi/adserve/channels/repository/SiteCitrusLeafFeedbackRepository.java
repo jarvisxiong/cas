@@ -29,8 +29,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
-public class SiteCitrusLeafFeedbackRepository
-{
+public class SiteCitrusLeafFeedbackRepository {
 
     private static CitrusleafClient                                   citrusleafClient;
     private String                                                    namespace;
@@ -45,8 +44,7 @@ public class SiteCitrusLeafFeedbackRepository
     private int                                                       boostTimeFrame;
     private double                                                    defaultECPM;
 
-    public void init(Configuration config, DataCenter colo)
-    {
+    public void init(Configuration config, DataCenter colo) {
         this.namespace = config.getString("namespace");
         this.set = config.getString("set");
         SiteCitrusLeafFeedbackRepository.citrusleafClient = new CitrusleafClient(config.getString("host"),
@@ -68,8 +66,7 @@ public class SiteCitrusLeafFeedbackRepository
      * 
      * @return : returns te entity matching for the site, segment and adgroup combination
      */
-    public SegmentAdGroupFeedbackEntity query(String siteId, Integer segmentId, DebugLogger logger)
-    {
+    public SegmentAdGroupFeedbackEntity query(String siteId, Integer segmentId, DebugLogger logger) {
         SiteFeedbackEntity siteFeedbackEntity = siteSegmentFeedbackCache.get(siteId);
         if (siteFeedbackEntity != null) {
             logger.debug("got the siteFeedback entity from cache for query", siteId, segmentId);
@@ -97,8 +94,7 @@ public class SiteCitrusLeafFeedbackRepository
     /**
      * Method that asynchronously fetches feedback from the citrusleaf and puts it into the cache
      */
-    private void asynchronouslyFetchFeedbackFromCitrusLeaf(String siteId, DebugLogger logger)
-    {
+    private void asynchronouslyFetchFeedbackFromCitrusLeaf(String siteId, DebugLogger logger) {
         Boolean isSiteGettingUpdated = this.currentlyUpdatingSites.putIfAbsent(siteId, true);
         if (isSiteGettingUpdated == null) {
             // forking new thread to fetch feedback from citrusleaf
@@ -115,20 +111,17 @@ public class SiteCitrusLeafFeedbackRepository
      * Class that performs feedback fetch from citrusleaf and cache updating tasks asynchronously
      * 
      */
-    class CacheUpdater implements Runnable
-    {
+    class CacheUpdater implements Runnable {
         private String      siteId;
         private DebugLogger logger;
 
-        public CacheUpdater(String siteId, DebugLogger logger)
-        {
+        public CacheUpdater(String siteId, DebugLogger logger) {
             this.siteId = siteId;
             this.logger = logger;
         }
 
         @Override
-        public void run()
-        {
+        public void run() {
             logger.debug("getting feedback form the citrus leaf for query", siteId);
             getFeedbackFromCitrusleaf(siteId);
         }
@@ -136,8 +129,7 @@ public class SiteCitrusLeafFeedbackRepository
         /**
          * Method which gets feedback form citrusleaf in case of a cache miss and updates the cache
          */
-        void getFeedbackFromCitrusleaf(String siteId)
-        {
+        void getFeedbackFromCitrusleaf(String siteId) {
             // getting all data for the site
             ClResult clResult = getFromCitrusLeaf(siteId);
             if (!clResult.resultCode.equals(ClResultCode.OK)) {
@@ -152,8 +144,7 @@ public class SiteCitrusLeafFeedbackRepository
         /**
          * Method which makes a call to citrus leaf to load the complete site info
          */
-        ClResult getFromCitrusLeaf(String site)
-        {
+        ClResult getFromCitrusLeaf(String site) {
             InspectorStats.incrementStatCount(InspectorStrings.siteFeedbackRequestsToCitrusLeaf);
             long time = System.currentTimeMillis();
             ClResult clResult = citrusleafClient.getAll(namespace, set, site, null);
@@ -168,8 +159,7 @@ public class SiteCitrusLeafFeedbackRepository
          * @param clResult
          *            : ClResult object containing the feedback
          */
-        SiteFeedbackEntity processResultFromCitrusLeaf(ClResult clResult)
-        {
+        SiteFeedbackEntity processResultFromCitrusLeaf(ClResult clResult) {
             if (clResult.results != null) {
                 Map<Integer, SegmentAdGroupFeedbackEntity> segmentAdGroupFeedbackEntityMap = new HashMap<Integer, SegmentAdGroupFeedbackEntity>();
                 for (Map.Entry<String, Object> binValuePair : clResult.results.entrySet()) {
@@ -239,8 +229,7 @@ public class SiteCitrusLeafFeedbackRepository
          * from citrus leaf
          */
         SegmentAdGroupFeedbackEntity buildSiteFeedbackEntity(SiteFeedback globalFeedback, SiteFeedback rctFeedback,
-                SiteFeedback coloFeedback)
-        {
+                SiteFeedback coloFeedback) {
             if (globalFeedback == null && rctFeedback == null && coloFeedback == null) {
                 return null;
             }
@@ -317,8 +306,7 @@ public class SiteCitrusLeafFeedbackRepository
          * Method that constructs channel segment feedback entity from adgroupFeedback
          */
         private ChannelSegmentFeedbackEntity.Builder buildChannelSegmentFeedbackEntityBuilder(
-                AdGroupFeedback adGroupFeedback, DateFormat dateFormat, Date date, String today)
-        {
+                AdGroupFeedback adGroupFeedback, DateFormat dateFormat, Date date, String today) {
             int impressionRendered = 0;
             double weightedImpressionsRendered = 0;
             double weighedRevenue = 0.0;
@@ -380,8 +368,7 @@ public class SiteCitrusLeafFeedbackRepository
         /**
          * Update the cache with fetched site feedback for the requested segment and its all adgroups
          */
-        void updateCache(SiteFeedbackEntity siteFeedbackEntity)
-        {
+        void updateCache(SiteFeedbackEntity siteFeedbackEntity) {
             if (siteFeedbackEntity != null) {
                 siteSegmentFeedbackCache.put(this.siteId, siteFeedbackEntity);
             }
@@ -392,8 +379,7 @@ public class SiteCitrusLeafFeedbackRepository
     /**
      * For lookup into the cache
      */
-    public SiteFeedbackEntity query(String siteId)
-    {
+    public SiteFeedbackEntity query(String siteId) {
         return this.siteSegmentFeedbackCache.get(siteId);
     }
 

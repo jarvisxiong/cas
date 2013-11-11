@@ -5,8 +5,7 @@ package com.inmobi.adserve.channels.util;
  * 
  * @author Devi Chand(devi.chand@inmobi.com)
  */
-public interface IABCitiesInterface
-{
+public interface IABCitiesInterface {
 
     /**
      * Maps inmobi cities to IAB cities.

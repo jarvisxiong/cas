@@ -19,18 +19,15 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class RequestParser
-{
+public class RequestParser {
 
-    public static JSONObject extractParams(Map<String, List<String>> params) throws Exception
-    {
+    public static JSONObject extractParams(Map<String, List<String>> params) throws Exception {
         return extractParams(params, "args");
     }
 
     // Extracting params.
     public static JSONObject extractParams(Map<String, List<String>> params, String jsonKey) throws JSONException,
-            UnsupportedEncodingException
-    {
+            UnsupportedEncodingException {
         if (!params.isEmpty()) {
             List<String> values = params.get(jsonKey);
             if (CollectionUtils.isNotEmpty(values)) {
@@ -42,8 +39,7 @@ public class RequestParser
     }
 
     public static void parseRequestParameters(JSONObject jObject, SASRequestParameters params,
-            CasInternalRequestParameters casInternalRequestParameters, DebugLogger logger)
-    {
+            CasInternalRequestParameters casInternalRequestParameters, DebugLogger logger) {
         logger.debug("Inside parameter parser");
         if (null == jObject) {
             logger.error("Returning null as jObject is null.");
@@ -132,8 +128,7 @@ public class RequestParser
         logger.debug("successfully parsed params");
     }
 
-    public static String stringify(JSONObject jObject, String field, DebugLogger logger)
-    {
+    public static String stringify(JSONObject jObject, String field, DebugLogger logger) {
         String fieldValue = "";
         try {
             Object fieldValueObject = jObject.get(field);
@@ -148,8 +143,7 @@ public class RequestParser
         return fieldValue;
     }
 
-    public static String parseArray(JSONObject jObject, String param, int index)
-    {
+    public static String parseArray(JSONObject jObject, String param, int index) {
         if (null == jObject) {
             return null;
         }
@@ -167,8 +161,7 @@ public class RequestParser
         }
     }
 
-    public static List<Long> getCategory(JSONObject jObject, DebugLogger logger, String oldORnew)
-    {
+    public static List<Long> getCategory(JSONObject jObject, DebugLogger logger, String oldORnew) {
         try {
             JSONArray categories = jObject.getJSONArray(oldORnew);
             Long[] category = new Long[categories.length()];
@@ -183,8 +176,7 @@ public class RequestParser
         }
     }
 
-    public static Set<Integer> getAcoountSegments(JSONObject jObject, DebugLogger logger)
-    {
+    public static Set<Integer> getAcoountSegments(JSONObject jObject, DebugLogger logger) {
         try {
             JSONArray segments = jObject.getJSONArray("segments");
             HashSet<Integer> accountSegments = new HashSet<Integer>();
@@ -201,8 +193,7 @@ public class RequestParser
 
     // Get user specific params
     public static SASRequestParameters getUserParams(SASRequestParameters parameter, JSONObject jObject,
-            DebugLogger logger)
-    {
+            DebugLogger logger) {
         logger.debug("inside parsing user params");
         String utf8 = "UTF-8";
         try {
@@ -237,8 +228,7 @@ public class RequestParser
     }
 
     // Get user id params
-    public static void setUserIdParams(CasInternalRequestParameters parameter, JSONObject jObject, DebugLogger logger)
-    {
+    public static void setUserIdParams(CasInternalRequestParameters parameter, JSONObject jObject, DebugLogger logger) {
         if (null == jObject) {
             return;
         }
@@ -265,8 +255,7 @@ public class RequestParser
         }
     }
 
-    public static String MD5(String md5)
-    {
+    public static String MD5(String md5) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] array = md.digest(md5.getBytes());

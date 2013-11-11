@@ -11,8 +11,7 @@ import java.sql.Timestamp;
 
 @Getter
 @ToString
-public class SiteEcpmEntity implements IdentifiableEntity<SiteEcpmQuery>
-{
+public class SiteEcpmEntity implements IdentifiableEntity<SiteEcpmQuery> {
 
     private static final long serialVersionUID = 1L;
 
@@ -23,8 +22,7 @@ public class SiteEcpmEntity implements IdentifiableEntity<SiteEcpmQuery>
     private final double      networkEcpm;
     private final Timestamp   modifiedOn;
 
-    public SiteEcpmEntity(Builder builder)
-    {
+    public SiteEcpmEntity(Builder builder) {
         this.siteId = builder.siteId;
         this.countryId = builder.countryId;
         this.osId = builder.osId;
@@ -33,14 +31,12 @@ public class SiteEcpmEntity implements IdentifiableEntity<SiteEcpmQuery>
         this.modifiedOn = builder.modifiedOn;
     }
 
-    public static Builder newBuilder()
-    {
+    public static Builder newBuilder() {
         return new Builder();
     }
 
     @Setter
-    public static class Builder
-    {
+    public static class Builder {
         private String    siteId;
         private Integer   countryId;
         private Integer   osId;
@@ -48,21 +44,18 @@ public class SiteEcpmEntity implements IdentifiableEntity<SiteEcpmQuery>
         private double    networkEcpm;
         private Timestamp modifiedOn;
 
-        public SiteEcpmEntity build()
-        {
+        public SiteEcpmEntity build() {
             return new SiteEcpmEntity(this);
         }
     }
 
     @Override
-    public SiteEcpmQuery getId()
-    {
+    public SiteEcpmQuery getId() {
         return new SiteEcpmQuery(this.siteId, this.countryId, this.osId);
     }
 
     @Override
-    public String getJSON()
-    {
+    public String getJSON() {
         return null;
     }
 }

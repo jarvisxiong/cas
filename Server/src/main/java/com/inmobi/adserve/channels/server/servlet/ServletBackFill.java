@@ -24,12 +24,10 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
 
-public class ServletBackFill implements Servlet
-{
+public class ServletBackFill implements Servlet {
     @Override
     public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
-            DebugLogger logger) throws Exception
-    {
+            DebugLogger logger) throws Exception {
 
         InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
 
@@ -271,13 +269,11 @@ public class ServletBackFill implements Servlet
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "BackFill";
     }
 
-    private static double getHighestEcpm(List<ChannelSegment> channelSegments)
-    {
+    private static double getHighestEcpm(List<ChannelSegment> channelSegments) {
         double highestEcpm = 0;
         for (ChannelSegment channelSegment : channelSegments) {
             if (channelSegment.getChannelSegmentFeedbackEntity().getECPM() < 10.0
@@ -288,8 +284,7 @@ public class ServletBackFill implements Servlet
         return highestEcpm;
     }
 
-    private static List<Long> getBlockedCategories(HttpRequestHandler hrh, DebugLogger logger)
-    {
+    private static List<Long> getBlockedCategories(HttpRequestHandler hrh, DebugLogger logger) {
         List<Long> blockedCategories = null;
         if (null != hrh.responseSender.sasParams.getSiteId()) {
             PublisherFilterEntity publisherFilterEntity = ServletHandler.repositoryHelper
@@ -301,8 +296,7 @@ public class ServletBackFill implements Servlet
         return blockedCategories;
     }
 
-    private static List<String> getBlockedAdvertisers(HttpRequestHandler hrh, DebugLogger logger)
-    {
+    private static List<String> getBlockedAdvertisers(HttpRequestHandler hrh, DebugLogger logger) {
         List<String> blockedAdvertisers = null;
         if (null != hrh.responseSender.sasParams.getSiteId()) {
             PublisherFilterEntity publisherFilterEntity = ServletHandler.repositoryHelper

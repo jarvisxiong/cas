@@ -47,8 +47,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 
-public class ChannelServer
-{
+public class ChannelServer {
     private static Logger                           logger;
     private static ChannelAdGroupRepository         channelAdGroupRepository;
     private static ChannelRepository                channelRepository;
@@ -65,8 +64,7 @@ public class ChannelServer
     public static short                             hostIdCode;
     public static String                            dataCentreName;
 
-    public static void main(String[] args) throws Exception
-    {
+    public static void main(String[] args) throws Exception {
         try {
             ConfigurationLoader config = ConfigurationLoader.getInstance(configFile);
 
@@ -190,16 +188,14 @@ public class ChannelServer
         }
     }
 
-    public static String getMyStackTrace(Exception exception)
-    {
+    public static String getMyStackTrace(Exception exception) {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         exception.printStackTrace(printWriter);
         return ("StackTrace is: " + stringWriter.toString());
     }
 
-    private static void instantiateRepository(Logger logger, ConfigurationLoader config) throws ClassNotFoundException
-    {
+    private static void instantiateRepository(Logger logger, ConfigurationLoader config) throws ClassNotFoundException {
         try {
             logger.debug("Starting to instantiate repository");
             ChannelSegmentMatchingCache.init(logger);
@@ -281,8 +277,7 @@ public class ChannelServer
         }
     }
 
-    private static DataCenter getDataCenter()
-    {
+    private static DataCenter getDataCenter() {
         DataCenter colo = DataCenter.ALL;
         if (DataCenter.UA2.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
             colo = DataCenter.UA2;
@@ -303,8 +298,7 @@ public class ChannelServer
     }
 
     // check if all log folders exists
-    public static boolean checkLogFolders(Configuration config)
-    {
+    public static boolean checkLogFolders(Configuration config) {
         String rrLogFolder = config.getString("appender.rr.File");
         String channelLogFolder = config.getString("appender.channel.File");
         String debugLogFolder = config.getString("appender.debug.File");

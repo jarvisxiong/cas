@@ -18,8 +18,7 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
  * 
  * @author Devi Chand(devi.chand@inmobi.com)
  */
-public class AuctionEngine implements AuctionEngineInterface
-{
+public class AuctionEngine implements AuctionEngineInterface {
     private boolean                     auctionComplete = false;
     private ChannelSegment              rtbResponse;
     private double                      secondBidPrice;
@@ -28,8 +27,7 @@ public class AuctionEngine implements AuctionEngineInterface
     private List<ChannelSegment>        rtbSegments;
     private DebugLogger                 logger;
 
-    public AuctionEngine(DebugLogger logger)
-    {
+    public AuctionEngine(DebugLogger logger) {
         this.logger = logger;
     }
 
@@ -40,8 +38,7 @@ public class AuctionEngine implements AuctionEngineInterface
      * bid will win and would be charged the secondHighest price If only 1 rtb is selected, it will be selected for
      * sending response and will be charged the highest of secondHighest price or 90% of bidFloor
      */
-    public AdNetworkInterface runRtbSecondPriceAuctionEngine()
-    {
+    public AdNetworkInterface runRtbSecondPriceAuctionEngine() {
         // Do not run auction 2 times.
         synchronized (this) {
             if (auctionComplete) {
@@ -133,8 +130,7 @@ public class AuctionEngine implements AuctionEngineInterface
         return rtbList.get(lowestLatencyBid).getAdNetworkInterface();
     }
 
-    public List<ChannelSegment> rtbFilters(List<ChannelSegment> rtbSegments)
-    {
+    public List<ChannelSegment> rtbFilters(List<ChannelSegment> rtbSegments) {
         List<ChannelSegment> rtbList = new ArrayList<ChannelSegment>();
         logger.debug("No of rtb partners who sent response are", rtbList.size());
         // Ad filter.
@@ -213,24 +209,20 @@ public class AuctionEngine implements AuctionEngineInterface
         return rtbList;
     }
 
-    public boolean isAuctionComplete()
-    {
+    public boolean isAuctionComplete() {
         return auctionComplete;
     }
 
-    public ChannelSegment getRtbResponse()
-    {
+    public ChannelSegment getRtbResponse() {
         return rtbResponse;
     }
 
-    public double getSecondBidPrice()
-    {
+    public double getSecondBidPrice() {
         return secondBidPrice;
     }
 
     @Override
-    public boolean isAllRtbComplete()
-    {
+    public boolean isAllRtbComplete() {
         if (rtbSegments == null) {
             return false;
         }
@@ -246,29 +238,24 @@ public class AuctionEngine implements AuctionEngineInterface
     }
 
     @Override
-    public boolean isRtbResponseNull()
-    {
+    public boolean isRtbResponseNull() {
         return rtbResponse == null;
     }
 
-    public List<ChannelSegment> getRtbSegments()
-    {
+    public List<ChannelSegment> getRtbSegments() {
         return rtbSegments;
     }
 
-    public void setRtbSegments(List<ChannelSegment> rtbSegments)
-    {
+    public void setRtbSegments(List<ChannelSegment> rtbSegments) {
         this.rtbSegments = rtbSegments;
     }
 
-    public String getEncryptedBid(Double bid)
-    {
+    public String getEncryptedBid(Double bid) {
         long winBid = (long) (bid * Math.pow(10, 6));
         return AsyncRequestMaker.getImpressionId(winBid);
     }
 
-    public double calculateRTBFloor(double siteFloor, double highestEcpm, double segmentFloor, double countryFloor)
-    {
+    public double calculateRTBFloor(double siteFloor, double highestEcpm, double segmentFloor, double countryFloor) {
         double rtbFloor;
         rtbFloor = Math.max(siteFloor, highestEcpm);
         rtbFloor = Math.max(rtbFloor, segmentFloor);

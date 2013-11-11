@@ -10,8 +10,7 @@ import java.sql.Timestamp;
 
 @Data
 @ToString
-public class PublisherFilterEntity implements IdentifiableEntity<PublisherFilterQuery>
-{
+public class PublisherFilterEntity implements IdentifiableEntity<PublisherFilterQuery> {
 
     private static final long serialVersionUID = 6433325928036900792L;
 
@@ -24,20 +23,17 @@ public class PublisherFilterEntity implements IdentifiableEntity<PublisherFilter
     private Timestamp         modified_on;
 
     @Override
-    public String getJSON()
-    {
+    public String getJSON() {
         return null;
     }
 
     @Override
-    public PublisherFilterQuery getId()
-    {
+    public PublisherFilterQuery getId() {
         return new PublisherFilterQuery(this.getSiteId(), this.getRuleType());
     }
 
     @Override
-    public boolean equals(Object obj)
-    {
+    public boolean equals(Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
@@ -61,8 +57,7 @@ public class PublisherFilterEntity implements IdentifiableEntity<PublisherFilter
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((ruleType == null) ? 0 : ruleType.hashCode());

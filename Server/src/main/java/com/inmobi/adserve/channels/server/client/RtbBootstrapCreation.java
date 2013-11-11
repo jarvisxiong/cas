@@ -19,20 +19,17 @@ import org.jboss.netty.util.Timer;
 import com.inmobi.adserve.channels.api.ChannelsClientHandler;
 
 
-public class RtbBootstrapCreation
-{
+public class RtbBootstrapCreation {
     public static ClientBootstrap                 bootstrap;
     private static ChannelsClientHandler          channelHandler;
     private static Timer                          timer;
     private static ConnectionLimitUpstreamHandler connectionLimitUpstreamHandler;
 
-    public static void init(Timer timer)
-    {
+    public static void init(Timer timer) {
         RtbBootstrapCreation.timer = timer;
     }
 
-    public static ClientBootstrap createBootstrap(Logger logger, final Configuration config)
-    {
+    public static ClientBootstrap createBootstrap(Logger logger, final Configuration config) {
         // make the bootstrap object
         try {
             bootstrap = new ClientBootstrap(new NioClientSocketChannelFactory(Executors.newCachedThreadPool(),
@@ -53,10 +50,8 @@ public class RtbBootstrapCreation
         }
         // make the channel pipeline
         try {
-            bootstrap.setPipelineFactory(new ChannelPipelineFactory()
-            {
-                public ChannelPipeline getPipeline() throws Exception
-                {
+            bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
+                public ChannelPipeline getPipeline() throws Exception {
                     int rtbReadTimeoutMills;
                     try {
                         rtbReadTimeoutMills = config.getInt("RTBreadtimeoutMillis");
@@ -86,23 +81,19 @@ public class RtbBootstrapCreation
         return bootstrap;
     }
 
-    public static void setMaxConnectionLimit(int maxOutboundConnectionLimit)
-    {
+    public static void setMaxConnectionLimit(int maxOutboundConnectionLimit) {
         connectionLimitUpstreamHandler.setMaxConnections(maxOutboundConnectionLimit);
     }
 
-    public static int getActiveOutboundConnections()
-    {
+    public static int getActiveOutboundConnections() {
         return connectionLimitUpstreamHandler.getActiveOutboundConnections();
     }
 
-    public static int getMaxConnections()
-    {
+    public static int getMaxConnections() {
         return connectionLimitUpstreamHandler.getMaxConnections();
     }
 
-    public static int getDroppedConnections()
-    {
+    public static int getDroppedConnections() {
         return connectionLimitUpstreamHandler.getDroppedConnections();
     }
 

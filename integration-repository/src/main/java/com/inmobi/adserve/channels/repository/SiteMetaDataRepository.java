@@ -17,13 +17,11 @@ import java.util.Set;
 
 
 public class SiteMetaDataRepository extends AbstractStatsMaintainingDBRepository<SiteMetaDataEntity, String> implements
-        RepositoryManager
-{
+        RepositoryManager {
 
     @Override
     public DBEntity<SiteMetaDataEntity, String> buildObjectFromRow(ResultSetRow resultSetRow)
-            throws RepositoryException
-    {
+            throws RepositoryException {
         NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
         String siteId = row.getString("site_id");
         String pubId = row.getString("pub_id");
@@ -49,8 +47,7 @@ public class SiteMetaDataRepository extends AbstractStatsMaintainingDBRepository
     }
 
     @Override
-    public boolean isObjectToBeDeleted(SiteMetaDataEntity entity)
-    {
+    public boolean isObjectToBeDeleted(SiteMetaDataEntity entity) {
         if (entity.getSiteId() == null) {
             return true;
         }
@@ -58,14 +55,12 @@ public class SiteMetaDataRepository extends AbstractStatsMaintainingDBRepository
     }
 
     @Override
-    public HashIndexKeyBuilder<SiteMetaDataEntity> getHashIndexKeyBuilder(String className)
-    {
+    public HashIndexKeyBuilder<SiteMetaDataEntity> getHashIndexKeyBuilder(String className) {
         return null;
     }
 
     @Override
-    public SiteMetaDataEntity queryUniqueResult(RepositoryQuery q) throws RepositoryException
-    {
+    public SiteMetaDataEntity queryUniqueResult(RepositoryQuery q) throws RepositoryException {
         return null;
     }
 

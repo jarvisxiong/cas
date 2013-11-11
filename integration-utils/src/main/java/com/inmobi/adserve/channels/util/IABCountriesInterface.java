@@ -5,8 +5,7 @@ package com.inmobi.adserve.channels.util;
  * 
  * @author Devi Chand(devi.chand@inmobi.com)
  */
-public interface IABCountriesInterface
-{
+public interface IABCountriesInterface {
 
     /**
      * Maps new inmobi categories to IAB countries.

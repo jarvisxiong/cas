@@ -17,15 +17,12 @@ import java.util.*;
  * @author devashish Filters class to filter the Channel Segments selected by MatchSegment class
  */
 
-public class Filters
-{
+public class Filters {
 
-    private final static Comparator<ChannelSegment>                                COMPARATOR                = new Comparator<ChannelSegment>()
-                                                                                                             {
+    private final static Comparator<ChannelSegment>                                COMPARATOR                = new Comparator<ChannelSegment>() {
                                                                                                                  public int compare(
                                                                                                                          ChannelSegment o1,
-                                                                                                                         ChannelSegment o2)
-                                                                                                                 {
+                                                                                                                         ChannelSegment o2) {
                                                                                                                      return o1
                                                                                                                              .getPrioritisedECPM() > o2
                                                                                                                              .getPrioritisedECPM() ? -1
@@ -52,20 +49,17 @@ public class Filters
     private byte                                                                   supplyClass;
     private SiteEcpmEntity                                                         siteEcpmEntity;
 
-    public static Map<String, String> getAdvertiserIdToNameMapping()
-    {
+    public static Map<String, String> getAdvertiserIdToNameMapping() {
         return advertiserIdToNameMapping;
     }
 
-    public Map<String, HashMap<String, ChannelSegment>> getMatchedSegments()
-    {
+    public Map<String, HashMap<String, ChannelSegment>> getMatchedSegments() {
         return matchedSegments;
     }
 
     public Filters(Map<String, HashMap<String, ChannelSegment>> matchedSegments, Configuration serverConfiguration,
             Configuration adapterConfiguration, SASRequestParameters sasParams, RepositoryHelper repositoryHelper,
-            DebugLogger logger)
-    {
+            DebugLogger logger) {
         this.matchedSegments = matchedSegments;
         this.serverConfiguration = serverConfiguration;
         this.adapterConfiguration = adapterConfiguration;
@@ -80,8 +74,7 @@ public class Filters
         this.supplyClassFloors = serverConfiguration.getStringArray("supplyClassFloors");
     }
 
-    public static void init(Configuration adapterConfiguration)
-    {
+    public static void init(Configuration adapterConfiguration) {
         Iterator<String> itr = adapterConfiguration.getKeys();
         while (null != itr && itr.hasNext()) {
             String str = itr.next();
@@ -97,8 +90,7 @@ public class Filters
      * 
      * @return returns a list of filtered channel segments
      */
-    public List<ChannelSegment> applyFilters()
-    {
+    public List<ChannelSegment> applyFilters() {
         sumUpSiteImpressions();
         advertiserLevelFiltering();
         if (matchedSegments.isEmpty()) {
@@ -111,8 +103,7 @@ public class Filters
         return selectTopAdGroupsForRequest(channelSegments);
     }
 
-    private void sumUpSiteImpressions()
-    {
+    private void sumUpSiteImpressions() {
         for (HashMap<String, ChannelSegment> advertiserMap : this.matchedSegments.values()) {
             for (ChannelSegment channelSegment : advertiserMap.values()) {
                 this.siteImpressions += channelSegment.getChannelSegmentCitrusLeafFeedbackEntity().getBeacons();
@@ -124,8 +115,7 @@ public class Filters
     /**
      * Returns true if advertiser has balance remaining less than its max revenue of last fifteen days times 3
      */
-    boolean isAdvertiserBurnLimitExceeded(ChannelSegment channelSegment)
-    {
+    boolean isAdvertiserBurnLimitExceeded(ChannelSegment channelSegment) {
         boolean result = channelSegment.getChannelFeedbackEntity().getBalance() < channelSegment
                 .getChannelFeedbackEntity()
                     .getRevenue() * revenueWindow;
@@ -140,8 +130,7 @@ public class Filters
         return result;
     }
 
-    boolean isAdvertiserDroppedInRtbBalanceFilter(ChannelSegment channelSegment)
-    {
+    boolean isAdvertiserDroppedInRtbBalanceFilter(ChannelSegment channelSegment) {
         String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
         boolean isRtbPartner = adapterConfiguration.getBoolean(advertiserIdToNameMapping.get(advertiserId) + ".isRtb",
             false);
@@ -162,8 +151,7 @@ public class Filters
     /**
      * Returns true if advertiser has served more impressions than its daily limit
      */
-    boolean isAdvertiserDailyImpressionCeilingExceeded(ChannelSegment channelSegment)
-    {
+    boolean isAdvertiserDailyImpressionCeilingExceeded(ChannelSegment channelSegment) {
         boolean result = channelSegment.getChannelFeedbackEntity().getTodayImpressions() > channelSegment
                 .getChannelEntity()
                     .getImpressionCeil();
@@ -181,8 +169,7 @@ public class Filters
     /**
      * Returns true if request sent to advetiser today is greater than its daily request cap
      */
-    boolean isAdvertiserDailyRequestCapExceeded(ChannelSegment channelSegment)
-    {
+    boolean isAdvertiserDailyRequestCapExceeded(ChannelSegment channelSegment) {
         boolean result = channelSegment.getChannelFeedbackEntity().getTodayRequests() > channelSegment
                 .getChannelEntity()
                     .getRequestCap();
@@ -201,8 +188,7 @@ public class Filters
      * Returns true if advertiser is not present in site's advertiser inclusion list OR if advertiser is not present in
      * publisher's advertiser inclusion list when site doesnt have advertiser inclusion list
      */
-    boolean isAdvertiserExcluded(ChannelSegment channelSegment)
-    {
+    boolean isAdvertiserExcluded(ChannelSegment channelSegment) {
         boolean result = false;
         String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
         SiteMetaDataEntity siteMetaDataEntity = repositoryHelper.querySiteMetaDetaRepository(sasParams.getSiteId());
@@ -233,8 +219,7 @@ public class Filters
      * Returns true in case of site is not present in advertiser's inclusion list OR site is present in advertiser's
      * exclusion list
      */
-    boolean isSiteExcludedByAdvertiser(ChannelSegment channelSegment)
-    {
+    boolean isSiteExcludedByAdvertiser(ChannelSegment channelSegment) {
         boolean result;
         String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
         if (channelSegment.getChannelEntity().getSitesIE().contains(sasParams.getSiteId())) {
@@ -257,8 +242,7 @@ public class Filters
      * Returns true in case of site is not present in adgroup's inclusion list OR site is present in adgroup's exclusion
      * list
      */
-    boolean isSiteExcludedByAdGroup(ChannelSegment channelSegment)
-    {
+    boolean isSiteExcludedByAdGroup(ChannelSegment channelSegment) {
         boolean result;
         String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
         String adGroupId = channelSegment.getChannelSegmentEntity().getAdgroupId();
@@ -278,8 +262,7 @@ public class Filters
         return result;
     }
 
-    boolean isAdGroupDailyImpressionCeilingExceeded(ChannelSegment channelSegment)
-    {
+    boolean isAdGroupDailyImpressionCeilingExceeded(ChannelSegment channelSegment) {
         boolean result = channelSegment.getChannelSegmentFeedbackEntity().getTodayImpressions() > channelSegment
                 .getChannelSegmentEntity()
                     .getImpressionCeil();
@@ -301,8 +284,7 @@ public class Filters
     /**
      * Filter that performs advertiser level filtering Drops all the segment of the advertiser being filtered out
      */
-    void advertiserLevelFiltering()
-    {
+    void advertiserLevelFiltering() {
         logger.debug("Inside advertiserLevelFiltering");
         Map<String, HashMap<String, ChannelSegment>> rows = new HashMap<String, HashMap<String, ChannelSegment>>();
         ChannelSegment channelSegment;
@@ -329,8 +311,7 @@ public class Filters
     /**
      * Filter to perform adgroup level filtering and short list a configurable number of adgroups per advertiser
      */
-    void adGroupLevelFiltering()
-    {
+    void adGroupLevelFiltering() {
         logger.debug("Inside adGroupLevelFiltering");
         Map<String, HashMap<String, ChannelSegment>> rows = new HashMap<String, HashMap<String, ChannelSegment>>();
         supplyClass = getSupplyClass(sasParams);
@@ -445,8 +426,7 @@ public class Filters
     /*
      * Filter to perform accountSegment filtering on the basis of dso brand, dso performance and dso programmatic
      */
-    boolean isAdvertiserFailedInAccountSegmentFilter(ChannelSegment channelSegment)
-    {
+    boolean isAdvertiserFailedInAccountSegmentFilter(ChannelSegment channelSegment) {
         int accountSegment = channelSegment.getChannelEntity().getAccountSegment();
         String advertiserId = channelSegment.getChannelEntity().getAccountId();
         if (sasParams.getDst() == 6 && null != sasParams.getAccountSegment()
@@ -465,8 +445,7 @@ public class Filters
     /*
      * 2 is tpan and 6 is rtbd This filter will work only if request come from rule engine
      */
-    boolean isDroppedInDstFilter(String advertiserId, ChannelSegment channelSegment)
-    {
+    boolean isDroppedInDstFilter(String advertiserId, ChannelSegment channelSegment) {
         if (sasParams.getDst() == 6 && channelSegment.getChannelSegmentEntity().getDst() != sasParams.getDst()) {
             logger.debug("dropped in dst filter for advertiser", advertiserId);
             if (getAdvertiserIdToNameMapping().containsKey(advertiserId)) {
@@ -488,8 +467,7 @@ public class Filters
         return false;
     }
 
-    byte getSupplyClass(SASRequestParameters sasParams)
-    {
+    byte getSupplyClass(SASRequestParameters sasParams) {
         siteEcpmEntity = repositoryHelper.querySiteEcpmRepository(sasParams.getSiteId(),
             Integer.valueOf(sasParams.getCountryStr()), sasParams.getOsId());
         if (siteEcpmEntity == null) {
@@ -507,8 +485,7 @@ public class Filters
         }
     }
 
-    boolean isDemandAcceptedBySupply(ChannelSegment channelSegment)
-    {
+    boolean isDemandAcceptedBySupply(ChannelSegment channelSegment) {
         byte demandClass;
         boolean result;
 
@@ -539,8 +516,7 @@ public class Filters
         return result;
     }
 
-    byte getEcpmClass(Double ecpm, Double networkEcpm)
-    {
+    byte getEcpmClass(Double ecpm, Double networkEcpm) {
         if (logger.isDebugEnabled()) {
             logger.debug("Ecpm is ", ecpm, "network ecpm", networkEcpm);
         }
@@ -555,8 +531,7 @@ public class Filters
         return ecpmClass;
     }
 
-    boolean isTODTargetingFailed(ChannelSegment channelSegment)
-    {
+    boolean isTODTargetingFailed(ChannelSegment channelSegment) {
         if (null == channelSegment.getChannelSegmentEntity().getTod()) {
             logger.debug(channelSegment.getChannelSegmentEntity().getAdgroupId(),
                 " has all ToD and DoW targeting. Passing the ToD check ");
@@ -580,8 +555,7 @@ public class Filters
     }
 
     boolean isChannelSegmentFilteredOutByPricingEngine(String advertiserId, Double dcpFloor,
-            ChannelSegment channelSegment)
-    {
+            ChannelSegment channelSegment) {
         // applying dcp floor
 
         if (null != dcpFloor) {
@@ -641,8 +615,7 @@ public class Filters
      * Segment property filter
      * 
      */
-    boolean isAnySegmentPropertyViolated(ChannelSegment channelSegment)
-    {
+    boolean isAnySegmentPropertyViolated(ChannelSegment channelSegment) {
         ChannelSegmentEntity channelSegmentEntity = channelSegment.getChannelSegmentEntity();
         if (channelSegmentEntity.isUdIdRequired()
                 && (StringUtils.isEmpty(sasParams.getUidParams()) || sasParams.getUidParams().equals("{}"))) {
@@ -681,8 +654,7 @@ public class Filters
      *            list containing those adgroups
      * @return returns the list having top adgroups
      */
-    List<ChannelSegment> selectTopAdGroupsForRequest(List<ChannelSegment> rows)
-    {
+    List<ChannelSegment> selectTopAdGroupsForRequest(List<ChannelSegment> rows) {
         logger.debug("Inside selectTopAdGroupsForRequest Filter");
         logger.debug(rows.size());
         List<ChannelSegment> shortlistedRow = new ArrayList<ChannelSegment>();
@@ -717,8 +689,7 @@ public class Filters
      * Method which returns prioritised ecpm
      * 
      */
-    double calculatePrioritisedECPM(ChannelSegment channelSegment)
-    {
+    double calculatePrioritisedECPM(ChannelSegment channelSegment) {
         ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = channelSegment
                 .getChannelSegmentCitrusLeafFeedbackEntity();
         double eCPM = channelSegmentFeedbackEntity.getECPM();
@@ -745,8 +716,7 @@ public class Filters
         return prioritisedECPM;
     }
 
-    void printSegments(Map<String, HashMap<String, ChannelSegment>> matchedSegments)
-    {
+    void printSegments(Map<String, HashMap<String, ChannelSegment>> matchedSegments) {
         if (logger.isDebugEnabled()) {
             logger.debug("Remaining AdGroups are :");
             for (Map.Entry<String, HashMap<String, ChannelSegment>> advertiserEntry : matchedSegments.entrySet()) {
@@ -767,8 +737,7 @@ public class Filters
      *            list to be ranked
      * @return returns the ranked list
      */
-    public List<ChannelSegment> rankAdapters(List<ChannelSegment> segment)
-    {
+    public List<ChannelSegment> rankAdapters(List<ChannelSegment> segment) {
         int rank = 0;
         // Arraylist that will contain the order in which we will wait for response
         // of the third party ad networks
@@ -804,8 +773,7 @@ public class Filters
         return rankedList;
     }
 
-    List<ChannelSegment> convertToSegmentsList(Map<String, HashMap<String, ChannelSegment>> matchedSegments)
-    {
+    List<ChannelSegment> convertToSegmentsList(Map<String, HashMap<String, ChannelSegment>> matchedSegments) {
         ArrayList<ChannelSegment> segmentList = new ArrayList<ChannelSegment>();
         for (Map.Entry<String, HashMap<String, ChannelSegment>> advertiserEntry : matchedSegments.entrySet()) {
             Map<String, ChannelSegment> adGroups = advertiserEntry.getValue();
@@ -829,8 +797,7 @@ public class Filters
      * @param rankList
      *            : List containing ranked segments }
      */
-    public List<ChannelSegment> ensureGuaranteedDelivery(List<ChannelSegment> rankList)
-    {
+    public List<ChannelSegment> ensureGuaranteedDelivery(List<ChannelSegment> rankList) {
         logger.debug("Inside guaranteed delivery filter");
         List<ChannelSegment> newRankList = new ArrayList<ChannelSegment>();
         newRankList.add(rankList.get(0));
@@ -851,8 +818,7 @@ public class Filters
     }
 
     public List<ChannelSegment> ensureGuaranteedDeliveryInCaseOfRTB(List<ChannelSegment> rtbSegments,
-            List<ChannelSegment> rankList)
-    {
+            List<ChannelSegment> rankList) {
         logger.debug("Inside guaranteed delivery RTB filter");
         if (!rankList.isEmpty()
                 && adapterConfiguration.getString(
@@ -866,8 +832,7 @@ public class Filters
         return rtbSegments;
     }
 
-    void fetchPricingEngineEntity()
-    {
+    void fetchPricingEngineEntity() {
         // Fetching pricing engine entity
         int country = 0;
         if (null != sasParams.getCountryStr()) {
@@ -879,14 +844,12 @@ public class Filters
         }
     }
 
-    public Double getRtbFloor()
-    {
+    public Double getRtbFloor() {
         return pricingEngineEntity == null ? null : pricingEngineEntity.getRtbFloor();
     }
 
     // Please do not call this, this is only for testing
-    void setSiteEcpmEntity(SiteEcpmEntity siteEcpmEntity)
-    {
+    void setSiteEcpmEntity(SiteEcpmEntity siteEcpmEntity) {
         this.siteEcpmEntity = siteEcpmEntity;
     }
 }

@@ -18,12 +18,10 @@ import java.util.Collection;
 
 public class PublisherFilterRepository extends
         AbstractStatsMaintainingDBRepository<PublisherFilterEntity, PublisherFilterQuery> implements Repository,
-        RepositoryManager
-{
+        RepositoryManager {
 
     @Override
-    public PublisherFilterEntity queryUniqueResult(RepositoryQuery publisherFilterQuery) throws RepositoryException
-    {
+    public PublisherFilterEntity queryUniqueResult(RepositoryQuery publisherFilterQuery) throws RepositoryException {
         Collection<PublisherFilterEntity> publisherFilterEntityResultSet = query(publisherFilterQuery);
         if (publisherFilterEntityResultSet == null || publisherFilterEntityResultSet.size() == 0) {
             return null;
@@ -36,8 +34,7 @@ public class PublisherFilterRepository extends
 
     @Override
     public DBEntity<PublisherFilterEntity, PublisherFilterQuery> buildObjectFromRow(ResultSetRow resultSetRow)
-            throws RepositoryException
-    {
+            throws RepositoryException {
         NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
         PublisherFilterEntity publisherFilterEntity = new PublisherFilterEntity();
         Timestamp modifyTime = row.getTimestamp("modified_on");
@@ -69,14 +66,12 @@ public class PublisherFilterRepository extends
     }
 
     @Override
-    public HashIndexKeyBuilder<PublisherFilterEntity> getHashIndexKeyBuilder(String className)
-    {
+    public HashIndexKeyBuilder<PublisherFilterEntity> getHashIndexKeyBuilder(String className) {
         return null;
     }
 
     @Override
-    public boolean isObjectToBeDeleted(PublisherFilterEntity publisherFilterEntity)
-    {
+    public boolean isObjectToBeDeleted(PublisherFilterEntity publisherFilterEntity) {
         return publisherFilterEntity.isExpired();
     }
 }

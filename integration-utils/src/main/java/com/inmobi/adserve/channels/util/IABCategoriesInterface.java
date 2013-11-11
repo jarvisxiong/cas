@@ -8,8 +8,7 @@ import java.util.List;
  * 
  * @author Devi Chand(devi.chand@inmobi.com)
  */
-public interface IABCategoriesInterface
-{
+public interface IABCategoriesInterface {
 
     /**
      * Maps new inmobi categories to IAB categories.

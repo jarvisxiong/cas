@@ -53,8 +53,7 @@ import com.inmobi.casthrift.CasAdvertisementLog;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class Logging
-{
+public class Logging {
 
     private static AbstractMessagePublisher                dataBusPublisher;
     private static String                                  rrLogKey;
@@ -65,16 +64,14 @@ public class Logging
     private final static ConcurrentHashMap<String, String> sampledAdvertiserLogNos = new ConcurrentHashMap<String, String>(
                                                                                            2000);
 
-    public static ConcurrentHashMap<String, String> getSampledadvertiserlognos()
-    {
+    public static ConcurrentHashMap<String, String> getSampledadvertiserlognos() {
         return sampledAdvertiserLogNos;
     }
 
     private static int totalCount;
 
     public static void init(AbstractMessagePublisher dataBusPublisher, String rrLogKey, String channelLogKey,
-            String advertisementLogKey, Configuration config)
-    {
+            String advertisementLogKey, Configuration config) {
         Logging.dataBusPublisher = dataBusPublisher;
         Logging.rrLogKey = rrLogKey;
         Logging.channelLogKey = channelLogKey;
@@ -84,8 +81,7 @@ public class Logging
         totalCount = config.getInt("sampledadvertisercount");
     }
 
-    public static JSONArray getCarrier(JSONObject jObject)
-    {
+    public static JSONArray getCarrier(JSONObject jObject) {
         try {
             return (jObject.getJSONArray("carrier"));
         }
@@ -94,8 +90,7 @@ public class Logging
         }
     }
 
-    public static JSONArray getHandset(JSONObject jObject)
-    {
+    public static JSONArray getHandset(JSONObject jObject) {
         try {
             return (jObject.getJSONArray("handset"));
         }
@@ -104,8 +99,7 @@ public class Logging
         }
     }
 
-    void appendToLog(StringBuilder log, String separator, String key, String value)
-    {
+    void appendToLog(StringBuilder log, String separator, String key, String value) {
         if (value == null) {
             return;
         }
@@ -115,8 +109,7 @@ public class Logging
     // Writing rrlogs
     public static void rrLogging(ChannelSegment channelSegment, List<ChannelSegment> rankList, DebugLogger logger,
             Configuration config, SASRequestParameters sasParams, String terminationReason) throws JSONException,
-            TException
-    {
+            TException {
         Logger rrLogger = LoggerFactory.getLogger(config.getString("rr"));
         boolean isTerminated = false;
         if (terminationReason.equalsIgnoreCase("no")) {
@@ -359,8 +352,7 @@ public class Logging
         }
     }
 
-    public static List<Channel> createChannelsLog(List<ChannelSegment> rankList)
-    {
+    public static List<Channel> createChannelsLog(List<ChannelSegment> rankList) {
         if (null == rankList) {
             return new ArrayList<Channel>();
         }
@@ -379,8 +371,7 @@ public class Logging
         return channels;
     }
 
-    public static CasAdChain createCasAdChain(ChannelSegment channelSegment)
-    {
+    public static CasAdChain createCasAdChain(ChannelSegment channelSegment) {
         CasAdChain casAdChain = new CasAdChain();
         casAdChain.setAdvertiserId(channelSegment.getChannelEntity().getAccountId());
         casAdChain.setCampaign_inc_id(channelSegment.getChannelSegmentEntity().getCampaignIncId());
@@ -390,8 +381,7 @@ public class Logging
         return casAdChain;
     }
 
-    public static AdStatus getAdStatus(String adStatus)
-    {
+    public static AdStatus getAdStatus(String adStatus) {
         if ("AD".equalsIgnoreCase(adStatus)) {
             return AdStatus.AD;
         }
@@ -406,8 +396,7 @@ public class Logging
 
     // Write Channel Logs
     public static void channelLogline(List<ChannelSegment> rankList, String clickUrl, DebugLogger logger,
-            Configuration config, SASRequestParameters sasParams, long totalTime) throws JSONException, TException
-    {
+            Configuration config, SASRequestParameters sasParams, long totalTime) throws JSONException, TException {
         logger.debug("came inside channel log line");
         Logger debugLogger = LoggerFactory.getLogger(config.getString("channel"));
         logger.debug("got logger handle for cas logs");
@@ -581,8 +570,7 @@ public class Logging
         }
     }
 
-    public static void advertiserLogging(List<ChannelSegment> rankList, DebugLogger logger, Configuration config)
-    {
+    public static void advertiserLogging(List<ChannelSegment> rankList, DebugLogger logger, Configuration config) {
         logger.debug("came inside advertiser log");
         Logger advertiserLogger = LoggerFactory.getLogger(config.getString("advertiser"));
         if (!advertiserLogger.isDebugEnabled()) {
@@ -617,8 +605,7 @@ public class Logging
         }
     }
 
-    public static void sampledAdvertiserLogging(List<ChannelSegment> rankList, DebugLogger logger, Configuration config)
-    {
+    public static void sampledAdvertiserLogging(List<ChannelSegment> rankList, DebugLogger logger, Configuration config) {
         logger.debug("came inside sampledAdvertiser log");
         Logger sampledAdvertiserLogger = LoggerFactory.getLogger(config.getString("sampledadvertiser"));
         if (!sampledAdvertiserLogger.isDebugEnabled()) {
@@ -719,8 +706,7 @@ public class Logging
         }
     }
 
-    public static ContentRating getContentRating(SASRequestParameters sasParams)
-    {
+    public static ContentRating getContentRating(SASRequestParameters sasParams) {
         if (sasParams == null) {
             return null;
         }
@@ -741,8 +727,7 @@ public class Logging
         }
     }
 
-    public static PricingModel getPricingModel(String pricingModel)
-    {
+    public static PricingModel getPricingModel(String pricingModel) {
         if (pricingModel == null) {
             return null;
         }
@@ -757,16 +742,14 @@ public class Logging
         }
     }
 
-    public static InventoryType getInventoryType(SASRequestParameters sasParams)
-    {
+    public static InventoryType getInventoryType(SASRequestParameters sasParams) {
         if (null != sasParams && sasParams.getSdkVersion() != null && sasParams.getSdkVersion().equalsIgnoreCase("0")) {
             return InventoryType.BROWSER;
         }
         return InventoryType.APP;
     }
 
-    public static Gender getGender(SASRequestParameters sasParams)
-    {
+    public static Gender getGender(SASRequestParameters sasParams) {
         if (sasParams == null) {
             return null;
         }

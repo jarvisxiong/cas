@@ -6,8 +6,7 @@ import lombok.Setter;
 
 
 @Getter
-public class ChannelFeedbackEntity implements IdentifiableEntity<String>
-{
+public class ChannelFeedbackEntity implements IdentifiableEntity<String> {
 
     private static final long serialVersionUID = 1L;
 
@@ -21,8 +20,7 @@ public class ChannelFeedbackEntity implements IdentifiableEntity<String>
     private final double      averageLatency;
     private final double      revenue;
 
-    public ChannelFeedbackEntity(Builder builder)
-    {
+    public ChannelFeedbackEntity(Builder builder) {
         this.advertiserId = builder.advertiserId;
         this.totalInflow = builder.totalInflow;
         this.totalBurn = builder.totalBurn;
@@ -34,14 +32,12 @@ public class ChannelFeedbackEntity implements IdentifiableEntity<String>
         this.revenue = builder.revenue;
     }
 
-    public static Builder newBuilder()
-    {
+    public static Builder newBuilder() {
         return new Builder();
     }
 
     @Setter
-    public static class Builder
-    {
+    public static class Builder {
         private String advertiserId;
         private double totalInflow;
         private double totalBurn;
@@ -52,21 +48,18 @@ public class ChannelFeedbackEntity implements IdentifiableEntity<String>
         private double averageLatency;
         private double revenue;
 
-        public ChannelFeedbackEntity build()
-        {
+        public ChannelFeedbackEntity build() {
             return new ChannelFeedbackEntity(this);
         }
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return advertiserId;
     }
 
     @Override
-    public String getJSON()
-    {
+    public String getJSON() {
         return null;
     }
 

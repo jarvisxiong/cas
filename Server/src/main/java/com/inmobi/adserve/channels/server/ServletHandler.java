@@ -17,8 +17,7 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
 
-public class ServletHandler
-{
+public class ServletHandler {
 
     public static final String                      jsonParsingError         = "EJSON";
     public static final String                      processingError          = "ESERVER";
@@ -43,8 +42,7 @@ public class ServletHandler
     public static final Random                      random                   = new Random();
     public static final Map<String, ServletFactory> servletMap               = new HashMap<String, ServletFactory>();
 
-    public static void init(ConfigurationLoader config, RepositoryHelper repositoryHelper)
-    {
+    public static void init(ConfigurationLoader config, RepositoryHelper repositoryHelper) {
         ServletHandler.rtbConfig = config.rtbConfiguration();
         ServletHandler.loggerConfig = config.loggerConfiguration();
         ServletHandler.serverConfig = config.serverConfiguration();
@@ -56,136 +54,107 @@ public class ServletHandler
         allowedSiteTypes = ServletHandler.serverConfig.getList("allowedSiteTypes");
         InspectorStats.setStats(InspectorStrings.percentRollout, (long) percentRollout);
 
-        servletMap.put("/stat", new ServletFactory()
-        {
+        servletMap.put("/stat", new ServletFactory() {
             @Override
-            public Servlet getServlet()
-            {
+            public Servlet getServlet() {
                 return new ServletStat();
             }
         });
 
-        servletMap.put("/mapsizes", new ServletFactory()
-        {
+        servletMap.put("/mapsizes", new ServletFactory() {
             @Override
-            public Servlet getServlet()
-            {
+            public Servlet getServlet() {
                 return new ServletMapsizes();
             }
         });
 
-        servletMap.put("/changerollout", new ServletFactory()
-        {
+        servletMap.put("/changerollout", new ServletFactory() {
             @Override
-            public Servlet getServlet()
-            {
+            public Servlet getServlet() {
                 return new ServletChangeRollout();
             }
         });
 
-        servletMap.put("/lbstatus", new ServletFactory()
-        {
+        servletMap.put("/lbstatus", new ServletFactory() {
             @Override
-            public Servlet getServlet()
-            {
+            public Servlet getServlet() {
                 return new ServletLbStatus();
             }
         });
 
-        servletMap.put("/disablelbstatus", new ServletFactory()
-        {
+        servletMap.put("/disablelbstatus", new ServletFactory() {
             @Override
-            public Servlet getServlet()
-            {
+            public Servlet getServlet() {
                 return new ServletDisableLbStatus();
             }
         });
 
-        servletMap.put("/enablelbstatus", new ServletFactory()
-        {
+        servletMap.put("/enablelbstatus", new ServletFactory() {
             @Override
-            public Servlet getServlet()
-            {
+            public Servlet getServlet() {
                 return new ServletEnableLbStatus();
             }
         });
 
-        servletMap.put("/configChange", new ServletFactory()
-        {
+        servletMap.put("/configChange", new ServletFactory() {
             @Override
-            public Servlet getServlet()
-            {
+            public Servlet getServlet() {
                 return new ServletChangeConfig();
             }
         });
 
-        servletMap.put("/backfill", new ServletFactory()
-        {
+        servletMap.put("/backfill", new ServletFactory() {
             @Override
-            public Servlet getServlet()
-            {
+            public Servlet getServlet() {
                 return new ServletBackFill();
             }
         });
 
-        servletMap.put("/getsegments", new ServletFactory()
-        {
+        servletMap.put("/getsegments", new ServletFactory() {
             @Override
-            public Servlet getServlet()
-            {
+            public Servlet getServlet() {
                 return new ServletGetSegment();
             }
         });
 
-        servletMap.put("/logParser", new ServletFactory()
-        {
+        servletMap.put("/logParser", new ServletFactory() {
             @Override
-            public Servlet getServlet()
-            {
+            public Servlet getServlet() {
                 return new ServletLogParser();
             }
         });
 
-        servletMap.put("/repoRefresh", new ServletFactory()
-        {
+        servletMap.put("/repoRefresh", new ServletFactory() {
             @Override
-            public Servlet getServlet()
-            {
+            public Servlet getServlet() {
                 return new ServletRepoRefresh();
             }
         });
 
-        servletMap.put("/repostat", new ServletFactory()
-        {
+        servletMap.put("/repostat", new ServletFactory() {
             @Override
-            public Servlet getServlet()
-            {
+            public Servlet getServlet() {
                 return new ServletRepoStat();
             }
         });
 
-        servletMap.put("/errorDetails", new ServletFactory()
-        {
+        servletMap.put("/errorDetails", new ServletFactory() {
             @Override
-            public Servlet getServlet()
-            {
+            public Servlet getServlet() {
                 return new ServletErrorDetails();
             }
         });
 
-        servletMap.put("/trace", new ServletFactory()
-        {
+        servletMap.put("/trace", new ServletFactory() {
             @Override
-            public Servlet getServlet()
-            {
+            public Servlet getServlet() {
                 return new ServletBackFill();
             }
         });
 
     }
 
-    public static String getHost(HttpRequest request)
-    {
+    public static String getHost(HttpRequest request) {
         List<Map.Entry<String, String>> headers = request.getHeaders();
         String host = null;
 
@@ -197,38 +166,31 @@ public class ServletHandler
         return host;
     }
 
-    public static Configuration getServerConfig()
-    {
+    public static Configuration getServerConfig() {
         return serverConfig;
     }
 
-    public static Configuration getAdapterConfig()
-    {
+    public static Configuration getAdapterConfig() {
         return adapterConfig;
     }
 
-    public static Configuration getLoggerConfig()
-    {
+    public static Configuration getLoggerConfig() {
         return loggerConfig;
     }
 
-    public static Configuration getLog4jConfig()
-    {
+    public static Configuration getLog4jConfig() {
         return log4jConfig;
     }
 
-    public static Configuration getDatabaseConfig()
-    {
+    public static Configuration getDatabaseConfig() {
         return databaseConfig;
     }
 
-    public static Configuration getRtbConfig()
-    {
+    public static Configuration getRtbConfig() {
         return ServletHandler.rtbConfig;
     }
 
-    public static void setRtbConfig(Configuration rtbConfig)
-    {
+    public static void setRtbConfig(Configuration rtbConfig) {
         ServletHandler.rtbConfig = rtbConfig;
     }
 }

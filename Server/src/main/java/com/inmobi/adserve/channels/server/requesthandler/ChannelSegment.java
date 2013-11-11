@@ -13,8 +13,7 @@ import java.util.Map;
 
 
 @Getter
-public class ChannelSegment
-{
+public class ChannelSegment {
     private ChannelSegmentEntity         channelSegmentEntity;
     private ChannelEntity                channelEntity;
     private ChannelFeedbackEntity        channelFeedbackEntity;
@@ -28,8 +27,7 @@ public class ChannelSegment
     public ChannelSegment(ChannelSegmentEntity channelSegmentEntity, ChannelEntity channelEntity,
             ChannelFeedbackEntity channelFeedbackEntity, ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity,
             ChannelSegmentFeedbackEntity channelSegmentCitrusLeafFeedbackEntity, AdNetworkInterface adNetworkInterface,
-            double prioritisedECPM)
-    {
+            double prioritisedECPM) {
         this.channelSegmentEntity = channelSegmentEntity;
         this.channelEntity = channelEntity;
         this.channelFeedbackEntity = channelFeedbackEntity;
@@ -39,8 +37,7 @@ public class ChannelSegment
         this.prioritisedECPM = prioritisedECPM;
     }
 
-    public void incrementInspectorStats(String inspectorString)
-    {
+    public void incrementInspectorStats(String inspectorString) {
         Map<String, String> advertiserIdToNameMapping = Filters.getAdvertiserIdToNameMapping();
         String advertiserId = channelSegmentEntity.getAdvertiserId();
         if (advertiserIdToNameMapping.containsKey(advertiserId)) {

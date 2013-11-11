@@ -31,21 +31,18 @@ import com.inmobi.phoenix.batteries.util.WilburyUUID;
 import com.ning.http.client.AsyncHttpClient;
 
 
-public class AsyncRequestMaker
-{
+public class AsyncRequestMaker {
 
     private static ClientBootstrap clientBootstrap;
     private static ClientBootstrap rtbClientBootstrap;
     private static AsyncHttpClient asyncHttpClient;
 
-    public static AsyncHttpClient getAsyncHttpClient()
-    {
+    public static AsyncHttpClient getAsyncHttpClient() {
         return asyncHttpClient;
     }
 
     public static void init(ClientBootstrap clientBootstrap, ClientBootstrap rtbClientBootstrap,
-            AsyncHttpClient asyncHttpClient)
-    {
+            AsyncHttpClient asyncHttpClient) {
         AsyncRequestMaker.clientBootstrap = clientBootstrap;
         AsyncRequestMaker.rtbClientBootstrap = rtbClientBootstrap;
         AsyncRequestMaker.asyncHttpClient = asyncHttpClient;
@@ -59,8 +56,7 @@ public class AsyncRequestMaker
             Configuration config, Configuration rtbConfig, Configuration adapterConfig, HttpRequestHandlerBase base,
             Set<String> advertiserSet, MessageEvent e, RepositoryHelper repositoryHelper, JSONObject jObject,
             SASRequestParameters sasParams, CasInternalRequestParameters casInternalRequestParameterGlobal,
-            List<ChannelSegment> rtbSegments) throws Exception
-    {
+            List<ChannelSegment> rtbSegments) throws Exception {
 
         List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
 
@@ -135,8 +131,7 @@ public class AsyncRequestMaker
     }
 
     private static CasInternalRequestParameters getCasInternalRequestParameters(SASRequestParameters sasParams,
-            CasInternalRequestParameters casInternalRequestParameterGlobal)
-    {
+            CasInternalRequestParameters casInternalRequestParameterGlobal) {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.impressionId = sasParams.getImpressionId();
         casInternalRequestParameters.blockedCategories = casInternalRequestParameterGlobal.blockedCategories;
@@ -159,8 +154,7 @@ public class AsyncRequestMaker
     }
 
     private static void controlEnrichment(CasInternalRequestParameters casInternalRequestParameters,
-            ChannelSegmentEntity channelSegmentEntity)
-    {
+            ChannelSegmentEntity channelSegmentEntity) {
         if (channelSegmentEntity.isStripUdId()) {
             casInternalRequestParameters.uid = null;
             casInternalRequestParameters.uidO1 = null;
@@ -184,8 +178,7 @@ public class AsyncRequestMaker
     }
 
     public static List<ChannelSegment> makeAsyncRequests(List<ChannelSegment> rankList, DebugLogger logger,
-            MessageEvent e, List<ChannelSegment> rtbSegments)
-    {
+            MessageEvent e, List<ChannelSegment> rtbSegments) {
         Iterator<ChannelSegment> itr = rankList.iterator();
         while (itr.hasNext()) {
             ChannelSegment channelSegment = itr.next();
@@ -217,16 +210,14 @@ public class AsyncRequestMaker
         return rankList;
     }
 
-    public static String getImpressionId(long adId)
-    {
+    public static String getImpressionId(long adId) {
         String uuidIntKey = (WilburyUUID.setIntKey(WilburyUUID.getUUID().toString(), (int) adId)).toString();
         String uuidMachineKey = (WilburyUUID.setMachineId(uuidIntKey, ChannelServer.hostIdCode)).toString();
         return (WilburyUUID.setDataCenterId(uuidMachineKey, ChannelServer.dataCenterIdCode)).toString();
     }
 
     private static ClickUrlMakerV6 setClickParams(DebugLogger logger, boolean pricingModel, Configuration config,
-            SASRequestParameters sasParams, JSONObject jObject)
-    {
+            SASRequestParameters sasParams, JSONObject jObject) {
         Set<String> unhashable = new HashSet<String>();
         unhashable.addAll(Arrays.asList(config.getStringArray("clickmaker.unhashable")));
         ClickUrlMakerV6 clickUrlMakerV6 = new ClickUrlMakerV6(logger, unhashable);

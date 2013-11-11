@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
-public class SiteEcpmQuery implements RepositoryQuery
-{
+public class SiteEcpmQuery implements RepositoryQuery {
 
     private String  siteId;
     private Integer countryId;

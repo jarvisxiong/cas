@@ -24,14 +24,12 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
 
-public class ServletLbStatus implements Servlet
-{
+public class ServletLbStatus implements Servlet {
 
     @SuppressWarnings("deprecation")
     @Override
     public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
-            DebugLogger logger) throws Exception
-    {
+            DebugLogger logger) throws Exception {
         // Initializing loggers for expected rotation format
         if (++ServletHandler.rollCount == 20) {
             Logger rrLogger = Logger.getLogger(ServletHandler.getLoggerConfig().getString("rr"));
@@ -68,8 +66,7 @@ public class ServletLbStatus implements Servlet
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "lbstatus";
     }
 }

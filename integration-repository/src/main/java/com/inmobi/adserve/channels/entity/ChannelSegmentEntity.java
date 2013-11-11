@@ -13,8 +13,7 @@ import java.util.Set;
 
 
 @Getter
-public class ChannelSegmentEntity implements IdentifiableEntity<String>
-{
+public class ChannelSegmentEntity implements IdentifiableEntity<String> {
 
     private static final long        serialVersionUID = 1L;
 
@@ -60,8 +59,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String>
     private final int                dst;                      // Classify rtbd and dcp ad groups
     private final long               campaignIncId;
 
-    public ChannelSegmentEntity(Builder builder)
-    {
+    public ChannelSegmentEntity(Builder builder) {
         this.advertiserId = builder.advertiserId;
         this.adgroupId = builder.adgroupId;
         this.adId = builder.adId;
@@ -112,14 +110,12 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String>
         this.campaignIncId = builder.campaignIncId;
     }
 
-    public static Builder newBuilder()
-    {
+    public static Builder newBuilder() {
         return new Builder();
     }
 
     @Setter
-    public static class Builder
-    {
+    public static class Builder {
         private String        advertiserId;
         private String        adgroupId;
         private String        adId;
@@ -162,21 +158,18 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String>
         private int           dst;
         private long          campaignIncId;
 
-        public ChannelSegmentEntity build()
-        {
+        public ChannelSegmentEntity build() {
             return new ChannelSegmentEntity(this);
         }
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return adgroupId;
     }
 
     @Override
-    public String getJSON()
-    {
+    public String getJSON() {
         return null; // To change body of implemented methods use File | Settings | File Templates.
     }
 

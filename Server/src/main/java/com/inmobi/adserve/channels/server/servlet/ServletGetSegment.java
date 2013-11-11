@@ -27,12 +27,10 @@ import java.util.Map;
  * @author devashish To see the state of currently loaded entries in all repository
  */
 
-public class ServletGetSegment implements Servlet
-{
+public class ServletGetSegment implements Servlet {
     @Override
     public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
-            DebugLogger logger) throws Exception
-    {
+            DebugLogger logger) throws Exception {
 
         Map<String, List<String>> params = queryStringDecoder.getParameters();
         JSONObject jObject;
@@ -110,8 +108,7 @@ public class ServletGetSegment implements Servlet
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "getSegment";
     }
 

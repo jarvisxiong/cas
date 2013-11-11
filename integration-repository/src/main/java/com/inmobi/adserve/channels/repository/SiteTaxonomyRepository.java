@@ -14,13 +14,11 @@ import java.sql.Timestamp;
 
 
 public class SiteTaxonomyRepository extends AbstractStatsMaintainingDBRepository<SiteTaxonomyEntity, String> implements
-        RepositoryManager
-{
+        RepositoryManager {
 
     @Override
     public DBEntity<SiteTaxonomyEntity, String> buildObjectFromRow(ResultSetRow resultSetRow)
-            throws RepositoryException
-    {
+            throws RepositoryException {
         NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
         String id = String.valueOf(row.getInt("id"));
         String name = row.getString("name");
@@ -33,20 +31,17 @@ public class SiteTaxonomyRepository extends AbstractStatsMaintainingDBRepository
     }
 
     @Override
-    public boolean isObjectToBeDeleted(SiteTaxonomyEntity object)
-    {
+    public boolean isObjectToBeDeleted(SiteTaxonomyEntity object) {
         return false;
     }
 
     @Override
-    public HashIndexKeyBuilder<SiteTaxonomyEntity> getHashIndexKeyBuilder(String className)
-    {
+    public HashIndexKeyBuilder<SiteTaxonomyEntity> getHashIndexKeyBuilder(String className) {
         return null;
     }
 
     @Override
-    public SiteTaxonomyEntity queryUniqueResult(RepositoryQuery q) throws RepositoryException
-    {
+    public SiteTaxonomyEntity queryUniqueResult(RepositoryQuery q) throws RepositoryException {
         return null;
     }
 }

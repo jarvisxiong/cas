@@ -19,13 +19,11 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
 
-public class ServletChangeConfig implements Servlet
-{
+public class ServletChangeConfig implements Servlet {
 
     @Override
     public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
-            DebugLogger logger) throws Exception
-    {
+            DebugLogger logger) throws Exception {
         Map<String, List<String>> params = queryStringDecoder.getParameters();
         JSONObject jObject = null;
         try {
@@ -85,8 +83,7 @@ public class ServletChangeConfig implements Servlet
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "configchange";
     }
 

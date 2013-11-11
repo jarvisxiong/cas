@@ -15,13 +15,11 @@ import java.sql.Timestamp;
 
 
 public class ChannelSegmentFeedbackRepository extends
-        AbstractStatsMaintainingDBRepository<ChannelSegmentFeedbackEntity, String> implements RepositoryManager
-{
+        AbstractStatsMaintainingDBRepository<ChannelSegmentFeedbackEntity, String> implements RepositoryManager {
 
     @Override
     public DBEntity<ChannelSegmentFeedbackEntity, String> buildObjectFromRow(ResultSetRow resultSetRow)
-            throws RepositoryException
-    {
+            throws RepositoryException {
         NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
         logger.debug("result set is not null");
         String adGroupId = row.getString("ad_group_id");
@@ -57,8 +55,7 @@ public class ChannelSegmentFeedbackRepository extends
     }
 
     @Override
-    public boolean isObjectToBeDeleted(ChannelSegmentFeedbackEntity entity)
-    {
+    public boolean isObjectToBeDeleted(ChannelSegmentFeedbackEntity entity) {
         if (entity.getAdGroupId() == null) {
             return true;
         }
@@ -66,14 +63,12 @@ public class ChannelSegmentFeedbackRepository extends
     }
 
     @Override
-    public HashIndexKeyBuilder<ChannelSegmentFeedbackEntity> getHashIndexKeyBuilder(String className)
-    {
+    public HashIndexKeyBuilder<ChannelSegmentFeedbackEntity> getHashIndexKeyBuilder(String className) {
         return null;
     }
 
     @Override
-    public ChannelSegmentFeedbackEntity queryUniqueResult(RepositoryQuery q) throws RepositoryException
-    {
+    public ChannelSegmentFeedbackEntity queryUniqueResult(RepositoryQuery q) throws RepositoryException {
         return null;
     }
 

@@ -10,8 +10,7 @@ import java.util.Set;
 
 
 @Data
-public class PricingEngineEntity implements IdentifiableEntity<PricingEngineQuery>
-{
+public class PricingEngineEntity implements IdentifiableEntity<PricingEngineQuery> {
 
     private static final long              serialVersionUID              = 1L;
     private final Integer                  countryId;
@@ -20,21 +19,12 @@ public class PricingEngineEntity implements IdentifiableEntity<PricingEngineQuer
     private final double                   dcpFloor;
     private final Map<String, Set<String>> supplyToDemandMap;
 
-    public static final byte[][]           DEFAULT_SUPPLY_DEMAND_MAPPING =
-                                                                         {
-                                                                         { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                                                                         { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
-                                                                         { 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 },
-                                                                         { 1, 1, 1, 1, 0, 0, 0, 0, 0, 0 },
-                                                                         { 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 },
-                                                                         { 1, 1, 1, 1, 1, 1, 0, 0, 0, 0 },
-                                                                         { 1, 1, 1, 1, 1, 1, 1, 0, 0, 0 },
-                                                                         { 1, 1, 1, 1, 1, 1, 1, 1, 0, 0 },
-                                                                         { 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
-                                                                         { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, };
+    public static final byte[][]           DEFAULT_SUPPLY_DEMAND_MAPPING = { { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 }, { 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 }, { 1, 1, 1, 1, 0, 0, 0, 0, 0, 0 },
+            { 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 }, { 1, 1, 1, 1, 1, 1, 0, 0, 0, 0 }, { 1, 1, 1, 1, 1, 1, 1, 0, 0, 0 },
+            { 1, 1, 1, 1, 1, 1, 1, 1, 0, 0 }, { 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 }, { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, };
 
-    public PricingEngineEntity(Builder builder)
-    {
+    public PricingEngineEntity(Builder builder) {
         this.countryId = builder.countryId;
         this.osId = builder.osId;
         this.rtbFloor = builder.rtbFloor;
@@ -42,28 +32,24 @@ public class PricingEngineEntity implements IdentifiableEntity<PricingEngineQuer
         this.supplyToDemandMap = builder.supplyToDemandMap;
     }
 
-    public static PricingEngineEntity.Builder newBuilder()
-    {
+    public static PricingEngineEntity.Builder newBuilder() {
         return new Builder();
     }
 
     @Setter
-    public static class Builder
-    {
+    public static class Builder {
         private Integer                  countryId;
         private Integer                  osId;
         private double                   rtbFloor;
         private double                   dcpFloor;
         private Map<String, Set<String>> supplyToDemandMap;
 
-        public PricingEngineEntity build()
-        {
+        public PricingEngineEntity build() {
             return new PricingEngineEntity(this);
         }
     }
 
-    public boolean isSupplyAcceptsDemand(int supply, int demand)
-    {
+    public boolean isSupplyAcceptsDemand(int supply, int demand) {
         if (this.supplyToDemandMap != null && this.supplyToDemandMap.containsKey(String.valueOf(supply))) {
             return this.supplyToDemandMap.get(String.valueOf(supply)).contains(String.valueOf(demand));
         }
@@ -71,20 +57,17 @@ public class PricingEngineEntity implements IdentifiableEntity<PricingEngineQuer
     }
 
     @Override
-    public String getJSON()
-    {
+    public String getJSON() {
         return null;
     }
 
     @Override
-    public PricingEngineQuery getId()
-    {
+    public PricingEngineQuery getId() {
         return new PricingEngineQuery(this.getCountryId(), this.getOsId());
     }
 
     @Override
-    public boolean equals(Object obj)
-    {
+    public boolean equals(Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
@@ -108,8 +91,7 @@ public class PricingEngineEntity implements IdentifiableEntity<PricingEngineQuer
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((countryId == null) ? 0 : countryId.hashCode());

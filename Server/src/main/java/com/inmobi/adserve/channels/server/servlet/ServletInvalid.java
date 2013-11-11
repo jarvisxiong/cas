@@ -19,14 +19,12 @@ import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class ServletInvalid implements Servlet
-{
+public class ServletInvalid implements Servlet {
 
     @SuppressWarnings("deprecation")
     @Override
     public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
-            DebugLogger logger) throws Exception
-    {
+            DebugLogger logger) throws Exception {
         // invalid request
         HttpResponse response = new DefaultHttpResponse(HTTP_1_1, NOT_FOUND);
         response.setContent(ChannelBuffers.copiedBuffer("Page not Found", Charset.forName("UTF-8").name()));
@@ -40,8 +38,7 @@ public class ServletInvalid implements Servlet
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "Invalid Servlet";
     }
 

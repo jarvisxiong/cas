@@ -11,23 +11,20 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 
 
-public class DebugLogger
-{
+public class DebugLogger {
     public static Configuration config;
     public static Logger        debugLogger  = null;
     private String              taskId       = "";
     private boolean             trace;
     private StringBuilder       traceBuilder = new StringBuilder();
 
-    public void setTrace()
-    {
+    public void setTrace() {
         trace = true;
     }
 
     private static Random randomNumberGenerator;
 
-    public static void init(Configuration config)
-    {
+    public static void init(Configuration config) {
         DebugLogger.config = config;
         LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
         JoranConfigurator configurator = new JoranConfigurator();
@@ -43,13 +40,11 @@ public class DebugLogger
         randomNumberGenerator = new Random();
     }
 
-    public DebugLogger()
-    {
+    public DebugLogger() {
         taskId = System.currentTimeMillis() + "-" + randomNumberGenerator.nextInt(99999999);
     }
 
-    public void trace(Object... logMessages)
-    {
+    public void trace(Object... logMessages) {
         if (trace) {
             for (Object logMessage : logMessages) {
                 traceBuilder.append(" ").append(logMessage);
@@ -60,8 +55,7 @@ public class DebugLogger
         }
     }
 
-    public void debug(Object... logMessages)
-    {
+    public void debug(Object... logMessages) {
         if (trace) {
             error(logMessages);
             return;
@@ -80,8 +74,7 @@ public class DebugLogger
         }
     }
 
-    public void info(Object... logMessages)
-    {
+    public void info(Object... logMessages) {
         if (trace) {
             error(logMessages);
             return;
@@ -98,8 +91,7 @@ public class DebugLogger
         debugLogger.info(sb.toString());
     }
 
-    public void error(Object... logMessages)
-    {
+    public void error(Object... logMessages) {
         Throwable t = new Throwable();
         StackTraceElement[] elements = t.getStackTrace();
 
@@ -113,13 +105,11 @@ public class DebugLogger
         trace(logMessages);
     }
 
-    public boolean isDebugEnabled()
-    {
+    public boolean isDebugEnabled() {
         return trace || debugLogger.isDebugEnabled();
     }
 
-    public String getTrace()
-    {
+    public String getTrace() {
         return traceBuilder.toString();
     }
 }

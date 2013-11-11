@@ -14,21 +14,18 @@ import java.util.List;
 
 
 @NoArgsConstructor
-public class RepositoryStatsProvider
-{
+public class RepositoryStatsProvider {
 
     private final List<AbstractStatsMaintainingDBRepository<? extends IdentifiableEntity<?>, ?>> repositories = Lists
                                                                                                                       .newArrayList();
 
     public RepositoryStatsProvider addRepositoryToStats(
-            AbstractStatsMaintainingDBRepository<? extends IdentifiableEntity<?>, ?> repository)
-    {
+            AbstractStatsMaintainingDBRepository<? extends IdentifiableEntity<?>, ?> repository) {
         this.repositories.add(repository);
         return this;
     }
 
-    public String getStats() throws JSONException
-    {
+    public String getStats() throws JSONException {
         JSONObject jsonObject = new JSONObject();
         for (AbstractStatsMaintainingDBRepository<? extends IdentifiableEntity<?>, ?> repository : repositories) {
             jsonObject.put(repository.getClass().getSimpleName(), new JSONObject(formatStats(repository.getStats())));
@@ -36,8 +33,7 @@ public class RepositoryStatsProvider
         return jsonObject.toString();
     }
 
-    public String getErrorDetails() throws JSONException
-    {
+    public String getErrorDetails() throws JSONException {
         JSONObject jsonObject = new JSONObject();
         for (AbstractStatsMaintainingDBRepository<? extends IdentifiableEntity<?>, ?> repository : repositories) {
             jsonObject.put(repository.getClass().getSimpleName(), new JSONObject(repository.getErrorDetails()));
@@ -45,8 +41,7 @@ public class RepositoryStatsProvider
         return jsonObject.toString();
     }
 
-    private String formatStats(DBRepositoryStats stats)
-    {
+    private String formatStats(DBRepositoryStats stats) {
         Formatter formatter = new Formatter();
 
         formatter.format("{ \"stats\": " + "{ \"age\": %d, " + "\"lastSuccessfulUpdate\"  : %d, "

@@ -11,8 +11,7 @@ import com.google.gson.Gson;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class ClickUrlMakerV6
-{
+public class ClickUrlMakerV6 {
 
     private DebugLogger         logger;
     private static final String DEFAULT_UDID_VALUE                            = "x";
@@ -33,51 +32,44 @@ public class ClickUrlMakerV6
                                                                                           ClickUrlMakerV6.clickURLHashingSecretKeyTestModeVersion,
                                                                                           36);
 
-    public ClickUrlMakerV6(DebugLogger logger, Set<String> unhashable)
-    {
+    public ClickUrlMakerV6(DebugLogger logger, Set<String> unhashable) {
         this.logger = logger;
         this.unhashable = unhashable;
     }
 
     private String testCryptoSecretKey = "qqq";
 
-    public void setTestCryptoSecretKey(String testCryptoSecretKey)
-    {
+    public void setTestCryptoSecretKey(String testCryptoSecretKey) {
         this.testCryptoSecretKey = testCryptoSecretKey;
     }
 
     private String cryptoSecretKey = "SystemManagerScottTiger";
 
-    public void setCryptoSecretKey(String cryptoSecretKey)
-    {
+    public void setCryptoSecretKey(String cryptoSecretKey) {
         this.cryptoSecretKey = cryptoSecretKey;
     }
 
     private String rmBeaconURLPrefix;
 
-    public void setRmBeaconURLPrefix(String rmBeaconURLPrefix)
-    {
+    public void setRmBeaconURLPrefix(String rmBeaconURLPrefix) {
         this.rmBeaconURLPrefix = rmBeaconURLPrefix;
     }
 
     private String imageBeaconURLPrefix;
 
-    public void setImageBeaconURLPrefix(String imageBeaconURLPrefix)
-    {
+    public void setImageBeaconURLPrefix(String imageBeaconURLPrefix) {
         this.imageBeaconURLPrefix = imageBeaconURLPrefix;
     }
 
     private Integer segmentId;
 
-    public void setSegmentId(Integer segmentId)
-    {
+    public void setSegmentId(Integer segmentId) {
         this.segmentId = segmentId;
     }
 
     private String beaconUrl;
 
-    public String getBeaconUrl(Map<String, String> getParams)
-    {
+    public String getBeaconUrl(Map<String, String> getParams) {
         if (null == beaconUrl) {
             return beaconUrl;
         }
@@ -103,8 +95,7 @@ public class ClickUrlMakerV6
 
     private String clickUrl;
 
-    public String getClickUrl(Map<String, String> getParams)
-    {
+    public String getClickUrl(Map<String, String> getParams) {
         if (null == clickUrl) {
             return clickUrl;
         }
@@ -131,132 +122,113 @@ public class ClickUrlMakerV6
 
     private String clickURLPrefix;
 
-    public void setClickURLPrefix(String clickURLPrefix)
-    {
+    public void setClickURLPrefix(String clickURLPrefix) {
         this.clickURLPrefix = clickURLPrefix;
     }
 
     private String imSdk;
 
-    public void setImSdk(String imSdk)
-    {
+    public void setImSdk(String imSdk) {
         this.imSdk = imSdk;
     }
 
     private String impressionId;
 
-    public void setImpressionId(String impressionId)
-    {
+    public void setImpressionId(String impressionId) {
         this.impressionId = impressionId;
     }
 
     private boolean isRmAd; // isBeaconingEventValue
 
-    public void setRmAd(boolean isRmAd)
-    {
+    public void setRmAd(boolean isRmAd) {
         this.isRmAd = isRmAd;
     }
 
     private Boolean isBillableDemog;
 
-    public void setIsBillableDemog(Boolean isBillableDemog)
-    {
+    public void setIsBillableDemog(Boolean isBillableDemog) {
         this.isBillableDemog = isBillableDemog;
     }
 
     private boolean isCPC;
 
-    public void setCPC(boolean isCPC)
-    {
+    public void setCPC(boolean isCPC) {
         this.isCPC = isCPC;
     }
 
     private Long siteIncId;
 
-    public void setSiteIncId(Long siteIncId)
-    {
+    public void setSiteIncId(Long siteIncId) {
         this.siteIncId = siteIncId;
     }
 
     private Long handsetInternalId;
 
-    public void setHandsetInternalId(Long handsetInternalId)
-    {
+    public void setHandsetInternalId(Long handsetInternalId) {
         this.handsetInternalId = handsetInternalId;
     }
 
     private Long ipFileVersion;
 
-    public void setIpFileVersion(Long ipFileVersion)
-    {
+    public void setIpFileVersion(Long ipFileVersion) {
         this.ipFileVersion = ipFileVersion;
     }
 
     private Map<String, String> uidMapUpperCase;
 
-    public void setUdIdVal(Map<String, String> uidMapUpperCase)
-    {
+    public void setUdIdVal(Map<String, String> uidMapUpperCase) {
         this.uidMapUpperCase = uidMapUpperCase;
     }
 
     private int carrierId;
 
-    public void setCarrierId(int carrierId)
-    {
+    public void setCarrierId(int carrierId) {
         this.carrierId = carrierId;
     }
 
     private int countryId;
 
-    public void setCountryId(int countryId)
-    {
+    public void setCountryId(int countryId) {
         this.countryId = countryId;
     }
 
     private String gender;
 
-    public void setGender(String gender)
-    {
+    public void setGender(String gender) {
         this.gender = gender;
     }
 
     private int age;
 
-    public void setAge(int age)
-    {
+    public void setAge(int age) {
         this.age = age;
     }
 
     private int location;
 
-    public void setLocation(int location)
-    {
+    public void setLocation(int location) {
         this.location = location;
     }
 
     private boolean testMode = false;
 
-    public void setTestMode(boolean testMode)
-    {
+    public void setTestMode(boolean testMode) {
         this.testMode = testMode;
     }
 
     private boolean isBeaconEnabledOnSite;
 
-    public void setBeaconEnabledOnSite(boolean isBeaconEnabledOnSite)
-    {
+    public void setBeaconEnabledOnSite(boolean isBeaconEnabledOnSite) {
         this.isBeaconEnabledOnSite = isBeaconEnabledOnSite;
     }
 
     private boolean imageBeaconFlag = false;
 
-    public void setImageBeaconFlag(boolean imageBeaconFlag)
-    {
+    public void setImageBeaconFlag(boolean imageBeaconFlag) {
         this.imageBeaconFlag = imageBeaconFlag;
     }
 
-    public void createClickUrls()
-    {
+    public void createClickUrls() {
         StringBuilder adUrlSuffix = new StringBuilder(100);
         // 1st URL component: url format version info
         adUrlSuffix.append(URLVERSIONINITSTR);
@@ -391,23 +363,19 @@ public class ClickUrlMakerV6
         return;
     }
 
-    public String getIdBase36(Long id)
-    {
+    public String getIdBase36(Long id) {
         return Long.toString(id, 36);
     }
 
-    public String getCountryIdBase36(int countryId)
-    {
+    public String getCountryIdBase36(int countryId) {
         return Long.toString(countryId, 36);
     }
 
-    public String getCarrierIdBase36(int carrierId, int countryId)
-    {
+    public String getCarrierIdBase36(int carrierId, int countryId) {
         return Long.toString(carrierId != 0 ? carrierId : -countryId, 36);
     }
 
-    public String getHashedValue(String value, String key)
-    {
+    public String getHashedValue(String value, String key) {
         String hashedUidValue = value;
         if (!(unhashable.contains(key) || 32 == value.length())) {
             byte[] uidStoredBytes = value.getBytes();
@@ -434,8 +402,7 @@ public class ClickUrlMakerV6
         return hashedUidValue;
     }
 
-    public String getEncodedJson(Map<String, String> clickUidMap, DebugLogger logger)
-    {
+    public String getEncodedJson(Map<String, String> clickUidMap, DebugLogger logger) {
         Gson gson = new Gson();
         String temp = gson.toJson(clickUidMap);
         byte[] unEncoded = temp.getBytes();
@@ -444,8 +411,7 @@ public class ClickUrlMakerV6
         return temp;
     }
 
-    private String appendSeparator(String parameter)
-    {
+    private String appendSeparator(String parameter) {
         return (URLPATHSEP + parameter);
     }
 }

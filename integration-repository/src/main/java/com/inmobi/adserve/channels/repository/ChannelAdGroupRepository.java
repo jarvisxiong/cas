@@ -19,13 +19,11 @@ import java.util.*;
 
 
 public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBRepository<ChannelSegmentEntity, String>
-        implements RepositoryManager
-{
+        implements RepositoryManager {
 
     @Override
     public DBEntity<ChannelSegmentEntity, String> buildObjectFromRow(ResultSetRow resultSetRow)
-            throws RepositoryException
-    {
+            throws RepositoryException {
         NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
         String adgroupId = row.getString("adgroup_id");
         Timestamp modifyTime = row.getTimestamp("modified_on");
@@ -163,8 +161,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
         }
     }
 
-    JSONObject getJSONFromString(String additionalParams)
-    {
+    JSONObject getJSONFromString(String additionalParams) {
         if (additionalParams != null) {
             try {
                 return new JSONObject(additionalParams);
@@ -177,8 +174,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
     }
 
     // Made protected for testing visibility.
-    ArrayList<Integer> parseOsIds(String osVersionTargeting)
-    {
+    ArrayList<Integer> parseOsIds(String osVersionTargeting) {
         ArrayList<Integer> osIds = null;
         try {
             if (osVersionTargeting != null) {
@@ -196,8 +192,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
     }
 
     // Made protected for testing visibility.
-    public ArrayList<Integer> parseManufacturingIds(String manufModelTargeting)
-    {
+    public ArrayList<Integer> parseManufacturingIds(String manufModelTargeting) {
         ArrayList<Integer> modelIds = null;
         try {
             if (manufModelTargeting != null) {
@@ -217,8 +212,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
         return modelIds;
     }
 
-    boolean getMode(String sIEJson)
-    {
+    boolean getMode(String sIEJson) {
         boolean mode = false;
         if (sIEJson != null) {
             try {
@@ -232,8 +226,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
         return mode;
     }
 
-    Set<String> getSites(String sIEJson)
-    {
+    Set<String> getSites(String sIEJson) {
         Set<String> sitesIE = new HashSet<String>();
         if (sIEJson != null) {
             try {
@@ -251,8 +244,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
     }
 
     @Override
-    public boolean isObjectToBeDeleted(ChannelSegmentEntity entity)
-    {
+    public boolean isObjectToBeDeleted(ChannelSegmentEntity entity) {
         List<String> matchingKeys;
         try {
             ChannelSegmentEntity oldEntity = query(entity.getId());
@@ -276,20 +268,17 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
     }
 
     @Override
-    public HashIndexKeyBuilder<ChannelSegmentEntity> getHashIndexKeyBuilder(String arg0)
-    {
+    public HashIndexKeyBuilder<ChannelSegmentEntity> getHashIndexKeyBuilder(String arg0) {
         return null;
     }
 
     @Override
-    public ChannelSegmentEntity queryUniqueResult(RepositoryQuery arg0) throws RepositoryException
-    {
+    public ChannelSegmentEntity queryUniqueResult(RepositoryQuery arg0) throws RepositoryException {
         return null;
     }
 
     public Collection<ChannelSegmentEntity> getEntities(long slotId, long category, long country,
-            Integer targetingPlatform, Integer siteRating, Integer osId)
-    {
+            Integer targetingPlatform, Integer siteRating, Integer osId) {
         return ChannelSegmentMatchingCache.getEntities(slotId, category, country, targetingPlatform, siteRating, osId);
     }
 

@@ -38,8 +38,7 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.ning.http.client.AsyncHttpClient;
 
 
-public class ResponseSender extends HttpRequestHandlerBase
-{
+public class ResponseSender extends HttpRequestHandlerBase {
 
     private static final String         startTags       = "<AdResponse><Ads number=\"1\"><Ad type=\"rm\" width=\"%s\" height=\"%s\"><![CDATA[";
     private static final String         endTags         = " ]]></Ad></Ads></AdResponse>";
@@ -66,48 +65,39 @@ public class ResponseSender extends HttpRequestHandlerBase
     private AuctionEngine               auctionEngine;
     private static final String         NO_AD_HEADER    = "X-MKHOJ-NOAD";
 
-    public List<ChannelSegment> getRankList()
-    {
+    public List<ChannelSegment> getRankList() {
         return this.rankList;
     }
 
-    public void setRankList(List<ChannelSegment> rankList)
-    {
+    public void setRankList(List<ChannelSegment> rankList) {
         this.rankList = rankList;
     }
 
-    public int getRankIndexToProcess()
-    {
+    public int getRankIndexToProcess() {
         return rankIndexToProcess;
     }
 
-    public void setRankIndexToProcess(int rankIndexToProcess)
-    {
+    public void setRankIndexToProcess(int rankIndexToProcess) {
         this.rankIndexToProcess = rankIndexToProcess;
     }
 
-    public ThirdPartyAdResponse getAdResponse()
-    {
+    public ThirdPartyAdResponse getAdResponse() {
         return this.adResponse;
     }
 
-    public ChannelSegment getRtbResponse()
-    {
+    public ChannelSegment getRtbResponse() {
         return auctionEngine.getRtbResponse();
     }
 
-    public int getSelectedAdIndex()
-    {
+    public int getSelectedAdIndex() {
         return this.selectedAdIndex;
     }
 
-    public long getTotalTime()
-    {
+    public long getTotalTime() {
         return this.totalTime;
     }
 
-    public ResponseSender(HttpRequestHandler hrh, DebugLogger logger)
-    {
+    public ResponseSender(HttpRequestHandler hrh, DebugLogger logger) {
         this.hrh = hrh;
         this.logger = logger;
         this.totalTime = System.currentTimeMillis();
@@ -122,8 +112,7 @@ public class ResponseSender extends HttpRequestHandlerBase
     }
 
     @Override
-    public void sendAdResponse(AdNetworkInterface selectedAdNetwork, ChannelEvent event)
-    {
+    public void sendAdResponse(AdNetworkInterface selectedAdNetwork, ChannelEvent event) {
         adResponse = selectedAdNetwork.getResponseAd();
         selectedAdIndex = getRankIndex(selectedAdNetwork);
         sendAdResponse(adResponse, event);
@@ -131,8 +120,7 @@ public class ResponseSender extends HttpRequestHandlerBase
 
     // send Ad Response
     public synchronized void sendAdResponse(ThirdPartyAdResponse adResponse, ChannelEvent event)
-            throws NullPointerException
-    {
+            throws NullPointerException {
         // Making sure response is sent only once
         if (responseSent) {
             return;
@@ -218,8 +206,7 @@ public class ResponseSender extends HttpRequestHandlerBase
 
     // send response to the caller
     public void sendResponse(HttpResponseStatus status, String responseString, Map responseHeaders, ChannelEvent event)
-            throws NullPointerException
-    {
+            throws NullPointerException {
         if (hrh.isTraceRequest) {
             status = OK;
         }
@@ -266,20 +253,17 @@ public class ResponseSender extends HttpRequestHandlerBase
     }
 
     // send response to the caller
-    public void sendResponse(String responseString, ChannelEvent event) throws NullPointerException
-    {
+    public void sendResponse(String responseString, ChannelEvent event) throws NullPointerException {
         sendResponse(HttpResponseStatus.OK, responseString, null, event);
     }
 
     @Override
-    public AuctionEngine getAuctionEngine()
-    {
+    public AuctionEngine getAuctionEngine() {
         return auctionEngine;
     }
 
     @Override
-    public synchronized void sendNoAdResponse(ChannelEvent event) throws NullPointerException
-    {
+    public synchronized void sendNoAdResponse(ChannelEvent event) throws NullPointerException {
         // Making sure response is sent only once
         if (responseSent) {
             return;
@@ -309,8 +293,7 @@ public class ResponseSender extends HttpRequestHandlerBase
     }
 
     // Return true if request contains Iframe Id and is a request from js adcode.
-    public boolean isJsAdRequest()
-    {
+    public boolean isJsAdRequest() {
         if (null == sasParams) {
             return false;
         }
@@ -320,8 +303,7 @@ public class ResponseSender extends HttpRequestHandlerBase
     }
 
     @Override
-    public Boolean isEligibleForProcess(AdNetworkInterface adNetwork)
-    {
+    public Boolean isEligibleForProcess(AdNetworkInterface adNetwork) {
         if (null == rankList) {
             return false;
         }
@@ -333,8 +315,7 @@ public class ResponseSender extends HttpRequestHandlerBase
     }
 
     @Override
-    public Boolean isLastEntry(AdNetworkInterface adNetwork)
-    {
+    public Boolean isLastEntry(AdNetworkInterface adNetwork) {
         int index = getRankIndex(adNetwork);
         if (logger.isDebugEnabled()) {
             logger.debug("inside isLastEntry for " + adNetwork.getName() + " and index is " + index);
@@ -345,8 +326,7 @@ public class ResponseSender extends HttpRequestHandlerBase
     // Iterates over the complete rank list and set the new value for
     // rankIndexToProcess.
     @Override
-    public void reassignRanks(AdNetworkInterface adNetworkCaller, MessageEvent event)
-    {
+    public void reassignRanks(AdNetworkInterface adNetworkCaller, MessageEvent event) {
         int index = getRankIndex(adNetworkCaller);
         if (logger.isDebugEnabled()) {
             logger.debug("reassignRanks called for " + adNetworkCaller.getName() + " and index is " + index);
@@ -386,8 +366,7 @@ public class ResponseSender extends HttpRequestHandlerBase
     }
 
     @Override
-    public void cleanUp()
-    {
+    public void cleanUp() {
         // Making sure cleanup is called only once
         if (requestCleaned) {
             return;
@@ -458,8 +437,7 @@ public class ResponseSender extends HttpRequestHandlerBase
         hrh.writeLogs(this, logger);
     }
 
-    private int getRankIndex(AdNetworkInterface adNetwork)
-    {
+    private int getRankIndex(AdNetworkInterface adNetwork) {
         int index;
         for (index = 0; index < rankList.size(); index++) {
             if (rankList.get(index).getAdNetworkInterface().getImpressionId().equals(adNetwork.getImpressionId())) {
@@ -470,8 +448,7 @@ public class ResponseSender extends HttpRequestHandlerBase
     }
 
     // return the response format
-    public String getResponseFormat()
-    {
+    public String getResponseFormat() {
         if (null != sasParams) {
             String responseFormat = sasParams.getRFormat();
             if (null == responseFormat) {
@@ -486,8 +463,7 @@ public class ResponseSender extends HttpRequestHandlerBase
     }
 
     @Override
-    public void processDcpList(MessageEvent serverEvent)
-    {
+    public void processDcpList(MessageEvent serverEvent) {
         // There would always be rtb partner before going to dcp list
         // So will iterate over the dcp list once.
         if (this.getRankList().isEmpty()) {
@@ -516,8 +492,7 @@ public class ResponseSender extends HttpRequestHandlerBase
     }
 
     @Override
-    public void processDcpPartner(MessageEvent serverEvent, AdNetworkInterface adNetworkInterface)
-    {
+    public void processDcpPartner(MessageEvent serverEvent, AdNetworkInterface adNetworkInterface) {
         if (!this.isEligibleForProcess(adNetworkInterface)) {
             logger.debug(adNetworkInterface.getName(), "is not eligible for processing");
             return;
@@ -537,8 +512,7 @@ public class ResponseSender extends HttpRequestHandlerBase
     }
 
     @Override
-    public AsyncHttpClient getAsyncClient()
-    {
+    public AsyncHttpClient getAsyncClient() {
         return AsyncRequestMaker.getAsyncHttpClient();
     }
 

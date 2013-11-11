@@ -19,13 +19,11 @@ import java.util.Date;
 
 
 public class SiteEcpmRepository extends AbstractStatsMaintainingDBRepository<SiteEcpmEntity, SiteEcpmQuery> implements
-        Repository, RepositoryManager
-{
+        Repository, RepositoryManager {
 
     @Override
     public DBEntity<SiteEcpmEntity, SiteEcpmQuery> buildObjectFromRow(ResultSetRow resultSetRow)
-            throws RepositoryException
-    {
+            throws RepositoryException {
         NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
         String siteId = row.getString("site_id");
         Integer countryId = row.getInt("country_id");
@@ -46,8 +44,7 @@ public class SiteEcpmRepository extends AbstractStatsMaintainingDBRepository<Sit
     }
 
     @Override
-    public boolean isObjectToBeDeleted(SiteEcpmEntity siteEcpmEntity)
-    {
+    public boolean isObjectToBeDeleted(SiteEcpmEntity siteEcpmEntity) {
         if (DateUtils.addDays(siteEcpmEntity.getModifiedOn(), 3).before(new Date())) {
             return true;
         }
@@ -55,14 +52,12 @@ public class SiteEcpmRepository extends AbstractStatsMaintainingDBRepository<Sit
     }
 
     @Override
-    public HashIndexKeyBuilder<SiteEcpmEntity> getHashIndexKeyBuilder(String className)
-    {
+    public HashIndexKeyBuilder<SiteEcpmEntity> getHashIndexKeyBuilder(String className) {
         return null; // To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public SiteEcpmEntity queryUniqueResult(RepositoryQuery repositoryQuery) throws RepositoryException
-    {
+    public SiteEcpmEntity queryUniqueResult(RepositoryQuery repositoryQuery) throws RepositoryException {
         return null;
     }
 }

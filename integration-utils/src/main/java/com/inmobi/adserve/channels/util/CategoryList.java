@@ -4,8 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class CategoryList
-{
+public class CategoryList {
     private static Map<Integer, String> categoryList                 = new HashMap<Integer, String>();
     private static int                  FAMILY_SAFE_BLOCK_CATEGORIES = 10000;
     private static int                  PERFORMANCE_BLOCK_CATEGORIES = 10001;
@@ -95,18 +94,15 @@ public class CategoryList
                     "Immigration,Legal Issues,Gay Life,Atheism/Agnosticism,Extreme Graphic/Explicit Violence,Pornography,Profane Content,Hate Content,Illegal Content,Warez,Spyware/Malware,Copyright Infringement,Adult Education,Pregnancy,Brain Tumor,Cancer,Cholesterol,Chronic Fatigue Syndrome,Chronic Pain,Deafness,Depression,Dermatology,A.D.D.,Diabetes,Epilepsy,GERD/Acid Reflux,Heart Disease,Herbs for Health,IBS/Crohn's Disease,Incest/Abuse Support,Incontinence,AIDS/HIV,Infertility,Men's Health,Panic/Anxiety Disorders,Physical Therapy,Psychology/Psychiatry,Senor Health,Sexuality,Sleep Disorders,Weight Loss,Women's Health,Alternative Medicine,Autism/PDD,Bipolar Disorder,Cocktails/Beer");
     }
 
-    public static String getCategory(int index)
-    {
+    public static String getCategory(int index) {
         return categoryList.get(index);
     }
 
-    public static String getBlockedCategoryForFamilySafe()
-    {
+    public static String getBlockedCategoryForFamilySafe() {
         return categoryList.get(FAMILY_SAFE_BLOCK_CATEGORIES);
     }
 
-    public static String getBlockedCategoryForPerformance()
-    {
+    public static String getBlockedCategoryForPerformance() {
         return categoryList.get(PERFORMANCE_BLOCK_CATEGORIES);
     }
 }

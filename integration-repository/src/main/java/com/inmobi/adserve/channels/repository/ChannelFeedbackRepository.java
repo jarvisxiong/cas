@@ -15,13 +15,11 @@ import java.sql.Timestamp;
 
 
 public class ChannelFeedbackRepository extends AbstractStatsMaintainingDBRepository<ChannelFeedbackEntity, String>
-        implements RepositoryManager
-{
+        implements RepositoryManager {
 
     @Override
     public DBEntity<ChannelFeedbackEntity, String> buildObjectFromRow(ResultSetRow resultSetRow)
-            throws RepositoryException
-    {
+            throws RepositoryException {
         NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
         logger.debug("result set is not null");
         String advertiserId = row.getString("id");
@@ -63,8 +61,7 @@ public class ChannelFeedbackRepository extends AbstractStatsMaintainingDBReposit
     }
 
     @Override
-    public boolean isObjectToBeDeleted(ChannelFeedbackEntity entity)
-    {
+    public boolean isObjectToBeDeleted(ChannelFeedbackEntity entity) {
         if (entity.getAdvertiserId() == null) {
             return true;
         }
@@ -72,14 +69,12 @@ public class ChannelFeedbackRepository extends AbstractStatsMaintainingDBReposit
     }
 
     @Override
-    public HashIndexKeyBuilder<ChannelFeedbackEntity> getHashIndexKeyBuilder(String className)
-    {
+    public HashIndexKeyBuilder<ChannelFeedbackEntity> getHashIndexKeyBuilder(String className) {
         return null;
     }
 
     @Override
-    public ChannelFeedbackEntity queryUniqueResult(RepositoryQuery q) throws RepositoryException
-    {
+    public ChannelFeedbackEntity queryUniqueResult(RepositoryQuery q) throws RepositoryException {
         return null;
     }
 

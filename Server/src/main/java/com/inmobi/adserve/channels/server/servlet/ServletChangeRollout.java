@@ -13,13 +13,11 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
 
-public class ServletChangeRollout implements Servlet
-{
+public class ServletChangeRollout implements Servlet {
 
     @Override
     public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
-            DebugLogger logger) throws Exception
-    {
+            DebugLogger logger) throws Exception {
         try {
             List<String> rollout = (queryStringDecoder.getParameters().get("percentRollout"));
             ServletHandler.percentRollout = Integer.parseInt(rollout.get(0));
@@ -34,8 +32,7 @@ public class ServletChangeRollout implements Servlet
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "changerollout";
     }
 }

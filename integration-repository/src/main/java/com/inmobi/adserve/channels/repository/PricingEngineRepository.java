@@ -22,14 +22,12 @@ import java.util.*;
 
 public class PricingEngineRepository extends
         AbstractStatsMaintainingDBRepository<PricingEngineEntity, PricingEngineQuery> implements Repository,
-        RepositoryManager
-{
+        RepositoryManager {
 
     private static final String JSON_ERROR = "JSON_ERROR";
 
     @Override
-    public PricingEngineEntity queryUniqueResult(RepositoryQuery pricingEngineIdQuery) throws RepositoryException
-    {
+    public PricingEngineEntity queryUniqueResult(RepositoryQuery pricingEngineIdQuery) throws RepositoryException {
         Collection<PricingEngineEntity> pricingEngineEntityResultSet = query(pricingEngineIdQuery);
         if (pricingEngineEntityResultSet == null || pricingEngineEntityResultSet.size() == 0) {
             return null;
@@ -42,8 +40,7 @@ public class PricingEngineRepository extends
 
     @Override
     public DBEntity<PricingEngineEntity, PricingEngineQuery> buildObjectFromRow(ResultSetRow resultSetRow)
-            throws RepositoryException
-    {
+            throws RepositoryException {
         NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
         Timestamp modifyTime = row.getTimestamp("modified_on");
         PricingEngineEntity.Builder builder = PricingEngineEntity.newBuilder();
@@ -68,27 +65,23 @@ public class PricingEngineRepository extends
         return new DBEntity<PricingEngineEntity, PricingEngineQuery>(entity, modifyTime);
     }
 
-    Map<String, Set<String>> getSupplyToDemandMap(String supplyDemandJson)
-    {
+    Map<String, Set<String>> getSupplyToDemandMap(String supplyDemandJson) {
         if (supplyDemandJson == null) {
             return null;
         }
         Gson gson = new Gson();
-        Type type = new TypeToken<HashMap<String, HashSet<String>>>()
-        {
+        Type type = new TypeToken<HashMap<String, HashSet<String>>>() {
         }.getType();
         return gson.fromJson(supplyDemandJson, type);
     }
 
     @Override
-    public HashIndexKeyBuilder<PricingEngineEntity> getHashIndexKeyBuilder(String className)
-    {
+    public HashIndexKeyBuilder<PricingEngineEntity> getHashIndexKeyBuilder(String className) {
         return null;
     }
 
     @Override
-    public boolean isObjectToBeDeleted(PricingEngineEntity pricingEngineEntity)
-    {
+    public boolean isObjectToBeDeleted(PricingEngineEntity pricingEngineEntity) {
         return pricingEngineEntity.getRtbFloor() == 0.0 && pricingEngineEntity.getDcpFloor() == 0.0;
     }
 }

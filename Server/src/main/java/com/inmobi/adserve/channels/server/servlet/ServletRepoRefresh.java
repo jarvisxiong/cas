@@ -22,15 +22,13 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.phoenix.exception.RepositoryException;
 
 
-public class ServletRepoRefresh implements Servlet
-{
+public class ServletRepoRefresh implements Servlet {
     private static final String LAST_UPDATE    = "'${last_update}'";
     private static final String REPLACE_STRING = "now() -interval '1 MINUTE'";
 
     @Override
     public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
-            DebugLogger logger) throws Exception
-    {
+            DebugLogger logger) throws Exception {
         Map<String, List<String>> params = queryStringDecoder.getParameters();
         String requestParam = params.get("args").toString();
         JSONArray jsonArray = new JSONArray(requestParam);
@@ -157,8 +155,7 @@ public class ServletRepoRefresh implements Servlet
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "RepoRefresh";
     }
 

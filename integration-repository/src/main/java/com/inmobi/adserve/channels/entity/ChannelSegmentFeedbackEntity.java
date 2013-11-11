@@ -6,8 +6,7 @@ import lombok.Setter;
 
 
 @Getter
-public class ChannelSegmentFeedbackEntity implements IdentifiableEntity<String>
-{
+public class ChannelSegmentFeedbackEntity implements IdentifiableEntity<String> {
 
     private static final long serialVersionUID = 1L;
 
@@ -21,8 +20,7 @@ public class ChannelSegmentFeedbackEntity implements IdentifiableEntity<String>
     private final int         clicks;
     private final int         todayImpressions;
 
-    public ChannelSegmentFeedbackEntity(Builder builder)
-    {
+    public ChannelSegmentFeedbackEntity(Builder builder) {
         this.advertiserId = builder.advertiserId;
         this.adGroupId = builder.adGroupId;
         this.eCPM = builder.eCPM;
@@ -34,15 +32,13 @@ public class ChannelSegmentFeedbackEntity implements IdentifiableEntity<String>
         this.todayImpressions = builder.todayImpressions;
     }
 
-    public static Builder newBuilder()
-    {
+    public static Builder newBuilder() {
         return new Builder();
     }
 
     @Getter
     @Setter
-    public static class Builder
-    {
+    public static class Builder {
         private String advertiserId;
         private String adGroupId;
         private double eCPM;
@@ -53,21 +49,18 @@ public class ChannelSegmentFeedbackEntity implements IdentifiableEntity<String>
         private int    clicks;
         private int    todayImpressions;
 
-        public ChannelSegmentFeedbackEntity build()
-        {
+        public ChannelSegmentFeedbackEntity build() {
             return new ChannelSegmentFeedbackEntity(this);
         }
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return adGroupId;
     }
 
     @Override
-    public String getJSON()
-    {
+    public String getJSON() {
         return null;
     }
 

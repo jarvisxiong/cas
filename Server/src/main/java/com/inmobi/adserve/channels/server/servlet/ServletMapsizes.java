@@ -12,13 +12,11 @@ import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class ServletMapsizes implements Servlet
-{
+public class ServletMapsizes implements Servlet {
 
     @Override
     public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
-            DebugLogger logger) throws Exception
-    {
+            DebugLogger logger) throws Exception {
         JSONObject mapsizes = new JSONObject();
         mapsizes.put("ResponseMap", ChannelsClientHandler.responseMap.size());
         mapsizes.put("StatusMap", ChannelsClientHandler.responseMap.size());
@@ -31,8 +29,7 @@ public class ServletMapsizes implements Servlet
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "mapsizes";
     }
 }

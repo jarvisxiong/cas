@@ -20,12 +20,10 @@ import java.util.Set;
 
 
 public class ChannelRepository extends AbstractStatsMaintainingDBRepository<ChannelEntity, String> implements
-        RepositoryManager
-{
+        RepositoryManager {
 
     @Override
-    public DBEntity<ChannelEntity, String> buildObjectFromRow(ResultSetRow resultSetRow) throws RepositoryException
-    {
+    public DBEntity<ChannelEntity, String> buildObjectFromRow(ResultSetRow resultSetRow) throws RepositoryException {
         NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
         Timestamp modifiedOn = row.getTimestamp("modified_on");
         String id = row.getString("id");
@@ -88,8 +86,7 @@ public class ChannelRepository extends AbstractStatsMaintainingDBRepository<Chan
         }
     }
 
-    private boolean getMode(String sIEJson)
-    {
+    private boolean getMode(String sIEJson) {
         boolean mode = false;
         if (sIEJson != null) {
             try {
@@ -103,8 +100,7 @@ public class ChannelRepository extends AbstractStatsMaintainingDBRepository<Chan
         return mode;
     }
 
-    private Set<String> getSites(String sIEJson)
-    {
+    private Set<String> getSites(String sIEJson) {
         Set<String> sitesIE = new HashSet<String>();
         if (sIEJson != null) {
             try {
@@ -122,8 +118,7 @@ public class ChannelRepository extends AbstractStatsMaintainingDBRepository<Chan
     }
 
     @Override
-    public boolean isObjectToBeDeleted(ChannelEntity entity)
-    {
+    public boolean isObjectToBeDeleted(ChannelEntity entity) {
         if (entity.getId() == null) {
             return true;
         }
@@ -131,15 +126,13 @@ public class ChannelRepository extends AbstractStatsMaintainingDBRepository<Chan
     }
 
     @Override
-    public HashIndexKeyBuilder<ChannelEntity> getHashIndexKeyBuilder(String className)
-    {
+    public HashIndexKeyBuilder<ChannelEntity> getHashIndexKeyBuilder(String className) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public ChannelEntity queryUniqueResult(RepositoryQuery q) throws RepositoryException
-    {
+    public ChannelEntity queryUniqueResult(RepositoryQuery q) throws RepositoryException {
         // TODO Auto-generated method stub
         return null;
     }

@@ -16,15 +16,13 @@ import org.jboss.netty.handler.timeout.IdleStateHandler;
 import org.jboss.netty.util.Timer;
 
 
-public class ChannelServerPipelineFactory implements ChannelPipelineFactory
-{
+public class ChannelServerPipelineFactory implements ChannelPipelineFactory {
 
     private final Timer      timer;
     private int              serverTimeoutMillis; ;
     private ExecutionHandler executionHandler;
 
-    public ChannelServerPipelineFactory(Timer timer, Configuration configuration)
-    {
+    public ChannelServerPipelineFactory(Timer timer, Configuration configuration) {
         this.timer = timer;
         try {
             this.serverTimeoutMillis = configuration.getInt("serverTimeoutMillis");
@@ -36,8 +34,7 @@ public class ChannelServerPipelineFactory implements ChannelPipelineFactory
                 TimeUnit.HOURS));
     }
 
-    public ChannelPipeline getPipeline() throws Exception
-    {
+    public ChannelPipeline getPipeline() throws Exception {
         ChannelPipeline pipeline = pipeline();
         pipeline.addLast("decoder", new HttpRequestDecoder());
         pipeline.addLast("encoder", new HttpResponseEncoder());

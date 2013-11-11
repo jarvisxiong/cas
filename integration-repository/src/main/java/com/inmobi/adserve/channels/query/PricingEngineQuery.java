@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
-public class PricingEngineQuery implements RepositoryQuery
-{
+public class PricingEngineQuery implements RepositoryQuery {
 
     private Integer countryId;
     private Integer osId;

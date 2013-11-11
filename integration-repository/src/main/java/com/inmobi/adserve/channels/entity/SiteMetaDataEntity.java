@@ -9,8 +9,7 @@ import java.util.Set;
 
 
 @Getter
-public class SiteMetaDataEntity implements IdentifiableEntity<String>
-{
+public class SiteMetaDataEntity implements IdentifiableEntity<String> {
 
     private static final long serialVersionUID = 1L;
 
@@ -20,8 +19,7 @@ public class SiteMetaDataEntity implements IdentifiableEntity<String>
     private final Set<String> advertisersIncludedBySite;
     private final Set<String> advertisersIncludedByPublisher;
 
-    public SiteMetaDataEntity(Builder builder)
-    {
+    public SiteMetaDataEntity(Builder builder) {
         this.siteId = builder.siteId;
         this.pubId = builder.pubId;
         this.modified_on = builder.modified_on;
@@ -29,35 +27,30 @@ public class SiteMetaDataEntity implements IdentifiableEntity<String>
         this.advertisersIncludedByPublisher = builder.advertisersIncludedByPublisher;
     }
 
-    public static Builder newBuilder()
-    {
+    public static Builder newBuilder() {
         return new Builder();
     }
 
     @Setter
-    public static class Builder
-    {
+    public static class Builder {
         private String      siteId;
         private String      pubId;
         private Timestamp   modified_on;
         private Set<String> advertisersIncludedBySite;
         private Set<String> advertisersIncludedByPublisher;
 
-        public SiteMetaDataEntity build()
-        {
+        public SiteMetaDataEntity build() {
             return new SiteMetaDataEntity(this);
         }
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return this.siteId;
     }
 
     @Override
-    public String getJSON()
-    {
+    public String getJSON() {
         return null;
     }
 }

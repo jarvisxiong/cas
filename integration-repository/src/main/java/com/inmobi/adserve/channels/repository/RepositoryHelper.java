@@ -12,8 +12,7 @@ import lombok.Setter;
 
 
 @Getter
-public class RepositoryHelper
-{
+public class RepositoryHelper {
     private final ChannelRepository                channelRepository;
     private final ChannelAdGroupRepository         channelAdGroupRepository;
     private final ChannelFeedbackRepository        channelFeedbackRepository;
@@ -26,8 +25,7 @@ public class RepositoryHelper
     private final SiteEcpmRepository               siteEcpmRepository;
     private final RepositoryStatsProvider          repositoryStatsProvider;
 
-    public RepositoryHelper(Builder builder)
-    {
+    public RepositoryHelper(Builder builder) {
         this.channelRepository = builder.channelRepository;
         this.channelAdGroupRepository = builder.channelAdGroupRepository;
         this.channelFeedbackRepository = builder.channelFeedbackRepository;
@@ -51,14 +49,12 @@ public class RepositoryHelper
                     .addRepositoryToStats(this.siteEcpmRepository);
     }
 
-    public static Builder newBuilder()
-    {
+    public static Builder newBuilder() {
         return new Builder();
     }
 
     @Setter
-    public static class Builder
-    {
+    public static class Builder {
         private ChannelRepository                channelRepository;
         private ChannelAdGroupRepository         channelAdGroupRepository;
         private ChannelFeedbackRepository        channelFeedbackRepository;
@@ -70,8 +66,7 @@ public class RepositoryHelper
         private PublisherFilterRepository        publisherFilterRepository;
         private SiteEcpmRepository               siteEcpmRepository;
 
-        public RepositoryHelper build()
-        {
+        public RepositoryHelper build() {
             Preconditions.checkNotNull(channelRepository);
             Preconditions.checkNotNull(channelAdGroupRepository);
             Preconditions.checkNotNull(channelFeedbackRepository);
@@ -86,8 +81,7 @@ public class RepositoryHelper
         }
     }
 
-    public ChannelEntity queryChannelRepository(String channelId)
-    {
+    public ChannelEntity queryChannelRepository(String channelId) {
         try {
             return channelRepository.query(channelId);
         }
@@ -96,8 +90,7 @@ public class RepositoryHelper
         return null;
     }
 
-    public ChannelSegmentEntity queryChannelAdGroupRepository(String adGroupId)
-    {
+    public ChannelSegmentEntity queryChannelAdGroupRepository(String adGroupId) {
         try {
             return channelAdGroupRepository.query(adGroupId);
         }
@@ -106,8 +99,7 @@ public class RepositoryHelper
         return null;
     }
 
-    public ChannelSegmentFeedbackEntity queryChannelSegmentFeedbackRepository(String adGroupId)
-    {
+    public ChannelSegmentFeedbackEntity queryChannelSegmentFeedbackRepository(String adGroupId) {
         try {
             return channelSegmentFeedbackRepository.query(adGroupId);
         }
@@ -116,8 +108,7 @@ public class RepositoryHelper
         return null;
     }
 
-    public ChannelFeedbackEntity queryChannelFeedbackRepository(String advertiserId)
-    {
+    public ChannelFeedbackEntity queryChannelFeedbackRepository(String advertiserId) {
         try {
             return channelFeedbackRepository.query(advertiserId);
         }
@@ -126,8 +117,7 @@ public class RepositoryHelper
         return null;
     }
 
-    public SiteTaxonomyEntity querySiteTaxonomyRepository(String id)
-    {
+    public SiteTaxonomyEntity querySiteTaxonomyRepository(String id) {
         try {
             return siteTaxonomyRepository.query(id);
         }
@@ -136,8 +126,7 @@ public class RepositoryHelper
         return null;
     }
 
-    public SiteMetaDataEntity querySiteMetaDetaRepository(String siteId)
-    {
+    public SiteMetaDataEntity querySiteMetaDetaRepository(String siteId) {
         try {
             return siteMetaDataRepository.query(siteId);
         }
@@ -147,18 +136,15 @@ public class RepositoryHelper
     }
 
     public SegmentAdGroupFeedbackEntity querySiteCitrusLeafFeedbackRepository(String siteId, Integer segmentId,
-            DebugLogger logger)
-    {
+            DebugLogger logger) {
         return siteCitrusLeafFeedbackRepository.query(siteId, segmentId, logger);
     }
 
-    public SiteFeedbackEntity querySiteCitrusLeafFeedbackRepository(String siteId)
-    {
+    public SiteFeedbackEntity querySiteCitrusLeafFeedbackRepository(String siteId) {
         return siteCitrusLeafFeedbackRepository.query(siteId);
     }
 
-    public PricingEngineEntity queryPricingEngineRepository(int country, int os)
-    {
+    public PricingEngineEntity queryPricingEngineRepository(int country, int os) {
         try {
             return pricingEngineRepository.query(new PricingEngineQuery(country, os));
         }
@@ -167,8 +153,7 @@ public class RepositoryHelper
         return null;
     }
 
-    public PublisherFilterEntity queryPublisherFilterRepository(String siteId, Integer ruleType)
-    {
+    public PublisherFilterEntity queryPublisherFilterRepository(String siteId, Integer ruleType) {
         try {
             return publisherFilterRepository.query(new PublisherFilterQuery(siteId, ruleType));
         }
@@ -177,8 +162,7 @@ public class RepositoryHelper
         return null;
     }
 
-    public SiteEcpmEntity querySiteEcpmRepository(String siteId, Integer countryId, Integer osId)
-    {
+    public SiteEcpmEntity querySiteEcpmRepository(String siteId, Integer countryId, Integer osId) {
         try {
             return siteEcpmRepository.query(new SiteEcpmQuery(siteId, countryId, osId));
         }

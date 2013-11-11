@@ -50,30 +50,25 @@ import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class SegmentFactory
-{
+public class SegmentFactory {
 
     private static RepositoryHelper repositoryHelper;
     private static Set<String>      rtbAdaptersNames = new HashSet<String>();
 
-    public static RepositoryHelper getRepositoryHelper()
-    {
+    public static RepositoryHelper getRepositoryHelper() {
         return repositoryHelper;
     }
 
-    public static void setRepositoryHelper(RepositoryHelper repositoryHelper)
-    {
+    public static void setRepositoryHelper(RepositoryHelper repositoryHelper) {
         SegmentFactory.repositoryHelper = repositoryHelper;
     }
 
-    public static void init(RepositoryHelper repositoryHelper, Configuration adapterConfiguration, Logger logger)
-    {
+    public static void init(RepositoryHelper repositoryHelper, Configuration adapterConfiguration, Logger logger) {
         SegmentFactory.repositoryHelper = repositoryHelper;
         SegmentFactory.populateRTBAdapterNames(adapterConfiguration, logger);
     }
 
-    private static void populateRTBAdapterNames(Configuration adapterConfiguration, Logger logger)
-    {
+    private static void populateRTBAdapterNames(Configuration adapterConfiguration, Logger logger) {
         Iterator<String> itr = adapterConfiguration.getKeys();
         while (null != itr && itr.hasNext()) {
             String str = itr.next();
@@ -90,8 +85,7 @@ public class SegmentFactory
     public static AdNetworkInterface getChannel(String advertiserId, String channelId, Configuration config,
             ClientBootstrap clientBootstrap, ClientBootstrap rtbClientBootstrap, HttpRequestHandlerBase base,
             MessageEvent serverEvent, Set<String> advertiserSet, DebugLogger logger, boolean isRtbEnabled,
-            int rtbMaxTimemout, int dst)
-    {
+            int rtbMaxTimemout, int dst) {
         if (isRtbEnabled) {
             for (String partnerName : rtbAdaptersNames) {
                 String advertiserIdString = config.getString(partnerName + ".advertiserId");

@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class SiteTaxonomyEntity implements IdentifiableEntity<String>
-{
+public class SiteTaxonomyEntity implements IdentifiableEntity<String> {
 
     private static final long serialVersionUID = 1L;
 
@@ -16,8 +15,7 @@ public class SiteTaxonomyEntity implements IdentifiableEntity<String>
     private String            name;
     private String            parentId;
 
-    public SiteTaxonomyEntity(String id, String name, String parentId)
-    {
+    public SiteTaxonomyEntity(String id, String name, String parentId) {
         super();
         this.id = id;
         this.name = name;
@@ -25,14 +23,12 @@ public class SiteTaxonomyEntity implements IdentifiableEntity<String>
     }
 
     @Override
-    public String getJSON()
-    {
+    public String getJSON() {
         return null;
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return id;
     }
 

@@ -8,8 +8,7 @@ import com.yammer.metrics.core.Histogram;
 
 
 // Yammer objects for country,os,advertiser
-public class RealTimeStats
-{
+public class RealTimeStats {
 
     private static final String SEP = ".";
     @Getter
@@ -25,26 +24,22 @@ public class RealTimeStats
     @Getter
     private Histogram           chargedBids;      // These are secondBidprices
 
-    public RealTimeStats(String countryName, String osName, String advertiserName)
-    {
+    public RealTimeStats(String countryName, String osName, String advertiserName) {
         String key = countryName + SEP + osName + SEP + advertiserName;
         initializeStats(key);
     }
 
-    public RealTimeStats(String countryName, String osName)
-    {
+    public RealTimeStats(String countryName, String osName) {
         String key = countryName + SEP + osName;
         initializeStats(key);
     }
 
-    public RealTimeStats(String countryName)
-    {
+    public RealTimeStats(String countryName) {
         String key = countryName;
         initializeStats(key);
     }
 
-    private void initializeStats(String key)
-    {
+    private void initializeStats(String key) {
         String fillsKey = key + SEP + "fills";
         String requestsKey = key + SEP + "requests";
         String serverImpressionsKey = key + SEP + "serverImpressions";

@@ -10,8 +10,7 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 @ToString
-public class SegmentAdGroupFeedbackEntity
-{
+public class SegmentAdGroupFeedbackEntity {
     private final Integer                                                  segmentId;
     private final Map<String/* AdgroupId */, ChannelSegmentFeedbackEntity> adGroupFeedbackMap;
 }

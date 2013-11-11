@@ -4,8 +4,7 @@ import java.util.HashMap;
 import org.apache.commons.lang.StringUtils;
 
 
-public class IABCountriesMap implements IABCountriesInterface
-{
+public class IABCountriesMap implements IABCountriesInterface {
 
     private static HashMap<String, String> countriesToIABMapping = new HashMap<String, String>();
 
@@ -262,8 +261,7 @@ public class IABCountriesMap implements IABCountriesInterface
     }
 
     @Override
-    public String getIabCountry(String country)
-    {
+    public String getIabCountry(String country) {
         if (null == country) {
             return null;
         }

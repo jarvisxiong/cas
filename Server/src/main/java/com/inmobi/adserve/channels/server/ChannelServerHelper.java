@@ -6,17 +6,14 @@ import java.net.UnknownHostException;
 import org.apache.log4j.Logger;
 
 
-public class ChannelServerHelper
-{
+public class ChannelServerHelper {
     private Logger logger;
 
-    public ChannelServerHelper(Logger serverLogger)
-    {
+    public ChannelServerHelper(Logger serverLogger) {
         logger = serverLogger;
     }
 
-    public byte getDataCenterId(String dataCenterIdKey)
-    {
+    public byte getDataCenterId(String dataCenterIdKey) {
         byte dataCenterIdCode;
         try {
             dataCenterIdCode = Byte.parseByte(System.getProperty(dataCenterIdKey));
@@ -31,8 +28,7 @@ public class ChannelServerHelper
         return dataCenterIdCode;
     }
 
-    public short getHostId(String hostNameKey)
-    {
+    public short getHostId(String hostNameKey) {
         short hostId = 0;
         String hostName = System.getProperty(hostNameKey);
         if (hostName == null) {
@@ -65,8 +61,7 @@ public class ChannelServerHelper
         return hostId;
     }
 
-    public String getDataCentreName(String key)
-    {
+    public String getDataCentreName(String key) {
         return System.getProperty(key);
     }
 }
