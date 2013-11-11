@@ -4,3 +4,9 @@
 *.jar
 *.war
 *.ear
+/target
+/bin
+/.settings
+/.classpath
+/velocity.log
+/.project

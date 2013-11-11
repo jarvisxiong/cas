@@ -7,58 +7,59 @@ import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
+
 public class ConnectionLimitUpstreamHandler extends SimpleChannelHandler {
 
-  private final AtomicInteger connections = new AtomicInteger(0);
-  private int maxConnections;
-  private int droppedConnections;
-  private DebugLogger logger;
+    private final AtomicInteger connections = new AtomicInteger(0);
+    private int                 maxConnections;
+    private int                 droppedConnections;
+    private DebugLogger         logger;
 
-  public ConnectionLimitUpstreamHandler(int maxConnections) {
-    this.maxConnections = maxConnections;
-    this.droppedConnections = 0;
-    this.logger = new DebugLogger();
-  }
-
-  @Override
-  public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-    if(maxConnections > 0) {
-      int currentCount = connections.getAndIncrement();
-      if(currentCount + 1 > maxConnections) {
-        logger.info("MaxLimit of connections", maxConnections, "exceeded so closing channel");
-        ctx.getChannel().close();
-        droppedConnections++;
-      }
+    public ConnectionLimitUpstreamHandler(int maxConnections) {
+        this.maxConnections = maxConnections;
+        this.droppedConnections = 0;
+        this.logger = new DebugLogger();
     }
 
-    super.channelOpen(ctx, e);
-  }
+    @Override
+    public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+        if (maxConnections > 0) {
+            int currentCount = connections.getAndIncrement();
+            if (currentCount + 1 > maxConnections) {
+                logger.info("MaxLimit of connections", maxConnections, "exceeded so closing channel");
+                ctx.getChannel().close();
+                droppedConnections++;
+            }
+        }
 
-  @Override
-  public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-    if(maxConnections > 0) {
-      connections.decrementAndGet();
+        super.channelOpen(ctx, e);
     }
 
-    super.channelClosed(ctx, e);
-  }
+    @Override
+    public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+        if (maxConnections > 0) {
+            connections.decrementAndGet();
+        }
 
-  public int getActiveOutboundConnections() {
-    return connections.get();
-  }
-
-  public void setMaxConnections(int maxConnection) {
-    if(maxConnection > 0) {
-      maxConnections = maxConnection;
+        super.channelClosed(ctx, e);
     }
-  }
 
-  public int getMaxConnections() {
-    return maxConnections;
-  }
+    public int getActiveOutboundConnections() {
+        return connections.get();
+    }
 
-  public int getDroppedConnections() {
-    return droppedConnections;
-  }
+    public void setMaxConnections(int maxConnection) {
+        if (maxConnection > 0) {
+            maxConnections = maxConnection;
+        }
+    }
+
+    public int getMaxConnections() {
+        return maxConnections;
+    }
+
+    public int getDroppedConnections() {
+        return droppedConnections;
+    }
 
 }
