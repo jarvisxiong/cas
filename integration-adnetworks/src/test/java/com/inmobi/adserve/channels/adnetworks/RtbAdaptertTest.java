@@ -1,9 +1,29 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.isA;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import com.inmobi.adserve.channels.adnetworks.rtb.ImpressionCallbackHelper;
+import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.casthrift.rtb.Bid;
+import com.inmobi.casthrift.rtb.BidRequest;
+import com.inmobi.casthrift.rtb.BidResponse;
+import com.inmobi.casthrift.rtb.SeatBid;
+import junit.framework.TestCase;
+import org.apache.commons.configuration.Configuration;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TSimpleJSONProtocol;
+import org.easymock.EasyMock;
+import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.handler.codec.http.*;
+import org.testng.annotations.Test;
 
 import java.io.File;
 import java.net.URI;
@@ -12,34 +32,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.TestCase;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TSimpleJSONProtocol;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpMethod;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.jboss.netty.handler.codec.http.HttpVersion;
-import org.testng.annotations.Test;
-
-import com.inmobi.adserve.channels.adnetworks.rtb.ImpressionCallbackHelper;
-import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.casthrift.rtb.Bid;
-import com.inmobi.casthrift.rtb.BidRequest;
-import com.inmobi.casthrift.rtb.BidResponse;
-import com.inmobi.casthrift.rtb.SeatBid;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.isA;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 
 public class RtbAdaptertTest extends TestCase {
@@ -88,7 +84,16 @@ public class RtbAdaptertTest extends TestCase {
         sasParams.setSource("app");
         logger = new DebugLogger();
         String urlBase = "";
-        rtbAdNetwork = new RtbAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent, urlBase, "rtb", 200);
+        CurrencyConversionEntity currencyConversionEntity = EasyMock.createMock(CurrencyConversionEntity.class);
+        EasyMock.expect(currencyConversionEntity.getConversionRate()).andReturn(10.0).anyTimes();
+        EasyMock.replay(currencyConversionEntity);
+        RepositoryHelper repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
+        EasyMock.expect(repositoryHelper.queryCurrencyConversionRepository(EasyMock.isA(String.class)))
+                    .andReturn(currencyConversionEntity)
+                    .anyTimes();
+        EasyMock.replay(repositoryHelper);
+        rtbAdNetwork = new RtbAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent, urlBase, "rtb", 200,
+                repositoryHelper);
         Bid bid2 = new Bid();
         bid2.id = "ab73dd4868a0bbadf8fd7527d95136b4";
         bid2.adid = "1335571993285";
@@ -172,7 +177,7 @@ public class RtbAdaptertTest extends TestCase {
         assertEquals(responseAdm.toString(), rtbAdNetwork.responseContent);
         rtbAdNetwork.setSecondBidPrice(0.23);
         rtbAdNetwork.setEncryptedBid("abc");
-        String afterMacros = rtbAdNetwork.replaceRTBMacros(responseAdm.toString(), 2);
+        String afterMacros = rtbAdNetwork.replaceRTBMacros(responseAdm.toString());
         assertEquals(afterMacros, rtbAdNetwork.responseContent);
         rtbAdNetwork.parseResponse(str.toString(), HttpResponseStatus.NOT_FOUND);
         assertEquals("", rtbAdNetwork.responseContent);
@@ -252,7 +257,7 @@ public class RtbAdaptertTest extends TestCase {
             0.0d, null, null, 32));
         rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
         rtbAdNetwork.setCallbackUrl("http://rtb:8970/${AUCTION_ID}/${AUCTION_BID_ID}");
-        rtbAdNetwork.setCallbackUrl(rtbAdNetwork.replaceRTBMacros(rtbAdNetwork.getCallbackUrl(), 2));
+        rtbAdNetwork.setCallbackUrl(rtbAdNetwork.replaceRTBMacros(rtbAdNetwork.getCallbackUrl()));
         assertEquals("http://rtb:8970/SGu1Jpq1IO/ac1a2c944cff0a176643079625b0cad4a1bbe4a3",
             rtbAdNetwork.getCallbackUrl());
     }
@@ -275,7 +280,7 @@ public class RtbAdaptertTest extends TestCase {
         rtbAdNetwork
                 .setCallbackUrl("http://rtb:8970/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_IMP_ID}/${AUCTION_SEAT_ID}/${AUCTION_AD_ID}/${AUCTION_PRICE}/${AUCTION_CURRENCY}");
         rtbAdNetwork.setEncryptedBid("abc");
-        rtbAdNetwork.setCallbackUrl(rtbAdNetwork.replaceRTBMacros(rtbAdNetwork.getCallbackUrl(), 2));
+        rtbAdNetwork.setCallbackUrl(rtbAdNetwork.replaceRTBMacros(rtbAdNetwork.getCallbackUrl()));
         assertEquals(
             "http://rtb:8970/SGu1Jpq1IO/ac1a2c944cff0a176643079625b0cad4a1bbe4a3/4f8d98e2-4bbd-40bc-8795-22da170700f9/TO-BE-DETERMINED/1335571993285/0.0/USD",
             rtbAdNetwork.getCallbackUrl());
@@ -304,7 +309,7 @@ public class RtbAdaptertTest extends TestCase {
         rtbAdNetwork.parseResponse(serializer.toString(bidResponse), HttpResponseStatus.OK);
         assertEquals(responseAdm.toString(), rtbAdNetwork.responseContent);
         rtbAdNetwork.setSecondBidPrice(0.23);
-        String afterMacros = rtbAdNetwork.replaceRTBMacros(responseAdm.toString(), 2);
+        String afterMacros = rtbAdNetwork.replaceRTBMacros(responseAdm.toString());
         assertEquals(afterMacros, rtbAdNetwork.responseContent);
         rtbAdNetwork.parseResponse(str.toString(), HttpResponseStatus.NOT_FOUND);
         assertEquals("", rtbAdNetwork.responseContent);

@@ -98,14 +98,14 @@ public class AuctionEngineTest
         thirdPartyAdResponse.adStatus = "AD";
         expect(mockAdnetworkInterface.getAdStatus()).andReturn("AD").anyTimes();
         expect(mockAdnetworkInterface.getResponseStruct()).andReturn(thirdPartyAdResponse).anyTimes();
-        expect(mockAdnetworkInterface.getSecondBidPrice()).andReturn(4d).anyTimes();
+        expect(mockAdnetworkInterface.getSecondBidPriceInUsd()).andReturn(4d).anyTimes();
         expect(mockAdnetworkInterface.getName()).andReturn(adNetworkName).anyTimes();
         expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
         expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("DummyResponsecontent").anyTimes();
         expect(mockAdnetworkInterface.getConnectionLatency()).andReturn(2l).anyTimes();
         expect(mockAdnetworkInterface.getId()).andReturn("2").anyTimes();
         expect(mockAdnetworkInterface.getLatency()).andReturn(latencyValue).anyTimes();
-        expect(mockAdnetworkInterface.getBidprice()).andReturn(bidValue).anyTimes();
+        expect(mockAdnetworkInterface.getBidPriceInUsd()).andReturn(bidValue).anyTimes();
         expect(mockAdnetworkInterface.isRtbPartner()).andReturn(true).anyTimes();
         expect(mockAdnetworkInterface.getAuctionId()).andReturn("auctionId").anyTimes();
         expect(mockAdnetworkInterface.getRtbImpressionId()).andReturn("impressionId").anyTimes();
@@ -213,7 +213,7 @@ public class AuctionEngineTest
 
         Assert.assertEquals(secondPrice1.getValue(), expectedSecondPriceVal);
         Assert.assertEquals(auctionEngineResponse.getName(), expectedRTBAdNetworkName);
-        Assert.assertEquals(auctionEngineResponse.getBidprice(), expectedWinnerBid);
+        Assert.assertEquals(auctionEngineResponse.getBidPriceInUsd(), expectedWinnerBid);
 
     }
 
@@ -318,7 +318,7 @@ public class AuctionEngineTest
 
         Assert.assertEquals(secondPrice1.getValue(), expectedSecondPriceVal);
         Assert.assertEquals(auctionEngineResponse.getName(), expectedRTBAdNetworkName);
-        Assert.assertEquals(auctionEngineResponse.getBidprice(), expectedWinnerBid);
+        Assert.assertEquals(auctionEngineResponse.getBidPriceInUsd(), expectedWinnerBid);
 
     }
 
@@ -350,7 +350,7 @@ public class AuctionEngineTest
 
         Assert.assertEquals(secondPrice1.getValue(), expectedSecondPriceVal);
         Assert.assertEquals(auctionEngineResponse.getName(), expectedRTBAdNetworkName);
-        Assert.assertEquals(auctionEngineResponse.getBidprice(), expectedWinnerBid);
+        Assert.assertEquals(auctionEngineResponse.getBidPriceInUsd(), expectedWinnerBid);
 
     }
 
@@ -425,7 +425,7 @@ public class AuctionEngineTest
 
         Assert.assertEquals(secondPrice1.getValue(), expectedSecondPriceVal);
         Assert.assertEquals(auctionEngineResponse.getName(), expectedRTBAdNetworkName);
-        Assert.assertEquals(auctionEngineResponse.getBidprice(), expectedWinnerBid);
+        Assert.assertEquals(auctionEngineResponse.getBidPriceInUsd(), expectedWinnerBid);
 
     }
 

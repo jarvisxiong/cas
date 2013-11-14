@@ -1,23 +1,11 @@
 package com.inmobi.adserve.channels.server;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
-import javax.security.sasl.Sasl;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-
+import com.inmobi.adserve.channels.adnetworks.adelphic.DCPAdelphicAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.ajillion.DCPAjillionAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.amobee.DCPAmobeeAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.appier.DCPAppierAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.appnexus.DCPAppNexusAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.atnt.ATNTAdNetwork;
-import com.inmobi.adserve.channels.adnetworks.adelphic.DCPAdelphicAdNetwork;
-import com.inmobi.adserve.channels.adnetworks.ajillion.DCPAjillionAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.drawbridge.DrawBridgeAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.httpool.DCPHttPoolAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.huntmads.DCPHuntmadsAdNetwork;
@@ -48,6 +36,15 @@ import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.DebugLogger;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.channel.MessageEvent;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 
 public class SegmentFactory {
@@ -85,7 +82,7 @@ public class SegmentFactory {
     public static AdNetworkInterface getChannel(String advertiserId, String channelId, Configuration config,
             ClientBootstrap clientBootstrap, ClientBootstrap rtbClientBootstrap, HttpRequestHandlerBase base,
             MessageEvent serverEvent, Set<String> advertiserSet, DebugLogger logger, boolean isRtbEnabled,
-            int rtbMaxTimemout, int dst) {
+            int rtbMaxTimemout, int dst, RepositoryHelper repositoryHelper) {
         if (isRtbEnabled) {
             for (String partnerName : rtbAdaptersNames) {
                 String advertiserIdString = config.getString(partnerName + ".advertiserId");
@@ -114,7 +111,7 @@ public class SegmentFactory {
                     }
                     logger.debug("dcname is ", dcname, "and urlBase is " + urlBase);
                     RtbAdNetwork rtbAdNetwork = new RtbAdNetwork(logger, config, rtbClientBootstrap, base, serverEvent,
-                            urlBase, partnerName, rtbMaxTimemout);
+                            urlBase, partnerName, rtbMaxTimemout, repositoryHelper);
                     logger.debug("Created RTB adapter instance for advertiser id : " + advertiserId);
                     return rtbAdNetwork;
                 }

@@ -1,20 +1,16 @@
 package com.inmobi.adserve.channels.adnetworks.rtb;
 
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-
+import com.google.gson.Gson;
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.util.*;
+import com.inmobi.casthrift.rtb.*;
 import lombok.Getter;
 import lombok.Setter;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TException;
@@ -25,41 +21,16 @@ import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpMethod;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.jboss.netty.handler.codec.http.HttpVersion;
+import org.jboss.netty.handler.codec.http.*;
 import org.jboss.netty.util.CharsetUtil;
 
-import com.google.gson.Gson;
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.adserve.channels.util.IABCategoriesInterface;
-import com.inmobi.adserve.channels.util.IABCategoriesMap;
-import com.inmobi.adserve.channels.util.IABCitiesInterface;
-import com.inmobi.adserve.channels.util.IABCitiesMap;
-import com.inmobi.adserve.channels.util.IABCountriesInterface;
-import com.inmobi.adserve.channels.util.IABCountriesMap;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.inmobi.casthrift.rtb.App;
-import com.inmobi.casthrift.rtb.Banner;
-import com.inmobi.casthrift.rtb.Bid;
-import com.inmobi.casthrift.rtb.BidRequest;
-import com.inmobi.casthrift.rtb.BidResponse;
-import com.inmobi.casthrift.rtb.Device;
-import com.inmobi.casthrift.rtb.Geo;
-import com.inmobi.casthrift.rtb.Impression;
-import com.inmobi.casthrift.rtb.SeatBid;
-import com.inmobi.casthrift.rtb.Site;
-import com.inmobi.casthrift.rtb.User;
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.util.*;
+import java.util.List;
+import java.util.regex.Pattern;
 
 
 /**
@@ -85,7 +56,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Setter
     private String                         callbackUrl;
     @Setter
-    private double                         bidprice;
+    private double                         bidPriceInUsd;
+    @Setter
+    private double                         bidPriceInLocal;
     @Getter
     @Setter
     BidRequest                             bidRequest;
@@ -100,7 +73,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private static final String            DISPLAY_MANAGER_INMOBI_SDK   = "inmobi_sdk";
     private static final String            DISPLAY_MANAGER_INMOBI_JS    = "inmobi_js";
     private final DebugLogger              logger;
-    private final String[]                 currenciesSupported          = { "USD" };
+    // All currencies supported in the auction
+    private final String[]                 currenciesSupported          = {};
     private String                         advertiserId;
     public static ImpressionCallbackHelper impressionCallbackHelper;
     private IABCategoriesInterface         iabCategoriesInterface;
@@ -108,8 +82,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private IABCitiesInterface             iabCitiesInterface;
     private boolean                        siteBlinded;
     private String                         advertiserName;
-    private Configuration                  config;
-    private double                         secondBidPrice               = 0;
+    private double                         secondBidPriceInUsd          = 0;
+    private double                         secondBidPriceInLocal        = 0;
     private String                         bidRequestJson               = "";
     protected static final String          mraid                        = "<script src=\"mraid.js\" ></script>";
     private String                         encryptedBid;
@@ -122,20 +96,22 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private String                         responseSeatId;
     private String                         responseImpressionId;
     private String                         responseAuctionId;
+    private RepositoryHelper               repositoryHelper;
+    private String                         bidderCurrency               = "USD";
+    private static final String            USD                          = "USD";
 
     public RtbAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
             HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent, String urlBase, String advertiserName,
-            int tmax) {
+            int tmax, RepositoryHelper repositoryHelper) {
 
         super(baseRequestHandler, serverEvent, logger);
-        this.config = config;
-        this.advertiserId = this.config.getString(advertiserName + ".advertiserId");
-        this.urlArg = this.config.getString(advertiserName + ".urlArg");
-        this.rtbVer = this.config.getString(advertiserName + ".rtbVer", "2.0");
-        this.callbackUrl = this.config.getString(advertiserName + ".wnUrlback");
-        this.rtbMethod = this.config.getString(advertiserName + ".rtbMethod");
-        this.wnRequired = this.config.getBoolean(advertiserName + ".isWnRequired");
-        this.siteBlinded = this.config.getBoolean(advertiserName + ".siteBlinded");
+        this.advertiserId = config.getString(advertiserName + ".advertiserId");
+        this.urlArg = config.getString(advertiserName + ".urlArg");
+        this.rtbVer = config.getString(advertiserName + ".rtbVer", "2.0");
+        this.callbackUrl = config.getString(advertiserName + ".wnUrlback");
+        this.rtbMethod = config.getString(advertiserName + ".rtbMethod");
+        this.wnRequired = config.getBoolean(advertiserName + ".isWnRequired");
+        this.siteBlinded = config.getBoolean(advertiserName + ".siteBlinded");
         this.logger = logger;
         this.clientBootstrap = clientBootstrap;
         this.urlBase = urlBase;
@@ -145,6 +121,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         this.iabCountriesInterface = new IABCountriesMap();
         this.advertiserName = advertiserName;
         this.tmax = tmax;
+        this.repositoryHelper = repositoryHelper;
     }
 
     @Override
@@ -282,7 +259,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             return null;
         }
         impression.setBanner(banner);
-        impression.setBidfloorcur("USD");
+        impression.setBidfloorcur(USD);
         // Set interstitial or not
         if (null != sasParams.getRqAdType() && "int".equalsIgnoreCase(sasParams.getRqAdType())) {
             impression.setInstl(1);
@@ -305,7 +282,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     private Banner createBannerObject() {
         Banner banner = new Banner();
-        ;
         banner.setId(casInternalRequestParameters.impressionId);
         if (!StringUtils.isBlank(sasParams.getSlot())
                 && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
@@ -467,7 +443,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Override
     public void impressionCallback() {
         URI uriCallBack = null;
-        this.callbackUrl = replaceRTBMacros(this.callbackUrl, 2);
+        this.callbackUrl = replaceRTBMacros(this.callbackUrl);
         logger.debug("Callback url is : ", callbackUrl);
         try {
             uriCallBack = new URI(callbackUrl);
@@ -511,16 +487,16 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         content.append(",\"bid\"=")
                     .append(bidResponse.seatbid.get(0).bid.get(0).id)
                     .append(",\"price\"=")
-                    .append(secondBidPrice)
+                    .append(secondBidPriceInUsd)
                     .append(",\"adid\"=")
                     .append(bidResponse.seatbid.get(0).bid.get(0).adid)
                     .append("}");
     }
 
-    public String replaceRTBMacros(String url, int dst) {
+    public String replaceRTBMacros(String url) {
         url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_ID), bidResponse.id);
         url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_BID_ID), bidResponse.bidid);
-        url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_CURRENCY), bidResponse.cur);
+        url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_CURRENCY), bidderCurrency);
         url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_AD_ID), bidResponse
                 .getSeatbid()
                     .get(0)
@@ -542,7 +518,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (6 != sasParams.getDst()) {
             url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_PRICE_ENCRYPTED), encryptedBid);
             url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_PRICE),
-                Double.toString(secondBidPrice));
+                Double.toString(secondBidPriceInLocal));
         }
         logger.debug("String after replacemacros is ", url);
         return url;
@@ -585,7 +561,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     public URI getRequestUri() {
-        StringBuilder url = null;
+        StringBuilder url;
         url = new StringBuilder();
         if (rtbMethod.equalsIgnoreCase("get")) {
             url.append(urlBase).append('?').append(urlArg).append('=');
@@ -610,7 +586,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         else {
             statusCode = status.getCode();
-            boolean parsedResponse = deserializeReponse(response);
+            boolean parsedResponse = deserializeResponse(response);
             if (!parsedResponse) {
                 adStatus = "NO_AD";
                 responseContent = "";
@@ -669,7 +645,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         logger.debug("response length is ", responseContent.length());
     }
 
-    public boolean deserializeReponse(String response) {
+    public boolean deserializeResponse(String response) {
         Gson gson = new Gson();
         try {
             bidResponse = gson.fromJson(response, BidResponse.class);
@@ -678,7 +654,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 logger.debug("BidResponse does not have seat bid object");
                 return false;
             }
-            setBidprice(bidResponse.getSeatbid().get(0).getBid().get(0).getPrice());
+            if (!StringUtils.isEmpty(bidResponse.getCur())) {
+                bidderCurrency = bidResponse.getCur();
+            }
+            setBidPriceInLocal(bidResponse.getSeatbid().get(0).getBid().get(0).getPrice());
+            setBidPriceInUsd(calculatePriceInUSD(getBidPriceInLocal(), bidderCurrency));
             responseSeatId = bidResponse.getSeatbid().get(0).getSeat();
             responseImpressionId = bidResponse.getSeatbid().get(0).getBid().get(0).getImpid();
             responseAuctionId = bidResponse.getId();
@@ -690,14 +670,40 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
     }
 
+    private double calculatePriceInUSD(double price, String currencyCode) {
+        if (StringUtils.isEmpty(currencyCode)) {
+            currencyCode = USD;
+        }
+        if (USD.equalsIgnoreCase(currencyCode)) {
+            return price;
+        }
+        else {
+            CurrencyConversionEntity currencyConversionEntity = repositoryHelper
+                    .queryCurrencyConversionRepository(currencyCode);
+            if (null != currencyConversionEntity && null != currencyConversionEntity.getConversionRate()) {
+                return price / currencyConversionEntity.getConversionRate();
+            }
+        }
+        return price;
+    }
+
+    private double calculatePriceInLocal(double price) {
+        CurrencyConversionEntity currencyConversionEntity = repositoryHelper
+                .queryCurrencyConversionRepository(bidderCurrency);
+        if (null != currencyConversionEntity && null != currencyConversionEntity.getConversionRate()) {
+            return price * currencyConversionEntity.getConversionRate();
+        }
+        return price;
+    }
+
     @Override
     public String getId() {
         return advertiserId;
     }
 
     @Override
-    public double getBidprice() {
-        return bidprice;
+    public double getBidPriceInUsd() {
+        return bidPriceInUsd;
     }
 
     @Override
@@ -707,18 +713,18 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     @Override
     public void setSecondBidPrice(Double price) {
-        this.secondBidPrice = price;
+        this.secondBidPriceInUsd = price;
+        this.secondBidPriceInLocal = calculatePriceInLocal(price);
         logger.debug("responseContent before replaceMacros is", responseContent);
-        this.responseContent = replaceRTBMacros(this.responseContent, sasParams.getDst());
+        this.responseContent = replaceRTBMacros(this.responseContent);
         ThirdPartyAdResponse adResponse = getResponseAd();
         adResponse.response = responseContent;
         logger.debug("responseContent after replaceMacros is", getResponseAd().response);
-        return;
     }
 
     @Override
-    public double getSecondBidPrice() {
-        return secondBidPrice;
+    public double getSecondBidPriceInUsd() {
+        return secondBidPriceInUsd;
     }
 
     @Override

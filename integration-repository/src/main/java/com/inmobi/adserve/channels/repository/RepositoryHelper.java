@@ -1,5 +1,8 @@
 package com.inmobi.adserve.channels.repository;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import com.google.common.base.Preconditions;
 import com.inmobi.adserve.channels.entity.*;
 import com.inmobi.adserve.channels.query.PricingEngineQuery;
@@ -7,8 +10,6 @@ import com.inmobi.adserve.channels.query.PublisherFilterQuery;
 import com.inmobi.adserve.channels.query.SiteEcpmQuery;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.phoenix.exception.RepositoryException;
-import lombok.Getter;
-import lombok.Setter;
 
 
 @Getter
@@ -23,6 +24,7 @@ public class RepositoryHelper {
     private final PricingEngineRepository          pricingEngineRepository;
     private final PublisherFilterRepository        publisherFilterRepository;
     private final SiteEcpmRepository               siteEcpmRepository;
+    private final CurrencyConversionRepository     currencyConversionRepository;
     private final RepositoryStatsProvider          repositoryStatsProvider;
 
     public RepositoryHelper(Builder builder) {
@@ -36,6 +38,7 @@ public class RepositoryHelper {
         this.pricingEngineRepository = builder.pricingEngineRepository;
         this.publisherFilterRepository = builder.publisherFilterRepository;
         this.siteEcpmRepository = builder.siteEcpmRepository;
+        this.currencyConversionRepository = builder.currencyConversionRepository;
         this.repositoryStatsProvider = new RepositoryStatsProvider();
         this.repositoryStatsProvider
                 .addRepositoryToStats(this.channelRepository)
@@ -46,7 +49,8 @@ public class RepositoryHelper {
                     .addRepositoryToStats(this.siteTaxonomyRepository)
                     .addRepositoryToStats(this.pricingEngineRepository)
                     .addRepositoryToStats(this.publisherFilterRepository)
-                    .addRepositoryToStats(this.siteEcpmRepository);
+                    .addRepositoryToStats(this.siteEcpmRepository)
+                    .addRepositoryToStats(this.currencyConversionRepository);
     }
 
     public static Builder newBuilder() {
@@ -65,6 +69,7 @@ public class RepositoryHelper {
         private PricingEngineRepository          pricingEngineRepository;
         private PublisherFilterRepository        publisherFilterRepository;
         private SiteEcpmRepository               siteEcpmRepository;
+        private CurrencyConversionRepository     currencyConversionRepository;
 
         public RepositoryHelper build() {
             Preconditions.checkNotNull(channelRepository);
@@ -77,6 +82,7 @@ public class RepositoryHelper {
             Preconditions.checkNotNull(pricingEngineRepository);
             Preconditions.checkNotNull(publisherFilterRepository);
             Preconditions.checkNotNull(siteEcpmRepository);
+            Preconditions.checkNotNull(currencyConversionRepository);
             return new RepositoryHelper(this);
         }
     }
@@ -165,6 +171,15 @@ public class RepositoryHelper {
     public SiteEcpmEntity querySiteEcpmRepository(String siteId, Integer countryId, Integer osId) {
         try {
             return siteEcpmRepository.query(new SiteEcpmQuery(siteId, countryId, osId));
+        }
+        catch (RepositoryException ignored) {
+        }
+        return null;
+    }
+
+    public CurrencyConversionEntity queryCurrencyConversionRepository(String countryId) {
+        try {
+            return currencyConversionRepository.query(countryId);
         }
         catch (RepositoryException ignored) {
         }
