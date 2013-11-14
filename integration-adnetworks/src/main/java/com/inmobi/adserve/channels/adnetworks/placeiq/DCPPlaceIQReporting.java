@@ -21,28 +21,31 @@ import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPPlaceIQReporting extends BaseReportingImpl {
+public class DCPPlaceIQReporting extends BaseReportingImpl
+{
 
-    private final Configuration config;
-    private DebugLogger         logger;
-    private String              startDate         = "";
-    private String              endDate           = "";
-    private String              accessKey         = "";
-    private String              secretKey         = "";
-    private String              bucketName        = "";
-    private static String       entireReportData  = null;
-    private String              externalSiteId    = null;
-    private SimpleDateFormat    placeiqDateFormat = new SimpleDateFormat("MM/dd/yy");
-    private SimpleDateFormat    dateFormat        = new SimpleDateFormat("yyyy-MM-dd");
+    private final Configuration    config;
+    private DebugLogger            logger;
+    private String                 startDate         = "";
+    private String                 endDate           = "";
+    private String                 accessKey         = "";
+    private String                 secretKey         = "";
+    private String                 bucketName        = "";
+    private static String          entireReportData  = null;
+    private String                 externalSiteId    = null;
+    private final SimpleDateFormat placeiqDateFormat = new SimpleDateFormat("MM/dd/yy");
+    private final SimpleDateFormat dateFormat        = new SimpleDateFormat("yyyy-MM-dd");
 
-    public DCPPlaceIQReporting(final Configuration config) {
+    public DCPPlaceIQReporting(final Configuration config)
+    {
         this.config = config;
         accessKey = config.getString("placeiq.accessKey");
         secretKey = config.getString("placeiq.secretKey");
         bucketName = config.getString("placeiq.bucketName");
     }
 
-    public String getEndDate() throws Exception {
+    public String getEndDate() throws Exception
+    {
         try {
             logger.debug("calculating latest date for PlaceIQ");
             ReportTime reportTime = ReportTime.getUTCTime();
@@ -59,39 +62,46 @@ public class DCPPlaceIQReporting extends BaseReportingImpl {
     }
 
     @Override
-    public String getRequestUrl() {
+    public String getRequestUrl()
+    {
 
         return null;
     }
 
     @Override
-    public double getTimeZone() {
+    public double getTimeZone()
+    {
         return 0;
     }
 
     @Override
-    public ReportGranularity getReportGranularity() {
+    public ReportGranularity getReportGranularity()
+    {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public int ReportReconcilerWindow() {
+    public int ReportReconcilerWindow()
+    {
         return 23;
     }
 
     @Override
-    public String getName() {
+    public String getName()
+    {
         return "PlaceIQ";
     }
 
     @Override
-    public String getAdvertiserId() {
+    public String getAdvertiserId()
+    {
         return (config.getString("placeiq.advertiserId"));
     }
 
     @Override
-    public ReportResponse fetchRows(DebugLogger logger, ReportTime startTime, String key, ReportTime endTime)
-            throws Exception {
+    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
+            final ReportTime endTime) throws Exception
+    {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         logger.debug("inside fetch rows of PlaceIQ");
@@ -136,6 +146,7 @@ public class DCPPlaceIQReporting extends BaseReportingImpl {
             }
             entireReportData = responseBuilder.toString();
             entireReportData = entireReportData.replace('$', ' ');
+            entireReportData = entireReportData.replaceAll("$-", "$0.00");
 
             reportResponse.status = ReportResponse.ResponseStatus.SUCCESS;
 
@@ -153,8 +164,9 @@ public class DCPPlaceIQReporting extends BaseReportingImpl {
         return reportResponse;
     }
 
-    private void generateReportResponse(final DebugLogger logger, ReportResponse reportResponse, String[] responseArray)
-            throws ParseException {
+    private void generateReportResponse(final DebugLogger logger, final ReportResponse reportResponse,
+            final String[] responseArray) throws ParseException
+    {
         if (responseArray.length > 1) {
             int impressionIndex = -1;
             int clicksIndex = -1;
@@ -196,8 +208,9 @@ public class DCPPlaceIQReporting extends BaseReportingImpl {
             for (int j = 1; j < responseArray.length; j++) {
 
                 String[] reportRow = responseArray[j].split(",");
-                if (reportRow.length == 0 || StringUtils.isBlank(reportRow[externalSiteIdIndex]))
+                if (reportRow.length == 0 || StringUtils.isBlank(reportRow[externalSiteIdIndex])) {
                     continue;
+                }
                 String extSiteId = reportRow[externalSiteIdIndex].split("/")[0];
                 Date reportingDate = placeiqDateFormat.parse(reportRow[dateIndex]);
                 ReportTime rowDate = new ReportTime(dateFormat.format(reportingDate), 0);
@@ -251,7 +264,8 @@ public class DCPPlaceIQReporting extends BaseReportingImpl {
     }
 
     // Combining the comma separated value within '"'
-    private String[] cleanUpEntry(String[] reportEntry) {
+    private String[] cleanUpEntry(final String[] reportEntry)
+    {
         boolean isNewEntry = true;
         int pos = 0;
         String[] newVal = new String[15];
