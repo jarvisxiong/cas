@@ -1,16 +1,16 @@
 package com.inmobi.adserve.channels.adnetworks.rtb;
 
-import java.awt.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.util.*;
-import java.util.List;
-import java.util.regex.Pattern;
-
+import com.google.gson.Gson;
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.util.*;
+import com.inmobi.casthrift.rtb.*;
 import lombok.Getter;
 import lombok.Setter;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TException;
@@ -24,15 +24,13 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.*;
 import org.jboss.netty.util.CharsetUtil;
 
-import com.google.gson.Gson;
-import com.inmobi.adserve.channels.api.*;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.util.*;
-import com.inmobi.casthrift.rtb.*;
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.util.*;
+import java.util.List;
+import java.util.regex.Pattern;
 
 
 /**
@@ -495,22 +493,24 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     public String replaceRTBMacros(String url) {
         url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_ID), bidResponse.id);
-        url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_BID_ID), bidResponse.bidid);
         url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_CURRENCY), bidderCurrency);
-        url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_AD_ID), bidResponse
-                .getSeatbid()
-                    .get(0)
-                    .getBid()
-                    .get(0)
-                    .getAdid());
-        url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_SEAT_ID), bidResponse
-                .getSeatbid()
-                    .get(0)
-                    .getSeat());
         if (6 != sasParams.getDst()) {
             url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_PRICE_ENCRYPTED), encryptedBid);
             url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_PRICE),
                 Double.toString(secondBidPriceInLocal));
+        }
+        if (null != bidResponse.getSeatbid().get(0).getBid().get(0).getAdid()) {
+            url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_AD_ID),
+                bidResponse.getSeatbid().get(0).getBid().get(0).getAdid());
+        }
+        if (null != bidResponse.bidid) {
+            url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_BID_ID), bidResponse.bidid);
+        }
+        if (null != bidResponse.getSeatbid().get(0).getSeat()) {
+            url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_SEAT_ID), bidResponse
+                    .getSeatbid()
+                        .get(0)
+                        .getSeat());
         }
         if (null == bidRequest) {
             logger.info("bidrequest is null");
