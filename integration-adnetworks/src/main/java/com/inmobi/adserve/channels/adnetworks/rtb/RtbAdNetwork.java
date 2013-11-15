@@ -55,6 +55,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Getter
     @Setter
     private String                         callbackUrl;
+    @Getter
     @Setter
     private double                         bidPriceInUsd;
     @Setter
@@ -73,8 +74,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private static final String            DISPLAY_MANAGER_INMOBI_SDK   = "inmobi_sdk";
     private static final String            DISPLAY_MANAGER_INMOBI_JS    = "inmobi_js";
     private final DebugLogger              logger;
-    // All currencies supported in the auction
-    private final String[]                 currenciesSupported          = {};
     private String                         advertiserId;
     public static ImpressionCallbackHelper impressionCallbackHelper;
     private IABCategoriesInterface         iabCategoriesInterface;
@@ -82,10 +81,13 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private IABCitiesInterface             iabCitiesInterface;
     private boolean                        siteBlinded;
     private String                         advertiserName;
+    @Getter
     private double                         secondBidPriceInUsd          = 0;
+    @Getter
     private double                         secondBidPriceInLocal        = 0;
     private String                         bidRequestJson               = "";
     protected static final String          mraid                        = "<script src=\"mraid.js\" ></script>";
+    @Setter
     private String                         encryptedBid;
     private static List<String>            mimes                        = Arrays.asList("image/jpeg", "image/gif",
                                                                             "image/png");
@@ -188,7 +190,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         bidRequest = new BidRequest(casInternalRequestParameters.auctionId, impresssionlist);
         bidRequest.setTmax(tmax);
         bidRequest.setAt(auctionType);
-        bidRequest.setCur(Arrays.asList(currenciesSupported));
+        bidRequest.setCur(Collections.<String> emptyList());
         if (casInternalRequestParameters != null) {
             logger.debug("blockedCategories are", casInternalRequestParameters.blockedCategories);
             logger.debug("blockedAdvertisers are", casInternalRequestParameters.blockedAdvertisers);
@@ -507,6 +509,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 .getSeatbid()
                     .get(0)
                     .getSeat());
+        if (6 != sasParams.getDst()) {
+            url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_PRICE_ENCRYPTED), encryptedBid);
+            url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_PRICE),
+                Double.toString(secondBidPriceInLocal));
+        }
         if (null == bidRequest) {
             logger.info("bidrequest is null");
             return url;
@@ -515,12 +522,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 .getImp()
                     .get(0)
                     .getId());
-        if (6 != sasParams.getDst()) {
-            url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_PRICE_ENCRYPTED), encryptedBid);
-            url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_PRICE),
-                Double.toString(secondBidPriceInLocal));
-        }
-        logger.debug("String after replacemacros is ", url);
+        logger.debug("String after replaceMacros is ", url);
         return url;
     }
 
@@ -680,7 +682,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         else {
             CurrencyConversionEntity currencyConversionEntity = repositoryHelper
                     .queryCurrencyConversionRepository(currencyCode);
-            if (null != currencyConversionEntity && null != currencyConversionEntity.getConversionRate()) {
+            if (null != currencyConversionEntity && null != currencyConversionEntity.getConversionRate()
+                    && currencyConversionEntity.getConversionRate() > 0.0) {
                 return price / currencyConversionEntity.getConversionRate();
             }
         }
@@ -688,6 +691,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     private double calculatePriceInLocal(double price) {
+        if (USD.equalsIgnoreCase(bidderCurrency)) {
+            return price;
+        }
         CurrencyConversionEntity currencyConversionEntity = repositoryHelper
                 .queryCurrencyConversionRepository(bidderCurrency);
         if (null != currencyConversionEntity && null != currencyConversionEntity.getConversionRate()) {
@@ -699,11 +705,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Override
     public String getId() {
         return advertiserId;
-    }
-
-    @Override
-    public double getBidPriceInUsd() {
-        return bidPriceInUsd;
     }
 
     @Override
@@ -720,16 +721,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         ThirdPartyAdResponse adResponse = getResponseAd();
         adResponse.response = responseContent;
         logger.debug("responseContent after replaceMacros is", getResponseAd().response);
-    }
-
-    @Override
-    public double getSecondBidPriceInUsd() {
-        return secondBidPriceInUsd;
-    }
-
-    @Override
-    public void setEncryptedBid(String encryptedBid) {
-        this.encryptedBid = encryptedBid;
     }
 
     @Override

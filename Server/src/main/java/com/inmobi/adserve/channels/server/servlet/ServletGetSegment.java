@@ -98,7 +98,8 @@ public class ServletGetSegment implements Servlet {
                 entity = ServletHandler.repositoryHelper.querySiteEcpmRepository(id.split("_")[0],
                     Integer.parseInt(id.split("_")[1]), Integer.parseInt(id.split("_")[2]));
             }
-            else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY)) {
+            else if (repoName != null
+                    && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY)) {
                 entity = ServletHandler.repositoryHelper.queryCurrencyConversionRepository(id.split("_")[0]);
             }
             segmentInfo.put(key, entity);
