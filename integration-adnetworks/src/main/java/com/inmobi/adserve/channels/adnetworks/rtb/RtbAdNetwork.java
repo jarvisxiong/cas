@@ -1,16 +1,16 @@
 package com.inmobi.adserve.channels.adnetworks.rtb;
 
-import com.google.gson.Gson;
-import com.inmobi.adserve.channels.api.*;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.util.*;
-import com.inmobi.casthrift.rtb.*;
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.util.*;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import lombok.Getter;
 import lombok.Setter;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TException;
@@ -24,13 +24,15 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.*;
 import org.jboss.netty.util.CharsetUtil;
 
-import java.awt.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.util.*;
-import java.util.List;
-import java.util.regex.Pattern;
+import com.google.gson.Gson;
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.util.*;
+import com.inmobi.casthrift.rtb.*;
 
 
 /**
@@ -55,7 +57,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Getter
     @Setter
     private String                         callbackUrl;
-    @Getter
     @Setter
     private double                         bidPriceInUsd;
     @Setter
@@ -81,13 +82,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private IABCitiesInterface             iabCitiesInterface;
     private boolean                        siteBlinded;
     private String                         advertiserName;
-    @Getter
     private double                         secondBidPriceInUsd          = 0;
-    @Getter
     private double                         secondBidPriceInLocal        = 0;
     private String                         bidRequestJson               = "";
     protected static final String          mraid                        = "<script src=\"mraid.js\" ></script>";
-    @Setter
     private String                         encryptedBid;
     private static List<String>            mimes                        = Arrays.asList("image/jpeg", "image/gif",
                                                                             "image/png");
@@ -736,5 +734,30 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Override
     public String getSeatId() {
         return responseSeatId;
+    }
+
+    @Override
+    public void setEncryptedBid(String encryptedBid) {
+        this.encryptedBid = encryptedBid;
+    }
+
+    @Override
+    public double getSecondBidPriceInUsd() {
+        return secondBidPriceInUsd;
+    }
+
+    @Override
+    public double getSecondBidPriceInLocal() {
+        return secondBidPriceInLocal;
+    }
+
+    @Override
+    public double getBidPriceInUsd() {
+        return bidPriceInUsd;
+    }
+
+    @Override
+    public double getBidPriceInLocal() {
+        return bidPriceInLocal;
     }
 }
