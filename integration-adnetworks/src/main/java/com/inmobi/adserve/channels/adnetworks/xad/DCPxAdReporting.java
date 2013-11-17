@@ -71,7 +71,7 @@ public class DCPxAdReporting extends BaseReportingImpl {
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.info("failed to obtain correct dates for fetching reports " + exception.getMessage());
+            logger.info("failed to obtain correct dates for fetching reports ", exception.getMessage());
             return null;
         }
         authToken = getToken();
@@ -93,8 +93,6 @@ public class DCPxAdReporting extends BaseReportingImpl {
             return reportResponse;
         }
         NodeList reportNodes = doc.getElementsByTagName("report");
-        // reportNodes.item(0).getAttributes().getNamedItem("appid").getNodeValue();
-        // if(reportNodes.item(0).getAttributes().getNamedItem("appid").getNodeValue().equals("all")) {
         for (int s = 0; s < reportNodes.getLength(); s++) {
             String appId = reportNodes.item(0).getAttributes().getNamedItem("appid").getNodeValue();
             if (appId.length() < 36) {
@@ -117,11 +115,9 @@ public class DCPxAdReporting extends BaseReportingImpl {
                                         .item(0);
                             Element clicks = (Element) reportZoneElement.getElementsByTagName("ad_click").item(0);
                             Element revenue = (Element) reportZoneElement.getElementsByTagName("net_revenue").item(0);
-                            // Element ecpm = (Element) (((Element)
-                            // reportZoneElement.getElementsByTagName("avg_cpm").item(0)));
                             ReportResponse.ReportRow row = new ReportResponse.ReportRow();
                             if (!decodeBlindedSiteId(appId, row)) {
-                                logger.debug("Error decoded BlindedSite id in Drawbridge", appId);
+                                logger.debug("Error decoded BlindedSite id in xAd", appId);
                                 continue;
                             }
                             row.request = Long.parseLong(request.getTextContent());
@@ -130,16 +126,15 @@ public class DCPxAdReporting extends BaseReportingImpl {
                             row.revenue = Double.parseDouble(revenue.getTextContent());
                             ReportTime reportDate = new ReportTime(logDate, 0);
                             row.reportTime = reportDate;
-                            // row.siteId = key;
                             row.isSiteData = true;
                             row.slotSize = getReportGranularity();
+                            logger.error("parsing data inside xAd ", appId);
                             reportResponse.addReportRow(row);
                         }
                     }
                 }
             }
         }
-        // }
         return reportResponse;
     }
 
@@ -256,7 +251,7 @@ public class DCPxAdReporting extends BaseReportingImpl {
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         connection.setRequestProperty("charset", "utf-8");
-        connection.setRequestProperty("Content-Length", "" + Integer.toString(urlParameters.getBytes().length));
+        connection.setRequestProperty("Content-Length", Integer.toString(urlParameters.getBytes().length));
         connection.setUseCaches(false);
 
         DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
@@ -271,7 +266,7 @@ public class DCPxAdReporting extends BaseReportingImpl {
             }
         }
         catch (IOException ioe) {
-            logger.info("Error in Httpool invokeHTTPUrl : ", ioe.getMessage());
+            logger.info("Error in xAd invokeHTTPUrl : ", ioe.getMessage());
         }
         finally {
             wr.flush();
