@@ -11,7 +11,8 @@ BEGIN
           start_date,
           end_date,
           modified_on from currency_conversion_rate
-          where is_deleted = 'f' and end_date = '30-DEC-99 00:00:00' and modified_on >= last_updated
+          where is_deleted = 'f' and end_date = to_timestamp('30-DEC-9999 00:00:00', 'DD-Mon-YYYY')
+          and modified_on >= last_updated
  LOOP
         RETURN NEXT row1;
     END LOOP;
