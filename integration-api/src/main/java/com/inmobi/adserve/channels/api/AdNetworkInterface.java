@@ -31,6 +31,9 @@ public interface AdNetworkInterface {
     // Returns the second bid price in local currency after auction
     double getSecondBidPriceInLocal();
 
+    // Return bidder currency
+    String getCurrency();
+
     // Returns true for rtb partner, false otherwise.
     boolean isRtbPartner();
 

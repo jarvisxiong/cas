@@ -27,14 +27,13 @@ import static org.easymock.classextension.EasyMock.replay;
 
 public class HttpRequestHandlerTest extends TestCase {
 
-    private static ConfigurationLoader config;
-    private static ChannelEntity       channelentity;
+    private static ChannelEntity channelentity;
 
     public void setUp() throws Exception {
         ChannelEntity.Builder builder = ChannelEntity.newBuilder();
         builder.setAccountId("advId");
         channelentity = builder.build();
-        config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
+        ConfigurationLoader config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
         ServletHandler.init(config, null);
 
         Configuration loggerConfig = createMock(Configuration.class);
@@ -85,6 +84,7 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.getRtbImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface1.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface1.getSeatId()).andReturn("advId").anyTimes();
+        expect(adNetworkInterface1.getCurrency()).andReturn("USD").anyTimes();
         replay(adNetworkInterface1);
         AdNetworkInterface adNetworkInterface2 = createMock(RtbAdNetwork.class);
         expect(adNetworkInterface2.getBidPriceInUsd()).andReturn((double) 4).anyTimes();
@@ -95,6 +95,7 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface2.getRtbImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface2.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface2.getSeatId()).andReturn("advId").anyTimes();
+        expect(adNetworkInterface2.getCurrency()).andReturn("USD").anyTimes();
         adNetworkInterface2.setSecondBidPrice(EasyMock.isA(Double.class));
         adNetworkInterface2.setEncryptedBid(EasyMock.isA(String.class));
         EasyMock.expectLastCall();
@@ -128,6 +129,7 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.getRtbImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface1.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface1.getSeatId()).andReturn("advId").anyTimes();
+        expect(adNetworkInterface1.getCurrency()).andReturn("USD").anyTimes();
         adNetworkInterface1.setSecondBidPrice(EasyMock.isA(Double.class));
         adNetworkInterface1.setEncryptedBid(EasyMock.isA(String.class));
         EasyMock.expectLastCall();
@@ -172,6 +174,7 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.getRtbImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface1.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface1.getSeatId()).andReturn("advId").anyTimes();
+        expect(adNetworkInterface1.getCurrency()).andReturn("USD").anyTimes();
         replay(adNetworkInterface1);
         AdNetworkInterface adNetworkInterface2 = createMock(RtbAdNetwork.class);
         expect(adNetworkInterface2.getBidPriceInUsd()).andReturn((double) 2).anyTimes();
@@ -182,6 +185,7 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface2.getRtbImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface2.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface2.getSeatId()).andReturn("advId").anyTimes();
+        expect(adNetworkInterface2.getCurrency()).andReturn("USD").anyTimes();
         replay(adNetworkInterface2);
         AdNetworkInterface adNetworkInterface3 = createMock(RtbAdNetwork.class);
         expect(adNetworkInterface3.getBidPriceInUsd()).andReturn((double) 2).anyTimes();
@@ -192,6 +196,7 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface3.getRtbImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface3.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface3.getSeatId()).andReturn("advId").anyTimes();
+        expect(adNetworkInterface3.getCurrency()).andReturn("USD").anyTimes();
         adNetworkInterface3.setSecondBidPrice(EasyMock.isA(Double.class));
         adNetworkInterface3.setEncryptedBid(EasyMock.isA(String.class));
         EasyMock.expectLastCall();
@@ -228,6 +233,7 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.getRtbImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface1.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface1.getSeatId()).andReturn("advId").anyTimes();
+        expect(adNetworkInterface1.getCurrency()).andReturn("USD").anyTimes();
         adNetworkInterface1.setSecondBidPrice(EasyMock.isA(Double.class));
         adNetworkInterface1.setEncryptedBid(EasyMock.isA(String.class));
         EasyMock.expectLastCall();
@@ -241,6 +247,7 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface2.getRtbImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface2.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface2.getSeatId()).andReturn("advId").anyTimes();
+        expect(adNetworkInterface2.getCurrency()).andReturn("USD").anyTimes();
         replay(adNetworkInterface2);
         AdNetworkInterface adNetworkInterface3 = createMock(RtbAdNetwork.class);
         expect(adNetworkInterface3.getBidPriceInUsd()).andReturn((double) 1).anyTimes();
@@ -251,6 +258,7 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface3.getRtbImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface3.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface3.getSeatId()).andReturn("advId").anyTimes();
+        expect(adNetworkInterface3.getCurrency()).andReturn("USD").anyTimes();
         replay(adNetworkInterface3);
         ChannelSegment channelSegment1 = new ChannelSegment(null, channelentity, null, null, null, adNetworkInterface1,
                 0);
@@ -284,6 +292,7 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.getRtbImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface1.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface1.getSeatId()).andReturn("advId").anyTimes();
+        expect(adNetworkInterface1.getCurrency()).andReturn("USD").anyTimes();
         adNetworkInterface1.setSecondBidPrice(EasyMock.isA(Double.class));
         adNetworkInterface1.setEncryptedBid(EasyMock.isA(String.class));
         EasyMock.expectLastCall();
@@ -297,6 +306,7 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface2.getRtbImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface2.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface2.getSeatId()).andReturn("advId").anyTimes();
+        expect(adNetworkInterface2.getCurrency()).andReturn("USD").anyTimes();
         replay(adNetworkInterface2);
         AdNetworkInterface adNetworkInterface3 = createMock(RtbAdNetwork.class);
         expect(adNetworkInterface3.getBidPriceInUsd()).andReturn((double) 0).anyTimes();
@@ -307,6 +317,7 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface3.getRtbImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface3.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface3.getSeatId()).andReturn("advId").anyTimes();
+        expect(adNetworkInterface3.getCurrency()).andReturn("USD").anyTimes();
         replay(adNetworkInterface3);
         ChannelSegment channelSegment1 = new ChannelSegment(null, channelentity, null, null, null, adNetworkInterface1,
                 0);
@@ -338,6 +349,7 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.getRtbImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface1.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface1.getSeatId()).andReturn("advId").anyTimes();
+        expect(adNetworkInterface1.getCurrency()).andReturn("USD").anyTimes();
         replay(adNetworkInterface1);
         AdNetworkInterface adNetworkInterface2 = createMock(RtbAdNetwork.class);
         expect(adNetworkInterface2.getBidPriceInUsd()).andReturn((double) 1).anyTimes();
@@ -348,6 +360,7 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface2.getRtbImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface2.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface2.getSeatId()).andReturn("advId").anyTimes();
+        expect(adNetworkInterface2.getCurrency()).andReturn("USD").anyTimes();
         replay(adNetworkInterface2);
         AdNetworkInterface adNetworkInterface3 = createMock(RtbAdNetwork.class);
         expect(adNetworkInterface3.getBidPriceInUsd()).andReturn((double) 0).anyTimes();
@@ -358,6 +371,7 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface3.getRtbImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface3.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface3.getSeatId()).andReturn("advId").anyTimes();
+        expect(adNetworkInterface3.getCurrency()).andReturn("USD").anyTimes();
         replay(adNetworkInterface3);
         ChannelSegment channelSegment1 = new ChannelSegment(null, channelentity, null, null, null, adNetworkInterface1,
                 0);
@@ -390,6 +404,7 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.getRtbImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface1.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface1.getSeatId()).andReturn("advId").anyTimes();
+        expect(adNetworkInterface1.getCurrency()).andReturn("USD").anyTimes();
         replay(adNetworkInterface1);
         AdNetworkInterface adNetworkInterface2 = createMock(RtbAdNetwork.class);
         expect(adNetworkInterface2.getBidPriceInUsd()).andReturn((double) 1).anyTimes();
@@ -401,6 +416,7 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface2.getRtbImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface2.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface2.getSeatId()).andReturn("advId").anyTimes();
+        expect(adNetworkInterface2.getCurrency()).andReturn("USD").anyTimes();
         replay(adNetworkInterface2);
         AdNetworkInterface adNetworkInterface3 = createMock(RtbAdNetwork.class);
         expect(adNetworkInterface3.getBidPriceInUsd()).andReturn((double) 0).anyTimes();
@@ -412,6 +428,7 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface3.getRtbImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface3.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface3.getSeatId()).andReturn("advId").anyTimes();
+        expect(adNetworkInterface3.getCurrency()).andReturn("USD").anyTimes();
         replay(adNetworkInterface3);
         ChannelSegment channelSegment1 = new ChannelSegment(null, channelentity, null, null, null, adNetworkInterface1,
                 0);
@@ -454,6 +471,7 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.getRtbImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface1.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface1.getSeatId()).andReturn("advId").anyTimes();
+        expect(adNetworkInterface1.getCurrency()).andReturn("USD").anyTimes();
         ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
         thirdPartyAdResponse.adStatus = "AD";
         thirdPartyAdResponse.latency = 12;

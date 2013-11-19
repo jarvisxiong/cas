@@ -97,6 +97,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private RepositoryHelper               repositoryHelper;
     private String                         bidderCurrency               = "USD";
     private static final String            USD                          = "USD";
+    @Getter
+    static List<String>                    currenciesSupported          = new ArrayList<String>(Arrays.asList("USD",
+                                                                            "RMB"));
 
     public RtbAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
             HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent, String urlBase, String advertiserName,
@@ -759,5 +762,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Override
     public double getBidPriceInLocal() {
         return bidPriceInLocal;
+    }
+
+    @Override
+    public String getCurrency() {
+        return bidderCurrency;
     }
 }

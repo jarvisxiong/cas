@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.AuctionEngineInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -202,6 +203,20 @@ public class AuctionEngine implements AuctionEngineInterface {
                     InspectorStats.incrementStatCount(
                         Filters.getAdvertiserIdToNameMapping().get(channelSegment.getChannelEntity().getAccountId()),
                         InspectorStrings.droppedInRtbAuctionIdMisMatchFilter);
+                }
+            }
+            else if (!RtbAdNetwork.getCurrenciesSupported().contains(
+                channelSegment.getAdNetworkInterface().getCurrency())) {
+                rtbListIterator.remove();
+                logger.debug("Dropped in currency not supported filter ", channelSegment
+                        .getAdNetworkInterface()
+                            .getName());
+                if (Filters
+                        .getAdvertiserIdToNameMapping()
+                            .containsKey(channelSegment.getChannelEntity().getAccountId())) {
+                    InspectorStats.incrementStatCount(
+                        Filters.getAdvertiserIdToNameMapping().get(channelSegment.getChannelEntity().getAccountId()),
+                        InspectorStrings.droppedInRtbCurrencyNotSupportedFilter);
                 }
             }
         }

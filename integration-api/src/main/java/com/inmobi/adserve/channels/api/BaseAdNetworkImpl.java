@@ -695,4 +695,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         return null;
     }
 
+    @Override
+    public String getCurrency() {
+        return "USD";
+    }
 }
