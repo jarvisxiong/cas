@@ -62,7 +62,7 @@ public class DCPxAdReporting extends BaseReportingImpl {
         try {
             reportingKey = key;
             this.startDate = startTime.getStringDate("-");
-            logger.debug("start date inside xad is ", this.startDate);
+            logger.debug("start date inside xad is " + this.startDate);
             endDate = endTime == null ? getEndDate("-") : startDate;
             if (ReportTime.compareStringDates(this.endDate, this.startDate) == -1) {
                 logger.debug("date is greater than the current date reporting window for xad");
@@ -71,7 +71,7 @@ public class DCPxAdReporting extends BaseReportingImpl {
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.info("failed to obtain correct dates for fetching reports ", exception.getMessage());
+            logger.info("failed to obtain correct dates for fetching reports " + exception.getMessage());
             return null;
         }
         authToken = getToken();
@@ -88,48 +88,47 @@ public class DCPxAdReporting extends BaseReportingImpl {
                     .getNamedItem("ecode")
                     .getNodeValue());
         if (responseStatus != 0) {
-            logger.info("Got non zero status from xAd . So retry required . Status", responseStatus);
+            logger.info("Got non zero status from xAd . So retry required . Status" + responseStatus);
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_SERVER_ERROR;
             return reportResponse;
         }
         NodeList reportNodes = doc.getElementsByTagName("report");
-        for (int s = 0; s < reportNodes.getLength(); s++) {
-            String appId = reportNodes.item(0).getAttributes().getNamedItem("appid").getNodeValue();
-            if (appId.length() < 36) {
-                continue;
-            }
-            appId = appId.substring(0, 36);
-            Node reportNode = reportNodes.item(s);
-            if (reportNode.getNodeType() == Node.ELEMENT_NODE) {
-                Element reportElement = (Element) reportNode;
-                NodeList reportRows = reportElement.getElementsByTagName("record");
-                for (int ind = 0; ind < reportRows.getLength(); ind++) {
-                    Node zoneReportNode = reportRows.item(ind);
-                    if (zoneReportNode.getNodeType() == Node.ELEMENT_NODE) {
-                        Element reportZoneElement = (Element) zoneReportNode;
-                        String logDate = reportZoneElement.getAttribute("date");
-                        if (startDate.compareTo(logDate) < 1) {
-                            Element request = (Element) reportZoneElement.getElementsByTagName("ad_request").item(0);
-                            Element impression = (Element) reportZoneElement
-                                    .getElementsByTagName("ad_impression")
-                                        .item(0);
-                            Element clicks = (Element) reportZoneElement.getElementsByTagName("ad_click").item(0);
-                            Element revenue = (Element) reportZoneElement.getElementsByTagName("net_revenue").item(0);
-                            ReportResponse.ReportRow row = new ReportResponse.ReportRow();
-                            if (!decodeBlindedSiteId(appId, row)) {
-                                logger.debug("Error decoded BlindedSite id in xAd", appId);
-                                continue;
+        reportNodes.item(0).getAttributes().getNamedItem("appid").getNodeValue();
+        if (reportNodes.item(0).getAttributes().getNamedItem("appid").getNodeValue().equals("all")) {
+            for (int s = 0; s < reportNodes.getLength(); s++) {
+                Node reportNode = reportNodes.item(s);
+                if (reportNode.getNodeType() == Node.ELEMENT_NODE) {
+                    Element reportElement = (Element) reportNode;
+                    NodeList reportRows = reportElement.getElementsByTagName("record");
+                    for (int ind = 0; ind < reportRows.getLength(); ind++) {
+                        Node zoneReportNode = reportRows.item(ind);
+                        if (zoneReportNode.getNodeType() == Node.ELEMENT_NODE) {
+                            Element reportZoneElement = (Element) zoneReportNode;
+                            String logDate = reportZoneElement.getAttribute("date");
+                            if (startDate.compareTo(logDate) < 1) {
+                                Element request = (Element) reportZoneElement
+                                        .getElementsByTagName("ad_request")
+                                            .item(0);
+                                Element impression = (Element) reportZoneElement
+                                        .getElementsByTagName("ad_impression")
+                                            .item(0);
+                                Element clicks = (Element) reportZoneElement.getElementsByTagName("ad_click").item(0);
+                                Element revenue = (Element) reportZoneElement.getElementsByTagName("net_revenue").item(
+                                    0);
+                                // Element ecpm = (Element) (((Element)
+                                // reportZoneElement.getElementsByTagName("avg_cpm").item(0)));
+                                ReportResponse.ReportRow row = new ReportResponse.ReportRow();
+                                row.request = Long.parseLong(request.getTextContent());
+                                row.clicks = Long.parseLong(clicks.getTextContent());
+                                row.impressions = Long.parseLong(impression.getTextContent());
+                                row.revenue = Double.parseDouble(revenue.getTextContent());
+                                ReportTime reportDate = new ReportTime(logDate, 0);
+                                row.reportTime = reportDate;
+                                row.siteId = key;
+                                row.slotSize = getReportGranularity();
+                                logger.debug("parsing data inside xAd" + row.request);
+                                reportResponse.addReportRow(row);
                             }
-                            row.request = Long.parseLong(request.getTextContent());
-                            row.clicks = Long.parseLong(clicks.getTextContent());
-                            row.impressions = Long.parseLong(impression.getTextContent());
-                            row.revenue = Double.parseDouble(revenue.getTextContent());
-                            ReportTime reportDate = new ReportTime(logDate, 0);
-                            row.reportTime = reportDate;
-                            row.isSiteData = true;
-                            row.slotSize = getReportGranularity();
-                            logger.error("parsing data inside xAd ", appId);
-                            reportResponse.addReportRow(row);
                         }
                     }
                 }
@@ -142,7 +141,8 @@ public class DCPxAdReporting extends BaseReportingImpl {
     public String getRequestUrl() {
         StringBuilder reportUrl = new StringBuilder();
         reportUrl
-                .append("v=1.0&appid=all&k=")
+                .append("v=1.0&O_fmt=JSON")
+                    .append("&k=")
                     .append(reportingKey)
                     .append("&token=")
                     .append(authToken)
@@ -251,7 +251,7 @@ public class DCPxAdReporting extends BaseReportingImpl {
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         connection.setRequestProperty("charset", "utf-8");
-        connection.setRequestProperty("Content-Length", Integer.toString(urlParameters.getBytes().length));
+        connection.setRequestProperty("Content-Length", "" + Integer.toString(urlParameters.getBytes().length));
         connection.setUseCaches(false);
 
         DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
