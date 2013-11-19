@@ -3,8 +3,8 @@ package com.inmobi.adserve.channels.server.servlet;
 import com.google.gson.Gson;
 import com.inmobi.adserve.channels.server.ChannelServerStringLiterals;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.ServletHandler;
+import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
@@ -15,9 +15,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,6 +97,10 @@ public class ServletGetSegment implements Servlet {
             else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY)) {
                 entity = ServletHandler.repositoryHelper.querySiteEcpmRepository(id.split("_")[0],
                     Integer.parseInt(id.split("_")[1]), Integer.parseInt(id.split("_")[2]));
+            }
+            else if (repoName != null
+                    && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY)) {
+                entity = ServletHandler.repositoryHelper.queryCurrencyConversionRepository(id.split("_")[0]);
             }
             segmentInfo.put(key, entity);
         }

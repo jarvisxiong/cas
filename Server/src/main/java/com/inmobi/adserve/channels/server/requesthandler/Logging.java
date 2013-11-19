@@ -4,8 +4,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.thrift.TException;
@@ -14,43 +13,22 @@ import org.apache.thrift.protocol.TBinaryProtocol;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import com.inmobi.adserve.channels.api.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.ReportTime;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-
-import java.util.concurrent.ConcurrentHashMap;
-
+import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.MetricsManager;
-import com.inmobi.casthrift.AdResponse;
-import com.inmobi.casthrift.CasChannelLog;
-import com.inmobi.casthrift.RequestParams;
-import com.inmobi.casthrift.RequestTpan;
-import com.inmobi.casthrift.SiteParams;
+import com.inmobi.casthrift.*;
 import com.inmobi.messaging.Message;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
-import com.inmobi.casthrift.Ad;
-import com.inmobi.casthrift.AdIdChain;
-import com.inmobi.casthrift.AdMeta;
-import com.inmobi.casthrift.AdStatus;
-import com.inmobi.casthrift.CasAdChain;
-import com.inmobi.casthrift.Channel;
-import com.inmobi.casthrift.ContentRating;
-import com.inmobi.casthrift.DemandSourceType;
-import com.inmobi.casthrift.Gender;
-import com.inmobi.casthrift.Geo;
-import com.inmobi.casthrift.HandsetMeta;
-import com.inmobi.casthrift.InventoryType;
-import com.inmobi.casthrift.PricingModel;
-import com.inmobi.casthrift.AdRR;
-import com.inmobi.casthrift.Impression;
-import com.inmobi.casthrift.Request;
-import com.inmobi.casthrift.User;
-
-import com.inmobi.casthrift.CasAdvertisementLog;
-
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class Logging {
@@ -192,7 +170,7 @@ public class Logging {
             log.append(channelSegmentEntity.getPricingModel()).append("\",\"BANNER\", \"");
             log.append(channelSegmentEntity.getExternalSiteKey()).append("\"],\"impid\":\"");
             log.append(channelSegment.getAdNetworkInterface().getImpressionId()).append("\"");
-            double winBid = channelSegment.getAdNetworkInterface().getSecondBidPrice();
+            double winBid = channelSegment.getAdNetworkInterface().getSecondBidPriceInUsd();
             if (winBid != -1) {
                 log.append(",\"" + "winBid" + "\":\"" + winBid + "\"");
                 ad.setWinBid(winBid);
@@ -362,7 +340,7 @@ public class Logging {
             channel.setAdStatus(getAdStatus(channelSegment.getAdNetworkInterface().getAdStatus()));
             channel.setLatency(channelSegment.getAdNetworkInterface().getLatency());
             channel.setAdChain(createCasAdChain(channelSegment));
-            double bid = channelSegment.getAdNetworkInterface().getBidprice();
+            double bid = channelSegment.getAdNetworkInterface().getBidPriceInUsd();
             if (bid > 0) {
                 channel.setBid(bid);
             }
@@ -450,7 +428,7 @@ public class Logging {
                 String externalSiteKey = ((ChannelSegment) rankList.get(index))
                         .getChannelSegmentEntity()
                             .getExternalSiteKey();
-                double bid = adNetwork.getBidprice();
+                double bid = adNetwork.getBidPriceInUsd();
                 String resp = adResponse.adStatus;
                 long latency = adResponse.latency;
                 logLine.put("adv", advertiserId);

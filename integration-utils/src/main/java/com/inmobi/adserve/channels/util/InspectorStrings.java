@@ -71,4 +71,5 @@ public class InspectorStrings {
     public final static String droppedInDstFilter                        = "DroppedInDstFilter";
     public final static String droppedInAccountSegmentFilter             = "DroppedInAccountSegmentFilter";
     public static final String droppedInSupplyDemandClassificationFilter = "DroppedInSupplyDemandClassificationFilter";
+    public static final String droppedInRtbCurrencyNotSupportedFilter    = "DroppedInRtbCurrencyNotSupportedFilter";
 }

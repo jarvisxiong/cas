@@ -1,27 +1,5 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.isA;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import junit.framework.TestCase;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.thrift.TDeserializer;
-import org.apache.thrift.TException;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.easymock.Capture;
-import org.easymock.EasyMock;
-import org.json.JSONException;
-import org.testng.annotations.Test;
-
 import com.inmobi.adserve.channels.adnetworks.tapit.DCPTapitAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
@@ -33,18 +11,36 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.casthrift.CasChannelLog;
 import com.inmobi.messaging.Message;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
+import junit.framework.TestCase;
+import org.apache.commons.configuration.Configuration;
+import org.apache.thrift.TDeserializer;
+import org.apache.thrift.TException;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.easymock.Capture;
+import org.easymock.EasyMock;
+import org.json.JSONException;
+import org.testng.annotations.Test;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.isA;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 
-public class LoggingTest extends TestCase
-{
+public class LoggingTest extends TestCase {
     DebugLogger              logger;
     ConfigurationLoader      config;
     Configuration            mockConfig;
     AbstractMessagePublisher dataBusPublisher;
     Set<String>              emptySet = new HashSet<String>();
 
-    public void setUp()
-    {
+    public void setUp() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
         expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
@@ -64,8 +60,7 @@ public class LoggingTest extends TestCase
     }
 
     @Test
-    public void testchannelDatabusLogging()
-    {
+    public void testchannelDatabusLogging() {
         ConfigurationLoader config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
         ServletHandler.init(config, null);
         AbstractMessagePublisher dataBusPublisher = createMock(AbstractMessagePublisher.class);
@@ -95,7 +90,7 @@ public class LoggingTest extends TestCase
         expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("DummyResponsecontent").anyTimes();
         expect(mockAdnetworkInterface.getConnectionLatency()).andReturn(20l).anyTimes();
         expect(mockAdnetworkInterface.getId()).andReturn("2").anyTimes();
-        expect(mockAdnetworkInterface.getBidprice()).andReturn(2d).anyTimes();
+        expect(mockAdnetworkInterface.getBidPriceInUsd()).andReturn(2d).anyTimes();
         replay(mockAdnetworkInterface);
         ChannelSegment channelSegment = new ChannelSegment(channelSegmentEntity, null, null, null, null,
                 mockAdnetworkInterface, 0);
@@ -139,8 +134,7 @@ public class LoggingTest extends TestCase
     }
 
     @Test
-    public void testsampledAdvertisingLogging()
-    {
+    public void testsampledAdvertisingLogging() {
         Long[] rcList = null;
         Long[] tags = null;
         Timestamp modified_on = null;
@@ -169,8 +163,7 @@ public class LoggingTest extends TestCase
     }
 
     @Test
-    public void testsampledAdvertisingLoggingWithResponseAsEmptyString()
-    {
+    public void testsampledAdvertisingLoggingWithResponseAsEmptyString() {
         Long[] rcList = null;
         Long[] tags = null;
         Timestamp modified_on = null;
@@ -199,8 +192,7 @@ public class LoggingTest extends TestCase
     }
 
     @Test
-    public void testsampledAdvertisingLoggingWithRequestUrlAsEmptyString()
-    {
+    public void testsampledAdvertisingLoggingWithRequestUrlAsEmptyString() {
         Long[] rcList = null;
         Long[] tags = null;
         Timestamp modified_on = null;
@@ -229,8 +221,7 @@ public class LoggingTest extends TestCase
     }
 
     @Test
-    public void testsampledAdvertisingLoggingForZeroSampleOnDatabus()
-    {
+    public void testsampledAdvertisingLoggingForZeroSampleOnDatabus() {
         Long[] rcList = null;
         Long[] tags = null;
         Timestamp modified_on = null;
