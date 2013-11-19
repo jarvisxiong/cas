@@ -54,8 +54,8 @@ public class DCPxAdReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(DebugLogger logger, ReportTime startTime, String key, ReportTime endTime)
-            throws Exception {
+    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
+            final ReportTime endTime) throws Exception {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         logger.debug("inside fetch rows of xad");
@@ -207,7 +207,7 @@ public class DCPxAdReporting extends BaseReportingImpl {
         return (doc.getDocumentElement().getAttributes().getNamedItem("token").getNodeValue());
     }
 
-    private String invokeHttpPostUrl(String urlParameters, String hostAddress) throws IOException,
+    private String invokeHttpPostUrl(final String urlParameters, final String hostAddress) throws IOException,
             NoSuchAlgorithmException, KeyManagementException {
 
         if (sslFlag == true) {
@@ -266,7 +266,7 @@ public class DCPxAdReporting extends BaseReportingImpl {
             }
         }
         catch (IOException ioe) {
-            logger.info("Error in Httpool invokeHTTPUrl : ", ioe.getMessage());
+            logger.info("Error in xAd invokeHTTPUrl : ", ioe.getMessage());
         }
         finally {
             wr.flush();

@@ -44,7 +44,7 @@ public class DCPLoganReporting extends BaseReportingImpl {
                                                          + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:rep=\"http://adserver.moceanmobile.net/soap/reporting\">"
                                                          + "<soapenv:Header><mns1:authHeader xmlns:mns1=\"http://adserver.moceanmobile.net/soap/reporting\"><apiKey>%s</apiKey></mns1:authHeader></soapenv:Header>"
                                                          + "<soapenv:Body><rep:getZoneReportByZone><fromDate xsi:type=\"xsd:string\">%s</fromDate><toDate xsi:type=\"xsd:string\">%s</toDate>"
-                                                         + "<networkIds xsi:type=\"rep:ArrayOfInt\"><item xsi:type=\"xsd:int\">%s</item>   </networkIds></rep:getZoneReportByZone></soapenv:Body>"
+                                                         + "<networkIds xsi:type=\"rep:ArrayOfInt\"><item xsi:type=\"xsd:int\">%s</item> </networkIds></rep:getZoneReportByZone></soapenv:Body>"
                                                          + "</soapenv:Envelope>";
 
     public DCPLoganReporting(final Configuration config) {
@@ -61,9 +61,9 @@ public class DCPLoganReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(DebugLogger logger, ReportTime startTime, String key, ReportTime endTime)
-            throws ClientProtocolException, IOException, ServerException, JSONException, ParserConfigurationException,
-            SAXException {
+    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
+            final ReportTime endTime) throws ClientProtocolException, IOException, ServerException, JSONException,
+            ParserConfigurationException, SAXException {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         logger.debug("inside fetch rows of logan");
@@ -108,7 +108,7 @@ public class DCPLoganReporting extends BaseReportingImpl {
                     Element impression = (Element) reportZoneElement.getElementsByTagName("impressions").item(0);
                     Element clicks = (Element) reportZoneElement.getElementsByTagName("clicks").item(0);
                     Element revenue = (Element) reportZoneElement.getElementsByTagName("earnings").item(0);
-                    Element ecpm = (Element) (((Element) reportZoneElement.getElementsByTagName("ecpmEarnings").item(0)));
+                    Element ecpm = (((Element) reportZoneElement.getElementsByTagName("ecpmEarnings").item(0)));
 
                     row.request = Long.parseLong(request.getTextContent());
                     row.clicks = Long.parseLong(clicks.getTextContent());
@@ -168,7 +168,7 @@ public class DCPLoganReporting extends BaseReportingImpl {
         }
     }
 
-    public String invokeHTTPUrl(DebugLogger logger) throws ServerException, ClientProtocolException, IOException {
+    public String invokeHTTPUrl(final DebugLogger logger) throws ServerException, ClientProtocolException, IOException {
         URL url = new URL(baseUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         String soapMessage = getRequestUrl();

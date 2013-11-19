@@ -15,6 +15,7 @@ import com.inmobi.adserve.channels.adnetworks.logan.DCPLoganAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.lomark.DCPLomarkAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mable.DCPMableAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.madnet.DCPMadNetAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.mobfox.DCPMobFoxAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.mobilecommerce.MobileCommerceAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mopub.DCPMoPubAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mullahmedia.MoolahMediaPremiumAdnetwork;
@@ -56,16 +57,17 @@ public class SegmentFactory {
         return repositoryHelper;
     }
 
-    public static void setRepositoryHelper(RepositoryHelper repositoryHelper) {
+    public static void setRepositoryHelper(final RepositoryHelper repositoryHelper) {
         SegmentFactory.repositoryHelper = repositoryHelper;
     }
 
-    public static void init(RepositoryHelper repositoryHelper, Configuration adapterConfiguration, Logger logger) {
+    public static void init(final RepositoryHelper repositoryHelper, final Configuration adapterConfiguration,
+            final Logger logger) {
         SegmentFactory.repositoryHelper = repositoryHelper;
         SegmentFactory.populateRTBAdapterNames(adapterConfiguration, logger);
     }
 
-    private static void populateRTBAdapterNames(Configuration adapterConfiguration, Logger logger) {
+    private static void populateRTBAdapterNames(final Configuration adapterConfiguration, final Logger logger) {
         Iterator<String> itr = adapterConfiguration.getKeys();
         while (null != itr && itr.hasNext()) {
             String str = itr.next();
@@ -318,6 +320,12 @@ public class SegmentFactory {
                 && (config.getString("webmedia.status").equals("on"))) {
             DCPAjillionAdnetwork adaptor = new DCPAjillionAdnetwork(logger, config, clientBootstrap, base, serverEvent);
             adaptor.setName("webmedia");
+            return adaptor;
+        }
+        else if ((advertiserId.equals(config.getString("mobfox.advertiserId")))
+                && (advertiserSet.isEmpty() || advertiserSet.contains("mobfox"))
+                && (config.getString("mobfox.status").equals("on"))) {
+            DCPMobFoxAdnetwork adaptor = new DCPMobFoxAdnetwork(logger, config, clientBootstrap, base, serverEvent);
             return adaptor;
         }
 
