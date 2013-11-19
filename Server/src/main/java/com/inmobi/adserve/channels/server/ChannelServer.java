@@ -59,6 +59,7 @@ public class ChannelServer {
     private static PricingEngineRepository          pricingEngineRepository;
     private static PublisherFilterRepository        publisherFilterRepository;
     private static SiteEcpmRepository               siteEcpmRepository;
+    private static CurrencyConversionRepository     currencyConversionRepository;
     private static final String                     configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
     public static byte                              dataCenterIdCode;
     public static short                             hostIdCode;
@@ -116,6 +117,7 @@ public class ChannelServer {
             pricingEngineRepository = new PricingEngineRepository();
             publisherFilterRepository = new PublisherFilterRepository();
             siteEcpmRepository = new SiteEcpmRepository();
+            currencyConversionRepository = new CurrencyConversionRepository();
 
             RepositoryHelper.Builder repoHelperBuilder = RepositoryHelper.newBuilder();
             repoHelperBuilder.setChannelRepository(channelRepository);
@@ -128,6 +130,7 @@ public class ChannelServer {
             repoHelperBuilder.setPricingEngineRepository(pricingEngineRepository);
             repoHelperBuilder.setPublisherFilterRepository(publisherFilterRepository);
             repoHelperBuilder.setSiteEcpmRepository(siteEcpmRepository);
+            repoHelperBuilder.setCurrencyConversionRepository(currencyConversionRepository);
             RepositoryHelper repositoryHelper = repoHelperBuilder.build();
 
             instantiateRepository(logger, config);
@@ -229,6 +232,9 @@ public class ChannelServer {
 
             ChannelSegmentMatchingCache.init(logger);
             // Reusing the repository from phoenix adsering framework.
+            currencyConversionRepository.init(logger,
+                config.cacheConfiguration().subset(ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY),
+                ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY);
             channelAdGroupRepository.init(logger,
                 config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY),
                 ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY);
@@ -264,7 +270,6 @@ public class ChannelServer {
             logger.error("failed to creatre binding for postgresql data source " + exception.getMessage());
             ServerStatusInfo.statusCode = 404;
             ServerStatusInfo.statusString = getMyStackTrace(exception);
-            return;
         }
         catch (InitializationException exception) {
             logger.error("failed to initialize repository " + exception.getMessage());
@@ -273,7 +278,6 @@ public class ChannelServer {
             if (logger.isDebugEnabled()) {
                 logger.debug(ChannelServer.getMyStackTrace(exception));
             }
-            return;
         }
     }
 

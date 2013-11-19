@@ -29,8 +29,7 @@ import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class AuctionEngineTest
-{
+public class AuctionEngineTest {
 
     Configuration                mockConfig;
     Configuration                mockAdapterConfig;
@@ -40,8 +39,7 @@ public class AuctionEngineTest
     CasInternalRequestParameters casInternalRequestParameters;
 
     @BeforeMethod
-    public void setUp() throws IOException
-    {
+    public void setUp() throws IOException {
         ConfigurationLoader config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
         ServletHandler.init(config, null);
         Filters.init(config.adapterConfiguration());
@@ -76,8 +74,7 @@ public class AuctionEngineTest
     }
 
     private ChannelSegment setBidder(final String advId, final String channelId, final String externalSiteKey,
-            final String adNetworkName, final Double bidValue, final Long latencyValue)
-    {
+            final String adNetworkName, final Double bidValue, final Long latencyValue) {
 
         Long[] rcList = null;
         Long[] tags = null;
@@ -98,19 +95,20 @@ public class AuctionEngineTest
         thirdPartyAdResponse.adStatus = "AD";
         expect(mockAdnetworkInterface.getAdStatus()).andReturn("AD").anyTimes();
         expect(mockAdnetworkInterface.getResponseStruct()).andReturn(thirdPartyAdResponse).anyTimes();
-        expect(mockAdnetworkInterface.getSecondBidPrice()).andReturn(4d).anyTimes();
+        expect(mockAdnetworkInterface.getSecondBidPriceInUsd()).andReturn(4d).anyTimes();
         expect(mockAdnetworkInterface.getName()).andReturn(adNetworkName).anyTimes();
         expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
         expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("DummyResponsecontent").anyTimes();
         expect(mockAdnetworkInterface.getConnectionLatency()).andReturn(2l).anyTimes();
         expect(mockAdnetworkInterface.getId()).andReturn("2").anyTimes();
         expect(mockAdnetworkInterface.getLatency()).andReturn(latencyValue).anyTimes();
-        expect(mockAdnetworkInterface.getBidprice()).andReturn(bidValue).anyTimes();
+        expect(mockAdnetworkInterface.getBidPriceInUsd()).andReturn(bidValue).anyTimes();
         expect(mockAdnetworkInterface.isRtbPartner()).andReturn(true).anyTimes();
         expect(mockAdnetworkInterface.getAuctionId()).andReturn("auctionId").anyTimes();
         expect(mockAdnetworkInterface.getRtbImpressionId()).andReturn("impressionId").anyTimes();
         expect(mockAdnetworkInterface.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(mockAdnetworkInterface.getSeatId()).andReturn(advId).anyTimes();
+        expect(mockAdnetworkInterface.getCurrency()).andReturn("USD").anyTimes();
         // this is done, to track the encryptedBid variable getting set inside the AuctionEngine.
         mockAdnetworkInterface.setEncryptedBid(EasyMock.capture(encryptedBid1));
         EasyMock.expectLastCall().anyTimes();
@@ -127,10 +125,8 @@ public class AuctionEngineTest
 
     // This function will provide the parameter data
     @DataProvider(name = "DataProviderWith3Bidders")
-    public Object[][] paramDataProviderWith3Bidders()
-    {
-        return new Object[][]
-        {
+    public Object[][] paramDataProviderWith3Bidders() {
+        return new Object[][] {
                 // 9. 2 same second bids, higher than floor price
                 { "testTwoSameBidsHigherThanFloorPrice", .70d, "A", 1d, 120l, "B", .80d, 100l, "C", .80d, 150l, .81d,
                         "A", 1d },
@@ -179,8 +175,7 @@ public class AuctionEngineTest
             final String rtbNameInput1, final Double bidInput1, final Long latencyInput1, final String rtbNameInput2,
             final Double bidInput2, final Long latencyInput2, final String rtbNameInput3, final Double bidInput3,
             final Long latencyInput3, final Double expectedSecondPriceValue, final String expectedRTBName,
-            final Double expectedWinnerBidValue)
-    {
+            final Double expectedWinnerBidValue) {
 
         Double bidFloorInput = floorPrice;
         Double bidInputVal1 = bidInput1;
@@ -213,16 +208,14 @@ public class AuctionEngineTest
 
         Assert.assertEquals(secondPrice1.getValue(), expectedSecondPriceVal);
         Assert.assertEquals(auctionEngineResponse.getName(), expectedRTBAdNetworkName);
-        Assert.assertEquals(auctionEngineResponse.getBidprice(), expectedWinnerBid);
+        Assert.assertEquals(auctionEngineResponse.getBidPriceInUsd(), expectedWinnerBid);
 
     }
 
     // This function will provide the parameter data
     @DataProvider(name = "DataProviderWith4Bidders")
-    public Object[][] paramDataProviderWith4Bidders()
-    {
-        return new Object[][]
-        {
+    public Object[][] paramDataProviderWith4Bidders() {
+        return new Object[][] {
                 // 1. more than floor price, 2nd price
                 { "testBidHigherThanFloorPriceAndSecondPrice", .70d, "A", 1d, 50l, "B", .90d, 100l, "C", .80d, 150l,
                         "D", .70d, 100l, .91d, "A", 1d },
@@ -280,8 +273,7 @@ public class AuctionEngineTest
             final String rtbNameInput1, final Double bidInput1, final Long latencyInput1, final String rtbNameInput2,
             final Double bidInput2, final Long latencyInput2, final String rtbNameInput3, final Double bidInput3,
             final Long latencyInput3, final String rtbNameInput4, final Double bidInput4, final Long latencyInput4,
-            final Double expectedSecondPriceValue, final String expectedRTBName, final Double expectedWinnerBidValue)
-    {
+            final Double expectedSecondPriceValue, final String expectedRTBName, final Double expectedWinnerBidValue) {
 
         Double bidFloorInput = floorPrice;
         Double bidInputVal1 = bidInput1;
@@ -318,14 +310,13 @@ public class AuctionEngineTest
 
         Assert.assertEquals(secondPrice1.getValue(), expectedSecondPriceVal);
         Assert.assertEquals(auctionEngineResponse.getName(), expectedRTBAdNetworkName);
-        Assert.assertEquals(auctionEngineResponse.getBidprice(), expectedWinnerBid);
+        Assert.assertEquals(auctionEngineResponse.getBidPriceInUsd(), expectedWinnerBid);
 
     }
 
     @Test
     // 5. only 1 bid
-    public void testOnlyOneBid()
-    {
+    public void testOnlyOneBid() {
 
         Double bidFloorInput = .70d;
         Double bidInputVal1 = 1d;
@@ -350,14 +341,13 @@ public class AuctionEngineTest
 
         Assert.assertEquals(secondPrice1.getValue(), expectedSecondPriceVal);
         Assert.assertEquals(auctionEngineResponse.getName(), expectedRTBAdNetworkName);
-        Assert.assertEquals(auctionEngineResponse.getBidprice(), expectedWinnerBid);
+        Assert.assertEquals(auctionEngineResponse.getBidPriceInUsd(), expectedWinnerBid);
 
     }
 
     @Test
     // 7. all lower than floor price
-    public void testAllLowerThanFloorPrice()
-    {
+    public void testAllLowerThanFloorPrice() {
 
         Double bidFloorInput = .70d;
         Double bidInputVal1 = .50d;
@@ -399,8 +389,7 @@ public class AuctionEngineTest
 
     @Test
     // 25. Only 1 bid with price 0.1 above floor price
-    public void testOnlyOneBidWithPrice1AboveFloorPrice()
-    {
+    public void testOnlyOneBidWithPrice1AboveFloorPrice() {
 
         Double bidFloorInput = .70d;
         Double bidInputVal1 = .71d;
@@ -425,15 +414,14 @@ public class AuctionEngineTest
 
         Assert.assertEquals(secondPrice1.getValue(), expectedSecondPriceVal);
         Assert.assertEquals(auctionEngineResponse.getName(), expectedRTBAdNetworkName);
-        Assert.assertEquals(auctionEngineResponse.getBidprice(), expectedWinnerBid);
+        Assert.assertEquals(auctionEngineResponse.getBidPriceInUsd(), expectedWinnerBid);
 
     }
 
     @Test
     // 26. Only 1 bid with price 0.1 below floor price. this bid will get
     // directly cut off at floor price filter
-    public void testOnlyOneBidWithPrice1BelowFloorPrice()
-    {
+    public void testOnlyOneBidWithPrice1BelowFloorPrice() {
 
         Double bidFloorInput = .70d;
         Double bidInputVal1 = .69d;
