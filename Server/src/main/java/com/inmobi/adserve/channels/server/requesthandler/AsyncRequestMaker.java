@@ -90,14 +90,8 @@ public class AsyncRequestMaker {
                     isCpc = true;
                 }
                 ClickUrlMakerV6 clickUrlMakerV6 = setClickParams(logger, isCpc, config, sasParams, jObject);
-                Map<String, String> clickGetParams = new HashMap<String, String>();
-                clickGetParams.put("ds", "1");
-                Map<String, String> beaconGetParams = new HashMap<String, String>();
-                beaconGetParams.put("ds", "1");
-                beaconGetParams.put("event", "beacon");
-                clickUrlMakerV6.createClickUrls();
-                clickUrl = clickUrlMakerV6.getClickUrl(clickGetParams);
-                beaconUrl = clickUrlMakerV6.getBeaconUrl(beaconGetParams);
+                clickUrl = clickUrlMakerV6.getClickUrl();
+                beaconUrl = clickUrlMakerV6.getBeaconUrl();
                 logger.debug("click url :", clickUrl);
                 logger.debug("beacon url :", beaconUrl);
             }
@@ -310,6 +304,10 @@ public class AsyncRequestMaker {
         builder.setRmBeaconURLPrefix(config.getString("clickmaker.beaconURLPrefix"));
         builder.setClickURLPrefix(config.getString("clickmaker.clickURLPrefix"));
         builder.setImageBeaconURLPrefix(config.getString("clickmaker.beaconURLPrefix"));
+        builder.setTestRequest(false);
+        builder.setLatlonval(sasParams.getLatLong());
+        builder.setRtbSite(false);
+        builder.setDst(sasParams.getDst() + "");
         return new ClickUrlMakerV6(builder);
     }
 }

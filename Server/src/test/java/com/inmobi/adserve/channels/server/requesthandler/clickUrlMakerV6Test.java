@@ -64,10 +64,10 @@ public class clickUrlMakerV6Test extends TestCase {
         ClickUrlMakerV6 clickUrlMakerV6 = new ClickUrlMakerV6(builder);
         clickUrlMakerV6.createClickUrls();
         assertEquals(
-            "http://localhost:8800/6/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/76256371268/0/5l/1/e9805b5e",
-            clickUrlMakerV6.getBeaconUrl(new HashMap<String, String>()));
+            "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/76256371268/0/5l/-1/0/0/x/0/nw/2/1/6e7ba049",
+            clickUrlMakerV6.getBeaconUrl());
         assertEquals(
-            "http://localhost:8800/6/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/76256371268/0/5l/1/e9805b5e",
-            clickUrlMakerV6.getClickUrl(new HashMap<String, String>()));
+            "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/76256371268/0/5l/-1/1/0/x/0/nw/2/1/fc017ace",
+            clickUrlMakerV6.getClickUrl());
     }
 }
