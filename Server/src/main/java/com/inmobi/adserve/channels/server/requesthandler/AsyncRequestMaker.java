@@ -54,7 +54,7 @@ public class AsyncRequestMaker {
         logger.debug("Total channels available for sending requests", rows.size() + "");
         boolean isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled", false);
         int rtbMaxTimeOut = rtbConfig.getInt("RTBreadtimeoutMillis", 200);
-        logger.debug("isRtbEnabled is", Boolean.valueOf(isRtbEnabled), " and rtbMaxTimeout is", rtbMaxTimeOut);
+        logger.debug("isRtbEnabled is", isRtbEnabled, " and rtbMaxTimeout is", rtbMaxTimeOut);
 
         for (ChannelSegment row : rows) {
             ChannelSegmentEntity channelSegmentEntity = row.getChannelSegmentEntity();
@@ -209,21 +209,20 @@ public class AsyncRequestMaker {
 
     private static ClickUrlMakerV6 setClickParams(DebugLogger logger, boolean pricingModel, Configuration config,
             SASRequestParameters sasParams, JSONObject jObject) {
-        Set<String> unhashable = new HashSet<String>();
-        unhashable.addAll(Arrays.asList(config.getStringArray("clickmaker.unhashable")));
-        ClickUrlMakerV6 clickUrlMakerV6 = new ClickUrlMakerV6(logger, unhashable);
+        ClickUrlMakerV6.Builder builder = ClickUrlMakerV6.newBuilder();
+        builder.setLogger(logger);
         try {
             if (null != sasParams.getAge()) {
-                clickUrlMakerV6.setAge(Integer.parseInt(sasParams.getAge()));
+                builder.setAge(Integer.parseInt(sasParams.getAge()));
             }
         }
         catch (NumberFormatException e) {
             logger.debug("Wrong format for Age", e.getMessage());
         }
         if (null != sasParams.getGender()) {
-            clickUrlMakerV6.setGender(sasParams.getGender());
+            builder.setGender(sasParams.getGender());
         }
-        clickUrlMakerV6.setCPC(pricingModel);
+        builder.setCPC(pricingModel);
         Integer carrierId = null;
         if (null != sasParams.getCarrier()) {
             try {
@@ -234,11 +233,11 @@ public class AsyncRequestMaker {
             }
         }
         if (null != carrierId) {
-            clickUrlMakerV6.setCarrierId(carrierId);
+            builder.setCarrierId(carrierId);
         }
         try {
             if (null != sasParams.getCountryStr()) {
-                clickUrlMakerV6.setCountryId(Integer.parseInt(sasParams.getCountryStr()));
+                builder.setCountryId(Integer.parseInt(sasParams.getCountryStr()));
             }
         }
         catch (NumberFormatException e) {
@@ -246,7 +245,7 @@ public class AsyncRequestMaker {
         }
         try {
             if (null != sasParams.getHandset()) {
-                clickUrlMakerV6.setHandsetInternalId(Long.parseLong(sasParams.getHandset().get(0).toString()));
+                builder.setHandsetInternalId(Long.parseLong(sasParams.getHandset().get(0).toString()));
             }
         }
         catch (NumberFormatException e1) {
@@ -260,22 +259,22 @@ public class AsyncRequestMaker {
             logger.debug("impression id is null");
         }
         else {
-            clickUrlMakerV6.setImpressionId(sasParams.getImpressionId());
+            builder.setImpressionId(sasParams.getImpressionId());
         }
-        clickUrlMakerV6.setIpFileVersion(sasParams.getIpFileVersion().longValue());
-        clickUrlMakerV6.setIsBillableDemog(false);
+        builder.setIpFileVersion(sasParams.getIpFileVersion().longValue());
+        builder.setIsBillableDemog(false);
         try {
             if (null != sasParams.getArea()) {
-                clickUrlMakerV6.setLocation(Integer.parseInt(sasParams.getArea()));
+                builder.setLocation(Integer.parseInt(sasParams.getArea()));
             }
         }
         catch (NumberFormatException e) {
             logger.debug("Wrong format for Area", e.getMessage());
         }
         if (null != sasParams.getSiteSegmentId()) {
-            clickUrlMakerV6.setSegmentId(sasParams.getSiteSegmentId());
+            builder.setSegmentId(sasParams.getSiteSegmentId());
         }
-        clickUrlMakerV6.setSiteIncId(sasParams.getSiteIncId());
+        builder.setSiteIncId(sasParams.getSiteIncId());
         Map<String, String> uidMap = new HashMap<String, String>();
         JSONObject userIdMap = null;
         try {
@@ -301,16 +300,16 @@ public class AsyncRequestMaker {
                 }
             }
         }
-        clickUrlMakerV6.setUdIdVal(uidMap);
-        clickUrlMakerV6.setCryptoSecretKey(config.getString("clickmaker.key.1.value"));
-        clickUrlMakerV6.setTestCryptoSecretKey(config.getString("clickmaker.key.2.value"));
-        clickUrlMakerV6.setImageBeaconFlag(true);// true/false
-        clickUrlMakerV6.setBeaconEnabledOnSite(true);// do not know
-        clickUrlMakerV6.setTestMode(false);
-        clickUrlMakerV6.setRmAd(jObject.optBoolean("rich-media", false));
-        clickUrlMakerV6.setRmBeaconURLPrefix(config.getString("clickmaker.beaconURLPrefix"));
-        clickUrlMakerV6.setClickURLPrefix(config.getString("clickmaker.clickURLPrefix"));
-        clickUrlMakerV6.setImageBeaconURLPrefix(config.getString("clickmaker.beaconURLPrefix"));
-        return clickUrlMakerV6;
+        builder.setUdIdVal(uidMap);
+        builder.setCryptoSecretKey(config.getString("clickmaker.key.1.value"));
+        builder.setTestCryptoSecretKey(config.getString("clickmaker.key.2.value"));
+        builder.setImageBeaconFlag(true);// true/false
+        builder.setBeaconEnabledOnSite(true);// do not know
+        builder.setTestMode(false);
+        builder.setRmAd(jObject.optBoolean("rich-media", false));
+        builder.setRmBeaconURLPrefix(config.getString("clickmaker.beaconURLPrefix"));
+        builder.setClickURLPrefix(config.getString("clickmaker.clickURLPrefix"));
+        builder.setImageBeaconURLPrefix(config.getString("clickmaker.beaconURLPrefix"));
+        return new ClickUrlMakerV6(builder);
     }
 }

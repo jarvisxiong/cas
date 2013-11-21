@@ -45,9 +45,9 @@ public class ServletBackFill implements Servlet {
         }
         sasParams = hrh.responseSender.sasParams;
         casInternalRequestParametersGlobal = hrh.responseSender.casInternalRequestParameters;
-        logger.debug("site floor is " + sasParams.getSiteFloor());
 
         if (RequestFilters.isDroppedInRequestFilters(hrh, logger)) {
+            logger.debug("Request is dropped in request filters");
             hrh.responseSender.sendNoAdResponse(e);
         }
 
