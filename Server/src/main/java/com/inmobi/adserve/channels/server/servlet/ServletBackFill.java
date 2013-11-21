@@ -1,27 +1,22 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import java.util.*;
-
+import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.PublisherFilterEntity;
-import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.ServletHandler;
+import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.requesthandler.*;
+import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.inmobi.adserve.channels.api.AdNetworkInterface;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
-import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
-import com.inmobi.adserve.channels.server.requesthandler.Filters;
-import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
-import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
-import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
+import java.util.*;
 
 
 public class ServletBackFill implements Servlet {
@@ -29,102 +24,36 @@ public class ServletBackFill implements Servlet {
     public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
             DebugLogger logger) throws Exception {
 
-        InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
-
-        Map<String, List<String>> params = queryStringDecoder.getParameters();
-        try {
-            hrh.jObject = RequestParser.extractParams(params);
-        }
-        catch (JSONException exeption) {
-            hrh.jObject = new JSONObject();
-            logger.debug("Encountered Json Error while creating json object inside HttpRequest Handler");
-            hrh.setTerminationReason(ServletHandler.jsonParsingError);
-            InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
-        }
         CasInternalRequestParameters casInternalRequestParametersGlobal = new CasInternalRequestParameters();
         SASRequestParameters sasParams = new SASRequestParameters();
-        RequestParser.parseRequestParameters(hrh.jObject, sasParams, casInternalRequestParametersGlobal, logger);
-        hrh.responseSender.sasParams = sasParams;
+        if (null == hrh.jObject) {
+            InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
+            Map<String, List<String>> params = queryStringDecoder.getParameters();
+            try {
+                hrh.jObject = RequestParser.extractParams(params);
+            }
+            catch (JSONException exception) {
+                hrh.jObject = new JSONObject();
+                logger.debug("Encountered Json Error while creating json object inside HttpRequest Handler");
+                hrh.setTerminationReason(ServletHandler.jsonParsingError);
+                InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
+            }
+            RequestParser.parseRequestParameters(hrh.jObject, sasParams, casInternalRequestParametersGlobal, logger);
+            sasParams.setDst(2);
+            hrh.responseSender.sasParams = sasParams;
+            hrh.responseSender.casInternalRequestParameters = casInternalRequestParametersGlobal;
+        }
+        sasParams = hrh.responseSender.sasParams;
+        casInternalRequestParametersGlobal = hrh.responseSender.casInternalRequestParameters;
         logger.debug("site floor is " + sasParams.getSiteFloor());
 
-        // Increment re Request if request came from rule engine
-        if (6 == sasParams.getDst()) {
-            logger.debug("Request came from rule engin...");
-            InspectorStats.incrementStatCount(InspectorStrings.ruleEngineRequests);
-        }
-
-        // Send noad if new-category is not present in the request
-        if (null == hrh.responseSender.sasParams.getCategories()) {
-            hrh.logger.error("new-category field is not present in the request so sending noad");
-            hrh.responseSender.sasParams.setCategories(new ArrayList<Long>());
-            hrh.setTerminationReason(ServletHandler.MISSING_CATEGORY);
-            InspectorStats.incrementStatCount(InspectorStrings.missingCategory, InspectorStrings.count);
+        if (RequestFilters.isDroppedInRequestFilters(hrh, logger)) {
             hrh.responseSender.sendNoAdResponse(e);
         }
 
         hrh.responseSender.getAuctionEngine().sasParams = hrh.responseSender.sasParams;
 
-        if (null == hrh.responseSender.sasParams) {
-            logger.error("Terminating request as sasParam is null");
-            hrh.setTerminationReason(ServletHandler.jsonParsingError);
-            InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
-            hrh.responseSender.sendNoAdResponse(e);
-            return;
-        }
-        if (null == hrh.responseSender.sasParams.getSiteId()) {
-            logger.error("Terminating request as site id was missing");
-            hrh.setTerminationReason(ServletHandler.missingSiteId);
-            InspectorStats.incrementStatCount(InspectorStrings.missingSiteId, InspectorStrings.count);
-            hrh.responseSender.sendNoAdResponse(e);
-            return;
-        }
-        if (!hrh.responseSender.sasParams.getAllowBannerAds() || hrh.responseSender.sasParams.getSiteFloor() > 5) {
-            logger.error("Request not being served because of banner not allowed or site floor above threshold");
-            hrh.responseSender.sendNoAdResponse(e);
-            return;
-        }
-        if (hrh.responseSender.sasParams.getSiteType() != null
-                && !ServletHandler.allowedSiteTypes.contains(hrh.responseSender.sasParams.getSiteType())) {
-            logger.error("Terminating request as incompatible content type");
-            hrh.setTerminationReason(ServletHandler.incompatibleSiteType);
-            InspectorStats.incrementStatCount(InspectorStrings.incompatibleSiteType, InspectorStrings.count);
-            hrh.responseSender.sendNoAdResponse(e);
-            return;
-        }
-        if (hrh.responseSender.sasParams.getSdkVersion() != null) {
-            try {
-                if ((hrh.responseSender.sasParams.getSdkVersion().substring(0, 1).equalsIgnoreCase("i") || hrh.responseSender.sasParams
-                        .getSdkVersion()
-                            .substring(0, 1)
-                            .equalsIgnoreCase("a"))
-                        && Integer.parseInt(hrh.responseSender.sasParams.getSdkVersion().substring(1, 2)) < 3) {
-                    logger.error("Terminating request as sdkVersion is less than 3");
-                    hrh.setTerminationReason(ServletHandler.lowSdkVersion);
-                    InspectorStats.incrementStatCount(InspectorStrings.lowSdkVersion, InspectorStrings.count);
-                    hrh.responseSender.sendNoAdResponse(e);
-                    return;
-                }
-                else
-                    logger.debug("sdk-version : " + hrh.responseSender.sasParams.getSdkVersion());
-            }
-            catch (StringIndexOutOfBoundsException exception) {
-                logger.error("Invalid sdk-version " + exception.getMessage());
-            }
-            catch (NumberFormatException exception) {
-                logger.error("Invalid sdk-version " + exception.getMessage());
-            }
-
-        }
-
-        if (ServletHandler.random.nextInt(100) >= ServletHandler.percentRollout) {
-            logger.debug("Request not being served because of limited percentage rollout");
-            InspectorStats.incrementStatCount(InspectorStrings.droppedRollout, InspectorStrings.count);
-            hrh.responseSender.sendNoAdResponse(e);
-        }
-
-        /**
-         * Set imai content if r-format is imai
-         */
+        // Set imai content if r-format is imai
         String imaiBaseUrl = null;
         String rFormat = hrh.responseSender.getResponseFormat();
         if (rFormat.equalsIgnoreCase("imai")) {
@@ -181,26 +110,8 @@ public class ServletBackFill implements Servlet {
             Collections.addAll(advertiserSet, advertiserList);
         }
 
-        casInternalRequestParametersGlobal.highestEcpm = getHighestEcpm(filteredSegments);
-        logger.debug("Highest Ecpm is", casInternalRequestParametersGlobal.highestEcpm);
-        casInternalRequestParametersGlobal.blockedCategories = getBlockedCategories(hrh, logger);
-        casInternalRequestParametersGlobal.blockedAdvertisers = getBlockedAdvertisers(hrh, logger);
-        logger.debug("blockedCategories are", casInternalRequestParametersGlobal.blockedCategories);
-        logger.debug("blockedAdvertisers are", casInternalRequestParametersGlobal.blockedAdvertisers);
-        double minimumRtbFloor = 0.05;
-        double segmentFloor = 0.0;
-        // RTB floor is being passed as segmentFloor
-        logger.debug("RTB floor from the pricing engine entity is", filter.getRtbFloor());
-        if (null != filter.getRtbFloor()) {
-            segmentFloor = filter.getRtbFloor();
-        }
-        casInternalRequestParametersGlobal.rtbBidFloor = hrh.responseSender.getAuctionEngine().calculateRTBFloor(
-            sasParams.getSiteFloor(), 0.0, segmentFloor, minimumRtbFloor);
-        logger.debug("site floor was " + sasParams.getSiteFloor() + " segmentFloor was " + segmentFloor
-                + " minimum rtb floor " + minimumRtbFloor + " and rtbFloor is "
-                + casInternalRequestParametersGlobal.rtbBidFloor);
-        // Generating auction id using site Inc Id
-        casInternalRequestParametersGlobal.auctionId = AsyncRequestMaker.getImpressionId(sasParams.getSiteIncId());
+        enrichCasInternalRequestParameters(logger, hrh, filteredSegments,
+            casInternalRequestParametersGlobal.rtbBidFloor, sasParams.getSiteFloor(), sasParams.getSiteIncId());
         hrh.responseSender.casInternalRequestParameters = casInternalRequestParametersGlobal;
         hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternalRequestParametersGlobal;
 
@@ -273,6 +184,32 @@ public class ServletBackFill implements Servlet {
         return "BackFill";
     }
 
+    private static void enrichCasInternalRequestParameters(DebugLogger logger, HttpRequestHandler hrh,
+            List<ChannelSegment> filteredSegments, Double rtbdFloor, Double siteFloor, long siteIncId) {
+        CasInternalRequestParameters casInternalRequestParametersGlobal = hrh.responseSender.casInternalRequestParameters;
+        casInternalRequestParametersGlobal.highestEcpm = getHighestEcpm(filteredSegments);
+        casInternalRequestParametersGlobal.blockedCategories = getBlockedCategories(hrh);
+        casInternalRequestParametersGlobal.blockedAdvertisers = getBlockedAdvertisers(hrh);
+        double minimumRtbFloor = 0.05;
+        double segmentFloor = 0.0;
+        // RTB floor is being passed as segmentFloor
+        if (null != rtbdFloor) {
+            segmentFloor = rtbdFloor;
+        }
+        casInternalRequestParametersGlobal.rtbBidFloor = hrh.responseSender.getAuctionEngine().calculateRTBFloor(
+            siteFloor, 0.0, segmentFloor, minimumRtbFloor);
+        casInternalRequestParametersGlobal.auctionId = AsyncRequestMaker.getImpressionId(siteIncId);
+        logger.debug("RTB floor from the pricing engine entity is", rtbdFloor);
+        logger.debug("Highest Ecpm is", casInternalRequestParametersGlobal.highestEcpm);
+        logger.debug("BlockedCategories are", casInternalRequestParametersGlobal.blockedCategories);
+        logger.debug("BlockedAdvertisers are", casInternalRequestParametersGlobal.blockedAdvertisers);
+        logger.debug("Site floor is", siteFloor);
+        logger.debug("SegmentFloor is", segmentFloor);
+        logger.debug("Minimum rtb floor is", minimumRtbFloor);
+        logger.debug("Final rtbFloor is", casInternalRequestParametersGlobal.rtbBidFloor);
+        logger.debug("Auction id generated is", casInternalRequestParametersGlobal.auctionId);
+    }
+
     private static double getHighestEcpm(List<ChannelSegment> channelSegments) {
         double highestEcpm = 0;
         for (ChannelSegment channelSegment : channelSegments) {
@@ -284,7 +221,7 @@ public class ServletBackFill implements Servlet {
         return highestEcpm;
     }
 
-    private static List<Long> getBlockedCategories(HttpRequestHandler hrh, DebugLogger logger) {
+    private static List<Long> getBlockedCategories(HttpRequestHandler hrh) {
         List<Long> blockedCategories = null;
         if (null != hrh.responseSender.sasParams.getSiteId()) {
             PublisherFilterEntity publisherFilterEntity = ServletHandler.repositoryHelper
@@ -296,7 +233,7 @@ public class ServletBackFill implements Servlet {
         return blockedCategories;
     }
 
-    private static List<String> getBlockedAdvertisers(HttpRequestHandler hrh, DebugLogger logger) {
+    private static List<String> getBlockedAdvertisers(HttpRequestHandler hrh) {
         List<String> blockedAdvertisers = null;
         if (null != hrh.responseSender.sasParams.getSiteId()) {
             PublisherFilterEntity publisherFilterEntity = ServletHandler.repositoryHelper
