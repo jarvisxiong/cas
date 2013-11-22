@@ -97,9 +97,8 @@ public class ChannelServer {
             AbstractMessagePublisher dataBusPublisher = (AbstractMessagePublisher) MessagePublisherFactory
                     .create(configFile);
             String rrLogKey = config.serverConfiguration().getString("rrLogKey");
-            String channelLogKey = config.serverConfiguration().getString("channelLogKey");
             String advertisementLogKey = config.serverConfiguration().getString("adsLogKey");
-            Logging.init(dataBusPublisher, rrLogKey, channelLogKey, advertisementLogKey, config.serverConfiguration());
+            Logging.init(dataBusPublisher, rrLogKey, advertisementLogKey, config.serverConfiguration());
 
             // Initializing graphite stats
             MetricsManager.init(

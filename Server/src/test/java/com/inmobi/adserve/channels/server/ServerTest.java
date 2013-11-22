@@ -1,8 +1,16 @@
 package com.inmobi.adserve.channels.server;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.server.requesthandler.Logging;
+import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
+import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.messaging.publisher.AbstractMessagePublisher;
+import junit.framework.TestCase;
+import org.apache.commons.configuration.Configuration;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.testng.annotations.Test;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -10,22 +18,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import junit.framework.TestCase;
-
-import org.apache.commons.configuration.Configuration;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.testng.annotations.Test;
-import com.inmobi.messaging.publisher.AbstractMessagePublisher;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.server.requesthandler.Logging;
-import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
-import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import com.inmobi.adserve.channels.util.DebugLogger;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 
-public class ServerTest extends TestCase
-{
+public class ServerTest extends TestCase {
 
     private HttpRequestHandler         httpRequestHandler;
     private Configuration              mockConfig       = null;
@@ -45,8 +43,7 @@ public class ServerTest extends TestCase
     private static int                 percentRollout   = 100;
     private static List<String>        siteType         = Arrays.asList("FAMILYSAFE", "PERFORMANCE", "MATURE");
 
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         if (count == 0) {
             prepareLogging();
             config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
@@ -57,11 +54,10 @@ public class ServerTest extends TestCase
         ServletHandler.init(config, null);
         httpRequestHandler = new HttpRequestHandler();
         AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
-        Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-channel", "cas-advertisement", mockConfig);
+        Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-advertisement", mockConfig);
     }
 
-    public void prepareLogging() throws Exception
-    {
+    public void prepareLogging() throws Exception {
         FileWriter fstream = new FileWriter("target/channel-server.properties");
         BufferedWriter out = new BufferedWriter(fstream);
         out.write("log4j.logger.app = DEBUG, channel\n");
@@ -88,8 +84,7 @@ public class ServerTest extends TestCase
         out.close();
     }
 
-    public void prepareConfig()
-    {
+    public void prepareConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("debug")).andReturn(debug).anyTimes();
         expect(mockConfig.getInt("clickmaker.ipFileVersion")).andReturn(ipFileVersion).anyTimes();
@@ -113,19 +108,15 @@ public class ServerTest extends TestCase
         replay(mockConfig);
     }
 
-    public JSONObject prepareParameters() throws Exception
-    {
+    public JSONObject prepareParameters() throws Exception {
         JSONObject args = new JSONObject();
         sasParam = new SASRequestParameters();
         sasParam.setAge("35");
         sasParam.setGender("m");
         sasParam.setImpressionId("4f8d98e2-4bbd-40bc-8729-22da000900f9");
-        int myarr[] =
-        { 1, 2 };
-        long category[] =
-        { 1, 2 };
-        long site[] =
-        { 334, 50 };
+        int myarr[] = { 1, 2 };
+        long category[] = { 1, 2 };
+        long site[] = { 334, 50 };
         HashMap<String, String> userParams = new HashMap<String, String>();
         userParams.put("u-gender", "m");
         userParams.put("u-age", "35");
@@ -139,29 +130,25 @@ public class ServerTest extends TestCase
     }
 
     @Test
-    public void testStringify() throws Exception
-    {
+    public void testStringify() throws Exception {
         DebugLogger logger = new DebugLogger();
         JSONObject jsonObject = prepareParameters();
         assertEquals(RequestParser.stringify(jsonObject, "remoteHostIp", logger), "10.14.110.100");
     }
 
     @Test
-    public void testResponseFormat() throws Exception
-    {
+    public void testResponseFormat() throws Exception {
         assertEquals(httpRequestHandler.responseSender.getResponseFormat(), "html");
     }
 
     @Test
-    public void testParseArray() throws Exception
-    {
+    public void testParseArray() throws Exception {
         JSONObject jsonObject = prepareParameters();
         assertEquals(RequestParser.parseArray(jsonObject, "testarr", 1), "2");
     }
 
     @Test
-    public void testGetUserParams() throws Exception
-    {
+    public void testGetUserParams() throws Exception {
         JSONObject jsonObject = prepareParameters();
         SASRequestParameters params = new SASRequestParameters();
         DebugLogger logger = new DebugLogger();
@@ -174,11 +161,9 @@ public class ServerTest extends TestCase
      * assertEquals(httpRequestHandler.getImpressionId(jsonObject, 2345l), "4f8d98e2-4bbd-40bc-8729-22da000900f9"); }
      */
     @Test
-    public void testGetCategory() throws Exception
-    {
+    public void testGetCategory() throws Exception {
         JSONObject jsonObject = prepareParameters();
-        Long[] category =
-        { 1l, 2l };
+        Long[] category = { 1l, 2l };
         assertTrue("Category are expected to be equal",
             RequestParser.getCategory(jsonObject, new DebugLogger(), "category").equals(Arrays.asList(category)));
     }

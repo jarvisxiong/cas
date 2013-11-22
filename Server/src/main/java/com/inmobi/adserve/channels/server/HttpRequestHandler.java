@@ -1,21 +1,14 @@
 package com.inmobi.adserve.channels.server;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.api.ServletFactory;
+import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
+import com.inmobi.adserve.channels.server.requesthandler.Logging;
+import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
+import com.inmobi.adserve.channels.server.servlet.ServletInvalid;
+import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 import org.apache.thrift.TException;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
@@ -28,13 +21,19 @@ import org.jboss.netty.util.CharsetUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
-import com.inmobi.adserve.channels.server.requesthandler.Logging;
-import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
-import com.inmobi.adserve.channels.server.servlet.ServletInvalid;
-import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 
 public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
@@ -44,10 +43,6 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
     public DebugLogger    logger            = null;
     public ResponseSender responseSender;
     public boolean        isTraceRequest;
-
-    public String getTerminationReason() {
-        return terminationReason;
-    }
 
     public void setTerminationReason(String terminationReason) {
         this.terminationReason = terminationReason;
@@ -133,7 +128,6 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
                 isTraceRequest = true;
             }
             servlet.handleRequest(this, queryStringDecoder, e, logger);
-            return;
         }
         catch (Exception exception) {
             terminationReason = ServletHandler.processingError;
@@ -166,42 +160,23 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
             totalTime = 0;
         }
         try {
-            if (responseSender.getAdResponse() == null) {
-                Logging.channelLogline(list, null, logger, ServletHandler.getLoggerConfig(), responseSender.sasParams,
-                    totalTime);
-                Logging.rrLogging(null, list, logger, ServletHandler.getLoggerConfig(), responseSender.sasParams,
-                    terminationReason);
-                Logging.advertiserLogging(list, logger, ServletHandler.getLoggerConfig());
-                Logging.sampledAdvertiserLogging(list, logger, ServletHandler.getLoggerConfig());
+            ChannelSegment adResponseChannelSegment = null;
+            if (null != responseSender.getRtbResponse()) {
+                adResponseChannelSegment = responseSender.getRtbResponse();
             }
-            else {
-                Logging.channelLogline(list, responseSender.getAdResponse().clickUrl, logger,
-                    ServletHandler.getLoggerConfig(), responseSender.sasParams, totalTime);
-                if (responseSender.getRtbResponse() == null) {
-                    logger.debug("rtb response is null so logging dcp response in rr");
-                    Logging.rrLogging(responseSender.getRankList().get(responseSender.getSelectedAdIndex()), list,
-                        logger, ServletHandler.getLoggerConfig(), responseSender.sasParams, terminationReason);
-                }
-                else {
-                    logger.debug("rtb response is not null so logging rtb response in rr");
-                    Logging.rrLogging(responseSender.getRtbResponse(), list, logger, ServletHandler.getLoggerConfig(),
-                        responseSender.sasParams, terminationReason);
-                }
-                Logging.advertiserLogging(list, logger, ServletHandler.getLoggerConfig());
-                Logging.sampledAdvertiserLogging(list, logger, ServletHandler.getLoggerConfig());
+            else if (null != responseSender.getAdResponse()) {
+                adResponseChannelSegment = responseSender.getRankList().get(responseSender.getSelectedAdIndex());
             }
+            Logging.rrLogging(adResponseChannelSegment, list, logger, responseSender.sasParams, terminationReason,
+                totalTime);
+            Logging.advertiserLogging(list, logger, ServletHandler.getLoggerConfig());
+            Logging.sampledAdvertiserLogging(list, logger, ServletHandler.getLoggerConfig());
         }
         catch (JSONException exception) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(ChannelServer.getMyStackTrace(exception));
-            }
-            return;
+            logger.debug(ChannelServer.getMyStackTrace(exception));
         }
         catch (TException exception) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(ChannelServer.getMyStackTrace(exception));
-            }
-            return;
+            logger.debug(ChannelServer.getMyStackTrace(exception));
         }
         logger.debug("done with logging");
     }
@@ -214,7 +189,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
         try {
             MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress(ServletHandler.getServerConfig().getString("sender")));
-            List<String> recipients = ServletHandler.getServerConfig().getList("recipients");
+            List recipients = ServletHandler.getServerConfig().getList("recipients");
             javax.mail.internet.InternetAddress[] addressTo = new javax.mail.internet.InternetAddress[recipients.size()];
 
             for (int index = 0; index < recipients.size(); index++) {
@@ -228,11 +203,9 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
             Transport.send(message);
         }
         catch (MessagingException mex) {
-            // logger.info("Error while sending mail");
             mex.printStackTrace();
         }
         catch (UnknownHostException ex) {
-            // logger.debug("could not resolve host inside send mail");
             ex.printStackTrace();
         }
     }

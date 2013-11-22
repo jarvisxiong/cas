@@ -174,7 +174,6 @@ public class ClickUrlMakerV6 {
     }
 
     public void createClickUrls() {
-        System.out.println("params are " + toString());
         StringBuilder adUrlSuffix = new StringBuilder(100);
         // 1st URL component: url format version info
         adUrlSuffix.append(URLVERSIONINITSTR);

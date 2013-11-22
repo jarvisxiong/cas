@@ -189,7 +189,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         bidRequest = new BidRequest(casInternalRequestParameters.auctionId, impresssionlist);
         bidRequest.setTmax(tmax);
         bidRequest.setAt(auctionType);
-        bidRequest.setCur(Collections.<String> emptyList());
+        bidRequest.setCur(currenciesSupported);
         if (casInternalRequestParameters != null) {
             logger.debug("blockedCategories are", casInternalRequestParameters.blockedCategories);
             logger.debug("blockedAdvertisers are", casInternalRequestParameters.blockedAdvertisers);
@@ -270,7 +270,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         if (casInternalRequestParameters != null) {
             impression.setBidfloor(casInternalRequestParameters.rtbBidFloor);
-            logger.debug("Bid floor is", new Double(impression.getBidfloor()).toString());
+            logger.debug("Bid floor is", Double.toString(impression.getBidfloor()));
         }
         if (null != displayManager) {
             impression.setDisplaymanager(displayManager);
@@ -359,7 +359,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     private Site createSiteObject() {
-        Site site = null;
+        Site site;
         if (siteBlinded) {
             site = new Site(getBlindedSiteId(sasParams.getSiteIncId(), entity.getIncId()));
         }
@@ -376,7 +376,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     private App createAppObject() {
-        App app = null;
+        App app;
         if (siteBlinded) {
             app = new App(getBlindedSiteId(sasParams.getSiteIncId(), entity.getAdgroupIncId()));
         }
@@ -462,6 +462,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                     .append(",\"adid\"=")
                     .append(bidResponse.seatbid.get(0).bid.get(0).adid)
                     .append("}");
+        assert uriCallBack != null;
         HttpRequest callBackRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET,
                 uriCallBack.toASCIIString());
         callBackRequest.setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE);
