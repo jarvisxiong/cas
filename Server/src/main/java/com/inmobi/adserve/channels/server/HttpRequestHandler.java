@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.server;
 
+import com.inmobi.adserve.adpool.AdPoolRequest;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.api.ServletFactory;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
@@ -13,8 +14,12 @@ import org.apache.thrift.TException;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
+import org.jboss.netty.handler.codec.http.multipart.Attribute;
+import org.jboss.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
+import org.jboss.netty.handler.codec.http.multipart.InterfaceHttpData;
 import org.jboss.netty.handler.timeout.IdleStateAwareChannelUpstreamHandler;
 import org.jboss.netty.handler.timeout.IdleStateEvent;
 import org.jboss.netty.util.CharsetUtil;
@@ -40,6 +45,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
 
     public String         terminationReason = "NO";
     public JSONObject     jObject           = null;
+    public AdPoolRequest  tObject;
     public DebugLogger    logger            = null;
     public ResponseSender responseSender;
     public boolean        isTraceRequest;
@@ -71,7 +77,8 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
             InspectorStats.incrementStatCount(InspectorStrings.totalTerminate);
             logger.debug("Channel is terminated", ctx.getChannel().getId());
         }
-        logger.info("Getting netty error in HttpRequestHandler:", e.getCause().getLocalizedMessage());
+        e.getCause().printStackTrace();
+        logger.info("Getting netty error in HttpRequestHandler:", e.getCause().getMessage());
         if (e.getChannel().isOpen()) {
             responseSender.sendNoAdResponse(e);
         }
@@ -110,9 +117,27 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
         try {
             HttpRequest request = (HttpRequest) e.getMessage();
-            logger.debug(request.getContent().toString(CharsetUtil.UTF_8));
-            QueryStringDecoder queryStringDecoder = new QueryStringDecoder(request.getUri());
-            String path = queryStringDecoder.getPath();
+            QueryStringDecoder queryStringDecoder = null;
+            String path = "";
+            if (request.getMethod() == HttpMethod.POST) {
+                HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(request);
+                InterfaceHttpData data = decoder.getBodyHttpData("post");
+                if (null != data && data.getHttpDataType() == InterfaceHttpData.HttpDataType.Attribute) {
+                    Attribute attribute = (Attribute) data;
+                    String value = attribute.getValue();
+                    logger.debug("post : ", value);
+                    queryStringDecoder = new QueryStringDecoder(request.getUri() + "?post=" + value);
+                    logger.debug("URI is : " + request.getUri() + "?" + value);
+                }
+            }
+            else {
+                logger.debug("get : ", request.getContent().toString(CharsetUtil.UTF_8));
+                queryStringDecoder = new QueryStringDecoder(request.getUri());
+                logger.debug("URI is : " + request.getUri());
+            }
+            if (null != queryStringDecoder) {
+                path = queryStringDecoder.getPath();
+            }
             logger.debug(path);
             ServletFactory servletFactory = ServletHandler.servletMap.get(path);
             Servlet servlet;

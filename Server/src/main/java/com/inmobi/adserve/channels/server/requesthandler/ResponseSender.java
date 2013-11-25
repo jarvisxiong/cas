@@ -260,7 +260,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
 
         Map<String, String> headers = null;
-        if (6 == sasParams.getDst()) {
+        if (null != sasParams && 6 == sasParams.getDst()) {
             headers = new HashMap<String, String>();
             headers.put(NO_AD_HEADER, "true");
         }

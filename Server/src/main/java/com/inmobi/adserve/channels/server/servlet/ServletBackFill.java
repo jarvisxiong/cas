@@ -26,23 +26,34 @@ public class ServletBackFill implements Servlet {
 
         CasInternalRequestParameters casInternalRequestParametersGlobal = new CasInternalRequestParameters();
         SASRequestParameters sasParams = new SASRequestParameters();
-        if (null == hrh.jObject) {
-            InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
-            Map<String, List<String>> params = queryStringDecoder.getParameters();
-            try {
-                hrh.jObject = RequestParser.extractParams(params);
+
+        Map<String, List<String>> params = queryStringDecoder.getParameters();
+        // Handling GET requests
+        if (params.containsKey("args")) {
+            if (null == hrh.jObject) {
+                InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
+                try {
+                    hrh.jObject = RequestParser.extractParams(params);
+                }
+                catch (JSONException exception) {
+                    hrh.jObject = new JSONObject();
+                    logger.debug("Encountered Json Error while creating json object inside HttpRequest Handler");
+                    hrh.setTerminationReason(ServletHandler.jsonParsingError);
+                    InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
+                }
+                RequestParser
+                        .parseRequestParameters(hrh.jObject, sasParams, casInternalRequestParametersGlobal, logger);
+                sasParams.setDst(2);
             }
-            catch (JSONException exception) {
-                hrh.jObject = new JSONObject();
-                logger.debug("Encountered Json Error while creating json object inside HttpRequest Handler");
-                hrh.setTerminationReason(ServletHandler.jsonParsingError);
-                InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
-            }
-            RequestParser.parseRequestParameters(hrh.jObject, sasParams, casInternalRequestParametersGlobal, logger);
-            sasParams.setDst(2);
-            hrh.responseSender.sasParams = sasParams;
-            hrh.responseSender.casInternalRequestParameters = casInternalRequestParametersGlobal;
+        } // Handling post requests
+        else if (null == hrh.tObject) {
+            hrh.tObject = ThriftRequestParser.extractParams(params);
+            ThriftRequestParser.parseRequestParameters(hrh.tObject, sasParams, casInternalRequestParametersGlobal,
+                logger, 2);
         }
+
+        hrh.responseSender.sasParams = sasParams;
+        hrh.responseSender.casInternalRequestParameters = casInternalRequestParametersGlobal;
         sasParams = hrh.responseSender.sasParams;
         casInternalRequestParametersGlobal = hrh.responseSender.casInternalRequestParameters;
 
@@ -57,7 +68,7 @@ public class ServletBackFill implements Servlet {
         String imaiBaseUrl = null;
         String rFormat = hrh.responseSender.getResponseFormat();
         if (rFormat.equalsIgnoreCase("imai")) {
-            if (hrh.responseSender.sasParams.getPlatformOsId() == 3) {
+            if (hrh.responseSender.sasParams.getOsId() == 3) {
                 imaiBaseUrl = ServletHandler.getServerConfig().getString("androidBaseUrl");
             }
             else {

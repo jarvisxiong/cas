@@ -173,7 +173,7 @@ public class RtbAdnetworkTest extends TestCase {
         responseAdm.append("<html><body style=\"margin:0;padding:0;\">");
         responseAdm
                 .append("<script src=\"mraid.js\" ></script><style type=\'text/css\'>body { margin:0;padding:0 }  </style> <p align='center'><a href=\'http://www.inmobi.com/\' target='_blank'><img src='http://www.digitalmarket.asia/wp-content/uploads/2012/04/7a4cb5ba9e52331ae91aeee709cd3fe3.jpg' border='0'/></a></p>");
-        responseAdm.append("<img src=\'\' height=1 width=1 border=0 /></body></html>");
+        responseAdm.append("<img src=\'?b=${WIN_BID}\' height=1 width=1 border=0 /></body></html>");
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         String beaconUrl = "";
         String externalSiteKey = "f6wqjq1r5v";
@@ -185,8 +185,8 @@ public class RtbAdnetworkTest extends TestCase {
         TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
         rtbAdNetwork.parseResponse(serializer.toString(bidResponse), HttpResponseStatus.OK);
         assertEquals(responseAdm.toString(), rtbAdNetwork.responseContent);
-        rtbAdNetwork.setSecondBidPrice(0.23);
         rtbAdNetwork.setEncryptedBid("abc");
+        rtbAdNetwork.setSecondBidPrice(0.23);
         String afterMacros = rtbAdNetwork.replaceRTBMacros(responseAdm.toString());
         assertEquals(afterMacros, rtbAdNetwork.responseContent);
         rtbAdNetwork.parseResponse(str.toString(), HttpResponseStatus.NOT_FOUND);
@@ -305,10 +305,10 @@ public class RtbAdnetworkTest extends TestCase {
         responseAdm.append("<html><body style=\"margin:0;padding:0;\">");
         responseAdm
                 .append("<script src=\"mraid.js\" ></script><style type=\'text/css\'>body { margin:0;padding:0 }  </style> <p align='center'><a href=\'http://www.inmobi.com/\' target='_blank'><img src='http://www.digitalmarket.asia/wp-content/uploads/2012/04/7a4cb5ba9e52331ae91aeee709cd3fe3.jpg' border='0'/></a></p>");
-        responseAdm.append("<img src=\'\' height=1 width=1 border=0 />");
+        responseAdm.append("<img src=\'beacon?b=${WIN_BID}\' height=1 width=1 border=0 />");
         responseAdm.append("</body></html>");
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
-        String beaconUrl = "";
+        String beaconUrl = "beacon";
         String externalSiteKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId,
             null, null, null, 0, null, null, true, true, externalSiteKey, null, null, null, 0, true, null, null, 0,
@@ -318,6 +318,7 @@ public class RtbAdnetworkTest extends TestCase {
         TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
         rtbAdNetwork.parseResponse(serializer.toString(bidResponse), HttpResponseStatus.OK);
         assertEquals(responseAdm.toString(), rtbAdNetwork.responseContent);
+        rtbAdNetwork.setEncryptedBid("0.23");
         rtbAdNetwork.setSecondBidPrice(0.23);
         String afterMacros = rtbAdNetwork.replaceRTBMacros(responseAdm.toString());
         assertEquals(afterMacros, rtbAdNetwork.responseContent);
@@ -334,7 +335,7 @@ public class RtbAdnetworkTest extends TestCase {
         responseAdm
                 .append("<script src=\"mraid.js\" ></script><style type=\'text/css\'>body { margin:0;padding:0 }  </style> <p align='center'><a href=\'http://www.inmobi.com/\' target='_blank'><img src='http://www.digitalmarket.asia/wp-content/uploads/2012/04/7a4cb5ba9e52331ae91aeee709cd3fe3.jpg' border='0'/></a></p>");
         responseAdm
-                .append("<img src=\'\' height=1 width=1 border=0 /><img src=\'${AUCTION_PRICE}${AUCTION_CURRENCY}\' height=1 width=1 border=0 />");
+                .append("<img src=\'?b=${WIN_BID}\' height=1 width=1 border=0 /><img src=\'${AUCTION_PRICE}${AUCTION_CURRENCY}\' height=1 width=1 border=0 />");
         responseAdm.append("</body></html>");
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         String beaconUrl = "";
@@ -348,6 +349,7 @@ public class RtbAdnetworkTest extends TestCase {
         TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
         rtbAdNetwork.parseResponse(serializer.toString(bidResponse), HttpResponseStatus.OK);
         assertEquals(responseAdm.toString(), rtbAdNetwork.responseContent);
+        rtbAdNetwork.setEncryptedBid("0.23");
         rtbAdNetwork.setSecondBidPrice(0.23);
         String afterMacros = rtbAdNetwork.replaceRTBMacros(responseAdm.toString());
         assertEquals(afterMacros, rtbAdNetwork.responseContent);

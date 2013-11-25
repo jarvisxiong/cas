@@ -243,9 +243,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             logger.info("Configure parameters inside rtb returned false", advertiserName);
             return false;
         }
-        if (StringUtils.isNotBlank(beaconUrl)) {
-            beaconUrl = beaconUrl + "&b=${WIN_BID}";
-        }
         logger.info("Configure parameters inside rtb returned true");
         return true;
     }

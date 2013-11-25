@@ -1,22 +1,19 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.security.MessageDigest;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.util.DebugLogger;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.util.DebugLogger;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.util.*;
 
 
 public class RequestParser {
@@ -76,7 +73,6 @@ public class RequestParser {
         params.setSdkVersion(sdkVersion);
         params.setSiteType(stringify(jObject, "site-type", logger));
         params.setAdcode(stringify(jObject, "adcode", logger));
-        params.setPlatformOsId(jObject.optInt("os-id", -1));
         if (params.getSiteType() != null) {
             params.setSiteType(params.getSiteType().toUpperCase());
         }
@@ -95,7 +91,7 @@ public class RequestParser {
         params.setIpFileVersion(jObject.optInt("rqIpFileVer", 1));
         logger.debug("country obtained is", params.getCountry());
         logger.debug("site floor is", params.getSiteFloor());
-        logger.debug("osId is", params.getPlatformOsId());
+        logger.debug("osId is", params.getOsId());
         params.setUidParams(stringify(jObject, "raw-uid", logger));
         setUserIdParams(casInternalRequestParameters, jObject, logger);
         params = getUserParams(params, jObject, logger);

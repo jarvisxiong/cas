@@ -1,11 +1,10 @@
 package com.inmobi.adserve.channels.api;
 
-import java.util.List;
-import java.util.Set;
-
+import lombok.Data;
 import org.json.JSONArray;
 
-import lombok.Data;
+import java.util.List;
+import java.util.Set;
 
 
 @Data
@@ -16,8 +15,6 @@ public class SASRequestParameters {
     private String       userAgent;
 
     private String       source;               // WAP/APP
-    private int          platformOsId;
-
     private String       age;
     private String       gender;
     private String       uid;
