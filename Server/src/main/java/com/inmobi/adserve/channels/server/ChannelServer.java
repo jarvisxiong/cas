@@ -213,17 +213,24 @@ public class ChannelServer {
             initialContext.createSubcontext("java:comp/env");
 
             Class.forName("org.postgresql.Driver");
+            
             Properties props = new Properties();
-            props.put("validationQuery", "select version(); ");
-            props.put("testWhileIdle", "true");
-            props.put("testOnBorrow", "true");
+            props.put("type", "javax.sql.DataSource");
+            props.put("driverClassName", "org.postgresql.Driver");
+            props.put("validationQuery", databaseConfig.getString("validationQuery"));
+            props.put("testWhileIdle", databaseConfig.getString("testWhileIdle", "true"));
+            props.put("testOnBorrow", databaseConfig.getString("testOnBorrow", "true"));
+            props.put("maxActive", databaseConfig.getString("maxActive", "20"));
+            props.put("maxIdle", databaseConfig.getString("maxIdle", "1"));
+            props.put("maxWait", databaseConfig.getString("maxWait", "-1"));
             props.put("user", databaseConfig.getString("username"));
             props.put("password", databaseConfig.getString("password"));
 
             final ObjectPool connectionPool = new GenericObjectPool(null);
             String connectUri = "jdbc:postgresql://" + databaseConfig.getString("host") + ":"
                     + databaseConfig.getInt("port") + "/"
-                    + databaseConfig.getString(ChannelServerStringLiterals.DATABASE);
+                    + databaseConfig.getString(ChannelServerStringLiterals.DATABASE)
+                    + "?" + databaseConfig.getString("socketTimeout");
             final ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectUri, props);
             new PoolableConnectionFactory(connectionFactory, connectionPool, null, null, false, true);
             final PoolingDataSource ds = new PoolingDataSource(connectionPool);
