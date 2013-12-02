@@ -1,6 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.placeiq;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -11,23 +10,18 @@ import java.util.Map.Entry;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang3.StringUtils;
-import org.jets3t.service.S3ServiceException;
-import org.jets3t.service.ServiceException;
 import org.jets3t.service.impl.rest.httpclient.RestS3Service;
 import org.jets3t.service.model.S3Object;
 import org.jets3t.service.security.AWSCredentials;
-import org.json.JSONException;
 
 import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
-import com.inmobi.adserve.channels.api.ServerException;
 import com.inmobi.adserve.channels.api.ReportResponse.ReportRow;
 import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPPlaceIQReporting extends BaseReportingImpl
-{
+public class DCPPlaceIQReporting extends BaseReportingImpl {
 
     private final Configuration    config;
     private DebugLogger            logger;
@@ -37,19 +31,18 @@ public class DCPPlaceIQReporting extends BaseReportingImpl
     private String                 secretKey         = "";
     private String                 bucketName        = "";
     private static String          entireReportData  = null;
+    private String                 externalSiteId    = null;
     private final SimpleDateFormat placeiqDateFormat = new SimpleDateFormat("MM/dd/yy");
     private final SimpleDateFormat dateFormat        = new SimpleDateFormat("yyyy-MM-dd");
 
-    public DCPPlaceIQReporting(final Configuration config)
-    {
+    public DCPPlaceIQReporting(final Configuration config) {
         this.config = config;
         accessKey = config.getString("placeiq.accessKey");
         secretKey = config.getString("placeiq.secretKey");
         bucketName = config.getString("placeiq.bucketName");
     }
 
-    public String getEndDate() throws Exception
-    {
+    public String getEndDate() throws Exception {
         try {
             logger.debug("calculating latest date for PlaceIQ");
             ReportTime reportTime = ReportTime.getUTCTime();
@@ -66,55 +59,39 @@ public class DCPPlaceIQReporting extends BaseReportingImpl
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
 
         return null;
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return 0;
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
+    public int ReportReconcilerWindow() {
         return 23;
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "PlaceIQ";
     }
 
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return (config.getString("placeiq.advertiserId"));
     }
 
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws Exception
-    {
-        // NO OP
-        return null;
-    }
-
-    // Fetches the report from the TPAN
-    @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final ReportTime endTime)
-            throws ServerException, JSONException, ParseException
-    {
+            final ReportTime endTime) throws Exception {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         logger.debug("inside fetch rows of PlaceIQ");
@@ -132,14 +109,7 @@ public class DCPPlaceIQReporting extends BaseReportingImpl
             logger.error("failed to obtain correct dates for fetching reports ", exception.getMessage());
             return null;
         }
-        RestS3Service s3Service = null;
-        try {
-            s3Service = new RestS3Service(new AWSCredentials(accessKey, secretKey));
-        }
-        catch (S3ServiceException e) {
-            logger.error("PlaceIQ : error while connecting to S3 bucket", e.getMessage(), e.getStackTrace());
-            return null;
-        }
+        RestS3Service s3Service = new RestS3Service(new AWSCredentials(accessKey, secretKey));
         S3Object s3obj = null;
 
         while (ReportTime.compareStringDates(startDate, endDate) != 1) {
@@ -153,34 +123,20 @@ public class DCPPlaceIQReporting extends BaseReportingImpl
                 startDate = reportTime.getStringDate("");
                 continue;
             }
-            InputStream stream = null;
-            try {
-                stream = s3obj.getDataInputStream();
-            }
-            catch (ServiceException e) {
-                logger.error("PlaceIQ : error reading data from S3 bucket", e.getMessage(), e.getStackTrace());
-                return null;
-            }
+            InputStream stream = s3obj.getDataInputStream();
             int content;
             StringBuilder responseBuilder = new StringBuilder();
-            try {
-                while ((content = stream.read()) != -1) {
-                    if (content == 13) {
-                        responseBuilder.append("\n");
-                    }
-                    else {
-                        responseBuilder.append((char) content);
-                    }
+            while ((content = stream.read()) != -1) {
+                if (content == 13) {
+                    responseBuilder.append("\n");
                 }
-            }
-            catch (IOException e) {
-                logger.error("PlaceIQ : error reading from S3 bucket", e.getMessage(), e.getStackTrace());
-                return null;
+                else {
+                    responseBuilder.append((char) content);
+                }
             }
             entireReportData = responseBuilder.toString();
             entireReportData = entireReportData.replace('$', ' ');
-            entireReportData = entireReportData.replaceAll("$-", "0.00");
-            entireReportData = entireReportData.replaceAll("N/A", "");
+            entireReportData = entireReportData.replaceAll("$-", "$0.00");
 
             reportResponse.status = ReportResponse.ResponseStatus.SUCCESS;
 
@@ -188,6 +144,7 @@ public class DCPPlaceIQReporting extends BaseReportingImpl
 
             logger.debug("successfuly got response inside PlaceIQ. Number of lines of response is ",
                 responseArray.length);
+            this.externalSiteId = key;
             generateReportResponse(logger, reportResponse, responseArray);
             ReportTime reportTime = new ReportTime(startDate, 0);
             reportTime = ReportTime.getNextDay(reportTime);
@@ -198,15 +155,14 @@ public class DCPPlaceIQReporting extends BaseReportingImpl
     }
 
     private void generateReportResponse(final DebugLogger logger, final ReportResponse reportResponse,
-            final String[] responseArray) throws ParseException
-    {
+            final String[] responseArray) throws ParseException {
         if (responseArray.length > 1) {
             int impressionIndex = -1;
             int clicksIndex = -1;
             int revenueIndex = -1;
+            int ecpmIndex = -1;
             int dateIndex = -1;
-            int siteIncIdIndex = -1;
-            int adGroupIncIdIndex = -1;
+            int externalSiteIdIndex = -1;
 
             String[] header = responseArray[0].replace("'", "").split(",");
 
@@ -223,16 +179,16 @@ public class DCPPlaceIQReporting extends BaseReportingImpl
                     revenueIndex = i;
                     continue;
                 }
+                else if ("eCPM".equalsIgnoreCase(header[i].trim())) {
+                    ecpmIndex = i;
+                    continue;
+                }
                 else if ("Date".equalsIgnoreCase(header[i].trim())) {
                     dateIndex = i;
                     continue;
                 }
-                else if ((header[i].trim()).startsWith("Ad unit 4")) {
-                    adGroupIncIdIndex = i;
-                    continue;
-                }
-                else if ((header[i].trim()).startsWith("Ad unit 3")) {
-                    siteIncIdIndex = i;
+                else if ((header[i].trim()).startsWith("Ad unit 1")) {
+                    externalSiteIdIndex = i;
                     continue;
                 }
             }
@@ -241,49 +197,35 @@ public class DCPPlaceIQReporting extends BaseReportingImpl
             for (int j = 1; j < responseArray.length; j++) {
 
                 String[] reportRow = responseArray[j].split(",");
-                if (reportRow.length == 0) {
+                if (reportRow.length == 0 || StringUtils.isBlank(reportRow[externalSiteIdIndex])) {
                     continue;
                 }
+                String extSiteId = reportRow[externalSiteIdIndex].split("/")[0];
                 Date reportingDate = placeiqDateFormat.parse(reportRow[dateIndex]);
                 ReportTime rowDate = new ReportTime(dateFormat.format(reportingDate), 0);
 
-                String[] rows1 = cleanUpEntry(reportRow);
+                if (extSiteId.equals(externalSiteId)) {
+                    String[] rows1 = cleanUpEntry(reportRow);
+                    ReportResponse.ReportRow row = new ReportResponse.ReportRow();
+                    row.siteId = extSiteId;
+                    row.impressions = Long.parseLong(rows1[impressionIndex]);// .replace("\"",
+                                                                             // "").trim());
+                    row.revenue = Double.parseDouble(rows1[revenueIndex]);// .replace("\"",
+                                                                          // "").trim());
+                    row.clicks = Long.parseLong(rows1[clicksIndex]);// .replace("\"",
+                                                                    // "").trim());
+                    row.reportTime = rowDate;
+                    row.slotSize = getReportGranularity();
+                    if (reportMap.get(reportRow[dateIndex]) == null) {
+                        reportMap.put(reportRow[dateIndex], row);
+                    }
+                    else {
+                        ReportResponse.ReportRow existingRow = reportMap.get(reportRow[dateIndex]);
+                        existingRow.impressions += row.impressions;
+                        existingRow.revenue += row.revenue;
+                        existingRow.clicks += row.clicks;
+                    }
 
-                if (reportRow.length == 0 || StringUtils.isBlank(rows1[siteIncIdIndex])
-                        || StringUtils.isBlank(rows1[adGroupIncIdIndex])) {
-                    continue;
-                }
-
-                ReportResponse.ReportRow row = new ReportResponse.ReportRow();
-                try {
-                    row.siteIncId = Long.parseLong(rows1[siteIncIdIndex], 16);
-                    row.adGroupIncId = Long.parseLong(rows1[adGroupIncIdIndex], 16);
-                }
-                catch (NumberFormatException ne) {
-                    logger.error("PlaceIQ : error decoding blinded site id ", reportRow[adGroupIncIdIndex],
-                        reportRow[siteIncIdIndex]);
-                    continue;
-                }
-
-                if (row.siteIncId == 0 || row.adGroupIncId == 0) {
-                    logger.error("PlaceIQ : failed to decoded blinded site id ", reportRow[adGroupIncIdIndex],
-                        reportRow[siteIncIdIndex]);
-                    continue;
-                }
-                row.isSiteData = true;
-                row.impressions = Long.parseLong(rows1[impressionIndex]);
-                row.revenue = Double.parseDouble(rows1[revenueIndex]);
-                row.clicks = Long.parseLong(rows1[clicksIndex]);
-                row.reportTime = rowDate;
-                row.slotSize = getReportGranularity();
-                if (reportMap.get(reportRow[adGroupIncIdIndex] + reportRow[siteIncIdIndex]) == null) {
-                    reportMap.put(reportRow[adGroupIncIdIndex] + reportRow[siteIncIdIndex], row);
-                }
-                else {
-                    ReportResponse.ReportRow existingRow = reportMap.get(reportRow[dateIndex]);
-                    existingRow.impressions += row.impressions;
-                    existingRow.revenue += row.revenue;
-                    existingRow.clicks += row.clicks;
                 }
             }
             Iterator<Entry<String, ReportRow>> it = reportMap.entrySet().iterator();
@@ -293,16 +235,25 @@ public class DCPPlaceIQReporting extends BaseReportingImpl
         }
 
         if (reportResponse.rows.size() > 0) {
-            logger.debug("successfully generated reporting log for PlaceIQ");
+            logger.debug("successfully generated reporting log for external site id : ", externalSiteId);
         }
         else {
-            logger.debug("failed to generate reporting log for PlaceIQ");
+            logger.debug("failed to generate reporting log for external site id : ", externalSiteId);
+            logger.debug("Default row added external site id : ", externalSiteId);
+            ReportResponse.ReportRow row = new ReportResponse.ReportRow();
+            row.siteId = externalSiteId;
+            row.impressions = 0;
+            row.revenue = 0;
+            row.request = 0;
+            row.clicks = 0;
+            row.reportTime = new ReportTime(startDate, 0);
+            row.slotSize = getReportGranularity();
+            reportResponse.addReportRow(row);
         }
     }
 
     // Combining the comma separated value within '"'
-    private String[] cleanUpEntry(final String[] reportEntry)
-    {
+    private String[] cleanUpEntry(final String[] reportEntry) {
         boolean isNewEntry = true;
         int pos = 0;
         String[] newVal = new String[15];

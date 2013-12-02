@@ -53,8 +53,9 @@ public class DCPWapStartAdNetwork extends BaseAdNetworkImpl {
         iABCountries = new IABCountriesMap();
     }
 
-    public DCPWapStartAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
+    public DCPWapStartAdNetwork(final DebugLogger logger, final Configuration config,
+            final ClientBootstrap clientBootstrap, final HttpRequestHandlerBase baseRequestHandler,
+            final MessageEvent serverEvent) {
         super(baseRequestHandler, serverEvent, logger);
         this.config = config;
         this.logger = logger;
@@ -111,12 +112,13 @@ public class DCPWapStartAdNetwork extends BaseAdNetworkImpl {
             StringBuilder url = new StringBuilder(host);
             url.append("?version=2&encoding=1&area=viewBannerXml&ip=").append(sasParams.getRemoteHostIp());
             url.append("&id=").append(externalSiteId);
-            url.append("&pageId=").append(blindedSiteId);
+            String bsiteId = StringUtils.replace(blindedSiteId, "-", "");
+            url.append("&pageId=00000000").append(bsiteId);
             url.append("&kws=").append(getURLEncode(getCategories(';'), format));
 
-            if (sasParams.getGender() != null) {
-                url.append("&sex=").append(sasParams.getGender());
-            }
+            // if (sasParams.getGender() != null) {
+            // url.append("&sex=").append(sasParams.getGender());
+            // }
             if (sasParams.getAge() != null) {
                 url.append("&age=").append(sasParams.getAge());
             }
@@ -140,7 +142,7 @@ public class DCPWapStartAdNetwork extends BaseAdNetworkImpl {
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status) {
+    public void parseResponse(final String response, final HttpResponseStatus status) {
         logger.debug("response is", response);
 
         if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {

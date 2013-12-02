@@ -4,20 +4,18 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.security.sasl.Sasl;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 
+import com.inmobi.adserve.channels.adnetworks.adelphic.DCPAdelphicAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.ajillion.DCPAjillionAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.amobee.DCPAmobeeAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.appier.DCPAppierAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.appnexus.DCPAppNexusAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.atnt.ATNTAdNetwork;
-import com.inmobi.adserve.channels.adnetworks.adelphic.DCPAdelphicAdNetwork;
-import com.inmobi.adserve.channels.adnetworks.ajillion.DCPAjillionAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.drawbridge.DrawBridgeAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.httpool.DCPHttPoolAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.huntmads.DCPHuntmadsAdNetwork;
@@ -27,6 +25,7 @@ import com.inmobi.adserve.channels.adnetworks.logan.DCPLoganAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.lomark.DCPLomarkAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mable.DCPMableAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.madnet.DCPMadNetAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.mobfox.DCPMobFoxAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.mobilecommerce.MobileCommerceAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mopub.DCPMoPubAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mullahmedia.MoolahMediaPremiumAdnetwork;
@@ -59,16 +58,17 @@ public class SegmentFactory {
         return repositoryHelper;
     }
 
-    public static void setRepositoryHelper(RepositoryHelper repositoryHelper) {
+    public static void setRepositoryHelper(final RepositoryHelper repositoryHelper) {
         SegmentFactory.repositoryHelper = repositoryHelper;
     }
 
-    public static void init(RepositoryHelper repositoryHelper, Configuration adapterConfiguration, Logger logger) {
+    public static void init(final RepositoryHelper repositoryHelper, final Configuration adapterConfiguration,
+            final Logger logger) {
         SegmentFactory.repositoryHelper = repositoryHelper;
         SegmentFactory.populateRTBAdapterNames(adapterConfiguration, logger);
     }
 
-    private static void populateRTBAdapterNames(Configuration adapterConfiguration, Logger logger) {
+    private static void populateRTBAdapterNames(final Configuration adapterConfiguration, final Logger logger) {
         Iterator<String> itr = adapterConfiguration.getKeys();
         while (null != itr && itr.hasNext()) {
             String str = itr.next();
@@ -82,10 +82,11 @@ public class SegmentFactory {
         logger.debug("RTB adapters in the config are" + rtbAdaptersNames.toString());
     }
 
-    public static AdNetworkInterface getChannel(String advertiserId, String channelId, Configuration config,
-            ClientBootstrap clientBootstrap, ClientBootstrap rtbClientBootstrap, HttpRequestHandlerBase base,
-            MessageEvent serverEvent, Set<String> advertiserSet, DebugLogger logger, boolean isRtbEnabled,
-            int rtbMaxTimemout, int dst) {
+    public static AdNetworkInterface getChannel(final String advertiserId, final String channelId,
+            final Configuration config, final ClientBootstrap clientBootstrap,
+            final ClientBootstrap rtbClientBootstrap, final HttpRequestHandlerBase base,
+            final MessageEvent serverEvent, final Set<String> advertiserSet, final DebugLogger logger,
+            final boolean isRtbEnabled, final int rtbMaxTimemout, final int dst) {
         if (isRtbEnabled) {
             for (String partnerName : rtbAdaptersNames) {
                 String advertiserIdString = config.getString(partnerName + ".advertiserId");
@@ -321,6 +322,12 @@ public class SegmentFactory {
                 && (config.getString("webmedia.status").equals("on"))) {
             DCPAjillionAdnetwork adaptor = new DCPAjillionAdnetwork(logger, config, clientBootstrap, base, serverEvent);
             adaptor.setName("webmedia");
+            return adaptor;
+        }
+        else if ((advertiserId.equals(config.getString("mobfox.advertiserId")))
+                && (advertiserSet.isEmpty() || advertiserSet.contains("mobfox"))
+                && (config.getString("mobfox.status").equals("on"))) {
+            DCPMobFoxAdnetwork adaptor = new DCPMobFoxAdnetwork(logger, config, clientBootstrap, base, serverEvent);
             return adaptor;
         }
 
