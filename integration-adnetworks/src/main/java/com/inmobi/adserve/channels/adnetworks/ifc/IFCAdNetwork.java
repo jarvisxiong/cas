@@ -166,7 +166,10 @@ public class IFCAdNetwork extends BaseAdNetworkImpl {
 			logger.info("IFC Mandatory Parameter missing: Slot");
 			return false;
 		}
-		
+		if (null == beaconUrl) {
+			logger.info("IFC Mandatory Parameter missing: BeaconURL");
+			return false;
+		}
 		return true;
 	}
 
@@ -283,6 +286,7 @@ public class IFCAdNetwork extends BaseAdNetworkImpl {
 		jsonObject.addProperty("genderOrig", sasParams.getGenderOrig());
 		jsonObject.addProperty("area", sasParams.getArea());
 		jsonObject.addProperty("host", sasParams.getHost());
+		jsonObject.addProperty("beaconURL", beaconUrl);
 		jsonObject.addProperty("appType", appType);
 		jsonObject.addProperty("categories",
 				getCategoryString(sasParams.getCategories()));
