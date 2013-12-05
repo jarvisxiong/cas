@@ -230,7 +230,7 @@ public class ChannelServer {
             String connectUri = "jdbc:postgresql://" + databaseConfig.getString("host") + ":"
                     + databaseConfig.getInt("port") + "/"
                     + databaseConfig.getString(ChannelServerStringLiterals.DATABASE)
-                    + "?" + databaseConfig.getString("socketTimeout");
+                    + "?socketTimeout=" + databaseConfig.getString("socketTimeout");
             final ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectUri, props);
             new PoolableConnectionFactory(connectionFactory, connectionPool, null, null, false, true);
             final PoolingDataSource ds = new PoolingDataSource(connectionPool);
