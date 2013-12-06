@@ -28,6 +28,7 @@ public class AdapterConfigModule extends AbstractModule {
     @Override
     protected void configure() {
 
+        @SuppressWarnings("unchecked")
         Iterator<String> keyIterator = adapterConfiguration.getKeys();
 
         Set<String> adapterNames = Sets.newHashSet();
