@@ -1,15 +1,5 @@
 package com.inmobi.adserve.channels.server;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-
 import com.inmobi.adserve.channels.adnetworks.adelphic.DCPAdelphicAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.ajillion.DCPAjillionAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.amobee.DCPAmobeeAdnetwork;
@@ -47,6 +37,15 @@ import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.DebugLogger;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.channel.MessageEvent;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 
 public class SegmentFactory {
@@ -82,11 +81,10 @@ public class SegmentFactory {
         logger.debug("RTB adapters in the config are" + rtbAdaptersNames.toString());
     }
 
-    public static AdNetworkInterface getChannel(final String advertiserId, final String channelId,
-            final Configuration config, final ClientBootstrap clientBootstrap,
-            final ClientBootstrap rtbClientBootstrap, final HttpRequestHandlerBase base,
-            final MessageEvent serverEvent, final Set<String> advertiserSet, final DebugLogger logger,
-            final boolean isRtbEnabled, final int rtbMaxTimemout, final int dst) {
+    public static AdNetworkInterface getChannel(String advertiserId, String channelId, Configuration config,
+            ClientBootstrap clientBootstrap, ClientBootstrap rtbClientBootstrap, HttpRequestHandlerBase base,
+            MessageEvent serverEvent, Set<String> advertiserSet, DebugLogger logger, boolean isRtbEnabled,
+            int rtbMaxTimemout, int dst, RepositoryHelper repositoryHelper) {
         if (isRtbEnabled) {
             for (String partnerName : rtbAdaptersNames) {
                 String advertiserIdString = config.getString(partnerName + ".advertiserId");
@@ -115,7 +113,7 @@ public class SegmentFactory {
                     }
                     logger.debug("dcname is ", dcname, "and urlBase is " + urlBase);
                     RtbAdNetwork rtbAdNetwork = new RtbAdNetwork(logger, config, rtbClientBootstrap, base, serverEvent,
-                            urlBase, partnerName, rtbMaxTimemout);
+                            urlBase, partnerName, rtbMaxTimemout, repositoryHelper);
                     logger.debug("Created RTB adapter instance for advertiser id : " + advertiserId);
                     return rtbAdNetwork;
                 }

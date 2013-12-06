@@ -19,11 +19,7 @@ import com.inmobi.phoenix.exception.InitializationException;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.dbcp.ConnectionFactory;
-import org.apache.commons.dbcp.DriverManagerConnectionFactory;
-import org.apache.commons.dbcp.PoolableConnectionFactory;
-import org.apache.commons.dbcp.PoolingDataSource;
-import org.apache.commons.pool.ObjectPool;
+import org.apache.commons.dbcp.*;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -59,6 +55,7 @@ public class ChannelServer {
     private static PricingEngineRepository          pricingEngineRepository;
     private static PublisherFilterRepository        publisherFilterRepository;
     private static SiteEcpmRepository               siteEcpmRepository;
+    private static CurrencyConversionRepository     currencyConversionRepository;
     private static final String                     configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
     public static byte                              dataCenterIdCode;
     public static short                             hostIdCode;
@@ -116,6 +113,7 @@ public class ChannelServer {
             pricingEngineRepository = new PricingEngineRepository();
             publisherFilterRepository = new PublisherFilterRepository();
             siteEcpmRepository = new SiteEcpmRepository();
+            currencyConversionRepository = new CurrencyConversionRepository();
 
             RepositoryHelper.Builder repoHelperBuilder = RepositoryHelper.newBuilder();
             repoHelperBuilder.setChannelRepository(channelRepository);
@@ -128,6 +126,7 @@ public class ChannelServer {
             repoHelperBuilder.setPricingEngineRepository(pricingEngineRepository);
             repoHelperBuilder.setPublisherFilterRepository(publisherFilterRepository);
             repoHelperBuilder.setSiteEcpmRepository(siteEcpmRepository);
+            repoHelperBuilder.setCurrencyConversionRepository(currencyConversionRepository);
             RepositoryHelper repositoryHelper = repoHelperBuilder.build();
 
             instantiateRepository(logger, config);
@@ -210,25 +209,42 @@ public class ChannelServer {
             initialContext.createSubcontext("java:comp/env");
 
             Class.forName("org.postgresql.Driver");
+            
             Properties props = new Properties();
-            props.put("validationQuery", "select version(); ");
-            props.put("testWhileIdle", "true");
-            props.put("testOnBorrow", "true");
+            props.put("type", "javax.sql.DataSource");
+            props.put("driverClassName", "org.postgresql.Driver");
             props.put("user", databaseConfig.getString("username"));
             props.put("password", databaseConfig.getString("password"));
 
-            final ObjectPool connectionPool = new GenericObjectPool(null);
+            String validationQuery = databaseConfig.getString("validationQuery");
+            int maxActive = databaseConfig.getInt("maxActive", 20);
+            int maxIdle = databaseConfig.getInt("maxIdle", 1);
+            int maxWait = databaseConfig.getInt("maxWait", -1);
+            boolean testWhileIdle = databaseConfig.getBoolean("testWhileIdle", true);
+            boolean  testOnBorrow = databaseConfig.getBoolean("testOnBorrow", true); 
+            final GenericObjectPool connectionPool = new GenericObjectPool(null);
+            connectionPool.setMaxActive(maxActive);
+            connectionPool.setMaxIdle(maxIdle);
+            connectionPool.setMaxWait(maxWait);
+            connectionPool.setTestWhileIdle(testWhileIdle);
+            connectionPool.setTestOnBorrow(testOnBorrow);
             String connectUri = "jdbc:postgresql://" + databaseConfig.getString("host") + ":"
                     + databaseConfig.getInt("port") + "/"
-                    + databaseConfig.getString(ChannelServerStringLiterals.DATABASE);
+                    + databaseConfig.getString(ChannelServerStringLiterals.DATABASE)
+                    + "?socketTimeout=" + databaseConfig.getString("socketTimeout");
             final ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectUri, props);
-            new PoolableConnectionFactory(connectionFactory, connectionPool, null, null, false, true);
-            final PoolingDataSource ds = new PoolingDataSource(connectionPool);
+            PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(connectionFactory, 
+                    connectionPool, null, validationQuery, true, false);
+
+            final PoolingDataSource ds = new PoolingDataSource(poolableConnectionFactory.getPool());
 
             initialContext.bind("java:comp/env/jdbc", ds);
 
             ChannelSegmentMatchingCache.init(logger);
-            // Reusing the repository from phoenix adsering framework.
+            // Reusing the repository from phoenix adserving framework.
+            currencyConversionRepository.init(logger,
+                config.cacheConfiguration().subset(ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY),
+                ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY);
             channelAdGroupRepository.init(logger,
                 config.cacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY),
                 ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY);
@@ -264,7 +280,6 @@ public class ChannelServer {
             logger.error("failed to creatre binding for postgresql data source " + exception.getMessage());
             ServerStatusInfo.statusCode = 404;
             ServerStatusInfo.statusString = getMyStackTrace(exception);
-            return;
         }
         catch (InitializationException exception) {
             logger.error("failed to initialize repository " + exception.getMessage());
@@ -273,7 +288,6 @@ public class ChannelServer {
             if (logger.isDebugEnabled()) {
                 logger.debug(ChannelServer.getMyStackTrace(exception));
             }
-            return;
         }
     }
 

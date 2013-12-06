@@ -29,8 +29,7 @@ import com.inmobi.adserve.channels.api.ServerException;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class DCPLoganReporting extends BaseReportingImpl
-{
+public class DCPLoganReporting extends BaseReportingImpl {
     private final Configuration config;
     private final String        apiKey;
     private String              date;
@@ -45,11 +44,10 @@ public class DCPLoganReporting extends BaseReportingImpl
                                                          + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:rep=\"http://adserver.moceanmobile.net/soap/reporting\">"
                                                          + "<soapenv:Header><mns1:authHeader xmlns:mns1=\"http://adserver.moceanmobile.net/soap/reporting\"><apiKey>%s</apiKey></mns1:authHeader></soapenv:Header>"
                                                          + "<soapenv:Body><rep:getZoneReportByZone><fromDate xsi:type=\"xsd:string\">%s</fromDate><toDate xsi:type=\"xsd:string\">%s</toDate>"
-                                                         + "<networkIds xsi:type=\"rep:ArrayOfInt\"><item xsi:type=\"xsd:int\">%s</item>   </networkIds></rep:getZoneReportByZone></soapenv:Body>"
+                                                         + "<networkIds xsi:type=\"rep:ArrayOfInt\"><item xsi:type=\"xsd:int\">%s</item> </networkIds></rep:getZoneReportByZone></soapenv:Body>"
                                                          + "</soapenv:Envelope>";
 
-    public DCPLoganReporting(final Configuration config)
-    {
+    public DCPLoganReporting(final Configuration config) {
         this.config = config;
         networkId = config.getString("logan.networkId");
         apiKey = config.getString("logan.apiKey");
@@ -58,16 +56,14 @@ public class DCPLoganReporting extends BaseReportingImpl
     }
 
     @Override
-    public int ReportReconcilerWindow()
-    {
-        return 20;
+    public int ReportReconcilerWindow() {
+        return 23;
     }
 
     @Override
     public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
             final ReportTime endTime) throws ClientProtocolException, IOException, ServerException, JSONException,
-            ParserConfigurationException, SAXException
-    {
+            ParserConfigurationException, SAXException {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         logger.debug("inside fetch rows of logan");
@@ -98,7 +94,6 @@ public class DCPLoganReporting extends BaseReportingImpl
         Document doc = builder.parse(new InputSource(new java.io.StringReader(entireReportData)));
         doc.getDocumentElement().normalize();
         NodeList nodeList = doc.getElementsByTagName("item");
-        boolean gotReport = false;
         for (int s = 0; s < nodeList.getLength(); s++) {
 
             Node zoneReportNode = nodeList.item(s);
@@ -124,69 +119,43 @@ public class DCPLoganReporting extends BaseReportingImpl
                     row.reportTime = reportDate;
                     row.siteId = zoneId;
                     row.slotSize = getReportGranularity();
-                    gotReport = true;
                     logger.debug("parsing data inside Logan" + row.request);
                     reportResponse.addReportRow(row);
                 }
             }
         }
-        if (!gotReport) {
-            addDefaultRow(logger, new ReportResponse.ReportRow(), reportResponse, key);
-        }
         return reportResponse;
     }
 
-    private void addDefaultRow(final DebugLogger logger, final ReportResponse.ReportRow row,
-            final ReportResponse reportResponse, final String key)
-    {
-        row.request = 0;
-        row.clicks = 0;
-        row.impressions = 0;
-        row.revenue = 0;
-        ReportTime reportDate = new ReportTime(date, 0);
-        row.reportTime = reportDate;
-        row.siteId = key;
-        row.slotSize = getReportGranularity();
-        reportResponse.addReportRow(row);
-        logger.debug("parsing data inside Logan", row.request);
-    }
-
     @Override
-    public String getAdvertiserId()
-    {
+    public String getAdvertiserId() {
         return (config.getString("logan.advertiserId"));
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "Logan";
     }
 
     @Override
-    public ReportGranularity getReportGranularity()
-    {
+    public ReportGranularity getReportGranularity() {
         return ReportGranularity.DAY;
     }
 
     @Override
-    public String getRequestUrl()
-    {
+    public String getRequestUrl() {
         return String.format(requestTemplate, apiKey, date, endDate, networkId);
     }
 
     @Override
-    public double getTimeZone()
-    {
+    public double getTimeZone() {
         return -3;
     }
 
-    public String getEndDate(final String seperator)
-    {
+    public String getEndDate(final String seperator) {
         try {
             logger.debug("calculating end date for logan");
             ReportTime reportTime = ReportTime.getUTCTime();
-            reportTime = ReportTime.getPreviousDay(reportTime);
             reportTime = ReportTime.getPreviousDay(reportTime);
             if (reportTime.getHour() <= ReportReconcilerWindow()) {
                 reportTime = ReportTime.getPreviousDay(reportTime);
@@ -199,8 +168,7 @@ public class DCPLoganReporting extends BaseReportingImpl
         }
     }
 
-    public String invokeHTTPUrl(final DebugLogger logger) throws ServerException, ClientProtocolException, IOException
-    {
+    public String invokeHTTPUrl(final DebugLogger logger) throws ServerException, ClientProtocolException, IOException {
         URL url = new URL(baseUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         String soapMessage = getRequestUrl();

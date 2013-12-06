@@ -77,6 +77,7 @@ public class DCPPlaceIQAdnetwork extends BaseAdNetworkImpl {
     private static DocumentBuilder        builder;
 
     private boolean                       isApp;
+    private boolean                       isGeoOrDeviceIdPresent;
 
     static {
 
@@ -133,15 +134,13 @@ public class DCPPlaceIQAdnetwork extends BaseAdNetworkImpl {
             logger.debug("mandatory parameters missing for placeiq so exiting adapter");
             return false;
         }
+        isGeoOrDeviceIdPresent = false;
         if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
                 && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
             String[] latlong = casInternalRequestParameters.latLong.split(",");
             latitude = latlong[0];
             longitude = latlong[1];
-        }
-        else {
-            logger.debug("mandatory parameters missing for placeiq so exiting adapter");
-            return false;
+            isGeoOrDeviceIdPresent = true;
         }
 
         if (!StringUtils.isBlank(sasParams.getSlot())
@@ -158,25 +157,28 @@ public class DCPPlaceIQAdnetwork extends BaseAdNetworkImpl {
         if (sasParams.getOsId() == HandSetOS.Android.getValue()) { // android
             os = ANDROID;
             isApp = true;
-            if (StringUtils.isEmpty(casInternalRequestParameters.uidMd5)
-                    && StringUtils.isEmpty(casInternalRequestParameters.uid)
-                    && StringUtils.isEmpty(casInternalRequestParameters.uidIDUS1)) {
-                logger.debug("mandatory parameters missing for placeiq so exiting adapter");
-                return false;
+            if (!(StringUtils.isEmpty(casInternalRequestParameters.uidMd5)
+                    && StringUtils.isEmpty(casInternalRequestParameters.uid) && StringUtils
+                        .isEmpty(casInternalRequestParameters.uidIDUS1))) {
+                isGeoOrDeviceIdPresent = true;
             }
         }
         else if (sasParams.getOsId() == HandSetOS.iPhone_OS.getValue()) { // iPhone
             os = IOS;
             isApp = true;
-            if (StringUtils.isEmpty(casInternalRequestParameters.uidIFA)) {
-                logger.debug("mandatory parameters missing for placeiq so exiting adapter");
-                return false;
+            if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
+                isGeoOrDeviceIdPresent = true;
             }
         }
         else {
             isApp = false;
             os = "Windows";
         }
+        if (!isGeoOrDeviceIdPresent) {
+            logger.debug("mandatory parameters missing for placeiq so exiting adapter");
+            return false;
+        }
+
         logger.info("Configure parameters inside PlaceIQ returned true");
         return true;
     }

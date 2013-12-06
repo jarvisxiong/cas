@@ -266,7 +266,7 @@ public class DCPxAdReporting extends BaseReportingImpl {
             }
         }
         catch (IOException ioe) {
-            logger.info("Error in Httpool invokeHTTPUrl : ", ioe.getMessage());
+            logger.info("Error in xAd invokeHTTPUrl : ", ioe.getMessage());
         }
         finally {
             wr.flush();
