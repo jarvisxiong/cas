@@ -1,5 +1,22 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.configuration.Configuration;
+import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.channel.MessageEvent;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.google.inject.Inject;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
@@ -13,13 +30,6 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
 import com.ning.http.client.AsyncHttpClient;
-import org.apache.commons.configuration.Configuration;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.*;
 
 
 public class AsyncRequestMaker {
@@ -28,12 +38,15 @@ public class AsyncRequestMaker {
     private static ClientBootstrap rtbClientBootstrap;
     private static AsyncHttpClient asyncHttpClient;
 
+    @Inject
+    private static SegmentFactory  segmentFactory;
+
     public static AsyncHttpClient getAsyncHttpClient() {
         return asyncHttpClient;
     }
 
-    public static void init(ClientBootstrap clientBootstrap, ClientBootstrap rtbClientBootstrap,
-            AsyncHttpClient asyncHttpClient) {
+    public static void init(final ClientBootstrap clientBootstrap, final ClientBootstrap rtbClientBootstrap,
+            final AsyncHttpClient asyncHttpClient) {
         AsyncRequestMaker.clientBootstrap = clientBootstrap;
         AsyncRequestMaker.rtbClientBootstrap = rtbClientBootstrap;
         AsyncRequestMaker.asyncHttpClient = asyncHttpClient;
@@ -43,11 +56,12 @@ public class AsyncRequestMaker {
      * For each channel we configure the parameters and make the async request if the async request is successful we add
      * it to segment list else we drop it
      */
-    public static List<ChannelSegment> prepareForAsyncRequest(List<ChannelSegment> rows, DebugLogger logger,
-            Configuration config, Configuration rtbConfig, Configuration adapterConfig, HttpRequestHandlerBase base,
-            Set<String> advertiserSet, MessageEvent e, RepositoryHelper repositoryHelper, JSONObject jObject,
-            SASRequestParameters sasParams, CasInternalRequestParameters casInternalRequestParameterGlobal,
-            List<ChannelSegment> rtbSegments) throws Exception {
+    public static List<ChannelSegment> prepareForAsyncRequest(final List<ChannelSegment> rows,
+            final DebugLogger logger, final Configuration config, final Configuration rtbConfig,
+            final Configuration adapterConfig, final HttpRequestHandlerBase base, final Set<String> advertiserSet,
+            final MessageEvent e, final RepositoryHelper repositoryHelper, final JSONObject jObject,
+            final SASRequestParameters sasParams, final CasInternalRequestParameters casInternalRequestParameterGlobal,
+            final List<ChannelSegment> rtbSegments) throws Exception {
 
         List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
 
@@ -58,7 +72,7 @@ public class AsyncRequestMaker {
 
         for (ChannelSegment row : rows) {
             ChannelSegmentEntity channelSegmentEntity = row.getChannelSegmentEntity();
-            AdNetworkInterface network = SegmentFactory.getChannel(channelSegmentEntity.getAdvertiserId(), row
+            AdNetworkInterface network = segmentFactory.getChannel(channelSegmentEntity.getAdvertiserId(), row
                     .getChannelSegmentEntity()
                         .getChannelId(), adapterConfig, clientBootstrap, rtbClientBootstrap, base, e, advertiserSet,
                 logger, isRtbEnabled, rtbMaxTimeOut, sasParams.getDst(), repositoryHelper);
@@ -121,8 +135,8 @@ public class AsyncRequestMaker {
         return segments;
     }
 
-    private static CasInternalRequestParameters getCasInternalRequestParameters(SASRequestParameters sasParams,
-            CasInternalRequestParameters casInternalRequestParameterGlobal) {
+    private static CasInternalRequestParameters getCasInternalRequestParameters(final SASRequestParameters sasParams,
+            final CasInternalRequestParameters casInternalRequestParameterGlobal) {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.impressionId = sasParams.getImpressionId();
         casInternalRequestParameters.blockedCategories = casInternalRequestParameterGlobal.blockedCategories;
@@ -144,8 +158,8 @@ public class AsyncRequestMaker {
         return casInternalRequestParameters;
     }
 
-    private static void controlEnrichment(CasInternalRequestParameters casInternalRequestParameters,
-            ChannelSegmentEntity channelSegmentEntity) {
+    private static void controlEnrichment(final CasInternalRequestParameters casInternalRequestParameters,
+            final ChannelSegmentEntity channelSegmentEntity) {
         if (channelSegmentEntity.isStripUdId()) {
             casInternalRequestParameters.uid = null;
             casInternalRequestParameters.uidO1 = null;
@@ -168,8 +182,8 @@ public class AsyncRequestMaker {
 
     }
 
-    public static List<ChannelSegment> makeAsyncRequests(List<ChannelSegment> rankList, DebugLogger logger,
-            MessageEvent e, List<ChannelSegment> rtbSegments) {
+    public static List<ChannelSegment> makeAsyncRequests(final List<ChannelSegment> rankList, final DebugLogger logger,
+            final MessageEvent e, final List<ChannelSegment> rtbSegments) {
         Iterator<ChannelSegment> itr = rankList.iterator();
         while (itr.hasNext()) {
             ChannelSegment channelSegment = itr.next();
@@ -201,14 +215,14 @@ public class AsyncRequestMaker {
         return rankList;
     }
 
-    public static String getImpressionId(long adId) {
+    public static String getImpressionId(final long adId) {
         String uuidIntKey = (WilburyUUID.setIntKey(WilburyUUID.getUUID().toString(), (int) adId)).toString();
         String uuidMachineKey = (WilburyUUID.setMachineId(uuidIntKey, ChannelServer.hostIdCode)).toString();
         return (WilburyUUID.setDataCenterId(uuidMachineKey, ChannelServer.dataCenterIdCode)).toString();
     }
 
-    private static ClickUrlMakerV6 setClickParams(DebugLogger logger, boolean pricingModel, Configuration config,
-            SASRequestParameters sasParams, JSONObject jObject) {
+    private static ClickUrlMakerV6 setClickParams(final DebugLogger logger, final boolean pricingModel,
+            final Configuration config, final SASRequestParameters sasParams, final JSONObject jObject) {
         Set<String> unhashable = new HashSet<String>();
         unhashable.addAll(Arrays.asList(config.getStringArray("clickmaker.unhashable")));
         ClickUrlMakerV6 clickUrlMakerV6 = new ClickUrlMakerV6(logger, unhashable);

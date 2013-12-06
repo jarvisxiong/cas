@@ -1,10 +1,11 @@
 package com.inmobi.adserve.channels.api;
 
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-
 import java.net.URI;
 import java.util.Map;
+
+import org.jboss.netty.handler.codec.http.HttpRequest;
+
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 
 
 public interface AdNetworkInterface {
@@ -23,7 +24,7 @@ public interface AdNetworkInterface {
 
     // Sets the secondBid price after running the auction.
     // Sets the price in both local and USD currency(Auction currency)
-    void setSecondBidPrice(Double price);
+    void setSecondBidPrice(final Double price);
 
     // Returns the second bid price after auctioning.
     double getSecondBidPriceInUsd();
@@ -57,8 +58,9 @@ public interface AdNetworkInterface {
 
     // Updates the request parameters according to the Ad Network. Returns true on
     // success.
-    boolean configureParameters(SASRequestParameters param, CasInternalRequestParameters casInternalRequestParameters,
-            ChannelSegmentEntity entity, String clickUrl, String beaconUrl);
+    boolean configureParameters(final SASRequestParameters param,
+            final CasInternalRequestParameters casInternalRequestParameters, final ChannelSegmentEntity entity,
+            final String clickUrl, final String beaconUrl);
 
     // Makes asynchronous request to Ad Network server. Returns true on success.
     boolean makeAsyncRequest();
@@ -115,8 +117,10 @@ public interface AdNetworkInterface {
 
     boolean useJsAdTag();
 
-    void setEncryptedBid(String encryptedBid);
+    void setEncryptedBid(final String encryptedBid);
 
     void generateJsAdResponse();
+
+    void setName(final String adapterName);
 
 }

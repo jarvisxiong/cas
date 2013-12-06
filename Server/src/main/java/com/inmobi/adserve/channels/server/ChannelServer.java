@@ -1,23 +1,17 @@
 package com.inmobi.adserve.channels.server;
 
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.repository.*;
-import com.inmobi.adserve.channels.server.client.BootstrapCreation;
-import com.inmobi.adserve.channels.server.client.RtbBootstrapCreation;
-import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
-import com.inmobi.adserve.channels.server.requesthandler.Filters;
-import com.inmobi.adserve.channels.server.requesthandler.Logging;
-import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
-import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.adserve.channels.util.MetricsManager;
-import com.inmobi.casthrift.DataCenter;
-import com.inmobi.messaging.publisher.AbstractMessagePublisher;
-import com.inmobi.messaging.publisher.MessagePublisherFactory;
-import com.inmobi.phoenix.exception.InitializationException;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.InetSocketAddress;
+import java.util.Properties;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbcp.ConnectionFactory;
 import org.apache.commons.dbcp.DriverManagerConnectionFactory;
@@ -35,16 +29,38 @@ import org.jboss.netty.logging.Log4JLoggerFactory;
 import org.jboss.netty.util.HashedWheelTimer;
 import org.jboss.netty.util.Timer;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.InetSocketAddress;
-import java.util.Properties;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
+import com.inmobi.adserve.channels.repository.ChannelFeedbackRepository;
+import com.inmobi.adserve.channels.repository.ChannelRepository;
+import com.inmobi.adserve.channels.repository.ChannelSegmentFeedbackRepository;
+import com.inmobi.adserve.channels.repository.ChannelSegmentMatchingCache;
+import com.inmobi.adserve.channels.repository.CurrencyConversionRepository;
+import com.inmobi.adserve.channels.repository.PricingEngineRepository;
+import com.inmobi.adserve.channels.repository.PublisherFilterRepository;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.repository.SiteCitrusLeafFeedbackRepository;
+import com.inmobi.adserve.channels.repository.SiteEcpmRepository;
+import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
+import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
+import com.inmobi.adserve.channels.server.client.BootstrapCreation;
+import com.inmobi.adserve.channels.server.client.RtbBootstrapCreation;
+import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
+import com.inmobi.adserve.channels.server.requesthandler.Filters;
+import com.inmobi.adserve.channels.server.requesthandler.Logging;
+import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
+import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.adserve.channels.util.MetricsManager;
+import com.inmobi.casthrift.DataCenter;
+import com.inmobi.messaging.publisher.AbstractMessagePublisher;
+import com.inmobi.messaging.publisher.MessagePublisherFactory;
+import com.inmobi.phoenix.exception.InitializationException;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
 
 
 public class ChannelServer {
@@ -65,7 +81,7 @@ public class ChannelServer {
     public static short                             hostIdCode;
     public static String                            dataCentreName;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(final String[] args) throws Exception {
         try {
             ConfigurationLoader config = ConfigurationLoader.getInstance(configFile);
 
@@ -138,7 +154,9 @@ public class ChannelServer {
             ServletHandler.init(config, repositoryHelper);
             MatchSegments.init(channelAdGroupRepository);
             Filters.init(config.adapterConfiguration());
-            SegmentFactory.init(repositoryHelper, config.adapterConfiguration(), logger);
+
+            Injector injector = Guice.createInjector(new AdapterConfigModule(config.adapterConfiguration(),
+                    ChannelServer.dataCentreName));
 
             // Creating netty client for out-bound calls.
             Timer timer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
@@ -191,14 +209,15 @@ public class ChannelServer {
         }
     }
 
-    public static String getMyStackTrace(Exception exception) {
+    public static String getMyStackTrace(final Exception exception) {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         exception.printStackTrace(printWriter);
         return ("StackTrace is: " + stringWriter.toString());
     }
 
-    private static void instantiateRepository(Logger logger, ConfigurationLoader config) throws ClassNotFoundException {
+    private static void instantiateRepository(final Logger logger, final ConfigurationLoader config)
+            throws ClassNotFoundException {
         try {
             logger.debug("Starting to instantiate repository");
             ChannelSegmentMatchingCache.init(logger);
@@ -213,7 +232,7 @@ public class ChannelServer {
             initialContext.createSubcontext("java:comp/env");
 
             Class.forName("org.postgresql.Driver");
-            
+
             Properties props = new Properties();
             props.put("type", "javax.sql.DataSource");
             props.put("driverClassName", "org.postgresql.Driver");
@@ -229,8 +248,8 @@ public class ChannelServer {
             final ObjectPool connectionPool = new GenericObjectPool(null);
             String connectUri = "jdbc:postgresql://" + databaseConfig.getString("host") + ":"
                     + databaseConfig.getInt("port") + "/"
-                    + databaseConfig.getString(ChannelServerStringLiterals.DATABASE)
-                    + "?" + databaseConfig.getString("socketTimeout");
+                    + databaseConfig.getString(ChannelServerStringLiterals.DATABASE) + "?"
+                    + databaseConfig.getString("socketTimeout");
             final ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectUri, props);
             new PoolableConnectionFactory(connectionFactory, connectionPool, null, null, false, true);
             final PoolingDataSource ds = new PoolingDataSource(connectionPool);
@@ -309,7 +328,7 @@ public class ChannelServer {
     }
 
     // check if all log folders exists
-    public static boolean checkLogFolders(Configuration config) {
+    public static boolean checkLogFolders(final Configuration config) {
         String rrLogFolder = config.getString("appender.rr.File");
         String channelLogFolder = config.getString("appender.channel.File");
         String debugLogFolder = config.getString("appender.debug.File");
