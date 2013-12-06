@@ -17,7 +17,6 @@ import org.apache.commons.dbcp.ConnectionFactory;
 import org.apache.commons.dbcp.DriverManagerConnectionFactory;
 import org.apache.commons.dbcp.PoolableConnectionFactory;
 import org.apache.commons.dbcp.PoolingDataSource;
-import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -236,28 +235,35 @@ public class ChannelServer {
             Properties props = new Properties();
             props.put("type", "javax.sql.DataSource");
             props.put("driverClassName", "org.postgresql.Driver");
-            props.put("validationQuery", databaseConfig.getString("validationQuery"));
-            props.put("testWhileIdle", databaseConfig.getString("testWhileIdle", "true"));
-            props.put("testOnBorrow", databaseConfig.getString("testOnBorrow", "true"));
-            props.put("maxActive", databaseConfig.getString("maxActive", "20"));
-            props.put("maxIdle", databaseConfig.getString("maxIdle", "1"));
-            props.put("maxWait", databaseConfig.getString("maxWait", "-1"));
             props.put("user", databaseConfig.getString("username"));
             props.put("password", databaseConfig.getString("password"));
 
-            final ObjectPool connectionPool = new GenericObjectPool(null);
+            String validationQuery = databaseConfig.getString("validationQuery");
+            int maxActive = databaseConfig.getInt("maxActive", 20);
+            int maxIdle = databaseConfig.getInt("maxIdle", 1);
+            int maxWait = databaseConfig.getInt("maxWait", -1);
+            boolean testWhileIdle = databaseConfig.getBoolean("testWhileIdle", true);
+            boolean testOnBorrow = databaseConfig.getBoolean("testOnBorrow", true);
+            final GenericObjectPool connectionPool = new GenericObjectPool(null);
+            connectionPool.setMaxActive(maxActive);
+            connectionPool.setMaxIdle(maxIdle);
+            connectionPool.setMaxWait(maxWait);
+            connectionPool.setTestWhileIdle(testWhileIdle);
+            connectionPool.setTestOnBorrow(testOnBorrow);
             String connectUri = "jdbc:postgresql://" + databaseConfig.getString("host") + ":"
                     + databaseConfig.getInt("port") + "/"
-                    + databaseConfig.getString(ChannelServerStringLiterals.DATABASE) + "?"
+                    + databaseConfig.getString(ChannelServerStringLiterals.DATABASE) + "?socketTimeout="
                     + databaseConfig.getString("socketTimeout");
             final ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectUri, props);
-            new PoolableConnectionFactory(connectionFactory, connectionPool, null, null, false, true);
-            final PoolingDataSource ds = new PoolingDataSource(connectionPool);
+            PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(connectionFactory,
+                    connectionPool, null, validationQuery, true, false);
+
+            final PoolingDataSource ds = new PoolingDataSource(poolableConnectionFactory.getPool());
 
             initialContext.bind("java:comp/env/jdbc", ds);
 
             ChannelSegmentMatchingCache.init(logger);
-            // Reusing the repository from phoenix adsering framework.
+            // Reusing the repository from phoenix adserving framework.
             currencyConversionRepository.init(logger,
                 config.cacheConfiguration().subset(ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY),
                 ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY);
