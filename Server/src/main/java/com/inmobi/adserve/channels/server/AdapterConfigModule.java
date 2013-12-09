@@ -4,8 +4,8 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
 
+import com.google.common.collect.Sets;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.MapBinder;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
@@ -61,4 +61,5 @@ public class AdapterConfigModule extends AbstractModule {
         requestStaticInjection(AsyncRequestMaker.class);
 
     }
+
 }
