@@ -126,6 +126,8 @@ public class DCPPaypalReporting extends BaseReportingImpl {
         reportingKeyMap.put("de3258fa43", "cb93667f");
         reportingKeyMap.put("06dc9ef276", "6614241e");
         reportingKeyMap.put("0770b6793f", "ab13526f");
+        reportingKeyMap.put("f32a4ae2ba", "4a718658");
+        reportingKeyMap.put("ce26806d50", "1a42bcc2");
     }
 
     public DCPPaypalReporting(final Configuration config) {
@@ -134,8 +136,8 @@ public class DCPPaypalReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(DebugLogger logger, ReportTime startTime, String key, ReportTime endTime)
-            throws Exception {
+    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
+            final ReportTime endTime) throws Exception {
         this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         logger.debug("inside fetch rows of paypal");
@@ -215,7 +217,8 @@ public class DCPPaypalReporting extends BaseReportingImpl {
         return reportResponse;
     }
 
-    private void addDefaultRow(DebugLogger logger, ReportResponse.ReportRow row, ReportResponse reportResponse) {
+    private void addDefaultRow(final DebugLogger logger, final ReportResponse.ReportRow row,
+            final ReportResponse reportResponse) {
         row.request = 0;
         row.clicks = 0;
         row.impressions = 0;
