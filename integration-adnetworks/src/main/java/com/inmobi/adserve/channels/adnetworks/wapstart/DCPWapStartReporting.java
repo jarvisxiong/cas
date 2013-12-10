@@ -103,6 +103,14 @@ public class DCPWapStartReporting extends BaseReportingImpl {
                 row.clicks = 0;
                 row.request = 0;
                 row.revenue = 0;
+
+                JSONObject reportRow = jReportArr.getJSONObject(i);
+                logger.debug("json array length is ", jReportArr.length());
+                row.request = 0;
+                row.reportTime = new ReportTime(reportRow.getString("day"), 0);
+                row.clicks = Long.parseLong(reportRow.getString("clicks"));
+                row.impressions = Long.parseLong(reportRow.getString("views"));
+                row.revenue = Double.parseDouble(reportRow.getString("income"));
                 double rate = getCurrencyConversionRate("RUB", startDate, logger, connection);
                 if (rate > 0) {
                     row.revenue /= rate;
@@ -111,13 +119,6 @@ public class DCPWapStartReporting extends BaseReportingImpl {
                     logger.info("Failed to get RUB to USD rate for ", startDate);
                     return null;
                 }
-                JSONObject reportRow = jReportArr.getJSONObject(i);
-                logger.debug("json array length is ", jReportArr.length());
-                row.request = 0;
-                row.reportTime = new ReportTime(reportRow.getString("day"), 0);
-                row.clicks = Long.parseLong(reportRow.getString("clicks"));
-                row.impressions = Long.parseLong(reportRow.getString("views"));
-                row.revenue = Double.parseDouble(reportRow.getString("income"));
                 logger.debug("parsing data inside wapstart ", row);
                 row.advertiserId = this.getAdvertiserId();
                 row.siteId = externalSiteId;
