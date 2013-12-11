@@ -80,7 +80,7 @@ public class ClickUrlMakerV6 {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("?");
             for (Map.Entry<String, String> entry : getParams.entrySet()) {
-                    stringBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
+                stringBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
             }
             return beaconUrl + stringBuilder.toString();
         }
