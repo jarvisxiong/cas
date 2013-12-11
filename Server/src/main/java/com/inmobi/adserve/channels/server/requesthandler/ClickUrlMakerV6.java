@@ -1,14 +1,14 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import com.google.gson.Gson;
+import com.inmobi.adserve.channels.util.DebugLogger;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
-
-import com.google.gson.Gson;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class ClickUrlMakerV6 {
@@ -79,15 +79,8 @@ public class ClickUrlMakerV6 {
         else {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("?");
-            int i = 1;
             for (Map.Entry<String, String> entry : getParams.entrySet()) {
-                if (i < getParams.size()) {
                     stringBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
-                }
-                else {
-                    stringBuilder.append(entry.getKey()).append("=").append(entry.getValue());
-                }
-                i++;
             }
             return beaconUrl + stringBuilder.toString();
         }
