@@ -34,8 +34,8 @@ public class DCPAjillionReporting extends BaseReportingImpl {
     private final String        userName;
     private DebugLogger         logger;
     private String              endDate;
-    private String              name;
-    private ReportTime          startTime;
+    private final String        name;
+    private ReportTime          reportStartTime;
 
     public DCPAjillionReporting(final Configuration config, final String name) {
         this.config = config;
@@ -66,7 +66,7 @@ public class DCPAjillionReporting extends BaseReportingImpl {
 
         logger.debug("inside fetch rows of ", name);
         try {
-            this.startTime = startTime;
+            this.reportStartTime = startTime;
             date = startTime.getMullahMediaStringDate();
             endDate = endTime == null ? getEndDate() : date;
 
@@ -100,19 +100,23 @@ public class DCPAjillionReporting extends BaseReportingImpl {
             int placementId = placementLists.getJSONObject(limit).getInt("id");
             placementIdArray.put(placementId);
         }
-        requestParamList.put("placement_ids", placementIdArray);
-        requestParamList.put("start_date", date);
-        requestParamList.put("end_date", date);
-        JSONArray columns = new JSONArray();
-        columns.put("external_publisher");
-        JSONArray sums = new JSONArray();
-        sums.put("hits");
-        sums.put("impressions");
-        sums.put("revenue");
-        requestParamList.put("columns", columns);
-        requestParamList.put("sums", sums);
-        String revenueResponse = invokeUrl(host, getRequestParams("publisher_report", requestParamList));
-        generateReportResponse(logger, reportResponse, new JSONObject(revenueResponse).getJSONArray("result"));
+        while (ReportTime.compareStringDates(date, endDate) != 1) {
+            requestParamList.put("placement_ids", placementIdArray);
+            requestParamList.put("start_date", date);
+            requestParamList.put("end_date", date);
+            JSONArray columns = new JSONArray();
+            columns.put("external_publisher");
+            JSONArray sums = new JSONArray();
+            sums.put("hits");
+            sums.put("impressions");
+            sums.put("revenue");
+            requestParamList.put("columns", columns);
+            requestParamList.put("sums", sums);
+            String revenueResponse = invokeUrl(host, getRequestParams("publisher_report", requestParamList));
+            generateReportResponse(logger, reportResponse, new JSONObject(revenueResponse).getJSONArray("result"));
+            reportStartTime = ReportTime.getNextDay(reportStartTime);
+            date = reportStartTime.getMullahMediaStringDate();
+        }
         return reportResponse;
     }
 
@@ -157,7 +161,8 @@ public class DCPAjillionReporting extends BaseReportingImpl {
         }
     }
 
-    private JSONObject getRequestParams(String methodName, JSONObject params) throws JSONException, ServerException {
+    private JSONObject getRequestParams(final String methodName, final JSONObject params) throws JSONException,
+            ServerException {
         JSONObject requestParams = new JSONObject();
         requestParams.put("jsonrpc", "2.0");
         requestParams.put("method", methodName);
@@ -174,7 +179,7 @@ public class DCPAjillionReporting extends BaseReportingImpl {
         return userParams;
     }
 
-    public String invokeUrl(String host, JSONObject queryObject) throws HttpException, IOException {
+    public String invokeUrl(final String host, final JSONObject queryObject) throws HttpException, IOException {
         URL url = new URL(host);
         HttpURLConnection.setFollowRedirects(false);
         HttpURLConnection hconn = (HttpURLConnection) url.openConnection();
@@ -195,8 +200,8 @@ public class DCPAjillionReporting extends BaseReportingImpl {
         return sBuffer.toString();
     }
 
-    private void generateReportResponse(final DebugLogger logger, ReportResponse reportResponse, JSONArray responseArray)
-            throws JSONException {
+    private void generateReportResponse(final DebugLogger logger, final ReportResponse reportResponse,
+            final JSONArray responseArray) throws JSONException {
 
         for (int i = 0; i < responseArray.length(); i++) {
             JSONObject reportRow = responseArray.getJSONObject(i);
@@ -209,7 +214,7 @@ public class DCPAjillionReporting extends BaseReportingImpl {
             row.impressions = reportRow.getLong("impressions");
             row.revenue = reportRow.getDouble("revenue");
             row.request = reportRow.getLong("hits");
-            row.reportTime = startTime;
+            row.reportTime = reportStartTime;
             row.slotSize = getReportGranularity();
             reportResponse.addReportRow(row);
         }
