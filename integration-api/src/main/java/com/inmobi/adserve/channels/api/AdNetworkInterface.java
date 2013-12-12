@@ -1,10 +1,10 @@
 package com.inmobi.adserve.channels.api;
 
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import org.jboss.netty.handler.codec.http.HttpRequest;
+
 import java.net.URI;
 import java.util.Map;
-
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 
 
 public interface AdNetworkInterface {
@@ -16,13 +16,23 @@ public interface AdNetworkInterface {
     long getLatency();
 
     // Return the bid price for rtb, for other will return the -1.
-    double getBidprice();
+    double getBidPriceInUsd();
+
+    // Returns teh bid price for rtbd in local currency in which partner has bid
+    double getBidPriceInLocal();
 
     // Sets the secondBid price after running the auction.
+    // Sets the price in both local and USD currency(Auction currency)
     void setSecondBidPrice(Double price);
 
     // Returns the second bid price after auctioning.
-    double getSecondBidPrice();
+    double getSecondBidPriceInUsd();
+
+    // Returns the second bid price in local currency after auction
+    double getSecondBidPriceInLocal();
+
+    // Return bidder currency
+    String getCurrency();
 
     // Returns true for rtb partner, false otherwise.
     boolean isRtbPartner();
