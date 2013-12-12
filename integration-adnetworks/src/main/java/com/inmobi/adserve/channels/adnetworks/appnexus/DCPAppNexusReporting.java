@@ -32,7 +32,7 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
     private final String        userName;
     private DebugLogger         logger;
     private String              endDate;
-    private String              name;
+    private final String        name;
     private final String        startDateFormatter = "%s 00:00:00";
     private final String        endDateFormatter   = "%s 23:59:59";
     private boolean             isTokenGenerated   = false;
@@ -75,7 +75,10 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
             logger.info("failed to obtain correct dates for fetching reports ", exception.getMessage());
             return null;
         }
-
+        if (key.contains("_")) {
+            logger.debug("invalid key", key);
+            return null;
+        }
         if (!isTokenGenerated) {
             String tokenResponse = invokeUrl(authUrl, getRequestToken(), null);
             token = new JSONObject(tokenResponse).getJSONObject("response").getString("token");
@@ -90,7 +93,6 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
                     .getJSONObject("report")
                     .getString("url");
         String reportData = invokeUrl(String.format(downloadUrl, downloadUrlString), token);
-
         generateReportResponse(logger, reportResponse, reportData.split("\n"), key);
         return reportResponse;
     }
@@ -146,7 +148,7 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
         return authParams;
     }
 
-    private JSONObject getRequestObject(String extSiteKey) throws JSONException {
+    private JSONObject getRequestObject(final String extSiteKey) throws JSONException {
         JSONArray columnArray = new JSONArray();
         columnArray.put("day");
         columnArray.put("clicks");
@@ -168,7 +170,8 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
         // {"report":{"columns":["day","clicks"],"report_type":"publisher_analytics"}}
     }
 
-    public String invokeUrl(String host, JSONObject queryObject, String token) throws HttpException, IOException {
+    public String invokeUrl(final String host, final JSONObject queryObject, final String token) throws HttpException,
+            IOException {
         URL url = new URL(host);
         HttpURLConnection.setFollowRedirects(false);
         HttpURLConnection hconn = (HttpURLConnection) url.openConnection();
@@ -194,7 +197,7 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
         return sBuffer.toString();
     }
 
-    public String invokeUrl(String host, String token) throws HttpException, IOException {
+    public String invokeUrl(final String host, final String token) throws HttpException, IOException {
         URL url = new URL(host);
         HttpURLConnection.setFollowRedirects(false);
         HttpURLConnection hconn = (HttpURLConnection) url.openConnection();
@@ -214,8 +217,8 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
         return sBuffer.toString();
     }
 
-    private void generateReportResponse(final DebugLogger logger, ReportResponse reportResponse,
-            String[] responseArray, String extSiteKey) throws ParseException {
+    private void generateReportResponse(final DebugLogger logger, final ReportResponse reportResponse,
+            final String[] responseArray, final String extSiteKey) throws ParseException {
         if (responseArray.length > 1) {
             int impressionIndex = -1;
             int clicksIndex = -1;
@@ -246,8 +249,9 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
             for (int j = 1; j < responseArray.length; j++) {
 
                 String[] reportRow = responseArray[j].split(",");
-                if (reportRow.length == 0)
+                if (reportRow.length == 0) {
                     continue;
+                }
 
                 ReportResponse.ReportRow row = new ReportResponse.ReportRow();
                 row.siteId = extSiteKey;
