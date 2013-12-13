@@ -15,14 +15,23 @@ import com.inmobi.adserve.channels.api.AdNetworkInterface;
 @EqualsAndHashCode
 public class BaseAdapterConfig implements AdapterConfig {
 
-    private final Configuration adapterConfig;
-    private final String        dcName;
-    private final String        adapterName;
+    private final Configuration             adapterConfig;
+    private final String                    dcName;
+    private final String                    adapterName;
+    private final Class<AdNetworkInterface> adapterClass;
 
+    @SuppressWarnings("unchecked")
     public BaseAdapterConfig(final Configuration adapterConfig, final String adapterName, final String dcName) {
         this.adapterConfig = adapterConfig;
         this.adapterName = adapterName;
         this.dcName = dcName;
+
+        try {
+            this.adapterClass = (Class<AdNetworkInterface>) Class.forName(adapterConfig.getString("class"));
+        }
+        catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -90,14 +99,8 @@ public class BaseAdapterConfig implements AdapterConfig {
     /*
      * @return the adNetworkInterfaceClass
      */
-    @SuppressWarnings("unchecked")
     @Override
     public Class<AdNetworkInterface> getAdNetworkInterfaceClass() {
-        try {
-            return (Class<AdNetworkInterface>) Class.forName(adapterConfig.getString("class"));
-        }
-        catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        return adapterClass;
     }
 }
