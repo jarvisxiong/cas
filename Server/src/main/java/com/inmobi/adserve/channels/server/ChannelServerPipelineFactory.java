@@ -28,9 +28,7 @@ public class ChannelServerPipelineFactory implements ChannelPipelineFactory {
 
     public ChannelServerPipelineFactory(Timer timer, Configuration configuration) {
         this.timer = timer;
-        int maxConnections;
         this.serverTimeoutMillis = configuration.getInt("serverTimeoutMillis", 825);
-        maxConnections = configuration.getInt("incomingMaxConnections", 200);
         executionHandler = new ExecutionHandler(new OrderedMemoryAwareThreadPoolExecutor(80, 1048576, 1048576, 3,
                 TimeUnit.HOURS));
         incomingConnectionLimitHandler = new ConnectionLimitHandler(configuration, ConnectionType.Incoming);
