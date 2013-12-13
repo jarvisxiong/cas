@@ -5,8 +5,8 @@ import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.json.JSONObject;
 
 import com.inmobi.adserve.channels.api.ChannelsClientHandler;
+import com.inmobi.adserve.channels.server.ConnectionLimitHandler;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.IncomingConnectionLimitHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.client.BootstrapCreation;
 import com.inmobi.adserve.channels.server.client.RtbBootstrapCreation;
@@ -15,6 +15,7 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class ServletMapsizes implements Servlet {
+
 
     @Override
     public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
@@ -30,9 +31,9 @@ public class ServletMapsizes implements Servlet {
         mapsizes.put("RTBDActiveOutboundConnections", RtbBootstrapCreation.getActiveOutboundConnections());
         mapsizes.put("RTBDMaxConnections", RtbBootstrapCreation.getMaxConnections());
         mapsizes.put("RTBDDroppedConnections", RtbBootstrapCreation.getDroppedConnections());
-        mapsizes.put("IncomingMaxConnections", IncomingConnectionLimitHandler.getIncomingMaxConnections());
-        mapsizes.put("IncomingDroppedConnections", IncomingConnectionLimitHandler.getIncomingDroppedConnections());
-        mapsizes.put("IncomingActiveConnections", IncomingConnectionLimitHandler.getIncomingActiveConnections());
+        mapsizes.put("IncomingMaxConnections", e.getChannel().getPipeline().get(ConnectionLimitHandler.class).getMaxConnectionsLimit());
+        mapsizes.put("IncomingDroppedConnections", e.getChannel().getPipeline().get(ConnectionLimitHandler.class).getDroppedConnections());
+        mapsizes.put("IncomingActiveConnections", e.getChannel().getPipeline().get(ConnectionLimitHandler.class).getActiveConnections());
         hrh.responseSender.sendResponse(mapsizes.toString(), e);
     }
 

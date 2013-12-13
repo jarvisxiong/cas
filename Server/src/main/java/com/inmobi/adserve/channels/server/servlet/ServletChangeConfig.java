@@ -1,11 +1,8 @@
 package com.inmobi.adserve.channels.server.servlet;
 
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.IncomingConnectionLimitHandler;
 import com.inmobi.adserve.channels.server.ServletHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
-import com.inmobi.adserve.channels.server.client.BootstrapCreation;
-import com.inmobi.adserve.channels.server.client.RtbBootstrapCreation;
 import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
@@ -64,33 +61,11 @@ public class ServletChangeConfig implements Servlet {
                         && ServletHandler.getServerConfig().containsKey(configKey.replace("server.", ""))) {
                     ServletHandler.getServerConfig().setProperty(configKey.replace("server.", ""),
                         jObject.getString(configKey));
-                    if (configKey.replace("server.", "").equals("maxconnections")) {
-                        BootstrapCreation.setMaxConnectionLimit(ServletHandler.getServerConfig().getInt(
-                            configKey.replace("server.", "")));
-                    }
-                    if (configKey.replace("server.", "").equals("incomingMaxConnections")) {
-                        IncomingConnectionLimitHandler.setIncomingMaxConnections(ServletHandler.getServerConfig().getInt(
-                                configKey.replace("server.", "")));
-                    }
                     updates.append(configKey)
                                 .append("=")
                                 .append(ServletHandler.getServerConfig().getString(configKey.replace("server.", "")))
                                 .append("\n");
                 }
-                if (configKey.startsWith("rtb")
-                        && ServletHandler.getServerConfig().containsKey(configKey.replace("rtb.", ""))) {
-                    ServletHandler.getServerConfig().setProperty(configKey.replace("rtb.", ""),
-                            jObject.getString(configKey));
-                    if (configKey.replace("rtb.", "").equals("maxconnections")) {
-                        RtbBootstrapCreation.setMaxConnectionLimit(ServletHandler.getServerConfig().getInt(
-                                configKey.replace("rtb.", "")));
-                    }
-                    updates.append(configKey)
-                            .append("=")
-                            .append(ServletHandler.getServerConfig().getString(configKey.replace("rtb.", "")))
-                            .append("\n");
-                }
-                
             }
             hrh.responseSender.sendResponse(updates.toString(), e);
         }

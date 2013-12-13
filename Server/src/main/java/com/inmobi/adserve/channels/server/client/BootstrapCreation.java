@@ -1,9 +1,8 @@
 package com.inmobi.adserve.channels.server.client;
 
-import java.util.NoSuchElementException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
+import com.inmobi.adserve.channels.api.ChannelsClientHandler;
+import com.inmobi.adserve.channels.server.ConnectionLimitHandler;
+import com.inmobi.adserve.channels.server.api.ConnectionType;
 import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
 import org.jboss.netty.bootstrap.ClientBootstrap;
@@ -16,14 +15,15 @@ import org.jboss.netty.handler.codec.http.HttpResponseDecoder;
 import org.jboss.netty.handler.timeout.ReadTimeoutHandler;
 import org.jboss.netty.util.Timer;
 
-import com.inmobi.adserve.channels.api.ChannelsClientHandler;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 
 public class BootstrapCreation {
     public static ClientBootstrap                 bootstrap;
     private static ChannelsClientHandler          channelHandler;
     private static Timer                          timer;
-    private static ConnectionLimitUpstreamHandler connectionLimitUpstreamHandler;
+    private static ConnectionLimitHandler connectionLimitUpstreamHandler;
 
     public static void init(Timer timer) {
         BootstrapCreation.timer = timer;
@@ -35,14 +35,7 @@ public class BootstrapCreation {
             bootstrap = new ClientBootstrap(new NioClientSocketChannelFactory(Executors.newCachedThreadPool(),
                     Executors.newCachedThreadPool()));
             channelHandler = new ChannelsClientHandler();
-            int maxConnections;
-            try {
-                maxConnections = config.getInt("maxconnections");
-            }
-            catch (NoSuchElementException e) {
-                maxConnections = 100;
-            }
-            connectionLimitUpstreamHandler = new ConnectionLimitUpstreamHandler(maxConnections);
+            connectionLimitUpstreamHandler = new ConnectionLimitHandler(config, ConnectionType.DCPOutGoing);
         }
         catch (Exception ex) {
             logger.info("error in building bootstrap " + ex.getMessage());
@@ -74,20 +67,16 @@ public class BootstrapCreation {
         return bootstrap;
     }
 
-    public static void setMaxConnectionLimit(int maxOutboundConnectionLimit) {
-        connectionLimitUpstreamHandler.setMaxConnections(maxOutboundConnectionLimit);
-    }
-
     public static int getActiveOutboundConnections() {
-        return connectionLimitUpstreamHandler.getActiveOutboundConnections();
+        return connectionLimitUpstreamHandler.getActiveConnections().get();
     }
 
     public static int getMaxConnections() {
-        return connectionLimitUpstreamHandler.getMaxConnections();
+        return connectionLimitUpstreamHandler.getMaxConnectionsLimit();
     }
 
     public static int getDroppedConnections() {
-        return connectionLimitUpstreamHandler.getDroppedConnections();
+        return connectionLimitUpstreamHandler.getDroppedConnections().get();
     }
 
 }

@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.server;
 
+import com.inmobi.adserve.channels.server.api.ConnectionType;
+import lombok.Getter;
 import org.apache.commons.configuration.Configuration;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -21,7 +23,8 @@ public class ChannelServerPipelineFactory implements ChannelPipelineFactory {
     private final Timer      timer;
     private int              serverTimeoutMillis; 
     private ExecutionHandler executionHandler;
-    private IncomingConnectionLimitHandler incomingConnectionLimitHandler;
+    @Getter
+    private ConnectionLimitHandler incomingConnectionLimitHandler;
 
     public ChannelServerPipelineFactory(Timer timer, Configuration configuration) {
         this.timer = timer;
@@ -30,7 +33,7 @@ public class ChannelServerPipelineFactory implements ChannelPipelineFactory {
         maxConnections = configuration.getInt("incomingMaxConnections", 200);
         executionHandler = new ExecutionHandler(new OrderedMemoryAwareThreadPoolExecutor(80, 1048576, 1048576, 3,
                 TimeUnit.HOURS));
-        incomingConnectionLimitHandler = new IncomingConnectionLimitHandler(maxConnections);
+        incomingConnectionLimitHandler = new ConnectionLimitHandler(configuration, ConnectionType.Incoming);
     }
 
     public ChannelPipeline getPipeline() throws Exception {
