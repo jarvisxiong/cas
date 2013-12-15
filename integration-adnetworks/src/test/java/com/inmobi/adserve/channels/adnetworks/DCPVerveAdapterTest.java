@@ -245,7 +245,7 @@ public class DCPVerveAdapterTest extends TestCase {
                     "{\"trueLatLongOnly\":\"true\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpVerveAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://adcel.vrvm.com/htmlad?ip=206.29.182.240&p=iphn&b=1324&site=00000000-0000-0000-0000-000000000000&ua=Mozilla&lat=37.4429&long=-122.1514&uis=v&ui=202cb962ac59075b964b07152d234b70&c=999&adunit=320x48";
+            String expectedUrl = "http://adcel.vrvm.com/htmlad?ip=206.29.182.240&p=iphn&b=1324&site=00000000-0000-0000-0000-000000000000&ua=Mozilla&lat=37.4429&long=-122.1514&uis=v&ui=202cb962ac59075b964b07152d234b70&c=97&adunit=320x48";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -271,7 +271,7 @@ public class DCPVerveAdapterTest extends TestCase {
                     "{\"trueLatLongOnly\":\"false\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
         if (dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpVerveAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://adcel.vrvm.com/htmlad?ip=206.29.182.240&p=iphn&b=1324&site=00000000-0000-0020-0000-000000000000&ua=Mozilla&uis=v&ui=202cb962ac59075b964b07152d234b70&c=999&adunit=320x48";
+            String expectedUrl = "http://adcel.vrvm.com/htmlad?ip=206.29.182.240&p=iphn&b=1324&site=00000000-0000-0020-0000-000000000000&ua=Mozilla&uis=v&ui=202cb962ac59075b964b07152d234b70&c=97&adunit=320x48";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -297,7 +297,7 @@ public class DCPVerveAdapterTest extends TestCase {
                     "{\"trueLatLongOnly\":\"true\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
         if (dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpVerveAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://adcel.vrvm.com/htmlad?ip=206.29.182.240&p=iphn&b=1324&site=00000000-0000-0020-0000-000000000000&ua=Mozilla&uis=v&ui=202cb962ac59075b964b07152d234b70&c=999&adunit=320x48";
+            String expectedUrl = "http://adcel.vrvm.com/htmlad?ip=206.29.182.240&p=iphn&b=1324&site=00000000-0000-0020-0000-000000000000&ua=Mozilla&uis=v&ui=202cb962ac59075b964b07152d234b70&c=97&adunit=320x48";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -323,7 +323,7 @@ public class DCPVerveAdapterTest extends TestCase {
                     "{\"trueLatLongOnly\":\"true\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpVerveAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://adcel.vrvm.com/htmlad?ip=206.29.182.240&p=ptnr&b=1324&site=00000000-0000-0000-0000-000000000000&ua=Mozilla&lat=37.4429&long=-122.1514&c=999&adunit=320x48";
+            String expectedUrl = "http://adcel.vrvm.com/htmlad?ip=206.29.182.240&p=ptnr&b=1324&site=00000000-0000-0000-0000-000000000000&ua=Mozilla&lat=37.4429&long=-122.1514&c=97&adunit=320x48";
             assertEquals(expectedUrl, actualUrl);
         }
     }
