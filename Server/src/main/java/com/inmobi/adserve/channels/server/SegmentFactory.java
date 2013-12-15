@@ -1,5 +1,15 @@
 package com.inmobi.adserve.channels.server;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.channel.MessageEvent;
+
 import com.inmobi.adserve.channels.adnetworks.adelphic.DCPAdelphicAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.ajillion.DCPAjillionAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.amobee.DCPAmobeeAdnetwork;
@@ -27,6 +37,7 @@ import com.inmobi.adserve.channels.adnetworks.placeiq.DCPPlaceIQAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.pubmatic.DCPPubmaticAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.siquis.DCPSiquisAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.smaato.DCPSmaatoAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.tapit.DCPTapitAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.verve.DCPVerveAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.wapstart.DCPWapStartAdNetwork;
@@ -37,15 +48,6 @@ import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.DebugLogger;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
 
 public class SegmentFactory {
@@ -81,10 +83,11 @@ public class SegmentFactory {
         logger.debug("RTB adapters in the config are" + rtbAdaptersNames.toString());
     }
 
-    public static AdNetworkInterface getChannel(String advertiserId, String channelId, Configuration config,
-            ClientBootstrap clientBootstrap, ClientBootstrap rtbClientBootstrap, HttpRequestHandlerBase base,
-            MessageEvent serverEvent, Set<String> advertiserSet, DebugLogger logger, boolean isRtbEnabled,
-            int rtbMaxTimemout, int dst, RepositoryHelper repositoryHelper) {
+    public static AdNetworkInterface getChannel(final String advertiserId, final String channelId,
+            final Configuration config, final ClientBootstrap clientBootstrap,
+            final ClientBootstrap rtbClientBootstrap, final HttpRequestHandlerBase base,
+            final MessageEvent serverEvent, final Set<String> advertiserSet, final DebugLogger logger,
+            final boolean isRtbEnabled, final int rtbMaxTimemout, final int dst, final RepositoryHelper repositoryHelper) {
         if (isRtbEnabled) {
             for (String partnerName : rtbAdaptersNames) {
                 String advertiserIdString = config.getString(partnerName + ".advertiserId");
@@ -326,6 +329,12 @@ public class SegmentFactory {
                 && (advertiserSet.isEmpty() || advertiserSet.contains("mobfox"))
                 && (config.getString("mobfox.status").equals("on"))) {
             DCPMobFoxAdnetwork adaptor = new DCPMobFoxAdnetwork(logger, config, clientBootstrap, base, serverEvent);
+            return adaptor;
+        }
+        else if ((advertiserId.equals(config.getString("smaato.advertiserId")))
+                && (advertiserSet.isEmpty() || advertiserSet.contains("smaato"))
+                && (config.getString("smaato.status").equals("on"))) {
+            DCPSmaatoAdnetwork adaptor = new DCPSmaatoAdnetwork(logger, config, clientBootstrap, base, serverEvent);
             return adaptor;
         }
 
