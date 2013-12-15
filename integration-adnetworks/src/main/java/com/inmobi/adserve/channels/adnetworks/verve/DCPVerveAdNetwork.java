@@ -177,7 +177,7 @@ public class DCPVerveAdNetwork extends BaseAdNetworkImpl {
                 url.append("&z=").append(casInternalRequestParameters.zipCode);
             }
 
-            url.append("&c=").append("999");// get category map
+            url.append("&c=97");// get category map
 
             if (width != 0 && height != 0) {
                 url.append("&adunit=").append(width).append('x').append(height);
