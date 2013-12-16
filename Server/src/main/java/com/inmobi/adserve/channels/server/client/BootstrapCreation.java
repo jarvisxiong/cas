@@ -35,7 +35,7 @@ public class BootstrapCreation {
             bootstrap = new ClientBootstrap(new NioClientSocketChannelFactory(Executors.newCachedThreadPool(),
                     Executors.newCachedThreadPool()));
             channelHandler = new ChannelsClientHandler();
-            connectionLimitUpstreamHandler = new ConnectionLimitHandler(config, ConnectionType.DCPOutGoing);
+            connectionLimitUpstreamHandler = new ConnectionLimitHandler(config, ConnectionType.DCP_OUTGOING);
         }
         catch (Exception ex) {
             logger.info("error in building bootstrap " + ex.getMessage());

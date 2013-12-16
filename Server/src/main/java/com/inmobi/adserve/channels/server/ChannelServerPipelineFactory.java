@@ -31,7 +31,7 @@ public class ChannelServerPipelineFactory implements ChannelPipelineFactory {
         this.serverTimeoutMillis = configuration.getInt("serverTimeoutMillis", 825);
         executionHandler = new ExecutionHandler(new OrderedMemoryAwareThreadPoolExecutor(80, 1048576, 1048576, 3,
                 TimeUnit.HOURS));
-        incomingConnectionLimitHandler = new ConnectionLimitHandler(configuration, ConnectionType.Incoming);
+        incomingConnectionLimitHandler = new ConnectionLimitHandler(configuration, ConnectionType.INCOMING);
     }
 
     public ChannelPipeline getPipeline() throws Exception {

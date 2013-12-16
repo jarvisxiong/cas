@@ -36,7 +36,7 @@ public class RtbBootstrapCreation {
             bootstrap = new ClientBootstrap(new NioClientSocketChannelFactory(Executors.newCachedThreadPool(),
                     Executors.newCachedThreadPool()));
             channelHandler = new ChannelsClientHandler();
-            connectionLimitUpstreamHandler = new ConnectionLimitHandler(config, ConnectionType.RTBDOutGoing);
+            connectionLimitUpstreamHandler = new ConnectionLimitHandler(config, ConnectionType.RTBD_OUTGOING);
         }
         catch (Exception ex) {
             logger.info("error in building RTBbootstrap " + ex.getMessage());

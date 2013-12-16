@@ -1,3 +1,3 @@
 package com.inmobi.adserve.channels.server.api;
 
-public enum ConnectionType {Incoming, DCPOutGoing, RTBDOutGoing} //Incoming or OutGoing
+public enum ConnectionType {INCOMING, DCP_OUTGOING, RTBD_OUTGOING} //Incoming or OutGoing

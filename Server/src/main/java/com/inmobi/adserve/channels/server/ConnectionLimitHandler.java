@@ -52,13 +52,13 @@ public class ConnectionLimitHandler extends SimpleChannelHandler {
     public int getMaxConnectionsLimit() {
         int maxConnections = 200;
       switch (connectionType) {
-          case DCPOutGoing :
+          case DCP_OUTGOING:
               maxConnections = config.getInt("dcpOutGoingMaxConnections", 200);
               break;
-          case RTBDOutGoing:
+          case RTBD_OUTGOING:
               maxConnections = config.getInt("rtbOutGoingMaxConnections", 200);
               break;
-          case Incoming:
+          case INCOMING:
               maxConnections = config.getInt("incomingMaxConnections", 500);
               break;
           default : break;
