@@ -20,6 +20,7 @@ public class ServletMapsizes implements Servlet {
     @Override
     public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
             DebugLogger logger) throws Exception {
+        ConnectionLimitHandler incomingConnectionLimitHandler = e.getChannel().getPipeline().get(ConnectionLimitHandler.class);
         JSONObject mapsizes = new JSONObject();
         mapsizes.put("ResponseMap", ChannelsClientHandler.responseMap.size());
         mapsizes.put("StatusMap", ChannelsClientHandler.responseMap.size());
@@ -31,9 +32,9 @@ public class ServletMapsizes implements Servlet {
         mapsizes.put("RTBDActiveOutboundConnections", RtbBootstrapCreation.getActiveOutboundConnections());
         mapsizes.put("RTBDMaxConnections", RtbBootstrapCreation.getMaxConnections());
         mapsizes.put("RTBDDroppedConnections", RtbBootstrapCreation.getDroppedConnections());
-        mapsizes.put("IncomingMaxConnections", e.getChannel().getPipeline().get(ConnectionLimitHandler.class).getMaxConnectionsLimit());
-        mapsizes.put("IncomingDroppedConnections", e.getChannel().getPipeline().get(ConnectionLimitHandler.class).getDroppedConnections());
-        mapsizes.put("IncomingActiveConnections", e.getChannel().getPipeline().get(ConnectionLimitHandler.class).getActiveConnections());
+        mapsizes.put("IncomingMaxConnections", incomingConnectionLimitHandler.getMaxConnectionsLimit());
+        mapsizes.put("IncomingDroppedConnections", incomingConnectionLimitHandler.getDroppedConnections());
+        mapsizes.put("IncomingActiveConnections", incomingConnectionLimitHandler.getActiveConnections());
         hrh.responseSender.sendResponse(mapsizes.toString(), e);
     }
 

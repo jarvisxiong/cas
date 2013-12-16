@@ -169,7 +169,7 @@ public class ChannelServer {
             ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(
                     Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
             Timer servertimer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
-            bootstrap.setPipelineFactory(new ChannelServerPipelineFactory(servertimer, config.serverConfiguration()));
+            bootstrap.setPipelineFactory(new ChannelServerPipelineFactory(servertimer, ServletHandler.getServerConfig()));
             bootstrap.setOption("child.keepAlive", true);
             bootstrap.setOption("child.tcpNoDelay", true);
             bootstrap.setOption("child.reuseAddress", true);

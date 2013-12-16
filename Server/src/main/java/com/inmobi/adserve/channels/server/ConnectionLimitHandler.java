@@ -30,7 +30,7 @@ public class ConnectionLimitHandler extends SimpleChannelHandler {
         int maxConnections = getMaxConnectionsLimit();
         if (maxConnections > 0) {
             int currentCount = activeConnections.getAndIncrement();
-            if (currentCount + 1 > maxConnections) {
+            if (currentCount > maxConnections) {
                 logger.info(connectionType.name(), "MaxLimit of connections", maxConnections, "exceeded so closing channel");
                 ctx.getChannel().close();
                 droppedConnections.incrementAndGet();
