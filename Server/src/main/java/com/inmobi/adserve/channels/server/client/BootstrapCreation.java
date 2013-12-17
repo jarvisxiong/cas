@@ -17,6 +17,8 @@ import org.jboss.netty.handler.timeout.ReadTimeoutHandler;
 import org.jboss.netty.util.Timer;
 
 import com.inmobi.adserve.channels.api.ChannelsClientHandler;
+import com.inmobi.adserve.channels.server.RequestIdHandler;
+import com.inmobi.adserve.channels.server.TraceMarkerhandler;
 
 
 public class BootstrapCreation {
@@ -25,11 +27,11 @@ public class BootstrapCreation {
     private static Timer                          timer;
     private static ConnectionLimitUpstreamHandler connectionLimitUpstreamHandler;
 
-    public static void init(Timer timer) {
+    public static void init(final Timer timer) {
         BootstrapCreation.timer = timer;
     }
 
-    public static ClientBootstrap createBootstrap(Logger logger, final Configuration config) {
+    public static ClientBootstrap createBootstrap(final Logger logger, final Configuration config) {
         // make the bootstrap object
         try {
             bootstrap = new ClientBootstrap(new NioClientSocketChannelFactory(Executors.newCachedThreadPool(),
@@ -48,11 +50,18 @@ public class BootstrapCreation {
             logger.info("error in building bootstrap " + ex.getMessage());
             return null;
         }
+
+        final RequestIdHandler requestIdHandler = new RequestIdHandler();
+        final TraceMarkerhandler traceMarkerhandler = new TraceMarkerhandler();
+
         // make the channel pipeline
         try {
             bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
+                @Override
                 public ChannelPipeline getPipeline() throws Exception {
                     ChannelPipeline pipeline = Channels.pipeline();
+                    pipeline.addLast("requestIdHandler", requestIdHandler);
+                    pipeline.addLast("traceMarkerhandler", traceMarkerhandler);
                     pipeline.addLast("connectionLimit", connectionLimitUpstreamHandler);
                     pipeline.addLast("timeout", new ReadTimeoutHandler(timer, config.getInt("readtimeoutMillis"),
                             TimeUnit.MILLISECONDS));
@@ -74,7 +83,7 @@ public class BootstrapCreation {
         return bootstrap;
     }
 
-    public static void setMaxConnectionLimit(int maxOutboundConnectionLimit) {
+    public static void setMaxConnectionLimit(final int maxOutboundConnectionLimit) {
         connectionLimitUpstreamHandler.setMaxConnections(maxOutboundConnectionLimit);
     }
 

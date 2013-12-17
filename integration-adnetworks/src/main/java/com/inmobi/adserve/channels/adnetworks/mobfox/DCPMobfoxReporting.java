@@ -11,19 +11,21 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPMobfoxReporting extends BaseReportingImpl {
+    private static final Logger LOG         = LoggerFactory.getLogger(DCPMobfoxReporting.class);
+
     private final String        accountId;
     private final String        apiKey;
     private String              startDate;
     private String              endDate;
-    private DebugLogger         logger;
     private final String        host;
     private final String        advertiserId;
     private final String        listUrl;
@@ -51,26 +53,25 @@ public class DCPMobfoxReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws Exception {
-        this.logger = logger;
+    public ReportResponse fetchRows(final ReportTime startTime, final String key, final ReportTime endTime)
+            throws Exception {
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
-        logger.debug("inside fetch rows of mobfox");
+        LOG.debug("inside fetch rows of mobfox");
         try {
             this.startDate = startTime.getStringDate("-");
-            logger.debug("start date inside mobfox is " + this.startDate);
+            LOG.debug("start date inside mobfox is {}", this.startDate);
             endDate = endTime == null ? getEndDate("-") : startDate;
             if (ReportTime.compareStringDates(this.endDate, this.startDate) == -1) {
-                logger.debug("date is greater than the current date reporting window for mobfox");
+                LOG.debug("date is greater than the current date reporting window for mobfox");
                 return null;
             }
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.info("failed to obtain correct dates for fetching reports " + exception.getMessage());
+            LOG.info("failed to obtain correct dates for fetching reports {}", exception.getMessage());
             return null;
         }
-        String listApiresponse = invokeHTTPUrl(String.format(String.format(listUrl, accountId, apiKey)), logger);
+        String listApiresponse = invokeHTTPUrl(String.format(String.format(listUrl, accountId, apiKey)));
 
         ListResponse response = (ListResponse) jaxbUnmarshaller.unmarshal(new ByteArrayInputStream(listApiresponse
                 .getBytes()));
@@ -84,7 +85,7 @@ public class DCPMobfoxReporting extends BaseReportingImpl {
         }
 
         if (null != publisherId) {
-            String reportingResponse = invokeHTTPUrl(getRequestUrl(), logger);
+            String reportingResponse = invokeHTTPUrl(getRequestUrl());
             ReportingApiResponse reportingApiResponse = (ReportingApiResponse) jaxbUnmarshallerReports
                     .unmarshal(new ByteArrayInputStream(reportingResponse.getBytes()));
 
@@ -98,7 +99,7 @@ public class DCPMobfoxReporting extends BaseReportingImpl {
             row.reportTime = reportDate;
             row.siteId = key;
             row.slotSize = getReportGranularity();
-            logger.debug("parsing data inside MobFox" + row.request);
+            LOG.debug("parsing data inside MobFox {}", row.request);
             reportResponse.addReportRow(row);
 
         }
@@ -139,7 +140,7 @@ public class DCPMobfoxReporting extends BaseReportingImpl {
 
     public String getEndDate(final String seperator) {
         try {
-            logger.debug("calculating end date for mobfox");
+            LOG.debug("calculating end date for mobfox");
             ReportTime reportTime = ReportTime.getUTCTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
             if (reportTime.getHour() < ReportReconcilerWindow()) {
@@ -148,7 +149,7 @@ public class DCPMobfoxReporting extends BaseReportingImpl {
             return (reportTime.getStringDate(seperator));
         }
         catch (Exception exception) {
-            logger.info("failed to obtain end date inside mobfox " + exception.getMessage());
+            LOG.info("failed to obtain end date inside mobfox {}", exception);
             return "";
         }
     }

@@ -16,16 +16,17 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class WebmobLinkAdNetwork extends BaseAdNetworkImpl {
-    private Configuration          config;
+public class WebmobLinkAdNetwork extends AbstractDCPAdNetworkImpl {
+    private static final Logger    LOG         = LoggerFactory.getLogger(WebmobLinkAdNetwork.class);
+
     private String                 mode;
     private String                 responseFormat;
     private String                 result;
@@ -54,13 +55,9 @@ public class WebmobLinkAdNetwork extends BaseAdNetworkImpl {
         channelList.put(11l, 23l);
     }
 
-    public WebmobLinkAdNetwork(final DebugLogger logger, final Configuration config,
-            final ClientBootstrap clientBootstrap, final HttpRequestHandlerBase baseRequestHandler,
-            final MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent, logger);
-        this.logger = logger;
-        this.config = config;
-        this.clientBootstrap = clientBootstrap;
+    public WebmobLinkAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }
 
     @Override
@@ -71,11 +68,11 @@ public class WebmobLinkAdNetwork extends BaseAdNetworkImpl {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId) || StringUtils.isBlank(mode)
                 || StringUtils.isBlank(responseFormat)) {
-            logger.debug("mandate parameters missing for webmoblink so exiting adapter");
+            LOG.debug("mandate parameters missing for webmoblink so exiting adapter");
             return false;
         }
         if (sasParams.getUserAgent().toUpperCase().contains("OPERA")) {
-            logger.debug("Opera user agent found. So exiting the adapter");
+            LOG.debug("Opera user agent found. So exiting the adapter");
             return false;
         }
         List<Long> categories = sasParams.getCategories();
@@ -98,9 +95,9 @@ public class WebmobLinkAdNetwork extends BaseAdNetworkImpl {
             country = carrier.getString(2);
         }
         catch (JSONException e) {
-            logger.debug("Failed to fetch the country code from allParametersJson");
+            LOG.debug("Failed to fetch the country code from allParametersJson");
         }
-        logger.debug("Configure parameters inside webmoblink returned true");
+        LOG.debug("Configure parameters inside webmoblink returned true");
         return true;
     }
 
@@ -122,9 +119,8 @@ public class WebmobLinkAdNetwork extends BaseAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         try {
-            logger.debug("pid=", externalSiteId, " mo=", mode, ", ua=", sasParams.getUserAgent(), ", ip=",
-                sasParams.getRemoteHostIp(), ", format=", responseFormat, ", result=", result, ", country=", country,
-                ", channels=", channels);
+            LOG.debug("pid={}, mo={}, ua={}, ip={}, format={}, result={}, country={}, channels={}", externalSiteId,
+                mode, sasParams.getUserAgent(), sasParams.getRemoteHostIp(), responseFormat, result, country, channels);
             StringBuilder url = new StringBuilder();
             url.append(host)
                         .append("?pid=")
@@ -145,12 +141,12 @@ public class WebmobLinkAdNetwork extends BaseAdNetworkImpl {
             if (!StringUtils.isBlank(channels)) {
                 url.append("&channels=").append(channels);
             }
-            logger.debug("Webmoblink uri -", url.toString());
+            LOG.debug("Webmoblink uri - {}", url);
             return (new URI(url.toString()));
         }
         catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            logger.info(exception.getMessage());
+            LOG.error("{}", exception);
         }
         return null;
     }
@@ -159,10 +155,10 @@ public class WebmobLinkAdNetwork extends BaseAdNetworkImpl {
     public void parseResponse(final String response, final HttpResponseStatus status) {
         super.parseResponse(response, status);
         if (statusCode == 200 && !StringUtils.isBlank(responseContent)) {
-            logger.debug("Insert beacon url in the Webmoblink ad response.");
+            LOG.debug("Insert beacon url in the Webmoblink ad response.");
             responseContent = responseContent.replace("<body><html>", "<body><html><img src=\"" + beaconUrl
                     + "\" height=1 width=1 />");
-            logger.debug("response length is", responseContent.length(), "responseContent is", responseContent);
+            LOG.debug("response length is {} responseContent is {}", responseContent.length(), responseContent);
         }
     }
 }

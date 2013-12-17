@@ -13,19 +13,22 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public class DCPLoganAdnetwork extends BaseAdNetworkImpl {
-    private final Configuration config;
+public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
+
+    private static final Logger LOG        = LoggerFactory.getLogger(DCPLoganAdnetwork.class);
+
     private transient String    latitude;
     private transient String    longitude;
     private int                 width;
@@ -38,19 +41,22 @@ public class DCPLoganAdnetwork extends BaseAdNetworkImpl {
     private static final String MIN_SIZE_X = "min_size_x";
     private static final String MIN_SIZE_Y = "min_size_y";
 
-    public DCPLoganAdnetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent, logger);
-        this.config = config;
-        this.logger = logger;
-        this.clientBootstrap = clientBootstrap;
+    /**
+     * @param config
+     * @param clientBootstrap
+     * @param baseRequestHandler
+     * @param serverEvent
+     */
+    protected DCPLoganAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }
 
     @Override
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            logger.debug("mandatory parameters missing for logan so exiting adapter");
+            LOG.debug("mandatory parameters missing for logan so exiting adapter");
             return false;
         }
         host = config.getString("logan.host");
@@ -67,7 +73,7 @@ public class DCPLoganAdnetwork extends BaseAdNetworkImpl {
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
-        logger.info("Configure parameters inside logan returned true");
+        LOG.info("Configure parameters inside logan returned true");
         return true;
     }
 
@@ -121,19 +127,19 @@ public class DCPLoganAdnetwork extends BaseAdNetworkImpl {
                 appendQueryParam(url, SIZE_X, width + "", false);
                 appendQueryParam(url, SIZE_Y, height + "", false);
             }
-            logger.debug("logan url is ", url.toString());
+            LOG.debug("logan url is {}", url);
             return (new URI(url.toString()));
         }
         catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            logger.info(exception.getMessage());
+            LOG.info("{}", exception);
         }
         return null;
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status) {
-        logger.debug("response is ", response);
+    public void parseResponse(final String response, final HttpResponseStatus status) {
+        LOG.debug("response is {}", response);
 
         if (StringUtils.isEmpty(response) || status.getCode() != 200 || response.startsWith("[{\"error")) {
             statusCode = status.getCode();
@@ -144,7 +150,7 @@ public class DCPLoganAdnetwork extends BaseAdNetworkImpl {
             return;
         }
         else {
-            logger.debug("beacon url inside logan is ", beaconUrl);
+            LOG.debug("beacon url inside logan is {}", beaconUrl);
 
             try {
                 JSONArray jArray = new JSONArray(response);
@@ -172,25 +178,23 @@ public class DCPLoganAdnetwork extends BaseAdNetworkImpl {
                     context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getString("img"));
                     t = TemplateType.IMAGE;
                 }
-                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl, logger);
+                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
             }
             catch (JSONException exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from logan : ", exception);
-                logger.info("Response from logan:", response);
+                LOG.info("Error parsing response from logan : {}", exception);
+                LOG.info("Response from logan: {}", response);
             }
             catch (Exception exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from logan : ", exception);
-                logger.info("Response from logan:", response);
+                LOG.info("Error parsing response from logan : {}", exception);
+                LOG.info("Response from logan: {}", response);
             }
 
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("response length is ", responseContent.length(), "responseContent is", responseContent);
-        }
+        LOG.debug("response length is {} responseContent is {}", responseContent.length(), responseContent);
     }
 
     @Override

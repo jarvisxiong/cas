@@ -14,8 +14,10 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
@@ -23,11 +25,12 @@ import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.CategoryList;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public abstract class BaseMoolahMediaNetworkImpl extends BaseAdNetworkImpl {
+public abstract class BaseMoolahMediaNetworkImpl extends AbstractDCPAdNetworkImpl {
+
+    private static final Logger          LOG        = LoggerFactory.getLogger(BaseMoolahMediaNetworkImpl.class);
 
     protected String                     advertiserId;
     protected String                     publisherId;
@@ -61,25 +64,29 @@ public abstract class BaseMoolahMediaNetworkImpl extends BaseAdNetworkImpl {
         carrierIdMap.put(566, 10);
     }
 
-    public BaseMoolahMediaNetworkImpl(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent, logger);
-        this.clientBootstrap = clientBootstrap;
-        this.logger = logger;
+    /**
+     * @param config
+     * @param clientBootstrap
+     * @param baseRequestHandler
+     * @param serverEvent
+     */
+    protected BaseMoolahMediaNetworkImpl(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }
 
     @Override
     protected boolean configureParameters() {
         if (sasParams.getRemoteHostIp() == null || StringUtils.isEmpty(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            logger.info("mandate parameters missing for mullah media so exiting adapter");
+            LOG.info("mandate parameters missing for mullah media so exiting adapter");
             return false;
         }
-        logger.debug("beacon url inside mullah media is ", beaconUrl);
+        LOG.debug("beacon url inside mullah media is {}", beaconUrl);
 
         source = StringUtils.isBlank(sasParams.getSource()) || "wap".equalsIgnoreCase(sasParams.getSource()) ? "web"
                 : "app";
-        logger.debug("Configure parameters inside mullah media returned true");
+        LOG.debug("Configure parameters inside mullah media returned true");
         return true;
     }
 
@@ -99,7 +106,7 @@ public abstract class BaseMoolahMediaNetworkImpl extends BaseAdNetworkImpl {
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status) {
+    public void parseResponse(final String response, final HttpResponseStatus status) {
         if (StringUtils.isBlank(response) || status.getCode() != 200 || !response.startsWith("{")
                 || response.startsWith("{\"error")) {
             statusCode = status.getCode();
@@ -110,7 +117,7 @@ public abstract class BaseMoolahMediaNetworkImpl extends BaseAdNetworkImpl {
             return;
         }
         else {
-            logger.debug("beacon url inside mullah media is ", beaconUrl);
+            LOG.debug("beacon url inside mullah media is {}", beaconUrl);
             try {
                 statusCode = status.getCode();
                 JSONObject adResponse = new JSONObject(response);
@@ -120,29 +127,28 @@ public abstract class BaseMoolahMediaNetworkImpl extends BaseAdNetworkImpl {
                             .getString(0));
                 context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getJSONArray("img").getString(0));
                 context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.IMAGE, context, sasParams, beaconUrl,
-                    logger);
+                responseContent = Formatter.getResponseFromTemplate(TemplateType.IMAGE, context, sasParams, beaconUrl);
                 adStatus = "AD";
             }
             catch (JSONException exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from mullah : ", exception);
-                logger.info("Response from mullah:", response);
+                LOG.info("Error parsing response from mullah : {}", exception);
+                LOG.info("Response from mullah: {}", response);
             }
             catch (Exception exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from mullah : ", exception);
-                logger.info("Response from mullah:", response);
+                LOG.info("Error parsing response from mullah : {}", exception);
+                LOG.info("Response from mullah: {}", response);
                 try {
                     throw exception;
                 }
                 catch (Exception e) {
-                    logger.info("Error while rethrowing the exception : ", e);
+                    LOG.info("Error while rethrowing the exception : {}", e);
                 }
             }
 
         }
-        logger.debug("response length is ", responseContent.length());
+        LOG.debug("response length is {}", responseContent.length());
     }
 
     public String getRequestParameters() throws Exception {
@@ -195,7 +201,7 @@ public abstract class BaseMoolahMediaNetworkImpl extends BaseAdNetworkImpl {
                     .append(externalSiteId);
 
         sb.append("&cat=").append(getURLEncode(getCategory(), format));
-        logger.debug("post body inside mullah media is ", sb.toString());
+        LOG.debug("post body inside mullah media is {}", sb);
         return (sb.toString());
     }
 
@@ -206,7 +212,7 @@ public abstract class BaseMoolahMediaNetworkImpl extends BaseAdNetworkImpl {
         }
         catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            logger.info(exception.getMessage());
+            LOG.info("{}", exception);
         }
         return null;
     }
@@ -216,7 +222,7 @@ public abstract class BaseMoolahMediaNetworkImpl extends BaseAdNetworkImpl {
         if (segmentCategories != null && segmentCategories[0] != 1) {
             for (int index = 0; index < segmentCategories.length; index++) {
                 String category = CategoryList.getCategory(segmentCategories[index].intValue());
-                logger.debug("segment category is ", category);
+                LOG.debug("segment category is {}", category);
                 if (category != null) {
                     return category;
                 }
@@ -225,7 +231,7 @@ public abstract class BaseMoolahMediaNetworkImpl extends BaseAdNetworkImpl {
         else if (sasParams.getCategories() != null) {
             for (int index = 0; index < sasParams.getCategories().size(); index++) {
                 String category = CategoryList.getCategory(sasParams.getCategories().get(index).intValue());
-                logger.debug("category is ", category);
+                LOG.debug("category is {}", category);
                 if (category != null) {
                     return category;
                 }
@@ -239,7 +245,7 @@ public abstract class BaseMoolahMediaNetworkImpl extends BaseAdNetworkImpl {
             return carrierIdMap.get(sasParams.getCarrier().getInt(0));
         }
         catch (JSONException e) {
-            logger.info("Cannot map carrier Id for MM");
+            LOG.info("Cannot map carrier Id for MM");
             return null;
         }
     }

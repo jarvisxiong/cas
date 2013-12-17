@@ -12,22 +12,24 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.configuration.Configuration;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPVerveReporting extends BaseReportingImpl {
-    private String        startDate;
-    private String        endDate;
-    private DebugLogger   logger;
-    private final String  host;
-    private final String  advertiserId;
-    private final String  token;
-    private static String reportStartDate  = null;
-    private static String entireReportData = null;
+    private static final Logger LOG              = LoggerFactory.getLogger(DCPVerveReporting.class);
+
+    private String              startDate;
+    private String              endDate;
+    private final String        host;
+    private final String        advertiserId;
+    private final String        token;
+    private static String       reportStartDate  = null;
+    private static String       entireReportData = null;
 
     public DCPVerveReporting(final Configuration config) {
         this.host = config.getString("verve.host");
@@ -36,28 +38,27 @@ public class DCPVerveReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(DebugLogger logger, ReportTime startTime, String key, ReportTime endTime)
+    public ReportResponse fetchRows(final ReportTime startTime, final String key, final ReportTime endTime)
             throws Exception {
-        this.logger = logger;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
-        logger.debug("inside fetch rows of verve");
+        LOG.debug("inside fetch rows of verve");
         try {
             this.startDate = startTime.getStringDate("-");
-            logger.debug("start date inside verve is ", this.startDate);
+            LOG.debug("start date inside verve is {}", this.startDate);
             endDate = endTime == null ? getEndDate("-") : startDate;
             if (ReportTime.compareStringDates(this.endDate, this.startDate) == -1) {
-                logger.debug("date is greater than the current date reporting window for verve");
+                LOG.debug("date is greater than the current date reporting window for verve");
                 return null;
             }
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.info("failed to obtain correct dates for fetching reports ", exception.getMessage());
+            LOG.info("failed to obtain correct dates for fetching reports {}", exception);
             return null;
         }
         if (reportStartDate == null || (ReportTime.compareStringDates(reportStartDate, startDate) > 0)) {
             entireReportData = invokeHttpUrl(getRequestUrl());
-            logger.debug("Response from Verve : ", entireReportData);
+            LOG.debug("Response from Verve : {}", entireReportData);
             reportStartDate = startDate;
         }
 
@@ -80,7 +81,7 @@ public class DCPVerveReporting extends BaseReportingImpl {
                 row.reportTime = reportDate;
                 row.siteId = key;
                 row.slotSize = getReportGranularity();
-                logger.debug("parsing data inside verve", row.request);
+                LOG.debug("parsing data inside verve {}", row.request);
                 reportResponse.addReportRow(row);
             }
         }
@@ -126,7 +127,7 @@ public class DCPVerveReporting extends BaseReportingImpl {
 
     public String getEndDate(final String seperator) {
         try {
-            logger.debug("calculating end date for Verve");
+            LOG.debug("calculating end date for Verve");
             ReportTime reportTime = ReportTime.getUTCTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
             reportTime = ReportTime.getPreviousDay(reportTime);
@@ -136,12 +137,12 @@ public class DCPVerveReporting extends BaseReportingImpl {
             return (reportTime.getStringDate(seperator));
         }
         catch (Exception exception) {
-            logger.info("failed to obtain end date inside verve ", exception.getMessage());
+            LOG.info("failed to obtain end date inside verve {}", exception);
             return "";
         }
     }
 
-    private String invokeHttpUrl(String requestUrl) throws IOException, NoSuchAlgorithmException,
+    private String invokeHttpUrl(final String requestUrl) throws IOException, NoSuchAlgorithmException,
             KeyManagementException {
 
         URL url = new URL(requestUrl);
@@ -159,7 +160,7 @@ public class DCPVerveReporting extends BaseReportingImpl {
             }
         }
         catch (IOException ioe) {
-            logger.info("Error in Httpool invokeHTTPUrl : ", ioe.getMessage());
+            LOG.info("Error in Httpool invokeHTTPUrl : {}", ioe);
         }
         finally {
             if (reader != null) {

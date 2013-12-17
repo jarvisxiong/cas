@@ -11,20 +11,22 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.api.ServerException;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPTapitReporting extends BaseReportingImpl {
+    private static final Logger LOG              = LoggerFactory.getLogger(DCPTapitReporting.class);
+
     private final Configuration config;
     private final String        token;
     private String              date;
     private final String        baseUrl;
-    private DebugLogger         logger;
     private static String       reportStartDate  = null;
     private static String       entireReportData = null;
 
@@ -34,10 +36,11 @@ public class DCPTapitReporting extends BaseReportingImpl {
         baseUrl = config.getString("tapit.baseUrl");
     }
 
-    private String invokeHTTPUrl(final String url) throws ServerException, ClientProtocolException, IOException,
+    @Override
+    protected String invokeHTTPUrl(final String url) throws ServerException, ClientProtocolException, IOException,
             IllegalStateException {
         String retStr = null;
-        logger.debug("url inside tapit is ", url);
+        LOG.debug("url inside tapit is {}", url);
         DefaultHttpClient httpclient = new DefaultHttpClient();
         HttpGet httpget = new HttpGet(url);
         HttpResponse response = httpclient.execute(httpget);
@@ -61,25 +64,23 @@ public class DCPTapitReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws ClientProtocolException, IllegalStateException, ServerException,
-            IOException, JSONException {
-        this.logger = logger;
+    public ReportResponse fetchRows(final ReportTime startTime, final String key, final ReportTime endTime)
+            throws ClientProtocolException, IllegalStateException, ServerException, IOException, JSONException {
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         String responseStr = null;
-        logger.debug("inside fetch rows of tapit");
+        LOG.debug("inside fetch rows of tapit");
         try {
             date = startTime.getStringDate("");
-            logger.debug("start date inside tapit is ", date);
+            LOG.debug("start date inside tapit is {}", date);
             String currDate = endTime == null ? getEndDate() : date;
             if (ReportTime.compareStringDates(currDate, date) == -1) {
-                logger.debug("date is greater than the current date reporting window for tapit");
+                LOG.debug("date is greater than the current date reporting window for tapit");
                 return null;
             }
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.info("failed to obtain correct dates for fetching reports ", exception.getMessage());
+            LOG.info("failed to obtain correct dates for fetching reports {}", exception);
             return null;
         }
 
@@ -91,7 +92,7 @@ public class DCPTapitReporting extends BaseReportingImpl {
         }
 
         responseStr = entireReportData;
-        logger.debug("response from tapit is ", responseStr);
+        LOG.debug("response from tapit is {}", responseStr);
         date = startTime.getStringDate("-");
 
         // parse the json response
@@ -105,9 +106,9 @@ public class DCPTapitReporting extends BaseReportingImpl {
             row.revenue = 0;
             for (int i = 0; i < jReportArr.length(); i++) {
                 JSONObject reportRow = jReportArr.getJSONObject(i);
-                logger.debug("json array length is ", jReportArr.length());
+                LOG.debug("json array length is {}", jReportArr.length());
                 if (reportRow.getString("zone_id").equalsIgnoreCase(key) && reportRow.getString("date").equals(date)) {
-                    logger.debug("coming here to get zone id");
+                    LOG.debug("coming here to get zone id");
                     String reqStr = (reportRow.getString("requests") != null && !"null".equalsIgnoreCase(reportRow
                             .getString("requests"))) ? (reportRow.getString("requests").trim()) : "0";
                     row.request = Long.parseLong(reqStr);
@@ -120,7 +121,7 @@ public class DCPTapitReporting extends BaseReportingImpl {
                     row.revenue = Double.parseDouble((reportRow.getString("earnings") != null && !"null"
                             .equalsIgnoreCase(reportRow.getString("earnings"))) ? (reportRow.getString("earnings")
                             .trim()) : "0.00");
-                    logger.debug("parsing data inside tapit ", row.request);
+                    LOG.debug("parsing data inside tapit {}", row.request);
                     break;
                 }
             }
@@ -162,7 +163,7 @@ public class DCPTapitReporting extends BaseReportingImpl {
 
     public String getEndDate() throws Exception {
         try {
-            logger.debug("calculating end date for tapit");
+            LOG.debug("calculating end date for tapit");
             ReportTime reportTime = ReportTime.getUTCTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
             if (reportTime.getHour() <= ReportReconcilerWindow()) {
@@ -171,7 +172,7 @@ public class DCPTapitReporting extends BaseReportingImpl {
             return (reportTime.getStringDate(""));
         }
         catch (Exception exception) {
-            logger.info("failed to obtain end date inside tapit ", exception.getMessage());
+            LOG.info("failed to obtain end date inside tapit {}", exception);
             return "";
         }
     }

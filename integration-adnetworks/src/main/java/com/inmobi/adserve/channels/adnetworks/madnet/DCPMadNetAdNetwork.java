@@ -13,15 +13,16 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
@@ -29,25 +30,30 @@ import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
  * @author deepak
  * 
  */
-public class DCPMadNetAdNetwork extends BaseAdNetworkImpl {
-    private final Configuration config;
+public class DCPMadNetAdNetwork extends AbstractDCPAdNetworkImpl {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DCPMadNetAdNetwork.class);
+
     private int                 width;
     private int                 height;
     private String              clientId;
     private static final String WAP = "wap";
 
-    public DCPMadNetAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent, logger);
-        this.config = config;
-        this.logger = logger;
-        this.clientBootstrap = clientBootstrap;
+    /**
+     * @param config
+     * @param clientBootstrap
+     * @param baseRequestHandler
+     * @param serverEvent
+     */
+    protected DCPMadNetAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }
 
     @Override
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())) {
-            logger.debug("mandatory parameters missing for madnet so exiting adapter");
+            LOG.debug("mandatory parameters missing for madnet so exiting adapter");
             return false;
         }
         host = config.getString("madnet.host");
@@ -59,7 +65,7 @@ public class DCPMadNetAdNetwork extends BaseAdNetworkImpl {
             height = (int) Math.ceil(dim.getHeight());
         }
 
-        logger.info("Configure parameters inside madnet returned true");
+        LOG.info("Configure parameters inside madnet returned true");
         return true;
     }
 
@@ -121,19 +127,19 @@ public class DCPMadNetAdNetwork extends BaseAdNetworkImpl {
                 url.append("&z=").append(casInternalRequestParameters.zipCode);
             }
 
-            logger.debug("MadNet url is ", url);
+            LOG.debug("MadNet url is {}", url);
             return (new URI(url.toString()));
         }
         catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            logger.info(exception.getMessage());
+            LOG.error("{}", exception);
         }
         return null;
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status) {
-        logger.debug("response is ", response, "and response length is ", response.length());
+    public void parseResponse(final String response, final HttpResponseStatus status) {
+        LOG.debug("response is {} and response length is {}", response, response.length());
         if (status.getCode() != 200 || StringUtils.isBlank(response)) {
             statusCode = status.getCode();
             if (200 == statusCode) {
@@ -180,27 +186,27 @@ public class DCPMadNetAdNetwork extends BaseAdNetworkImpl {
                         context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl2, beaconArray.getString(2));
                     }
                 }
-                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl, logger);
+                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
             }
             catch (JSONException exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from MadNet : ", exception);
-                logger.info("Response from MadNet:", response);
+                LOG.info("Error parsing response from MadNet : {}", exception);
+                LOG.info("Response from MadNet: {}", response);
             }
             catch (Exception exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from MadNet : ", exception);
-                logger.info("Response from MadNet:", response);
+                LOG.info("Error parsing response from MadNet : {}", exception);
+                LOG.info("Response from MadNet: {}", response);
                 try {
                     throw exception;
                 }
                 catch (Exception e) {
-                    logger.info("Error while rethrowing the exception : ", e);
+                    LOG.info("Error while rethrowing the exception : {}", e);
                 }
             }
         }
-        logger.debug("response length is ", responseContent.length());
+        LOG.debug("response length is {}", responseContent.length());
     }
 
     @Override

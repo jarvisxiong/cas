@@ -4,32 +4,34 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.configuration.Configuration;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPLomarkReporting extends BaseReportingImpl {
-    private String        startDate;
-    private String        endDate;
-    private DebugLogger   logger;
-    private final String  host;
-    private final String  advertiserId;
-    private final String  reportKey;
-    private final String  reportSecretKey;
-    private static String reportStartDate  = null;
-    private static String entireReportData = null;
-    private double        fixedCPCRateUSD  = 0;
+    private static final Logger LOG              = LoggerFactory.getLogger(DCPLomarkReporting.class);
+
+    private String              startDate;
+    private String              endDate;
+    private final String        host;
+    private final String        advertiserId;
+    private final String        reportKey;
+    private final String        reportSecretKey;
+    private static String       reportStartDate  = null;
+    private static String       entireReportData = null;
+    private double              fixedCPCRateUSD  = 0;
 
     public DCPLomarkReporting(final Configuration config) {
         this.host = config.getString("lomark.host");
@@ -40,38 +42,37 @@ public class DCPLomarkReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(DebugLogger logger, ReportTime startTime, String key, ReportTime endTime)
+    public ReportResponse fetchRows(final ReportTime startTime, final String key, final ReportTime endTime)
             throws Exception {
-        this.logger = logger;
         if (fixedCPCRateUSD <= 0) {
-            logger.debug("Fixed CPC rate for lomark should be > 0");
+            LOG.debug("Fixed CPC rate for lomark should be > 0");
             new ReportResponse(ReportResponse.ResponseStatus.FAIL_SERVER_ERROR);
             return null;
         }
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
-        logger.debug("inside fetch rows of lomark");
+        LOG.debug("inside fetch rows of lomark");
         try {
             this.startDate = startTime.getStringDate("-");
-            logger.debug("start date inside lomark is ", this.startDate);
+            LOG.debug("start date inside lomark is {}", this.startDate);
             endDate = endTime == null ? getEndDate("-") : startDate;
             if (ReportTime.compareStringDates(this.endDate, this.startDate) == -1) {
-                logger.debug("date is greater than the current date reporting window for lomark");
+                LOG.debug("date is greater than the current date reporting window for lomark");
                 return null;
             }
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.info("failed to obtain correct dates for fetching reports ", exception.getMessage());
+            LOG.info("failed to obtain correct dates for fetching reports {}", exception);
             return null;
         }
         if (reportStartDate == null || (ReportTime.compareStringDates(reportStartDate, startDate) > 0)) {
-            entireReportData = invokeHTTPUrl(getRequestUrl(), logger);
+            entireReportData = invokeHTTPUrl(getRequestUrl());
             reportStartDate = startDate;
         }
 
         JSONObject jsonResponse = new JSONObject(entireReportData);
         if (jsonResponse.getInt("status") != 100) {
-            logger.info("Error response from Lomark : ", entireReportData);
+            LOG.info("Error response from Lomark : {}", entireReportData);
             reportStartDate = null;
             return null;
         }
@@ -102,7 +103,7 @@ public class DCPLomarkReporting extends BaseReportingImpl {
                 if (row.impressions > 0) {
                     row.ecpm = (row.revenue / row.impressions) * 1000;
                 }
-                logger.debug("parsing data inside lomark", row.request);
+                LOG.debug("parsing data inside lomark {}", row.request);
             }
         }
 
@@ -126,7 +127,7 @@ public class DCPLomarkReporting extends BaseReportingImpl {
             reportUrl.append("&sign=").append(getSignature(requestMap, reportSecretKey));
         }
         catch (IOException exception) {
-            logger.info(exception.getMessage());
+            LOG.info("{}", exception);
         }
 
         return reportUrl.toString();
@@ -159,7 +160,7 @@ public class DCPLomarkReporting extends BaseReportingImpl {
 
     public String getEndDate(final String seperator) {
         try {
-            logger.debug("calculating end date for lomark");
+            LOG.debug("calculating end date for lomark");
             ReportTime reportTime = ReportTime.getUTCTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
             reportTime = ReportTime.getPreviousDay(reportTime);
@@ -169,12 +170,12 @@ public class DCPLomarkReporting extends BaseReportingImpl {
             return (reportTime.getStringDate(seperator));
         }
         catch (Exception exception) {
-            logger.info("failed to obtain end date inside lomark ", exception.getMessage());
+            LOG.info("failed to obtain end date inside lomark {}", exception);
             return "";
         }
     }
 
-    public static String getSignature(Map<String, String> params, String secret) throws IOException {
+    public static String getSignature(final Map<String, String> params, final String secret) throws IOException {
         // first sort asc as per the paramter names
         Map<String, String> sortedParams = new TreeMap<String, String>(params);
         Set<Entry<String, String>> entrys = sortedParams.entrySet();

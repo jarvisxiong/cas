@@ -7,12 +7,13 @@ import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.api.ServerException;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 /**
@@ -20,11 +21,12 @@ import com.inmobi.adserve.channels.util.DebugLogger;
  * 
  */
 public class DCPHuntmadsReporting extends BaseReportingImpl {
+    private static final Logger LOG              = LoggerFactory.getLogger(DCPHuntmadsReporting.class);
+
     private final Configuration config;
     private final String        token;
     private String              date;
     private final String        baseUrl;
-    private DebugLogger         logger;
     private final String        zoneListApiUrl;
     private String              endDate;
 
@@ -45,34 +47,33 @@ public class DCPHuntmadsReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws ClientProtocolException, IOException, ServerException, JSONException {
-        this.logger = logger;
+    public ReportResponse fetchRows(final ReportTime startTime, final String key, final ReportTime endTime)
+            throws ClientProtocolException, IOException, ServerException, JSONException {
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
-        logger.debug("inside fetch rows of huntmads");
+        LOG.debug("inside fetch rows of huntmads");
         try {
             date = startTime.getStringDate("-");
-            logger.debug("start date inside huntmads is " + date);
+            LOG.debug("start date inside huntmads is {}", date);
             endDate = endTime == null ? getEndDate("-") : date;
             if (ReportTime.compareStringDates(endDate, date) == -1) {
-                logger.debug("date is greater than the current date reporting window for huntmads");
+                LOG.debug("date is greater than the current date reporting window for huntmads");
                 return null;
             }
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.info("failed to obtain correct dates for fetching reports " + exception.getMessage());
+            LOG.info("failed to obtain correct dates for fetching reports {}", exception);
             return null;
         }
         date = startTime.getStringDate("-");
         if (zoneList == null) {
-            zoneList = invokeHTTPUrl(zoneListApiUrl, logger);
+            zoneList = invokeHTTPUrl(zoneListApiUrl);
         }
         if (reportStartDate == null || (ReportTime.compareStringDates(reportStartDate, date) > 0)) {
-            entireReportData = invokeHTTPUrl(getRequestUrl(), logger);
+            entireReportData = invokeHTTPUrl(getRequestUrl());
             reportStartDate = date;
         }
-        logger.debug("response is " + entireReportData);
+        LOG.debug("response is {}", entireReportData);
 
         // parse the json response
         String reportingZoneId = null;
@@ -87,7 +88,7 @@ public class DCPHuntmadsReporting extends BaseReportingImpl {
             }
         }
         if (reportingZoneId == null) {
-            logger.info("Zone reporting id not found for zone :" + key);
+            LOG.info("Zone reporting id not found for zone : {}", key);
             return addDefaultReportRow(key, reportResponse);
         }
         if ("[]".equals(entireReportData)) {
@@ -104,7 +105,7 @@ public class DCPHuntmadsReporting extends BaseReportingImpl {
                 JSONObject reportObject = reportRow.getJSONObject("report");
                 String reportDate = reportObject.getString("date");
                 if (date.compareTo(reportDate) < 1) {
-                    generateReportRow(logger, key, reportResponse, reportObject, reportDate);
+                    generateReportRow(key, reportResponse, reportObject, reportDate);
                 }
 
             }
@@ -124,8 +125,8 @@ public class DCPHuntmadsReporting extends BaseReportingImpl {
      * @param reportDate
      * @throws JSONException
      */
-    private void generateReportRow(final DebugLogger logger, final String key, final ReportResponse reportResponse,
-            final JSONObject reportRow, final String reportDate) throws JSONException {
+    private void generateReportRow(final String key, final ReportResponse reportResponse, final JSONObject reportRow,
+            final String reportDate) throws JSONException {
         ReportResponse.ReportRow row = new ReportResponse.ReportRow();
         String reqStr = (reportRow.getString("requests") != null && !"null".equalsIgnoreCase(reportRow
                 .getString("requests"))) ? (reportRow.getString("requests").trim()) : "0";
@@ -140,7 +141,7 @@ public class DCPHuntmadsReporting extends BaseReportingImpl {
         row.siteId = key;
         row.reportTime = new ReportTime(reportDate, 0);
         row.slotSize = getReportGranularity();
-        logger.debug("parsing data inside huntmads " + row.request);
+        LOG.debug("parsing data inside huntmads {}", row.request);
         reportResponse.addReportRow(row);
     }
 
@@ -176,7 +177,7 @@ public class DCPHuntmadsReporting extends BaseReportingImpl {
 
     public String getEndDate(final String seperator) {
         try {
-            logger.debug("calculating end date for huntmads");
+            LOG.debug("calculating end date for huntmads");
             ReportTime reportTime = ReportTime.getUTCTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
             reportTime = ReportTime.getPreviousDay(reportTime);
@@ -186,13 +187,13 @@ public class DCPHuntmadsReporting extends BaseReportingImpl {
             return (reportTime.getStringDate(seperator));
         }
         catch (Exception exception) {
-            logger.info("failed to obtain end date inside huntmads " + exception.getMessage());
+            LOG.info("failed to obtain end date inside huntmads {}", exception);
             return "";
         }
     }
 
     private ReportResponse addDefaultReportRow(final String key, final ReportResponse reportResponse) {
-        logger.debug("coming here to get log_date");
+        LOG.debug("coming here to get log_date");
         ReportResponse.ReportRow row = new ReportResponse.ReportRow();
         row.request = 0;
         row.clicks = 0;
@@ -201,7 +202,7 @@ public class DCPHuntmadsReporting extends BaseReportingImpl {
         row.siteId = key;
         row.reportTime = new ReportTime(getEndDate("-"), 0);
         row.slotSize = this.getReportGranularity();
-        logger.debug("parsing data inside siquis " + row.request);
+        LOG.debug("parsing data inside siquis {}", row.request);
         reportResponse.addReportRow(row);
         return reportResponse;
     }

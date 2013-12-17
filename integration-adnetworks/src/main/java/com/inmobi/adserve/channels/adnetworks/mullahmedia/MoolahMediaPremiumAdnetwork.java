@@ -5,14 +5,13 @@ import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class MoolahMediaPremiumAdnetwork extends BaseMoolahMediaNetworkImpl {
 
-    public MoolahMediaPremiumAdnetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
-        super(logger, config, clientBootstrap, baseRequestHandler, serverEvent);
+    public MoolahMediaPremiumAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
         host = config.getString("mmpremium.host");
         publisherId = config.getString("mmpremium.publisherId");
         advertiserId = config.getString("mmpremium.advertiserId");

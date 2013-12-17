@@ -1,33 +1,50 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.inject.Inject;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.entity.*;
+import com.inmobi.adserve.channels.entity.ChannelEntity;
+import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
+import com.inmobi.adserve.channels.entity.SegmentAdGroupFeedbackEntity;
+import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ServletHandler;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
-import java.util.*;
 
-
+@Singleton
 public class MatchSegments {
-    private DebugLogger                         logger;
-    private static final String                 DEFAULT = "default";
-    private RepositoryHelper                    repositoryHelper;
-    private SASRequestParameters                sasParams;
-    private SegmentAdGroupFeedbackEntity        segmentAdGroupFeedbackEntity;
-    private static ChannelAdGroupRepository     channelAdGroupRepository;
-    private static ChannelEntity                defaultChannelEntity;
-    private static ChannelFeedbackEntity        defaultChannelFeedbackEntity;
-    private static ChannelSegmentFeedbackEntity defaultChannelSegmentFeedbackEntity;
-    private static ChannelSegmentFeedbackEntity defaultChannelSegmentCitrusLeafFeedbackEntity;
+    private final String                       DEFAULT = "default";
+    private final RepositoryHelper             repositoryHelper;
+    private final ChannelAdGroupRepository     channelAdGroupRepository;
+    private final ChannelEntity                defaultChannelEntity;
+    private final ChannelFeedbackEntity        defaultChannelFeedbackEntity;
+    private final ChannelSegmentFeedbackEntity defaultChannelSegmentFeedbackEntity;
+    private final ChannelSegmentFeedbackEntity defaultChannelSegmentCitrusLeafFeedbackEntity;
+    private static final Logger                LOG     = LoggerFactory.getLogger(MatchSegments.class);
 
-    public static void init(ChannelAdGroupRepository channelAdGroupRepository) {
-        Set<String> emptySet = new HashSet<String>();
+    @Inject
+    public MatchSegments(final RepositoryHelper repositoryHelper) {
+        this.repositoryHelper = repositoryHelper;
+
         Double defaultEcpm = ServletHandler.getServerConfig().getDouble("default.ecpm", 0.1);
-        MatchSegments.channelAdGroupRepository = channelAdGroupRepository;
+        channelAdGroupRepository = repositoryHelper.getChannelAdGroupRepository();
 
         ChannelEntity.Builder channelEntityBuilder = ChannelEntity.newBuilder();
         channelEntityBuilder.setImpressionCeil(Long.MAX_VALUE);
@@ -35,13 +52,13 @@ public class MatchSegments {
         channelEntityBuilder.setPriority(3);
         channelEntityBuilder.setRequestCap(Long.MAX_VALUE);
         channelEntityBuilder.setSiteInclusion(false);
-        channelEntityBuilder.setSitesIE(emptySet);
-        MatchSegments.defaultChannelEntity = channelEntityBuilder.build();
+        channelEntityBuilder.setSitesIE(new HashSet<String>());
+        defaultChannelEntity = channelEntityBuilder.build();
 
         ChannelFeedbackEntity.Builder channelFeedbackEntityBuilder = ChannelFeedbackEntity.newBuilder();
         channelFeedbackEntityBuilder.setAdvertiserId(DEFAULT);
         channelFeedbackEntityBuilder.setBalance(Double.MAX_VALUE);
-        MatchSegments.defaultChannelFeedbackEntity = channelFeedbackEntityBuilder.build();
+        defaultChannelFeedbackEntity = channelFeedbackEntityBuilder.build();
 
         ChannelSegmentFeedbackEntity.Builder channelSegmentFeedbackEntityBuilder = ChannelSegmentFeedbackEntity
                 .newBuilder();
@@ -50,21 +67,13 @@ public class MatchSegments {
         channelSegmentFeedbackEntityBuilder.setECPM(defaultEcpm);
         channelSegmentFeedbackEntityBuilder.setFillRatio(0.01);
         channelSegmentFeedbackEntityBuilder.setLastHourLatency(400);
-        MatchSegments.defaultChannelSegmentFeedbackEntity = channelSegmentFeedbackEntityBuilder.build();
+        defaultChannelSegmentFeedbackEntity = channelSegmentFeedbackEntityBuilder.build();
 
-        MatchSegments.defaultChannelSegmentCitrusLeafFeedbackEntity = MatchSegments.defaultChannelSegmentFeedbackEntity;
-    }
-
-    public MatchSegments(RepositoryHelper repositoryHelper, SASRequestParameters sasParams, DebugLogger logger) {
-        this.repositoryHelper = repositoryHelper;
-        this.sasParams = sasParams;
-        this.logger = logger;
-        this.segmentAdGroupFeedbackEntity = repositoryHelper.querySiteCitrusLeafFeedbackRepository(
-            sasParams.getSiteId(), sasParams.getSiteSegmentId(), logger);
+        this.defaultChannelSegmentCitrusLeafFeedbackEntity = this.defaultChannelSegmentFeedbackEntity;
     }
 
     // select channel segment based on specified rules
-    public Map<String, HashMap<String, ChannelSegment>> matchSegments(SASRequestParameters sasParams) {
+    public Map<String, HashMap<String, ChannelSegment>> matchSegments(final SASRequestParameters sasParams) {
         String slotStr = sasParams.getSlot();
         String countryStr = sasParams.getCountryStr();
         int osId = sasParams.getOsId();
@@ -86,18 +95,21 @@ public class MatchSegments {
             siteRating = 2;
         }
         try {
-            logger.debug("Requesting Parameters :", "slot:", slotStr, "categories:", sasParams.getCategories(),
-                "country:", countryStr, "targetingPlatform:", targetingPlatform, "siteRating:", siteRating, "osId",
-                osId);
+            LOG
+                    .debug(
+                        "Requesting Parameters :  slot: {} categories: {} country: {} targetingPlatform: {} siteRating: {} osId: {}",
+                        slotStr, sasParams.getCategories(), countryStr, targetingPlatform, siteRating, osId);
             long slot = Long.parseLong(slotStr);
             long country = -1;
             if (countryStr != null) {
                 country = Long.parseLong(countryStr);
             }
-            return (matchSegments(logger, slot, getCategories(), country, targetingPlatform, siteRating, osId));
+
+            return (matchSegments(slot, getCategories(sasParams), country, targetingPlatform, siteRating, osId,
+                sasParams));
         }
         catch (NumberFormatException exception) {
-            logger.error("Error parsing required arguments " + exception.getMessage());
+            LOG.error("Error parsing required arguments {}", exception);
             return null;
         }
     }
@@ -106,7 +118,7 @@ public class MatchSegments {
      * repositoryHelper Method which computes categories according to new category taxonomy and returns the category
      * list (old or new) depending upon the config
      */
-    public List<Long> getCategories() {
+    List<Long> getCategories(final SASRequestParameters sasParams) {
         // Computing all the parents for categories in the category list from the
         // request
         HashSet<Long> categories = new HashSet<Long>();
@@ -130,8 +142,9 @@ public class MatchSegments {
         return sasParams.getCategories();
     }
 
-    private Map<String, HashMap<String, ChannelSegment>> matchSegments(DebugLogger logger, long slotId,
-            List<Long> categories, long country, Integer targetingPlatform, Integer siteRating, int osId) {
+    private Map<String, HashMap<String, ChannelSegment>> matchSegments(final long slotId, final List<Long> categories,
+            final long country, final Integer targetingPlatform, final Integer siteRating, final int osId,
+            final SASRequestParameters sasParams) {
         Map<String, HashMap<String, ChannelSegment>> result = new HashMap<String, HashMap<String, ChannelSegment>>();
         Set<ChannelSegmentEntity> allFilteredEntities = new HashSet<ChannelSegmentEntity>();
 
@@ -150,46 +163,49 @@ public class MatchSegments {
                 for (int os : osIds) {
                     Collection<ChannelSegmentEntity> filteredEntities = loadEntities(slotId, category, countryId,
                         targetingPlatform, siteRating, os);
-                    logger.debug("Found", filteredEntities.size(), "adGroups");
+                    LOG.debug("Found {} adGroups", filteredEntities.size());
                     allFilteredEntities.addAll(filteredEntities);
                 }
             }
         }
         if (!allFilteredEntities.isEmpty()) {
-            logger.debug("AdGroups are :");
+            LOG.debug("AdGroups are :");
             for (ChannelSegmentEntity entity : allFilteredEntities) {
-                logger.debug("AdGroup :", entity.getAdgroupId());
-                insertChannelSegmentToResultSet(result, entity);
+                LOG.debug("AdGroup : {}", entity.getAdgroupId());
+                insertChannelSegmentToResultSet(result, entity, sasParams);
             }
         }
         if (result.size() == 0) {
-            logger.debug("No matching records for the request - slot:", slotId, "categories:", categories, "country:",
-                country, "targetingPlatform", targetingPlatform, "siteRating", siteRating, "osId", osId);
+            LOG
+                    .debug(
+                        "No matching records for the request - slot: {} categories: {} country: {} targetingPlatform: {} siteRating: {} osId: {}",
+                        slotId, categories, country, targetingPlatform, siteRating, osId);
         }
         else {
-            logger.debug("Final selected list of adGroups : ");
-            printSegments(result, logger);
+            LOG.debug("Final selected list of adGroups : ");
+            printSegments(result);
         }
         return result;
     }
 
     // Loads entities and updates cache if required.
-    private Collection<ChannelSegmentEntity> loadEntities(long slotId, long category, long country,
-            Integer targetingPlatform, Integer siteRating, int osId) {
-        logger.debug("Loading adgroups for slot:", slotId, "category:", category, "country:", country,
-            "targetingPlatform:", targetingPlatform, "siteRating:", siteRating, "osId:", osId);
+    private Collection<ChannelSegmentEntity> loadEntities(final long slotId, final long category, final long country,
+            final Integer targetingPlatform, final Integer siteRating, final int osId) {
+        LOG.debug(
+            "Loading adgroups for slot: {} category: {} country: {} targetingPlatform: {} siteRating: {} osId: {}",
+            slotId, category, country, targetingPlatform, siteRating, osId);
         return channelAdGroupRepository.getEntities(slotId, category, country, targetingPlatform, siteRating, osId);
     }
 
-    private void insertChannelSegmentToResultSet(Map<String, HashMap<String, ChannelSegment>> result,
-            ChannelSegmentEntity channelSegmentEntity) {
+    private void insertChannelSegmentToResultSet(final Map<String, HashMap<String, ChannelSegment>> result,
+            final ChannelSegmentEntity channelSegmentEntity, final SASRequestParameters sasParams) {
         if (Filters.getAdvertiserIdToNameMapping().containsKey(channelSegmentEntity.getAdvertiserId())) {
             InspectorStats.incrementStatCount(
                 Filters.getAdvertiserIdToNameMapping().get(channelSegmentEntity.getAdvertiserId()),
                 InspectorStrings.totalMatchedSegments);
         }
 
-        ChannelSegment channelSegment = createSegment(channelSegmentEntity);
+        ChannelSegment channelSegment = createSegment(channelSegmentEntity, sasParams);
 
         if (result.get(channelSegmentEntity.getAdvertiserId()) == null) {
             HashMap<String, ChannelSegment> hashMap = new HashMap<String, ChannelSegment>();
@@ -204,7 +220,8 @@ public class MatchSegments {
 
     }
 
-    private ChannelSegment createSegment(ChannelSegmentEntity channelSegmentEntity) {
+    private ChannelSegment createSegment(final ChannelSegmentEntity channelSegmentEntity,
+            final SASRequestParameters sasParams) {
         ChannelEntity channelEntity = repositoryHelper.queryChannelRepository(channelSegmentEntity.getChannelId());
         ChannelFeedbackEntity channelFeedbackEntity = repositoryHelper
                 .queryChannelFeedbackRepository(channelSegmentEntity.getAdvertiserId());
@@ -212,46 +229,52 @@ public class MatchSegments {
                 .queryChannelSegmentFeedbackRepository(channelSegmentEntity.getAdgroupId());
         ChannelSegmentFeedbackEntity channelSegmentCitrusLeafFeedbackEntity = null;
         if (channelEntity == null) {
-            logger.debug("No channelEntity for found");
-            channelEntity = MatchSegments.defaultChannelEntity;
+            LOG.debug("No channelEntity for found");
+            channelEntity = defaultChannelEntity;
         }
 
         if (channelFeedbackEntity == null) {
-            logger.debug("No channelFeedbackEntity found");
-            channelFeedbackEntity = MatchSegments.defaultChannelFeedbackEntity;
+            LOG.debug("No channelFeedbackEntity found");
+            channelFeedbackEntity = defaultChannelFeedbackEntity;
         }
 
         if (channelSegmentFeedbackEntity == null) {
-            logger.debug("No channelSegmentFeedbackEntity found");
-            channelSegmentFeedbackEntity = MatchSegments.defaultChannelSegmentFeedbackEntity;
+            LOG.debug("No channelSegmentFeedbackEntity found");
+            channelSegmentFeedbackEntity = defaultChannelSegmentFeedbackEntity;
         }
 
+        SegmentAdGroupFeedbackEntity segmentAdGroupFeedbackEntity = repositoryHelper
+                .querySiteCitrusLeafFeedbackRepository(sasParams.getSiteId(), sasParams.getSiteSegmentId());
+
         if (segmentAdGroupFeedbackEntity != null) {
-            if (segmentAdGroupFeedbackEntity.getAdGroupFeedbackMap() != null)
+            if (segmentAdGroupFeedbackEntity.getAdGroupFeedbackMap() != null) {
                 channelSegmentCitrusLeafFeedbackEntity = segmentAdGroupFeedbackEntity.getAdGroupFeedbackMap().get(
                     channelSegmentEntity.getExternalSiteKey());
+            }
         }
         else {
-            logger.debug("No segmentAdGroupFeedbackEntity found");
+            LOG.debug("No segmentAdGroupFeedbackEntity found");
         }
 
         if (channelSegmentCitrusLeafFeedbackEntity == null) {
-            logger.debug("No channelSegmentCitrusLeafFeedbackEntity");
-            channelSegmentCitrusLeafFeedbackEntity = MatchSegments.defaultChannelSegmentCitrusLeafFeedbackEntity;
+            LOG.debug("No channelSegmentCitrusLeafFeedbackEntity");
+            channelSegmentCitrusLeafFeedbackEntity = defaultChannelSegmentCitrusLeafFeedbackEntity;
         }
+
         double pEcpm = channelSegmentCitrusLeafFeedbackEntity.getECPM();
         return new ChannelSegment(channelSegmentEntity, channelEntity, channelFeedbackEntity,
                 channelSegmentFeedbackEntity, channelSegmentCitrusLeafFeedbackEntity, null, pEcpm);
     }
 
-    public static void printSegments(Map<String, HashMap<String, ChannelSegment>> matchedSegments, DebugLogger logger) {
-        if (logger.isDebugEnabled()) {
+    private static void printSegments(final Map<String, HashMap<String, ChannelSegment>> matchedSegments) {
+        if (LOG.isDebugEnabled()) {
             for (Map.Entry<String, HashMap<String, ChannelSegment>> advertiserEntry : matchedSegments.entrySet()) {
                 Map<String, ChannelSegment> adGroups = advertiserEntry.getValue();
                 for (Map.Entry<String, ChannelSegment> adGroupEntry : adGroups.entrySet()) {
                     ChannelSegment channelSegment = adGroupEntry.getValue();
-                    logger.debug("Advertiser :", channelSegment.getChannelSegmentEntity().getAdvertiserId(),
-                        ", AdGroup :", channelSegment.getChannelSegmentEntity().getAdgroupId());
+                    LOG.debug("Advertiser :{} , AdGroup : {}", channelSegment
+                            .getChannelSegmentEntity()
+                                .getAdvertiserId(), channelSegment.getChannelSegmentEntity().getAdgroupId());
                 }
             }
         }

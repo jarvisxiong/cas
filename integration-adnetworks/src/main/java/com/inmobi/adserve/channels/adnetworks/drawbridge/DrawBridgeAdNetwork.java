@@ -14,43 +14,45 @@ import org.apache.velocity.VelocityContext;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public class DrawBridgeAdNetwork extends BaseAdNetworkImpl {
+public class DrawBridgeAdNetwork extends AbstractDCPAdNetworkImpl {
     // Updates the request parameters according to the Ad Network. Returns true on
     // success.i
+    private static final Logger LOG           = LoggerFactory.getLogger(DrawBridgeAdNetwork.class);
 
     private String              geoCoordinate = null;
     private Dimension           dim;
-    private final Configuration config;
     private String              source        = null;
-    private int                 filer_iPod    = 0;            // 1 - Only iPod (Filter non iPod), 2 - Filter iPod, 0 &
-                                                               // others - Dont filter
+    private int                 filer_iPod    = 0;                                                 // 1 - Only iPod
+                                                                                                    // (Filter non
+                                                                                                    // iPod), 2 - Filter
+                                                                                                    // iPod, 0 &
+                                                                                                    // others - Dont
+                                                                                                    // filter
     private static final String FILTER_IPOD   = "filter_iPod";
 
-    public DrawBridgeAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent, logger);
-        this.logger = logger;
-        this.config = config;
-        this.clientBootstrap = clientBootstrap;
+    public DrawBridgeAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }
 
     // Configure the request parameters for making the ad call
     @Override
     protected boolean configureParameters() {
         if (StringUtils.isEmpty(sasParams.getUserAgent())) {
-            logger.debug("Drawbridge : user-agent blank/null, mandatory parameter missing");
+            LOG.debug("Drawbridge : user-agent blank/null, mandatory parameter missing");
             return false;
         }
         dim = getAdDimension();
@@ -64,14 +66,14 @@ public class DrawBridgeAdNetwork extends BaseAdNetworkImpl {
         filer_iPod = entity.getAdditionalParams().optInt(FILTER_IPOD);
         boolean is_iPodRequest = sasParams.getUserAgent().toLowerCase().contains("ipod");
         if (filer_iPod == 1 && !is_iPodRequest) { // 1 - Only iPod (Filter non iPod traffic)
-            logger.debug("Drawbridge : Request is from non iPod device for an iPod segment, so exiting adapter");
+            LOG.debug("Drawbridge : Request is from non iPod device for an iPod segment, so exiting adapter");
             return false;
         }
         if (filer_iPod == 2 && is_iPodRequest) { // 2 - Filter iPod (non iPod traffic only)
-            logger.debug("Drawbridge : Request is from iPod device for a non-iPod segment, so exiting adapter");
+            LOG.debug("Drawbridge : Request is from iPod device for a non-iPod segment, so exiting adapter");
             return false;
         }
-        logger.debug("configure parameter successful for drawbridge");
+        LOG.debug("configure parameter successful for drawbridge");
         return true;
     }
 
@@ -157,13 +159,13 @@ public class DrawBridgeAdNetwork extends BaseAdNetworkImpl {
         finalUrl.append("&_impressionbeacon=").append(getURLEncode(beaconUrl, format));
         finalUrl.append("&_app=").append(source);
 
-        logger.debug("url inside drawbridge:", finalUrl);
+        LOG.debug("url inside drawbridge: {}", finalUrl);
         try {
             return (new URI(finalUrl.toString()));
         }
         catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            logger.info("Error Forming Url inside drawbridge:", exception.getMessage());
+            LOG.error("Error Forming Url inside drawbridge: {}", exception);
         }
         return null;
     }
@@ -175,7 +177,7 @@ public class DrawBridgeAdNetwork extends BaseAdNetworkImpl {
     }
 
     // get 3 letter country name
-    public String getCountry(String country) {
+    public String getCountry(final String country) {
         try {
             if (country != null) {
                 return (new Locale("en", country).getISO3Country());
@@ -183,14 +185,14 @@ public class DrawBridgeAdNetwork extends BaseAdNetworkImpl {
             return null;
         }
         catch (MissingResourceException exception) {
-            logger.info("3 letter name not found for country");
+            LOG.info("3 letter name not found for country");
             return null;
         }
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status) {
-        logger.debug("response is", response, "and response length is", response.length());
+    public void parseResponse(final String response, final HttpResponseStatus status) {
+        LOG.debug("response is {} and response length is {}", response, response.length());
         if (status.getCode() != 200 || StringUtils.isBlank(response)) {
             statusCode = status.getCode();
             if (200 == statusCode) {
@@ -205,27 +207,26 @@ public class DrawBridgeAdNetwork extends BaseAdNetworkImpl {
             context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
             context.remove(VelocityTemplateFieldConstants.IMBeaconUrl);
             try {
-                responseContent = Formatter
-                        .getResponseFromTemplate(TemplateType.HTML, context, sasParams, null, logger);
+                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, null);
             }
             catch (Exception exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from drawbridge :", exception);
-                logger.info("Response from drawbridge:", response);
+                LOG.info("Error parsing response from drawbridge : {}", exception);
+                LOG.info("Response from drawbridge: {}", response);
                 try {
                     throw exception;
                 }
                 catch (Exception e) {
-                    logger.info("Error while rethrowing the exception :", e);
+                    LOG.info("Error while rethrowing the exception : {}", e);
                 }
             }
             adStatus = "AD";
         }
-        logger.debug("response length is", responseContent.length());
+        LOG.debug("response length is {}", responseContent.length());
     }
 
     // Generate sha1 hash of uid
-    public String getSha1Hash(String param) {
+    public String getSha1Hash(final String param) {
         if (param != null && param.length() == 32) {
             return param;
         }
@@ -236,11 +237,11 @@ public class DrawBridgeAdNetwork extends BaseAdNetworkImpl {
             return (bytesToHex(output));
         }
         catch (NoSuchAlgorithmException exception) {
-            logger.info("error generating hash of uid", exception.getMessage());
+            LOG.info("error generating hash of uid {}", exception);
             return null;
         }
         catch (NullPointerException exception) {
-            logger.info("error generating hash inside drawbridge", exception.getMessage());
+            LOG.info("error generating hash inside drawbridge {}", exception);
             return null;
         }
     }
@@ -254,7 +255,7 @@ public class DrawBridgeAdNetwork extends BaseAdNetworkImpl {
     }
 
     // convert byte array to hexadecimal value
-    public String bytesToHex(byte[] b) {
+    public String bytesToHex(final byte[] b) {
         char hexDigit[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
         StringBuffer buf = new StringBuffer();
         for (int j = 0; j < b.length; j++) {

@@ -18,13 +18,14 @@ import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.api.ServerException;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 /**
@@ -32,12 +33,13 @@ import com.inmobi.adserve.channels.util.DebugLogger;
  * 
  */
 public class DCPNexageReporting extends BaseReportingImpl {
+    private static final Logger LOG = LoggerFactory.getLogger(DCPNexageReporting.class);
+
     private final Configuration config;
     private final String        companyid;
     private final String        host;
     private final String        accesskey;
     private final String        secretkey;
-    private DebugLogger         logger;
     private String              startDate;
     private String              endDate;
     private String              externalSiteId;
@@ -56,32 +58,31 @@ public class DCPNexageReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String externalSiteId,
-            final ReportTime endTime) throws KeyManagementException, NoSuchAlgorithmException, MalformedURLException,
-            ServerException, IOException, ParserConfigurationException, SAXException {
-        this.logger = logger;
+    public ReportResponse fetchRows(final ReportTime startTime, final String externalSiteId, final ReportTime endTime)
+            throws KeyManagementException, NoSuchAlgorithmException, MalformedURLException, ServerException,
+            IOException, ParserConfigurationException, SAXException {
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         this.externalSiteId = externalSiteId;
 
-        logger.debug("inside fetch rows of nexage");
+        LOG.debug("inside fetch rows of nexage");
         try {
             startDate = startTime.getStringDate("-");
-            logger.debug("start date inside nexage is " + startDate);
+            LOG.debug("start date inside nexage is {}", startDate);
             endDate = endTime == null ? getEndDate("-") : startDate;
 
             if (ReportTime.compareStringDates(endDate, startDate) == -1) {
-                logger.debug("date is greater than the current date reporting window for nexage");
+                LOG.debug("date is greater than the current date reporting window for nexage");
                 return null;
             }
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.info("failed to obtain correct dates for fetching reports " + exception.getMessage());
+            LOG.info("failed to obtain correct dates for fetching reports {}", exception);
             return null;
         }
 
         String reportData = invokeHTTPUrl(getRequestUrl());
-        logger.debug("Response from Nexage is " + reportData);
+        LOG.debug("Response from Nexage is {}", reportData);
 
         try {
             JSONObject data = new JSONObject(reportData);
@@ -89,10 +90,10 @@ public class DCPNexageReporting extends BaseReportingImpl {
                 JSONArray jReportArr = data.getJSONArray("detail");
                 for (int i = 0; i < jReportArr.length(); i++) {
                     JSONObject reportRow = jReportArr.getJSONObject(i);
-                    logger.debug("json array length is " + jReportArr.length());
+                    LOG.debug("json array length is {}", jReportArr.length());
                     String logDate = reportRow.getString("day").substring(0, 10);
                     if (this.startDate.compareTo(logDate) < 1) {
-                        logger.debug("coming here to get log date");
+                        LOG.debug("coming here to get log date");
                         ReportResponse.ReportRow row = new ReportResponse.ReportRow();
                         row.reportTime = new ReportTime(logDate, 0);
                         row.request = Long.parseLong(reportRow.getString("requests"));
@@ -101,7 +102,7 @@ public class DCPNexageReporting extends BaseReportingImpl {
                         row.revenue = Double.parseDouble(reportRow.getString("revenue").replaceAll(",", ""));
                         row.siteId = externalSiteId;
                         row.slotSize = this.getReportGranularity();
-                        logger.debug("parsing data inside nexage " + row.request);
+                        LOG.debug("parsing data inside nexage {}", row.request);
                         reportResponse.addReportRow(row);
                         // gotReport = true;
                     }
@@ -109,7 +110,6 @@ public class DCPNexageReporting extends BaseReportingImpl {
             }
         }
         catch (JSONException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return reportResponse;
@@ -137,7 +137,7 @@ public class DCPNexageReporting extends BaseReportingImpl {
 
     public String getEndDate(final String seperator) {
         try {
-            logger.debug("calculating end date for nexage");
+            LOG.debug("calculating end date for nexage");
             ReportTime reportTime = ReportTime.getUTCTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
             reportTime = ReportTime.getPreviousDay(reportTime);
@@ -147,15 +147,17 @@ public class DCPNexageReporting extends BaseReportingImpl {
             return (reportTime.getStringDate(seperator));
         }
         catch (Exception exception) {
-            logger.info("failed to obtain end date inside nexage " + exception.getMessage());
+            LOG.info("failed to obtain end date inside nexage {}", exception.getMessage());
             return "";
         }
     }
 
-    private String invokeHTTPUrl(String urlString) {
+    @Override
+    protected String invokeHTTPUrl(final String urlString) {
         StringBuffer sBuffer = new StringBuffer();
         try {
             Authenticator.setDefault(new Authenticator() {
+                @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
                     return new PasswordAuthentication(accesskey, secretkey.toCharArray());
                 }
@@ -178,10 +180,10 @@ public class DCPNexageReporting extends BaseReportingImpl {
             System.out.println(sBuffer.toString());
         }
         catch (MalformedURLException mue) {
-            logger.info(mue.getMessage());
+            LOG.info("{}", mue.getMessage());
         }
         catch (IOException ioe) {
-            logger.info(ioe.getMessage());
+            LOG.info("{}", ioe.getMessage());
         }
         return sBuffer.toString();
     }

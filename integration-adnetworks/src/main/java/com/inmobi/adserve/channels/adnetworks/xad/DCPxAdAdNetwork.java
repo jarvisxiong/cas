@@ -12,20 +12,22 @@ import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public class DCPxAdAdNetwork extends BaseAdNetworkImpl {
-    private final Configuration config;
+public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
+    private static final Logger LOG              = LoggerFactory.getLogger(DCPxAdAdNetwork.class);
+
     private String              latitude         = null;
     private String              longitude        = null;
     private int                 width;
@@ -34,26 +36,23 @@ public class DCPxAdAdNetwork extends BaseAdNetworkImpl {
     private String              deviceIdType;
     private static final String DERIVED_LAT_LONG = "derived-lat-lon";
     private boolean             isLocSourceDerived;
-    private static final String APP_ID_FORMAT    = "%s_%s";          // <blinded_id>_<category>
+    private static final String APP_ID_FORMAT    = "%s_%s";                                       // <blinded_id>_<category>
     private static final String UUID_MD5         = "uuid|md5";
     private static final String UUID_SHA1        = "uuid|sha1";
     private static final String ANDROID_ID_MD5   = "android_id|md5";
     private static final String ANDROID_ID_SHA1  = "android_id|sha1";
     private static final String IDFA_PLAIN       = "idfa|plain";
 
-    public DCPxAdAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent, logger);
-        this.config = config;
-        this.logger = logger;
-        this.clientBootstrap = clientBootstrap;
+    public DCPxAdAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }
 
     @Override
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            logger.debug("mandatory parameters missing for xad so exiting adapter");
+            LOG.debug("mandatory parameters missing for xad so exiting adapter");
             return false;
         }
         host = config.getString("xad.host");
@@ -65,7 +64,7 @@ public class DCPxAdAdNetwork extends BaseAdNetworkImpl {
             height = (int) Math.ceil(dim.getHeight());
         }
         else {
-            logger.debug("mandate parameters missing for xAd, so returning from adapter");
+            LOG.debug("mandate parameters missing for xAd, so returning from adapter");
             return false;
         }
         setDeviceIdandType();
@@ -82,7 +81,7 @@ public class DCPxAdAdNetwork extends BaseAdNetworkImpl {
             }
         }
 
-        logger.info("Configure parameters inside xad returned true");
+        LOG.info("Configure parameters inside xad returned true");
         return true;
     }
 
@@ -135,20 +134,20 @@ public class DCPxAdAdNetwork extends BaseAdNetworkImpl {
             }
             url.append("&os=").append(HandSetOS.values()[osId].toString());
 
-            logger.debug("xAd url is", url);
+            LOG.debug("xAd url is {}", url);
 
             return (new URI(url.toString()));
         }
         catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            logger.info(exception.getMessage());
+            LOG.error("{}", exception);
         }
         return null;
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status) {
-        logger.debug("response is", response);
+    public void parseResponse(final String response, final HttpResponseStatus status) {
+        LOG.debug("response is {}", response);
 
         if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
             statusCode = status.getCode();
@@ -163,17 +162,16 @@ public class DCPxAdAdNetwork extends BaseAdNetworkImpl {
             VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
             try {
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl,
-                    logger);
+                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
             }
             catch (Exception exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from XAd :", exception);
-                logger.info("Response from XAd:", response);
+                LOG.info("Error parsing response from XAd : {}", exception);
+                LOG.info("Response from XAd: {}", response);
             }
         }
-        logger.debug("response length is", responseContent.length());
+        LOG.debug("response length is {}", responseContent.length());
     }
 
     @Override
@@ -244,12 +242,12 @@ public class DCPxAdAdNetwork extends BaseAdNetworkImpl {
                 deviceId = userParams.getString("WC");
             }
             if (StringUtils.isEmpty(deviceId)) {
-                logger.debug("setting deviceid to null for xAd");
+                LOG.debug("setting deviceid to null for xAd");
             }
 
         }
         catch (Exception e) {
-            logger.debug("setting deviceid to null for xAd");
+            LOG.debug("setting deviceid to null for xAd");
         }
 
         if (StringUtils.isBlank(deviceId)) {

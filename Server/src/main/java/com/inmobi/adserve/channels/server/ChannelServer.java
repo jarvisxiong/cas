@@ -3,9 +3,7 @@ package com.inmobi.adserve.channels.server;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.InetSocketAddress;
 import java.util.Properties;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import javax.naming.Context;
@@ -21,8 +19,6 @@ import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.bootstrap.ServerBootstrap;
-import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.jboss.netty.logging.InternalLoggerFactory;
 import org.jboss.netty.logging.Log4JLoggerFactory;
 import org.jboss.netty.util.HashedWheelTimer;
@@ -50,9 +46,7 @@ import com.inmobi.adserve.channels.server.client.RtbBootstrapCreation;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 import com.inmobi.adserve.channels.server.requesthandler.Filters;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
-import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.MetricsManager;
 import com.inmobi.casthrift.DataCenter;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
@@ -92,7 +86,6 @@ public class ChannelServer {
             // Set the status code for load balancer status.
             ServerStatusInfo.statusCode = 200;
 
-            DebugLogger.init(config.loggerConfiguration());
             SlotSizeMapping.init();
             Formatter.init();
 
@@ -151,11 +144,11 @@ public class ChannelServer {
             instantiateRepository(logger, config);
 
             ServletHandler.init(config, repositoryHelper);
-            MatchSegments.init(channelAdGroupRepository);
             Filters.init(config.adapterConfiguration());
 
             Injector injector = Guice.createInjector(new AdapterConfigModule(config.adapterConfiguration(),
-                    ChannelServer.dataCentreName));
+                    ChannelServer.dataCentreName), new NettyModule(config.serverConfiguration()), new ServerModule(
+                    config.loggerConfiguration(), repositoryHelper));
 
             // Creating netty client for out-bound calls.
             Timer timer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
@@ -184,20 +177,24 @@ public class ChannelServer {
 
             // Initialising request handler
             AsyncRequestMaker.init(clientBootstrap, rtbClientBootstrap, asyncHttpClient);
-            ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(
-                    Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
-            Timer servertimer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
-            bootstrap.setPipelineFactory(new ChannelServerPipelineFactory(servertimer, config.serverConfiguration()));
-            bootstrap.setOption("child.keepAlive", true);
-            bootstrap.setOption("child.tcpNoDelay", true);
-            bootstrap.setOption("child.reuseAddress", true);
-            bootstrap.setOption("child.connectTimeoutMillis", 5); // FIXME
-            bootstrap.bind(new InetSocketAddress(8800));
+
+            final NettyServer server = injector.getInstance(NettyServer.class);
+            server.startAndWait();
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+                @Override
+                public void run() {
+                    server.stopAndWait();
+                }
+            });
+
+            // System.out.close();
+
             // If client bootstrap is not present throwing exception which will
             // set
             // lbStatus as NOT_OK.
         }
         catch (Exception exception) {
+            System.out.println(exception);
             ServerStatusInfo.statusString = getMyStackTrace(exception);
             ServerStatusInfo.statusCode = 404;
             logger.info("stack trace is " + getMyStackTrace(exception));

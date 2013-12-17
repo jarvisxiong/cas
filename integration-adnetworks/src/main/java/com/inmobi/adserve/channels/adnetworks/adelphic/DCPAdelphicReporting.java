@@ -10,17 +10,18 @@ import java.net.URLConnection;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPAdelphicReporting extends BaseReportingImpl {
+    private static final Logger LOG            = LoggerFactory.getLogger(DCPAdelphicReporting.class);
 
     private final Configuration config;
-    private DebugLogger         logger;
     private String              startDate      = "";
     private String              endDate        = "";
     private String              responseString = "";
@@ -36,47 +37,45 @@ public class DCPAdelphicReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final ReportTime endTime)
-            throws Exception {
-        this.logger = logger;
+    public ReportResponse fetchRows(final ReportTime startTime, final ReportTime endTime) throws Exception {
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
-        logger.debug("inside fetch rows of Adelphic");
+        LOG.debug("inside fetch rows of Adelphic");
         try {
             startDate = startTime.getStringDate("-");
             endDate = endTime == null ? getEndDate() : startDate;
-            logger.debug("start date inside Adelphic is ", startDate);
+            LOG.debug("start date inside Adelphic is {}", startDate);
             if (ReportTime.compareStringDates(endDate, startDate) == -1) {
-                logger.debug("end date is less than start date plus reporting window for Adelphic");
+                LOG.debug("end date is less than start date plus reporting window for Adelphic");
                 return null;
             }
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.info("failed to obtain correct dates for fetching reports ", exception.getMessage());
+            LOG.info("failed to obtain correct dates for fetching reports {}", exception);
             return null;
         }
         while (ReportTime.compareStringDates(startDate, endDate) != 1) {
             String url = getRequestUrl();
-            logger.debug("url inside Adelphic is ", url);
+            LOG.debug("url inside Adelphic is {}", url);
             responseString = invokeHTTPUrl(url);
             reportResponse.status = ReportResponse.ResponseStatus.SUCCESS;
 
             String[] responseArray = responseString.split("\n");
-            logger.debug("successfuly got response inside Adelphic. Number of lines of response is ",
+            LOG.debug("successfuly got response inside Adelphic. Number of lines of response is {}",
                 responseArray.length);
-            generateReportResponse(logger, reportResponse, responseArray);
+            generateReportResponse(reportResponse, responseArray);
             ReportTime reportTime = new ReportTime(startDate, 0);
             reportTime = ReportTime.getNextDay(reportTime);
             startDate = reportTime.getStringDate("-");
-            logger.debug("start date inside Adelphic now is ", startDate);
+            LOG.debug("start date inside Adelphic now is {}", startDate);
         }
-        logger.debug("successfully parsed data inside Adelphic");
+        LOG.debug("successfully parsed data inside Adelphic");
         return reportResponse;
     }
 
     public String getEndDate() throws Exception {
         try {
-            logger.debug("calculating latest date for Adelphic");
+            LOG.debug("calculating latest date for Adelphic");
             ReportTime reportTime = ReportTime.getUTCTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
             if (reportTime.getHour() <= ReportReconcilerWindow()) {
@@ -85,7 +84,7 @@ public class DCPAdelphicReporting extends BaseReportingImpl {
             return (reportTime.getStringDate("-"));
         }
         catch (Exception exception) {
-            logger.info("failed to obtain end date inside Adelphic ", exception.getMessage());
+            LOG.info("failed to obtain end date inside Adelphic {}", exception);
             return null;
         }
     }
@@ -121,7 +120,8 @@ public class DCPAdelphicReporting extends BaseReportingImpl {
         return (config.getString("adelphic.advertiserId"));
     }
 
-    private String invokeHTTPUrl(final String url) throws MalformedURLException, IOException {
+    @Override
+    protected String invokeHTTPUrl(final String url) throws MalformedURLException, IOException {
         URLConnection conn = new URL(url).openConnection();
         String authStr = userName + ":" + password;
         String authEncoded = new String(Base64.encodeBase64(authStr.getBytes()));
@@ -138,7 +138,7 @@ public class DCPAdelphicReporting extends BaseReportingImpl {
             }
         }
         catch (IOException ioe) {
-            logger.info("Error in Httpool invokeHTTPUrl : ", ioe.getMessage());
+            LOG.info("Error in Httpool invokeHTTPUrl : {}", ioe);
         }
         finally {
             if (res != null) {
@@ -150,14 +150,7 @@ public class DCPAdelphicReporting extends BaseReportingImpl {
 
     }
 
-    @Override
-    public ReportResponse fetchRows(DebugLogger logger, ReportTime startTime, String key, ReportTime endTime)
-            throws Exception {
-        // not applicable so returns null
-        return null;
-    }
-
-    private void generateReportResponse(final DebugLogger logger, ReportResponse reportResponse, String[] responseArray) {
+    private void generateReportResponse(final ReportResponse reportResponse, final String[] responseArray) {
         if (responseArray.length > 1) {
             int impressionIndex = -1;
             int clicksIndex = -1;
@@ -199,7 +192,7 @@ public class DCPAdelphicReporting extends BaseReportingImpl {
                 String[] rows1 = responseArray[j].split(",");
                 ReportResponse.ReportRow row = new ReportResponse.ReportRow();
                 if (!decodeBlindedSiteId(rows1[siteNameIndex], row)) {
-                    logger.debug("Error decoded BlindedSite id in Adelphic", rows1[siteNameIndex]);
+                    LOG.debug("Error decoded BlindedSite id in Adelphic {}", rows1[siteNameIndex]);
                     continue;
                 }
                 row.isSiteData = true;

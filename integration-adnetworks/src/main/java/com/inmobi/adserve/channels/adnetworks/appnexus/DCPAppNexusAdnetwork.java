@@ -13,15 +13,16 @@ import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.Request;
@@ -29,8 +30,10 @@ import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
 
 
-public class DCPAppNexusAdnetwork extends BaseAdNetworkImpl {
-    private final Configuration config;
+public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
+
+    private static final Logger LOG             = LoggerFactory.getLogger(DCPAppNexusAdnetwork.class);
+
     private String              latitude        = null;
     private String              longitude       = null;
     private int                 width;
@@ -52,19 +55,22 @@ public class DCPAppNexusAdnetwork extends BaseAdNetworkImpl {
     private String              name;
     private boolean             isApp;
 
-    public DCPAppNexusAdnetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent, logger);
-        this.config = config;
-        this.logger = logger;
-        this.clientBootstrap = clientBootstrap;
+    /**
+     * @param config
+     * @param clientBootstrap
+     * @param baseRequestHandler
+     * @param serverEvent
+     */
+    protected DCPAppNexusAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }
 
     @Override
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            logger.debug("mandatory parameters missing for ", name, " so exiting adapter");
+            LOG.debug("mandatory parameters missing for {} so exiting adapter", name);
             return false;
         }
         host = config.getString(name + ".host");
@@ -76,7 +82,7 @@ public class DCPAppNexusAdnetwork extends BaseAdNetworkImpl {
             height = (int) Math.ceil(dim.getHeight());
         }
         else {
-            logger.debug("mandate parameters missing for ", name, " so returning from adapter");
+            LOG.debug("mandate parameters missing for {} so returning from adapter", name);
             return false;
         }
 
@@ -95,7 +101,7 @@ public class DCPAppNexusAdnetwork extends BaseAdNetworkImpl {
             isApp = false;
         }
 
-        logger.info("Configure parameters inside ", name, "returned true");
+        LOG.info("Configure parameters inside {} returned true", name);
         return true;
     }
 
@@ -151,13 +157,13 @@ public class DCPAppNexusAdnetwork extends BaseAdNetworkImpl {
             }
 
             appendQueryParam(url, CLICKURL, getURLEncode(clickUrl, format), false);
-            logger.debug(name, "url is", url);
+            LOG.debug("{} url is {}", name, url);
 
             return (new URI(url.toString()));
         }
         catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            logger.info(exception.getMessage());
+            LOG.error("{}", exception);
         }
         return null;
     }
@@ -165,20 +171,20 @@ public class DCPAppNexusAdnetwork extends BaseAdNetworkImpl {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public boolean makeAsyncRequest() {
-        logger.debug("In PayPal async");
+        LOG.debug("In PayPal async");
         try {
             String uri = getRequestUri().toString();
             requestUrl = uri;
             setNingRequest(requestUrl);
-            logger.debug("Nexage uri :", uri);
+            LOG.debug("Nexage uri : {}", uri);
             startTime = System.currentTimeMillis();
             baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
                 @Override
-                public Response onCompleted(Response response) throws Exception {
+                public Response onCompleted(final Response response) throws Exception {
                     if (!isRequestCompleted()) {
-                        logger.debug("Operation complete for channel partner: ", getName());
+                        LOG.debug("Operation complete for channel partner: {}", getName());
                         latency = System.currentTimeMillis() - startTime;
-                        logger.debug(getName(), "operation complete latency", latency);
+                        LOG.debug("{} operation complete latency {}", getName(), latency);
                         String responseStr = response.getResponseBody();
                         HttpResponseStatus httpResponseStatus = HttpResponseStatus.valueOf(response.getStatusCode());
                         parseResponse(responseStr, httpResponseStatus);
@@ -188,35 +194,35 @@ public class DCPAppNexusAdnetwork extends BaseAdNetworkImpl {
                 }
 
                 @Override
-                public void onThrowable(Throwable t) {
+                public void onThrowable(final Throwable t) {
                     if (isRequestComplete) {
                         return;
                     }
 
                     if (t instanceof java.util.concurrent.TimeoutException) {
                         latency = System.currentTimeMillis() - startTime;
-                        logger.debug(getName(), "timeout latency ", latency);
+                        LOG.debug("{} timeout latency {}", getName(), latency);
                         adStatus = "TIME_OUT";
                         processResponse();
                         return;
                     }
 
-                    logger.debug(getName(), "error latency ", latency);
+                    LOG.debug("{} error latency {}", getName(), latency);
                     adStatus = "TERM";
-                    logger.info("error while fetching response from:", getName(), t.getMessage());
+                    LOG.info("error while fetching response from: {} {}", getName(), t);
                     processResponse();
                     return;
                 }
             });
         }
         catch (Exception e) {
-            logger.debug("Exception in", getName(), "makeAsyncRequest :", e.getMessage());
+            LOG.error("Exception in {} makeAsyncRequest :", getName(), e);
         }
-        logger.debug(getName(), "returning from make NingRequest");
+        LOG.debug("{} returning from make NingRequest", getName());
         return true;
     }
 
-    private void setNingRequest(String requestUrl) {
+    private void setNingRequest(final String requestUrl) {
         ningRequest = new RequestBuilder()
                 .setUrl(requestUrl)
                     .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
@@ -229,8 +235,8 @@ public class DCPAppNexusAdnetwork extends BaseAdNetworkImpl {
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status) {
-        logger.debug("response is", response);
+    public void parseResponse(final String response, final HttpResponseStatus status) {
+        LOG.debug("response is {}", response);
 
         if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
             statusCode = status.getCode();
@@ -255,14 +261,13 @@ public class DCPAppNexusAdnetwork extends BaseAdNetworkImpl {
                 JSONObject adsJson = responseArray.getJSONObject(0);
                 context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, adsJson.getString("content"));
 
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl,
-                    logger);
+                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
             }
             catch (Exception exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from ", name, exception);
-                logger.info("Response from ", name, response);
+                LOG.info("Error parsing response from {} {}", name, exception);
+                LOG.info("Response from {} {}", name, response);
             }
         }
     }
@@ -272,7 +277,8 @@ public class DCPAppNexusAdnetwork extends BaseAdNetworkImpl {
         return (config.getString(name + ".advertiserId"));
     }
 
-    public void setName(String name) {
+    @Override
+    public void setName(final String name) {
         this.name = name;
     }
 

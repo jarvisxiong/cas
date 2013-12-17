@@ -8,7 +8,6 @@ import org.apache.commons.configuration.Configuration;
 import com.google.common.collect.Sets;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.MapBinder;
-import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 
 
 /**
@@ -57,8 +56,6 @@ public class AdapterConfigModule extends AbstractModule {
         for (AdapterConfig adapterConfig : adapterConfigs) {
             advertiserIdConfigMapBinder.addBinding(adapterConfig.getAdvertiserId()).toInstance(adapterConfig);
         }
-
-        requestStaticInjection(AsyncRequestMaker.class);
 
     }
 

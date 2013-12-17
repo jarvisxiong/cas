@@ -7,6 +7,8 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import javax.inject.Inject;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -14,12 +16,12 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import com.inmobi.adserve.channels.server.api.Servlet;
-import com.inmobi.adserve.channels.server.api.ServletFactory;
 import org.apache.thrift.TException;
 import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.channel.group.ChannelGroup;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.jboss.netty.handler.timeout.IdleStateAwareChannelUpstreamHandler;
@@ -27,35 +29,55 @@ import org.jboss.netty.handler.timeout.IdleStateEvent;
 import org.jboss.netty.util.CharsetUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
 
+import com.google.inject.Provider;
+import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.api.ServletFactory;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.server.servlet.ServletInvalid;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
 
 public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
 
-    public String         terminationReason = "NO";
-    public JSONObject     jObject           = null;
-    public DebugLogger    logger            = null;
-    public ResponseSender responseSender;
-    public boolean        isTraceRequest;
+    private static final Logger LOG               = LoggerFactory.getLogger(HttpRequestHandler.class);
+
+    public String               terminationReason = "NO";
+    public JSONObject           jObject           = null;
+    public ResponseSender       responseSender;
+    private ChannelGroup        allChannels;
+
+    private Provider<Marker>    traceMarkerProvider;
+    private Marker              traceMarker;
 
     public String getTerminationReason() {
         return terminationReason;
     }
 
-    public void setTerminationReason(String terminationReason) {
+    public void setTerminationReason(final String terminationReason) {
         this.terminationReason = terminationReason;
     }
 
-    public HttpRequestHandler() {
-        logger = new DebugLogger();
-        responseSender = new ResponseSender(this, logger);
+    HttpRequestHandler() {
+        responseSender = new ResponseSender(this);
+    }
+
+    @Inject
+    HttpRequestHandler(final ChannelGroup allChannels, final Provider<Marker> traceMarkerProvider) {
+        this.allChannels = allChannels;
+        this.traceMarkerProvider = traceMarkerProvider;
+        responseSender = new ResponseSender(this);
+    }
+
+    @Override
+    public void channelOpen(final ChannelHandlerContext ctx, final ChannelStateEvent e) throws Exception {
+        allChannels.add(e.getChannel());
     }
 
     /**
@@ -63,35 +85,35 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
      * means channel is closed by party who requested for the ad
      */
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
+    public void exceptionCaught(final ChannelHandlerContext ctx, final ExceptionEvent e) throws Exception {
 
         String exceptionString = e.getClass().getSimpleName();
         InspectorStats.incrementStatCount(InspectorStrings.channelException, exceptionString);
         InspectorStats.incrementStatCount(InspectorStrings.channelException, InspectorStrings.count);
-        if (logger == null) {
-            logger = new DebugLogger();
-        }
         if (exceptionString.equalsIgnoreCase(ServletHandler.CLOSED_CHANNEL_EXCEPTION)
                 || exceptionString.equalsIgnoreCase(ServletHandler.CONNECTION_RESET_PEER)) {
             InspectorStats.incrementStatCount(InspectorStrings.totalTerminate);
-            logger.debug("Channel is terminated", ctx.getChannel().getId());
+            LOG.debug(traceMarker, "Channel is terminated {}", ctx.getChannel().getId());
         }
-        logger.info("Getting netty error in HttpRequestHandler:", e.getCause().getLocalizedMessage());
+        LOG.info("Getting netty error in HttpRequestHandler: {}", e);
         if (e.getChannel().isOpen()) {
             responseSender.sendNoAdResponse(e);
         }
+
+        e.getChannel().close();
     }
 
     // Invoked when request timeout.
     @Override
-    public void channelIdle(ChannelHandlerContext ctx, IdleStateEvent e) {
+    public void channelIdle(final ChannelHandlerContext ctx, final IdleStateEvent e) {
         if (e.getChannel().isOpen()) {
-            logger.debug("Channel is open in channelIdle handler");
+            LOG.debug(traceMarker, "Channel is open in channelIdle handler");
             if (responseSender.getRankList() != null) {
                 for (ChannelSegment channelSegment : responseSender.getRankList()) {
                     if (channelSegment.getAdNetworkInterface().getAdStatus().equals("AD")) {
-                        logger.debug("Got Ad from", channelSegment.getAdNetworkInterface().getName(), "Top Rank was",
-                            responseSender.getRankList().get(0).getAdNetworkInterface().getName());
+                        LOG.debug(traceMarker, "Got Ad from {} Top Rank was {}", channelSegment
+                                .getAdNetworkInterface()
+                                    .getName(), responseSender.getRankList().get(0).getAdNetworkInterface().getName());
                         responseSender.sendAdResponse(channelSegment.getAdNetworkInterface(), e);
                         return;
                     }
@@ -102,23 +124,26 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
         // Whenever channel is Write_idle, increment the totalTimeout. It means
         // server
         // could not write the response with in 800 ms
-        logger.debug("inside channel idle event handler for Request channel ID: " + e.getChannel().getId());
+        LOG.debug(traceMarker, "inside channel idle event handler for Request channel ID: {}", e.getChannel().getId());
         if (e.getState().toString().equalsIgnoreCase("ALL_IDLE")
                 || e.getState().toString().equalsIgnoreCase("WRITE_IDLE")) {
             InspectorStats.incrementStatCount(InspectorStrings.totalTimeout);
-            logger.debug("server timeout");
+            LOG.debug("server timeout");
         }
     }
 
     // Invoked when message is received over the connection
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+    public void messageReceived(final ChannelHandlerContext ctx, final MessageEvent e) throws Exception {
         try {
             HttpRequest request = (HttpRequest) e.getMessage();
-            logger.debug(request.getContent().toString(CharsetUtil.UTF_8));
+
+            traceMarker = traceMarkerProvider.get();
+
+            LOG.debug(traceMarker, request.getContent().toString(CharsetUtil.UTF_8));
             QueryStringDecoder queryStringDecoder = new QueryStringDecoder(request.getUri());
             String path = queryStringDecoder.getPath();
-            logger.debug(path);
+            LOG.debug(path);
             ServletFactory servletFactory = ServletHandler.servletMap.get(path);
             Servlet servlet;
             if (servletFactory == null) {
@@ -127,12 +152,9 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
             else {
                 servlet = servletFactory.getServlet();
             }
-            logger.debug("Got the servlet " + servlet.getName());
-            if ("/trace".equals(path)) {
-                logger.setTrace();
-                isTraceRequest = true;
-            }
-            servlet.handleRequest(this, queryStringDecoder, e, logger);
+            LOG.debug(traceMarker, "Got the servlet {}", servlet.getName());
+
+            servlet.handleRequest(this, queryStringDecoder, e);
             return;
         }
         catch (Exception exception) {
@@ -146,14 +168,14 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             exception.printStackTrace(pw);
-            logger.info("stack trace is", sw.toString());
-            if (logger.isDebugEnabled()) {
+            LOG.info("stack trace is {}", sw);
+            if (LOG.isDebugEnabled()) {
                 sendMail(exception.getMessage(), sw.toString());
             }
         }
     }
 
-    public void writeLogs(ResponseSender responseSender, DebugLogger logger) {
+    public void writeLogs(final ResponseSender responseSender) {
         List<ChannelSegment> list = new ArrayList<ChannelSegment>();
         if (null != responseSender.getRankList()) {
             list.addAll(responseSender.getRankList());
@@ -167,47 +189,43 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
         }
         try {
             if (responseSender.getAdResponse() == null) {
-                Logging.channelLogline(list, null, logger, ServletHandler.getLoggerConfig(), responseSender.sasParams,
+                Logging.channelLogline(list, null, ServletHandler.getLoggerConfig(), responseSender.sasParams,
                     totalTime);
-                Logging.rrLogging(null, list, logger, ServletHandler.getLoggerConfig(), responseSender.sasParams,
+                Logging.rrLogging(null, list, ServletHandler.getLoggerConfig(), responseSender.sasParams,
                     terminationReason);
-                Logging.advertiserLogging(list, logger, ServletHandler.getLoggerConfig());
-                Logging.sampledAdvertiserLogging(list, logger, ServletHandler.getLoggerConfig());
+                Logging.advertiserLogging(list, ServletHandler.getLoggerConfig());
+                Logging.sampledAdvertiserLogging(list, ServletHandler.getLoggerConfig());
             }
             else {
-                Logging.channelLogline(list, responseSender.getAdResponse().clickUrl, logger,
-                    ServletHandler.getLoggerConfig(), responseSender.sasParams, totalTime);
+                Logging.channelLogline(list, responseSender.getAdResponse().clickUrl, ServletHandler.getLoggerConfig(),
+                    responseSender.sasParams, totalTime);
                 if (responseSender.getRtbResponse() == null) {
-                    logger.debug("rtb response is null so logging dcp response in rr");
+                    LOG.debug("rtb response is null so logging dcp response in rr");
                     Logging.rrLogging(responseSender.getRankList().get(responseSender.getSelectedAdIndex()), list,
-                        logger, ServletHandler.getLoggerConfig(), responseSender.sasParams, terminationReason);
+                        ServletHandler.getLoggerConfig(), responseSender.sasParams, terminationReason);
                 }
                 else {
-                    logger.debug("rtb response is not null so logging rtb response in rr");
-                    Logging.rrLogging(responseSender.getRtbResponse(), list, logger, ServletHandler.getLoggerConfig(),
+                    LOG.debug("rtb response is not null so logging rtb response in rr");
+                    Logging.rrLogging(responseSender.getRtbResponse(), list, ServletHandler.getLoggerConfig(),
                         responseSender.sasParams, terminationReason);
                 }
-                Logging.advertiserLogging(list, logger, ServletHandler.getLoggerConfig());
-                Logging.sampledAdvertiserLogging(list, logger, ServletHandler.getLoggerConfig());
+                Logging.advertiserLogging(list, ServletHandler.getLoggerConfig());
+                Logging.sampledAdvertiserLogging(list, ServletHandler.getLoggerConfig());
             }
         }
         catch (JSONException exception) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(ChannelServer.getMyStackTrace(exception));
-            }
+            LOG.debug("{}", exception);
             return;
         }
         catch (TException exception) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(ChannelServer.getMyStackTrace(exception));
-            }
+            LOG.debug("{}", exception);
             return;
         }
-        logger.debug("done with logging");
+        LOG.debug("done with logging");
     }
 
     // send Mail if channel server crashes
-    public static void sendMail(String errorMessage, String stackTrace) {
+    public static void sendMail(final String errorMessage, final String stackTrace) {
         Properties properties = System.getProperties();
         properties.setProperty("mail.smtp.host", ServletHandler.getServerConfig().getString("smtpServer"));
         Session session = Session.getDefaultInstance(properties);
@@ -218,7 +236,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
             javax.mail.internet.InternetAddress[] addressTo = new javax.mail.internet.InternetAddress[recipients.size()];
 
             for (int index = 0; index < recipients.size(); index++) {
-                addressTo[index] = new javax.mail.internet.InternetAddress((String) recipients.get(index));
+                addressTo[index] = new javax.mail.internet.InternetAddress(recipients.get(index));
             }
 
             message.setRecipients(Message.RecipientType.TO, addressTo);

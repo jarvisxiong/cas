@@ -24,21 +24,23 @@ import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.api.ServerException;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPWapStartReporting extends BaseReportingImpl {
+    private static final Logger LOG = LoggerFactory.getLogger(DCPWapStartReporting.class);
+
     private final Configuration config;
     private final String        token;
     private String              startDate;
     private String              endDate;
     private final String        baseUrl;
-    private DebugLogger         logger;
     private String              externalSiteId;
     private final Connection    connection;
 
@@ -55,43 +57,30 @@ public class DCPWapStartReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws ClientProtocolException, IllegalStateException, ServerException,
-            IOException, JSONException {
-        this.logger = logger;
+    public ReportResponse fetchRows(final ReportTime startTime, final String key, final ReportTime endTime)
+            throws ClientProtocolException, IllegalStateException, ServerException, IOException, JSONException {
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         String responseStr = null;
         externalSiteId = key;
-        logger.debug("inside fetch rows of wapstart");
+        LOG.debug("inside fetch rows of wapstart");
         try {
             startDate = startTime.getStringDate("-");
-            logger.debug("start date inside wapstart is ", startDate);
+            LOG.debug("start date inside wapstart is {}", startDate);
 
             endDate = endTime == null ? getEndDate() : ReportTime.getNextDay(startTime).getStringDate("-");
             if (ReportTime.compareStringDates(endDate, startDate) == -1) {
-                logger.debug("date is greater than the current date reporting window for wapstart");
+                LOG.debug("date is greater than the current date reporting window for wapstart");
                 return null;
             }
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.info("failed to obtain correct dates for fetching reports ", exception.getMessage());
+            LOG.info("failed to obtain correct dates for fetching reports {}", exception);
             return null;
         }
 
-        try {
-            responseStr = invokeHTTPUrl(getRequestUrl());
-        }
-        catch (KeyManagementException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (NoSuchAlgorithmException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return null;
-        }
-        logger.debug("response from wapstart is ", responseStr);
+        responseStr = invokeHTTPUrl(getRequestUrl());
+        LOG.debug("response from wapstart is {}", responseStr);
 
         // parse the json response
         if (responseStr != null && !responseStr.startsWith("{\"error")) {
@@ -103,22 +92,22 @@ public class DCPWapStartReporting extends BaseReportingImpl {
                 row.clicks = 0;
                 row.request = 0;
                 row.revenue = 0;
-                double rate = getCurrencyConversionRate("RUB", startDate, logger, connection);
+                double rate = getCurrencyConversionRate("RUB", startDate, connection);
                 if (rate > 0) {
                     row.revenue /= rate;
                 }
                 else {
-                    logger.info("Failed to get RUB to USD rate for ", startDate);
+                    LOG.info("Failed to get RUB to USD rate for {}", startDate);
                     return null;
                 }
                 JSONObject reportRow = jReportArr.getJSONObject(i);
-                logger.debug("json array length is ", jReportArr.length());
+                LOG.debug("json array length is {}", jReportArr.length());
                 row.request = 0;
                 row.reportTime = new ReportTime(reportRow.getString("day"), 0);
                 row.clicks = Long.parseLong(reportRow.getString("clicks"));
                 row.impressions = Long.parseLong(reportRow.getString("views"));
                 row.revenue = Double.parseDouble(reportRow.getString("income"));
-                logger.debug("parsing data inside wapstart ", row);
+                LOG.debug("parsing data inside wapstart {}", row);
                 row.advertiserId = this.getAdvertiserId();
                 row.siteId = externalSiteId;
                 row.slotSize = getReportGranularity();
@@ -156,7 +145,7 @@ public class DCPWapStartReporting extends BaseReportingImpl {
 
     public String getEndDate() throws Exception {
         try {
-            logger.debug("calculating end date for wapstart");
+            LOG.debug("calculating end date for wapstart");
             ReportTime reportTime = ReportTime.getUTCTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
             if (reportTime.getHour() <= ReportReconcilerWindow()) {
@@ -165,13 +154,13 @@ public class DCPWapStartReporting extends BaseReportingImpl {
             return (reportTime.getStringDate("-"));
         }
         catch (Exception exception) {
-            logger.info("failed to obtain end date inside wapstart ", exception.getMessage());
+            LOG.info("failed to obtain end date inside wapstart {}", exception);
             return "";
         }
     }
 
-    public String invokeHTTPUrl(final String url) throws ServerException, NoSuchAlgorithmException,
-            KeyManagementException, MalformedURLException, IOException {
+    @Override
+    public String invokeHTTPUrl(final String url) throws ServerException, MalformedURLException, IOException {
         TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
             @Override
             public java.security.cert.X509Certificate[] getAcceptedIssuers() {
@@ -187,46 +176,44 @@ public class DCPWapStartReporting extends BaseReportingImpl {
             }
         } };
 
-        // Install the all-trusting trust manager
-        SSLContext sc = SSLContext.getInstance("SSL");
-        sc.init(null, trustAllCerts, new java.security.SecureRandom());
-        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-
-        // Create all-trusting host name verifier
-        HostnameVerifier allHostsValid = new HostnameVerifier() {
-            @Override
-            public boolean verify(final String hostname, final SSLSession session) {
-                return true;
-            }
-        };
-
-        // Install the all-trusting host verifier
-        HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
-        URLConnection conn = new URL(url).openConnection();
-        // Setting connection and read timeout to 5 min
-        conn.setReadTimeout(300000);
-        conn.setConnectTimeout(300000);
-        // conn.setRequestProperty("X-WSSE", getHeader());
-        conn.setDoOutput(true);
-        InputStream in = conn.getInputStream();
-        BufferedReader res = null;
-        StringBuffer sBuffer = new StringBuffer();
         try {
+            // Install the all-trusting trust manager
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+            // Create all-trusting host name verifier
+            HostnameVerifier allHostsValid = new HostnameVerifier() {
+                @Override
+                public boolean verify(final String hostname, final SSLSession session) {
+                    return true;
+                }
+            };
+
+            // Install the all-trusting host verifier
+            HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+            URLConnection conn = new URL(url).openConnection();
+            // Setting connection and read timeout to 5 min
+            conn.setReadTimeout(300000);
+            conn.setConnectTimeout(300000);
+            // conn.setRequestProperty("X-WSSE", getHeader());
+            conn.setDoOutput(true);
+            InputStream in = conn.getInputStream();
+            BufferedReader res = null;
+            StringBuffer sBuffer = new StringBuffer();
+
             res = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             String inputLine;
             while ((inputLine = res.readLine()) != null) {
                 sBuffer.append(inputLine);
             }
+            res.close();
+            return sBuffer.toString();
         }
-        catch (IOException ioe) {
-            logger.info("Error in Httpool invokeHTTPUrl : ", ioe.getMessage());
-        }
-        finally {
-            if (res != null) {
-                res.close();
-            }
+        catch (Exception exception) {
+            LOG.info("Error in Httpool invokeHTTPUrl : ", exception.getMessage());
+            throw new ServerException(exception);
         }
 
-        return sBuffer.toString();
     }
 }

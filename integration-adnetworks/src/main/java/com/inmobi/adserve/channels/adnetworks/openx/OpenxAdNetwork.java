@@ -9,30 +9,29 @@ import org.apache.velocity.VelocityContext;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public class OpenxAdNetwork extends BaseAdNetworkImpl {
+public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
     // Updates the request parameters according to the Ad Network. Returns true on
     // success.i
+    private static final Logger LOG       = LoggerFactory.getLogger(OpenxAdNetwork.class);
 
     private String              latitude  = null;
     private String              longitude = null;
-    private final Configuration config;
 
-    public OpenxAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent, logger);
-        this.logger = logger;
-        this.config = config;
+    public OpenxAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
         this.clientBootstrap = clientBootstrap;
     }
 
@@ -40,7 +39,7 @@ public class OpenxAdNetwork extends BaseAdNetworkImpl {
     @Override
     public boolean configureParameters() {
         if (StringUtils.isBlank(externalSiteId)) {
-            logger.debug("mandate parameters missing for openx, so returning from adapter");
+            LOG.debug("mandate parameters missing for openx, so returning from adapter");
             return false;
         }
 
@@ -50,7 +49,7 @@ public class OpenxAdNetwork extends BaseAdNetworkImpl {
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        logger.debug("Configure parameters inside openx returned true");
+        LOG.debug("Configure parameters inside openx returned true");
         return true;
     }
 
@@ -116,21 +115,21 @@ public class OpenxAdNetwork extends BaseAdNetworkImpl {
                 finalUrl.append('&').append(paramValue[0]).append('=').append(paramValue[1]);
             }
         }
-        logger.debug("url inside openx: ", finalUrl.toString());
+        LOG.debug("url inside openx: {}", finalUrl);
         try {
             return (new URI(finalUrl.toString()));
         }
         catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            logger.info("Error Forming Url inside openx", exception.getMessage());
+            LOG.info("Error Forming Url inside openx {}", exception);
         }
         return null;
     }
 
     // parse the response received from openx
     @Override
-    public void parseResponse(String response, HttpResponseStatus status) {
-        logger.debug("response is", response, "and response length is", response.length());
+    public void parseResponse(final String response, final HttpResponseStatus status) {
+        LOG.debug("response is {} and response length is {}", response, response.length());
         if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
             statusCode = status.getCode();
             if (200 == statusCode) {
@@ -144,22 +143,21 @@ public class OpenxAdNetwork extends BaseAdNetworkImpl {
             VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
             try {
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl,
-                    logger);
+                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
             }
             catch (Exception exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from openx :", exception);
-                logger.info("Response from openx:", response);
+                LOG.info("Error parsing response from openx : {}", exception);
+                LOG.info("Response from openx: {}", response);
                 try {
                     throw exception;
                 }
                 catch (Exception e) {
-                    logger.info("Error while rethrowing the exception :", e);
+                    LOG.info("Error while rethrowing the exception : {}", e);
                 }
             }
             adStatus = "AD";
         }
-        logger.debug("response length is ", responseContent.length());
+        LOG.debug("response length is {}", responseContent.length());
     }
 }

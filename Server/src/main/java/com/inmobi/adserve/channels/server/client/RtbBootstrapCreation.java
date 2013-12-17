@@ -17,6 +17,8 @@ import org.jboss.netty.handler.timeout.ReadTimeoutHandler;
 import org.jboss.netty.util.Timer;
 
 import com.inmobi.adserve.channels.api.ChannelsClientHandler;
+import com.inmobi.adserve.channels.server.RequestIdHandler;
+import com.inmobi.adserve.channels.server.TraceMarkerhandler;
 
 
 public class RtbBootstrapCreation {
@@ -25,11 +27,11 @@ public class RtbBootstrapCreation {
     private static Timer                          timer;
     private static ConnectionLimitUpstreamHandler connectionLimitUpstreamHandler;
 
-    public static void init(Timer timer) {
+    public static void init(final Timer timer) {
         RtbBootstrapCreation.timer = timer;
     }
 
-    public static ClientBootstrap createBootstrap(Logger logger, final Configuration config) {
+    public static ClientBootstrap createBootstrap(final Logger logger, final Configuration config) {
         // make the bootstrap object
         try {
             bootstrap = new ClientBootstrap(new NioClientSocketChannelFactory(Executors.newCachedThreadPool(),
@@ -48,9 +50,13 @@ public class RtbBootstrapCreation {
             logger.info("error in building RTBbootstrap " + ex.getMessage());
             return null;
         }
-        // make the channel pipeline
+
+        final RequestIdHandler requestIdHandler = new RequestIdHandler();
+        final TraceMarkerhandler traceMarkerhandler = new TraceMarkerhandler();
+
         try {
             bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
+                @Override
                 public ChannelPipeline getPipeline() throws Exception {
                     int rtbReadTimeoutMills;
                     try {
@@ -60,6 +66,8 @@ public class RtbBootstrapCreation {
                         rtbReadTimeoutMills = 200;
                     }
                     ChannelPipeline pipeline = Channels.pipeline();
+                    pipeline.addLast("requestIdHandler", requestIdHandler);
+                    pipeline.addLast("traceMarkerhandler", traceMarkerhandler);
                     pipeline.addLast("connectionLimit", connectionLimitUpstreamHandler);
                     pipeline.addLast("timeout", new ReadTimeoutHandler(timer, rtbReadTimeoutMills,
                             TimeUnit.MILLISECONDS));
@@ -81,7 +89,7 @@ public class RtbBootstrapCreation {
         return bootstrap;
     }
 
-    public static void setMaxConnectionLimit(int maxOutboundConnectionLimit) {
+    public static void setMaxConnectionLimit(final int maxOutboundConnectionLimit) {
         connectionLimitUpstreamHandler.setMaxConnections(maxOutboundConnectionLimit);
     }
 

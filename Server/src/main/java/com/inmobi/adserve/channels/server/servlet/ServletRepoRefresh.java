@@ -8,34 +8,37 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
-import com.inmobi.adserve.channels.server.api.Servlet;
-import com.inmobi.adserve.channels.server.ServletHandler;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.server.ChannelServerStringLiterals;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.server.ServletHandler;
+import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.phoenix.exception.RepositoryException;
 
 
 public class ServletRepoRefresh implements Servlet {
+    private static final Logger LOG            = LoggerFactory.getLogger(ServletRepoRefresh.class);
+
     private static final String LAST_UPDATE    = "'${last_update}'";
     private static final String REPLACE_STRING = "now() -interval '1 MINUTE'";
 
     @Override
-    public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
-            DebugLogger logger) throws Exception {
+    public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
+            final MessageEvent e) throws Exception {
         Map<String, List<String>> params = queryStringDecoder.getParameters();
         String requestParam = params.get("args").toString();
         JSONArray jsonArray = new JSONArray(requestParam);
         JSONObject jObject = jsonArray.getJSONObject(0);
-        hrh.logger.debug("requestParam", requestParam, "jObject", jObject);
+        LOG.debug("requestParam {} jObject {}", requestParam, jObject);
         String repoName = jObject.get("repoName").toString();
-        hrh.logger.debug("RepoName is", repoName);
+        LOG.debug("RepoName is {}", repoName);
 
         String dbHost = jObject.get("DBHost").toString();
         String dbPort = jObject.get("DBPort").toString();
@@ -133,15 +136,15 @@ public class ServletRepoRefresh implements Servlet {
                 ServletHandler.repositoryHelper.getSiteEcpmRepository().newUpdateFromResultSetToOptimizeUpdate(
                     resultSet);
             }
-            hrh.logger.debug("Successfully updated", repoName);
+            LOG.debug("Successfully updated {}", repoName);
             hrh.responseSender.sendResponse("OK", e);
         }
         catch (SQLException e1) {
-            hrh.logger.info("error is", e1.getMessage());
+            LOG.info("error is {}", e1);
             hrh.responseSender.sendResponse("NOTOK", e);
         }
         catch (RepositoryException e2) {
-            hrh.logger.info("error is", e2.getMessage());
+            LOG.info("error is", e2);
             hrh.responseSender.sendResponse("NOTOK", e);
         }
         finally {

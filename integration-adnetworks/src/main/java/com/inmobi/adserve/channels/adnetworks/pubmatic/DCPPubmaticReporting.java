@@ -8,6 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,25 +18,22 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.cxf.frontend.ClientProxy;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.api.ServerException;
-import com.inmobi.adserve.channels.util.DebugLogger;
-import com.pubmatic.core.reporting.webservices.Currency;
-import com.pubmatic.core.reporting.webservices.PublisherDemandReportingWebService;
-import com.pubmatic.core.reporting.webservices.PublisherDemandReportingWebServiceImplService;
-import com.pubmatic.core.reporting.webservices.PublisherDemandStatistics;
-import com.pubmatic.core.reporting.webservices.ReportingException_Exception;
-import com.pubmatic.core.reporting.webservices.ReportingOptionalParams;
 
 
 public class DCPPubmaticReporting extends BaseReportingImpl {
+    private static final Logger                    LOG             = LoggerFactory
+                                                                           .getLogger(DCPPubmaticReporting.class);
+
     private final Configuration                    config;
     private String                                 startDate       = "";
     private String                                 endDate         = "";
-    private DebugLogger                            logger;
     private ReportResponse                         reportResponse;
     private final String                           accessToken;
     private final long                             publisherId;
@@ -58,24 +56,23 @@ public class DCPPubmaticReporting extends BaseReportingImpl {
 
     // Fetches the report from the TPAN
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws ServerException, IOException, JSONException {
-        this.logger = logger;
+    public ReportResponse fetchRows(final ReportTime startTime, final String key, final ReportTime endTime)
+            throws ServerException, IOException, JSONException {
         reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
-        logger.debug("inside fetch rows of draw bridge");
+        LOG.debug("inside fetch rows of draw bridge");
         try {
             startDate = startTime.getStringDate("-");
-            logger.debug("start date inside pubmatic is " + startDate);
+            LOG.debug("start date inside pubmatic is {}", startDate);
             endDate = endTime == null ? getEndDate() : startDate;
-            logger.debug("end date inside pubmatic is " + endDate);
+            LOG.debug("end date inside pubmatic is {}", endDate);
             if (ReportTime.compareStringDates(endDate, startDate) == -1) {
-                logger.debug("end date is less than start date plus reporting window for mobile commerce");
+                LOG.debug("end date is less than start date plus reporting window for mobile commerce");
                 return null;
             }
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.info("failed to obtain correct dates for fetching reports " + exception.getMessage());
+            LOG.info("failed to obtain correct dates for fetching reports {}", exception);
             return null;
         }
 
@@ -101,8 +98,7 @@ public class DCPPubmaticReporting extends BaseReportingImpl {
             }
             catch (ReportingException_Exception e) {
                 reportResponse.status = ReportResponse.ResponseStatus.FAIL_SERVER_ERROR;
-                logger.info(e.getMessage());
-                logger.info(e.getStackTrace().toString());
+                LOG.info("{}", e);
                 return null;
             }
         }
@@ -126,16 +122,16 @@ public class DCPPubmaticReporting extends BaseReportingImpl {
             }
         }
         reportResponse.status = ReportResponse.ResponseStatus.SUCCESS;
-        logger.debug("successfuly got response inside pubmatic. Number of lines of response is "
-                + reportResponse.rows.size());
-        logger.debug("successfully parsed data inside pubmatic");
+        LOG.debug("successfuly got response inside pubmatic. Number of lines of response is ",
+            reportResponse.rows.size());
+        LOG.debug("successfully parsed data inside pubmatic");
         return reportResponse;
     }
 
     // obtain end date for the date range in which data is to be fetched
     public String getEndDate() throws Exception {
         try {
-            logger.debug("calculating end date for pubmatic");
+            LOG.debug("calculating end date for pubmatic");
             ReportTime reportTime = ReportTime.getUTCTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
             reportTime = ReportTime.getPreviousDay(reportTime);
@@ -145,7 +141,7 @@ public class DCPPubmaticReporting extends BaseReportingImpl {
             return (reportTime.getStringDate("-"));
         }
         catch (Exception exception) {
-            logger.info("failed to obtain end date inside mobile commerce " + exception.getMessage());
+            LOG.info("failed to obtain end date inside mobile commerce {}", exception.getMessage());
             return "";
         }
     }
@@ -189,7 +185,8 @@ public class DCPPubmaticReporting extends BaseReportingImpl {
         return token;
     }
 
-    private String invokeHTTPUrl(final String url, String urlParameters) throws MalformedURLException, IOException {
+    private String invokeHTTPUrl(final String url, final String urlParameters) throws MalformedURLException,
+            IOException {
         HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
         String authStr = userName + ":" + password;
         String authEncoded = new String(Base64.encodeBase64(authStr.getBytes()));
@@ -216,7 +213,7 @@ public class DCPPubmaticReporting extends BaseReportingImpl {
 
     }
 
-    private void setRequestHeader(String oauthToken, Object port) {
+    private void setRequestHeader(final String oauthToken, final Object port) {
 
         Map<String, List<String>> headers = new HashMap<String, List<String>>();
         List<String> headList = new ArrayList<String>();

@@ -5,28 +5,28 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
-import com.inmobi.adserve.channels.util.DebugLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class ConnectionLimitUpstreamHandler extends SimpleChannelHandler {
+    private static final Logger LOG         = LoggerFactory.getLogger(ConnectionLimitUpstreamHandler.class);
 
     private final AtomicInteger connections = new AtomicInteger(0);
     private int                 maxConnections;
     private int                 droppedConnections;
-    private DebugLogger         logger;
 
-    public ConnectionLimitUpstreamHandler(int maxConnections) {
+    public ConnectionLimitUpstreamHandler(final int maxConnections) {
         this.maxConnections = maxConnections;
         this.droppedConnections = 0;
-        this.logger = new DebugLogger();
     }
 
     @Override
-    public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+    public void channelOpen(final ChannelHandlerContext ctx, final ChannelStateEvent e) throws Exception {
         if (maxConnections > 0) {
             int currentCount = connections.getAndIncrement();
             if (currentCount + 1 > maxConnections) {
-                logger.info("MaxLimit of connections", maxConnections, "exceeded so closing channel");
+                LOG.info("MaxLimit of connections {} exceeded so closing channel", maxConnections);
                 ctx.getChannel().close();
                 droppedConnections++;
             }
@@ -36,7 +36,7 @@ public class ConnectionLimitUpstreamHandler extends SimpleChannelHandler {
     }
 
     @Override
-    public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+    public void channelClosed(final ChannelHandlerContext ctx, final ChannelStateEvent e) throws Exception {
         if (maxConnections > 0) {
             connections.decrementAndGet();
         }
@@ -48,7 +48,7 @@ public class ConnectionLimitUpstreamHandler extends SimpleChannelHandler {
         return connections.get();
     }
 
-    public void setMaxConnections(int maxConnection) {
+    public void setMaxConnections(final int maxConnection) {
         if (maxConnection > 0) {
             maxConnections = maxConnection;
         }

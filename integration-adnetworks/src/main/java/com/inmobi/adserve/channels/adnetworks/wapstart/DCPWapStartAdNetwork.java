@@ -19,30 +19,33 @@ import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.phoenix.logging.DebugLogger;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
 
 
-public class DCPWapStartAdNetwork extends BaseAdNetworkImpl {
-    private final Configuration           config;
+public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
+    private static final Logger           LOG           = LoggerFactory.getLogger(DCPWapStartAdNetwork.class);
+
     private String                        latitude      = null;
     private String                        longitude     = null;
     private int                           width;
@@ -60,10 +63,7 @@ public class DCPWapStartAdNetwork extends BaseAdNetworkImpl {
     public DCPWapStartAdNetwork(final DebugLogger logger, final Configuration config,
             final ClientBootstrap clientBootstrap, final HttpRequestHandlerBase baseRequestHandler,
             final MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent, logger);
-        this.config = config;
-        this.logger = logger;
-        this.clientBootstrap = clientBootstrap;
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
         factory = DocumentBuilderFactory.newInstance();
         try {
             builder = factory.newDocumentBuilder();
@@ -77,7 +77,7 @@ public class DCPWapStartAdNetwork extends BaseAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            logger.debug("mandatory parameters missing for wapstart so exiting adapter");
+            LOG.debug("mandatory parameters missing for wapstart so exiting adapter");
             return false;
         }
         host = config.getString("wapstart.host");
@@ -89,7 +89,7 @@ public class DCPWapStartAdNetwork extends BaseAdNetworkImpl {
             height = (int) Math.ceil(dim.getHeight());
         }
         else {
-            logger.debug("mandate parameters missing for WapStart, so returning from adapter");
+            LOG.debug("mandate parameters missing for WapStart, so returning from adapter");
             return false;
         }
 
@@ -101,7 +101,7 @@ public class DCPWapStartAdNetwork extends BaseAdNetworkImpl {
 
         }
 
-        logger.info("Configure parameters inside wapstart returned true");
+        LOG.info("Configure parameters inside wapstart returned true");
         return true;
     }
 
@@ -134,13 +134,13 @@ public class DCPWapStartAdNetwork extends BaseAdNetworkImpl {
                             .append(getURLEncode(String.format(latlongFormat, latitude, longitude), format));
             }
 
-            logger.debug("WapStart url is", url);
+            LOG.debug("WapStart url is {}", url);
 
             return (new URI(url.toString()));
         }
         catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            logger.info(exception.getMessage());
+            LOG.info("{}", exception);
         }
         return null;
     }
@@ -148,20 +148,20 @@ public class DCPWapStartAdNetwork extends BaseAdNetworkImpl {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public boolean makeAsyncRequest() {
-        logger.debug("In PayPal async");
+        LOG.debug("In PayPal async");
         try {
             String uri = getRequestUri().toString();
             requestUrl = uri;
             setNingRequest(requestUrl);
-            logger.debug("Nexage uri :", uri);
+            LOG.debug("Nexage uri : {}", uri);
             startTime = System.currentTimeMillis();
             baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
                 @Override
                 public Response onCompleted(final Response response) throws Exception {
                     if (!isRequestCompleted()) {
-                        logger.debug("Operation complete for channel partner: ", getName());
+                        LOG.debug("Operation complete for channel partner: {}", getName());
                         latency = System.currentTimeMillis() - startTime;
-                        logger.debug(getName(), "operation complete latency", latency);
+                        LOG.debug("{} operation complete latency {}", getName(), latency);
                         String responseStr = response.getResponseBody();
                         HttpResponseStatus httpResponseStatus = HttpResponseStatus.valueOf(response.getStatusCode());
                         parseResponse(responseStr, httpResponseStatus);
@@ -178,24 +178,24 @@ public class DCPWapStartAdNetwork extends BaseAdNetworkImpl {
 
                     if (t instanceof java.util.concurrent.TimeoutException) {
                         latency = System.currentTimeMillis() - startTime;
-                        logger.debug(getName(), "timeout latency ", latency);
+                        LOG.debug("{} timeout latency {}", getName(), latency);
                         adStatus = "TIME_OUT";
                         processResponse();
                         return;
                     }
 
-                    logger.debug(getName(), "error latency ", latency);
+                    LOG.debug("{} error latency {}", getName(), latency);
                     adStatus = "TERM";
-                    logger.info("error while fetching response from:", getName(), t.getMessage());
+                    LOG.info("error while fetching response from: {} {}", getName(), t);
                     processResponse();
                     return;
                 }
             });
         }
         catch (Exception e) {
-            logger.debug("Exception in", getName(), "makeAsyncRequest :", e.getMessage());
+            LOG.debug("Exception in {} makeAsyncRequest : {}", getName(), e.getMessage());
         }
-        logger.debug(getName(), "returning from make NingRequest");
+        LOG.debug("{} returning from make NingRequest", getName());
         return true;
     }
 
@@ -213,7 +213,7 @@ public class DCPWapStartAdNetwork extends BaseAdNetworkImpl {
 
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
-        logger.debug("response is", response);
+        LOG.debug("response is {}", response);
 
         if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
             statusCode = status.getCode();
@@ -271,13 +271,13 @@ public class DCPWapStartAdNetwork extends BaseAdNetworkImpl {
                 }
 
                 statusCode = status.getCode();
-                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl, logger);
+                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
             }
             catch (Exception exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from WapStart :", exception);
-                logger.info("Response from WapStart:", response);
+                LOG.info("Error parsing response from WapStart : {}", exception);
+                LOG.info("Response from WapStart: {}", response);
             }
         }
     }
@@ -299,9 +299,9 @@ public class DCPWapStartAdNetwork extends BaseAdNetworkImpl {
             URI uri = getRequestUri();
             requestUrl = uri.toString();
             request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri.toASCIIString());
-            logger.debug("host name is ", uri.getHost());
+            LOG.debug("host name is {}", uri.getHost());
             request.setHeader(HttpHeaders.Names.HOST, uri.getHost());
-            logger.debug("got the host");
+            LOG.debug("got the host");
             request.setHeader("x-display-metrics", String.format("%sx%s", width, height));
             request.setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent());
             request.setHeader("xplus1-user-agent", sasParams.getUserAgent());
@@ -313,7 +313,7 @@ public class DCPWapStartAdNetwork extends BaseAdNetworkImpl {
         }
         catch (Exception ex) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.HTTPREQUEST_ERROR;
-            logger.info("Error in making http request ", ex.getMessage());
+            LOG.info("Error in making http request {}", ex);
         }
         return request;
     }

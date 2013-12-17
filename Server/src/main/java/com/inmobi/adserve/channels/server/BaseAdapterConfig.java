@@ -1,11 +1,16 @@
 package com.inmobi.adserve.channels.server;
 
+import java.util.Iterator;
+import java.util.Set;
+
 import lombok.EqualsAndHashCode;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang3.StringUtils;
 
+import com.google.common.collect.Sets;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.util.ConfigurationLoader;
 
 
 /**
@@ -102,5 +107,32 @@ public class BaseAdapterConfig implements AdapterConfig {
     @Override
     public Class<AdNetworkInterface> getAdNetworkInterfaceClass() {
         return adapterClass;
+    }
+
+    public static void main(final String[] args) {
+
+        ConfigurationLoader obj = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
+
+        Configuration adapterConfiguration = obj.adapterConfiguration();
+
+        Iterator<String> keyIterator = adapterConfiguration.getKeys();
+
+        Set<String> adapterNames = Sets.newHashSet();
+
+        while (keyIterator.hasNext()) {
+            String key = keyIterator.next();
+
+            String adapterName = key.substring(0, key.indexOf("."));
+            adapterNames.add(adapterName);
+        }
+
+        for (String adapterName : adapterNames) {
+            Configuration adapterConfig = adapterConfiguration.subset(adapterName);
+
+            BaseAdapterConfig c = new BaseAdapterConfig(adapterConfig, adapterName, null);
+
+            System.out.println("  " + c.getAdapterHost() + "  " + c.getAdapterName() + "  " + c.getAdapterType() + "  "
+                    + c.getAdNetworkInterfaceClass() + "  " + c.getAdvertiserId());
+        }
     }
 }

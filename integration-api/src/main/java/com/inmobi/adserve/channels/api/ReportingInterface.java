@@ -1,6 +1,5 @@
 package com.inmobi.adserve.channels.api;
 
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public interface ReportingInterface {
@@ -13,12 +12,10 @@ public interface ReportingInterface {
     };
 
     // Fetches the report from the TPAN exterSiteId wise
-    ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws Exception;
+    ReportResponse fetchRows(final ReportTime startTime, final String key, final ReportTime endTime) throws Exception;
 
     // Fetches the report from the TPAN Site inc id wise
-    ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final ReportTime endTime)
-            throws Exception;
+    ReportResponse fetchRows(final ReportTime startTime, final ReportTime endTime) throws Exception;
 
     // Constructs the request url. This is made public for testing purpose.
     String getRequestUrl();

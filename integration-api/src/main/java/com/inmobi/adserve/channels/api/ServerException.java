@@ -5,7 +5,11 @@ public class ServerException extends Exception {
 
     public String             errorString;
 
-    public ServerException(String errorMessage) {
+    public ServerException(final String errorMessage) {
         errorString = errorMessage;
+    }
+
+    public ServerException(final Exception e) {
+        super(e);
     }
 }

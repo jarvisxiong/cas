@@ -15,6 +15,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.configuration.Configuration;
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -26,15 +28,15 @@ import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.api.ServerException;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPLoganReporting extends BaseReportingImpl {
+    private static final Logger LOG              = LoggerFactory.getLogger(DCPLoganReporting.class);
+
     private final Configuration config;
     private final String        apiKey;
     private String              date;
     private final String        baseUrl;
-    private DebugLogger         logger;
     private String              endDate;
 
     private static String       reportStartDate  = null;
@@ -61,32 +63,31 @@ public class DCPLoganReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws ClientProtocolException, IOException, ServerException, JSONException,
-            ParserConfigurationException, SAXException {
-        this.logger = logger;
+    public ReportResponse fetchRows(final ReportTime startTime, final String key, final ReportTime endTime)
+            throws ClientProtocolException, IOException, ServerException, JSONException, ParserConfigurationException,
+            SAXException {
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
-        logger.debug("inside fetch rows of logan");
+        LOG.debug("inside fetch rows of logan");
         try {
             date = startTime.getStringDate("-");
-            logger.debug("start date inside logan is " + date);
+            LOG.debug("start date inside logan is {}", date);
             endDate = endTime == null ? getEndDate("-") : date;
             if (ReportTime.compareStringDates(endDate, date) == -1) {
-                logger.debug("date is greater than the current date reporting window for logan");
+                LOG.debug("date is greater than the current date reporting window for logan");
                 return null;
             }
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.info("failed to obtain correct dates for fetching reports " + exception.getMessage());
+            LOG.info("failed to obtain correct dates for fetching reports {}", exception.getMessage());
             return null;
         }
         date = startTime.getStringDate("-");
         if (reportStartDate == null || (ReportTime.compareStringDates(reportStartDate, date) > 0)) {
-            entireReportData = invokeHTTPUrl(logger);
+            entireReportData = invokeHTTPUrl();
             reportStartDate = date;
         }
-        logger.debug("response is " + entireReportData);
+        LOG.debug("response is {}", entireReportData);
 
         // parse xml
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -119,7 +120,7 @@ public class DCPLoganReporting extends BaseReportingImpl {
                     row.reportTime = reportDate;
                     row.siteId = zoneId;
                     row.slotSize = getReportGranularity();
-                    logger.debug("parsing data inside Logan" + row.request);
+                    LOG.debug("parsing data inside Logan {}", row.request);
                     reportResponse.addReportRow(row);
                 }
             }
@@ -154,7 +155,7 @@ public class DCPLoganReporting extends BaseReportingImpl {
 
     public String getEndDate(final String seperator) {
         try {
-            logger.debug("calculating end date for logan");
+            LOG.debug("calculating end date for logan");
             ReportTime reportTime = ReportTime.getUTCTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
             if (reportTime.getHour() <= ReportReconcilerWindow()) {
@@ -163,12 +164,12 @@ public class DCPLoganReporting extends BaseReportingImpl {
             return (reportTime.getStringDate(seperator));
         }
         catch (Exception exception) {
-            logger.info("failed to obtain end date inside logan " + exception.getMessage());
+            LOG.info("failed to obtain end date inside logan {}", exception);
             return "";
         }
     }
 
-    public String invokeHTTPUrl(final DebugLogger logger) throws ServerException, ClientProtocolException, IOException {
+    public String invokeHTTPUrl() throws ServerException, ClientProtocolException, IOException {
         URL url = new URL(baseUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         String soapMessage = getRequestUrl();
@@ -192,7 +193,7 @@ public class DCPLoganReporting extends BaseReportingImpl {
             }
         }
         catch (IOException ioe) {
-            logger.info("Error in Logan invokeHTTPUrl : ", ioe.getMessage());
+            LOG.info("Error in Logan invokeHTTPUrl : {}", ioe);
         }
         finally {
             if (res != null) {

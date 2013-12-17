@@ -11,20 +11,22 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.api.ServerException;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPAmobeeReporting extends BaseReportingImpl {
+    private static final Logger LOG     = LoggerFactory.getLogger(DCPAmobeeReporting.class);
+
     private final Configuration config;
     private final String        reportingKey;
     private String              date;
     private final String        baseUrl;
-    private DebugLogger         logger;
     private final String        userName;
     private final String        password;
     private String              endDate = "";
@@ -38,10 +40,11 @@ public class DCPAmobeeReporting extends BaseReportingImpl {
         reportingKey = config.getString("amobee.key");
     }
 
-    private String invokeHTTPUrl(final String url) throws ServerException, ClientProtocolException, IOException,
+    @Override
+    protected String invokeHTTPUrl(final String url) throws ServerException, ClientProtocolException, IOException,
             IllegalStateException {
         String retStr = null;
-        logger.debug("url inside amobee is ", url);
+        LOG.debug("url inside amobee is {}", url);
         DefaultHttpClient httpclient = new DefaultHttpClient();
         HttpGet httpget = new HttpGet(url);
         httpget.setHeader("username", userName);
@@ -67,30 +70,28 @@ public class DCPAmobeeReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final ReportTime endTime)
-            throws Exception {
-        this.logger = logger;
+    public ReportResponse fetchRows(final ReportTime startTime, final ReportTime endTime) throws Exception {
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         String responseStr = null;
-        logger.debug("inside fetch rows of amobee");
+        LOG.debug("inside fetch rows of amobee");
         try {
             date = startTime.getStringDate("");
-            logger.debug("start date inside amobee is ", date);
+            LOG.debug("start date inside amobee is {}", date);
             endDate = endTime == null ? getEndDate() : date;
             if (ReportTime.compareStringDates(endDate, date) == -1) {
-                logger.debug("date is greater than the current date reporting window for amobee");
+                LOG.debug("date is greater than the current date reporting window for amobee");
                 return null;
             }
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.error("failed to obtain correct dates for fetching reports ", exception.getMessage());
+            LOG.error("failed to obtain correct dates for fetching reports {}", exception);
             return null;
         }
 
         while (ReportTime.compareStringDates(date, endDate) != 1) {
             responseStr = invokeHTTPUrl(getRequestUrl());
-            logger.debug("response from amobee is ", responseStr);
+            LOG.debug("response from amobee is {}", responseStr);
             // parse the json response
             if (responseStr != null && !responseStr.startsWith("{\"error")) {
                 JSONObject data = new JSONObject(responseStr).getJSONObject("reportMap");
@@ -109,7 +110,7 @@ public class DCPAmobeeReporting extends BaseReportingImpl {
                         if (jReportArr.length() > 0) {
                             JSONObject reportRow = jReportArr.getJSONObject(0);
                             if (!decodeBlindedSiteId(key, row)) {
-                                logger.debug("Error decoded BlindedSite id in Amobee", key);
+                                LOG.debug("Error decoded BlindedSite id in Amobee {}", key);
                                 continue;
                             }
                             row.isSiteData = true;
@@ -159,7 +160,7 @@ public class DCPAmobeeReporting extends BaseReportingImpl {
 
     public String getEndDate() throws Exception {
         try {
-            logger.debug("calculating end date for amobee");
+            LOG.debug("calculating end date for amobee");
             ReportTime reportTime = ReportTime.getUTCTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
             if (reportTime.getHour() <= ReportReconcilerWindow()) {
@@ -168,15 +169,8 @@ public class DCPAmobeeReporting extends BaseReportingImpl {
             return (reportTime.getStringDate(""));
         }
         catch (Exception exception) {
-            logger.error("failed to obtain end date inside amobee ", exception.getMessage());
+            LOG.error("failed to obtain end date inside amobee {}", exception);
             return "";
         }
-    }
-
-    @Override
-    public ReportResponse fetchRows(DebugLogger logger, ReportTime startTime, String key, ReportTime endTime)
-            throws Exception {
-        // TODO Auto-generated method stub
-        return null;
     }
 }

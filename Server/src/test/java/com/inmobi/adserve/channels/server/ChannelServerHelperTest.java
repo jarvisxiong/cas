@@ -4,19 +4,19 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
 import junit.framework.TestCase;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
 import org.testng.annotations.Test;
 
 
-public class ChannelServerHelperTest extends TestCase
-{
+public class ChannelServerHelperTest extends TestCase {
 
     private ChannelServerHelper channelServerHelper;
     private Configuration       mockConfig = null;
 
-    public void setUp() throws Exception
-    {
+    @Override
+    public void setUp() throws Exception {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("rr")).andReturn("rr").anyTimes();
         expect(mockConfig.getString("channel")).andReturn("channel").anyTimes();
@@ -32,43 +32,31 @@ public class ChannelServerHelperTest extends TestCase
     }
 
     @Test
-    public void testGetDcIdWithoutSystemProperty()
-    {
+    public void testGetDcIdWithoutSystemProperty() {
         System.clearProperty("dc.id");
         assertEquals(0, channelServerHelper.getDataCenterId("dc.id"));
     }
 
     @Test
-    public void testGetDcIdAlreadySet()
-    {
+    public void testGetDcIdAlreadySet() {
         System.setProperty("dc.id", "2");
         assertEquals(2, channelServerHelper.getDataCenterId("dc.id"));
     }
 
     @Test
-    public void testGetHostIdWithoutSystemProperty()
-    {
-        System.clearProperty("host.name");
-        assertEquals(0, channelServerHelper.getHostId("host.name"));
-    }
-
-    @Test
-    public void testGetHostDataCenterOutOfBoundException()
-    {
+    public void testGetHostDataCenterOutOfBoundException() {
         System.setProperty("host.name", "web200");
         assertEquals(0, channelServerHelper.getHostId("host.name"));
     }
 
     @Test
-    public void testGetHostDataCenterNumberFormatException()
-    {
+    public void testGetHostDataCenterNumberFormatException() {
         System.setProperty("host.name", "web200abcd");
         assertEquals(0, channelServerHelper.getHostId("host.name"));
     }
 
     @Test
-    public void testgetHostAlreadySet()
-    {
+    public void testgetHostAlreadySet() {
         System.setProperty("host.name", "web2004.ads.lhr1.inmobi.com");
         short expected = 2004;
         assertEquals(expected, channelServerHelper.getHostId("host.name"));
