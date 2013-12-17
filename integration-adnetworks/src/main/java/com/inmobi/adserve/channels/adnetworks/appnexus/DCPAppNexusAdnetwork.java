@@ -44,7 +44,7 @@ public class DCPAppNexusAdnetwork extends BaseAdNetworkImpl {
     private static final String ANDROID_ID_SHA1 = "md5udid";
     private static final String ANDROID_ID_MD5  = "sha1udid";
     private static final String ODIN1           = "sha1mac";
-    private static final String CLICKURL        = "pubclick";
+//    private static final String CLICKURL        = "pubclick";
 
     private static final String sizeFormat      = "%dx%d";
     private static final String latlongFormat   = "%s,%s";
@@ -150,7 +150,7 @@ public class DCPAppNexusAdnetwork extends BaseAdNetworkImpl {
                 }
             }
 
-            appendQueryParam(url, CLICKURL, getURLEncode(clickUrl, format), false);
+            //appendQueryParam(url, CLICKURL, getURLEncode(clickUrl, format), false);
             logger.debug(name, "url is", url);
 
             return (new URI(url.toString()));

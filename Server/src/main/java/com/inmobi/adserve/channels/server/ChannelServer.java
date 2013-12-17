@@ -60,6 +60,32 @@ import com.inmobi.messaging.publisher.MessagePublisherFactory;
 import com.inmobi.phoenix.exception.InitializationException;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.dbcp.ConnectionFactory;
+import org.apache.commons.dbcp.DriverManagerConnectionFactory;
+import org.apache.commons.dbcp.PoolableConnectionFactory;
+import org.apache.commons.dbcp.PoolingDataSource;
+import org.apache.commons.pool.impl.GenericObjectPool;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.bootstrap.ServerBootstrap;
+import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
+import org.jboss.netty.logging.InternalLoggerFactory;
+import org.jboss.netty.logging.Log4JLoggerFactory;
+import org.jboss.netty.util.HashedWheelTimer;
+import org.jboss.netty.util.Timer;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.InetSocketAddress;
+import java.util.Properties;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 
 public class ChannelServer {
@@ -187,7 +213,7 @@ public class ChannelServer {
             ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(
                     Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
             Timer servertimer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
-            bootstrap.setPipelineFactory(new ChannelServerPipelineFactory(servertimer, config.serverConfiguration()));
+            bootstrap.setPipelineFactory(new ChannelServerPipelineFactory(servertimer, ServletHandler.getServerConfig()));
             bootstrap.setOption("child.keepAlive", true);
             bootstrap.setOption("child.tcpNoDelay", true);
             bootstrap.setOption("child.reuseAddress", true);
@@ -335,29 +361,17 @@ public class ChannelServer {
 
     // check if all log folders exists
     public static boolean checkLogFolders(final Configuration config) {
-        String rrLogFolder = config.getString("appender.rr.File");
-        String channelLogFolder = config.getString("appender.channel.File");
         String debugLogFolder = config.getString("appender.debug.File");
         String advertiserLogFolder = config.getString("appender.advertiser.File");
         String sampledAdvertiserLogFolder = config.getString("appender.sampledadvertiser.File");
         String repositoryLogFolder = config.getString("appender.repository.File");
-        File rrFolder = null;
-        File channelFolder = null;
         File debugFolder = null;
         File advertiserFolder = null;
         File sampledAdvertiserFolder = null;
         File repositoryFolder = null;
-        if (rrLogFolder != null) {
-            rrLogFolder = rrLogFolder.substring(0, rrLogFolder.lastIndexOf('/') + 1);
-            rrFolder = new File(rrLogFolder);
-        }
         if (repositoryLogFolder != null) {
             repositoryLogFolder = repositoryLogFolder.substring(0, repositoryLogFolder.lastIndexOf('/') + 1);
             repositoryFolder = new File(repositoryLogFolder);
-        }
-        if (channelLogFolder != null) {
-            channelLogFolder = channelLogFolder.substring(0, channelLogFolder.lastIndexOf('/') + 1);
-            channelFolder = new File(channelLogFolder);
         }
         if (debugLogFolder != null) {
             debugLogFolder = debugLogFolder.substring(0, debugLogFolder.lastIndexOf('/') + 1);
@@ -372,12 +386,10 @@ public class ChannelServer {
                 sampledAdvertiserLogFolder.lastIndexOf('/') + 1);
             sampledAdvertiserFolder = new File(sampledAdvertiserLogFolder);
         }
-        if (rrFolder != null && rrFolder.exists() && channelFolder != null && channelFolder.exists()) {
-            if (debugFolder != null && debugFolder.exists() && advertiserFolder != null && advertiserFolder.exists()) {
-                if (sampledAdvertiserFolder != null && sampledAdvertiserFolder.exists() && repositoryFolder != null
-                        && repositoryFolder.exists()) {
-                    return true;
-                }
+        if (debugFolder != null && debugFolder.exists() && advertiserFolder != null && advertiserFolder.exists()) {
+            if (sampledAdvertiserFolder != null && sampledAdvertiserFolder.exists() && repositoryFolder != null
+                    && repositoryFolder.exists()) {
+            return true;
             }
         }
         ServerStatusInfo.statusCode = 404;

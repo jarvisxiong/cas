@@ -1,22 +1,20 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.ServletHandler;
+import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
+import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.client.BootstrapCreation;
-import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
-import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 
 public class ServletChangeConfig implements Servlet {
@@ -63,10 +61,6 @@ public class ServletChangeConfig implements Servlet {
                         && ServletHandler.getServerConfig().containsKey(configKey.replace("server.", ""))) {
                     ServletHandler.getServerConfig().setProperty(configKey.replace("server.", ""),
                         jObject.getString(configKey));
-                    if (configKey.replace("server.", "").equals("maxconnections")) {
-                        BootstrapCreation.setMaxConnectionLimit(ServletHandler.getServerConfig().getInt(
-                            configKey.replace("server.", "")));
-                    }
                     updates.append(configKey)
                                 .append("=")
                                 .append(ServletHandler.getServerConfig().getString(configKey.replace("server.", "")))
