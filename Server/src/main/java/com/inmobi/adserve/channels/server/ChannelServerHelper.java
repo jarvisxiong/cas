@@ -1,9 +1,9 @@
 package com.inmobi.adserve.channels.server;
 
+import org.apache.log4j.Logger;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-
-import org.apache.log4j.Logger;
 
 
 public class ChannelServerHelper {
@@ -63,5 +63,19 @@ public class ChannelServerHelper {
 
     public String getDataCentreName(String key) {
         return System.getProperty(key);
+    }
+
+    public Integer getIncomingMaxConnections(String incomingConnectionsKey) {
+        Integer maxIncomingConnections = null;
+        try {
+            maxIncomingConnections = Integer.parseInt(System.getProperty(incomingConnectionsKey));
+        }
+        catch (NumberFormatException e) {
+            logger.info("NumberFormatException in getIncomingMaxConnections");
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Max limit for incoming connections is " + maxIncomingConnections);
+        }
+        return maxIncomingConnections;
     }
 }
