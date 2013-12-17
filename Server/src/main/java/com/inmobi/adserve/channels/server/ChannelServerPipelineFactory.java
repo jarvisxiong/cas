@@ -1,9 +1,7 @@
 package com.inmobi.adserve.channels.server;
 
-import static org.jboss.netty.channel.Channels.pipeline;
-
-import java.util.concurrent.TimeUnit;
-
+import com.inmobi.adserve.channels.server.api.ConnectionType;
+import lombok.Getter;
 import org.apache.commons.configuration.Configuration;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -15,27 +13,30 @@ import org.jboss.netty.handler.execution.OrderedMemoryAwareThreadPoolExecutor;
 import org.jboss.netty.handler.timeout.IdleStateHandler;
 import org.jboss.netty.util.Timer;
 
+import java.util.concurrent.TimeUnit;
+
+import static org.jboss.netty.channel.Channels.pipeline;
+
 
 public class ChannelServerPipelineFactory implements ChannelPipelineFactory {
 
     private final Timer      timer;
-    private int              serverTimeoutMillis; ;
+    private int              serverTimeoutMillis; 
     private ExecutionHandler executionHandler;
+    @Getter
+    private ConnectionLimitHandler incomingConnectionLimitHandler;
 
     public ChannelServerPipelineFactory(Timer timer, Configuration configuration) {
         this.timer = timer;
-        try {
-            this.serverTimeoutMillis = configuration.getInt("serverTimeoutMillis");
-        }
-        catch (Exception e) {
-            this.serverTimeoutMillis = 825;
-        }
+        this.serverTimeoutMillis = configuration.getInt("serverTimeoutMillis", 825);
         executionHandler = new ExecutionHandler(new OrderedMemoryAwareThreadPoolExecutor(80, 1048576, 1048576, 3,
                 TimeUnit.HOURS));
+        incomingConnectionLimitHandler = new ConnectionLimitHandler(configuration, ConnectionType.INCOMING);
     }
 
     public ChannelPipeline getPipeline() throws Exception {
         ChannelPipeline pipeline = pipeline();
+        pipeline.addLast("incomingLimitHandler", incomingConnectionLimitHandler);
         pipeline.addLast("decoder", new HttpRequestDecoder());
         pipeline.addLast("encoder", new HttpResponseEncoder());
         pipeline.addLast("httpchunkhandler", new HttpChunkAggregator(100000000));
