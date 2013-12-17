@@ -1,50 +1,10 @@
 package com.inmobi.adserve.channels.server;
 
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.InetSocketAddress;
-import java.util.Properties;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.dbcp.ConnectionFactory;
-import org.apache.commons.dbcp.DriverManagerConnectionFactory;
-import org.apache.commons.dbcp.PoolableConnectionFactory;
-import org.apache.commons.dbcp.PoolingDataSource;
-import org.apache.commons.pool.impl.GenericObjectPool;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.bootstrap.ServerBootstrap;
-import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
-import org.jboss.netty.logging.InternalLoggerFactory;
-import org.jboss.netty.logging.Log4JLoggerFactory;
-import org.jboss.netty.util.HashedWheelTimer;
-import org.jboss.netty.util.Timer;
-
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
-import com.inmobi.adserve.channels.repository.ChannelFeedbackRepository;
-import com.inmobi.adserve.channels.repository.ChannelRepository;
-import com.inmobi.adserve.channels.repository.ChannelSegmentFeedbackRepository;
-import com.inmobi.adserve.channels.repository.ChannelSegmentMatchingCache;
-import com.inmobi.adserve.channels.repository.CurrencyConversionRepository;
-import com.inmobi.adserve.channels.repository.PricingEngineRepository;
-import com.inmobi.adserve.channels.repository.PublisherFilterRepository;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.repository.SiteCitrusLeafFeedbackRepository;
-import com.inmobi.adserve.channels.repository.SiteEcpmRepository;
-import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
-import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
+import com.inmobi.adserve.channels.repository.*;
 import com.inmobi.adserve.channels.server.client.BootstrapCreation;
 import com.inmobi.adserve.channels.server.client.RtbBootstrapCreation;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
@@ -131,6 +91,7 @@ public class ChannelServer {
             dataCenterIdCode = channelServerHelper.getDataCenterId(ChannelServerStringLiterals.DATA_CENTER_ID_KEY);
             hostIdCode = channelServerHelper.getHostId(ChannelServerStringLiterals.HOST_NAME_KEY);
             dataCentreName = channelServerHelper.getDataCentreName(ChannelServerStringLiterals.DATA_CENTRE_NAME_KEY);
+
             // Initialising Internal logger factory for Netty
             InternalLoggerFactory.setDefaultFactory(new Log4JLoggerFactory());
 
@@ -175,8 +136,11 @@ public class ChannelServer {
             RepositoryHelper repositoryHelper = repoHelperBuilder.build();
 
             instantiateRepository(logger, config);
-
             ServletHandler.init(config, repositoryHelper);
+            Integer maxIncomingConnections = channelServerHelper.getIncomingMaxConnections(ChannelServerStringLiterals.INCOMING_CONNECTIONS);
+            if (null != maxIncomingConnections) {
+                ServletHandler.getServerConfig().setProperty("incomingMaxConnections", maxIncomingConnections);
+            }
             MatchSegments.init(channelAdGroupRepository);
             Filters.init(config.adapterConfiguration());
 
