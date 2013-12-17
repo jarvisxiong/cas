@@ -87,7 +87,6 @@ public class Logging {
     public static void rrLogging(ChannelSegment channelSegment, List<ChannelSegment> rankList, DebugLogger logger,
             Configuration config, SASRequestParameters sasParams, String terminationReason) throws JSONException,
             TException {
-        Logger rrLogger = LoggerFactory.getLogger(config.getString("rr"));
         boolean isTerminated = false;
         if (terminationReason.equalsIgnoreCase("no")) {
             isTerminated = true;
@@ -273,13 +272,6 @@ public class Logging {
         }
 
         logger.debug("finally writing to rr log", log);
-
-        if (enableFileLogging) {
-            rrLogger.info(log.toString());
-        }
-        else {
-            logger.debug("file logging is not enabled");
-        }
         short adRequested = 1;
         Request request = new Request(adRequested, adsServed, sasParams == null ? null : sasParams.getSiteId(),
                 sasParams == null ? null : sasParams.getTid());
@@ -375,7 +367,6 @@ public class Logging {
     public static void channelLogline(List<ChannelSegment> rankList, String clickUrl, DebugLogger logger,
             Configuration config, SASRequestParameters sasParams, long totalTime) throws JSONException, TException {
         logger.debug("came inside channel log line");
-        Logger debugLogger = LoggerFactory.getLogger(config.getString("channel"));
         logger.debug("got logger handle for cas logs");
         char sep = 0x01;
         StringBuilder log = new StringBuilder();
@@ -529,9 +520,6 @@ public class Logging {
 
         logger.debug("finished writing cas logs");
         logger.debug(log.toString());
-        if (enableFileLogging) {
-            debugLogger.info(log.toString());
-        }
         CasChannelLog channelLog = new CasChannelLog(totalTime, clickUrl, sasParams == null ? null
                 : sasParams.getSiteId(), new RequestTpan(responseList), siteParams, requestParams, timestamp);
         if (null != geo) {
