@@ -37,8 +37,6 @@ public class HttpRequestHandlerTest extends TestCase {
         ServletHandler.init(config, null);
 
         Configuration loggerConfig = createMock(Configuration.class);
-        expect(loggerConfig.getString("channel")).andReturn("channel").anyTimes();
-        expect(loggerConfig.getString("rr")).andReturn("rr").anyTimes();
         expect(loggerConfig.getString("advertiser")).andReturn("advertiser").anyTimes();
         expect(loggerConfig.getString("sampledadvertiser")).andReturn("sampledadvertiser").anyTimes();
 
