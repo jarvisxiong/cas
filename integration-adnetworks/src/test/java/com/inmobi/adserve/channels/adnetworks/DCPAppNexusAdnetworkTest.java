@@ -67,7 +67,7 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
         dcpAppNexusAdNetwork.setName("appnexus");
     }
 
-    @Test
+    /*@Test
     public void testDCPAppNexusConfigureParameters() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
@@ -86,7 +86,7 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
             new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertTrue(dcpAppNexusAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl,
             null));
-    }
+    }*/
 
     @Test
     public void testDCPAppNexusConfigureParametersBlankIP() {
