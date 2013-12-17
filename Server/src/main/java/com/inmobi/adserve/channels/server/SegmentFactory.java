@@ -80,6 +80,10 @@ public class SegmentFactory {
 
         AdapterConfig adapterConfig = advertiserIdConfigMap.get(advertiserId);
 
+        if(adapterConfig == null){
+	        return null;
+        }
+
         if (isRtbEnabled) {
 
             if ((CollectionUtils.isEmpty(advertiserSet) || advertiserSet.contains(adapterConfig.getAdapterName()))
