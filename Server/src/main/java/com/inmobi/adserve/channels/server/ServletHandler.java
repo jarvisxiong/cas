@@ -1,19 +1,34 @@
 package com.inmobi.adserve.channels.server;
 
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.server.api.Servlet;
-import com.inmobi.adserve.channels.server.api.ServletFactory;
-import com.inmobi.adserve.channels.server.servlet.*;
-import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
-import org.apache.commons.configuration.Configuration;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import org.apache.commons.configuration.Configuration;
+import org.jboss.netty.handler.codec.http.HttpRequest;
+
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.api.ServletFactory;
+import com.inmobi.adserve.channels.server.servlet.ServletBackFill;
+import com.inmobi.adserve.channels.server.servlet.ServletChangeConfig;
+import com.inmobi.adserve.channels.server.servlet.ServletChangeRollout;
+import com.inmobi.adserve.channels.server.servlet.ServletDisableLbStatus;
+import com.inmobi.adserve.channels.server.servlet.ServletEnableLbStatus;
+import com.inmobi.adserve.channels.server.servlet.ServletErrorDetails;
+import com.inmobi.adserve.channels.server.servlet.ServletGetAdapterConfig;
+import com.inmobi.adserve.channels.server.servlet.ServletGetSegment;
+import com.inmobi.adserve.channels.server.servlet.ServletGetServerConfig;
+import com.inmobi.adserve.channels.server.servlet.ServletLbStatus;
+import com.inmobi.adserve.channels.server.servlet.ServletLogParser;
+import com.inmobi.adserve.channels.server.servlet.ServletMapsizes;
+import com.inmobi.adserve.channels.server.servlet.ServletRepoRefresh;
+import com.inmobi.adserve.channels.server.servlet.ServletRepoStat;
+import com.inmobi.adserve.channels.server.servlet.ServletStat;
+import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 
 
 public class ServletHandler {
@@ -41,7 +56,7 @@ public class ServletHandler {
     public static final Random                      random                   = new Random();
     public static final Map<String, ServletFactory> servletMap               = new HashMap<String, ServletFactory>();
 
-    public static void init(ConfigurationLoader config, RepositoryHelper repositoryHelper) {
+    public static void init(final ConfigurationLoader config, final RepositoryHelper repositoryHelper) {
         ServletHandler.rtbConfig = config.rtbConfiguration();
         ServletHandler.loggerConfig = config.loggerConfiguration();
         ServletHandler.serverConfig = config.serverConfiguration();
@@ -51,7 +66,7 @@ public class ServletHandler {
         ServletHandler.repositoryHelper = repositoryHelper;
         percentRollout = ServletHandler.serverConfig.getInt("percentRollout", 100);
         allowedSiteTypes = ServletHandler.serverConfig.getList("allowedSiteTypes");
-        InspectorStats.setStats(InspectorStrings.percentRollout, (long) percentRollout);
+        InspectorStats.setStats(InspectorStrings.percentRollout, percentRollout);
 
         servletMap.put("/stat", new ServletFactory() {
             @Override
@@ -144,13 +159,6 @@ public class ServletHandler {
             }
         });
 
-        servletMap.put("/trace", new ServletFactory() {
-            @Override
-            public Servlet getServlet() {
-                return new ServletBackFill();
-            }
-        });
-
         servletMap.put("/getServerConfig", new ServletFactory() {
             @Override
             public Servlet getServlet() {
@@ -167,7 +175,7 @@ public class ServletHandler {
 
     }
 
-    public static String getHost(HttpRequest request) {
+    public static String getHost(final HttpRequest request) {
         List<Map.Entry<String, String>> headers = request.getHeaders();
         String host = null;
 
@@ -203,7 +211,7 @@ public class ServletHandler {
         return ServletHandler.rtbConfig;
     }
 
-    public static void setRtbConfig(Configuration rtbConfig) {
+    public static void setRtbConfig(final Configuration rtbConfig) {
         ServletHandler.rtbConfig = rtbConfig;
     }
 }
