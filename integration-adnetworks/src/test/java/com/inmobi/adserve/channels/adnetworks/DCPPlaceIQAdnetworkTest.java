@@ -230,7 +230,7 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
             String actualUrl = dcpPlaceIQAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://test.ads.placeiq.com/1.41/ad?RT=xml&SK="
                     + secret
-                    + "&PT=IMB&AU=IMB%2Fbz%2F6456fc%2F0&IP=206.29.182.240&UA=Mozilla&DO=Android&LT=37.4429&LG=-122.1514&SZ=320x50&AM=202cb962ac59075b964b07152d234b70&AP=6575868&AT=STI";
+                    + "&PT=IMB&AU=IMB%2Fbz%2F6456fc%2F0&IP=206.29.182.240&UA=Mozilla&DO=Android&LT=37.4429&LG=-122.1514&SZ=320x50&AM=202cb962ac59075b964b07152d234b70&AP=6575868&AT=STG";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -265,7 +265,7 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
             String actualUrl = dcpPlaceIQAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://test.ads.placeiq.com/1.41/ad?RT=xml&SK="
                     + secret
-                    + "&PT=IMB&AU=IMB%2Fuc%2F6456fc%2F0&IP=206.29.182.240&UA=Mozilla&DO=Android&LT=37.4429&LG=-122.1514&SZ=320x50&AM=202cb962ac59075b964b07152d234b70&AP=6575868&AT=STI";
+                    + "&PT=IMB&AU=IMB%2Fuc%2F6456fc%2F0&IP=206.29.182.240&UA=Mozilla&DO=Android&LT=37.4429&LG=-122.1514&SZ=320x50&AM=202cb962ac59075b964b07152d234b70&AP=6575868&AT=STG";
             assertEquals(expectedUrl, actualUrl);
         }
     }

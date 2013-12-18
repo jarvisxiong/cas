@@ -98,6 +98,7 @@ public class ChannelServer {
             dataCenterIdCode = channelServerHelper.getDataCenterId(ChannelServerStringLiterals.DATA_CENTER_ID_KEY);
             hostIdCode = channelServerHelper.getHostId(ChannelServerStringLiterals.HOST_NAME_KEY);
             dataCentreName = channelServerHelper.getDataCentreName(ChannelServerStringLiterals.DATA_CENTRE_NAME_KEY);
+
             // Initialising Internal logger factory for Netty
             InternalLoggerFactory.setDefaultFactory(new Log4JLoggerFactory());
 
@@ -142,8 +143,12 @@ public class ChannelServer {
             RepositoryHelper repositoryHelper = repoHelperBuilder.build();
 
             instantiateRepository(logger, config);
-
             ServletHandler.init(config, repositoryHelper);
+            Integer maxIncomingConnections = channelServerHelper
+                    .getIncomingMaxConnections(ChannelServerStringLiterals.INCOMING_CONNECTIONS);
+            if (null != maxIncomingConnections) {
+                ServletHandler.getServerConfig().setProperty("incomingMaxConnections", maxIncomingConnections);
+            }
             Filters.init(config.adapterConfiguration());
 
             Injector injector = Guice.createInjector(new AdapterConfigModule(config.adapterConfiguration(),

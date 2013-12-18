@@ -1,5 +1,21 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
@@ -34,21 +50,6 @@ import com.inmobi.casthrift.SiteParams;
 import com.inmobi.casthrift.User;
 import com.inmobi.messaging.Message;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
-import org.apache.commons.configuration.Configuration;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 public class Logging {
@@ -110,7 +111,6 @@ public class Logging {
     public static void rrLogging(final ChannelSegment channelSegment, final List<ChannelSegment> rankList,
             final Configuration config, final SASRequestParameters sasParams, final String terminationReason)
             throws JSONException, TException {
-        Logger rrLogger = LoggerFactory.getLogger(config.getString("rr"));
         boolean isTerminated = false;
         if (terminationReason.equalsIgnoreCase("no")) {
             isTerminated = true;
@@ -294,15 +294,7 @@ public class Logging {
         if (null != sasParams && null != sasParams.getSiteSegmentId()) {
             log.append(separator).append("sel-seg-id=").append(sasParams.getSiteSegmentId());
         }
-
         LOG.debug("finally writing to rr log {}", log);
-
-        if (enableFileLogging) {
-            rrLogger.info(log.toString());
-        }
-        else {
-            LOG.debug("file logging is not enabled");
-        }
         short adRequested = 1;
         Request request = new Request(adRequested, adsServed, sasParams == null ? null : sasParams.getSiteId(),
                 sasParams == null ? null : sasParams.getTid());
@@ -399,7 +391,6 @@ public class Logging {
             final Configuration config, final SASRequestParameters sasParams, final long totalTime)
             throws JSONException, TException {
         LOG.debug("came inside channel log line");
-        Logger debugLogger = LoggerFactory.getLogger(config.getString("channel"));
         LOG.debug("got logger handle for cas logs");
         char sep = 0x01;
         StringBuilder log = new StringBuilder();
@@ -551,9 +542,6 @@ public class Logging {
 
         LOG.debug("finished writing cas logs");
         LOG.debug(log.toString());
-        if (enableFileLogging) {
-            debugLogger.info(log.toString());
-        }
         CasChannelLog channelLog = new CasChannelLog(totalTime, clickUrl, sasParams == null ? null
                 : sasParams.getSiteId(), new RequestTpan(responseList), siteParams, requestParams, timestamp);
         if (null != geo) {
@@ -565,7 +553,7 @@ public class Logging {
         if (enableDatabusLogging) {
             TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
             Message msg = new Message(tSerializer.serialize(channelLog));
-            //dataBusPublisher.publish(channelLogKey, msg);
+            // dataBusPublisher.publish(channelLogKey, msg);
         }
     }
 

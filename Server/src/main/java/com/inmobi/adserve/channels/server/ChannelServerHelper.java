@@ -65,8 +65,17 @@ public class ChannelServerHelper {
         return System.getProperty(key);
     }
 
-    public static void main(final String[] args) throws UnknownHostException {
-        System.out.println(InetAddress.getLocalHost());
-        System.out.println(InetAddress.getLocalHost().getHostName());
+    public Integer getIncomingMaxConnections(final String incomingConnectionsKey) {
+        Integer maxIncomingConnections = null;
+        try {
+            maxIncomingConnections = Integer.parseInt(System.getProperty(incomingConnectionsKey));
+        }
+        catch (NumberFormatException e) {
+            logger.info("NumberFormatException in getIncomingMaxConnections");
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Max limit for incoming connections is " + maxIncomingConnections);
+        }
+        return maxIncomingConnections;
     }
 }

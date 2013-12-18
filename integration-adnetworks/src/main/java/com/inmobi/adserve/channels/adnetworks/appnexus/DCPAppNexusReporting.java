@@ -10,6 +10,7 @@ import java.text.ParseException;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,7 +32,6 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
     private String              date;
     private final String        host;
     private final String        authUrl;
-    private final String        reportUrl;
     private final String        downloadUrl;
     private final String        userName;
     private String              endDate;
@@ -40,13 +40,13 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
     private final String        endDateFormatter   = "%s 23:59:59";
     private boolean             isTokenGenerated   = false;
     private String              token              = null;
+    private static String       reportData         = null;
 
     public DCPAppNexusReporting(final Configuration config, final String name) {
         this.config = config;
         password = config.getString(name + ".password");
         host = config.getString(name + ".host");
         authUrl = config.getString(name + ".authUrl");
-        reportUrl = config.getString(name + ".reportUrl");
         downloadUrl = config.getString(name + ".downloadUrl");
         userName = config.getString(name + ".user");
         this.name = name;
@@ -54,7 +54,7 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
 
     @Override
     public int ReportReconcilerWindow() {
-        return 10;
+        return 1;
     }
 
     @Override
@@ -77,7 +77,7 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
             LOG.info("failed to obtain correct dates for fetching reports {}", exception);
             return null;
         }
-        if (key.contains("_")) {
+        if (!Character.isDigit(key.charAt(0)) || key.contains("_")) {
             LOG.debug("invalid key {}", key);
             return null;
         }
@@ -87,15 +87,18 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
             isTokenGenerated = true;
         }
 
-        String reportIdResponse = invokeUrl(host, getRequestObject(key), token);
-        String reportId = new JSONObject(reportIdResponse).getJSONObject("response").getString("report_id");
-        String reportResponseString = invokeUrl(String.format(reportUrl, reportId), token);
-        String downloadUrlString = new JSONObject(reportResponseString)
-                .getJSONObject("response")
-                    .getJSONObject("report")
-                    .getString("url");
-        String reportData = invokeUrl(String.format(downloadUrl, downloadUrlString), token);
+        if (StringUtils.isBlank(reportData)) {
+            for (int i = 0; i < 20; i++) {
+                String reportIdResponse = invokeUrl(host, getRequestObject(key), token);
+                String reportId = new JSONObject(reportIdResponse).getJSONObject("response").getString("report_id");
+                Thread.sleep(30000);
+                reportData = invokeUrl(String.format(downloadUrl, reportId), token);
+                if (StringUtils.isNotBlank(reportData)) {
+                    break;
+                }
 
+            }
+        }
         generateReportResponse(reportResponse, reportData.split("\n"), key);
         return reportResponse;
     }
@@ -130,6 +133,7 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
             LOG.debug("calculating end date for {}", name);
             ReportTime reportTime = ReportTime.getUTCTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
+            reportTime = ReportTime.getPreviousDay(reportTime);
             if (reportTime.getHour() <= ReportReconcilerWindow()) {
                 reportTime = ReportTime.getPreviousDay(reportTime);
             }
@@ -154,23 +158,19 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
     private JSONObject getRequestObject(final String extSiteKey) throws JSONException {
         JSONArray columnArray = new JSONArray();
         columnArray.put("day");
+        columnArray.put("placement_id");
         columnArray.put("clicks");
         columnArray.put("imps_total");
         columnArray.put("publisher_revenue");
-        JSONArray filtersArray = new JSONArray();
-        JSONObject placementIdFilter = new JSONObject();
-        placementIdFilter.put("placement_id", extSiteKey);
-        filtersArray.put(placementIdFilter);
         JSONObject requestObject = new JSONObject();
         requestObject.put("columns", columnArray);
-        requestObject.put("filters", filtersArray);
+        // requestObject.put("filters", filtersArray);
         requestObject.put("report_type", "publisher_analytics");
         requestObject.put("start_date", String.format(startDateFormatter, date));
         requestObject.put("end_date", String.format(endDateFormatter, endDate));
         JSONObject reportObject = new JSONObject();
         reportObject.put("report", requestObject);
         return reportObject;
-        // {"report":{"columns":["day","clicks"],"report_type":"publisher_analytics"}}
     }
 
     public String invokeUrl(final String host, final JSONObject queryObject, final String token) throws HttpException,
@@ -234,6 +234,7 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
             int clicksIndex = -1;
             int revenueIndex = -1;
             int dateIndex = -1;
+            int placementIdIndex = -1;
 
             String[] header = responseArray[0].replace("'", "").split(",");
 
@@ -254,12 +255,20 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
                     dateIndex = i;
                     continue;
                 }
+                else if ("placement_id".equalsIgnoreCase(header[i].trim())) {
+                    placementIdIndex = i;
+                    continue;
+                }
             }
 
             for (int j = 1; j < responseArray.length; j++) {
 
                 String[] reportRow = responseArray[j].split(",");
                 if (reportRow.length == 0) {
+                    continue;
+                }
+
+                if (!extSiteKey.equalsIgnoreCase(reportRow[placementIdIndex])) {
                     continue;
                 }
 
