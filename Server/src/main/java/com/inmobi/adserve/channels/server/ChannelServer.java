@@ -188,7 +188,6 @@ public class ChannelServer {
             });
 
             // System.out.close();
-
             // If client bootstrap is not present throwing exception which will
             // set
             // lbStatus as NOT_OK.
@@ -332,29 +331,17 @@ public class ChannelServer {
 
     // check if all log folders exists
     public static boolean checkLogFolders(final Configuration config) {
-        String rrLogFolder = config.getString("appender.rr.File");
-        String channelLogFolder = config.getString("appender.channel.File");
         String debugLogFolder = config.getString("appender.debug.File");
         String advertiserLogFolder = config.getString("appender.advertiser.File");
         String sampledAdvertiserLogFolder = config.getString("appender.sampledadvertiser.File");
         String repositoryLogFolder = config.getString("appender.repository.File");
-        File rrFolder = null;
-        File channelFolder = null;
         File debugFolder = null;
         File advertiserFolder = null;
         File sampledAdvertiserFolder = null;
         File repositoryFolder = null;
-        if (rrLogFolder != null) {
-            rrLogFolder = rrLogFolder.substring(0, rrLogFolder.lastIndexOf('/') + 1);
-            rrFolder = new File(rrLogFolder);
-        }
         if (repositoryLogFolder != null) {
             repositoryLogFolder = repositoryLogFolder.substring(0, repositoryLogFolder.lastIndexOf('/') + 1);
             repositoryFolder = new File(repositoryLogFolder);
-        }
-        if (channelLogFolder != null) {
-            channelLogFolder = channelLogFolder.substring(0, channelLogFolder.lastIndexOf('/') + 1);
-            channelFolder = new File(channelLogFolder);
         }
         if (debugLogFolder != null) {
             debugLogFolder = debugLogFolder.substring(0, debugLogFolder.lastIndexOf('/') + 1);
@@ -369,12 +356,10 @@ public class ChannelServer {
                 sampledAdvertiserLogFolder.lastIndexOf('/') + 1);
             sampledAdvertiserFolder = new File(sampledAdvertiserLogFolder);
         }
-        if (rrFolder != null && rrFolder.exists() && channelFolder != null && channelFolder.exists()) {
-            if (debugFolder != null && debugFolder.exists() && advertiserFolder != null && advertiserFolder.exists()) {
-                if (sampledAdvertiserFolder != null && sampledAdvertiserFolder.exists() && repositoryFolder != null
-                        && repositoryFolder.exists()) {
-                    return true;
-                }
+        if (debugFolder != null && debugFolder.exists() && advertiserFolder != null && advertiserFolder.exists()) {
+            if (sampledAdvertiserFolder != null && sampledAdvertiserFolder.exists() && repositoryFolder != null
+                    && repositoryFolder.exists()) {
+                return true;
             }
         }
         ServerStatusInfo.statusCode = 404;

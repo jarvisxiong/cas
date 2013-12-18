@@ -18,7 +18,6 @@ import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportResponse.ReportRow;
 import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class IFCReportingTest extends TestCase {
@@ -28,7 +27,6 @@ public class IFCReportingTest extends TestCase {
     private IFCReporting  ifcReporting;
     private final String  loggerConf = "/tmp/channel-server.properties";
     private final String  debug      = "debug";
-    private DebugLogger   logger;
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -51,15 +49,13 @@ public class IFCReportingTest extends TestCase {
             f.createNewFile();
         }
         prepareMockConfig();
-        DebugLogger.init(mockConfig);
-        logger = new DebugLogger();
         SlotSizeMapping.init();
         ifcReporting = new IFCReporting(mockConfig);
     }
 
     public void testFetchRows() {
         ReportTime reportTime = new ReportTime("2011-08-01", 05);
-        ReportResponse reportResponse = ifcReporting.fetchRows(logger, reportTime, null);
+        ReportResponse reportResponse = ifcReporting.fetchRows(reportTime, null);
         List<ReportRow> reportRows = reportResponse.getReportRows();
         for (Iterator<ReportRow> iterator = reportRows.iterator(); iterator.hasNext();) {
             ReportRow reportRow = iterator.next();

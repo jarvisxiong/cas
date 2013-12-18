@@ -13,12 +13,11 @@ import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.adnetworks.generic.GenericReporting;
 import com.inmobi.adserve.channels.api.ReportResponse;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class GenericReportingTest extends TestCase {
     private Configuration    mockConfig     = null;
-    private String           advertiserName = "drawbridge";
+    private final String     advertiserName = "drawbridge";
     private GenericReporting genericReporting;
 
     public void prepareMockConfig() {
@@ -52,11 +51,10 @@ public class GenericReportingTest extends TestCase {
         replay(mockConfig);
     }
 
+    @Override
     public void setUp() throws Exception {
         prepareMockConfig();
-        DebugLogger.init(mockConfig);
         genericReporting = new GenericReporting(mockConfig, advertiserName);
-        genericReporting.logger = new DebugLogger();
     }
 
     @Test
@@ -98,7 +96,7 @@ public class GenericReportingTest extends TestCase {
         assertEquals(genericReporting.reportResponse.rows.get(1).clicks, 10);
     }
 
-    public void debug(Object... os) {
+    public void debug(final Object... os) {
         System.out.println(Arrays.deepToString(os));
     }
 

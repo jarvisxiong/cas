@@ -83,7 +83,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
      * @param baseRequestHandler
      * @param serverEvent
      */
-    protected DCPLomarkAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+    public DCPLomarkAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
         super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }

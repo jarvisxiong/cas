@@ -14,6 +14,7 @@ import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
+import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ServletHandler;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
@@ -49,6 +50,9 @@ public class MatchSegmentsTest extends TestCase {
         expect(repositoryHelper.querySiteTaxonomyRepository("3")).andReturn(s3).anyTimes();
         expect(repositoryHelper.querySiteTaxonomyRepository("4")).andReturn(s4).anyTimes();
         expect(repositoryHelper.querySiteCitrusLeafFeedbackRepository("1", 2)).andReturn(null).anyTimes();
+        expect(repositoryHelper.getChannelAdGroupRepository())
+                .andReturn(createMock(ChannelAdGroupRepository.class))
+                    .anyTimes();
         replay(repositoryHelper);
         MatchSegments matchSegments = new MatchSegments(repositoryHelper);
         assertEquals(new ArrayList<Long>(), matchSegments.getCategories(sasRequestParameters));

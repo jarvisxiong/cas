@@ -23,7 +23,6 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPAppNexusAdnetworkTest extends TestCase {
@@ -31,7 +30,6 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
     private final ClientBootstrap clientBootstrap = null;
-    private DebugLogger           logger;
     private DCPAppNexusAdnetwork  dcpAppNexusAdNetwork;
     private final String          appNexusHost    = "http://mobile.adnxs.com/mob?psa=0&format=json";
     private final String          appNexusStatus  = "on";
@@ -61,9 +59,7 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
         MessageEvent serverEvent = createMock(MessageEvent.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        DebugLogger.init(mockConfig);
-        logger = new DebugLogger();
-        dcpAppNexusAdNetwork = new DCPAppNexusAdnetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpAppNexusAdNetwork = new DCPAppNexusAdnetwork(mockConfig, clientBootstrap, base, serverEvent);
         dcpAppNexusAdNetwork.setName("appnexus");
     }
 
@@ -170,7 +166,7 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
             new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpAppNexusAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpAppNexusAdNetwork.getRequestUri().toString();
-            String expectedUrl = "http://mobile.adnxs.com/mob?psa=0&format=json&ip=206.29.182.240&ua=Mozilla&id=240&size=300x50&loc=37.4429%2C-122.1514&pubclick=http%3A%2F%2Fc2.w.inmobi.com%2Fc.asm%2F4%2Fb%2Fbx5%2Fyaz%2F2%2Fb%2Fa5%2Fm%2F0%2F0%2F0%2F202cb962ac59075b964b07152d234b70%2F4f8d98e2-4bbd-40bc-87e5-22da170600f9%2F-1%2F1%2F9cddca11%3Fds%3D1";
+            String expectedUrl = "http://mobile.adnxs.com/mob?psa=0&format=json&ip=206.29.182.240&ua=Mozilla&id=240&size=300x50&loc=37.4429%2C-122.1514";
             assertEquals(expectedUrl, actualUrl);
         }
     }

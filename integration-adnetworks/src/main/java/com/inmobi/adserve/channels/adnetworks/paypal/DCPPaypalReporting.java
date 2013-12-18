@@ -123,6 +123,8 @@ public class DCPPaypalReporting extends BaseReportingImpl {
         reportingKeyMap.put("de3258fa43", "cb93667f");
         reportingKeyMap.put("06dc9ef276", "6614241e");
         reportingKeyMap.put("0770b6793f", "ab13526f");
+        reportingKeyMap.put("f32a4ae2ba", "4a718658");
+        reportingKeyMap.put("ce26806d50", "1a42bcc2");
     }
 
     public DCPPaypalReporting(final Configuration config) {

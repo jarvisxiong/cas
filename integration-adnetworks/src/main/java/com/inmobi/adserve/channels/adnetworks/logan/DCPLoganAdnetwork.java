@@ -47,7 +47,7 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
      * @param baseRequestHandler
      * @param serverEvent
      */
-    protected DCPLoganAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+    public DCPLoganAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
         super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }

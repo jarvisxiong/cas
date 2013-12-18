@@ -53,7 +53,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String ifaFormat    = "IFA";
     private Request             ningRequest;
 
-    protected DCPMableAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+    public DCPMableAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
         super(config, clientBootstrap, baseRequestHandler, serverEvent);
         this.authKey = config.getString("mable.authKey");

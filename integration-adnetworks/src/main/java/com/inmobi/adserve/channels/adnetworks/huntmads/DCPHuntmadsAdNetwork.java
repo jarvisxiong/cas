@@ -40,7 +40,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
      * @param baseRequestHandler
      * @param serverEvent
      */
-    protected DCPHuntmadsAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+    public DCPHuntmadsAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
         super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }

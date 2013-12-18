@@ -45,7 +45,7 @@ public class DCPMadNetAdNetwork extends AbstractDCPAdNetworkImpl {
      * @param baseRequestHandler
      * @param serverEvent
      */
-    protected DCPMadNetAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+    public DCPMadNetAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
         super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }

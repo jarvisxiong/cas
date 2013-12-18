@@ -64,7 +64,7 @@ public class DCPAppierAdNetwork extends AbstractDCPAdNetworkImpl {
      * @param baseRequestHandler
      * @param serverEvent
      */
-    protected DCPAppierAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+    public DCPAppierAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
         super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }

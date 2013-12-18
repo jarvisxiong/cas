@@ -23,7 +23,6 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 /**
@@ -35,7 +34,6 @@ public class DCPWapStartAdnetworkTest extends TestCase {
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
     private final ClientBootstrap clientBootstrap = null;
-    private DebugLogger           logger;
     private DCPWapStartAdNetwork  dcpWapstartAdNetwork;
     private final String          wapstartHost    = "http://ro.plus1.wapstart.ru";
     private final String          wapstartStatus  = "on";
@@ -66,9 +64,7 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         SlotSizeMapping.init();
-        DebugLogger.init(mockConfig);
-        logger = new DebugLogger();
-        dcpWapstartAdNetwork = new DCPWapStartAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpWapstartAdNetwork = new DCPWapStartAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test

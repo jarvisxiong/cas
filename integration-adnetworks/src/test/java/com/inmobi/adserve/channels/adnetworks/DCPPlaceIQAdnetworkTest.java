@@ -27,10 +27,9 @@ import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPPlaceIQAdnetworkTest extends TestCase {
@@ -38,7 +37,6 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
     private final String          debug            = "debug";
     private final String          loggerConf       = "/tmp/channel-server.properties";
     private final ClientBootstrap clientBootstrap  = null;
-    private DebugLogger           logger;
 
     private DCPPlaceIQAdnetwork   dcpPlaceIQAdNetwork;
     private final String          placeiqHost      = "http://test.ads.placeiq.com/1.41/ad";
@@ -75,10 +73,8 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         SlotSizeMapping.init();
-        DebugLogger.init(mockConfig);
         Formatter.init();
-        logger = new DebugLogger();
-        dcpPlaceIQAdNetwork = new DCPPlaceIQAdnetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpPlaceIQAdNetwork = new DCPPlaceIQAdnetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test
@@ -104,8 +100,7 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
     }
 
     @Test
-    public void testDCPPlaceiqConfigureParametersWithGeoAndNoUid() throws JSONException
-    {
+    public void testDCPPlaceiqConfigureParametersWithGeoAndNoUid() throws JSONException {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -357,7 +352,7 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
         assertEquals(false, dcpPlaceIQAdNetwork.isClickUrlRequired());
     }
 
-    private String getHashedValue(String message, String hashingType) {
+    private String getHashedValue(final String message, final String hashingType) {
         try {
             MessageDigest md = MessageDigest.getInstance(hashingType);
             byte[] array = md.digest(message.getBytes());

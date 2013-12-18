@@ -70,7 +70,7 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
      * @param baseRequestHandler
      * @param serverEvent
      */
-    protected DCPMobFoxAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+    public DCPMobFoxAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
         super(config, clientBootstrap, baseRequestHandler, serverEvent);
         try {

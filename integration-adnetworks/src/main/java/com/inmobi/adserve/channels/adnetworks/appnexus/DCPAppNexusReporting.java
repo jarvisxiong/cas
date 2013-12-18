@@ -77,7 +77,10 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
             LOG.info("failed to obtain correct dates for fetching reports {}", exception);
             return null;
         }
-
+        if (key.contains("_")) {
+            LOG.debug("invalid key {}", key);
+            return null;
+        }
         if (!isTokenGenerated) {
             String tokenResponse = invokeUrl(authUrl, getRequestToken(), null);
             token = new JSONObject(tokenResponse).getJSONObject("response").getString("token");
@@ -201,7 +204,6 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
     public String invokeUrl(final String host, final String token) throws ServerException {
         try {
             URL url = new URL(host);
-
             HttpURLConnection.setFollowRedirects(false);
             HttpURLConnection hconn = (HttpURLConnection) url.openConnection();
             hconn.setRequestMethod("GET");
@@ -218,7 +220,6 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
             }
             res.close();
             return sBuffer.toString();
-
         }
         catch (Exception e) {
             LOG.error("Encountered exception", e);

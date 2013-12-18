@@ -31,7 +31,6 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPLomarkAdnetworkTest extends TestCase {
@@ -39,7 +38,6 @@ public class DCPLomarkAdnetworkTest extends TestCase {
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
     private final ClientBootstrap clientBootstrap = null;
-    private DebugLogger           logger;
     private DCPLomarkAdNetwork    dcpLomarkAdnetwork;
     private final String          lomarkHost      = "http://apitest.lomark.cn/v2/get";
     private final String          lomarkStatus    = "on";
@@ -70,11 +68,9 @@ public class DCPLomarkAdnetworkTest extends TestCase {
         MessageEvent serverEvent = createMock(MessageEvent.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        DebugLogger.init(mockConfig);
         SlotSizeMapping.init();
         Formatter.init();
-        logger = new DebugLogger();
-        dcpLomarkAdnetwork = new DCPLomarkAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpLomarkAdnetwork = new DCPLomarkAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test
@@ -564,7 +560,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
         assertTrue(dcpLomarkAdnetwork.isClickUrlRequired());
     }
 
-    private String getSignature(HashMap<String, String> params, String secret) throws IOException
+    private String getSignature(final HashMap<String, String> params, final String secret) throws IOException
 
     {
         // first sort asc as per the paramter names

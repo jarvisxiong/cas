@@ -41,7 +41,7 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
      * @param baseRequestHandler
      * @param serverEvent
      */
-    protected DCPAjillionAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+    public DCPAjillionAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
         super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }

@@ -32,12 +32,6 @@ public class ChannelServerHelperTest extends TestCase {
     }
 
     @Test
-    public void testGetDcIdWithoutSystemProperty() {
-        System.clearProperty("dc.id");
-        assertEquals(0, channelServerHelper.getDataCenterId("dc.id"));
-    }
-
-    @Test
     public void testGetDcIdAlreadySet() {
         System.setProperty("dc.id", "2");
         assertEquals(2, channelServerHelper.getDataCenterId("dc.id"));

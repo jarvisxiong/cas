@@ -27,7 +27,6 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPMableAdnetworkTest extends TestCase {
@@ -35,7 +34,6 @@ public class DCPMableAdnetworkTest extends TestCase {
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
     private final ClientBootstrap clientBootstrap = null;
-    private DebugLogger           logger;
 
     private DCPMableAdnetwork     dcpMableAdNetwork;
     private final String          mableHost       = "http://ad.ipredictive.com/d/ads";
@@ -68,10 +66,8 @@ public class DCPMableAdnetworkTest extends TestCase {
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         SlotSizeMapping.init();
-        DebugLogger.init(mockConfig);
         Formatter.init();
-        logger = new DebugLogger();
-        dcpMableAdNetwork = new DCPMableAdnetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpMableAdNetwork = new DCPMableAdnetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test

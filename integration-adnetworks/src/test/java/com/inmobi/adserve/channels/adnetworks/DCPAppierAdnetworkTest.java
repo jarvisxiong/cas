@@ -26,7 +26,6 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPAppierAdnetworkTest extends TestCase {
@@ -34,7 +33,6 @@ public class DCPAppierAdnetworkTest extends TestCase {
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
     private final ClientBootstrap clientBootstrap = null;
-    private DebugLogger           logger;
     private DCPAppierAdNetwork    dcpAppierAdNetwork;
     private final String          appierHost      = "http://ed5.rtb.appier.net/imreq/inmobi_hk";
     private final String          appierStatus    = "on";
@@ -62,9 +60,7 @@ public class DCPAppierAdnetworkTest extends TestCase {
         MessageEvent serverEvent = createMock(MessageEvent.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        DebugLogger.init(mockConfig);
-        logger = new DebugLogger();
-        dcpAppierAdNetwork = new DCPAppierAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpAppierAdNetwork = new DCPAppierAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test

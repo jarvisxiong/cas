@@ -81,15 +81,8 @@ public class ClickUrlMakerV6 {
         else {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("?");
-            int i = 1;
             for (Map.Entry<String, String> entry : getParams.entrySet()) {
-                if (i < getParams.size()) {
-                    stringBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
-                }
-                else {
-                    stringBuilder.append(entry.getKey()).append("=").append(entry.getValue());
-                }
-                i++;
+                stringBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
             }
             return beaconUrl + stringBuilder.toString();
         }
@@ -108,15 +101,8 @@ public class ClickUrlMakerV6 {
         else {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("?");
-            int i = 1;
             for (Map.Entry<String, String> entry : getParams.entrySet()) {
-                if (i < getParams.size()) {
-                    stringBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
-                }
-                else {
-                    stringBuilder.append(entry.getKey()).append("=").append(entry.getValue());
-                }
-                i++;
+                stringBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
             }
             return clickUrl + stringBuilder.toString();
         }

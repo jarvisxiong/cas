@@ -36,7 +36,6 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.inmobi.phoenix.logging.DebugLogger;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
@@ -60,16 +59,15 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
         iABCountries = new IABCountriesMap();
     }
 
-    public DCPWapStartAdNetwork(final DebugLogger logger, final Configuration config,
-            final ClientBootstrap clientBootstrap, final HttpRequestHandlerBase baseRequestHandler,
-            final MessageEvent serverEvent) {
+    public DCPWapStartAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
         super(config, clientBootstrap, baseRequestHandler, serverEvent);
         factory = DocumentBuilderFactory.newInstance();
         try {
             builder = factory.newDocumentBuilder();
         }
         catch (ParserConfigurationException e) {
-            logger.error("XML Parser Builder initialization failed");
+            LOG.error("XML Parser Builder initialization failed");
         }
     }
 

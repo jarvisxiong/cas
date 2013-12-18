@@ -41,7 +41,7 @@ public class DCPAmobeeAdnetwork extends AbstractDCPAdNetworkImpl {
      * @param baseRequestHandler
      * @param serverEvent
      */
-    protected DCPAmobeeAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+    public DCPAmobeeAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
         super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }

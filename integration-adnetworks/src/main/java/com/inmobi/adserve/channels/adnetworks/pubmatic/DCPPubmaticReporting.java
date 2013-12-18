@@ -8,7 +8,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Currency;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,12 @@ import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.api.ServerException;
-
+import com.pubmatic.core.reporting.webservices.Currency;
+import com.pubmatic.core.reporting.webservices.PublisherDemandReportingWebService;
+import com.pubmatic.core.reporting.webservices.PublisherDemandReportingWebServiceImplService;
+import com.pubmatic.core.reporting.webservices.PublisherDemandStatistics;
+import com.pubmatic.core.reporting.webservices.ReportingException_Exception;
+import com.pubmatic.core.reporting.webservices.ReportingOptionalParams;
 
 public class DCPPubmaticReporting extends BaseReportingImpl {
     private static final Logger                    LOG             = LoggerFactory

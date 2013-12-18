@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.ServletHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
-import com.inmobi.adserve.channels.server.client.BootstrapCreation;
 import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -65,10 +64,6 @@ public class ServletChangeConfig implements Servlet {
                         && ServletHandler.getServerConfig().containsKey(configKey.replace("server.", ""))) {
                     ServletHandler.getServerConfig().setProperty(configKey.replace("server.", ""),
                         jObject.getString(configKey));
-                    if (configKey.replace("server.", "").equals("maxconnections")) {
-                        BootstrapCreation.setMaxConnectionLimit(ServletHandler.getServerConfig().getInt(
-                            configKey.replace("server.", "")));
-                    }
                     updates.append(configKey)
                                 .append("=")
                                 .append(ServletHandler.getServerConfig().getString(configKey.replace("server.", "")))

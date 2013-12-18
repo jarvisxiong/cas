@@ -37,14 +37,16 @@ public class SegmentFactory {
 
         AdapterConfig adapterConfig = advertiserIdConfigMap.get(advertiserId);
 
-        if (!(CollectionUtils.isEmpty(advertiserSet) || advertiserSet.contains(adapterConfig.getAdapterName()))
-                || !adapterConfig.isActive()) {
+        if ((adapterConfig == null)
+                || !(CollectionUtils.isEmpty(advertiserSet) || advertiserSet.contains(adapterConfig.getAdapterName()))
+                || !adapterConfig.isActive() || ((6 == dst) && (adapterConfig.getAdapterType() == AdapterType.DCP))
+                || (adapterConfig.getAdapterType() == AdapterType.RTB && !isRtbEnabled)) {
             return null;
         }
 
         Class<AdNetworkInterface> adNetworkInterfaceClass = adapterConfig.getAdNetworkInterfaceClass();
 
-        if (adapterConfig.getAdapterType() == AdapterType.RTB && isRtbEnabled) {
+        if (adapterConfig.getAdapterType() == AdapterType.RTB) {
             LOG.debug("dcname is {} and urlBase is {}", ChannelServer.dataCentreName, adapterConfig.getAdapterHost());
 
             try {
@@ -66,10 +68,6 @@ public class SegmentFactory {
 
         }
         else {
-            if (6 == dst) {
-                LOG.debug("Request came from rule engine so not going through dcp adapter selection list");
-                return null;
-            }
 
             try {
                 AdNetworkInterface adNetworkInterface = adNetworkInterfaceClass.getConstructor(

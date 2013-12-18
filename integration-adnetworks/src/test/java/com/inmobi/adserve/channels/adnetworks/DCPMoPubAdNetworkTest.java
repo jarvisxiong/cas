@@ -23,10 +23,9 @@ import com.inmobi.adserve.channels.adnetworks.mopub.DCPMoPubAdNetwork;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPMoPubAdNetworkTest extends TestCase {
@@ -34,7 +33,6 @@ public class DCPMoPubAdNetworkTest extends TestCase {
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
     private final ClientBootstrap clientBootstrap = null;
-    private DebugLogger           logger;
 
     private DCPMoPubAdNetwork     dcpMoPubAdNetwork;
     private final String          mopubHost       = "http://ads.mopub.com/m/ad";
@@ -65,9 +63,7 @@ public class DCPMoPubAdNetworkTest extends TestCase {
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         SlotSizeMapping.init();
-        DebugLogger.init(mockConfig);
-        logger = new DebugLogger();
-        dcpMoPubAdNetwork = new DCPMoPubAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpMoPubAdNetwork = new DCPMoPubAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test

@@ -31,7 +31,7 @@ public class DCPAjillionReporting extends BaseReportingImpl {
     private final String        userName;
     private String              endDate;
     private final String        name;
-    private ReportTime          startTime;
+    private ReportTime          reportStartTime;
 
     public DCPAjillionReporting(final Configuration config, final String name) {
         this.config = config;
@@ -52,7 +52,7 @@ public class DCPAjillionReporting extends BaseReportingImpl {
 
         LOG.debug("inside fetch rows of {}", name);
         try {
-            this.startTime = startTime;
+            this.reportStartTime = startTime;
             date = startTime.getMullahMediaStringDate();
             endDate = endTime == null ? getEndDate() : date;
 
@@ -86,19 +86,24 @@ public class DCPAjillionReporting extends BaseReportingImpl {
             int placementId = placementLists.getJSONObject(limit).getInt("id");
             placementIdArray.put(placementId);
         }
-        requestParamList.put("placement_ids", placementIdArray);
-        requestParamList.put("start_date", date);
-        requestParamList.put("end_date", date);
-        JSONArray columns = new JSONArray();
-        columns.put("external_publisher");
-        JSONArray sums = new JSONArray();
-        sums.put("hits");
-        sums.put("impressions");
-        sums.put("revenue");
-        requestParamList.put("columns", columns);
-        requestParamList.put("sums", sums);
-        String revenueResponse = invokeUrl(host, getRequestParams("publisher_report", requestParamList));
-        generateReportResponse(reportResponse, new JSONObject(revenueResponse).getJSONArray("result"));
+
+        while (ReportTime.compareStringDates(date, endDate) != 1) {
+            requestParamList.put("placement_ids", placementIdArray);
+            requestParamList.put("start_date", date);
+            requestParamList.put("end_date", date);
+            JSONArray columns = new JSONArray();
+            columns.put("external_publisher");
+            JSONArray sums = new JSONArray();
+            sums.put("hits");
+            sums.put("impressions");
+            sums.put("revenue");
+            requestParamList.put("columns", columns);
+            requestParamList.put("sums", sums);
+            String revenueResponse = invokeUrl(host, getRequestParams("publisher_report", requestParamList));
+            generateReportResponse(reportResponse, new JSONObject(revenueResponse).getJSONArray("result"));
+            reportStartTime = ReportTime.getNextDay(reportStartTime);
+            date = reportStartTime.getMullahMediaStringDate();
+        }
         return reportResponse;
     }
 
@@ -196,7 +201,7 @@ public class DCPAjillionReporting extends BaseReportingImpl {
             row.impressions = reportRow.getLong("impressions");
             row.revenue = reportRow.getDouble("revenue");
             row.request = reportRow.getLong("hits");
-            row.reportTime = startTime;
+            row.reportTime = reportStartTime;
             row.slotSize = getReportGranularity();
             reportResponse.addReportRow(row);
         }

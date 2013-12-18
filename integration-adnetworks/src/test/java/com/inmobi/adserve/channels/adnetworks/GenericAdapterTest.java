@@ -22,20 +22,18 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class GenericAdapterTest extends TestCase {
 
-    private String          httpoolHost         = "http://a.mobile.toboads.com/get";
-    private String          httpoolAdvertiserId = "9999";
-    private GenericAdapter  genericAdapter;
-    private ClientBootstrap clientBootstrap     = new ClientBootstrap();
-    private Configuration   mockConfig          = null;
+    private final String          httpoolHost         = "http://a.mobile.toboads.com/get";
+    private final String          httpoolAdvertiserId = "9999";
+    private GenericAdapter        genericAdapter;
+    private final ClientBootstrap clientBootstrap     = new ClientBootstrap();
+    private Configuration         mockConfig          = null;
     // private String loggerConf = "/tmp/channel-server.properties";
-    private String          debug               = "debug";
-    private String          advertiserName      = "httpool";
-    private DebugLogger     logger;
+    private final String          debug               = "debug";
+    private final String          advertiserName      = "httpool";
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -65,18 +63,18 @@ public class GenericAdapterTest extends TestCase {
         replay(mockConfig);
     }
 
+    @Override
     public void setUp() throws Exception {
         File f;
         f = new File("/tmp/channel-server.properties");
-        if (!f.exists())
+        if (!f.exists()) {
             f.createNewFile();
+        }
         MessageEvent serverEvent = createMock(MessageEvent.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        DebugLogger.init(mockConfig);
-        logger = new DebugLogger();
         SlotSizeMapping.init();
-        genericAdapter = new GenericAdapter(logger, mockConfig, clientBootstrap, base, serverEvent, "httpool");
+        genericAdapter = new GenericAdapter(mockConfig, clientBootstrap, base, serverEvent, "httpool");
     }
 
     @Test

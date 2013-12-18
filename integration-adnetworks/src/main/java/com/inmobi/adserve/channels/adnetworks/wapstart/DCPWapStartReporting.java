@@ -7,8 +7,6 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.sql.Connection;
 
@@ -92,6 +90,14 @@ public class DCPWapStartReporting extends BaseReportingImpl {
                 row.clicks = 0;
                 row.request = 0;
                 row.revenue = 0;
+
+                JSONObject reportRow = jReportArr.getJSONObject(i);
+                LOG.debug("json array length is {}", jReportArr.length());
+                row.request = 0;
+                row.reportTime = new ReportTime(reportRow.getString("day"), 0);
+                row.clicks = Long.parseLong(reportRow.getString("clicks"));
+                row.impressions = Long.parseLong(reportRow.getString("views"));
+                row.revenue = Double.parseDouble(reportRow.getString("income"));
                 double rate = getCurrencyConversionRate("RUB", startDate, connection);
                 if (rate > 0) {
                     row.revenue /= rate;
@@ -100,13 +106,6 @@ public class DCPWapStartReporting extends BaseReportingImpl {
                     LOG.info("Failed to get RUB to USD rate for {}", startDate);
                     return null;
                 }
-                JSONObject reportRow = jReportArr.getJSONObject(i);
-                LOG.debug("json array length is {}", jReportArr.length());
-                row.request = 0;
-                row.reportTime = new ReportTime(reportRow.getString("day"), 0);
-                row.clicks = Long.parseLong(reportRow.getString("clicks"));
-                row.impressions = Long.parseLong(reportRow.getString("views"));
-                row.revenue = Double.parseDouble(reportRow.getString("income"));
                 LOG.debug("parsing data inside wapstart {}", row);
                 row.advertiserId = this.getAdvertiserId();
                 row.siteId = externalSiteId;

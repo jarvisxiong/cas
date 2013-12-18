@@ -1,20 +1,19 @@
 package com.inmobi.adserve.channels.server;
 
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.api.ServletFactory;
+import com.inmobi.adserve.channels.server.servlet.*;
+import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
+import org.apache.commons.configuration.Configuration;
+import org.jboss.netty.handler.codec.http.HttpRequest;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
-import com.inmobi.adserve.channels.server.api.Servlet;
-import com.inmobi.adserve.channels.server.api.ServletFactory;
-import com.inmobi.adserve.channels.server.servlet.*;
-import org.apache.commons.configuration.Configuration;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
 
 
 public class ServletHandler {
@@ -149,6 +148,20 @@ public class ServletHandler {
             @Override
             public Servlet getServlet() {
                 return new ServletBackFill();
+            }
+        });
+
+        servletMap.put("/getServerConfig", new ServletFactory() {
+            @Override
+            public Servlet getServlet() {
+                return new ServletGetServerConfig();
+            }
+        });
+
+        servletMap.put("/getAdapterConfig", new ServletFactory() {
+            @Override
+            public Servlet getServlet() {
+                return new ServletGetAdapterConfig();
             }
         });
 

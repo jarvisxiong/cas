@@ -47,7 +47,7 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String ANDROID_ID_SHA1 = "md5udid";
     private static final String ANDROID_ID_MD5  = "sha1udid";
     private static final String ODIN1           = "sha1mac";
-    private static final String CLICKURL        = "pubclick";
+    // private static final String CLICKURL = "pubclick";
 
     private static final String sizeFormat      = "%dx%d";
     private static final String latlongFormat   = "%s,%s";
@@ -61,7 +61,7 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
      * @param baseRequestHandler
      * @param serverEvent
      */
-    protected DCPAppNexusAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+    public DCPAppNexusAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
         super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }
@@ -156,7 +156,7 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
                 }
             }
 
-            appendQueryParam(url, CLICKURL, getURLEncode(clickUrl, format), false);
+            // appendQueryParam(url, CLICKURL, getURLEncode(clickUrl, format), false);
             LOG.debug("{} url is {}", name, url);
 
             return (new URI(url.toString()));

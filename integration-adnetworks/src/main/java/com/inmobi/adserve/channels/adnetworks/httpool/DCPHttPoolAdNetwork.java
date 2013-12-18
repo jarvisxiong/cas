@@ -39,7 +39,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
      * @param baseRequestHandler
      * @param serverEvent
      */
-    protected DCPHttPoolAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+    public DCPHttPoolAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
         super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }

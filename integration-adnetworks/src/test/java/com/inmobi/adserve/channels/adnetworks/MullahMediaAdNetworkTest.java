@@ -24,7 +24,6 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 /**
@@ -37,7 +36,6 @@ public class MullahMediaAdNetworkTest extends TestCase {
     private final String          debug             = "debug";
     private final String          loggerConf        = "/tmp/channel-server.properties";
     private final ClientBootstrap clientBootstrap   = null;
-    private DebugLogger           logger;
     private MullahMediaNetwork    dcpMMAdNetwork;
     private final String          mullahMediaHost   = "http://ads.160tracker.com/mobile_ad_api_indirect.php";
     private final String          mullahMediaStatus = "on";
@@ -68,10 +66,8 @@ public class MullahMediaAdNetworkTest extends TestCase {
         MessageEvent serverEvent = createMock(MessageEvent.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        DebugLogger.init(mockConfig);
         Formatter.init();
-        logger = new DebugLogger();
-        dcpMMAdNetwork = new MullahMediaNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpMMAdNetwork = new MullahMediaNetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test

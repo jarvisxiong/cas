@@ -1,5 +1,9 @@
 package com.inmobi.adserve.channels.adnetworks;
 
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
+
 import java.io.File;
 import java.util.ArrayList;
 
@@ -13,10 +17,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-
 import com.inmobi.adserve.channels.adnetworks.verve.DCPVerveAdNetwork;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -25,7 +25,6 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPVerveAdapterTest extends TestCase {
@@ -33,7 +32,6 @@ public class DCPVerveAdapterTest extends TestCase {
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
     private final ClientBootstrap clientBootstrap = null;
-    private DebugLogger           logger;
     private DCPVerveAdNetwork     dcpVerveAdnetwork;
     private final String          verveHost       = "http://adcel.vrvm.com/htmlad";
     private final String          verveStatus     = "on";
@@ -60,11 +58,9 @@ public class DCPVerveAdapterTest extends TestCase {
         MessageEvent serverEvent = createMock(MessageEvent.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        DebugLogger.init(mockConfig);
         SlotSizeMapping.init();
         Formatter.init();
-        logger = new DebugLogger();
-        dcpVerveAdnetwork = new DCPVerveAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpVerveAdnetwork = new DCPVerveAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test
@@ -245,7 +241,7 @@ public class DCPVerveAdapterTest extends TestCase {
                     "{\"trueLatLongOnly\":\"true\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpVerveAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://adcel.vrvm.com/htmlad?ip=206.29.182.240&p=iphn&b=1324&site=00000000-0000-0000-0000-000000000000&ua=Mozilla&lat=37.4429&long=-122.1514&uis=v&ui=202cb962ac59075b964b07152d234b70&c=999&adunit=320x48";
+            String expectedUrl = "http://adcel.vrvm.com/htmlad?ip=206.29.182.240&p=iphn&b=1324&site=00000000-0000-0000-0000-000000000000&ua=Mozilla&lat=37.4429&long=-122.1514&uis=v&ui=202cb962ac59075b964b07152d234b70&c=97&adunit=320x48";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -271,7 +267,7 @@ public class DCPVerveAdapterTest extends TestCase {
                     "{\"trueLatLongOnly\":\"false\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
         if (dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpVerveAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://adcel.vrvm.com/htmlad?ip=206.29.182.240&p=iphn&b=1324&site=00000000-0000-0020-0000-000000000000&ua=Mozilla&uis=v&ui=202cb962ac59075b964b07152d234b70&c=999&adunit=320x48";
+            String expectedUrl = "http://adcel.vrvm.com/htmlad?ip=206.29.182.240&p=iphn&b=1324&site=00000000-0000-0020-0000-000000000000&ua=Mozilla&uis=v&ui=202cb962ac59075b964b07152d234b70&c=97&adunit=320x48";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -297,7 +293,7 @@ public class DCPVerveAdapterTest extends TestCase {
                     "{\"trueLatLongOnly\":\"true\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
         if (dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpVerveAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://adcel.vrvm.com/htmlad?ip=206.29.182.240&p=iphn&b=1324&site=00000000-0000-0020-0000-000000000000&ua=Mozilla&uis=v&ui=202cb962ac59075b964b07152d234b70&c=999&adunit=320x48";
+            String expectedUrl = "http://adcel.vrvm.com/htmlad?ip=206.29.182.240&p=iphn&b=1324&site=00000000-0000-0020-0000-000000000000&ua=Mozilla&uis=v&ui=202cb962ac59075b964b07152d234b70&c=97&adunit=320x48";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -323,7 +319,7 @@ public class DCPVerveAdapterTest extends TestCase {
                     "{\"trueLatLongOnly\":\"true\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpVerveAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://adcel.vrvm.com/htmlad?ip=206.29.182.240&p=ptnr&b=1324&site=00000000-0000-0000-0000-000000000000&ua=Mozilla&lat=37.4429&long=-122.1514&c=999&adunit=320x48";
+            String expectedUrl = "http://adcel.vrvm.com/htmlad?ip=206.29.182.240&p=ptnr&b=1324&site=00000000-0000-0000-0000-000000000000&ua=Mozilla&lat=37.4429&long=-122.1514&c=97&adunit=320x48";
             assertEquals(expectedUrl, actualUrl);
         }
     }
