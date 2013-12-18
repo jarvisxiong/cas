@@ -61,8 +61,8 @@ public class DCPPlaceIQAdnetwork extends BaseAdNetworkImpl {
     private static final String           COUNTRY       = "CO";
     private static final String           SECRET        = "SK";
     private static final String           ADTYPE        = "AT";
-    private static final String           APPTYPE       = "STI";
-    private static final String           WAPTYPE       = "STW";
+    private static final String           APPTYPE       = "STG";
+    private static final String           WAPTYPE       = "STG%2CSTW";
     private static final String           ANDROID       = "Android";
     private static final String           IOS           = "iOS";
     private static final String           auIdFormat    = "%s/%s/%s/%s";
