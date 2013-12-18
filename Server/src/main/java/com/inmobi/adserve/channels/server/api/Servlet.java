@@ -8,8 +8,10 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public interface Servlet {
-  
-  void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e, DebugLogger logger) throws Exception;
-  String getName();
+
+    void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e, DebugLogger logger)
+            throws Exception;
+
+    String getName();
 
 }
