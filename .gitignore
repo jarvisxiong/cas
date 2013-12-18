@@ -8,9 +8,6 @@
 .idea
 *.iml
 
-# Test generated files to compare'
-adserve-phoenix_components-adoutput/src/test/resources/sample/*/*/*.new
-
 # Eclipse files
 .project
 .classpath
