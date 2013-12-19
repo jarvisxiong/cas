@@ -1,53 +1,28 @@
 package com.inmobi.adserve.channels.util;
 
-import org.apache.commons.configuration.AbstractConfiguration;
-import org.apache.commons.configuration.CombinedConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.configuration.tree.OverrideCombiner;
 import org.apache.log4j.Logger;
 
 
 public class ConfigurationLoader {
-    private Logger                     logger   = Logger.getLogger(ConfigurationLoader.class);
-    private String                     configFile;
+    private static final Logger        LOG      = Logger.getLogger(ConfigurationLoader.class);
     private static ConfigurationLoader instance = null;
 
-    private CombinedConfiguration      c        = new CombinedConfiguration(new OverrideCombiner());
+    private final Configuration        configfuration;
 
-    private ConfigurationLoader(String configFile) {
-        this.configFile = configFile;
-        c.addConfiguration(loadProvidedConfiguration());
-        c.addConfiguration(loadDefaultConfiguration());
-    }
-
-    private AbstractConfiguration loadDefaultConfiguration() {
-        AbstractConfiguration c = new PropertiesConfiguration();
+    private ConfigurationLoader(final String configFile) {
         try {
-            c = new PropertiesConfiguration(configFile);
+            configfuration = new PropertiesConfiguration(configFile);
         }
         catch (ConfigurationException e) {
-            logger.error("Error loading default config {}", e);
+            LOG.error("error loading config {}", e);
+            throw new RuntimeException(e);
         }
-        return c;
     }
 
-    private AbstractConfiguration loadProvidedConfiguration() {
-        AbstractConfiguration c = new PropertiesConfiguration();
-        String configFile = System.getProperty("config");
-        if (configFile != null) {
-            try {
-                c = new PropertiesConfiguration(configFile);
-            }
-            catch (ConfigurationException e) {
-                logger.error("Error loading default config {}", e);
-            }
-        }
-        return c;
-    }
-
-    public static synchronized ConfigurationLoader getInstance(String configFile) {
+    public static synchronized ConfigurationLoader getInstance(final String configFile) {
         if (instance == null) {
             instance = new ConfigurationLoader(configFile);
         }
@@ -55,55 +30,55 @@ public class ConfigurationLoader {
     }
 
     public Configuration cacheConfiguration() {
-        return c.subset("Cache");
+        return configfuration.subset("Cache");
     }
 
     public Configuration repoConfiguration() {
-        return c.subset("Cache.ChannelAdGroupRepository");
+        return configfuration.subset("Cache.ChannelAdGroupRepository");
     }
 
     public Configuration feedBackConfiguration() {
-        return c.subset("Cache.ChannelFeedbackRepository");
+        return configfuration.subset("Cache.ChannelFeedbackRepository");
     }
 
     public Configuration segmentFeedBackConfiguration() {
-        return c.subset("Cache.ChannelSegmentFeedbackRepository");
+        return configfuration.subset("Cache.ChannelSegmentFeedbackRepository");
     }
 
     public Configuration siteTaxonomyConfiguration() {
-        return c.subset("Cache.SiteTaxonomyRepository");
+        return configfuration.subset("Cache.SiteTaxonomyRepository");
     }
 
     public Configuration siteMetaDataConfiguration() {
-        return c.subset("Cache.SiteMetaDataRepository");
+        return configfuration.subset("Cache.SiteMetaDataRepository");
     }
 
     public Configuration adapterConfiguration() {
-        return c.subset("adapter");
+        return configfuration.subset("adapter");
     }
 
     public Configuration databaseConfiguration() {
-        return c.subset("database");
+        return configfuration.subset("database");
     }
 
     public Configuration serverConfiguration() {
-        return c.subset("server");
+        return configfuration.subset("server");
     }
 
     public Configuration loggerConfiguration() {
-        return c.subset("logger");
+        return configfuration.subset("logger");
     }
 
     public Configuration reportConfiguration() {
-        return c.subset("report");
+        return configfuration.subset("report");
     }
 
     public Configuration log4jConfiguration() {
-        return c.subset("log4j");
+        return configfuration.subset("log4j");
     }
 
     public Configuration rtbConfiguration() {
-        return c.subset("rtb");
+        return configfuration.subset("rtb");
     }
 
 }
