@@ -425,7 +425,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         // Setting do not track
         if (null != casInternalRequestParameters.uidADT) {
             try {
-                device.setDnt(Integer.parseInt(casInternalRequestParameters.uidADT));
+                device.setDnt(Integer.parseInt(casInternalRequestParameters.uidADT) == 0 ? 1 : 0);
             }
             catch (NumberFormatException e) {
                 logger.debug("Exception while parsing uidADT to integer", e.getMessage());
