@@ -6,15 +6,16 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 
 
+// TODO: change the getters using lombok
 public class ConfigurationLoader {
     private static final Logger        LOG      = Logger.getLogger(ConfigurationLoader.class);
     private static ConfigurationLoader instance = null;
 
-    private final Configuration        configfuration;
+    private final Configuration        configuration;
 
     private ConfigurationLoader(final String configFile) {
         try {
-            configfuration = new PropertiesConfiguration(configFile);
+            configuration = new PropertiesConfiguration(configFile);
         }
         catch (ConfigurationException e) {
             LOG.error("error loading config {}", e);
@@ -30,55 +31,55 @@ public class ConfigurationLoader {
     }
 
     public Configuration cacheConfiguration() {
-        return configfuration.subset("Cache");
+        return configuration.subset("Cache");
     }
 
     public Configuration repoConfiguration() {
-        return configfuration.subset("Cache.ChannelAdGroupRepository");
+        return configuration.subset("Cache.ChannelAdGroupRepository");
     }
 
     public Configuration feedBackConfiguration() {
-        return configfuration.subset("Cache.ChannelFeedbackRepository");
+        return configuration.subset("Cache.ChannelFeedbackRepository");
     }
 
     public Configuration segmentFeedBackConfiguration() {
-        return configfuration.subset("Cache.ChannelSegmentFeedbackRepository");
+        return configuration.subset("Cache.ChannelSegmentFeedbackRepository");
     }
 
     public Configuration siteTaxonomyConfiguration() {
-        return configfuration.subset("Cache.SiteTaxonomyRepository");
+        return configuration.subset("Cache.SiteTaxonomyRepository");
     }
 
     public Configuration siteMetaDataConfiguration() {
-        return configfuration.subset("Cache.SiteMetaDataRepository");
+        return configuration.subset("Cache.SiteMetaDataRepository");
     }
 
     public Configuration adapterConfiguration() {
-        return configfuration.subset("adapter");
+        return configuration.subset("adapter");
     }
 
     public Configuration databaseConfiguration() {
-        return configfuration.subset("database");
+        return configuration.subset("database");
     }
 
     public Configuration serverConfiguration() {
-        return configfuration.subset("server");
+        return configuration.subset("server");
     }
 
     public Configuration loggerConfiguration() {
-        return configfuration.subset("logger");
+        return configuration.subset("logger");
     }
 
     public Configuration reportConfiguration() {
-        return configfuration.subset("report");
+        return configuration.subset("report");
     }
 
     public Configuration log4jConfiguration() {
-        return configfuration.subset("log4j");
+        return configuration.subset("log4j");
     }
 
     public Configuration rtbConfiguration() {
-        return configfuration.subset("rtb");
+        return configuration.subset("rtb");
     }
 
 }
