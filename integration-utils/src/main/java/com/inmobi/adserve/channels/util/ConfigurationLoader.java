@@ -2,7 +2,6 @@ package com.inmobi.adserve.channels.util;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.FileConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 
@@ -16,9 +15,6 @@ public class ConfigurationLoader {
     private ConfigurationLoader(final String configFile) {
         try {
             configfuration = new PropertiesConfiguration(configFile);
-            if (configfuration instanceof FileConfiguration) {
-                ((FileConfiguration) configfuration).isAutoSave();
-            }
         }
         catch (ConfigurationException e) {
             LOG.error("error loading config {}", e);
