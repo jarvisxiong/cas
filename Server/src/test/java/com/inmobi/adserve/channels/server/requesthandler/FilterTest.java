@@ -4,7 +4,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
 
-import java.io.IOException;
+import java.lang.reflect.Field;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,10 +18,12 @@ import junit.framework.TestCase;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.configuration.Configuration;
 import org.json.JSONObject;
+import org.slf4j.Marker;
 import org.testng.annotations.Test;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
@@ -70,8 +72,22 @@ public class FilterTest extends TestCase {
     private ChannelSegmentEntity         s2;
     private SASRequestParameters         sasParams;
 
+    private static void setPrivateStatic(final String fieldName, final Object newValue) throws Exception {
+        Field field = Filters.class.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.set(null, newValue);
+    }
+
     @Override
-    public void setUp() throws IOException {
+    public void setUp() throws Exception {
+
+        setPrivateStatic("traceMarkerProvider", new Provider<Marker>() {
+            @Override
+            public Marker get() {
+                return null;
+            }
+        });
+
         ConfigurationLoader config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
         ServletHandler.init(config, null);
         mockConfig = createMock(Configuration.class);
