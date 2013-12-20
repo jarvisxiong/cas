@@ -175,7 +175,7 @@ public class DCPPlaceIQReporting extends BaseReportingImpl {
                     clicksIndex = i;
                     continue;
                 }
-                else if (header[i].trim().contains("Revenue")) {
+                else if (header[i].trim().contains("Revenue") || header[i].trim().contains("Spend") || header[i].trim().contains("Spent")) {
                     revenueIndex = i;
                     continue;
                 }

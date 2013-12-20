@@ -125,6 +125,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                                                                             15, 16);
     private static List<Integer>           performanceBlockedAttributes = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
                                                                             11, 12, 13, 14, 15, 16);
+    private static final String            FAMILY_SAFE_RATING           = "1";
+    private static final String            PERFORMANCE_RATING           = "0";
+    private static final String            RATING_KEY                   = "fs";
     private String                         responseSeatId;
     private String                         responseImpressionId;
     private String                         responseAuctionId;
@@ -406,6 +409,18 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (null != sasParams.getCategories()) {
             site.setCat(iabCategoriesInterface.getIABCategories(sasParams.getCategories()));
         }
+        Map<String, String> siteExtensions = new HashMap<String, String>();
+        String siteRating;
+        if (!SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
+            // Family safe
+            siteRating = FAMILY_SAFE_RATING;
+        }
+        else {
+            siteRating = PERFORMANCE_RATING;
+        }
+        siteExtensions.put(RATING_KEY, siteRating);
+        site.setExt(siteExtensions);
+
         return site;
     }
 
@@ -420,6 +435,17 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (null != sasParams.getCategories()) {
             app.setCat(iabCategoriesInterface.getIABCategories(sasParams.getCategories()));
         }
+        Map<String, String> appExtensions = new HashMap<String, String>();
+        String appRating;
+        if (!SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
+            // Family safe
+            appRating = FAMILY_SAFE_RATING;
+        }
+        else {
+            appRating = PERFORMANCE_RATING;
+        }
+        appExtensions.put(RATING_KEY, appRating);
+        app.setExt(appExtensions);
         return app;
     }
 
@@ -435,7 +461,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         // Setting do not track
         if (null != casInternalRequestParameters.uidADT) {
             try {
-                device.setDnt(Integer.parseInt(casInternalRequestParameters.uidADT));
+                device.setDnt(Integer.parseInt(casInternalRequestParameters.uidADT) == 0 ? 1 : 0);
             }
             catch (NumberFormatException e) {
                 LOG.debug("Exception while parsing uidADT to integer {}", e);
