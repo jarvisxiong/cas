@@ -105,8 +105,10 @@ public class RequestParser {
             logger.error("site object not found in request");
             params.setSiteIncId(0);
         }
+        
         try {
-            params.setHandset(jObject.getJSONArray("handset"));
+            JSONArray jsonArray = jObject.getJSONArray("handset");
+            params.setHandsetInternalId(Long.parseLong(jsonArray.get(0).toString()));
         }
         catch (JSONException e) {
             logger.error("Handset array not found");

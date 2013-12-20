@@ -106,20 +106,21 @@ public class Logging {
                 ad.setWinBid(winBid);
             }
         }
-        JSONArray handset = null;
         JSONArray carrier = null;
         String requestSlot = null;
         String slotServed = null;
+        Long handsetInternalId = null;
         if (null != sasParams) {
-            handset = sasParams.getHandset();
+            handsetInternalId = sasParams.getHandsetInternalId();
             carrier = sasParams.getCarrier();
             requestSlot = sasParams.getRqMkSlot();
             slotServed = sasParams.getSlot();
         }
         HandsetMeta handsetMeta = new HandsetMeta();
-        if (null != handset && handset.length() > 0) {
-            handsetMeta.setId(handset.getInt(0));
+        if (null != handsetInternalId) {
+            handsetMeta.setId(handsetInternalId.intValue());
         }
+        
         if (null != sasParams && sasParams.getOsId() != 0) {
             handsetMeta.setOsId(sasParams.getOsId());
         }

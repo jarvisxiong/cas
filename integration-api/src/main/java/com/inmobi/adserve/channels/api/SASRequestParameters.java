@@ -54,8 +54,8 @@ public class SASRequestParameters {
     private String       rqMkAdcount;
     private String       tid;
     private String       tp;
-    private JSONArray    handset;
-    private JSONArray    carrier;
+    private long         handsetInternalId;
+    private JSONArray carrier;
     private String       rqMkSlot;
     private Integer      ipFileVersion;
     private boolean      isRichMedia;

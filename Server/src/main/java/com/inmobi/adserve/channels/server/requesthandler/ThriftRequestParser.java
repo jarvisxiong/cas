@@ -9,10 +9,12 @@ import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONException;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -75,7 +77,8 @@ public class ThriftRequestParser {
         params.setRFormat(tObject.responseFormat);
         // TODO change to short in DCP too
         params.setRqMkAdcount(tObject.requestedAdCount + "");
-        // TODO params.setTid(tObject.taskId);
+        // TODO confirm task id is request Id
+        params.setTid(tObject.requestId);
         params.setAllowBannerAds(tObject.supplyCapability == SupplyCapability.BANNER);
         params.setSiteFloor(tObject.site.ecpmFloor);
         //TODO use segment id in cas as long
@@ -125,6 +128,12 @@ public class ThriftRequestParser {
         Map<UidType, String> uidMap = uidParams.getUidValues();
         for (UidType uidType : uidMap.keySet()) {
             switch (uidType) {
+                //TODO add case for adt value
+                case UDID:
+                    parameter.uid = uidMap.get(uidType);
+                    if (StringUtils.isNotBlank(parameter.uid) && parameter.uid.length() != 32) {
+                        parameter.uid = MD5(parameter.uid);
+                    }
                 case O1:
                     parameter.uidO1 = uidMap.get(uidType);
                     break;
@@ -148,5 +157,20 @@ public class ThriftRequestParser {
             }
         }
 
+    }
+
+    public static String MD5(String md5) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] array = md.digest(md5.getBytes());
+            StringBuffer sb = new StringBuffer();
+            for (byte anArray : array) {
+                sb.append(Integer.toHexString((anArray & 0xFF) | 0x100).substring(1, 3));
+            }
+            return sb.toString();
+        }
+        catch (java.security.NoSuchAlgorithmException ignored) {
+        }
+        return null;
     }
 }

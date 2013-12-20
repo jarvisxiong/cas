@@ -1,20 +1,17 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.util.DebugLogger;
+import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
 
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
-import com.inmobi.adserve.channels.util.DebugLogger;
-
-import junit.framework.TestCase;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 
 public class RequestParserTest extends TestCase
@@ -52,7 +49,7 @@ public class RequestParserTest extends TestCase
             "PE (iPod; U; CPU iPhone OS 4_3_1 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Mobile/8G4"
                     .toUpperCase(),
             sasRequestParameters.getSiteType());
-        assertEquals(sasRequestParameters.getHandset().toString(), "[42279,\"apple_ipod_touch_ver4_3_1_subua\"]");
+        assertEquals(sasRequestParameters.getHandsetInternalId(), 42279);
         assertEquals(sasRequestParameters.getRqMkAdcount(), "1");
         assertEquals(sasRequestParameters.getSiteFloor(), 0.0);
         assertEquals(sasRequestParameters.getOsId(), 6);

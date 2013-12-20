@@ -1,27 +1,21 @@
 package com.inmobi.adserve.channels.adnetworks.ifd;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.configuration.Configuration;
-import org.codehaus.plexus.util.StringUtils;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.DebugLogger;
+import org.apache.commons.configuration.Configuration;
+import org.codehaus.plexus.util.StringUtils;
+import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.channel.MessageEvent;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.util.*;
 
 
 public class IFDAdNetwork extends BaseAdNetworkImpl {
@@ -114,7 +108,7 @@ public class IFDAdNetwork extends BaseAdNetworkImpl {
         }
 
         try {
-            paramMap.put("h-id", sasParams.getHandset().getString(0));
+            paramMap.put("h-id", sasParams.getHandsetInternalId() + "");
         }
         catch (Exception exception) {
             throw new Exception("mandatory parameter handset value is either null or not formatted properly.");
