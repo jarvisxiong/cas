@@ -1,12 +1,15 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
 import com.google.common.base.Charsets;
+import com.inmobi.adserve.adpool.*;
 import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.phoenix.batteries.util.WilburyUUID;
+import com.inmobi.types.GUID;
 import com.ning.http.client.AsyncHttpClient;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -17,9 +20,8 @@ import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 
 import java.awt.*;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.OK;
@@ -141,54 +143,93 @@ public class ResponseSender extends HttpRequestHandlerBase {
             sendResponse(OK, finalReponse, adResponse.responseHeaders, event);
         }
         else {
-            JSONObject jsonObject = new JSONObject();
-            try {
-                jsonObject.put("secondHighestBid", this
-                        .getAuctionEngine()
-                            .getRtbResponse()
-                            .getAdNetworkInterface()
-                            .getSecondBidPriceInUsd());
-                jsonObject.put("winnerBid", this
-                        .getAuctionEngine()
-                            .getRtbResponse()
-                            .getAdNetworkInterface()
-                            .getBidPriceInUsd());
-                jsonObject.put("adm", finalReponse);
-                jsonObject.put("advertiserId", this.auctionEngine.getRtbResponse().getChannelEntity().getAccountId());
-                jsonObject.put("adgroupId", this.auctionEngine
-                        .getRtbResponse()
-                            .getChannelSegmentEntity()
-                            .getAdgroupId());
-                jsonObject.put("adgroupIncId", this.auctionEngine
-                        .getRtbResponse()
-                            .getChannelSegmentEntity()
-                            .getAdgroupIncId());
-                jsonObject.put("adIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getIncId());
-                jsonObject.put("adId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getAdId());
-                jsonObject.put("rtbFloor", casInternalRequestParameters.rtbBidFloor);
-                jsonObject.put("impressionId", this.auctionEngine
-                        .getRtbResponse()
-                            .getAdNetworkInterface()
-                            .getImpressionId());
-                jsonObject.put("campaignIncId", this.auctionEngine
-                        .getRtbResponse()
-                            .getChannelSegmentEntity()
-                            .getCampaignIncId());
-                jsonObject.put("campaignId", this.auctionEngine
-                        .getRtbResponse()
-                            .getChannelSegmentEntity()
-                            .getCampaignId());
-                InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
-                sendResponse(OK, jsonObject.toString(), adResponse.responseHeaders, event);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("RTB reponse json to RE is " + jsonObject.toString());
-                }
+            String rtbdResponse = createThriftResponse(finalReponse).toString();
+            if (logger.isDebugEnabled()) {
+                logger.debug("RTB reponse json to RE is " + rtbdResponse);
             }
-            catch (JSONException e) {
-                logger.debug("Error while making json object for rule engine " + e.getMessage());
-                // Sending NOAD if error making json object
-                sendNoAdResponse(event);
-            }
+            sendResponse(OK, rtbdResponse, adResponse.responseHeaders, event);
+            InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
+        }
+    }
+    
+    private AdPoolResponse createThriftResponse (String finalResponse) {
+        AdPoolResponse adPoolResponse = new AdPoolResponse();
+        AdInfo rtbdAd = new AdInfo();
+        rtbdAd.setAdGroupIncId(this.auctionEngine
+                .getRtbResponse()
+                .getChannelSegmentEntity()
+                .getAdgroupIncId());
+        rtbdAd.setAdIncId(this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getIncId());
+        rtbdAd.setAdvertiserId(this.auctionEngine.getRtbResponse().getChannelEntity().getAccountId());
+        rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);
+        rtbdAd.setBid((long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface().getSecondBidPriceInUsd() * 1000));
+        rtbdAd.setBidInOriginalCurrency((long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface().getSecondBidPriceInLocal() * 1000));
+        rtbdAd.setCampaignIncId(this.auctionEngine
+                .getRtbResponse()
+                .getChannelSegmentEntity()
+                .getCampaignIncId());
+        rtbdAd.setMinChargedValue((long)(casInternalRequestParameters.rtbBidFloor*1000));
+        UUID uuid = WilburyUUID.extractUUID(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getImpressionId());
+        rtbdAd.setImpressionId(new GUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits()));
+        rtbdAd.setSlotServed(Short.parseShort(sasParams.getSlot()));
+        Creative rtbdCreative = new Creative();
+        rtbdCreative.setValue(finalResponse);
+        //TODO Action type is not available in DCP
+        // rtbdCreative.setActionType()
+        //TODO Confirm with Anand
+        rtbdCreative.setAdType(AdType.TEXT);
+        //TODO Landing url is not available in RTBD, ask for default value
+        //rtbdCreative.setLandingUrl("");
+        //NO idea what is studio bundle
+        //rtbdCreative.setStudioBundle()
+        rtbdAd.setCreative(rtbdCreative);
+        adPoolResponse.setAds(Arrays.asList(rtbdAd));
+        return adPoolResponse;
+    }
+    
+    private JSONObject createJsonResponse(String finalResponse) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("secondHighestBid", this
+                    .getAuctionEngine()
+                    .getRtbResponse()
+                    .getAdNetworkInterface()
+                    .getSecondBidPriceInUsd());
+            jsonObject.put("winnerBid", this
+                    .getAuctionEngine()
+                    .getRtbResponse()
+                    .getAdNetworkInterface()
+                    .getBidPriceInUsd());
+            jsonObject.put("adm", finalResponse);
+            jsonObject.put("advertiserId", this.auctionEngine.getRtbResponse().getChannelEntity().getAccountId());
+            jsonObject.put("adgroupId", this.auctionEngine
+                    .getRtbResponse()
+                    .getChannelSegmentEntity()
+                    .getAdgroupId());
+            jsonObject.put("adgroupIncId", this.auctionEngine
+                    .getRtbResponse()
+                    .getChannelSegmentEntity()
+                    .getAdgroupIncId());
+            jsonObject.put("adIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getIncId());
+            jsonObject.put("adId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getAdId());
+            jsonObject.put("rtbFloor", casInternalRequestParameters.rtbBidFloor);
+            jsonObject.put("impressionId", this.auctionEngine
+                    .getRtbResponse()
+                    .getAdNetworkInterface()
+                    .getImpressionId());
+            jsonObject.put("campaignIncId", this.auctionEngine
+                    .getRtbResponse()
+                    .getChannelSegmentEntity()
+                    .getCampaignIncId());
+            jsonObject.put("campaignId", this.auctionEngine
+                    .getRtbResponse()
+                    .getChannelSegmentEntity()
+                    .getCampaignId());
+            return jsonObject;
+        }
+        catch (JSONException e) {
+            logger.debug("Error while making json object for rule engine " + e.getMessage());
+            return null;
         }
     }
 

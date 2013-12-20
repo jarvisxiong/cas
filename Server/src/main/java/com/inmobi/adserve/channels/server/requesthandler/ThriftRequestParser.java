@@ -61,9 +61,12 @@ public class ThriftRequestParser {
         params.setCountry(tObject.geo.countryCode);
         // TODO Clean the names country name and country id
         params.setCountryStr(tObject.geo.countryId + "");
-        // TODO params.setArea(parseArray(jObject, "carrier", 4));
-        // TODO SLot doubt(array) and short previously it was string
-        params.setSlot(tObject.selectedSlots.iterator().next() + "");
+        // TODO Iterate over the segments using all slots
+        if (null != tObject.selectedSlots) {
+            params.setSlot(tObject.selectedSlots.get(0) + "");
+        } else {
+            params.setSlot(tObject.requestSlotId + "");
+        }
         params.setRqMkSlot(tObject.requestSlotId + "");
         params.setSdkVersion(tObject.sdkVersion);
         // TODO verify the names
@@ -77,18 +80,13 @@ public class ThriftRequestParser {
         params.setRFormat(tObject.responseFormat);
         // TODO change to short in DCP too
         params.setRqMkAdcount(tObject.requestedAdCount + "");
-        // TODO confirm task id is request Id
         params.setTid(tObject.requestId);
         params.setAllowBannerAds(tObject.supplyCapability == SupplyCapability.BANNER);
         params.setSiteFloor(tObject.site.ecpmFloor);
         //TODO use segment id in cas as long
         params.setSiteSegmentId(new Long(tObject.segmentId).intValue());
         params.setModelId(new Long(tObject.device.modelId).intValue());
-        logger.debug("Site segment id is", params.getSiteSegmentId(), "and model id is", params.getModelId());
         // TODO Ip File Version not present params.setIpFileVersion(jObject.optInt("rqIpFileVer", 1));
-        logger.debug("country obtained is", params.getCountry());
-        logger.debug("site floor is", params.getSiteFloor());
-        logger.debug("osId is", params.getOsId());
         params.setSiteIncId(tObject.site.siteIncId);
         params.setAppUrl(tObject.site.siteUrl);
         params.setRqAdType(tObject.requestedAdType.name());
@@ -101,15 +99,17 @@ public class ThriftRequestParser {
 
         params.setGender(tObject.user.gender.name());
         // TODO add postal code in thrift params.setPostalCode(tObject.uidParams.user.);
-        // TODO USer Location??
+        // TODO user Location??
         // params.setUserLocation(tObject.uidParams.user.);
         params.setGenderOrig(tObject.user.gender.name());
         params.setGender(tObject.user.gender.name());
         setUserIdParams(casInternalRequestParameters, tObject);
-        // TODO params.setHandset(jObject.getJSONArray("handset"));
-        // TODO params.setCarrier(jObject.getJSONArray("carrier"));
-
-        logger.debug("successfully parsed params");
+        params.setHandsetInternalId(tObject.getDevice().getHandsetInternalId());
+        params.setCarrierId(new Long(tObject.getCarrier().carrierId).intValue());
+        //TODO Need area/region
+        // params.setArea(tObject.geo.);
+        params.setCity(tObject.geo.cityId + "");
+        logger.debug("Successfully parsed tObject, SAS params are : ", params.toString());
     }
 
     private static ArrayList<Long> convertIntToLong(List<Integer> intList) {

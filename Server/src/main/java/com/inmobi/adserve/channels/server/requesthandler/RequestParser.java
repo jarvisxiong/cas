@@ -40,7 +40,6 @@ public class RequestParser {
         logger.debug("Inside parameter parser");
         if (null == jObject) {
             logger.error("Returning null as jObject is null.");
-            params = null;
             return;
         }
         params.setAllParametersJson(jObject.toString());
