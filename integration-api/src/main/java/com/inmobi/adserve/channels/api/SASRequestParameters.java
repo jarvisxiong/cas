@@ -3,6 +3,7 @@ package com.inmobi.adserve.channels.api;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -44,6 +45,7 @@ public class SASRequestParameters {
     private String       keywords;             // List of comma separated keywords describing site
     // Uid parameters
     private String       uidParams;
+    private Map<String, String>     tUidParams;
 
     private String       rqIframe;
     private String       rFormat;
