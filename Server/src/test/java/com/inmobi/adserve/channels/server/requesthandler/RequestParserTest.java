@@ -8,13 +8,17 @@ import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Marker;
 import org.testng.annotations.Test;
 
+import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 
 
 public class RequestParserTest extends TestCase {
+
+    private RequestParser requestParser;
 
     @Override
     public void setUp() {
@@ -23,6 +27,12 @@ public class RequestParserTest extends TestCase {
         expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
         expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
         replay(mockConfig);
+        requestParser = new RequestParser(new Provider<Marker>() {
+            @Override
+            public Marker get() {
+                return null;
+            }
+        });
     }
 
     @Test
@@ -39,7 +49,8 @@ public class RequestParserTest extends TestCase {
                         + ",\"pub-id\":\"4028cb9731d7d0ad0131e1d1996101ef\",\"os-id\":6}");
         SASRequestParameters sasRequestParameters = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        RequestParser.parseRequestParameters(jObject, sasRequestParameters, casInternalRequestParameters);
+
+        requestParser.parseRequestParameters(jObject, sasRequestParameters, casInternalRequestParameters);
         assertNotNull(sasRequestParameters);
         assertEquals(
             "PE (iPod; U; CPU iPhone OS 4_3_1 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Mobile/8G4"

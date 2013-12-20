@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.ws.rs.Path;
+
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
@@ -13,11 +15,14 @@ import org.jboss.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.ServletHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
 
 
+@Path("/logParser")
+@Singleton
 public class ServletLogParser implements Servlet {
     private static final Logger LOG = LoggerFactory.getLogger(ServletLogParser.class);
 

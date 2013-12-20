@@ -10,8 +10,10 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
+import org.slf4j.Marker;
 import org.testng.annotations.Test;
 
+import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
@@ -54,7 +56,12 @@ public class MatchSegmentsTest extends TestCase {
                 .andReturn(createMock(ChannelAdGroupRepository.class))
                     .anyTimes();
         replay(repositoryHelper);
-        MatchSegments matchSegments = new MatchSegments(repositoryHelper);
+        MatchSegments matchSegments = new MatchSegments(repositoryHelper, new Provider<Marker>() {
+            @Override
+            public Marker get() {
+                return null;
+            }
+        });
         assertEquals(new ArrayList<Long>(), matchSegments.getCategories(sasRequestParameters));
     }
 }

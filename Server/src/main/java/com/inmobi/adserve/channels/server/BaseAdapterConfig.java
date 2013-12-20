@@ -89,7 +89,6 @@ public class BaseAdapterConfig implements AdapterConfig {
     @Override
     public AdapterType getAdapterType() {
         boolean isRtb = adapterConfig.getBoolean("isRtb", false);
-
         if (isRtb) {
             return AdapterType.RTB;
         }

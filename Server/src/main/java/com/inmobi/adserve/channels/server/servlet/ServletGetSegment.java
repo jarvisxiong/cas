@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.ws.rs.Path;
+
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.json.JSONArray;
@@ -13,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
+import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.ChannelServerStringLiterals;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.ServletHandler;
@@ -26,8 +30,16 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
  * @author devashish To see the state of currently loaded entries in all repository
  */
 
+@Singleton
+@Path("/getsegments")
 public class ServletGetSegment implements Servlet {
     private static final Logger LOG = LoggerFactory.getLogger(ServletGetSegment.class);
+    private final RequestParser requestParser;
+
+    @Inject
+    ServletGetSegment(final RequestParser requestParser) {
+        this.requestParser = requestParser;
+    }
 
     @Override
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
@@ -36,7 +48,7 @@ public class ServletGetSegment implements Servlet {
         Map<String, List<String>> params = queryStringDecoder.getParameters();
         JSONObject jObject;
         try {
-            jObject = RequestParser.extractParams(params, "segments");
+            jObject = requestParser.extractParams(params, "segments");
         }
         catch (JSONException exeption) {
             LOG.debug("Encountered Json Error while creating json object inside servlet");

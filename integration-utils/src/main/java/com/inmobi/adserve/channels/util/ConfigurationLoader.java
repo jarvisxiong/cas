@@ -1,109 +1,77 @@
 package com.inmobi.adserve.channels.util;
 
-import org.apache.commons.configuration.AbstractConfiguration;
-import org.apache.commons.configuration.CombinedConfiguration;
+import lombok.Getter;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.configuration.tree.OverrideCombiner;
 import org.apache.log4j.Logger;
 
 
 public class ConfigurationLoader {
-    private Logger                     logger   = Logger.getLogger(ConfigurationLoader.class);
-    private String                     configFile;
+
+    private static final Logger        LOG      = Logger.getLogger(ConfigurationLoader.class);
+
     private static ConfigurationLoader instance = null;
 
-    private CombinedConfiguration      c        = new CombinedConfiguration(new OverrideCombiner());
+    @Getter
+    private final Configuration        configuration;
+    @Getter
+    private Configuration              cacheConfiguration;
+    @Getter
+    private Configuration              repoConfiguration;
+    @Getter
+    private Configuration              feedBackConfiguration;
+    @Getter
+    private Configuration              segmentFeedBackConfiguration;
+    @Getter
+    private Configuration              siteTaxonomyConfiguration;
+    @Getter
+    private Configuration              siteMetaDataConfiguration;
+    @Getter
+    private Configuration              adapterConfiguration;
+    @Getter
+    private Configuration              databaseConfiguration;
+    @Getter
+    private Configuration              serverConfiguration;
+    @Getter
+    private Configuration              loggerConfiguration;
+    @Getter
+    private Configuration              reportConfiguration;
+    @Getter
+    private Configuration              log4jConfiguration;
+    @Getter
+    private Configuration              rtbConfiguration;
 
-    private ConfigurationLoader(String configFile) {
-        this.configFile = configFile;
-        c.addConfiguration(loadProvidedConfiguration());
-        c.addConfiguration(loadDefaultConfiguration());
-    }
-
-    private AbstractConfiguration loadDefaultConfiguration() {
-        AbstractConfiguration c = new PropertiesConfiguration();
+    private ConfigurationLoader(final String configFile) {
         try {
-            c = new PropertiesConfiguration(configFile);
+            configuration = new PropertiesConfiguration(configFile);
+            cacheConfiguration = configuration.subset("Cache");
+            repoConfiguration = configuration.subset("Cache.ChannelAdGroupRepository");
+            feedBackConfiguration = configuration.subset("Cache.ChannelFeedbackRepository");
+            segmentFeedBackConfiguration = configuration.subset("Cache.ChannelSegmentFeedbackRepository");
+            siteTaxonomyConfiguration = configuration.subset("Cache.SiteTaxonomyRepository");
+            siteMetaDataConfiguration = configuration.subset("Cache.SiteMetaDataRepository");
+            adapterConfiguration = configuration.subset("adapter");
+            databaseConfiguration = configuration.subset("database");
+            serverConfiguration = configuration.subset("server");
+            loggerConfiguration = configuration.subset("logger");
+            reportConfiguration = configuration.subset("report");
+            log4jConfiguration = configuration.subset("log4j");
+            rtbConfiguration = configuration.subset("rtb");
+
         }
         catch (ConfigurationException e) {
-            logger.error("Error loading default config {}", e);
+            LOG.error("error loading config {}", e);
+            throw new RuntimeException(e);
         }
-        return c;
     }
 
-    private AbstractConfiguration loadProvidedConfiguration() {
-        AbstractConfiguration c = new PropertiesConfiguration();
-        String configFile = System.getProperty("config");
-        if (configFile != null) {
-            try {
-                c = new PropertiesConfiguration(configFile);
-            }
-            catch (ConfigurationException e) {
-                logger.error("Error loading default config {}", e);
-            }
-        }
-        return c;
-    }
-
-    public static synchronized ConfigurationLoader getInstance(String configFile) {
+    public static synchronized ConfigurationLoader getInstance(final String configFile) {
         if (instance == null) {
             instance = new ConfigurationLoader(configFile);
         }
         return instance;
-    }
-
-    public Configuration cacheConfiguration() {
-        return c.subset("Cache");
-    }
-
-    public Configuration repoConfiguration() {
-        return c.subset("Cache.ChannelAdGroupRepository");
-    }
-
-    public Configuration feedBackConfiguration() {
-        return c.subset("Cache.ChannelFeedbackRepository");
-    }
-
-    public Configuration segmentFeedBackConfiguration() {
-        return c.subset("Cache.ChannelSegmentFeedbackRepository");
-    }
-
-    public Configuration siteTaxonomyConfiguration() {
-        return c.subset("Cache.SiteTaxonomyRepository");
-    }
-
-    public Configuration siteMetaDataConfiguration() {
-        return c.subset("Cache.SiteMetaDataRepository");
-    }
-
-    public Configuration adapterConfiguration() {
-        return c.subset("adapter");
-    }
-
-    public Configuration databaseConfiguration() {
-        return c.subset("database");
-    }
-
-    public Configuration serverConfiguration() {
-        return c.subset("server");
-    }
-
-    public Configuration loggerConfiguration() {
-        return c.subset("logger");
-    }
-
-    public Configuration reportConfiguration() {
-        return c.subset("report");
-    }
-
-    public Configuration log4jConfiguration() {
-        return c.subset("log4j");
-    }
-
-    public Configuration rtbConfiguration() {
-        return c.subset("rtb");
     }
 
 }

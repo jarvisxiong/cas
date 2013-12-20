@@ -2,11 +2,14 @@ package com.inmobi.adserve.channels.server.servlet;
 
 import java.util.List;
 
+import javax.ws.rs.Path;
+
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.ServletHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
@@ -14,6 +17,8 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
 
+@Singleton
+@Path("/changerollout")
 public class ServletChangeRollout implements Servlet {
     private static final Logger LOG = LoggerFactory.getLogger(ServletChangeRollout.class);
 

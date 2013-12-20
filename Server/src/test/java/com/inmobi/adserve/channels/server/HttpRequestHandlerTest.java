@@ -54,12 +54,12 @@ public class HttpRequestHandlerTest extends TestCase {
         replay(mockServerConfig);
 
         ConfigurationLoader mockConfigLoader = createMock(ConfigurationLoader.class);
-        expect(mockConfigLoader.loggerConfiguration()).andReturn(loggerConfig).anyTimes();
-        expect(mockConfigLoader.adapterConfiguration()).andReturn(null).anyTimes();
-        expect(mockConfigLoader.serverConfiguration()).andReturn(mockServerConfig).anyTimes();
-        expect(mockConfigLoader.rtbConfiguration()).andReturn(null).anyTimes();
-        expect(mockConfigLoader.log4jConfiguration()).andReturn(null).anyTimes();
-        expect(mockConfigLoader.databaseConfiguration()).andReturn(null).anyTimes();
+        expect(mockConfigLoader.getLoggerConfiguration()).andReturn(loggerConfig).anyTimes();
+        expect(mockConfigLoader.getAdapterConfiguration()).andReturn(null).anyTimes();
+        expect(mockConfigLoader.getServerConfiguration()).andReturn(mockServerConfig).anyTimes();
+        expect(mockConfigLoader.getRtbConfiguration()).andReturn(null).anyTimes();
+        expect(mockConfigLoader.getLog4jConfiguration()).andReturn(null).anyTimes();
+        expect(mockConfigLoader.getDatabaseConfiguration()).andReturn(null).anyTimes();
         replay(mockConfigLoader);
 
         AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);

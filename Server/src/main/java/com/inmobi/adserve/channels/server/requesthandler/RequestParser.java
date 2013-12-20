@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
@@ -17,21 +19,31 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
 
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 
 
+@Singleton
 public class RequestParser {
-    private static final Logger LOG = LoggerFactory.getLogger(RequestParser.class);
+    private static final Logger    LOG = LoggerFactory.getLogger(RequestParser.class);
+    private final Provider<Marker> traceMarkerProvider;
 
-    public static JSONObject extractParams(final Map<String, List<String>> params) throws Exception {
+    @Inject
+    public RequestParser(final Provider<Marker> traceMarkerProvider) {
+        this.traceMarkerProvider = traceMarkerProvider;
+    }
+
+    public JSONObject extractParams(final Map<String, List<String>> params) throws Exception {
         return extractParams(params, "args");
     }
 
     // Extracting params.
-    public static JSONObject extractParams(final Map<String, List<String>> params, final String jsonKey)
-            throws JSONException, UnsupportedEncodingException {
+    public JSONObject extractParams(final Map<String, List<String>> params, final String jsonKey) throws JSONException,
+            UnsupportedEncodingException {
         if (!params.isEmpty()) {
             List<String> values = params.get(jsonKey);
             if (CollectionUtils.isNotEmpty(values)) {
@@ -42,11 +54,13 @@ public class RequestParser {
         return null;
     }
 
-    public static void parseRequestParameters(final JSONObject jObject, SASRequestParameters params,
+    public void parseRequestParameters(final JSONObject jObject, SASRequestParameters params,
             final CasInternalRequestParameters casInternalRequestParameters) {
-        LOG.debug("Inside parameter parser");
+        Marker traceMarker = traceMarkerProvider.get();
+
+        LOG.debug(traceMarker, "Inside parameter parser");
         if (null == jObject) {
-            LOG.error("Returning null as jObject is null.");
+            LOG.error(traceMarker, "Returning null as jObject is null.");
             params = null;
             return;
         }
@@ -54,8 +68,8 @@ public class RequestParser {
         int dst = jObject.optInt("dst", 2);
         Set<Integer> accountSegments = getAcoountSegments(jObject);
         boolean isResponseOnlyFromDcp = jObject.optBoolean("isResponseOnlyFromDcp", false);
-        LOG.debug("dst type is {} isResponseOnlyFromDcp  {} and account segments are {}", dst, isResponseOnlyFromDcp,
-            accountSegments);
+        LOG.debug(traceMarker, "dst type is {} isResponseOnlyFromDcp  {} and account segments are {}", dst,
+            isResponseOnlyFromDcp, accountSegments);
         params.setDst(dst);
         params.setResponseOnlyFromDcp(isResponseOnlyFromDcp);
         params.setAccountSegment(accountSegments);
@@ -95,11 +109,12 @@ public class RequestParser {
         params.setSiteFloor(jObject.optDouble("site-floor", 0.0));
         params.setSiteSegmentId(jObject.optInt("sel-seg-id", 0));
         params.setModelId(jObject.optInt("model-id", 0));
-        LOG.debug("Site segment id is {} and model id is {}", params.getSiteSegmentId(), params.getModelId());
+        LOG.debug(traceMarker, "Site segment id is {} and model id is {}", params.getSiteSegmentId(),
+            params.getModelId());
         params.setIpFileVersion(jObject.optInt("rqIpFileVer", 1));
-        LOG.debug("country obtained is {}", params.getCountry());
-        LOG.debug("site floor is {}", params.getSiteFloor());
-        LOG.debug("osId is {}", params.getPlatformOsId());
+        LOG.debug(traceMarker, "country obtained is {}", params.getCountry());
+        LOG.debug(traceMarker, "site floor is {}", params.getSiteFloor());
+        LOG.debug(traceMarker, "osId is {}", params.getPlatformOsId());
         params.setUidParams(stringify(jObject, "raw-uid"));
         setUserIdParams(casInternalRequestParameters, jObject);
         params = getUserParams(params, jObject);
@@ -110,29 +125,31 @@ public class RequestParser {
             }
         }
         catch (JSONException exception) {
-            LOG.error("site object not found in request");
+            LOG.error(traceMarker, "site object not found in request");
             params.setSiteIncId(0);
         }
         try {
             params.setHandset(jObject.getJSONArray("handset"));
         }
         catch (JSONException e) {
-            LOG.error("Handset array not found");
+            LOG.error(traceMarker, "Handset array not found");
         }
         try {
             params.setCarrier(jObject.getJSONArray("carrier"));
         }
         catch (JSONException e) {
-            LOG.error("carrier array not found");
+            LOG.error(traceMarker, "carrier array not found");
         }
         params.setOsId(jObject.optInt("os-id", -1));
         params.setRichMedia(jObject.optBoolean("rich-media", false));
         params.setRqAdType(stringify(jObject, "rqAdtype"));
         params.setAppUrl(stringify(jObject, "site-url"));
-        LOG.debug("successfully parsed params");
+        LOG.debug(traceMarker, "successfully parsed params");
     }
 
-    public static String stringify(final JSONObject jObject, final String field) {
+    public String stringify(final JSONObject jObject, final String field) {
+        Marker traceMarker = traceMarkerProvider.get();
+
         String fieldValue = "";
         try {
             Object fieldValueObject = jObject.get(field);
@@ -143,11 +160,11 @@ public class RequestParser {
         catch (JSONException e) {
             return null;
         }
-        LOG.debug("Retrived from json {} = {}", field, fieldValue);
+        LOG.debug(traceMarker, "Retrived from json {} = {}", field, fieldValue);
         return fieldValue;
     }
 
-    public static String parseArray(final JSONObject jObject, final String param, final int index) {
+    public String parseArray(final JSONObject jObject, final String param, final int index) {
         if (null == jObject) {
             return null;
         }
@@ -165,7 +182,9 @@ public class RequestParser {
         }
     }
 
-    public static List<Long> getCategory(final JSONObject jObject, final String oldORnew) {
+    public List<Long> getCategory(final JSONObject jObject, final String oldORnew) {
+        Marker traceMarker = traceMarkerProvider.get();
+
         try {
             JSONArray categories = jObject.getJSONArray(oldORnew);
             Long[] category = new Long[categories.length()];
@@ -175,12 +194,14 @@ public class RequestParser {
             return Arrays.asList(category);
         }
         catch (JSONException e) {
-            LOG.error("error while reading category array {}", e);
+            LOG.error(traceMarker, "error while reading category array {}", e);
             return null;
         }
     }
 
-    public static Set<Integer> getAcoountSegments(final JSONObject jObject) {
+    public Set<Integer> getAcoountSegments(final JSONObject jObject) {
+        Marker traceMarker = traceMarkerProvider.get();
+
         try {
             JSONArray segments = jObject.getJSONArray("segments");
             HashSet<Integer> accountSegments = new HashSet<Integer>();
@@ -190,14 +211,16 @@ public class RequestParser {
             return accountSegments;
         }
         catch (JSONException e) {
-            LOG.debug("error while reading account segments array {}", e);
+            LOG.debug(traceMarker, "error while reading account segments array {}", e);
             return new HashSet<Integer>();
         }
     }
 
     // Get user specific params
-    public static SASRequestParameters getUserParams(final SASRequestParameters parameter, final JSONObject jObject) {
-        LOG.debug("inside parsing user params");
+    public SASRequestParameters getUserParams(final SASRequestParameters parameter, final JSONObject jObject) {
+        Marker traceMarker = traceMarkerProvider.get();
+
+        LOG.debug(traceMarker, "inside parsing user params");
         String utf8 = "UTF-8";
         try {
             JSONObject userMap = (JSONObject) jObject.get("uparams");
@@ -221,17 +244,19 @@ public class RequestParser {
                 }
             }
             catch (UnsupportedEncodingException e) {
-                LOG.debug("Error in encoding u params {}", e);
+                LOG.debug(traceMarker, "Error in encoding u params {}", e);
             }
         }
         catch (JSONException exception) {
-            LOG.debug("json exception in parsing u params {}", exception);
+            LOG.debug(traceMarker, "json exception in parsing u params {}", exception);
         }
         return parameter;
     }
 
     // Get user id params
-    public static void setUserIdParams(final CasInternalRequestParameters parameter, final JSONObject jObject) {
+    public void setUserIdParams(final CasInternalRequestParameters parameter, final JSONObject jObject) {
+        Marker traceMarker = traceMarkerProvider.get();
+
         if (null == jObject) {
             return;
         }
@@ -254,11 +279,11 @@ public class RequestParser {
             parameter.uidADT = stringify(userIdMap, "u-id-adt");
         }
         catch (JSONException exception) {
-            LOG.debug("Error in extracting userid params");
+            LOG.debug(traceMarker, "Error in extracting userid params");
         }
     }
 
-    public static String MD5(final String md5) {
+    public String MD5(final String md5) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] array = md.digest(md5.getBytes());

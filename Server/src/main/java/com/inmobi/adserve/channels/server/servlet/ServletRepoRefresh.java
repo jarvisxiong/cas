@@ -8,6 +8,8 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.Path;
+
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.json.JSONArray;
@@ -15,6 +17,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.ChannelServerStringLiterals;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.ServletHandler;
@@ -23,6 +26,8 @@ import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.phoenix.exception.RepositoryException;
 
 
+@Singleton
+@Path("/repoRefresh")
 public class ServletRepoRefresh implements Servlet {
     private static final Logger LOG            = LoggerFactory.getLogger(ServletRepoRefresh.class);
 
@@ -56,7 +61,7 @@ public class ServletRepoRefresh implements Servlet {
             statement = con.createStatement();
             if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY)) {
                 final String query = config
-                        .cacheConfiguration()
+                        .getCacheConfiguration()
                             .subset(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY)
                             .getString(ChannelServerStringLiterals.QUERY)
                             .replace(LAST_UPDATE, REPLACE_STRING);
@@ -66,7 +71,7 @@ public class ServletRepoRefresh implements Servlet {
             }
             else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_REPOSITORY)) {
                 final String query = config
-                        .cacheConfiguration()
+                        .getCacheConfiguration()
                             .subset(ChannelServerStringLiterals.CHANNEL_REPOSITORY)
                             .getString(ChannelServerStringLiterals.QUERY)
                             .replace(LAST_UPDATE, REPLACE_STRING);
@@ -77,7 +82,7 @@ public class ServletRepoRefresh implements Servlet {
             }
             else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY)) {
                 final String query = config
-                        .cacheConfiguration()
+                        .getCacheConfiguration()
                             .subset(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY)
                             .getString(ChannelServerStringLiterals.QUERY)
                             .replace(LAST_UPDATE, REPLACE_STRING);
@@ -87,7 +92,7 @@ public class ServletRepoRefresh implements Servlet {
             }
             else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY)) {
                 final String query = config
-                        .cacheConfiguration()
+                        .getCacheConfiguration()
                             .subset(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY)
                             .getString(ChannelServerStringLiterals.QUERY)
                             .replace(LAST_UPDATE, REPLACE_STRING);
@@ -98,7 +103,7 @@ public class ServletRepoRefresh implements Servlet {
             }
             else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)) {
                 final String query = config
-                        .cacheConfiguration()
+                        .getCacheConfiguration()
                             .subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)
                             .getString(ChannelServerStringLiterals.QUERY)
                             .replace(LAST_UPDATE, REPLACE_STRING);
@@ -108,7 +113,7 @@ public class ServletRepoRefresh implements Servlet {
             }
             else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY)) {
                 final String query = config
-                        .cacheConfiguration()
+                        .getCacheConfiguration()
                             .subset(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY)
                             .getString(ChannelServerStringLiterals.QUERY)
                             .replace(LAST_UPDATE, REPLACE_STRING);
@@ -118,7 +123,7 @@ public class ServletRepoRefresh implements Servlet {
             }
             else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY)) {
                 final String query = config
-                        .cacheConfiguration()
+                        .getCacheConfiguration()
                             .subset(ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY)
                             .getString(ChannelServerStringLiterals.QUERY)
                             .replace(LAST_UPDATE, REPLACE_STRING);
@@ -128,7 +133,7 @@ public class ServletRepoRefresh implements Servlet {
             }
             else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY)) {
                 final String query = config
-                        .cacheConfiguration()
+                        .getCacheConfiguration()
                             .subset(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY)
                             .getString(ChannelServerStringLiterals.QUERY)
                             .replace(LAST_UPDATE, REPLACE_STRING);

@@ -40,7 +40,7 @@ public class AuctionEngineTest {
     public void setUp() throws IOException {
         ConfigurationLoader config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
         ServletHandler.init(config, null);
-        Filters.init(config.adapterConfiguration());
+        Filters.init(config.getAdapterConfiguration());
         // this is done, to track the encryptedBid variable getting set inside the AuctionEngine.
         encryptedBid1 = new Capture<String>();
 

@@ -5,6 +5,8 @@ import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 import java.nio.charset.Charset;
 
+import javax.ws.rs.Path;
+
 import org.apache.log4j.Logger;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
@@ -16,6 +18,7 @@ import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.slf4j.LoggerFactory;
 
+import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.ServerStatusInfo;
 import com.inmobi.adserve.channels.server.ServletHandler;
@@ -24,6 +27,8 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
 
+@Singleton
+@Path("/lbstatus")
 public class ServletLbStatus implements Servlet {
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(ServletLbStatus.class);
 

@@ -15,8 +15,10 @@ import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Marker;
 import org.testng.annotations.Test;
 
+import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
@@ -38,6 +40,7 @@ public class ServerTest extends TestCase {
     private final String               beaconURLPrefix  = "http://c3.w.inmobi.com/c.asm";
     private final String               secretKeyVersion = "1";
     private SASRequestParameters       sasParam;
+    private RequestParser              requestParser;
     private static String              rrFile           = "";
     private static String              channelFile      = "";
     private static int                 count            = 0;
@@ -46,6 +49,7 @@ public class ServerTest extends TestCase {
 
     @Override
     public void setUp() throws Exception {
+
         if (count == 0) {
             prepareLogging();
             config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
@@ -56,6 +60,13 @@ public class ServerTest extends TestCase {
         httpRequestHandler = new HttpRequestHandler();
         AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
         Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-channel", "cas-advertisement", mockConfig);
+
+        requestParser = new RequestParser(new Provider<Marker>() {
+            @Override
+            public Marker get() {
+                return null;
+            }
+        });
     }
 
     public void prepareLogging() throws Exception {
@@ -133,7 +144,7 @@ public class ServerTest extends TestCase {
     @Test
     public void testStringify() throws Exception {
         JSONObject jsonObject = prepareParameters();
-        assertEquals(RequestParser.stringify(jsonObject, "remoteHostIp"), "10.14.110.100");
+        assertEquals(requestParser.stringify(jsonObject, "remoteHostIp"), "10.14.110.100");
     }
 
     @Test
@@ -144,14 +155,14 @@ public class ServerTest extends TestCase {
     @Test
     public void testParseArray() throws Exception {
         JSONObject jsonObject = prepareParameters();
-        assertEquals(RequestParser.parseArray(jsonObject, "testarr", 1), "2");
+        assertEquals(requestParser.parseArray(jsonObject, "testarr", 1), "2");
     }
 
     @Test
     public void testGetUserParams() throws Exception {
         JSONObject jsonObject = prepareParameters();
         SASRequestParameters params = new SASRequestParameters();
-        params = RequestParser.getUserParams(params, jsonObject);
+        params = requestParser.getUserParams(params, jsonObject);
         assertEquals(params.getAge(), "35");
     }
 
@@ -164,7 +175,7 @@ public class ServerTest extends TestCase {
         JSONObject jsonObject = prepareParameters();
         Long[] category = { 1l, 2l };
         assertTrue("Category are expected to be equal",
-            RequestParser.getCategory(jsonObject, "category").equals(Arrays.asList(category)));
+            requestParser.getCategory(jsonObject, "category").equals(Arrays.asList(category)));
     }
 
     /*

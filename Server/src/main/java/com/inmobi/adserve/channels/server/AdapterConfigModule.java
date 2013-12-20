@@ -58,5 +58,4 @@ public class AdapterConfigModule extends AbstractModule {
         }
 
     }
-
 }

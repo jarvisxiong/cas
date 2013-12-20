@@ -16,10 +16,12 @@ import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
 
 
+@Singleton
 public class ServletInvalid implements Servlet {
     private static final Logger LOG = LoggerFactory.getLogger(ServletInvalid.class);
 
