@@ -222,18 +222,7 @@ public class AsyncRequestMaker {
             builder.setGender(sasParams.getGender());
         }
         builder.setCPC(pricingModel);
-        Integer carrierId = null;
-        if (null != sasParams.getCarrier()) {
-            try {
-                carrierId = sasParams.getCarrier().getInt(0);
-            }
-            catch (JSONException e) {
-                logger.debug("carrierId is not present in the request");
-            }
-        }
-        if (null != carrierId) {
-            builder.setCarrierId(carrierId);
-        }
+        builder.setCarrierId(sasParams.getCarrierId());
         try {
             if (null != sasParams.getCountryStr()) {
                 builder.setCountryId(Integer.parseInt(sasParams.getCountryStr()));

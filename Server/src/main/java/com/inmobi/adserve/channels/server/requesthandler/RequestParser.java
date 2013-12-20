@@ -61,8 +61,10 @@ public class RequestParser {
         params.setLatLong(stringify(jObject, "latlong", logger));
         params.setSiteId(stringify(jObject, "rqMkSiteid", logger));
         params.setSource(stringify(jObject, "source", logger));
-        params.setCountry(parseArray(jObject, "carrier", 2));
+        params.setCarrierId(Integer.parseInt(parseArray(jObject, "carrier", 0)));
         params.setCountryStr(parseArray(jObject, "carrier", 1));
+        params.setCountry(parseArray(jObject, "carrier", 2));
+        params.setCity(parseArray(jObject, "carrier", 3));
         params.setArea(parseArray(jObject, "carrier", 4));
         params.setSlot(stringify(jObject, "slot-served", logger));
         params.setRqMkSlot(stringify(jObject, "rqMkAdSlot", logger));
@@ -113,12 +115,6 @@ public class RequestParser {
         catch (JSONException e) {
             logger.error("Handset array not found");
         }
-        try {
-            params.setCarrier(jObject.getJSONArray("carrier"));
-        }
-        catch (JSONException e) {
-            logger.error("carrier array not found");
-        }
         params.setOsId(jObject.optInt("os-id", -1));
         params.setRichMedia(jObject.optBoolean("rich-media", false));
         params.setRqAdType(stringify(jObject, "rqAdtype", logger));
@@ -143,19 +139,17 @@ public class RequestParser {
 
     public static String parseArray(JSONObject jObject, String param, int index) {
         if (null == jObject) {
-            return null;
+            return "0";
         }
         try {
             JSONArray jArray = jObject.getJSONArray(param);
             if (null == jArray) {
-                return null;
+                return "0";
             }
-            else {
-                return (jArray.getString(index));
-            }
+            return (jArray.getString(index));
         }
         catch (JSONException e) {
-            return null;
+            return "0";
         }
     }
 

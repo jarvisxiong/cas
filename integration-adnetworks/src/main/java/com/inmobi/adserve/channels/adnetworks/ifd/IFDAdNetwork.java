@@ -115,9 +115,9 @@ public class IFDAdNetwork extends BaseAdNetworkImpl {
         }
 
         try {
-            paramMap.put("cid", sasParams.getCarrier().getString(0));
-            paramMap.put("cnid", sasParams.getCarrier().getString(1));
-            paramMap.put("cc", sasParams.getCarrier().getString(2).toUpperCase());
+            paramMap.put("cid", sasParams.getCarrierId() + "");
+            paramMap.put("cnid", sasParams.getCountryStr());
+            paramMap.put("cc", sasParams.getCountry().toUpperCase());
         }
         catch (Exception exception) {
             throw new Exception("mandatory parameter carrier value is either null or not formatted properly.");

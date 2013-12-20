@@ -1,7 +1,6 @@
 package com.inmobi.adserve.channels.api;
 
 import lombok.Data;
-import org.json.JSONArray;
 
 import java.util.List;
 import java.util.Set;
@@ -29,7 +28,6 @@ public class SASRequestParameters {
     private String       clurl;
     private String       siteId;
     private String       genderOrig;
-    private String       area;
     private String       slot;
     private String       host;
     // TODO: Convert this to ENUM.
@@ -55,7 +53,9 @@ public class SASRequestParameters {
     private String       tid;
     private String       tp;
     private long         handsetInternalId;
-    private JSONArray carrier;
+    private int          carrierId;
+    private String       city;
+    private String       area;
     private String       rqMkSlot;
     private Integer      ipFileVersion;
     private boolean      isRichMedia;

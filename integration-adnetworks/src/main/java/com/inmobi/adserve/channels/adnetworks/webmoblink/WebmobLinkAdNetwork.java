@@ -1,27 +1,18 @@
 package com.inmobi.adserve.channels.adnetworks.webmoblink;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.util.DebugLogger;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.DebugLogger;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
 
 
 public class WebmobLinkAdNetwork extends BaseAdNetworkImpl {
@@ -93,13 +84,7 @@ public class WebmobLinkAdNetwork extends BaseAdNetworkImpl {
             channels = sb.toString();
         }
         result = config.getString("webmoblink.resformat");
-        try {
-            JSONArray carrier = sasParams.getCarrier();
-            country = carrier.getString(2);
-        }
-        catch (JSONException e) {
-            logger.debug("Failed to fetch the country code from allParametersJson");
-        }
+        country = sasParams.getCountry();
         logger.debug("Configure parameters inside webmoblink returned true");
         return true;
     }

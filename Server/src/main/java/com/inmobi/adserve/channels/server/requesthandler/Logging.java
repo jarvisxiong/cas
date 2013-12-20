@@ -17,7 +17,6 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TBinaryProtocol;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,15 +105,17 @@ public class Logging {
                 ad.setWinBid(winBid);
             }
         }
-        JSONArray carrier = null;
         String requestSlot = null;
         String slotServed = null;
         Long handsetInternalId = null;
+        Geo geo = null;
         if (null != sasParams) {
             handsetInternalId = sasParams.getHandsetInternalId();
-            carrier = sasParams.getCarrier();
             requestSlot = sasParams.getRqMkSlot();
             slotServed = sasParams.getSlot();
+            geo = new Geo(sasParams.getCarrierId(), Integer.valueOf(sasParams.getCountryStr()).shortValue());
+            geo.setRegion(Integer.parseInt(sasParams.getArea()));
+            geo.setCity(Integer.parseInt(sasParams.getCity()));
         }
         HandsetMeta handsetMeta = new HandsetMeta();
         if (null != handsetInternalId) {
@@ -123,16 +124,6 @@ public class Logging {
         
         if (null != sasParams && sasParams.getOsId() != 0) {
             handsetMeta.setOsId(sasParams.getOsId());
-        }
-        Geo geo = null;
-        if (null != carrier) {
-            geo = new Geo(carrier.getInt(0), Integer.valueOf(carrier.getInt(1)).shortValue());
-            if (carrier.length() >= 4 && carrier.get(3) != null) {
-                geo.setRegion(carrier.getInt(3));
-            }
-            if (carrier.length() >= 5 && carrier.get(4) != null) {
-                geo.setCity(carrier.getInt(4));
-            }
         }
 
         short slotRequested = -1;
