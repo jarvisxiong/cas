@@ -10,6 +10,7 @@ import java.net.URLConnection;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.sql.Connection;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -39,11 +40,13 @@ public class DCPWapStartReporting extends BaseReportingImpl {
     private final String        baseUrl;
     private DebugLogger         logger;
     private String              externalSiteId;
+    private final Connection    connection;
 
-    public DCPWapStartReporting(final Configuration config) {
+    public DCPWapStartReporting(final Configuration config, final Connection connection) {
         this.config = config;
         token = config.getString("wapstart.token");
         baseUrl = config.getString("wapstart.host");
+        this.connection = connection;
     }
 
     @Override
@@ -63,7 +66,8 @@ public class DCPWapStartReporting extends BaseReportingImpl {
         try {
             startDate = startTime.getStringDate("-");
             logger.debug("start date inside wapstart is ", startDate);
-            endDate = endTime == null ? getEndDate() : startDate;
+
+            endDate = endTime == null ? getEndDate() : ReportTime.getNextDay(startTime).getStringDate("-");
             if (ReportTime.compareStringDates(endDate, startDate) == -1) {
                 logger.debug("date is greater than the current date reporting window for wapstart");
                 return null;
@@ -99,6 +103,7 @@ public class DCPWapStartReporting extends BaseReportingImpl {
                 row.clicks = 0;
                 row.request = 0;
                 row.revenue = 0;
+
                 JSONObject reportRow = jReportArr.getJSONObject(i);
                 logger.debug("json array length is ", jReportArr.length());
                 row.request = 0;
@@ -106,6 +111,14 @@ public class DCPWapStartReporting extends BaseReportingImpl {
                 row.clicks = Long.parseLong(reportRow.getString("clicks"));
                 row.impressions = Long.parseLong(reportRow.getString("views"));
                 row.revenue = Double.parseDouble(reportRow.getString("income"));
+                double rate = getCurrencyConversionRate("RUB", startDate, logger, connection);
+                if (rate > 0) {
+                    row.revenue /= rate;
+                }
+                else {
+                    logger.info("Failed to get RUB to USD rate for ", startDate);
+                    return null;
+                }
                 logger.debug("parsing data inside wapstart ", row);
                 row.advertiserId = this.getAdvertiserId();
                 row.siteId = externalSiteId;

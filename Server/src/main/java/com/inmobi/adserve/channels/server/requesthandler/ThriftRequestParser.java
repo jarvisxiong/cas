@@ -47,7 +47,7 @@ public class ThriftRequestParser {
             params.setResponseOnlyFromDcp(false);
         }
         // TODO params.setAccountSegment(tObject.accountSegment);
-        params.setRemoteHostIp(tObject.normalizedRemoteIp);
+        params.setRemoteHostIp(tObject.remoteHostIp);
         params.setUserAgent(tObject.device.userAgent);
 
         params.setLocSrc(tObject.geo.locationSource.name());
@@ -55,7 +55,7 @@ public class ThriftRequestParser {
         params.setLatLong(tObject.geo.latLong.toString());
         // TODO check for site null
         params.setSiteId(tObject.site.siteId);
-        params.setSource(tObject.site.sitePlatform.toString());
+        params.setSource(tObject.site.contentRating.toString());
         params.setCountry(tObject.geo.countryCode);
         // TODO Clean the names country name and country id
         params.setCountryStr(tObject.geo.countryId + "");
@@ -65,7 +65,7 @@ public class ThriftRequestParser {
         params.setRqMkSlot(tObject.requestSlotId + "");
         params.setSdkVersion(tObject.sdkVersion);
         // TODO verify the names
-        params.setSiteType(tObject.site.siteCategory.toString());
+        params.setSiteType(tObject.site.inventoryType.toString());
         // TODO add adcode in thrift
         // params.setAdcode(tObject.adCode);
         // TODO Change to int in thrift
@@ -75,10 +75,11 @@ public class ThriftRequestParser {
         params.setRFormat(tObject.responseFormat);
         // TODO change to short in DCP too
         params.setRqMkAdcount(tObject.requestedAdCount + "");
-        params.setTid(tObject.taskId);
+        // TODO params.setTid(tObject.taskId);
         params.setAllowBannerAds(tObject.supplyCapability == SupplyCapability.BANNER);
         params.setSiteFloor(tObject.site.ecpmFloor);
-        params.setSiteSegmentId(Integer.parseInt(tObject.segmentId));
+        //TODO use segment id in cas as long
+        params.setSiteSegmentId(new Long(tObject.segmentId).intValue());
         params.setModelId(new Long(tObject.device.modelId).intValue());
         logger.debug("Site segment id is", params.getSiteSegmentId(), "and model id is", params.getModelId());
         // TODO Ip File Version not present params.setIpFileVersion(jObject.optInt("rqIpFileVer", 1));
@@ -87,20 +88,20 @@ public class ThriftRequestParser {
         logger.debug("osId is", params.getOsId());
         params.setSiteIncId(tObject.site.siteIncId);
         params.setAppUrl(tObject.site.siteUrl);
-        params.setRqAdType(tObject.adType.name());
+        params.setRqAdType(tObject.requestedAdType.name());
         params.setRichMedia(tObject.supplyCapability == SupplyCapability.RICH_MEDIA);
         // TODO Change age to integer in DCP
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-        int yob = tObject.uidParams.user.yearOfBirth;
+        int yob = tObject.user.yearOfBirth;
         int age = currentYear - yob;
         params.setAge(age + "");
 
-        params.setGender(tObject.uidParams.user.gender.name());
+        params.setGender(tObject.user.gender.name());
         // TODO add postal code in thrift params.setPostalCode(tObject.uidParams.user.);
         // TODO USer Location??
         // params.setUserLocation(tObject.uidParams.user.);
-        params.setGenderOrig(tObject.uidParams.user.gender.name());
-        params.setGender(tObject.uidParams.user.gender.name());
+        params.setGenderOrig(tObject.user.gender.name());
+        params.setGender(tObject.user.gender.name());
         setUserIdParams(casInternalRequestParameters, tObject);
         // TODO params.setHandset(jObject.getJSONArray("handset"));
         // TODO params.setCarrier(jObject.getJSONArray("carrier"));

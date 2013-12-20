@@ -158,6 +158,20 @@ public class ServletHandler {
             }
         });
 
+        servletMap.put("/getServerConfig", new ServletFactory() {
+            @Override
+            public Servlet getServlet() {
+                return new ServletGetServerConfig();
+            }
+        });
+
+        servletMap.put("/getAdapterConfig", new ServletFactory() {
+            @Override
+            public Servlet getServlet() {
+                return new ServletGetAdapterConfig();
+            }
+        });
+
     }
 
     public static String getHost(HttpRequest request) {

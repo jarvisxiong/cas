@@ -194,7 +194,7 @@ public class DCPWapStartAdnetworkTest extends TestCase {
             new ArrayList<Integer>(), 0.0d, null, null, 32));
         if (dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpWapstartAdNetwork.getRequestUri().toString();
-            String expectedUrl = "http://ro.plus1.wapstart.ru?version=2&encoding=1&area=viewBannerXml&ip=206.29.182.240&id=1324&pageId=00000000-0000-0020-0000-000000000000&kws=Food+%26+Drink%3BAdventure%3BWord&location=37.4429%2C-122.1514";
+            String expectedUrl = "http://ro.plus1.wapstart.ru?version=2&encoding=1&area=viewBannerXml&ip=206.29.182.240&id=1324&pageId=0000000000000000000000200000000000000000&kws=Food+%26+Drink%3BAdventure%3BWord&location=37.4429%2C-122.1514";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -220,7 +220,7 @@ public class DCPWapStartAdnetworkTest extends TestCase {
             new ArrayList<Integer>(), 0.0d, null, null, 32));
         if (dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpWapstartAdNetwork.getRequestUri().toString();
-            String expectedUrl = "http://ro.plus1.wapstart.ru?version=2&encoding=1&area=viewBannerXml&ip=206.29.182.240&id=1324&pageId=00000000-0000-0020-0000-000000000000&kws=Food+%26+Drink%3BAdventure%3BWord";
+            String expectedUrl = "http://ro.plus1.wapstart.ru?version=2&encoding=1&area=viewBannerXml&ip=206.29.182.240&id=1324&pageId=0000000000000000000000200000000000000000&kws=Food+%26+Drink%3BAdventure%3BWord";
             assertEquals(expectedUrl, actualUrl);
         }
     }

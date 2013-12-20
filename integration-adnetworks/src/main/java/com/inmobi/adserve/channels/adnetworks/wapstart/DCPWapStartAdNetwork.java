@@ -35,6 +35,10 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.ning.http.client.AsyncCompletionHandler;
+import com.ning.http.client.Request;
+import com.ning.http.client.RequestBuilder;
+import com.ning.http.client.Response;
 
 
 public class DCPWapStartAdNetwork extends BaseAdNetworkImpl {
@@ -47,14 +51,15 @@ public class DCPWapStartAdNetwork extends BaseAdNetworkImpl {
     private static DocumentBuilderFactory factory;
     private static DocumentBuilder        builder;
     private static final String           latlongFormat = "%s,%s";
-    // private static final String DERIVED_LAT_LONG = "derived-lat-lon";
+    private Request                       ningRequest;
 
     static {
         iABCountries = new IABCountriesMap();
     }
 
-    public DCPWapStartAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
+    public DCPWapStartAdNetwork(final DebugLogger logger, final Configuration config,
+            final ClientBootstrap clientBootstrap, final HttpRequestHandlerBase baseRequestHandler,
+            final MessageEvent serverEvent) {
         super(baseRequestHandler, serverEvent, logger);
         this.config = config;
         this.logger = logger;
@@ -111,12 +116,13 @@ public class DCPWapStartAdNetwork extends BaseAdNetworkImpl {
             StringBuilder url = new StringBuilder(host);
             url.append("?version=2&encoding=1&area=viewBannerXml&ip=").append(sasParams.getRemoteHostIp());
             url.append("&id=").append(externalSiteId);
-            url.append("&pageId=").append(blindedSiteId);
+            String bsiteId = StringUtils.replace(blindedSiteId, "-", "");
+            url.append("&pageId=00000000").append(bsiteId);
             url.append("&kws=").append(getURLEncode(getCategories(';'), format));
 
-            if (sasParams.getGender() != null) {
-                url.append("&sex=").append(sasParams.getGender());
-            }
+            // if (sasParams.getGender() != null) {
+            // url.append("&sex=").append(sasParams.getGender());
+            // }
             if (sasParams.getAge() != null) {
                 url.append("&age=").append(sasParams.getAge());
             }
@@ -139,8 +145,74 @@ public class DCPWapStartAdNetwork extends BaseAdNetworkImpl {
         return null;
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    public void parseResponse(String response, HttpResponseStatus status) {
+    public boolean makeAsyncRequest() {
+        logger.debug("In PayPal async");
+        try {
+            String uri = getRequestUri().toString();
+            requestUrl = uri;
+            setNingRequest(requestUrl);
+            logger.debug("Nexage uri :", uri);
+            startTime = System.currentTimeMillis();
+            baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
+                @Override
+                public Response onCompleted(final Response response) throws Exception {
+                    if (!isRequestCompleted()) {
+                        logger.debug("Operation complete for channel partner: ", getName());
+                        latency = System.currentTimeMillis() - startTime;
+                        logger.debug(getName(), "operation complete latency", latency);
+                        String responseStr = response.getResponseBody();
+                        HttpResponseStatus httpResponseStatus = HttpResponseStatus.valueOf(response.getStatusCode());
+                        parseResponse(responseStr, httpResponseStatus);
+                        processResponse();
+                    }
+                    return response;
+                }
+
+                @Override
+                public void onThrowable(final Throwable t) {
+                    if (isRequestComplete) {
+                        return;
+                    }
+
+                    if (t instanceof java.util.concurrent.TimeoutException) {
+                        latency = System.currentTimeMillis() - startTime;
+                        logger.debug(getName(), "timeout latency ", latency);
+                        adStatus = "TIME_OUT";
+                        processResponse();
+                        return;
+                    }
+
+                    logger.debug(getName(), "error latency ", latency);
+                    adStatus = "TERM";
+                    logger.info("error while fetching response from:", getName(), t.getMessage());
+                    processResponse();
+                    return;
+                }
+            });
+        }
+        catch (Exception e) {
+            logger.debug("Exception in", getName(), "makeAsyncRequest :", e.getMessage());
+        }
+        logger.debug(getName(), "returning from make NingRequest");
+        return true;
+    }
+
+    private void setNingRequest(final String requestUrl) {
+        ningRequest = new RequestBuilder()
+                .setUrl(requestUrl)
+                    .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+                    .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
+                    .setHeader(HttpHeaders.Names.REFERER, requestUrl)
+                    .setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE)
+                    .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
+                    .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
+                    .build();
+    }
+
+    @Override
+    public void parseResponse(final String response, final HttpResponseStatus status) {
         logger.debug("response is", response);
 
         if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {

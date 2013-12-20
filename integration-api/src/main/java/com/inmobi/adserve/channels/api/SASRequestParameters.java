@@ -32,6 +32,7 @@ public class SASRequestParameters {
     private String       area;
     private String       slot;
     private String       host;
+    // TODO: Convert this to ENUM.
     private String       siteType;
     private String       sdkVersion;
     private long         siteIncId;

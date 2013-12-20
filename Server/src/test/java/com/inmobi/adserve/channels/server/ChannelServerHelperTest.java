@@ -31,25 +31,12 @@ public class ChannelServerHelperTest extends TestCase
         channelServerHelper = new ChannelServerHelper(Logger.getLogger(mockConfig.getString("debug")));
     }
 
-    @Test
-    public void testGetDcIdWithoutSystemProperty()
-    {
-        System.clearProperty("dc.id");
-        assertEquals(0, channelServerHelper.getDataCenterId("dc.id"));
-    }
 
     @Test
     public void testGetDcIdAlreadySet()
     {
         System.setProperty("dc.id", "2");
         assertEquals(2, channelServerHelper.getDataCenterId("dc.id"));
-    }
-
-    @Test
-    public void testGetHostIdWithoutSystemProperty()
-    {
-        System.clearProperty("host.name");
-        assertEquals(0, channelServerHelper.getHostId("host.name"));
     }
 
     @Test

@@ -61,8 +61,8 @@ public class DCPPlaceIQAdnetwork extends BaseAdNetworkImpl {
     private static final String           COUNTRY       = "CO";
     private static final String           SECRET        = "SK";
     private static final String           ADTYPE        = "AT";
-    private static final String           APPTYPE       = "STI";
-    private static final String           WAPTYPE       = "STW";
+    private static final String           APPTYPE       = "STG";
+    private static final String           WAPTYPE       = "STG%2CSTW";
     private static final String           ANDROID       = "Android";
     private static final String           IOS           = "iOS";
     private static final String           auIdFormat    = "%s/%s/%s/%s";
@@ -77,34 +77,35 @@ public class DCPPlaceIQAdnetwork extends BaseAdNetworkImpl {
     private static DocumentBuilder        builder;
 
     private boolean                       isApp;
+    private boolean                       isGeoOrDeviceIdPresent;
 
     static {
 
-        categoryList.put(2, "books");
-        categoryList.put(3, "business");
-        categoryList.put(7, "education");
-        categoryList.put(8, "entertainment");
-        categoryList.put(9, "finance");
-        categoryList.put(10, "fooddrink");
-        categoryList.put(11, "games");
-        categoryList.put(27, "sports");
-        categoryList.put(31, "healthfitness");
-        categoryList.put(32, "lifestyle");
-        categoryList.put(34, "medical");
-        categoryList.put(35, "music");
-        categoryList.put(36, "news");
-        categoryList.put(37, "photography");
-        categoryList.put(38, "automotive");
-        categoryList.put(54, "news");
-        categoryList.put(53, "music");
-        categoryList.put(56, "familyparenting");
-        categoryList.put(59, "news");
-        categoryList.put(66, "productivity");
-        categoryList.put(67, "shopping");
-        categoryList.put(68, "social");
-        categoryList.put(72, "travel");
-        categoryList.put(71, "tools");
-        categoryList.put(74, "weather");
+        categoryList.put(2, "bk");
+        categoryList.put(3, "bz");
+        categoryList.put(7, "ed");
+        categoryList.put(8, "en");
+        categoryList.put(9, "fn");
+        categoryList.put(10, "fd");
+        categoryList.put(11, "gm");
+        categoryList.put(27, "sp");
+        categoryList.put(31, "ht");
+        categoryList.put(32, "lf");
+        categoryList.put(34, "md");
+        categoryList.put(35, "mu");
+        categoryList.put(36, "nw");
+        categoryList.put(37, "ph");
+        categoryList.put(38, "at");
+        categoryList.put(54, "nw");
+        categoryList.put(53, "mu");
+        categoryList.put(56, "fm");
+        categoryList.put(59, "nw");
+        categoryList.put(66, "pd");
+        categoryList.put(67, "sh");
+        categoryList.put(68, "sc");
+        categoryList.put(72, "tr");
+        categoryList.put(71, "tl");
+        categoryList.put(74, "wt");
     }
 
     public DCPPlaceIQAdnetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
@@ -133,15 +134,13 @@ public class DCPPlaceIQAdnetwork extends BaseAdNetworkImpl {
             logger.debug("mandatory parameters missing for placeiq so exiting adapter");
             return false;
         }
+        isGeoOrDeviceIdPresent = false;
         if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
                 && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
             String[] latlong = casInternalRequestParameters.latLong.split(",");
             latitude = latlong[0];
             longitude = latlong[1];
-        }
-        else {
-            logger.debug("mandatory parameters missing for placeiq so exiting adapter");
-            return false;
+            isGeoOrDeviceIdPresent = true;
         }
 
         if (!StringUtils.isBlank(sasParams.getSlot())
@@ -158,25 +157,28 @@ public class DCPPlaceIQAdnetwork extends BaseAdNetworkImpl {
         if (sasParams.getOsId() == HandSetOS.Android.getValue()) { // android
             os = ANDROID;
             isApp = true;
-            if (StringUtils.isEmpty(casInternalRequestParameters.uidMd5)
-                    && StringUtils.isEmpty(casInternalRequestParameters.uid)
-                    && StringUtils.isEmpty(casInternalRequestParameters.uidIDUS1)) {
-                logger.debug("mandatory parameters missing for placeiq so exiting adapter");
-                return false;
+            if (!(StringUtils.isEmpty(casInternalRequestParameters.uidMd5)
+                    && StringUtils.isEmpty(casInternalRequestParameters.uid) && StringUtils
+                        .isEmpty(casInternalRequestParameters.uidIDUS1))) {
+                isGeoOrDeviceIdPresent = true;
             }
         }
         else if (sasParams.getOsId() == HandSetOS.iPhone_OS.getValue()) { // iPhone
             os = IOS;
             isApp = true;
-            if (StringUtils.isEmpty(casInternalRequestParameters.uidIFA)) {
-                logger.debug("mandatory parameters missing for placeiq so exiting adapter");
-                return false;
+            if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
+                isGeoOrDeviceIdPresent = true;
             }
         }
         else {
             isApp = false;
             os = "Windows";
         }
+        if (!isGeoOrDeviceIdPresent) {
+            logger.debug("mandatory parameters missing for placeiq so exiting adapter");
+            return false;
+        }
+
         logger.info("Configure parameters inside PlaceIQ returned true");
         return true;
     }
@@ -339,7 +341,7 @@ public class DCPPlaceIQAdnetwork extends BaseAdNetworkImpl {
             }
         }
 
-        return StringUtils.isBlank(category) ? "nocat" : category;
+        return StringUtils.isBlank(category) ? "uc" : category;
     }
 
 }

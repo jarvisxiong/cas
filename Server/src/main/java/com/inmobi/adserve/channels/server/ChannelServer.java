@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.server;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.repository.*;
@@ -23,7 +25,6 @@ import org.apache.commons.dbcp.ConnectionFactory;
 import org.apache.commons.dbcp.DriverManagerConnectionFactory;
 import org.apache.commons.dbcp.PoolableConnectionFactory;
 import org.apache.commons.dbcp.PoolingDataSource;
-import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -65,7 +66,7 @@ public class ChannelServer {
     public static short                             hostIdCode;
     public static String                            dataCentreName;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(final String[] args) throws Exception {
         try {
             ConfigurationLoader config = ConfigurationLoader.getInstance(configFile);
 
@@ -90,6 +91,7 @@ public class ChannelServer {
             dataCenterIdCode = channelServerHelper.getDataCenterId(ChannelServerStringLiterals.DATA_CENTER_ID_KEY);
             hostIdCode = channelServerHelper.getHostId(ChannelServerStringLiterals.HOST_NAME_KEY);
             dataCentreName = channelServerHelper.getDataCentreName(ChannelServerStringLiterals.DATA_CENTRE_NAME_KEY);
+
             // Initialising Internal logger factory for Netty
             InternalLoggerFactory.setDefaultFactory(new Log4JLoggerFactory());
 
@@ -133,11 +135,16 @@ public class ChannelServer {
             RepositoryHelper repositoryHelper = repoHelperBuilder.build();
 
             instantiateRepository(logger, config);
-
             ServletHandler.init(config, repositoryHelper);
+            Integer maxIncomingConnections = channelServerHelper.getIncomingMaxConnections(ChannelServerStringLiterals.INCOMING_CONNECTIONS);
+            if (null != maxIncomingConnections) {
+                ServletHandler.getServerConfig().setProperty("incomingMaxConnections", maxIncomingConnections);
+            }
             MatchSegments.init(channelAdGroupRepository);
             Filters.init(config.adapterConfiguration());
-            SegmentFactory.init(repositoryHelper, config.adapterConfiguration(), logger);
+
+            Injector injector = Guice.createInjector(new AdapterConfigModule(config.adapterConfiguration(),
+                    ChannelServer.dataCentreName));
 
             // Creating netty client for out-bound calls.
             Timer timer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
@@ -169,7 +176,7 @@ public class ChannelServer {
             ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(
                     Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
             Timer servertimer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
-            bootstrap.setPipelineFactory(new ChannelServerPipelineFactory(servertimer, config.serverConfiguration()));
+            bootstrap.setPipelineFactory(new ChannelServerPipelineFactory(servertimer, ServletHandler.getServerConfig()));
             bootstrap.setOption("child.keepAlive", true);
             bootstrap.setOption("child.tcpNoDelay", true);
             bootstrap.setOption("child.reuseAddress", true);
@@ -190,14 +197,15 @@ public class ChannelServer {
         }
     }
 
-    public static String getMyStackTrace(Exception exception) {
+    public static String getMyStackTrace(final Exception exception) {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         exception.printStackTrace(printWriter);
         return ("StackTrace is: " + stringWriter.toString());
     }
 
-    private static void instantiateRepository(Logger logger, ConfigurationLoader config) throws ClassNotFoundException {
+    private static void instantiateRepository(final Logger logger, final ConfigurationLoader config)
+            throws ClassNotFoundException {
         try {
             logger.debug("Starting to instantiate repository");
             ChannelSegmentMatchingCache.init(logger);
@@ -212,25 +220,39 @@ public class ChannelServer {
             initialContext.createSubcontext("java:comp/env");
 
             Class.forName("org.postgresql.Driver");
+
             Properties props = new Properties();
-            props.put("validationQuery", "select version(); ");
-            props.put("testWhileIdle", "true");
-            props.put("testOnBorrow", "true");
+            props.put("type", "javax.sql.DataSource");
+            props.put("driverClassName", "org.postgresql.Driver");
             props.put("user", databaseConfig.getString("username"));
             props.put("password", databaseConfig.getString("password"));
 
-            final ObjectPool connectionPool = new GenericObjectPool(null);
+            String validationQuery = databaseConfig.getString("validationQuery");
+            int maxActive = databaseConfig.getInt("maxActive", 20);
+            int maxIdle = databaseConfig.getInt("maxIdle", 1);
+            int maxWait = databaseConfig.getInt("maxWait", -1);
+            boolean testWhileIdle = databaseConfig.getBoolean("testWhileIdle", true);
+            boolean testOnBorrow = databaseConfig.getBoolean("testOnBorrow", true);
+            final GenericObjectPool connectionPool = new GenericObjectPool(null);
+            connectionPool.setMaxActive(maxActive);
+            connectionPool.setMaxIdle(maxIdle);
+            connectionPool.setMaxWait(maxWait);
+            connectionPool.setTestWhileIdle(testWhileIdle);
+            connectionPool.setTestOnBorrow(testOnBorrow);
             String connectUri = "jdbc:postgresql://" + databaseConfig.getString("host") + ":"
                     + databaseConfig.getInt("port") + "/"
-                    + databaseConfig.getString(ChannelServerStringLiterals.DATABASE);
+                    + databaseConfig.getString(ChannelServerStringLiterals.DATABASE) + "?socketTimeout="
+                    + databaseConfig.getString("socketTimeout");
             final ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectUri, props);
-            new PoolableConnectionFactory(connectionFactory, connectionPool, null, null, false, true);
-            final PoolingDataSource ds = new PoolingDataSource(connectionPool);
+            PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(connectionFactory,
+                    connectionPool, null, validationQuery, true, false);
+
+            final PoolingDataSource ds = new PoolingDataSource(poolableConnectionFactory.getPool());
 
             initialContext.bind("java:comp/env/jdbc", ds);
 
             ChannelSegmentMatchingCache.init(logger);
-            // Reusing the repository from phoenix adsering framework.
+            // Reusing the repository from phoenix adserving framework.
             currencyConversionRepository.init(logger,
                 config.cacheConfiguration().subset(ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY),
                 ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY);
@@ -301,30 +323,18 @@ public class ChannelServer {
     }
 
     // check if all log folders exists
-    public static boolean checkLogFolders(Configuration config) {
-        String rrLogFolder = config.getString("appender.rr.File");
-        String channelLogFolder = config.getString("appender.channel.File");
+    public static boolean checkLogFolders(final Configuration config) {
         String debugLogFolder = config.getString("appender.debug.File");
         String advertiserLogFolder = config.getString("appender.advertiser.File");
         String sampledAdvertiserLogFolder = config.getString("appender.sampledadvertiser.File");
         String repositoryLogFolder = config.getString("appender.repository.File");
-        File rrFolder = null;
-        File channelFolder = null;
         File debugFolder = null;
         File advertiserFolder = null;
         File sampledAdvertiserFolder = null;
         File repositoryFolder = null;
-        if (rrLogFolder != null) {
-            rrLogFolder = rrLogFolder.substring(0, rrLogFolder.lastIndexOf('/') + 1);
-            rrFolder = new File(rrLogFolder);
-        }
         if (repositoryLogFolder != null) {
             repositoryLogFolder = repositoryLogFolder.substring(0, repositoryLogFolder.lastIndexOf('/') + 1);
             repositoryFolder = new File(repositoryLogFolder);
-        }
-        if (channelLogFolder != null) {
-            channelLogFolder = channelLogFolder.substring(0, channelLogFolder.lastIndexOf('/') + 1);
-            channelFolder = new File(channelLogFolder);
         }
         if (debugLogFolder != null) {
             debugLogFolder = debugLogFolder.substring(0, debugLogFolder.lastIndexOf('/') + 1);
@@ -339,12 +349,10 @@ public class ChannelServer {
                 sampledAdvertiserLogFolder.lastIndexOf('/') + 1);
             sampledAdvertiserFolder = new File(sampledAdvertiserLogFolder);
         }
-        if (rrFolder != null && rrFolder.exists() && channelFolder != null && channelFolder.exists()) {
-            if (debugFolder != null && debugFolder.exists() && advertiserFolder != null && advertiserFolder.exists()) {
-                if (sampledAdvertiserFolder != null && sampledAdvertiserFolder.exists() && repositoryFolder != null
-                        && repositoryFolder.exists()) {
-                    return true;
-                }
+        if (debugFolder != null && debugFolder.exists() && advertiserFolder != null && advertiserFolder.exists()) {
+            if (sampledAdvertiserFolder != null && sampledAdvertiserFolder.exists() && repositoryFolder != null
+                    && repositoryFolder.exists()) {
+            return true;
             }
         }
         ServerStatusInfo.statusCode = 404;
