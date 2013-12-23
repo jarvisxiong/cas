@@ -1,31 +1,25 @@
 package com.inmobi.adserve.channels.adnetworks.ifc;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-
-import org.apache.commons.configuration.Configuration;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpMethod;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.jboss.netty.handler.codec.http.HttpVersion;
-import org.jboss.netty.util.CharsetUtil;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.google.gson.JsonObject;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.util.CategoryList;
 import com.inmobi.adserve.channels.util.DebugLogger;
+import org.apache.commons.configuration.Configuration;
+import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
+import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.handler.codec.http.*;
+import org.jboss.netty.util.CharsetUtil;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
 
 /**
  * 
@@ -283,7 +277,7 @@ public class IFCAdNetwork extends BaseAdNetworkImpl {
 		jsonObject.addProperty("userLocation", sasParams.getUserLocation());
 		jsonObject.addProperty("impressionId",
 				casInternalRequestParameters.impressionId);
-		jsonObject.addProperty("genderOrig", sasParams.getGenderOrig());
+		jsonObject.addProperty("genderOrig", sasParams.getGender());
 		jsonObject.addProperty("area", sasParams.getArea());
 		jsonObject.addProperty("host", sasParams.getHost());
 		jsonObject.addProperty("beaconURL", beaconUrl);

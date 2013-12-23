@@ -230,7 +230,7 @@ public class RtbAdnetworkTest extends TestCase {
         catLong[1] = (long) 2;
         sasParams.setCategories(Arrays.asList(catLong));
         sasParams.setLocSrc("wifi");
-        sasParams.setGenderOrig("Male");
+        sasParams.setGender("Male");
         casInternalRequestParameters.uid = "1234";
         sasParams.setAge("26");
         sasParams.setRemoteHostIp("206.29.182.240");

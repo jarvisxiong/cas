@@ -196,7 +196,6 @@ public class RequestParser {
                 parameter.setPostalCode(parameter.getPostalCode().replaceAll(" ", ""));
             }
             parameter.setUserLocation(stringify(userMap, "u-location", logger));
-            parameter.setGenderOrig(stringify(userMap, "u-gender-orig", logger));
             try {
                 if (null != parameter.getAge()) {
                     parameter.setAge(URLEncoder.encode(parameter.getAge(), utf8));

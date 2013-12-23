@@ -151,9 +151,6 @@ public class Logging {
             if (null != sasParams.getGender()) {
                 user.setGender(getGender(sasParams));
             }
-            if (null != sasParams.getUid()) {
-                user.setId(sasParams.getUid());
-            }
         }
         short adRequested = 1;
         Request request = new Request(adRequested, adsServed, sasParams == null ? null : sasParams.getSiteId(),

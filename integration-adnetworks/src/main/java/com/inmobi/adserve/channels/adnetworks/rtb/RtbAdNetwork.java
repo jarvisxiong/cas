@@ -338,7 +338,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     private User createUserObject() {
         User user = new User();
-        user.setGender(sasParams.getGenderOrig());
+        user.setGender(sasParams.getGender());
         if (casInternalRequestParameters.uid != null) {
             user.setId(casInternalRequestParameters.uid);
             user.setBuyeruid(casInternalRequestParameters.uid);
@@ -365,9 +365,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         else {
             site = new Site(sasParams.getSiteId());
-        }
-        if (null != sasParams.getKeywords()) {
-            site.setKeywords(sasParams.getKeywords());
         }
         if (null != sasParams.getCategories()) {
             site.setCat(iabCategoriesInterface.getIABCategories(sasParams.getCategories()));

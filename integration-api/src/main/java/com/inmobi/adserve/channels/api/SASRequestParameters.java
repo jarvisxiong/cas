@@ -17,7 +17,7 @@ public class SASRequestParameters {
     private String       source;               // WAP/APP
     private String       age;
     private String       gender;
-    private String       uid;
+    //private String       uid;
     private String       locSrc;               // wifi/ip
     private String       postalCode;
     // User location parameters
@@ -28,7 +28,6 @@ public class SASRequestParameters {
     private String       impressionId;
     private String       clurl;
     private String       siteId;
-    private String       genderOrig;
     private String       slot;
     private String       host;
     // TODO: Convert this to ENUM.
@@ -42,7 +41,6 @@ public class SASRequestParameters {
     private Double       siteFloor      = 0.0d;
     private Boolean      allowBannerAds = true;
     private Integer      siteSegmentId;
-    private String       keywords;             // List of comma separated keywords describing site
     // Uid parameters
     private String       uidParams;
     private Map<String, String>     tUidParams;

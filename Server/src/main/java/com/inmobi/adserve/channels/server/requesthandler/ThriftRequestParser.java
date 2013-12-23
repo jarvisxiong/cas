@@ -39,7 +39,6 @@ public class ThriftRequestParser {
         params.setResponseOnlyFromDcp(2 == dst);
         
         
-        //TODO params.setAccountSegment(tObject.accountSegment);
         //TODO rframe not present params.setRqIframe(stringify(jObject, "rqIframe", logger));
         //TODO add adcode in thrift params.setAdcode(tObject.adCode);
         //TODO Ip File Version not present params.setIpFileVersion(jObject.optInt("rqIpFileVer", 1));
@@ -68,29 +67,36 @@ public class ThriftRequestParser {
         
         
         //Fill param from Site Object
-        params.setSiteId(tObject.site.siteId);
-        params.setSource(tObject.site.contentRating.toString());
-        //TODO verify the names
-        params.setSiteType(tObject.site.inventoryType.toString());
-        params.setCategories(convertIntToLong(tObject.site.siteTags));
-        params.setSiteFloor(tObject.site.ecpmFloor);
-        params.setSiteIncId(tObject.site.siteIncId);
-        params.setAppUrl(tObject.site.siteUrl);
+        if (null != tObject.site) {
+            params.setSiteId(tObject.site.siteId);
+            params.setSource(tObject.site.contentRating.toString());
+            //TODO verify the names
+            params.setSiteType(tObject.site.inventoryType.toString());
+            params.setCategories(convertIntToLong(tObject.site.siteTags));
+            params.setSiteFloor(tObject.site.ecpmFloor);
+            params.setSiteIncId(tObject.site.siteIncId);
+            params.setAppUrl(tObject.site.siteUrl);
+        }
         
         
         //Fill params from Device Object
-        params.setUserAgent(tObject.device.userAgent);
-        //TODO Change to int in thrift
-        params.setOsId(new Long(tObject.device.osId).intValue());
-        params.setModelId(new Long(tObject.device.modelId).intValue());
-        params.setHandsetInternalId(tObject.device.getHandsetInternalId());
-        
+        if (null != tObject.device) {
+            params.setUserAgent(tObject.device.userAgent);
+            //TODO Change to int in thrift
+            params.setOsId(new Long(tObject.device.osId).intValue());
+            params.setModelId(new Long(tObject.device.modelId).intValue());
+            params.setHandsetInternalId(tObject.device.getHandsetInternalId());
+        }
 
         //Fill params from Geo Object
         if (null != tObject.geo) {
             params.setLocSrc(tObject.geo.locationSource.name());
-            //TODO Confirm the string format
-            params.setLatLong(tObject.geo.latLong.toString());
+            //TODO Change format in dcp 
+            String latLong = "";
+            if (tObject.geo.latLong != null) {
+               latLong = tObject.geo.latLong.latitude + "," + tObject.geo.latLong.longitude; 
+            }
+            params.setLatLong(latLong);
             params.setCountry(tObject.geo.countryCode);
             //TODO Clean the names country name and country id
             params.setCountryStr(tObject.geo.countryId + "");
@@ -105,9 +111,7 @@ public class ThriftRequestParser {
             int yob = tObject.user.yearOfBirth;
             int age = currentYear - yob;
             params.setAge(age + "");
-            params.setGender(tObject.user.gender.name());
-            params.setGenderOrig(tObject.user.gender.name());
-            params.setGender(tObject.user.gender.name());
+            params.setGender(tObject.user.gender.name().equalsIgnoreCase("Male") ? "M" : "F");
         }
 
         
@@ -119,11 +123,17 @@ public class ThriftRequestParser {
 
         
         //Fill params from Carrier Object
-        params.setCarrierId(new Long(tObject.carrier.carrierId).intValue());
+        if (null != tObject.carrier) {
+            params.setCarrierId(new Long(tObject.carrier.carrierId).intValue());
+        }
+        
         logger.debug("Successfully parsed tObject, SAS params are : ", params.toString());
     }
     
     private static Set<Integer> getAccountSegments(Set<DemandType> demandTypes) {
+        if (null == demandTypes) {
+            return Collections.emptySet();
+        }
         Set<Integer> accountsSegments = new HashSet<Integer>();
         for (DemandType demandType : demandTypes) {
             switch (demandType) {
@@ -143,8 +153,11 @@ public class ThriftRequestParser {
         return accountsSegments;
     }
 
-    private static ArrayList<Long> convertIntToLong(List<Integer> intList) {
-        ArrayList<Long> longList = new ArrayList<Long>();
+    private static List convertIntToLong(List<Integer> intList) {
+        if (null == intList) {
+            return Collections.EMPTY_LIST;
+        }
+        List<Long> longList = new ArrayList<Long>();
         for (Integer obj : intList) {
             longList.add(Long.valueOf(obj));
         }
