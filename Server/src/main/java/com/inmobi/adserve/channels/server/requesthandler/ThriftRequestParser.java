@@ -43,9 +43,7 @@ public class ThriftRequestParser {
         //TODO add adcode in thrift params.setAdcode(tObject.adCode);
         //TODO Ip File Version not present params.setIpFileVersion(jObject.optInt("rqIpFileVer", 1));
         //TODO add postal code in thrift params.setPostalCode(tObject.uidParams.user.);
-        //TODO user Location params.setUserLocation(tObject.uidParams.user.);
         //TODO Need area/region params.setArea(tObject.geo.);
-
 
         //Fill params from AdPoolRequest Object
         params.setRemoteHostIp(tObject.remoteHostIp);
@@ -64,6 +62,7 @@ public class ThriftRequestParser {
         params.setRqAdType(tObject.requestedAdType.name());
         params.setRichMedia(tObject.supplyCapability == SupplyCapability.RICH_MEDIA);
         params.setAccountSegment(getAccountSegments(tObject.demandTypesAllowed));
+        params.setSdkVersion(tObject.sdkVersion);
         
         
         //Fill param from Site Object

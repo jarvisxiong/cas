@@ -322,8 +322,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (null != sasParams.getCountry()) {
             geo.setCountry(iabCountriesInterface.getIabCountry(sasParams.getCountry()));
         }
-        if (null != sasParams.getUserLocation() && null != iabCitiesInterface.getIABCity(sasParams.getUserLocation())) {
-            geo.setCity(iabCitiesInterface.getIABCity(sasParams.getUserLocation()));
+        if (null != sasParams.getCity() && null != iabCitiesInterface.getIABCity(sasParams.getCity())) {
+            geo.setCity(iabCitiesInterface.getIABCity(sasParams.getCity()));
         }
         geo.setZip(casInternalRequestParameters.zipCode);
         // Setting type of geo data

@@ -17,19 +17,16 @@ public class SASRequestParameters {
     private String       source;               // WAP/APP
     private String       age;
     private String       gender;
-    //private String       uid;
     private String       locSrc;               // wifi/ip
     private String       postalCode;
     // User location parameters
     private String       latLong;
     private String       country;
     private String       countryStr;
-    private String       userLocation;
     private String       impressionId;
     private String       clurl;
     private String       siteId;
     private String       slot;
-    private String       host;
     // TODO: Convert this to ENUM.
     private String       siteType;
     private String       sdkVersion;
@@ -51,7 +48,6 @@ public class SASRequestParameters {
     private int          osId;
     private String       rqMkAdcount;
     private String       tid;
-    private String       tp;
     private long         handsetInternalId;
     private int          carrierId;
     private String       city;
@@ -65,8 +61,7 @@ public class SASRequestParameters {
     private int          modelId;
 
     private int          dst;                  // This will describe the type of request dcp or rtbd
-    private Set<Integer> accountSegment;       // This will tell from which all type of segments you can fill for
-                                                // example dso brancd, dso performance etc.
+    private Set<Integer> accountSegment;      
     private boolean      isResponseOnlyFromDcp;
 
     public SASRequestParameters() {

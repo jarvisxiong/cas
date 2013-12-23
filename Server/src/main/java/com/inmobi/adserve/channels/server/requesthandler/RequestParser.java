@@ -82,7 +82,6 @@ public class RequestParser {
         params.setRFormat(stringify(jObject, "r-format", logger));
         params.setRqMkAdcount(stringify(jObject, "rqMkAdcount", logger));
         params.setTid(stringify(jObject, "tid", logger));
-        params.setTp(stringify(jObject, "tp", logger));
 
         params.setAllowBannerAds(jObject.optBoolean("site-allowBanner", true));
         params.setSiteFloor(jObject.optDouble("site-floor", 0.0));
@@ -195,7 +194,6 @@ public class RequestParser {
             if (!StringUtils.isEmpty(parameter.getPostalCode())) {
                 parameter.setPostalCode(parameter.getPostalCode().replaceAll(" ", ""));
             }
-            parameter.setUserLocation(stringify(userMap, "u-location", logger));
             try {
                 if (null != parameter.getAge()) {
                     parameter.setAge(URLEncoder.encode(parameter.getAge(), utf8));

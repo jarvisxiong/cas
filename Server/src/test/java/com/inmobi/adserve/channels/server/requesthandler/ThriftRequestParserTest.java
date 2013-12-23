@@ -74,6 +74,9 @@ public class ThriftRequestParserTest extends TestCase {
         adPoolRequest.setSegmentId(234);
         adPoolRequest.setRequestSlotId((short)12);
         adPoolRequest.setRequestedAdCount((short)1);
+        adPoolRequest.setSdkVersion("i362");
+        adPoolRequest.setRequestId("tid");
+        adPoolRequest.setResponseFormat("html");
 
         SASRequestParameters sasRequestParameters = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
@@ -89,14 +92,12 @@ public class ThriftRequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getPostalCode(), null); //Not coming in dcp
         assertEquals(sasRequestParameters.getCountry(), "US");
         assertEquals(sasRequestParameters.getCountryStr(), "94");
-        assertEquals(sasRequestParameters.getUserLocation(), null); //Not coming in dcp
         assertEquals(sasRequestParameters.getImpressionId(), null); //Internal, Populated in cas
         assertEquals(sasRequestParameters.getClurl(), null); //Internal, Populated in cas
         assertEquals(sasRequestParameters.getSiteId(), "siteId");
         assertEquals(sasRequestParameters.getSlot(), "12");
-        assertEquals(sasRequestParameters.getHost(), null);  //Not coming in dcp
         assertEquals(sasRequestParameters.getSiteType(), "APP");
-        assertEquals(sasRequestParameters.getSdkVersion(), null); //Not coming in dcp
+        assertEquals(sasRequestParameters.getSdkVersion(), "i362"); 
         assertEquals(sasRequestParameters.getSiteIncId(), 12345);
         assertEquals(sasRequestParameters.getAdIncId(), 0);  //Internal, Populated in cas
         assertEquals(sasRequestParameters.getAdcode(), null); //Not coming in dcp
@@ -106,12 +107,11 @@ public class ThriftRequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getSiteSegmentId(), new Integer(234));
         assertEquals(sasRequestParameters.getUidParams(), null);
         assertEquals(sasRequestParameters.getTUidParams(), null);
-        assertEquals(sasRequestParameters.getRqIframe(), null);
-        assertEquals(sasRequestParameters.getRFormat(), null);
+        assertEquals(sasRequestParameters.getRqIframe(), null); //Not coming in dcp
+        assertEquals(sasRequestParameters.getRFormat(), "html");
         assertEquals(sasRequestParameters.getOsId(), 123);
         assertEquals(sasRequestParameters.getRqMkAdcount(), "1");
-        assertEquals(sasRequestParameters.getTid(), null);
-        assertEquals(sasRequestParameters.getTp(), null); //Not coming in dcp
+        assertEquals(sasRequestParameters.getTid(), "tid");
         assertEquals(sasRequestParameters.getHandsetInternalId(), 456);
         assertEquals(sasRequestParameters.getCarrierId(), 12345);
         assertEquals(sasRequestParameters.getCity(), "12");

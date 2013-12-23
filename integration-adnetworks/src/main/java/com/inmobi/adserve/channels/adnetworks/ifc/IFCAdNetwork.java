@@ -274,12 +274,10 @@ public class IFCAdNetwork extends BaseAdNetworkImpl {
 		jsonObject.addProperty("publisherID", publisherID);
 		jsonObject.addProperty("source", sasParams.getSource());
 		jsonObject.addProperty("locSrc", sasParams.getLocSrc());
-		jsonObject.addProperty("userLocation", sasParams.getUserLocation());
 		jsonObject.addProperty("impressionId",
 				casInternalRequestParameters.impressionId);
 		jsonObject.addProperty("genderOrig", sasParams.getGender());
 		jsonObject.addProperty("area", sasParams.getArea());
-		jsonObject.addProperty("host", sasParams.getHost());
 		jsonObject.addProperty("beaconURL", beaconUrl);
 		jsonObject.addProperty("appType", appType);
 		jsonObject.addProperty("categories",
