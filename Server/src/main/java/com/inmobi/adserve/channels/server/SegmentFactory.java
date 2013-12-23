@@ -53,8 +53,7 @@ public class SegmentFactory {
                 AdNetworkInterface rtbAdNetwork = adNetworkInterfaceClass
                         .getConstructor(
                             new Class[] { Configuration.class, ClientBootstrap.class, HttpRequestHandlerBase.class,
-                                    MessageEvent.class, String.class, String.class, Integer.class,
-                                    RepositoryHelper.class })
+                                    MessageEvent.class, String.class, String.class, int.class, RepositoryHelper.class })
                             .newInstance(config, rtbClientBootstrap, base, serverEvent, adapterConfig.getAdapterHost(),
                                 adapterConfig.getAdapterName(), rtbMaxTimemout, repositoryHelper);
                 rtbAdNetwork.setName(adapterConfig.getAdapterName());

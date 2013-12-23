@@ -101,8 +101,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Setter
     BidResponse                            bidResponse;
     private final boolean                  wnRequired;
-    Integer                                auctionType                  = 2;
-    Integer                                tmax                         = 200;
+    private final int                      auctionType                  = 2;
+    private int                            tmax                         = 200;
     private static final String            X_OPENRTB_VERSION            = "x-openrtb-version";
     private static final String            CONTENT_TYPE                 = "application/json";
     private static final String            DISPLAY_MANAGER_INMOBI_SDK   = "inmobi_sdk";
