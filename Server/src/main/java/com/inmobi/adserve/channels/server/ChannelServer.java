@@ -48,7 +48,12 @@ import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-
+ /*
+ * 
+ * Run jar:-
+ * java -Dincoming.connections=100 -Ddcpoutbound.connections=50 -Drtboutbound.connections=50 -jar cas-server.jar
+ * If these are not specified server will pick these values from channel-server.properties config file.
+ * */
 public class ChannelServer {
     private static Logger                           logger;
     private static ChannelAdGroupRepository         channelAdGroupRepository;
@@ -138,9 +143,12 @@ public class ChannelServer {
 
             instantiateRepository(logger, config);
             ServletHandler.init(config, repositoryHelper);
-            Integer maxIncomingConnections = channelServerHelper.getMaxConnections(ChannelServerStringLiterals.INCOMING_CONNECTIONS, ConnectionType.INCOMING);
-            Integer maxRTbdOutGoingConnections = channelServerHelper.getMaxConnections(ChannelServerStringLiterals.RTBD_OUTGING_CONNECTIONS, ConnectionType.RTBD_OUTGOING);
-            Integer maxDCpOutGoingConnections = channelServerHelper.getMaxConnections(ChannelServerStringLiterals.DCP_OUTGOING_CONNECTIONS, ConnectionType.DCP_OUTGOING);
+            Integer maxIncomingConnections = channelServerHelper.getMaxConnections(ChannelServerStringLiterals.INCOMING_CONNECTIONS, 
+                    ConnectionType.INCOMING);
+            Integer maxRTbdOutGoingConnections = channelServerHelper.getMaxConnections(ChannelServerStringLiterals.RTBD_OUTGING_CONNECTIONS, 
+                    ConnectionType.RTBD_OUTGOING);
+            Integer maxDCpOutGoingConnections = channelServerHelper.getMaxConnections(ChannelServerStringLiterals.DCP_OUTGOING_CONNECTIONS, 
+                    ConnectionType.DCP_OUTGOING);
             if (null != maxIncomingConnections) {
                 ServletHandler.getServerConfig().setProperty("incomingMaxConnections", maxIncomingConnections);
             }
