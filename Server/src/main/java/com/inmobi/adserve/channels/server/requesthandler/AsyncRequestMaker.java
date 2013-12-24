@@ -263,7 +263,7 @@ public class AsyncRequestMaker {
         builder.setImageBeaconURLPrefix(config.getString("clickmaker.beaconURLPrefix"));
         builder.setTestRequest(false);
         builder.setLatlonval(sasParams.getLatLong());
-        builder.setRtbSite(false);
+        builder.setRtbSite(sasParams.getSst() != 0);//TODO:- Change this according to thrift enums
         builder.setDst(sasParams.getDst() + "");
         return new ClickUrlMakerV6(builder);
     }

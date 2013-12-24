@@ -44,6 +44,7 @@ public class ThriftRequestParser {
         //TODO Ip File Version not present params.setIpFileVersion(jObject.optInt("rqIpFileVer", 1));
         //TODO add postal code in thrift params.setPostalCode(tObject.uidParams.user.);
         //TODO Need area/region params.setArea(tObject.geo.);
+        //TODO pass sst also
 
         //Fill params from AdPoolRequest Object
         params.setRemoteHostIp(tObject.remoteHostIp);

@@ -63,6 +63,7 @@ public class SASRequestParameters {
     private int          dst;                  // This will describe the type of request dcp or rtbd
     private Set<Integer> accountSegment;      
     private boolean      isResponseOnlyFromDcp;
+    private int sst;//0 for Network 
 
     public SASRequestParameters() {
         // Do Nothing.
