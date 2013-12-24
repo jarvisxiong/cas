@@ -1,4 +1,4 @@
-package com.inmobi.adserve.channels.server;
+package com.inmobi.adserve.channels.server.config;
 
 import lombok.EqualsAndHashCode;
 
@@ -6,6 +6,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang3.StringUtils;
 
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.server.AdapterType;
 
 
 /**

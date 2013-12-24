@@ -43,6 +43,9 @@ import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
 import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
 import com.inmobi.adserve.channels.server.client.BootstrapCreation;
 import com.inmobi.adserve.channels.server.client.RtbBootstrapCreation;
+import com.inmobi.adserve.channels.server.module.NettyModule;
+import com.inmobi.adserve.channels.server.module.ServerModule;
+import com.inmobi.adserve.channels.server.netty.NettyServer;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 import com.inmobi.adserve.channels.server.requesthandler.Filters;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
@@ -193,7 +196,7 @@ public class ChannelServer {
                 }
             });
 
-            // System.out.close();
+            System.out.close();
             // If client bootstrap is not present throwing exception which will
             // set
             // lbStatus as NOT_OK.

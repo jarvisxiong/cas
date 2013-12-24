@@ -38,26 +38,26 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 
 public class Filters {
 
-    private static final Logger                                                    LOG                       = LoggerFactory
-                                                                                                                     .getLogger(Filters.class);
+    private static final Logger                                                    LOG                                = LoggerFactory
+                                                                                                                              .getLogger(Filters.class);
 
     @Inject
     private static Provider<Marker>                                                traceMarkerProvider;
 
-    private final static Comparator<ChannelSegment>                                COMPARATOR                = new Comparator<ChannelSegment>() {
-                                                                                                                 @Override
-                                                                                                                 public int compare(
-                                                                                                                         final ChannelSegment o1,
-                                                                                                                         final ChannelSegment o2) {
-                                                                                                                     return o1
-                                                                                                                             .getPrioritisedECPM() > o2
-                                                                                                                             .getPrioritisedECPM() ? -1
-                                                                                                                             : 1;
-                                                                                                                 }
-                                                                                                             };
+    private final static Comparator<ChannelSegment>                                CHANNEL_SEGMENT_REVERSE_COMPARATOR = new Comparator<ChannelSegment>() {
+                                                                                                                          @Override
+                                                                                                                          public int compare(
+                                                                                                                                  final ChannelSegment o1,
+                                                                                                                                  final ChannelSegment o2) {
+                                                                                                                              return o1
+                                                                                                                                      .getPrioritisedECPM() > o2
+                                                                                                                                      .getPrioritisedECPM() ? -1
+                                                                                                                                      : 1;
+                                                                                                                          }
+                                                                                                                      };
 
-    private final static Map<String/* advertiserId */, String/* advertiserName */> advertiserIdToNameMapping = new HashMap<String, String>();
-    private final static String                                                    ENDS_WITH_ADVERTISER_ID   = ".advertiserId";
+    private final static Map<String/* advertiserId */, String/* advertiserName */> advertiserIdToNameMapping          = new HashMap<String, String>();
+    private final static String                                                    ENDS_WITH_ADVERTISER_ID            = ".advertiserId";
     private Map<String, HashMap<String, ChannelSegment>>                           matchedSegments;
     private final Configuration                                                    serverConfiguration;
     private final Configuration                                                    adapterConfiguration;
@@ -221,7 +221,7 @@ public class Filters {
 
     /**
      * Returns true if advertiser is not present in site's advertiser inclusion list OR if advertiser is not present in
-     * publisher's advertiser inclusion list when site doesnt have advertiser inclusion list
+     * publisher's advertiser inclusion list when site doesn't have advertiser inclusion list
      */
     boolean isAdvertiserExcluded(final ChannelSegment channelSegment) {
         Marker traceMarker = traceMarkerProvider.get();
@@ -451,7 +451,7 @@ public class Filters {
             if (segmentListToBeSorted.isEmpty()) {
                 continue;
             }
-            Collections.sort(segmentListToBeSorted, COMPARATOR);
+            Collections.sort(segmentListToBeSorted, CHANNEL_SEGMENT_REVERSE_COMPARATOR);
             // choosing top segments from the sorted list
             int adGpCount = 1;
             int partnerSegmentNo;
@@ -722,7 +722,7 @@ public class Filters {
         LOG.debug(traceMarker, "{}", rows.size());
         List<ChannelSegment> shortlistedRow = new ArrayList<ChannelSegment>();
         // Creating a sorted list of segments based on their pEcpm
-        Collections.sort(rows, COMPARATOR);
+        Collections.sort(rows, CHANNEL_SEGMENT_REVERSE_COMPARATOR);
         // choosing top segments from the sorted list
         int totalSegmentNo = serverConfiguration.getInt("totalSegmentNo", -1);
         for (ChannelSegment channelSegment : rows) {

@@ -4,30 +4,54 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
-import org.slf4j.Marker;
 import org.testng.annotations.Test;
 
-import com.google.inject.Provider;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ServletHandler;
+import com.inmobi.adserve.channels.server.module.NettyModule;
+import com.inmobi.adserve.channels.server.module.ServerModule;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 
 
 public class MatchSegmentsTest extends TestCase {
+    private static final String CHANNEL_SERVER_CONFIG_FILE = "/opt/mkhoj/conf/cas/channel-server.properties";
+    private ConfigurationLoader config;
+    private MatchSegments       matchSegments;
+
+    @Override
+    public void setUp() throws ClassNotFoundException {
+
+        config = ConfigurationLoader.getInstance(CHANNEL_SERVER_CONFIG_FILE);
+        System.out.println(config.getAdapterConfiguration());
+
+        RepositoryHelper repositoryHelper = createMock(RepositoryHelper.class);
+
+        ServletHandler.init(config, repositoryHelper);
+
+        Injector injector = Guice.createInjector(new NettyModule(config.getServerConfiguration()), new ServerModule(
+                config.getLoggerConfiguration(), config.getAdapterConfiguration(), repositoryHelper));
+
+        matchSegments = injector.getInstance(MatchSegments.class);
+
+    }
 
     @Test
-    public void testGetCategories() {
-        String configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
-        ConfigurationLoader config = ConfigurationLoader.getInstance(configFile);
+    public void testGetCategories() throws SecurityException, NoSuchMethodException, IllegalArgumentException,
+            IllegalAccessException, InvocationTargetException {
+
         ServletHandler.init(config, null);
         Configuration mockConfig = createMock(Configuration.class);
         SASRequestParameters sasRequestParameters = new SASRequestParameters();
@@ -56,12 +80,9 @@ public class MatchSegmentsTest extends TestCase {
                 .andReturn(createMock(ChannelAdGroupRepository.class))
                     .anyTimes();
         replay(repositoryHelper);
-        MatchSegments matchSegments = new MatchSegments(repositoryHelper, new Provider<Marker>() {
-            @Override
-            public Marker get() {
-                return null;
-            }
-        });
-        assertEquals(new ArrayList<Long>(), matchSegments.getCategories(sasRequestParameters));
+
+        Method method = MatchSegments.class.getDeclaredMethod("getCategories", SASRequestParameters.class);
+        method.setAccessible(true);
+        assertEquals(new ArrayList<Long>(), method.invoke(matchSegments, sasRequestParameters));
     }
 }

@@ -1,4 +1,4 @@
-package com.inmobi.adserve.channels.server;
+package com.inmobi.adserve.channels.server.handler;
 
 import javax.inject.Inject;
 
@@ -11,6 +11,7 @@ import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
 import com.google.inject.Key;
+import com.inmobi.adserve.channels.server.SimpleScope;
 
 
 /**

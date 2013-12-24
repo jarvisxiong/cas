@@ -1,4 +1,4 @@
-package com.inmobi.adserve.channels.server;
+package com.inmobi.adserve.channels.server.annotations;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;

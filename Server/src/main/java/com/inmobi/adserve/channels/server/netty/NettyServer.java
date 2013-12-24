@@ -1,4 +1,4 @@
-package com.inmobi.adserve.channels.server;
+package com.inmobi.adserve.channels.server.netty;
 
 import java.net.SocketAddress;
 
@@ -10,6 +10,7 @@ import org.jboss.netty.channel.ChannelFactory;
 import org.jboss.netty.channel.group.ChannelGroup;
 
 import com.google.common.util.concurrent.AbstractIdleService;
+import com.inmobi.adserve.channels.server.ChannelServerPipelineFactory;
 
 
 /**
@@ -39,7 +40,7 @@ public class NettyServer extends AbstractIdleService {
         bootstrap.setOption("child.keepAlive", true);
         bootstrap.setOption("child.tcpNoDelay", true);
         bootstrap.setOption("child.reuseAddress", true);
-        bootstrap.setOption("child.connectTimeoutMillis", 5); // FIXME
+        bootstrap.setOption("child.connectTimeoutMillis", 5);
         Channel channel = bootstrap.bind(address);
         allChannels.add(channel);
     }

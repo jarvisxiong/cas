@@ -1,4 +1,4 @@
-package com.inmobi.adserve.channels.server;
+package com.inmobi.adserve.channels.server.annotations;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
@@ -12,6 +12,6 @@ import java.lang.annotation.Target;
  * 
  */
 @Target({ FIELD, METHOD, PARAMETER })
-@interface LoggerConfiguration {
+public @interface LoggerConfiguration {
 
 }

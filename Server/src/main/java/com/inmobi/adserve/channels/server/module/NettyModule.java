@@ -1,4 +1,4 @@
-package com.inmobi.adserve.channels.server;
+package com.inmobi.adserve.channels.server.module;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -18,6 +18,9 @@ import org.slf4j.Marker;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.inmobi.adserve.channels.server.SimpleScope;
+import com.inmobi.adserve.channels.server.annotations.BatchScoped;
+import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
 import com.inmobi.adserve.channels.server.api.Servlet;
 
 

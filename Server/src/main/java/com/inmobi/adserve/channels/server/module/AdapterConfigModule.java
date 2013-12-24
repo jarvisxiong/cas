@@ -1,4 +1,4 @@
-package com.inmobi.adserve.channels.server;
+package com.inmobi.adserve.channels.server.module;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -8,6 +8,9 @@ import org.apache.commons.configuration.Configuration;
 import com.google.common.collect.Sets;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.name.Names;
+import com.inmobi.adserve.channels.server.config.AdapterConfig;
+import com.inmobi.adserve.channels.server.config.BaseAdapterConfig;
 
 
 /**
@@ -52,9 +55,13 @@ public class AdapterConfigModule extends AbstractModule {
 
         MapBinder<String, AdapterConfig> advertiserIdConfigMapBinder = MapBinder.newMapBinder(binder(), String.class,
             AdapterConfig.class);
+        MapBinder<String, String> advertiserIdToNameMapBinder = MapBinder.newMapBinder(binder(), String.class,
+            String.class, Names.named("advertiserIdToNameMap"));
 
         for (AdapterConfig adapterConfig : adapterConfigs) {
             advertiserIdConfigMapBinder.addBinding(adapterConfig.getAdvertiserId()).toInstance(adapterConfig);
+            advertiserIdToNameMapBinder.addBinding(adapterConfig.getAdvertiserId()).toInstance(
+                adapterConfig.getAdapterName());
         }
 
     }

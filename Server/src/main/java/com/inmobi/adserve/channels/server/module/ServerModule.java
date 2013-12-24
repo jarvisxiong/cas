@@ -1,4 +1,4 @@
-package com.inmobi.adserve.channels.server;
+package com.inmobi.adserve.channels.server.module;
 
 import java.util.Map;
 import java.util.Set;
@@ -20,6 +20,7 @@ import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 import com.inmobi.adserve.channels.server.requesthandler.Filters;
@@ -42,7 +43,7 @@ public class ServerModule extends AbstractModule {
         this.loggerConfiguration = loggerConfiguration;
         this.adapterConfiguration = adapterConfiguration;
         this.repositoryHelper = repositoryHelper;
-        this.reflections = new Reflections("com.inmobi", new TypeAnnotationsScanner());
+        this.reflections = new Reflections("com.inmobi.adserve.channels", new TypeAnnotationsScanner());
     }
 
     @Override

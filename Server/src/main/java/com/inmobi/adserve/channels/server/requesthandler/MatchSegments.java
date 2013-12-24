@@ -1,6 +1,5 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,8 +13,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.name.Named;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
@@ -34,7 +36,7 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 public class MatchSegments {
     private static final Logger                LOG     = LoggerFactory.getLogger(MatchSegments.class);
 
-    private final String                       DEFAULT = "default";
+    private static final String                DEFAULT = "default";
     private final RepositoryHelper             repositoryHelper;
     private final ChannelAdGroupRepository     channelAdGroupRepository;
     private final ChannelEntity                defaultChannelEntity;
@@ -43,10 +45,14 @@ public class MatchSegments {
     private final ChannelSegmentFeedbackEntity defaultChannelSegmentCitrusLeafFeedbackEntity;
     private final Provider<Marker>             traceMarkerProvider;
 
+    private final Map<String, String>          advertiserIdToNameMap;
+
     @Inject
-    public MatchSegments(final RepositoryHelper repositoryHelper, final Provider<Marker> traceMarkerProvider) {
+    public MatchSegments(final RepositoryHelper repositoryHelper, final Provider<Marker> traceMarkerProvider,
+            @Named("advertiserIdToNameMap") final Map<String, String> advertiserIdToNameMap) {
         this.traceMarkerProvider = traceMarkerProvider;
         this.repositoryHelper = repositoryHelper;
+        this.advertiserIdToNameMap = advertiserIdToNameMap;
 
         Double defaultEcpm = ServletHandler.getServerConfig().getDouble("default.ecpm", 0.1);
         channelAdGroupRepository = repositoryHelper.getChannelAdGroupRepository();
@@ -126,12 +132,13 @@ public class MatchSegments {
      * repositoryHelper Method which computes categories according to new category taxonomy and returns the category
      * list (old or new) depending upon the config
      */
-    List<Long> getCategories(final SASRequestParameters sasParams) {
+    private List<Long> getCategories(final SASRequestParameters sasParams) {
         // Computing all the parents for categories in the category list from the
         // request
-        HashSet<Long> categories = new HashSet<Long>();
-        if (null != sasParams.getCategories()) {
-            for (Long cat : sasParams.getCategories()) {
+        Set<Long> categories = Sets.newHashSet();
+        List<Long> categoryList = sasParams.getCategories();
+        if (null != categoryList) {
+            for (Long cat : categoryList) {
                 String parentId = cat.toString();
                 while (parentId != null) {
                     categories.add(Long.parseLong(parentId));
@@ -144,10 +151,9 @@ public class MatchSegments {
             }
         }
         // setting Categories field in sasParams to contain their parentids as well
-        List<Long> temp = new ArrayList<Long>();
-        temp.addAll(categories);
-        sasParams.setCategories(temp);
-        return sasParams.getCategories();
+        categoryList = Lists.newArrayList(categories);
+        sasParams.setCategories(categoryList);
+        return categoryList;
     }
 
     private Map<String, HashMap<String, ChannelSegment>> matchSegments(final long slotId, final List<Long> categories,
@@ -209,23 +215,24 @@ public class MatchSegments {
     private void insertChannelSegmentToResultSet(final Map<String, HashMap<String, ChannelSegment>> result,
             final ChannelSegmentEntity channelSegmentEntity, final SASRequestParameters sasParams,
             final Marker traceMarker) {
-        if (Filters.getAdvertiserIdToNameMapping().containsKey(channelSegmentEntity.getAdvertiserId())) {
-            InspectorStats.incrementStatCount(
-                Filters.getAdvertiserIdToNameMapping().get(channelSegmentEntity.getAdvertiserId()),
+
+        // select the segment only if advertiserIdToNameMap contains incoming Segment advertiserId
+        if (advertiserIdToNameMap.containsKey(channelSegmentEntity.getAdvertiserId())) {
+            InspectorStats.incrementStatCount(advertiserIdToNameMap.get(channelSegmentEntity.getAdvertiserId()),
                 InspectorStrings.totalMatchedSegments);
-        }
 
-        ChannelSegment channelSegment = createSegment(channelSegmentEntity, sasParams, traceMarker);
+            ChannelSegment channelSegment = createSegment(channelSegmentEntity, sasParams, traceMarker);
 
-        if (result.get(channelSegmentEntity.getAdvertiserId()) == null) {
-            HashMap<String, ChannelSegment> hashMap = new HashMap<String, ChannelSegment>();
-            hashMap.put(channelSegmentEntity.getAdgroupId(), channelSegment);
-            result.put(channelSegmentEntity.getAdvertiserId(), hashMap);
-        }
-        else {
-            HashMap<String, ChannelSegment> hashMap = result.get(channelSegmentEntity.getAdvertiserId());
-            hashMap.put(channelSegmentEntity.getAdgroupId(), channelSegment);
-            result.put(channelSegmentEntity.getAdvertiserId(), hashMap);
+            if (result.get(channelSegmentEntity.getAdvertiserId()) == null) {
+                HashMap<String, ChannelSegment> hashMap = new HashMap<String, ChannelSegment>();
+                hashMap.put(channelSegmentEntity.getAdgroupId(), channelSegment);
+                result.put(channelSegmentEntity.getAdvertiserId(), hashMap);
+            }
+            else {
+                HashMap<String, ChannelSegment> hashMap = result.get(channelSegmentEntity.getAdvertiserId());
+                hashMap.put(channelSegmentEntity.getAdgroupId(), channelSegment);
+                result.put(channelSegmentEntity.getAdvertiserId(), hashMap);
+            }
         }
 
     }
