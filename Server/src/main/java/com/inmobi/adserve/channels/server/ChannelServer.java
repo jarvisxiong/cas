@@ -5,6 +5,7 @@ import com.google.inject.Injector;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.repository.*;
+import com.inmobi.adserve.channels.server.api.ConnectionType;
 import com.inmobi.adserve.channels.server.client.BootstrapCreation;
 import com.inmobi.adserve.channels.server.client.RtbBootstrapCreation;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
@@ -137,9 +138,17 @@ public class ChannelServer {
 
             instantiateRepository(logger, config);
             ServletHandler.init(config, repositoryHelper);
-            Integer maxIncomingConnections = channelServerHelper.getIncomingMaxConnections(ChannelServerStringLiterals.INCOMING_CONNECTIONS);
+            Integer maxIncomingConnections = channelServerHelper.getMaxConnections(ChannelServerStringLiterals.INCOMING_CONNECTIONS, ConnectionType.INCOMING);
+            Integer maxRTbdOutGoingConnections = channelServerHelper.getMaxConnections(ChannelServerStringLiterals.RTBD_OUTGING_CONNECTIONS, ConnectionType.RTBD_OUTGOING);
+            Integer maxDCpOutGoingConnections = channelServerHelper.getMaxConnections(ChannelServerStringLiterals.DCP_OUTGOING_CONNECTIONS, ConnectionType.DCP_OUTGOING);
             if (null != maxIncomingConnections) {
                 ServletHandler.getServerConfig().setProperty("incomingMaxConnections", maxIncomingConnections);
+            }
+            if (null != maxIncomingConnections) {
+                ServletHandler.getServerConfig().setProperty("rtbOutGoingMaxConnections", maxRTbdOutGoingConnections);
+            }
+            if (null != maxIncomingConnections) {
+                ServletHandler.getServerConfig().setProperty("dcpOutGoingMaxConnections", maxDCpOutGoingConnections);
             }
             MatchSegments.init(channelAdGroupRepository);
             Filters.init(config.adapterConfiguration());

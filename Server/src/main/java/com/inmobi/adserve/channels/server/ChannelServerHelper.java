@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.server;
 
+import com.inmobi.adserve.channels.server.api.ConnectionType;
 import org.apache.log4j.Logger;
 
 import java.net.InetAddress;
@@ -65,17 +66,17 @@ public class ChannelServerHelper {
         return System.getProperty(key);
     }
 
-    public Integer getIncomingMaxConnections(String incomingConnectionsKey) {
-        Integer maxIncomingConnections = null;
+    public Integer getMaxConnections(String connectionsKey, ConnectionType connectionType) {
+        Integer maxConnections = null;
         try {
-            maxIncomingConnections = Integer.parseInt(System.getProperty(incomingConnectionsKey));
+            maxConnections = Integer.parseInt(System.getProperty(connectionsKey));
         }
         catch (NumberFormatException e) {
-            logger.info("NumberFormatException in getIncomingMaxConnections");
+            logger.info("NumberFormatException " + connectionType.toString() + "maxConnections");
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("Max limit for incoming connections is " + maxIncomingConnections);
+            logger.debug("Max limit for " +  connectionType.toString() + " connections is " + maxConnections);
         }
-        return maxIncomingConnections;
+        return maxConnections;
     }
 }
