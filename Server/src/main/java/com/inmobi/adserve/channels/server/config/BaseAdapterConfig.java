@@ -89,8 +89,7 @@ public class BaseAdapterConfig implements AdapterConfig {
      */
     @Override
     public AdapterType getAdapterType() {
-        boolean isRtb = adapterConfig.getBoolean("isRtb", false);
-        if (isRtb) {
+        if (isRtb()) {
             return AdapterType.RTB;
         }
         return AdapterType.DCP;
@@ -102,6 +101,11 @@ public class BaseAdapterConfig implements AdapterConfig {
     @Override
     public Class<AdNetworkInterface> getAdNetworkInterfaceClass() {
         return adapterClass;
+    }
+
+    @Override
+    public boolean isRtb() {
+        return adapterConfig.getBoolean("isRtb", false);
     }
 
 }

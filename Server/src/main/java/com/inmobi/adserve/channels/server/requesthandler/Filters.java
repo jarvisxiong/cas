@@ -653,7 +653,7 @@ public class Filters {
                 percentage = 1;
             }
 
-            LOG.debug(traceMarker, "pricing engine percentage allowed is {}" + percentage);
+            LOG.debug(traceMarker, "pricing engine percentage allowed is {}", percentage);
             // applying dcp floor
             if (ServletHandler.random.nextInt(100) <= percentage) {
                 LOG.debug(traceMarker, "dcp floor filter passed by adgroup {}", channelSegment
