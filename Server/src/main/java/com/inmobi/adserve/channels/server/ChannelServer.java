@@ -112,14 +112,13 @@ public class ChannelServer {
             String channelLogKey = config.getServerConfiguration().getString("channelLogKey");
             String advertisementLogKey = config.getServerConfiguration().getString("adsLogKey");
             Logging.init(dataBusPublisher, rrLogKey, channelLogKey, advertisementLogKey,
-                config.getServerConfiguration());
+                    config.getServerConfiguration());
 
             // Initializing graphite stats
             MetricsManager.init(
-                config.getServerConfiguration().getString("graphiteServer.host", "mon02.ads.uj1.inmobi.com"), config
-                        .getServerConfiguration()
-                            .getInt("graphiteServer.port", 2003),
-                config.getServerConfiguration().getInt("graphiteServer.intervalInMinutes", 1));
+                    config.getServerConfiguration().getString("graphiteServer.host", "mon02.ads.uj1.inmobi.com"),
+                    config.getServerConfiguration().getInt("graphiteServer.port", 2003), config
+                            .getServerConfiguration().getInt("graphiteServer.intervalInMinutes", 1));
             channelAdGroupRepository = new ChannelAdGroupRepository();
             channelRepository = new ChannelRepository();
             channelFeedbackRepository = new ChannelFeedbackRepository();
@@ -156,7 +155,8 @@ public class ChannelServer {
             Filters.init(config.getAdapterConfiguration());
 
             Injector injector = Guice.createInjector(new NettyModule(config.getServerConfiguration()),
-                new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(), repositoryHelper));
+                    new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(),
+                            repositoryHelper));
 
             // Creating netty client for out-bound calls.
             Timer timer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
@@ -165,14 +165,13 @@ public class ChannelServer {
             ClientBootstrap clientBootstrap = BootstrapCreation
                     .createBootstrap(logger, config.getServerConfiguration());
             ClientBootstrap rtbClientBootstrap = RtbBootstrapCreation.createBootstrap(logger,
-                config.getRtbConfiguration());
+                    config.getRtbConfiguration());
 
             // For some partners netty client does not work thus
             // Creating a ning client for out-bound calls
             AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder()
                     .setRequestTimeoutInMs(config.getServerConfiguration().getInt("readtimeoutMillis") - 100)
-                        .setConnectionTimeoutInMs(600)
-                        .build();
+                    .setConnectionTimeoutInMs(600).build();
             AsyncHttpClient asyncHttpClient = new AsyncHttpClient(asyncHttpClientConfig);
 
             if (null == clientBootstrap) {
@@ -270,39 +269,44 @@ public class ChannelServer {
             ChannelSegmentMatchingCache.init(logger);
             // Reusing the repository from phoenix adserving framework.
             currencyConversionRepository.init(logger,
-                config.getCacheConfiguration().subset(ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY),
-                ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY);
+                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY),
+                    ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY);
             channelAdGroupRepository.init(logger,
-                config.getCacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY),
-                ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY);
+                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY),
+                    ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY);
             channelRepository.init(logger,
-                config.getCacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_REPOSITORY),
-                ChannelServerStringLiterals.CHANNEL_REPOSITORY);
+                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_REPOSITORY),
+                    ChannelServerStringLiterals.CHANNEL_REPOSITORY);
             channelFeedbackRepository.init(logger,
-                config.getCacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY),
-                ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY);
-            channelSegmentFeedbackRepository.init(logger,
-                config.getCacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY),
-                ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY);
+                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY),
+                    ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY);
+            channelSegmentFeedbackRepository.init(
+                    logger,
+                    config.getCacheConfiguration().subset(
+                            ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY),
+                    ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY);
             siteTaxonomyRepository.init(logger,
-                config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY),
-                ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY);
+                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY),
+                    ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY);
             siteMetaDataRepository.init(logger,
-                config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY),
-                ChannelServerStringLiterals.SITE_METADATA_REPOSITORY);
+                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY),
+                    ChannelServerStringLiterals.SITE_METADATA_REPOSITORY);
             pricingEngineRepository.init(logger,
-                config.getCacheConfiguration().subset(ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY),
-                ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY);
+                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY),
+                    ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY);
             publisherFilterRepository.init(logger,
-                config.getCacheConfiguration().subset(ChannelServerStringLiterals.PUBLISHER_FILTER_REPOSITORY),
-                ChannelServerStringLiterals.PUBLISHER_FILTER_REPOSITORY);
+                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.PUBLISHER_FILTER_REPOSITORY),
+                    ChannelServerStringLiterals.PUBLISHER_FILTER_REPOSITORY);
             siteCitrusLeafFeedbackRepository.init(
-                config.getServerConfiguration().subset(ChannelServerStringLiterals.CITRUS_LEAF_FEEDBACK),
-                getDataCenter());
+                    config.getServerConfiguration().subset(ChannelServerStringLiterals.CITRUS_LEAF_FEEDBACK),
+                    getDataCenter());
             siteEcpmRepository.init(logger,
-                config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY),
-                ChannelServerStringLiterals.SITE_ECPM_REPOSITORY);
+                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY),
+                    ChannelServerStringLiterals.SITE_ECPM_REPOSITORY);
             logger.error("* * * * Instantiating repository completed * * * *");
+            config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)
+                    .subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY);
+
         }
         catch (NamingException exception) {
             logger.error("failed to creatre binding for postgresql data source " + exception.getMessage());
@@ -363,7 +367,7 @@ public class ChannelServer {
         }
         if (sampledAdvertiserLogFolder != null) {
             sampledAdvertiserLogFolder = sampledAdvertiserLogFolder.substring(0,
-                sampledAdvertiserLogFolder.lastIndexOf('/') + 1);
+                    sampledAdvertiserLogFolder.lastIndexOf('/') + 1);
             sampledAdvertiserFolder = new File(sampledAdvertiserLogFolder);
         }
         if (debugFolder != null && debugFolder.exists() && advertiserFolder != null && advertiserFolder.exists()) {

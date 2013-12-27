@@ -25,8 +25,7 @@ public class RequestIdHandler extends SimpleChannelUpstreamHandler {
     @Override
     public void handleUpstream(final ChannelHandlerContext ctx, final ChannelEvent e) throws Exception {
 
-        MDC.put("requestId", System.currentTimeMillis() + "-" + randomNumberGenerator.nextInt(99999999));
+        MDC.put("requestId", String.format("%s-%s" , System.currentTimeMillis() ,randomNumberGenerator.nextInt(99999999)));
         super.handleUpstream(ctx, e);
     }
-
 }
