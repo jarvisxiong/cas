@@ -1,5 +1,9 @@
 package com.inmobi.adserve.channels.adnetworks;
 
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,10 +17,6 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.testng.annotations.Test;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-
 import com.inmobi.adserve.channels.adnetworks.xad.DCPxAdAdNetwork;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -24,7 +24,6 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPxAdAdNetworkTest extends TestCase {
@@ -32,7 +31,6 @@ public class DCPxAdAdNetworkTest extends TestCase {
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
     private final ClientBootstrap clientBootstrap = null;
-    private DebugLogger           logger;
 
     private DCPxAdAdNetwork       dcpxAdAdnetwork;
     private final String          xAdHost         = "http://xad.com/rest/banner";
@@ -62,11 +60,9 @@ public class DCPxAdAdNetworkTest extends TestCase {
         MessageEvent serverEvent = createMock(MessageEvent.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        DebugLogger.init(mockConfig);
         SlotSizeMapping.init();
         Formatter.init();
-        logger = new DebugLogger();
-        dcpxAdAdnetwork = new DCPxAdAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpxAdAdnetwork = new DCPxAdAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test

@@ -16,17 +16,18 @@ import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPMoPubReporting extends BaseReportingImpl {
+    private static final Logger LOG               = LoggerFactory.getLogger(DCPMoPubReporting.class);
 
     private final Configuration config;
-    private DebugLogger         logger;
     private String              startDate         = "";
     private String              endDate           = "";
     private static String       responseStartDate = "";
@@ -44,44 +45,43 @@ public class DCPMoPubReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws Exception {
-        this.logger = logger;
+    public ReportResponse fetchRows(final ReportTime startTime, final String key, final ReportTime endTime)
+            throws Exception {
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
-        logger.debug("inside fetch rows of MoPub");
+        LOG.debug("inside fetch rows of MoPub");
         try {
             startDate = startTime.getStringDate("-");
             endDate = endTime == null ? getEndDate() : startDate;
-            logger.debug("start date inside MoPub is ", startDate);
+            LOG.debug("start date inside MoPub is {}", startDate);
             if (ReportTime.compareStringDates(endDate, startDate) == -1) {
-                logger.debug("end date is less than start date plus reporting window for MoPub");
+                LOG.debug("end date is less than start date plus reporting window for MoPub");
                 return null;
             }
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.info("failed to obtain correct dates for fetching reports ", exception.getMessage());
+            LOG.info("failed to obtain correct dates for fetching reports {}", exception);
             return null;
         }
 
         if (StringUtils.isBlank(responseStartDate) || StringUtils.isBlank(responseString)
                 || ReportTime.compareStringDates(responseStartDate, startDate) > 0) {
             String url = getRequestUrl();
-            logger.debug("url inside MoPub is ", url);
+            LOG.debug("url inside MoPub is {}", url);
             responseString = invokeHTTPUrl(url);
             responseStartDate = startDate;
         }
         reportResponse.status = ReportResponse.ResponseStatus.SUCCESS;
 
-        logger.debug("successfuly got response inside MoPub. Response is ", responseString);
-        generateReportResponse(logger, reportResponse, responseString, key);
-        logger.debug("successfully parsed data inside MoPub");
+        LOG.debug("successfuly got response inside MoPub. Response is {}", responseString);
+        generateReportResponse(reportResponse, responseString, key);
+        LOG.debug("successfully parsed data inside MoPub");
         return reportResponse;
     }
 
     public String getEndDate() throws Exception {
         try {
-            logger.debug("calculating latest date for MoPub");
+            LOG.debug("calculating latest date for MoPub");
             ReportTime reportTime = ReportTime.getUTCTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
             reportTime = ReportTime.getPreviousDay(reportTime);
@@ -91,7 +91,7 @@ public class DCPMoPubReporting extends BaseReportingImpl {
             return (reportTime.getStringDate("-"));
         }
         catch (Exception exception) {
-            logger.info("failed to obtain end date inside MoPub ", exception.getMessage());
+            LOG.info("failed to obtain end date inside MoPub {}", exception);
             return null;
         }
     }
@@ -103,7 +103,7 @@ public class DCPMoPubReporting extends BaseReportingImpl {
                 URLEncoder.encode("date,adunit", "UTF-8"));
         }
         catch (UnsupportedEncodingException e) {
-            logger.info("Erorr encoding URL");
+            LOG.info("Erorr encoding URL");
         }
         return null;
     }
@@ -133,7 +133,8 @@ public class DCPMoPubReporting extends BaseReportingImpl {
         return (config.getString("mopub.advertiserId"));
     }
 
-    private String invokeHTTPUrl(final String url) throws MalformedURLException, IOException {
+    @Override
+    protected String invokeHTTPUrl(final String url) throws MalformedURLException, IOException {
         URLConnection conn = new URL(url).openConnection();
         String authStr = accountId + ":" + secretKey;
         String authEncoded = new String(Base64.encodeBase64(authStr.getBytes()));
@@ -150,7 +151,7 @@ public class DCPMoPubReporting extends BaseReportingImpl {
             }
         }
         catch (IOException ioe) {
-            logger.info("Error in Httpool invokeHTTPUrl : ", ioe.getMessage());
+            LOG.info("Error in Httpool invokeHTTPUrl : {}", ioe.getMessage());
         }
         finally {
             if (res != null) {
@@ -162,8 +163,8 @@ public class DCPMoPubReporting extends BaseReportingImpl {
 
     }
 
-    private void generateReportResponse(final DebugLogger logger, ReportResponse reportResponse, String response,
-            String key) throws JSONException {
+    private void generateReportResponse(final ReportResponse reportResponse, final String response, final String key)
+            throws JSONException {
         Boolean dataFound = false;
         JSONObject responseObject = new JSONObject(response);
         JSONArray responseHeader = responseObject.getJSONArray("columns");

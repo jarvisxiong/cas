@@ -10,38 +10,37 @@ import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
 
 
-public class DCPMoPubAdNetwork extends BaseAdNetworkImpl {
-    private final Configuration config;
+public class DCPMoPubAdNetwork extends AbstractDCPAdNetworkImpl {
+    private static final Logger LOG              = LoggerFactory.getLogger(DCPMoPubAdNetwork.class);
+
     private String              deviceId;
     private static final String name             = "mopub";
     private static final String responseTemplate = "%s <img src='%s' height=1 width=1 border=0 style=\"display:none;\"/>";
     private Request             ningRequest;
 
-    public DCPMoPubAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent, logger);
-        this.config = config;
-        this.logger = logger;
-        this.clientBootstrap = clientBootstrap;
+    public DCPMoPubAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }
 
     @Override
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            logger.debug("mandatory parameters missing for MoPub so exiting adapter");
+            LOG.debug("mandatory parameters missing for MoPub so exiting adapter");
             return false;
         }
 
@@ -55,11 +54,11 @@ public class DCPMoPubAdNetwork extends BaseAdNetworkImpl {
             deviceId = "sha:" + casInternalRequestParameters.uidO1;
         }
         if (StringUtils.isBlank(deviceId)) {
-            logger.debug("Device id mandate parameters missing for MoPub, so returning from adapter");
+            LOG.debug("Device id mandate parameters missing for MoPub, so returning from adapter");
             return false;
         }
 
-        logger.info("Configure parameters inside MoPub returned true");
+        LOG.info("Configure parameters inside MoPub returned true");
         return true;
     }
 
@@ -87,20 +86,20 @@ public class DCPMoPubAdNetwork extends BaseAdNetworkImpl {
                 url.append("&ll=").append(getURLEncode(casInternalRequestParameters.latLong, format));
             }
 
-            logger.debug("MoPub url is", url);
+            LOG.debug("MoPub url is {}", url);
 
             return (new URI(url.toString()));
         }
         catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            logger.info(exception.getMessage());
+            LOG.error("{}", exception);
         }
         return null;
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status) {
-        logger.debug("response is", response);
+    public void parseResponse(final String response, final HttpResponseStatus status) {
+        LOG.debug("response is {}", response);
         statusCode = status.getCode();
         if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
             if (200 == statusCode) {
@@ -113,7 +112,7 @@ public class DCPMoPubAdNetwork extends BaseAdNetworkImpl {
             responseContent = String.format(responseTemplate, response, beaconUrl);
             adStatus = "AD";
         }
-        logger.debug("response length is", response.length());
+        LOG.debug("response length is {}", response.length());
     }
 
     @Override
@@ -124,20 +123,20 @@ public class DCPMoPubAdNetwork extends BaseAdNetworkImpl {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public boolean makeAsyncRequest() {
-        logger.debug("In mopub async");
+        LOG.debug("In mopub async");
         try {
             String uri = getRequestUri().toString();
             requestUrl = uri;
             setNingRequest(requestUrl);
-            logger.debug("Nexage uri :", uri);
+            LOG.debug("Nexage uri : {}", uri);
             startTime = System.currentTimeMillis();
             baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
                 @Override
-                public Response onCompleted(Response response) throws Exception {
+                public Response onCompleted(final Response response) throws Exception {
                     if (!isRequestCompleted()) {
-                        logger.debug("Operation complete for channel partner: ", getName());
+                        LOG.debug("Operation complete for channel partner: {}", getName());
                         latency = System.currentTimeMillis() - startTime;
-                        logger.debug(getName(), "operation complete latency", latency);
+                        LOG.debug("{} operation complete latency {}", getName(), latency);
                         String responseStr = response.getResponseBody();
                         responseHeaders = new HashMap<String, String>();
                         responseHeaders.put("X-Clickthrough", response.getHeader("X-Clickthrough"));
@@ -149,35 +148,35 @@ public class DCPMoPubAdNetwork extends BaseAdNetworkImpl {
                 }
 
                 @Override
-                public void onThrowable(Throwable t) {
+                public void onThrowable(final Throwable t) {
                     if (isRequestComplete) {
                         return;
                     }
 
                     if (t instanceof java.util.concurrent.TimeoutException) {
                         latency = System.currentTimeMillis() - startTime;
-                        logger.debug(getName(), "timeout latency ", latency);
+                        LOG.debug("{} timeout latency ", getName(), latency);
                         adStatus = "TIME_OUT";
                         processResponse();
                         return;
                     }
 
-                    logger.debug(getName(), "error latency ", latency);
+                    LOG.debug("{} error latency {}", getName(), latency);
                     adStatus = "TERM";
-                    logger.info("error while fetching response from:", getName(), t.getMessage());
+                    LOG.info("error while fetching response from: {} {}", getName(), t);
                     processResponse();
                     return;
                 }
             });
         }
         catch (Exception e) {
-            logger.debug("Exception in", getName(), "makeAsyncRequest :", e.getMessage());
+            LOG.debug("Exception in {} makeAsyncRequest : {}", getName(), e);
         }
-        logger.debug(getName(), "returning from make NingRequest");
+        LOG.debug("{} returning from make NingRequest", getName());
         return true;
     }
 
-    private void setNingRequest(String requestUrl) {
+    private void setNingRequest(final String requestUrl) {
         ningRequest = new RequestBuilder()
                 .setUrl(requestUrl)
                     .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())

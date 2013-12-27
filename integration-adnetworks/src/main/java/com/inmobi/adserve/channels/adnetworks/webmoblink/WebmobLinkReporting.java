@@ -12,6 +12,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -24,11 +26,10 @@ import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.api.ServerException;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class WebmobLinkReporting extends BaseReportingImpl {
-    private DebugLogger         logger;
+    private static final Logger LOG                  = LoggerFactory.getLogger(WebmobLinkReporting.class);
     private final Configuration config;
     private final String        token;
     private String              pubId;
@@ -52,38 +53,36 @@ public class WebmobLinkReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws ParserConfigurationException, DOMException, ParseException, SAXException,
-            IOException {
-        this.logger = logger;
+    public ReportResponse fetchRows(final ReportTime startTime, final String key, final ReportTime endTime)
+            throws ParserConfigurationException, DOMException, ParseException, SAXException, IOException {
         pubId = key;
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         String responseString = null;
-        logger.debug("inside fetch rows of Webmoblink");
+        LOG.debug("inside fetch rows of Webmoblink");
         try {
             startDate = startTime.getStringDate("/");
-            logger.debug("start date inside Webmoblink is " + startDate);
+            LOG.debug("start date inside Webmoblink is {}" + startDate);
             endDate = endTime == null ? getEndDate() : startDate;
-            logger.debug("end date inside Webmoblink is " + endDate);
+            LOG.debug("end date inside Webmoblink is {}" + endDate);
             if (ReportTime.compareStringDates(endDate, startDate) == -1) {
-                logger.debug("end date is less than start date plus reporting window for Webmoblink");
+                LOG.debug("end date is less than start date plus reporting window for Webmoblink");
                 return null;
             }
             String url = getRequestUrl();
-            logger.debug("url inside Webmoblink is " + url);
-            responseString = invokeUrl(url, null, logger);
+            LOG.debug("url inside Webmoblink is {}", url);
+            responseString = invokeUrl(url, null);
         }
         catch (ServerException se) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_SERVER_ERROR;
-            logger.info("failed to collect response from Webmoblink " + se.getMessage());
+            LOG.info("failed to collect response from Webmoblink {}", se);
             return reportResponse;
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.info("failed to obtain correct dates for fetching reports " + exception.getMessage());
+            LOG.info("failed to obtain correct dates for fetching reports {}", exception);
             return reportResponse;
         }
-        logger.debug("successfully invoked url, so will do xml parsing");
+        LOG.debug("successfully invoked url, so will do xml parsing");
         // XML Parsing
         DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
@@ -99,25 +98,25 @@ public class WebmobLinkReporting extends BaseReportingImpl {
                 if (status != 0) {
                     switch (status) {
                         case 1:
-                            logger.info("Error. Missing mandatory parameters");
+                            LOG.info("Error. Missing mandatory parameters");
                             break;
                         case 2:
-                            logger.info("Error. The parameter 'pid' is invalid");
+                            LOG.info("Error. The parameter 'pid' is invalid");
                             break;
                         case 3:
-                            logger.info("Error. The parameter 'startDate' is invalid");
+                            LOG.info("Error. The parameter 'startDate' is invalid");
                             break;
                         case 4:
-                            logger.info("Error. The parameter 'endDate' is invalid");
+                            LOG.info("Error. The parameter 'endDate' is invalid");
                             break;
                         case 5:
-                            logger.info("Error. The time period is invalid");
+                            LOG.info("Error. The time period is invalid");
                             break;
                         case 6:
-                            logger.info("Error. Unknown publisher ID or Credential");
+                            LOG.info("Error. Unknown publisher ID or Credential");
                             break;
                         case 7:
-                            logger.info("Error. The period is more than 60 days");
+                            LOG.info("Error. The period is more than 60 days");
                             break;
                     }
                     reportResponse.status = ReportResponse.ResponseStatus.FAIL_SERVER_ERROR;
@@ -146,7 +145,7 @@ public class WebmobLinkReporting extends BaseReportingImpl {
                     row.revenue = Double.parseDouble(revenue.getTextContent());
                     row.siteId = key;
                     row.slotSize = getReportGranularity();
-                    logger.debug("parsing data inside Webmoblink " + row.request);
+                    LOG.debug("parsing data inside Webmoblink {}", row.request);
                     reportResponse.addReportRow(row);
                 }
             }
@@ -184,7 +183,7 @@ public class WebmobLinkReporting extends BaseReportingImpl {
 
     public String getEndDate() throws Exception {
         try {
-            logger.debug("calculating end date for WebmobLink");
+            LOG.debug("calculating end date for WebmobLink");
             ReportTime reportTime = ReportTime.getUTCTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
             if (reportTime.getHour() <= ReportReconcilerWindow()) {
@@ -193,7 +192,7 @@ public class WebmobLinkReporting extends BaseReportingImpl {
             return (reportTime.getStringDate("/"));
         }
         catch (Exception exception) {
-            logger.info("failed to obtain end date inside WebMobLink " + exception.getMessage());
+            LOG.info("failed to obtain end date inside WebMobLink {}", exception);
             return "";
         }
     }

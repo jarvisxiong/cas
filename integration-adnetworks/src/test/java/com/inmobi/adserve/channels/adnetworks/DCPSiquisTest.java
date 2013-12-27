@@ -25,7 +25,6 @@ import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 /**
@@ -45,7 +44,6 @@ public class DCPSiquisTest extends TestCase {
     private final String          partnerId          = "inmobikorea";
 
     private final ClientBootstrap clientBootstrap    = null;
-    private static DebugLogger    logger;
 
     public void prepareMockConfig() {
         mockConfig = EasyMock.createMock(Configuration.class);
@@ -71,10 +69,8 @@ public class DCPSiquisTest extends TestCase {
         MessageEvent serverEvent = createMock(MessageEvent.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        DebugLogger.init(mockConfig);
         Formatter.init();
-        logger = new DebugLogger();
-        dcpSiquisAdNetwork = new DCPSiquisAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpSiquisAdNetwork = new DCPSiquisAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test

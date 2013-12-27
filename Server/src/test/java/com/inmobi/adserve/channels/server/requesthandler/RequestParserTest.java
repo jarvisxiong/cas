@@ -3,36 +3,40 @@ package com.inmobi.adserve.channels.server.requesthandler;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
+import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Marker;
 import org.testng.annotations.Test;
 
+import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
-import com.inmobi.adserve.channels.util.DebugLogger;
-
-import junit.framework.TestCase;
 
 
-public class RequestParserTest extends TestCase
-{
+public class RequestParserTest extends TestCase {
 
-    public void setUp()
-    {
+    private RequestParser requestParser;
+
+    @Override
+    public void setUp() {
         Configuration mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
         expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
         expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
         replay(mockConfig);
-        DebugLogger.init(mockConfig);
+        requestParser = new RequestParser(new Provider<Marker>() {
+            @Override
+            public Marker get() {
+                return null;
+            }
+        });
     }
 
     @Test
-    public void testParseRequestParameters() throws JSONException
-    {
+    public void testParseRequestParameters() throws JSONException {
         JSONObject jObject = new JSONObject(
                 "{\"site-type\":\"PE (iPod; U; CPU iPhone OS 4_3_1 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Mobile/8G4\""
                         + ",\"handset\":[42279,\"apple_ipod_touch_ver4_3_1_subua\"],\"rqMkAdcount\":\"1\",\"new-category\":[70,42],\"site-floor\":0"
@@ -45,8 +49,8 @@ public class RequestParserTest extends TestCase
                         + ",\"pub-id\":\"4028cb9731d7d0ad0131e1d1996101ef\",\"os-id\":6}");
         SASRequestParameters sasRequestParameters = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        RequestParser.parseRequestParameters(jObject, sasRequestParameters, casInternalRequestParameters,
-            new DebugLogger());
+
+        requestParser.parseRequestParameters(jObject, sasRequestParameters, casInternalRequestParameters);
         assertNotNull(sasRequestParameters);
         assertEquals(
             "PE (iPod; U; CPU iPhone OS 4_3_1 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Mobile/8G4"

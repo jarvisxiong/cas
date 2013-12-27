@@ -4,70 +4,64 @@ import org.apache.commons.configuration.Configuration;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.api.ServerException;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DrawBridgeReporting extends BaseReportingImpl {
-    private Configuration  config;
-    private String         startDate = "";
-    private String         endDate   = "";
-    private DebugLogger    logger;
-    private ReportResponse reportResponse;
+    private static final Logger LOG       = LoggerFactory.getLogger(DrawBridgeReporting.class);
+
+    private final Configuration config;
+    private String              startDate = "";
+    private String              endDate   = "";
+    private ReportResponse      reportResponse;
 
     public DrawBridgeReporting(final Configuration config) {
         this.config = config;
     }
 
-    @Override
-    public ReportResponse fetchRows(DebugLogger logger, ReportTime startTime, String key, ReportTime endTime)
-            throws Exception {
-        // NO OP
-        return null;
-    }
-
     // Fetches the report from the TPAN
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final ReportTime endTime)
-            throws ServerException, JSONException {
-        this.logger = logger;
+    public ReportResponse fetchRows(final ReportTime startTime, final ReportTime endTime) throws ServerException,
+            JSONException {
         reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
-        logger.debug("inside fetch rows of draw bridge");
+        LOG.debug("inside fetch rows of draw bridge");
         try {
             startDate = startTime.getStringDate("-");
-            logger.debug("start date inside drawbridge is " + startDate);
+            LOG.debug("start date inside drawbridge is {}", startDate);
             endDate = endTime == null ? getEndDate() : startDate;
-            logger.debug("end date inside drawbridge is " + endDate);
+            LOG.debug("end date inside drawbridge is ", endDate);
             if (ReportTime.compareStringDates(endDate, startDate) == -1) {
-                logger.debug("end date is less than start date plus reporting window for mobile commerce");
+                LOG.debug("end date is less than start date plus reporting window for mobile commerce");
                 return null;
             }
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.info("failed to obtain correct dates for fetching reports " + exception.getMessage());
+            LOG.info("failed to obtain correct dates for fetching reports ", exception);
             return null;
         }
         String url = getRequestUrl();
-        logger.debug("url inside drawbridge is " + url);
-        String responseString = invokeUrl(url, null, logger);
+        LOG.debug("url inside drawbridge is {}", url);
+        String responseString = invokeUrl(url, null);
         reportResponse.status = ReportResponse.ResponseStatus.SUCCESS;
         String[] responseArray = responseString.split("\n");
-        logger.debug("successfuly got response inside drawbridge. Number of lines of response is "
-                + responseArray.length + "response : " + responseString);
-        generateReportResponse(logger, reportResponse, responseString);
-        logger.debug("successfully parsed data inside drawbridge");
+        LOG.debug("successfuly got response inside drawbridge. Number of lines of response is {} response : {}",
+            responseArray.length, responseString);
+        generateReportResponse(reportResponse, responseString);
+        LOG.debug("successfully parsed data inside drawbridge");
         return reportResponse;
     }
 
     // obtain end date for the date range in which data is to be fetched
     public String getEndDate() throws Exception {
         try {
-            logger.debug("calculating end date for drawbridge");
+            LOG.debug("calculating end date for drawbridge");
             ReportTime reportTime = ReportTime.getUTCTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
             if (reportTime.getHour() <= ReportReconcilerWindow()) {
@@ -76,7 +70,7 @@ public class DrawBridgeReporting extends BaseReportingImpl {
             return (reportTime.getStringDate("-"));
         }
         catch (Exception exception) {
-            logger.info("failed to obtain end date inside mobile commerce " + exception.getMessage());
+            LOG.info("failed to obtain end date inside mobile commerce {}", exception);
             return "";
         }
     }
@@ -91,7 +85,7 @@ public class DrawBridgeReporting extends BaseReportingImpl {
         String url = String.format(config.getString("drawbridge.host"), config.getString("drawbridge.partnerId"),
             config.getString("drawbridge.partnerSignature"), startDate, endDate,
             config.getString("drawbridge.responseFormat"), interval);
-        logger.debug("url inside draw bridge is " + url);
+        LOG.debug("url inside draw bridge is {}", url);
         return url;
     }
 
@@ -122,7 +116,7 @@ public class DrawBridgeReporting extends BaseReportingImpl {
         return 7;
     }
 
-    private void generateReportResponse(final DebugLogger logger, ReportResponse reportResponse, String response)
+    private void generateReportResponse(final ReportResponse reportResponse, final String response)
             throws JSONException {
 
         JSONObject responseObject = new JSONObject(response);
@@ -132,7 +126,7 @@ public class DrawBridgeReporting extends BaseReportingImpl {
             JSONObject reportRow = responseStatsArray.getJSONObject(i);
             ReportResponse.ReportRow row = new ReportResponse.ReportRow();
             if (!decodeBlindedSiteId(reportRow.getString("property"), row)) {
-                logger.debug("Error decoded BlindedSite id in Drawbridge", reportRow.getString("property"));
+                LOG.debug("Error decoded BlindedSite id in Drawbridge {}", reportRow.getString("property"));
                 continue;
             }
             row.isSiteData = true;

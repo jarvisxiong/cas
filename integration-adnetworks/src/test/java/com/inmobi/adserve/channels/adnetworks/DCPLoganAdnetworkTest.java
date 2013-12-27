@@ -22,7 +22,6 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPLoganAdnetworkTest extends TestCase {
@@ -30,7 +29,6 @@ public class DCPLoganAdnetworkTest extends TestCase {
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
     private final ClientBootstrap clientBootstrap = null;
-    private DebugLogger           logger;
     private DCPLoganAdnetwork     dcpLoganAdNetwork;
     private final String          loganHost       = "http://ads.mocean.mobi/ad?track=1&key=6&type=3&over_18=0";
     private final String          loganStatus     = "on";
@@ -60,9 +58,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
         MessageEvent serverEvent = createMock(MessageEvent.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        DebugLogger.init(mockConfig);
-        logger = new DebugLogger();
-        dcpLoganAdNetwork = new DCPLoganAdnetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpLoganAdNetwork = new DCPLoganAdnetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test

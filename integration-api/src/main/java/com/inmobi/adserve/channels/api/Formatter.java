@@ -11,12 +11,15 @@ import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
 public class Formatter {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Formatter.class);
 
     public enum TemplateType {
         HTML,
@@ -48,21 +51,21 @@ public class Formatter {
         velocityTemplateJsAdTag = velocityEngine.getTemplate("nexageJsAdTag.vm");
     }
 
-    static void updateVelocityContext(VelocityContext context, SASRequestParameters sasParams, String beaconUrl,
-            DebugLogger logger) {
+    static void updateVelocityContext(final VelocityContext context, final SASRequestParameters sasParams,
+            final String beaconUrl) {
         if (StringUtils.isNotBlank(beaconUrl)) {
             context.put(VelocityTemplateFieldConstants.IMBeaconUrl, beaconUrl);
         }
         if (!WAP.equalsIgnoreCase(sasParams.getSource())) {
             context.put(VelocityTemplateFieldConstants.APP, true);
-            context.put(VelocityTemplateFieldConstants.SDK360Onwards, requestFromSDK360Onwards(sasParams, logger));
+            context.put(VelocityTemplateFieldConstants.SDK360Onwards, requestFromSDK360Onwards(sasParams));
             if (StringUtils.isNotBlank(sasParams.getImaiBaseUrl())) {
                 context.put(VelocityTemplateFieldConstants.IMAIBaseUrl, sasParams.getImaiBaseUrl());
             }
         }
     }
 
-    static boolean requestFromSDK360Onwards(SASRequestParameters sasParams, DebugLogger logger) {
+    static boolean requestFromSDK360Onwards(final SASRequestParameters sasParams) {
         if (StringUtils.isBlank(sasParams.getSdkVersion())) {
             return false;
         }
@@ -74,18 +77,18 @@ public class Formatter {
             }
         }
         catch (StringIndexOutOfBoundsException e2) {
-            logger.debug("Invalid sdkversion ", e2.getMessage());
+            LOG.debug("Invalid sdkversion {}", e2);
         }
         catch (NumberFormatException e3) {
-            logger.debug("Invalid sdkversion ", e3.getMessage());
+            LOG.debug("Invalid sdkversion {}", e3);
         }
         return false;
     }
 
-    public static String getResponseFromTemplate(TemplateType type, VelocityContext context,
-            SASRequestParameters sasParams, String beaconUrl, DebugLogger logger) throws ResourceNotFoundException,
+    public static String getResponseFromTemplate(final TemplateType type, final VelocityContext context,
+            final SASRequestParameters sasParams, final String beaconUrl) throws ResourceNotFoundException,
             ParseErrorException, MethodInvocationException, IOException {
-        updateVelocityContext(context, sasParams, beaconUrl, logger);
+        updateVelocityContext(context, sasParams, beaconUrl);
         StringWriter writer = new StringWriter();
         switch (type) {
             case HTML:
@@ -110,7 +113,7 @@ public class Formatter {
         return writer.toString();
     }
 
-    public static String getRichTextTemplateForSlot(String slot) {
+    public static String getRichTextTemplateForSlot(final String slot) {
         if (slot == null) {
             return null;
         }

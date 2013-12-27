@@ -1,5 +1,9 @@
 package com.inmobi.adserve.channels.adnetworks;
 
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,10 +18,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-
 import com.inmobi.adserve.channels.adnetworks.pubmatic.DCPPubmaticAdNetwork;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -25,7 +25,6 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPPubmaticAdapterTest extends TestCase {
@@ -33,7 +32,6 @@ public class DCPPubmaticAdapterTest extends TestCase {
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
     private final ClientBootstrap clientBootstrap = null;
-    private DebugLogger           logger;
     private DCPPubmaticAdNetwork  dcpPubmaticAdnetwork;
     private final String          pubmaticHost    = "http://showads.pubmatic.com/AdServer/AdServerServlet";
     private final String          pubmaticStatus  = "on";
@@ -63,11 +61,9 @@ public class DCPPubmaticAdapterTest extends TestCase {
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         SlotSizeMapping.init();
         prepareMockConfig();
-        DebugLogger.init(mockConfig);
         SlotSizeMapping.init();
         Formatter.init();
-        logger = new DebugLogger();
-        dcpPubmaticAdnetwork = new DCPPubmaticAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpPubmaticAdnetwork = new DCPPubmaticAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test

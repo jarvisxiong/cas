@@ -1,8 +1,9 @@
 package com.inmobi.adserve.channels.server.client;
 
-import com.inmobi.adserve.channels.api.ChannelsClientHandler;
-import com.inmobi.adserve.channels.server.ConnectionLimitHandler;
-import com.inmobi.adserve.channels.server.api.ConnectionType;
+import java.util.NoSuchElementException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
 import org.jboss.netty.bootstrap.ClientBootstrap;
@@ -15,22 +16,22 @@ import org.jboss.netty.handler.codec.http.HttpResponseDecoder;
 import org.jboss.netty.handler.timeout.ReadTimeoutHandler;
 import org.jboss.netty.util.Timer;
 
-import java.util.NoSuchElementException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import com.inmobi.adserve.channels.api.ChannelsClientHandler;
+import com.inmobi.adserve.channels.server.ConnectionLimitHandler;
+import com.inmobi.adserve.channels.server.api.ConnectionType;
 
 
 public class RtbBootstrapCreation {
-    public static ClientBootstrap                 bootstrap;
-    private static ChannelsClientHandler          channelHandler;
-    private static Timer                          timer;
+    public static ClientBootstrap         bootstrap;
+    private static ChannelsClientHandler  channelHandler;
+    private static Timer                  timer;
     private static ConnectionLimitHandler connectionLimitUpstreamHandler;
 
-    public static void init(Timer timer) {
+    public static void init(final Timer timer) {
         RtbBootstrapCreation.timer = timer;
     }
 
-    public static ClientBootstrap createBootstrap(Logger logger, final Configuration config) {
+    public static ClientBootstrap createBootstrap(final Logger logger, final Configuration config) {
         // make the bootstrap object
         try {
             bootstrap = new ClientBootstrap(new NioClientSocketChannelFactory(Executors.newCachedThreadPool(),
@@ -42,9 +43,10 @@ public class RtbBootstrapCreation {
             logger.info("error in building RTBbootstrap " + ex.getMessage());
             return null;
         }
-        // make the channel pipeline
+
         try {
             bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
+                @Override
                 public ChannelPipeline getPipeline() throws Exception {
                     int rtbReadTimeoutMills;
                     try {

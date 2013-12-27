@@ -12,21 +12,24 @@ import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.IABCategoriesInterface;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public class DCPAdelphicAdNetwork extends BaseAdNetworkImpl {
-    private final Configuration                 config;
+public class DCPAdelphicAdNetwork extends AbstractDCPAdNetworkImpl {
+
+    private static final Logger                 LOG            = LoggerFactory.getLogger(DCPAdelphicAdNetwork.class);
+
     private int                                 width;
     private int                                 height;
     private String                              deviceId;
@@ -39,19 +42,22 @@ public class DCPAdelphicAdNetwork extends BaseAdNetworkImpl {
 
     private static final IABCategoriesInterface iabCategoryMap = new IABCategoriesMap();
 
-    public DCPAdelphicAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent, logger);
-        this.config = config;
-        this.logger = logger;
-        this.clientBootstrap = clientBootstrap;
+    /**
+     * @param config
+     * @param clientBootstrap
+     * @param baseRequestHandler
+     * @param serverEvent
+     */
+    public DCPAdelphicAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }
 
     @Override
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            logger.debug("mandatory parameters missing for Adelphic so exiting adapter");
+            LOG.debug("mandatory parameters missing for Adelphic so exiting adapter");
             return false;
         }
 
@@ -62,12 +68,12 @@ public class DCPAdelphicAdNetwork extends BaseAdNetworkImpl {
             height = (int) Math.ceil(dim.getHeight());
         }
         else {
-            logger.debug("mandate parameters missing for Adelphic, so returning from adapter");
+            LOG.debug("mandate parameters missing for Adelphic, so returning from adapter");
             return false;
         }
         deviceId = getUid();
         if (StringUtils.isEmpty(deviceId)) {
-            logger.debug("mandate parameters missing for Adelphic, so returning from adapter");
+            LOG.debug("mandate parameters missing for Adelphic, so returning from adapter");
             return false;
         }
         if (casInternalRequestParameters.latLong != null
@@ -85,12 +91,12 @@ public class DCPAdelphicAdNetwork extends BaseAdNetworkImpl {
             siteId = additionalParams.getString("site");
         }
         catch (Exception e) {
-            logger.error("Spot Id/Site/pubId is not configured for the segment:{}", entity.getExternalSiteKey());
+            LOG.error("Spot Id/Site/pubId is not configured for the segment:{}", entity.getExternalSiteKey());
             return false;
         }
         sourceType = (StringUtils.isBlank(sasParams.getSource()) || "WAP".equalsIgnoreCase(sasParams.getSource())) ? 'w'
                 : 'a';
-        logger.info("Configure parameters inside Adelphic returned true");
+        LOG.info("Configure parameters inside Adelphic returned true");
         return true;
     }
 
@@ -164,20 +170,20 @@ public class DCPAdelphicAdNetwork extends BaseAdNetworkImpl {
             url.append("&bcat=").append(
                 getURLEncode(getValueFromListAsString(iabCategoryMap.getIABCategories(bCat)), format));
             url.append("&scat=").append(getURLEncode(getCategories(',', true, true), format));
-            logger.debug("Adelphic url is", url);
+            LOG.debug("Adelphic url is {}", url);
 
             return (new URI(url.toString()));
         }
         catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            logger.info(exception.getMessage());
+            LOG.error("{}", exception);
         }
         return null;
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status) {
-        logger.debug("response is", response);
+    public void parseResponse(final String response, final HttpResponseStatus status) {
+        LOG.debug("response is {}", response);
         statusCode = status.getCode();
         if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
             if (200 == statusCode) {
@@ -190,17 +196,16 @@ public class DCPAdelphicAdNetwork extends BaseAdNetworkImpl {
             VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
             try {
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl,
-                    logger);
+                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
             }
             catch (Exception exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from Adelphic :", exception);
-                logger.info("Response from Adelphic:", response);
+                LOG.info("Error parsing response from Adelphic : {}", exception);
+                LOG.info("Response from Adelphic: {}", response);
             }
         }
-        logger.debug("response length is", responseContent.length());
+        LOG.debug("response length is {}", responseContent.length());
     }
 
     @Override

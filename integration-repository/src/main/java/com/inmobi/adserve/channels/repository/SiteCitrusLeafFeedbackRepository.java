@@ -1,23 +1,5 @@
 package com.inmobi.adserve.channels.repository;
 
-import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
-import com.inmobi.adserve.channels.entity.SegmentAdGroupFeedbackEntity;
-import com.inmobi.adserve.channels.entity.SiteFeedbackEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.casthrift.AdGroupFeedback;
-import com.inmobi.casthrift.DataCenter;
-import com.inmobi.casthrift.Feedback;
-import com.inmobi.casthrift.SiteFeedback;
-import net.citrusleaf.CitrusleafClient;
-import net.citrusleaf.CitrusleafClient.ClResult;
-import net.citrusleaf.CitrusleafClient.ClResultCode;
-import org.apache.commons.configuration.Configuration;
-import org.apache.thrift.TDeserializer;
-import org.apache.thrift.TException;
-import org.apache.thrift.protocol.TBinaryProtocol;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,6 +9,27 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import net.citrusleaf.CitrusleafClient;
+import net.citrusleaf.CitrusleafClient.ClResult;
+import net.citrusleaf.CitrusleafClient.ClResultCode;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.thrift.TDeserializer;
+import org.apache.thrift.TException;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
+import com.inmobi.adserve.channels.entity.SegmentAdGroupFeedbackEntity;
+import com.inmobi.adserve.channels.entity.SiteFeedbackEntity;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.casthrift.AdGroupFeedback;
+import com.inmobi.casthrift.DataCenter;
+import com.inmobi.casthrift.Feedback;
+import com.inmobi.casthrift.SiteFeedback;
 
 
 public class SiteCitrusLeafFeedbackRepository {
@@ -43,8 +46,10 @@ public class SiteCitrusLeafFeedbackRepository {
     private int                                                       feedbackTimeFrame;
     private int                                                       boostTimeFrame;
     private double                                                    defaultECPM;
+    private static final Logger                                       LOG = LoggerFactory
+                                                                                  .getLogger(SiteCitrusLeafFeedbackRepository.class);
 
-    public void init(Configuration config, DataCenter colo) {
+    public void init(final Configuration config, final DataCenter colo) {
         this.namespace = config.getString("namespace");
         this.set = config.getString("set");
         SiteCitrusLeafFeedbackRepository.citrusleafClient = new CitrusleafClient(config.getString("host"),
@@ -66,26 +71,26 @@ public class SiteCitrusLeafFeedbackRepository {
      * 
      * @return : returns te entity matching for the site, segment and adgroup combination
      */
-    public SegmentAdGroupFeedbackEntity query(String siteId, Integer segmentId, DebugLogger logger) {
+    public SegmentAdGroupFeedbackEntity query(final String siteId, final Integer segmentId) {
         SiteFeedbackEntity siteFeedbackEntity = siteSegmentFeedbackCache.get(siteId);
         if (siteFeedbackEntity != null) {
-            logger.debug("got the siteFeedback entity from cache for query", siteId, segmentId);
+            LOG.debug("got the siteFeedback entity from cache for query {} {}", siteId, segmentId);
             if (System.currentTimeMillis() - siteFeedbackEntity.getLastUpdated() < refreshTime) {
-                logger.debug("siteFeedback entity is fresh for query", siteId, segmentId);
+                LOG.debug("siteFeedback entity is fresh for query {} {}", siteId, segmentId);
                 InspectorStats.incrementStatCount(InspectorStrings.siteFeedbackCacheHit);
                 return siteFeedbackEntity.getSegmentAdGroupFeedbackMap() == null ? null : siteFeedbackEntity
                         .getSegmentAdGroupFeedbackMap()
                             .get(segmentId);
             }
-            logger.debug("siteFeedback entity is stale for query", siteId, "_", segmentId);
+            LOG.debug("siteFeedback entity is stale for query {}_{}", siteId, segmentId);
         }
         else {
-            logger.debug("siteFeedback not found for siteId:", siteId);
+            LOG.debug("siteFeedback not found for siteId: {}", siteId);
         }
-        logger.debug("Returning default/old siteFeedback entity", "and Fetching new data from citrus leaf for siteId:",
+        LOG.debug("Returning default/old siteFeedback entity and Fetching new data from citrus leaf for siteId: {}",
             siteId);
         InspectorStats.incrementStatCount(InspectorStrings.siteFeedbackCacheMiss);
-        asynchronouslyFetchFeedbackFromCitrusLeaf(siteId, logger);
+        asynchronouslyFetchFeedbackFromCitrusLeaf(siteId);
         siteFeedbackEntity = siteSegmentFeedbackCache.get(siteId);
         return siteFeedbackEntity == null ? null : (siteFeedbackEntity.getSegmentAdGroupFeedbackMap() == null ? null
                 : siteFeedbackEntity.getSegmentAdGroupFeedbackMap().get(segmentId));
@@ -94,16 +99,16 @@ public class SiteCitrusLeafFeedbackRepository {
     /**
      * Method that asynchronously fetches feedback from the citrusleaf and puts it into the cache
      */
-    private void asynchronouslyFetchFeedbackFromCitrusLeaf(String siteId, DebugLogger logger) {
+    private void asynchronouslyFetchFeedbackFromCitrusLeaf(final String siteId) {
         Boolean isSiteGettingUpdated = this.currentlyUpdatingSites.putIfAbsent(siteId, true);
         if (isSiteGettingUpdated == null) {
             // forking new thread to fetch feedback from citrusleaf
-            CacheUpdater cacheUpdater = new CacheUpdater(siteId, logger);
+            CacheUpdater cacheUpdater = new CacheUpdater(siteId);
             Thread cacheUpdaterThread = new Thread(cacheUpdater);
             executorService.execute(cacheUpdaterThread);
         }
         else {
-            logger.debug("Not fetching feedback as site is already updating");
+            LOG.debug("Not fetching feedback as site is already updating");
         }
     }
 
@@ -112,39 +117,37 @@ public class SiteCitrusLeafFeedbackRepository {
      * 
      */
     class CacheUpdater implements Runnable {
-        private String      siteId;
-        private DebugLogger logger;
+        private final String siteId;
 
-        public CacheUpdater(String siteId, DebugLogger logger) {
+        public CacheUpdater(final String siteId) {
             this.siteId = siteId;
-            this.logger = logger;
         }
 
         @Override
         public void run() {
-            logger.debug("getting feedback form the citrus leaf for query", siteId);
+            LOG.debug("getting feedback form the citrus leaf for query {}", siteId);
             getFeedbackFromCitrusleaf(siteId);
         }
 
         /**
          * Method which gets feedback form citrusleaf in case of a cache miss and updates the cache
          */
-        void getFeedbackFromCitrusleaf(String siteId) {
+        void getFeedbackFromCitrusleaf(final String siteId) {
             // getting all data for the site
             ClResult clResult = getFromCitrusLeaf(siteId);
             if (!clResult.resultCode.equals(ClResultCode.OK)) {
-                logger.debug("key not found in citrus leaf");
+                LOG.debug("key not found in citrus leaf");
                 InspectorStats.incrementStatCount(InspectorStrings.siteFeedbackFailedToLoadFromCitrusLeaf);
                 return;
             }
-            logger.debug("key found in citrus leaf");
+            LOG.debug("key found in citrus leaf");
             updateCache(processResultFromCitrusLeaf(clResult));
         }
 
         /**
          * Method which makes a call to citrus leaf to load the complete site info
          */
-        ClResult getFromCitrusLeaf(String site) {
+        ClResult getFromCitrusLeaf(final String site) {
             InspectorStats.incrementStatCount(InspectorStrings.siteFeedbackRequestsToCitrusLeaf);
             long time = System.currentTimeMillis();
             ClResult clResult = citrusleafClient.getAll(namespace, set, site, null);
@@ -159,7 +162,7 @@ public class SiteCitrusLeafFeedbackRepository {
          * @param clResult
          *            : ClResult object containing the feedback
          */
-        SiteFeedbackEntity processResultFromCitrusLeaf(ClResult clResult) {
+        SiteFeedbackEntity processResultFromCitrusLeaf(final ClResult clResult) {
             if (clResult.results != null) {
                 Map<Integer, SegmentAdGroupFeedbackEntity> segmentAdGroupFeedbackEntityMap = new HashMap<Integer, SegmentAdGroupFeedbackEntity>();
                 for (Map.Entry<String, Object> binValuePair : clResult.results.entrySet()) {
@@ -172,8 +175,8 @@ public class SiteCitrusLeafFeedbackRepository {
                             tDeserializer.deserialize(globalFeedback, (byte[]) binValuePair.getValue());
                         }
                         catch (TException exception) {
-                            logger.debug("Error in deserializing thrift for global feedback for " + "segment",
-                                segmentId, exception);
+                            LOG.debug("Error in deserializing thrift for global feedback for segment {} {}", segmentId,
+                                exception);
                             globalFeedback = null;
                         }
                         bin = DataCenter.RCT.toString() + "\u0001" + segmentId;
@@ -187,7 +190,7 @@ public class SiteCitrusLeafFeedbackRepository {
                             tDeserializer.deserialize(rctFeedback, (byte[]) byteArray);
                         }
                         catch (TException exception) {
-                            logger.debug("Error in deserializing thrift for rct feedback for " + "segment", segmentId,
+                            LOG.debug("Error in deserializing thrift for rct feedback for segment {} {}", segmentId,
                                 exception);
                             rctFeedback = null;
                         }
@@ -202,8 +205,8 @@ public class SiteCitrusLeafFeedbackRepository {
                             tDeserializer.deserialize(coloFeedback, (byte[]) byteArray);
                         }
                         catch (TException exception) {
-                            logger.debug("Error in deserializing thrift for local feedback for " + "segment",
-                                segmentId, exception);
+                            LOG.debug("Error in deserializing thrift for local feedback for segment {} {}", segmentId,
+                                exception);
                             coloFeedback = null;
                         }
                         SegmentAdGroupFeedbackEntity segmentAdGroupFeedbackEntity = buildSiteFeedbackEntity(
@@ -220,7 +223,7 @@ public class SiteCitrusLeafFeedbackRepository {
                 builder.setSegmentAdGroupFeedbackMap(segmentAdGroupFeedbackEntityMap);
                 return builder.build();
             }
-            logger.debug("No result set for this site in citrusleaf");
+            LOG.debug("No result set for this site in citrusleaf");
             return null;
         }
 
@@ -228,8 +231,8 @@ public class SiteCitrusLeafFeedbackRepository {
          * Builds the siteFeedbackEntity object form the global and colo feedback objects(thrift genereated) fetched
          * from citrus leaf
          */
-        SegmentAdGroupFeedbackEntity buildSiteFeedbackEntity(SiteFeedback globalFeedback, SiteFeedback rctFeedback,
-                SiteFeedback coloFeedback) {
+        SegmentAdGroupFeedbackEntity buildSiteFeedbackEntity(final SiteFeedback globalFeedback,
+                final SiteFeedback rctFeedback, final SiteFeedback coloFeedback) {
             if (globalFeedback == null && rctFeedback == null && coloFeedback == null) {
                 return null;
             }
@@ -306,7 +309,7 @@ public class SiteCitrusLeafFeedbackRepository {
          * Method that constructs channel segment feedback entity from adgroupFeedback
          */
         private ChannelSegmentFeedbackEntity.Builder buildChannelSegmentFeedbackEntityBuilder(
-                AdGroupFeedback adGroupFeedback, DateFormat dateFormat, Date date, String today) {
+                final AdGroupFeedback adGroupFeedback, final DateFormat dateFormat, final Date date, final String today) {
             int impressionRendered = 0;
             double weightedImpressionsRendered = 0;
             double weighedRevenue = 0.0;
@@ -368,7 +371,7 @@ public class SiteCitrusLeafFeedbackRepository {
         /**
          * Update the cache with fetched site feedback for the requested segment and its all adgroups
          */
-        void updateCache(SiteFeedbackEntity siteFeedbackEntity) {
+        void updateCache(final SiteFeedbackEntity siteFeedbackEntity) {
             if (siteFeedbackEntity != null) {
                 siteSegmentFeedbackCache.put(this.siteId, siteFeedbackEntity);
             }
@@ -379,7 +382,7 @@ public class SiteCitrusLeafFeedbackRepository {
     /**
      * For lookup into the cache
      */
-    public SiteFeedbackEntity query(String siteId) {
+    public SiteFeedbackEntity query(final String siteId) {
         return this.siteSegmentFeedbackCache.get(siteId);
     }
 

@@ -5,7 +5,6 @@ import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 import java.nio.charset.Charset;
 
-import com.inmobi.adserve.channels.server.api.Servlet;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
@@ -14,17 +13,22 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.adserve.channels.server.api.Servlet;
 
 
+@Singleton
 public class ServletInvalid implements Servlet {
+    private static final Logger LOG = LoggerFactory.getLogger(ServletInvalid.class);
 
     @SuppressWarnings("deprecation")
     @Override
-    public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
-            DebugLogger logger) throws Exception {
+    public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
+            final MessageEvent e) throws Exception {
         // invalid request
         HttpResponse response = new DefaultHttpResponse(HTTP_1_1, NOT_FOUND);
         response.setContent(ChannelBuffers.copiedBuffer("Page not Found", Charset.forName("UTF-8").name()));

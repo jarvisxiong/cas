@@ -27,24 +27,25 @@ import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.api.ServerException;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPSmaatoReporting extends BaseReportingImpl {
-    private final String loginName;
-    private final String password;
-    private String       startDate;
-    private String       endDate;
-    private DebugLogger  logger;
-    private final String host;
-    private final String postData;
-    private final String advertiserId;
-    private String       extSiteKey;
+    private static final Logger LOG = LoggerFactory.getLogger(DCPSmaatoReporting.class);
+    private final String        loginName;
+    private final String        password;
+    private String              startDate;
+    private String              endDate;
+    private final String        host;
+    private final String        postData;
+    private final String        advertiserId;
+    private String              extSiteKey;
 
     public DCPSmaatoReporting(final Configuration config) {
         this.loginName = config.getString("smaato.user");
@@ -55,38 +56,37 @@ public class DCPSmaatoReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws Exception {
-        this.logger = logger;
+    public ReportResponse fetchRows(final ReportTime startTime, final String key, final ReportTime endTime)
+            throws Exception {
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
-        logger.debug("inside fetch rows of smaato");
+        LOG.debug("inside fetch rows of smaato");
         try {
             this.startDate = startTime.getStringDate("-");
-            logger.debug("start date inside smaato is " + this.startDate);
+            LOG.debug("start date inside smaato is {}", this.startDate);
             endDate = endTime == null ? getEndDate("-") : startDate;
             if (ReportTime.compareStringDates(this.endDate, this.startDate) == -1) {
-                logger.debug("date is greater than the current date reporting window for smaato");
+                LOG.debug("date is greater than the current date reporting window for smaato");
                 return null;
             }
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.info("failed to obtain correct dates for fetching reports " + exception.getMessage());
+            LOG.info("failed to obtain correct dates for fetching reports {}", exception);
             return null;
         }
         extSiteKey = key;
-        String response = invokePostMethod(host, getRequestUrl(), logger);
-        logger.debug(response);
+        String response = invokePostMethod(host, getRequestUrl());
+        LOG.debug(response);
         reportResponse.status = ReportResponse.ResponseStatus.SUCCESS;
         String[] responseArray = response.split("\n");
-        generateReportResponse(logger, reportResponse, responseArray, key);
+        generateReportResponse(reportResponse, responseArray, key);
         return reportResponse;
     }
 
     @Override
     public String getRequestUrl() {
         String reportUrl = String.format(postData, loginName, password, startDate, endDate, extSiteKey);
-        logger.debug("url data is  ", reportUrl);
+        LOG.debug("url data is  {}", reportUrl);
         return reportUrl;
     }
 
@@ -117,7 +117,7 @@ public class DCPSmaatoReporting extends BaseReportingImpl {
 
     public String getEndDate(final String seperator) {
         try {
-            logger.debug("calculating end date for smaato");
+            LOG.debug("calculating end date for smaato");
             ReportTime reportTime = ReportTime.getUTCTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
             if (reportTime.getHour() < ReportReconcilerWindow()) {
@@ -126,13 +126,13 @@ public class DCPSmaatoReporting extends BaseReportingImpl {
             return (reportTime.getStringDate(seperator));
         }
         catch (Exception exception) {
-            logger.info("failed to obtain end date inside smaato " + exception.getMessage());
+            LOG.info("failed to obtain end date inside smaato {}", exception);
             return "";
         }
     }
 
-    private void generateReportResponse(final DebugLogger logger, final ReportResponse reportResponse,
-            final String[] responseArray, final String key) {
+    private void generateReportResponse(final ReportResponse reportResponse, final String[] responseArray,
+            final String key) {
         if (responseArray.length > 1) {
             int impressionIndex = -1;
             int clicksIndex = -1;
@@ -182,8 +182,8 @@ public class DCPSmaatoReporting extends BaseReportingImpl {
         }
     }
 
-    private String invokePostMethod(final String url, final String postData, final DebugLogger logger)
-            throws ServerException, NoSuchAlgorithmException, KeyManagementException {
+    private String invokePostMethod(final String url, final String postData) throws ServerException,
+            NoSuchAlgorithmException, KeyManagementException {
 
         StringBuffer result = new StringBuffer();
         try {
@@ -215,11 +215,11 @@ public class DCPSmaatoReporting extends BaseReportingImpl {
         }
 
         catch (MalformedURLException exception) {
-            logger.info("malformed url ", exception.getMessage());
+            LOG.info("malformed url {}", exception);
             throw new ServerException("Invalid Url");
         }
         catch (IOException exception) {
-            logger.info("io error while reading response ", exception.getMessage());
+            LOG.info("io error while reading response {}", exception);
             throw new ServerException("Error While Reading Response");
         }
         return result.toString();

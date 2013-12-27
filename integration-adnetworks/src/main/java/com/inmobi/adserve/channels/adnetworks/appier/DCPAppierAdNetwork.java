@@ -18,20 +18,22 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.jboss.netty.util.CharsetUtil;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public class DCPAppierAdNetwork extends BaseAdNetworkImpl {
-    private final Configuration config;
+public class DCPAppierAdNetwork extends AbstractDCPAdNetworkImpl {
+    private static final Logger LOG          = LoggerFactory.getLogger(DCPAppierAdNetwork.class);
+
     private transient String    latitude;
     private transient String    longitude;
     private int                 width;
@@ -56,19 +58,22 @@ public class DCPAppierAdNetwork extends BaseAdNetworkImpl {
     private static final String PERFORMANCE  = "Performance";
     private static final String FAMILY_SAFE  = "FAMILY_SAFE";
 
-    public DCPAppierAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent, logger);
-        this.config = config;
-        this.logger = logger;
-        this.clientBootstrap = clientBootstrap;
+    /**
+     * @param config
+     * @param clientBootstrap
+     * @param baseRequestHandler
+     * @param serverEvent
+     */
+    public DCPAppierAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }
 
     @Override
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            logger.debug("mandatory parameters missing for appier so exiting adapter");
+            LOG.debug("mandatory parameters missing for appier so exiting adapter");
             return false;
         }
         host = config.getString("appier.host");
@@ -93,7 +98,7 @@ public class DCPAppierAdNetwork extends BaseAdNetworkImpl {
         }
         sourceType = (StringUtils.isBlank(sasParams.getSource()) || "WAP".equalsIgnoreCase(sasParams.getSource())) ? "1"
                 : "0";
-        logger.info("Configure parameters inside Appier returned true");
+        LOG.info("Configure parameters inside Appier returned true");
         return true;
     }
 
@@ -113,7 +118,7 @@ public class DCPAppierAdNetwork extends BaseAdNetworkImpl {
             URI uri = getRequestUri();
             requestUrl = uri.toString();
             request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri.toASCIIString());
-            logger.debug("host name is ", uri.getHost());
+            LOG.debug("host name is {}", uri.getHost());
             request.setHeader(HttpHeaders.Names.HOST, uri.getHost());
             request.setHeader(HttpHeaders.Names.REFERER, uri.toString());
             request.setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
@@ -126,7 +131,7 @@ public class DCPAppierAdNetwork extends BaseAdNetworkImpl {
         }
         catch (Exception ex) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.HTTPREQUEST_ERROR;
-            logger.info("Error in making http request ", ex.getMessage());
+            LOG.error("Error in making http request {}", ex);
         }
         return request;
     }
@@ -187,15 +192,14 @@ public class DCPAppierAdNetwork extends BaseAdNetworkImpl {
             appendQueryParam(url, SITE_RATING, FAMILY_SAFE, false);
         }
 
-        logger.debug("Appier url is ", url.toString());
+        LOG.debug("Appier url is {}", url);
 
         return url.toString();
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status) {
-        logger.debug("response is ", response);
-        logger.debug("response is", response);
+    public void parseResponse(final String response, final HttpResponseStatus status) {
+        LOG.debug("response is {}", response);
         statusCode = status.getCode();
         if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
             if (200 == statusCode || 204 == statusCode) {
@@ -237,16 +241,16 @@ public class DCPAppierAdNetwork extends BaseAdNetworkImpl {
                     context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getString("banner_url"));
                     t = TemplateType.IMAGE;
                 }
-                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl, logger);
+                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
             }
             catch (Exception exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from Appier :", exception);
-                logger.info("Response from Appier:", response);
+                LOG.error("Error parsing response from Appier : {}", exception);
+                LOG.error("Response from Appier: {}", response);
             }
         }
-        logger.debug("response length is", responseContent.length());
+        LOG.debug("response length is {}", responseContent.length());
     }
 
     @Override

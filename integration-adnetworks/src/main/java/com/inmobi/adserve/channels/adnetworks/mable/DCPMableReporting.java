@@ -13,23 +13,26 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.inmobi.adserve.channels.adnetworks.amobee.DCPAmobeeReporting;
 import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.api.ServerException;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPMableReporting extends BaseReportingImpl {
+    private static final Logger LOG     = LoggerFactory.getLogger(DCPAmobeeReporting.class);
+
     private final Configuration config;
     private String              date;
     private String              dbDate;
     private final String        baseUrl;
-    private DebugLogger         logger;
     private final String        authKey;
     private String              endDate = "";
-    private Connection          connection;
+    private final Connection    connection;
 
     public DCPMableReporting(final Configuration config, final Connection connection) {
 
@@ -41,7 +44,7 @@ public class DCPMableReporting extends BaseReportingImpl {
 
     private String invokeHTTPUrl(final String url, final String urlParameters) throws ServerException,
             ClientProtocolException, IOException, IllegalStateException {
-        logger.debug("url inside mable is ", url);
+        LOG.debug("url inside mable is {}", url);
         URLConnection conn = new URL(url).openConnection();
         // Setting connection and read timeout to 5 min
         conn.setReadTimeout(300000);
@@ -63,7 +66,7 @@ public class DCPMableReporting extends BaseReportingImpl {
             }
         }
         catch (IOException ioe) {
-            logger.info("Error in Httpool invokeHTTPUrl : ", ioe.getMessage());
+            LOG.info("Error in Httpool invokeHTTPUrl : {}", ioe);
         }
         finally {
             if (res != null) {
@@ -80,25 +83,23 @@ public class DCPMableReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final ReportTime endTime)
-            throws Exception {
-        this.logger = logger;
+    public ReportResponse fetchRows(final ReportTime startTime, final ReportTime endTime) throws Exception {
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         String responseStr = null;
-        logger.debug("inside fetch rows of mable");
+        LOG.debug("inside fetch rows of mable");
         try {
             date = startTime.getStringDate("");
             dbDate = startTime.getStringDate("-");
-            logger.debug("start date inside mable is ", date);
+            LOG.debug("start date inside mable is {}", date);
             endDate = endTime == null ? getEndDate() : date;
             if (ReportTime.compareStringDates(endDate, date) == -1) {
-                logger.debug("date is greater than the current date reporting window for mable");
+                LOG.debug("date is greater than the current date reporting window for mable");
                 return null;
             }
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.error("failed to obtain correct dates for fetching reports ", exception.getMessage());
+            LOG.error("failed to obtain correct dates for fetching reports {}", exception);
             return null;
         }
         while (ReportTime.compareStringDates(date, endDate) != 1) {
@@ -107,7 +108,7 @@ public class DCPMableReporting extends BaseReportingImpl {
             requestObject.put("report_dt", date);
 
             responseStr = invokeHTTPUrl(getRequestUrl(), requestObject.toString());
-            logger.debug("response from mable is ", responseStr);
+            LOG.debug("response from mable is {}", responseStr);
             if (responseStr != null && !responseStr.startsWith("{\"error")) {
                 JSONArray reportArray = new JSONArray(responseStr);
                 for (int i = 0; i < reportArray.length(); i++) {
@@ -115,18 +116,18 @@ public class DCPMableReporting extends BaseReportingImpl {
                     ReportResponse.ReportRow row = new ReportResponse.ReportRow();
                     String key = reportRow.getString("blind_id");
                     if (!decodeBlindedSiteId(key, row)) {
-                        logger.debug("Error decoded BlindedSite id in Mable", key);
+                        LOG.debug("Error decoded BlindedSite id in Mable {}", key);
                         continue;
                     }
                     row.isSiteData = true;
                     row.impressions = reportRow.getLong("imps");
                     row.revenue = reportRow.getDouble("revenue");
-                    double rate = getCurrencyConversionRate("KRW", dbDate, logger, connection);
+                    double rate = getCurrencyConversionRate("KRW", dbDate, connection);
                     if (rate > 0) {
                         row.revenue /= rate;
                     }
                     else {
-                        logger.info("Failed to get KWR to USD rate for ", date);
+                        LOG.info("Failed to get KWR to USD rate for {}", date);
                         return null;
                     }
 
@@ -173,7 +174,7 @@ public class DCPMableReporting extends BaseReportingImpl {
 
     public String getEndDate() throws Exception {
         try {
-            logger.debug("calculating end date for mable");
+            LOG.debug("calculating end date for mable");
             ReportTime reportTime = ReportTime.getUTCTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
             if (reportTime.getHour() <= ReportReconcilerWindow()) {
@@ -182,15 +183,8 @@ public class DCPMableReporting extends BaseReportingImpl {
             return (reportTime.getStringDate(""));
         }
         catch (Exception exception) {
-            logger.error("failed to obtain end date inside mable ", exception.getMessage());
+            LOG.error("failed to obtain end date inside mable {}", exception);
             return "";
         }
-    }
-
-    @Override
-    public ReportResponse fetchRows(DebugLogger logger, ReportTime startTime, String key, ReportTime endTime)
-            throws Exception {
-        // TODO Auto-generated method stub
-        return null;
     }
 }

@@ -4,17 +4,18 @@ import org.apache.commons.configuration.Configuration;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPAppierReporting extends BaseReportingImpl {
+    private static final Logger LOG            = LoggerFactory.getLogger(DCPAppierReporting.class);
 
     private final Configuration config;
-    private DebugLogger         logger;
     private String              startDate      = "";
     private String              endDate        = "";
     private String              responseString = "";
@@ -30,46 +31,44 @@ public class DCPAppierReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final ReportTime endTime)
-            throws Exception {
-        this.logger = logger;
+    public ReportResponse fetchRows(final ReportTime startTime, final ReportTime endTime) throws Exception {
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
-        logger.debug("inside fetch rows of appier");
+        LOG.debug("inside fetch rows of appier");
         try {
             startDate = startTime.getStringDate("");
             endDate = endTime == null ? getEndDate() : (ReportTime.getNextDay(startTime)).getStringDate("");
-            logger.debug("start date inside appier is ", startDate);
+            LOG.debug("start date inside appier is {}", startDate);
             if (ReportTime.compareStringDates(endDate, startDate) == -1) {
-                logger.debug("end date is less than start date plus reporting window for appier");
+                LOG.debug("end date is less than start date plus reporting window for appier");
                 return null;
             }
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.info("failed to obtain correct dates for fetching reports ", exception.getMessage());
+            LOG.info("failed to obtain correct dates for fetching reports {}", exception);
             return null;
         }
 
         String url = getRequestUrl();
-        logger.debug("url inside appier is ", url);
-        responseString = invokeHTTPUrl(url, logger);
+        LOG.debug("url inside appier is {}", url);
+        responseString = invokeHTTPUrl(url);
         reportResponse.status = ReportResponse.ResponseStatus.SUCCESS;
 
         JSONArray responseArray = new JSONObject(responseString).getJSONArray("report");
-        logger.debug("successfuly got response inside appier. Number of lines of response is ", responseArray.length());
-        generateReportResponse(logger, reportResponse, responseArray);
+        LOG.debug("successfuly got response inside appier. Number of lines of response is {}", responseArray.length());
+        generateReportResponse(reportResponse, responseArray);
         ReportTime reportTime = new ReportTime(startDate, 0);
         reportTime = ReportTime.getNextDay(reportTime);
         startDate = reportTime.getStringDate("-");
-        logger.debug("start date inside appier now is ", startDate);
+        LOG.debug("start date inside appier now is {}", startDate);
 
-        logger.debug("successfully parsed data inside appier");
+        LOG.debug("successfully parsed data inside appier");
         return reportResponse;
     }
 
     public String getEndDate() throws Exception {
         try {
-            logger.debug("calculating latest date for appier");
+            LOG.debug("calculating latest date for appier");
             ReportTime reportTime = ReportTime.getUTCTime();
             // reportTime = ReportTime.getPreviousDay(reportTime);
             if (reportTime.getHour() <= ReportReconcilerWindow()) {
@@ -78,7 +77,7 @@ public class DCPAppierReporting extends BaseReportingImpl {
             return (reportTime.getStringDate(""));
         }
         catch (Exception exception) {
-            logger.info("failed to obtain end date inside appier ", exception.getMessage());
+            LOG.info("failed to obtain end date inside appier {}", exception);
             return null;
         }
     }
@@ -114,21 +113,14 @@ public class DCPAppierReporting extends BaseReportingImpl {
         return (config.getString("appier.advertiserId"));
     }
 
-    @Override
-    public ReportResponse fetchRows(DebugLogger logger, ReportTime startTime, String key, ReportTime endTime)
-            throws Exception {
-        // not applicable so returns null
-        return null;
-    }
-
-    private void generateReportResponse(final DebugLogger logger, ReportResponse reportResponse, JSONArray responseArray)
+    private void generateReportResponse(final ReportResponse reportResponse, final JSONArray responseArray)
             throws JSONException {
 
         for (int i = 0; i < responseArray.length(); i++) {
             JSONObject reportRow = responseArray.getJSONObject(i);
             ReportResponse.ReportRow row = new ReportResponse.ReportRow();
             if (!decodeBlindedSiteId(reportRow.getString("bsiteid"), row)) {
-                logger.debug("Error decoded BlindedSite id in appier", reportRow.getString("bsiteid"));
+                LOG.debug("Error decoded BlindedSite id in appier {}", reportRow.getString("bsiteid"));
                 continue;
             }
             row.isSiteData = true;

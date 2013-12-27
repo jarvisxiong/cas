@@ -1,19 +1,19 @@
 package com.inmobi.adserve.channels.server;
 
-import org.apache.log4j.Logger;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.apache.log4j.Logger;
+
 
 public class ChannelServerHelper {
-    private Logger logger;
+    private final Logger logger;
 
-    public ChannelServerHelper(Logger serverLogger) {
+    public ChannelServerHelper(final Logger serverLogger) {
         logger = serverLogger;
     }
 
-    public byte getDataCenterId(String dataCenterIdKey) {
+    public byte getDataCenterId(final String dataCenterIdKey) {
         byte dataCenterIdCode;
         try {
             dataCenterIdCode = Byte.parseByte(System.getProperty(dataCenterIdKey));
@@ -28,7 +28,7 @@ public class ChannelServerHelper {
         return dataCenterIdCode;
     }
 
-    public short getHostId(String hostNameKey) {
+    public short getHostId(final String hostNameKey) {
         short hostId = 0;
         String hostName = System.getProperty(hostNameKey);
         if (hostName == null) {
@@ -61,11 +61,11 @@ public class ChannelServerHelper {
         return hostId;
     }
 
-    public String getDataCentreName(String key) {
+    public String getDataCentreName(final String key) {
         return System.getProperty(key);
     }
 
-    public Integer getIncomingMaxConnections(String incomingConnectionsKey) {
+    public Integer getIncomingMaxConnections(final String incomingConnectionsKey) {
         Integer maxIncomingConnections = null;
         try {
             maxIncomingConnections = Integer.parseInt(System.getProperty(incomingConnectionsKey));

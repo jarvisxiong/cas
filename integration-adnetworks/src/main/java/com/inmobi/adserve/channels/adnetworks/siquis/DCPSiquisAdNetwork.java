@@ -15,43 +15,41 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public class DCPSiquisAdNetwork extends BaseAdNetworkImpl {
+public class DCPSiquisAdNetwork extends AbstractDCPAdNetworkImpl {
 
-    private final Configuration config;
+    private static final Logger LOG = LoggerFactory.getLogger(DCPSiquisAdNetwork.class);
+
     private boolean             isAndroid;
 
-    public DCPSiquisAdNetwork(final DebugLogger logger, final Configuration config,
-            final ClientBootstrap clientBootstrap, final HttpRequestHandlerBase baseRequestHandler,
-            final MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent, logger);
-        this.logger = logger;
-        this.config = config;
-        this.clientBootstrap = clientBootstrap;
+    public DCPSiquisAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }
 
     @Override
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            logger.debug("mandatory parameters missing for siquis so exiting adapter");
+            LOG.debug("mandatory parameters missing for siquis so exiting adapter");
             return false;
         }
 
         isAndroid = "app".equalsIgnoreCase(sasParams.getSource())
                 && sasParams.getOsId() == HandSetOS.Android.getValue();
         host = config.getString("siquis.host");
-        logger.info("Configure parameters inside siquis returned true");
+        LOG.info("Configure parameters inside siquis returned true");
         return true;
     }
 
@@ -78,19 +76,19 @@ public class DCPSiquisAdNetwork extends BaseAdNetworkImpl {
             url.append("&device_id=").append(uniqueDeviceId);
             url.append("&partner_id=").append(config.getString("siquis.partnerId"));
 
-            logger.debug("Siquis url is ", url.toString());
+            LOG.debug("Siquis url is {}", url);
             return (new URI(url.toString()));
         }
         catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            logger.info(exception.getMessage());
+            LOG.error("{}", exception);
         }
         return null;
     }
 
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
-        logger.debug("response is ", response, "and response length is ", response.length());
+        LOG.debug("response is {} and response length is {}", response, response.length());
         if (status.getCode() != 200 || StringUtils.isBlank(response) || !response.startsWith("[{\"")) {
             statusCode = status.getCode();
             if (200 == statusCode) {
@@ -125,33 +123,33 @@ public class DCPSiquisAdNetwork extends BaseAdNetworkImpl {
                 String vmTemplate = Formatter.getRichTextTemplateForSlot(slot);
                 if (StringUtils.isEmpty(vmTemplate)) {
                     responseContent = Formatter.getResponseFromTemplate(TemplateType.PLAIN, context, sasParams,
-                        beaconUrl, logger);
+                        beaconUrl);
                 }
                 else {
                     context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
                     responseContent = Formatter.getResponseFromTemplate(TemplateType.RICH, context, sasParams,
-                        beaconUrl, logger);
+                        beaconUrl);
                 }
                 adStatus = "AD";
             }
             catch (JSONException exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from siquis : ", exception);
-                logger.info("Response from siquis:", response);
+                LOG.info("Error parsing response from siquis : {}", exception);
+                LOG.info("Response from siquis: {}", response);
             }
             catch (Exception exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from siquis : ", exception);
-                logger.info("Response from siquis:", response);
+                LOG.info("Error parsing response from siquis : {}", exception);
+                LOG.info("Response from siquis: {}", response);
                 try {
                     throw exception;
                 }
                 catch (Exception e) {
-                    logger.info("Error while rethrowing the exception : ", e);
+                    LOG.info("Error while rethrowing the exception : {}", e);
                 }
             }
         }
-        logger.debug("response length is ", responseContent.length(), "responseContent is", responseContent);
+        LOG.debug("response length is {} responseContent is {}", responseContent.length(), responseContent);
     }
 
     /**
@@ -177,7 +175,7 @@ public class DCPSiquisAdNetwork extends BaseAdNetworkImpl {
             }
         }
         catch (Exception ex) {
-            logger.info("Faild to reformat Siquis clickurl ", clickUrl);
+            LOG.info("Faild to reformat Siquis clickurl {}", clickUrl);
             return null;
         }
 

@@ -5,34 +5,30 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.httpclient.HttpException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.xml.sax.SAXException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.api.ServerException;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPAjillionReporting extends BaseReportingImpl {
+    private static final Logger LOG = LoggerFactory.getLogger(DCPAjillionReporting.class);
+
     private final Configuration config;
     private final String        password;
     private String              date;
     private final String        host;
     private final String        userName;
-    private DebugLogger         logger;
     private String              endDate;
     private final String        name;
     private ReportTime          reportStartTime;
@@ -51,33 +47,23 @@ public class DCPAjillionReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws KeyManagementException, NoSuchAlgorithmException, MalformedURLException,
-            ServerException, IOException, ParserConfigurationException, SAXException, JSONException {
-        // NO Op
-        return null;
-    }
-
-    @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final ReportTime endTime)
-            throws Exception {
-        this.logger = logger;
+    public ReportResponse fetchRows(final ReportTime startTime, final ReportTime endTime) throws Exception {
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
 
-        logger.debug("inside fetch rows of ", name);
+        LOG.debug("inside fetch rows of {}", name);
         try {
             this.reportStartTime = startTime;
             date = startTime.getMullahMediaStringDate();
             endDate = endTime == null ? getEndDate() : date;
 
             if (ReportTime.compareStringDates(endDate, date) == -1) {
-                logger.debug("date is greater than the current date reporting window for ", name);
+                LOG.debug("date is greater than the current date reporting window for {}", name);
                 return null;
             }
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.info("failed to obtain correct dates for fetching reports ", exception.getMessage());
+            LOG.info("failed to obtain correct dates for fetching reports {}", exception);
             return null;
         }
 
@@ -100,6 +86,7 @@ public class DCPAjillionReporting extends BaseReportingImpl {
             int placementId = placementLists.getJSONObject(limit).getInt("id");
             placementIdArray.put(placementId);
         }
+
         while (ReportTime.compareStringDates(date, endDate) != 1) {
             requestParamList.put("placement_ids", placementIdArray);
             requestParamList.put("start_date", date);
@@ -113,7 +100,7 @@ public class DCPAjillionReporting extends BaseReportingImpl {
             requestParamList.put("columns", columns);
             requestParamList.put("sums", sums);
             String revenueResponse = invokeUrl(host, getRequestParams("publisher_report", requestParamList));
-            generateReportResponse(logger, reportResponse, new JSONObject(revenueResponse).getJSONArray("result"));
+            generateReportResponse(reportResponse, new JSONObject(revenueResponse).getJSONArray("result"));
             reportStartTime = ReportTime.getNextDay(reportStartTime);
             date = reportStartTime.getMullahMediaStringDate();
         }
@@ -147,7 +134,7 @@ public class DCPAjillionReporting extends BaseReportingImpl {
 
     public String getEndDate() {
         try {
-            logger.debug("calculating end date for ", name);
+            LOG.debug("calculating end date for {}", name);
             ReportTime reportTime = ReportTime.getUTCTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
             if (reportTime.getHour() <= ReportReconcilerWindow()) {
@@ -156,7 +143,7 @@ public class DCPAjillionReporting extends BaseReportingImpl {
             return (reportTime.getMullahMediaStringDate());
         }
         catch (Exception exception) {
-            logger.info("failed to obtain end date inside  ", name, exception.getMessage());
+            LOG.info("failed to obtain end date inside  {} {}", name, exception);
             return "";
         }
     }
@@ -200,14 +187,14 @@ public class DCPAjillionReporting extends BaseReportingImpl {
         return sBuffer.toString();
     }
 
-    private void generateReportResponse(final DebugLogger logger, final ReportResponse reportResponse,
-            final JSONArray responseArray) throws JSONException {
+    private void generateReportResponse(final ReportResponse reportResponse, final JSONArray responseArray)
+            throws JSONException {
 
         for (int i = 0; i < responseArray.length(); i++) {
             JSONObject reportRow = responseArray.getJSONObject(i);
             ReportResponse.ReportRow row = new ReportResponse.ReportRow();
             if (!decodeBlindedSiteId(reportRow.getString("external_publisher"), row)) {
-                logger.debug("Error decoded BlindedSite id in appier", reportRow.getString("external_publisher"));
+                LOG.debug("Error decoded BlindedSite id in appier {}", reportRow.getString("external_publisher"));
                 continue;
             }
             row.isSiteData = true;

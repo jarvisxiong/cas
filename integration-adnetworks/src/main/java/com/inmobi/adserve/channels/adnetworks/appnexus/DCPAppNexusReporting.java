@@ -14,15 +14,19 @@ import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.inmobi.adserve.channels.adnetworks.adelphic.DCPAdelphicReporting;
 import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.api.ServerException;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPAppNexusReporting extends BaseReportingImpl {
+    private static final Logger LOG                = LoggerFactory.getLogger(DCPAdelphicReporting.class);
+
     private final Configuration config;
     private final String        password;
     private String              date;
@@ -30,7 +34,6 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
     private final String        authUrl;
     private final String        downloadUrl;
     private final String        userName;
-    private DebugLogger         logger;
     private String              endDate;
     private final String        name;
     private final String        startDateFormatter = "%s 00:00:00";
@@ -55,28 +58,27 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws Exception, JSONException {
-        this.logger = logger;
+    public ReportResponse fetchRows(final ReportTime startTime, final String key, final ReportTime endTime)
+            throws Exception, JSONException {
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
 
-        logger.debug("inside fetch rows of ", name);
+        LOG.debug("inside fetch rows of {}", name);
         try {
             date = startTime.getStringDate("-");
             endDate = endTime == null ? getEndDate() : date;
 
             if (ReportTime.compareStringDates(endDate, date) == -1) {
-                logger.debug("date is greater than the current date reporting window for ", name);
+                LOG.debug("date is greater than the current date reporting window for {}", name);
                 return null;
             }
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.info("failed to obtain correct dates for fetching reports ", exception.getMessage());
+            LOG.info("failed to obtain correct dates for fetching reports {}", exception);
             return null;
         }
         if (!Character.isDigit(key.charAt(0)) || key.contains("_")) {
-            logger.debug("invalid key", key);
+            LOG.debug("invalid key {}", key);
             return null;
         }
         if (!isTokenGenerated) {
@@ -97,7 +99,7 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
 
             }
         }
-        generateReportResponse(logger, reportResponse, reportData.split("\n"), key);
+        generateReportResponse(reportResponse, reportData.split("\n"), key);
         return reportResponse;
     }
 
@@ -128,7 +130,7 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
 
     public String getEndDate() {
         try {
-            logger.debug("calculating end date for ", name);
+            LOG.debug("calculating end date for {}", name);
             ReportTime reportTime = ReportTime.getUTCTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
             reportTime = ReportTime.getPreviousDay(reportTime);
@@ -138,7 +140,7 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
             return (reportTime.getStringDate("-"));
         }
         catch (Exception exception) {
-            logger.info("failed to obtain end date inside  ", name, exception.getMessage());
+            LOG.info("failed to obtain end date inside  {} , {}", name, exception);
             return "";
         }
     }
@@ -198,28 +200,35 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
         return sBuffer.toString();
     }
 
-    public String invokeUrl(final String host, final String token) throws HttpException, IOException {
-        URL url = new URL(host);
-        HttpURLConnection.setFollowRedirects(false);
-        HttpURLConnection hconn = (HttpURLConnection) url.openConnection();
-        hconn.setRequestMethod("GET");
-        hconn.setRequestProperty("Authorization", token);
-        hconn.setDoInput(true);
-        hconn.setDoOutput(true);
-        hconn.setRequestProperty("Content-Type", "application/json");
-        StringBuilder sBuffer = new StringBuilder();
-        BufferedReader res = new BufferedReader(new InputStreamReader(hconn.getInputStream(), "UTF-8"));
-        String inputLine;
-        while ((inputLine = res.readLine()) != null) {
-            sBuffer.append(inputLine);
-            sBuffer.append("\n");
+    @Override
+    public String invokeUrl(final String host, final String token) throws ServerException {
+        try {
+            URL url = new URL(host);
+            HttpURLConnection.setFollowRedirects(false);
+            HttpURLConnection hconn = (HttpURLConnection) url.openConnection();
+            hconn.setRequestMethod("GET");
+            hconn.setRequestProperty("Authorization", token);
+            hconn.setDoInput(true);
+            hconn.setDoOutput(true);
+            hconn.setRequestProperty("Content-Type", "application/json");
+            StringBuilder sBuffer = new StringBuilder();
+            BufferedReader res = new BufferedReader(new InputStreamReader(hconn.getInputStream(), "UTF-8"));
+            String inputLine;
+            while ((inputLine = res.readLine()) != null) {
+                sBuffer.append(inputLine);
+                sBuffer.append("\n");
+            }
+            res.close();
+            return sBuffer.toString();
         }
-        res.close();
-        return sBuffer.toString();
+        catch (Exception e) {
+            LOG.error("Encountered exception", e);
+            throw new ServerException(e);
+        }
     }
 
-    private void generateReportResponse(final DebugLogger logger, final ReportResponse reportResponse,
-            final String[] responseArray, final String extSiteKey) throws ParseException {
+    private void generateReportResponse(final ReportResponse reportResponse, final String[] responseArray,
+            final String extSiteKey) throws ParseException {
         if (responseArray.length > 1) {
             int impressionIndex = -1;
             int clicksIndex = -1;
@@ -275,11 +284,11 @@ public class DCPAppNexusReporting extends BaseReportingImpl {
         }
 
         if (reportResponse.rows.size() > 0) {
-            logger.debug("successfully generated reporting log for external site id : ", extSiteKey);
+            LOG.debug("successfully generated reporting log for external site id : {}", extSiteKey);
         }
         else {
-            logger.debug("failed to generate reporting log for external site id : ", extSiteKey);
-            logger.debug("Default row added external site id : ", extSiteKey);
+            LOG.debug("failed to generate reporting log for external site id : {}", extSiteKey);
+            LOG.debug("Default row added external site id : {}", extSiteKey);
             ReportResponse.ReportRow row = new ReportResponse.ReportRow();
             row.siteId = extSiteKey;
             row.impressions = 0;
