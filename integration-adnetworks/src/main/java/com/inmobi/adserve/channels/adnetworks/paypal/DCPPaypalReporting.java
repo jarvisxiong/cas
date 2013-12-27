@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.adnetworks.paypal;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -297,6 +298,7 @@ public class DCPPaypalReporting extends BaseReportingImpl {
             }
         } };
 
+        BufferedReader res = null;
         try {
             // Install the all-trusting trust manager
             SSLContext sc = SSLContext.getInstance("SSL");
@@ -320,7 +322,7 @@ public class DCPPaypalReporting extends BaseReportingImpl {
             // conn.setRequestProperty("X-WSSE", getHeader());
             conn.setDoOutput(true);
             InputStream in = conn.getInputStream();
-            BufferedReader res = null;
+
             StringBuffer sBuffer = new StringBuffer();
 
             res = new BufferedReader(new InputStreamReader(in, "UTF-8"));
@@ -328,13 +330,23 @@ public class DCPPaypalReporting extends BaseReportingImpl {
             while ((inputLine = res.readLine()) != null) {
                 sBuffer.append(inputLine);
             }
-            res.close();
             return sBuffer.toString();
 
         }
         catch (Exception exception) {
             LOG.info("Error in Httpool invokeHTTPUrl : {}", exception.getMessage());
             throw new ServerException(exception);
+        }
+        finally {
+            if (res != null) {
+                try {
+                    res.close();
+                }
+                catch (IOException exception) {
+                    LOG.info("Error in closing BufferedReader {}", exception);
+                    throw new ServerException(exception);
+                }
+            }
         }
 
     }
