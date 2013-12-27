@@ -51,9 +51,11 @@ public class SimpleScope implements Scope {
                                                                            @Override
                                                                            public Object get() {
                                                                                throw new IllegalStateException(
-                                                                                       "If you got here then it means that"
-                                                                                               + " your code asked for scoped object which should have been"
-                                                                                               + " explicitly seeded in this scope by calling"
+                                                                                       "If you got here then it means"
+                                                                                               + " that your code asked"
+                                                                                               + " for scoped object which"
+                                                                                               + " should have been explicitly"
+                                                                                               + " seeded in this scope by calling"
                                                                                                + " SimpleScope.seed(), but was not.");
                                                                            }
                                                                        };

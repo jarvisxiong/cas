@@ -39,14 +39,10 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final Logger LOG         = LoggerFactory.getLogger(IFCAdNetwork.class);
 
     private String              requestId;
-    private String              deviceOs;                                                 // ******Mandatory
-                                                                                           // Param*******//
-    private String              deviceOSVersion;                                          // ******Mandatory
-                                                                                           // Param*******//
-    private String              handset;                                                  // ******Mandatory
-                                                                                           // Param*******//
-    private String              carrier;                                                  // ******Mandatory
-                                                                                           // Param*******//
+    private String              deviceOs;                                                 // Mandatory Param
+    private String              deviceOSVersion;                                          // Mandatory Param
+    private String              handset;                                                  // Mandatory Param
+    private String              carrier;                                                  // Mandatory Param
     private String              isTest;
     private String              zone;
     private String              listingCount;
@@ -55,15 +51,11 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
     private String              ccid;
     private String              userAgent;
     private String              gender;
-    private String              siteID;                                                   // ******Mandatory
-                                                                                           // Param*******//
-    private String              slotWidth;                                                // ******Mandatory
-                                                                                           // Param*******//
-    private String              slotHeight;                                               // ******Mandatory
-                                                                                           // Param*******//
+    private String              siteID;                                                   // Mandatory Param
+    private String              slotWidth;                                                // Mandatory Param
+    private String              slotHeight;                                               // Mandatory Param
     private String              appType;
-    private String              publisherID;                                              // ******Mandatory
-                                                                                           // Param*******//
+    private String              publisherID;                                              // Mandatory Param
     private Boolean             siteAllowBanner;
     private Boolean             richMedia;
     private String              adcode;
@@ -365,9 +357,8 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         if (null == response
-                || (null != response && (status.getCode() != 200 || response.startsWith("<!--") || response
-                        .trim()
-                            .isEmpty()))) {
+                || (null != response && (status.getCode() != 200 || response.startsWith("<!--") || response.trim()
+                        .isEmpty()))) {
             statusCode = status.getCode();
             if (200 == statusCode) {
                 statusCode = 500;

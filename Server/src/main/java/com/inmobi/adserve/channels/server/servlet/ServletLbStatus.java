@@ -7,7 +7,6 @@ import java.nio.charset.Charset;
 
 import javax.ws.rs.Path;
 
-import org.apache.log4j.Logger;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
@@ -21,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.ServerStatusInfo;
-import com.inmobi.adserve.channels.server.ServletHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -36,22 +34,6 @@ public class ServletLbStatus implements Servlet {
     @Override
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
             final MessageEvent e) throws Exception {
-        // Initializing loggers for expected rotation format
-        if (++ServletHandler.rollCount == 20) {
-            Logger rrLogger = Logger.getLogger(ServletHandler.getLoggerConfig().getString("rr"));
-            if (null != rrLogger) {
-                rrLogger.debug("");
-            }
-            Logger advertiserLogger = Logger.getLogger(ServletHandler.getLoggerConfig().getString("advertiser"));
-            if (null != advertiserLogger) {
-                advertiserLogger.debug("");
-            }
-            Logger channelLogger = Logger.getLogger(ServletHandler.getLoggerConfig().getString("channel"));
-            if (null != channelLogger) {
-                channelLogger.debug("");
-            }
-            ServletHandler.rollCount = 0;
-        }
         LOG.debug("asked for load balancer status");
         InspectorStats.incrementStatCount("LbStatus", InspectorStrings.totalRequests);
         if (ServerStatusInfo.statusCode != 404) {
@@ -60,8 +42,7 @@ public class ServletLbStatus implements Servlet {
             return;
         }
         HttpResponse response = new DefaultHttpResponse(HTTP_1_1, NOT_FOUND);
-        response
-                .setContent(ChannelBuffers.copiedBuffer(ServerStatusInfo.statusString, Charset.forName("UTF-8").name()));
+        response.setContent(ChannelBuffers.copiedBuffer(ServerStatusInfo.statusString, Charset.forName("UTF-8").name()));
         if (e != null) {
             Channel channel = e.getChannel();
             if (channel != null && channel.isWritable()) {
