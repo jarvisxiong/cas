@@ -219,8 +219,8 @@ public class AsyncRequestMaker {
             logger.debug("Wrong format for Age", e.getMessage());
         }
         try {
-            if (null != sasParams.getCountryStr()) {
-                builder.setCountryId(null != sasParams.getCountryStr() ? Integer.parseInt(sasParams.getCountryStr()) : 0);
+            if (null != sasParams.getCountryId()) {
+                builder.setCountryId(null != sasParams.getCountryId() ? Integer.parseInt(sasParams.getCountryId()) : 0);
             }
         }
         catch (NumberFormatException e) {
@@ -233,8 +233,8 @@ public class AsyncRequestMaker {
             builder.setImpressionId(sasParams.getImpressionId());
         }
         try {
-            if (null != sasParams.getArea()) {
-                builder.setLocation(Integer.parseInt(sasParams.getArea()));
+            if (null != sasParams.getState()) {
+                builder.setLocation(Integer.parseInt(sasParams.getState()));
             }
         }
         catch (NumberFormatException e) {

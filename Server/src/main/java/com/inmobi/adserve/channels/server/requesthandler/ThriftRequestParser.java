@@ -38,24 +38,16 @@ public class ThriftRequestParser {
         params.setDst(dst);
         params.setResponseOnlyFromDcp(2 == dst);
         
-        
-        //TODO rframe not present params.setRqIframe(stringify(jObject, "rqIframe", logger));
-        //TODO add adcode in thrift params.setAdcode(tObject.adCode);
-        //TODO Ip File Version not present params.setIpFileVersion(jObject.optInt("rqIpFileVer", 1));
-        //TODO add postal code in thrift params.setPostalCode(tObject.uidParams.user.);
-        //TODO Need area/region params.setArea(tObject.geo.);
-        //TODO pass sst also
 
         //Fill params from AdPoolRequest Object
         params.setRemoteHostIp(tObject.remoteHostIp);
         //TODO Iterate over the segments using all slots
-        String slotId =  null != tObject.selectedSlots ?  (tObject.selectedSlots.get(0) + "") : (tObject.requestSlotId + "");
+        Short slotId =  null != tObject.selectedSlots ?  tObject.selectedSlots.get(0) : (short)0;
         params.setSlot(slotId);
-        params.setRqMkSlot(tObject.requestSlotId + "");
-        params.setSdkVersion(tObject.sdkVersion);
+        params.setRqMkSlot(tObject.selectedSlots);
         params.setRFormat(tObject.responseFormat);
         //TODO change to short in DCP too
-        params.setRqMkAdcount(tObject.requestedAdCount + "");
+        params.setRqMkAdcount(tObject.requestedAdCount);
         params.setTid(tObject.requestId);
         params.setAllowBannerAds(tObject.supplyCapability == SupplyCapability.BANNER);
         //TODO use segment id in cas as long
@@ -63,7 +55,15 @@ public class ThriftRequestParser {
         params.setRqAdType(tObject.requestedAdType.name());
         params.setRichMedia(tObject.supplyCapability == SupplyCapability.RICH_MEDIA);
         params.setAccountSegment(getAccountSegments(tObject.demandTypesAllowed));
-        params.setSdkVersion(tObject.sdkVersion);
+        params.setIpFileVersion(new Long(tObject.ipFileVersion).intValue());
+        params.setSst(tObject.supplySource != null ? tObject.supplySource.ordinal() : 0);
+
+        
+        //Fill params from integration details object
+        if (null != tObject.integrationDetails) {
+            params.setRqIframe(tObject.integrationDetails.iFrameId);
+            params.setAdcode(tObject.integrationDetails.adCodeType.toString());
+        }
         
         
         //Fill param from Site Object
@@ -97,20 +97,22 @@ public class ThriftRequestParser {
                latLong = tObject.geo.latLong.latitude + "," + tObject.geo.latLong.longitude; 
             }
             params.setLatLong(latLong);
-            params.setCountry(tObject.geo.countryCode);
+            params.setCountryCode(tObject.geo.countryCode);
             //TODO Clean the names country name and country id
-            params.setCountryStr(tObject.geo.countryId + "");
-            params.setCity(tObject.geo.cityId + "");
+            params.setCountryId(tObject.geo.getCountryId());
+            params.setCity(tObject.geo.getCityIds().iterator().next());
+            params.setPostalCode(tObject.geo.getZipIds().iterator().next());
+            params.setState(tObject.geo.getStateIds().iterator().next());
         }
         
 
         //Fill Params from User Object
         if (null != tObject.user) {
             //TODO Change age to integer in DCP
-            int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+            int currentYear = (short)Calendar.getInstance().get(Calendar.YEAR);
             int yob = tObject.user.yearOfBirth;
             int age = currentYear - yob;
-            params.setAge(age + "");
+            params.setAge((short)age);
             params.setGender(tObject.user.gender.name().equalsIgnoreCase("Male") ? "M" : "F");
         }
 
@@ -118,7 +120,7 @@ public class ThriftRequestParser {
         //Fill params from UIDParams Object
         if (null != tObject.getUidParams()) {
             setUserIdParams(casInternalRequestParameters, tObject.getUidParams());
-            params.setTUidParams(getUserIdMap(tObject.getUidParams().getUidValues()));
+            params.setTUidParams(getUserIdMap(tObject.getUidParams().getRawUidValues()));
         }
 
         
@@ -153,7 +155,7 @@ public class ThriftRequestParser {
         return accountsSegments;
     }
 
-    private static List convertIntToLong(List<Integer> intList) {
+    private static List convertIntToLong(Set<Integer> intList) {
         if (null == intList) {
             return Collections.EMPTY_LIST;
         }
@@ -173,10 +175,10 @@ public class ThriftRequestParser {
     }
 
     private static void setUserIdParams(CasInternalRequestParameters parameter, UidParams uidParams) {
-        Map<UidType, String> uidMap = uidParams.getUidValues();
+        Map<UidType, String> uidMap =  uidParams.getRawUidValues();
+        parameter.uidADT = uidParams.isLimitIOSAdTracking() ? "0" : "1";
         for (UidType uidType : uidMap.keySet()) {
             switch (uidType) {
-                //TODO add case for adt value
                 case UDID:
                     parameter.uid = uidMap.get(uidType);
                     if (StringUtils.isNotBlank(parameter.uid) && parameter.uid.length() != 32) {
@@ -220,4 +222,5 @@ public class ThriftRequestParser {
         }
         return null;
     }
+    
 }

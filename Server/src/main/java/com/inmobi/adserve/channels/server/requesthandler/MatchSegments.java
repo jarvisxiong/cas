@@ -66,7 +66,7 @@ public class MatchSegments {
     // select channel segment based on specified rules
     public Map<String, HashMap<String, ChannelSegment>> matchSegments(SASRequestParameters sasParams) {
         String slotStr = sasParams.getSlot();
-        String countryStr = sasParams.getCountryStr();
+        String countryStr = sasParams.getCountryId();
         int osId = sasParams.getOsId();
         String sourceStr = sasParams.getSource();
         String siteRatingStr = sasParams.getSiteType();

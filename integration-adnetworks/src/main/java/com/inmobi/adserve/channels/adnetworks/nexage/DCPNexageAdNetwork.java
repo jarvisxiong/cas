@@ -1,23 +1,6 @@
 package com.inmobi.adserve.channels.adnetworks.nexage;
 
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.json.JSONException;
-
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.IABCountriesInterface;
@@ -27,6 +10,18 @@ import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.VelocityContext;
+import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.handler.codec.http.HttpHeaders;
+import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import org.json.JSONException;
+
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 
 public class DCPNexageAdNetwork extends BaseAdNetworkImpl {
@@ -75,9 +70,9 @@ public class DCPNexageAdNetwork extends BaseAdNetworkImpl {
             isGeo = true;
         }
 
-        if (!StringUtils.isBlank(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+        if (null != sasParams.getSlot()
+                && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long)sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
@@ -148,7 +143,7 @@ public class DCPNexageAdNetwork extends BaseAdNetworkImpl {
 
         finalUrl.append("&cn=").append(getCategories(',', true, true).split(",")[0].trim());
 
-        if (StringUtils.isNotBlank(sasParams.getAge())) {
+        if (null != sasParams.getAge()) {
             finalUrl.append("&u(age)=").append(sasParams.getAge());
         }
 
@@ -162,11 +157,9 @@ public class DCPNexageAdNetwork extends BaseAdNetworkImpl {
 
         finalUrl.append("&p(blind_id)=").append(blindedSiteId); // send blindedSiteid instead of url
 
-        finalUrl.append("&u(country)=").append(iABCountries.getIabCountry(sasParams.getCountry()));
+        finalUrl.append("&u(country)=").append(iABCountries.getIabCountry(sasParams.getCountryCode()));
 
-        if (StringUtils.isNotBlank(sasParams.getArea())) {
-            finalUrl.append("&u(dma)=").append(sasParams.getArea());
-        }
+        finalUrl.append("&u(dma)=").append(sasParams.getState());
 
         String[] urlParams = finalUrl.toString().split("&");
         finalUrl.delete(0, finalUrl.length());

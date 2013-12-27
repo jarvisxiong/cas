@@ -6,25 +6,12 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelException;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpMethod;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.jboss.netty.handler.codec.http.HttpVersion;
+import org.jboss.netty.channel.*;
+import org.jboss.netty.handler.codec.http.*;
 import org.json.JSONObject;
 
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
@@ -68,7 +55,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected String                              beaconUrl;
     protected String                              source;
     protected String                              blindedSiteId;
-    protected String                              slot;
+    protected Short                               slot;
     private static final String                   DEFAULT_EMPTY_STRING    = "";
     protected String                              format                  = "UTF-8";
     private String                                adapterName;
@@ -191,7 +178,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                             }
                             channel1.close();
                             processResponse();
-                            return;
                         }
                     }
                 });
@@ -602,9 +588,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     // return year of birth
     protected String getYearofBirth() {
-        if (sasParams.getAge() != null && sasParams.getAge().matches("\\d+")) {
+        if (sasParams.getAge() != null && sasParams.getAge().toString().matches("\\d+")) {
             Calendar cal = new GregorianCalendar();
-            return (Integer.toString(cal.get(Calendar.YEAR) - Integer.parseInt(sasParams.getAge())));
+            return (Integer.toString(cal.get(Calendar.YEAR) - sasParams.getAge()));
         }
         return null;
     }

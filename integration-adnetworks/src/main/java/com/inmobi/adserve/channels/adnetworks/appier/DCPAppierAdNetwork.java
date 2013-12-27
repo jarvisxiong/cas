@@ -1,8 +1,10 @@
 package com.inmobi.adserve.channels.adnetworks.appier;
 
-import java.awt.Dimension;
-import java.net.URI;
-
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -10,24 +12,12 @@ import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpMethod;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.jboss.netty.handler.codec.http.HttpVersion;
+import org.jboss.netty.handler.codec.http.*;
 import org.jboss.netty.util.CharsetUtil;
 import org.json.JSONObject;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import java.awt.*;
+import java.net.URI;
 
 
 public class DCPAppierAdNetwork extends BaseAdNetworkImpl {
@@ -78,9 +68,9 @@ public class DCPAppierAdNetwork extends BaseAdNetworkImpl {
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (!StringUtils.isBlank(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+        if (null != sasParams.getSlot()
+                && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long)sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
@@ -156,8 +146,8 @@ public class DCPAppierAdNetwork extends BaseAdNetworkImpl {
         if (StringUtils.isNotBlank(casInternalRequestParameters.zipCode)) {
             appendQueryParam(url, ZIP, casInternalRequestParameters.zipCode, false);
         }
-        if (StringUtils.isNotBlank(sasParams.getCountry())) {
-            appendQueryParam(url, COUNTRY, sasParams.getCountry().toUpperCase(), false);
+        if (StringUtils.isNotBlank(sasParams.getCountryCode())) {
+            appendQueryParam(url, COUNTRY, sasParams.getCountryCode().toUpperCase(), false);
         }
         if (StringUtils.isNotBlank(sasParams.getGender())) {
             appendQueryParam(url, GENDER, sasParams.getGender(), false);
@@ -224,7 +214,7 @@ public class DCPAppierAdNetwork extends BaseAdNetworkImpl {
                 String adType = adResponse.getString("type");
                 if ("txt".equalsIgnoreCase(adType)) {
                     context.put(VelocityTemplateFieldConstants.AdText, adResponse.getString("text"));
-                    String vmTemplate = Formatter.getRichTextTemplateForSlot(slot);
+                    String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                     if (!StringUtils.isEmpty(vmTemplate)) {
                         context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
                         t = TemplateType.RICH;

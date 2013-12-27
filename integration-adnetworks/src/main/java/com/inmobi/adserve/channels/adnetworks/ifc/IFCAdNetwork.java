@@ -149,13 +149,12 @@ public class IFCAdNetwork extends BaseAdNetworkImpl {
 			return false;
 		}
 		if (sasParams.getSlot() != null
-				&& SlotSizeMapping.getDimension(Long.parseLong(sasParams
-						.getSlot())) != null) {
-			SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+				&& SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
+			SlotSizeMapping.getDimension((long)sasParams.getSlot());
 			slotHeight = String.valueOf(SlotSizeMapping.getDimension(
-					Long.parseLong(sasParams.getSlot())).getHeight());
+                    (long) sasParams.getSlot()).getHeight());
 			slotWidth = String.valueOf(SlotSizeMapping.getDimension(
-					Long.parseLong(sasParams.getSlot())).getWidth());
+                    (long) sasParams.getSlot()).getWidth());
 		} else {
 			logger.info("IFC Mandatory Parameter missing: Slot");
 			return false;
@@ -277,7 +276,7 @@ public class IFCAdNetwork extends BaseAdNetworkImpl {
 		jsonObject.addProperty("impressionId",
 				casInternalRequestParameters.impressionId);
 		jsonObject.addProperty("genderOrig", sasParams.getGender());
-		jsonObject.addProperty("area", sasParams.getArea());
+		jsonObject.addProperty("state", sasParams.getState());
 		jsonObject.addProperty("beaconURL", beaconUrl);
 		jsonObject.addProperty("appType", appType);
 		jsonObject.addProperty("categories",
@@ -292,7 +291,7 @@ public class IFCAdNetwork extends BaseAdNetworkImpl {
 		jsonObject.addProperty("age", sasParams.getAge());
 		jsonObject.addProperty("gender", gender);
 		jsonObject.addProperty("latLong", casInternalRequestParameters.latLong);
-		jsonObject.addProperty("country", sasParams.getCountry());
+		jsonObject.addProperty("country", sasParams.getCountryCode());
 		jsonObject.addProperty("siteID", siteID);
 		jsonObject.addProperty("adGroupID", adGroupID);
 		jsonObject.addProperty("richMedia", richMedia);

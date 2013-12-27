@@ -284,9 +284,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private Banner createBannerObject() {
         Banner banner = new Banner();
         banner.setId(casInternalRequestParameters.impressionId);
-        if (!StringUtils.isBlank(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+        if (null != sasParams.getSlot()
+                && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long)sasParams.getSlot());
             banner.setW((int) dim.getWidth());
             banner.setH((int) dim.getHeight());
         }
@@ -319,11 +319,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             geo.setLat(Float.parseFloat(latlong[0]));
             geo.setLon(Float.parseFloat(latlong[1]));
         }
-        if (null != sasParams.getCountry()) {
-            geo.setCountry(iabCountriesInterface.getIabCountry(sasParams.getCountry()));
+        if (null != sasParams.getCountryCode()) {
+            geo.setCountry(iabCountriesInterface.getIabCountry(sasParams.getCountryCode()));
         }
-        if (null != sasParams.getCity() && null != iabCitiesInterface.getIABCity(sasParams.getCity())) {
-            geo.setCity(iabCitiesInterface.getIABCity(sasParams.getCity()));
+        if (null != iabCitiesInterface.getIABCity(sasParams.getCity() + "")) {
+            geo.setCity(iabCitiesInterface.getIABCity(sasParams.getCity() + ""));
         }
         geo.setZip(casInternalRequestParameters.zipCode);
         // Setting type of geo data
@@ -346,7 +346,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         try {
             if (sasParams.getAge() != null) {
-                int age = Integer.parseInt(sasParams.getAge());
+                int age = sasParams.getAge();
                 int year = Calendar.getInstance().get(Calendar.YEAR);
                 int yob = year - age;
                 user.setYob(yob);

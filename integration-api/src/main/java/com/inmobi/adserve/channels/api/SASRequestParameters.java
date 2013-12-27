@@ -15,18 +15,18 @@ public class SASRequestParameters {
     private String       userAgent;
 
     private String       source;               // WAP/APP
-    private String       age;
+    private Short        age;
     private String       gender;
     private String       locSrc;               // wifi/ip
-    private String       postalCode;
+    private Integer      postalCode;
     // User location parameters
     private String       latLong;
-    private String       country;
-    private String       countryStr;
+    private String       countryCode;      //Country Code like US for USA
+    private Long         countryId;    // Integer value for country
     private String       impressionId;
     private String       clurl;
     private String       siteId;
-    private String       slot;
+    private Short        slot;
     // TODO: Convert this to ENUM.
     private String       siteType;
     private String       sdkVersion;
@@ -46,13 +46,13 @@ public class SASRequestParameters {
     private String       rFormat;
 
     private int          osId;
-    private String       rqMkAdcount;
+    private Short        rqMkAdcount;
     private String       tid;
     private long         handsetInternalId;
     private int          carrierId;
-    private String       city;
-    private String       area;
-    private String       rqMkSlot;
+    private int          city;
+    private int          state;
+    private List<Short>  rqMkSlot;
     private Integer      ipFileVersion;
     private boolean      isRichMedia;
     private String       rqAdType;
@@ -63,7 +63,7 @@ public class SASRequestParameters {
     private int          dst;                  // This will describe the type of request dcp or rtbd
     private Set<Integer> accountSegment;      
     private boolean      isResponseOnlyFromDcp;
-    private int sst;//0 for Network 
+    private int          sst;//0 for Network 
 
     public SASRequestParameters() {
         // Do Nothing.

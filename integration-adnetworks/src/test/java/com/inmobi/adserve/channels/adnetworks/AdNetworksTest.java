@@ -286,9 +286,9 @@ public class AdNetworksTest extends TestCase {
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         sasParams.setCarrierId(365);
-        sasParams.setCountryStr("0");
-        sasParams.setCountry("us");
-        sasParams.setCategories(Arrays.asList(new Long[]{10l, 13l, 30l}));
+        sasParams.setCountryId(0l);
+        sasParams.setCountryCode("us");
+        sasParams.setCategories(Arrays.asList(10l, 13l, 30l));
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         String externalSiteKey = "10023";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(webmoblinkAdvId, null,
@@ -367,8 +367,8 @@ public class AdNetworksTest extends TestCase {
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         sasParams.setCarrierId(365);
-        sasParams.setCountryStr("0");
-        sasParams.setCountry("us");
+        sasParams.setCountryId(0l);
+        sasParams.setCountryCode("us");
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
                 + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1" + "/9cddca11?ds=1";
         String externalSiteKey = "10023";
@@ -386,8 +386,8 @@ public class AdNetworksTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setCarrierId(365);
-        sasParams.setCountryStr("0");
-        sasParams.setCountry("us");
+        sasParams.setCountryId(0l);
+        sasParams.setCountryCode("us");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         Long[] cats = { 10l, 13l, 30l };
@@ -431,7 +431,7 @@ public class AdNetworksTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "1234";
         casInternalRequestParameters.uidIFA = "dfjksahfdjksahdkaw2e23231";
-        sasParams.setCountry("us");
+        sasParams.setCountryCode("us");
         sasParams.setOsId(HandSetOS.iPhone_OS.getValue());
         String externalKey = "118398";
         sasParams.setSiteIncId(18);
@@ -457,7 +457,7 @@ public class AdNetworksTest extends TestCase {
         casInternalRequestParameters.uid = "1234";
         casInternalRequestParameters.uidO1 = "dfjksahfdjksahdkaw2e23231";
         sasParams.setOsId(HandSetOS.iPhone_OS.getValue());
-        sasParams.setCountry("us");
+        sasParams.setCountryCode("us");
         String externalKey = "118398";
         sasParams.setSiteIncId(18);
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(openxAdvertiserId, null,
@@ -480,7 +480,7 @@ public class AdNetworksTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "1234";
-        sasParams.setCountry("us");
+        sasParams.setCountryCode("us");   
         String externalKey = "118398";
         sasParams.setSiteIncId(18);
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(openxAdvertiserId, null,
@@ -766,7 +766,7 @@ public class AdNetworksTest extends TestCase {
         sasParams.setUserAgent("Mozilla");
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-        sasParams.setSlot("15");
+        sasParams.setSlot((short) 15);
         sasParams.setSiteIncId(18);
         casInternalRequestParameters.uidIFA = "202cb962ac59075b964b07152d234b70";
         String externalKey = "19100";
@@ -793,7 +793,7 @@ public class AdNetworksTest extends TestCase {
         casInternalRequestParameters.latLong = " ,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
+        sasParams.setSlot((short)15);
         sasParams.setSiteIncId(18);
         casInternalRequestParameters.uidO1 = "202cb962ac59075b964b07152d234b70";
         sasParams.setSource("iphone");
@@ -819,7 +819,6 @@ public class AdNetworksTest extends TestCase {
         sasParams.setUserAgent("Mozilla");
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-        sasParams.setSlot("");
         sasParams.setSiteIncId(18);
         casInternalRequestParameters.uidMd5 = "202cb962ac59075b964b07152d234b70";
         sasParams.setSource("android");
@@ -843,8 +842,8 @@ public class AdNetworksTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setCarrierId(365);
-        sasParams.setCountryStr("0");
-        sasParams.setCountry("us");
+        sasParams.setCountryId(0l);
+        sasParams.setCountryCode("us");
         sasParams.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29"
                 + "+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         Long[] cats = { 10l, 13l, 30l };
@@ -872,8 +871,8 @@ public class AdNetworksTest extends TestCase {
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         sasParams.setCarrierId(365);
-        sasParams.setCountryStr("0");
-        sasParams.setCountry("us");
+        sasParams.setCountryId(0l);
+        sasParams.setCountryCode("us");
         Long[] cats = { 10l, 13l, 30l };
         sasParams.setCategories(Arrays.asList(cats));
         String beaconUrl = "http://c2.w.inmobi.com/c"
@@ -898,8 +897,8 @@ public class AdNetworksTest extends TestCase {
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         sasParams.setCarrierId(365);
-        sasParams.setCountryStr("0");
-        sasParams.setCountry("us");
+        sasParams.setCountryId(0l);
+        sasParams.setCountryCode("us");
         Long[] cats = {};
         sasParams.setCategories(Arrays.asList(cats));
         ;
@@ -922,7 +921,7 @@ public class AdNetworksTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short)4);
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c"
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
@@ -949,7 +948,7 @@ public class AdNetworksTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short) 4);
         sasParams.setSource("wap");
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c"
@@ -978,7 +977,7 @@ public class AdNetworksTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSource("app");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short)4);
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c"
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
@@ -1006,7 +1005,7 @@ public class AdNetworksTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSource("app");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short) 4);
         sasParams.setSdkVersion("a370");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
         String externalKey = "19100";
@@ -1035,7 +1034,7 @@ public class AdNetworksTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short)4);
         sasParams.setSource("WAP");
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c"
@@ -1064,7 +1063,7 @@ public class AdNetworksTest extends TestCase {
 
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short)4);
         sasParams.setSource("android");
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c"
@@ -1091,7 +1090,7 @@ public class AdNetworksTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short)4);
         sasParams.setSource("android");
         sasParams.setSdkVersion("a370");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
@@ -1120,7 +1119,7 @@ public class AdNetworksTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short)4);
         sasParams.setSource("wap");
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
@@ -1145,7 +1144,7 @@ public class AdNetworksTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short)4);
         sasParams.setSource("wap");
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
@@ -1170,7 +1169,7 @@ public class AdNetworksTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short)4);
         sasParams.setSource("app");
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
@@ -1195,7 +1194,7 @@ public class AdNetworksTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short)4);
         sasParams.setSource("app");
         sasParams.setSdkVersion("a370");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
@@ -1222,7 +1221,7 @@ public class AdNetworksTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short)4);
         sasParams.setSource("wap");
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
@@ -1247,7 +1246,7 @@ public class AdNetworksTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short)4);
         sasParams.setSource("app");
         sasParams.setSdkVersion("i360");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
@@ -1274,7 +1273,7 @@ public class AdNetworksTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short)4);
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
@@ -1298,7 +1297,7 @@ public class AdNetworksTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short)4);
         sasParams.setSource("App");
         sasParams.setSdkVersion("a360");
         String externalKey = "19100";

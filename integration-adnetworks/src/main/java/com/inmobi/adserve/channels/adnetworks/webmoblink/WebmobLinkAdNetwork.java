@@ -84,7 +84,7 @@ public class WebmobLinkAdNetwork extends BaseAdNetworkImpl {
             channels = sb.toString();
         }
         result = config.getString("webmoblink.resformat");
-        country = sasParams.getCountry();
+        country = sasParams.getCountryCode();
         logger.debug("Configure parameters inside webmoblink returned true");
         return true;
     }

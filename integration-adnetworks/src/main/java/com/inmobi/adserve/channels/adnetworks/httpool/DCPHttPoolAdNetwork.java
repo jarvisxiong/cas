@@ -1,9 +1,9 @@
 package com.inmobi.adserve.channels.adnetworks.httpool;
 
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -13,14 +13,9 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 
 public class DCPHttPoolAdNetwork extends BaseAdNetworkImpl {
@@ -53,9 +48,9 @@ public class DCPHttPoolAdNetwork extends BaseAdNetworkImpl {
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (!StringUtils.isBlank(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            Long slotSize = Long.parseLong(sasParams.getSlot());
+        if (null != sasParams.getSlot()
+                && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
+            Long slotSize = (long)sasParams.getSlot();
             // Httpool doesnt support 320x48 & 320x53. so mapping to 320x50
             if (slotSize == 9l || slotSize == 24l) {
                 slotSize = 15l;
@@ -104,7 +99,7 @@ public class DCPHttPoolAdNetwork extends BaseAdNetworkImpl {
                 did = "nodeviceid-1234567890";
             }
             url.append("&did=").append(did);
-            if (!StringUtils.isEmpty(slot)) {
+            if (null != slot) {
                 url.append("&format=").append(slotFormat);
             }
             String category = getCategories(';');
@@ -165,7 +160,7 @@ public class DCPHttPoolAdNetwork extends BaseAdNetworkImpl {
                     context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getString("image_url"));
                     if ("shop".equalsIgnoreCase(adType)) {
                         context.put(VelocityTemplateFieldConstants.AdText, adResponse.getString("content"));
-                        String vmTemplate = Formatter.getRichTextTemplateForSlot(slot);
+                        String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                         if (StringUtils.isEmpty(vmTemplate)) {
                             logger.info("No template found for the slot");
                             adStatus = "NO_AD";

@@ -21,11 +21,7 @@ import org.json.JSONObject;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.adnetworks.nexage.DCPNexageAdNetwork;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
@@ -80,7 +76,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
-        sasParams.setSlot("9");
+        sasParams.setSlot((short)9);
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
         String burl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
@@ -194,7 +190,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot((short)9);
         List<Long> cat = new ArrayList<Long>();
         cat.add(13l);
         sasParams.setCategories(cat);
@@ -463,7 +459,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
-        sasParams.setArea("area");
+        sasParams.setState("area");
         String externalKey = "8a809449013c3c643cad82cb412b5857";
         SlotSizeMapping.init();
         String burl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";

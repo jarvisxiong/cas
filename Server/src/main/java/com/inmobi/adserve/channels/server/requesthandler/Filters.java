@@ -469,7 +469,7 @@ public class Filters {
 
     byte getSupplyClass(SASRequestParameters sasParams) {
         siteEcpmEntity = repositoryHelper.querySiteEcpmRepository(sasParams.getSiteId(),
-            Integer.valueOf(sasParams.getCountryStr()), sasParams.getOsId());
+            Integer.valueOf(sasParams.getCountryId()), sasParams.getOsId());
         if (siteEcpmEntity == null) {
             logger.debug("SiteEcpmEntity is null, thus returning default class");
             return defaultSupplyClass;
@@ -835,8 +835,8 @@ public class Filters {
     void fetchPricingEngineEntity() {
         // Fetching pricing engine entity
         int country = 0;
-        if (null != sasParams.getCountryStr()) {
-            country = Integer.parseInt(sasParams.getCountryStr());
+        if (null != sasParams.getCountryId()) {
+            country = Integer.parseInt(sasParams.getCountryId());
         }
         int os = sasParams.getOsId();
         if (null != repositoryHelper && country != 0) {

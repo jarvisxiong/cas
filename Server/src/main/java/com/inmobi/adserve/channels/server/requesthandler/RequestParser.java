@@ -61,12 +61,12 @@ public class RequestParser {
         params.setSiteId(stringify(jObject, "rqMkSiteid", logger));
         params.setSource(stringify(jObject, "source", logger));
         params.setCarrierId(Integer.parseInt(parseArray(jObject, "carrier", 0)));
-        params.setCountryStr(parseArray(jObject, "carrier", 1));
-        params.setCountry(parseArray(jObject, "carrier", 2));
-        params.setCity(parseArray(jObject, "carrier", 3));
-        params.setArea(parseArray(jObject, "carrier", 4));
-        params.setSlot(stringify(jObject, "slot-served", logger));
-        params.setRqMkSlot(stringify(jObject, "rqMkAdSlot", logger));
+        params.setCountryId(Long.parseLong(parseArray(jObject, "carrier", 1)));
+        params.setCountryCode(parseArray(jObject, "carrier", 2));
+        params.setCity(Integer.parseInt(parseArray(jObject, "carrier", 3)));
+        params.setState(Integer.parseInt(parseArray(jObject, "carrier", 4)));
+        params.setSlot(Short.parseShort(stringify(jObject, "slot-served", logger)));
+        params.setRqMkSlot(Arrays.asList(Short.parseShort(stringify(jObject, "rqMkAdSlot", logger))));
         String sdkVersion = stringify(jObject, "sdk-version", logger);
         if (StringUtils.isBlank(sdkVersion) || "null".equalsIgnoreCase(sdkVersion)) {
             sdkVersion = null;
@@ -80,7 +80,7 @@ public class RequestParser {
         params.setCategories(getCategory(jObject, logger, "new-category"));
         params.setRqIframe(stringify(jObject, "rqIframe", logger));
         params.setRFormat(stringify(jObject, "r-format", logger));
-        params.setRqMkAdcount(stringify(jObject, "rqMkAdcount", logger));
+        params.setRqMkAdcount(Short.parseShort(stringify(jObject, "rqMkAdcount", logger)));
         params.setTid(stringify(jObject, "tid", logger));
 
         params.setAllowBannerAds(jObject.optBoolean("site-allowBanner", true));
@@ -89,7 +89,7 @@ public class RequestParser {
         params.setModelId(jObject.optInt("model-id", 0));
         logger.debug("Site segment id is", params.getSiteSegmentId(), "and model id is", params.getModelId());
         params.setIpFileVersion(jObject.optInt("rqIpFileVer", 1));
-        logger.debug("country obtained is", params.getCountry());
+        logger.debug("country obtained is", params.getCountryCode());
         logger.debug("site floor is", params.getSiteFloor());
         logger.debug("osId is", params.getOsId());
         params.setUidParams(stringify(jObject, "raw-uid", logger));
@@ -188,29 +188,29 @@ public class RequestParser {
         String utf8 = "UTF-8";
         try {
             JSONObject userMap = (JSONObject) jObject.get("uparams");
-            parameter.setAge(stringify(userMap, "u-age", logger));
+            parameter.setAge(Short.parseShort(stringify(userMap, "u-age", logger)));
             parameter.setGender(stringify(userMap, "u-gender", logger));
-            parameter.setPostalCode(stringify(userMap, "u-postalcode", logger));
-            if (!StringUtils.isEmpty(parameter.getPostalCode())) {
-                parameter.setPostalCode(parameter.getPostalCode().replaceAll(" ", ""));
-            }
+            parameter.setPostalCode(Integer.parseInt(stringify(userMap, "u-postalcode", logger)));
             try {
                 if (null != parameter.getAge()) {
-                    parameter.setAge(URLEncoder.encode(parameter.getAge(), utf8));
+                    parameter.setAge(Short.parseShort(URLEncoder.encode(parameter.getAge().toString(), utf8)));
                 }
                 if (null != parameter.getGender()) {
                     parameter.setGender(URLEncoder.encode(parameter.getGender(), utf8));
                 }
                 if (null != parameter.getPostalCode()) {
-                    parameter.setPostalCode(URLEncoder.encode(parameter.getPostalCode(), utf8));
+                    parameter.setPostalCode(Integer.parseInt(URLEncoder.encode(parameter.getPostalCode().toString(), utf8)));
                 }
             }
             catch (UnsupportedEncodingException e) {
                 logger.debug("Error in encoding u params", e.getMessage());
             }
         }
-        catch (JSONException exception) {
-            logger.debug("json exception in parsing u params", exception);
+        catch (NumberFormatException exception) {
+            logger.debug("NumberFormatException in parsing u params", exception);
+        }
+        catch (JSONException exception2) {
+            logger.debug("json exception in parsing u params", exception2);
         }
         return parameter;
     }

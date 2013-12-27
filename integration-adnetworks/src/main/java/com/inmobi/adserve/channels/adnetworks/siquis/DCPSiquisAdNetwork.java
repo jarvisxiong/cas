@@ -1,10 +1,13 @@
 package com.inmobi.adserve.channels.adnetworks.siquis;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLDecoder;
-import java.util.Calendar;
-
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -16,14 +19,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.util.Calendar;
 
 
 public class DCPSiquisAdNetwork extends BaseAdNetworkImpl {
@@ -122,7 +121,7 @@ public class DCPSiquisAdNetwork extends BaseAdNetworkImpl {
                 }
                 context.put(VelocityTemplateFieldConstants.SmallFont, "1");
                 context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
-                String vmTemplate = Formatter.getRichTextTemplateForSlot(slot);
+                String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                 if (StringUtils.isEmpty(vmTemplate)) {
                     responseContent = Formatter.getResponseFromTemplate(TemplateType.PLAIN, context, sasParams,
                         beaconUrl, logger);

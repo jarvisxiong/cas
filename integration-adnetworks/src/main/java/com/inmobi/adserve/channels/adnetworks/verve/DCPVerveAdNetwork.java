@@ -1,9 +1,10 @@
 package com.inmobi.adserve.channels.adnetworks.verve;
 
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -12,15 +13,9 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONException;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 
 public class DCPVerveAdNetwork extends BaseAdNetworkImpl {
@@ -87,9 +82,9 @@ public class DCPVerveAdNetwork extends BaseAdNetworkImpl {
                 && StringUtils.isNotBlank(sasParams.getLocSrc())) { // request has true lat-long
             return false;
         }
-        if (!StringUtils.isBlank(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+        if (null != sasParams.getSlot()
+                && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long)sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
@@ -134,7 +129,7 @@ public class DCPVerveAdNetwork extends BaseAdNetworkImpl {
             if (!StringUtils.isEmpty(sasParams.getGender())) {
                 url.append("&ei=gender=").append(sasParams.getGender().toLowerCase());
             }
-            if (!StringUtils.isEmpty(sasParams.getAge())) {
+            if (null != sasParams.getAge()) {
                 url.append(";age=").append(sasParams.getAge());
             }
             url.append("&ua=").append(getURLEncode(sasParams.getUserAgent(), format));

@@ -89,7 +89,7 @@ public class IFDAdNetwork extends BaseAdNetworkImpl {
         }
 
         try {
-            paramMap.put("mk-ad-slot", sasParams.getSlot());
+            paramMap.put("mk-ad-slot", sasParams.getSlot().toString());
         }
         catch (Exception exception) {
             throw new Exception("mandatory parameter mk-ad-slot value is missing");
@@ -116,8 +116,8 @@ public class IFDAdNetwork extends BaseAdNetworkImpl {
 
         try {
             paramMap.put("cid", sasParams.getCarrierId() + "");
-            paramMap.put("cnid", sasParams.getCountryStr());
-            paramMap.put("cc", sasParams.getCountry().toUpperCase());
+            paramMap.put("cnid", sasParams.getCountryCode());
+            paramMap.put("cc", sasParams.getCountryId().toString());
         }
         catch (Exception exception) {
             throw new Exception("mandatory parameter carrier value is either null or not formatted properly.");

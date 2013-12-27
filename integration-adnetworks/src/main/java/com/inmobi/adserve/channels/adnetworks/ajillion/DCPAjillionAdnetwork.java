@@ -1,8 +1,12 @@
 package com.inmobi.adserve.channels.adnetworks.ajillion;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -11,13 +15,8 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONObject;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 
 public class DCPAjillionAdnetwork extends BaseAdNetworkImpl {
@@ -80,8 +79,8 @@ public class DCPAjillionAdnetwork extends BaseAdNetworkImpl {
             if (StringUtils.isNotBlank(sasParams.getGender())) {
                 appendQueryParam(url, GENDER, sasParams.getGender(), false);
             }
-            if (StringUtils.isNotBlank(sasParams.getAge())) {
-                appendQueryParam(url, AGE, sasParams.getAge(), false);
+            if (null != sasParams.getAge()) {
+                appendQueryParam(url, AGE, sasParams.getAge().toString(), false);
             }
             logger.debug(name, " url is", url);
             return (new URI(url.toString()));

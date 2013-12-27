@@ -20,11 +20,7 @@ import org.jboss.netty.util.CharsetUtil;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.adnetworks.appier.DCPAppierAdNetwork;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
@@ -152,7 +148,7 @@ public class DCPAppierAdnetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
+        sasParams.setSlot((short)15); 
         sasParams.setSource("wap");
         sasParams.setOsId(3);
         sasParams.setSiteType("PERFORMANCE");
@@ -186,7 +182,7 @@ public class DCPAppierAdnetworkTest extends TestCase {
         sasParams.setCategories(Arrays.asList(cat));
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
+        sasParams.setSlot((short)15);
         sasParams.setSiteType("FAMILY_SAFE");
         String externalKey = "1324";
         SlotSizeMapping.init();
@@ -215,7 +211,6 @@ public class DCPAppierAdnetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("");
         sasParams.setSiteType("PERFORMANCE");
         String externalKey = "test";
         Long[] cat = new Long[] { 15l, 13l };
@@ -290,7 +285,7 @@ public class DCPAppierAdnetworkTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short)4);
         sasParams.setSource("wap");
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c"
@@ -316,7 +311,7 @@ public class DCPAppierAdnetworkTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short)4);
         sasParams.setSdkVersion("i360");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
         sasParams.setSource("app");

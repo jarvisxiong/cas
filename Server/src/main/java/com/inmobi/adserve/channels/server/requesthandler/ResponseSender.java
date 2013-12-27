@@ -1,7 +1,10 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
 import com.google.common.base.Charsets;
-import com.inmobi.adserve.adpool.*;
+import com.inmobi.adserve.adpool.AdInfo;
+import com.inmobi.adserve.adpool.AdPoolResponse;
+import com.inmobi.adserve.adpool.AuctionType;
+import com.inmobi.adserve.adpool.Creative;
 import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
@@ -9,6 +12,7 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
+import com.inmobi.types.AdIdChain;
 import com.inmobi.types.GUID;
 import com.ning.http.client.AsyncHttpClient;
 import org.codehaus.jettison.json.JSONException;
@@ -155,19 +159,23 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private AdPoolResponse createThriftResponse (String finalResponse) {
         AdPoolResponse adPoolResponse = new AdPoolResponse();
         AdInfo rtbdAd = new AdInfo();
-        rtbdAd.setAdGroupIncId(this.auctionEngine
+        AdIdChain adIdChain = new AdIdChain();
+        adIdChain.setAdgroup_guid(this.auctionEngine
                 .getRtbResponse()
                 .getChannelSegmentEntity()
-                .getAdgroupIncId());
-        rtbdAd.setAdIncId(this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getIncId());
-        rtbdAd.setAdvertiserId(this.auctionEngine.getRtbResponse().getChannelEntity().getAccountId());
-        rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);
-        rtbdAd.setBid((long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface().getSecondBidPriceInUsd() * 1000));
-        rtbdAd.setBidInOriginalCurrency((long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface().getSecondBidPriceInLocal() * 1000));
-        rtbdAd.setCampaignIncId(this.auctionEngine
+                .getAdgroupId());
+        adIdChain.setAdvertiser_guid(this.auctionEngine
+                .getRtbResponse()
+                .getChannelEntity()
+                .getAccountId());
+        adIdChain.setAd(this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getIncId());
+        adIdChain.setCampaign(this.auctionEngine
                 .getRtbResponse()
                 .getChannelSegmentEntity()
                 .getCampaignIncId());
+        rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);
+        rtbdAd.setBid((long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface().getSecondBidPriceInUsd() * 1000));
+        rtbdAd.setBidInOriginalCurrency((long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface().getSecondBidPriceInLocal() * 1000));
         rtbdAd.setMinChargedValue((long)(casInternalRequestParameters.rtbBidFloor*1000));
         UUID uuid = WilburyUUID.extractUUID(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getImpressionId());
         rtbdAd.setImpressionId(new GUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits()));
@@ -176,8 +184,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
         rtbdCreative.setValue(finalResponse);
         //TODO Action type is not available in DCP
         // rtbdCreative.setActionType()
-        //TODO Confirm with Anand
-        rtbdCreative.setAdType(AdType.TEXT);
         //TODO Landing url is not available in RTBD, ask for default value
         //rtbdCreative.setLandingUrl("");
         //NO idea what is studio bundle

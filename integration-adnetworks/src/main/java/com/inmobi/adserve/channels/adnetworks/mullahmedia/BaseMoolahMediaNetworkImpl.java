@@ -162,8 +162,8 @@ public abstract class BaseMoolahMediaNetworkImpl extends BaseAdNetworkImpl {
         if (casInternalRequestParameters.zipCode != null) {
             sb.append("&zip=").append(casInternalRequestParameters.zipCode);
         }
-        if (sasParams.getCountry() != null) {
-            sb.append("&country=").append(sasParams.getCountry());
+        if (sasParams.getCountryCode() != null) {
+            sb.append("&country=").append(sasParams.getCountryCode());
         }
         if (casInternalRequestParameters.latLong != null && casInternalRequestParameters.latLong.contains(",")) {
             String[] latlong = casInternalRequestParameters.latLong.split(",");
@@ -173,9 +173,9 @@ public abstract class BaseMoolahMediaNetworkImpl extends BaseAdNetworkImpl {
         if (carrierId != null) {
             sb.append("&carrier_id=").append(carrierId);
         }
-        if (!StringUtils.isEmpty(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+        if (null != sasParams.getSlot()
+                && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long)sasParams.getSlot());
             sb.append("&w=").append(dim.getWidth()).append("&h=").append(dim.getHeight());
             if (sasParams.getSlot().equals("10")) // 300x250
             {

@@ -91,9 +91,9 @@ public class DCPLomarkAdNetwork extends BaseAdNetworkImpl {
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (!StringUtils.isBlank(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+        if (null != sasParams.getSlot()
+                && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long)sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
@@ -275,7 +275,7 @@ public class DCPLomarkAdNetwork extends BaseAdNetworkImpl {
                     context.put(VelocityTemplateFieldConstants.AdText,
                         displayInfo.getJSONObject("title").getString("text"));
                     context.put(VelocityTemplateFieldConstants.Description, displayInfo.getString("subtitle"));
-                    String vmTemplate = Formatter.getRichTextTemplateForSlot(slot);
+                    String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                     if (StringUtils.isEmpty(vmTemplate)) {
                         logger.info("No template found for the slot");
                         adStatus = "NO_AD";
@@ -344,7 +344,7 @@ public class DCPLomarkAdNetwork extends BaseAdNetworkImpl {
     }
 
     private int getAdType() {
-        Integer slot = Integer.parseInt(sasParams.getSlot());
+        Short slot = sasParams.getSlot();
         if (10 == slot // 300X250
                 || 14 == slot // 320X480
                 || 16 == slot) /* 768X1024 */{

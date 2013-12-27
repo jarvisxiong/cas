@@ -1,8 +1,12 @@
 package com.inmobi.adserve.channels.adnetworks.mobilecommerce;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -12,13 +16,8 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 
 public class MobileCommerceAdNetwork extends BaseAdNetworkImpl {
@@ -91,8 +90,8 @@ public class MobileCommerceAdNetwork extends BaseAdNetworkImpl {
                 url.append("&inm_img=").append(getURLEncode(beaconUrl, format));
             }
 
-            if (sasParams.getCountry() != null) {
-                url.append("&region=").append(sasParams.getCountry());
+            if (sasParams.getCountryCode() != null) {
+                url.append("&region=").append(sasParams.getCountryCode());
             }
             String categoryId = null;
             if ((categoryId = getCategoryId()) != null) {
@@ -190,7 +189,7 @@ public class MobileCommerceAdNetwork extends BaseAdNetworkImpl {
         }
         context.put(VelocityTemplateFieldConstants.AdTag, true);
         addPartnerBeaconUrls(context, responseJson);
-        String vmTemplate = Formatter.getRichTextTemplateForSlot(slot);
+        String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
         if (StringUtils.isEmpty(vmTemplate)) {
             responseTemplate = TemplateType.PLAIN;
         }

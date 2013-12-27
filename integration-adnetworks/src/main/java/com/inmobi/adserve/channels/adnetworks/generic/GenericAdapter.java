@@ -1,30 +1,24 @@
 package com.inmobi.adserve.channels.adnetworks.generic;
 
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.util.DebugLogger;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpMethod;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.jboss.netty.handler.codec.http.HttpVersion;
+import org.jboss.netty.handler.codec.http.*;
 import org.jboss.netty.util.CharsetUtil;
 import org.json.JSONObject;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.DebugLogger;
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
 
 
 /**
@@ -263,7 +257,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
             return casInternalRequestParameters.uid;
         }
         if (macro.equals(MacrosAndStrings.FORMAT)) {
-            Dimension format = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+            Dimension format = SlotSizeMapping.getDimension((long)sasParams.getSlot());
             if (format != null) {
                 return (int) format.getWidth() + "x" + (int) format.getHeight();
             }

@@ -1,8 +1,13 @@
 package com.inmobi.adserve.channels.adnetworks.openx;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -10,14 +15,8 @@ import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 
 public class OpenxAdNetwork extends BaseAdNetworkImpl {
@@ -70,9 +69,9 @@ public class OpenxAdNetwork extends BaseAdNetworkImpl {
         StringBuilder finalUrl = new StringBuilder(config.getString("openx.host"));
         finalUrl.append(externalSiteId)
                     .append("&cnt=")
-                    .append(sasParams.getCountry().toLowerCase())
+                    .append(sasParams.getCountryCode().toLowerCase())
                     .append("&dma=")
-                    .append(sasParams.getArea());
+                    .append(sasParams.getState());
         finalUrl.append("&net=").append(sasParams.getLocSrc()).append("&age=").append(sasParams.getAge());
         if (sasParams.getGender() != null) {
             finalUrl.append("&gen=").append(sasParams.getGender().toUpperCase());

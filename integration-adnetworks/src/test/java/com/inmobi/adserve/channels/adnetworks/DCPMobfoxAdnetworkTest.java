@@ -20,11 +20,7 @@ import org.json.JSONObject;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.adnetworks.mobfox.DCPMobFoxAdnetwork;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.DebugLogger;
 
@@ -78,7 +74,7 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setSlot("11");
+        sasParams.setSlot((short)11);
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
@@ -146,9 +142,9 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
         category.add(3l);
         sasParams.setCategories(category);
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
+        sasParams.setSlot((short)15);
         sasParams.setGender("m");
-        sasParams.setAge("32");
+        sasParams.setAge((short)32);
         String externalKey = "6378ef4a7db50d955c90f7dffb05ee20";
         SlotSizeMapping.init();
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
@@ -175,7 +171,7 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "38.5,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
+        sasParams.setSlot((short)15);
         List<Long> category = new ArrayList<Long>();
         category.add(3l);
         category.add(2l);
@@ -206,7 +202,7 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
         casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("15");
+        sasParams.setSlot((short)15);
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c"
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"

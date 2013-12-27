@@ -1,22 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.mobfox;
 
-import java.awt.Dimension;
-import java.io.ByteArrayInputStream;
-import java.net.URI;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -25,6 +8,21 @@ import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.sun.xml.txw2.annotation.XmlAttribute;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.VelocityContext;
+import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.awt.*;
+import java.io.ByteArrayInputStream;
+import java.net.URI;
 
 
 public class DCPMobFoxAdnetwork extends BaseAdNetworkImpl {
@@ -91,9 +89,9 @@ public class DCPMobFoxAdnetwork extends BaseAdNetworkImpl {
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (!StringUtils.isBlank(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+        if (null != sasParams.getSlot()
+                && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null ) {
+            Dimension dim = SlotSizeMapping.getDimension((long)sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
@@ -150,8 +148,8 @@ public class DCPMobFoxAdnetwork extends BaseAdNetworkImpl {
         if (height != 0) {
             appendQueryParam(url, HEIGHT, height + "", false);
         }
-        if (StringUtils.isNotBlank(sasParams.getAge())) {
-            appendQueryParam(url, AGE, sasParams.getAge(), false);
+        if (null != sasParams.getAge()) {
+            appendQueryParam(url, AGE, sasParams.getAge().toString(), false);
         }
         appendQueryParam(url, B_SITE_ID, blindedSiteId, false);
 
@@ -169,7 +167,6 @@ public class DCPMobFoxAdnetwork extends BaseAdNetworkImpl {
                 statusCode = 500;
             }
             responseContent = "";
-            return;
         }
         else {
             statusCode = status.getCode();

@@ -113,8 +113,8 @@ public class Logging {
             handsetInternalId = sasParams.getHandsetInternalId();
             requestSlot = sasParams.getRqMkSlot();
             slotServed = sasParams.getSlot();
-            geo = new Geo(sasParams.getCarrierId(), Integer.valueOf(sasParams.getCountryStr()).shortValue());
-            geo.setRegion(Integer.parseInt(sasParams.getArea()));
+            geo = new Geo(sasParams.getCarrierId(), Integer.valueOf(sasParams.getCountryId()).shortValue());
+            geo.setRegion(Integer.parseInt(sasParams.getState()));
             geo.setCity(Integer.parseInt(sasParams.getCity()));
         }
         HandsetMeta handsetMeta = new HandsetMeta();
@@ -191,7 +191,7 @@ public class Logging {
                 if (sasParamsOsId > 0 && sasParamsOsId < 21) {
                     osName = HandSetOS.values()[sasParamsOsId - 1].toString();
                 }
-                MetricsManager.updateStats(Integer.parseInt(sasParams.getCountryStr()), sasParams.getCountry(),
+                MetricsManager.updateStats(Integer.parseInt(sasParams.getCountryId()), sasParams.getCountry(),
                     sasParams.getOsId(), osName, Filters.getAdvertiserIdToNameMapping().get(advertiserId), false,
                     false, isServerImpression, 0.0, (long) 0.0, impression.getAd().getWinBid());
             }
