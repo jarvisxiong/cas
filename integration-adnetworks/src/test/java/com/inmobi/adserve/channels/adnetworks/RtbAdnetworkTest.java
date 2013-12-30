@@ -224,7 +224,7 @@ public class RtbAdnetworkTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setSiteId("123");
         sasParams.setSource("app");
-        sasParams.setSlot("1");
+        sasParams.setSlot((short)1);
         Long[] catLong = new Long[2];
         catLong[0] = (long) 1;
         catLong[1] = (long) 2;
@@ -232,7 +232,7 @@ public class RtbAdnetworkTest extends TestCase {
         sasParams.setLocSrc("wifi");
         sasParams.setGender("Male");
         casInternalRequestParameters.uid = "1234";
-        sasParams.setAge("26");
+        sasParams.setAge((short)26);
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");

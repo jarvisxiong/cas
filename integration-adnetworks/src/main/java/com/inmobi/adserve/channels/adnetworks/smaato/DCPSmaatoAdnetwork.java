@@ -111,7 +111,7 @@ public class DCPSmaatoAdnetwork extends BaseAdNetworkImpl {
         }
         if (null != sasParams.getSlot()
                 && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
-            dimension = slotIdMap.get((long)sasParams.getSlot());
+            dimension = slotIdMap.get((int)sasParams.getSlot());
             if (StringUtils.isBlank(dimension)) {
                 logger.debug("mandatory parameters missing for smaato so exiting adapter");
                 return false;

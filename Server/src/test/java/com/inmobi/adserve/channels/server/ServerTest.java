@@ -111,7 +111,7 @@ public class ServerTest extends TestCase {
     public JSONObject prepareParameters() throws Exception {
         JSONObject args = new JSONObject();
         sasParam = new SASRequestParameters();
-        sasParam.setAge("35");
+        sasParam.setAge((short)35);
         sasParam.setGender("m");
         sasParam.setImpressionId("4f8d98e2-4bbd-40bc-8729-22da000900f9");
         int myarr[] = { 1, 2 };
@@ -153,7 +153,7 @@ public class ServerTest extends TestCase {
         SASRequestParameters params = new SASRequestParameters();
         DebugLogger logger = new DebugLogger();
         params = RequestParser.getUserParams(params, jsonObject, logger);
-        assertEquals(params.getAge(), "35");
+        assertEquals(params.getAge(), new Short("35"));
     }
 
     /*

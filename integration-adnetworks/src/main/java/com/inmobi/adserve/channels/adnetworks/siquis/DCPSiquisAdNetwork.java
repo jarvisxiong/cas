@@ -132,6 +132,7 @@ public class DCPSiquisAdNetwork extends BaseAdNetworkImpl {
                         beaconUrl, logger);
                 }
                 adStatus = "AD";
+                logger.debug("response length is ", responseContent.length(), "responseContent is", responseContent);
             }
             catch (JSONException exception) {
                 adStatus = "NO_AD";
@@ -150,7 +151,6 @@ public class DCPSiquisAdNetwork extends BaseAdNetworkImpl {
                 }
             }
         }
-        logger.debug("response length is ", responseContent.length(), "responseContent is", responseContent);
     }
 
     /**

@@ -1,8 +1,18 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import com.inmobi.adserve.channels.adnetworks.placeiq.DCPPlaceIQAdnetwork;
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.util.DebugLogger;
+import junit.framework.TestCase;
+import org.apache.commons.configuration.Configuration;
+import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.testng.annotations.Test;
 
 import java.io.File;
 import java.security.MessageDigest;
@@ -12,25 +22,9 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
-import junit.framework.TestCase;
-
-import org.apache.commons.configuration.Configuration;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.testng.annotations.Test;
-
-import com.inmobi.adserve.channels.adnetworks.placeiq.DCPPlaceIQAdnetwork;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 
 public class DCPPlaceIQAdnetworkTest extends TestCase {
@@ -86,7 +80,7 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setSlot("11");
+        sasParams.setSlot((short)11);
         sasParams.setOsId(HandSetOS.Android.getValue());
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -109,7 +103,7 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setSlot("11");
+        sasParams.setSlot((short)11);
         sasParams.setOsId(HandSetOS.Android.getValue());
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -130,7 +124,7 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setSlot("11");
+        sasParams.setSlot((short)11);
         sasParams.setOsId(HandSetOS.iPhone_OS.getValue());
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -152,7 +146,7 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setSlot("11");
+        sasParams.setSlot((short)11);
         sasParams.setOsId(HandSetOS.webOS.getValue());
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -219,7 +213,7 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
         category.add(3l);
         sasParams.setCategories(category);
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
+        sasParams.setSlot((short)15);
         sasParams.setSiteIncId(6575868);
         sasParams.setOsId(HandSetOS.Android.getValue());
         String externalKey = "PlaceIQ_test_7";
@@ -254,7 +248,7 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
         category.add(1l);
         sasParams.setCategories(category);
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
+        sasParams.setSlot((short)15);
         sasParams.setSiteIncId(6575868);
         sasParams.setOsId(HandSetOS.Android.getValue());
         String externalKey = "PlaceIQ_test_7";
@@ -282,7 +276,7 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
         casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("15");
+        sasParams.setSlot((short)15);
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setOsId(HandSetOS.Android.getValue());
         casInternalRequestParameters.uid = "23e2ewq445545saasw232323";

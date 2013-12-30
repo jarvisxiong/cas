@@ -50,23 +50,23 @@ public class RequestParserTest extends TestCase
                         .toUpperCase(),
                 sasRequestParameters.getSiteType());
         assertEquals(sasRequestParameters.getHandsetInternalId(), 42279);
-        assertEquals(sasRequestParameters.getRqMkAdcount(), "1");
+        assertEquals(sasRequestParameters.getRqMkAdcount(), new Short("1"));
         assertEquals(sasRequestParameters.getSiteFloor(), 0.0);
         assertEquals(sasRequestParameters.getOsId(), 6);
-        assertEquals(sasRequestParameters.getRqMkSlot(), "9");
+        assertEquals(sasRequestParameters.getRqMkSlot().get(0), new Short("9"));
         assertEquals(sasRequestParameters.getUidParams(),
             "{\"O1\":\"8d10846582eef7c6f5873883b09a5a63\",\"u-id-s\":\"O1\",\"IX\":\"4fa7!506c!508902de!iPod3,1!8G4!19800\"}");
         assertEquals(sasRequestParameters.getCarrierId(), 406);
-        assertEquals(sasRequestParameters.getCountryId(), "94");
-        assertEquals(sasRequestParameters.getCountry(), "US");
-        assertEquals(sasRequestParameters.getState(), "31118");
-        assertEquals(sasRequestParameters.getCity(), "12328");
+        assertEquals(sasRequestParameters.getCountryId(), new Long(94));
+        assertEquals(sasRequestParameters.getCountryCode(), "US");
+        assertEquals(sasRequestParameters.getState(), new Integer(31118));
+        assertEquals(sasRequestParameters.getCity(), new Integer(12328));
         assertEquals(sasRequestParameters.getTid(), "0e919b0a-73c4-44cb-90ec-2b37b2249219");
         assertEquals(sasRequestParameters.getSiteId(), "4028cba631d63df10131e1d3191d00cb");
         assertEquals(sasRequestParameters.getSiteIncId(), 34093);
         assertEquals(sasRequestParameters.getRemoteHostIp(), "3.0.0.0");
         assertEquals(sasRequestParameters.getLocSrc(), "wifi");
-        assertEquals(sasRequestParameters.getSlot(), "9");
+        assertEquals(sasRequestParameters.getSlot(), new Short("9"));
         assertEquals(sasRequestParameters.getRFormat(), "xhtml");
         assertEquals(sasRequestParameters.getAllowBannerAds(), Boolean.TRUE);
         assertEquals(sasRequestParameters.getCategories().toString(), "[70, 42]");

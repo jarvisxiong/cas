@@ -22,7 +22,7 @@ public class SASRequestParameters {
     // User location parameters
     private String       latLong;
     private String       countryCode;      //Country Code like US for USA
-    private Long         countryId;    // Integer value for country
+    private Long         countryId;        // Integer value for country
     private String       impressionId;
     private String       clurl;
     private String       siteId;
@@ -50,8 +50,8 @@ public class SASRequestParameters {
     private String       tid;
     private long         handsetInternalId;
     private int          carrierId;
-    private int          city;
-    private int          state;
+    private Integer      city;
+    private Integer      state;
     private List<Short>  rqMkSlot;
     private Integer      ipFileVersion;
     private boolean      isRichMedia;

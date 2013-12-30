@@ -101,22 +101,22 @@ public class ThriftRequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getRemoteHostIp(), "10.14.118.143");
         assertEquals(sasRequestParameters.getUserAgent(), "UserAgent");
         assertEquals(sasRequestParameters.getSource(), "FAMILY_SAFE");
-        assertEquals(sasRequestParameters.getAge(), "83");
+        assertEquals(sasRequestParameters.getAge(), new Short("83"));
         assertEquals(sasRequestParameters.getGender(), "M");
         assertEquals(sasRequestParameters.getLocSrc(), "LATLON");
-        assertEquals(sasRequestParameters.getPostalCode(), "123"); 
+        assertEquals(sasRequestParameters.getPostalCode(), new Integer(123)); 
         assertEquals(sasRequestParameters.getCountryCode(), "US");
-        assertEquals(sasRequestParameters.getCountryId(), "94");
+        assertEquals(sasRequestParameters.getCountryId(), new Long(94));
         assertEquals(sasRequestParameters.getImpressionId(), null); //Internal, Populated in cas
         assertEquals(sasRequestParameters.getClurl(), null); //Internal, Populated in cas
         assertEquals(sasRequestParameters.getSiteId(), "siteId");
-        assertEquals(sasRequestParameters.getSlot(), "12");
+        assertEquals(sasRequestParameters.getSlot(), new Short("12"));
         assertEquals(sasRequestParameters.getSiteType(), "APP");
         assertEquals(sasRequestParameters.getSdkVersion(), null); 
         assertEquals(sasRequestParameters.getSiteIncId(), 12345);
         assertEquals(sasRequestParameters.getAdIncId(), 0);  //Internal, Populated in cas
         assertEquals(sasRequestParameters.getAdcode(), AdCodeType.BASIC.toString()); 
-        assertEquals(sasRequestParameters.getCategories(), Collections.emptyList());
+        assertEquals(sasRequestParameters.getCategories(), Collections.<Long>emptyList());
         assertEquals(sasRequestParameters.getSiteFloor(), 3.2);
         assertEquals(sasRequestParameters.getAllowBannerAds(), Boolean.FALSE);
         assertEquals(sasRequestParameters.getSiteSegmentId(), new Integer(234));
@@ -125,13 +125,13 @@ public class ThriftRequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getRqIframe(), "009"); 
         assertEquals(sasRequestParameters.getRFormat(), "html");
         assertEquals(sasRequestParameters.getOsId(), 123);
-        assertEquals(sasRequestParameters.getRqMkAdcount(), "1");
+        assertEquals(sasRequestParameters.getRqMkAdcount(), new Short("1"));
         assertEquals(sasRequestParameters.getTid(), "tid");
         assertEquals(sasRequestParameters.getHandsetInternalId(), 456);
         assertEquals(sasRequestParameters.getCarrierId(), 12345);
-        assertEquals(sasRequestParameters.getCity(), "12");
-        assertEquals(sasRequestParameters.getState(), "123"); 
-        assertEquals(sasRequestParameters.getRqMkSlot(), "12");
+        assertEquals(sasRequestParameters.getCity(), new Integer(12));
+        assertEquals(sasRequestParameters.getState(), new Integer(123)); 
+        assertEquals(sasRequestParameters.getRqMkSlot().get(0), new Short("12"));
         assertEquals(sasRequestParameters.getIpFileVersion(), new Integer(3456)); 
         assertEquals(sasRequestParameters.isRichMedia(), false);
         assertEquals(sasRequestParameters.getRqAdType(), "INTERSTITIAL");
@@ -139,7 +139,7 @@ public class ThriftRequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getAppUrl(), "siteUrl");
         assertEquals(sasRequestParameters.getModelId(), 234);
         assertEquals(sasRequestParameters.getDst(), 6);
-        assertEquals(sasRequestParameters.getAccountSegment(), Collections.emptySet());
+        assertEquals(sasRequestParameters.getAccountSegment(), Collections.<Integer>emptySet());
         assertEquals(sasRequestParameters.isResponseOnlyFromDcp(), false);
         assertEquals(sasRequestParameters.getSst(), 0);
     }

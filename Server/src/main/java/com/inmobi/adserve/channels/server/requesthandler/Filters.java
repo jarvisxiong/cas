@@ -469,7 +469,7 @@ public class Filters {
 
     byte getSupplyClass(SASRequestParameters sasParams) {
         siteEcpmEntity = repositoryHelper.querySiteEcpmRepository(sasParams.getSiteId(),
-            Integer.valueOf(sasParams.getCountryId()), sasParams.getOsId());
+            sasParams.getCountryId().intValue(), sasParams.getOsId());
         if (siteEcpmEntity == null) {
             logger.debug("SiteEcpmEntity is null, thus returning default class");
             return defaultSupplyClass;
@@ -622,7 +622,7 @@ public class Filters {
             channelSegment.incrementInspectorStats(InspectorStrings.droppedInUdidFilter);
             return true;
         }
-        if (channelSegmentEntity.isZipCodeRequired() && StringUtils.isEmpty(sasParams.getPostalCode())) {
+        if (channelSegmentEntity.isZipCodeRequired() && null == sasParams.getPostalCode()) {
             channelSegment.incrementInspectorStats(InspectorStrings.droppedInZipcodeFilter);
             return true;
         }
@@ -836,7 +836,7 @@ public class Filters {
         // Fetching pricing engine entity
         int country = 0;
         if (null != sasParams.getCountryId()) {
-            country = Integer.parseInt(sasParams.getCountryId());
+            country = sasParams.getCountryId().intValue();
         }
         int os = sasParams.getOsId();
         if (null != repositoryHelper && country != 0) {

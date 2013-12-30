@@ -1,14 +1,13 @@
 package com.inmobi.adserve.channels.util;
 
+import com.yammer.metrics.reporting.GraphiteReporter;
+import org.apache.commons.lang.StringUtils;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang.StringUtils;
-
-import com.yammer.metrics.reporting.GraphiteReporter;
 
 
 public class MetricsManager {
@@ -68,12 +67,12 @@ public class MetricsManager {
         return realTimeCountryStats.get(countryId);
     }
 
-    public static void updateStats(int countryId, String countryName, int osId, String osName, String advertiserName,
+    public static void updateStats(Long countryId, String countryName, int osId, String osName, String advertiserName,
             boolean fills, boolean requests, boolean serverImpressions, double bids, long latency, double chargedBids) {
-        RealTimeStats realTimeCountryOsAdvertiserStats = getRealTimeCountryOsAdvertiserStats(countryId, countryName,
+        RealTimeStats realTimeCountryOsAdvertiserStats = getRealTimeCountryOsAdvertiserStats(countryId.intValue(), countryName,
             osId, osName, advertiserName);
-        RealTimeStats realTimeCountryOsStats = getRealTimeCountryOsStats(countryId, countryName, osId, osName);
-        RealTimeStats realTimeCountryStats = getRealTimeCountryStats(countryId, countryName);
+        RealTimeStats realTimeCountryOsStats = getRealTimeCountryOsStats(countryId.intValue(), countryName, osId, osName);
+        RealTimeStats realTimeCountryStats = getRealTimeCountryStats(countryId.intValue(), countryName);
 
         if (fills) {
             realTimeCountryOsAdvertiserStats.getFills().inc();

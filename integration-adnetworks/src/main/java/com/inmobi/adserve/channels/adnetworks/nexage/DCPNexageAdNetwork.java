@@ -159,7 +159,9 @@ public class DCPNexageAdNetwork extends BaseAdNetworkImpl {
 
         finalUrl.append("&u(country)=").append(iABCountries.getIabCountry(sasParams.getCountryCode()));
 
-        finalUrl.append("&u(dma)=").append(sasParams.getState());
+        if (null != sasParams.getState()) {
+            finalUrl.append("&u(dma)=").append(sasParams.getState());
+        }
 
         String[] urlParams = finalUrl.toString().split("&");
         finalUrl.delete(0, finalUrl.length());

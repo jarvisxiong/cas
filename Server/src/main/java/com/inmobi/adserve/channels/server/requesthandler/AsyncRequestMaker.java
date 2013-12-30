@@ -139,7 +139,7 @@ public class AsyncRequestMaker {
         casInternalRequestParameters.uidIDUS1 = casInternalRequestParameterGlobal.uidIDUS1;
         casInternalRequestParameters.uidMd5 = casInternalRequestParameterGlobal.uidMd5;
         casInternalRequestParameters.uidADT = casInternalRequestParameterGlobal.uidADT;
-        casInternalRequestParameters.zipCode = sasParams.getPostalCode();
+        casInternalRequestParameters.zipCode = sasParams.getPostalCode().toString();
         casInternalRequestParameters.latLong = sasParams.getLatLong();
         casInternalRequestParameters.appUrl = sasParams.getAppUrl();
         return casInternalRequestParameters;
@@ -213,14 +213,14 @@ public class AsyncRequestMaker {
         ClickUrlMakerV6.Builder builder = ClickUrlMakerV6.newBuilder();
         builder.setLogger(logger);
         try {
-            builder.setAge(null != sasParams.getAge() ? Integer.parseInt(sasParams.getAge()) : 0);
+            builder.setAge(null != sasParams.getAge() ? sasParams.getAge().intValue() : 0);
         }
         catch (NumberFormatException e) {
             logger.debug("Wrong format for Age", e.getMessage());
         }
         try {
             if (null != sasParams.getCountryId()) {
-                builder.setCountryId(null != sasParams.getCountryId() ? Integer.parseInt(sasParams.getCountryId()) : 0);
+                builder.setCountryId(null != sasParams.getCountryId() ? sasParams.getCountryId().intValue() : 0);
             }
         }
         catch (NumberFormatException e) {
@@ -234,7 +234,7 @@ public class AsyncRequestMaker {
         }
         try {
             if (null != sasParams.getState()) {
-                builder.setLocation(Integer.parseInt(sasParams.getState()));
+                builder.setLocation(sasParams.getState());
             }
         }
         catch (NumberFormatException e) {

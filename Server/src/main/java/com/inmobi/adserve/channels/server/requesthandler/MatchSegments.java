@@ -65,14 +65,14 @@ public class MatchSegments {
 
     // select channel segment based on specified rules
     public Map<String, HashMap<String, ChannelSegment>> matchSegments(SASRequestParameters sasParams) {
-        String slotStr = sasParams.getSlot();
-        String countryStr = sasParams.getCountryId();
+        Short slotId = sasParams.getSlot();
+        Long countryId = sasParams.getCountryId();
         int osId = sasParams.getOsId();
         String sourceStr = sasParams.getSource();
         String siteRatingStr = sasParams.getSiteType();
         Integer targetingPlatform = (sourceStr == null || sourceStr.equalsIgnoreCase("wap")) ? 2 : 1 /* app */;
         Integer siteRating = -1;
-        if (null == siteRatingStr || slotStr == null || sasParams.getCategories() == null
+        if (null == siteRatingStr || slotId == null || sasParams.getCategories() == null
                 || sasParams.getCategories().isEmpty()) {
             return null;
         }
@@ -86,13 +86,13 @@ public class MatchSegments {
             siteRating = 2;
         }
         try {
-            logger.debug("Requesting Parameters :", "slot:", slotStr, "categories:", sasParams.getCategories(),
-                "country:", countryStr, "targetingPlatform:", targetingPlatform, "siteRating:", siteRating, "osId",
+            logger.debug("Requesting Parameters :", "slot:", slotId, "categories:", sasParams.getCategories(),
+                "country:", countryId, "targetingPlatform:", targetingPlatform, "siteRating:", siteRating, "osId",
                 osId);
-            long slot = Long.parseLong(slotStr);
+            long slot = slotId.longValue();
             long country = -1;
-            if (countryStr != null) {
-                country = Long.parseLong(countryStr);
+            if (countryId != null) {
+                country = countryId;
             }
             return (matchSegments(logger, slot, getCategories(), country, targetingPlatform, siteRating, osId));
         }

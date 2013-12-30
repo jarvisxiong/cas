@@ -225,7 +225,7 @@ public class FilterTest extends TestCase
         replay(s2);
         sasParams = new SASRequestParameters();
         sasParams.setUidParams("xxx");
-        sasParams.setPostalCode("110051");
+        sasParams.setPostalCode(110051);
         sasParams.setLatLong("11.35&12.56");
         sasParams.setRichMedia(true);
         sasParams.setRqAdType("int");
@@ -376,7 +376,7 @@ public class FilterTest extends TestCase
         matchedSegments.put(channelSegmentEntity6.getAdvertiserId(), adv3);
         SASRequestParameters sasParams = new SASRequestParameters();
         sasParams.setSiteFloor(0.3);
-        sasParams.setCountryStr("1");
+        sasParams.setCountryId(1l);
         sasParams.setOsId(1);
         sasParams.setDst(2);
         sasParams.setSiteId("siteid");
@@ -599,7 +599,7 @@ public class FilterTest extends TestCase
         expect(repositoryHelper.querySiteEcpmRepository("siteid", 1, 2)).andReturn(siteEcpmEntity).anyTimes();
         replay(repositoryHelper);
         sasParams.setSiteId("siteid");
-        sasParams.setCountryStr("1");
+        sasParams.setCountryId(1l);
         sasParams.setOsId(2);
         Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
         assertEquals(0, f1.getSupplyClass(sasParams));
@@ -610,7 +610,7 @@ public class FilterTest extends TestCase
     {
         repositoryHelper = createMock(RepositoryHelper.class);
         expect(repositoryHelper.queryPricingEngineRepository(1, 2)).andReturn(null).anyTimes();
-        sasParams.setCountryStr("1");
+        sasParams.setCountryId(1l);
         sasParams.setOsId(2);
         Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
         assertEquals(true, f1.isDemandAcceptedBySupply(channelSegment1));
@@ -630,7 +630,7 @@ public class FilterTest extends TestCase
         expect(repositoryHelper.queryPricingEngineRepository(1, 2)).andReturn(null).anyTimes();
         replay(repositoryHelper);
         sasParams.setSiteId("siteid");
-        sasParams.setCountryStr("1");
+        sasParams.setCountryId(1l);
         sasParams.setOsId(2);
         Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
         f1.setSiteEcpmEntity(siteEcpmEntity);
@@ -650,7 +650,7 @@ public class FilterTest extends TestCase
         expect(repositoryHelper.queryPricingEngineRepository(1, 2)).andReturn(pricingEngineEntity).anyTimes();
         replay(repositoryHelper);
         sasParams.setSiteId("siteid");
-        sasParams.setCountryStr("1");
+        sasParams.setCountryId(1l);
         sasParams.setOsId(2);
         Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
         channelSegment1.setPrioritisedECPM(3.0);
@@ -677,7 +677,7 @@ public class FilterTest extends TestCase
         expect(repositoryHelper.queryPricingEngineRepository(1, 2)).andReturn(pricingEngineEntity).anyTimes();
         replay(repositoryHelper);
         sasParams.setSiteId("siteid");
-        sasParams.setCountryStr("1");
+        sasParams.setCountryId(1l);
         sasParams.setOsId(2);
         Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
         f1.fetchPricingEngineEntity();
@@ -705,7 +705,7 @@ public class FilterTest extends TestCase
         expect(repositoryHelper.queryPricingEngineRepository(1, 2)).andReturn(pricingEngineEntity).anyTimes();
         replay(repositoryHelper);
         sasParams.setSiteId("siteid");
-        sasParams.setCountryStr("1");
+        sasParams.setCountryId(1l);
         sasParams.setOsId(2);
         Filters f1 = new Filters(null, mockConfig, mockAdapterConfig, sasParams, repositoryHelper, logger);
         f1.fetchPricingEngineEntity();

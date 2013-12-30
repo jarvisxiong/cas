@@ -1,28 +1,22 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-
-import java.io.File;
-import java.util.ArrayList;
-
+import com.inmobi.adserve.channels.adnetworks.widerplanet.DCPWiderPlanetAdnetwork;
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.util.DebugLogger;
 import junit.framework.TestCase;
-
 import org.apache.commons.configuration.Configuration;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.testng.annotations.Test;
 
-import com.inmobi.adserve.channels.adnetworks.widerplanet.DCPWiderPlanetAdnetwork;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
+import java.io.File;
+import java.util.ArrayList;
+
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 
 public class DCPWiderPlanetAdNetworkTest extends TestCase {
@@ -198,7 +192,7 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
+        sasParams.setSlot((short)15);
         String externalKey = "7211";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c"
@@ -226,7 +220,7 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
+        sasParams.setSlot((short)15);
         String externalKey = "7211";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c"
@@ -254,7 +248,7 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase {
         sasParams.setSource("WAP");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
+        sasParams.setSlot((short)15);
         String externalKey = "7211";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c"

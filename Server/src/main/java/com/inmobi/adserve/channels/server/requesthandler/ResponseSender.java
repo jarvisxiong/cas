@@ -122,11 +122,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
         responseSent = true;
         logger.debug("ad received so trying to send ad response");
         String finalReponse = adResponse.response;
-        if (sasParams.getSlot() != null && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
+        if (sasParams.getSlot() != null && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
             logger.debug("slot served is", sasParams.getSlot());
             InspectorStats.incrementStatCount(InspectorStrings.totalFills);
             if (getResponseFormat().equals("xhtml")) {
-                Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+                Dimension dim = SlotSizeMapping.getDimension((long)(sasParams.getSlot()));
                 String startElement = String.format(startTags, (int) dim.getWidth(), (int) dim.getHeight());
                 finalReponse = startElement + finalReponse + endTags;
             }
@@ -179,7 +179,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         rtbdAd.setMinChargedValue((long)(casInternalRequestParameters.rtbBidFloor*1000));
         UUID uuid = WilburyUUID.extractUUID(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getImpressionId());
         rtbdAd.setImpressionId(new GUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits()));
-        rtbdAd.setSlotServed(Short.parseShort(sasParams.getSlot()));
+        rtbdAd.setSlotServed(sasParams.getSlot());
         Creative rtbdCreative = new Creative();
         rtbdCreative.setValue(finalResponse);
         //TODO Action type is not available in DCP

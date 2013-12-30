@@ -105,17 +105,17 @@ public class Logging {
                 ad.setWinBid(winBid);
             }
         }
-        String requestSlot = null;
-        String slotServed = null;
+        Short requestSlot = null;
+        Short slotServed = null;
         Long handsetInternalId = null;
         Geo geo = null;
         if (null != sasParams) {
             handsetInternalId = sasParams.getHandsetInternalId();
-            requestSlot = sasParams.getRqMkSlot();
+            requestSlot = sasParams.getRqMkSlot().get(0);
             slotServed = sasParams.getSlot();
-            geo = new Geo(sasParams.getCarrierId(), Integer.valueOf(sasParams.getCountryId()).shortValue());
-            geo.setRegion(Integer.parseInt(sasParams.getState()));
-            geo.setCity(Integer.parseInt(sasParams.getCity()));
+            geo = new Geo(sasParams.getCarrierId(), sasParams.getCountryId().shortValue());
+            geo.setRegion(sasParams.getState());
+            geo.setCity(sasParams.getCity());
         }
         HandsetMeta handsetMeta = new HandsetMeta();
         if (null != handsetInternalId) {
@@ -126,27 +126,10 @@ public class Logging {
             handsetMeta.setOsId(sasParams.getOsId());
         }
 
-        short slotRequested = -1;
-        if (null != requestSlot) {
-            if (requestSlot.matches("^\\d+$")) {
-                slotRequested = Integer.valueOf(requestSlot).shortValue();
-            }
-            else {
-                logger.info("wrong value for request slot is", requestSlot);
-            }
-        }
-
         User user = new User();
         if (null != sasParams) {
             if (null != sasParams.getAge()) {
-                if (sasParams.getAge().matches("^\\d+$")) {
-                    try {
-                        user.setAge(Short.valueOf(sasParams.getAge()));
-                    }
-                    catch (NumberFormatException e) {
-                        logger.info("Exception in casting age from string to Short", e);
-                    }
-                }
+                user.setAge(sasParams.getAge());
             }
             if (null != sasParams.getGender()) {
                 user.setGender(getGender(sasParams));
@@ -163,7 +146,7 @@ public class Logging {
         request.setInventory(inventory);
         request.setUser(user);
         if (requestSlot != null) {
-            request.setSlot_requested(slotRequested);
+            request.setSlot_requested(requestSlot);
         }
         if (null != sasParams && null != sasParams.getSiteSegmentId()) {
             request.setSegmentId(sasParams.getSiteSegmentId());
@@ -191,7 +174,7 @@ public class Logging {
                 if (sasParamsOsId > 0 && sasParamsOsId < 21) {
                     osName = HandSetOS.values()[sasParamsOsId - 1].toString();
                 }
-                MetricsManager.updateStats(Integer.parseInt(sasParams.getCountryId()), sasParams.getCountry(),
+                MetricsManager.updateStats(sasParams.getCountryId(), sasParams.getCountryCode(),
                     sasParams.getOsId(), osName, Filters.getAdvertiserIdToNameMapping().get(advertiserId), false,
                     false, isServerImpression, 0.0, (long) 0.0, impression.getAd().getWinBid());
             }
