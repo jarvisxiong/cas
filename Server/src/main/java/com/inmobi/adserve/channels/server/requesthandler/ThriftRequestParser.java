@@ -7,10 +7,12 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.thrift.TDeserializer;
+import org.apache.thrift.TException;
+import org.apache.thrift.protocol.TBinaryProtocol;
 import org.json.JSONException;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.util.*;
 
@@ -25,7 +27,14 @@ public class ThriftRequestParser {
             List<String> values = params.get("post");
             if (CollectionUtils.isNotEmpty(values)) {
                 String stringVal = values.iterator().next();
-                return gson.fromJson(URLDecoder.decode(stringVal, "UTF-8"), AdPoolRequest.class);
+                AdPoolRequest adPoolRequest = new AdPoolRequest();
+                TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
+                try {
+                    tDeserializer.deserialize(adPoolRequest, stringVal.getBytes());
+                } catch (TException e) {
+                    e.printStackTrace();
+                }
+                return adPoolRequest;
             }
         }
         return null;
@@ -52,7 +61,7 @@ public class ThriftRequestParser {
         params.setAllowBannerAds(tObject.supplyCapability == SupplyCapability.BANNER);
         //TODO use segment id in cas as long
         params.setSiteSegmentId(new Long(tObject.segmentId).intValue());
-        params.setRqAdType(tObject.requestedAdType.name());
+        params.setRqAdType(null != tObject.requestedAdType ? tObject.requestedAdType.name() : "INTERSTITIAL");
         params.setRichMedia(tObject.supplyCapability == SupplyCapability.RICH_MEDIA);
         params.setAccountSegment(getAccountSegments(tObject.demandTypesAllowed));
         params.setIpFileVersion(new Long(tObject.ipFileVersion).intValue());
@@ -69,9 +78,8 @@ public class ThriftRequestParser {
         //Fill param from Site Object
         if (null != tObject.site) {
             params.setSiteId(tObject.site.siteId);
-            params.setSource(tObject.site.contentRating.toString());
-            //TODO verify the names
-            params.setSiteType(tObject.site.inventoryType.toString());
+            params.setSource(null != tObject.site.contentRating ? tObject.site.contentRating.toString() : "FAMILY_SAFE");
+            params.setSiteType(null != tObject.site.inventoryType ? tObject.site.inventoryType.toString() : "APP");
             params.setCategories(convertIntToLong(tObject.site.siteTags));
             params.setSiteFloor(tObject.site.ecpmFloor);
             params.setSiteIncId(tObject.site.siteIncId);
@@ -90,7 +98,7 @@ public class ThriftRequestParser {
 
         //Fill params from Geo Object
         if (null != tObject.geo) {
-            params.setLocSrc(tObject.geo.locationSource.name());
+            params.setLocSrc(null != tObject.geo.locationSource ? tObject.geo.locationSource.name() : "LATLON");
             //TODO Change format in dcp 
             String latLong = "";
             if (tObject.geo.latLong != null) {
@@ -100,9 +108,12 @@ public class ThriftRequestParser {
             params.setCountryCode(tObject.geo.countryCode);
             //TODO Clean the names country name and country id
             params.setCountryId(tObject.geo.getCountryId());
-            params.setCity(tObject.geo.getCityIds().iterator().next());
-            params.setPostalCode(tObject.geo.getZipIds().iterator().next());
-            params.setState(tObject.geo.getStateIds().iterator().next());
+            Set<Integer> cities = tObject.geo.getCityIds();
+            params.setCity(null != cities && cities.iterator().hasNext() ? tObject.geo.getCityIds().iterator().next() : null);
+            Set<Integer> postalCodes = tObject.geo.getZipIds();
+            params.setPostalCode(null != postalCodes && postalCodes.iterator().hasNext() ? tObject.geo.getZipIds().iterator().next() : null);
+            Set<Integer> states = tObject.geo.getStateIds();
+            params.setState(null != states && states.iterator().hasNext() ? tObject.geo.getStateIds().iterator().next() : null);
         }
         
 

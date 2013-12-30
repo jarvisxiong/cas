@@ -19,7 +19,7 @@ public class RequestFilters {
             return false;
         }
         else if (null == hrh.responseSender.sasParams.getCategories()) {
-            hrh.logger.error("new-category field is not present in the request so sending noad");
+            hrh.logger.error("Category field is not present in the request so sending noad");
             hrh.responseSender.sasParams.setCategories(new ArrayList<Long>());
             hrh.setTerminationReason(ServletHandler.MISSING_CATEGORY);
             InspectorStats.incrementStatCount(InspectorStrings.missingCategory, InspectorStrings.count);

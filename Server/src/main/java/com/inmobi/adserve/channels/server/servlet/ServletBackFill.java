@@ -54,7 +54,6 @@ public class ServletBackFill implements Servlet {
 
         hrh.responseSender.sasParams = sasParams;
         hrh.responseSender.casInternalRequestParameters = casInternalRequestParametersGlobal;
-        sasParams = hrh.responseSender.sasParams;
         casInternalRequestParametersGlobal = hrh.responseSender.casInternalRequestParameters;
 
         if (RequestFilters.isDroppedInRequestFilters(hrh, logger)) {

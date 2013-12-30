@@ -17,9 +17,6 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
-import org.jboss.netty.handler.codec.http.multipart.Attribute;
-import org.jboss.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
-import org.jboss.netty.handler.codec.http.multipart.InterfaceHttpData;
 import org.jboss.netty.handler.timeout.IdleStateAwareChannelUpstreamHandler;
 import org.jboss.netty.handler.timeout.IdleStateEvent;
 import org.jboss.netty.util.CharsetUtil;
@@ -117,28 +114,20 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
         try {
             HttpRequest request = (HttpRequest) e.getMessage();
-            QueryStringDecoder queryStringDecoder = null;
-            String path = "";
+            QueryStringDecoder queryStringDecoder;
+            String content = request.getContent().toString(CharsetUtil.UTF_8);
             if (request.getMethod() == HttpMethod.POST) {
-                HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(request);
-                InterfaceHttpData data = decoder.getBodyHttpData("post");
-                if (null != data && data.getHttpDataType() == InterfaceHttpData.HttpDataType.Attribute) {
-                    Attribute attribute = (Attribute) data;
-                    String value = attribute.getValue();
-                    logger.debug("post : ", value);
-                    queryStringDecoder = new QueryStringDecoder(request.getUri() + "?post=" + value);
-                    logger.debug("URI is : " + request.getUri() + "?" + value);
-                }
+                logger.debug("post : ", content);
+                queryStringDecoder = new QueryStringDecoder(request.getUri() + "?post=" + content);
+                logger.debug("URI is : " + request.getUri() + "?" + content);
             }
             else {
-                logger.debug("get : ", request.getContent().toString(CharsetUtil.UTF_8));
+                logger.debug("get : ", content);
                 queryStringDecoder = new QueryStringDecoder(request.getUri());
                 logger.debug("URI is : " + request.getUri());
             }
-            if (null != queryStringDecoder) {
-                path = queryStringDecoder.getPath();
-            }
-            logger.debug(path);
+            String path = queryStringDecoder.getPath();
+            logger.debug("Servlet path is " + path);
             ServletFactory servletFactory = ServletHandler.servletMap.get(path);
             Servlet servlet;
             if (servletFactory == null) {

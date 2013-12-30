@@ -108,15 +108,25 @@ public class Logging {
         Short requestSlot = null;
         Short slotServed = null;
         Long handsetInternalId = null;
-        Geo geo = null;
+        Long countryId = null;
+        Integer carrierId = null;
         if (null != sasParams) {
             handsetInternalId = sasParams.getHandsetInternalId();
-            requestSlot = sasParams.getRqMkSlot().get(0);
             slotServed = sasParams.getSlot();
-            geo = new Geo(sasParams.getCarrierId(), sasParams.getCountryId().shortValue());
+            countryId = sasParams.getCountryId();
+            carrierId = sasParams.getCarrierId();
+            if (null != sasParams.getRqMkSlot() && sasParams.getRqMkSlot().size() > 0) {
+                requestSlot = sasParams.getRqMkSlot().get(0);
+            }
+        }
+
+        Geo geo = null;
+        if (null != carrierId && null != countryId) {
+            geo = new Geo(carrierId, countryId.shortValue());
             geo.setRegion(sasParams.getState());
             geo.setCity(sasParams.getCity());
         }
+        
         HandsetMeta handsetMeta = new HandsetMeta();
         if (null != handsetInternalId) {
             handsetMeta.setId(handsetInternalId.intValue());
