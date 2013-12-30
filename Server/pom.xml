@@ -11,10 +11,14 @@
 	</parent>
 
 	<dependencies>
-        <dependency>
-            <groupId>com.inmobi.commons</groupId>
-            <artifactId>datatypes-java</artifactId>
-        </dependency>
+                 <dependency>
+                         <groupId>com.inmobi.adserve</groupId>
+                         <artifactId>creativevalidator</artifactId>
+                </dependency>
+	        <dependency>
+        		 <groupId>com.inmobi.commons</groupId>
+	           	 <artifactId>datatypes-java</artifactId>
+       		 </dependency>
 		<dependency>
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>

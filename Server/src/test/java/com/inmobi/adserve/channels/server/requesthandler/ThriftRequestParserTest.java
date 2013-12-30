@@ -115,7 +115,7 @@ public class ThriftRequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getSdkVersion(), null); 
         assertEquals(sasRequestParameters.getSiteIncId(), 12345);
         assertEquals(sasRequestParameters.getAdIncId(), 0);  //Internal, Populated in cas
-        assertEquals(sasRequestParameters.getAdcode(), AdCodeType.BASIC.toString()); 
+        assertEquals(sasRequestParameters.getAdcode(), "NON-JS");
         assertEquals(sasRequestParameters.getCategories(), Collections.<Long>emptyList());
         assertEquals(sasRequestParameters.getSiteFloor(), 3.2);
         assertEquals(sasRequestParameters.getAllowBannerAds(), Boolean.FALSE);

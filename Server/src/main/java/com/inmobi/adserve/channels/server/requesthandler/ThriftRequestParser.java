@@ -5,6 +5,7 @@ import com.inmobi.adserve.adpool.*;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.types.InventoryType;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TDeserializer;
@@ -72,6 +73,9 @@ public class ThriftRequestParser {
         if (null != tObject.integrationDetails) {
             params.setRqIframe(tObject.integrationDetails.iFrameId);
             params.setAdcode(tObject.integrationDetails.adCodeType.toString());
+            params.setSdkVersion(tObject.integrationDetails.sdkVersion);
+            //TODO Wait for the final contract from Devashish
+            params.setAdcode(getAdCode(tObject.integrationDetails.integrationType));
         }
         
         
@@ -79,7 +83,7 @@ public class ThriftRequestParser {
         if (null != tObject.site) {
             params.setSiteId(tObject.site.siteId);
             params.setSource(null != tObject.site.contentRating ? tObject.site.contentRating.toString() : "FAMILY_SAFE");
-            params.setSiteType(null != tObject.site.inventoryType ? tObject.site.inventoryType.toString() : "APP");
+            params.setSiteType(null != tObject.site.inventoryType  && tObject.site.inventoryType == InventoryType.APP ? "APP" : "WAP");
             params.setCategories(convertIntToLong(tObject.site.siteTags));
             params.setSiteFloor(tObject.site.ecpmFloor);
             params.setSiteIncId(tObject.site.siteIncId);
@@ -106,7 +110,6 @@ public class ThriftRequestParser {
             }
             params.setLatLong(latLong);
             params.setCountryCode(tObject.geo.countryCode);
-            //TODO Clean the names country name and country id
             params.setCountryId(tObject.geo.getCountryId());
             Set<Integer> cities = tObject.geo.getCityIds();
             params.setCity(null != cities && cities.iterator().hasNext() ? tObject.geo.getCityIds().iterator().next() : null);
@@ -166,9 +169,9 @@ public class ThriftRequestParser {
         return accountsSegments;
     }
 
-    private static List convertIntToLong(Set<Integer> intList) {
+    private static List<Long> convertIntToLong(Set<Integer> intList) {
         if (null == intList) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         List<Long> longList = new ArrayList<Long>();
         for (Integer obj : intList) {
@@ -233,5 +236,11 @@ public class ThriftRequestParser {
         }
         return null;
     }
-    
+
+    public static String getAdCode(IntegrationType integrationType) {
+        if (integrationType == IntegrationType.JSAC || integrationType == IntegrationType.WINDOWS_JS_SDK)  {
+            return "JS";
+        }
+        return "NON-JS";
+    }
 }

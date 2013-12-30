@@ -64,7 +64,7 @@ public class SASRequestParameters {
     private Set<Integer> accountSegment;      
     private boolean      isResponseOnlyFromDcp;
     private int          sst;//0 for Network 
-
+    
     public SASRequestParameters() {
         // Do Nothing.
     }
