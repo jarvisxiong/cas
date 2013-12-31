@@ -200,6 +200,9 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
     private void setNingRequest(final String requestUrl) {
         ningRequest = new RequestBuilder()
                 .setUrl(requestUrl)
+                    .setHeader("x-display-metrics", String.format("%sx%s", width, height))
+                    .setHeader("xplus1-user-agent", sasParams.getUserAgent())
+                    .setHeader("x-plus1-remote-addr", sasParams.getRemoteHostIp())         
                     .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
                     .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
                     .setHeader(HttpHeaders.Names.REFERER, requestUrl)

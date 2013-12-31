@@ -172,6 +172,7 @@ public class DCPSmaatoReporting extends BaseReportingImpl {
 
                     row.impressions = Long.parseLong(rows1[impressionIndex]);
                     row.revenue = Double.valueOf(rows1[revenueIndex]).doubleValue();
+                    row.revenue *= 0.75;
                     row.clicks = Long.parseLong(rows1[clicksIndex]);
                     row.reportTime = new ReportTime(rows1[dateIndex], 0);
                     row.slotSize = getReportGranularity();
