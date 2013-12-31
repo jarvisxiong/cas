@@ -1,8 +1,11 @@
 package com.inmobi.adserve.channels.server.config;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import org.apache.commons.configuration.Configuration;
+import org.testng.collections.Lists;
 
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
@@ -13,7 +16,7 @@ import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
  * 
  */
 @Singleton
-public class ServerConfig {
+public class ServerConfig implements CasConfig {
 
     private final Configuration serverConfiguration;
 
@@ -30,6 +33,10 @@ public class ServerConfig {
         return serverConfiguration.getInt("rtbBalanceFilterAmount", 50);
     }
 
+    public int getMaxSegmentSelectionCount() {
+        return serverConfiguration.getInt("partnerSegmentNo", 2);
+    }
+
     public double getNormalizingFactor() {
         return serverConfiguration.getDouble("normalizingFactor", 0.1);
     }
@@ -42,8 +49,14 @@ public class ServerConfig {
         return serverConfiguration.getByte("defaultDemandClass", (byte) 0);
     }
 
-    public String[] getsupplyClassFloors() {
-        return serverConfiguration.getStringArray("supplyClassFloors");
-    }
+    public List<Double> getSupplyClassFloors() {
+        String[] supplyClassFloorStringArray = serverConfiguration.getStringArray("supplyClassFloors");
 
+        List<Double> supplyClassFloors = Lists.newArrayList();
+        for (String supplyClassFloor : supplyClassFloorStringArray) {
+            supplyClassFloors.add(Double.valueOf(supplyClassFloor));
+        }
+
+        return supplyClassFloors;
+    }
 }

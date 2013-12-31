@@ -8,7 +8,7 @@ import com.inmobi.adserve.channels.server.AdapterType;
  * @author abhishek.parwal
  * 
  */
-public interface AdapterConfig {
+public interface AdapterConfig extends CasConfig {
 
     String getAdvertiserId();
 
@@ -23,5 +23,7 @@ public interface AdapterConfig {
     Class<AdNetworkInterface> getAdNetworkInterfaceClass();
 
     boolean isRtb();
+
+    int getMaxSegmentSelectionCount();
 
 }

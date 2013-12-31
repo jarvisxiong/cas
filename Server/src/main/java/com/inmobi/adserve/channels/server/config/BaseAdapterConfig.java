@@ -20,12 +20,15 @@ public class BaseAdapterConfig implements AdapterConfig {
     private final String                    dcName;
     private final String                    adapterName;
     private final Class<AdNetworkInterface> adapterClass;
+    private final ServerConfig              serverConfig;
 
     @SuppressWarnings("unchecked")
-    public BaseAdapterConfig(final Configuration adapterConfig, final String adapterName, final String dcName) {
+    public BaseAdapterConfig(final Configuration adapterConfig, final String adapterName, final String dcName,
+            final ServerConfig serverConfig) {
         this.adapterConfig = adapterConfig;
         this.adapterName = adapterName;
         this.dcName = dcName;
+        this.serverConfig = serverConfig;
 
         try {
             this.adapterClass = (Class<AdNetworkInterface>) Class.forName(adapterConfig.getString("class"));
@@ -106,6 +109,11 @@ public class BaseAdapterConfig implements AdapterConfig {
     @Override
     public boolean isRtb() {
         return adapterConfig.getBoolean("isRtb", false);
+    }
+
+    @Override
+    public int getMaxSegmentSelectionCount() {
+        return adapterConfig.getInt("partnerSegmentNo", serverConfig.getMaxSegmentSelectionCount());
     }
 
 }
