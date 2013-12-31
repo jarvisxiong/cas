@@ -4,6 +4,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -14,20 +16,19 @@ import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.api.ServerException;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class ATNTReporting extends BaseReportingImpl {
-    private Configuration config;
-    private String        userName;
-    private String        password;
-    private String        format;
-    private String        startDate   = "";
-    private String        endDate     = "";
-    private String        apiKey;
-    private String        granularity = null;
+    private static final Logger LOG         = LoggerFactory.getLogger(ATNTReporting.class);
 
-    private DebugLogger   logger;
+    private final Configuration config;
+    private final String        userName;
+    private final String        password;
+    private final String        format;
+    private String              startDate   = "";
+    private String              endDate     = "";
+    private String              apiKey;
+    private String              granularity = null;
 
     public ATNTReporting(final Configuration config) {
         this.config = config;
@@ -38,10 +39,8 @@ public class ATNTReporting extends BaseReportingImpl {
 
     // Fetches the report from the TPAN
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) {
-        this.logger = logger;
-        logger.debug("fetching rows inside atnt reporter");
+    public ReportResponse fetchRows(final ReportTime startTime, final String key, final ReportTime endTime) {
+        LOG.debug("fetching rows inside atnt reporter");
         String soapMessage = "";
         ReportResponse reportResponse = null;
         if (getReportGranularity() == ReportGranularity.DAY) {
@@ -53,39 +52,38 @@ public class ATNTReporting extends BaseReportingImpl {
         apiKey = key;
         String responseString = "";
         String url = getRequestUrl();
-        logger.debug("url inside atnt is" + url);
+        LOG.debug("url inside atnt is {}", url);
         try {
             endDate = endTime == null ? getEndDate(startTime) : startDate;
-            logger.debug("start date inside atnt is " + startDate);
-            logger.debug("end date inside atnt is " + endDate);
+            LOG.debug("start date {} , end date {} inside atnt is {}", startDate, endDate);
             if (ReportTime.compareStringDates(endDate, startDate) == -1) {
-                logger.debug("end date smaller than starting date plus reporting window, so returning back");
+                LOG.debug("end date smaller than starting date plus reporting window, so returning back");
                 return null;
             }
             soapMessage = getSoapMessage();
-            logger.debug("soap message is " + soapMessage);
+            LOG.debug("soap message is {}", soapMessage);
         }
         catch (Exception exception) {
-            logger.info("invalid date arguments so cant send request to ant reporter " + exception.getMessage());
+            LOG.info("invalid date arguments so cant send request to ant reporter {}", exception);
             reportResponse = new ReportResponse(ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR);
             return reportResponse;
         }
         try {
-            responseString = invokeUrl(url, soapMessage, logger);
-            logger.debug("response string inside atnt is " + responseString);
+            responseString = invokeUrl(url, soapMessage);
+            LOG.debug("response string inside atnt is {}", responseString);
         }
         catch (ServerException exception) {
             reportResponse = new ReportResponse(ReportResponse.ResponseStatus.FAIL_SERVER_ERROR);
-            logger.info("failed to invoke url properly inside atnt " + exception.getMessage());
+            LOG.info("failed to invoke url properly inside atnt {}", exception);
             return reportResponse;
         }
         if (responseString == null) {
-            logger.debug("Errorneous data so exiting application");
+            LOG.debug("Errorneous data so exiting application");
             reportResponse = new ReportResponse(ReportResponse.ResponseStatus.FAIL_SERVER_ERROR);
             return reportResponse;
         }
         reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
-        logger.debug("successfully invoked url, so will do xml parsing");
+        LOG.debug("successfully invoked url, so will do xml parsing");
         try {
             // XML Parsing
             DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -120,7 +118,7 @@ public class ATNTReporting extends BaseReportingImpl {
                                     row.reportTime = new ReportTime(dateElement.getAttribute("date"), 0);
                                     row.siteId = key;
                                     row.slotSize = getReportGranularity();
-                                    logger.debug("fetching rows inside atnt");
+                                    LOG.debug("fetching rows inside atnt");
                                     reportResponse.addReportRow(row);
                                 }
                             }
@@ -131,15 +129,15 @@ public class ATNTReporting extends BaseReportingImpl {
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_SERVER_ERROR;
-            logger.info("Invalid Response from atnt " + exception.getMessage());
+            LOG.info("Invalid Response from atnt {}", exception);
             return reportResponse;
         }
-        logger.debug("returning from fetch rows of atnt");
+        LOG.debug("returning from fetch rows of atnt");
         return reportResponse;
     }
 
     public String getEndDate(final ReportTime startTime) {
-        logger.debug("fetching end date of atnt");
+        LOG.debug("fetching end date of atnt");
         ReportTime reportTime = ReportTime.getPacificTime();
         reportTime = ReportTime.getPreviousDay(reportTime);
         if (reportTime.getHour() <= ReportReconcilerWindow()) {
@@ -147,7 +145,7 @@ public class ATNTReporting extends BaseReportingImpl {
         }
         ReportTime previousMonth = ReportTime.getPreviousMonth(reportTime);
         if (ReportTime.compareDates(previousMonth, startTime) == 1) {
-            logger.info("start date too early for date to be fetched so changing it accordingly");
+            LOG.info("start date too early for date to be fetched so changing it accordingly");
             startDate = previousMonth.getStringDate("-");
         }
         else {

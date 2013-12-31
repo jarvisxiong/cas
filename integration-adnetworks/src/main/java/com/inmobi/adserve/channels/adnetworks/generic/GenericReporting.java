@@ -18,31 +18,33 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import com.inmobi.adserve.channels.adnetworks.ifc.IFCReporting;
 import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.api.ServerException;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class GenericReporting extends BaseReportingImpl {
+    private static final Logger LOG            = LoggerFactory.getLogger(IFCReporting.class);
 
-    public Configuration  config;
-    public DebugLogger    logger;
-    public String         startDate      = "";
-    public String         endDate        = "";
-    public String         responseString = "";
-    public ReportResponse reportResponse;
-    public String         advertiserName = "";
-    public String         responseFormat = "";
-    public String         key            = "";
-    public ReportTime     startTime;
+    public Configuration        config;
+    public String               startDate      = "";
+    public String               endDate        = "";
+    public String               responseString = "";
+    public ReportResponse       reportResponse;
+    public String               advertiserName = "";
+    public String               responseFormat = "";
+    public String               key            = "";
+    public ReportTime           startTime;
 
     public GenericReporting(final Configuration config, final String advertiserName) {
         this.config = config;
@@ -55,32 +57,30 @@ public class GenericReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) {
-        this.logger = logger;
+    public ReportResponse fetchRows(final ReportTime startTime, final String key, final ReportTime endTime) {
         this.key = key;
         this.startTime = startTime;
         reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
-        logger.debug("inside the fetch rows of generic");
+        LOG.debug("inside the fetch rows of generic");
         try {
             startDate = startTime.getStringDate(config.getString(advertiserName + MacrosAndStrings.TIME_SEPARATOR));
-            logger.debug("startdate inside " + advertiserName + " is " + startDate);
+            LOG.debug("startdate inside {}  is {}", advertiserName, startDate);
             endDate = endTime == null ? getEndDate() : startDate;
-            logger.debug("enddate inside " + advertiserName + " is " + endDate);
+            LOG.debug("enddate inside {}  is {}", advertiserName, endDate);
             if (ReportTime.compareStringDates(endDate, startDate) == -1) {
-                logger.debug(" end date is less than start date plus reportinf window for " + advertiserName);
+                LOG.debug(" end date is less than start date plus reportinf window for {}", advertiserName);
                 return null;
             }
         }
         catch (Exception e) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.debug("Failed to obtain correct dates for fetching reports " + e.getMessage());
+            LOG.debug("Failed to obtain correct dates for fetching reports {}", e);
         }
         try {
             String url = getRequestUrl();
-            logger.debug("url inside " + advertiserName + " is " + url);
+            LOG.debug("url inside {}  is {}", advertiserName, url);
             if (responseFormat.equals(MacrosAndStrings.CSV)) {
-                responseString = invokeUrl(url, null, logger);
+                responseString = invokeUrl(url, null);
             }
             else if (responseFormat.equals("json")) {
                 responseString = invokeHTTPUrl(url);
@@ -88,7 +88,7 @@ public class GenericReporting extends BaseReportingImpl {
         }
         catch (Exception e) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_SERVER_ERROR;
-            logger.debug("failed to get response from " + advertiserName);
+            LOG.debug("failed to get response from {}", advertiserName);
         }
         if (responseFormat.equals(MacrosAndStrings.CSV)) {
             return parseResponseInCsv();
@@ -101,9 +101,10 @@ public class GenericReporting extends BaseReportingImpl {
         }
     }
 
+    @Override
     public String invokeHTTPUrl(final String url) throws ServerException {
         String retStr = null;
-        logger.debug("url inside tapit is " + url);
+        LOG.debug("url inside tapit is {}", url);
         DefaultHttpClient httpclient = new DefaultHttpClient();
         try {
             HttpGet httpget = new HttpGet(url);
@@ -120,11 +121,11 @@ public class GenericReporting extends BaseReportingImpl {
             retStr = buffer.toString();
         }
         catch (MalformedURLException mue) {
-            logger.info("malformed url " + mue.getMessage());
+            LOG.info("malformed url {}", mue.getMessage());
             throw new ServerException("Invalid Url");
         }
         catch (IOException exception) {
-            logger.info("io error while reading response " + exception.getMessage());
+            LOG.info("io error while reading response {}", exception);
             throw new ServerException("Error While Reading Response");
         }
 
@@ -140,7 +141,7 @@ public class GenericReporting extends BaseReportingImpl {
 
     public String getEndDate() throws Exception {
         try {
-            logger.debug("calculating end date for " + advertiserName);
+            LOG.debug("calculating end date for {}", advertiserName);
             ReportTime reportTime = ReportTime.getUTCTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
             if (reportTime.getHour() <= ReportReconcilerWindow()) {
@@ -149,7 +150,7 @@ public class GenericReporting extends BaseReportingImpl {
             return (reportTime.getStringDate(config.getString(advertiserName + MacrosAndStrings.TIME_SEPARATOR)));
         }
         catch (Exception exception) {
-            logger.info("failed to obtain end date inside " + advertiserName + exception.getMessage());
+            LOG.info("failed to obtain end date inside {} {}", advertiserName, exception.getMessage());
             return "";
         }
     }
@@ -183,8 +184,8 @@ public class GenericReporting extends BaseReportingImpl {
         try {
             int externalSiteKeyField = config.getInt(advertiserName + MacrosAndStrings.EXTERNAL_SITE_KEY_FIELD);
             String[] responseArray = responseString.split("\n");
-            logger.debug("successfuly got response inside " + advertiserName + " Number of lines of response is "
-                    + responseArray.length);
+            LOG.debug("successfuly got response inside {}  Number of lines of response is {}", advertiserName,
+                responseArray.length);
             for (int i = 1; i < responseArray.length; i++) {
                 if (responseArray[i].contains("\"") || responseArray[i].contains(" ")) {
                     responseArray[i] = responseArray[i].replaceAll("\"", "").replaceAll(" ", "");
@@ -197,7 +198,7 @@ public class GenericReporting extends BaseReportingImpl {
                     int revenueIndex = config.getInt(advertiserName + MacrosAndStrings.REVENUE_INDEX);
                     int ecpmIndex = config.getInt(advertiserName + MacrosAndStrings.ECPM_INDEX);
                     int reportTimeIndex = config.getInt(advertiserName + MacrosAndStrings.REPORT_TIME_INDEX);
-                    logger.debug("row length is " + responseArrayRow.length);
+                    LOG.debug("row length is {}", responseArrayRow.length);
                     ReportResponse.ReportRow row = new ReportResponse.ReportRow();
                     row.request = 0;
                     row.clicks = 0;
@@ -227,14 +228,14 @@ public class GenericReporting extends BaseReportingImpl {
                     else {
                         row.reportTime = new ReportTime(startTime);
                     }
-                    logger.debug("parsing data inside " + advertiserName + " " + row.request);
+                    LOG.debug("parsing data inside {} {}", advertiserName, row.request);
                     reportResponse.addReportRow(row);
                 }
             }
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_SERVER_ERROR;
-            logger.debug("Invalid Response inside " + advertiserName + exception.getMessage());
+            LOG.debug("Invalid Response inside {} {}", advertiserName, exception.getMessage());
             return reportResponse;
         }
         return reportResponse;
@@ -297,7 +298,7 @@ public class GenericReporting extends BaseReportingImpl {
                             row.reportTime = new ReportTime(startDate, 0);
                         }
                         row.slotSize = getReportGranularity();
-                        logger.debug("parsing data inside " + advertiserName + " " + row.request);
+                        LOG.debug("parsing data inside {} {}", advertiserName, row.request);
                         reportResponse.addReportRow(row);
                         break;
                     }
@@ -343,7 +344,7 @@ public class GenericReporting extends BaseReportingImpl {
                             row.reportTime = new ReportTime(reportRow.getString(reportTimeIndex), 0);
                         }
                         row.slotSize = getReportGranularity();
-                        logger.debug("parsing data inside " + advertiserName + " " + row.request);
+                        LOG.debug("parsing data inside {} {}", advertiserName, row.request);
                         reportResponse.addReportRow(row);
                         break;
                     }
@@ -352,7 +353,7 @@ public class GenericReporting extends BaseReportingImpl {
         }
         catch (JSONException jse) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_SERVER_ERROR;
-            logger.info("failed to parse the json response from tapit " + jse.getMessage());
+            LOG.info("failed to parse the json response from tapit {}", jse.getMessage());
             return reportResponse;
         }
         return reportResponse;
@@ -379,7 +380,7 @@ public class GenericReporting extends BaseReportingImpl {
                                 .item(0);
                     int status = Integer.parseInt(((Element) statusNode).getTextContent());
                     if (status != 0) {
-                        logger.debug("status says error in response");
+                        LOG.debug("status says error in response");
                         reportResponse.status = ReportResponse.ResponseStatus.FAIL_SERVER_ERROR;
                         return reportResponse;
                     }
@@ -436,7 +437,7 @@ public class GenericReporting extends BaseReportingImpl {
                             }
                             row.siteId = key;
                             row.slotSize = getReportGranularity();
-                            logger.debug("parsing data inside " + advertiserName + row.request);
+                            LOG.debug("parsing data inside {} {}", advertiserName, row.request);
                             reportResponse.addReportRow(row);
                         }
                     }
@@ -445,7 +446,7 @@ public class GenericReporting extends BaseReportingImpl {
         }
         catch (Exception e) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_SERVER_ERROR;
-            logger.info("Invalid Response from " + advertiserName + e.getMessage());
+            LOG.info("Invalid Response from {} {}", advertiserName, e.getMessage());
         }
         return reportResponse;
     }

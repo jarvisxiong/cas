@@ -23,7 +23,6 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPAjillionAdnetworkTest extends TestCase {
@@ -31,7 +30,6 @@ public class DCPAjillionAdnetworkTest extends TestCase {
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
     private final ClientBootstrap clientBootstrap = null;
-    private DebugLogger           logger;
     private DCPAjillionAdnetwork  dcpAjillionAdNetwork;
     private final String          AjilionHost     = "http://ad.AjillionMAX.com/ad/%s/4";
     private final String          AjilionStatus   = "on";
@@ -65,9 +63,8 @@ public class DCPAjillionAdnetworkTest extends TestCase {
         MessageEvent serverEvent = createMock(MessageEvent.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        DebugLogger.init(mockConfig);
-        logger = new DebugLogger();
-        dcpAjillionAdNetwork = new DCPAjillionAdnetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+
+        dcpAjillionAdNetwork = new DCPAjillionAdnetwork(mockConfig, clientBootstrap, base, serverEvent);
         dcpAjillionAdNetwork.setName("Ajilion");
     }
 

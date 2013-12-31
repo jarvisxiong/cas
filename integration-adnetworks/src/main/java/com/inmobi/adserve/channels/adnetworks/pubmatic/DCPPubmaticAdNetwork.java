@@ -21,28 +21,30 @@ import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.jboss.netty.util.CharsetUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public class DCPPubmaticAdNetwork extends BaseAdNetworkImpl {
-    private final Configuration          config;
+public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
+    private static final Logger          LOG         = LoggerFactory.getLogger(DCPPubmaticAdNetwork.class);
+
     private transient String             pubId;
     private String                       latlong     = null;
     private int                          width;
     private int                          height;
     private String                       deviceId;
     private String                       adId;
-    private String                       dateFormat  = "yyyy-MM-dd HH:mm:ss";
+    private final String                 dateFormat  = "yyyy-MM-dd HH:mm:ss";
     private static String                creativeTag = "creative_tag";
     private static String                trackingUrl = "tracking_url";
     private static String                pubMaticBid = "PubMatic_Bid";
@@ -52,19 +54,16 @@ public class DCPPubmaticAdNetwork extends BaseAdNetworkImpl {
         iABCountries = new IABCountriesMap();
     }
 
-    public DCPPubmaticAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent, logger);
-        this.config = config;
-        this.logger = logger;
-        this.clientBootstrap = clientBootstrap;
+    public DCPPubmaticAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }
 
     @Override
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            logger.debug("mandatory parameters missing for pubmatic so exiting adapter");
+            LOG.debug("mandatory parameters missing for pubmatic so exiting adapter");
             return false;
         }
 
@@ -84,19 +83,19 @@ public class DCPPubmaticAdNetwork extends BaseAdNetworkImpl {
 
             }
             catch (Exception e) {
-                logger.error("AdId is not configured for the segment:{}", entity.getExternalSiteKey());
+                LOG.error("AdId is not configured for the segment:{}", entity.getExternalSiteKey());
                 return false;
             }
         }
         else {
-            logger.debug("mandate parameters missing for pubmatic, so returning from adapter");
+            LOG.debug("mandate parameters missing for pubmatic, so returning from adapter");
             return false;
         }
 
         deviceId = getUid();
         if (!"wap".equalsIgnoreCase(sasParams.getSource()) && StringUtils.isBlank(deviceId)) { // deviceid mandatory for
                                                                                                // App traffic
-            logger.debug("mandate parameters missing for pubmatic, so returning from adapter");
+            LOG.debug("mandate parameters missing for pubmatic, so returning from adapter");
             return false;
         }
         if (casInternalRequestParameters.latLong != null) {
@@ -106,7 +105,7 @@ public class DCPPubmaticAdNetwork extends BaseAdNetworkImpl {
             }
         }
 
-        logger.info("Configure parameters inside pubmatic returned true");
+        LOG.info("Configure parameters inside pubmatic returned true");
         return true;
     }
 
@@ -149,7 +148,7 @@ public class DCPPubmaticAdNetwork extends BaseAdNetworkImpl {
         params.append("&kltstamp=").append(getURLEncode(dfm.format(Calendar.getInstance().getTime()), format));
         params.append("&ranreq=").append(Math.random());
 
-        logger.debug("pubmatic url is ", params.toString());
+        LOG.debug("pubmatic url is {}", params);
 
         return params.toString();
     }
@@ -161,9 +160,9 @@ public class DCPPubmaticAdNetwork extends BaseAdNetworkImpl {
             URI uri = getRequestUri();
             requestUrl = uri.toString();
             request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri.toASCIIString());
-            logger.debug("host name is ", uri.getHost());
+            LOG.debug("host name is {}", uri.getHost());
             request.setHeader(HttpHeaders.Names.HOST, uri.getHost());
-            logger.debug("got the host");
+            LOG.debug("got the host");
             request.setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent());
             request.setHeader(HttpHeaders.Names.REFERER, uri.toString());
             request.setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
@@ -177,7 +176,7 @@ public class DCPPubmaticAdNetwork extends BaseAdNetworkImpl {
         }
         catch (Exception ex) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.HTTPREQUEST_ERROR;
-            logger.info("Error in making http request ", ex.getMessage());
+            LOG.info("Error in making http request {}", ex);
         }
         return request;
     }
@@ -188,8 +187,8 @@ public class DCPPubmaticAdNetwork extends BaseAdNetworkImpl {
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status) {
-        logger.debug("response is ", response);
+    public void parseResponse(final String response, final HttpResponseStatus status) {
+        LOG.debug("response is {}", response);
 
         if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
             statusCode = status.getCode();
@@ -211,19 +210,19 @@ public class DCPPubmaticAdNetwork extends BaseAdNetworkImpl {
             }
             catch (JSONException exception) {
                 adStatus = "NO_AD";
-                logger.debug("Error parsing response from pubmatic : ", exception.toString());
-                logger.info("Response from pubmatic NO_AD:", response);
+                LOG.debug("Error parsing response from pubmatic : {}", exception);
+                LOG.info("Response from pubmatic NO_AD: {}", response);
                 return;
             }
             catch (Exception ex) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from pubmatic : ", ex.toString());
-                logger.info("Response from pubmatic:", response);
+                LOG.info("Error parsing response from pubmatic : {}", ex);
+                LOG.info("Response from pubmatic: {}", response);
                 try {
                     throw ex;
                 }
                 catch (Exception e) {
-                    logger.info("Error while rethrowing the exception : ", e.toString());
+                    LOG.info("Error while rethrowing the exception : {}", e);
                     return;
                 }
             }
@@ -232,17 +231,16 @@ public class DCPPubmaticAdNetwork extends BaseAdNetworkImpl {
             context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, partnerBeacon);
             context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, htmlCode);
             try {
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl,
-                    logger);
+                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
             }
             catch (Exception exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from pubmatic : ", exception.toString());
-                logger.info("Response from pubmatic:", response);
+                LOG.info("Error parsing response from pubmatic : {}", exception);
+                LOG.info("Response from pubmatic: {}", response);
             }
         }
-        logger.debug("response length is ", responseContent.length());
+        LOG.debug("response length is {}", responseContent);
     }
 
     @Override

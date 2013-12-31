@@ -27,7 +27,6 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPNexageAdNetworkTest extends TestCase {
@@ -35,7 +34,6 @@ public class DCPNexageAdNetworkTest extends TestCase {
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
     private final ClientBootstrap clientBootstrap = null;
-    private DebugLogger           logger;
 
     private DCPNexageAdNetwork    dcpNexageAdnetwork;
     private final String          NexageHost      = "http://bos.ads.nexage.com/adServe?";
@@ -65,11 +63,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         MessageEvent serverEvent = createMock(MessageEvent.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        DebugLogger.init(mockConfig);
         SlotSizeMapping.init();
         Formatter.init();
-        logger = new DebugLogger();
-        dcpNexageAdnetwork = new DCPNexageAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpNexageAdnetwork = new DCPNexageAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test

@@ -13,23 +13,25 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.openx.oauth.client.Client;
 
 
 public class OpenxReporting extends BaseReportingImpl {
-    private Configuration    config;
-    private DebugLogger      logger;
-    private String           startDate        = "";
-    private String           endDate          = "";
-    private BasicCookieStore cookieStore      = null;
-    private static String    reportStartDate  = null;
-    private static String    entireReportData = null;
-    private final String     domain;
+    private static final Logger LOG              = LoggerFactory.getLogger(OpenxReporting.class);
+
+    private final Configuration config;
+    private String              startDate        = "";
+    private String              endDate          = "";
+    private BasicCookieStore    cookieStore      = null;
+    private static String       reportStartDate  = null;
+    private static String       entireReportData = null;
+    private final String        domain;
 
     public OpenxReporting(final Configuration config) {
         this.config = config;
@@ -47,7 +49,7 @@ public class OpenxReporting extends BaseReportingImpl {
         String accessTokenUrl = config.getString("openx.accessTokenUrl");
         String realm = config.getString("openx.realm");
         String authorizeUrl = config.getString("openx.authorizeUrl");
-        logger.debug("building client for authentication");
+        LOG.debug("building client for authentication");
         Client cl = new Client(apiKey, apiSecret, loginUrl, username, password, domain, path, requestTokenUrl,
                 accessTokenUrl, realm, authorizeUrl);
         try {
@@ -55,32 +57,31 @@ public class OpenxReporting extends BaseReportingImpl {
             cookieStore = cl.getHelper().getCookieStore();
         }
         catch (Exception ex) {
-            logger.info("Failed to authenticate the user inside openx ", ex.getMessage());
+            LOG.info("Failed to authenticate the user inside openx {}", ex);
             return false;
         }
         return true;
     }
 
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws ClientProtocolException, IOException, JSONException {
-        this.logger = logger;
+    public ReportResponse fetchRows(final ReportTime startTime, final String key, final ReportTime endTime)
+            throws ClientProtocolException, IOException, JSONException {
 
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
-        logger.debug("inside fetch rows of openx");
+        LOG.debug("inside fetch rows of openx");
         try {
             startDate = startTime.getStringDate("-");
-            logger.debug("start date inside openx is ", startDate);
+            LOG.debug("start date inside openx is {}", startDate);
             endDate = endTime == null ? getEndDate() : startDate;
-            logger.debug("end date inside openx is ", endDate);
+            LOG.debug("end date inside openx is {}", endDate);
             if (ReportTime.compareStringDates(endDate, startDate) == -1) {
-                logger.debug("end date is less than start date plus reporting window for openx");
+                LOG.debug("end date is less than start date plus reporting window for openx");
                 return null;
             }
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.info("failed to obtain correct dates for fetching reports ", exception.getMessage());
+            LOG.info("failed to obtain correct dates for fetching reports {}", exception);
             return null;
         }
         if (partnerContactFlag() && !authenticate()) {
@@ -93,7 +94,7 @@ public class OpenxReporting extends BaseReportingImpl {
             boolean gotReport = false;
             if (partnerContactFlag()) {
                 String url = getRequestUrl();
-                logger.debug("url inside openx is ", url);
+                LOG.debug("url inside openx is {}", url);
                 HttpGet httpget = new HttpGet(url);
                 HttpResponse response = httpclient.execute(httpget);
                 InputStream is = response.getEntity().getContent();
@@ -107,7 +108,7 @@ public class OpenxReporting extends BaseReportingImpl {
                     entireReportData = reportString;
                     reportStartDate = startDate;
                 }
-                logger.debug("response inside openx is ", entireReportData);
+                LOG.debug("response inside openx is {}", entireReportData);
             }
             JSONObject data = new JSONObject(entireReportData);
             JSONObject report = data.getJSONObject("ReportOutput");
@@ -124,14 +125,14 @@ public class OpenxReporting extends BaseReportingImpl {
                     row.siteId = key;
                     row.reportTime = new ReportTime(startDate, 0);
                     row.slotSize = getReportGranularity();
-                    logger.debug("parsing data inside mobile commerce ", row.request);
+                    LOG.debug("parsing data inside mobile commerce {}", row.request);
                     reportResponse.addReportRow(row);
                     gotReport = true;
                     break;
                 }
             }
             if (!gotReport) {
-                logger.debug("No record found for the segment");
+                LOG.debug("No record found for the segment");
                 ReportResponse.ReportRow row = new ReportResponse.ReportRow();
                 row.request = 0;
                 row.clicks = 0;
@@ -140,14 +141,14 @@ public class OpenxReporting extends BaseReportingImpl {
                 row.siteId = key;
                 row.reportTime = new ReportTime(startDate, 0);
                 row.slotSize = getReportGranularity();
-                logger.debug("parsing data inside OpenX ", row.request);
+                LOG.debug("parsing data inside OpenX {}", row.request);
                 reportResponse.addReportRow(row);
             }
 
             ReportTime reportTime = new ReportTime(startDate, 0);
             reportTime = ReportTime.getNextDay(reportTime);
             startDate = reportTime.getStringDate("-");
-            logger.debug("start date inside openx now is ", startDate);
+            LOG.debug("start date inside openx now is {}", startDate);
         }
 
         return reportResponse;
@@ -197,7 +198,7 @@ public class OpenxReporting extends BaseReportingImpl {
 
     public String getEndDate() throws Exception {
         try {
-            logger.debug("calculating end date for openx");
+            LOG.debug("calculating end date for openx");
             ReportTime reportTime = ReportTime.getUTCTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
             reportTime = ReportTime.getPreviousDay(reportTime);
@@ -207,7 +208,7 @@ public class OpenxReporting extends BaseReportingImpl {
             return (reportTime.getStringDate("-"));
         }
         catch (Exception exception) {
-            logger.info("failed to obtain end date inside OpenX ", exception.getMessage());
+            LOG.info("failed to obtain end date inside OpenX {}", exception);
             return "";
         }
     }

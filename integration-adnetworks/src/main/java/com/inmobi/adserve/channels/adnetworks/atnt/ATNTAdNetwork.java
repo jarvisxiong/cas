@@ -8,26 +8,32 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class ATNTAdNetwork extends BaseAdNetworkImpl {
+public class ATNTAdNetwork extends AbstractDCPAdNetworkImpl {
+
+    private final static Logger LOG = LoggerFactory.getLogger(ATNTAdNetwork.class);
+
     // Updates the request parameters according to the Ad Network. Returns true on
     // success.
     private String              loc;
     private String              platform;
-    private final Configuration config;
 
-    public ATNTAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent, logger);
-        this.logger = logger;
-        this.config = config;
-        this.clientBootstrap = clientBootstrap;
+    /**
+     * @param config
+     * @param clientBootstrap
+     * @param baseRequestHandler
+     * @param serverEvent
+     */
+    public ATNTAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }
 
     // Assign the value to the parameters
@@ -36,7 +42,7 @@ public class ATNTAdNetwork extends BaseAdNetworkImpl {
         if (sasParams.getUserAgent() == null || sasParams.getRemoteHostIp() == null
                 || StringUtils.isBlank(externalSiteId)) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MANDATE_PARAM_MISSING;
-            logger.debug("configure parameters in atnt returned false because mandate parameters were missing");
+            LOG.debug("configure parameters in atnt returned false because mandate parameters were missing");
             return false;
         }
         if (casInternalRequestParameters.latLong != null) {
@@ -46,7 +52,7 @@ public class ATNTAdNetwork extends BaseAdNetworkImpl {
         else {
             loc = null;
         }
-        logger.debug("Configure Parameters in atnt retunred true");
+        LOG.debug("Configure Parameters in atnt retunred true");
         return true;
     }
 
@@ -97,12 +103,12 @@ public class ATNTAdNetwork extends BaseAdNetworkImpl {
                     finalUrl.append('&').append(paramValue[0]).append('=').append(paramValue[1]);
                 }
             }
-            logger.debug("url inside atnt is", finalUrl);
+            LOG.debug("url inside atnt is {}", finalUrl);
             return (new URI(finalUrl.toString()));
         }
         catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            logger.info("Error Forming Url inside atnt", exception.getMessage());
+            LOG.info("Error Forming Url inside atnt {}", exception);
         }
         return null;
     }

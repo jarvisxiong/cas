@@ -26,7 +26,6 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPSmaatoAdnetworkTest extends TestCase {
@@ -34,7 +33,6 @@ public class DCPSmaatoAdnetworkTest extends TestCase {
     private final String          debug             = "debug";
     private final String          loggerConf        = "/tmp/channel-server.properties";
     private final ClientBootstrap clientBootstrap   = null;
-    private DebugLogger           logger;
 
     private DCPSmaatoAdnetwork    dcpSmaatoAdNetwork;
     private final String          smaatoHost        = "http://f101.smaato.com/oapi/reqAd.jsp";
@@ -67,10 +65,8 @@ public class DCPSmaatoAdnetworkTest extends TestCase {
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         SlotSizeMapping.init();
-        DebugLogger.init(mockConfig);
         Formatter.init();
-        logger = new DebugLogger();
-        dcpSmaatoAdNetwork = new DCPSmaatoAdnetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpSmaatoAdNetwork = new DCPSmaatoAdnetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test

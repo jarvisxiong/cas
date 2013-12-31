@@ -8,15 +8,18 @@ import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.api.ServerException;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPWiderPlanetReporting extends BaseReportingImpl {
+    private static final Logger LOG = LoggerFactory.getLogger(DCPWiderPlanetReporting.class);
+
     private final Configuration config;
     private final String        userName;
     private final String        password;
@@ -25,10 +28,9 @@ public class DCPWiderPlanetReporting extends BaseReportingImpl {
     private final String        reportingApiUrl;
     private String              date;
     private String              sessionId;
-    private DebugLogger         logger;
     // private static String reportStartDate = null;
     // private static String entireReportData = null;
-    private Connection          connection;
+    private final Connection    connection;
 
     public DCPWiderPlanetReporting(final Configuration config, final Connection connection) {
 
@@ -48,48 +50,46 @@ public class DCPWiderPlanetReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws ClientProtocolException, IllegalStateException, ServerException,
-            IOException, JSONException {
-        this.logger = logger;
+    public ReportResponse fetchRows(final ReportTime startTime, final String key, final ReportTime endTime)
+            throws ClientProtocolException, IllegalStateException, ServerException, IOException, JSONException {
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
         String responseStr = null;
         String endDate = null;
         ReportTime localStartTime = startTime;
-        logger.debug("inside fetch rows of widerplanet");
+        LOG.debug("inside fetch rows of widerplanet");
         try {
             date = startTime.getStringDate("-");
-            logger.debug("start date inside widerplanet is ", date);
+            LOG.debug("start date inside widerplanet is {}", date);
             endDate = endTime == null ? getEndDate() : date;
             if (ReportTime.compareStringDates(endDate, date) == -1) {
-                logger.debug("date is greater than the current date reporting window for widerplanet");
+                LOG.debug("date is greater than the current date reporting window for widerplanet");
                 return null;
             }
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.info("failed to obtain correct dates for fetching reports ", exception.getMessage());
+            LOG.info("failed to obtain correct dates for fetching reports {}", exception);
             return null;
         }
 
-        String sessionResponse = invokeHTTPUrl(String.format(tokenApiUrl, userName, password), logger);
+        String sessionResponse = invokeHTTPUrl(String.format(tokenApiUrl, userName, password));
         JSONObject sessionObject = new JSONObject(sessionResponse);
         if (sessionObject.getInt("code") != 0) {
-            logger.info("Issue with session Id generation ", sessionResponse);
+            LOG.info("Issue with session Id generation {}", sessionResponse);
             return null;
         }
         sessionId = sessionObject.getString("data");
         date = localStartTime.getStringDate("-");
 
         while (ReportTime.compareStringDates(date, endDate) < 1) {
-            logger.debug("response from widerplanet is ", responseStr);
-            responseStr = invokeHTTPUrl(getRequestUrl(), logger).replaceAll("null", "0");
+            LOG.debug("response from widerplanet is {}", responseStr);
+            responseStr = invokeHTTPUrl(getRequestUrl()).replaceAll("null", "0");
 
             // parse the json response
             if (responseStr != null) {
                 JSONObject data = new JSONObject(responseStr);
                 if (data.getInt("code") != 0) {
-                    logger.info("Error response from widerplanet ", responseStr);
+                    LOG.info("Error response from widerplanet {}", responseStr);
                     return null;
                 }
                 JSONArray jReportArr = data.getJSONArray("data");
@@ -101,15 +101,15 @@ public class DCPWiderPlanetReporting extends BaseReportingImpl {
                         row.clicks = reportRow.getLong("clicks");
                         row.impressions = reportRow.getLong("impressions");
                         row.revenue = reportRow.getDouble("revenue");
-                        double rate = getCurrencyConversionRate("KRW", date, logger, connection);
+                        double rate = getCurrencyConversionRate("KRW", date, connection);
                         if (rate > 0) {
                             row.revenue /= rate;
                         }
                         else {
-                            logger.info("Failed to get KWR to USD rate for ", date);
+                            LOG.info("Failed to get KWR to USD rate for {}", date);
                             return null;
                         }
-                        logger.debug("parsing data inside widerplanet ", row.request);
+                        LOG.debug("parsing data inside widerplanet {}", row.request);
                         row.reportTime = new ReportTime(date, 0);
                         row.advertiserId = this.getAdvertiserId();
                         row.siteId = key;
@@ -152,7 +152,7 @@ public class DCPWiderPlanetReporting extends BaseReportingImpl {
 
     public String getEndDate() throws Exception {
         try {
-            logger.debug("calculating end date for widerplanet");
+            LOG.debug("calculating end date for widerplanet");
             ReportTime reportTime = ReportTime.getUTCTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
             if (reportTime.getHour() <= ReportReconcilerWindow()) {
@@ -161,7 +161,7 @@ public class DCPWiderPlanetReporting extends BaseReportingImpl {
             return (reportTime.getStringDate("-"));
         }
         catch (Exception exception) {
-            logger.info("failed to obtain end date inside widerplanet ", exception.getMessage());
+            LOG.info("failed to obtain end date inside widerplanet {}", exception);
             return "";
         }
     }

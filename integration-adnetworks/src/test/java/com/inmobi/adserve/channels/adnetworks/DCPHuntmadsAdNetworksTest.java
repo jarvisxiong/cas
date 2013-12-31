@@ -23,7 +23,6 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 /**
@@ -35,7 +34,6 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
     private final ClientBootstrap clientBootstrap = null;
-    private DebugLogger           logger;
     private DCPHuntmadsAdNetwork  dcpHuntmadsAdNetwork;
     private final String          huntmadsHost    = "http://ads.huntmad.com/ad";
     private final String          huntmadsStatus  = "on";
@@ -65,9 +63,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         MessageEvent serverEvent = createMock(MessageEvent.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        DebugLogger.init(mockConfig);
-        logger = new DebugLogger();
-        dcpHuntmadsAdNetwork = new DCPHuntmadsAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpHuntmadsAdNetwork = new DCPHuntmadsAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test

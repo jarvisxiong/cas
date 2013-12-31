@@ -35,7 +35,7 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.phoenix.logging.DebugLogger;
 
 
 public class AdNetworksTest extends TestCase {
@@ -141,17 +141,15 @@ public class AdNetworksTest extends TestCase {
         MessageEvent serverEvent = createMock(MessageEvent.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        DebugLogger.init(mockConfig);
         SlotSizeMapping.init();
         Formatter.init();
-        logger = new DebugLogger();
-        ifdAdNetwork = new IFDAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
-        atntAdNetwork = new ATNTAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
-        mobileCommerceAdNetwork = new MobileCommerceAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
-        drawBridgeAdNetwork = new DrawBridgeAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
-        openxAdNetwork = new OpenxAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
-        dcpTapitAdNetwork = new DCPTapitAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
-        webmoblinkAdNetwork = new WebmobLinkAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        ifdAdNetwork = new IFDAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
+        atntAdNetwork = new ATNTAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
+        mobileCommerceAdNetwork = new MobileCommerceAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
+        drawBridgeAdNetwork = new DrawBridgeAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
+        openxAdNetwork = new OpenxAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
+        dcpTapitAdNetwork = new DCPTapitAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
+        webmoblinkAdNetwork = new WebmobLinkAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test

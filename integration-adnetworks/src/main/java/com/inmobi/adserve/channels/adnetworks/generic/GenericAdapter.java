@@ -19,12 +19,13 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.jboss.netty.util.CharsetUtil;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 /**
@@ -42,14 +43,16 @@ import com.inmobi.adserve.channels.util.DebugLogger;
 
 public class GenericAdapter extends BaseAdNetworkImpl {
 
-    private String        advertiserName = "";
-    private Configuration config;
-    private String        requestMethod  = "";
-    private String        responseFormat = "";
+    private static final Logger LOG            = LoggerFactory.getLogger(GenericAdapter.class);
 
-    public GenericAdapter(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent, String advertiserName) {
-        super(baseRequestHandler, serverEvent, logger);
+    private String              advertiserName = "";
+    private final Configuration config;
+    private String              requestMethod  = "";
+    private String              responseFormat = "";
+
+    public GenericAdapter(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent, final String advertiserName) {
+        super(baseRequestHandler, serverEvent);
         this.config = config;
         this.clientBootstrap = clientBootstrap;
         this.advertiserName = advertiserName;
@@ -63,7 +66,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
     @Override
     public boolean configureParameters() {
         if (isMandateParamAbsent()) {
-            logger.debug("mandate parameters missing for", advertiserName, "so returning from adapter");
+            LOG.debug("mandate parameters missing for", advertiserName, "so returning from adapter");
             return false;
         }
         return true;
@@ -81,25 +84,30 @@ public class GenericAdapter extends BaseAdNetworkImpl {
         return false;
     }
 
+    @Override
     public String getName() {
         return advertiserName;
     }
 
+    @Override
     public boolean isBeaconUrlRequired() {
         return config.getString(advertiserName.concat(MacrosAndStrings.IS_BEACON_REQUIRED)).equals(
             MacrosAndStrings.TRUE);
     }
 
+    @Override
     public boolean isClickUrlRequired() {
         return config
                 .getString(advertiserName.concat(MacrosAndStrings.IS_CLICK_REQUIRED))
                     .equals(MacrosAndStrings.TRUE);
     }
 
+    @Override
     public String getId() {
         return (config.getString(advertiserName.concat(MacrosAndStrings.ADVERTISER_ID)));
     }
 
+    @Override
     public HttpRequest getHttpRequest() throws Exception {
         HttpRequest httpRequest = null;
         URI uri;
@@ -109,12 +117,12 @@ public class GenericAdapter extends BaseAdNetworkImpl {
         catch (URISyntaxException e) {
             return null;
         }
-        logger.debug("host name is", uri.getHost());
+        LOG.debug("host name is {}", uri.getHost());
         if (requestMethod.equals(MacrosAndStrings.GET)) {
             try {
                 httpRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, uri.toASCIIString());
                 httpRequest.setHeader(HttpHeaders.Names.HOST, uri.getHost());
-                logger.debug("got the host");
+                LOG.debug("got the host");
                 httpRequest.setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent());
                 httpRequest.setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us");
                 httpRequest.setHeader(HttpHeaders.Names.REFERER, uri.toString());
@@ -124,11 +132,11 @@ public class GenericAdapter extends BaseAdNetworkImpl {
             }
             catch (Exception ex) {
                 errorStatus = ThirdPartyAdResponse.ResponseStatus.HTTPREQUEST_ERROR;
-                logger.info("Error in making http request", ex.getMessage());
+                LOG.info("Error in making http request {}", ex);
             }
         }
         else {
-            logger.debug("got uri inside", advertiserName, ", uri is", uri.toString());
+            LOG.debug("got uri inside {} , uri is {}", advertiserName, uri);
             httpRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri.toASCIIString());
             ChannelBuffer buffer = ChannelBuffers.copiedBuffer(getRequestParams(), CharsetUtil.UTF_8);
             httpRequest.setHeader(HttpHeaders.Names.HOST, uri.getHost());
@@ -139,6 +147,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
         return httpRequest;
     }
 
+    @Override
     public URI getRequestUri() throws Exception {
         String finalUrl = "";
         if (requestMethod.equals(MacrosAndStrings.GET)) {
@@ -147,13 +156,13 @@ public class GenericAdapter extends BaseAdNetworkImpl {
         else {
             finalUrl = host;
         }
-        logger.debug("url inside", advertiserName, ":", finalUrl);
+        LOG.debug("url inside{} : {}", advertiserName, finalUrl);
         try {
             return (new URI(finalUrl));
         }
         catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            logger.info("Error Forming Url inside", advertiserName, exception.getMessage());
+            LOG.info("Error Forming Url inside {} {}", advertiserName, exception);
         }
         return null;
     }
@@ -181,8 +190,9 @@ public class GenericAdapter extends BaseAdNetworkImpl {
         return requestParams.toString();
     }
 
-    public void parseResponse(String response, HttpResponseStatus status) {
-        logger.debug("response is", response, "and response length is", response.length());
+    @Override
+    public void parseResponse(final String response, final HttpResponseStatus status) {
+        LOG.debug("response is {} and response length is {}", response, response.length());
         if (responseFormat.equals(MacrosAndStrings.JSON)) {
             if (status.getCode() != 200 || StringUtils.isBlank(response)) {
                 statusCode = status.getCode();
@@ -214,7 +224,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
                     }
                 }
                 catch (Exception e) {
-                    logger.debug("Exception in converting json object from response", e.getMessage());
+                    LOG.debug("Exception in converting json object from response {}", e);
                 }
             }
         }
@@ -242,10 +252,10 @@ public class GenericAdapter extends BaseAdNetworkImpl {
             statusCode = 500;
             responseContent = "";
         }
-        logger.debug("response length is", responseContent.length());
+        LOG.debug("response length is {}", responseContent.length());
     }
 
-    public String expandMacro(String macro) {
+    public String expandMacro(final String macro) {
 
         if (macro.equals(MacrosAndStrings.IMPRESSION_ID)) {
             return casInternalRequestParameters.impressionId;
@@ -280,7 +290,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
         }
     }
 
-    public void debug(Object... os) {
+    public void debug(final Object... os) {
         System.out.println(Arrays.deepToString(os));
     }
 }

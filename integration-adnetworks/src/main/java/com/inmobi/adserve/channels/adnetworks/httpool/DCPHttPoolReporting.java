@@ -28,6 +28,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -39,7 +41,6 @@ import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.api.ServerException;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 /**
@@ -47,16 +48,17 @@ import com.inmobi.adserve.channels.util.DebugLogger;
  * 
  */
 public class DCPHttPoolReporting extends BaseReportingImpl {
+    private static final Logger LOG              = LoggerFactory.getLogger(DCPHttPoolReporting.class);
+
     private final Configuration config;
     private final String        password;
     private String              date;
     private final String        host;
     private final String        emailId;
-    private DebugLogger         logger;
     private static String       reportStartDate  = null;
     private static String       entireReportData = null;
     private String              endDate;
-    private Connection          connection;
+    private final Connection    connection;
 
     public DCPHttPoolReporting(final Configuration config, final Connection connection) {
         this.config = config;
@@ -66,8 +68,8 @@ public class DCPHttPoolReporting extends BaseReportingImpl {
         emailId = config.getString("httpool.email");
     }
 
-    public String invokeHTTPUrl(final String url) throws ServerException, NoSuchAlgorithmException,
-            KeyManagementException, MalformedURLException, IOException {
+    @Override
+    public String invokeHTTPUrl(final String url) throws ServerException {
         TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
             @Override
             public java.security.cert.X509Certificate[] getAcceptedIssuers() {
@@ -83,47 +85,45 @@ public class DCPHttPoolReporting extends BaseReportingImpl {
             }
         } };
 
-        // Install the all-trusting trust manager
-        SSLContext sc = SSLContext.getInstance("SSL");
-        sc.init(null, trustAllCerts, new java.security.SecureRandom());
-        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-
-        // Create all-trusting host name verifier
-        HostnameVerifier allHostsValid = new HostnameVerifier() {
-            @Override
-            public boolean verify(final String hostname, final SSLSession session) {
-                return true;
-            }
-        };
-
-        // Install the all-trusting host verifier
-        HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
-        URLConnection conn = new URL(url).openConnection();
-        // Setting connection and read timeout to 5 min
-        conn.setReadTimeout(300000);
-        conn.setConnectTimeout(300000);
-        conn.setRequestProperty("X-WSSE", getHeader());
-        conn.setDoOutput(true);
-        InputStream in = conn.getInputStream();
-        BufferedReader res = null;
-        StringBuffer sBuffer = new StringBuffer();
         try {
-            res = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+            // Install the all-trusting trust manager
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+            // Create all-trusting host name verifier
+            HostnameVerifier allHostsValid = new HostnameVerifier() {
+                @Override
+                public boolean verify(final String hostname, final SSLSession session) {
+                    return true;
+                }
+            };
+
+            // Install the all-trusting host verifier
+            HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+            URLConnection conn = new URL(url).openConnection();
+            // Setting connection and read timeout to 5 min
+            conn.setReadTimeout(300000);
+            conn.setConnectTimeout(300000);
+            conn.setRequestProperty("X-WSSE", getHeader());
+            conn.setDoOutput(true);
+            InputStream in = conn.getInputStream();
+            StringBuffer sBuffer = new StringBuffer();
+
+            BufferedReader res = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             String inputLine;
             while ((inputLine = res.readLine()) != null) {
                 sBuffer.append(inputLine);
             }
+            res.close();
+            return sBuffer.toString();
+
         }
-        catch (IOException ioe) {
-            logger.info("Error in Httpool invokeHTTPUrl : ", ioe.getMessage());
-        }
-        finally {
-            if (res != null) {
-                res.close();
-            }
+        catch (Exception e) {
+            LOG.info("Error in Httpool invokeHTTPUrl : ", e.getMessage());
+            throw new ServerException(e);
         }
 
-        return sBuffer.toString();
     }
 
     @Override
@@ -132,26 +132,25 @@ public class DCPHttPoolReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws KeyManagementException, NoSuchAlgorithmException, MalformedURLException,
-            ServerException, IOException, ParserConfigurationException, SAXException {
-        this.logger = logger;
+    public ReportResponse fetchRows(final ReportTime startTime, final String key, final ReportTime endTime)
+            throws KeyManagementException, NoSuchAlgorithmException, MalformedURLException, ServerException,
+            IOException, ParserConfigurationException, SAXException {
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
 
-        logger.debug("inside fetch rows of httpool");
+        LOG.debug("inside fetch rows of httpool");
         try {
             date = startTime.getStringDate("-");
-            logger.debug("start date inside httpool is ", date);
+            LOG.debug("start date inside httpool is {}", date);
             endDate = endTime == null ? getEndDate("-") : date;
 
             if (ReportTime.compareStringDates(endDate, date) == -1) {
-                logger.debug("date is greater than the current date reporting window for httpool");
+                LOG.debug("date is greater than the current date reporting window for httpool");
                 return null;
             }
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.info("failed to obtain correct dates for fetching reports ", exception.getMessage());
+            LOG.info("failed to obtain correct dates for fetching reports {}", exception);
             return null;
         }
         date = startTime.getStringDate("-");
@@ -160,7 +159,7 @@ public class DCPHttPoolReporting extends BaseReportingImpl {
             entireReportData = invokeHTTPUrl(requestUrl);
             reportStartDate = date;
         }
-        logger.debug("Response from Httpool is ", entireReportData);
+        LOG.debug("Response from Httpool is {}", entireReportData);
 
         // boolean gotReport = false;
         // parse the xml response
@@ -196,13 +195,12 @@ public class DCPHttPoolReporting extends BaseReportingImpl {
                             row.impressions = Long.parseLong(impression.getTextContent());
                             row.revenue = Double.parseDouble(revenue.getTextContent());
                             ReportTime reportDate = new ReportTime(logDate, 0);
-                            double rate = getCurrencyConversionRate("EUR", reportDate.getStringDate("-"), logger,
-                                connection);
+                            double rate = getCurrencyConversionRate("EUR", reportDate.getStringDate("-"), connection);
                             if (rate > 0) {
                                 row.revenue /= rate;
                             }
                             else {
-                                logger.info("Failed to get EUR to USD rate for ", logDate);
+                                LOG.info("Failed to get EUR to USD rate for ", logDate);
                                 return null;
                             }
                             row.ecpm = 0.0;
@@ -210,7 +208,7 @@ public class DCPHttPoolReporting extends BaseReportingImpl {
                             row.siteId = key;
                             row.slotSize = getReportGranularity();
                             // gotReport = true;
-                            logger.debug("parsing data inside ", advertiserName, row.request);
+                            LOG.debug("parsing data inside {} {}", advertiserName, row.request);
                             reportResponse.addReportRow(row);
                         }
                     }
@@ -253,7 +251,7 @@ public class DCPHttPoolReporting extends BaseReportingImpl {
 
     public String getEndDate(final String seperator) {
         try {
-            logger.debug("calculating end date for httpool");
+            LOG.debug("calculating end date for httpool");
             ReportTime reportTime = ReportTime.getUTCTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
             if (reportTime.getHour() <= ReportReconcilerWindow()) {
@@ -262,7 +260,7 @@ public class DCPHttPoolReporting extends BaseReportingImpl {
             return (reportTime.getStringDate(seperator));
         }
         catch (Exception exception) {
-            logger.info("failed to obtain end date inside httpool ", exception.getMessage());
+            LOG.info("failed to obtain end date inside httpool ", exception.getMessage());
             return "";
         }
     }

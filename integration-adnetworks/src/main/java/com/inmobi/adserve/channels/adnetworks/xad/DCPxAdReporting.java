@@ -21,6 +21,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -31,20 +33,20 @@ import org.xml.sax.SAXException;
 import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPxAdReporting extends BaseReportingImpl {
-    private final String userId;
-    private final String password;
-    private String       startDate;
-    private String       endDate;
-    private DebugLogger  logger;
-    private final String host;
-    private String       reportingKey;
-    private String       authToken;
-    private boolean      sslFlag = true;
-    private final String advertiserId;
+    private static final Logger LOG     = LoggerFactory.getLogger(DCPxAdReporting.class);
+
+    private final String        userId;
+    private final String        password;
+    private String              startDate;
+    private String              endDate;
+    private final String        host;
+    private String              reportingKey;
+    private String              authToken;
+    private boolean             sslFlag = true;
+    private final String        advertiserId;
 
     public DCPxAdReporting(final Configuration config) {
         this.userId = config.getString("xad.userId");
@@ -54,24 +56,23 @@ public class DCPxAdReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws Exception {
-        this.logger = logger;
+    public ReportResponse fetchRows(final ReportTime startTime, final String key, final ReportTime endTime)
+            throws Exception {
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
-        logger.debug("inside fetch rows of xad");
+        LOG.debug("inside fetch rows of xad");
         try {
             reportingKey = key;
             this.startDate = startTime.getStringDate("-");
-            logger.debug("start date inside xad is " + this.startDate);
+            LOG.debug("start date inside xad is {}", this.startDate);
             endDate = endTime == null ? getEndDate("-") : startDate;
             if (ReportTime.compareStringDates(this.endDate, this.startDate) == -1) {
-                logger.debug("date is greater than the current date reporting window for xad");
+                LOG.debug("date is greater than the current date reporting window for xad");
                 return null;
             }
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.info("failed to obtain correct dates for fetching reports " + exception.getMessage());
+            LOG.info("failed to obtain correct dates for fetching reports {}", exception);
             return null;
         }
         authToken = getToken();
@@ -88,7 +89,7 @@ public class DCPxAdReporting extends BaseReportingImpl {
                     .getNamedItem("ecode")
                     .getNodeValue());
         if (responseStatus != 0) {
-            logger.info("Got non zero status from xAd . So retry required . Status" + responseStatus);
+            LOG.info("Got non zero status from xAd . So retry required . Status {}", responseStatus);
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_SERVER_ERROR;
             return reportResponse;
         }
@@ -126,7 +127,7 @@ public class DCPxAdReporting extends BaseReportingImpl {
                                 row.reportTime = reportDate;
                                 row.siteId = key;
                                 row.slotSize = getReportGranularity();
-                                logger.debug("parsing data inside xAd" + row.request);
+                                LOG.debug("parsing data inside xAd {}", row.request);
                                 reportResponse.addReportRow(row);
                             }
                         }
@@ -180,7 +181,7 @@ public class DCPxAdReporting extends BaseReportingImpl {
 
     public String getEndDate(final String seperator) {
         try {
-            logger.debug("calculating end date for xad");
+            LOG.debug("calculating end date for xad");
             ReportTime reportTime = ReportTime.getUTCTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
             reportTime = ReportTime.getPreviousDay(reportTime);
@@ -190,7 +191,7 @@ public class DCPxAdReporting extends BaseReportingImpl {
             return (reportTime.getStringDate(seperator));
         }
         catch (Exception exception) {
-            logger.info("failed to obtain end date inside xad " + exception.getMessage());
+            LOG.info("failed to obtain end date inside xad {}", exception.getMessage());
             return "";
         }
     }
@@ -266,7 +267,7 @@ public class DCPxAdReporting extends BaseReportingImpl {
             }
         }
         catch (IOException ioe) {
-            logger.info("Error in xAd invokeHTTPUrl : ", ioe.getMessage());
+            LOG.info("Error in xAd invokeHTTPUrl : {}", ioe);
         }
         finally {
             wr.flush();

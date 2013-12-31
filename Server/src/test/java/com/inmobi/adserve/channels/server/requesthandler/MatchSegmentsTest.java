@@ -4,6 +4,8 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,22 +14,44 @@ import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 import org.testng.annotations.Test;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
+import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ServletHandler;
+import com.inmobi.adserve.channels.server.module.NettyModule;
+import com.inmobi.adserve.channels.server.module.ServerModule;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
-public class MatchSegmentsTest extends TestCase
-{
+public class MatchSegmentsTest extends TestCase {
+    private static final String CHANNEL_SERVER_CONFIG_FILE = "/opt/mkhoj/conf/cas/channel-server.properties";
+    private ConfigurationLoader config;
+    private MatchSegments       matchSegments;
+
+    @Override
+    public void setUp() throws ClassNotFoundException {
+
+        config = ConfigurationLoader.getInstance(CHANNEL_SERVER_CONFIG_FILE);
+        System.out.println(config.getAdapterConfiguration());
+
+        RepositoryHelper repositoryHelper = createMock(RepositoryHelper.class);
+
+        ServletHandler.init(config, repositoryHelper);
+
+        Injector injector = Guice.createInjector(new NettyModule(config.getServerConfiguration()), new ServerModule(
+                config.getLoggerConfiguration(), config.getAdapterConfiguration(), repositoryHelper));
+
+        matchSegments = injector.getInstance(MatchSegments.class);
+
+    }
 
     @Test
-    public void testGetCategories()
-    {
-        String configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
-        ConfigurationLoader config = ConfigurationLoader.getInstance(configFile);
+    public void testGetCategories() throws SecurityException, NoSuchMethodException, IllegalArgumentException,
+            IllegalAccessException, InvocationTargetException {
+
         ServletHandler.init(config, null);
         Configuration mockConfig = createMock(Configuration.class);
         SASRequestParameters sasRequestParameters = new SASRequestParameters();
@@ -42,8 +66,6 @@ public class MatchSegmentsTest extends TestCase
         newCat.add(1L);
         newCat.add(2L);
         newCat.add(3L);
-        DebugLogger.init(mockConfig);
-        DebugLogger debugLogger = new DebugLogger();
         RepositoryHelper repositoryHelper = createMock(RepositoryHelper.class);
         SiteTaxonomyEntity s1 = new SiteTaxonomyEntity("1", "name", "4");
         SiteTaxonomyEntity s2 = new SiteTaxonomyEntity("2", "name", null);
@@ -53,10 +75,14 @@ public class MatchSegmentsTest extends TestCase
         expect(repositoryHelper.querySiteTaxonomyRepository("2")).andReturn(s2).anyTimes();
         expect(repositoryHelper.querySiteTaxonomyRepository("3")).andReturn(s3).anyTimes();
         expect(repositoryHelper.querySiteTaxonomyRepository("4")).andReturn(s4).anyTimes();
-        expect(repositoryHelper.querySiteCitrusLeafFeedbackRepository("1", 2, debugLogger)).andReturn(null).anyTimes();
+        expect(repositoryHelper.querySiteCitrusLeafFeedbackRepository("1", 2)).andReturn(null).anyTimes();
+        expect(repositoryHelper.getChannelAdGroupRepository())
+                .andReturn(createMock(ChannelAdGroupRepository.class))
+                    .anyTimes();
         replay(repositoryHelper);
-        MatchSegments.init(null);
-        MatchSegments matchSegments = new MatchSegments(repositoryHelper, sasRequestParameters, debugLogger);
-        assertEquals(new ArrayList<Long>(), matchSegments.getCategories());
+
+        Method method = MatchSegments.class.getDeclaredMethod("getCategories", SASRequestParameters.class);
+        method.setAccessible(true);
+        assertEquals(new ArrayList<Long>(), method.invoke(matchSegments, sasRequestParameters));
     }
 }

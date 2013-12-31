@@ -1,33 +1,42 @@
 package com.inmobi.adserve.channels.api;
 
-import com.inmobi.adserve.channels.api.ServerException;
-import java.net.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.UUID;
-import java.io.*;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-
-import com.inmobi.adserve.channels.util.DebugLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /*
  * This is a Base class for reporting Adapters for third party Ad networks.
  */
 public abstract class BaseReportingImpl implements ReportingInterface {
+    private static final Logger            LOG                   = LoggerFactory.getLogger(BaseReportingImpl.class);
+
     private static HashMap<String, Double> currencyConversionMap = new HashMap<String, Double>();
 
-    public static String invokeUrl(String url, String soapMessage, DebugLogger logger) throws ServerException {
+    public String invokeUrl(final String url, final String soapMessage) throws ServerException {
         String responseString = "";
         try {
-            logger.debug("inside invokeUrl with url ", url);
+            LOG.debug("inside invokeUrl with url {}", url);
             URL urlObject;
             urlObject = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) urlObject.openConnection();
@@ -45,7 +54,7 @@ public abstract class BaseReportingImpl implements ReportingInterface {
                     wout.write(soapMessage);
                 }
                 catch (IOException ioe) {
-                    logger.info("Error in Httpool invokeHTTPUrl : ", ioe.getMessage());
+                    LOG.info("Error in Httpool invokeHTTPUrl : {}", ioe);
                 }
                 finally {
                     out.close();
@@ -55,7 +64,7 @@ public abstract class BaseReportingImpl implements ReportingInterface {
                 }
             }
             int statusCode = connection.getResponseCode();
-            logger.debug("status code is", statusCode);
+            LOG.debug("status code is {}", statusCode);
             if (statusCode != 200) {
                 throw new ServerException("Erroneous Status Code");
             }
@@ -63,24 +72,23 @@ public abstract class BaseReportingImpl implements ReportingInterface {
             BufferedReader buffer = new BufferedReader(new InputStreamReader(inp));
             String inputLine;
             while ((inputLine = buffer.readLine()) != null) {
-                logger.debug("response line is ", inputLine);
+                LOG.debug("response line is {}", inputLine);
                 responseString = responseString + inputLine + "\n";
             }
         }
 
         catch (MalformedURLException exception) {
-            logger.info("malformed url ", exception.getMessage());
+            LOG.error("malformed url {}", exception);
             throw new ServerException("Invalid Url");
         }
         catch (IOException exception) {
-            logger.info("io error while reading response ", exception.getMessage());
+            LOG.info("io error while reading response {}", exception);
             throw new ServerException("Error While Reading Response");
         }
         return responseString;
     }
 
-    protected double getCurrencyConversionRate(String currencyId, String queryDate, DebugLogger logger,
-            Connection connection) {
+    protected double getCurrencyConversionRate(final String currencyId, String queryDate, final Connection connection) {
         String currencyDateKey = currencyId + "_" + queryDate;
         if (currencyConversionMap.containsKey(currencyDateKey)) {
             return currencyConversionMap.get(currencyDateKey);
@@ -99,17 +107,16 @@ public abstract class BaseReportingImpl implements ReportingInterface {
             resultSet.close();
         }
         catch (SQLException ex) {
-            logger.info("Getting Sql Exception ", ex.getMessage());
+            LOG.info("Getting Sql Exception {}", ex);
             return -1;
         }
-        logger.debug("returning after collecting data from currency conversion rate table ");
+        LOG.debug("returning after collecting data from currency conversion rate table ");
         return conversionRate;
     }
 
-    protected String invokeHTTPUrl(final String url, DebugLogger logger) throws ServerException,
-            ClientProtocolException, IOException {
+    protected String invokeHTTPUrl(final String url) throws ServerException, ClientProtocolException, IOException {
         String retStr = null;
-        logger.debug("url is ", url);
+        LOG.debug("url is {}", url);
         DefaultHttpClient httpclient = new DefaultHttpClient();
         HttpGet httpget = new HttpGet(url);
         HttpResponse response = httpclient.execute(httpget);
@@ -126,13 +133,19 @@ public abstract class BaseReportingImpl implements ReportingInterface {
         return retStr;
     }
 
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final ReportTime endTime)
-            throws Exception {
-        logger.info("Site wise reporting not configured for ", getName());
+    @Override
+    public ReportResponse fetchRows(final ReportTime startTime, final ReportTime endTime) throws Exception {
+        LOG.info("Site wise reporting not configured for {}", getName());
         return null;
     }
 
-    protected boolean decodeBlindedSiteId(String blindedSiteId, ReportResponse.ReportRow row) {
+    @Override
+    public ReportResponse fetchRows(final ReportTime startTime, final String key, final ReportTime endTime)
+            throws Exception {
+        return null;
+    }
+
+    protected boolean decodeBlindedSiteId(final String blindedSiteId, final ReportResponse.ReportRow row) {
         UUID uuid;
         try {
             uuid = UUID.fromString(blindedSiteId);

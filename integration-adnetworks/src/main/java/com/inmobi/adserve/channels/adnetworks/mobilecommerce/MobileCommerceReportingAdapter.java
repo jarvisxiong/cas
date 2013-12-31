@@ -1,28 +1,29 @@
 package com.inmobi.adserve.channels.adnetworks.mobilecommerce;
 
 import org.apache.commons.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.api.ServerException;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class MobileCommerceReportingAdapter extends BaseReportingImpl {
+    private static final Logger LOG            = LoggerFactory.getLogger(MobileCommerceReportingAdapter.class);
 
-    private Configuration config;
-    private DebugLogger   logger;
-    private String        currency       = "";
-    private String        startDate      = "";
-    private String        endDate        = "";
-    private String        pubId          = "";
-    private String        responseFormat = "";
-    private String        display        = "";
-    private String        baseUrl        = "";
-    private boolean       isInvoked      = false;
+    private final Configuration config;
+    private String              currency       = "";
+    private String              startDate      = "";
+    private String              endDate        = "";
+    private String              pubId          = "";
+    private String              responseFormat = "";
+    private String              display        = "";
+    private String              baseUrl        = "";
+    private boolean             isInvoked      = false;
     // private ReportResponse reportResponse;
-    private String        responseString = "";
+    private String              responseString = "";
 
     public MobileCommerceReportingAdapter(final Configuration config) {
         this.config = config;
@@ -35,39 +36,38 @@ public class MobileCommerceReportingAdapter extends BaseReportingImpl {
 
     // Fetches the report from the TPAN
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws ServerException {
-        this.logger = logger;
+    public ReportResponse fetchRows(final ReportTime startTime, final String key, final ReportTime endTime)
+            throws ServerException {
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
-        logger.debug("inside fetch rows of mobile commerce");
+        LOG.debug("inside fetch rows of mobile commerce");
         try {
             startDate = startTime.getStringDate("");
-            logger.debug("start date inside mobile commerce is ", startDate);
+            LOG.debug("start date inside mobile commerce is {}", startDate);
             endDate = endTime == null ? getEndDate() : startDate;
-            logger.debug("end date inside mobile commerce is ", endDate);
+            LOG.debug("end date inside mobile commerce is {}", endDate);
             if (ReportTime.compareStringDates(endDate, startDate) == -1) {
-                logger.debug("end date is less than start date plus reporting window for mobile commerce");
+                LOG.debug("end date is less than start date plus reporting window for mobile commerce");
                 return null;
             }
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.info("failed to obtain correct dates for fetching reports ", exception.getMessage());
+            LOG.info("failed to obtain correct dates for fetching reports {}", exception);
             return null;
         }
         if (!isInvoked) {
             String url = getRequestUrl();
-            logger.debug("url inside mobile commerce is ", url);
-            responseString = invokeUrl(url, null, logger);
+            LOG.debug("url inside mobile commerce is {}", url);
+            responseString = invokeUrl(url, null);
             isInvoked = true;
         }
         reportResponse.status = ReportResponse.ResponseStatus.SUCCESS;
         String[] responseArray = responseString.split("\n");
-        logger.debug("successfuly got response inside mobile commerce. Number of lines of response is ",
+        LOG.debug("successfuly got response inside mobile commerce. Number of lines of response is {}",
             responseArray.length);
         boolean gotReport = false;
         if (responseArray.length == 1) {
-            logger.info("0 rows reported by Mobile Commerce");
+            LOG.info("0 rows reported by Mobile Commerce");
             isInvoked = false;
             return null;
         }
@@ -104,14 +104,14 @@ public class MobileCommerceReportingAdapter extends BaseReportingImpl {
                 row.siteId = key;
                 row.reportTime = new ReportTime(rows1[2], 0);
                 row.slotSize = getReportGranularity();
-                logger.debug("parsing data inside mobile commerce ", row.request);
+                LOG.debug("parsing data inside mobile commerce {}", row.request);
                 reportResponse.addReportRow(row);
                 gotReport = true;
             }
         }
 
         if (!gotReport) {
-            logger.debug("Adding default row");
+            LOG.debug("Adding default row");
             ReportResponse.ReportRow row = new ReportResponse.ReportRow();
             row.request = 0;
             row.clicks = 0;
@@ -120,16 +120,16 @@ public class MobileCommerceReportingAdapter extends BaseReportingImpl {
             row.siteId = key;
             row.reportTime = new ReportTime(endDate, 0);
             row.slotSize = getReportGranularity();
-            logger.debug("parsing data inside tapit ", row.request);
+            LOG.debug("parsing data inside tapit {}", row.request);
             reportResponse.addReportRow(row);
         }
-        logger.debug("successfully parsed data inside mobile commerce");
+        LOG.debug("successfully parsed data inside mobile commerce");
         return reportResponse;
     }
 
     public String getEndDate() throws Exception {
         try {
-            logger.debug("calculating end date for mobile commerce");
+            LOG.debug("calculating end date for mobile commerce");
             ReportTime reportTime = ReportTime.getPacificTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
             if (reportTime.getHour() <= ReportReconcilerWindow()) {
@@ -138,7 +138,7 @@ public class MobileCommerceReportingAdapter extends BaseReportingImpl {
             return (reportTime.getStringDate(""));
         }
         catch (Exception exception) {
-            logger.info("failed to obtain end date inside mobile commerce ", exception.getMessage());
+            LOG.info("failed to obtain end date inside mobile commerce {}", exception);
             return "";
         }
     }

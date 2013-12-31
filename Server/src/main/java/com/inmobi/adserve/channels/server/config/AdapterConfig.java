@@ -1,6 +1,7 @@
-package com.inmobi.adserve.channels.server;
+package com.inmobi.adserve.channels.server.config;
 
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.server.AdapterType;
 
 
 /**

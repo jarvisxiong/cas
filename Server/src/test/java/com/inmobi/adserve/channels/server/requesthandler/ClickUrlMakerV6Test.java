@@ -1,28 +1,22 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.easymock.EasyMock.*;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
 import org.testng.annotations.Test;
 
-import com.inmobi.adserve.channels.server.requesthandler.ClickUrlMakerV6;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
-import junit.framework.TestCase;
+public class ClickUrlMakerV6Test extends TestCase {
+    private Configuration mockConfig = null;
 
-
-public class clickUrlMakerV6Test extends TestCase
-{
-    private static DebugLogger logger;
-    private Configuration      mockConfig = null;
-
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
         expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
@@ -30,17 +24,13 @@ public class clickUrlMakerV6Test extends TestCase
     }
 
     @Override
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         prepareMockConfig();
-        DebugLogger.init(mockConfig);
-        logger = new DebugLogger();
     }
 
     @Test
-    public void testClickUrlMaker()
-    {
-        ClickUrlMakerV6 clickUrlMaker = new ClickUrlMakerV6(logger, null);
+    public void testClickUrlMaker() {
+        ClickUrlMakerV6 clickUrlMaker = new ClickUrlMakerV6(null);
         clickUrlMaker.setAge(20);
         clickUrlMaker.setBeaconEnabledOnSite(true);
         clickUrlMaker.setCarrierId(2);

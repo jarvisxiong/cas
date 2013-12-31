@@ -26,7 +26,6 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPAdelphicAdnetworkTest extends TestCase {
@@ -34,7 +33,6 @@ public class DCPAdelphicAdnetworkTest extends TestCase {
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
     private final ClientBootstrap clientBootstrap = null;
-    private DebugLogger           logger;
 
     private DCPAdelphicAdNetwork  dcpAdelphicAdNetwork;
     private final String          adelphicHost    = "http://ad.ipredictive.com/d/ads";
@@ -65,10 +63,8 @@ public class DCPAdelphicAdnetworkTest extends TestCase {
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         SlotSizeMapping.init();
-        DebugLogger.init(mockConfig);
         Formatter.init();
-        logger = new DebugLogger();
-        dcpAdelphicAdNetwork = new DCPAdelphicAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpAdelphicAdNetwork = new DCPAdelphicAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test

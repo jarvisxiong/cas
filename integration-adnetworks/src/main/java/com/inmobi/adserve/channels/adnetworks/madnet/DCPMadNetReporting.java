@@ -1,14 +1,10 @@
 package com.inmobi.adserve.channels.adnetworks.madnet;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 
 import javax.net.ssl.HostnameVerifier;
@@ -27,18 +23,19 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.api.ServerException;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPMadNetReporting extends BaseReportingImpl {
+    private static final Logger LOG            = LoggerFactory.getLogger(DCPMadNetReporting.class);
 
     private final Configuration config;
-    private DebugLogger         logger;
     private String              startDate      = "";
     private String              endDate        = "";
     private String              responseString = "";
@@ -57,34 +54,32 @@ public class DCPMadNetReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final ReportTime endTime)
-            throws Exception {
-        this.logger = logger;
+    public ReportResponse fetchRows(final ReportTime startTime, final ReportTime endTime) throws Exception {
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
-        logger.debug("inside fetch rows of MadNet");
+        LOG.debug("inside fetch rows of MadNet");
         try {
             startDate = startTime.getStringDate("-");
             endDate = endTime == null ? getEndDate() : startDate;
-            logger.debug("start date inside MadNet is ", startDate);
+            LOG.debug("start date inside MadNet is {}", startDate);
             if (ReportTime.compareStringDates(endDate, startDate) == -1) {
-                logger.debug("end date is less than start date plus reporting window for MadNet");
+                LOG.debug("end date is less than start date plus reporting window for MadNet");
                 return null;
             }
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.info("failed to obtain correct dates for fetching reports ", exception.getMessage());
+            LOG.info("failed to obtain correct dates for fetching reports {}", exception);
             return null;
         }
         accessToken = getAccessToken();
         if (StringUtils.isBlank(accessToken)) {
-            logger.debug("Failed to generate token");
+            LOG.debug("Failed to generate token");
             return null;
         }
         while (ReportTime.compareStringDates(startDate, endDate) != 1) {
             String url = getRequestUrl();
-            logger.debug("url inside MadNet is ", url);
-            logger.debug("start date inside MadNet now is ", startDate);
+            LOG.debug("url inside MadNet is {}", url);
+            LOG.debug("start date inside MadNet now is {}", startDate);
             responseString = invokeHTTPUrl(url);
             reportResponse.status = ReportResponse.ResponseStatus.SUCCESS;
 
@@ -95,7 +90,7 @@ public class DCPMadNetReporting extends BaseReportingImpl {
                 for (int i = 0; i < dataArray.length(); i++) {
                     JSONObject jo = dataArray.getJSONObject(i);
                     JSONObject fields = jo.getJSONObject("fields");
-                    logger.debug("coming here to get log date");
+                    LOG.debug("coming here to get log date");
                     ReportResponse.ReportRow row = new ReportResponse.ReportRow();
                     String bSiteId = jo.getString("key_value");
                     decodeBlindedSiteId(bSiteId, row);
@@ -111,11 +106,11 @@ public class DCPMadNetReporting extends BaseReportingImpl {
                 startDate = ReportTime.getNextDay(new ReportTime(startDate, 0)).getStringDate("-");
             }
             catch (JSONException e) {
-                logger.info("Error parsing reporting data for MadNet");
+                LOG.info("Error parsing reporting data for MadNet");
                 return reportResponse;
             }
         }
-        logger.debug("successfully parsed data inside MadNet");
+        LOG.debug("successfully parsed data inside MadNet");
         return reportResponse;
     }
 
@@ -133,15 +128,15 @@ public class DCPMadNetReporting extends BaseReportingImpl {
             return wDriver.getCurrentUrl().split("=")[1].split("&")[0];
         }
         catch (Exception e) {
-            logger.info("Failed to generate access token for MadNet : ", e.getMessage());
+            LOG.info("Failed to generate access token for MadNet : {}", e);
             return null;
         }
     }
 
     @Override
-    protected boolean decodeBlindedSiteId(String blindedSiteId, ReportResponse.ReportRow row) {
+    protected boolean decodeBlindedSiteId(final String blindedSiteId, final ReportResponse.ReportRow row) {
         if (blindedSiteId.length() < 36) {
-            logger.info("failed to decodeBlindedSiteId for ", getName(), blindedSiteId);
+            LOG.info("failed to decodeBlindedSiteId for {} {}", getName(), blindedSiteId);
             return false;
         }
         String bSiteId = blindedSiteId.substring(2, blindedSiteId.length());
@@ -150,7 +145,7 @@ public class DCPMadNetReporting extends BaseReportingImpl {
 
     public String getEndDate() throws Exception {
         try {
-            logger.debug("calculating latest date for MadNet");
+            LOG.debug("calculating latest date for MadNet");
             ReportTime reportTime = ReportTime.getUTCTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
             if (reportTime.getHour() <= ReportReconcilerWindow()) {
@@ -159,7 +154,7 @@ public class DCPMadNetReporting extends BaseReportingImpl {
             return (reportTime.getStringDate("-"));
         }
         catch (Exception exception) {
-            logger.info("failed to obtain end date inside MadNet ", exception.getMessage());
+            LOG.info("failed to obtain end date inside MadNet {}", exception);
             return null;
         }
     }
@@ -195,14 +190,7 @@ public class DCPMadNetReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(DebugLogger logger, ReportTime startTime, String key, ReportTime endTime)
-            throws Exception {
-        // not applicable so returns null
-        return null;
-    }
-
-    public String invokeHTTPUrl(final String url) throws ServerException, NoSuchAlgorithmException,
-            KeyManagementException, MalformedURLException, IOException {
+    public String invokeHTTPUrl(final String url) throws ServerException {
         TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
             @Override
             public java.security.cert.X509Certificate[] getAcceptedIssuers() {
@@ -217,47 +205,45 @@ public class DCPMadNetReporting extends BaseReportingImpl {
             public void checkServerTrusted(final X509Certificate[] certs, final String authType) {
             }
         } };
-
-        // Install the all-trusting trust manager
-        SSLContext sc = SSLContext.getInstance("SSL");
-        sc.init(null, trustAllCerts, new java.security.SecureRandom());
-        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-
-        // Create all-trusting host name verifier
-        HostnameVerifier allHostsValid = new HostnameVerifier() {
-            @Override
-            public boolean verify(final String hostname, final SSLSession session) {
-                return true;
-            }
-        };
-
-        // Install the all-trusting host verifier
-        HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
-        URLConnection conn = new URL(url).openConnection();
-        // Setting connection and read timeout to 5 min
-        conn.setReadTimeout(300000);
-        conn.setConnectTimeout(300000);
-        // conn.setRequestProperty("X-WSSE", getHeader());
-        conn.setDoOutput(true);
-        InputStream in = conn.getInputStream();
-        BufferedReader res = null;
-        StringBuffer sBuffer = new StringBuffer();
         try {
+            // Install the all-trusting trust manager
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+            // Create all-trusting host name verifier
+            HostnameVerifier allHostsValid = new HostnameVerifier() {
+                @Override
+                public boolean verify(final String hostname, final SSLSession session) {
+                    return true;
+                }
+            };
+
+            // Install the all-trusting host verifier
+            HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+            URLConnection conn = new URL(url).openConnection();
+            // Setting connection and read timeout to 5 min
+            conn.setReadTimeout(300000);
+            conn.setConnectTimeout(300000);
+            // conn.setRequestProperty("X-WSSE", getHeader());
+            conn.setDoOutput(true);
+            InputStream in = conn.getInputStream();
+            BufferedReader res = null;
+            StringBuffer sBuffer = new StringBuffer();
+
             res = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             String inputLine;
             while ((inputLine = res.readLine()) != null) {
                 sBuffer.append(inputLine);
             }
+            res.close();
+            return sBuffer.toString();
+
         }
-        catch (IOException ioe) {
-            logger.info("Error in MadNet invokeHTTPUrl : ", ioe.getMessage());
-        }
-        finally {
-            if (res != null) {
-                res.close();
-            }
+        catch (Exception e) {
+            LOG.info("Error in MadNet invokeHTTPUrl : {}", e);
+            throw new ServerException(e);
         }
 
-        return sBuffer.toString();
     }
 }

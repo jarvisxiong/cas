@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.inmobi.channels</groupId>
 	<artifactId>cas</artifactId>
@@ -21,6 +22,7 @@
 		<yammer.version>2.2.0</yammer.version>
 		<guice.version>3.0</guice.version>
 		<guice-multibindings.version>3.0</guice-multibindings.version>
+		<guice-servlet.version>3.0</guice-servlet.version>
 	</properties>
 
 	<modules>
@@ -69,6 +71,16 @@
 				<version>${guice-multibindings.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>com.google.inject.extensions</groupId>
+				<artifactId>guice-servlet</artifactId>
+				<version>${guice-servlet.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.reflections</groupId>
+				<artifactId>reflections</artifactId>
+				<version>0.9.9-RC1</version>
+			</dependency>
+			<dependency>
 				<groupId>org.apache.velocity</groupId>
 				<artifactId>velocity</artifactId>
 				<version>1.6-beta1</version>
@@ -115,11 +127,6 @@
 				<artifactId>easymock</artifactId>
 				<version>3.1</version>
 				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.google.code.google-collections</groupId>
-				<artifactId>google-collect</artifactId>
-				<version>snapshot-20080530</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.thrift</groupId>

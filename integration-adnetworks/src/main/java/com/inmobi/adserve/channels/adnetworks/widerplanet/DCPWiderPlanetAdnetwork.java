@@ -10,55 +10,56 @@ import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.adnetworks.adelphic.DCPAdelphicAdNetwork;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public class DCPWiderPlanetAdnetwork extends BaseAdNetworkImpl {
-    private final Configuration config;
+public class DCPWiderPlanetAdnetwork extends AbstractDCPAdNetworkImpl {
+    private static final Logger LOG = LoggerFactory.getLogger(DCPAdelphicAdNetwork.class);
+
     private String              inmobiCookieId;
 
-    public DCPWiderPlanetAdnetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent, logger);
-        this.config = config;
-        this.logger = logger;
-        this.clientBootstrap = clientBootstrap;
+    public DCPWiderPlanetAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }
 
     @Override
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            logger.debug("mandatory parameters missing for widerplanet so exiting adapter");
+            LOG.debug("mandatory parameters missing for widerplanet so exiting adapter");
             return false;
         }
         if (!"WAP".equalsIgnoreCase(sasParams.getSource())) {
-            logger.debug("Only WAP traffic allowed. So exiting the adapter");
+            LOG.debug("Only WAP traffic allowed. So exiting the adapter");
         }
         try {
             JSONObject userParams = new JSONObject(sasParams.getUidParams());
             inmobiCookieId = userParams.getString("imuc__5");
-            if (StringUtils.isBlank(inmobiCookieId))
+            if (StringUtils.isBlank(inmobiCookieId)) {
                 inmobiCookieId = userParams.getString("WC");
+            }
             if (StringUtils.isEmpty(inmobiCookieId)) {
-                logger.debug("imucId is not present. So exiting the adapter");
+                LOG.debug("imucId is not present. So exiting the adapter");
                 return false;
             }
 
         }
         catch (Exception e) {
-            logger.debug("imucId is not present. So exiting the adapter");
+            LOG.debug("imucId is not present. So exiting the adapter");
             return false;
         }
 
-        logger.info("Configure parameters inside Wider Planet returned true");
+        LOG.info("Configure parameters inside Wider Planet returned true");
         return true;
     }
 
@@ -87,20 +88,20 @@ public class DCPWiderPlanetAdnetwork extends BaseAdNetworkImpl {
             if (null != uid) {
                 url.append("&duid=").append(uid);
             }
-            logger.debug("WiderPlanet url is", url);
+            LOG.debug("WiderPlanet url is {}", url);
 
             return (new URI(url.toString()));
         }
         catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            logger.info(exception.getMessage());
+            LOG.error("{}", exception);
         }
         return null;
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status) {
-        logger.debug("response is", response);
+    public void parseResponse(final String response, final HttpResponseStatus status) {
+        LOG.debug("response is {}", response);
         statusCode = status.getCode();
         if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
             if (200 == statusCode) {
@@ -130,7 +131,7 @@ public class DCPWiderPlanetAdnetwork extends BaseAdNetworkImpl {
                         context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl2,
                             adResponse.getString("beacon_ext2"));
                     }
-                    responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl, logger);
+                    responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                     adStatus = "AD";
                 }
                 else {
@@ -142,13 +143,13 @@ public class DCPWiderPlanetAdnetwork extends BaseAdNetworkImpl {
             }
             catch (Exception exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from widerplanet : ", exception);
-                logger.info("Response from wider planet:", response);
+                LOG.info("Error parsing response from widerplanet : {}", exception);
+                LOG.info("Response from wider planet: {}", response);
 
             }
 
         }
-        logger.debug("response length is", responseContent.length());
+        LOG.debug("response length is {}", responseContent.length());
     }
 
     @Override

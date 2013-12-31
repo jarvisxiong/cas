@@ -24,10 +24,9 @@ import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPMadNetAdNetworkTest extends TestCase {
@@ -35,7 +34,6 @@ public class DCPMadNetAdNetworkTest extends TestCase {
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
     private final ClientBootstrap clientBootstrap = null;
-    private DebugLogger           logger;
 
     private DCPMadNetAdNetwork    dcpMadNetAdNetwork;
     private final String          madnetHost      = "http://p.madnet.ru/ads2s";
@@ -66,9 +64,7 @@ public class DCPMadNetAdNetworkTest extends TestCase {
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         SlotSizeMapping.init();
-        DebugLogger.init(mockConfig);
-        logger = new DebugLogger();
-        dcpMadNetAdNetwork = new DCPMadNetAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpMadNetAdNetwork = new DCPMadNetAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test

@@ -1,32 +1,46 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import com.google.common.base.Charsets;
-import com.inmobi.adserve.channels.api.*;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
-import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.ning.http.client.AsyncHttpClient;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.*;
-import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
-import org.jboss.netty.handler.codec.http.HttpResponse;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
+import java.awt.Dimension;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+import org.jboss.netty.buffer.ChannelBuffers;
+import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelEvent;
+import org.jboss.netty.channel.ChannelFuture;
+import org.jboss.netty.channel.ChannelFutureListener;
+import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
+import org.jboss.netty.handler.codec.http.HttpResponse;
+import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Charsets;
+import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.ChannelsClientHandler;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
+import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.ning.http.client.AsyncHttpClient;
+
 
 public class ResponseSender extends HttpRequestHandlerBase {
+
+    private final static Logger         LOG             = LoggerFactory.getLogger(ResponseSender.class);
 
     private static final String         startTags       = "<AdResponse><Ads number=\"1\"><Ad type=\"rm\" width=\"%s\" height=\"%s\"><![CDATA[";
     private static final String         endTags         = " ]]></Ad></Ads></AdResponse>";
@@ -39,8 +53,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                                                                 + " </style></head><body class=\"nofill\"><!-- NO FILL -->"
                                                                 + "<script type=\"text/javascript\" charset=\"utf-8\">"
                                                                 + "parent.postMessage('{\"topic\":\"nfr\",\"container\" : \"%s\"}', '*');</script></body></html>";
-    private HttpRequestHandler          hrh;
-    private DebugLogger                 logger;
+    private final HttpRequestHandler    hrh;
     private long                        totalTime;
     private List<ChannelSegment>        rankList;
     private ThirdPartyAdResponse        adResponse;
@@ -50,14 +63,14 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private int                         selectedAdIndex;
     private boolean                     requestCleaned;
     public CasInternalRequestParameters casInternalRequestParameters;
-    private AuctionEngine               auctionEngine;
+    private final AuctionEngine         auctionEngine;
     private static final String         NO_AD_HEADER    = "X-MKHOJ-NOAD";
 
     public List<ChannelSegment> getRankList() {
         return this.rankList;
     }
 
-    public void setRankList(List<ChannelSegment> rankList) {
+    public void setRankList(final List<ChannelSegment> rankList) {
         this.rankList = rankList;
     }
 
@@ -65,7 +78,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         return rankIndexToProcess;
     }
 
-    public void setRankIndexToProcess(int rankIndexToProcess) {
+    public void setRankIndexToProcess(final int rankIndexToProcess) {
         this.rankIndexToProcess = rankIndexToProcess;
     }
 
@@ -85,9 +98,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
         return this.totalTime;
     }
 
-    public ResponseSender(HttpRequestHandler hrh, DebugLogger logger) {
+    public ResponseSender(final HttpRequestHandler hrh) {
         this.hrh = hrh;
-        this.logger = logger;
         this.totalTime = System.currentTimeMillis();
         this.rankList = null;
         this.adResponse = null;
@@ -96,28 +108,28 @@ public class ResponseSender extends HttpRequestHandlerBase {
         this.rankIndexToProcess = 0;
         this.selectedAdIndex = 0;
         this.requestCleaned = false;
-        this.auctionEngine = new AuctionEngine(logger);
+        this.auctionEngine = new AuctionEngine();
     }
 
     @Override
-    public void sendAdResponse(AdNetworkInterface selectedAdNetwork, ChannelEvent event) {
+    public void sendAdResponse(final AdNetworkInterface selectedAdNetwork, final ChannelEvent event) {
         adResponse = selectedAdNetwork.getResponseAd();
         selectedAdIndex = getRankIndex(selectedAdNetwork);
         sendAdResponse(adResponse, event);
     }
 
     // send Ad Response
-    public synchronized void sendAdResponse(ThirdPartyAdResponse adResponse, ChannelEvent event)
+    public synchronized void sendAdResponse(final ThirdPartyAdResponse adResponse, final ChannelEvent event)
             throws NullPointerException {
         // Making sure response is sent only once
         if (responseSent) {
             return;
         }
         responseSent = true;
-        logger.debug("ad received so trying to send ad response");
+        LOG.debug("ad received so trying to send ad response");
         String finalReponse = adResponse.response;
         if (sasParams.getSlot() != null && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            logger.debug("slot served is", sasParams.getSlot());
+            LOG.debug("slot served is {}", sasParams.getSlot());
             InspectorStats.incrementStatCount(InspectorStrings.totalFills);
             if (getResponseFormat().equals("xhtml")) {
                 Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
@@ -129,7 +141,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
             }
         }
         else {
-            logger.info("invalid slot, so not returning response, even though we got an ad");
+            LOG.info("invalid slot, so not returning response, even though we got an ad");
             InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
             if (getResponseFormat().equals("xhtml")) {
                 finalReponse = noAdXhtml;
@@ -180,12 +192,10 @@ public class ResponseSender extends HttpRequestHandlerBase {
                             .getCampaignId());
                 InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
                 sendResponse(OK, jsonObject.toString(), adResponse.responseHeaders, event);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("RTB reponse json to RE is " + jsonObject.toString());
-                }
+                LOG.debug("RTB reponse json to RE is {}", jsonObject);
             }
             catch (JSONException e) {
-                logger.debug("Error while making json object for rule engine " + e.getMessage());
+                LOG.debug("Error while making json object for rule engine " + e.getMessage());
                 // Sending NOAD if error making json object
                 sendNoAdResponse(event);
             }
@@ -193,11 +203,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     // send response to the caller
-    public void sendResponse(HttpResponseStatus status, String responseString, Map responseHeaders, ChannelEvent event)
-            throws NullPointerException {
-        if (hrh.isTraceRequest) {
-            status = OK;
-        }
+    public void sendResponse(final HttpResponseStatus status, final String responseString, final Map responseHeaders,
+            final ChannelEvent event) throws NullPointerException {
 
         HttpResponse response = new DefaultHttpResponse(HTTP_1_1, status);
         response.addHeader("Cache-Control", "no-cache, no-store, must-revalidate");
@@ -209,39 +216,35 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 response.addHeader(key.toString(), responseHeaders.get(key));
             }
         }
-        logger.debug("trace request =", hrh.isTraceRequest);
 
-        String finalResponse = hrh.isTraceRequest ? logger.getTrace() : responseString;
+        String finalResponse = responseString;
         byte[] bytes = finalResponse.getBytes(Charsets.UTF_8);
 
-        if (hrh.isTraceRequest) {
-            response.setHeader("Content-Type", "text/plain; charset=utf-8");
-        }
         response.setHeader("Content-Length", bytes.length);
         response.setContent(ChannelBuffers.copiedBuffer(bytes));
 
         if (event != null) {
-            logger.debug("event not null inside send Response");
+            LOG.debug("event not null inside send Response");
             Channel channel = event.getChannel();
             if (channel != null && channel.isWritable()) {
-                logger.debug("channel not null inside send Response");
+                LOG.debug("channel not null inside send Response");
                 ChannelFuture future = channel.write(response);
                 future.addListener(ChannelFutureListener.CLOSE);
             }
             else {
-                logger.debug("Request Channel is null or channel is not writeable.");
+                LOG.debug("Request Channel is null or channel is not writeable.");
             }
         }
         totalTime = System.currentTimeMillis() - totalTime;
-        logger.debug("successfully sent response");
+        LOG.debug("successfully sent response");
         if (null != sasParams) {
             cleanUp();
-            logger.debug("successfully called cleanUp()");
+            LOG.debug("successfully called cleanUp()");
         }
     }
 
     // send response to the caller
-    public void sendResponse(String responseString, ChannelEvent event) throws NullPointerException {
+    public void sendResponse(final String responseString, final ChannelEvent event) throws NullPointerException {
         sendResponse(HttpResponseStatus.OK, responseString, null, event);
     }
 
@@ -251,7 +254,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     @Override
-    public synchronized void sendNoAdResponse(ChannelEvent event) throws NullPointerException {
+    public synchronized void sendNoAdResponse(final ChannelEvent event) throws NullPointerException {
         // Making sure response is sent only once
         if (responseSent) {
             return;
@@ -265,7 +268,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
             headers.put(NO_AD_HEADER, "true");
         }
 
-        logger.debug("Sending No ads");
+        LOG.debug("Sending No ads");
         if (getResponseFormat().equals("xhtml")) {
             sendResponse(OK, noAdXhtml, headers, event);
         }
@@ -291,42 +294,34 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     @Override
-    public Boolean isEligibleForProcess(AdNetworkInterface adNetwork) {
+    public Boolean isEligibleForProcess(final AdNetworkInterface adNetwork) {
         if (null == rankList) {
             return false;
         }
         int index = getRankIndex(adNetwork);
-        if (logger.isDebugEnabled()) {
-            logger.debug("inside isEligibleForProcess for " + adNetwork.getName() + " and index is " + index);
-        }
+        LOG.debug("inside isEligibleForProcess for {} and index is {}", adNetwork.getName(), index);
         return index == 0 || index == rankIndexToProcess;
     }
 
     @Override
-    public Boolean isLastEntry(AdNetworkInterface adNetwork) {
+    public Boolean isLastEntry(final AdNetworkInterface adNetwork) {
         int index = getRankIndex(adNetwork);
-        if (logger.isDebugEnabled()) {
-            logger.debug("inside isLastEntry for " + adNetwork.getName() + " and index is " + index);
-        }
+        LOG.debug("inside isLastEntry for {} and index is {}", adNetwork.getName(), index);
         return index == rankList.size() - 1;
     }
 
     // Iterates over the complete rank list and set the new value for
     // rankIndexToProcess.
     @Override
-    public void reassignRanks(AdNetworkInterface adNetworkCaller, MessageEvent event) {
+    public void reassignRanks(final AdNetworkInterface adNetworkCaller, final MessageEvent event) {
         int index = getRankIndex(adNetworkCaller);
-        if (logger.isDebugEnabled()) {
-            logger.debug("reassignRanks called for " + adNetworkCaller.getName() + " and index is " + index);
-        }
+        LOG.debug("reassignRanks called for {} and index is {}", adNetworkCaller.getName(), index);
 
         while (index < rankList.size()) {
             ChannelSegment channel = rankList.get(index);
             AdNetworkInterface adNetwork = channel.getAdNetworkInterface();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("reassignRanks iterating for " + adNetwork.getName() + " and index is " + index);
-            }
+            LOG.debug("reassignRanks iterating for {} and index is {}", adNetwork.getName(), index);
 
             if (adNetwork.isRequestCompleted()) {
                 if (adNetwork.getResponseAd().responseStatus == ThirdPartyAdResponse.ResponseStatus.SUCCESS) {
@@ -360,7 +355,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
             return;
         }
         requestCleaned = true;
-        logger.debug("trying to close open channels");
+        LOG.debug("trying to close open channels");
         if (rankList == null || rankList.size() < 1) {
             InspectorStats.incrementStatCount(InspectorStrings.nomatchsegmentcount);
             InspectorStats.incrementStatCount(InspectorStrings.nomatchsegmentlatency, totalTime);
@@ -368,18 +363,14 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
         // closing unclosed dcp channels
         for (int index = 0; rankList != null && index < rankList.size(); index++) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("calling clean up for channel " + rankList.get(index).getAdNetworkInterface().getId());
-            }
+            LOG.debug("calling clean up for channel {}", rankList.get(index).getAdNetworkInterface());
             try {
                 rankList.get(index).getAdNetworkInterface().cleanUp();
             }
             catch (Exception exception) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Error in closing channel for index: " + index + " Name: "
-                            + rankList.get(index).getAdNetworkInterface().getName() + " Exception: "
-                            + exception.getLocalizedMessage());
-                }
+                LOG.debug("Error in closing channel for index: {} Name: {} Exception: {}", index, rankList
+                        .get(index)
+                            .getAdNetworkInterface(), exception);
             }
         }
         for (int index = 0; rankList != null && index < rankList.size(); index++) {
@@ -394,18 +385,14 @@ public class ResponseSender extends HttpRequestHandlerBase {
         List<ChannelSegment> rtbList = auctionEngine.getRtbSegments();
 
         for (int index = 0; rtbList != null && index < rtbList.size(); index++) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("calling clean up for channel " + rtbList.get(index).getAdNetworkInterface().getId());
-            }
+            LOG.debug("calling clean up for channel {}", rtbList.get(index).getAdNetworkInterface().getId());
             try {
                 rtbList.get(index).getAdNetworkInterface().cleanUp();
             }
             catch (Exception exception) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Error in closing channel for index: " + index + " Name: "
-                            + rtbList.get(index).getAdNetworkInterface().getName() + " Exception: "
-                            + exception.getLocalizedMessage());
-                }
+                LOG.debug("Error in closing channel for index: {}  Name: {} Exception: {}", index, rtbList
+                        .get(index)
+                            .getAdNetworkInterface(), exception);
             }
         }
         for (int index = 0; rtbList != null && index < rtbList.size(); index++) {
@@ -416,16 +403,14 @@ public class ResponseSender extends HttpRequestHandlerBase {
             }
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("done with closing channels");
-            logger.debug("responsemap size is :" + ChannelsClientHandler.responseMap.size());
-            logger.debug("adstatus map size is :" + ChannelsClientHandler.adStatusMap.size());
-            logger.debug("status map size is:" + ChannelsClientHandler.statusMap.size());
-        }
-        hrh.writeLogs(this, logger);
+        LOG.debug("done with closing channels");
+        LOG.debug("responsemap size is : {}", ChannelsClientHandler.responseMap.size());
+        LOG.debug("adstatus map size is : {}", ChannelsClientHandler.adStatusMap.size());
+        LOG.debug("status map size is: {}", ChannelsClientHandler.statusMap.size());
+        hrh.writeLogs(this);
     }
 
-    private int getRankIndex(AdNetworkInterface adNetwork) {
+    private int getRankIndex(final AdNetworkInterface adNetwork) {
         int index;
         for (index = 0; index < rankList.size(); index++) {
             if (rankList.get(index).getAdNetworkInterface().getImpressionId().equals(adNetwork.getImpressionId())) {
@@ -451,11 +436,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     @Override
-    public void processDcpList(MessageEvent serverEvent) {
+    public void processDcpList(final MessageEvent serverEvent) {
         // There would always be rtb partner before going to dcp list
         // So will iterate over the dcp list once.
         if (this.getRankList().isEmpty()) {
-            logger.debug("dcp list is empty so sending NoAd");
+            LOG.debug("dcp list is empty so sending NoAd");
             this.sendNoAdResponse(serverEvent);
             return;
         }
@@ -480,12 +465,12 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     @Override
-    public void processDcpPartner(MessageEvent serverEvent, AdNetworkInterface adNetworkInterface) {
+    public void processDcpPartner(final MessageEvent serverEvent, final AdNetworkInterface adNetworkInterface) {
         if (!this.isEligibleForProcess(adNetworkInterface)) {
-            logger.debug(adNetworkInterface.getName(), "is not eligible for processing");
+            LOG.debug("{} is not eligible for processing", adNetworkInterface.getName());
             return;
         }
-        logger.debug("the channel is eligible for processing");
+        LOG.debug("the channel is eligible for processing");
         if (adNetworkInterface.getResponseAd().responseStatus == ThirdPartyAdResponse.ResponseStatus.SUCCESS) {
             sendAdResponse(adNetworkInterface, serverEvent);
             cleanUp();

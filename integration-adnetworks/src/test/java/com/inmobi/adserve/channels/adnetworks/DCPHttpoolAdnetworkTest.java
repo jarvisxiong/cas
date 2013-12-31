@@ -23,7 +23,6 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPHttpoolAdnetworkTest extends TestCase {
@@ -31,7 +30,6 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
     private final ClientBootstrap clientBootstrap = null;
-    private DebugLogger           logger;
     // Httpool
     private DCPHttPoolAdNetwork   dcpHttpoolAdNetwork;
     private final String          httpoolHost     = "http://a.mobile.toboads.com/get?ormma=0&fh=0&sdkid=api&sdkver=100&";
@@ -61,10 +59,8 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         MessageEvent serverEvent = createMock(MessageEvent.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        DebugLogger.init(mockConfig);
         Formatter.init();
-        logger = new DebugLogger();
-        dcpHttpoolAdNetwork = new DCPHttPoolAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpHttpoolAdNetwork = new DCPHttPoolAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test

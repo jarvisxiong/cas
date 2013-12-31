@@ -13,18 +13,19 @@ import org.apache.commons.lang3.StringUtils;
 import org.jets3t.service.impl.rest.httpclient.RestS3Service;
 import org.jets3t.service.model.S3Object;
 import org.jets3t.service.security.AWSCredentials;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.BaseReportingImpl;
 import com.inmobi.adserve.channels.api.ReportResponse;
 import com.inmobi.adserve.channels.api.ReportResponse.ReportRow;
 import com.inmobi.adserve.channels.api.ReportTime;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPPlaceIQReporting extends BaseReportingImpl {
+    private static final Logger    LOG               = LoggerFactory.getLogger(DCPPlaceIQReporting.class);
 
     private final Configuration    config;
-    private DebugLogger            logger;
     private String                 startDate         = "";
     private String                 endDate           = "";
     private String                 accessKey         = "";
@@ -44,7 +45,7 @@ public class DCPPlaceIQReporting extends BaseReportingImpl {
 
     public String getEndDate() throws Exception {
         try {
-            logger.debug("calculating latest date for PlaceIQ");
+            LOG.debug("calculating latest date for PlaceIQ");
             ReportTime reportTime = ReportTime.getUTCTime();
             reportTime = ReportTime.getPreviousDay(reportTime);
             if (reportTime.getHour() <= ReportReconcilerWindow()) {
@@ -53,7 +54,7 @@ public class DCPPlaceIQReporting extends BaseReportingImpl {
             return (reportTime.getStringDate(""));
         }
         catch (Exception exception) {
-            logger.error("failed to obtain end date inside PlaceIQ ", exception.getMessage());
+            LOG.error("failed to obtain end date inside PlaceIQ {}", exception);
             return null;
         }
     }
@@ -90,23 +91,22 @@ public class DCPPlaceIQReporting extends BaseReportingImpl {
     }
 
     @Override
-    public ReportResponse fetchRows(final DebugLogger logger, final ReportTime startTime, final String key,
-            final ReportTime endTime) throws Exception {
-        this.logger = logger;
+    public ReportResponse fetchRows(final ReportTime startTime, final String key, final ReportTime endTime)
+            throws Exception {
         ReportResponse reportResponse = new ReportResponse(ReportResponse.ResponseStatus.SUCCESS);
-        logger.debug("inside fetch rows of PlaceIQ");
+        LOG.debug("inside fetch rows of PlaceIQ");
         try {
             startDate = startTime.getStringDate("");
             endDate = endTime == null ? getEndDate() : startDate;
-            logger.debug("start date inside PlaceIQ is ", startDate);
+            LOG.debug("start date inside PlaceIQ is {}", startDate);
             if (ReportTime.compareStringDates(endDate, startDate) == -1) {
-                logger.debug("end date is less than start date plus reporting window for PlaceIQ");
+                LOG.debug("end date is less than start date plus reporting window for PlaceIQ");
                 return null;
             }
         }
         catch (Exception exception) {
             reportResponse.status = ReportResponse.ResponseStatus.FAIL_INVALID_DATE_ERROR;
-            logger.error("failed to obtain correct dates for fetching reports ", exception.getMessage());
+            LOG.error("failed to obtain correct dates for fetching reports {}", exception);
             return null;
         }
         RestS3Service s3Service = new RestS3Service(new AWSCredentials(accessKey, secretKey));
@@ -117,7 +117,7 @@ public class DCPPlaceIQReporting extends BaseReportingImpl {
                 s3obj = s3Service.getObject(bucketName, String.format("%s.csv", startDate));
             }
             catch (Exception exception) {
-                logger.error("Reports are not uploaded by placeiq");
+                LOG.error("Reports are not uploaded by placeiq");
                 ReportTime reportTime = new ReportTime(startDate, 0);
                 reportTime = ReportTime.getNextDay(reportTime);
                 startDate = reportTime.getStringDate("");
@@ -142,20 +142,20 @@ public class DCPPlaceIQReporting extends BaseReportingImpl {
 
             String[] responseArray = entireReportData.split("\n");
 
-            logger.debug("successfuly got response inside PlaceIQ. Number of lines of response is ",
+            LOG.debug("successfuly got response inside PlaceIQ. Number of lines of response is {}",
                 responseArray.length);
             this.externalSiteId = key;
-            generateReportResponse(logger, reportResponse, responseArray);
+            generateReportResponse(reportResponse, responseArray);
             ReportTime reportTime = new ReportTime(startDate, 0);
             reportTime = ReportTime.getNextDay(reportTime);
             startDate = reportTime.getStringDate("");
         }
-        logger.debug("successfully parsed data inside PlaceIQ");
+        LOG.debug("successfully parsed data inside PlaceIQ");
         return reportResponse;
     }
 
-    private void generateReportResponse(final DebugLogger logger, final ReportResponse reportResponse,
-            final String[] responseArray) throws ParseException {
+    private void generateReportResponse(final ReportResponse reportResponse, final String[] responseArray)
+            throws ParseException {
         if (responseArray.length > 1) {
             int impressionIndex = -1;
             int clicksIndex = -1;
@@ -235,11 +235,11 @@ public class DCPPlaceIQReporting extends BaseReportingImpl {
         }
 
         if (reportResponse.rows.size() > 0) {
-            logger.debug("successfully generated reporting log for external site id : ", externalSiteId);
+            LOG.debug("successfully generated reporting log for external site id : {}", externalSiteId);
         }
         else {
-            logger.debug("failed to generate reporting log for external site id : ", externalSiteId);
-            logger.debug("Default row added external site id : ", externalSiteId);
+            LOG.debug("failed to generate reporting log for external site id : {}", externalSiteId);
+            LOG.debug("Default row added external site id : {}", externalSiteId);
             ReportResponse.ReportRow row = new ReportResponse.ReportRow();
             row.siteId = externalSiteId;
             row.impressions = 0;
