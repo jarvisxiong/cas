@@ -73,6 +73,8 @@ public class ThriftRequestParserTest extends TestCase {
         IntegrationDetails integrationDetails = new IntegrationDetails();
         integrationDetails.setAdCodeType(AdCodeType.BASIC);
         integrationDetails.setIFrameId("009");
+        integrationDetails.setIntegrationType(IntegrationType.IOS_SDK);
+        integrationDetails.setIntegrationVersion(231);
 
         AdPoolRequest adPoolRequest = new AdPoolRequest();
         adPoolRequest.setSite(site);
@@ -112,7 +114,7 @@ public class ThriftRequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getSiteId(), "siteId");
         assertEquals(sasRequestParameters.getSlot(), new Short("12"));
         assertEquals(sasRequestParameters.getSiteType(), "APP");
-        assertEquals(sasRequestParameters.getSdkVersion(), null); 
+        assertEquals(sasRequestParameters.getSdkVersion(), "i231"); 
         assertEquals(sasRequestParameters.getSiteIncId(), 12345);
         assertEquals(sasRequestParameters.getAdIncId(), 0);  //Internal, Populated in cas
         assertEquals(sasRequestParameters.getAdcode(), "NON-JS");

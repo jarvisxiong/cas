@@ -52,7 +52,7 @@ public class ThriftRequestParser {
         //Fill params from AdPoolRequest Object
         params.setRemoteHostIp(tObject.remoteHostIp);
         //TODO Iterate over the segments using all slots
-        Short slotId =  null != tObject.selectedSlots ?  tObject.selectedSlots.get(0) : (short)0;
+        Short slotId =  tObject.isSetSelectedSlots() ?  tObject.selectedSlots.get(0) : (short)0;
         params.setSlot(slotId);
         params.setRqMkSlot(tObject.selectedSlots);
         params.setRFormat(tObject.responseFormat);
@@ -62,28 +62,28 @@ public class ThriftRequestParser {
         params.setAllowBannerAds(tObject.supplyCapability == SupplyCapability.BANNER);
         //TODO use segment id in cas as long
         params.setSiteSegmentId(new Long(tObject.segmentId).intValue());
-        params.setRqAdType(null != tObject.requestedAdType ? tObject.requestedAdType.name() : "INTERSTITIAL");
+        params.setRqAdType(tObject.isSetRequestedAdType() ? tObject.requestedAdType.name() : "INTERSTITIAL");
         params.setRichMedia(tObject.supplyCapability == SupplyCapability.RICH_MEDIA);
         params.setAccountSegment(getAccountSegments(tObject.demandTypesAllowed));
         params.setIpFileVersion(new Long(tObject.ipFileVersion).intValue());
-        params.setSst(tObject.supplySource != null ? tObject.supplySource.ordinal() : 0);
+        params.setSst(tObject.isSetSupplySource() ? tObject.supplySource.ordinal() : 0);
 
         
         //Fill params from integration details object
-        if (null != tObject.integrationDetails) {
+        if (tObject.isSetIntegrationDetails()) {
             params.setRqIframe(tObject.integrationDetails.iFrameId);
             params.setAdcode(tObject.integrationDetails.adCodeType.toString());
-            params.setSdkVersion(tObject.integrationDetails.sdkVersion);
+            params.setSdkVersion(getSdkVersion(tObject.integrationDetails.integrationType, tObject.integrationDetails.integrationVersion));
             //TODO Wait for the final contract from Devashish
             params.setAdcode(getAdCode(tObject.integrationDetails.integrationType));
         }
         
         
         //Fill param from Site Object
-        if (null != tObject.site) {
+        if (tObject.isSetSite()) {
             params.setSiteId(tObject.site.siteId);
-            params.setSource(null != tObject.site.contentRating ? tObject.site.contentRating.toString() : "FAMILY_SAFE");
-            params.setSiteType(null != tObject.site.inventoryType  && tObject.site.inventoryType == InventoryType.APP ? "APP" : "WAP");
+            params.setSource(tObject.site.isSetContentRating() ? tObject.site.contentRating.toString() : "FAMILY_SAFE");
+            params.setSiteType(tObject.site.isSetInventoryType() && tObject.site.inventoryType == InventoryType.APP ? "APP" : "WAP");
             params.setCategories(convertIntToLong(tObject.site.siteTags));
             params.setSiteFloor(tObject.site.ecpmFloor);
             params.setSiteIncId(tObject.site.siteIncId);
@@ -92,7 +92,7 @@ public class ThriftRequestParser {
         
         
         //Fill params from Device Object
-        if (null != tObject.device) {
+        if (tObject.isSetDevice()) {
             params.setUserAgent(tObject.device.userAgent);
             //TODO Change to int in thrift
             params.setOsId(new Long(tObject.device.osId).intValue());
@@ -101,8 +101,8 @@ public class ThriftRequestParser {
         }
 
         //Fill params from Geo Object
-        if (null != tObject.geo) {
-            params.setLocSrc(null != tObject.geo.locationSource ? tObject.geo.locationSource.name() : "LATLON");
+        if (tObject.isSetGeo()) {
+            params.setLocSrc(tObject.geo.isSetLocationSource() ? tObject.geo.locationSource.name() : "LATLON");
             //TODO Change format in dcp 
             String latLong = "";
             if (tObject.geo.latLong != null) {
@@ -121,7 +121,7 @@ public class ThriftRequestParser {
         
 
         //Fill Params from User Object
-        if (null != tObject.user) {
+        if (tObject.isSetUser()) {
             //TODO Change age to integer in DCP
             int currentYear = (short)Calendar.getInstance().get(Calendar.YEAR);
             int yob = tObject.user.yearOfBirth;
@@ -132,14 +132,14 @@ public class ThriftRequestParser {
 
         
         //Fill params from UIDParams Object
-        if (null != tObject.getUidParams()) {
+        if (tObject.isSetUidParams()) {
             setUserIdParams(casInternalRequestParameters, tObject.getUidParams());
             params.setTUidParams(getUserIdMap(tObject.getUidParams().getRawUidValues()));
         }
 
         
         //Fill params from Carrier Object
-        if (null != tObject.carrier) {
+        if (tObject.isSetCarrier()) {
             params.setCarrierId(new Long(tObject.carrier.carrierId).intValue());
         }
         
@@ -242,5 +242,14 @@ public class ThriftRequestParser {
             return "JS";
         }
         return "NON-JS";
+    }
+
+    public static String getSdkVersion(IntegrationType integrationType, int version) {
+        if (integrationType == IntegrationType.ANDROID_SDK)  {
+            return "a" + version;
+        } else if (integrationType == IntegrationType.IOS_SDK) {
+            return "i" + version;
+        }
+        return null;
     }
 }
