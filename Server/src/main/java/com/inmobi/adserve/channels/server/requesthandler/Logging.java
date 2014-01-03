@@ -4,7 +4,10 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.inject.Inject;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.thrift.TException;
@@ -22,6 +25,7 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.server.annotations.AdvertiserIdNameMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.MetricsManager;
@@ -64,6 +68,10 @@ public class Logging {
                                                                                            2000);
     private final static Logger                            LOG                     = LoggerFactory
                                                                                            .getLogger(Logging.class);
+
+    @AdvertiserIdNameMap
+    @Inject
+    private static Map<String, String>                     advertiserIdNameMap;
 
     public static ConcurrentHashMap<String, String> getSampledadvertiserlognos() {
         return sampledAdvertiserLogNos;
@@ -168,7 +176,7 @@ public class Logging {
         String advertiserId = null;
         if (channelSegment != null) {
             InspectorStats.incrementStatCount(channelSegment.getAdNetworkInterface().getName(),
-                InspectorStrings.serverImpression);
+                    InspectorStrings.serverImpression);
             isServerImpression = true;
             advertiserId = channelSegment.getChannelEntity().getAccountId();
             adsServed = 1;
@@ -335,8 +343,8 @@ public class Logging {
                     osName = HandSetOS.values()[sasParamsOsId - 1].toString();
                 }
                 MetricsManager.updateStats(Integer.parseInt(sasParams.getCountryStr()), sasParams.getCountry(),
-                    sasParams.getOsId(), osName, Filters.getAdvertiserIdToNameMapping().get(advertiserId), false,
-                    false, isServerImpression, 0.0, (long) 0.0, impression.getAd().getWinBid());
+                        sasParams.getOsId(), osName, advertiserIdNameMap.get(advertiserId), false, false,
+                        isServerImpression, 0.0, (long) 0.0, impression.getAd().getWinBid());
             }
         }
         catch (Exception e) {
@@ -423,7 +431,7 @@ public class Logging {
                 InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalRequests);
                 InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.latency, adResponse.latency);
                 InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.connectionLatency,
-                    adNetwork.getConnectionLatency());
+                        adNetwork.getConnectionLatency());
                 if ("AD".equals(adResponse.adStatus)) {
                     InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalFills);
                     isFilled = true;
@@ -462,8 +470,8 @@ public class Logging {
                             osName = HandSetOS.values()[sasParamsOsId - 1].toString();
                         }
                         MetricsManager.updateStats(Integer.parseInt(sasParams.getCountryStr()), sasParams.getCountry(),
-                            sasParams.getOsId(), osName, Filters.getAdvertiserIdToNameMapping().get(advertiserId),
-                            isFilled, true, false, bid, latency, 0.0);
+                                sasParams.getOsId(), osName, advertiserIdNameMap.get(advertiserId), isFilled, true,
+                                false, bid, latency, 0.0);
                     }
                 }
                 catch (Exception e) {
@@ -516,10 +524,8 @@ public class Logging {
             }
             log.append("}").append(sep).append("rq-h-user-agent=\"");
             log.append(sasParams.getUserAgent()).append("\"").append(sep).append("rq-site-params=[{\"categ\":");
-            log.append(sasParams.getCategories().toString())
-                        .append("},{\"type\":\"")
-                        .append(sasParams.getSiteType())
-                        .append("\"}]");
+            log.append(sasParams.getCategories().toString()).append("},{\"type\":\"").append(sasParams.getSiteType())
+                    .append("\"}]");
             carrier = sasParams.getCarrier();
         }
 
@@ -631,9 +637,8 @@ public class Logging {
                     if (index > 0 && partnerName.length() > 0 && log.length() > 0) {
                         log.append("\n");
                     }
-                    log.append(partnerName)
-                                .append(sep)
-                                .append(rankList.get(index).getChannelSegmentEntity().getExternalSiteKey());
+                    log.append(partnerName).append(sep)
+                            .append(rankList.get(index).getChannelSegmentEntity().getExternalSiteKey());
                     log.append(sep).append(requestUrl).append(sep).append(adResponse.adStatus);
                     log.append(sep).append(response).append(sep).append(advertiserId);
                     count++;
@@ -654,9 +659,8 @@ public class Logging {
                 if (index > 0 && partnerName.length() > 0 && log.length() > 0) {
                     log.append("\n");
                 }
-                log.append(partnerName)
-                            .append(sep)
-                            .append(rankList.get(index).getChannelSegmentEntity().getExternalSiteKey());
+                log.append(partnerName).append(sep)
+                        .append(rankList.get(index).getChannelSegmentEntity().getExternalSiteKey());
                 log.append(sep).append(requestUrl).append(sep).append(adResponse.adStatus);
                 log.append(sep).append(response).append(sep).append(advertiserId);
                 count++;

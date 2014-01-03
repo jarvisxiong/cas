@@ -2,7 +2,8 @@ package com.inmobi.adserve.channels.server.requesthandler.beans;
 
 import java.util.List;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 
@@ -11,10 +12,10 @@ import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
  * @author abhishek.parwal
  * 
  */
-@Data
+@AllArgsConstructor
 public class AdvertiserMatchedSegmentDetail {
 
-    private String               advertiserId;
-    private List<String>         adGroups;
-    private List<ChannelSegment> channelSegmentList;
+    @Getter
+    private final List<ChannelSegment> channelSegmentList;
+
 }

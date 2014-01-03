@@ -1,4 +1,4 @@
-package com.inmobi.adserve.channels.server.requesthandler.filters;
+package com.inmobi.adserve.channels.server.requesthandler.filters.advertiser;
 
 import java.util.Iterator;
 import java.util.List;
@@ -43,7 +43,7 @@ public abstract class AbstractAdvertiserLevelFilter implements AdvertiserLevelFi
 
             boolean result = failedInFilter(channelSegment, sasParams);
 
-            String advertiserId = matchedSegmentDetail.getAdvertiserId();
+            String advertiserId = channelSegment.getChannelEntity().getAccountId();
 
             if (result) {
                 iterator.remove();

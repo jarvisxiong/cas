@@ -33,8 +33,12 @@ public class ServerConfig implements CasConfig {
         return serverConfiguration.getInt("rtbBalanceFilterAmount", 50);
     }
 
-    public int getMaxSegmentSelectionCount() {
+    public int getMaxPartnerSegmentSelectionCount() {
         return serverConfiguration.getInt("partnerSegmentNo", 2);
+    }
+
+    public int getMaxSegmentSelectionCount() {
+        return serverConfiguration.getInt("totalSegmentNo", -1);
     }
 
     public double getNormalizingFactor() {

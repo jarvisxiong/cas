@@ -38,24 +38,23 @@ public class SegmentFactory {
 
         AdapterConfig adapterConfig = advertiserIdConfigMap.get(advertiserId);
 
-        if ((adapterConfig == null)
-                || !(CollectionUtils.isEmpty(advertiserSet) || advertiserSet.contains(adapterConfig.getAdapterName()))
-                || !adapterConfig.isActive() || ((6 == dst) && (adapterConfig.getAdapterType() == AdapterType.DCP))
-                || (adapterConfig.getAdapterType() == AdapterType.RTB && !isRtbEnabled)) {
+        boolean isRtb = adapterConfig.isRtb();
+
+        if (!(CollectionUtils.isEmpty(advertiserSet) || advertiserSet.contains(adapterConfig.getAdapterName()))
+                || ((6 == dst) && !isRtb) || (isRtb && !isRtbEnabled)) {
             return null;
         }
 
         Class<AdNetworkInterface> adNetworkInterfaceClass = adapterConfig.getAdNetworkInterfaceClass();
 
-        if (adapterConfig.getAdapterType() == AdapterType.RTB) {
+        if (adapterConfig.isRtb()) {
             LOG.debug("dcname is {} and urlBase is {}", ChannelServer.dataCentreName, adapterConfig.getAdapterHost());
 
             try {
-                AdNetworkInterface rtbAdNetwork = adNetworkInterfaceClass
-                        .getConstructor(
-                            new Class[] { Configuration.class, ClientBootstrap.class, HttpRequestHandlerBase.class,
-                                    MessageEvent.class, String.class, String.class, int.class, RepositoryHelper.class })
-                            .newInstance(config, rtbClientBootstrap, base, serverEvent, adapterConfig.getAdapterHost(),
+                AdNetworkInterface rtbAdNetwork = adNetworkInterfaceClass.getConstructor(
+                        new Class[] { Configuration.class, ClientBootstrap.class, HttpRequestHandlerBase.class,
+                                MessageEvent.class, String.class, String.class, int.class, RepositoryHelper.class })
+                        .newInstance(config, rtbClientBootstrap, base, serverEvent, adapterConfig.getAdapterHost(),
                                 adapterConfig.getAdapterName(), rtbMaxTimemout, repositoryHelper);
                 rtbAdNetwork.setName(adapterConfig.getAdapterName());
                 LOG.debug("Created RTB adapter instance for advertiser id : {}", advertiserId);
@@ -71,8 +70,8 @@ public class SegmentFactory {
 
             try {
                 AdNetworkInterface adNetworkInterface = adNetworkInterfaceClass.getConstructor(
-                    new Class[] { Configuration.class, ClientBootstrap.class, HttpRequestHandlerBase.class,
-                            MessageEvent.class }).newInstance(config, clientBootstrap, base, serverEvent);
+                        new Class[] { Configuration.class, ClientBootstrap.class, HttpRequestHandlerBase.class,
+                                MessageEvent.class }).newInstance(config, clientBootstrap, base, serverEvent);
                 adNetworkInterface.setName(adapterConfig.getAdapterName());
                 return adNetworkInterface;
             }

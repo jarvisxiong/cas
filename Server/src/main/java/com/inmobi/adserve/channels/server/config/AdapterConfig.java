@@ -26,4 +26,6 @@ public interface AdapterConfig extends CasConfig {
 
     int getMaxSegmentSelectionCount();
 
+    boolean isValidHost();
+
 }

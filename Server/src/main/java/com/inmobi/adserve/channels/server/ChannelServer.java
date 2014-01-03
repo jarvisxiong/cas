@@ -47,7 +47,6 @@ import com.inmobi.adserve.channels.server.module.NettyModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
 import com.inmobi.adserve.channels.server.netty.NettyServer;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
-import com.inmobi.adserve.channels.server.requesthandler.Filters;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.MetricsManager;
@@ -152,7 +151,6 @@ public class ChannelServer {
             if (null != maxIncomingConnections) {
                 ServletHandler.getServerConfig().setProperty("incomingMaxConnections", maxIncomingConnections);
             }
-            Filters.init(config.getAdapterConfiguration());
 
             Injector injector = Guice.createInjector(new NettyModule(config.getServerConfiguration()),
                     new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(),

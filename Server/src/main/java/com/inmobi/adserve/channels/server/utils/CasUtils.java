@@ -2,10 +2,14 @@ package com.inmobi.adserve.channels.server.utils;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.PricingEngineEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.server.beans.CasContext;
 
 
 /**
@@ -14,6 +18,7 @@ import com.inmobi.adserve.channels.repository.RepositoryHelper;
  */
 @Singleton
 public class CasUtils {
+    private static final Logger    LOG = LoggerFactory.getLogger(CasUtils.class);
 
     private final RepositoryHelper repositoryHelper;
 
@@ -31,6 +36,15 @@ public class CasUtils {
             return repositoryHelper.queryPricingEngineRepository(country, os);
         }
         return null;
+    }
+
+    public Double getRtbFloor(final CasContext casContext, final SASRequestParameters sasRequestParameters) {
+        PricingEngineEntity pricingEngineEntity = casContext.getPricingEngineEntity();
+        if (pricingEngineEntity == null) {
+            casContext.setPricingEngineEntity(pricingEngineEntity);
+        }
+
+        return pricingEngineEntity == null ? 0 : pricingEngineEntity.getRtbFloor();
     }
 
 }

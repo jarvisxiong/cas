@@ -7,9 +7,14 @@ import org.apache.commons.configuration.Configuration;
 
 import com.google.common.collect.Sets;
 import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
-import com.google.inject.name.Names;
+import com.inmobi.adserve.channels.server.annotations.AdvertiserIdNameMap;
 import com.inmobi.adserve.channels.server.config.AdapterConfig;
+import com.inmobi.adserve.channels.server.config.AdapterConfigFactory;
 import com.inmobi.adserve.channels.server.config.BaseAdapterConfig;
 
 
@@ -19,11 +24,11 @@ import com.inmobi.adserve.channels.server.config.BaseAdapterConfig;
  */
 public class AdapterConfigModule extends AbstractModule {
 
-    private final Configuration adapterConfiguration;
+    private final Configuration allAdapterConfiguration;
     private final String        dcName;
 
-    public AdapterConfigModule(final Configuration adapterConfiguration, final String dcName) {
-        this.adapterConfiguration = adapterConfiguration;
+    public AdapterConfigModule(final Configuration allAdapterConfiguration, final String dcName) {
+        this.allAdapterConfiguration = allAdapterConfiguration;
         this.dcName = dcName;
     }
 
@@ -31,7 +36,7 @@ public class AdapterConfigModule extends AbstractModule {
     protected void configure() {
 
         @SuppressWarnings("unchecked")
-        Iterator<String> keyIterator = adapterConfiguration.getKeys();
+        Iterator<String> keyIterator = allAdapterConfiguration.getKeys();
 
         Set<String> adapterNames = Sets.newHashSet();
 
@@ -44,25 +49,28 @@ public class AdapterConfigModule extends AbstractModule {
             adapterNames.add(adapterName);
         }
 
+        Module adapterConfigFactoryModule = new FactoryModuleBuilder().implement(AdapterConfig.class,
+                BaseAdapterConfig.class).build(AdapterConfigFactory.class);
+        Injector injector = Guice.createInjector(adapterConfigFactoryModule);
+        AdapterConfigFactory adapterConfigFactory = injector.getInstance(AdapterConfigFactory.class);
+
         for (String adapterName : adapterNames) {
-            Configuration adapterConfig = adapterConfiguration.subset(adapterName);
-
-            BaseAdapterConfig baseAdapterConfig = new BaseAdapterConfig(adapterConfig, adapterName, dcName);
-
-            adapterConfigs.add(baseAdapterConfig);
-
+            Configuration adapterConfiguration = allAdapterConfiguration.subset(adapterName);
+            AdapterConfig adapterConfig = adapterConfigFactory.create(adapterConfiguration, adapterName, dcName);
+            adapterConfigs.add(adapterConfig);
         }
 
         MapBinder<String, AdapterConfig> advertiserIdConfigMapBinder = MapBinder.newMapBinder(binder(), String.class,
-            AdapterConfig.class);
+                AdapterConfig.class);
         MapBinder<String, String> advertiserIdToNameMapBinder = MapBinder.newMapBinder(binder(), String.class,
-            String.class, Names.named("advertiserIdToNameMap"));
+                String.class, AdvertiserIdNameMap.class);
 
         for (AdapterConfig adapterConfig : adapterConfigs) {
             advertiserIdConfigMapBinder.addBinding(adapterConfig.getAdvertiserId()).toInstance(adapterConfig);
             advertiserIdToNameMapBinder.addBinding(adapterConfig.getAdvertiserId()).toInstance(
-                adapterConfig.getAdapterName());
+                    adapterConfig.getAdapterName());
         }
 
     }
+
 }

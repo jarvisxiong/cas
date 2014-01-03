@@ -1,10 +1,13 @@
 package com.inmobi.adserve.channels.server.config;
 
+import javax.inject.Inject;
+
 import lombok.EqualsAndHashCode;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang3.StringUtils;
 
+import com.google.inject.assistedinject.Assisted;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.server.AdapterType;
 
@@ -23,8 +26,9 @@ public class BaseAdapterConfig implements AdapterConfig {
     private final ServerConfig              serverConfig;
 
     @SuppressWarnings("unchecked")
-    public BaseAdapterConfig(final Configuration adapterConfig, final String adapterName, final String dcName,
-            final ServerConfig serverConfig) {
+    @Inject
+    public BaseAdapterConfig(@Assisted final Configuration adapterConfig, @Assisted final String adapterName,
+            @Assisted final String dcName, final ServerConfig serverConfig) {
         this.adapterConfig = adapterConfig;
         this.adapterName = adapterName;
         this.dcName = dcName;
@@ -87,6 +91,12 @@ public class BaseAdapterConfig implements AdapterConfig {
         return adapterHost;
     }
 
+    public boolean isValidHost() {
+        String hostName = getAdapterHost();
+
+        return StringUtils.isNotBlank(hostName) && !"NA".equalsIgnoreCase(hostName);
+    }
+
     /**
      * @return the adapterType
      */
@@ -113,7 +123,7 @@ public class BaseAdapterConfig implements AdapterConfig {
 
     @Override
     public int getMaxSegmentSelectionCount() {
-        return adapterConfig.getInt("partnerSegmentNo", serverConfig.getMaxSegmentSelectionCount());
+        return adapterConfig.getInt("partnerSegmentNo", serverConfig.getMaxPartnerSegmentSelectionCount());
     }
 
 }

@@ -1,4 +1,4 @@
-package com.inmobi.adserve.channels.server.requesthandler.filters;
+package com.inmobi.adserve.channels.server.requesthandler.filters.adgroup;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Marker;

@@ -7,7 +7,7 @@ import org.reflections.scanners.SubTypesScanner;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
-import com.inmobi.adserve.channels.server.requesthandler.filters.AdvertiserLevelFilter;
+import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AdvertiserLevelFilter;
 
 
 /**

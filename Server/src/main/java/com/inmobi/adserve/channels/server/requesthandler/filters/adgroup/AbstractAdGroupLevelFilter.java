@@ -1,4 +1,4 @@
-package com.inmobi.adserve.channels.server.requesthandler.filters;
+package com.inmobi.adserve.channels.server.requesthandler.filters.adgroup;
 
 import java.util.Iterator;
 import java.util.List;

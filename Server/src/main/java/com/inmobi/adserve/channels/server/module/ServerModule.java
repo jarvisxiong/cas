@@ -23,7 +23,7 @@ import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
-import com.inmobi.adserve.channels.server.requesthandler.Filters;
+import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
 
 
@@ -55,7 +55,7 @@ public class ServerModule extends AbstractModule {
         bind(MatchSegments.class).asEagerSingleton();
 
         requestStaticInjection(AsyncRequestMaker.class);
-        requestStaticInjection(Filters.class);
+        requestStaticInjection(ChannelSegment.class);
 
         install(new AdapterConfigModule(adapterConfiguration, ChannelServer.dataCentreName));
 
