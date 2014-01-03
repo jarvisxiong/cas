@@ -5,7 +5,7 @@ import javax.inject.Inject;
 import lombok.EqualsAndHashCode;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 import com.google.inject.assistedinject.Assisted;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;

@@ -2,9 +2,12 @@ package com.inmobi.adserve.channels.server.requesthandler;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
@@ -20,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
-import com.inmobi.adserve.channels.api.ReportTime;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
@@ -157,7 +159,7 @@ public class Logging {
         }
 
         InventoryType inventory = getInventoryType(sasParams);
-        String timestamp = ReportTime.getTTime();
+        String timestamp = getUTCTimestamp();
         log.append(separator + "ttime=\"" + timestamp + "\"");
         log.append(separator + "rq-src=[\"uk\",\"uk\",\"uk\",\"uk\",");
         if (null != sasParams && null != sasParams.getTp()) {
@@ -408,7 +410,7 @@ public class Logging {
             log.append(sep + "rq-mk-siteid=\"").append(sasParams.getSiteId()).append("\"");
         }
 
-        String timestamp = ReportTime.getUTCTimestamp();
+        String timestamp = getUTCTimestamp();
         log.append(sep).append("ttime=\"").append(timestamp).append("\"");
         if (null != sasParams && sasParams.getTid() != null) {
             log.append(sep).append("tid=\"").append(sasParams.getTid()).append("\"");
@@ -750,5 +752,13 @@ public class Logging {
         else {
             return Gender.FEMALE;
         }
+    }
+
+    public static String getUTCTimestamp() {
+        java.util.Date date = new java.util.Date();
+        DateFormat utcFormatDate = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss-SSS");
+        TimeZone utcTime = TimeZone.getTimeZone("GMT");
+        utcFormatDate.setTimeZone(utcTime);
+        return (utcFormatDate.format(date));
     }
 }
