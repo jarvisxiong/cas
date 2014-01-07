@@ -19,7 +19,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
 
-import com.inmobi.adserve.channels.adnetworks.adelphic.DCPAdelphicAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.amobee.DCPAmobeeAdnetwork;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -27,7 +26,6 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPAmobeeAdnetworkTest extends TestCase {
@@ -35,7 +33,6 @@ public class DCPAmobeeAdnetworkTest extends TestCase {
     private final String          debug             = "debug";
     private final String          loggerConf        = "/tmp/channel-server.properties";
     private final ClientBootstrap clientBootstrap   = null;
-    private DebugLogger           logger;
 
     private DCPAmobeeAdnetwork    dcpAmobeeAdNetwork;
     private final String          amobeeHost        = "http://pulse-serving.amobee.com/upsteed/wap/adrequest";
@@ -68,10 +65,8 @@ public class DCPAmobeeAdnetworkTest extends TestCase {
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         SlotSizeMapping.init();
-        DebugLogger.init(mockConfig);
         Formatter.init();
-        logger = new DebugLogger();
-        dcpAmobeeAdNetwork = new DCPAmobeeAdnetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpAmobeeAdNetwork = new DCPAmobeeAdnetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test

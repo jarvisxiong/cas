@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.inmobi.channels</groupId>
 	<artifactId>cas</artifactId>
-	<version>3.32-SNAPSHOT</version>
+	<version>3.35-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<url>https://github.corp.inmobi.com/channel-adserve</url>
 	<parent>
@@ -21,6 +21,7 @@
 		<yammer.version>2.2.0</yammer.version>
 		<guice.version>3.0</guice.version>
 		<guice-multibindings.version>3.0</guice-multibindings.version>
+		<guice-servlet.version>3.0</guice-servlet.version>
 	</properties>
 
 	<modules>
@@ -69,6 +70,16 @@
 				<version>${guice-multibindings.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>com.google.inject.extensions</groupId>
+				<artifactId>guice-servlet</artifactId>
+				<version>${guice-servlet.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.reflections</groupId>
+				<artifactId>reflections</artifactId>
+				<version>0.9.9-RC1</version>
+			</dependency>
+			<dependency>
 				<groupId>org.apache.velocity</groupId>
 				<artifactId>velocity</artifactId>
 				<version>1.6-beta1</version>
@@ -115,11 +126,6 @@
 				<artifactId>easymock</artifactId>
 				<version>3.1</version>
 				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.google.code.google-collections</groupId>
-				<artifactId>google-collect</artifactId>
-				<version>snapshot-20080530</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.thrift</groupId>
@@ -229,11 +235,6 @@
 				<version>1.2</version>
 			</dependency>
 			<dependency>
-				<groupId>com.openx</groupId>
-				<artifactId>oauth</artifactId>
-				<version>1.0.3</version>
-			</dependency>
-			<dependency>
 				<groupId>org.easymock</groupId>
 				<artifactId>easymockclassextension</artifactId>
 				<version>2.5.2</version>
@@ -248,22 +249,6 @@
 				<groupId>org.codehaus.jackson</groupId>
 				<artifactId>jackson-jaxrs</artifactId>
 				<version>1.9.9</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.cxf</groupId>
-				<artifactId>cxf-bundle</artifactId>
-				<version>2.6.1</version>
-			</dependency>
-			<dependency>
-				<groupId>org.seleniumhq.selenium</groupId>
-				<artifactId>selenium-java</artifactId>
-				<version>2.33.0</version>
-				<exclusions>
-					<exclusion>
-						<artifactId>xercesImpl</artifactId>
-						<groupId>xerces</groupId>
-					</exclusion>
-				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.projectlombok</groupId>
@@ -289,11 +274,6 @@
 						<groupId>xml-apis</groupId>
 					</exclusion>
 				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>net.java.dev.jets3t</groupId>
-				<artifactId>jets3t</artifactId>
-				<version>0.8.0</version>
 			</dependency>
 			<dependency>
 				<groupId>com.yammer.metrics</groupId>

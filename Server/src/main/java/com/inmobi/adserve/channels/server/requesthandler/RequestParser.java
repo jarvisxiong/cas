@@ -9,24 +9,40 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
+@Singleton
 public class RequestParser {
+    private static final Logger    LOG = LoggerFactory.getLogger(RequestParser.class);
+    private final Provider<Marker> traceMarkerProvider;
 
-    public static JSONObject extractParams(Map<String, List<String>> params) throws Exception {
+    @Inject
+    public RequestParser(final Provider<Marker> traceMarkerProvider) {
+        this.traceMarkerProvider = traceMarkerProvider;
+    }
+
+    public JSONObject extractParams(final Map<String, List<String>> params) throws Exception {
         return extractParams(params, "args");
     }
 
     // Extracting params.
-    public static JSONObject extractParams(Map<String, List<String>> params, String jsonKey) throws JSONException,
+    public JSONObject extractParams(final Map<String, List<String>> params, final String jsonKey) throws JSONException,
             UnsupportedEncodingException {
         if (!params.isEmpty()) {
             List<String> values = params.get(jsonKey);
@@ -38,67 +54,70 @@ public class RequestParser {
         return null;
     }
 
-    public static void parseRequestParameters(JSONObject jObject, SASRequestParameters params,
-            CasInternalRequestParameters casInternalRequestParameters, DebugLogger logger) {
-        logger.debug("Inside parameter parser");
+    public void parseRequestParameters(final JSONObject jObject, SASRequestParameters params,
+            final CasInternalRequestParameters casInternalRequestParameters) {
+        Marker traceMarker = traceMarkerProvider.get();
+
+        LOG.debug(traceMarker, "Inside parameter parser");
         if (null == jObject) {
-            logger.error("Returning null as jObject is null.");
+            LOG.error(traceMarker, "Returning null as jObject is null.");
             params = null;
             return;
         }
         params.setAllParametersJson(jObject.toString());
         int dst = jObject.optInt("dst", 2);
-        Set<Integer> accountSegments = getAcoountSegments(jObject, logger);
+        Set<Integer> accountSegments = getAcoountSegments(jObject);
         boolean isResponseOnlyFromDcp = jObject.optBoolean("isResponseOnlyFromDcp", false);
-        logger.debug("dst type is", dst, "isResponseOnlyFromDcp ", isResponseOnlyFromDcp, "and account segments are",
-            accountSegments);
+        LOG.debug(traceMarker, "dst type is {} isResponseOnlyFromDcp  {} and account segments are {}", dst,
+            isResponseOnlyFromDcp, accountSegments);
         params.setDst(dst);
         params.setResponseOnlyFromDcp(isResponseOnlyFromDcp);
         params.setAccountSegment(accountSegments);
-        params.setRemoteHostIp(stringify(jObject, "w-s-carrier", logger));
-        params.setUserAgent(stringify(jObject, "rqXInmobiPhoneUseragent", logger));
+        params.setRemoteHostIp(stringify(jObject, "w-s-carrier"));
+        params.setUserAgent(stringify(jObject, "rqXInmobiPhoneUseragent"));
         if (null == params.getUserAgent()) {
-            params.setUserAgent(stringify(jObject, "rqHUserAgent", logger));
+            params.setUserAgent(stringify(jObject, "rqHUserAgent"));
         }
-        params.setLocSrc(stringify(jObject, "loc-src", logger));
-        params.setLatLong(stringify(jObject, "latlong", logger));
-        params.setSiteId(stringify(jObject, "rqMkSiteid", logger));
-        params.setSource(stringify(jObject, "source", logger));
+        params.setLocSrc(stringify(jObject, "loc-src"));
+        params.setLatLong(stringify(jObject, "latlong"));
+        params.setSiteId(stringify(jObject, "rqMkSiteid"));
+        params.setSource(stringify(jObject, "source"));
         params.setCountry(parseArray(jObject, "carrier", 2));
         params.setCountryStr(parseArray(jObject, "carrier", 1));
         params.setArea(parseArray(jObject, "carrier", 4));
-        params.setSlot(stringify(jObject, "slot-served", logger));
-        params.setRqMkSlot(stringify(jObject, "rqMkAdSlot", logger));
-        String sdkVersion = stringify(jObject, "sdk-version", logger);
+        params.setSlot(stringify(jObject, "slot-served"));
+        params.setRqMkSlot(stringify(jObject, "rqMkAdSlot"));
+        String sdkVersion = stringify(jObject, "sdk-version");
         if (StringUtils.isBlank(sdkVersion) || "null".equalsIgnoreCase(sdkVersion)) {
             sdkVersion = null;
         }
         params.setSdkVersion(sdkVersion);
-        params.setSiteType(stringify(jObject, "site-type", logger));
-        params.setAdcode(stringify(jObject, "adcode", logger));
+        params.setSiteType(stringify(jObject, "site-type"));
+        params.setAdcode(stringify(jObject, "adcode"));
         params.setPlatformOsId(jObject.optInt("os-id", -1));
         if (params.getSiteType() != null) {
             params.setSiteType(params.getSiteType().toUpperCase());
         }
-        params.setCategories(getCategory(jObject, logger, "new-category"));
-        params.setRqIframe(stringify(jObject, "rqIframe", logger));
-        params.setRFormat(stringify(jObject, "r-format", logger));
-        params.setRqMkAdcount(stringify(jObject, "rqMkAdcount", logger));
-        params.setTid(stringify(jObject, "tid", logger));
-        params.setTp(stringify(jObject, "tp", logger));
+        params.setCategories(getCategory(jObject, "new-category"));
+        params.setRqIframe(stringify(jObject, "rqIframe"));
+        params.setRFormat(stringify(jObject, "r-format"));
+        params.setRqMkAdcount(stringify(jObject, "rqMkAdcount"));
+        params.setTid(stringify(jObject, "tid"));
+        params.setTp(stringify(jObject, "tp"));
 
         params.setAllowBannerAds(jObject.optBoolean("site-allowBanner", true));
         params.setSiteFloor(jObject.optDouble("site-floor", 0.0));
         params.setSiteSegmentId(jObject.optInt("sel-seg-id", 0));
         params.setModelId(jObject.optInt("model-id", 0));
-        logger.debug("Site segment id is", params.getSiteSegmentId(), "and model id is", params.getModelId());
+        LOG.debug(traceMarker, "Site segment id is {} and model id is {}", params.getSiteSegmentId(),
+            params.getModelId());
         params.setIpFileVersion(jObject.optInt("rqIpFileVer", 1));
-        logger.debug("country obtained is", params.getCountry());
-        logger.debug("site floor is", params.getSiteFloor());
-        logger.debug("osId is", params.getPlatformOsId());
-        params.setUidParams(stringify(jObject, "raw-uid", logger));
-        setUserIdParams(casInternalRequestParameters, jObject, logger);
-        params = getUserParams(params, jObject, logger);
+        LOG.debug(traceMarker, "country obtained is {}", params.getCountry());
+        LOG.debug(traceMarker, "site floor is {}", params.getSiteFloor());
+        LOG.debug(traceMarker, "osId is {}", params.getPlatformOsId());
+        params.setUidParams(stringify(jObject, "raw-uid"));
+        setUserIdParams(casInternalRequestParameters, jObject);
+        params = getUserParams(params, jObject);
         try {
             JSONArray siteInfo = jObject.getJSONArray("site");
             if (siteInfo != null && siteInfo.length() > 0) {
@@ -106,29 +125,31 @@ public class RequestParser {
             }
         }
         catch (JSONException exception) {
-            logger.error("site object not found in request");
+            LOG.error(traceMarker, "site object not found in request");
             params.setSiteIncId(0);
         }
         try {
             params.setHandset(jObject.getJSONArray("handset"));
         }
         catch (JSONException e) {
-            logger.error("Handset array not found");
+            LOG.error(traceMarker, "Handset array not found");
         }
         try {
             params.setCarrier(jObject.getJSONArray("carrier"));
         }
         catch (JSONException e) {
-            logger.error("carrier array not found");
+            LOG.error(traceMarker, "carrier array not found");
         }
         params.setOsId(jObject.optInt("os-id", -1));
         params.setRichMedia(jObject.optBoolean("rich-media", false));
-        params.setRqAdType(stringify(jObject, "rqAdtype", logger));
-        params.setAppUrl(stringify(jObject, "site-url", logger));
-        logger.debug("successfully parsed params");
+        params.setRqAdType(stringify(jObject, "rqAdtype"));
+        params.setAppUrl(stringify(jObject, "site-url"));
+        LOG.debug(traceMarker, "successfully parsed params");
     }
 
-    public static String stringify(JSONObject jObject, String field, DebugLogger logger) {
+    public String stringify(final JSONObject jObject, final String field) {
+        Marker traceMarker = traceMarkerProvider.get();
+
         String fieldValue = "";
         try {
             Object fieldValueObject = jObject.get(field);
@@ -139,11 +160,11 @@ public class RequestParser {
         catch (JSONException e) {
             return null;
         }
-        logger.debug("Retrived from json", field, " = ", fieldValue);
+        LOG.debug(traceMarker, "Retrived from json {} = {}", field, fieldValue);
         return fieldValue;
     }
 
-    public static String parseArray(JSONObject jObject, String param, int index) {
+    public String parseArray(final JSONObject jObject, final String param, final int index) {
         if (null == jObject) {
             return null;
         }
@@ -161,7 +182,9 @@ public class RequestParser {
         }
     }
 
-    public static List<Long> getCategory(JSONObject jObject, DebugLogger logger, String oldORnew) {
+    public List<Long> getCategory(final JSONObject jObject, final String oldORnew) {
+        Marker traceMarker = traceMarkerProvider.get();
+
         try {
             JSONArray categories = jObject.getJSONArray(oldORnew);
             Long[] category = new Long[categories.length()];
@@ -171,12 +194,14 @@ public class RequestParser {
             return Arrays.asList(category);
         }
         catch (JSONException e) {
-            logger.error("error while reading category array", e.getMessage());
+            LOG.error(traceMarker, "error while reading category array {}", e);
             return null;
         }
     }
 
-    public static Set<Integer> getAcoountSegments(JSONObject jObject, DebugLogger logger) {
+    public Set<Integer> getAcoountSegments(final JSONObject jObject) {
+        Marker traceMarker = traceMarkerProvider.get();
+
         try {
             JSONArray segments = jObject.getJSONArray("segments");
             HashSet<Integer> accountSegments = new HashSet<Integer>();
@@ -186,26 +211,27 @@ public class RequestParser {
             return accountSegments;
         }
         catch (JSONException e) {
-            logger.debug("error while reading account segments array", e.getMessage());
+            LOG.debug(traceMarker, "error while reading account segments array {}", e);
             return new HashSet<Integer>();
         }
     }
 
     // Get user specific params
-    public static SASRequestParameters getUserParams(SASRequestParameters parameter, JSONObject jObject,
-            DebugLogger logger) {
-        logger.debug("inside parsing user params");
+    public SASRequestParameters getUserParams(final SASRequestParameters parameter, final JSONObject jObject) {
+        Marker traceMarker = traceMarkerProvider.get();
+
+        LOG.debug(traceMarker, "inside parsing user params");
         String utf8 = "UTF-8";
         try {
             JSONObject userMap = (JSONObject) jObject.get("uparams");
-            parameter.setAge(stringify(userMap, "u-age", logger));
-            parameter.setGender(stringify(userMap, "u-gender", logger));
-            parameter.setPostalCode(stringify(userMap, "u-postalcode", logger));
+            parameter.setAge(stringify(userMap, "u-age"));
+            parameter.setGender(stringify(userMap, "u-gender"));
+            parameter.setPostalCode(stringify(userMap, "u-postalcode"));
             if (!StringUtils.isEmpty(parameter.getPostalCode())) {
                 parameter.setPostalCode(parameter.getPostalCode().replaceAll(" ", ""));
             }
-            parameter.setUserLocation(stringify(userMap, "u-location", logger));
-            parameter.setGenderOrig(stringify(userMap, "u-gender-orig", logger));
+            parameter.setUserLocation(stringify(userMap, "u-location"));
+            parameter.setGenderOrig(stringify(userMap, "u-gender-orig"));
             try {
                 if (null != parameter.getAge()) {
                     parameter.setAge(URLEncoder.encode(parameter.getAge(), utf8));
@@ -218,17 +244,19 @@ public class RequestParser {
                 }
             }
             catch (UnsupportedEncodingException e) {
-                logger.debug("Error in encoding u params", e.getMessage());
+                LOG.debug(traceMarker, "Error in encoding u params {}", e);
             }
         }
         catch (JSONException exception) {
-            logger.debug("json exception in parsing u params", exception);
+            LOG.debug(traceMarker, "json exception in parsing u params {}", exception);
         }
         return parameter;
     }
 
     // Get user id params
-    public static void setUserIdParams(CasInternalRequestParameters parameter, JSONObject jObject, DebugLogger logger) {
+    public void setUserIdParams(final CasInternalRequestParameters parameter, final JSONObject jObject) {
+        Marker traceMarker = traceMarkerProvider.get();
+
         if (null == jObject) {
             return;
         }
@@ -237,25 +265,25 @@ public class RequestParser {
             if (null == userIdMap) {
                 return;
             }
-            String uid = stringify(userIdMap, "u-id", logger);
-            parameter.uid = (StringUtils.isNotBlank(uid) ? uid : stringify(userIdMap, "UDID", logger));
+            String uid = stringify(userIdMap, "u-id");
+            parameter.uid = (StringUtils.isNotBlank(uid) ? uid : stringify(userIdMap, "UDID"));
             if (StringUtils.isNotBlank(parameter.uid) && parameter.uid.length() != 32) {
                 parameter.uid = MD5(parameter.uid);
             }
-            parameter.uidO1 = stringify(userIdMap, "O1", logger);
-            parameter.uidMd5 = stringify(userIdMap, "UM5", logger);
-            parameter.uidIFA = stringify(userIdMap, "IDA", logger);
-            parameter.uidSO1 = stringify(userIdMap, "SO1", logger);
-            parameter.uidIFV = stringify(userIdMap, "IDV", logger);
-            parameter.uidIDUS1 = stringify(userIdMap, "IDUS1", logger);
-            parameter.uidADT = stringify(userIdMap, "u-id-adt", logger);
+            parameter.uidO1 = stringify(userIdMap, "O1");
+            parameter.uidMd5 = stringify(userIdMap, "UM5");
+            parameter.uidIFA = stringify(userIdMap, "IDA");
+            parameter.uidSO1 = stringify(userIdMap, "SO1");
+            parameter.uidIFV = stringify(userIdMap, "IDV");
+            parameter.uidIDUS1 = stringify(userIdMap, "IDUS1");
+            parameter.uidADT = stringify(userIdMap, "u-id-adt");
         }
         catch (JSONException exception) {
-            logger.debug("Error in extracting userid params");
+            LOG.debug(traceMarker, "Error in extracting userid params");
         }
     }
 
-    public static String MD5(String md5) {
+    public String MD5(final String md5) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] array = md.digest(md5.getBytes());

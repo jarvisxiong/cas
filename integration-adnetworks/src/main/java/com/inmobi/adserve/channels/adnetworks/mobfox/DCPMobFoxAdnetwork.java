@@ -7,6 +7,7 @@ import java.net.URI;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -16,19 +17,21 @@ import org.apache.velocity.VelocityContext;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.sun.xml.txw2.annotation.XmlAttribute;
 
 
-public class DCPMobFoxAdnetwork extends BaseAdNetworkImpl {
-    private final Configuration   config;
+public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
+
+    private static final Logger   LOG          = LoggerFactory.getLogger(DCPMobFoxAdnetwork.class);
+
     private transient String      latitude;
     private transient String      longitude;
     private int                   width;
@@ -61,13 +64,15 @@ public class DCPMobFoxAdnetwork extends BaseAdNetworkImpl {
     private static JAXBContext    jaxbContext;
     private static Unmarshaller   jaxbUnmarshaller;
 
-    public DCPMobFoxAdnetwork(final DebugLogger logger, final Configuration config,
-            final ClientBootstrap clientBootstrap, final HttpRequestHandlerBase baseRequestHandler,
-            final MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent, logger);
-        this.config = config;
-        this.logger = logger;
-        this.clientBootstrap = clientBootstrap;
+    /**
+     * @param config
+     * @param clientBootstrap
+     * @param baseRequestHandler
+     * @param serverEvent
+     */
+    public DCPMobFoxAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
         try {
             jaxbContext = JAXBContext.newInstance(Request.class);
             jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -81,7 +86,7 @@ public class DCPMobFoxAdnetwork extends BaseAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            logger.debug("mandatory parameters missing for mobfox so exiting adapter");
+            LOG.debug("mandatory parameters missing for mobfox so exiting adapter");
             return false;
         }
         host = config.getString("mobfox.host");
@@ -98,7 +103,7 @@ public class DCPMobFoxAdnetwork extends BaseAdNetworkImpl {
             height = (int) Math.ceil(dim.getHeight());
         }
 
-        logger.info("Configure parameters inside Mobfox returned true");
+        LOG.info("Configure parameters inside Mobfox returned true");
         return true;
     }
 
@@ -155,13 +160,13 @@ public class DCPMobFoxAdnetwork extends BaseAdNetworkImpl {
         }
         appendQueryParam(url, B_SITE_ID, blindedSiteId, false);
 
-        logger.debug("Mobfox url is ", url.toString());
+        LOG.debug("Mobfox url is {}", url);
         return new URI(url.toString());
     }
 
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
-        logger.debug("response is", response);
+        LOG.debug("response is {}", response);
 
         if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
             statusCode = status.getCode();
@@ -185,14 +190,13 @@ public class DCPMobFoxAdnetwork extends BaseAdNetworkImpl {
                 }
                 context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, htmlContent);
 
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl,
-                    logger);
+                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
             }
             catch (Exception exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from Mobfox");
-                logger.info("Response from Mobfox", response);
+                LOG.info("Error parsing response from Mobfox");
+                LOG.info("Response from Mobfox {}", response);
             }
         }
     }

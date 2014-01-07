@@ -23,7 +23,6 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPAppNexusAdnetworkTest extends TestCase {
@@ -31,7 +30,6 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
     private final ClientBootstrap clientBootstrap = null;
-    private DebugLogger           logger;
     private DCPAppNexusAdnetwork  dcpAppNexusAdNetwork;
     private final String          appNexusHost    = "http://mobile.adnxs.com/mob?psa=0&format=json";
     private final String          appNexusStatus  = "on";
@@ -61,9 +59,7 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
         MessageEvent serverEvent = createMock(MessageEvent.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        DebugLogger.init(mockConfig);
-        logger = new DebugLogger();
-        dcpAppNexusAdNetwork = new DCPAppNexusAdnetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpAppNexusAdNetwork = new DCPAppNexusAdnetwork(mockConfig, clientBootstrap, base, serverEvent);
         dcpAppNexusAdNetwork.setName("appnexus");
     }
 

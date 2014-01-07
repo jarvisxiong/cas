@@ -1,37 +1,42 @@
 package com.inmobi.adserve.channels.server;
 
-import com.inmobi.adserve.channels.server.api.ConnectionType;
-import com.inmobi.adserve.channels.util.DebugLogger;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import lombok.Getter;
+
 import org.apache.commons.configuration.Configuration;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import com.inmobi.adserve.channels.server.api.ConnectionType;
+
 
 public class ConnectionLimitHandler extends SimpleChannelHandler {
-    @Getter
-    private AtomicInteger activeConnections = new AtomicInteger(0);
-    @Getter
-    private AtomicInteger droppedConnections = new AtomicInteger(0);
-    private DebugLogger logger;
-    private ConnectionType connectionType;
-    private Configuration config;
+    private final static Logger  LOG                = LoggerFactory.getLogger(ConnectionLimitHandler.class);
 
-    public ConnectionLimitHandler(Configuration configuration, ConnectionType connType) {
+    @Getter
+    private final AtomicInteger  activeConnections  = new AtomicInteger(0);
+    @Getter
+    private final AtomicInteger  droppedConnections = new AtomicInteger(0);
+    private final ConnectionType connectionType;
+    private final Configuration  config;
+
+    public ConnectionLimitHandler(final Configuration configuration, final ConnectionType connType) {
         config = configuration;
         connectionType = connType;
-        this.logger = new DebugLogger();
     }
 
     @Override
-    public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+    public void channelOpen(final ChannelHandlerContext ctx, final ChannelStateEvent e) throws Exception {
         int maxConnections = getMaxConnectionsLimit();
         if (maxConnections > 0) {
             int currentCount = activeConnections.getAndIncrement();
             if (currentCount > maxConnections) {
-                logger.info(connectionType.name(), "MaxLimit of connections", maxConnections, "exceeded so closing channel");
+                LOG.info("{} MaxLimit of connections {} exceeded so closing channel", connectionType.name(),
+                    maxConnections);
                 ctx.getChannel().close();
                 droppedConnections.incrementAndGet();
             }
@@ -40,7 +45,7 @@ public class ConnectionLimitHandler extends SimpleChannelHandler {
     }
 
     @Override
-    public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+    public void channelClosed(final ChannelHandlerContext ctx, final ChannelStateEvent e) throws Exception {
         int maxConnections = getMaxConnectionsLimit();
         if (maxConnections > 0) {
             activeConnections.decrementAndGet();
@@ -48,21 +53,22 @@ public class ConnectionLimitHandler extends SimpleChannelHandler {
 
         super.channelClosed(ctx, e);
     }
-    
+
     public int getMaxConnectionsLimit() {
         int maxConnections = 200;
-      switch (connectionType) {
-          case DCP_OUTGOING:
-              maxConnections = config.getInt("dcpOutGoingMaxConnections", 200);
-              break;
-          case RTBD_OUTGOING:
-              maxConnections = config.getInt("rtbOutGoingMaxConnections", 200);
-              break;
-          case INCOMING:
-              maxConnections = config.getInt("incomingMaxConnections", 500);
-              break;
-          default : break;
-      }
+        switch (connectionType) {
+            case DCP_OUTGOING:
+                maxConnections = config.getInt("dcpOutGoingMaxConnections", 200);
+                break;
+            case RTBD_OUTGOING:
+                maxConnections = config.getInt("rtbOutGoingMaxConnections", 200);
+                break;
+            case INCOMING:
+                maxConnections = config.getInt("incomingMaxConnections", 500);
+                break;
+            default:
+                break;
+        }
         return maxConnections;
     }
 }

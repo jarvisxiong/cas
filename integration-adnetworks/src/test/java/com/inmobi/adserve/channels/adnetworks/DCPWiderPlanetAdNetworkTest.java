@@ -22,7 +22,6 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPWiderPlanetAdNetworkTest extends TestCase {
@@ -30,7 +29,6 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase {
     private final String            debug             = "debug";
     private final String            loggerConf        = "/tmp/channel-server.properties";
     private final ClientBootstrap   clientBootstrap   = null;
-    private DebugLogger             logger;
     private DCPWiderPlanetAdnetwork dcpWiderPlanetAdNetwork;
     private final String            widerPlanetHost   = "http://adtg.widerplanet.com/delivery/adw.php";
     private final String            widerPlanetStatus = "on";
@@ -60,9 +58,7 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase {
         MessageEvent serverEvent = createMock(MessageEvent.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        DebugLogger.init(mockConfig);
-        logger = new DebugLogger();
-        dcpWiderPlanetAdNetwork = new DCPWiderPlanetAdnetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpWiderPlanetAdNetwork = new DCPWiderPlanetAdnetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test

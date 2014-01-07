@@ -1,6 +1,9 @@
 package com.inmobi.adserve.channels.api;
 
 import static org.easymock.EasyMock.expect;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.fail;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.velocity.VelocityContext;
@@ -9,16 +12,12 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-
-import static org.testng.Assert.*;
 
 
 public class FormatterTest {
 
     private Configuration mockConfig;
-    private DebugLogger   logger;
 
     @BeforeTest
     public void setUp() throws Exception {
@@ -27,9 +26,7 @@ public class FormatterTest {
         expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
         expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
         EasyMock.replay(mockConfig);
-        DebugLogger.init(mockConfig);
         Formatter.init();
-        logger = new DebugLogger();
     }
 
     @Test
@@ -45,19 +42,19 @@ public class FormatterTest {
     @Test
     public void testrequestFromSDK360Onwards() {
         SASRequestParameters sasParams = new SASRequestParameters();
-        assertEquals(false, Formatter.requestFromSDK360Onwards(sasParams, logger));
+        assertEquals(false, Formatter.requestFromSDK360Onwards(sasParams));
         sasParams.setSdkVersion("i350");
-        assertEquals(false, Formatter.requestFromSDK360Onwards(sasParams, logger));
+        assertEquals(false, Formatter.requestFromSDK360Onwards(sasParams));
         sasParams.setSdkVersion("a350");
-        assertEquals(false, Formatter.requestFromSDK360Onwards(sasParams, logger));
+        assertEquals(false, Formatter.requestFromSDK360Onwards(sasParams));
         sasParams.setSdkVersion("i360");
-        assertEquals(true, Formatter.requestFromSDK360Onwards(sasParams, logger));
+        assertEquals(true, Formatter.requestFromSDK360Onwards(sasParams));
         sasParams.setSdkVersion("a360");
-        assertEquals(true, Formatter.requestFromSDK360Onwards(sasParams, logger));
+        assertEquals(true, Formatter.requestFromSDK360Onwards(sasParams));
         sasParams.setSdkVersion("i");
-        assertEquals(false, Formatter.requestFromSDK360Onwards(sasParams, logger));
+        assertEquals(false, Formatter.requestFromSDK360Onwards(sasParams));
         sasParams.setSdkVersion("aaaa");
-        assertEquals(false, Formatter.requestFromSDK360Onwards(sasParams, logger));
+        assertEquals(false, Formatter.requestFromSDK360Onwards(sasParams));
     }
 
     @Test
@@ -65,7 +62,7 @@ public class FormatterTest {
         SASRequestParameters sasParams = new SASRequestParameters();
         sasParams.setSource("wap");
         VelocityContext context = new VelocityContext();
-        Formatter.updateVelocityContext(context, sasParams, null, logger);
+        Formatter.updateVelocityContext(context, sasParams, null);
         assertNull(context.get(VelocityTemplateFieldConstants.IMBeaconUrl));
         assertNull(context.get(VelocityTemplateFieldConstants.APP));
         assertNull(context.get(VelocityTemplateFieldConstants.SDK360Onwards));
@@ -78,7 +75,7 @@ public class FormatterTest {
         sasParams.setSource("APP");
         sasParams.setSdkVersion("i360");
         VelocityContext context = new VelocityContext();
-        Formatter.updateVelocityContext(context, sasParams, "beacon", logger);
+        Formatter.updateVelocityContext(context, sasParams, "beacon");
         assertEquals(context.get(VelocityTemplateFieldConstants.IMBeaconUrl), "beacon");
         assertEquals(context.get(VelocityTemplateFieldConstants.APP), true);
         assertEquals(context.get(VelocityTemplateFieldConstants.SDK360Onwards), true);
@@ -92,7 +89,7 @@ public class FormatterTest {
         sasParams.setSdkVersion("i360");
         sasParams.setImaiBaseUrl("imai");
         VelocityContext context = new VelocityContext();
-        Formatter.updateVelocityContext(context, sasParams, "beacon", logger);
+        Formatter.updateVelocityContext(context, sasParams, "beacon");
         assertEquals(context.get(VelocityTemplateFieldConstants.IMAIBaseUrl), "imai");
     }
 
@@ -104,7 +101,7 @@ public class FormatterTest {
     }
 
     @Test(dataProvider = "slot")
-    public void testGetRichTextTemplateForSlot(String slot) {
+    public void testGetRichTextTemplateForSlot(final String slot) {
         String template = Formatter.getRichTextTemplateForSlot(slot);
         Double slotType = Double.valueOf(slot);
         if (!slot.equals(slotType.toString()) && slot.equals(slotType.toString() + ".0")) {

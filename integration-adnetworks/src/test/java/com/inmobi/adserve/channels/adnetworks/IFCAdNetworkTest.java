@@ -25,21 +25,21 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.phoenix.logging.DebugLogger;
 
 
 public class IFCAdNetworkTest extends TestCase {
-    private IFCAdNetwork    ifcAdNetwork;
-    private Configuration   mockConfig        = null;
-    private String          ifcHostus         = "http://10.14.118.91:8083/IFCPlatform/";
-    private String          ifcAdvertiserId   = "1234";
-    private ClientBootstrap clientBootstrap   = new ClientBootstrap();
-    private String          ifcResponseFormat = "json";
-    private String          isTest            = "0";
-    private String          filter            = "clean";
-    private String          debug             = "debug";
-    private String          loggerConf        = "/tmp/channel-server.properties";
-    private DebugLogger     logger;
+    private IFCAdNetwork          ifcAdNetwork;
+    private Configuration         mockConfig        = null;
+    private final String          ifcHostus         = "http://10.14.118.91:8083/IFCPlatform/";
+    private final String          ifcAdvertiserId   = "1234";
+    private final ClientBootstrap clientBootstrap   = new ClientBootstrap();
+    private final String          ifcResponseFormat = "json";
+    private final String          isTest            = "0";
+    private final String          filter            = "clean";
+    private final String          debug             = "debug";
+    private final String          loggerConf        = "/tmp/channel-server.properties";
+    private DebugLogger           logger;
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -55,18 +55,18 @@ public class IFCAdNetworkTest extends TestCase {
         replay(mockConfig);
     }
 
+    @Override
     public void setUp() throws Exception {
         File f;
         f = new File("/tmp/channel-server.properties");
-        if (!f.exists())
+        if (!f.exists()) {
             f.createNewFile();
+        }
         MessageEvent serverEvent = createMock(MessageEvent.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        DebugLogger.init(mockConfig);
-        logger = new DebugLogger();
         SlotSizeMapping.init();
-        ifcAdNetwork = new IFCAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        ifcAdNetwork = new IFCAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test

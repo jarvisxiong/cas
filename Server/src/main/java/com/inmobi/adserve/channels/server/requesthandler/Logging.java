@@ -1,18 +1,14 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import com.inmobi.adserve.channels.api.AdNetworkInterface;
-import com.inmobi.adserve.channels.api.ReportTime;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.MetricsManager;
-import com.inmobi.casthrift.*;
-import com.inmobi.messaging.Message;
-import com.inmobi.messaging.publisher.AbstractMessagePublisher;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TimeZone;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
@@ -23,11 +19,39 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.MetricsManager;
+import com.inmobi.casthrift.Ad;
+import com.inmobi.casthrift.AdIdChain;
+import com.inmobi.casthrift.AdMeta;
+import com.inmobi.casthrift.AdRR;
+import com.inmobi.casthrift.AdResponse;
+import com.inmobi.casthrift.AdStatus;
+import com.inmobi.casthrift.CasAdChain;
+import com.inmobi.casthrift.CasAdvertisementLog;
+import com.inmobi.casthrift.CasChannelLog;
+import com.inmobi.casthrift.Channel;
+import com.inmobi.casthrift.ContentRating;
+import com.inmobi.casthrift.DemandSourceType;
+import com.inmobi.casthrift.Gender;
+import com.inmobi.casthrift.Geo;
+import com.inmobi.casthrift.HandsetMeta;
+import com.inmobi.casthrift.Impression;
+import com.inmobi.casthrift.InventoryType;
+import com.inmobi.casthrift.PricingModel;
+import com.inmobi.casthrift.Request;
+import com.inmobi.casthrift.RequestParams;
+import com.inmobi.casthrift.RequestTpan;
+import com.inmobi.casthrift.SiteParams;
+import com.inmobi.casthrift.User;
+import com.inmobi.messaging.Message;
+import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 
 
 public class Logging {
@@ -40,6 +64,8 @@ public class Logging {
     private static boolean                                 enableDatabusLogging;
     private final static ConcurrentHashMap<String, String> sampledAdvertiserLogNos = new ConcurrentHashMap<String, String>(
                                                                                            2000);
+    private final static Logger                            LOG                     = LoggerFactory
+                                                                                           .getLogger(Logging.class);
 
     public static ConcurrentHashMap<String, String> getSampledadvertiserlognos() {
         return sampledAdvertiserLogNos;
@@ -47,8 +73,8 @@ public class Logging {
 
     private static int totalCount;
 
-    public static void init(AbstractMessagePublisher dataBusPublisher, String rrLogKey, String channelLogKey,
-            String advertisementLogKey, Configuration config) {
+    public static void init(final AbstractMessagePublisher dataBusPublisher, final String rrLogKey,
+            final String channelLogKey, final String advertisementLogKey, final Configuration config) {
         Logging.dataBusPublisher = dataBusPublisher;
         Logging.rrLogKey = rrLogKey;
         Logging.channelLogKey = channelLogKey;
@@ -58,7 +84,7 @@ public class Logging {
         totalCount = config.getInt("sampledadvertisercount");
     }
 
-    public static JSONArray getCarrier(JSONObject jObject) {
+    public static JSONArray getCarrier(final JSONObject jObject) {
         try {
             return (jObject.getJSONArray("carrier"));
         }
@@ -67,7 +93,7 @@ public class Logging {
         }
     }
 
-    public static JSONArray getHandset(JSONObject jObject) {
+    public static JSONArray getHandset(final JSONObject jObject) {
         try {
             return (jObject.getJSONArray("handset"));
         }
@@ -76,7 +102,7 @@ public class Logging {
         }
     }
 
-    void appendToLog(StringBuilder log, String separator, String key, String value) {
+    void appendToLog(final StringBuilder log, final String separator, final String key, final String value) {
         if (value == null) {
             return;
         }
@@ -84,14 +110,14 @@ public class Logging {
     }
 
     // Writing rrlogs
-    public static void rrLogging(ChannelSegment channelSegment, List<ChannelSegment> rankList, DebugLogger logger,
-            Configuration config, SASRequestParameters sasParams, String terminationReason) throws JSONException,
-            TException {
+    public static void rrLogging(final ChannelSegment channelSegment, final List<ChannelSegment> rankList,
+            final Configuration config, final SASRequestParameters sasParams, final String terminationReason)
+            throws JSONException, TException {
         boolean isTerminated = false;
         if (terminationReason.equalsIgnoreCase("no")) {
             isTerminated = true;
         }
-        logger.info("Obtained the handle to rr logger");
+        LOG.info("Obtained the handle to rr logger");
         char separator = 0x01;
         StringBuilder log = new StringBuilder();
         short adsServed = 0;
@@ -101,18 +127,18 @@ public class Logging {
             host = addr.getHostName();
 
             if (host == null) {
-                logger.info("host cant be empty, abandoning rr logging");
+                LOG.info("host cant be empty, abandoning rr logging");
                 return;
             }
             log.append("host=\"" + host + "\"");
         }
         catch (UnknownHostException ex) {
-            logger.info("could not resolve host inside rr logging, so abandoning response");
+            LOG.info("could not resolve host inside rr logging, so abandoning response");
             return;
         }
 
         log.append(separator + "terminated=\"" + terminationReason + "\"");
-        logger.debug("is sas params null here", Boolean.valueOf(sasParams == null));
+        LOG.debug("is sas params null here {}", Boolean.valueOf(sasParams == null));
 
         if (null != sasParams && null != sasParams.getSiteId()) {
             log.append(separator + "rq-mk-siteid=\"" + sasParams.getSiteId() + "\"");
@@ -125,7 +151,7 @@ public class Logging {
         }
 
         InventoryType inventory = getInventoryType(sasParams);
-        String timestamp = ReportTime.getTTime();
+        String timestamp = getUTCTimestamp();
         log.append(separator + "ttime=\"" + timestamp + "\"");
         log.append(separator + "rq-src=[\"uk\",\"uk\",\"uk\",\"uk\",");
         if (null != sasParams && null != sasParams.getTp()) {
@@ -144,7 +170,7 @@ public class Logging {
         String advertiserId = null;
         if (channelSegment != null) {
             InspectorStats.incrementStatCount(channelSegment.getAdNetworkInterface().getName(),
-                InspectorStrings.serverImpression);
+                    InspectorStrings.serverImpression);
             isServerImpression = true;
             advertiserId = channelSegment.getChannelEntity().getAccountId();
             adsServed = 1;
@@ -216,7 +242,7 @@ public class Logging {
                 slotRequested = Integer.valueOf(requestSlot).shortValue();
             }
             else {
-                logger.info("wrong value for request slot is", requestSlot);
+                LOG.info("wrong value for request slot is {}", requestSlot);
             }
         }
 
@@ -234,7 +260,7 @@ public class Logging {
                         user.setAge(Short.valueOf(sasParams.getAge()));
                     }
                     catch (NumberFormatException e) {
-                        logger.info("Exception in casting age from string to Short", e);
+                        LOG.info("Exception in casting age from string to Short {}", e);
                     }
                 }
             }
@@ -270,8 +296,7 @@ public class Logging {
         if (null != sasParams && null != sasParams.getSiteSegmentId()) {
             log.append(separator).append("sel-seg-id=").append(sasParams.getSiteSegmentId());
         }
-
-        logger.debug("finally writing to rr log", log);
+        LOG.debug("finally writing to rr log {}", log);
         short adRequested = 1;
         Request request = new Request(adRequested, adsServed, sasParams == null ? null : sasParams.getSiteId(),
                 sasParams == null ? null : sasParams.getTid());
@@ -301,7 +326,7 @@ public class Logging {
             TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
             Message msg = new Message(tSerializer.serialize(adRR));
             dataBusPublisher.publish(rrLogKey, msg);
-            logger.debug("ADRR is: ", adRR);
+            LOG.debug("ADRR is: {}", adRR);
         }
         // Logging realtime stats for graphite
         String osName = "";
@@ -312,16 +337,16 @@ public class Logging {
                     osName = HandSetOS.values()[sasParamsOsId - 1].toString();
                 }
                 MetricsManager.updateStats(Integer.parseInt(sasParams.getCountryStr()), sasParams.getCountry(),
-                    sasParams.getOsId(), osName, Filters.getAdvertiserIdToNameMapping().get(advertiserId), false,
-                    false, isServerImpression, 0.0, (long) 0.0, impression.getAd().getWinBid());
+                        sasParams.getOsId(), osName, Filters.getAdvertiserIdToNameMapping().get(advertiserId), false,
+                        false, isServerImpression, 0.0, (long) 0.0, impression.getAd().getWinBid());
             }
         }
         catch (Exception e) {
-            logger.info("error while writting to graphite in rrLog", e);
+            LOG.info("error while writting to graphite in rrLog {}", e);
         }
     }
 
-    public static List<Channel> createChannelsLog(List<ChannelSegment> rankList) {
+    public static List<Channel> createChannelsLog(final List<ChannelSegment> rankList) {
         if (null == rankList) {
             return new ArrayList<Channel>();
         }
@@ -340,7 +365,7 @@ public class Logging {
         return channels;
     }
 
-    public static CasAdChain createCasAdChain(ChannelSegment channelSegment) {
+    public static CasAdChain createCasAdChain(final ChannelSegment channelSegment) {
         CasAdChain casAdChain = new CasAdChain();
         casAdChain.setAdvertiserId(channelSegment.getChannelEntity().getAccountId());
         casAdChain.setCampaign_inc_id(channelSegment.getChannelSegmentEntity().getCampaignIncId());
@@ -350,7 +375,7 @@ public class Logging {
         return casAdChain;
     }
 
-    public static AdStatus getAdStatus(String adStatus) {
+    public static AdStatus getAdStatus(final String adStatus) {
         if ("AD".equalsIgnoreCase(adStatus)) {
             return AdStatus.AD;
         }
@@ -364,10 +389,11 @@ public class Logging {
     }
 
     // Write Channel Logs
-    public static void channelLogline(List<ChannelSegment> rankList, String clickUrl, DebugLogger logger,
-            Configuration config, SASRequestParameters sasParams, long totalTime) throws JSONException, TException {
-        logger.debug("came inside channel log line");
-        logger.debug("got logger handle for cas logs");
+    public static void channelLogline(final List<ChannelSegment> rankList, final String clickUrl,
+            final Configuration config, final SASRequestParameters sasParams, final long totalTime)
+            throws JSONException, TException {
+        LOG.debug("came inside channel log line");
+        LOG.debug("got logger handle for cas logs");
         char sep = 0x01;
         StringBuilder log = new StringBuilder();
         log.append("trtt=").append(totalTime);
@@ -376,7 +402,7 @@ public class Logging {
             log.append(sep + "rq-mk-siteid=\"").append(sasParams.getSiteId()).append("\"");
         }
 
-        String timestamp = ReportTime.getUTCTimestamp();
+        String timestamp = getUTCTimestamp();
         log.append(sep).append("ttime=\"").append(timestamp).append("\"");
         if (null != sasParams && sasParams.getTid() != null) {
             log.append(sep).append("tid=\"").append(sasParams.getTid()).append("\"");
@@ -385,21 +411,21 @@ public class Logging {
             log.append(sep + "clurl=\"" + clickUrl + "\"");
         }
         log.append(sep).append("rq-tpan=[");
-        logger.debug("sasparams not null here");
+        LOG.debug("sasparams not null here");
 
         List<AdResponse> responseList = new ArrayList<AdResponse>();
 
         // Writing inspector stats and getting log line from adapters
         for (int index = 0; rankList != null && index < rankList.size(); index++) {
             JSONObject logLine = null;
-            AdNetworkInterface adNetwork = ((ChannelSegment) rankList.get(index)).getAdNetworkInterface();
+            AdNetworkInterface adNetwork = rankList.get(index).getAdNetworkInterface();
             ThirdPartyAdResponse adResponse = adNetwork.getResponseStruct();
             boolean isFilled = false;
             try {
                 InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalRequests);
                 InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.latency, adResponse.latency);
                 InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.connectionLatency,
-                    adNetwork.getConnectionLatency());
+                        adNetwork.getConnectionLatency());
                 if ("AD".equals(adResponse.adStatus)) {
                     InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalFills);
                     isFilled = true;
@@ -415,9 +441,7 @@ public class Logging {
                 }
                 logLine = new JSONObject();
                 String advertiserId = adNetwork.getId();
-                String externalSiteKey = ((ChannelSegment) rankList.get(index))
-                        .getChannelSegmentEntity()
-                            .getExternalSiteKey();
+                String externalSiteKey = rankList.get(index).getChannelSegmentEntity().getExternalSiteKey();
                 double bid = adNetwork.getBidPriceInUsd();
                 String resp = adResponse.adStatus;
                 long latency = adResponse.latency;
@@ -440,16 +464,16 @@ public class Logging {
                             osName = HandSetOS.values()[sasParamsOsId - 1].toString();
                         }
                         MetricsManager.updateStats(Integer.parseInt(sasParams.getCountryStr()), sasParams.getCountry(),
-                            sasParams.getOsId(), osName, Filters.getAdvertiserIdToNameMapping().get(advertiserId),
-                            isFilled, true, false, bid, latency, 0.0);
+                                sasParams.getOsId(), osName, Filters.getAdvertiserIdToNameMapping().get(advertiserId),
+                                isFilled, true, false, bid, latency, 0.0);
                     }
                 }
                 catch (Exception e) {
-                    logger.info("error while writting to graphite in channelLog", e);
+                    LOG.info("error while writting to graphite in channelLog {}", e);
                 }
             }
             catch (JSONException exception) {
-                logger.info("error reading channel log line from the adapters");
+                LOG.info("error reading channel log line from the adapters");
             }
 
             if (logLine != null) {
@@ -494,10 +518,8 @@ public class Logging {
             }
             log.append("}").append(sep).append("rq-h-user-agent=\"");
             log.append(sasParams.getUserAgent()).append("\"").append(sep).append("rq-site-params=[{\"categ\":");
-            log.append(sasParams.getCategories().toString())
-                        .append("},{\"type\":\"")
-                        .append(sasParams.getSiteType())
-                        .append("\"}]");
+            log.append(sasParams.getCategories().toString()).append("},{\"type\":\"").append(sasParams.getSiteType())
+                    .append("\"}]");
             carrier = sasParams.getCarrier();
         }
 
@@ -518,8 +540,8 @@ public class Logging {
             segmentId = sasParams.getSiteSegmentId();
         }
 
-        logger.debug("finished writing cas logs");
-        logger.debug(log.toString());
+        LOG.debug("finished writing cas logs");
+        LOG.debug(log.toString());
         CasChannelLog channelLog = new CasChannelLog(totalTime, clickUrl, sasParams == null ? null
                 : sasParams.getSiteId(), new RequestTpan(responseList), siteParams, requestParams, timestamp);
         if (null != geo) {
@@ -531,21 +553,21 @@ public class Logging {
         if (enableDatabusLogging) {
             TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
             Message msg = new Message(tSerializer.serialize(channelLog));
-            //dataBusPublisher.publish(channelLogKey, msg);
+            // dataBusPublisher.publish(channelLogKey, msg);
         }
     }
 
-    public static void advertiserLogging(List<ChannelSegment> rankList, DebugLogger logger, Configuration config) {
-        logger.debug("came inside advertiser log");
+    public static void advertiserLogging(final List<ChannelSegment> rankList, final Configuration config) {
+        LOG.debug("came inside advertiser log");
         Logger advertiserLogger = LoggerFactory.getLogger(config.getString("advertiser"));
         if (!advertiserLogger.isDebugEnabled()) {
             return;
         }
         char sep = 0x01;
         StringBuilder log = new StringBuilder();
-        logger.debug("got logger handle for advertiser logs");
+        LOG.debug("got logger handle for advertiser logs");
         for (int index = 0; rankList != null && index < rankList.size(); index++) {
-            AdNetworkInterface adNetworkInterface = ((ChannelSegment) rankList.get(index)).getAdNetworkInterface();
+            AdNetworkInterface adNetworkInterface = rankList.get(index).getAdNetworkInterface();
             ThirdPartyAdResponse adResponse = adNetworkInterface.getResponseStruct();
             String partnerName = adNetworkInterface.getName();
             log.append(partnerName);
@@ -566,22 +588,22 @@ public class Logging {
         }
         if (enableFileLogging && log.length() > 0) {
             advertiserLogger.debug(log.toString());
-            logger.debug("done with advertiser logging");
+            LOG.debug("done with advertiser logging");
         }
     }
 
-    public static void sampledAdvertiserLogging(List<ChannelSegment> rankList, DebugLogger logger, Configuration config) {
-        logger.debug("came inside sampledAdvertiser log");
+    public static void sampledAdvertiserLogging(final List<ChannelSegment> rankList, final Configuration config) {
+        LOG.debug("came inside sampledAdvertiser log");
         Logger sampledAdvertiserLogger = LoggerFactory.getLogger(config.getString("sampledadvertiser"));
         if (!sampledAdvertiserLogger.isDebugEnabled()) {
             return;
         }
         char sep = 0x01;
         StringBuilder log = new StringBuilder();
-        logger.debug("got logger handle for sampledAdvertiser logs");
+        LOG.debug("got logger handle for sampledAdvertiser logs");
 
         for (int index = 0; rankList != null && index < rankList.size(); index++) {
-            AdNetworkInterface adNetworkInterface = ((ChannelSegment) rankList.get(index)).getAdNetworkInterface();
+            AdNetworkInterface adNetworkInterface = rankList.get(index).getAdNetworkInterface();
             ThirdPartyAdResponse adResponse = adNetworkInterface.getResponseStruct();
             String adstatus = adResponse.adStatus;
             if (!adstatus.equalsIgnoreCase("AD")) {
@@ -609,9 +631,8 @@ public class Logging {
                     if (index > 0 && partnerName.length() > 0 && log.length() > 0) {
                         log.append("\n");
                     }
-                    log.append(partnerName)
-                                .append(sep)
-                                .append(rankList.get(index).getChannelSegmentEntity().getExternalSiteKey());
+                    log.append(partnerName).append(sep)
+                            .append(rankList.get(index).getChannelSegmentEntity().getExternalSiteKey());
                     log.append(sep).append(requestUrl).append(sep).append(adResponse.adStatus);
                     log.append(sep).append(response).append(sep).append(advertiserId);
                     count++;
@@ -619,7 +640,7 @@ public class Logging {
                 }
             }
             else {
-                logger.debug("creating new sampledadvertiser logs");
+                LOG.debug("creating new sampledadvertiser logs");
                 count = 0;
                 sampledAdvertiserLogNos.put(partnerName + extsiteKey, System.currentTimeMillis() + "_" + 0);
                 time = Long.parseLong(sampledAdvertiserLogNos.get(partnerName + extsiteKey).split("_")[0]);
@@ -632,9 +653,8 @@ public class Logging {
                 if (index > 0 && partnerName.length() > 0 && log.length() > 0) {
                     log.append("\n");
                 }
-                log.append(partnerName)
-                            .append(sep)
-                            .append(rankList.get(index).getChannelSegmentEntity().getExternalSiteKey());
+                log.append(partnerName).append(sep)
+                        .append(rankList.get(index).getChannelSegmentEntity().getExternalSiteKey());
                 log.append(sep).append(requestUrl).append(sep).append(adResponse.adStatus);
                 log.append(sep).append(response).append(sep).append(advertiserId);
                 count++;
@@ -652,26 +672,26 @@ public class Logging {
                     msg = new Message(tSerializer.serialize(casAdvertisementLog));
                 }
                 catch (TException e) {
-                    logger.debug("Error while creating sampledAdvertiser logs for databus ");
+                    LOG.debug("Error while creating sampledAdvertiser logs for databus ");
                 }
                 if (null != msg) {
                     dataBusPublisher.publish(sampledAdvertisementLogKey, msg);
                 }
                 else {
-                    logger.debug("In sampledAdvertiser log: log msg is null");
+                    LOG.debug("In sampledAdvertiser log: log msg is null");
                 }
             }
             else {
-                logger.debug("In sampledAdvertiser log: enableDatabusLogging is false ");
+                LOG.debug("In sampledAdvertiser log: enableDatabusLogging is false ");
             }
         }
         if (enableFileLogging && log.length() > 0) {
             sampledAdvertiserLogger.debug(log.toString());
-            logger.debug("done with sampledAdvertiser logging");
+            LOG.debug("done with sampledAdvertiser logging");
         }
     }
 
-    public static ContentRating getContentRating(SASRequestParameters sasParams) {
+    public static ContentRating getContentRating(final SASRequestParameters sasParams) {
         if (sasParams == null) {
             return null;
         }
@@ -692,7 +712,7 @@ public class Logging {
         }
     }
 
-    public static PricingModel getPricingModel(String pricingModel) {
+    public static PricingModel getPricingModel(final String pricingModel) {
         if (pricingModel == null) {
             return null;
         }
@@ -707,14 +727,14 @@ public class Logging {
         }
     }
 
-    public static InventoryType getInventoryType(SASRequestParameters sasParams) {
+    public static InventoryType getInventoryType(final SASRequestParameters sasParams) {
         if (null != sasParams && sasParams.getSdkVersion() != null && sasParams.getSdkVersion().equalsIgnoreCase("0")) {
             return InventoryType.BROWSER;
         }
         return InventoryType.APP;
     }
 
-    public static Gender getGender(SASRequestParameters sasParams) {
+    public static Gender getGender(final SASRequestParameters sasParams) {
         if (sasParams == null) {
             return null;
         }
@@ -724,5 +744,13 @@ public class Logging {
         else {
             return Gender.FEMALE;
         }
+    }
+
+    public static String getUTCTimestamp() {
+        java.util.Date date = new java.util.Date();
+        DateFormat utcFormatDate = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss-SSS");
+        TimeZone utcTime = TimeZone.getTimeZone("GMT");
+        utcFormatDate.setTimeZone(utcTime);
+        return (utcFormatDate.format(date));
     }
 }

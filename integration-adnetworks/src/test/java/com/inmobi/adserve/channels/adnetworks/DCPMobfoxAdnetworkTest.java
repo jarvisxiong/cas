@@ -26,7 +26,6 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class DCPMobfoxAdnetworkTest extends TestCase {
@@ -34,7 +33,6 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
     private final String          debug             = "debug";
     private final String          loggerConf        = "/tmp/channel-server.properties";
     private final ClientBootstrap clientBootstrap   = null;
-    private DebugLogger           logger;
 
     private DCPMobFoxAdnetwork    dcpMobfoxAdNetwork;
     private final String          mobfoxHost        = "http://my.mobfox.com/request.php";
@@ -67,10 +65,8 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         SlotSizeMapping.init();
-        DebugLogger.init(mockConfig);
         Formatter.init();
-        logger = new DebugLogger();
-        dcpMobfoxAdNetwork = new DCPMobFoxAdnetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpMobfoxAdNetwork = new DCPMobFoxAdnetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test

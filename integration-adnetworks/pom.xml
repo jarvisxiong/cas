@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.inmobi.channels</groupId>
 		<artifactId>cas</artifactId>
-		<version>3.32-SNAPSHOT</version>
+		<version>3.35-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
@@ -24,10 +24,6 @@
 		<dependency>
 			<groupId>org.sonatype.maven.plugin</groupId>
 			<artifactId>emma-maven-plugin</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.openx</groupId>
-			<artifactId>oauth</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.netty</groupId>
@@ -64,14 +60,6 @@
 			<artifactId>jackson-jaxrs</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-bundle</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-java</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 		</dependency>
@@ -92,10 +80,6 @@
 					<groupId>xml-apis</groupId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>net.java.dev.jets3t</groupId>
-			<artifactId>jets3t</artifactId>
 		</dependency>
 	</dependencies>
 
@@ -125,42 +109,20 @@
 				<artifactId>maven-resources-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.cxf</groupId>
-				<artifactId>cxf-codegen-plugin</artifactId>
-				<version>2.6.1</version>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jaxb2-maven-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>generate-sources</id>
-						<phase>generate-sources</phase>
-						<configuration>
-							<sourceRoot>target/src/generated/cxf</sourceRoot>
-							<wsdlOptions>
-								<wsdlOption>
-									<wsdl>http://beta-api.pubmatic.com/v1/PublisherDemandInsightsService?wsdl</wsdl>
-								</wsdlOption>
-							</wsdlOptions>
-						</configuration>
 						<goals>
-							<goal>wsdl2java</goal>
+							<goal>xjc</goal>
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<schemaDirectory>src/main/resources/</schemaDirectory>
+				</configuration>
 			</plugin>
-			<plugin>
-            	<groupId>org.codehaus.mojo</groupId>
-                <artifactId>jaxb2-maven-plugin</artifactId>
-					<executions>
-                       	<execution>
-                           	<goals>
-                               	<goal>xjc</goal>
-                               </goals>
-                           </execution>
-                       </executions>
-                       <configuration>
-                               <schemaDirectory>src/main/resources/</schemaDirectory>
-                       </configuration>
-                </plugin>
-			
+
 		</plugins>
 	</build>
 
