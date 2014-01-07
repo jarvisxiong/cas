@@ -1,4 +1,4 @@
-package com.inmobi.adserve.channels.server.requesthandler.filters.adgroup;
+package com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,7 +17,9 @@ import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.beans.CasContext;
 import com.inmobi.adserve.channels.server.config.AdapterConfig;
+import com.inmobi.adserve.channels.server.constants.ChannelSegmentFilterOrder;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
+import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AdGroupLevelFilter;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
 
@@ -30,6 +32,7 @@ public class AdGroupPartnerCountFilter implements AdGroupLevelFilter {
     private static final Logger              LOG = LoggerFactory.getLogger(AdGroupPartnerCountFilter.class);
     private final Map<String, AdapterConfig> advertiserIdConfigMap;
     private final Provider<Marker>           traceMarkerProvider;
+    private ChannelSegmentFilterOrder        order;
 
     /**
      * @param traceMarkerProvider
@@ -116,6 +119,16 @@ public class AdGroupPartnerCountFilter implements AdGroupLevelFilter {
      */
     private void incrementStats(final ChannelSegment channelSegment) {
         channelSegment.incrementInspectorStats(InspectorStrings.totalSelectedSegments);
+    }
+
+    @Override
+    final public void setOrder(final ChannelSegmentFilterOrder order) {
+        this.order = order;
+    }
+
+    @Override
+    public ChannelSegmentFilterOrder getOrder() {
+        return order;
     }
 
 }

@@ -1,4 +1,4 @@
-package com.inmobi.adserve.channels.server.requesthandler.filters.adgroup;
+package com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl;
 
 import java.util.Date;
 
@@ -15,6 +15,7 @@ import com.inmobi.adserve.channels.entity.PricingEngineEntity;
 import com.inmobi.adserve.channels.server.ServletHandler;
 import com.inmobi.adserve.channels.server.beans.CasContext;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
+import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AbstractAdGroupLevelFilter;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
 

@@ -1,4 +1,4 @@
-package com.inmobi.adserve.channels.server.requesthandler.filters.advertiser;
+package com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl;
 
 import java.util.Map;
 
@@ -13,6 +13,7 @@ import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.config.AdapterConfig;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
+import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AbstractAdvertiserLevelFilter;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
 

@@ -1,4 +1,4 @@
-package com.inmobi.adserve.channels.server.requesthandler.filters.advertiser;
+package com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl;
 
 import java.util.Map;
 
@@ -11,7 +11,9 @@ import org.slf4j.Marker;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.server.annotations.AdvertiserIdNameMap;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
+import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AbstractAdvertiserLevelFilter;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
@@ -29,7 +31,7 @@ public class AdvertiserFailedInAccountSegmentFilter extends AbstractAdvertiserLe
 
     @Inject
     public AdvertiserFailedInAccountSegmentFilter(final Provider<Marker> traceMarkerProvider,
-            final Map<String, String> advertiserIdNameMap) {
+            @AdvertiserIdNameMap final Map<String, String> advertiserIdNameMap) {
         super(traceMarkerProvider, InspectorStrings.droppedInAccountSegmentFilter);
         this.advertiserIdNameMap = advertiserIdNameMap;
     }

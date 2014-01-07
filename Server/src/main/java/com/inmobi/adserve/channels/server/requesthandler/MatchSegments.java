@@ -18,7 +18,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.google.inject.name.Named;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
@@ -29,6 +28,7 @@ import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ServletHandler;
+import com.inmobi.adserve.channels.server.annotations.AdvertiserIdNameMap;
 import com.inmobi.adserve.channels.server.requesthandler.beans.AdvertiserMatchedSegmentDetail;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -51,7 +51,7 @@ public class MatchSegments {
 
     @Inject
     public MatchSegments(final RepositoryHelper repositoryHelper, final Provider<Marker> traceMarkerProvider,
-            @Named("advertiserIdToNameMap") final Map<String, String> advertiserIdToNameMap) {
+            @AdvertiserIdNameMap final Map<String, String> advertiserIdToNameMap) {
         this.traceMarkerProvider = traceMarkerProvider;
         this.repositoryHelper = repositoryHelper;
         this.advertiserIdToNameMap = advertiserIdToNameMap;

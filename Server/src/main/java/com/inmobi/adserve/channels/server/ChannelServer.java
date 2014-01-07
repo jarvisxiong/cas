@@ -152,9 +152,10 @@ public class ChannelServer {
                 ServletHandler.getServerConfig().setProperty("incomingMaxConnections", maxIncomingConnections);
             }
 
-            Injector injector = Guice.createInjector(new NettyModule(config.getServerConfiguration()),
-                    new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(),
-                            repositoryHelper));
+            Injector injector = Guice.createInjector(
+                    new NettyModule(config.getServerConfiguration()),
+                    new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(), config
+                            .getServerConfiguration(), repositoryHelper));
 
             // Creating netty client for out-bound calls.
             Timer timer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);

@@ -1,4 +1,4 @@
-package com.inmobi.adserve.channels.server.requesthandler.filters.advertiser;
+package com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl;
 
 import java.util.Set;
 
@@ -14,6 +14,7 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
+import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AbstractAdvertiserLevelFilter;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
 

@@ -1,4 +1,4 @@
-package com.inmobi.adserve.channels.server.requesthandler.filters.advertiser;
+package com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl;
 
 import javax.inject.Inject;
 
@@ -11,6 +11,7 @@ import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.config.ServerConfig;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
+import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AbstractAdvertiserLevelFilter;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
 
@@ -34,9 +35,8 @@ public class AdvertiserBurnLimitExceededFilter extends AbstractAdvertiserLevelFi
 
     @Override
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams) {
-        return channelSegment.getChannelFeedbackEntity().getBalance() < channelSegment
-                .getChannelFeedbackEntity()
-                    .getRevenue() * serverConfiguration.getRevenueWindow();
+        return channelSegment.getChannelFeedbackEntity().getBalance() < channelSegment.getChannelFeedbackEntity()
+                .getRevenue() * serverConfiguration.getRevenueWindow();
 
     }
 

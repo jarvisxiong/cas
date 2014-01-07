@@ -1,7 +1,6 @@
 package com.inmobi.adserve.channels.server.requesthandler.filters;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -27,20 +26,20 @@ import com.inmobi.adserve.channels.server.utils.CasUtils;
  */
 @Singleton
 public class ChannelSegmentFilterApplier {
-    private static final Logger              LOG = LoggerFactory.getLogger(ChannelSegmentFilterApplier.class);
+    private static final Logger               LOG = LoggerFactory.getLogger(ChannelSegmentFilterApplier.class);
 
-    private final Provider<Marker>           traceMarkerProvider;
+    private final Provider<Marker>            traceMarkerProvider;
 
-    private final Set<AdvertiserLevelFilter> advertiserLevelFilters;
+    private final List<AdvertiserLevelFilter> advertiserLevelFilters;
 
-    private final Set<AdGroupLevelFilter>    adGroupLevelFilters;
+    private final List<AdGroupLevelFilter>    adGroupLevelFilters;
 
-    private final CasUtils                   casUtils;
+    private final CasUtils                    casUtils;
 
     @Inject
     public ChannelSegmentFilterApplier(final Provider<Marker> traceMarkerProvider,
-            final Set<AdvertiserLevelFilter> advertiserLevelFilters, final Set<AdGroupLevelFilter> adGroupLevelFilters,
-            final CasUtils casUtils) {
+            final List<AdvertiserLevelFilter> advertiserLevelFilters,
+            final List<AdGroupLevelFilter> adGroupLevelFilters, final CasUtils casUtils) {
         this.traceMarkerProvider = traceMarkerProvider;
         this.advertiserLevelFilters = advertiserLevelFilters;
         this.adGroupLevelFilters = adGroupLevelFilters;

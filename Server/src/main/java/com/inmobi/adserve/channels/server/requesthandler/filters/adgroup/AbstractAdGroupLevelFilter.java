@@ -10,6 +10,7 @@ import org.slf4j.Marker;
 import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.beans.CasContext;
+import com.inmobi.adserve.channels.server.constants.ChannelSegmentFilterOrder;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 
 
@@ -19,10 +20,12 @@ import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
  */
 public abstract class AbstractAdGroupLevelFilter implements AdGroupLevelFilter {
 
-    private static final Logger      LOG = LoggerFactory.getLogger(AbstractAdGroupLevelFilter.class);
+    private static final Logger       LOG = LoggerFactory.getLogger(AbstractAdGroupLevelFilter.class);
 
-    protected final Provider<Marker> traceMarkerProvider;
-    private final String             inspectorString;
+    protected final Provider<Marker>  traceMarkerProvider;
+    private final String              inspectorString;
+
+    private ChannelSegmentFilterOrder order;
 
     protected AbstractAdGroupLevelFilter(final Provider<Marker> traceMarkerProvider, final String inspectorString) {
         this.traceMarkerProvider = traceMarkerProvider;
@@ -67,5 +70,15 @@ public abstract class AbstractAdGroupLevelFilter implements AdGroupLevelFilter {
      */
     protected abstract boolean failedInFilter(final ChannelSegment channelSegment,
             final SASRequestParameters sasParams, final CasContext casContext);
+
+    @Override
+    final public void setOrder(final ChannelSegmentFilterOrder order) {
+        this.order = order;
+    }
+
+    @Override
+    public ChannelSegmentFilterOrder getOrder() {
+        return order;
+    }
 
 }

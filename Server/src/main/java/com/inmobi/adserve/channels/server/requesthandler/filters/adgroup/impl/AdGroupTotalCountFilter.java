@@ -1,4 +1,4 @@
-package com.inmobi.adserve.channels.server.requesthandler.filters.adgroup;
+package com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl;
 
 import java.util.Iterator;
 import java.util.List;
@@ -14,7 +14,10 @@ import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.beans.CasContext;
 import com.inmobi.adserve.channels.server.config.ServerConfig;
+import com.inmobi.adserve.channels.server.constants.ChannelSegmentFilterOrder;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
+import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AbstractAdGroupLevelFilter;
+import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AdGroupLevelFilter;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
 
@@ -25,11 +28,13 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 public class AdGroupTotalCountFilter implements AdGroupLevelFilter {
 
-    private static final Logger    LOG = LoggerFactory.getLogger(AbstractAdGroupLevelFilter.class);
+    private static final Logger       LOG = LoggerFactory.getLogger(AbstractAdGroupLevelFilter.class);
 
-    private final Provider<Marker> traceMarkerProvider;
+    private final Provider<Marker>    traceMarkerProvider;
 
-    private final ServerConfig     serverConfig;
+    private final ServerConfig        serverConfig;
+
+    private ChannelSegmentFilterOrder order;
 
     @Inject
     AdGroupTotalCountFilter(final Provider<Marker> traceMarkerProvider, final ServerConfig serverConfig) {
@@ -85,5 +90,15 @@ public class AdGroupTotalCountFilter implements AdGroupLevelFilter {
      */
     protected void incrementStats(final ChannelSegment channelSegment) {
         channelSegment.incrementInspectorStats(InspectorStrings.droppedInSegmentPerRequestFilter);
+    }
+
+    @Override
+    final public void setOrder(final ChannelSegmentFilterOrder order) {
+        this.order = order;
+    }
+
+    @Override
+    public ChannelSegmentFilterOrder getOrder() {
+        return order;
     }
 }

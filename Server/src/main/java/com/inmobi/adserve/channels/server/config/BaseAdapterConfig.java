@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.server.config;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import lombok.EqualsAndHashCode;
@@ -8,6 +9,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 
 import com.google.inject.assistedinject.Assisted;
+import com.google.inject.name.Named;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.server.AdapterType;
 
@@ -27,8 +29,9 @@ public class BaseAdapterConfig implements AdapterConfig {
 
     @SuppressWarnings("unchecked")
     @Inject
-    public BaseAdapterConfig(@Assisted final Configuration adapterConfig, @Assisted final String adapterName,
-            @Assisted final String dcName, final ServerConfig serverConfig) {
+    public BaseAdapterConfig(@Assisted final Configuration adapterConfig,
+            @Assisted("adapterName") final String adapterName, @Nullable @Named("dcName") final String dcName,
+            final ServerConfig serverConfig) {
         this.adapterConfig = adapterConfig;
         this.adapterName = adapterName;
         this.dcName = dcName;
@@ -91,6 +94,7 @@ public class BaseAdapterConfig implements AdapterConfig {
         return adapterHost;
     }
 
+    @Override
     public boolean isValidHost() {
         String hostName = getAdapterHost();
 

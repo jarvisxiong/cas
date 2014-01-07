@@ -21,9 +21,13 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ChannelServer;
+import com.inmobi.adserve.channels.server.annotations.LoggerConfiguration;
+import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
+import com.inmobi.adserve.channels.server.requesthandler.AuctionEngine;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
+import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
 
 
@@ -37,11 +41,13 @@ public class ServerModule extends AbstractModule {
     private final RepositoryHelper repositoryHelper;
     private final Reflections      reflections;
     private final Configuration    adapterConfiguration;
+    private final Configuration    serverConfiguration;
 
     public ServerModule(final Configuration loggerConfiguration, final Configuration adapterConfiguration,
-            final RepositoryHelper repositoryHelper) {
+            final Configuration serverConfiguration, final RepositoryHelper repositoryHelper) {
         this.loggerConfiguration = loggerConfiguration;
         this.adapterConfiguration = adapterConfiguration;
+        this.serverConfiguration = serverConfiguration;
         this.repositoryHelper = repositoryHelper;
         this.reflections = new Reflections("com.inmobi.adserve.channels", new TypeAnnotationsScanner());
     }
@@ -53,11 +59,16 @@ public class ServerModule extends AbstractModule {
 
         bind(RepositoryHelper.class).toInstance(repositoryHelper);
         bind(MatchSegments.class).asEagerSingleton();
+        bind(Configuration.class).annotatedWith(ServerConfiguration.class).toInstance(serverConfiguration);
+        bind(Configuration.class).annotatedWith(LoggerConfiguration.class).toInstance(loggerConfiguration);
 
         requestStaticInjection(AsyncRequestMaker.class);
         requestStaticInjection(ChannelSegment.class);
+        requestStaticInjection(Logging.class);
+        requestStaticInjection(AuctionEngine.class);
 
         install(new AdapterConfigModule(adapterConfiguration, ChannelServer.dataCentreName));
+        install(new ChannelSegmentFilterModule());
 
     }
 
