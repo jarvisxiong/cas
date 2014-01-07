@@ -40,7 +40,7 @@ import java.util.Properties;
 
 public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
 
-    public String         terminationReason = "NO";
+    public String         terminationReason;
     public JSONObject     jObject           = null;
     public AdPoolRequest  tObject;
     public DebugLogger    logger            = null;

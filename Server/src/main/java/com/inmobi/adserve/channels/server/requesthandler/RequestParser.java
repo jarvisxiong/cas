@@ -80,7 +80,9 @@ public class RequestParser {
         params.setCategories(getCategory(jObject, logger, "new-category"));
         params.setRqIframe(stringify(jObject, "rqIframe", logger));
         params.setRFormat(stringify(jObject, "r-format", logger));
-        params.setRqMkAdcount(Short.parseShort(stringify(jObject, "rqMkAdcount", logger)));
+        String adCountStr =  stringify(jObject, "rqMkAdcount", logger);
+        adCountStr = StringUtils.isEmpty(adCountStr) ? adCountStr : "1";
+        params.setRqMkAdcount(Short.parseShort(adCountStr));
         params.setTid(stringify(jObject, "tid", logger));
 
         params.setAllowBannerAds(jObject.optBoolean("site-allowBanner", true));

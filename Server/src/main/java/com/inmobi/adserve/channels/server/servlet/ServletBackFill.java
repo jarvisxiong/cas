@@ -25,7 +25,10 @@ public class ServletBackFill implements Servlet {
             DebugLogger logger) throws Exception {
 
         CasInternalRequestParameters casInternalRequestParametersGlobal = new CasInternalRequestParameters();
-        SASRequestParameters sasParams = new SASRequestParameters();
+        SASRequestParameters sasParams = hrh.responseSender.sasParams;
+        if (null == sasParams) {
+            sasParams = new SASRequestParameters();
+        }
 
         Map<String, List<String>> params = queryStringDecoder.getParameters();
         // Handling GET requests
@@ -51,7 +54,7 @@ public class ServletBackFill implements Servlet {
             ThriftRequestParser.parseRequestParameters(hrh.tObject, sasParams, casInternalRequestParametersGlobal,
                 logger, 2);
         }
-
+        logger.debug("sasparams in backfill are: " + sasParams);
         hrh.responseSender.sasParams = sasParams;
         hrh.responseSender.casInternalRequestParameters = casInternalRequestParametersGlobal;
         casInternalRequestParametersGlobal = hrh.responseSender.casInternalRequestParameters;

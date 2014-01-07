@@ -59,7 +59,7 @@ public class Logging {
             SASRequestParameters sasParams, String terminationReason, long totalTime) throws JSONException, TException {
         InspectorStats.incrementStatCount(InspectorStrings.latency, totalTime);
         boolean isTerminated = false;
-        if (terminationReason.equalsIgnoreCase("no")) {
+        if (null != terminationReason) {
             isTerminated = true;
         }
         short adsServed = 0;

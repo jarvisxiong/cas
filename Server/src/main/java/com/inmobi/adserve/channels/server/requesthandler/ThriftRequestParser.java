@@ -1,6 +1,5 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import com.google.gson.Gson;
 import com.inmobi.adserve.adpool.*;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
@@ -23,7 +22,6 @@ public class ThriftRequestParser {
     // Extracting params.
     public static AdPoolRequest extractParams(Map<String, List<String>> params) throws JSONException,
             UnsupportedEncodingException {
-        Gson gson = new Gson();
         if (!params.isEmpty()) {
             List<String> values = params.get("post");
             if (CollectionUtils.isNotEmpty(values)) {

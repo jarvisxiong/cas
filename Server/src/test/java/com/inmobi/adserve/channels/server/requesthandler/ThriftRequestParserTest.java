@@ -103,7 +103,7 @@ public class ThriftRequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getRemoteHostIp(), "10.14.118.143");
         assertEquals(sasRequestParameters.getUserAgent(), "UserAgent");
         assertEquals(sasRequestParameters.getSource(), "FAMILY_SAFE");
-        assertEquals(sasRequestParameters.getAge(), new Short("83"));
+        assertEquals(sasRequestParameters.getAge(), new Short("84"));
         assertEquals(sasRequestParameters.getGender(), "M");
         assertEquals(sasRequestParameters.getLocSrc(), "LATLON");
         assertEquals(sasRequestParameters.getPostalCode(), new Integer(123)); 

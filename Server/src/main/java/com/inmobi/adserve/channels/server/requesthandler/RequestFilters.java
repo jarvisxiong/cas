@@ -16,37 +16,37 @@ public class RequestFilters {
         if (ServletHandler.random.nextInt(100) >= ServletHandler.percentRollout) {
             logger.debug("Request not being served because of limited percentage rollout");
             InspectorStats.incrementStatCount(InspectorStrings.droppedRollout, InspectorStrings.count);
-            return false;
+            return true;
         }
         else if (null == hrh.responseSender.sasParams.getCategories()) {
             hrh.logger.error("Category field is not present in the request so sending noad");
             hrh.responseSender.sasParams.setCategories(new ArrayList<Long>());
             hrh.setTerminationReason(ServletHandler.MISSING_CATEGORY);
             InspectorStats.incrementStatCount(InspectorStrings.missingCategory, InspectorStrings.count);
-            return false;
+            return true;
         }
         else if (null == hrh.responseSender.sasParams) {
             logger.error("Terminating request as sasParam is null");
             hrh.setTerminationReason(ServletHandler.jsonParsingError);
             InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
-            return false;
+            return true;
         }
         else if (null == hrh.responseSender.sasParams.getSiteId()) {
             logger.error("Terminating request as site id was missing");
             hrh.setTerminationReason(ServletHandler.missingSiteId);
             InspectorStats.incrementStatCount(InspectorStrings.missingSiteId, InspectorStrings.count);
-            return false;
+            return true;
         }
         else if (!hrh.responseSender.sasParams.getAllowBannerAds() || hrh.responseSender.sasParams.getSiteFloor() > 5) {
             logger.error("Request not being served because of banner not allowed or site floor above threshold");
-            return false;
+            return true;
         }
         else if (hrh.responseSender.sasParams.getSiteType() != null
                 && !ServletHandler.allowedSiteTypes.contains(hrh.responseSender.sasParams.getSiteType())) {
             logger.error("Terminating request as incompatible content type");
             hrh.setTerminationReason(ServletHandler.incompatibleSiteType);
             InspectorStats.incrementStatCount(InspectorStrings.incompatibleSiteType, InspectorStrings.count);
-            return false;
+            return true;
         }
         else if (hrh.responseSender.sasParams.getSdkVersion() != null) {
             try {
@@ -58,7 +58,7 @@ public class RequestFilters {
                     logger.error("Terminating request as sdkVersion is less than 3");
                     hrh.setTerminationReason(ServletHandler.lowSdkVersion);
                     InspectorStats.incrementStatCount(InspectorStrings.lowSdkVersion, InspectorStrings.count);
-                    return false;
+                    return true;
                 }
                 else
                     logger.debug("sdk-version : " + hrh.responseSender.sasParams.getSdkVersion());
@@ -71,6 +71,6 @@ public class RequestFilters {
             }
 
         }
-        return true;
+        return false;
     }
 }
