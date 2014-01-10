@@ -80,8 +80,8 @@ public class ThriftRequestParser {
         //Fill param from Site Object
         if (tObject.isSetSite()) {
             params.setSiteId(tObject.site.siteId);
-            params.setSource(tObject.site.isSetContentRating() ? tObject.site.contentRating.toString() : "FAMILY_SAFE");
-            params.setSiteType(tObject.site.isSetInventoryType() && tObject.site.inventoryType == InventoryType.APP ? "APP" : "WAP");
+            params.setSource(tObject.site.isSetInventoryType() && tObject.site.inventoryType == InventoryType.APP ? "APP" : "WAP");
+            params.setSiteType(tObject.site.isSetContentRating() ? tObject.site.contentRating.toString() : "FAMILY_SAFE");
             params.setCategories(convertIntToLong(tObject.site.siteTags));
             params.setSiteFloor(tObject.site.ecpmFloor);
             params.setSiteIncId(tObject.site.siteIncId);

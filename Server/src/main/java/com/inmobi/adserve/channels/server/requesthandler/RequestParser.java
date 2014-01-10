@@ -81,7 +81,7 @@ public class RequestParser {
         params.setRqIframe(stringify(jObject, "rqIframe", logger));
         params.setRFormat(stringify(jObject, "r-format", logger));
         String adCountStr =  stringify(jObject, "rqMkAdcount", logger);
-        adCountStr = StringUtils.isEmpty(adCountStr) ? adCountStr : "1";
+        adCountStr = StringUtils.isEmpty(adCountStr) ? "1" : adCountStr;
         params.setRqMkAdcount(Short.parseShort(adCountStr));
         params.setTid(stringify(jObject, "tid", logger));
 
@@ -202,6 +202,16 @@ public class RequestParser {
                 }
                 if (null != parameter.getPostalCode()) {
                     parameter.setPostalCode(Integer.parseInt(URLEncoder.encode(parameter.getPostalCode().toString(), utf8)));
+                }
+                String[] advertiserList = null;
+                if (userMap.get("u-adapter") != null) {
+                    advertiserList = ((String) userMap.get("u-adapter")).split(",");
+                }
+                
+                Set<String> advertiserSet = new HashSet<String>();
+                if (advertiserList != null) {
+                    Collections.addAll(advertiserSet, advertiserList);
+                    parameter.setUAdapters(advertiserSet);
                 }
             }
             catch (UnsupportedEncodingException e) {

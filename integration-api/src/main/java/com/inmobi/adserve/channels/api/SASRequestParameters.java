@@ -59,6 +59,7 @@ public class SASRequestParameters {
     private String       imaiBaseUrl;
     private String       appUrl;
     private int          modelId;
+    private Set<String>  uAdapters;
 
     private int          dst;                  // This will describe the type of request dcp or rtbd
     private Set<Integer> accountSegment;      

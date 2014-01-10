@@ -104,25 +104,6 @@ public class ServletBackFill implements Servlet {
             return;
         }
 
-        String advertisers;
-        String[] advertiserList = null;
-        try {
-            JSONObject uObject = (JSONObject) hrh.jObject.get("uparams");
-            if (uObject.get("u-adapter") != null) {
-                advertisers = (String) uObject.get("u-adapter");
-                advertiserList = advertisers.split(",");
-            }
-        }
-        catch (JSONException exception) {
-            logger.debug("Some thing went wrong in finding adapters for end to end testing");
-        }
-
-        Set<String> advertiserSet = new HashSet<String>();
-
-        if (advertiserList != null) {
-            Collections.addAll(advertiserSet, advertiserList);
-        }
-
         enrichCasInternalRequestParameters(logger, hrh, filteredSegments,
             casInternalRequestParametersGlobal.rtbBidFloor, sasParams.getSiteFloor(), sasParams.getSiteIncId());
         hrh.responseSender.casInternalRequestParameters = casInternalRequestParametersGlobal;
@@ -134,7 +115,7 @@ public class ServletBackFill implements Servlet {
 
         dcpSegments = AsyncRequestMaker.prepareForAsyncRequest(filteredSegments, logger,
             ServletHandler.getServerConfig(), ServletHandler.getRtbConfig(), ServletHandler.getAdapterConfig(),
-            hrh.responseSender, advertiserSet, e, ServletHandler.repositoryHelper, hrh.jObject,
+            hrh.responseSender, sasParams.getUAdapters(), e, ServletHandler.repositoryHelper, hrh.jObject,
             hrh.responseSender.sasParams, casInternalRequestParametersGlobal, rtbSegments);
 
         logger.debug("rtb rankList size is", rtbSegments.size());

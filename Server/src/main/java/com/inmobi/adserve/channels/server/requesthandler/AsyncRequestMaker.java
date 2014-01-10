@@ -267,4 +267,9 @@ public class AsyncRequestMaker {
         builder.setDst(sasParams.getDst() + "");
         return new ClickUrlMakerV6(builder);
     }
+
+    public static void main(String[] args) {
+        Integer adIncId = WilburyUUID.getIntKey("7b7903dc-0143-1000-d601-403b2a6a00c5");
+        System.out.println("ad_inc_id " + adIncId);
+    }
 }

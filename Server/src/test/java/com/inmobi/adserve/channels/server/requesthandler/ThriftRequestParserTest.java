@@ -102,7 +102,7 @@ public class ThriftRequestParserTest extends TestCase {
 
         assertEquals(sasRequestParameters.getRemoteHostIp(), "10.14.118.143");
         assertEquals(sasRequestParameters.getUserAgent(), "UserAgent");
-        assertEquals(sasRequestParameters.getSource(), "FAMILY_SAFE");
+        assertEquals(sasRequestParameters.getSource(), "APP");
         assertEquals(sasRequestParameters.getAge(), new Short("84"));
         assertEquals(sasRequestParameters.getGender(), "M");
         assertEquals(sasRequestParameters.getLocSrc(), "LATLON");
@@ -113,7 +113,7 @@ public class ThriftRequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getClurl(), null); //Internal, Populated in cas
         assertEquals(sasRequestParameters.getSiteId(), "siteId");
         assertEquals(sasRequestParameters.getSlot(), new Short("12"));
-        assertEquals(sasRequestParameters.getSiteType(), "APP");
+        assertEquals(sasRequestParameters.getSiteType(), "FAMILY_SAFE");
         assertEquals(sasRequestParameters.getSdkVersion(), "i231"); 
         assertEquals(sasRequestParameters.getSiteIncId(), 12345);
         assertEquals(sasRequestParameters.getAdIncId(), 0);  //Internal, Populated in cas
