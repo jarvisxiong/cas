@@ -20,7 +20,7 @@ import java.util.*;
 public class ThriftRequestParser {
 
     // Extracting params.
-    public static AdPoolRequest extractParams(Map<String, List<String>> params) throws JSONException,
+    public static AdPoolRequest extractParams(Map<String, List<String>> params, DebugLogger logger) throws JSONException,
             UnsupportedEncodingException {
         if (!params.isEmpty()) {
             List<String> values = params.get("post");
@@ -31,7 +31,7 @@ public class ThriftRequestParser {
                 try {
                     tDeserializer.deserialize(adPoolRequest, stringVal.getBytes());
                 } catch (TException e) {
-                    e.printStackTrace();
+                    logger.error("Error in deserializing thrift in extractParams ", e.getMessage());
                 }
                 return adPoolRequest;
             }
@@ -54,7 +54,6 @@ public class ThriftRequestParser {
         params.setSlot(slotId);
         params.setRqMkSlot(tObject.selectedSlots);
         params.setRFormat(tObject.responseFormat);
-        //TODO change to short in DCP too
         params.setRqMkAdcount(tObject.requestedAdCount);
         params.setTid(tObject.requestId);
         params.setAllowBannerAds(tObject.supplyCapability == SupplyCapability.BANNER);

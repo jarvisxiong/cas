@@ -1,5 +1,13 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import java.util.List;
+import java.util.Map;
+
+import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.handler.codec.http.QueryStringDecoder;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
@@ -10,13 +18,6 @@ import com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParser;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.QueryStringDecoder;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.List;
-import java.util.Map;
 
 
 public class ServletRtbd implements Servlet {
@@ -44,7 +45,7 @@ public class ServletRtbd implements Servlet {
             RequestParser.parseRequestParameters(hrh.jObject, sasParams, casInternalRequestParametersGlobal, logger);
         } // Post method handling
         else {
-            hrh.tObject = ThriftRequestParser.extractParams(params);
+            hrh.tObject = ThriftRequestParser.extractParams(params, logger);
             ThriftRequestParser.parseRequestParameters(hrh.tObject, sasParams, casInternalRequestParametersGlobal,
                 logger, 6);
         }

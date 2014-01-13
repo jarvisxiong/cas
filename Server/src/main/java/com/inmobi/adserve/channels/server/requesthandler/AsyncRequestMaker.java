@@ -212,38 +212,11 @@ public class AsyncRequestMaker {
             SASRequestParameters sasParams) {
         ClickUrlMakerV6.Builder builder = ClickUrlMakerV6.newBuilder();
         builder.setLogger(logger);
-        try {
-            builder.setAge(null != sasParams.getAge() ? sasParams.getAge().intValue() : 0);
-        }
-        catch (NumberFormatException e) {
-            logger.debug("Wrong format for Age", e.getMessage());
-        }
-        try {
-            if (null != sasParams.getCountryId()) {
-                builder.setCountryId(null != sasParams.getCountryId() ? sasParams.getCountryId().intValue() : 0);
-            }
-        }
-        catch (NumberFormatException e) {
-            logger.debug("Wrong format for CountryString", e.getMessage());
-        }
-        if (null == sasParams.getImpressionId()) {
-            logger.debug("impression id is null");
-        }
-        else {
-            builder.setImpressionId(sasParams.getImpressionId());
-        }
-        try {
-            if (null != sasParams.getState()) {
-                builder.setLocation(sasParams.getState());
-            }
-        }
-        catch (NumberFormatException e) {
-            logger.debug("Wrong format for Area", e.getMessage());
-        }
-        if (null != sasParams.getSiteSegmentId()) {
-            builder.setSegmentId(sasParams.getSiteSegmentId());
-        }
-        
+        builder.setImpressionId(sasParams.getImpressionId());
+        builder.setAge(null != sasParams.getAge() ? sasParams.getAge().intValue() : 0);
+        builder.setCountryId(null != sasParams.getCountryId() ? sasParams.getCountryId().intValue() : 0);
+        builder.setLocation(null != sasParams.getState() ? sasParams.getState() : 0);
+        builder.setSegmentId(null != sasParams.getSiteSegmentId() ? sasParams.getSiteSegmentId() : 0);
         builder.setGender(null != sasParams.getGender() ? sasParams.getGender() : "");
         builder.setCPC(pricingModel);
         builder.setCarrierId(sasParams.getCarrierId());

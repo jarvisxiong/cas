@@ -50,7 +50,7 @@ public class ServletBackFill implements Servlet {
             }
         } // Handling post requests
         else if (null == hrh.tObject) {
-            hrh.tObject = ThriftRequestParser.extractParams(params);
+            hrh.tObject = ThriftRequestParser.extractParams(params, logger);
             ThriftRequestParser.parseRequestParameters(hrh.tObject, sasParams, casInternalRequestParametersGlobal,
                 logger, 2);
         }
