@@ -1,8 +1,6 @@
 package com.inmobi.adserve.channels.api;
 
-import java.io.IOException;
-import java.io.StringWriter;
-
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -14,7 +12,8 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import java.io.IOException;
+import java.io.StringWriter;
 
 
 public class Formatter {
