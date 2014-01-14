@@ -25,7 +25,8 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
+public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl
+{
 
     private static final Logger LOG        = LoggerFactory.getLogger(DCPLoganAdnetwork.class);
 
@@ -48,12 +49,14 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
      * @param serverEvent
      */
     public DCPLoganAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent)
+    {
         super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }
 
     @Override
-    public boolean configureParameters() {
+    public boolean configureParameters()
+    {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing for logan so exiting adapter");
@@ -78,17 +81,20 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
     }
 
     @Override
-    public String getName() {
+    public String getName()
+    {
         return "logan";
     }
 
     @Override
-    public boolean isClickUrlRequired() {
+    public boolean isClickUrlRequired()
+    {
         return true;
     }
 
     @Override
-    public URI getRequestUri() throws Exception {
+    public URI getRequestUri() throws Exception
+    {
         try {
             StringBuilder url = new StringBuilder(host);
             appendQueryParam(url, IP, sasParams.getRemoteHostIp(), false);
@@ -138,7 +144,8 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
     }
 
     @Override
-    public void parseResponse(final String response, final HttpResponseStatus status) {
+    public void parseResponse(final String response, final HttpResponseStatus status)
+    {
         LOG.debug("response is {}", response);
 
         if (StringUtils.isEmpty(response) || status.getCode() != 200 || response.startsWith("[{\"error")) {
@@ -153,30 +160,46 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
             LOG.debug("beacon url inside logan is {}", beaconUrl);
 
             try {
-                JSONArray jArray = new JSONArray(response);
+                JSONArray jArray = null;
+                if (response.endsWith(";")) {
+                    jArray = new JSONArray(response.substring(0, response.length() - 1));
+                }
+                else {
+                    jArray = new JSONArray(response);
+                }
                 JSONObject adResponse = jArray.getJSONObject(0);
-                boolean textAd = !response.contains("type\": \"image");
+                boolean textAd = response.contains("\"text\" :") && !response.contains("\"text\" : \"\"");
+                boolean bannerAd = false;
+                if (!textAd) {
+                    bannerAd = response.contains("\"img\" :") && !response.contains("\"img\" : \"\"");
+                }
 
                 statusCode = status.getCode();
                 VelocityContext context = new VelocityContext();
-                context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse.getString("url"));
-                context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
                 context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, adResponse.get("track"));
                 TemplateType t;
-                if (textAd && StringUtils.isNotBlank(adResponse.getString("text"))) {
-                    context.put(VelocityTemplateFieldConstants.AdText, adResponse.getString("text"));
-                    String vmTemplate = Formatter.getRichTextTemplateForSlot(slot);
-                    if (!StringUtils.isEmpty(vmTemplate)) {
-                        context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
-                        t = TemplateType.RICH;
+                if (textAd || bannerAd) {
+                    context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse.getString("url"));
+                    context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
+                    if (textAd && StringUtils.isNotBlank(adResponse.getString("text"))) {
+                        context.put(VelocityTemplateFieldConstants.AdText, adResponse.getString("text"));
+                        String vmTemplate = Formatter.getRichTextTemplateForSlot(slot);
+                        if (!StringUtils.isEmpty(vmTemplate)) {
+                            context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
+                            t = TemplateType.RICH;
+                        }
+                        else {
+                            t = TemplateType.PLAIN;
+                        }
                     }
                     else {
-                        t = TemplateType.PLAIN;
+                        context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getString("img"));
+                        t = TemplateType.IMAGE;
                     }
                 }
                 else {
-                    context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getString("img"));
-                    t = TemplateType.IMAGE;
+                    context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, adResponse.getString("content"));
+                    t = TemplateType.HTML;
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
@@ -198,7 +221,8 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
     }
 
     @Override
-    public String getId() {
+    public String getId()
+    {
         return (config.getString("logan.advertiserId"));
     }
 }

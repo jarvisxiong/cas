@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.inmobi.channels</groupId>
 	<artifactId>cas</artifactId>
-	<version>3.32-SNAPSHOT</version>
+	<version>3.34-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<url>https://github.corp.inmobi.com/channel-adserve</url>
 	<parent>
@@ -236,11 +235,6 @@
 				<version>1.2</version>
 			</dependency>
 			<dependency>
-				<groupId>com.openx</groupId>
-				<artifactId>oauth</artifactId>
-				<version>1.0.3</version>
-			</dependency>
-			<dependency>
 				<groupId>org.easymock</groupId>
 				<artifactId>easymockclassextension</artifactId>
 				<version>2.5.2</version>
@@ -255,22 +249,6 @@
 				<groupId>org.codehaus.jackson</groupId>
 				<artifactId>jackson-jaxrs</artifactId>
 				<version>1.9.9</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.cxf</groupId>
-				<artifactId>cxf-bundle</artifactId>
-				<version>2.6.1</version>
-			</dependency>
-			<dependency>
-				<groupId>org.seleniumhq.selenium</groupId>
-				<artifactId>selenium-java</artifactId>
-				<version>2.33.0</version>
-				<exclusions>
-					<exclusion>
-						<artifactId>xercesImpl</artifactId>
-						<groupId>xerces</groupId>
-					</exclusion>
-				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.projectlombok</groupId>
@@ -296,11 +274,6 @@
 						<groupId>xml-apis</groupId>
 					</exclusion>
 				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>net.java.dev.jets3t</groupId>
-				<artifactId>jets3t</artifactId>
-				<version>0.8.0</version>
 			</dependency>
 			<dependency>
 				<groupId>com.yammer.metrics</groupId>
