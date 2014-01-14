@@ -15,6 +15,9 @@ import com.inmobi.phoenix.batteries.util.WilburyUUID;
 import com.inmobi.types.AdIdChain;
 import com.inmobi.types.GUID;
 import com.ning.http.client.AsyncHttpClient;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TBinaryProtocol;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.*;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
@@ -145,11 +148,18 @@ public class ResponseSender extends HttpRequestHandlerBase {
             sendResponse(OK, finalReponse, adResponse.responseHeaders, event);
         }
         else {
-            String rtbdResponse = createThriftResponse(finalReponse).toString();
+            AdPoolResponse rtbdResponse = createThriftResponse(finalReponse);
             if (logger.isDebugEnabled()) {
                 logger.debug("RTB reponse json to RE is " + rtbdResponse);
             }
-            sendResponse(OK, rtbdResponse, adResponse.responseHeaders, event);
+            TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
+            byte[] serializedResponse = new byte[0];
+            try {
+                serializedResponse = serializer.serialize(rtbdResponse);
+            } catch (TException e) {
+                logger.error("Error in serializing the adpoolresponse " + e.getMessage());
+            }
+            sendResponse(OK, new String(serializedResponse), adResponse.responseHeaders, event);
             InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
         }
     }

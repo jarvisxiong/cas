@@ -63,6 +63,7 @@ public class ClickUrlMakerV6 {
     private final String              latlonval;
     private final boolean             isRtbSite;
     private final String              creativeId;
+    private final String              budgetBucketId;
     private final String              dst;
 
     public ClickUrlMakerV6(Builder builder) {
@@ -88,6 +89,7 @@ public class ClickUrlMakerV6 {
         testMode = builder.testMode;
         isBeaconEnabledOnSite = builder.isBeaconEnabledOnSite;
         imageBeaconFlag = builder.imageBeaconFlag;
+        budgetBucketId = builder.budgetBucketId;
         if (StringUtils.isEmpty(builder.gender)) {
             gender = "u";
         }
@@ -169,6 +171,7 @@ public class ClickUrlMakerV6 {
         private String              latlonval;
         private boolean             isRtbSite;
         private String              creativeId;
+        private String              budgetBucketId;
         private String              dst;
     }
 
@@ -290,11 +293,15 @@ public class ClickUrlMakerV6 {
             beaconUrlSuffix.append(appendSeparator(NON_RTB_SUPPLY));
         }
 
-        // 22th dst
+        // 22th budget bucket id
+        adUrlSuffix.append(appendSeparator(budgetBucketId));
+        beaconUrlSuffix.append(appendSeparator(budgetBucketId));
+
+        // 23th dst
         adUrlSuffix.append(appendSeparator(dst));
         beaconUrlSuffix.append(appendSeparator(dst));
 
-        // 23th and 24th URL Component: hash key version and url hash
+        // 24th and 25th URL Component: hash key version and url hash
         CryptoHashGenerator cryptoHashGenerator;
         if (testMode) {
             adUrlSuffix.append(appendSeparator(ClickUrlMakerV6.clickURLHashingSecretKeyTestModeVersionBase36));

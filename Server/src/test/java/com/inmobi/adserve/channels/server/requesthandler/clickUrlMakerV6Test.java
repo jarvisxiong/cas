@@ -56,6 +56,7 @@ public class clickUrlMakerV6Test extends TestCase {
         builder.setRmAd(false);
         builder.setSiteIncId((long) 1);
         builder.setHandsetInternalId((long) 1);
+        builder.setBudgetBucketId("101");
         Map<String, String> updMap = new HashMap<String, String>();
         updMap.put("UDID", "uidvalue");
         builder.setUdIdVal(updMap);
@@ -64,10 +65,10 @@ public class clickUrlMakerV6Test extends TestCase {
         ClickUrlMakerV6 clickUrlMakerV6 = new ClickUrlMakerV6(builder);
         clickUrlMakerV6.createClickUrls();
         assertEquals(
-            "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/76256371268/0/5l/-1/0/0/x/0/nw/2/1/6e7ba049",
+            "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/76256371268/0/5l/-1/0/0/x/0/nw/101/2/1/7e4ea15d",
             clickUrlMakerV6.getBeaconUrl());
         assertEquals(
-            "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/76256371268/0/5l/-1/1/0/x/0/nw/2/1/fc017ace",
+            "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/76256371268/0/5l/-1/1/0/x/0/nw/101/2/1/9ebd36dc",
             clickUrlMakerV6.getClickUrl());
     }
 }
