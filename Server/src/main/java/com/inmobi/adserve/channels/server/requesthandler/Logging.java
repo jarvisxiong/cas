@@ -1,16 +1,14 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import com.inmobi.adserve.channels.api.AdNetworkInterface;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.MetricsManager;
-import com.inmobi.casthrift.*;
-import com.inmobi.messaging.Message;
-import com.inmobi.messaging.publisher.AbstractMessagePublisher;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TimeZone;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
@@ -21,14 +19,39 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TimeZone;
-import java.util.concurrent.ConcurrentHashMap;
+import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.MetricsManager;
+import com.inmobi.casthrift.Ad;
+import com.inmobi.casthrift.AdIdChain;
+import com.inmobi.casthrift.AdMeta;
+import com.inmobi.casthrift.AdRR;
+import com.inmobi.casthrift.AdResponse;
+import com.inmobi.casthrift.AdStatus;
+import com.inmobi.casthrift.CasAdChain;
+import com.inmobi.casthrift.CasAdvertisementLog;
+import com.inmobi.casthrift.CasChannelLog;
+import com.inmobi.casthrift.Channel;
+import com.inmobi.casthrift.ContentRating;
+import com.inmobi.casthrift.DemandSourceType;
+import com.inmobi.casthrift.Gender;
+import com.inmobi.casthrift.Geo;
+import com.inmobi.casthrift.HandsetMeta;
+import com.inmobi.casthrift.Impression;
+import com.inmobi.casthrift.InventoryType;
+import com.inmobi.casthrift.PricingModel;
+import com.inmobi.casthrift.Request;
+import com.inmobi.casthrift.RequestParams;
+import com.inmobi.casthrift.RequestTpan;
+import com.inmobi.casthrift.SiteParams;
+import com.inmobi.casthrift.User;
+import com.inmobi.messaging.Message;
+import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 
 
 public class Logging {
