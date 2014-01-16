@@ -110,6 +110,8 @@ public class Logging {
         Long handsetInternalId = null;
         Long countryId = null;
         Integer carrierId = null;
+        Integer state = null;
+        Integer city = null;
         if (null != sasParams) {
             handsetInternalId = sasParams.getHandsetInternalId();
             slotServed = sasParams.getSlot();
@@ -118,13 +120,19 @@ public class Logging {
             if (null != sasParams.getRqMkSlot() && sasParams.getRqMkSlot().size() > 0) {
                 requestSlot = sasParams.getRqMkSlot().get(0);
             }
+            state = sasParams.getState();
+            city = sasParams.getCity();
         }
 
         Geo geo = null;
         if (null != carrierId && null != countryId) {
             geo = new Geo(carrierId, countryId.shortValue());
-            geo.setRegion(sasParams.getState());
-            geo.setCity(sasParams.getCity());
+            if (null != state) {
+                geo.setRegion(state);
+            }
+            if (null != city) {
+                geo.setCity(city);
+            }
         }
         
         HandsetMeta handsetMeta = new HandsetMeta();

@@ -150,7 +150,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         else {
             AdPoolResponse rtbdResponse = createThriftResponse(finalReponse);
             if (logger.isDebugEnabled()) {
-                logger.debug("RTB reponse json to RE is " + rtbdResponse);
+                logger.debug("RTB response json to RE is " + rtbdResponse);
             }
             TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
             byte[] serializedResponse = new byte[0];
@@ -159,7 +159,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
             } catch (TException e) {
                 logger.error("Error in serializing the adpoolresponse " + e.getMessage());
             }
-            sendResponse(OK, new String(serializedResponse), adResponse.responseHeaders, event);
+            sendResponse(OK, serializedResponse, adResponse.responseHeaders, event);
             InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
         }
     }
@@ -198,6 +198,15 @@ public class ResponseSender extends HttpRequestHandlerBase {
     // send response to the caller
     public void sendResponse(HttpResponseStatus status, String responseString, Map responseHeaders, ChannelEvent event)
             throws NullPointerException {
+        String finalResponse = hrh.isTraceRequest ? logger.getTrace() : responseString;
+        byte[] bytes = finalResponse.getBytes(Charsets.UTF_8);
+        sendResponse(status, bytes, responseHeaders, event);
+
+    }
+    
+    // send response to the caller
+    public void sendResponse(HttpResponseStatus status, byte[] bytes, Map responseHeaders, ChannelEvent event)
+            throws NullPointerException {
         if (hrh.isTraceRequest) {
             status = OK;
         }
@@ -213,10 +222,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
             }
         }
         logger.debug("trace request =", hrh.isTraceRequest);
-
-        String finalResponse = hrh.isTraceRequest ? logger.getTrace() : responseString;
-        byte[] bytes = finalResponse.getBytes(Charsets.UTF_8);
-
         if (hrh.isTraceRequest) {
             response.setHeader("Content-Type", "text/plain; charset=utf-8");
         }

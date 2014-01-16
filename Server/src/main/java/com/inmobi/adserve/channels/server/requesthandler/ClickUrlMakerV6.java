@@ -1,14 +1,16 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import com.google.gson.Gson;
-import com.inmobi.adserve.channels.util.DebugLogger;
+import java.util.Map;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 
-import java.util.Map;
+import com.google.gson.Gson;
+import com.inmobi.adserve.channels.util.DebugLogger;
 
 @ToString
 public class ClickUrlMakerV6 {
@@ -224,12 +226,8 @@ public class ClickUrlMakerV6 {
         }
         adUrlSuffix.append(appendSeparator(billable));
         // 12th URL Component: udid or odin1. Based on PI311
-        if (null == udIdVal) {
-            logger.debug("udIdVal is null so returning");
-            return;
-        }
-
-        if (udIdVal.isEmpty()) {
+        if (null == udIdVal || udIdVal.isEmpty()) {
+            logger.debug("udIdVal is null or empty so returning");
             adUrlSuffix.append(appendSeparator(DEFAULT_UDID_VALUE));
         }
         else {
@@ -315,7 +313,6 @@ public class ClickUrlMakerV6 {
         }
         adUrlSuffix.append(appendSeparator(cryptoHashGenerator.generateHash(adUrlSuffix.toString())));
         beaconUrlSuffix.append(appendSeparator(cryptoHashGenerator.generateHash(adUrlSuffix.toString())));
-
         if (null != clickURLPrefix) {
             clickUrl = this.clickURLPrefix + adUrlSuffix.toString();
         }

@@ -97,6 +97,7 @@ public class AsyncRequestMaker {
                     isCpc = true;
                 }
                 ClickUrlMakerV6 clickUrlMakerV6 = setClickParams(logger, isCpc, config, sasParams);
+                clickUrlMakerV6.createClickUrls();
                 clickUrl = clickUrlMakerV6.getClickUrl();
                 beaconUrl = clickUrlMakerV6.getBeaconUrl();
                 logger.debug("click url :", clickUrl);
@@ -139,7 +140,9 @@ public class AsyncRequestMaker {
         casInternalRequestParameters.uidIDUS1 = casInternalRequestParameterGlobal.uidIDUS1;
         casInternalRequestParameters.uidMd5 = casInternalRequestParameterGlobal.uidMd5;
         casInternalRequestParameters.uidADT = casInternalRequestParameterGlobal.uidADT;
-        casInternalRequestParameters.zipCode = sasParams.getPostalCode().toString();
+        if (null != sasParams.getPostalCode()) {
+            casInternalRequestParameters.zipCode = sasParams.getPostalCode().toString();
+        }
         casInternalRequestParameters.latLong = sasParams.getLatLong();
         casInternalRequestParameters.appUrl = sasParams.getAppUrl();
         return casInternalRequestParameters;
