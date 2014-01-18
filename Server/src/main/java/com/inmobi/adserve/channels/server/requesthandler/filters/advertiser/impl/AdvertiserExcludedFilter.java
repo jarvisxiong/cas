@@ -35,9 +35,12 @@ public class AdvertiserExcludedFilter extends AbstractAdvertiserLevelFilter {
         this.repositoryHelper = repositoryHelper;
     }
 
+    /**
+     * Returns true if advertiser is not present in site's advertiser inclusion list OR if advertiser is not present in
+     * publisher's advertiser inclusion list when site doesn't have advertiser inclusion list
+     */
     @Override
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams) {
-        boolean result = false;
         String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
         SiteMetaDataEntity siteMetaDataEntity = repositoryHelper.querySiteMetaDetaRepository(sasParams.getSiteId());
         if (siteMetaDataEntity != null) {
@@ -45,15 +48,15 @@ public class AdvertiserExcludedFilter extends AbstractAdvertiserLevelFilter {
             Set<String> advertisersIncludedbyPublisher = siteMetaDataEntity.getAdvertisersIncludedByPublisher();
             // checking if site has advertiser inclusion list
             if (!advertisersIncludedbySite.isEmpty()) {
-                result = !advertisersIncludedbySite.contains(advertiserId);
+                return !advertisersIncludedbySite.contains(advertiserId);
             }
             // else checking in publisher advertiser inclusion list if any
             else {
-                result = !advertisersIncludedbyPublisher.isEmpty()
+                return !advertisersIncludedbyPublisher.isEmpty()
                         && !advertisersIncludedbyPublisher.contains(advertiserId);
             }
         }
-        return result;
+        return false;
     }
 
 }

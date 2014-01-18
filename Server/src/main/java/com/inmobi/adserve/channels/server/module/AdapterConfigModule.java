@@ -17,7 +17,6 @@ import com.google.inject.util.Providers;
 import com.inmobi.adserve.channels.server.annotations.AdvertiserIdNameMap;
 import com.inmobi.adserve.channels.server.config.AdapterConfig;
 import com.inmobi.adserve.channels.server.config.AdapterConfigFactory;
-import com.inmobi.adserve.channels.server.config.BaseAdapterConfig;
 
 
 /**
@@ -37,8 +36,7 @@ public class AdapterConfigModule extends AbstractModule {
     @Override
     protected void configure() {
 
-        install(new FactoryModuleBuilder().implement(AdapterConfig.class, BaseAdapterConfig.class).build(
-                AdapterConfigFactory.class));
+        install(new FactoryModuleBuilder().build(AdapterConfigFactory.class));
         bind(String.class).annotatedWith(Names.named("dcName")).toProvider(Providers.of(dcName));
     }
 

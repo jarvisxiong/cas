@@ -18,10 +18,12 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.constants.ChannelSegmentFilterOrder;
 import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilter;
+import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AbstractAdGroupLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AdGroupLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupPartnerCountFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupSupplyDemandClassificationFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupTotalCountFilter;
+import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AbstractAdvertiserLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AdvertiserLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserDetailsInvalidFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserExcludedFilter;
@@ -68,6 +70,7 @@ public class ChannelSegmentFilterModule extends AbstractModule {
         List<AdvertiserLevelFilter> advertiserLevelFilterList = Lists.newArrayList();
 
         Set<Class<? extends AdvertiserLevelFilter>> classes = reflections.getSubTypesOf(AdvertiserLevelFilter.class);
+        classes.addAll(reflections.getSubTypesOf(AbstractAdvertiserLevelFilter.class));
 
         for (Class<? extends AdvertiserLevelFilter> class1 : classes) {
             AdvertiserLevelFilter filter = injector.getInstance(class1);
@@ -95,6 +98,7 @@ public class ChannelSegmentFilterModule extends AbstractModule {
         List<AdGroupLevelFilter> adGroupLevelFilterList = Lists.newArrayList();
 
         Set<Class<? extends AdGroupLevelFilter>> classes = reflections.getSubTypesOf(AdGroupLevelFilter.class);
+        classes.addAll(reflections.getSubTypesOf(AbstractAdGroupLevelFilter.class));
 
         for (Class<? extends AdGroupLevelFilter> class1 : classes) {
             AdGroupLevelFilter filter = injector.getInstance(class1);
