@@ -371,7 +371,9 @@ public class Logging {
         casAdChain.setCampaign_inc_id(channelSegment.getChannelSegmentEntity().getCampaignIncId());
         casAdChain.setAdgroup_inc_id(channelSegment.getChannelSegmentEntity().getAdgroupIncId());
         casAdChain.setExternalSiteKey(channelSegment.getChannelSegmentEntity().getExternalSiteKey());
-        casAdChain.setDst(DemandSourceType.findByValue(channelSegment.getChannelSegmentEntity().getDst()));
+        //Hardcoded dst for data team to switch RTBD from DCP to RTBD
+        //Will remove and use adgroup dst once their release completes
+        casAdChain.setDst(DemandSourceType.DCP); 
         return casAdChain;
     }
 
