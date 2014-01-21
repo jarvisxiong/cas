@@ -1,16 +1,14 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import java.util.Map;
-
+import com.google.gson.Gson;
+import com.inmobi.adserve.channels.util.DebugLogger;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 
-import com.google.gson.Gson;
-import com.inmobi.adserve.channels.util.DebugLogger;
+import java.util.Map;
 
 @ToString
 public class ClickUrlMakerV6 {
@@ -227,7 +225,7 @@ public class ClickUrlMakerV6 {
         adUrlSuffix.append(appendSeparator(billable));
         // 12th URL Component: udid or odin1. Based on PI311
         if (null == udIdVal || udIdVal.isEmpty()) {
-            logger.debug("udIdVal is null or empty so returning");
+            logger.debug("udIdVal is null or empty so using default value");
             adUrlSuffix.append(appendSeparator(DEFAULT_UDID_VALUE));
         }
         else {

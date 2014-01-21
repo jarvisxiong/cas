@@ -78,7 +78,7 @@ public class RequestParser {
             params.setSiteType(params.getSiteType().toUpperCase());
         }
         params.setCategories(getCategory(jObject, logger, "new-category"));
-        params.setRqIframe(stringify(jObject, "rqIframe", logger));
+        params.setRqIframe((stringify(jObject, "rqIframe", logger)));
         params.setRFormat(stringify(jObject, "r-format", logger));
         String adCountStr =  stringify(jObject, "rqMkAdcount", logger);
         adCountStr = StringUtils.isEmpty(adCountStr) ? "1" : adCountStr;

@@ -240,7 +240,7 @@ public class AsyncRequestMaker {
         builder.setTestRequest(false);
         builder.setLatlonval(sasParams.getLatLong());
         builder.setRtbSite(sasParams.getSst() != 0);//TODO:- Change this according to thrift enums
-        builder.setDst(sasParams.getDst() + "");
+        builder.setDst((sasParams.getDst() - 1) + "");
         builder.setBudgetBucketId("101"); //Default Value
         return new ClickUrlMakerV6(builder);
     }

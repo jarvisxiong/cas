@@ -191,6 +191,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         Creative rtbdCreative = new Creative();
         rtbdCreative.setValue(finalResponse);
         rtbdAd.setCreative(rtbdCreative);
+        rtbdAd.setOriginalCurrencyName(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getCurrency());
         adPoolResponse.setAds(Arrays.asList(rtbdAd));
         return adPoolResponse;
     }

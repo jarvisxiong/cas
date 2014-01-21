@@ -53,14 +53,14 @@ public class ThriftRequestParser {
         Short slotId =  tObject.isSetSelectedSlots() ?  tObject.selectedSlots.get(0) : (short)0;
         params.setSlot(slotId);
         params.setRqMkSlot(tObject.selectedSlots);
-        params.setRFormat(tObject.responseFormat);
+        params.setRFormat(getResponseFormat(tObject.responseFormat));
         params.setRqMkAdcount(tObject.requestedAdCount);
         params.setTid(tObject.requestId);
-        params.setAllowBannerAds(tObject.supplyCapability == SupplyCapability.BANNER);
+        params.setAllowBannerAds(tObject.supplyCapabilities.contains(SupplyCapability.BANNER));
         //TODO use segment id in cas as long
         params.setSiteSegmentId(new Long(tObject.segmentId).intValue());
         params.setRqAdType(tObject.isSetRequestedAdType() ? tObject.requestedAdType.name() : "INTERSTITIAL");
-        params.setRichMedia(tObject.supplyCapability == SupplyCapability.RICH_MEDIA);
+        params.setRichMedia(tObject.supplyCapabilities.contains(SupplyCapability.RICH_MEDIA));
         params.setAccountSegment(getAccountSegments(tObject.demandTypesAllowed));
         params.setIpFileVersion(new Long(tObject.ipFileVersion).intValue());
         params.setSst(tObject.isSetSupplySource() ? tObject.supplySource.ordinal() : 0);
@@ -107,7 +107,7 @@ public class ThriftRequestParser {
             }
             params.setLatLong(latLong);
             params.setCountryCode(tObject.geo.countryCode);
-            params.setCountryId(tObject.geo.getCountryId());
+            params.setCountryId((long) tObject.geo.getCountryId());
             Set<Integer> cities = tObject.geo.getCityIds();
             params.setCity(null != cities && cities.iterator().hasNext() ? tObject.geo.getCityIds().iterator().next() : null);
             Set<Integer> postalCodes = tObject.geo.getZipIds();
@@ -142,7 +142,27 @@ public class ThriftRequestParser {
         
         logger.debug("Successfully parsed tObject, SAS params are : ", params.toString());
     }
-    
+
+
+    private static String getResponseFormat (ResponseFormat rqFormat) {
+        String rFormat = "html";
+        switch (rqFormat) {
+            case XHTML: rFormat = "xhtml";
+                break;
+            case AXML: rFormat = "axml";
+                break;
+            case JSON: rFormat = "json";
+                break;
+            case RTBS: rFormat = "rtbs";
+                break;
+            case IMAI: rFormat = "imai";
+                break;
+            case NATIVE: rFormat = "native";
+                break;
+        }
+        return rFormat;
+    }
+
     private static Set<Integer> getAccountSegments(Set<DemandType> demandTypes) {
         if (null == demandTypes) {
             return Collections.emptySet();

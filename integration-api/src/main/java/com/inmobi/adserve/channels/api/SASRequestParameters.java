@@ -42,8 +42,8 @@ public class SASRequestParameters {
     private String       uidParams;
     private Map<String, String>     tUidParams;
 
-    private String       rqIframe;
-    private String       rFormat;
+    private String      rqIframe;
+    private String      rFormat;
 
     private int          osId;
     private Short        rqMkAdcount;

@@ -83,7 +83,9 @@ public class ThriftRequestParserTest extends TestCase {
         adPoolRequest.setUser(user);
         adPoolRequest.setGeo(geo);
         adPoolRequest.setRequestedAdType(RequestedAdType.INTERSTITIAL);
-        adPoolRequest.setSupplyCapability(SupplyCapability.TEXT);
+        List<SupplyCapability> supplyCapabilities = new ArrayList<SupplyCapability>();
+        supplyCapabilities.add(SupplyCapability.TEXT);
+        adPoolRequest.setSupplyCapabilities(supplyCapabilities);
         adPoolRequest.setRemoteHostIp("10.14.118.143");
         adPoolRequest.setSegmentId(234);
         List<Short> selectedSlots = new ArrayList<Short>();
@@ -91,7 +93,7 @@ public class ThriftRequestParserTest extends TestCase {
         adPoolRequest.setSelectedSlots(selectedSlots);
         adPoolRequest.setRequestedAdCount((short) 1);
         adPoolRequest.setRequestId("tid");
-        adPoolRequest.setResponseFormat("html");
+        adPoolRequest.setResponseFormat(ResponseFormat.XHTML);
         adPoolRequest.setIntegrationDetails(integrationDetails);
         adPoolRequest.setIpFileVersion(3456);
 
@@ -125,7 +127,7 @@ public class ThriftRequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getUidParams(), null);
         assertEquals(sasRequestParameters.getTUidParams(), null);
         assertEquals(sasRequestParameters.getRqIframe(), "009"); 
-        assertEquals(sasRequestParameters.getRFormat(), "html");
+        assertEquals(sasRequestParameters.getRFormat(), "xhtml");
         assertEquals(sasRequestParameters.getOsId(), 123);
         assertEquals(sasRequestParameters.getRqMkAdcount(), new Short("1"));
         assertEquals(sasRequestParameters.getTid(), "tid");
