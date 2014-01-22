@@ -62,6 +62,7 @@ public class ServletBackFill implements Servlet {
         if (RequestFilters.isDroppedInRequestFilters(hrh, logger)) {
             logger.debug("Request is dropped in request filters");
             hrh.responseSender.sendNoAdResponse(e);
+            return;
         }
 
         hrh.responseSender.getAuctionEngine().sasParams = hrh.responseSender.sasParams;

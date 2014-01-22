@@ -50,7 +50,7 @@ public class ThriftRequestParser {
         //Fill params from AdPoolRequest Object
         params.setRemoteHostIp(tObject.remoteHostIp);
         //TODO Iterate over the segments using all slots
-        Short slotId =  tObject.isSetSelectedSlots() ?  tObject.selectedSlots.get(0) : (short)0;
+        Short slotId =  null != tObject.selectedSlots ?  tObject.selectedSlots.get(0) : (short)0;
         params.setSlot(slotId);
         params.setRqMkSlot(tObject.selectedSlots);
         params.setRFormat(getResponseFormat(tObject.responseFormat));
@@ -124,7 +124,8 @@ public class ThriftRequestParser {
             int yob = tObject.user.yearOfBirth;
             int age = currentYear - yob;
             params.setAge((short)age);
-            params.setGender(tObject.user.gender.name().equalsIgnoreCase("Male") ? "M" : "F");
+            String gender = null != tObject.user.gender ? tObject.user.gender.name() : "Male"; 
+            params.setGender(gender.equalsIgnoreCase("Male") ? "M" : "F");
         }
 
         
@@ -147,6 +148,8 @@ public class ThriftRequestParser {
     private static String getResponseFormat (ResponseFormat rqFormat) {
         String rFormat = "html";
         switch (rqFormat) {
+            case HTML:rFormat = "html";
+                break;
             case XHTML: rFormat = "xhtml";
                 break;
             case AXML: rFormat = "axml";
@@ -159,6 +162,7 @@ public class ThriftRequestParser {
                 break;
             case NATIVE: rFormat = "native";
                 break;
+            default:// Do Nothing
         }
         return rFormat;
     }
