@@ -46,7 +46,6 @@ public class ServletBackFill implements Servlet {
                 }
                 RequestParser
                         .parseRequestParameters(hrh.jObject, sasParams, casInternalRequestParametersGlobal, logger);
-                sasParams.setDst(2);
             }
         } // Handling post requests
         else if (null == hrh.tObject) {

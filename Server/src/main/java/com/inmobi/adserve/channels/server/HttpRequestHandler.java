@@ -117,14 +117,14 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
             QueryStringDecoder queryStringDecoder;
             String content = request.getContent().toString(CharsetUtil.UTF_8);
             if (request.getMethod() == HttpMethod.POST) {
-                logger.debug("post : ", content);
+                //logger.debug("post : ", content);
                 queryStringDecoder = new QueryStringDecoder(request.getUri() + "?post=" + content);
-                logger.debug("URI is : " + request.getUri() + "?" + content);
+                //logger.debug("URI is : " + request.getUri() + "?" + content);
             }
             else {
-                logger.debug("get : ", content);
+                //logger.debug("get : ", content);
                 queryStringDecoder = new QueryStringDecoder(request.getUri());
-                logger.debug("URI is : " + request.getUri());
+                //logger.debug("URI is : " + request.getUri());
             }
             String path = queryStringDecoder.getPath();
             logger.debug("Servlet path is " + path);

@@ -65,8 +65,14 @@ public class RequestParser {
         params.setCountryCode(parseArray(jObject, "carrier", 2));
         params.setCity(Integer.parseInt(parseArray(jObject, "carrier", 3)));
         params.setState(Integer.parseInt(parseArray(jObject, "carrier", 4)));
-        params.setSlot(Short.parseShort(stringify(jObject, "slot-served", logger)));
-        params.setRqMkSlot(Arrays.asList(Short.parseShort(stringify(jObject, "rqMkAdSlot", logger))));
+        String slot = stringify(jObject, "slot-served", logger);
+        if (StringUtils.isNotEmpty(slot)) {
+            params.setSlot(Short.parseShort(slot));
+        }
+        String rqMkSlot = stringify(jObject, "rqMkAdSlot", logger);
+        if (StringUtils.isNotEmpty(rqMkSlot)) {
+            params.setRqMkSlot(Arrays.asList(Short.parseShort(rqMkSlot)));
+        }
         String sdkVersion = stringify(jObject, "sdk-version", logger);
         if (StringUtils.isBlank(sdkVersion) || "null".equalsIgnoreCase(sdkVersion)) {
             sdkVersion = null;
@@ -119,7 +125,7 @@ public class RequestParser {
         params.setRichMedia(jObject.optBoolean("rich-media", false));
         params.setRqAdType(stringify(jObject, "rqAdtype", logger));
         params.setAppUrl(stringify(jObject, "site-url", logger));
-        logger.debug("successfully parsed params");
+        logger.debug("successfully parsed params ", params);
     }
 
     public static String stringify(JSONObject jObject, String field, DebugLogger logger) {

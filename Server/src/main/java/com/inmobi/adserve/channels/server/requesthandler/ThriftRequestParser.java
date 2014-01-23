@@ -50,7 +50,7 @@ public class ThriftRequestParser {
         //Fill params from AdPoolRequest Object
         params.setRemoteHostIp(tObject.remoteHostIp);
         //TODO Iterate over the segments using all slots
-        Short slotId =  null != tObject.selectedSlots ?  tObject.selectedSlots.get(0) : (short)0;
+        Short slotId =  null != tObject.selectedSlots && !tObject.selectedSlots.isEmpty() ?  tObject.selectedSlots.get(0) : (short)0;
         params.setSlot(slotId);
         params.setRqMkSlot(tObject.selectedSlots);
         params.setRFormat(getResponseFormat(tObject.responseFormat));
