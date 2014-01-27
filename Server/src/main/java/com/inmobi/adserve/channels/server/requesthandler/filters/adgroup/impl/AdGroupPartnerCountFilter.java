@@ -10,8 +10,8 @@ import org.apache.hadoop.thirdparty.guava.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
-import org.testng.collections.Lists;
 
+import com.google.common.collect.Lists;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.SASRequestParameters;

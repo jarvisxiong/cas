@@ -5,8 +5,8 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.apache.commons.configuration.Configuration;
-import org.testng.collections.Lists;
 
+import com.google.common.collect.Lists;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
 
