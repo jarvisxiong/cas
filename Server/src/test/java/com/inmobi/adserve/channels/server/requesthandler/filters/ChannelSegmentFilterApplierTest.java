@@ -707,7 +707,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         AdGroupSiteExclusionFilter adGroupTotalCountFilter = injector.getInstance(AdGroupSiteExclusionFilter.class);
         adGroupTotalCountFilter.filter(channelSegments, sasParams, new CasContext());
 
-        assertEquals(false, channelSegments.contains(channelSegment1));
+        assertEquals(true, channelSegments.contains(channelSegment1));
     }
 
     @Test
@@ -781,6 +781,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         repositoryHelper = createMock(RepositoryHelper.class);
         expect(repositoryHelper.queryPricingEngineRepository(1, 2)).andReturn(null).anyTimes();
         expect(repositoryHelper.getChannelAdGroupRepository()).andReturn(null).anyTimes();
+        expect(repositoryHelper.querySiteEcpmRepository("siteid", 1, 2)).andReturn(null).anyTimes();
         replay(repositoryHelper);
 
         sasParams.setCountryStr("1");
@@ -817,6 +818,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         repositoryHelper = createMock(RepositoryHelper.class);
         expect(repositoryHelper.queryPricingEngineRepository(1, 2)).andReturn(null).anyTimes();
         expect(repositoryHelper.getChannelAdGroupRepository()).andReturn(null).anyTimes();
+        expect(repositoryHelper.querySiteEcpmRepository("siteid", 1, 2)).andReturn(null).anyTimes();
         replay(repositoryHelper);
 
         sasParams.setSiteId("siteid");
@@ -862,11 +864,28 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         repositoryHelper = createMock(RepositoryHelper.class);
         expect(repositoryHelper.queryPricingEngineRepository(1, 2)).andReturn(pricingEngineEntity).anyTimes();
         expect(repositoryHelper.getChannelAdGroupRepository()).andReturn(null).anyTimes();
+        expect(repositoryHelper.querySiteEcpmRepository("siteid", 1, 2)).andReturn(null).anyTimes();
         replay(repositoryHelper);
 
         sasParams.setSiteId("siteid");
         sasParams.setCountryStr("1");
         sasParams.setOsId(2);
+
+        Injector injector = Guice.createInjector(
+                new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(), config
+                        .getServerConfiguration(), repositoryHelper), new AbstractModule() {
+
+                    @Override
+                    protected void configure() {
+                        bind(Marker.class).toProvider(new Provider<Marker>() {
+                            @Override
+                            public Marker get() {
+                                return null;
+                            }
+                        });
+
+                    }
+                });
 
         AdGroupSupplyDemandClassificationFilter adGroupSupplyDemandClassificationFilter = injector
                 .getInstance(AdGroupSupplyDemandClassificationFilter.class);
@@ -875,6 +894,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         List<ChannelSegment> channelSegments = Lists.newArrayList(channelSegment1);
 
         CasContext casContext = new CasContext();
+
         casContext.setPricingEngineEntity(injector.getInstance(CasUtils.class).fetchPricingEngineEntity(sasParams));
         adGroupSupplyDemandClassificationFilter.filter(channelSegments, sasParams, casContext);
 
@@ -900,7 +920,24 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         repositoryHelper = createMock(RepositoryHelper.class);
         expect(repositoryHelper.queryPricingEngineRepository(1, 2)).andReturn(pricingEngineEntity).anyTimes();
         expect(repositoryHelper.getChannelAdGroupRepository()).andReturn(null).anyTimes();
+        expect(repositoryHelper.querySiteEcpmRepository("siteid", 1, 2)).andReturn(null).anyTimes();
         replay(repositoryHelper);
+
+        Injector injector = Guice.createInjector(
+                new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(), config
+                        .getServerConfiguration(), repositoryHelper), new AbstractModule() {
+
+                    @Override
+                    protected void configure() {
+                        bind(Marker.class).toProvider(new Provider<Marker>() {
+                            @Override
+                            public Marker get() {
+                                return null;
+                            }
+                        });
+
+                    }
+                });
 
         sasParams.setSiteId("siteid");
         sasParams.setCountryStr("1");
@@ -937,11 +974,28 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         repositoryHelper = createMock(RepositoryHelper.class);
         expect(repositoryHelper.queryPricingEngineRepository(1, 2)).andReturn(pricingEngineEntity).anyTimes();
         expect(repositoryHelper.getChannelAdGroupRepository()).andReturn(null).anyTimes();
+        expect(repositoryHelper.querySiteEcpmRepository("siteid", 1, 2)).andReturn(null).anyTimes();
         replay(repositoryHelper);
 
         sasParams.setSiteId("siteid");
         sasParams.setCountryStr("1");
         sasParams.setOsId(2);
+
+        Injector injector = Guice.createInjector(
+                new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(), config
+                        .getServerConfiguration(), repositoryHelper), new AbstractModule() {
+
+                    @Override
+                    protected void configure() {
+                        bind(Marker.class).toProvider(new Provider<Marker>() {
+                            @Override
+                            public Marker get() {
+                                return null;
+                            }
+                        });
+
+                    }
+                });
 
         CasContext casContext = new CasContext();
         casContext.setPricingEngineEntity(injector.getInstance(CasUtils.class).fetchPricingEngineEntity(sasParams));
@@ -951,7 +1005,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
                 .getInstance(AdGroupSupplyDemandClassificationFilter.class);
         adGroupSupplyDemandClassificationFilter.filter(channelSegments, sasParams, casContext);
 
-        assertEquals(false, channelSegments.contains(channelSegment1));
+        assertEquals(true, channelSegments.contains(channelSegment1));
     }
 
     public static ChannelSegmentEntity.Builder getChannelSegmentEntityBuilder(final String advertiserId,
