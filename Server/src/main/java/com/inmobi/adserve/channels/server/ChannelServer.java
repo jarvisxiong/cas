@@ -41,6 +41,7 @@ import com.inmobi.adserve.channels.repository.SiteCitrusLeafFeedbackRepository;
 import com.inmobi.adserve.channels.repository.SiteEcpmRepository;
 import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
 import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
+import com.inmobi.adserve.channels.server.api.ConnectionType;
 import com.inmobi.adserve.channels.server.client.BootstrapCreation;
 import com.inmobi.adserve.channels.server.client.RtbBootstrapCreation;
 import com.inmobi.adserve.channels.server.module.NettyModule;
@@ -58,6 +59,11 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 
 
+/*
+ * 
+ * Run jar:- java -Dincoming.connections=100 -Ddcpoutbound.connections=50 -Drtboutbound.connections=50 -jar
+ * cas-server.jar If these are not specified server will pick these values from channel-server.properties config file.
+ */
 public class ChannelServer {
     private static Logger                           logger;
     private static ChannelAdGroupRepository         channelAdGroupRepository;
@@ -146,10 +152,20 @@ public class ChannelServer {
 
             instantiateRepository(logger, config);
             ServletHandler.init(config, repositoryHelper);
-            Integer maxIncomingConnections = channelServerHelper
-                    .getIncomingMaxConnections(ChannelServerStringLiterals.INCOMING_CONNECTIONS);
+            Integer maxIncomingConnections = channelServerHelper.getMaxConnections(
+                    ChannelServerStringLiterals.INCOMING_CONNECTIONS, ConnectionType.INCOMING);
+            Integer maxRTbdOutGoingConnections = channelServerHelper.getMaxConnections(
+                    ChannelServerStringLiterals.RTBD_OUTGING_CONNECTIONS, ConnectionType.RTBD_OUTGOING);
+            Integer maxDCpOutGoingConnections = channelServerHelper.getMaxConnections(
+                    ChannelServerStringLiterals.DCP_OUTGOING_CONNECTIONS, ConnectionType.DCP_OUTGOING);
             if (null != maxIncomingConnections) {
                 ServletHandler.getServerConfig().setProperty("incomingMaxConnections", maxIncomingConnections);
+            }
+            if (null != maxIncomingConnections) {
+                ServletHandler.getServerConfig().setProperty("rtbOutGoingMaxConnections", maxRTbdOutGoingConnections);
+            }
+            if (null != maxIncomingConnections) {
+                ServletHandler.getServerConfig().setProperty("dcpOutGoingMaxConnections", maxDCpOutGoingConnections);
             }
 
             Injector injector = Guice.createInjector(
