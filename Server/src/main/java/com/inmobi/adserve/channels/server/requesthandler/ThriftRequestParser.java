@@ -32,6 +32,7 @@ public class ThriftRequestParser {
                     tDeserializer.deserialize(adPoolRequest, stringVal.getBytes());
                 } catch (TException e) {
                     logger.error("Error in deserializing thrift in extractParams ", e.getMessage());
+                    e.printStackTrace();
                 }
                 return adPoolRequest;
             }
@@ -56,11 +57,12 @@ public class ThriftRequestParser {
         params.setRFormat(getResponseFormat(tObject.responseFormat));
         params.setRqMkAdcount(tObject.requestedAdCount);
         params.setTid(tObject.requestId);
-        params.setAllowBannerAds(tObject.supplyCapabilities.contains(SupplyCapability.BANNER));
+        params.setAllowBannerAds(tObject.isSetSupplyCapabilities() && tObject.supplyCapabilities.contains(SupplyCapability.BANNER));
         //TODO use segment id in cas as long
         params.setSiteSegmentId(new Long(tObject.segmentId).intValue());
-        params.setRqAdType(tObject.isSetRequestedAdType() ? tObject.requestedAdType.name() : "INTERSTITIAL");
-        params.setRichMedia(tObject.supplyCapabilities.contains(SupplyCapability.RICH_MEDIA));
+        boolean isInterstitial = tObject.isSetRequestedAdType() && (tObject.requestedAdType == RequestedAdType.INTERSTITIAL);
+        params.setRqAdType(isInterstitial ? "int" : (tObject.isSetRequestedAdType() ? tObject.requestedAdType.name() : ""));
+        params.setRichMedia(tObject.isSetSupplyCapabilities() && tObject.supplyCapabilities.contains(SupplyCapability.RICH_MEDIA));
         params.setAccountSegment(getAccountSegments(tObject.demandTypesAllowed));
         params.setIpFileVersion(new Long(tObject.ipFileVersion).intValue());
         params.setSst(tObject.isSetSupplySource() ? tObject.supplySource.ordinal() : 0);
@@ -147,6 +149,9 @@ public class ThriftRequestParser {
 
     private static String getResponseFormat (ResponseFormat rqFormat) {
         String rFormat = "html";
+        if (null == rqFormat) {
+            return rFormat;
+        }
         switch (rqFormat) {
             case HTML:rFormat = "html";
                 break;

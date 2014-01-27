@@ -10,7 +10,9 @@ import com.inmobi.adserve.channels.server.servlet.ServletInvalid;
 import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
+import org.apache.thrift.protocol.TBinaryProtocol;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
@@ -19,7 +21,6 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.jboss.netty.handler.timeout.IdleStateAwareChannelUpstreamHandler;
 import org.jboss.netty.handler.timeout.IdleStateEvent;
-import org.jboss.netty.util.CharsetUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -36,6 +37,8 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+//import org.jboss.netty.handler.codec.http.HttpRequest;
 
 
 public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
@@ -115,16 +118,25 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
         try {
             HttpRequest request = (HttpRequest) e.getMessage();
             QueryStringDecoder queryStringDecoder;
-            String content = request.getContent().toString(CharsetUtil.UTF_8);
+            String content = new String(request.getContent().array());
+
+
+            AdPoolRequest adPoolRequest = new AdPoolRequest();
+            TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
+            try {
+                tDeserializer.deserialize(adPoolRequest, request.getContent().array());
+            } catch (TException ex) {
+                logger.error("Error in deserializing thrift in extractParams ", ex.getMessage());
+                ex.printStackTrace();
+            }
+            logger.debug("adpoolrequest " + adPoolRequest);
+            
+            
             if (request.getMethod() == HttpMethod.POST) {
-                //logger.debug("post : ", content);
                 queryStringDecoder = new QueryStringDecoder(request.getUri() + "?post=" + content);
-                //logger.debug("URI is : " + request.getUri() + "?" + content);
             }
             else {
-                //logger.debug("get : ", content);
                 queryStringDecoder = new QueryStringDecoder(request.getUri());
-                //logger.debug("URI is : " + request.getUri());
             }
             String path = queryStringDecoder.getPath();
             logger.debug("Servlet path is " + path);

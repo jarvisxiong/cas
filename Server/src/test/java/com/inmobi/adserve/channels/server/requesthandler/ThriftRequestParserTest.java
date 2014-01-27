@@ -138,7 +138,7 @@ public class ThriftRequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getRqMkSlot().get(0), new Short("12"));
         assertEquals(sasRequestParameters.getIpFileVersion(), new Integer(3456)); 
         assertEquals(sasRequestParameters.isRichMedia(), false);
-        assertEquals(sasRequestParameters.getRqAdType(), "INTERSTITIAL");
+        assertEquals(sasRequestParameters.getRqAdType(), "int");
         assertEquals(sasRequestParameters.getImaiBaseUrl(), null);  //Internal, Populated in cas
         assertEquals(sasRequestParameters.getAppUrl(), "siteUrl");
         assertEquals(sasRequestParameters.getModelId(), 234);
