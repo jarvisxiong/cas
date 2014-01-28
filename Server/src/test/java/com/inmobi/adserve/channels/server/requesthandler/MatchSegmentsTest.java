@@ -1,19 +1,5 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-
-import junit.framework.TestCase;
-
-import org.apache.commons.configuration.Configuration;
-import org.testng.annotations.Test;
-
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
@@ -24,6 +10,18 @@ import com.inmobi.adserve.channels.server.ServletHandler;
 import com.inmobi.adserve.channels.server.module.NettyModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import junit.framework.TestCase;
+import org.apache.commons.configuration.Configuration;
+import org.testng.annotations.Test;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 
 public class MatchSegmentsTest extends TestCase {
@@ -41,7 +39,7 @@ public class MatchSegmentsTest extends TestCase {
 
         ServletHandler.init(config, repositoryHelper);
 
-        Injector injector = Guice.createInjector(new NettyModule(config.getServerConfiguration()), new ServerModule(
+        Injector injector = Guice.createInjector(new NettyModule(config.getServerConfiguration(), 8800), new ServerModule(
                 config.getLoggerConfiguration(), config.getAdapterConfiguration(), repositoryHelper));
 
         matchSegments = injector.getInstance(MatchSegments.class);
