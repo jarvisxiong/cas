@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -176,6 +177,7 @@ public class Logging {
             impressions.add(impression);
         }
         AdRR adRR = new AdRR(host, timestamp, request, impressions, isTerminated, terminationReason);
+        adRR.setTime_stamp(new Date().getTime());
         List<Channel> channels = createChannelsLog(rankList);
         adRR.setChannels(channels);
         if (enableDatabusLogging) {

@@ -148,7 +148,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
             sendResponse(OK, finalReponse, adResponse.responseHeaders, event);
         }
         else {
-            AdPoolResponse rtbdResponse = createThriftResponse(finalReponse);
+            AdPoolResponse rtbdResponse = createThriftResponse(adResponse.response);
             if (logger.isDebugEnabled()) {
                 logger.debug("RTB response json to RE is " + rtbdResponse);
             }
