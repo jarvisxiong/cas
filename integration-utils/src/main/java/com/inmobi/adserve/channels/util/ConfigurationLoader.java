@@ -1,7 +1,5 @@
 package com.inmobi.adserve.channels.util;
 
-import java.net.URL;
-
 import lombok.Getter;
 
 import org.apache.commons.configuration.Configuration;
@@ -45,10 +43,16 @@ public class ConfigurationLoader {
     @Getter
     private final Configuration        rtbConfiguration;
 
-    private ConfigurationLoader(final URL configFileURL) {
+    private ConfigurationLoader(final String configFile) {
 
         try {
-            configuration = new PropertiesConfiguration(configFileURL);
+            if (configFile.startsWith("/")) {
+                configuration = new PropertiesConfiguration(configFile);
+            }
+            else {
+                configuration = new PropertiesConfiguration(ConfigurationLoader.class.getClassLoader().getResource(
+                        configFile));
+            }
         }
         catch (ConfigurationException e) {
             LOG.error("error loading config {}", e);
@@ -73,7 +77,7 @@ public class ConfigurationLoader {
 
     public static synchronized ConfigurationLoader getInstance(final String configFile) {
         if (instance == null) {
-            instance = new ConfigurationLoader(ConfigurationLoader.class.getClassLoader().getResource(configFile));
+            instance = new ConfigurationLoader(configFile);
         }
         return instance;
     }

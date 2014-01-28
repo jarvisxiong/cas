@@ -18,13 +18,19 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Module;
 import com.inmobi.adserve.channels.adnetworks.tapit.DCPTapitAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.ServletHandler;
+import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
+import com.inmobi.adserve.channels.server.module.AdapterConfigModule;
 import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilterApplierTest;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 
@@ -39,7 +45,7 @@ public class AuctionEngineTest {
 
     @BeforeMethod
     public void setUp() throws IOException {
-        ConfigurationLoader config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
+        final ConfigurationLoader config = ConfigurationLoader.getInstance("channel-server.properties");
         ServletHandler.init(config, null);
         // this is done, to track the encryptedBid variable getting set inside the AuctionEngine.
         encryptedBid1 = new Capture<String>();
@@ -65,6 +71,19 @@ public class AuctionEngineTest {
 
         casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.auctionId = "auctionId";
+
+        Module module = new AbstractModule() {
+
+            @Override
+            protected void configure() {
+                bind(Configuration.class).annotatedWith(ServerConfiguration.class).toInstance(
+                        config.getServerConfiguration());
+                install(new AdapterConfigModule(config.getAdapterConfiguration(), ChannelServer.dataCentreName));
+                requestStaticInjection(AuctionEngine.class);
+            }
+        };
+
+        Guice.createInjector(module);
 
     }
 

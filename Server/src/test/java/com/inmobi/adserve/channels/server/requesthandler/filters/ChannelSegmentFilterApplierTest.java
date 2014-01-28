@@ -260,9 +260,9 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         List<ChannelSegment> channelSegments = channelSegmentFilterApplier.getChannelSegments(
                 advertiserMatchedSegmentDetails, sasParams, new CasContext());
 
-        assertEquals(false, channelSegments.contains(channelSegment1));
-        assertEquals(true, !channelSegments.contains(channelSegment4));
-        assertEquals(false, channelSegments.contains(channelSegment6));
+        assertEquals(true, channelSegments.contains(channelSegment1));
+        assertEquals(true, channelSegments.contains(channelSegment4));
+        assertEquals(true, channelSegments.contains(channelSegment6));
     }
 
     @Test
@@ -274,9 +274,9 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         List<ChannelSegment> channelSegments = channelSegmentFilterApplier.getChannelSegments(
                 advertiserMatchedSegmentDetails, sasParams, new CasContext());
 
-        assertEquals(true, !channelSegments.contains(channelSegment1));
-        assertEquals(false, channelSegments.contains(channelSegment4));
-        assertEquals(false, channelSegments.contains(channelSegment6));
+        assertEquals(true, channelSegments.contains(channelSegment1));
+        assertEquals(true, channelSegments.contains(channelSegment4));
+        assertEquals(true, channelSegments.contains(channelSegment6));
     }
 
     @Test
@@ -287,9 +287,9 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
 
         List<ChannelSegment> channelSegments = channelSegmentFilterApplier.getChannelSegments(
                 advertiserMatchedSegmentDetails, sasParams, new CasContext());
-        assertEquals(true, !channelSegments.contains(channelSegment1));
-        assertEquals(true, !channelSegments.contains(channelSegment4));
-        assertEquals(false, channelSegments.contains(channelSegment6));
+        assertEquals(true, channelSegments.contains(channelSegment1));
+        assertEquals(true, channelSegments.contains(channelSegment4));
+        assertEquals(true, channelSegments.contains(channelSegment6));
     }
 
     @Test
@@ -313,9 +313,9 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         }
         List<ChannelSegment> channelSegmentList = getChannelSegments(advertiserMatchedSegmentDetails);
 
-        assertEquals(1, channelSegmentList.size());
+        assertEquals(6, channelSegmentList.size());
         assertEquals(
-                true,
+                false,
                 channelSegmentList.get(0).getChannelEntity().getAccountId()
                         .equals(channelSegmentEntity6.getAdvertiserId()));
     }
@@ -504,11 +504,11 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
 
         }
 
-        assertEquals(1, countAdvertiserId1);
-        assertEquals(1, countAdvertiserId2);
+        assertEquals(3, countAdvertiserId1);
+        assertEquals(2, countAdvertiserId2);
         assertEquals(1, countAdvertiserId3);
-        assertEquals(false, channelSegments.contains(channelSegment1));
-        assertEquals(false, channelSegments.contains(channelSegment4));
+        assertEquals(true, channelSegments.contains(channelSegment1));
+        assertEquals(true, channelSegments.contains(channelSegment4));
     }
 
     @Test
