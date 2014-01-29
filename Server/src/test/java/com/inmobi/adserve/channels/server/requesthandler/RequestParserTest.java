@@ -1,12 +1,13 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Marker;
 import org.testng.annotations.Test;
 
 import static org.easymock.EasyMock.expect;
@@ -16,7 +17,7 @@ import static org.easymock.classextension.EasyMock.replay;
 
 public class RequestParserTest extends TestCase
 {
-
+    RequestParser requestParser;
     public void setUp()
     {
         Configuration mockConfig = createMock(Configuration.class);
@@ -24,7 +25,12 @@ public class RequestParserTest extends TestCase
         expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
         expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
         replay(mockConfig);
-        DebugLogger.init(mockConfig);
+        requestParser = new RequestParser(new Provider<Marker>() {
+            @Override
+            public Marker get() {
+                return null;
+            }
+        });
     }
 
     @Test
@@ -42,8 +48,7 @@ public class RequestParserTest extends TestCase
                         + ",\"pub-id\":\"4028cb9731d7d0ad0131e1d1996101ef\",\"os-id\":6}");
         SASRequestParameters sasRequestParameters = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        RequestParser.parseRequestParameters(jObject, sasRequestParameters, casInternalRequestParameters,
-                new DebugLogger());
+        requestParser.parseRequestParameters(jObject, sasRequestParameters, casInternalRequestParameters);
         assertNotNull(sasRequestParameters);
         assertEquals(
                 "PE (iPod; U; CPU iPhone OS 4_3_1 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Mobile/8G4"
@@ -55,7 +60,7 @@ public class RequestParserTest extends TestCase
         assertEquals(sasRequestParameters.getOsId(), 6);
         assertEquals(sasRequestParameters.getRqMkSlot().get(0), new Short("9"));
         assertEquals(sasRequestParameters.getUidParams(),
-            "{\"O1\":\"8d10846582eef7c6f5873883b09a5a63\",\"u-id-s\":\"O1\",\"IX\":\"4fa7!506c!508902de!iPod3,1!8G4!19800\"}");
+                "{\"O1\":\"8d10846582eef7c6f5873883b09a5a63\",\"u-id-s\":\"O1\",\"IX\":\"4fa7!506c!508902de!iPod3,1!8G4!19800\"}");
         assertEquals(sasRequestParameters.getCarrierId(), 406);
         assertEquals(sasRequestParameters.getCountryId(), new Long(94));
         assertEquals(sasRequestParameters.getCountryCode(), "US");

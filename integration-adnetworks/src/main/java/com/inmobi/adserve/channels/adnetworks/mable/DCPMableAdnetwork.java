@@ -3,7 +3,6 @@ package com.inmobi.adserve.channels.adnetworks.mable;
 import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.Request;
@@ -20,14 +19,17 @@ import org.jboss.netty.handler.codec.http.*;
 import org.jboss.netty.util.CharsetUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 
-public class DCPMableAdnetwork extends BaseAdNetworkImpl {
-    private final Configuration config;
+public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
+    private static final Logger LOG          = LoggerFactory.getLogger(DCPMableAdnetwork.class);
+
     private int                 width;
     private int                 height;
     private String              latitude;
@@ -41,21 +43,18 @@ public class DCPMableAdnetwork extends BaseAdNetworkImpl {
     private static final String ifaFormat    = "IFA";
     private Request             ningRequest;
 
-    public DCPMableAdnetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent, logger);
-        this.config = config;
-        this.logger = logger;
+    public DCPMableAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
         this.authKey = config.getString("mable.authKey");
         this.host = config.getString("mable.host");
-        this.clientBootstrap = clientBootstrap;
     }
 
     @Override
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            logger.debug("mandatory parameters missing for Mable so exiting adapter");
+            LOG.debug("mandatory parameters missing for Mable so exiting adapter");
             return false;
         }
 
@@ -66,7 +65,7 @@ public class DCPMableAdnetwork extends BaseAdNetworkImpl {
             height = (int) Math.ceil(dim.getHeight());
         }
         else {
-            logger.debug("mandate parameters missing for Mable, so returning from adapter");
+            LOG.debug("mandate parameters missing for Mable, so returning from adapter");
             return false;
         }
 
@@ -77,7 +76,7 @@ public class DCPMableAdnetwork extends BaseAdNetworkImpl {
             longitude = latlong[1];
         }
 
-        logger.info("Configure parameters inside Mable returned true");
+        LOG.info("Configure parameters inside Mable returned true");
         return true;
     }
 
@@ -126,9 +125,9 @@ public class DCPMableAdnetwork extends BaseAdNetworkImpl {
 
         }
         catch (JSONException e) {
-            logger.info("Error while forming request object");
+            LOG.info("Error while forming request object");
         }
-        logger.debug("Mable request " + request);
+        LOG.debug("Mable request {}", request);
         return request.toString();
     }
 
@@ -141,7 +140,7 @@ public class DCPMableAdnetwork extends BaseAdNetworkImpl {
         }
         catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            logger.error(exception.getMessage());
+            LOG.error("{}", exception);
         }
         return null;
     }
@@ -156,11 +155,11 @@ public class DCPMableAdnetwork extends BaseAdNetworkImpl {
             startTime = System.currentTimeMillis();
             baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
                 @Override
-                public Response onCompleted(Response response) throws Exception {
+                public Response onCompleted(final Response response) throws Exception {
                     if (!isRequestCompleted()) {
-                        logger.debug("Operation complete for channel partner: ", getName());
+                        LOG.debug("Operation complete for channel partner: {}", getName());
                         latency = System.currentTimeMillis() - startTime;
-                        logger.debug(getName(), "operation complete latency", latency);
+                        LOG.debug("{} operation complete latency {}", getName(), latency);
                         String responseStr = response.getResponseBody();
                         HttpResponseStatus httpResponseStatus = HttpResponseStatus.valueOf(response.getStatusCode());
                         parseResponse(responseStr, httpResponseStatus);
@@ -170,35 +169,35 @@ public class DCPMableAdnetwork extends BaseAdNetworkImpl {
                 }
 
                 @Override
-                public void onThrowable(Throwable t) {
+                public void onThrowable(final Throwable t) {
                     if (isRequestComplete) {
                         return;
                     }
 
                     if (t instanceof java.util.concurrent.TimeoutException) {
                         latency = System.currentTimeMillis() - startTime;
-                        logger.debug(getName(), "timeout latency ", latency);
+                        LOG.debug("{} timeout latency {}", getName(), latency);
                         adStatus = "TIME_OUT";
                         processResponse();
                         return;
                     }
 
-                    logger.debug(getName(), "error latency ", latency);
+                    LOG.debug("{} error latency {}", getName(), latency);
                     adStatus = "TERM";
-                    logger.info("error while fetching response from:", getName(), t.getMessage());
+                    LOG.info("error while fetching response from: {} {}", getName(), t);
                     processResponse();
                     return;
                 }
             });
         }
         catch (Exception e) {
-            logger.debug("Exception in", getName(), "makeAsyncRequest :", e.getMessage());
+            LOG.debug("Exception in {} makeAsyncRequest : {}", getName(), e.getMessage());
         }
-        logger.debug(getName(), "returning from make NingRequest");
+        LOG.debug("{} returning from make NingRequest", getName());
         return true;
     }
 
-    private void setNingRequest(String requestUrl) {
+    private void setNingRequest(final String requestUrl) {
         String requestParams = getRequestParams();
         ChannelBuffer buffer = ChannelBuffers.copiedBuffer(requestParams, CharsetUtil.UTF_8);
         ningRequest = new RequestBuilder("POST")
@@ -213,13 +212,13 @@ public class DCPMableAdnetwork extends BaseAdNetworkImpl {
                     .setBody(requestParams)
                     .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
                     .build();
-        logger.info("Mable request: ", ningRequest);
-        logger.info("Mable request Body: ", requestParams);
+        LOG.info("Mable request: {}", ningRequest);
+        LOG.info("Mable request Body: {}", requestParams);
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status) {
-        logger.debug("response is", response);
+    public void parseResponse(final String response, final HttpResponseStatus status) {
+        LOG.debug("response is {}", response);
         statusCode = status.getCode();
         if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
             if (200 == statusCode) {
@@ -232,17 +231,16 @@ public class DCPMableAdnetwork extends BaseAdNetworkImpl {
             VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
             try {
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl,
-                    logger);
+                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
             }
             catch (Exception exception) {
                 adStatus = "NO_AD";
-                logger.error("Error parsing response from Mable :", exception);
-                logger.error("Response from Mable:", response);
+                LOG.error("Error parsing response from Mable : {}", exception);
+                LOG.error("Response from Mable: {}", response);
             }
         }
-        logger.debug("response length is", responseContent.length());
+        LOG.debug("response length is {}", responseContent.length());
     }
 
     @Override
@@ -256,9 +254,9 @@ public class DCPMableAdnetwork extends BaseAdNetworkImpl {
             URI uri = getRequestUri();
             requestUrl = uri.toString();
             request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri.toASCIIString());
-            logger.debug("host name is ", uri.getHost());
+            LOG.debug("host name is {}", uri.getHost());
             request.setHeader(HttpHeaders.Names.HOST, uri.getHost());
-            logger.debug("got the host");
+            LOG.debug("got the host");
             request.setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent());
             request.setHeader(HttpHeaders.Names.REFERER, uri.toString());
             request.setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
@@ -272,7 +270,7 @@ public class DCPMableAdnetwork extends BaseAdNetworkImpl {
         }
         catch (Exception ex) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.HTTPREQUEST_ERROR;
-            logger.error("Error in making http request ", ex.getMessage());
+            LOG.error("Error in making http request {}", ex);
         }
         return request;
     }

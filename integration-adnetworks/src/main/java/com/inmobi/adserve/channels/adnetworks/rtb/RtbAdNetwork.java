@@ -23,6 +23,8 @@ import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.*;
 import org.jboss.netty.util.CharsetUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.net.URI;
@@ -35,10 +37,12 @@ import java.util.regex.Pattern;
 
 /**
  * Generic RTB adapter.
- *
+ * 
  * @author Devi Chand(devi.chand@inmobi.com)
  */
 public class RtbAdNetwork extends BaseAdNetworkImpl {
+
+    private final static Logger            LOG                          = LoggerFactory.getLogger(RtbAdNetwork.class);
 
     @Getter
     @Setter
@@ -65,21 +69,20 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Getter
     @Setter
     BidResponse                            bidResponse;
-    private boolean                        wnRequired;
-    Integer                                auctionType                  = 2;
-    Integer                                tmax                         = 200;
+    private final boolean                  wnRequired;
+    private final int                      auctionType                  = 2;
+    private int                            tmax                         = 200;
     private static final String            X_OPENRTB_VERSION            = "x-openrtb-version";
     private static final String            CONTENT_TYPE                 = "application/json";
     private static final String            DISPLAY_MANAGER_INMOBI_SDK   = "inmobi_sdk";
     private static final String            DISPLAY_MANAGER_INMOBI_JS    = "inmobi_js";
-    private final DebugLogger              logger;
-    private String                         advertiserId;
+    private final String                   advertiserId;
     public static ImpressionCallbackHelper impressionCallbackHelper;
-    private IABCategoriesInterface         iabCategoriesInterface;
-    private IABCountriesInterface          iabCountriesInterface;
-    private IABCitiesInterface             iabCitiesInterface;
-    private boolean                        siteBlinded;
-    private String                         advertiserName;
+    private final IABCategoriesInterface   iabCategoriesInterface;
+    private final IABCountriesInterface    iabCountriesInterface;
+    private final IABCitiesInterface       iabCitiesInterface;
+    private final boolean                  siteBlinded;
+    private final String                   advertiserName;
     private double                         secondBidPriceInUsd          = 0;
     private double                         secondBidPriceInLocal        = 0;
     private String                         bidRequestJson               = "";
@@ -97,18 +100,18 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private String                         responseSeatId;
     private String                         responseImpressionId;
     private String                         responseAuctionId;
-    private RepositoryHelper               repositoryHelper;
+    private final RepositoryHelper         repositoryHelper;
     private String                         bidderCurrency               = "USD";
     private static final String            USD                          = "USD";
     @Getter
     static List<String>                    currenciesSupported          = new ArrayList<String>(Arrays.asList("USD",
                                                                             "RMB"));
 
-    public RtbAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent, String urlBase, String advertiserName,
-            int tmax, RepositoryHelper repositoryHelper) {
+    public RtbAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent, final String urlBase,
+            final String advertiserName, final int tmax, final RepositoryHelper repositoryHelper) {
 
-        super(baseRequestHandler, serverEvent, logger);
+        super(baseRequestHandler, serverEvent);
         this.advertiserId = config.getString(advertiserName + ".advertiserId");
         this.urlArg = config.getString(advertiserName + ".urlArg");
         this.rtbVer = config.getString(advertiserName + ".rtbVer", "2.0");
@@ -116,7 +119,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         this.rtbMethod = config.getString(advertiserName + ".rtbMethod");
         this.wnRequired = config.getBoolean(advertiserName + ".isWnRequired");
         this.siteBlinded = config.getBoolean(advertiserName + ".siteBlinded");
-        this.logger = logger;
         this.clientBootstrap = clientBootstrap;
         this.urlBase = urlBase;
         this.setRtbPartner(true);
@@ -131,10 +133,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Override
     protected boolean configureParameters() {
 
-        logger.debug("inside configureParameters of RTB");
+        LOG.debug("inside configureParameters of RTB");
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            logger.debug("mandate parameters missing for dummy so exiting adapter");
+            LOG.debug("mandate parameters missing for dummy so exiting adapter");
             return false;
         }
 
@@ -187,15 +189,18 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         return serializeBidRequest();
     }
 
-    private boolean createBidRequestObject(List<Impression> impresssionlist, Site site, App app, User user,
-            Device device) {
+    private boolean createBidRequestObject(final List<Impression> impresssionlist, final Site site, final App app,
+            final User user, final Device device) {
         bidRequest = new BidRequest(casInternalRequestParameters.auctionId, impresssionlist);
         bidRequest.setTmax(tmax);
         bidRequest.setAt(auctionType);
-        bidRequest.setCur(currenciesSupported);
+        bidRequest.setCur(Collections.<String> emptyList());
+        List<String> seatList = new ArrayList<String>();
+        seatList.add(advertiserId);
+        bidRequest.setWseat(seatList);
         if (casInternalRequestParameters != null) {
-            logger.debug("blockedCategories are", casInternalRequestParameters.blockedCategories);
-            logger.debug("blockedAdvertisers are", casInternalRequestParameters.blockedAdvertisers);
+            LOG.debug("blockedCategories are {}", casInternalRequestParameters.blockedCategories);
+            LOG.debug("blockedAdvertisers are {}", casInternalRequestParameters.blockedAdvertisers);
             bidRequest.setBcat(new ArrayList<String>());
             if (null != casInternalRequestParameters.blockedCategories) {
                 bidRequest.setBcat(iabCategoriesInterface
@@ -216,7 +221,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             }
         }
         else {
-            logger.debug("casInternalRequestParameters is null, so not setting blocked advertisers and categories");
+            LOG.debug("casInternalRequestParameters is null, so not setting blocked advertisers and categories");
         }
 
         if (site != null) {
@@ -226,7 +231,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             bidRequest.setApp(app);
         }
         else {
-            logger.debug("App and Site both object can not be null so returning");
+            LOG.debug("App and Site both object can not be null so returning");
             return false;
         }
 
@@ -239,24 +244,28 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
         try {
             bidRequestJson = serializer.toString(bidRequest);
-            logger.info("RTB request json is :", bidRequestJson);
+            LOG.info("RTB request json is : {}", bidRequestJson);
         }
         catch (TException e) {
-            logger.debug("Could not create json from bidrequest for partner", advertiserName);
-            logger.info("Configure parameters inside rtb returned false", advertiserName);
+            LOG.debug("Could not create json from bidrequest for partner {}", advertiserName);
+            LOG.info("Configure parameters inside rtb returned false {}", advertiserName);
             return false;
         }
-        logger.info("Configure parameters inside rtb returned true");
+        if (StringUtils.isNotBlank(beaconUrl)) {
+            beaconUrl = beaconUrl + "&b=${WIN_BID}";
+        }
+        LOG.info("Configure parameters inside rtb returned true");
         return true;
     }
 
-    private Impression createImpressionObject(Banner banner, String displayManager, String displayManagerVersion) {
+    private Impression createImpressionObject(final Banner banner, final String displayManager,
+            final String displayManagerVersion) {
         Impression impression;
         if (null != casInternalRequestParameters.impressionId) {
             impression = new Impression(casInternalRequestParameters.impressionId);
         }
         else {
-            logger.info("Impression id can not be null in sasparam");
+            LOG.info("Impression id can not be null in sasparam");
             return null;
         }
         impression.setBanner(banner);
@@ -270,7 +279,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         if (casInternalRequestParameters != null) {
             impression.setBidfloor(casInternalRequestParameters.rtbBidFloor);
-            logger.debug("Bid floor is", Double.toString(impression.getBidfloor()));
+            LOG.debug("Bid floor is {}", impression.getBidfloor());
         }
         if (null != displayManager) {
             impression.setDisplaymanager(displayManager);
@@ -353,13 +362,13 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             }
         }
         catch (NumberFormatException e) {
-            logger.debug("Exception :", e.getMessage());
+            LOG.debug("Exception : {}", e);
         }
         return user;
     }
 
     private Site createSiteObject() {
-        Site site;
+        Site site = null;
         if (siteBlinded) {
             site = new Site(getBlindedSiteId(sasParams.getSiteIncId(), entity.getIncId()));
         }
@@ -374,7 +383,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (!SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
             // Family safe
             siteRating = FAMILY_SAFE_RATING;
-        } else {
+        }
+        else {
             siteRating = PERFORMANCE_RATING;
         }
         siteExtensions.put(RATING_KEY, siteRating);
@@ -384,7 +394,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     private App createAppObject() {
-        App app;
+        App app = null;
         if (siteBlinded) {
             app = new App(getBlindedSiteId(sasParams.getSiteIncId(), entity.getAdgroupIncId()));
         }
@@ -399,7 +409,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (!SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
             // Family safe
             appRating = FAMILY_SAFE_RATING;
-        } else {
+        }
+        else {
             appRating = PERFORMANCE_RATING;
         }
         appExtensions.put(RATING_KEY, appRating);
@@ -407,7 +418,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         return app;
     }
 
-    private Device createDeviceObject(Geo geo) {
+    private Device createDeviceObject(final Geo geo) {
         Device device = new Device();
         device.setIp(sasParams.getRemoteHostIp());
         device.setUa(sasParams.getUserAgent());
@@ -422,7 +433,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 device.setDnt(Integer.parseInt(casInternalRequestParameters.uidADT) == 0 ? 1 : 0);
             }
             catch (NumberFormatException e) {
-                logger.debug("Exception while parsing uidADT to integer", e.getMessage());
+                LOG.debug("Exception while parsing uidADT to integer {}", e);
             }
         }
         // Setting platform id sha1 hashed
@@ -463,12 +474,12 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     public void impressionCallback() {
         URI uriCallBack = null;
         this.callbackUrl = replaceRTBMacros(this.callbackUrl);
-        logger.debug("Callback url is : ", callbackUrl);
+        LOG.debug("Callback url is : {}", callbackUrl);
         try {
             uriCallBack = new URI(callbackUrl);
         }
         catch (URISyntaxException e) {
-            logger.debug("error in creating uri for callback");
+            LOG.debug("error in creating uri for callback");
         }
         StringBuilder content = new StringBuilder();
         content.append("{\"bidid\"=")
@@ -480,20 +491,18 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                     .append(",\"adid\"=")
                     .append(bidResponse.seatbid.get(0).bid.get(0).adid)
                     .append("}");
-        assert uriCallBack != null;
         HttpRequest callBackRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET,
                 uriCallBack.toASCIIString());
         callBackRequest.setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE);
         ChannelBuffer buffer = ChannelBuffers.copiedBuffer(content, Charset.defaultCharset());
         callBackRequest.addHeader(HttpHeaders.Names.CONTENT_LENGTH, buffer.readableBytes());
         callBackRequest.setContent(buffer);
-        boolean callbackResult = impressionCallbackHelper.writeResponse(clientBootstrap, logger, uriCallBack,
-            callBackRequest);
+        boolean callbackResult = impressionCallbackHelper.writeResponse(clientBootstrap, uriCallBack, callBackRequest);
         if (callbackResult) {
-            logger.debug("Callback is sent successfully");
+            LOG.debug("Callback is sent successfully");
         }
         else {
-            logger.debug("Could not send the callback");
+            LOG.debug("Could not send the callback");
         }
     }
 
@@ -519,11 +528,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (6 != sasParams.getDst()) {
             url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_PRICE_ENCRYPTED), encryptedBid);
             url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_PRICE),
-                    Double.toString(secondBidPriceInLocal));
+                Double.toString(secondBidPriceInLocal));
         }
         if (null != bidResponse.getSeatbid().get(0).getBid().get(0).getAdid()) {
             url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_AD_ID),
-                    bidResponse.getSeatbid().get(0).getBid().get(0).getAdid());
+                bidResponse.getSeatbid().get(0).getBid().get(0).getAdid());
         }
         if (null != bidResponse.bidid) {
             url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_BID_ID), bidResponse.bidid);
@@ -531,18 +540,18 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (null != bidResponse.getSeatbid().get(0).getSeat()) {
             url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_SEAT_ID), bidResponse
                     .getSeatbid()
-                    .get(0)
-                    .getSeat());
+                        .get(0)
+                        .getSeat());
         }
         if (null == bidRequest) {
-            logger.info("bidrequest is null");
+            LOG.info("bidrequest is null");
             return url;
         }
         url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_IMP_ID), bidRequest
                 .getImp()
-                .get(0)
-                .getId());
-        logger.debug("String after replaceMacros is ", url);
+                    .get(0)
+                    .getId());
+        LOG.debug("String after replaceMacros is {}", url);
         return url;
     }
 
@@ -556,18 +565,18 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         else {
             httpRequestMethod = HttpMethod.POST;
         }
-        logger.debug("HttpRequest method is : ", httpRequestMethod);
+        LOG.debug("HttpRequest method is : {}", httpRequestMethod);
         try {
             URI uri = getRequestUri();
             requestUrl = (uri.toString());
             request = (new DefaultHttpRequest(HttpVersion.HTTP_1_1, httpRequestMethod, uri.toASCIIString()));
-            logger.debug("host name is ", uri.getHost());
+            LOG.debug("host name is {}", uri.getHost());
             request.setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json");
             request.setHeader(X_OPENRTB_VERSION, rtbVer);
             request.setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
             request.setHeader(HttpHeaders.Names.HOST, uri.getHost());
             if (null == bidRequest) {
-                logger.debug("bidRequest is null so httpRequest is null");
+                LOG.debug("bidRequest is null so httpRequest is null");
                 return null;
             }
             ChannelBuffer buffer = ChannelBuffers.copiedBuffer(bidRequestJson, CharsetUtil.UTF_8);
@@ -576,12 +585,13 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         catch (Exception ex) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.HTTPREQUEST_ERROR;
-            logger.info("Error in making http request for partner", advertiserName, ex);
+            LOG.info("Error in making http request for partner {} {}", advertiserName, ex);
         }
-        logger.debug("content is ", request.getContent().toString(CharsetUtil.UTF_8));
+        LOG.debug("content is {}", request.getContent());
         return request;
     }
 
+    @Override
     public URI getRequestUri() {
         StringBuilder url;
         url = new StringBuilder();
@@ -591,13 +601,14 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         else {
             url.append(urlBase);
         }
-        logger.debug(getName(), "url is", url.toString());
+        LOG.debug("{} url is {}", getName(), url.toString());
         return (URI.create(url.toString()));
     }
 
-    public void parseResponse(String response, HttpResponseStatus status) {
+    @Override
+    public void parseResponse(final String response, final HttpResponseStatus status) {
         adStatus = "NO_AD";
-        logger.debug("response is ", response);
+        LOG.debug("response is {}", response);
         if (status.getCode() != 200 || StringUtils.isBlank(response)) {
             statusCode = status.getCode();
             if (200 == statusCode) {
@@ -613,7 +624,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 adStatus = "NO_AD";
                 responseContent = "";
                 statusCode = 500;
-                logger.info("Error in parsing rtb response");
+                LOG.info("Error in parsing rtb response");
                 return;
             }
             adStatus = "AD";
@@ -631,7 +642,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 }
             }
             // Checking whether to send win notification
-            logger.debug("isWinRequired is", wnRequired, "and winfromconfig is", callbackUrl);
+            LOG.debug("isWinRequired is {} and winfromconfig is {}", wnRequired, callbackUrl);
             if (wnRequired) {
                 // setCallbackContent();
                 // Win notification is required
@@ -640,15 +651,15 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                     nUrl = bidResponse.seatbid.get(0).getBid().get(0).getNurl();
                 }
                 catch (Exception e) {
-                    logger.debug("Exception while parsing response");
+                    LOG.debug("Exception while parsing response {}", e);
                 }
-                logger.debug("nurl is", nUrl);
+                LOG.debug("nurl is {}", nUrl);
                 if (!StringUtils.isEmpty(callbackUrl)) {
-                    logger.debug("inside wn from config");
+                    LOG.debug("inside wn from config");
                     velocityContext.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, callbackUrl);
                 }
                 else if (!StringUtils.isEmpty(nUrl)) {
-                    logger.debug("inside wn from nurl");
+                    LOG.debug("inside wn from nurl");
                     velocityContext.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, nUrl);
                 }
 
@@ -656,24 +667,24 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             velocityContext.put(VelocityTemplateFieldConstants.IMBeaconUrl, this.beaconUrl);
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.RTB_HTML, velocityContext, sasParams,
-                        null, logger);
+                    null);
             }
             catch (Exception e) {
                 adStatus = "NO_AD";
-                logger.info("Some exception is caught while filling the velocity template for partner", advertiserName,
-                        e.getMessage());
+                LOG.info("Some exception is caught while filling the velocity template for partner{} {}",
+                    advertiserName, e);
             }
         }
-        logger.debug("response length is ", responseContent.length());
+        LOG.debug("response length is {}", responseContent.length());
     }
 
-    public boolean deserializeResponse(String response) {
+    public boolean deserializeResponse(final String response) {
         Gson gson = new Gson();
         try {
             bidResponse = gson.fromJson(response, BidResponse.class);
-            logger.debug("Done with parsing of bidresponse");
+            LOG.debug("Done with parsing of bidresponse");
             if (null == bidResponse || null == bidResponse.getSeatbid() || bidResponse.getSeatbidSize() == 0) {
-                logger.debug("BidResponse does not have seat bid object");
+                LOG.debug("BidResponse does not have seat bid object");
                 return false;
             }
             if (!StringUtils.isEmpty(bidResponse.getCur())) {
@@ -687,12 +698,12 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             return true;
         }
         catch (NullPointerException e) {
-            logger.info("Could not parse the rtb response from partner:", this.getName());
+            LOG.info("Could not parse the rtb response from partner: {}", this.getName());
             return false;
         }
     }
 
-    private double calculatePriceInUSD(double price, String currencyCode) {
+    private double calculatePriceInUSD(final double price, String currencyCode) {
         if (StringUtils.isEmpty(currencyCode)) {
             currencyCode = USD;
         }
@@ -710,7 +721,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         return price;
     }
 
-    private double calculatePriceInLocal(double price) {
+    private double calculatePriceInLocal(final double price) {
         if (USD.equalsIgnoreCase(bidderCurrency)) {
             return price;
         }
@@ -733,14 +744,14 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     @Override
-    public void setSecondBidPrice(Double price) {
+    public void setSecondBidPrice(final Double price) {
         this.secondBidPriceInUsd = price;
         this.secondBidPriceInLocal = calculatePriceInLocal(price);
-        logger.debug("responseContent before replaceMacros is", responseContent);
+        LOG.debug("responseContent before replaceMacros is {}", responseContent);
         this.responseContent = replaceRTBMacros(this.responseContent);
         ThirdPartyAdResponse adResponse = getResponseAd();
         adResponse.response = responseContent;
-        logger.debug("responseContent after replaceMacros is", getResponseAd().response);
+        LOG.debug("responseContent after replaceMacros is {}", getResponseAd().response);
     }
 
     @Override
@@ -759,7 +770,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     @Override
-    public void setEncryptedBid(String encryptedBid) {
+    public void setEncryptedBid(final String encryptedBid) {
         this.encryptedBid = encryptedBid;
     }
 

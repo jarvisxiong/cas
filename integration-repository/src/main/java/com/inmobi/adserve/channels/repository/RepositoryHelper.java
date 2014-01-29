@@ -3,12 +3,25 @@ package com.inmobi.adserve.channels.repository;
 import lombok.Getter;
 import lombok.Setter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Preconditions;
-import com.inmobi.adserve.channels.entity.*;
+import com.inmobi.adserve.channels.entity.ChannelEntity;
+import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
+import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.entity.PricingEngineEntity;
+import com.inmobi.adserve.channels.entity.PublisherFilterEntity;
+import com.inmobi.adserve.channels.entity.SegmentAdGroupFeedbackEntity;
+import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
+import com.inmobi.adserve.channels.entity.SiteFeedbackEntity;
+import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
+import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
 import com.inmobi.adserve.channels.query.PricingEngineQuery;
 import com.inmobi.adserve.channels.query.PublisherFilterQuery;
 import com.inmobi.adserve.channels.query.SiteEcpmQuery;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.phoenix.exception.RepositoryException;
 
 
@@ -26,8 +39,9 @@ public class RepositoryHelper {
     private final SiteEcpmRepository               siteEcpmRepository;
     private final CurrencyConversionRepository     currencyConversionRepository;
     private final RepositoryStatsProvider          repositoryStatsProvider;
+    private static final Logger                    LOG = LoggerFactory.getLogger(RepositoryHelper.class);
 
-    public RepositoryHelper(Builder builder) {
+    public RepositoryHelper(final Builder builder) {
         this.channelRepository = builder.channelRepository;
         this.channelAdGroupRepository = builder.channelAdGroupRepository;
         this.channelFeedbackRepository = builder.channelFeedbackRepository;
@@ -87,7 +101,7 @@ public class RepositoryHelper {
         }
     }
 
-    public ChannelEntity queryChannelRepository(String channelId) {
+    public ChannelEntity queryChannelRepository(final String channelId) {
         try {
             return channelRepository.query(channelId);
         }
@@ -96,7 +110,7 @@ public class RepositoryHelper {
         return null;
     }
 
-    public ChannelSegmentEntity queryChannelAdGroupRepository(String adGroupId) {
+    public ChannelSegmentEntity queryChannelAdGroupRepository(final String adGroupId) {
         try {
             return channelAdGroupRepository.query(adGroupId);
         }
@@ -105,7 +119,7 @@ public class RepositoryHelper {
         return null;
     }
 
-    public ChannelSegmentFeedbackEntity queryChannelSegmentFeedbackRepository(String adGroupId) {
+    public ChannelSegmentFeedbackEntity queryChannelSegmentFeedbackRepository(final String adGroupId) {
         try {
             return channelSegmentFeedbackRepository.query(adGroupId);
         }
@@ -114,7 +128,7 @@ public class RepositoryHelper {
         return null;
     }
 
-    public ChannelFeedbackEntity queryChannelFeedbackRepository(String advertiserId) {
+    public ChannelFeedbackEntity queryChannelFeedbackRepository(final String advertiserId) {
         try {
             return channelFeedbackRepository.query(advertiserId);
         }
@@ -123,7 +137,7 @@ public class RepositoryHelper {
         return null;
     }
 
-    public SiteTaxonomyEntity querySiteTaxonomyRepository(String id) {
+    public SiteTaxonomyEntity querySiteTaxonomyRepository(final String id) {
         try {
             return siteTaxonomyRepository.query(id);
         }
@@ -132,7 +146,7 @@ public class RepositoryHelper {
         return null;
     }
 
-    public SiteMetaDataEntity querySiteMetaDetaRepository(String siteId) {
+    public SiteMetaDataEntity querySiteMetaDetaRepository(final String siteId) {
         try {
             return siteMetaDataRepository.query(siteId);
         }
@@ -141,16 +155,16 @@ public class RepositoryHelper {
         return null;
     }
 
-    public SegmentAdGroupFeedbackEntity querySiteCitrusLeafFeedbackRepository(String siteId, Integer segmentId,
-            DebugLogger logger) {
-        return siteCitrusLeafFeedbackRepository.query(siteId, segmentId, logger);
+    public SegmentAdGroupFeedbackEntity querySiteCitrusLeafFeedbackRepository(final String siteId,
+            final Integer segmentId) {
+        return siteCitrusLeafFeedbackRepository.query(siteId, segmentId);
     }
 
-    public SiteFeedbackEntity querySiteCitrusLeafFeedbackRepository(String siteId) {
+    public SiteFeedbackEntity querySiteCitrusLeafFeedbackRepository(final String siteId) {
         return siteCitrusLeafFeedbackRepository.query(siteId);
     }
 
-    public PricingEngineEntity queryPricingEngineRepository(int country, int os) {
+    public PricingEngineEntity queryPricingEngineRepository(final int country, final int os) {
         try {
             return pricingEngineRepository.query(new PricingEngineQuery(country, os));
         }
@@ -159,7 +173,7 @@ public class RepositoryHelper {
         return null;
     }
 
-    public PublisherFilterEntity queryPublisherFilterRepository(String siteId, Integer ruleType) {
+    public PublisherFilterEntity queryPublisherFilterRepository(final String siteId, final Integer ruleType) {
         try {
             return publisherFilterRepository.query(new PublisherFilterQuery(siteId, ruleType));
         }
@@ -168,7 +182,7 @@ public class RepositoryHelper {
         return null;
     }
 
-    public SiteEcpmEntity querySiteEcpmRepository(String siteId, Integer countryId, Integer osId) {
+    public SiteEcpmEntity querySiteEcpmRepository(final String siteId, final Integer countryId, final Integer osId) {
         try {
             return siteEcpmRepository.query(new SiteEcpmQuery(siteId, countryId, osId));
         }
@@ -177,7 +191,7 @@ public class RepositoryHelper {
         return null;
     }
 
-    public CurrencyConversionEntity queryCurrencyConversionRepository(String countryId) {
+    public CurrencyConversionEntity queryCurrencyConversionRepository(final String countryId) {
         try {
             return currencyConversionRepository.query(countryId);
         }

@@ -1,15 +1,16 @@
 package com.inmobi.adserve.channels.adnetworks.ifd;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import org.apache.commons.configuration.Configuration;
 import org.codehaus.plexus.util.StringUtils;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -18,34 +19,35 @@ import java.net.URLEncoder;
 import java.util.*;
 
 
-public class IFDAdNetwork extends BaseAdNetworkImpl {
+public class IFDAdNetwork extends AbstractDCPAdNetworkImpl {
     // Updates the request parameters according to the Ad Network. Returns true on
     // success.i
 
-    private Configuration config;
+    private static final Logger LOG = LoggerFactory.getLogger(IFDAdNetwork.class);
 
-    public IFDAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent, logger);
-        this.config = config;
-        this.clientBootstrap = clientBootstrap;
-        this.logger = logger;
+    public IFDAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }
 
     // Assign the value to the parameters
-    public boolean configureParameters(final SASRequestParameters param, final String externalSiteKey, String clurl) {
+    public boolean configureParameters(final SASRequestParameters param, final String externalSiteKey,
+            final String clurl) {
         return false;
     }
 
     // Assign the value to the parameters
+    @Override
     public boolean configureParameters() {
         return true;
     }
 
+    @Override
     public String getName() {
         return "ifd";
     }
 
+    @Override
     public boolean isInternal() {
         return true;
     }
@@ -130,7 +132,7 @@ public class IFDAdNetwork extends BaseAdNetworkImpl {
             format = sasParams.getRFormat();
         }
         catch (Exception exception) {
-            logger.info("error in parsing format passed by network");
+            LOG.info("error in parsing format passed by network");
         }
         if (StringUtils.isEmpty(format)) {
             format = config.getString("ifd.responseFormat");
@@ -141,14 +143,14 @@ public class IFDAdNetwork extends BaseAdNetworkImpl {
             paramMap.put("sdk-version", sasParams.getSdkVersion());
         }
         catch (Exception exception) {
-            logger.info("error in parsing sdk-version passed by network");
+            LOG.info("error in parsing sdk-version passed by network");
         }
 
         try {
             paramMap.put("u-latlong", sasParams.getLatLong());
         }
         catch (Exception exception) {
-            logger.info("error in parsing latlong passed by network");
+            LOG.info("error in parsing latlong passed by network");
         }
         normalizedParms = normalizeParameters(paramMap);
 
@@ -191,12 +193,12 @@ public class IFDAdNetwork extends BaseAdNetworkImpl {
     }
 
     // parsing the response message to get HTTP response code and httpresponse
-    public void parseResponse(String response) {
+    public void parseResponse(final String response) {
         if (response == null || response.contains("<!-- mKhoj: No advt for this position -->")) {
             statusCode = 500;
             return;
         }
-        logger.debug("response is ", response);
+        LOG.debug("response is {}", response);
         String responseArray[] = response.split("\n");
         StringBuilder responseBuilder = new StringBuilder();
         int index = 0;
@@ -205,7 +207,7 @@ public class IFDAdNetwork extends BaseAdNetworkImpl {
                 try {
                     String responseHeader[] = responseArray[index].split(" ");
                     statusCode = Integer.parseInt(responseHeader[1].trim());
-                    logger.debug("status code is", statusCode);
+                    LOG.debug("status code is {}", statusCode);
                     if (statusCode != 200) {
                         return;
                     }
@@ -213,13 +215,13 @@ public class IFDAdNetwork extends BaseAdNetworkImpl {
                 catch (Exception ex) {
                     errorStatus = ThirdPartyAdResponse.ResponseStatus.INVALID_RESPONSE;
                     statusCode = 500;
-                    logger.debug("status code is 500 inside parseResponse");
+                    LOG.debug("status code is 500 inside parseResponse");
                     return;
                 }
             }
             // blank line indicates end of header and start of body
             else if (responseArray[index].trim().isEmpty()) {
-                logger.debug("got a blank line to separate header and body");
+                LOG.debug("got a blank line to separate header and body");
                 break;
             }
         }
@@ -228,6 +230,6 @@ public class IFDAdNetwork extends BaseAdNetworkImpl {
         }
         responseContent = new String(responseBuilder.toString());
         adStatus = "AD";
-        logger.debug("response length is ", responseContent.length());
+        LOG.debug("response length is {}", responseContent.length());
     }
 }

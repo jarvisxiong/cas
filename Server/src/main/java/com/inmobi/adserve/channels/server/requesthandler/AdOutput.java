@@ -1,7 +1,6 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.creativetool.api.AdCreative;
 import com.inmobi.adserve.creativetool.api.AdMakerFactory;
 import com.inmobi.adserve.creativetool.api.AdRequest;
@@ -14,21 +13,24 @@ import com.inmobi.phoenix.exception.InitializationException;
 import com.inmobi.phoenix.exception.RepositoryException;
 import lombok.Data;
 import org.apache.commons.configuration.ConfigurationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 
 public class AdOutput {
     private static AdMakerFactory adMakerFactory;
+    private static final Logger LOG     = LoggerFactory.getLogger(AdOutput.class);
     
-    public static void  init(final DebugLogger logger) {
+    public static void  init() {
         try {
             adMakerFactory = new AdMakerFactory();
         } catch (InitializationException e) {
-            logger.debug("Failed in Initialization", e);
+            LOG.debug("Failed in Initialization", e);
         } catch (ConfigurationException e) {
-            logger.debug("Failed in Configuration", e);
+            LOG.debug("Failed in Configuration", e);
         } catch (RepositoryException e) {
-            logger.debug("Failed in Repository", e);
+            LOG.debug("Failed in Repository", e);
         }        
     }
     

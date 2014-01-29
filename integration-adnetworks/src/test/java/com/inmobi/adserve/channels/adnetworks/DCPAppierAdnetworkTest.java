@@ -1,15 +1,9 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-
+import com.inmobi.adserve.channels.adnetworks.appier.DCPAppierAdNetwork;
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import junit.framework.TestCase;
-
 import org.apache.commons.configuration.Configuration;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -19,10 +13,13 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.util.CharsetUtil;
 import org.testng.annotations.Test;
 
-import com.inmobi.adserve.channels.adnetworks.appier.DCPAppierAdNetwork;
-import com.inmobi.adserve.channels.api.*;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 
 public class DCPAppierAdnetworkTest extends TestCase {
@@ -30,7 +27,6 @@ public class DCPAppierAdnetworkTest extends TestCase {
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
     private final ClientBootstrap clientBootstrap = null;
-    private DebugLogger           logger;
     private DCPAppierAdNetwork    dcpAppierAdNetwork;
     private final String          appierHost      = "http://ed5.rtb.appier.net/imreq/inmobi_hk";
     private final String          appierStatus    = "on";
@@ -58,9 +54,7 @@ public class DCPAppierAdnetworkTest extends TestCase {
         MessageEvent serverEvent = createMock(MessageEvent.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        DebugLogger.init(mockConfig);
-        logger = new DebugLogger();
-        dcpAppierAdNetwork = new DCPAppierAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpAppierAdNetwork = new DCPAppierAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test

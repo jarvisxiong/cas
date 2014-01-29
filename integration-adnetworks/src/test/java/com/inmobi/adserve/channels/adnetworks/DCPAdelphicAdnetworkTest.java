@@ -3,7 +3,6 @@ package com.inmobi.adserve.channels.adnetworks;
 import com.inmobi.adserve.channels.adnetworks.adelphic.DCPAdelphicAdNetwork;
 import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 import org.jboss.netty.bootstrap.ClientBootstrap;
@@ -28,7 +27,6 @@ public class DCPAdelphicAdnetworkTest extends TestCase {
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
     private final ClientBootstrap clientBootstrap = null;
-    private DebugLogger           logger;
 
     private DCPAdelphicAdNetwork  dcpAdelphicAdNetwork;
     private final String          adelphicHost    = "http://ad.ipredictive.com/d/ads";
@@ -59,10 +57,8 @@ public class DCPAdelphicAdnetworkTest extends TestCase {
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         SlotSizeMapping.init();
-        DebugLogger.init(mockConfig);
         Formatter.init();
-        logger = new DebugLogger();
-        dcpAdelphicAdNetwork = new DCPAdelphicAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpAdelphicAdNetwork = new DCPAdelphicAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test
@@ -70,7 +66,7 @@ public class DCPAdelphicAdnetworkTest extends TestCase {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setSlot((short) 11);
+        sasParams.setSlot(Short.valueOf("11"));
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
@@ -157,7 +153,7 @@ public class DCPAdelphicAdnetworkTest extends TestCase {
         category.add(3l);
         sasParams.setCategories(category);
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot((short)15);
+        sasParams.setSlot(Short.valueOf("15"));
         String externalKey = "0344343";
         SlotSizeMapping.init();
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
@@ -183,7 +179,7 @@ public class DCPAdelphicAdnetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "38.5,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot((short)15);
+        sasParams.setSlot(Short.valueOf("15"));
         List<Long> category = new ArrayList<Long>();
         category.add(3l);
         category.add(2l);
@@ -214,7 +210,7 @@ public class DCPAdelphicAdnetworkTest extends TestCase {
         casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot((short)15);
+        sasParams.setSlot(Short.valueOf("15"));
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c"
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
@@ -241,7 +237,7 @@ public class DCPAdelphicAdnetworkTest extends TestCase {
         casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot((short)15);
+        sasParams.setSlot(Short.valueOf("15"));
         sasParams.setSource("APP");
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c"

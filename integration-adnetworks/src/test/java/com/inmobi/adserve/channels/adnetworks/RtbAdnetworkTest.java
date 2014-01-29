@@ -1,5 +1,34 @@
 package com.inmobi.adserve.channels.adnetworks;
 
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.isA;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
+
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import junit.framework.TestCase;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TSimpleJSONProtocol;
+import org.easymock.EasyMock;
+import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
+import org.jboss.netty.handler.codec.http.HttpHeaders;
+import org.jboss.netty.handler.codec.http.HttpMethod;
+import org.jboss.netty.handler.codec.http.HttpRequest;
+import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import org.jboss.netty.handler.codec.http.HttpVersion;
+import org.testng.annotations.Test;
+
 import com.inmobi.adserve.channels.adnetworks.rtb.ImpressionCallbackHelper;
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -9,47 +38,23 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.casthrift.rtb.Bid;
 import com.inmobi.casthrift.rtb.BidRequest;
 import com.inmobi.casthrift.rtb.BidResponse;
 import com.inmobi.casthrift.rtb.SeatBid;
-import junit.framework.TestCase;
-import org.apache.commons.configuration.Configuration;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TSimpleJSONProtocol;
-import org.easymock.EasyMock;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.*;
-import org.testng.annotations.Test;
-
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.isA;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
 
 
 public class RtbAdnetworkTest extends TestCase {
 
-    private Configuration                mockConfig                   = null;
-    private final String                 debug                        = "debug";
-    private final String                 loggerConf                   = "/tmp/channel-server.properties";
-    private ClientBootstrap              clientBootstrap              = null;
-    private DebugLogger                  logger;
-    private RtbAdNetwork                 rtbAdNetwork;
-    private SASRequestParameters         sasParams                    = new SASRequestParameters();
-    private CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-    private String                       rtbAdvId                     = "id";
-    BidResponse                          bidResponse;
+    private Configuration                      mockConfig                   = null;
+    private final String                       debug                        = "debug";
+    private final String                       loggerConf                   = "/tmp/channel-server.properties";
+    private ClientBootstrap                    clientBootstrap              = null;
+    private RtbAdNetwork                       rtbAdNetwork;
+    private final SASRequestParameters         sasParams                    = new SASRequestParameters();
+    private final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+    private final String                       rtbAdvId                     = "id";
+    BidResponse                                bidResponse;
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -79,11 +84,9 @@ public class RtbAdnetworkTest extends TestCase {
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         clientBootstrap = createMock(ClientBootstrap.class);
         prepareMockConfig();
-        DebugLogger.init(mockConfig);
         Formatter.init();
         sasParams.setSource("app");
         sasParams.setDst(2);
-        logger = new DebugLogger();
         String urlBase = "";
         CurrencyConversionEntity currencyConversionEntity = EasyMock.createMock(CurrencyConversionEntity.class);
         EasyMock.expect(currencyConversionEntity.getConversionRate()).andReturn(10.0).anyTimes();
@@ -93,7 +96,7 @@ public class RtbAdnetworkTest extends TestCase {
                     .andReturn(currencyConversionEntity)
                     .anyTimes();
         EasyMock.replay(repositoryHelper);
-        rtbAdNetwork = new RtbAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent, urlBase, "rtb", 200,
+        rtbAdNetwork = new RtbAdNetwork(mockConfig, clientBootstrap, base, serverEvent, urlBase, "rtb", 200,
                 repositoryHelper);
         Bid bid2 = new Bid();
         bid2.id = "ab73dd4868a0bbadf8fd7527d95136b4";
@@ -130,8 +133,8 @@ public class RtbAdnetworkTest extends TestCase {
         rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
         RtbAdNetwork.impressionCallbackHelper = createMock(ImpressionCallbackHelper.class);
         expect(
-            RtbAdNetwork.impressionCallbackHelper.writeResponse(isA(ClientBootstrap.class), isA(DebugLogger.class),
-                isA(URI.class), isA(DefaultHttpRequest.class))).andReturn(true).anyTimes();
+            RtbAdNetwork.impressionCallbackHelper.writeResponse(isA(ClientBootstrap.class), isA(URI.class),
+                isA(DefaultHttpRequest.class))).andReturn(true).anyTimes();
         replay(RtbAdNetwork.impressionCallbackHelper);
         rtbAdNetwork.setBidResponse(bidResponse);
         rtbAdNetwork.impressionCallback();

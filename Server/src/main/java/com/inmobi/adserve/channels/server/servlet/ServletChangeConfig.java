@@ -1,46 +1,62 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.ServletHandler;
-import com.inmobi.adserve.channels.server.api.Servlet;
-import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
-import com.inmobi.adserve.channels.util.DebugLogger;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.QueryStringDecoder;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.ws.rs.Path;
 
+import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.handler.codec.http.QueryStringDecoder;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.server.ServletHandler;
+import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
+
+
+@Singleton
+@Path("/configChange")
 public class ServletChangeConfig implements Servlet {
+    private static final Logger LOG = LoggerFactory.getLogger(ServletChangeConfig.class);
+    private final RequestParser requestParser;
+
+    @Inject
+    ServletChangeConfig(final RequestParser requestParser) {
+        this.requestParser = requestParser;
+    }
 
     @Override
-    public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e,
-            DebugLogger logger) throws Exception {
+    public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
+            final MessageEvent e) throws Exception {
+
         Map<String, List<String>> params = queryStringDecoder.getParameters();
         JSONObject jObject = null;
         try {
-            jObject = RequestParser.extractParams(params, "update");
+            jObject = requestParser.extractParams(params, "update");
         }
         catch (JSONException exeption) {
-            logger.debug("Encountered Json Error while creating json object inside servlet");
+            LOG.debug("Encountered Json Error while creating json object inside servlet");
             hrh.setTerminationReason(ServletHandler.jsonParsingError);
             InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
             hrh.responseSender.sendResponse("Incorrect Json", e);
             return;
         }
         if (jObject == null) {
-            logger.debug("jobject is null so returning");
+            LOG.debug("jobject is null so returning");
             hrh.setTerminationReason(ServletHandler.jsonParsingError);
             hrh.responseSender.sendResponse("Incorrect Json", e);
             return;
         }
-        logger.debug("Successfully got json for config change");
+        LOG.debug("Successfully got json for config change");
         try {
             StringBuilder updates = new StringBuilder();
             updates.append("Successfully changed Config!!!!!!!!!!!!!!!!!\n").append("The changes are\n");
@@ -70,8 +86,7 @@ public class ServletChangeConfig implements Servlet {
             hrh.responseSender.sendResponse(updates.toString(), e);
         }
         catch (JSONException ex) {
-            logger
-                    .debug("Encountered Json Error while creating json object inside HttpRequest Handler for config change");
+            LOG.debug("Encountered Json Error while creating json object inside HttpRequest Handler for config change");
             hrh.terminationReason = ServletHandler.jsonParsingError;
         }
     }

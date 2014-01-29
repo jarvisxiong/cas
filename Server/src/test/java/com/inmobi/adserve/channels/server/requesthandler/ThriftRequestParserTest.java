@@ -3,7 +3,6 @@ package com.inmobi.adserve.channels.server.requesthandler;
 import com.inmobi.adserve.adpool.*;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.types.ContentRating;
 import com.inmobi.types.Gender;
 import com.inmobi.types.InventoryType;
@@ -26,7 +25,6 @@ public class ThriftRequestParserTest extends TestCase {
         expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
         expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
         replay(mockConfig);
-        DebugLogger.init(mockConfig);
     }
     
     public void testParseRequestParameters() 
@@ -99,8 +97,7 @@ public class ThriftRequestParserTest extends TestCase {
 
         SASRequestParameters sasRequestParameters = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        DebugLogger debugLogger = new DebugLogger();
-        ThriftRequestParser.parseRequestParameters(adPoolRequest, sasRequestParameters, casInternalRequestParameters, debugLogger, 6);
+        ThriftRequestParser.parseRequestParameters(adPoolRequest, sasRequestParameters, casInternalRequestParameters, 6);
 
         assertEquals(sasRequestParameters.getRemoteHostIp(), "10.14.118.143");
         assertEquals(sasRequestParameters.getUserAgent(), "UserAgent");

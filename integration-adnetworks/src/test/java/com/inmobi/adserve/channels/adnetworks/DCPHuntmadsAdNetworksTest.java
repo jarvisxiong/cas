@@ -1,25 +1,22 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-
+import com.inmobi.adserve.channels.adnetworks.huntmads.DCPHuntmadsAdNetwork;
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import junit.framework.TestCase;
-
 import org.apache.commons.configuration.Configuration;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.testng.annotations.Test;
 
-import com.inmobi.adserve.channels.adnetworks.huntmads.DCPHuntmadsAdNetwork;
-import com.inmobi.adserve.channels.api.*;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 
 /**
@@ -31,7 +28,6 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
     private final ClientBootstrap clientBootstrap = null;
-    private DebugLogger           logger;
     private DCPHuntmadsAdNetwork  dcpHuntmadsAdNetwork;
     private final String          huntmadsHost    = "http://ads.huntmad.com/ad";
     private final String          huntmadsStatus  = "on";
@@ -61,9 +57,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         MessageEvent serverEvent = createMock(MessageEvent.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        DebugLogger.init(mockConfig);
-        logger = new DebugLogger();
-        dcpHuntmadsAdNetwork = new DCPHuntmadsAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpHuntmadsAdNetwork = new DCPHuntmadsAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test

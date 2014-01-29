@@ -2,7 +2,6 @@ package com.inmobi.adserve.channels.adnetworks.nexage;
 
 import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
@@ -18,19 +17,21 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 
-public class DCPNexageAdNetwork extends BaseAdNetworkImpl {
+public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
     // Updates the request parameters according to the Ad Network. Returns true on
     // success.i
+    private static final Logger          LOG             = LoggerFactory.getLogger(DCPNexageAdNetwork.class);
 
     private int                          height          = 0;
     private int                          width           = 0;
-    private final Configuration          config;
     private static IABCountriesInterface iABCountries;
     private Request                      ningRequest;
     private String                       pos;
@@ -48,12 +49,9 @@ public class DCPNexageAdNetwork extends BaseAdNetworkImpl {
         iABCountries = new IABCountriesMap();
     }
 
-    public DCPNexageAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent, logger);
-        this.logger = logger;
-        this.config = config;
-        this.clientBootstrap = clientBootstrap;
+    public DCPNexageAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }
 
     // Configure the request parameters for making the ad call
@@ -61,7 +59,7 @@ public class DCPNexageAdNetwork extends BaseAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            logger.debug("mandate parameters missing for nexage, so returning from adapter");
+            LOG.debug("mandate parameters missing for nexage, so returning from adapter");
             return false;
         }
 
@@ -83,7 +81,7 @@ public class DCPNexageAdNetwork extends BaseAdNetworkImpl {
             pos = entity.getAdditionalParams().getString(POS);
         }
         catch (JSONException e) {
-            logger.info("pos is not configured for the segment:{}", entity.getExternalSiteKey(), this.getName());
+            LOG.info("pos is not configured for the segment:{} {}", entity.getExternalSiteKey(), this.getName());
             return false;
         }
 
@@ -94,7 +92,7 @@ public class DCPNexageAdNetwork extends BaseAdNetworkImpl {
             jsAdTag = false;
         }
 
-        logger.debug("Configure parameters inside nexage returned true");
+        LOG.debug("Configure parameters inside nexage returned true");
         return true;
     }
 
@@ -174,22 +172,22 @@ public class DCPNexageAdNetwork extends BaseAdNetworkImpl {
                 finalUrl.append("&").append(paramValue[0]).append("=").append(paramValue[1]);
             }
         }
-        logger.debug("url inside nexage: ", finalUrl.toString());
+        LOG.debug("url inside nexage: {}", finalUrl);
         try {
             return (new URI(finalUrl.toString()));
         }
         catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            logger.info("Error Forming Url inside nexage", exception.getMessage());
+            LOG.info("Error Forming Url inside nexage {}", exception);
         }
         return null;
     }
 
     // parse the response received from nexage
     @Override
-    public void parseResponse(String response, HttpResponseStatus status) {
-        logger.debug("response is ", response, "and response length is ", response.length());
-        if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
+    public void parseResponse(final String response, final HttpResponseStatus status) {
+        LOG.debug("response is {} and response length is ", response, response.length());
+        if (status.getCode() != 200 || response.trim().isEmpty()) {
             statusCode = status.getCode();
             if (200 == statusCode) {
                 statusCode = 500;
@@ -201,49 +199,48 @@ public class DCPNexageAdNetwork extends BaseAdNetworkImpl {
             VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
             try {
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl,
-                    logger);
+                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
             }
             catch (Exception exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from nexage :", exception);
-                logger.info("Response from nexage:", response);
+                LOG.info("Error parsing response from nexage : {}", exception);
+                LOG.info("Response from nexage: {}", response);
                 try {
                     throw exception;
                 }
                 catch (Exception e) {
-                    logger.info("Error while rethrowing the exception :", e);
+                    LOG.info("Error while rethrowing the exception : {}", e);
                 }
             }
             adStatus = "AD";
         }
-        logger.debug("response length is", responseContent.length());
+        LOG.debug("response length is {}", responseContent.length());
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public boolean makeAsyncRequest() {
-        logger.debug("In nexage async");
+        LOG.debug("In nexage async");
 
         if (useJsAdTag()) {
             generateJsAdResponse();
             processResponse();
-            logger.debug("sent jsadcode ... returning from make NingRequest");
+            LOG.debug("sent jsadcode ... returning from make NingRequest");
             return true;
         }
         try {
             String uri = getRequestUri().toString();
             requestUrl = uri;
             setNingRequest(requestUrl);
-            logger.debug("Nexage uri :", uri);
+            LOG.debug("Nexage uri : {}", uri);
             startTime = System.currentTimeMillis();
             baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
                 @Override
-                public Response onCompleted(Response response) throws Exception {
+                public Response onCompleted(final Response response) throws Exception {
                     if (!isRequestCompleted()) {
-                        logger.debug("Operation complete for channel partner: ", getName());
+                        LOG.debug("Operation complete for channel partner: {}", getName());
                         latency = System.currentTimeMillis() - startTime;
-                        logger.debug("Nexage operation complete latency ", latency);
+                        LOG.debug("Nexage operation complete latency {}", latency);
                         String responseStr = response.getResponseBody();
                         HttpResponseStatus httpResponseStatus = HttpResponseStatus.valueOf(response.getStatusCode());
                         parseResponse(responseStr, httpResponseStatus);
@@ -253,31 +250,31 @@ public class DCPNexageAdNetwork extends BaseAdNetworkImpl {
                 }
 
                 @Override
-                public void onThrowable(Throwable t) {
+                public void onThrowable(final Throwable t) {
                     if (isRequestComplete) {
                         return;
                     }
 
                     if (t instanceof java.util.concurrent.TimeoutException) {
                         latency = System.currentTimeMillis() - startTime;
-                        logger.debug("Nexage timeout latency ", latency);
+                        LOG.debug("Nexage timeout latency {}", latency);
                         adStatus = "TIME_OUT";
                         processResponse();
                         return;
                     }
 
-                    logger.debug("Nexage error latency ", latency);
+                    LOG.debug("Nexage error latency {}", latency);
                     adStatus = "TERM";
-                    logger.info("error while fetching response from:", getName(), t.getMessage());
+                    LOG.info("error while fetching response from: {} {}", getName(), t);
                     processResponse();
                     return;
                 }
             });
         }
         catch (Exception e) {
-            logger.debug("Exception in Nexage makeAsyncRequest :", e.getMessage());
+            LOG.debug("Exception in Nexage makeAsyncRequest : {}", e);
         }
-        logger.debug("returning from make NingRequest");
+        LOG.debug("returning from make NingRequest");
         return true;
     }
 
@@ -294,23 +291,17 @@ public class DCPNexageAdNetwork extends BaseAdNetworkImpl {
         }
         try {
             responseContent = Formatter.getResponseFromTemplate(TemplateType.NEXAGE_JS_AD_TAG, context, sasParams,
-                beaconUrl, logger);
+                beaconUrl);
             adStatus = "AD";
         }
         catch (Exception exception) {
             adStatus = "NO_AD";
-            logger.info("Error generating Static Js adtag for nexage  :", exception);
-            try {
-                throw exception;
-            }
-            catch (Exception e) {
-                logger.info("Error while rethrowing the exception :", e);
-            }
+            LOG.info("Error generating Static Js adtag for nexage  : {}", exception);
         }
-        logger.debug("response length is", responseContent.length());
+        LOG.debug("response length is {}", responseContent.length());
     }
 
-    private void setNingRequest(String requestUrl) {
+    private void setNingRequest(final String requestUrl) {
         ningRequest = new RequestBuilder()
                 .setUrl(requestUrl)
                     .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())

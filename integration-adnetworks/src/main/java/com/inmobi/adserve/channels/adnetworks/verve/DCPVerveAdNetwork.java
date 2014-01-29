@@ -3,7 +3,6 @@ package com.inmobi.adserve.channels.adnetworks.verve;
 import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -12,14 +11,18 @@ import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 
-public class DCPVerveAdNetwork extends BaseAdNetworkImpl {
-    private final Configuration config;
+public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
+
+    private static final Logger LOG                = LoggerFactory.getLogger(DCPVerveAdNetwork.class);
+
     private transient String    latitude;
     private transient String    longitude;
     private int                 width;
@@ -33,19 +36,16 @@ public class DCPVerveAdNetwork extends BaseAdNetworkImpl {
     private static final String TRUE_LAT_LONG_ONLY = "trueLatLongOnly";
     private boolean             sendTrueLatLongOnly;
 
-    public DCPVerveAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent, logger);
-        this.config = config;
-        this.logger = logger;
-        this.clientBootstrap = clientBootstrap;
+    public DCPVerveAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }
 
     @Override
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            logger.debug("mandatory parameters missing for verve so exiting adapter");
+            LOG.debug("mandatory parameters missing for verve so exiting adapter");
             return false;
         }
         host = config.getString("verve.host");
@@ -56,8 +56,8 @@ public class DCPVerveAdNetwork extends BaseAdNetworkImpl {
         }
         catch (JSONException e) {
             sendTrueLatLongOnly = false;
-            logger
-                    .info("trueLatLong is not configured for the segment:{}", entity.getExternalSiteKey(),
+            LOG
+                    .info("trueLatLong is not configured for the segment:{} {}", entity.getExternalSiteKey(),
                         this.getName());
         }
 
@@ -98,18 +98,18 @@ public class DCPVerveAdNetwork extends BaseAdNetworkImpl {
         else if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
             if (StringUtils.isBlank(sasParams.getSdkVersion())
                     || sasParams.getSdkVersion().toLowerCase().startsWith("a35")) {
-                logger.info("Blocking traffic for 3.5.* android version");
+                LOG.info("Blocking traffic for 3.5.* android version");
                 return false;
             }
             portalKeyword = ANDROID_KEYWORD;
         }
         else {
-            logger.info("param source ", sasParams.getSource());
-            logger.info("Configure parameters inside verve returned false");
+            LOG.info("param source {}", sasParams.getSource());
+            LOG.info("Configure parameters inside verve returned false");
             return false;
         }
 
-        logger.info("Configure parameters inside verve returned true");
+        LOG.info("Configure parameters inside verve returned true");
         return true;
     }
 
@@ -129,7 +129,7 @@ public class DCPVerveAdNetwork extends BaseAdNetworkImpl {
             if (!StringUtils.isEmpty(sasParams.getGender())) {
                 url.append("&ei=gender=").append(sasParams.getGender().toLowerCase());
             }
-            if (null != sasParams.getAge()) {
+            if (null !=  sasParams.getAge()) {
                 url.append(";age=").append(sasParams.getAge());
             }
             url.append("&ua=").append(getURLEncode(sasParams.getUserAgent(), format));
@@ -178,19 +178,19 @@ public class DCPVerveAdNetwork extends BaseAdNetworkImpl {
                 url.append("&adunit=").append(width).append('x').append(height);
             }
 
-            logger.debug("Verve url is ", url);
+            LOG.debug("Verve url is {}", url);
             return (new URI(url.toString()));
         }
         catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            logger.info(exception.getMessage());
+            LOG.error("{}", exception);
         }
         return null;
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status) {
-        logger.debug("response is ", response, "and response length is ", response.length());
+    public void parseResponse(final String response, final HttpResponseStatus status) {
+        LOG.debug("response is {} and response length is {}", response, response.length());
         if (status.getCode() != 200 || StringUtils.isBlank(response)) {
             statusCode = status.getCode();
             if (200 == statusCode) {
@@ -205,23 +205,16 @@ public class DCPVerveAdNetwork extends BaseAdNetworkImpl {
             context.put(VelocityTemplateFieldConstants.IMBeaconUrl, beaconUrl);
             context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
             try {
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl,
-                    logger);
+                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
             }
             catch (Exception exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from verve : ", exception);
-                logger.info("Response from verve : ", response);
-                try {
-                    throw exception;
-                }
-                catch (Exception e) {
-                    logger.info("Error while rethrowing the exception : ", e);
-                }
+                LOG.info("Error parsing response from verve : {}", exception);
+                LOG.info("Response from verve : {}", response);
             }
         }
-        logger.debug("response length is ", responseContent.length());
+        LOG.debug("response length is {}", responseContent.length());
     }
 
     @Override

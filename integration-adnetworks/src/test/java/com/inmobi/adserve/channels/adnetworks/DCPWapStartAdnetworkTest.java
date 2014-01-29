@@ -3,7 +3,6 @@ package com.inmobi.adserve.channels.adnetworks;
 import com.inmobi.adserve.channels.adnetworks.wapstart.DCPWapStartAdNetwork;
 import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 import org.jboss.netty.bootstrap.ClientBootstrap;
@@ -29,7 +28,6 @@ public class DCPWapStartAdnetworkTest extends TestCase {
     private final String          debug           = "debug";
     private final String          loggerConf      = "/tmp/channel-server.properties";
     private final ClientBootstrap clientBootstrap = null;
-    private DebugLogger           logger;
     private DCPWapStartAdNetwork  dcpWapstartAdNetwork;
     private final String          wapstartHost    = "http://ro.plus1.wapstart.ru";
     private final String          wapstartStatus  = "on";
@@ -60,9 +58,7 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         SlotSizeMapping.init();
-        DebugLogger.init(mockConfig);
-        logger = new DebugLogger();
-        dcpWapstartAdNetwork = new DCPWapStartAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        dcpWapstartAdNetwork = new DCPWapStartAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test
@@ -70,7 +66,7 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setSlot((short)15);
+        sasParams.setSlot(Short.valueOf("15"));
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
@@ -111,7 +107,7 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
-        sasParams.setSlot((short)15);
+        sasParams.setSlot(Short.valueOf("15"));
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
@@ -132,7 +128,7 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setSlot((short)15);
+        sasParams.setSlot(Short.valueOf("15"));
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
@@ -154,7 +150,7 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent(" ");
-        sasParams.setSlot((short)15);
+        sasParams.setSlot(Short.valueOf("15"));
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
@@ -177,7 +173,7 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot((short)15);
+        sasParams.setSlot(Short.valueOf("15"));
         sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "1324";
         SlotSizeMapping.init();
@@ -202,7 +198,7 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         casInternalRequestParameters.latLong = " ,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot((short)15);
+        sasParams.setSlot(Short.valueOf("15"));
         sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "1324";
         SlotSizeMapping.init();
@@ -276,7 +272,7 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot((short)4);
+        sasParams.setSlot(Short.valueOf("4"));
         sasParams.setSource("wap");
         sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "19100";
@@ -304,7 +300,7 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot((short)4);
+        sasParams.setSlot(Short.valueOf("4"));
         sasParams.setSdkVersion("i360");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
         sasParams.setSource("app");
@@ -353,7 +349,7 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setSlot((short)4);
+        sasParams.setSlot(Short.valueOf("4"));
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.latLong = "37.4429,-122.1514";

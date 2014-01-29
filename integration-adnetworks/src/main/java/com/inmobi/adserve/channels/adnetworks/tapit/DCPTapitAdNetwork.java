@@ -2,7 +2,6 @@ package com.inmobi.adserve.channels.adnetworks.tapit;
 
 import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -12,37 +11,36 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 
-public class DCPTapitAdNetwork extends BaseAdNetworkImpl {
-    private final Configuration config;
+public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
+    private static final Logger LOG = LoggerFactory.getLogger(DCPTapitAdNetwork.class);
 
     private String              latitude;
     private String              longitude;
     private double              width;
     private double              height;
 
-    public DCPTapitAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent, logger);
-        this.config = config;
-        this.clientBootstrap = clientBootstrap;
-        this.logger = logger;
+    public DCPTapitAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }
 
     @Override
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            logger.debug("mandate parameters missing for tapit so exiting adapter");
+            LOG.debug("mandate parameters missing for tapit so exiting adapter");
             return false;
         }
         if (sasParams.getUserAgent().toUpperCase().contains("OPERA")) {
-            logger.debug("Opera user agent found. So exiting the adapter");
+            LOG.debug("Opera user agent found. So exiting the adapter");
             return false;
         }
         host = config.getString("tapit.host");
@@ -58,7 +56,7 @@ public class DCPTapitAdNetwork extends BaseAdNetworkImpl {
             width = dim.getWidth();
             height = dim.getHeight();
         }
-        logger.debug("Configure parameters inside tapit returned true");
+        LOG.debug("Configure parameters inside tapit returned true");
         return true;
     }
 
@@ -112,19 +110,19 @@ public class DCPTapitAdNetwork extends BaseAdNetworkImpl {
             }
             url.append("&tpsid=").append(blindedSiteId);
 
-            logger.debug("Tapit url is ", url.toString());
+            LOG.debug("Tapit url is {}", url);
             return (new URI(url.toString()));
         }
         catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            logger.info(exception.getMessage());
+            LOG.error("{}", exception);
         }
         return null;
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status) {
-        logger.debug("response is ", response);
+    public void parseResponse(final String response, final HttpResponseStatus status) {
+        LOG.debug("response is {}", response);
         if (StringUtils.isEmpty(response) || status.getCode() != 200 || response.contains("{\"error")) {
             statusCode = status.getCode();
             if (200 == statusCode) {
@@ -134,7 +132,7 @@ public class DCPTapitAdNetwork extends BaseAdNetworkImpl {
             return;
         }
         else {
-            logger.debug("beacon url inside mullah media is ", beaconUrl);
+            LOG.debug("beacon url inside mullah media is {}", beaconUrl);
             try {
                 statusCode = status.getCode();
                 JSONObject adResponse = new JSONObject(response);
@@ -165,27 +163,27 @@ public class DCPTapitAdNetwork extends BaseAdNetworkImpl {
                         t = TemplateType.IMAGE;
                     }
                 }
-                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl, logger);
+                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
             }
             catch (JSONException exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from tapit : ", exception);
-                logger.info("Response from tapit:", response);
+                LOG.info("Error parsing response from tapit : {}", exception);
+                LOG.info("Response from tapit: {}", response);
             }
             catch (Exception exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from tapit : ", exception);
-                logger.info("Response from tapit:", response);
+                LOG.info("Error parsing response from tapit : {}", exception);
+                LOG.info("Response from tapit: {}", response);
                 try {
                     throw exception;
                 }
                 catch (Exception e) {
-                    logger.info("Error while rethrowing the exception : ", e);
+                    LOG.info("Error while rethrowing the exception : {}", e);
                 }
             }
         }
-        logger.debug("response length is ", responseContent.length());
+        LOG.debug("response length is {}", responseContent.length());
     }
 
     @Override
@@ -193,7 +191,7 @@ public class DCPTapitAdNetwork extends BaseAdNetworkImpl {
         return (config.getString("tapit.advertiserId"));
     }
 
-    private String getUidParamNameFromSourceType(String source) {
+    private String getUidParamNameFromSourceType(final String source) {
         if ("iphone".equalsIgnoreCase(source)) {
             return "udid";
         }

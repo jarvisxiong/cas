@@ -3,7 +3,6 @@ package com.inmobi.adserve.channels.server.requesthandler;
 import com.inmobi.adserve.adpool.*;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.types.InventoryType;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -11,6 +10,8 @@ import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -19,8 +20,11 @@ import java.util.*;
 
 public class ThriftRequestParser {
 
+    private static final Logger LOG = LoggerFactory.getLogger(ThriftRequestParser.class);
+
+
     // Extracting params.
-    public static AdPoolRequest extractParams(Map<String, List<String>> params, DebugLogger logger) throws JSONException,
+    public static AdPoolRequest extractParams(Map<String, List<String>> params) throws JSONException,
             UnsupportedEncodingException {
         if (!params.isEmpty()) {
             List<String> values = params.get("post");
@@ -31,7 +35,7 @@ public class ThriftRequestParser {
                 try {
                     tDeserializer.deserialize(adPoolRequest, stringVal.getBytes());
                 } catch (TException e) {
-                    logger.error("Error in deserializing thrift in extractParams ", e.getMessage());
+                    LOG.error("Error in deserializing thrift in extractParams {}", e.getMessage());
                     e.printStackTrace();
                 }
                 return adPoolRequest;
@@ -41,8 +45,8 @@ public class ThriftRequestParser {
     }
 
     public static void parseRequestParameters(AdPoolRequest tObject, SASRequestParameters params,
-            CasInternalRequestParameters casInternalRequestParameters, DebugLogger logger, int dst) {
-        logger.debug("Inside thrift request parser");
+            CasInternalRequestParameters casInternalRequestParameters, int dst) {
+        LOG.debug("Inside thrift request parser");
         params.setAllParametersJson(tObject.toString());
         params.setDst(dst);
         params.setResponseOnlyFromDcp(2 == dst);
@@ -143,7 +147,7 @@ public class ThriftRequestParser {
             params.setCarrierId(new Long(tObject.carrier.carrierId).intValue());
         }
         
-        logger.debug("Successfully parsed tObject, SAS params are : ", params.toString());
+        LOG.debug("Successfully parsed tObject, SAS params are : {}", params.toString());
     }
 
 

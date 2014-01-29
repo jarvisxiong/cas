@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.inmobi.channels</groupId>
 	<artifactId>cas</artifactId>
-	<version>3.32-SNAPSHOT</version>
+	<version>3.38-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<url>https://github.corp.inmobi.com/channel-adserve</url>
 	<parent>
@@ -21,15 +21,18 @@
 		<yammer.version>2.2.0</yammer.version>
 		<guice.version>3.0</guice.version>
 		<guice-multibindings.version>3.0</guice-multibindings.version>
+		<guice-servlet.version>3.0</guice-servlet.version>
 		<creative-validator>5.0.90</creative-validator>
 	</properties>
-    <modules>
-        <module>Server</module>
-        <module>integration-adnetworks</module>
-        <module>integration-api</module>
-        <module>integration-repository</module>
-        <module>integration-utils</module>
-    </modules>
+
+	<modules>
+		<module>Server</module>
+		<module>integration-adnetworks</module>
+		<module>integration-api</module>
+		<module>integration-repository</module>
+		<module>integration-utils</module>
+	</modules>
+
 	<dependencyManagement>
 		<dependencies>
 		        <dependency>
@@ -76,6 +79,16 @@
 				<groupId>com.google.inject.extensions</groupId>
 				<artifactId>guice-multibindings</artifactId>
 				<version>${guice-multibindings.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.inject.extensions</groupId>
+				<artifactId>guice-servlet</artifactId>
+				<version>${guice-servlet.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.reflections</groupId>
+				<artifactId>reflections</artifactId>
+				<version>0.9.9-RC1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.velocity</groupId>
@@ -126,14 +139,9 @@
 				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>com.google.code.google-collections</groupId>
-				<artifactId>google-collect</artifactId>
-				<version>snapshot-20080530</version>
-			</dependency>
-			<dependency>
 				<groupId>org.apache.thrift</groupId>
 				<artifactId>libthrift</artifactId>
-				<version>0.8.0</version>
+				<version>0.4.0</version>
 			</dependency>
 			<dependency>
 				<groupId>inmobi.phoenix.batteries</groupId>
@@ -238,11 +246,6 @@
 				<version>1.2</version>
 			</dependency>
 			<dependency>
-				<groupId>com.openx</groupId>
-				<artifactId>oauth</artifactId>
-				<version>1.0.3</version>
-			</dependency>
-			<dependency>
 				<groupId>org.easymock</groupId>
 				<artifactId>easymockclassextension</artifactId>
 				<version>2.5.2</version>
@@ -257,22 +260,6 @@
 				<groupId>org.codehaus.jackson</groupId>
 				<artifactId>jackson-jaxrs</artifactId>
 				<version>1.9.9</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.cxf</groupId>
-				<artifactId>cxf-bundle</artifactId>
-				<version>2.6.1</version>
-			</dependency>
-			<dependency>
-				<groupId>org.seleniumhq.selenium</groupId>
-				<artifactId>selenium-java</artifactId>
-				<version>2.33.0</version>
-				<exclusions>
-					<exclusion>
-						<artifactId>xercesImpl</artifactId>
-						<groupId>xerces</groupId>
-					</exclusion>
-				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.projectlombok</groupId>
@@ -298,11 +285,6 @@
 						<groupId>xml-apis</groupId>
 					</exclusion>
 				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>net.java.dev.jets3t</groupId>
-				<artifactId>jets3t</artifactId>
-				<version>0.8.0</version>
 			</dependency>
 			<dependency>
 				<groupId>com.yammer.metrics</groupId>
@@ -341,37 +323,39 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-    <scm>
-        <connection>scm:git:https://github.corp.inmobi.com/channel-adserve/cas.git</connection>
-        <url>scm:git:https://github.corp.inmobi.com/channel-adserve/cas.git</url>
-        <developerConnection>scm:git:https://github.corp.inmobi.com/channel-adserve/cas.git</developerConnection>
-        <tag>HEAD</tag>
-    </scm>
 
-    <repositories>
-        <repository>
-            <id>releases</id>
-            <name>Releases</name>
-            <url>http://maven.scm.corp.inmobi.com/content/repositories/releases/</url>
-        </repository>
-    </repositories>
 
-    <build>
-        <sourceDirectory>src/main/java</sourceDirectory>
-        <testSourceDirectory>src/test/java</testSourceDirectory>
-        <defaultGoal>install</defaultGoal>
-        <directory>target</directory>
+	<scm>
+		<connection>scm:git:https://github.corp.inmobi.com/channel-adserve/cas.git</connection>
+		<url>scm:git:https://github.corp.inmobi.com/channel-adserve/cas.git</url>
+		<developerConnection>scm:git:https://github.corp.inmobi.com/channel-adserve/cas.git</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
 
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>2.7.2</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+	<repositories>
+		<repository>
+			<id>releases</id>
+			<name>Releases</name>
+			<url>http://maven.scm.corp.inmobi.com/content/repositories/releases/</url>
+		</repository>
+	</repositories>
+
+	<build>
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<testSourceDirectory>src/test/java</testSourceDirectory>
+		<defaultGoal>install</defaultGoal>
+		<directory>target</directory>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+				<version>2.7.2</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 </project>

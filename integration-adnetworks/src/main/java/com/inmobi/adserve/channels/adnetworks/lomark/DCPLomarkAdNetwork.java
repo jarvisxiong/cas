@@ -4,7 +4,6 @@ import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.configuration.Configuration;
@@ -15,6 +14,8 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.IOException;
@@ -24,8 +25,10 @@ import java.util.*;
 import java.util.Map.Entry;
 
 
-public class DCPLomarkAdNetwork extends BaseAdNetworkImpl {
-    private final Configuration          config;
+public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
+
+    private static final Logger          LOG         = LoggerFactory.getLogger(DCPLomarkAdNetwork.class);
+
     private transient String             key;
     private transient String             secretKey;
     private transient String             latitude;
@@ -66,19 +69,22 @@ public class DCPLomarkAdNetwork extends BaseAdNetworkImpl {
         categoryMap.put(28l, 11);
     }
 
-    public DCPLomarkAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent, logger);
-        this.config = config;
-        this.logger = logger;
-        this.clientBootstrap = clientBootstrap;
+    /**
+     * @param config
+     * @param clientBootstrap
+     * @param baseRequestHandler
+     * @param serverEvent
+     */
+    public DCPLomarkAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }
 
     @Override
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            logger.debug("mandatory parameters missing for lomark so exiting adapter");
+            LOG.debug("mandatory parameters missing for lomark so exiting adapter");
             return false;
         }
         host = config.getString("lomark.host");
@@ -116,16 +122,16 @@ public class DCPLomarkAdNetwork extends BaseAdNetworkImpl {
             client = 3;
         }
         else {
-            logger.info("Lomark: Device OS - Unsupported OS");
+            LOG.info("Lomark: Device OS - Unsupported OS");
             return false;
         }
         // filter non udid app traffic for Lomark
         if (client < 3 && StringUtils.isBlank(uuid)) {
-            logger.info("Lomark: Udid - mandatory paramter for app - missing");
+            LOG.info("Lomark: Udid - mandatory paramter for app - missing");
             return false;
         }
 
-        logger.info("Configure parameters inside lomark returned true");
+        LOG.info("Configure parameters inside lomark returned true");
         return true;
     }
 
@@ -200,19 +206,19 @@ public class DCPLomarkAdNetwork extends BaseAdNetworkImpl {
             url.append("&Timestamp=").append(millisec);
             requestMap.put("Timestamp", String.valueOf(millisec));
             url.append("&Sign=").append(getSignature(requestMap, secretKey));
-            logger.debug("lomark url is", url.toString());
+            LOG.debug("lomark url is {}", url);
             return (new URI(url.toString()));
         }
         catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            logger.info(exception.getMessage());
+            LOG.error("{}", exception);
         }
         return null;
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status) {
-        logger.debug("response is", response, "and response length is", response.length());
+    public void parseResponse(final String response, final HttpResponseStatus status) {
+        LOG.debug("response is {} and response length is {}", response, response.length());
         if (status.getCode() != 200 || StringUtils.isBlank(response)) {
             statusCode = status.getCode();
             if (200 == statusCode) {
@@ -236,7 +242,7 @@ public class DCPLomarkAdNetwork extends BaseAdNetworkImpl {
                 int clickType = clickInfo.getInt("type");
                 int creativeType = displayInfo.getInt("type");
                 if (creativeType == 3 || clickType > 3) {
-                    logger.info("Unsupported Creative type or click type for Lomark");
+                    LOG.info("Unsupported Creative type or click type for Lomark");
                     adStatus = "NO_AD";
                     return;
                 }
@@ -277,7 +283,7 @@ public class DCPLomarkAdNetwork extends BaseAdNetworkImpl {
                     context.put(VelocityTemplateFieldConstants.Description, displayInfo.getString("subtitle"));
                     String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                     if (StringUtils.isEmpty(vmTemplate)) {
-                        logger.info("No template found for the slot");
+                        LOG.info("No template found for the slot");
                         adStatus = "NO_AD";
                         return;
                     }
@@ -290,21 +296,15 @@ public class DCPLomarkAdNetwork extends BaseAdNetworkImpl {
                     type = TemplateType.IMAGE;
                     adStatus = "AD";
                 }
-                responseContent = Formatter.getResponseFromTemplate(type, context, sasParams, beaconUrl, logger);
+                responseContent = Formatter.getResponseFromTemplate(type, context, sasParams, beaconUrl);
             }
             catch (Exception exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from lomark :", exception);
-                logger.info("Response from lomark :", response);
-                try {
-                    throw exception;
-                }
-                catch (Exception e) {
-                    logger.info("Error while rethrowing the exception :", e);
-                }
+                LOG.info("Error parsing response from lomark : {}", exception);
+                LOG.info("Response from lomark : {}", response);
             }
         }
-        logger.debug("response length is", responseContent.length());
+        LOG.debug("response length is {}", responseContent.length());
     }
 
     @Override
@@ -317,7 +317,7 @@ public class DCPLomarkAdNetwork extends BaseAdNetworkImpl {
         return true;
     }
 
-    private String getSignature(HashMap<String, String> params, String secret) throws IOException
+    private String getSignature(final HashMap<String, String> params, final String secret) throws IOException
 
     {
         // first sort asc as per the paramter names
@@ -364,7 +364,7 @@ public class DCPLomarkAdNetwork extends BaseAdNetworkImpl {
             }
         }
         catch (Exception e) {
-            logger.info("Cannot map carrier Id for Lomark");
+            LOG.info("Cannot map carrier Id for Lomark");
         }
         return 4;
     }

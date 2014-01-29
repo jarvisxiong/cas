@@ -1,17 +1,21 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
 import com.google.gson.Gson;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
 @ToString
 public class ClickUrlMakerV6 {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ClickUrlMakerV6.class);
+
 
     private static final String       DEFAULT_UDID_VALUE                            = "x";
     private static final String       URLPATHSEP                                    = "/";
@@ -34,7 +38,6 @@ public class ClickUrlMakerV6 {
     @Getter
     private String                    clickUrl;
 
-    private final DebugLogger         logger;
     private final Map<String, String> udIdVal;                                                                                             // Uppercase
     private final String              testCryptoSecretKey;
     private final String              cryptoSecretKey;
@@ -67,8 +70,6 @@ public class ClickUrlMakerV6 {
     private final String              dst;
 
     public ClickUrlMakerV6(Builder builder) {
-
-        logger = builder.logger;
         udIdVal = builder.udIdVal;
         testCryptoSecretKey = builder.testCryptoSecretKey;
         cryptoSecretKey = builder.cryptoSecretKey;
@@ -142,7 +143,6 @@ public class ClickUrlMakerV6 {
 
     @Setter
     public static class Builder {
-        private DebugLogger         logger;
         private Map<String, String> udIdVal;
         private String              testCryptoSecretKey;
         private String              cryptoSecretKey;
@@ -188,19 +188,19 @@ public class ClickUrlMakerV6 {
         }
         // 3rd URL component: site inc id
         if (null == siteIncId) {
-            logger.debug("Site inc id is null so returning");
+            LOG.debug("Site inc id is null so returning");
             return;
         }
         adUrlSuffix.append(appendSeparator(getIdBase36(siteIncId)));
         // 4th URL Component: handset device id
         if (null == handsetInternalId) {
-            logger.debug("handsetInternaleId is null so returning");
+            LOG.debug("handsetInternaleId is null so returning");
             return;
         }
         adUrlSuffix.append(appendSeparator(getIdBase36(handsetInternalId)));
         // 5th URL Component: ip file version
         if (null == ipFileVersion) {
-            logger.debug("ipFileVersion is null so returning");
+            LOG.debug("ipFileVersion is null so returning");
             return;
         }
         adUrlSuffix.append(appendSeparator(getIdBase36(ipFileVersion)));
@@ -225,7 +225,7 @@ public class ClickUrlMakerV6 {
         adUrlSuffix.append(appendSeparator(billable));
         // 12th URL Component: udid or odin1. Based on PI311
         if (null == udIdVal || udIdVal.isEmpty()) {
-            logger.debug("udIdVal is null or empty so using default value");
+            LOG.debug("udIdVal is null or empty so using default value");
             adUrlSuffix.append(appendSeparator(DEFAULT_UDID_VALUE));
         }
         else {
@@ -233,7 +233,7 @@ public class ClickUrlMakerV6 {
         }
         // 13th impression id
         if (null == impressionId) {
-            logger.debug("impressionId is null so returning");
+            LOG.debug("impressionId is null so returning");
             return;
         }
         adUrlSuffix.append(appendSeparator(impressionId));
@@ -302,12 +302,12 @@ public class ClickUrlMakerV6 {
         if (testMode) {
             adUrlSuffix.append(appendSeparator(ClickUrlMakerV6.clickURLHashingSecretKeyTestModeVersionBase36));
             beaconUrlSuffix.append(appendSeparator(ClickUrlMakerV6.clickURLHashingSecretKeyTestModeVersionBase36));
-            cryptoHashGenerator = new CryptoHashGenerator(testCryptoSecretKey, logger);
+            cryptoHashGenerator = new CryptoHashGenerator(testCryptoSecretKey);
         }
         else {
             adUrlSuffix.append(appendSeparator(ClickUrlMakerV6.clickURLHashingSecretKeyVersionBase36));
             beaconUrlSuffix.append(appendSeparator(ClickUrlMakerV6.clickURLHashingSecretKeyVersionBase36));
-            cryptoHashGenerator = new CryptoHashGenerator(cryptoSecretKey, logger);
+            cryptoHashGenerator = new CryptoHashGenerator(cryptoSecretKey);
         }
         adUrlSuffix.append(appendSeparator(cryptoHashGenerator.generateHash(adUrlSuffix.toString())));
         beaconUrlSuffix.append(appendSeparator(cryptoHashGenerator.generateHash(adUrlSuffix.toString())));

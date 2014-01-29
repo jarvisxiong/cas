@@ -1,11 +1,10 @@
 package com.inmobi.adserve.channels.adnetworks.mobilecommerce;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -15,26 +14,23 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
 
-public class MobileCommerceAdNetwork extends BaseAdNetworkImpl {
-
-    private final Configuration config;
+public class MobileCommerceAdNetwork extends AbstractDCPAdNetworkImpl {
+    private static final Logger LOG = LoggerFactory.getLogger(MobileCommerceAdNetwork.class);
 
     // Parameters from NAS
     private String              uid;
     private final String        responseFormat;
 
-    public MobileCommerceAdNetwork(final DebugLogger logger, final Configuration config,
-            final ClientBootstrap clientBootstrap, final HttpRequestHandlerBase baseRequestHandler,
-            final MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent, logger);
-        this.logger = logger;
-        this.config = config;
-        this.clientBootstrap = clientBootstrap;
+    public MobileCommerceAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
         responseFormat = config.getString("mobilecommerce.responseFormat");
     }
 
@@ -42,12 +38,12 @@ public class MobileCommerceAdNetwork extends BaseAdNetworkImpl {
     public boolean configureParameters() {
         if (sasParams.getRemoteHostIp() == null || sasParams.getUserAgent() == null
                 || StringUtils.isBlank(externalSiteId)) {
-            logger.info("mandate parameters missing for mobile commerce so exiting adapter");
+            LOG.info("mandate parameters missing for mobile commerce so exiting adapter");
             return false;
         }
         host = config.getString("mobilecommerce.hostus");
         uid = externalSiteId;
-        logger.debug("Configure parameters inside mobile commerce returned true");
+        LOG.debug("Configure parameters inside mobile commerce returned true");
         return true;
     }
 
@@ -97,12 +93,12 @@ public class MobileCommerceAdNetwork extends BaseAdNetworkImpl {
             if ((categoryId = getCategoryId()) != null) {
                 url.append("&catId=").append(categoryId);
             }
-            logger.debug("mobile commerce url is ", url.toString());
+            LOG.debug("mobile commerce url is {}", url);
             return (new URI(url.toString()));
         }
         catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            logger.info(exception.getMessage());
+            LOG.error("{}", exception);
         }
         return null;
     }
@@ -117,7 +113,7 @@ public class MobileCommerceAdNetwork extends BaseAdNetworkImpl {
 
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
-        logger.debug("response is ", response, "and response length is ", response.length());
+        LOG.debug("response is {} and response length is {}", response, response.length());
         if (status.getCode() != 200 || StringUtils.isBlank(response)) {
             statusCode = status.getCode();
             if (200 == statusCode) {
@@ -143,28 +139,28 @@ public class MobileCommerceAdNetwork extends BaseAdNetworkImpl {
                     responseContent = "";
                     return;
                 }
-                responseContent = Formatter.getResponseFromTemplate(responseTemplate, context, sasParams, null, logger);
+                responseContent = Formatter.getResponseFromTemplate(responseTemplate, context, sasParams, null);
                 adStatus = "AD";
 
             }
             catch (JSONException exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from MobileCommerce : ", exception);
-                logger.info("Response from siquis:", response);
+                LOG.info("Error parsing response from MobileCommerce : {}", exception);
+                LOG.info("Response from siquis: {}", response);
             }
             catch (Exception exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from MobileCommerce : ", exception);
-                logger.info("Response from MobileCommerce:", response);
+                LOG.info("Error parsing response from MobileCommerce : {}", exception);
+                LOG.info("Response from MobileCommerce: {}", response);
                 try {
                     throw exception;
                 }
                 catch (Exception e) {
-                    logger.info("Error while rethrowing the exception : ", e);
+                    LOG.info("Error while rethrowing the exception : {}", e);
                 }
             }
         }
-        logger.debug("response length is ", responseContent.length(), "responseContent is", responseContent);
+        LOG.debug("response length is {} responseContent is {}", responseContent.length(), responseContent);
     }
 
     /**

@@ -6,7 +6,7 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DebugLogger;
+import com.inmobi.phoenix.logging.DebugLogger;
 import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 import org.jboss.netty.bootstrap.ClientBootstrap;
@@ -27,17 +27,17 @@ import static org.easymock.classextension.EasyMock.replay;
 
 
 public class IFCAdNetworkTest extends TestCase {
-    private IFCAdNetwork    ifcAdNetwork;
-    private Configuration   mockConfig        = null;
-    private String          ifcHostus         = "http://10.14.118.91:8083/IFCPlatform/";
-    private String          ifcAdvertiserId   = "1234";
-    private ClientBootstrap clientBootstrap   = new ClientBootstrap();
-    private String          ifcResponseFormat = "json";
-    private String          isTest            = "0";
-    private String          filter            = "clean";
-    private String          debug             = "debug";
-    private String          loggerConf        = "/tmp/channel-server.properties";
-    private DebugLogger     logger;
+    private IFCAdNetwork          ifcAdNetwork;
+    private Configuration         mockConfig        = null;
+    private final String          ifcHostus         = "http://10.14.118.91:8083/IFCPlatform/";
+    private final String          ifcAdvertiserId   = "1234";
+    private final ClientBootstrap clientBootstrap   = new ClientBootstrap();
+    private final String          ifcResponseFormat = "json";
+    private final String          isTest            = "0";
+    private final String          filter            = "clean";
+    private final String          debug             = "debug";
+    private final String          loggerConf        = "/tmp/channel-server.properties";
+    private DebugLogger           logger;
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -53,18 +53,18 @@ public class IFCAdNetworkTest extends TestCase {
         replay(mockConfig);
     }
 
+    @Override
     public void setUp() throws Exception {
         File f;
         f = new File("/tmp/channel-server.properties");
-        if (!f.exists())
+        if (!f.exists()) {
             f.createNewFile();
+        }
         MessageEvent serverEvent = createMock(MessageEvent.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        DebugLogger.init(mockConfig);
-        logger = new DebugLogger();
         SlotSizeMapping.init();
-        ifcAdNetwork = new IFCAdNetwork(logger, mockConfig, clientBootstrap, base, serverEvent);
+        ifcAdNetwork = new IFCAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
     }
 
     @Test
@@ -83,7 +83,7 @@ public class IFCAdNetworkTest extends TestCase {
         jsonObject.put("adcode", "NON-JS");
         sasParams.setAllParametersJson(jsonObject.toString());
         sasParams.setSiteId("12");
-        sasParams.setSlot((short) 11);
+        sasParams.setSlot(Short.valueOf("11"));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -114,7 +114,7 @@ public class IFCAdNetworkTest extends TestCase {
         jsonObject.put("sdk-version", "i351");
         sasParams.setAllParametersJson(jsonObject.toString());
         sasParams.setSiteId("12");
-        sasParams.setSlot((short) 1);
+        sasParams.setSlot(Short.valueOf("1"));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -145,7 +145,7 @@ public class IFCAdNetworkTest extends TestCase {
         jsonObject.put("sdk-version", "i301");
         sasParams.setAllParametersJson(jsonObject.toString());
         sasParams.setSiteId("12");
-        sasParams.setSlot((short) 1);
+        sasParams.setSlot(Short.valueOf("1"));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -186,7 +186,7 @@ public class IFCAdNetworkTest extends TestCase {
         jsonObject.put("sdk-version", "i351");
         sasParams.setAllParametersJson(jsonObject.toString());
         sasParams.setSiteId("12");
-        sasParams.setSlot((short) 1);
+        sasParams.setSlot(Short.valueOf("1"));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -225,7 +225,7 @@ public class IFCAdNetworkTest extends TestCase {
         jsonObject.put("adcode", "JS");
         sasParams.setAllParametersJson(jsonObject.toString());
         sasParams.setSiteId("12");
-        sasParams.setSlot((short) 1);
+        sasParams.setSlot(Short.valueOf("1"));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");

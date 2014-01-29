@@ -26,14 +26,12 @@ import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.server.ServletHandler;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import com.inmobi.adserve.channels.util.DebugLogger;
 
 
 public class AuctionEngineTest {
 
     Configuration                mockConfig;
     Configuration                mockAdapterConfig;
-    private DebugLogger          logger;
     Capture<String>              encryptedBid1;
     Capture<Double>              secondPrice1;
     CasInternalRequestParameters casInternalRequestParameters;
@@ -42,7 +40,7 @@ public class AuctionEngineTest {
     public void setUp() throws IOException {
         ConfigurationLoader config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
         ServletHandler.init(config, null);
-        Filters.init(config.adapterConfiguration());
+        Filters.init(config.getAdapterConfiguration());
         // this is done, to track the encryptedBid variable getting set inside the AuctionEngine.
         encryptedBid1 = new Capture<String>();
 
@@ -64,9 +62,6 @@ public class AuctionEngineTest {
         expect(mockConfig.getInt("rtb.maxconnections")).andReturn(50).anyTimes();
 
         replay(mockConfig);
-
-        DebugLogger.init(mockConfig);
-        logger = new DebugLogger();
 
         casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.auctionId = "auctionId";
@@ -188,7 +183,7 @@ public class AuctionEngineTest {
         String expectedRTBAdNetworkName = expectedRTBName;
         Double expectedWinnerBid = expectedWinnerBidValue;
 
-        AuctionEngine auctionEngine = new AuctionEngine(logger);
+        AuctionEngine auctionEngine = new AuctionEngine();
         List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
         rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", rtbNameInput1, bidInputVal1,
@@ -288,7 +283,7 @@ public class AuctionEngineTest {
         String expectedRTBAdNetworkName = expectedRTBName;
         Double expectedWinnerBid = expectedWinnerBidValue;
 
-        AuctionEngine auctionEngine = new AuctionEngine(logger);
+        AuctionEngine auctionEngine = new AuctionEngine();
         List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
         rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", rtbNameInput1, bidInputVal1,
@@ -325,7 +320,7 @@ public class AuctionEngineTest {
         String expectedRTBAdNetworkName = "A";
         Double expectedWinnerBid = bidInputVal1;
 
-        AuctionEngine auctionEngine = new AuctionEngine(logger);
+        AuctionEngine auctionEngine = new AuctionEngine();
         List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
         rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1));
@@ -360,7 +355,7 @@ public class AuctionEngineTest {
         Long latencyInputVal4 = 100l;
         Double expectedAuctionEngineResponse = null;
 
-        AuctionEngine auctionEngine = new AuctionEngine(logger);
+        AuctionEngine auctionEngine = new AuctionEngine();
         List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
         rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1));
@@ -398,7 +393,7 @@ public class AuctionEngineTest {
         String expectedRTBAdNetworkName = "A";
         Double expectedWinnerBid = bidInputVal1;
 
-        AuctionEngine auctionEngine = new AuctionEngine(logger);
+        AuctionEngine auctionEngine = new AuctionEngine();
         List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
         rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1));
@@ -428,7 +423,7 @@ public class AuctionEngineTest {
         Long latencyInputVal1 = 100l;
         String expectedAuctionEngineResponse = null;
 
-        AuctionEngine auctionEngine = new AuctionEngine(logger);
+        AuctionEngine auctionEngine = new AuctionEngine();
         List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
         rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1));

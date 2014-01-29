@@ -2,7 +2,6 @@ package com.inmobi.adserve.channels.adnetworks.httpool;
 
 import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -12,32 +11,39 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 
-public class DCPHttPoolAdNetwork extends BaseAdNetworkImpl {
-    private final Configuration config;
+public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
+
+    private static final Logger LOG        = LoggerFactory.getLogger(DCPHttPoolAdNetwork.class);
+
     private transient String    latitude;
     private transient String    longitude;
     private String              slotFormat;
     private boolean             acceptShop = false;
 
-    public DCPHttPoolAdNetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent, logger);
-        this.config = config;
-        this.logger = logger;
-        this.clientBootstrap = clientBootstrap;
+    /**
+     * @param config
+     * @param clientBootstrap
+     * @param baseRequestHandler
+     * @param serverEvent
+     */
+    public DCPHttPoolAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
     }
 
     @Override
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            logger.debug("mandatory parameters missing for httpool so exiting adapter");
+            LOG.debug("mandatory parameters missing for httpool so exiting adapter");
             return false;
         }
         host = config.getString("httpool.host");
@@ -49,8 +55,8 @@ public class DCPHttPoolAdNetwork extends BaseAdNetworkImpl {
             longitude = latlong[1];
         }
         if (null != sasParams.getSlot()
-                && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
-            Long slotSize = (long)sasParams.getSlot();
+                                && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
+                        Long slotSize = (long)sasParams.getSlot();
             // Httpool doesnt support 320x48 & 320x53. so mapping to 320x50
             if (slotSize == 9l || slotSize == 24l) {
                 slotSize = 15l;
@@ -60,7 +66,7 @@ public class DCPHttPoolAdNetwork extends BaseAdNetworkImpl {
             slotFormat = String.format("%dx%d", (int) Math.ceil(dim.getWidth()), (int) Math.ceil(dim.getHeight()));
         }
 
-        logger.info("Configure parameters inside httpool returned true");
+        LOG.info("Configure parameters inside httpool returned true");
         return true;
     }
 
@@ -110,20 +116,20 @@ public class DCPHttPoolAdNetwork extends BaseAdNetworkImpl {
             if (StringUtils.isNotBlank(gender)) {
                 url.append("&dd_gnd=").append(gender.equalsIgnoreCase("f") ? 2 : 1);
             }
-            logger.debug("httpool url is ", url.toString());
+            LOG.debug("httpool url is {}", url.toString());
 
             return (new URI(url.toString()));
         }
         catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            logger.info(exception.getMessage());
+            LOG.error("{}", exception);
         }
         return null;
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status) {
-        logger.debug("response is ", response);
+    public void parseResponse(final String response, final HttpResponseStatus status) {
+        LOG.debug("response is {}", response);
 
         if (StringUtils.isEmpty(response) || status.getCode() != 200) {
             statusCode = status.getCode();
@@ -134,7 +140,7 @@ public class DCPHttPoolAdNetwork extends BaseAdNetworkImpl {
             return;
         }
         else {
-            logger.debug("beacon url inside httpool is ", beaconUrl);
+            LOG.debug("beacon url inside httpool is {}", beaconUrl);
 
             try {
                 JSONObject adResponse = new JSONObject(response);
@@ -162,7 +168,7 @@ public class DCPHttPoolAdNetwork extends BaseAdNetworkImpl {
                         context.put(VelocityTemplateFieldConstants.AdText, adResponse.getString("content"));
                         String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                         if (StringUtils.isEmpty(vmTemplate)) {
-                            logger.info("No template found for the slot");
+                            LOG.info("No template found for the slot");
                             adStatus = "NO_AD";
                             return;
                         }
@@ -175,28 +181,28 @@ public class DCPHttPoolAdNetwork extends BaseAdNetworkImpl {
                         t = TemplateType.IMAGE;
                     }
                 }
-                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl, logger);
+                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
             }
             catch (JSONException exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from httpool : ", exception);
-                logger.info("Response from httpool:", response);
+                LOG.info("Error parsing response from httpool : {}", exception);
+                LOG.info("Response from httpool: {}", response);
             }
             catch (Exception exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from httpool : ", exception);
-                logger.info("Response from httpool:", response);
+                LOG.info("Error parsing response from httpool : {}", exception);
+                LOG.info("Response from httpool: {}", response);
                 try {
                     throw exception;
                 }
                 catch (Exception e) {
-                    logger.info("Error while rethrowing the exception : ", e);
+                    LOG.info("Error while rethrowing the exception : {}", e);
                 }
             }
         }
 
-        logger.debug("response length is ", responseContent.length(), "responseContent is", responseContent);
+        LOG.debug("response length is {} responseContent is {}", responseContent.length(), responseContent);
     }
 
     @Override

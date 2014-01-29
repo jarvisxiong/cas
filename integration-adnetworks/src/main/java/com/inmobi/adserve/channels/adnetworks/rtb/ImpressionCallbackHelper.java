@@ -7,13 +7,15 @@ import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.handler.codec.http.HttpRequest;
-
-import com.inmobi.adserve.channels.util.DebugLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class ImpressionCallbackHelper {
-    public boolean writeResponse(ClientBootstrap clientBootstrap, final DebugLogger logger, URI uriCallBack,
-            HttpRequest callBackRequest) {
+    private final static Logger LOG = LoggerFactory.getLogger(ImpressionCallbackHelper.class);
+
+    public boolean writeResponse(final ClientBootstrap clientBootstrap, final URI uriCallBack,
+            final HttpRequest callBackRequest) {
         ChannelFuture channelFuture = clientBootstrap.connect(new InetSocketAddress(uriCallBack.getHost(), uriCallBack
                 .getPort() == -1 ? 80 : uriCallBack.getPort()));
         ChannelFuture futureCallBack = null;
@@ -23,26 +25,27 @@ public class ImpressionCallbackHelper {
             }
         }
         catch (Exception e) {
-            logger.info("Error in making callback request" + e.getMessage());
+            LOG.info("Error in making callback request {}", e);
         }
         if (null == futureCallBack) {
-            logger.debug("Could not make callback connection ");
+            LOG.debug("Could not make callback connection ");
             return false;
         }
         futureCallBack.addListener(new ChannelFutureListener() {
 
-            public void operationComplete(ChannelFuture future) throws Exception {
+            @Override
+            public void operationComplete(final ChannelFuture future) throws Exception {
 
                 if (!future.isSuccess()) {
-                    logger.info("error sending callback");
+                    LOG.info("error sending callback");
                     return;
                 }
-                logger.debug("CallBack is sent");
+                LOG.debug("CallBack is sent");
                 return;
             }
         });
         futureCallBack.addListener(ChannelFutureListener.CLOSE);
-        logger.debug("Callback channel is closed");
+        LOG.debug("Callback channel is closed");
         return true;
     }
 }

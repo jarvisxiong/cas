@@ -1,12 +1,11 @@
 package com.inmobi.adserve.channels.adnetworks.placeiq;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.util.DebugLogger;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -14,6 +13,8 @@ import org.apache.velocity.VelocityContext;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -31,8 +32,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class DCPPlaceIQAdnetwork extends BaseAdNetworkImpl {
-    private final Configuration           config;
+public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
+
+    private static final Logger           LOG           = LoggerFactory.getLogger(DCPPlaceIQAdnetwork.class);
+
     private transient String              latitude;
     private transient String              longitude;
     private int                           width;
@@ -63,7 +66,7 @@ public class DCPPlaceIQAdnetwork extends BaseAdNetworkImpl {
     private static final String           ANDROID       = "Android";
     private static final String           IOS           = "iOS";
     private static final String           auIdFormat    = "%s/%s/%s/%s";
-    private SimpleDateFormat              dateFormat    = new SimpleDateFormat("yyyy-MM-dd");
+    private final SimpleDateFormat        dateFormat    = new SimpleDateFormat("yyyy-MM-dd");
 
     private final String                  partnerId;
     private final String                  seed;
@@ -105,12 +108,9 @@ public class DCPPlaceIQAdnetwork extends BaseAdNetworkImpl {
         categoryList.put(74, "wt");
     }
 
-    public DCPPlaceIQAdnetwork(DebugLogger logger, Configuration config, ClientBootstrap clientBootstrap,
-            HttpRequestHandlerBase baseRequestHandler, MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent, logger);
-        this.config = config;
-        this.logger = logger;
-        this.clientBootstrap = clientBootstrap;
+    public DCPPlaceIQAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+        super(config, clientBootstrap, baseRequestHandler, serverEvent);
         partnerId = config.getString("placeiq.partnerId");
         host = config.getString("placeiq.host");
         seed = config.getString("placeiq.seed");
@@ -120,7 +120,7 @@ public class DCPPlaceIQAdnetwork extends BaseAdNetworkImpl {
             builder = factory.newDocumentBuilder();
         }
         catch (ParserConfigurationException e) {
-            logger.error("XML Parser Builder initialization failed");
+            LOG.error("XML Parser Builder initialization failed");
         }
     }
 
@@ -128,7 +128,7 @@ public class DCPPlaceIQAdnetwork extends BaseAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            logger.debug("mandatory parameters missing for placeiq so exiting adapter");
+            LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
             return false;
         }
         isGeoOrDeviceIdPresent = false;
@@ -147,7 +147,7 @@ public class DCPPlaceIQAdnetwork extends BaseAdNetworkImpl {
             height = (int) Math.ceil(dim.getHeight());
         }
         else {
-            logger.debug("mandatory parameters missing for placeiq so exiting adapter");
+            LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
             return false;
         }
 
@@ -172,11 +172,11 @@ public class DCPPlaceIQAdnetwork extends BaseAdNetworkImpl {
             os = "Windows";
         }
         if (!isGeoOrDeviceIdPresent) {
-            logger.debug("mandatory parameters missing for placeiq so exiting adapter");
+            LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
             return false;
         }
 
-        logger.info("Configure parameters inside PlaceIQ returned true");
+        LOG.info("Configure parameters inside PlaceIQ returned true");
         return true;
     }
 
@@ -210,7 +210,7 @@ public class DCPPlaceIQAdnetwork extends BaseAdNetworkImpl {
         if (StringUtils.isNotEmpty(casInternalRequestParameters.zipCode)) {
             appendQueryParam(url, ZIP, casInternalRequestParameters.zipCode, false);
         }
-        if (StringUtils.isNotEmpty(sasParams.getCountryCode())) {
+        if (null != sasParams.getCountryCode()) {
             appendQueryParam(url, COUNTRY, sasParams.getCountryCode().toUpperCase(), false);
         }
 
@@ -241,14 +241,14 @@ public class DCPPlaceIQAdnetwork extends BaseAdNetworkImpl {
             appendQueryParam(url, SITEID, sasParams.getSiteIncId() + "", false);
             appendQueryParam(url, ADTYPE, WAPTYPE, false);
         }
-        logger.debug("PlaceIQ url is ", url.toString());
+        LOG.debug("PlaceIQ url is {}", url);
 
         return new URI(url.toString());
     }
 
     @Override
-    public void parseResponse(String response, HttpResponseStatus status) {
-        logger.debug("response is", response);
+    public void parseResponse(final String response, final HttpResponseStatus status) {
+        LOG.debug("response is {}", response);
         statusCode = status.getCode();
         if (StringUtils.isBlank(response) || status.getCode() != 200
                 || ("xml".equalsIgnoreCase(requestFormat) && response.contains("<NOAD>"))) {
@@ -284,17 +284,16 @@ public class DCPPlaceIQAdnetwork extends BaseAdNetworkImpl {
                 }
 
                 statusCode = status.getCode();
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl,
-                    logger);
+                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
             }
             catch (Exception exception) {
                 adStatus = "NO_AD";
-                logger.info("Error parsing response from PlaceIQ :", exception);
-                logger.info("Response from PlaceIQ:", response);
+                LOG.info("Error parsing response from PlaceIQ : {}", exception);
+                LOG.info("Response from PlaceIQ: {}", response);
             }
         }
-        logger.debug("response length is", responseContent.length());
+        LOG.debug("response length is {}", responseContent.length());
 
     }
 
