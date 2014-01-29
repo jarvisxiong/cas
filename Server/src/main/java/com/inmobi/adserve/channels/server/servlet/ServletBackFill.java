@@ -72,8 +72,8 @@ public class ServletBackFill implements Servlet {
                 }
             } // Handling post requests
             else if (null == hrh.tObject) {
-                hrh.tObject = ThriftRequestParser.extractParams(params);
-                ThriftRequestParser.parseRequestParameters(hrh.tObject, sasParams, casInternalRequestParametersGlobal,
+                hrh.tObject = thriftRequestParser.extractParams(params);
+                thriftRequestParser.parseRequestParameters(hrh.tObject, sasParams, casInternalRequestParametersGlobal,
                          2);
             }
             LOG.debug("sasparams in backfill are: {}", sasParams);

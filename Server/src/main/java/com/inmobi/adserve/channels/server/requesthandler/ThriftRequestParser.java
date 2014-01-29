@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import com.google.inject.Singleton;
 import com.inmobi.adserve.adpool.*;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
@@ -17,14 +18,14 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.util.*;
 
-
+@Singleton
 public class ThriftRequestParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(ThriftRequestParser.class);
 
 
     // Extracting params.
-    public static AdPoolRequest extractParams(Map<String, List<String>> params) throws JSONException,
+    public AdPoolRequest extractParams(Map<String, List<String>> params) throws JSONException,
             UnsupportedEncodingException {
         if (!params.isEmpty()) {
             List<String> values = params.get("post");
@@ -44,7 +45,7 @@ public class ThriftRequestParser {
         return null;
     }
 
-    public static void parseRequestParameters(AdPoolRequest tObject, SASRequestParameters params,
+    public void parseRequestParameters(AdPoolRequest tObject, SASRequestParameters params,
             CasInternalRequestParameters casInternalRequestParameters, int dst) {
         LOG.debug("Inside thrift request parser");
         params.setAllParametersJson(tObject.toString());
@@ -151,7 +152,7 @@ public class ThriftRequestParser {
     }
 
 
-    private static String getResponseFormat (ResponseFormat rqFormat) {
+    private String getResponseFormat (ResponseFormat rqFormat) {
         String rFormat = "html";
         if (null == rqFormat) {
             return rFormat;
@@ -176,7 +177,7 @@ public class ThriftRequestParser {
         return rFormat;
     }
 
-    private static Set<Integer> getAccountSegments(Set<DemandType> demandTypes) {
+    private Set<Integer> getAccountSegments(Set<DemandType> demandTypes) {
         if (null == demandTypes) {
             return Collections.emptySet();
         }
@@ -199,7 +200,7 @@ public class ThriftRequestParser {
         return accountsSegments;
     }
 
-    private static List<Long> convertIntToLong(Set<Integer> intList) {
+    private List<Long> convertIntToLong(Set<Integer> intList) {
         if (null == intList) {
             return Collections.emptyList();
         }
@@ -210,7 +211,7 @@ public class ThriftRequestParser {
         return longList;
     }
     
-    private static Map<String, String> getUserIdMap(Map<UidType, String> uidMap) {
+    private Map<String, String> getUserIdMap(Map<UidType, String> uidMap) {
         Map<String, String> userIdMap = new HashMap<String, String>();
         for (UidType uidType : uidMap.keySet()) {
             userIdMap.put(uidType.toString().toUpperCase(Locale.ENGLISH), uidMap.get(uidType));
@@ -218,7 +219,7 @@ public class ThriftRequestParser {
         return userIdMap;
     }
 
-    private static void setUserIdParams(CasInternalRequestParameters parameter, UidParams uidParams) {
+    private void setUserIdParams(CasInternalRequestParameters parameter, UidParams uidParams) {
         Map<UidType, String> uidMap =  uidParams.getRawUidValues();
         parameter.uidADT = uidParams.isLimitIOSAdTracking() ? "0" : "1";
         for (UidType uidType : uidMap.keySet()) {
@@ -252,7 +253,7 @@ public class ThriftRequestParser {
         }
     }
 
-    public static String MD5(String md5) {
+    public String MD5(String md5) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] array = md.digest(md5.getBytes());
@@ -267,14 +268,14 @@ public class ThriftRequestParser {
         return null;
     }
 
-    public static String getAdCode(IntegrationType integrationType) {
+    public String getAdCode(IntegrationType integrationType) {
         if (integrationType == IntegrationType.JSAC || integrationType == IntegrationType.WINDOWS_JS_SDK)  {
             return "JS";
         }
         return "NON-JS";
     }
 
-    public static String getSdkVersion(IntegrationType integrationType, int version) {
+    public String getSdkVersion(IntegrationType integrationType, int version) {
         if (integrationType == IntegrationType.ANDROID_SDK)  {
             return "a" + version;
         } else if (integrationType == IntegrationType.IOS_SDK) {

@@ -17,7 +17,8 @@ import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
 
 public class ThriftRequestParserTest extends TestCase {
-   
+
+    ThriftRequestParser thriftRequestParser;
     public void setUp()
     {
         Configuration mockConfig = createMock(Configuration.class);
@@ -25,6 +26,7 @@ public class ThriftRequestParserTest extends TestCase {
         expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
         expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
         replay(mockConfig);
+        thriftRequestParser = new ThriftRequestParser();
     }
     
     public void testParseRequestParameters() 
@@ -97,7 +99,7 @@ public class ThriftRequestParserTest extends TestCase {
 
         SASRequestParameters sasRequestParameters = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        ThriftRequestParser.parseRequestParameters(adPoolRequest, sasRequestParameters, casInternalRequestParameters, 6);
+        thriftRequestParser.parseRequestParameters(adPoolRequest, sasRequestParameters, casInternalRequestParameters, 6);
 
         assertEquals(sasRequestParameters.getRemoteHostIp(), "10.14.118.143");
         assertEquals(sasRequestParameters.getUserAgent(), "UserAgent");

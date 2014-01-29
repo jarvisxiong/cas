@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.server.servlet;
 
 import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
@@ -20,10 +21,12 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import javax.inject.Inject;
+import javax.ws.rs.Path;
 import java.util.List;
 import java.util.Map;
 
-
+@Singleton
+@Path("/rtbdfill")
 public class ServletRtbd implements Servlet {
     private static final Logger LOG = LoggerFactory.getLogger(ServletRtbd.class);
     private final MatchSegments matchSegments;
@@ -65,8 +68,8 @@ public class ServletRtbd implements Servlet {
             requestParser.parseRequestParameters(hrh.jObject, sasParams, casInternalRequestParametersGlobal);
         } // Post method handling
         else {
-            hrh.tObject = ThriftRequestParser.extractParams(params);
-            ThriftRequestParser.parseRequestParameters(hrh.tObject, sasParams, casInternalRequestParametersGlobal, 6);
+            hrh.tObject = thriftRequestParser.extractParams(params);
+            thriftRequestParser.parseRequestParameters(hrh.tObject, sasParams, casInternalRequestParametersGlobal, 6);
         }
 
         sasParams.setDst(6);

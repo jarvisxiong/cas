@@ -1,14 +1,22 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
 import com.google.common.base.Charsets;
+import com.inmobi.adserve.adpool.AdInfo;
+import com.inmobi.adserve.adpool.AdPoolResponse;
+import com.inmobi.adserve.adpool.AuctionType;
+import com.inmobi.adserve.adpool.Creative;
 import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.phoenix.util.WilburyUUID;
+import com.inmobi.types.AdIdChain;
+import com.inmobi.types.GUID;
 import com.ning.http.client.AsyncHttpClient;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TBinaryProtocol;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.*;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
@@ -18,9 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.OK;
@@ -142,53 +149,53 @@ public class ResponseSender extends HttpRequestHandlerBase {
             sendResponse(OK, finalReponse, adResponse.responseHeaders, event);
         }
         else {
-            JSONObject jsonObject = new JSONObject();
+
+            AdPoolResponse rtbdResponse = createThriftResponse(adResponse.response);
+            LOG.debug("RTB response json to RE is " + rtbdResponse);
+            TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
+            byte[] serializedResponse = new byte[0];
             try {
-                jsonObject.put("secondHighestBid", this
-                        .getAuctionEngine()
-                            .getRtbResponse()
-                            .getAdNetworkInterface()
-                            .getSecondBidPriceInUsd());
-                jsonObject.put("winnerBid", this
-                        .getAuctionEngine()
-                            .getRtbResponse()
-                            .getAdNetworkInterface()
-                            .getBidPriceInUsd());
-                jsonObject.put("adm", finalReponse);
-                jsonObject.put("advertiserId", this.auctionEngine.getRtbResponse().getChannelEntity().getAccountId());
-                jsonObject.put("adgroupId", this.auctionEngine
-                        .getRtbResponse()
-                            .getChannelSegmentEntity()
-                            .getAdgroupId());
-                jsonObject.put("adgroupIncId", this.auctionEngine
-                        .getRtbResponse()
-                            .getChannelSegmentEntity()
-                            .getAdgroupIncId());
-                jsonObject.put("adIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getIncId());
-                jsonObject.put("adId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getAdId());
-                jsonObject.put("rtbFloor", casInternalRequestParameters.rtbBidFloor);
-                jsonObject.put("impressionId", this.auctionEngine
-                        .getRtbResponse()
-                            .getAdNetworkInterface()
-                            .getImpressionId());
-                jsonObject.put("campaignIncId", this.auctionEngine
-                        .getRtbResponse()
-                            .getChannelSegmentEntity()
-                            .getCampaignIncId());
-                jsonObject.put("campaignId", this.auctionEngine
-                        .getRtbResponse()
-                            .getChannelSegmentEntity()
-                            .getCampaignId());
+            serializedResponse = serializer.serialize(rtbdResponse);
+            } catch (TException e) {
+                LOG.error("Error in serializing the adpoolresponse " + e.getMessage());
+                sendResponse(OK, serializedResponse, adResponse.responseHeaders, event);
                 InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
-                sendResponse(OK, jsonObject.toString(), adResponse.responseHeaders, event);
-                LOG.debug("RTB reponse json to RE is {}", jsonObject);
-            }
-            catch (JSONException e) {
-                LOG.debug("Error while making json object for rule engine " + e.getMessage());
-                // Sending NOAD if error making json object
-                sendNoAdResponse(event);
             }
         }
+    }
+
+    private AdPoolResponse createThriftResponse (String finalResponse) {
+        AdPoolResponse adPoolResponse = new AdPoolResponse();
+        AdInfo rtbdAd = new AdInfo();
+        AdIdChain adIdChain = new AdIdChain();
+        adIdChain.setAdgroup_guid(this.auctionEngine
+                .getRtbResponse()
+                .getChannelSegmentEntity()
+                .getAdgroupId());
+        adIdChain.setAdvertiser_guid(this.auctionEngine
+                .getRtbResponse()
+                .getChannelEntity()
+                .getAccountId());
+        adIdChain.setAd(this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getIncId());
+        adIdChain.setCampaign(this.auctionEngine
+                .getRtbResponse()
+                .getChannelSegmentEntity()
+                .getCampaignIncId());
+        rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);
+        rtbdAd.setBid((long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface().getSecondBidPriceInUsd() * 1000));
+        rtbdAd.setMinChargedValue((long)(casInternalRequestParameters.rtbBidFloor*1000));
+        UUID uuid = WilburyUUID.extractUUID(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getImpressionId());
+        rtbdAd.setImpressionId(new GUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits()));
+        rtbdAd.setSlotServed(sasParams.getSlot());
+        Creative rtbdCreative = new Creative();
+        rtbdCreative.setValue(finalResponse);
+        rtbdAd.setCreative(rtbdCreative);
+        adPoolResponse.setAds(Arrays.asList(rtbdAd));
+        if (!"USD".equalsIgnoreCase(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getCurrency())) {
+            rtbdAd.setOriginalCurrencyName(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getCurrency());
+            rtbdAd.setBidInOriginalCurrency((long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface().getBidPriceInLocal() * 1000));
+        }
+        return adPoolResponse;
     }
 
     // send response to the caller
