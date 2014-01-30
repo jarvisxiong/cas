@@ -2,12 +2,15 @@ package com.inmobi.adserve.channels.server.module;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.inmobi.adserve.channels.server.ChannelServerPipelineFactory;
+import com.inmobi.adserve.channels.server.ChannelStatServerPipelineFactory;
 import com.inmobi.adserve.channels.server.SimpleScope;
 import com.inmobi.adserve.channels.server.annotations.BatchScoped;
 import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import org.apache.commons.configuration.Configuration;
 import org.jboss.netty.channel.ChannelFactory;
+import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.group.ChannelGroup;
 import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
@@ -47,6 +50,11 @@ public class NettyModule extends AbstractModule {
         bind(SimpleScope.class).toInstance(simpleScope);
         bind(Marker.class).toProvider(SimpleScope.<Marker> seededKeyProvider()).in(BatchScoped.class);
         bind(Servlet.class).toProvider(SimpleScope.<Servlet> seededKeyProvider()).in(BatchScoped.class);
+        if (port == 8800) {
+            bind(ChannelPipelineFactory.class).to(ChannelServerPipelineFactory.class).asEagerSingleton();
+        } else if (port == 8801) {
+            bind(ChannelPipelineFactory.class).to(ChannelStatServerPipelineFactory.class).asEagerSingleton();
+        }
     }
 
     @Provides

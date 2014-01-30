@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.server;
 
 import com.google.inject.Provider;
 import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
+import com.inmobi.adserve.channels.server.handler.TraceMarkerhandler;
 import lombok.Getter;
 import org.apache.commons.configuration.Configuration;
 import org.jboss.netty.channel.ChannelPipeline;
@@ -24,6 +25,7 @@ public class ChannelStatServerPipelineFactory implements ChannelPipelineFactory 
 
     private final RequestIdHandler             requestIdHandler;
     private final Provider<HttpRequestHandler> httpRequestHandlerProvider;
+    private final TraceMarkerhandler traceMarkerhandler;
     private final Timer                        timer;
     private final int                          serverTimeoutMillis;
     private final ExecutionHandler             executionHandler;
@@ -33,12 +35,13 @@ public class ChannelStatServerPipelineFactory implements ChannelPipelineFactory 
     @Inject
     ChannelStatServerPipelineFactory(final Timer timer, @ServerConfiguration final Configuration configuration,
                                      final Provider<HttpRequestHandler> httpRequestHandlerProvider,
-                                     final ServletHandler servletHandler) {
+                                     final ServletHandler servletHandler, final TraceMarkerhandler traceMarkerhandler) {
         this.timer = timer;
         this.serverTimeoutMillis = configuration.getInt("serverTimeoutMillis", 825);
         executionHandler = new ExecutionHandler(new OrderedMemoryAwareThreadPoolExecutor(80, 1048576, 1048576, 3,
                 TimeUnit.HOURS));
         this.httpRequestHandlerProvider = httpRequestHandlerProvider;
+        this.traceMarkerhandler = traceMarkerhandler;
         this.requestIdHandler = new RequestIdHandler();
         this.servletHandler = servletHandler;
     }
@@ -53,6 +56,7 @@ public class ChannelStatServerPipelineFactory implements ChannelPipelineFactory 
         pipeline.addLast("executionHandler", executionHandler);
         pipeline.addLast("idleStateHandler", new IdleStateHandler(this.timer, 0, 0, serverTimeoutMillis,
                 TimeUnit.MILLISECONDS));
+        pipeline.addLast("traceMarkerhandler", traceMarkerhandler);
         pipeline.addLast("servletHandler", servletHandler);
         pipeline.addLast("handler", httpRequestHandlerProvider.get());
         return pipeline;

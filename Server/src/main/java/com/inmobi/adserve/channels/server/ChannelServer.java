@@ -1,6 +1,5 @@
 package com.inmobi.adserve.channels.server;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -32,7 +31,6 @@ import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.logging.InternalLoggerFactory;
 import org.jboss.netty.logging.Log4JLoggerFactory;
 import org.jboss.netty.util.HashedWheelTimer;
@@ -158,15 +156,6 @@ public class ChannelServer {
             }
             Filters.init(config.getAdapterConfiguration());
 
-            Injector injector = Guice.createInjector(new NettyModule(config.getServerConfiguration(), 8800),
-                    new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(),
-                            repositoryHelper), new AbstractModule() {
-                @Override
-                protected void configure() {
-                    bind(ChannelPipelineFactory.class).to(ChannelServerPipelineFactory.class).asEagerSingleton();
-                }
-            });
-
             // Creating netty client for out-bound calls.
             Timer timer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
             BootstrapCreation.init(timer);
@@ -194,17 +183,14 @@ public class ChannelServer {
 
             // Initialising request handler
             AsyncRequestMaker.init(clientBootstrap, rtbClientBootstrap, asyncHttpClient);
-
+            Injector injector = Guice.createInjector(new NettyModule(config.getServerConfiguration(), 8800),
+                    new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(),
+                            repositoryHelper));
             final NettyServer server = injector.getInstance(NettyServer.class);
             server.startAndWait();
             Injector injector2 = Guice.createInjector(new NettyModule(config.getServerConfiguration(), 8801),
                     new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(),
-                            repositoryHelper), new AbstractModule() {
-                @Override
-                protected void configure() {
-                    bind(ChannelPipelineFactory.class).to(ChannelStatServerPipelineFactory.class).asEagerSingleton();
-                }
-            });
+                            repositoryHelper));
             final NettyServer statusServer = injector2.getInstance(NettyServer.class);
             server.startAndWait();
             statusServer.startAndWait();
