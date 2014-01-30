@@ -1,14 +1,16 @@
 package com.inmobi.adserve.channels.server.module;
 
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
-import javax.inject.Singleton;
-
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
+import com.inmobi.adserve.channels.server.ChannelServerPipelineFactory;
+import com.inmobi.adserve.channels.server.ChannelStatServerPipelineFactory;
+import com.inmobi.adserve.channels.server.SimpleScope;
+import com.inmobi.adserve.channels.server.annotations.BatchScoped;
+import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
+import com.inmobi.adserve.channels.server.api.Servlet;
 import org.apache.commons.configuration.Configuration;
 import org.jboss.netty.channel.ChannelFactory;
+import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.group.ChannelGroup;
 import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
@@ -16,12 +18,11 @@ import org.jboss.netty.util.HashedWheelTimer;
 import org.jboss.netty.util.Timer;
 import org.slf4j.Marker;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
-import com.inmobi.adserve.channels.server.SimpleScope;
-import com.inmobi.adserve.channels.server.annotations.BatchScoped;
-import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
-import com.inmobi.adserve.channels.server.api.Servlet;
+import javax.inject.Singleton;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -31,9 +32,11 @@ import com.inmobi.adserve.channels.server.api.Servlet;
 public class NettyModule extends AbstractModule {
 
     private final Configuration serverConfiguration;
+    private final Integer port;
 
-    public NettyModule(final Configuration serverConfiguration) {
+    public NettyModule(final Configuration serverConfiguration, final Integer port) {
         this.serverConfiguration = serverConfiguration;
+        this.port = port;
     }
 
     @Override
@@ -47,11 +50,16 @@ public class NettyModule extends AbstractModule {
         bind(SimpleScope.class).toInstance(simpleScope);
         bind(Marker.class).toProvider(SimpleScope.<Marker> seededKeyProvider()).in(BatchScoped.class);
         bind(Servlet.class).toProvider(SimpleScope.<Servlet> seededKeyProvider()).in(BatchScoped.class);
+        if (port == 8800) {
+            bind(ChannelPipelineFactory.class).to(ChannelServerPipelineFactory.class).asEagerSingleton();
+        } else if (port == 8801) {
+            bind(ChannelPipelineFactory.class).to(ChannelStatServerPipelineFactory.class).asEagerSingleton();
+        }
     }
 
     @Provides
     SocketAddress provideSocketAddress() {
-        return new InetSocketAddress(8800);
+        return new InetSocketAddress(port);
     }
 
     @Provides

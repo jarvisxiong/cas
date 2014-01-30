@@ -1,29 +1,5 @@
 package com.inmobi.adserve.channels.server;
 
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.dbcp.ConnectionFactory;
-import org.apache.commons.dbcp.DriverManagerConnectionFactory;
-import org.apache.commons.dbcp.PoolableConnectionFactory;
-import org.apache.commons.dbcp.PoolingDataSource;
-import org.apache.commons.pool.impl.GenericObjectPool;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.logging.InternalLoggerFactory;
-import org.jboss.netty.logging.Log4JLoggerFactory;
-import org.jboss.netty.util.HashedWheelTimer;
-import org.jboss.netty.util.Timer;
-
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -46,6 +22,28 @@ import com.inmobi.messaging.publisher.MessagePublisherFactory;
 import com.inmobi.phoenix.exception.InitializationException;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.dbcp.ConnectionFactory;
+import org.apache.commons.dbcp.DriverManagerConnectionFactory;
+import org.apache.commons.dbcp.PoolableConnectionFactory;
+import org.apache.commons.dbcp.PoolingDataSource;
+import org.apache.commons.pool.impl.GenericObjectPool;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.logging.InternalLoggerFactory;
+import org.jboss.netty.logging.Log4JLoggerFactory;
+import org.jboss.netty.util.HashedWheelTimer;
+import org.jboss.netty.util.Timer;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
  /*
  * 
@@ -158,10 +156,6 @@ public class ChannelServer {
             }
             Filters.init(config.getAdapterConfiguration());
 
-            Injector injector = Guice.createInjector(new NettyModule(config.getServerConfiguration()),
-                    new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(),
-                            repositoryHelper));
-
             // Creating netty client for out-bound calls.
             Timer timer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
             BootstrapCreation.init(timer);
@@ -189,13 +183,22 @@ public class ChannelServer {
 
             // Initialising request handler
             AsyncRequestMaker.init(clientBootstrap, rtbClientBootstrap, asyncHttpClient);
-
+            Injector injector = Guice.createInjector(new NettyModule(config.getServerConfiguration(), 8800),
+                    new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(),
+                            repositoryHelper));
             final NettyServer server = injector.getInstance(NettyServer.class);
             server.startAndWait();
+            Injector injector2 = Guice.createInjector(new NettyModule(config.getServerConfiguration(), 8801),
+                    new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(),
+                            repositoryHelper));
+            final NettyServer statusServer = injector2.getInstance(NettyServer.class);
+            server.startAndWait();
+            statusServer.startAndWait();
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
                     server.stopAndWait();
+                    statusServer.stopAndWait();
                 }
             });
 
