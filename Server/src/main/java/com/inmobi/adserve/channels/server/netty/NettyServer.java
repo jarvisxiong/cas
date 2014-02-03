@@ -18,29 +18,29 @@ import com.inmobi.adserve.channels.server.ChannelServerPipelineFactory;
  * 
  */
 public class NettyServer extends AbstractIdleService {
-    private final ChannelGroup                 allChannels;
-    private final SocketAddress                address;
-    private final ChannelFactory               factory;
-    private final ServerBootstrap              bootstrap;
-    private final ChannelServerPipelineFactory channelServerPipelineFactory;
+    private final ChannelGroup    allChannels;
+    private final SocketAddress   address;
+    private final ChannelFactory  factory;
+    private final ServerBootstrap bootstrap;
 
     @Inject
     NettyServer(final ChannelFactory factory, final ChannelGroup allChannels, final SocketAddress address,
             final ChannelServerPipelineFactory channelServerPipelineFactory) {
         this.factory = factory;
+
         this.bootstrap = new ServerBootstrap(factory);
+        this.bootstrap.setPipelineFactory(channelServerPipelineFactory);
+        this.bootstrap.setOption("child.keepAlive", true);
+        this.bootstrap.setOption("child.tcpNoDelay", true);
+        this.bootstrap.setOption("child.reuseAddress", true);
+        this.bootstrap.setOption("child.connectTimeoutMillis", 5);
+
         this.allChannels = allChannels;
         this.address = address;
-        this.channelServerPipelineFactory = channelServerPipelineFactory;
     }
 
     @Override
     protected void startUp() throws Exception {
-        bootstrap.setPipelineFactory(channelServerPipelineFactory);
-        bootstrap.setOption("child.keepAlive", true);
-        bootstrap.setOption("child.tcpNoDelay", true);
-        bootstrap.setOption("child.reuseAddress", true);
-        bootstrap.setOption("child.connectTimeoutMillis", 5);
         Channel channel = bootstrap.bind(address);
         allChannels.add(channel);
     }

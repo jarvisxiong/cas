@@ -22,6 +22,7 @@ import com.inmobi.adserve.channels.server.SimpleScope;
 import com.inmobi.adserve.channels.server.annotations.BatchScoped;
 import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
 import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.netty.NettyServer;
 
 
 /**
@@ -47,8 +48,11 @@ public class NettyModule extends AbstractModule {
         bind(SimpleScope.class).toInstance(simpleScope);
         bind(Marker.class).toProvider(SimpleScope.<Marker> seededKeyProvider()).in(BatchScoped.class);
         bind(Servlet.class).toProvider(SimpleScope.<Servlet> seededKeyProvider()).in(BatchScoped.class);
+
+        bind(NettyServer.class).asEagerSingleton();
     }
 
+    @Singleton
     @Provides
     SocketAddress provideSocketAddress() {
         return new InetSocketAddress(8800);
@@ -60,6 +64,7 @@ public class NettyModule extends AbstractModule {
         return new DefaultChannelGroup("http-server");
     }
 
+    @Singleton
     @Provides
     ChannelFactory provideChannelFactory() {
         return new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
