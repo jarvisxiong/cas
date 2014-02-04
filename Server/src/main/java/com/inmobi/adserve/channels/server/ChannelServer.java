@@ -359,8 +359,8 @@ public class ChannelServer {
         else if (DataCenter.UJ1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
             colo = DataCenter.UJ1;
         }
-        else if (DataCenter.UJ1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
-            colo = DataCenter.UJ1;
+        else if (DataCenter.UH1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
+            colo = DataCenter.UH1;
         }
         else if (DataCenter.LHR1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
             colo = DataCenter.LHR1;
