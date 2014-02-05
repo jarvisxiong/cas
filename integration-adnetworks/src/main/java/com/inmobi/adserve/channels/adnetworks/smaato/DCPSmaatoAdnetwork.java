@@ -69,7 +69,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String         IMAGE_TYPE       = "IMG";
     private static final String         TEXT_TYPE        = "TXT";
 
-    private static final String         responseFormat   = "img%2Ctxt";
+    private static final String         responseFormat   = "all";
     private static final String         strictField      = "true";
     private static final String         latLongFormat    = "%s,%s";
     private final String                publisherId;
@@ -87,7 +87,10 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         slotIdMap.put(10, "medrect");
         slotIdMap.put(11, "leader");
         slotIdMap.put(13, "sky");
+        slotIdMap.put(14, "full_320x480");
         slotIdMap.put(15, "mma");
+        slotIdMap.put(16,"full_768x1024");
+        slotIdMap.put(17,"full_800x1280");
 
     }
 

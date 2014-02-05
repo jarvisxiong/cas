@@ -155,7 +155,7 @@ public class DCPSmaatoAdnetworkTest extends TestCase {
         if (dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
             String actualUrl = dcpSmaatoAdNetwork.getRequestUri().toString();
 
-            String expectedUrl = "http://f101.smaato.com/oapi/reqAd.jsp?adspace=6378ef4a7db50d955c90f7dffb05ee20&pub=923867039&device=Mozilla%2F5.0+%28iPod%3B+CPU+iPhone+OS+6_1_5+like+Mac+OS+X%29+AppleWebKit%2F536.26+%28KHTML%2C+like+Gecko%29+Mobile%2F10B400&devip=178.190.64.146&format=img%2Ctxt&dimension=mma&dimensionstrict=true&openudid=202cb962ac59075b964b07152d234b70&gps=37.4429%2C-122.1514&gender=m&kws=Business&width=320&height=50&age=32";
+            String expectedUrl = "http://f101.smaato.com/oapi/reqAd.jsp?adspace=6378ef4a7db50d955c90f7dffb05ee20&pub=923867039&device=Mozilla%2F5.0+%28iPod%3B+CPU+iPhone+OS+6_1_5+like+Mac+OS+X%29+AppleWebKit%2F536.26+%28KHTML%2C+like+Gecko%29+Mobile%2F10B400&devip=178.190.64.146&format=all&dimension=mma&dimensionstrict=true&openudid=202cb962ac59075b964b07152d234b70&gps=37.4429%2C-122.1514&gender=m&kws=Business&width=320&height=50&age=32";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -189,7 +189,7 @@ public class DCPSmaatoAdnetworkTest extends TestCase {
             null, null, 0));
         if (dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpSmaatoAdNetwork.getRequestUri().toString();
-            String expectedUrl = "http://f101.smaato.com/oapi/reqAd.jsp?adspace=01212121&pub=923867039&device=Mozilla&devip=206.29.182.240&format=img%2Ctxt&dimension=mma&dimensionstrict=true&openudid=202cb962ac59075b964b07152d234b70&gps=38.5%2C-122.1514&kws=Business%2CBooks+%26+Reference&width=320&height=50";
+            String expectedUrl = "http://f101.smaato.com/oapi/reqAd.jsp?adspace=01212121&pub=923867039&device=Mozilla&devip=206.29.182.240&format=all&dimension=mma&dimensionstrict=true&openudid=202cb962ac59075b964b07152d234b70&gps=38.5%2C-122.1514&kws=Business%2CBooks+%26+Reference&width=320&height=50";
             assertEquals(expectedUrl, actualUrl);
 
         }
