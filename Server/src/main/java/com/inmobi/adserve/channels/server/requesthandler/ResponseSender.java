@@ -149,17 +149,20 @@ public class ResponseSender extends HttpRequestHandlerBase {
             sendResponse(OK, finalReponse, adResponse.responseHeaders, event);
         }
         else {
-
             AdPoolResponse rtbdResponse = createThriftResponse(adResponse.response);
-            LOG.debug("RTB response json to RE is " + rtbdResponse);
-            TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
-            byte[] serializedResponse = new byte[0];
-            try {
-            serializedResponse = serializer.serialize(rtbdResponse);
-            } catch (TException e) {
-                LOG.error("Error in serializing the adpoolresponse " + e.getMessage());
-                sendResponse(OK, serializedResponse, adResponse.responseHeaders, event);
-                InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
+            LOG.debug("RTB response json to RE is ", rtbdResponse);
+            if (null == rtbdResponse) {
+                sendNoAdResponse(event);
+            } else {
+                    try {
+                        TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
+                        byte[] serializedResponse = serializer.serialize(rtbdResponse);
+                        sendResponse(OK, serializedResponse, adResponse.responseHeaders, event);
+                        InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
+                    } catch (TException e) {
+                        LOG.error("Error in serializing the adpool response ", e.getMessage());
+                        sendNoAdResponse(event);
+                    }
             }
         }
     }
@@ -264,7 +267,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
 
         Map<String, String> headers = null;
-        if (6 == sasParams.getDst()) {
+        if (null != sasParams && 6 == sasParams.getDst()) {
             headers = new HashMap<String, String>();
             headers.put(NO_AD_HEADER, "true");
         }

@@ -47,7 +47,7 @@ public class ThriftRequestParser {
 
     public void parseRequestParameters(AdPoolRequest tObject, SASRequestParameters params,
             CasInternalRequestParameters casInternalRequestParameters, int dst) {
-        LOG.debug("Inside thrift request parser");
+        LOG.debug("Inside thrift request parser AdPoolRequest is ", tObject);
         params.setAllParametersJson(tObject.toString());
         params.setDst(dst);
         params.setResponseOnlyFromDcp(2 == dst);

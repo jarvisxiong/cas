@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 @Singleton
-@Path("/rtbdfill")
+@Path("/rtbdFill")
 public class ServletRtbd implements Servlet {
     private static final Logger LOG = LoggerFactory.getLogger(ServletRtbd.class);
     private final MatchSegments matchSegments;
@@ -81,6 +81,6 @@ public class ServletRtbd implements Servlet {
 
     @Override
     public String getName() {
-        return "Rtbd";
+        return "rtbdFill";
     }
 }

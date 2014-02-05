@@ -8,12 +8,15 @@ import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
+import org.apache.thrift.protocol.TBinaryProtocol;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.group.ChannelGroup;
+import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.jboss.netty.handler.timeout.IdleStateAwareChannelUpstreamHandler;
@@ -101,7 +104,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
         if (e.getChannel().isOpen()) {
             responseSender.sendNoAdResponse(e);
         }
-
+        e.getCause().printStackTrace();
         e.getChannel().close();
     }
 
@@ -148,8 +151,29 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
 
             LOG.debug(traceMarker, "Got the servlet {}", servlet.getName());
 
-            servlet.handleRequest(this, new QueryStringDecoder(request.getUri()), e);
-            return;
+
+            QueryStringDecoder queryStringDecoder;
+            String content = new String(request.getContent().array());
+
+
+            AdPoolRequest adPoolRequest = new AdPoolRequest();
+            TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
+            try {
+                tDeserializer.deserialize(adPoolRequest, request.getContent().array());
+            } catch (TException ex) {
+                LOG.debug(traceMarker, "Error in deserializing thrift in HttprequestHandler ", ex.getMessage());
+                ex.printStackTrace();
+            }
+            LOG.debug(traceMarker, "adpoolrequest " + adPoolRequest);
+
+
+            if (request.getMethod() == HttpMethod.POST) {
+                queryStringDecoder = new QueryStringDecoder(request.getUri() + "?post=" + content);
+            }
+            else {
+                queryStringDecoder = new QueryStringDecoder(request.getUri());
+            }
+            servlet.handleRequest(this, queryStringDecoder, e);
         }
         catch (Exception exception) {
             terminationReason = ServletHandler.processingError;
