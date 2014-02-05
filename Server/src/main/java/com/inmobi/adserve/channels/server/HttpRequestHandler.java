@@ -16,6 +16,7 @@ import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.group.ChannelGroup;
+import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.jboss.netty.handler.timeout.IdleStateAwareChannelUpstreamHandler;
@@ -147,14 +148,16 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
 
             LOG.debug(traceMarker, "Got the servlet {}", servlet.getName());
 
-            AdPoolRequest adPoolRequest = new AdPoolRequest();
-            TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
-            try {
-                tDeserializer.deserialize(adPoolRequest, request.getContent().array());
-                this.tObject = adPoolRequest;
-            } catch (TException ex) {
-                LOG.error(traceMarker, "Error in de serializing thrift ", ex);
-                this.responseSender.sendNoAdResponse(e);
+            if (request.getMethod() == HttpMethod.POST) {
+                AdPoolRequest adPoolRequest = new AdPoolRequest();
+                TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
+                try {
+                    tDeserializer.deserialize(adPoolRequest, request.getContent().array());
+                    this.tObject = adPoolRequest;
+                } catch (TException ex) {
+                    LOG.error(traceMarker, "Error in de serializing thrift ", ex);
+                    this.responseSender.sendNoAdResponse(e);
+                }
             }
 
             servlet.handleRequest(this, new QueryStringDecoder(request.getUri()), e);
