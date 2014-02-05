@@ -150,7 +150,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
         else {
             AdPoolResponse rtbdResponse = createThriftResponse(adResponse.response);
-            LOG.debug("RTB response json to RE is ", rtbdResponse);
+            LOG.debug("RTB response json to RE is {}", rtbdResponse);
             if (null == rtbdResponse) {
                 sendNoAdResponse(event);
             } else {
@@ -160,7 +160,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                         sendResponse(OK, serializedResponse, adResponse.responseHeaders, event);
                         InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
                     } catch (TException e) {
-                        LOG.error("Error in serializing the adpool response ", e.getMessage());
+                        LOG.error("Error in serializing the adPool response ", e);
                         sendNoAdResponse(event);
                     }
             }

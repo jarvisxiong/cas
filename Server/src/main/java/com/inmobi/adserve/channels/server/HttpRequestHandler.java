@@ -16,12 +16,10 @@ import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.group.ChannelGroup;
-import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.jboss.netty.handler.timeout.IdleStateAwareChannelUpstreamHandler;
 import org.jboss.netty.handler.timeout.IdleStateEvent;
-import org.jboss.netty.util.CharsetUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -145,43 +143,27 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
 
             traceMarker = traceMarkerProvider.get();
 
-            LOG.debug(traceMarker, request.getContent().toString(CharsetUtil.UTF_8));
-
             Servlet servlet = servletProvider.get();
 
             LOG.debug(traceMarker, "Got the servlet {}", servlet.getName());
-
-
-            QueryStringDecoder queryStringDecoder;
-            String content = new String(request.getContent().array());
-
 
             AdPoolRequest adPoolRequest = new AdPoolRequest();
             TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
             try {
                 tDeserializer.deserialize(adPoolRequest, request.getContent().array());
+                this.tObject = adPoolRequest;
             } catch (TException ex) {
-                LOG.debug(traceMarker, "Error in deserializing thrift in HttprequestHandler ", ex.getMessage());
-                ex.printStackTrace();
+                LOG.error(traceMarker, "Error in de serializing thrift ", ex);
+                this.responseSender.sendNoAdResponse(e);
             }
-            LOG.debug(traceMarker, "adpoolrequest " + adPoolRequest);
 
-
-            if (request.getMethod() == HttpMethod.POST) {
-                queryStringDecoder = new QueryStringDecoder(request.getUri() + "?post=" + content);
-            }
-            else {
-                queryStringDecoder = new QueryStringDecoder(request.getUri());
-            }
-            servlet.handleRequest(this, queryStringDecoder, e);
+            servlet.handleRequest(this, new QueryStringDecoder(request.getUri()), e);
         }
         catch (Exception exception) {
             terminationReason = ServletHandler.processingError;
             InspectorStats.incrementStatCount(InspectorStrings.processingError, InspectorStrings.count);
             responseSender.sendNoAdResponse(e);
             String exceptionClass = exception.getClass().getSimpleName();
-            // incrementing the count of the number of exceptions thrown in the
-            // server code
             InspectorStats.incrementStatCount(exceptionClass, InspectorStrings.count);
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);

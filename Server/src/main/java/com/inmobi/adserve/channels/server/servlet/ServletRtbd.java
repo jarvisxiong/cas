@@ -61,14 +61,13 @@ public class ServletRtbd implements Servlet {
             }
             catch (JSONException exception) {
                 hrh.jObject = new JSONObject();
-                LOG.debug("Encountered Json Error while creating json object inside HttpRequest Handler");
+                LOG.debug("Encountered Json Error while creating json object inside ", exception);
                 hrh.setTerminationReason(ServletHandler.jsonParsingError);
                 InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
             }
             requestParser.parseRequestParameters(hrh.jObject, sasParams, casInternalRequestParametersGlobal);
         } // Post method handling
-        else {
-            hrh.tObject = thriftRequestParser.extractParams(params);
+        else if (null != hrh.tObject) {
             thriftRequestParser.parseRequestParameters(hrh.tObject, sasParams, casInternalRequestParametersGlobal, 6);
         }
 

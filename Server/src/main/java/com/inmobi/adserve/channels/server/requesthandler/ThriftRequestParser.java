@@ -5,16 +5,10 @@ import com.inmobi.adserve.adpool.*;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.types.InventoryType;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.thrift.TDeserializer;
-import org.apache.thrift.TException;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.util.*;
 
@@ -23,31 +17,9 @@ public class ThriftRequestParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(ThriftRequestParser.class);
 
-
-    // Extracting params.
-    public AdPoolRequest extractParams(Map<String, List<String>> params) throws JSONException,
-            UnsupportedEncodingException {
-        if (!params.isEmpty()) {
-            List<String> values = params.get("post");
-            if (CollectionUtils.isNotEmpty(values)) {
-                String stringVal = values.iterator().next();
-                AdPoolRequest adPoolRequest = new AdPoolRequest();
-                TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
-                try {
-                    tDeserializer.deserialize(adPoolRequest, stringVal.getBytes());
-                } catch (TException e) {
-                    LOG.error("Error in deserializing thrift in extractParams {}", e.getMessage());
-                    e.printStackTrace();
-                }
-                return adPoolRequest;
-            }
-        }
-        return null;
-    }
-
     public void parseRequestParameters(AdPoolRequest tObject, SASRequestParameters params,
             CasInternalRequestParameters casInternalRequestParameters, int dst) {
-        LOG.debug("Inside thrift request parser AdPoolRequest is ", tObject);
+        LOG.debug("Inside parameter parser : ThriftParser");
         params.setAllParametersJson(tObject.toString());
         params.setDst(dst);
         params.setResponseOnlyFromDcp(2 == dst);
@@ -185,7 +157,7 @@ public class ThriftRequestParser {
         for (DemandType demandType : demandTypes) {
             switch (demandType) {
                 case BRAND:
-                     accountsSegments.add(1);
+                     accountsSegments.add(4);
                     break;
                 case PERFORMANCE:
                     accountsSegments.add(6);

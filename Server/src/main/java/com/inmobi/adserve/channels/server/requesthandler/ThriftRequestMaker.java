@@ -88,6 +88,7 @@ public static void main(String[] args) throws Exception {
         String targetUrl = "http://localhost:8800/rtbdFill";
         TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
         byte[] urlParameters = serializer.serialize(adPoolRequest);
+        System.out.println(urlParameters.length);
 
         URL url;
         HttpURLConnection connection = null;
@@ -98,11 +99,10 @@ public static void main(String[] args) throws Exception {
             connection = (HttpURLConnection)url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type",
-                    "application/x-www-form-urlencoded");
+                    "application/x-thrift");
 
             connection.setRequestProperty("Content-Length", "" +
-                    Integer.toString(urlParameters.length));
-            connection.setRequestProperty("Content-Language", "en-US");
+                    123456);
 
             connection.setUseCaches (false);
             connection.setDoInput(true);
@@ -111,7 +111,7 @@ public static void main(String[] args) throws Exception {
             //Send request
             DataOutputStream wr = new DataOutputStream (
                     connection.getOutputStream ());
-            wr.writeBytes (new String(urlParameters));
+            wr.write(urlParameters);
             wr.flush ();
             wr.close ();
 

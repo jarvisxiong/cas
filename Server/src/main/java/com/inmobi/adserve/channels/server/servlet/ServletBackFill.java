@@ -63,20 +63,17 @@ public class ServletBackFill implements Servlet {
                     }
                     catch (JSONException exception) {
                         hrh.jObject = new JSONObject();
-                        LOG.debug("Encountered Json Error while creating json object inside HttpRequest Handler");
+                        LOG.error("Encountered Json Error while creating json object inside HttpRequest Handler");
                         hrh.setTerminationReason(ServletHandler.jsonParsingError);
                         InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
                     }
                     requestParser
                             .parseRequestParameters(hrh.jObject, sasParams, casInternalRequestParametersGlobal);
                 }
-            } // Handling post requests
-            else if (null == hrh.tObject) {
-                hrh.tObject = thriftRequestParser.extractParams(params);
+            } else if (null == hrh.tObject) {
                 thriftRequestParser.parseRequestParameters(hrh.tObject, sasParams, casInternalRequestParametersGlobal,
                          2);
             }
-            LOG.debug("sasparams in backfill are: {}", sasParams);
             hrh.responseSender.sasParams = sasParams;
             hrh.responseSender.casInternalRequestParameters = casInternalRequestParametersGlobal;
             casInternalRequestParametersGlobal = hrh.responseSender.casInternalRequestParameters;
