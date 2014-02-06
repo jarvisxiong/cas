@@ -1,21 +1,16 @@
 package com.inmobi.adserve.channels.adnetworks.rtb;
 
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-
+import com.google.gson.Gson;
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.util.*;
+import com.inmobi.casthrift.rtb.*;
 import lombok.Getter;
 import lombok.Setter;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TException;
@@ -26,44 +21,18 @@ import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpMethod;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.jboss.netty.handler.codec.http.HttpVersion;
+import org.jboss.netty.handler.codec.http.*;
 import org.jboss.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.util.IABCategoriesInterface;
-import com.inmobi.adserve.channels.util.IABCategoriesMap;
-import com.inmobi.adserve.channels.util.IABCitiesInterface;
-import com.inmobi.adserve.channels.util.IABCitiesMap;
-import com.inmobi.adserve.channels.util.IABCountriesInterface;
-import com.inmobi.adserve.channels.util.IABCountriesMap;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.inmobi.casthrift.rtb.App;
-import com.inmobi.casthrift.rtb.Banner;
-import com.inmobi.casthrift.rtb.Bid;
-import com.inmobi.casthrift.rtb.BidRequest;
-import com.inmobi.casthrift.rtb.BidResponse;
-import com.inmobi.casthrift.rtb.Device;
-import com.inmobi.casthrift.rtb.Geo;
-import com.inmobi.casthrift.rtb.Impression;
-import com.inmobi.casthrift.rtb.SeatBid;
-import com.inmobi.casthrift.rtb.Site;
-import com.inmobi.casthrift.rtb.User;
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.util.*;
+import java.util.List;
+import java.util.regex.Pattern;
 
 
 /**
@@ -603,7 +572,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         try {
             URI uri = getRequestUri();
             requestUrl = (uri.toString());
-            request = (new DefaultHttpRequest(HttpVersion.HTTP_1_1, httpRequestMethod, uri.toASCIIString()));
+            request = (new DefaultHttpRequest(HttpVersion.HTTP_1_1, httpRequestMethod, uri.getPath()));
             LOG.debug("host name is {}", uri.getHost());
             request.setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json");
             request.setHeader(X_OPENRTB_VERSION, rtbVer);
