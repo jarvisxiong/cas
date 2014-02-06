@@ -186,7 +186,8 @@ public class ChannelServer {
             // Creating a ning client for out-bound calls
             AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder()
                     .setRequestTimeoutInMs(config.getServerConfiguration().getInt("readtimeoutMillis") - 100)
-                    .setConnectionTimeoutInMs(600).build();
+                    .setConnectionTimeoutInMs(config.getServerConfiguration().getInt("readtimeoutMillis") - 200)
+                    .build();
             AsyncHttpClient asyncHttpClient = new AsyncHttpClient(asyncHttpClientConfig);
 
             if (null == clientBootstrap) {

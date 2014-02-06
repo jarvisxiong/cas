@@ -65,7 +65,7 @@ public class ServletBackFill implements Servlet {
 
     @Override
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
-            final MessageEvent e) throws Exception {
+            final MessageEvent messageEvent) throws Exception {
 
         Marker traceMarker = traceMarkerProvider.get();
 
@@ -101,7 +101,7 @@ public class ServletBackFill implements Servlet {
             hrh.responseSender.sasParams.setCategories(new ArrayList<Long>());
             hrh.setTerminationReason(ServletHandler.MISSING_CATEGORY);
             InspectorStats.incrementStatCount(InspectorStrings.missingCategory, InspectorStrings.count);
-            hrh.responseSender.sendNoAdResponse(e);
+            hrh.responseSender.sendNoAdResponse(messageEvent);
         }
 
         hrh.responseSender.getAuctionEngine().sasParams = hrh.responseSender.sasParams;
@@ -110,20 +110,20 @@ public class ServletBackFill implements Servlet {
             LOG.error(traceMarker, "Terminating request as sasParam is null");
             hrh.setTerminationReason(ServletHandler.jsonParsingError);
             InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
-            hrh.responseSender.sendNoAdResponse(e);
+            hrh.responseSender.sendNoAdResponse(messageEvent);
             return;
         }
         if (null == hrh.responseSender.sasParams.getSiteId()) {
             LOG.error(traceMarker, "Terminating request as site id was missing");
             hrh.setTerminationReason(ServletHandler.missingSiteId);
             InspectorStats.incrementStatCount(InspectorStrings.missingSiteId, InspectorStrings.count);
-            hrh.responseSender.sendNoAdResponse(e);
+            hrh.responseSender.sendNoAdResponse(messageEvent);
             return;
         }
         if (!hrh.responseSender.sasParams.getAllowBannerAds() || hrh.responseSender.sasParams.getSiteFloor() > 5) {
             LOG.error(traceMarker,
                     "Request not being served because of banner not allowed or site floor above threshold");
-            hrh.responseSender.sendNoAdResponse(e);
+            hrh.responseSender.sendNoAdResponse(messageEvent);
             return;
         }
         if (hrh.responseSender.sasParams.getSiteType() != null
@@ -131,7 +131,7 @@ public class ServletBackFill implements Servlet {
             LOG.error(traceMarker, "Terminating request as incompatible content type");
             hrh.setTerminationReason(ServletHandler.incompatibleSiteType);
             InspectorStats.incrementStatCount(InspectorStrings.incompatibleSiteType, InspectorStrings.count);
-            hrh.responseSender.sendNoAdResponse(e);
+            hrh.responseSender.sendNoAdResponse(messageEvent);
             return;
         }
         if (hrh.responseSender.sasParams.getSdkVersion() != null) {
@@ -142,7 +142,7 @@ public class ServletBackFill implements Servlet {
                     LOG.error(traceMarker, "Terminating request as sdkVersion is less than 3");
                     hrh.setTerminationReason(ServletHandler.lowSdkVersion);
                     InspectorStats.incrementStatCount(InspectorStrings.lowSdkVersion, InspectorStrings.count);
-                    hrh.responseSender.sendNoAdResponse(e);
+                    hrh.responseSender.sendNoAdResponse(messageEvent);
                     return;
                 }
                 else {
@@ -161,7 +161,7 @@ public class ServletBackFill implements Servlet {
         if (ServletHandler.random.nextInt(100) >= ServletHandler.percentRollout) {
             LOG.debug(traceMarker, "Request not being served because of limited percentage rollout");
             InspectorStats.incrementStatCount(InspectorStrings.droppedRollout, InspectorStrings.count);
-            hrh.responseSender.sendNoAdResponse(e);
+            hrh.responseSender.sendNoAdResponse(messageEvent);
         }
 
         /**
@@ -186,7 +186,7 @@ public class ServletBackFill implements Servlet {
 
         if (CollectionUtils.isEmpty(matchedSegmentDetails)) {
             LOG.debug(traceMarker, "No Entities matching the request.");
-            hrh.responseSender.sendNoAdResponse(e);
+            hrh.responseSender.sendNoAdResponse(messageEvent);
             return;
         }
 
@@ -198,7 +198,7 @@ public class ServletBackFill implements Servlet {
 
         if (filteredSegments == null || filteredSegments.size() == 0) {
             LOG.debug(traceMarker, "All segments dropped in filters");
-            hrh.responseSender.sendNoAdResponse(e);
+            hrh.responseSender.sendNoAdResponse(messageEvent);
             return;
         }
 
@@ -246,18 +246,18 @@ public class ServletBackFill implements Servlet {
         List<ChannelSegment> dcpSegments;
 
         dcpSegments = AsyncRequestMaker.prepareForAsyncRequest(filteredSegments, ServletHandler.getServerConfig(),
-                ServletHandler.getRtbConfig(), ServletHandler.getAdapterConfig(), hrh.responseSender, advertiserSet, e,
+                ServletHandler.getRtbConfig(), ServletHandler.getAdapterConfig(), hrh.responseSender, advertiserSet, messageEvent,
                 ServletHandler.repositoryHelper, hrh.jObject, hrh.responseSender.sasParams,
                 casInternalRequestParametersGlobal, rtbSegments);
 
         LOG.debug(traceMarker, "rtb rankList size is {}", rtbSegments.size());
         if (dcpSegments.isEmpty() && rtbSegments.isEmpty()) {
             LOG.debug(traceMarker, "No successful configuration of adapter ");
-            hrh.responseSender.sendNoAdResponse(e);
+            hrh.responseSender.sendNoAdResponse(messageEvent);
             return;
         }
 
-        List<ChannelSegment> tempRankList = AsyncRequestMaker.makeAsyncRequests(dcpSegments, e, rtbSegments);
+        List<ChannelSegment> tempRankList = AsyncRequestMaker.makeAsyncRequests(dcpSegments, messageEvent, rtbSegments);
 
         hrh.responseSender.setRankList(tempRankList);
         hrh.responseSender.getAuctionEngine().setRtbSegments(rtbSegments);
@@ -269,7 +269,7 @@ public class ServletBackFill implements Servlet {
         if (hrh.responseSender.getRankList().isEmpty()
                 && hrh.responseSender.getAuctionEngine().getRtbSegments().isEmpty()) {
             LOG.debug(traceMarker, "No calls");
-            hrh.responseSender.sendNoAdResponse(e);
+            hrh.responseSender.sendNoAdResponse(messageEvent);
             return;
         }
 
@@ -277,12 +277,12 @@ public class ServletBackFill implements Servlet {
             AdNetworkInterface highestBid = hrh.responseSender.getAuctionEngine().runRtbSecondPriceAuctionEngine();
             if (null != highestBid) {
                 LOG.debug(traceMarker, "Sending rtb response of {}", highestBid.getName());
-                hrh.responseSender.sendAdResponse(highestBid, e);
+                hrh.responseSender.sendAdResponse(highestBid, messageEvent);
                 // highestBid.impressionCallback();
                 return;
             }
             // Resetting the rankIndexToProcess for already completed adapters.
-            hrh.responseSender.processDcpList(e);
+            hrh.responseSender.processDcpList(messageEvent);
             LOG.debug(traceMarker, "returned from send Response, ranklist size is {}", hrh.responseSender.getRankList()
                     .size());
         }
