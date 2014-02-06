@@ -145,10 +145,12 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
             traceMarker = traceMarkerProvider.get();
 
             Servlet servlet = servletProvider.get();
+            String servletName = servlet.getName();
 
-            LOG.debug(traceMarker, "Got the servlet {}", servlet.getName());
+            LOG.debug(traceMarker, "Got the servlet {}", servletName);
 
-            if (request.getMethod() == HttpMethod.POST) {
+            if (request.getMethod() == HttpMethod.POST && (servletName.equalsIgnoreCase("BackFill")
+                    || servletName.equalsIgnoreCase("rtbdFill"))) {
                 AdPoolRequest adPoolRequest = new AdPoolRequest();
                 TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
                 try {

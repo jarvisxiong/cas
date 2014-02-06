@@ -183,7 +183,7 @@ public class Logging {
             TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
             Message msg = new Message(tSerializer.serialize(adRR));
             dataBusPublisher.publish(rrLogKey, msg);
-            LOG.debug("ADRR is: ", adRR);
+            LOG.debug("ADRR is : {}", adRR);
         }
         // Logging real time stats for graphite
         String osName = "";
