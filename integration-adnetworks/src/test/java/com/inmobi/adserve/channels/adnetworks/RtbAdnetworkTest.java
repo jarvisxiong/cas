@@ -1,34 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.isA;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import junit.framework.TestCase;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TSimpleJSONProtocol;
-import org.easymock.EasyMock;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpMethod;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.jboss.netty.handler.codec.http.HttpVersion;
-import org.testng.annotations.Test;
-
 import com.inmobi.adserve.channels.adnetworks.rtb.ImpressionCallbackHelper;
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -42,6 +13,28 @@ import com.inmobi.casthrift.rtb.Bid;
 import com.inmobi.casthrift.rtb.BidRequest;
 import com.inmobi.casthrift.rtb.BidResponse;
 import com.inmobi.casthrift.rtb.SeatBid;
+import junit.framework.TestCase;
+import org.apache.commons.configuration.Configuration;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TSimpleJSONProtocol;
+import org.easymock.EasyMock;
+import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.handler.codec.http.*;
+import org.testng.annotations.Test;
+
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.isA;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 
 public class RtbAdnetworkTest extends TestCase {
@@ -162,7 +155,7 @@ public class RtbAdnetworkTest extends TestCase {
     @Test
     public void testGetHttpRequestBidRequestNotNull() throws Exception {
         URI uri = new URI("http://localhost:8800");
-        HttpRequest httpRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri.toASCIIString());
+        HttpRequest httpRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri.getPath());
         httpRequest.setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json");
         httpRequest.setHeader("x-openrtb-version", "2.0");
         httpRequest.setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
