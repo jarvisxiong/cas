@@ -40,7 +40,8 @@ public class NettyModule extends AbstractModule {
     @Override
     protected void configure() {
 
-        bind(Timer.class).toInstance(new HashedWheelTimer(5, TimeUnit.MILLISECONDS));
+        bind(Timer.class).toInstance(
+                new HashedWheelTimer(serverConfiguration.getInt("tickDuration", 100), TimeUnit.MILLISECONDS));
         bind(Configuration.class).annotatedWith(ServerConfiguration.class).toInstance(serverConfiguration);
 
         SimpleScope simpleScope = new SimpleScope();

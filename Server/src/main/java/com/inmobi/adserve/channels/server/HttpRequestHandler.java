@@ -24,6 +24,7 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.group.ChannelGroup;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
+import org.jboss.netty.handler.timeout.IdleState;
 import org.jboss.netty.handler.timeout.IdleStateAwareChannelUpstreamHandler;
 import org.jboss.netty.handler.timeout.IdleStateEvent;
 import org.jboss.netty.util.CharsetUtil;
@@ -113,9 +114,8 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
             if (responseSender.getRankList() != null) {
                 for (ChannelSegment channelSegment : responseSender.getRankList()) {
                     if (channelSegment.getAdNetworkInterface().getAdStatus().equals("AD")) {
-                        LOG.debug(traceMarker, "Got Ad from {} Top Rank was {}", channelSegment
-                                .getAdNetworkInterface()
-                                    .getName(), responseSender.getRankList().get(0).getAdNetworkInterface().getName());
+                        LOG.debug(traceMarker, "Got Ad from {} Top Rank was {}", channelSegment.getAdNetworkInterface()
+                                .getName(), responseSender.getRankList().get(0).getAdNetworkInterface().getName());
                         responseSender.sendAdResponse(channelSegment.getAdNetworkInterface(), e);
                         return;
                     }
@@ -127,8 +127,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
         // server
         // could not write the response with in 800 ms
         LOG.debug(traceMarker, "inside channel idle event handler for Request channel ID: {}", e.getChannel().getId());
-        if (e.getState().toString().equalsIgnoreCase("ALL_IDLE")
-                || e.getState().toString().equalsIgnoreCase("WRITE_IDLE")) {
+        if (e.getState() == IdleState.ALL_IDLE || e.getState() == IdleState.WRITER_IDLE) {
             InspectorStats.incrementStatCount(InspectorStrings.totalTimeout);
             LOG.debug(traceMarker, "server timeout");
         }
@@ -184,24 +183,24 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
         try {
             if (responseSender.getAdResponse() == null) {
                 Logging.channelLogline(list, null, ServletHandler.getLoggerConfig(), responseSender.sasParams,
-                    totalTime);
+                        totalTime);
                 Logging.rrLogging(null, list, ServletHandler.getLoggerConfig(), responseSender.sasParams,
-                    terminationReason);
+                        terminationReason);
                 Logging.advertiserLogging(list, ServletHandler.getLoggerConfig());
                 Logging.sampledAdvertiserLogging(list, ServletHandler.getLoggerConfig());
             }
             else {
                 Logging.channelLogline(list, responseSender.getAdResponse().clickUrl, ServletHandler.getLoggerConfig(),
-                    responseSender.sasParams, totalTime);
+                        responseSender.sasParams, totalTime);
                 if (responseSender.getRtbResponse() == null) {
                     LOG.debug(traceMarker, "rtb response is null so logging dcp response in rr");
                     Logging.rrLogging(responseSender.getRankList().get(responseSender.getSelectedAdIndex()), list,
-                        ServletHandler.getLoggerConfig(), responseSender.sasParams, terminationReason);
+                            ServletHandler.getLoggerConfig(), responseSender.sasParams, terminationReason);
                 }
                 else {
                     LOG.debug(traceMarker, "rtb response is not null so logging rtb response in rr");
                     Logging.rrLogging(responseSender.getRtbResponse(), list, ServletHandler.getLoggerConfig(),
-                        responseSender.sasParams, terminationReason);
+                            responseSender.sasParams, terminationReason);
                 }
                 Logging.advertiserLogging(list, ServletHandler.getLoggerConfig());
                 Logging.sampledAdvertiserLogging(list, ServletHandler.getLoggerConfig());
