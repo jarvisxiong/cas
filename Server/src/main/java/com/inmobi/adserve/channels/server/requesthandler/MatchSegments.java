@@ -160,7 +160,6 @@ public class MatchSegments {
     private List<AdvertiserMatchedSegmentDetail> matchSegments(final long slotId, final List<Long> categories,
             final long country, final Integer targetingPlatform, final Integer siteRating, final int osId,
             final SASRequestParameters sasParams, final Marker traceMarker) {
-        List<AdvertiserMatchedSegmentDetail> result = Lists.newArrayList();
         Set<ChannelSegmentEntity> allFilteredEntities = new HashSet<ChannelSegmentEntity>();
 
         // adding -1 for all categories
@@ -184,7 +183,8 @@ public class MatchSegments {
             }
         }
 
-        insertChannelSegmentToResultSet(result, allFilteredEntities, sasParams, traceMarker);
+        List<AdvertiserMatchedSegmentDetail> result = insertChannelSegmentToResultSet(allFilteredEntities, sasParams,
+                traceMarker);
 
         if (result.size() == 0) {
             LOG.debug(
@@ -208,7 +208,7 @@ public class MatchSegments {
         return channelAdGroupRepository.getEntities(slotId, category, country, targetingPlatform, siteRating, osId);
     }
 
-    private void insertChannelSegmentToResultSet(final List<AdvertiserMatchedSegmentDetail> result,
+    private List<AdvertiserMatchedSegmentDetail> insertChannelSegmentToResultSet(
             final Set<ChannelSegmentEntity> allFilteredEntities, final SASRequestParameters sasParams,
             final Marker traceMarker) {
 
@@ -240,6 +240,8 @@ public class MatchSegments {
             }
 
         }
+
+        return Lists.newArrayList(advertiserToMatchedSegmentDetailMap.values());
 
     }
 
