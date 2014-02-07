@@ -24,6 +24,7 @@ import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.awt.*;
 import java.util.*;
@@ -226,7 +227,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
         response.setHeader("Content-Length", bytes.length);
         response.setContent(ChannelBuffers.copiedBuffer(bytes));
-
+        String requestId = MDC.get("requestId");
+        LOG.debug("requestId 2 : {}", requestId);
         if (event != null) {
             LOG.debug("event not null inside send Response");
             Channel channel = event.getChannel();
@@ -239,6 +241,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 LOG.debug("Request Channel is null or channel is not writeable.");
             }
         }
+        LOG.debug("requestId 3 : {}", requestId);
+        MDC.put("requestId", requestId);
         totalTime = System.currentTimeMillis() - totalTime;
         LOG.debug("successfully sent response");
         if (null != sasParams) {

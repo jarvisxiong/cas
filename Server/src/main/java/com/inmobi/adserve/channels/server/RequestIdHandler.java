@@ -27,12 +27,15 @@ public class RequestIdHandler extends SimpleChannelUpstreamHandler {
         randomNumberGenerator = new Random();
     }
 
+    
     @Override
     public void messageReceived(
             ChannelHandlerContext ctx, MessageEvent e) throws Exception {
         String requestId = String.format("%s-%s", System.currentTimeMillis(), randomNumberGenerator.nextInt(99999999));
         LOG.error("Generating New requestId.... {} ", requestId);
         MDC.put("requestId", requestId);
-        ctx.sendUpstream(e);
+        super.messageReceived(ctx,e);
     }
+     
+
 }
