@@ -572,7 +572,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         try {
             URI uri = getRequestUri();
             requestUrl = (uri.toString());
-            request = (new DefaultHttpRequest(HttpVersion.HTTP_1_1, httpRequestMethod, uri.getPath()));
+            request = (new DefaultHttpRequest(HttpVersion.HTTP_1_1, httpRequestMethod, uri.toASCIIString()));
             LOG.debug("host name is {}", uri.getHost());
             request.setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json");
             request.setHeader(X_OPENRTB_VERSION, rtbVer);
