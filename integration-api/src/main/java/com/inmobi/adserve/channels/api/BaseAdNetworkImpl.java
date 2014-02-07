@@ -120,7 +120,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         try {
             request = getHttpRequest();
             uri = new URI(request.getUri());
+            request.setUri(uri.getPath());
             LOG.debug("uri is {}", uri);
+            LOG.debug("request is {}", request);
             LOG.info("url inside makeAsyncRequest is not null");
         }
         catch (Exception ex) {
@@ -234,7 +236,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         try {
             URI uri = getRequestUri();
             requestUrl = uri.toString();
-            request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, uri.getPath());
+            request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, uri.toASCIIString());
             LOG.debug("host name is {}", uri.getHost());
             request.setHeader(HttpHeaders.Names.HOST, uri.getHost());
             LOG.debug("got the host");

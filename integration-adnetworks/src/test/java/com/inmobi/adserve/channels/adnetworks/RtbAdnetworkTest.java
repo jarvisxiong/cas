@@ -155,7 +155,7 @@ public class RtbAdnetworkTest extends TestCase {
     @Test
     public void testGetHttpRequestBidRequestNotNull() throws Exception {
         URI uri = new URI("http://localhost:8800");
-        HttpRequest httpRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri.getPath());
+        HttpRequest httpRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri.toASCIIString());
         httpRequest.setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json");
         httpRequest.setHeader("x-openrtb-version", "2.0");
         httpRequest.setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
