@@ -25,6 +25,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.slf4j.Marker;
 
 import javax.inject.Inject;
@@ -90,7 +91,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
      */
     @Override
     public void exceptionCaught(final ChannelHandlerContext ctx, final ExceptionEvent e) throws Exception {
-
+        MDC.put("requestId", e.getChannel().getId().toString());
         String exceptionString = e.getClass().getSimpleName();
         InspectorStats.incrementStatCount(InspectorStrings.channelException, exceptionString);
         InspectorStats.incrementStatCount(InspectorStrings.channelException, InspectorStrings.count);
@@ -103,13 +104,13 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
         if (e.getChannel().isOpen()) {
             responseSender.sendNoAdResponse(e);
         }
-        e.getCause().printStackTrace();
         e.getChannel().close();
     }
 
     // Invoked when request timeout.
     @Override
     public void channelIdle(final ChannelHandlerContext ctx, final IdleStateEvent e) {
+        MDC.put("requestId", e.getChannel().getId().toString());
         if (e.getChannel().isOpen()) {
             LOG.debug(traceMarker, "Channel is open in channelIdle handler");
             if (responseSender.getRankList() != null) {

@@ -1,13 +1,9 @@
 package com.inmobi.adserve.channels.api;
 
-import java.io.UnsupportedEncodingException;
-import java.net.InetSocketAddress;
-import java.net.URI;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.security.MessageDigest;
-import java.util.*;
-
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.util.CategoryList;
+import com.inmobi.adserve.channels.util.IABCategoriesInterface;
+import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import org.apache.commons.lang.StringUtils;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.*;
@@ -15,11 +11,15 @@ import org.jboss.netty.handler.codec.http.*;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.CategoryList;
-import com.inmobi.adserve.channels.util.IABCategoriesInterface;
-import com.inmobi.adserve.channels.util.IABCategoriesMap;
+import java.io.UnsupportedEncodingException;
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.util.*;
 
 
 // This abstract class have base functionality of TPAN adapters.
@@ -45,7 +45,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected SASRequestParameters                sasParams;
     protected CasInternalRequestParameters        casInternalRequestParameters;
     protected HttpRequestHandlerBase              baseRequestHandler      = null;
-    private final MessageEvent                    serverEvent;
+    protected final MessageEvent                    serverEvent;
     protected String                              requestUrl              = "";
     private ThirdPartyAdResponse                  responseStruct;
     private boolean                               isRtbPartner            = false;
@@ -145,6 +145,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         future.addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(final ChannelFuture future) throws Exception {
+                MDC.put("requestId", serverEvent.getChannel().getId().toString());
                 connectionLatency = System.currentTimeMillis() - startTime;
                 if (!future.isSuccess()) {
                     latency = System.currentTimeMillis() - startTime;
@@ -161,6 +162,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 channel.getCloseFuture().addListener(new ChannelFutureListener() {
                     @Override
                     public void operationComplete(final ChannelFuture future) throws Exception {
+                        MDC.put("requestId", serverEvent.getChannel().getId().toString());
                         latency = System.currentTimeMillis() - startTime;
                         if (!isRequestCompleted()) {
                             LOG.debug("Operation complete for channel partner: {}", getName());
