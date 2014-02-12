@@ -15,6 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -124,7 +125,7 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
 
             if (StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)) {
                 appendQueryParam(url, LOCATION,
-                    getURLEncode(String.format(latlongFormat, latitude, longitude), format), false);
+                        getURLEncode(String.format(latlongFormat, latitude, longitude), format), false);
             }
             if (StringUtils.isNotBlank(sasParams.getPostalCode())) {
                 appendQueryParam(url, POSTAL_CODE, sasParams.getPostalCode(), false);
@@ -133,14 +134,14 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
             if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
                 if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
                     appendQueryParam(url, ANDROID_ID_MD5, getURLEncode(casInternalRequestParameters.uidMd5, format),
-                        false);
+                            false);
                 }
                 else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
                     appendQueryParam(url, ANDROID_ID_MD5, getURLEncode(casInternalRequestParameters.uid, format), false);
                 }
                 if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
                     appendQueryParam(url, ANDROID_ID_SHA1, getURLEncode(casInternalRequestParameters.uidIDUS1, format),
-                        false);
+                            false);
                 }
 
             }
@@ -181,6 +182,8 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
             baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
                 @Override
                 public Response onCompleted(final Response response) throws Exception {
+                    MDC.put("requestId", serverEvent.getChannel().getId().toString());
+
                     if (!isRequestCompleted()) {
                         LOG.debug("Operation complete for channel partner: {}", getName());
                         latency = System.currentTimeMillis() - startTime;
@@ -195,6 +198,8 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
 
                 @Override
                 public void onThrowable(final Throwable t) {
+                    MDC.put("requestId", serverEvent.getChannel().getId().toString());
+
                     if (isRequestComplete) {
                         return;
                     }
@@ -223,15 +228,12 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
     }
 
     private void setNingRequest(final String requestUrl) {
-        ningRequest = new RequestBuilder()
-                .setUrl(requestUrl)
-                    .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-                    .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
-                    .setHeader(HttpHeaders.Names.REFERER, requestUrl)
-                    .setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE)
-                    .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
-                    .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-                    .build();
+        ningRequest = new RequestBuilder().setUrl(requestUrl)
+                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
+                .setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE)
+                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
+                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp()).build();
     }
 
     @Override
