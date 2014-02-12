@@ -7,6 +7,7 @@ import com.inmobi.adserve.adpool.AuctionType;
 import com.inmobi.adserve.adpool.Creative;
 import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -170,19 +171,24 @@ public class ResponseSender extends HttpRequestHandlerBase {
         AdPoolResponse adPoolResponse = new AdPoolResponse();
         AdInfo rtbdAd = new AdInfo();
         AdIdChain adIdChain = new AdIdChain();
-        adIdChain.setAdgroup_guid(this.auctionEngine
+        ChannelSegmentEntity channelSegmentEntity = this.auctionEngine
                 .getRtbResponse()
-                .getChannelSegmentEntity()
+                .getChannelSegmentEntity();
+        adIdChain.setAdgroup_guid(channelSegmentEntity
                 .getAdgroupId());
-        adIdChain.setAdvertiser_guid(this.auctionEngine
-                .getRtbResponse()
-                .getChannelEntity()
-                .getAccountId());
-        adIdChain.setAd(this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getIncId());
-        adIdChain.setCampaign(this.auctionEngine
-                .getRtbResponse()
-                .getChannelSegmentEntity()
+        adIdChain.setAd_guid(channelSegmentEntity
+                .getAdId());
+        adIdChain.setAdvertiser_guid(channelSegmentEntity
+                .getAdvertiserId());
+        adIdChain.setCampaign_guid(channelSegmentEntity
+                .getCampaignId());
+        adIdChain.setAd(channelSegmentEntity
+                .getIncId());
+        adIdChain.setGroup(channelSegmentEntity
+                .getAdgroupIncId());
+        adIdChain.setCampaign(channelSegmentEntity
                 .getCampaignIncId());
+        rtbdAd.setAdIds(adIdChain);
         rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);
         rtbdAd.setBid((long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface().getSecondBidPriceInUsd() * 1000));
         rtbdAd.setMinChargedValue((long)(casInternalRequestParameters.rtbBidFloor*1000));

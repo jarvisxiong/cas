@@ -85,7 +85,7 @@ public static void main(String[] args) throws Exception {
 }
     private static void sendPost(AdPoolRequest adPoolRequest) throws Exception {
 
-        String targetUrl = "http://localhost:8800/rtbdFill";
+        String targetUrl = "http://10.14.118.66:8800/rtbdFill";
         TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
         byte[] urlParameters = serializer.serialize(adPoolRequest);
         System.out.println(urlParameters.length);
