@@ -10,12 +10,8 @@ import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.ServletHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.*;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -32,16 +28,14 @@ public class ServletBackFill implements Servlet {
 
     private final MatchSegments    matchSegments;
     private final Provider<Marker> traceMarkerProvider;
-    private final RequestParser    requestParser;
-    private final ThriftRequestParser    thriftRequestParser;
+    private final RequestFilters   requestFilters;
 
     @Inject
     ServletBackFill(final MatchSegments matchSegments, final Provider<Marker> traceMarkerProvider,
-            final RequestParser requestParser, final ThriftRequestParser    thriftRequestParser) {
+                    final RequestFilters   requestFilters) {
         this.matchSegments = matchSegments;
         this.traceMarkerProvider = traceMarkerProvider;
-        this.requestParser = requestParser;
-        this.thriftRequestParser = thriftRequestParser;
+        this.requestFilters = requestFilters;
     }
 
         @Override
@@ -49,42 +43,14 @@ public class ServletBackFill implements Servlet {
 
             CasInternalRequestParameters casInternalRequestParametersGlobal = new CasInternalRequestParameters();
             SASRequestParameters sasParams = hrh.responseSender.sasParams;
-            if (null == sasParams) {
-                sasParams = new SASRequestParameters();
-            }
-
-            Map<String, List<String>> params = queryStringDecoder.getParameters();
-            // Handling GET requests
-            if (params.containsKey("args")) {
-                if (null == hrh.jObject) {
-                    InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
-                    try {
-                        hrh.jObject = requestParser.extractParams(params);
-                    }
-                    catch (JSONException exception) {
-                        hrh.jObject = new JSONObject();
-                        LOG.error("Encountered Json Error while creating json object inside HttpRequest Handler");
-                        hrh.setTerminationReason(ServletHandler.jsonParsingError);
-                        InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
-                    }
-                    requestParser
-                            .parseRequestParameters(hrh.jObject, sasParams, casInternalRequestParametersGlobal);
-                }
-            } else if (null == hrh.tObject) {
-                thriftRequestParser.parseRequestParameters(hrh.tObject, sasParams, casInternalRequestParametersGlobal,
-                         2);
-            }
-            hrh.responseSender.sasParams = sasParams;
-            hrh.responseSender.casInternalRequestParameters = casInternalRequestParametersGlobal;
+            hrh.responseSender.getAuctionEngine().sasParams = hrh.responseSender.sasParams;
             casInternalRequestParametersGlobal = hrh.responseSender.casInternalRequestParameters;
 
-            if (RequestFilters.isDroppedInRequestFilters(hrh)) {
+            if (requestFilters.isDroppedInRequestFilters(hrh)) {
                 LOG.debug("Request is dropped in request filters");
                 hrh.responseSender.sendNoAdResponse(e);
                 return;
             }
-
-            hrh.responseSender.getAuctionEngine().sasParams = hrh.responseSender.sasParams;
 
             // Set imai content if r-format is imai
             String imaiBaseUrl = null;

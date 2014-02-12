@@ -16,6 +16,7 @@ public class InspectorStrings {
     public static final String totalTerminate                            = "TotalTerminate";
     public static final String successfulRequests                        = "success";
     public static final String jsonParsingError                          = "Terminated_JsonError";
+    public static final String thriftParsingError                        = "Terminated_ThriftError";
     public static final String processingError                           = "Terminated_ServerError";
     public static final String missingSiteId                             = "Terminated_NoSite";
     public static final String isUpdating                                = "IsUpdating";

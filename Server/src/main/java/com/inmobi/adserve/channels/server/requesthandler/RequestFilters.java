@@ -14,7 +14,7 @@ public class RequestFilters {
     private static final Logger LOG = LoggerFactory.getLogger(RequestFilters.class);
 
 
-    public static boolean isDroppedInRequestFilters(HttpRequestHandler hrh) {
+    public boolean isDroppedInRequestFilters(HttpRequestHandler hrh) {
         // Send noad if new-category is not present in the request
         if (ServletHandler.random.nextInt(100) >= ServletHandler.percentRollout) {
             LOG.debug("Request not being served because of limited percentage rollout");

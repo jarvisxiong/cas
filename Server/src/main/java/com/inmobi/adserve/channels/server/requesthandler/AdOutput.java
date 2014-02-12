@@ -9,31 +9,20 @@ import com.inmobi.phoenix.entity.advertisement.CreativeEntity;
 import com.inmobi.phoenix.entity.advertisement.creative.ContentProvider;
 import com.inmobi.phoenix.entity.advertisement.creative.CreativeContentType;
 import com.inmobi.phoenix.entity.advertisement.creative.CreativeType;
-import com.inmobi.phoenix.exception.InitializationException;
-import com.inmobi.phoenix.exception.RepositoryException;
 import lombok.Data;
-import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 
 public class AdOutput {
-    private static AdMakerFactory adMakerFactory;
+    private final AdMakerFactory adMakerFactory;
     private static final Logger LOG     = LoggerFactory.getLogger(AdOutput.class);
-    
-    public static void  init() {
-        try {
-            adMakerFactory = new AdMakerFactory();
-        } catch (InitializationException e) {
-            LOG.debug("Failed in Initialization", e);
-        } catch (ConfigurationException e) {
-            LOG.debug("Failed in Configuration", e);
-        } catch (RepositoryException e) {
-            LOG.debug("Failed in Repository", e);
-        }        
+
+    public AdOutput(final AdMakerFactory adMakerFactory) {
+        this.adMakerFactory = adMakerFactory;
     }
-    
+
     @Data
     public static class Builder {
         Long slot;
@@ -49,7 +38,7 @@ public class AdOutput {
     
     
     
-    public static byte [] makeAd(Builder builder) {
+    public byte [] makeAd(Builder builder) {
         CreativeEntity creativeEntity = new CreativeEntity();
         creativeEntity.setCreativeType(builder.getCreativeType());
         creativeEntity.setCreativeContentType(builder.getCreativeContentType());

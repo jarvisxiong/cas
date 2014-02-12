@@ -30,6 +30,7 @@ public class ServletHandler extends SimpleChannelUpstreamHandler {
 
     // TODO: clear up all these responses, configs to separate module
     public static final String     jsonParsingError         = "EJSON";
+    public static final String     thriftParsingError       = "ETHRIFT";
     public static final String     processingError          = "ESERVER";
     public static final String     missingSiteId            = "NOSITE";
     public static final String     incompatibleSiteType     = "ESITE";
