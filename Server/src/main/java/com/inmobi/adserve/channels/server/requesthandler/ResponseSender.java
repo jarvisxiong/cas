@@ -190,8 +190,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 .getCampaignIncId());
         rtbdAd.setAdIds(adIdChain);
         rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);
-        rtbdAd.setBid((long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface().getSecondBidPriceInUsd() * 1000));
-        rtbdAd.setMinChargedValue((long)(casInternalRequestParameters.rtbBidFloor*1000));
+        rtbdAd.setBid((long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface().getSecondBidPriceInUsd() * Math.pow(10, 6)));
+        rtbdAd.setMinChargedValue((long)(casInternalRequestParameters.rtbBidFloor * Math.pow(10, 6)));
         UUID uuid = WilburyUUID.extractUUID(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getImpressionId());
         rtbdAd.setImpressionId(new GUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits()));
         rtbdAd.setSlotServed(sasParams.getSlot());
@@ -201,7 +201,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         adPoolResponse.setAds(Arrays.asList(rtbdAd));
         if (!"USD".equalsIgnoreCase(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getCurrency())) {
             rtbdAd.setOriginalCurrencyName(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getCurrency());
-            rtbdAd.setBidInOriginalCurrency((long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface().getBidPriceInLocal() * 1000));
+            rtbdAd.setBidInOriginalCurrency((long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface().getBidPriceInLocal() * Math.pow(10, 6)));
         }
         return adPoolResponse;
     }

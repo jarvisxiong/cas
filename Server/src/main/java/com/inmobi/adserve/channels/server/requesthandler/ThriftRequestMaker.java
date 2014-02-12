@@ -32,8 +32,8 @@ public static void main(String[] args) throws Exception {
     site.setContentRating(ContentRating.PERFORMANCE);
     site.setInventoryType(InventoryType.APP);
     Set<Integer> tags = new HashSet<Integer>();
-    tags.add(70);
-    tags.add(71);
+    tags.add(7);
+    tags.add(32);
     site.setSiteTags(tags);
     site.setSiteTaxonomies(tags);
 
@@ -73,7 +73,7 @@ public static void main(String[] args) throws Exception {
     adPoolRequest.setGeo(geo);
     adPoolRequest.setIpFileVersion(1234);
     List<Short> list = new ArrayList<Short>();
-    list.add((short)2);
+    list.add((short)15);
     adPoolRequest.setSelectedSlots(list);
     List<SupplyCapability> supplyCapabilities = new ArrayList<SupplyCapability>();
     supplyCapabilities.add(SupplyCapability.BANNER);

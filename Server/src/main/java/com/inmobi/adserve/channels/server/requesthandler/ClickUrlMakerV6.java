@@ -115,7 +115,7 @@ public class ClickUrlMakerV6 {
         else {
             tierInfo = builder.tierInfo;
         }
-        if (null == builder.latlonval) {
+        if (StringUtils.isEmpty(builder.latlonval)) {
             latlonval = "x";
         }
         else {
