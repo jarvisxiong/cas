@@ -2,22 +2,16 @@ package com.inmobi.adserve.channels.server;
 
 import com.google.inject.Provider;
 import com.inmobi.adserve.adpool.AdPoolRequest;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.*;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
-import org.apache.thrift.protocol.TBinaryProtocol;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.group.ChannelGroup;
-import org.jboss.netty.handler.codec.http.HttpMethod;
-import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.jboss.netty.handler.timeout.IdleStateAwareChannelUpstreamHandler;
 import org.jboss.netty.handler.timeout.IdleStateEvent;
@@ -41,7 +35,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 
@@ -60,8 +53,6 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
 
     private Provider<Servlet>   servletProvider;
 
-    private RequestParser requestParser;
-    private ThriftRequestParser thriftRequestParser;
 
     public String getTerminationReason() {
         return terminationReason;
@@ -77,14 +68,11 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
 
     @Inject
     HttpRequestHandler(final ChannelGroup allChannels, final Provider<Marker> traceMarkerProvider,
-            final Provider<Servlet> servletProvider, final RequestParser requestParser,
-            final ThriftRequestParser thriftRequestParser) {
+            final Provider<Servlet> servletProvider) {
         this.allChannels = allChannels;
         this.traceMarkerProvider = traceMarkerProvider;
         this.servletProvider = servletProvider;
         responseSender = new ResponseSender(this);
-        this.requestParser = requestParser;
-        this.thriftRequestParser = thriftRequestParser;
     }
 
     @Override
@@ -111,6 +99,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
         if (e.getChannel().isOpen()) {
             responseSender.sendNoAdResponse(e);
         }
+        e.getCause().printStackTrace();
         e.getChannel().close();
     }
 
@@ -133,9 +122,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
             }
             responseSender.sendNoAdResponse(e);
         }
-        // Whenever channel is Write_idle, increment the totalTimeout. It means
-        // server
-        // could not write the response with in 800 ms
+
         LOG.debug(traceMarker, "inside channel idle event handler for Request channel ID: {}", e.getChannel().getId());
         if (e.getState().toString().equalsIgnoreCase("ALL_IDLE")
                 || e.getState().toString().equalsIgnoreCase("WRITE_IDLE")) {
@@ -148,8 +135,10 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
     @Override
     public void messageReceived(final ChannelHandlerContext ctx, final MessageEvent e) throws Exception {
         try {
-            HttpRequest request = (HttpRequest) e.getMessage();
-
+            RequestParameterHolder requestParameterHolder = (RequestParameterHolder) e.getMessage();
+            this.terminationReason = requestParameterHolder.getTerminationReason();
+            this.responseSender.sasParams = requestParameterHolder.getSasParams();
+            this.responseSender.casInternalRequestParameters = requestParameterHolder.getCasInternalRequestParameters();
             traceMarker = traceMarkerProvider.get();
 
             Servlet servlet = servletProvider.get();
@@ -157,44 +146,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
 
             LOG.debug(traceMarker, "Got the servlet {}", servletName);
 
-            QueryStringDecoder queryStringDecoder = new QueryStringDecoder(request.getUri());
-            Map<String, List<String>> params = queryStringDecoder.getParameters();
-            SASRequestParameters sasParams = new SASRequestParameters();
-            CasInternalRequestParameters  casInternalRequestParametersGlobal = new CasInternalRequestParameters();
-            Integer dst = null;
-            if  (servletName.equalsIgnoreCase("rtbdFill")) {
-                dst = 6;
-            } else if (servletName.equalsIgnoreCase("BackFill")) {
-                dst = 2;
-            }
-
-            if (request.getMethod() == HttpMethod.POST && null != dst) {
-                TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
-                try {
-                    AdPoolRequest adPoolRequest = new AdPoolRequest();
-                    tDeserializer.deserialize(adPoolRequest, request.getContent().array());
-                    this.tObject = adPoolRequest;
-                    thriftRequestParser.parseRequestParameters(this.tObject, sasParams, casInternalRequestParametersGlobal, dst);
-                } catch (TException ex) {
-                    this.tObject = new AdPoolRequest();
-                    LOG.error(traceMarker, "Error in de serializing thrift ", ex);
-                    this.setTerminationReason(ServletHandler.thriftParsingError);
-                    InspectorStats.incrementStatCount(InspectorStrings.thriftParsingError, InspectorStrings.count);
-                    this.responseSender.sendNoAdResponse(e);
-                }
-            } else if (params.containsKey("args")) {
-                try {
-                    this.jObject = requestParser.extractParams(params);
-                }
-                catch (JSONException exception) {
-                    this.jObject = new JSONObject();
-                    LOG.debug("Encountered Json Error while creating json object inside ", exception);
-                    this.setTerminationReason(ServletHandler.jsonParsingError);
-                    InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
-                    this.responseSender.sendNoAdResponse(e);
-                }
-                requestParser.parseRequestParameters(this.jObject, sasParams, casInternalRequestParametersGlobal);
-            }
+            QueryStringDecoder queryStringDecoder = new QueryStringDecoder(requestParameterHolder.getUri());
 
             servlet.handleRequest(this, queryStringDecoder, e);
         }

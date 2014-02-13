@@ -41,10 +41,9 @@ public class ServletBackFill implements Servlet {
         @Override
         public void handleRequest(HttpRequestHandler hrh, QueryStringDecoder queryStringDecoder, MessageEvent e) throws Exception {
 
-            CasInternalRequestParameters casInternalRequestParametersGlobal = new CasInternalRequestParameters();
             SASRequestParameters sasParams = hrh.responseSender.sasParams;
             hrh.responseSender.getAuctionEngine().sasParams = hrh.responseSender.sasParams;
-            casInternalRequestParametersGlobal = hrh.responseSender.casInternalRequestParameters;
+            CasInternalRequestParameters casInternalRequestParametersGlobal = hrh.responseSender.casInternalRequestParameters;
 
             if (requestFilters.isDroppedInRequestFilters(hrh)) {
                 LOG.debug("Request is dropped in request filters");

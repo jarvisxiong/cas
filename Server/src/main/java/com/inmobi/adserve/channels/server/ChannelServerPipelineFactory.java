@@ -33,11 +33,12 @@ public class ChannelServerPipelineFactory implements ChannelPipelineFactory {
     @Getter
     private final ConnectionLimitHandler       incomingConnectionLimitHandler;
     private final ServletHandler               servletHandler;
+    private final RequestParserHandler         requestParserHandler;
 
     @Inject
     ChannelServerPipelineFactory(final Timer timer, @ServerConfiguration final Configuration configuration,
             final Provider<HttpRequestHandler> httpRequestHandlerProvider, final TraceMarkerhandler traceMarkerhandler,
-            final ServletHandler servletHandler) {
+            final ServletHandler servletHandler, final RequestParserHandler requestParserHandler) {
         this.timer = timer;
         this.serverTimeoutMillis = configuration.getInt("serverTimeoutMillis", 825);
         executionHandler = new ExecutionHandler(new OrderedMemoryAwareThreadPoolExecutor(80, 1048576, 1048576, 3,
@@ -47,6 +48,7 @@ public class ChannelServerPipelineFactory implements ChannelPipelineFactory {
         this.requestIdHandler = new RequestIdHandler();
         this.incomingConnectionLimitHandler = new ConnectionLimitHandler(configuration, ConnectionType.INCOMING);
         this.servletHandler = servletHandler;
+        this.requestParserHandler = requestParserHandler;
     }
 
     @Override
@@ -62,6 +64,7 @@ public class ChannelServerPipelineFactory implements ChannelPipelineFactory {
                 TimeUnit.MILLISECONDS));
         pipeline.addLast("traceMarkerhandler", traceMarkerhandler);
         pipeline.addLast("servletHandler", servletHandler);
+        pipeline.addLast("requestParserHandler", requestParserHandler);
         pipeline.addLast("handler", httpRequestHandlerProvider.get());
         return pipeline;
     }

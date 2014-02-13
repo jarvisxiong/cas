@@ -5,8 +5,7 @@ import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
-import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
-import com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParser;
+import com.inmobi.adserve.channels.server.requesthandler.RequestFilters;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import org.jboss.netty.channel.MessageEvent;
@@ -24,16 +23,15 @@ public class ServletRtbd implements Servlet {
     private static final Logger LOG = LoggerFactory.getLogger(ServletRtbd.class);
     private final MatchSegments matchSegments;
     private final Provider<Marker> traceMarkerProvider;
-    private final RequestParser    requestParser;
-    private final ThriftRequestParser    thriftRequestParser;
+    private final RequestFilters requestFilters;
+
 
     @Inject
-    public ServletRtbd(RequestParser requestParser, Provider<Marker> traceMarkerProvider, MatchSegments matchSegments,
-                       ThriftRequestParser thriftRequestParser) {
-        this.requestParser = requestParser;
+    public ServletRtbd(final Provider<Marker> traceMarkerProvider, MatchSegments matchSegments,
+                       final RequestFilters requestFilters) {
         this.traceMarkerProvider = traceMarkerProvider;
         this.matchSegments = matchSegments;
-        this.thriftRequestParser = thriftRequestParser;
+        this.requestFilters = requestFilters;
     }
 
     @Override
@@ -43,7 +41,7 @@ public class ServletRtbd implements Servlet {
         LOG.debug(traceMarker, "Inside RTBD servlet");
         InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
         InspectorStats.incrementStatCount(InspectorStrings.ruleEngineRequests);
-        ServletBackFill servletBackFill = new ServletBackFill(matchSegments, traceMarkerProvider);
+        ServletBackFill servletBackFill = new ServletBackFill(matchSegments, traceMarkerProvider, requestFilters);
         servletBackFill.handleRequest(hrh, queryStringDecoder, e);
     }
 

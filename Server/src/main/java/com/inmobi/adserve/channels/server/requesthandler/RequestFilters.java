@@ -15,6 +15,16 @@ public class RequestFilters {
 
 
     public boolean isDroppedInRequestFilters(HttpRequestHandler hrh) {
+        if (null != hrh.getTerminationReason()) {
+            LOG.debug("Request not being served because of the termination reason {}", hrh.getTerminationReason());
+            if (ServletHandler.jsonParsingError.equalsIgnoreCase(hrh.getTerminationReason())) {
+                InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
+            } else {
+                InspectorStats.incrementStatCount(InspectorStrings.thriftParsingError, InspectorStrings.count);
+            }
+            return true;
+        }
+
         // Send noad if new-category is not present in the request
         if (ServletHandler.random.nextInt(100) >= ServletHandler.percentRollout) {
             LOG.debug("Request not being served because of limited percentage rollout");
