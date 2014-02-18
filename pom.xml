@@ -39,6 +39,12 @@
 		            <groupId>com.inmobi.adserve</groupId>
 		            <artifactId>creativevalidator</artifactId>
 		            <version>${creative-validator}</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>com.inmobi.instrumentation</groupId>
+                            <artifactId>timing-measurement</artifactId>
+                        </exclusion>
+                    </exclusions>
 		        </dependency>
 			<dependency>
 				<groupId>com.inmobi.commons</groupId>
