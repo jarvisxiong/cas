@@ -42,7 +42,7 @@ public class ThriftRequestParser {
         params.setRichMedia(tObject.isSetSupplyCapabilities() && tObject.supplyCapabilities.contains(SupplyCapability.RICH_MEDIA));
         params.setAccountSegment(getAccountSegments(tObject.demandTypesAllowed));
         params.setIpFileVersion(new Long(tObject.ipFileVersion).intValue());
-        params.setSst(tObject.isSetSupplySource() ? tObject.supplySource.ordinal() : 0);
+        params.setSst(tObject.isSetSupplySource() ? tObject.supplySource.getValue() : 0);
 
         
         //Fill params from integration details object

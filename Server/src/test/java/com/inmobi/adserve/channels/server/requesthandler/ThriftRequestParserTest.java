@@ -1,12 +1,11 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
 import com.inmobi.adserve.adpool.*;
+import com.inmobi.adserve.adpool.Geo;
+import com.inmobi.adserve.adpool.Site;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.types.ContentRating;
-import com.inmobi.types.Gender;
-import com.inmobi.types.InventoryType;
-import com.inmobi.types.LocationSource;
+import com.inmobi.types.*;
 import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 
@@ -96,6 +95,7 @@ public class ThriftRequestParserTest extends TestCase {
         adPoolRequest.setResponseFormat(ResponseFormat.XHTML);
         adPoolRequest.setIntegrationDetails(integrationDetails);
         adPoolRequest.setIpFileVersion(3456);
+        adPoolRequest.setSupplySource(SupplySource.RTB_EXCHANGE);
 
         SASRequestParameters sasRequestParameters = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
@@ -144,6 +144,6 @@ public class ThriftRequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getDst(), 6);
         assertEquals(sasRequestParameters.getAccountSegment(), Collections.<Integer>emptySet());
         assertEquals(sasRequestParameters.isResponseOnlyFromDcp(), false);
-        assertEquals(sasRequestParameters.getSst(), 0);
+        assertEquals(sasRequestParameters.getSst(), 100);
     }
 }

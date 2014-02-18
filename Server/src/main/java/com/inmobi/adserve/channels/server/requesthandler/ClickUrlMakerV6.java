@@ -11,6 +11,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
+/**
+ *
+ * @author devi.chand@inmobi.com
+ */
+
 @ToString
 public class ClickUrlMakerV6 {
 

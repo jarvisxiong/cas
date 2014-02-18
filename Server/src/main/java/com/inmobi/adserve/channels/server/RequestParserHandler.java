@@ -84,7 +84,7 @@ public class RequestParserHandler extends OneToOneDecoder {
                 LOG.error(traceMarker, "Error in de serializing thrift ", ex);
                 InspectorStats.incrementStatCount(InspectorStrings.thriftParsingError, InspectorStrings.count);
             }
-        } else if (params.containsKey("args")) {
+        } else if (params.containsKey("args") && null != dst) {
             JSONObject jsonObject;
             try {
                 jsonObject = requestParser.extractParams(params);
@@ -97,6 +97,6 @@ public class RequestParserHandler extends OneToOneDecoder {
             }
             requestParser.parseRequestParameters(jsonObject, sasParams, casInternalRequestParameters);
         }
-       return new RequestParameterHolder(sasParams, casInternalRequestParameters, request.getUri(), terminationReason);
+       return new RequestParameterHolder(sasParams, casInternalRequestParameters, request.getUri(), terminationReason, request);
     }
 }
