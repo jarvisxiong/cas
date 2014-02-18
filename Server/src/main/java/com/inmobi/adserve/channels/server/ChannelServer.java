@@ -4,11 +4,24 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.repository.*;
+import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
+import com.inmobi.adserve.channels.repository.ChannelFeedbackRepository;
+import com.inmobi.adserve.channels.repository.ChannelRepository;
+import com.inmobi.adserve.channels.repository.ChannelSegmentFeedbackRepository;
+import com.inmobi.adserve.channels.repository.ChannelSegmentMatchingCache;
+import com.inmobi.adserve.channels.repository.CurrencyConversionRepository;
+import com.inmobi.adserve.channels.repository.PricingEngineRepository;
+import com.inmobi.adserve.channels.repository.PublisherFilterRepository;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.repository.SiteCitrusLeafFeedbackRepository;
+import com.inmobi.adserve.channels.repository.SiteEcpmRepository;
+import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
+import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
 import com.inmobi.adserve.channels.server.api.ConnectionType;
 import com.inmobi.adserve.channels.server.client.BootstrapCreation;
 import com.inmobi.adserve.channels.server.client.RtbBootstrapCreation;
 import com.inmobi.adserve.channels.server.module.NettyModule;
+import com.inmobi.adserve.channels.server.module.ScopeModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
 import com.inmobi.adserve.channels.server.netty.NettyServer;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
@@ -45,12 +58,12 @@ import java.io.StringWriter;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
- /*
+
+/*
  * 
- * Run jar:-
- * java -Dincoming.connections=100 -Ddcpoutbound.connections=50 -Drtboutbound.connections=50 -jar cas-server.jar
- * If these are not specified server will pick these values from channel-server.properties config file.
- * */
+ * Run jar:- java -Dincoming.connections=100 -Ddcpoutbound.connections=50 -Drtboutbound.connections=50 -jar
+ * cas-server.jar If these are not specified server will pick these values from channel-server.properties config file.
+ */
 public class ChannelServer {
     private static Logger                           logger;
     private static ChannelAdGroupRepository         channelAdGroupRepository;
@@ -139,12 +152,12 @@ public class ChannelServer {
 
             instantiateRepository(logger, config);
             ServletHandler.init(config, repositoryHelper);
-            Integer maxIncomingConnections = channelServerHelper.getMaxConnections(ChannelServerStringLiterals.INCOMING_CONNECTIONS, 
-                    ConnectionType.INCOMING);
-            Integer maxRTbdOutGoingConnections = channelServerHelper.getMaxConnections(ChannelServerStringLiterals.RTBD_OUTGING_CONNECTIONS, 
-                    ConnectionType.RTBD_OUTGOING);
-            Integer maxDCpOutGoingConnections = channelServerHelper.getMaxConnections(ChannelServerStringLiterals.DCP_OUTGOING_CONNECTIONS, 
-                    ConnectionType.DCP_OUTGOING);
+            Integer maxIncomingConnections = channelServerHelper.getMaxConnections(
+                    ChannelServerStringLiterals.INCOMING_CONNECTIONS, ConnectionType.INCOMING);
+            Integer maxRTbdOutGoingConnections = channelServerHelper.getMaxConnections(
+                    ChannelServerStringLiterals.RTBD_OUTGING_CONNECTIONS, ConnectionType.RTBD_OUTGOING);
+            Integer maxDCpOutGoingConnections = channelServerHelper.getMaxConnections(
+                    ChannelServerStringLiterals.DCP_OUTGOING_CONNECTIONS, ConnectionType.DCP_OUTGOING);
             if (null != maxIncomingConnections) {
                 ServletHandler.getServerConfig().setProperty("incomingMaxConnections", maxIncomingConnections);
             }
@@ -155,10 +168,6 @@ public class ChannelServer {
                 ServletHandler.getServerConfig().setProperty("dcpOutGoingMaxConnections", maxDCpOutGoingConnections);
             }
             Filters.init(config.getAdapterConfiguration());
-
-            Injector injector = Guice.createInjector(new NettyModule(config.getServerConfiguration()),
-                    new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(),
-                            repositoryHelper));
 
             // Creating netty client for out-bound calls.
             Timer timer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
@@ -188,12 +197,27 @@ public class ChannelServer {
             // Initialising request handler
             AsyncRequestMaker.init(clientBootstrap, rtbClientBootstrap, asyncHttpClient);
 
-            final NettyServer server = injector.getInstance(NettyServer.class);
+            Injector parentInjector = Guice.createInjector(new ScopeModule());
+
+            Injector serverInjector = parentInjector.createChildInjector(
+                    new NettyModule(config.getServerConfiguration(), 8800),
+                    new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(),
+                            repositoryHelper));
+
+            final NettyServer server = serverInjector.getInstance(NettyServer.class);
             server.startAndWait();
+            Injector statInjector = parentInjector.createChildInjector(new NettyModule(config.getServerConfiguration(),
+                    8801), new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(),
+                    repositoryHelper));
+
+            final NettyServer statusServer = statInjector.getInstance(NettyServer.class);
+            server.startAndWait();
+            statusServer.startAndWait();
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
                     server.stopAndWait();
+                    statusServer.stopAndWait();
                 }
             });
 

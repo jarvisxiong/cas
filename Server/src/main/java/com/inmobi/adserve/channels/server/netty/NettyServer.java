@@ -1,10 +1,10 @@
 package com.inmobi.adserve.channels.server.netty;
 
 import com.google.common.util.concurrent.AbstractIdleService;
-import com.inmobi.adserve.channels.server.ChannelServerPipelineFactory;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFactory;
+import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.group.ChannelGroup;
 
 import javax.inject.Inject;
@@ -20,11 +20,11 @@ public class NettyServer extends AbstractIdleService {
     private final SocketAddress                address;
     private final ChannelFactory               factory;
     private final ServerBootstrap              bootstrap;
-    private final ChannelServerPipelineFactory channelServerPipelineFactory;
+    private final ChannelPipelineFactory       channelServerPipelineFactory;
 
     @Inject
     NettyServer(final ChannelFactory factory, final ChannelGroup allChannels, final SocketAddress address,
-            final ChannelServerPipelineFactory channelServerPipelineFactory) {
+            final ChannelPipelineFactory channelServerPipelineFactory) {
         this.factory = factory;
         this.bootstrap = new ServerBootstrap(factory);
         this.allChannels = allChannels;

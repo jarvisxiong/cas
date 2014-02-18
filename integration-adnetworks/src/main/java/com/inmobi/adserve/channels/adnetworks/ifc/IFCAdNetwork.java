@@ -32,6 +32,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
 
 	private static final Logger LOG = LoggerFactory
 			.getLogger(IFCAdNetwork.class);
+
 	private String requestId;
 	private String deviceOs; // Mandatory Param
 	private String deviceOSVersion; // Mandatory Param
