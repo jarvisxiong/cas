@@ -64,14 +64,14 @@ public class AdGroupTotalCountFilter implements AdGroupLevelFilter {
             if (result) {
                 // TODO: we can optimize if we don't need these inspector stats , then we can shorten our iteration
                 iterator.remove();
-                LOG.debug(traceMarker, "Failed in filter {}  , adgroup {}", this.getClass().getName(), channelSegment
-                        .getChannelSegmentFeedbackEntity().getId());
+                LOG.debug(traceMarker, "Failed in filter {}  , adgroup {}", this.getClass().getSimpleName(),
+                        channelSegment.getChannelSegmentFeedbackEntity().getId());
                 incrementStats(channelSegment);
             }
             else {
                 selectedSegmentCount++;
-                LOG.debug(traceMarker, "Passed in filter {} ,  adgroup {}", this.getClass().getName(), channelSegment
-                        .getChannelSegmentFeedbackEntity().getId());
+                LOG.debug(traceMarker, "Passed in filter {} ,  adgroup {}", this.getClass().getSimpleName(),
+                        channelSegment.getChannelSegmentFeedbackEntity().getId());
             }
         }
     }

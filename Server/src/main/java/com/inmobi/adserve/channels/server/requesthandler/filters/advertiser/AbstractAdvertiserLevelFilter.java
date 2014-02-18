@@ -50,11 +50,13 @@ public abstract class AbstractAdvertiserLevelFilter implements AdvertiserLevelFi
 
             if (result) {
                 iterator.remove();
-                LOG.debug(traceMarker, "Failed in filter {}  , advertiser {}", this.getClass().getName(), advertiserId);
+                LOG.debug(traceMarker, "Failed in filter {}  , advertiser {}", this.getClass().getSimpleName(),
+                        advertiserId);
                 incrementStats(channelSegment);
             }
             else {
-                LOG.debug(traceMarker, "Passed in filter {} ,  advertiser {}", this.getClass().getName(), advertiserId);
+                LOG.debug(traceMarker, "Passed in filter {} ,  advertiser {}", this.getClass().getSimpleName(),
+                        advertiserId);
             }
         }
     }
@@ -82,5 +84,4 @@ public abstract class AbstractAdvertiserLevelFilter implements AdvertiserLevelFi
     public ChannelSegmentFilterOrder getOrder() {
         return order;
     }
-
 }

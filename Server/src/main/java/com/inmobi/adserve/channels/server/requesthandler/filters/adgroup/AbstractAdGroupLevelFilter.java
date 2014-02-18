@@ -45,12 +45,12 @@ public abstract class AbstractAdGroupLevelFilter implements AdGroupLevelFilter {
 
             if (result) {
                 iterator.remove();
-                LOG.debug(traceMarker, "Failed in filter {}  , adgroup {}", this.getClass().getName(), channelSegment
-                        .getChannelSegmentFeedbackEntity().getId());
+                LOG.debug(traceMarker, "Failed in filter {}  , adgroup {}", this.getClass().getSimpleName(),
+                        channelSegment.getChannelSegmentFeedbackEntity().getId());
                 incrementStats(channelSegment);
             }
             else {
-                LOG.debug(traceMarker, "Passed in filter {} ,  advertiser {}", this.getClass().getName(),
+                LOG.debug(traceMarker, "Passed in filter {} ,  advertiser {}", this.getClass().getSimpleName(),
                         channelSegment.getChannelSegmentFeedbackEntity().getId());
             }
         }
