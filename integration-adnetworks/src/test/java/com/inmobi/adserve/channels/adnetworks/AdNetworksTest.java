@@ -781,7 +781,7 @@ public class AdNetworksTest extends TestCase {
             null, 32));
         if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpTapitAdNetwork.getRequestUri().toString();
-            String expectedUrl = "http://r.tapit.com/adrequest.php?format=json&ip=206.29.182.240&ua=Mozilla&zone=19100&lat=37.4429&long=-122.1514&enctype=raw&ifa=202cb962ac59075b964b07152d234b70&w=320.0&h=50.0&tpsid=00000000-0000-0020-0000-000000000012";
+            String expectedUrl = "http://r.tapit.com/adrequest.php?format=json&ip=206.29.182.240&ua=Mozilla&zone=19100&lat=37.4429&long=-122.1514&enctype=raw&idfa=202cb962ac59075b964b07152d234b70&w=320.0&h=50.0&tpsid=00000000-0000-0020-0000-000000000012";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -834,7 +834,7 @@ public class AdNetworksTest extends TestCase {
             null, 32));
         if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpTapitAdNetwork.getRequestUri().toString();
-            String expectedUrl = "http://r.tapit.com/adrequest.php?format=json&ip=206.29.182.240&ua=Mozilla&zone=19100&lat=37.4429&long=-122.1514&enctype=md5&android_id=202cb962ac59075b964b07152d234b70&tpsid=00000000-0000-0020-0000-000000000012";
+            String expectedUrl = "http://r.tapit.com/adrequest.php?format=json&ip=206.29.182.240&ua=Mozilla&zone=19100&lat=37.4429&long=-122.1514&enctype=md5&udid=202cb962ac59075b964b07152d234b70&tpsid=00000000-0000-0020-0000-000000000012";
             assertEquals(expectedUrl, actualUrl);
         }
     }

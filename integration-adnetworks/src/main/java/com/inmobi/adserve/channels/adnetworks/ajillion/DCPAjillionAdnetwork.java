@@ -31,7 +31,9 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
     private final String        CLIENT_IP   = "clientip";
     private final String        CLIENT_UA   = "clientua";
     private final String        AGE         = "age";
+    private final String      	IS_BEACON_RQD = "use_beacon";
     private final String        slotFormat  = "%s.slot_%s_%s";
+    private final String        beaconRequiredFlag = "1"; 
     private String              placementId = null;
     private String              name;
 
@@ -80,6 +82,7 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
         try {
             StringBuilder url = new StringBuilder(String.format(host, placementId));
             appendQueryParam(url, FORMAT, "json", true);
+            appendQueryParam(url, IS_BEACON_RQD, beaconRequiredFlag, false);
             appendQueryParam(url, KEYWORD, getURLEncode(getCategories(','), format), false);
             appendQueryParam(url, PUBID, blindedSiteId, false);
             appendQueryParam(url, CLIENT_IP, sasParams.getRemoteHostIp(), false);
@@ -126,6 +129,8 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
                 VelocityContext context = new VelocityContext();
 
                 TemplateType t = TemplateType.IMAGE;
+                if(adResponse.has("beacon_url"))
+                	context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl,adResponse.getString("beacon_url"));
                 if (adResponse.getString("creative_type").equalsIgnoreCase("image")) {
                     context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse.getString("click_url"));
                     context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);

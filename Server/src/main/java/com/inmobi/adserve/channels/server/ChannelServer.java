@@ -45,6 +45,7 @@ import com.inmobi.adserve.channels.server.api.ConnectionType;
 import com.inmobi.adserve.channels.server.client.BootstrapCreation;
 import com.inmobi.adserve.channels.server.client.RtbBootstrapCreation;
 import com.inmobi.adserve.channels.server.module.NettyModule;
+import com.inmobi.adserve.channels.server.module.ScopeModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
 import com.inmobi.adserve.channels.server.netty.NettyServer;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
@@ -168,11 +169,6 @@ public class ChannelServer {
                 ServletHandler.getServerConfig().setProperty("dcpOutGoingMaxConnections", maxDCpOutGoingConnections);
             }
 
-            Injector injector = Guice.createInjector(
-                    new NettyModule(config.getServerConfiguration()),
-                    new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(), config
-                            .getServerConfiguration(), repositoryHelper));
-
             // Creating netty client for out-bound calls.
             Timer timer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
             BootstrapCreation.init(timer);
@@ -201,12 +197,27 @@ public class ChannelServer {
             // Initialising request handler
             AsyncRequestMaker.init(clientBootstrap, rtbClientBootstrap, asyncHttpClient);
 
-            final NettyServer server = injector.getInstance(NettyServer.class);
+            Injector parentInjector = Guice.createInjector(new ScopeModule());
+
+            Injector serverInjector = parentInjector.createChildInjector(
+                    new NettyModule(config.getServerConfiguration(), 8800),
+                    new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(), config
+                            .getServerConfiguration(), repositoryHelper));
+            final NettyServer server = serverInjector.getInstance(NettyServer.class);
             server.startAndWait();
+
+            Injector statInjector = parentInjector.createChildInjector(
+                    new NettyModule(config.getServerConfiguration(), 8801),
+                    new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(), config
+                            .getServerConfiguration(), repositoryHelper));
+            final NettyServer statusServer = statInjector.getInstance(NettyServer.class);
+            statusServer.startAndWait();
+
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
                     server.stopAndWait();
+                    statusServer.stopAndWait();
                 }
             });
 

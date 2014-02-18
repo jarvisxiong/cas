@@ -1,39 +1,25 @@
 package com.inmobi.adserve.channels.api;
 
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.util.CategoryList;
+import com.inmobi.adserve.channels.util.IABCategoriesInterface;
+import com.inmobi.adserve.channels.util.IABCategoriesMap;
+import org.apache.commons.lang.StringUtils;
+import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.channel.*;
+import org.jboss.netty.handler.codec.http.*;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import org.apache.commons.lang.StringUtils;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelException;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpMethod;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.jboss.netty.handler.codec.http.HttpVersion;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
-
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.CategoryList;
-import com.inmobi.adserve.channels.util.IABCategoriesInterface;
-import com.inmobi.adserve.channels.util.IABCategoriesMap;
+import java.util.*;
 
 
 // This abstract class have base functionality of TPAN adapters.
@@ -135,7 +121,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         try {
             request = getHttpRequest();
             uri = new URI(request.getUri());
+            //request.setUri(uri.getPath());
             LOG.debug("uri is {}", uri);
+            //LOG.debug("request is {}", request);
             LOG.info("url inside makeAsyncRequest is not null");
         }
         catch (Exception ex) {

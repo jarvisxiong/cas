@@ -96,7 +96,7 @@ public class IFCAdNetworkTest extends TestCase {
             ifcAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
             null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
             new ArrayList<Integer>(), 0.0d, null, null, 32));
-        assertEquals(ifcAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", ""), true);
+        assertEquals(ifcAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", ""), false);
     }
 
     @Test

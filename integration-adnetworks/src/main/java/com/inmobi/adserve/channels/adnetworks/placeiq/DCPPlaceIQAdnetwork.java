@@ -315,10 +315,10 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
         if (allTags) {
 
             for (int index = 0; index < sasParams.getCategories().size(); index++) {
-                if (categoryList.get(sasParams.getCategories().get(0).intValue()) == null) {
+                if (categoryList.get(sasParams.getCategories().get(index).intValue()) == null) {
                     continue;
                 }
-                category = categoryList.get(sasParams.getCategories().get(0).intValue());
+                category = categoryList.get(sasParams.getCategories().get(index).intValue());
                 break;
             }
 
