@@ -31,6 +31,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.slf4j.Marker;
 
 import com.google.inject.Provider;
@@ -88,6 +89,7 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
      */
     @Override
     public void exceptionCaught(final ChannelHandlerContext ctx, final ExceptionEvent e) throws Exception {
+        MDC.put("requestId", e.getChannel().getId().toString());
 
         String exceptionString = e.getClass().getSimpleName();
         InspectorStats.incrementStatCount(InspectorStrings.channelException, exceptionString);
@@ -108,14 +110,15 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
     // Invoked when request timeout.
     @Override
     public void channelIdle(final ChannelHandlerContext ctx, final IdleStateEvent e) {
+        MDC.put("requestId", e.getChannel().getId().toString());
+
         if (e.getChannel().isOpen()) {
             LOG.debug(traceMarker, "Channel is open in channelIdle handler");
             if (responseSender.getRankList() != null) {
                 for (ChannelSegment channelSegment : responseSender.getRankList()) {
                     if (channelSegment.getAdNetworkInterface().getAdStatus().equals("AD")) {
-                        LOG.debug(traceMarker, "Got Ad from {} Top Rank was {}", channelSegment
-                                .getAdNetworkInterface()
-                                    .getName(), responseSender.getRankList().get(0).getAdNetworkInterface().getName());
+                        LOG.debug(traceMarker, "Got Ad from {} Top Rank was {}", channelSegment.getAdNetworkInterface()
+                                .getName(), responseSender.getRankList().get(0).getAdNetworkInterface().getName());
                         responseSender.sendAdResponse(channelSegment.getAdNetworkInterface(), e);
                         return;
                     }
@@ -184,24 +187,24 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
         try {
             if (responseSender.getAdResponse() == null) {
                 Logging.channelLogline(list, null, ServletHandler.getLoggerConfig(), responseSender.sasParams,
-                    totalTime);
+                        totalTime);
                 Logging.rrLogging(null, list, ServletHandler.getLoggerConfig(), responseSender.sasParams,
-                    terminationReason);
+                        terminationReason);
                 Logging.advertiserLogging(list, ServletHandler.getLoggerConfig());
                 Logging.sampledAdvertiserLogging(list, ServletHandler.getLoggerConfig());
             }
             else {
                 Logging.channelLogline(list, responseSender.getAdResponse().clickUrl, ServletHandler.getLoggerConfig(),
-                    responseSender.sasParams, totalTime);
+                        responseSender.sasParams, totalTime);
                 if (responseSender.getRtbResponse() == null) {
                     LOG.debug(traceMarker, "rtb response is null so logging dcp response in rr");
                     Logging.rrLogging(responseSender.getRankList().get(responseSender.getSelectedAdIndex()), list,
-                        ServletHandler.getLoggerConfig(), responseSender.sasParams, terminationReason);
+                            ServletHandler.getLoggerConfig(), responseSender.sasParams, terminationReason);
                 }
                 else {
                     LOG.debug(traceMarker, "rtb response is not null so logging rtb response in rr");
                     Logging.rrLogging(responseSender.getRtbResponse(), list, ServletHandler.getLoggerConfig(),
-                        responseSender.sasParams, terminationReason);
+                            responseSender.sasParams, terminationReason);
                 }
                 Logging.advertiserLogging(list, ServletHandler.getLoggerConfig());
                 Logging.sampledAdvertiserLogging(list, ServletHandler.getLoggerConfig());

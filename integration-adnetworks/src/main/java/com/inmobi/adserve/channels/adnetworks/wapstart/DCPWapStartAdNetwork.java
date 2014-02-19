@@ -21,6 +21,7 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -129,7 +130,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             if (StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)) {
                 url.append("&location=")
-                            .append(getURLEncode(String.format(latlongFormat, latitude, longitude), format));
+                        .append(getURLEncode(String.format(latlongFormat, latitude, longitude), format));
             }
 
             LOG.debug("WapStart url is {}", url);
@@ -156,6 +157,8 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
             baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
                 @Override
                 public Response onCompleted(final Response response) throws Exception {
+                    MDC.put("requestId", serverEvent.getChannel().getId().toString());
+
                     if (!isRequestCompleted()) {
                         LOG.debug("Operation complete for channel partner: {}", getName());
                         latency = System.currentTimeMillis() - startTime;
@@ -170,6 +173,8 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 
                 @Override
                 public void onThrowable(final Throwable t) {
+                    MDC.put("requestId", serverEvent.getChannel().getId().toString());
+
                     if (isRequestComplete) {
                         return;
                     }
@@ -198,18 +203,15 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
     }
 
     private void setNingRequest(final String requestUrl) {
-        ningRequest = new RequestBuilder()
-                .setUrl(requestUrl)
-                    .setHeader("x-display-metrics", String.format("%sx%s", width, height))
-                    .setHeader("xplus1-user-agent", sasParams.getUserAgent())
-                    .setHeader("x-plus1-remote-addr", sasParams.getRemoteHostIp())         
-                    .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-                    .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
-                    .setHeader(HttpHeaders.Names.REFERER, requestUrl)
-                    .setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE)
-                    .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
-                    .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-                    .build();
+        ningRequest = new RequestBuilder().setUrl(requestUrl)
+                .setHeader("x-display-metrics", String.format("%sx%s", width, height))
+                .setHeader("xplus1-user-agent", sasParams.getUserAgent())
+                .setHeader("x-plus1-remote-addr", sasParams.getRemoteHostIp())
+                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
+                .setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE)
+                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
+                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp()).build();
     }
 
     @Override
@@ -237,9 +239,8 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
                     Element rootElement = (Element) rootNode;
 
                     Element partnerClickUrl = (Element) rootElement.getElementsByTagName("link").item(0);
-                    Element partnerBeaconElement = (Element) rootElement
-                            .getElementsByTagName("cookieSetterUrl")
-                                .item(0);
+                    Element partnerBeaconElement = (Element) rootElement.getElementsByTagName("cookieSetterUrl")
+                            .item(0);
 
                     String partnerBeacon = partnerBeaconElement.getTextContent();
                     if (StringUtils.isNotEmpty(partnerBeacon)) {

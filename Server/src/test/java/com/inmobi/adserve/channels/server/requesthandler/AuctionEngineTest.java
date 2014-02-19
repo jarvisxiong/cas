@@ -18,13 +18,21 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Module;
 import com.inmobi.adserve.channels.adnetworks.tapit.DCPTapitAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.ServletHandler;
+import com.inmobi.adserve.channels.server.annotations.RtbConfiguration;
+import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
+import com.inmobi.adserve.channels.server.module.AdapterConfigModule;
+import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilterApplierTest;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 
 
@@ -38,9 +46,8 @@ public class AuctionEngineTest {
 
     @BeforeMethod
     public void setUp() throws IOException {
-        ConfigurationLoader config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
+        final ConfigurationLoader config = ConfigurationLoader.getInstance("channel-server.properties");
         ServletHandler.init(config, null);
-        Filters.init(config.getAdapterConfiguration());
         // this is done, to track the encryptedBid variable getting set inside the AuctionEngine.
         encryptedBid1 = new Capture<String>();
 
@@ -66,6 +73,22 @@ public class AuctionEngineTest {
         casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.auctionId = "auctionId";
 
+        Module module = new AbstractModule() {
+
+            @Override
+            protected void configure() {
+                bind(Configuration.class).annotatedWith(ServerConfiguration.class).toInstance(
+                        config.getServerConfiguration());
+                bind(Configuration.class).annotatedWith(RtbConfiguration.class)
+                        .toInstance(config.getRtbConfiguration());
+
+                install(new AdapterConfigModule(config.getAdapterConfiguration(), ChannelServer.dataCentreName));
+                requestStaticInjection(AuctionEngine.class);
+            }
+        };
+
+        Guice.createInjector(module);
+
     }
 
     private ChannelSegment setBidder(final String advId, final String channelId, final String externalSiteKey,
@@ -77,10 +100,10 @@ public class AuctionEngineTest {
         Long[] slotIds = null;
         Integer[] siteRatings = null;
         ChannelSegmentEntity channelSegmentEntity1 = new ChannelSegmentEntity(
-                FilterTest.getChannelSegmentEntityBuilder(advId, "adgroupId", "adId", channelId, 1, rcList, tags, true,
-                    true, externalSiteKey, modified_on, "campaignId", slotIds, 1, true, "pricingModel", siteRatings, 1,
-                    null, false, false, false, false, false, false, false, false, false, false, null, null, 0.0d, null,
-                    null, false, new HashSet<String>(), 0));
+                ChannelSegmentFilterApplierTest.getChannelSegmentEntityBuilder(advId, "adgroupId", "adId", channelId,
+                        1, rcList, tags, true, true, externalSiteKey, modified_on, "campaignId", slotIds, 1, true,
+                        "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, false, false,
+                        false, false, null, null, 0.0d, null, null, false, new HashSet<String>(), 0));
         ChannelEntity.Builder builder = ChannelEntity.newBuilder();
         builder.setAccountId(advId);
         ChannelEntity channelEntity = builder.build();
@@ -187,11 +210,11 @@ public class AuctionEngineTest {
         List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
         rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", rtbNameInput1, bidInputVal1,
-            latencyInputVal1));
+                latencyInputVal1));
         rtbSegments.add(setBidder("advId2", "channelId2", "externalSiteKey2", rtbNameInput2, bidInputVal2,
-            latencyInputVal2));
+                latencyInputVal2));
         rtbSegments.add(setBidder("advId3", "channelId3", "externalSiteKey3", rtbNameInput3, bidInputVal3,
-            latencyInputVal3));
+                latencyInputVal3));
         auctionEngine.setRtbSegments(rtbSegments);
 
         casInternalRequestParameters.rtbBidFloor = bidFloorInput;
@@ -287,13 +310,13 @@ public class AuctionEngineTest {
         List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
         rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", rtbNameInput1, bidInputVal1,
-            latencyInputVal1));
+                latencyInputVal1));
         rtbSegments.add(setBidder("advId2", "channelId2", "externalSiteKey2", rtbNameInput2, bidInputVal2,
-            latencyInputVal2));
+                latencyInputVal2));
         rtbSegments.add(setBidder("advId3", "channelId3", "externalSiteKey3", rtbNameInput3, bidInputVal3,
-            latencyInputVal3));
+                latencyInputVal3));
         rtbSegments.add(setBidder("advId4", "channelId4", "externalSiteKey4", rtbNameInput4, bidInputVal4,
-            latencyInputVal4));
+                latencyInputVal4));
         auctionEngine.setRtbSegments(rtbSegments);
 
         casInternalRequestParameters.rtbBidFloor = bidFloorInput;

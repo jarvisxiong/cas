@@ -15,6 +15,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -165,6 +166,8 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
             baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
                 @Override
                 public Response onCompleted(final Response response) throws Exception {
+                    MDC.put("requestId", serverEvent.getChannel().getId().toString());
+
                     if (!isRequestCompleted()) {
                         LOG.debug("Operation complete for channel partner: {}", getName());
                         latency = System.currentTimeMillis() - startTime;
@@ -179,6 +182,8 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
 
                 @Override
                 public void onThrowable(final Throwable t) {
+                    MDC.put("requestId", serverEvent.getChannel().getId().toString());
+
                     if (isRequestComplete) {
                         return;
                     }
@@ -207,15 +212,12 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
     }
 
     private void setNingRequest(final String requestUrl) {
-        ningRequest = new RequestBuilder()
-                .setUrl(requestUrl)
-                    .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-                    .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
-                    .setHeader(HttpHeaders.Names.REFERER, requestUrl)
-                    .setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE)
-                    .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
-                    .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-                    .build();
+        ningRequest = new RequestBuilder().setUrl(requestUrl)
+                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
+                .setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE)
+                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
+                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp()).build();
     }
 
     @Override

@@ -11,6 +11,7 @@ import org.jboss.netty.handler.codec.http.*;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
@@ -44,7 +45,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected SASRequestParameters                sasParams;
     protected CasInternalRequestParameters        casInternalRequestParameters;
     protected HttpRequestHandlerBase              baseRequestHandler      = null;
-    private final MessageEvent                    serverEvent;
+    protected final MessageEvent                  serverEvent;
     protected String                              requestUrl              = "";
     private ThirdPartyAdResponse                  responseStruct;
     private boolean                               isRtbPartner            = false;
@@ -146,6 +147,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         future.addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(final ChannelFuture future) throws Exception {
+                MDC.put("requestId", serverEvent.getChannel().getId().toString());
+
                 connectionLatency = System.currentTimeMillis() - startTime;
                 if (!future.isSuccess()) {
                     latency = System.currentTimeMillis() - startTime;
@@ -162,6 +165,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 channel.getCloseFuture().addListener(new ChannelFutureListener() {
                     @Override
                     public void operationComplete(final ChannelFuture future) throws Exception {
+                        MDC.put("requestId", serverEvent.getChannel().getId().toString());
+
                         latency = System.currentTimeMillis() - startTime;
                         if (!isRequestCompleted()) {
                             LOG.debug("Operation complete for channel partner: {}", getName());
@@ -521,7 +526,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     if (cat == segmentCategories[i]) {
                         if (isIABCategory) {
                             return getValueFromListAsString(iabCategoryMap.getIABCategories(segmentCategories[i]),
-                                seperator);
+                                    seperator);
 
                         }
                         category = CategoryList.getCategory(cat);
