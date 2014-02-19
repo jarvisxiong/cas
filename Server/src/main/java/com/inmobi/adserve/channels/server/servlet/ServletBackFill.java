@@ -1,5 +1,25 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.ws.rs.Path;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.handler.codec.http.QueryStringDecoder;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
@@ -9,37 +29,38 @@ import com.inmobi.adserve.channels.entity.PublisherFilterEntity;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.ServletHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
-import com.inmobi.adserve.channels.server.requesthandler.*;
+import com.inmobi.adserve.channels.server.beans.CasContext;
+import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
+import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
+import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
+import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
+import com.inmobi.adserve.channels.server.requesthandler.beans.AdvertiserMatchedSegmentDetail;
+import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilterApplier;
+import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.QueryStringDecoder;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
-import javax.inject.Inject;
-import javax.ws.rs.Path;
-import java.util.*;
 
 
 @Singleton
 @Path("/backfill")
 public class ServletBackFill implements Servlet {
-    private static final Logger    LOG = LoggerFactory.getLogger(ServletBackFill.class);
+    private static final Logger               LOG = LoggerFactory.getLogger(ServletBackFill.class);
 
-    private final MatchSegments    matchSegments;
-    private final Provider<Marker> traceMarkerProvider;
-    private final RequestParser    requestParser;
+    private final MatchSegments               matchSegments;
+    private final Provider<Marker>            traceMarkerProvider;
+    private final RequestParser               requestParser;
+    private final ChannelSegmentFilterApplier channelSegmentFilterApplier;
+    private final CasUtils                    casUtils;
 
     @Inject
     ServletBackFill(final MatchSegments matchSegments, final Provider<Marker> traceMarkerProvider,
-            final RequestParser requestParser) {
+            final ChannelSegmentFilterApplier channelSegmentFilterApplier, final RequestParser requestParser,
+            final CasUtils casUtils) {
         this.matchSegments = matchSegments;
         this.traceMarkerProvider = traceMarkerProvider;
         this.requestParser = requestParser;
+        this.channelSegmentFilterApplier = channelSegmentFilterApplier;
+        this.casUtils = casUtils;
     }
 
     @Override
@@ -47,6 +68,8 @@ public class ServletBackFill implements Servlet {
             final MessageEvent e) throws Exception {
 
         Marker traceMarker = traceMarkerProvider.get();
+
+        CasContext casContext = new CasContext();
 
         InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
 
@@ -99,7 +122,7 @@ public class ServletBackFill implements Servlet {
         }
         if (!hrh.responseSender.sasParams.getAllowBannerAds() || hrh.responseSender.sasParams.getSiteFloor() > 5) {
             LOG.error(traceMarker,
-                "Request not being served because of banner not allowed or site floor above threshold");
+                    "Request not being served because of banner not allowed or site floor above threshold");
             hrh.responseSender.sendNoAdResponse(e);
             return;
         }
@@ -114,9 +137,7 @@ public class ServletBackFill implements Servlet {
         if (hrh.responseSender.sasParams.getSdkVersion() != null) {
             try {
                 if ((hrh.responseSender.sasParams.getSdkVersion().substring(0, 1).equalsIgnoreCase("i") || hrh.responseSender.sasParams
-                        .getSdkVersion()
-                            .substring(0, 1)
-                            .equalsIgnoreCase("a"))
+                        .getSdkVersion().substring(0, 1).equalsIgnoreCase("a"))
                         && Integer.parseInt(hrh.responseSender.sasParams.getSdkVersion().substring(1, 2)) < 3) {
                     LOG.error(traceMarker, "Terminating request as sdkVersion is less than 3");
                     hrh.setTerminationReason(ServletHandler.lowSdkVersion);
@@ -160,20 +181,20 @@ public class ServletBackFill implements Servlet {
         LOG.debug(traceMarker, "imai base url is {}", hrh.responseSender.sasParams.getImaiBaseUrl());
 
         // getting the selected third party site details
-        Map<String, HashMap<String, ChannelSegment>> matchedSegments = matchSegments
+        List<AdvertiserMatchedSegmentDetail> matchedSegmentDetails = matchSegments
                 .matchSegments(hrh.responseSender.sasParams);
 
-        if (matchedSegments == null || matchedSegments.isEmpty()) {
+        if (CollectionUtils.isEmpty(matchedSegmentDetails)) {
             LOG.debug(traceMarker, "No Entities matching the request.");
             hrh.responseSender.sendNoAdResponse(e);
             return;
         }
 
         hrh.responseSender.sasParams.setSiteFloor(0.0);
-        Filters filter = new Filters(matchedSegments, ServletHandler.getServerConfig(),
-                ServletHandler.getAdapterConfig(), hrh.responseSender.sasParams, ServletHandler.repositoryHelper);
+
         // applying all the filters
-        List<ChannelSegment> filteredSegments = filter.applyFilters();
+        List<ChannelSegment> filteredSegments = channelSegmentFilterApplier.getChannelSegments(matchedSegmentDetails,
+                sasParams, casContext);
 
         if (filteredSegments == null || filteredSegments.size() == 0) {
             LOG.debug(traceMarker, "All segments dropped in filters");
@@ -207,16 +228,14 @@ public class ServletBackFill implements Servlet {
         LOG.debug(traceMarker, "blockedCategories are {}", casInternalRequestParametersGlobal.blockedCategories);
         LOG.debug(traceMarker, "blockedAdvertisers are {}", casInternalRequestParametersGlobal.blockedAdvertisers);
         double minimumRtbFloor = 0.05;
-        double segmentFloor = 0.0;
+        double segmentFloor = casUtils.getRtbFloor(casContext, sasParams);
         // RTB floor is being passed as segmentFloor
-        LOG.debug(traceMarker, "RTB floor from the pricing engine entity is {}", filter.getRtbFloor());
-        if (null != filter.getRtbFloor()) {
-            segmentFloor = filter.getRtbFloor();
-        }
+        LOG.debug(traceMarker, "RTB floor from the pricing engine entity is {}", segmentFloor);
+
         casInternalRequestParametersGlobal.rtbBidFloor = hrh.responseSender.getAuctionEngine().calculateRTBFloor(
-            sasParams.getSiteFloor(), 0.0, segmentFloor, minimumRtbFloor);
+                sasParams.getSiteFloor(), 0.0, segmentFloor, minimumRtbFloor);
         LOG.debug(traceMarker, "site floor was {}  segmentFloor was  {}  minimum rtb floor {}  and rtbFloor is {} ",
-            sasParams.getSiteFloor(), segmentFloor, minimumRtbFloor, casInternalRequestParametersGlobal.rtbBidFloor);
+                sasParams.getSiteFloor(), segmentFloor, minimumRtbFloor, casInternalRequestParametersGlobal.rtbBidFloor);
         // Generating auction id using site Inc Id
         casInternalRequestParametersGlobal.auctionId = AsyncRequestMaker.getImpressionId(sasParams.getSiteIncId());
         hrh.responseSender.casInternalRequestParameters = casInternalRequestParametersGlobal;
@@ -227,9 +246,9 @@ public class ServletBackFill implements Servlet {
         List<ChannelSegment> dcpSegments;
 
         dcpSegments = AsyncRequestMaker.prepareForAsyncRequest(filteredSegments, ServletHandler.getServerConfig(),
-            ServletHandler.getRtbConfig(), ServletHandler.getAdapterConfig(), hrh.responseSender, advertiserSet, e,
-            ServletHandler.repositoryHelper, hrh.jObject, hrh.responseSender.sasParams,
-            casInternalRequestParametersGlobal, rtbSegments);
+                ServletHandler.getRtbConfig(), ServletHandler.getAdapterConfig(), hrh.responseSender, advertiserSet, e,
+                ServletHandler.repositoryHelper, hrh.jObject, hrh.responseSender.sasParams,
+                casInternalRequestParametersGlobal, rtbSegments);
 
         LOG.debug(traceMarker, "rtb rankList size is {}", rtbSegments.size());
         if (dcpSegments.isEmpty() && rtbSegments.isEmpty()) {
@@ -238,32 +257,14 @@ public class ServletBackFill implements Servlet {
             return;
         }
 
-        List<ChannelSegment> tempRankList;
-
-        boolean gDFlag = ServletHandler.getServerConfig().getBoolean("guaranteedDelivery");
-        if (gDFlag) {
-            tempRankList = filter.rankAdapters(dcpSegments);
-            if (!tempRankList.isEmpty()) {
-                tempRankList = filter.ensureGuaranteedDelivery(tempRankList);
-            }
-            if (!rtbSegments.isEmpty()) {
-                rtbSegments = filter.ensureGuaranteedDeliveryInCaseOfRTB(rtbSegments, tempRankList);
-            }
-        }
-        else {
-            tempRankList = dcpSegments;
-        }
-        tempRankList = AsyncRequestMaker.makeAsyncRequests(tempRankList, e, rtbSegments);
+        List<ChannelSegment> tempRankList = AsyncRequestMaker.makeAsyncRequests(dcpSegments, e, rtbSegments);
 
         hrh.responseSender.setRankList(tempRankList);
         hrh.responseSender.getAuctionEngine().setRtbSegments(rtbSegments);
         LOG.debug(traceMarker, "Number of tpans whose request was successfully completed {}", hrh.responseSender
-                .getRankList()
-                    .size());
+                .getRankList().size());
         LOG.debug(traceMarker, "Number of rtb tpans whose request was successfully completed {}", hrh.responseSender
-                .getAuctionEngine()
-                    .getRtbSegments()
-                    .size());
+                .getAuctionEngine().getRtbSegments().size());
         // if none of the async request succeed, we return "NO_AD"
         if (hrh.responseSender.getRankList().isEmpty()
                 && hrh.responseSender.getAuctionEngine().getRtbSegments().isEmpty()) {
@@ -282,9 +283,8 @@ public class ServletBackFill implements Servlet {
             }
             // Resetting the rankIndexToProcess for already completed adapters.
             hrh.responseSender.processDcpList(e);
-            LOG.debug(traceMarker, "returned from send Response, ranklist size is {}", hrh.responseSender
-                    .getRankList()
-                        .size());
+            LOG.debug(traceMarker, "returned from send Response, ranklist size is {}", hrh.responseSender.getRankList()
+                    .size());
         }
     }
 

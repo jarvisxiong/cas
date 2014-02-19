@@ -55,12 +55,12 @@ public class ChannelServerPipelineFactory implements ChannelPipelineFactory {
     @Override
     public ChannelPipeline getPipeline() throws Exception {
         ChannelPipeline pipeline = pipeline();
-        pipeline.addLast("requestIdHandler", requestIdHandler);
         pipeline.addLast("incomingLimitHandler", incomingConnectionLimitHandler);
         pipeline.addLast("decoder", new HttpRequestDecoder());
         pipeline.addLast("encoder", new HttpResponseEncoder());
         pipeline.addLast("httpchunkhandler", new HttpChunkAggregator(100000000));
         pipeline.addLast("executionHandler", executionHandler);
+        pipeline.addLast("requestIdHandler", requestIdHandler);
         pipeline.addLast("idleStateHandler", new IdleStateHandler(this.timer, 0, 0, serverTimeoutMillis,
                 TimeUnit.MILLISECONDS));
         pipeline.addLast("traceMarkerhandler", traceMarkerhandler);
