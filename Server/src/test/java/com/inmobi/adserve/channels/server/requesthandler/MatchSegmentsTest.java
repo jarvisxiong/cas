@@ -22,28 +22,28 @@ import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ServletHandler;
 import com.inmobi.adserve.channels.server.module.NettyModule;
+import com.inmobi.adserve.channels.server.module.ScopeModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 
 
 public class MatchSegmentsTest extends TestCase {
     private static final String CHANNEL_SERVER_CONFIG_FILE = "/opt/mkhoj/conf/cas/channel-server.properties";
-    private ConfigurationLoader config;
+    private ConfigurationLoader configurationLoder;
     private MatchSegments       matchSegments;
 
     @Override
     public void setUp() throws ClassNotFoundException {
 
-        config = ConfigurationLoader.getInstance(CHANNEL_SERVER_CONFIG_FILE);
-        System.out.println(config.getAdapterConfiguration());
+        configurationLoder = ConfigurationLoader.getInstance(CHANNEL_SERVER_CONFIG_FILE);
+        System.out.println(configurationLoder.getAdapterConfiguration());
 
         RepositoryHelper repositoryHelper = createMock(RepositoryHelper.class);
 
-        ServletHandler.init(config, repositoryHelper);
+        ServletHandler.init(configurationLoder, repositoryHelper);
 
-        Injector injector = Guice.createInjector(new NettyModule(config.getServerConfiguration()), new ServerModule(
-                config.getLoggerConfiguration(), config.getAdapterConfiguration(), config.getServerConfiguration(),
-                repositoryHelper));
+        Injector injector = Guice.createInjector(new NettyModule(configurationLoder.getServerConfiguration(), 8800),
+                new ServerModule(configurationLoder, repositoryHelper), new ScopeModule());
 
         matchSegments = injector.getInstance(MatchSegments.class);
 
@@ -53,7 +53,7 @@ public class MatchSegmentsTest extends TestCase {
     public void testGetCategories() throws SecurityException, NoSuchMethodException, IllegalArgumentException,
             IllegalAccessException, InvocationTargetException {
 
-        ServletHandler.init(config, null);
+        ServletHandler.init(configurationLoder, null);
         Configuration mockConfig = createMock(Configuration.class);
         SASRequestParameters sasRequestParameters = new SASRequestParameters();
         sasRequestParameters.setSiteId("1");

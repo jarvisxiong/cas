@@ -29,6 +29,7 @@ import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.ServletHandler;
+import com.inmobi.adserve.channels.server.annotations.RtbConfiguration;
 import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
 import com.inmobi.adserve.channels.server.module.AdapterConfigModule;
 import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilterApplierTest;
@@ -78,6 +79,9 @@ public class AuctionEngineTest {
             protected void configure() {
                 bind(Configuration.class).annotatedWith(ServerConfiguration.class).toInstance(
                         config.getServerConfiguration());
+                bind(Configuration.class).annotatedWith(RtbConfiguration.class)
+                        .toInstance(config.getRtbConfiguration());
+
                 install(new AdapterConfigModule(config.getAdapterConfiguration(), ChannelServer.dataCentreName));
                 requestStaticInjection(AuctionEngine.class);
             }

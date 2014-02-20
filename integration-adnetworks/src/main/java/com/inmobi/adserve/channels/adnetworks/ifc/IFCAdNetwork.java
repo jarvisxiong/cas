@@ -70,7 +70,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
     public IFCAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
         super(config, clientBootstrap, baseRequestHandler, serverEvent);
-        ifcURL = config.getString("ifc.url");
+        ifcURL = config.getString("ifc.host");
     }
 
     @Override
@@ -128,6 +128,9 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             String sdkVersion = stringifyParam(jsonObject, "sdk-version", false);
             if (sdkVersion != null
                     && (sdkVersion.toLowerCase().startsWith("i30") || sdkVersion.toLowerCase().startsWith("a30"))) {
+                return false;
+            }
+            if ((sdkVersion == null || sdkVersion.toLowerCase().equals("0")) && adcode.equalsIgnoreCase("non-js")) {
                 return false;
             }
         }

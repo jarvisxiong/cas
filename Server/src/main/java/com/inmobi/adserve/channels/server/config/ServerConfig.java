@@ -8,6 +8,7 @@ import org.apache.commons.configuration.Configuration;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.server.annotations.RtbConfiguration;
 import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
 
 
@@ -19,10 +20,21 @@ import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
 public class ServerConfig implements CasConfig {
 
     private final Configuration serverConfiguration;
+    private final Configuration rtbConfiguration;
 
     @Inject
-    public ServerConfig(@ServerConfiguration final Configuration serverConfiguration) {
+    public ServerConfig(@ServerConfiguration final Configuration serverConfiguration,
+            @RtbConfiguration final Configuration rtbConfiguration) {
         this.serverConfiguration = serverConfiguration;
+        this.rtbConfiguration = rtbConfiguration;
+    }
+
+    public boolean isRtbEnabled() {
+        return rtbConfiguration.getBoolean("isRtbEnabled");
+    }
+
+    public int getRtbRequestTimeoutInMillis() {
+        return rtbConfiguration.getInt("RTBreadtimeoutMillis");
     }
 
     public double getRevenueWindow() {

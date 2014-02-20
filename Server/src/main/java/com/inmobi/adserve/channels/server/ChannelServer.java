@@ -45,6 +45,7 @@ import com.inmobi.adserve.channels.server.api.ConnectionType;
 import com.inmobi.adserve.channels.server.client.BootstrapCreation;
 import com.inmobi.adserve.channels.server.client.RtbBootstrapCreation;
 import com.inmobi.adserve.channels.server.module.NettyModule;
+import com.inmobi.adserve.channels.server.module.ScopeModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
 import com.inmobi.adserve.channels.server.netty.NettyServer;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
@@ -84,9 +85,9 @@ public class ChannelServer {
 
     public static void main(final String[] args) throws Exception {
         try {
-            ConfigurationLoader config = ConfigurationLoader.getInstance(configFile);
+            ConfigurationLoader configurationLoader = ConfigurationLoader.getInstance(configFile);
 
-            if (!checkLogFolders(config.getLog4jConfiguration())) {
+            if (!checkLogFolders(configurationLoader.getLog4jConfiguration())) {
                 System.out.println("Log folders are not available so exiting..");
                 return;
             }
@@ -97,7 +98,7 @@ public class ChannelServer {
             SlotSizeMapping.init();
             Formatter.init();
 
-            PropertyConfigurator.configure(config.getLoggerConfiguration().getString("log4jLoggerConf"));
+            PropertyConfigurator.configure(configurationLoader.getLoggerConfiguration().getString("log4jLoggerConf"));
             logger = Logger.getLogger("repository");
             logger.debug("Initializing logger completed");
 
@@ -113,17 +114,18 @@ public class ChannelServer {
             // Initialising logging - Write to databus
             AbstractMessagePublisher dataBusPublisher = (AbstractMessagePublisher) MessagePublisherFactory
                     .create(configFile);
-            String rrLogKey = config.getServerConfiguration().getString("rrLogKey");
-            String channelLogKey = config.getServerConfiguration().getString("channelLogKey");
-            String advertisementLogKey = config.getServerConfiguration().getString("adsLogKey");
+            String rrLogKey = configurationLoader.getServerConfiguration().getString("rrLogKey");
+            String channelLogKey = configurationLoader.getServerConfiguration().getString("channelLogKey");
+            String advertisementLogKey = configurationLoader.getServerConfiguration().getString("adsLogKey");
             Logging.init(dataBusPublisher, rrLogKey, channelLogKey, advertisementLogKey,
-                    config.getServerConfiguration());
+                    configurationLoader.getServerConfiguration());
 
             // Initializing graphite stats
             MetricsManager.init(
-                    config.getServerConfiguration().getString("graphiteServer.host", "mon02.ads.uj1.inmobi.com"),
-                    config.getServerConfiguration().getInt("graphiteServer.port", 2003), config
-                            .getServerConfiguration().getInt("graphiteServer.intervalInMinutes", 1));
+                    configurationLoader.getServerConfiguration().getString("graphiteServer.host",
+                            "mon02.ads.uj1.inmobi.com"),
+                    configurationLoader.getServerConfiguration().getInt("graphiteServer.port", 2003),
+                    configurationLoader.getServerConfiguration().getInt("graphiteServer.intervalInMinutes", 1));
             channelAdGroupRepository = new ChannelAdGroupRepository();
             channelRepository = new ChannelRepository();
             channelFeedbackRepository = new ChannelFeedbackRepository();
@@ -150,8 +152,8 @@ public class ChannelServer {
             repoHelperBuilder.setCurrencyConversionRepository(currencyConversionRepository);
             RepositoryHelper repositoryHelper = repoHelperBuilder.build();
 
-            instantiateRepository(logger, config);
-            ServletHandler.init(config, repositoryHelper);
+            instantiateRepository(logger, configurationLoader);
+            ServletHandler.init(configurationLoader, repositoryHelper);
             Integer maxIncomingConnections = channelServerHelper.getMaxConnections(
                     ChannelServerStringLiterals.INCOMING_CONNECTIONS, ConnectionType.INCOMING);
             Integer maxRTbdOutGoingConnections = channelServerHelper.getMaxConnections(
@@ -168,25 +170,20 @@ public class ChannelServer {
                 ServletHandler.getServerConfig().setProperty("dcpOutGoingMaxConnections", maxDCpOutGoingConnections);
             }
 
-            Injector injector = Guice.createInjector(
-                    new NettyModule(config.getServerConfiguration()),
-                    new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(), config
-                            .getServerConfiguration(), repositoryHelper));
-
             // Creating netty client for out-bound calls.
             Timer timer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
             BootstrapCreation.init(timer);
             RtbBootstrapCreation.init(timer);
-            ClientBootstrap clientBootstrap = BootstrapCreation
-                    .createBootstrap(logger, config.getServerConfiguration());
+            ClientBootstrap clientBootstrap = BootstrapCreation.createBootstrap(logger,
+                    configurationLoader.getServerConfiguration());
             ClientBootstrap rtbClientBootstrap = RtbBootstrapCreation.createBootstrap(logger,
-                    config.getRtbConfiguration());
+                    configurationLoader.getRtbConfiguration());
 
             // For some partners netty client does not work thus
             // Creating a ning client for out-bound calls
             AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder()
-                    .setRequestTimeoutInMs(config.getServerConfiguration().getInt("readtimeoutMillis") - 100)
-                    .setConnectionTimeoutInMs(config.getServerConfiguration().getInt("readtimeoutMillis") - 200)
+                    .setRequestTimeoutInMs(configurationLoader.getServerConfiguration().getInt("readtimeoutMillis") - 100)
+                    .setConnectionTimeoutInMs(configurationLoader.getServerConfiguration().getInt("readtimeoutMillis") - 200)
                     .build();
             AsyncHttpClient asyncHttpClient = new AsyncHttpClient(asyncHttpClientConfig);
 
@@ -202,12 +199,25 @@ public class ChannelServer {
             // Initialising request handler
             AsyncRequestMaker.init(clientBootstrap, rtbClientBootstrap, asyncHttpClient);
 
-            final NettyServer server = injector.getInstance(NettyServer.class);
+            Injector parentInjector = Guice.createInjector(new ScopeModule());
+
+            Injector serverInjector = parentInjector.createChildInjector(
+                    new NettyModule(configurationLoader.getServerConfiguration(), 8800), new ServerModule(
+                            configurationLoader, repositoryHelper));
+            final NettyServer server = serverInjector.getInstance(NettyServer.class);
             server.startAndWait();
+
+            Injector statInjector = parentInjector.createChildInjector(
+                    new NettyModule(configurationLoader.getServerConfiguration(), 8801), new ServerModule(
+                            configurationLoader, repositoryHelper));
+            final NettyServer statusServer = statInjector.getInstance(NettyServer.class);
+            statusServer.startAndWait();
+
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
                     server.stopAndWait();
+                    statusServer.stopAndWait();
                 }
             });
 
@@ -347,8 +357,8 @@ public class ChannelServer {
         else if (DataCenter.UJ1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
             colo = DataCenter.UJ1;
         }
-        else if (DataCenter.UJ1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
-            colo = DataCenter.UJ1;
+        else if (DataCenter.UH1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
+            colo = DataCenter.UH1;
         }
         else if (DataCenter.LHR1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
             colo = DataCenter.LHR1;

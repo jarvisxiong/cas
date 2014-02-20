@@ -66,13 +66,13 @@ public class AdGroupPartnerCountFilter implements AdGroupLevelFilter {
                 boolean result = failedInFilter(selectedSegmentListForAdvertiser.size(), adapterConfig);
 
                 if (result) {
-                    LOG.debug(traceMarker, "Failed in filter {}  , advertiser {}", this.getClass().getName(),
+                    LOG.debug(traceMarker, "Failed in filter {}  , advertiser {}", this.getClass().getSimpleName(),
                             advertiserId);
                     break;
                 }
                 else {
                     selectedSegmentListForAdvertiser.add(channelSegment);
-                    LOG.debug(traceMarker, "Passed in filter {} ,  advertiser {}", this.getClass().getName(),
+                    LOG.debug(traceMarker, "Passed in filter {} ,  advertiser {}", this.getClass().getSimpleName(),
                             advertiserId);
                     incrementStats(channelSegment);
                 }

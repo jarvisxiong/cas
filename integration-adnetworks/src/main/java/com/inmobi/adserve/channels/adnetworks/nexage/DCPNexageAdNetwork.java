@@ -14,6 +14,7 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -242,6 +243,8 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
                 @Override
                 public Response onCompleted(final Response response) throws Exception {
+                    MDC.put("requestId", serverEvent.getChannel().getId().toString());
+
                     if (!isRequestCompleted()) {
                         LOG.debug("Operation complete for channel partner: {}", getName());
                         latency = System.currentTimeMillis() - startTime;
@@ -256,6 +259,8 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
 
                 @Override
                 public void onThrowable(final Throwable t) {
+                    MDC.put("requestId", serverEvent.getChannel().getId().toString());
+
                     if (isRequestComplete) {
                         return;
                     }
@@ -296,7 +301,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
         }
         try {
             responseContent = Formatter.getResponseFromTemplate(TemplateType.NEXAGE_JS_AD_TAG, context, sasParams,
-                beaconUrl);
+                    beaconUrl);
             adStatus = "AD";
         }
         catch (Exception exception) {
@@ -307,15 +312,12 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
     }
 
     private void setNingRequest(final String requestUrl) {
-        ningRequest = new RequestBuilder()
-                .setUrl(requestUrl)
-                    .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-                    .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
-                    .setHeader(HttpHeaders.Names.REFERER, requestUrl)
-                    .setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE)
-                    .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
-                    .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-                    .build();
+        ningRequest = new RequestBuilder().setUrl(requestUrl)
+                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
+                .setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE)
+                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
+                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp()).build();
     }
 
     @Override

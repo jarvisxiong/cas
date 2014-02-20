@@ -89,13 +89,13 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
     private String                       advertiserId1;
     private String                       advertiserId2;
     private String                       advertiserId3;
-    private ConfigurationLoader          config;
+    private ConfigurationLoader          configurationLoder;
 
     @Override
     public void setUp() throws Exception {
 
-        config = ConfigurationLoader.getInstance("channel-server.properties");
-        ServletHandler.init(config, null);
+        configurationLoder = ConfigurationLoader.getInstance("channel-server.properties");
+        ServletHandler.init(configurationLoder, null);
         emptySet = new HashSet<String>();
         emptySet2 = new HashSet<String>();
 
@@ -231,21 +231,19 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         sasParams.setRqAdType("int");
         sasParams.setSiteId("siteid");
 
-        injector = Guice.createInjector(
-                new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(), config
-                        .getServerConfiguration(), repositoryHelper), new AbstractModule() {
+        injector = Guice.createInjector(new ServerModule(configurationLoder, repositoryHelper), new AbstractModule() {
 
+            @Override
+            protected void configure() {
+                bind(Marker.class).toProvider(new Provider<Marker>() {
                     @Override
-                    protected void configure() {
-                        bind(Marker.class).toProvider(new Provider<Marker>() {
-                            @Override
-                            public Marker get() {
-                                return null;
-                            }
-                        });
-
+                    public Marker get() {
+                        return null;
                     }
                 });
+
+            }
+        });
 
         channelSegmentFilterApplier = injector.getInstance(ChannelSegmentFilterApplier.class);
 
@@ -787,9 +785,8 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         sasParams.setCountryStr("1");
         sasParams.setOsId(2);
 
-        Injector injector = Guice.createInjector(
-                new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(), config
-                        .getServerConfiguration(), repositoryHelper), new AbstractModule() {
+        Injector injector = Guice.createInjector(new ServerModule(configurationLoder, repositoryHelper),
+                new AbstractModule() {
 
                     @Override
                     protected void configure() {
@@ -825,9 +822,8 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         sasParams.setCountryStr("1");
         sasParams.setOsId(2);
 
-        Injector injector = Guice.createInjector(
-                new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(), config
-                        .getServerConfiguration(), repositoryHelper), new AbstractModule() {
+        Injector injector = Guice.createInjector(new ServerModule(configurationLoder, repositoryHelper),
+                new AbstractModule() {
 
                     @Override
                     protected void configure() {
@@ -871,9 +867,8 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         sasParams.setCountryStr("1");
         sasParams.setOsId(2);
 
-        Injector injector = Guice.createInjector(
-                new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(), config
-                        .getServerConfiguration(), repositoryHelper), new AbstractModule() {
+        Injector injector = Guice.createInjector(new ServerModule(configurationLoder, repositoryHelper),
+                new AbstractModule() {
 
                     @Override
                     protected void configure() {
@@ -923,9 +918,8 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         expect(repositoryHelper.querySiteEcpmRepository("siteid", 1, 2)).andReturn(null).anyTimes();
         replay(repositoryHelper);
 
-        Injector injector = Guice.createInjector(
-                new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(), config
-                        .getServerConfiguration(), repositoryHelper), new AbstractModule() {
+        Injector injector = Guice.createInjector(new ServerModule(configurationLoder, repositoryHelper),
+                new AbstractModule() {
 
                     @Override
                     protected void configure() {
@@ -981,9 +975,8 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         sasParams.setCountryStr("1");
         sasParams.setOsId(2);
 
-        Injector injector = Guice.createInjector(
-                new ServerModule(config.getLoggerConfiguration(), config.getAdapterConfiguration(), config
-                        .getServerConfiguration(), repositoryHelper), new AbstractModule() {
+        Injector injector = Guice.createInjector(new ServerModule(configurationLoder, repositoryHelper),
+                new AbstractModule() {
 
                     @Override
                     protected void configure() {
