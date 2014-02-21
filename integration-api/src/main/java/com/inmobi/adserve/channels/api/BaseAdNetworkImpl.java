@@ -134,6 +134,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         try {
             request = getHttpRequest();
             uri = new URI(request.getUri());
+            request.setUri(uri.getPath());
+            LOG.info(request.toString());
             LOG.debug("uri is {}", uri);
             LOG.info("url inside makeAsyncRequest is not null");
         }
@@ -573,6 +575,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         }
         if (StringUtils.isNotEmpty(casInternalRequestParameters.uidO1)) {
             return casInternalRequestParameters.uidO1;
+        }
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIDUS1)) {
+            return casInternalRequestParameters.uidIDUS1;
         }
         if (StringUtils.isNotEmpty(casInternalRequestParameters.uid)) {
             return casInternalRequestParameters.uid;
