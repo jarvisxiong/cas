@@ -35,7 +35,7 @@ public class AdGroupAdapterMismatchFilter extends AbstractAdGroupLevelFilter {
     protected AdGroupAdapterMismatchFilter(final Provider<Marker> traceMarkerProvider,
 
     final Map<String, AdapterConfig> advertiserIdConfigMap, final ServerConfig serverConfig) {
-        super(traceMarkerProvider, InspectorStrings.droppedInDstFilter);
+        super(traceMarkerProvider, InspectorStrings.ADAPTER_MISMATCH);
         this.advertiserIdConfigMap = advertiserIdConfigMap;
         this.serverConfig = serverConfig;
     }
@@ -54,11 +54,14 @@ public class AdGroupAdapterMismatchFilter extends AbstractAdGroupLevelFilter {
             return true;
         }
 
-        // if segment is dcp , then if adapter is not dcp -> drop the segment
-        if (channelSegment.getChannelSegmentEntity().getDst() == 2 && (adapterType != AdapterType.DCP)) {
+        // TODO: uncomment in UMP phase 2 release .
+        // if request is from dcp OR segment is dcp , then if adapter is not dcp -> drop the segment
+        if ((sasParams.getDst() == 2 || channelSegment.getChannelSegmentEntity().getDst() == 2)
+                && sasParams.isResponseOnlyFromDcp() && (adapterType != AdapterType.DCP)) {
             return true;
         }
 
         return false;
     }
+
 }
