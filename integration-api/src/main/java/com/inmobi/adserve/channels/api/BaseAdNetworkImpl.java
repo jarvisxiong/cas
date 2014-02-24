@@ -134,8 +134,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         try {
             request = getHttpRequest();
             uri = new URI(request.getUri());
-            request.setUri(uri.getPath());
-            LOG.info(request.toString());
             LOG.debug("uri is {}", uri);
             LOG.info("url inside makeAsyncRequest is not null");
         }
