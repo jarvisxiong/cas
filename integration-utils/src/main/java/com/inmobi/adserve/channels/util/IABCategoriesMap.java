@@ -97,13 +97,13 @@ public class IABCategoriesMap implements IABCategoriesInterface {
             "IAB5-2", "IAB6-7", "IAB7", "IAB7-10", "IAB7-11", "IAB7-12", "IAB7-13", "IAB7-14", "IAB7-16", "IAB7-18",
             "IAB7-19", "IAB7-2", "IAB7-20", "IAB7-21", "IAB7-22", "IAB7-24", "IAB7-25", "IAB7-27", "IAB7-28",
             "IAB7-29", "IAB7-3", "IAB7-30", "IAB7-31", "IAB7-34", "IAB7-36", "IAB7-37", "IAB7-38", "IAB7-39", "IAB7-4",
-            "IAB7-40", "IAB7-41", "IAB7-44", "IAB7-45", "IAB7-5", "IAB7-6", "IAB7-8", "IAB7-9", "IAB8-5", "IAB9-9" });
+            "IAB7-40", "IAB7-41", "IAB7-44", "IAB7-45", "IAB7-5", "IAB7-6", "IAB7-8", "IAB7-9", "IAB8-5", "IAB9-9","IAB19-3" });
         categoriesToIABMapping.put(PERFORMANCE_BLOCK_CATEGORIES, new String[] { "IAB11-1", "IAB11-2", "IAB14-3",
             "IAB23-2", "IAB25-2", "IAB25-3", "IAB25-4", "IAB25-5", "IAB26", "IAB26-1", "IAB26-2", "IAB26-3", "IAB26-4",
             "IAB5-2", "IAB6-7", "IAB7-10", "IAB7-11", "IAB7-12", "IAB7-13", "IAB7-14", "IAB7-16", "IAB7-18", "IAB7-19",
             "IAB7-2", "IAB7-20", "IAB7-21", "IAB7-22", "IAB7-24", "IAB7-25", "IAB7-27", "IAB7-28", "IAB7-29", "IAB7-3",
             "IAB7-30", "IAB7-31", "IAB7-34", "IAB7-36", "IAB7-37", "IAB7-38", "IAB7-39", "IAB7-40", "IAB7-44",
-            "IAB7-45", "IAB7-5", "IAB7-8", "IAB7-9", "IAB8-5" });
+            "IAB7-45", "IAB7-5", "IAB7-8", "IAB7-9", "IAB8-5","IAB19-3" });
     }
 
     @Override

@@ -567,6 +567,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         if (StringUtils.isNotEmpty(casInternalRequestParameters.uidO1)) {
             return casInternalRequestParameters.uidO1;
         }
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIDUS1)) {
+            return casInternalRequestParameters.uidIDUS1;
+        }
         if (StringUtils.isNotEmpty(casInternalRequestParameters.uid)) {
             return casInternalRequestParameters.uid;
         }
