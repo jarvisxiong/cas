@@ -127,13 +127,13 @@ public class ClickUrlMakerV6 {
             latlonval = builder.latlonval;
         }
         if (null == builder.creativeId) {
-            creativeId = "0";
+            creativeId = "";
         }
         else {
             creativeId = builder.creativeId;
         }
         if (null == builder.dst) {
-            dst = "2";
+            dst = "1";
         }
         else {
             dst = builder.dst;
