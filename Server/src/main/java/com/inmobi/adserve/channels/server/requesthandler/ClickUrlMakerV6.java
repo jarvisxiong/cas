@@ -127,7 +127,7 @@ public class ClickUrlMakerV6 {
             latlonval = builder.latlonval;
         }
         if (null == builder.creativeId) {
-            creativeId = "";
+            creativeId = "0";
         }
         else {
             creativeId = builder.creativeId;
