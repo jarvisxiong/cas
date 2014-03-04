@@ -1,5 +1,9 @@
 package com.inmobi.adserve.channels.adnetworks.huntmads;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -7,9 +11,6 @@ import java.net.URISyntaxException;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,9 +41,9 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
      * @param baseRequestHandler
      * @param serverEvent
      */
-    public DCPHuntmadsAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public DCPHuntmadsAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
     @Override
@@ -146,9 +147,9 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {}", response);
 
-        if (StringUtils.isEmpty(response) || status.getCode() != 200 || !response.startsWith("[{\"")
+        if (StringUtils.isEmpty(response) || status.code() != 200 || !response.startsWith("[{\"")
                 || response.startsWith("[{\"error")) {
-            statusCode = status.getCode();
+            statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
             }
@@ -163,7 +164,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
                 JSONObject adResponse = jArray.getJSONObject(0);
                 boolean textAd = !response.contains("type\": \"image");
 
-                statusCode = status.getCode();
+                statusCode = status.code();
                 VelocityContext context = new VelocityContext();
                 context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse.getString("url"));
                 String partnerBeacon = adResponse.getString("track");

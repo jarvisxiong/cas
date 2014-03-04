@@ -1,5 +1,9 @@
 package com.inmobi.adserve.channels.adnetworks.drawbridge;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -11,9 +15,6 @@ import java.util.MissingResourceException;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,9 +44,9 @@ public class DrawBridgeAdNetwork extends AbstractDCPAdNetworkImpl {
                                                                                                     // filter
     private static final String FILTER_IPOD   = "filter_iPod";
 
-    public DrawBridgeAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public DrawBridgeAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
     // Configure the request parameters for making the ad call
@@ -91,10 +92,8 @@ public class DrawBridgeAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         StringBuilder finalUrl = new StringBuilder();
-        finalUrl.append(config.getString("drawbridge.host"))
-                    .append(config.getString("drawbridge.partnerId"))
-                    .append("&_psign=")
-                    .append(config.getString("drawbridge.partnerSignature"));
+        finalUrl.append(config.getString("drawbridge.host")).append(config.getString("drawbridge.partnerId"))
+                .append("&_psign=").append(config.getString("drawbridge.partnerSignature"));
         if (!(StringUtils.isEmpty(sasParams.getRemoteHostIp()) || sasParams.getRemoteHostIp().equals("null"))) {
             finalUrl.append("&_clip=").append(sasParams.getRemoteHostIp());
         }
@@ -193,8 +192,8 @@ public class DrawBridgeAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {} and response length is {}", response, response.length());
-        if (status.getCode() != 200 || StringUtils.isBlank(response)) {
-            statusCode = status.getCode();
+        if (status.code() != 200 || StringUtils.isBlank(response)) {
+            statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
             }
@@ -202,7 +201,7 @@ public class DrawBridgeAdNetwork extends AbstractDCPAdNetworkImpl {
             return;
         }
         else {
-            statusCode = status.getCode();
+            statusCode = status.code();
             VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
             context.remove(VelocityTemplateFieldConstants.IMBeaconUrl);

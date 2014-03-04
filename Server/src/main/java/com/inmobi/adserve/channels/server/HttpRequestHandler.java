@@ -1,5 +1,11 @@
 package com.inmobi.adserve.channels.server;
 
+import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.QueryStringDecoder;
+import io.netty.handler.timeout.IdleStateEvent;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetAddress;
@@ -17,17 +23,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.thrift.TException;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelStateEvent;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.group.ChannelGroup;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.QueryStringDecoder;
-import org.jboss.netty.handler.timeout.IdleState;
-import org.jboss.netty.handler.timeout.IdleStateAwareChannelUpstreamHandler;
-import org.jboss.netty.handler.timeout.IdleStateEvent;
-import org.jboss.netty.util.CharsetUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -40,23 +35,25 @@ import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
+import com.inmobi.adserve.channels.util.CommonUtils;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
 
-public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
+public class HttpRequestHandler extends ChannelDuplexHandler {
 
     private static final Logger LOG               = LoggerFactory.getLogger(HttpRequestHandler.class);
 
     public String               terminationReason = "NO";
     public JSONObject           jObject           = null;
     public ResponseSender       responseSender;
-    private ChannelGroup        allChannels;
 
     private Provider<Marker>    traceMarkerProvider;
     private Marker              traceMarker;
 
     private Provider<Servlet>   servletProvider;
+
+    private HttpRequest         httpRequest;
 
     public String getTerminationReason() {
         return terminationReason;
@@ -71,17 +68,41 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
     }
 
     @Inject
-    HttpRequestHandler(final ChannelGroup allChannels, final Provider<Marker> traceMarkerProvider,
-            final Provider<Servlet> servletProvider) {
-        this.allChannels = allChannels;
+    HttpRequestHandler(final Provider<Marker> traceMarkerProvider, final Provider<Servlet> servletProvider) {
         this.traceMarkerProvider = traceMarkerProvider;
         this.servletProvider = servletProvider;
         responseSender = new ResponseSender(this);
     }
 
+    // Invoked when request timeout.
     @Override
-    public void channelOpen(final ChannelHandlerContext ctx, final ChannelStateEvent e) throws Exception {
-        allChannels.add(e.getChannel());
+    public void userEventTriggered(final ChannelHandlerContext ctx, final Object evt) throws Exception {
+        // MDC.put("requestId", e.getChannel().getId().toString());
+
+        if (evt instanceof IdleStateEvent) {
+            IdleStateEvent e = (IdleStateEvent) evt;
+            if (ctx.channel().isOpen()) {
+                LOG.debug(traceMarker, "Channel is open in channelIdle handler");
+                if (responseSender.getRankList() != null) {
+                    for (ChannelSegment channelSegment : responseSender.getRankList()) {
+                        if (channelSegment.getAdNetworkInterface().getAdStatus().equals("AD")) {
+                            LOG.debug(traceMarker, "Got Ad from {} Top Rank was {}", channelSegment
+                                    .getAdNetworkInterface().getName(), responseSender.getRankList().get(0)
+                                    .getAdNetworkInterface().getName());
+                            responseSender.sendAdResponse(channelSegment.getAdNetworkInterface(), ctx.channel());
+                            return;
+                        }
+                    }
+                }
+                responseSender.sendNoAdResponse(ctx.channel());
+            }
+            // Whenever channel is Write_idle, increment the totalTimeout. It means
+            // server
+            // could not write the response with in 800 ms
+            LOG.debug(traceMarker, "inside channel idle event handler for Request channel ID: {}", ctx.channel());
+            InspectorStats.incrementStatCount(InspectorStrings.totalTimeout);
+            LOG.debug(traceMarker, "server timeout");
+        }
     }
 
     /**
@@ -89,75 +110,44 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
      * means channel is closed by party who requested for the ad
      */
     @Override
-    public void exceptionCaught(final ChannelHandlerContext ctx, final ExceptionEvent e) throws Exception {
-        MDC.put("requestId", e.getChannel().getId().toString());
+    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
+        MDC.put("requestId", String.valueOf(ctx.channel().hashCode()));
 
-        String exceptionString = e.getClass().getSimpleName();
+        String exceptionString = cause.getClass().getSimpleName();
         InspectorStats.incrementStatCount(InspectorStrings.channelException, exceptionString);
         InspectorStats.incrementStatCount(InspectorStrings.channelException, InspectorStrings.count);
         if (exceptionString.equalsIgnoreCase(ServletHandler.CLOSED_CHANNEL_EXCEPTION)
                 || exceptionString.equalsIgnoreCase(ServletHandler.CONNECTION_RESET_PEER)) {
             InspectorStats.incrementStatCount(InspectorStrings.totalTerminate);
-            LOG.debug(traceMarker, "Channel is terminated {}", ctx.getChannel().getId());
+            LOG.debug(traceMarker, "Channel is terminated {}", ctx.channel());
         }
-        LOG.info(traceMarker, "Getting netty error in HttpRequestHandler: {}", e);
-        if (e.getChannel().isOpen()) {
-            responseSender.sendNoAdResponse(e);
+        LOG.info(traceMarker, "Getting netty error in HttpRequestHandler: {}", cause);
+        if (ctx.channel().isOpen()) {
+            responseSender.sendNoAdResponse(ctx.channel());
         }
 
-        e.getChannel().close();
-    }
-
-    // Invoked when request timeout.
-    @Override
-    public void channelIdle(final ChannelHandlerContext ctx, final IdleStateEvent e) {
-        MDC.put("requestId", e.getChannel().getId().toString());
-
-        if (e.getChannel().isOpen()) {
-            LOG.debug(traceMarker, "Channel is open in channelIdle handler");
-            if (responseSender.getRankList() != null) {
-                for (ChannelSegment channelSegment : responseSender.getRankList()) {
-                    if (channelSegment.getAdNetworkInterface().getAdStatus().equals("AD")) {
-                        LOG.debug(traceMarker, "Got Ad from {} Top Rank was {}", channelSegment.getAdNetworkInterface()
-                                .getName(), responseSender.getRankList().get(0).getAdNetworkInterface().getName());
-                        responseSender.sendAdResponse(channelSegment.getAdNetworkInterface(), e);
-                        return;
-                    }
-                }
-            }
-            responseSender.sendNoAdResponse(e);
-        }
-        // Whenever channel is Write_idle, increment the totalTimeout. It means
-        // server
-        // could not write the response with in 800 ms
-        LOG.debug(traceMarker, "inside channel idle event handler for Request channel ID: {}", e.getChannel().getId());
-        if (e.getState() == IdleState.ALL_IDLE || e.getState() == IdleState.WRITER_IDLE) {
-            InspectorStats.incrementStatCount(InspectorStrings.totalTimeout);
-            LOG.debug(traceMarker, "server timeout");
-        }
+        ctx.channel().close();
     }
 
     // Invoked when message is received over the connection
     @Override
-    public void messageReceived(final ChannelHandlerContext ctx, final MessageEvent e) throws Exception {
+    public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
         try {
-            HttpRequest request = (HttpRequest) e.getMessage();
+            httpRequest = (HttpRequest) msg;
 
             traceMarker = traceMarkerProvider.get();
 
-            LOG.debug(traceMarker, request.getContent().toString(CharsetUtil.UTF_8));
-
             Servlet servlet = servletProvider.get();
 
-            LOG.debug(traceMarker, "Got the servlet {}", servlet.getName());
+            LOG.debug(traceMarker, "Got the servlet {} , uri {}", servlet.getName(), httpRequest.getUri());
 
-            servlet.handleRequest(this, new QueryStringDecoder(request.getUri()), e);
+            servlet.handleRequest(this, new QueryStringDecoder(httpRequest.getUri()), ctx.channel());
             return;
         }
         catch (Exception exception) {
             terminationReason = ServletHandler.processingError;
             InspectorStats.incrementStatCount(InspectorStrings.processingError, InspectorStrings.count);
-            responseSender.sendNoAdResponse(e);
+            responseSender.sendNoAdResponse(ctx.channel());
             String exceptionClass = exception.getClass().getSimpleName();
             // incrementing the count of the number of exceptions thrown in the
             // server code
@@ -170,6 +160,23 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
                 sendMail(exception.getMessage(), sw.toString());
             }
         }
+    }
+
+    public boolean isRequestFromLocalHost() {
+        String host = CommonUtils.getHost(httpRequest);
+
+        if (host != null && host.startsWith("localhost")) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return the httpRequest
+     */
+    public HttpRequest getHttpRequest() {
+        return httpRequest;
     }
 
     public void writeLogs(final ResponseSender responseSender) {

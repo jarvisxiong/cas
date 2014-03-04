@@ -1,9 +1,9 @@
 package com.inmobi.adserve.channels.api;
 
+import io.netty.handler.codec.http.HttpRequest;
+
 import java.net.URI;
 import java.util.Map;
-
-import org.jboss.netty.handler.codec.http.HttpRequest;
 
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 

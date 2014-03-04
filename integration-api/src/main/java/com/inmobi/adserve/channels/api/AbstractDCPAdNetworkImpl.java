@@ -1,8 +1,9 @@
 package com.inmobi.adserve.channels.api;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+
 import org.apache.commons.configuration.Configuration;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
 
 
 /**
@@ -13,9 +14,9 @@ public class AbstractDCPAdNetworkImpl extends BaseAdNetworkImpl {
 
     protected final Configuration config;
 
-    protected AbstractDCPAdNetworkImpl(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(baseRequestHandler, serverEvent);
+    protected AbstractDCPAdNetworkImpl(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(baseRequestHandler, serverChannel);
         this.config = config;
         this.clientBootstrap = clientBootstrap;
     }

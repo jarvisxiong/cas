@@ -73,6 +73,7 @@ public class ServerModule extends AbstractModule {
 
         install(new AdapterConfigModule(adapterConfiguration, ChannelServer.dataCentreName));
         install(new ChannelSegmentFilterModule());
+        install(new ScopeModule());
 
     }
 

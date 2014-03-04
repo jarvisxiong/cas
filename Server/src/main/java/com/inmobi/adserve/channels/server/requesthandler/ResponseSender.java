@@ -1,30 +1,39 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
+
+import java.awt.Dimension;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Charsets;
-import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.ChannelsClientHandler;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.ning.http.client.AsyncHttpClient;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.*;
-import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
-import org.jboss.netty.handler.codec.http.HttpResponse;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.awt.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.jboss.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
-import static org.jboss.netty.handler.codec.http.HttpResponseStatus.OK;
-import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 
 public class ResponseSender extends HttpRequestHandlerBase {
@@ -101,14 +110,15 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     @Override
-    public void sendAdResponse(final AdNetworkInterface selectedAdNetwork, final ChannelEvent event) {
+    public void sendAdResponse(final AdNetworkInterface selectedAdNetwork, final Channel channel) {
         adResponse = selectedAdNetwork.getResponseAd();
         selectedAdIndex = getRankIndex(selectedAdNetwork);
-        sendAdResponse(adResponse, event);
+        sendAdResponse(adResponse, channel);
     }
 
     // send Ad Response
-    public synchronized void sendAdResponse(final ThirdPartyAdResponse adResponse, final ChannelEvent event)
+    // TODO: does it need to be synchronized?
+    public synchronized void sendAdResponse(final ThirdPartyAdResponse adResponse, final Channel channel)
             throws NullPointerException {
         // Making sure response is sent only once
         if (responseSent) {
@@ -135,86 +145,72 @@ public class ResponseSender extends HttpRequestHandlerBase {
             if (getResponseFormat().equals("xhtml")) {
                 finalReponse = noAdXhtml;
             }
-            sendResponse(OK, finalReponse, adResponse.responseHeaders, event);
+            sendResponse(HttpResponseStatus.OK, finalReponse, adResponse.responseHeaders, channel);
             return;
         }
         if (6 != sasParams.getDst()) {
-            sendResponse(OK, finalReponse, adResponse.responseHeaders, event);
+            sendResponse(HttpResponseStatus.OK, finalReponse, adResponse.responseHeaders, channel);
         }
         else {
             JSONObject jsonObject = new JSONObject();
             try {
-                jsonObject.put("secondHighestBid", this
-                        .getAuctionEngine()
-                            .getRtbResponse()
-                            .getAdNetworkInterface()
-                            .getSecondBidPriceInUsd());
-                jsonObject.put("winnerBid", this
-                        .getAuctionEngine()
-                            .getRtbResponse()
-                            .getAdNetworkInterface()
-                            .getBidPriceInUsd());
+                jsonObject.put("secondHighestBid", this.getAuctionEngine().getRtbResponse().getAdNetworkInterface()
+                        .getSecondBidPriceInUsd());
+                jsonObject.put("winnerBid", this.getAuctionEngine().getRtbResponse().getAdNetworkInterface()
+                        .getBidPriceInUsd());
                 jsonObject.put("adm", finalReponse);
                 jsonObject.put("advertiserId", this.auctionEngine.getRtbResponse().getChannelEntity().getAccountId());
-                jsonObject.put("adgroupId", this.auctionEngine
-                        .getRtbResponse()
-                            .getChannelSegmentEntity()
-                            .getAdgroupId());
-                jsonObject.put("adgroupIncId", this.auctionEngine
-                        .getRtbResponse()
-                            .getChannelSegmentEntity()
-                            .getAdgroupIncId());
+                jsonObject.put("adgroupId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity()
+                        .getAdgroupId());
+                jsonObject.put("adgroupIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity()
+                        .getAdgroupIncId());
                 jsonObject.put("adIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getIncId());
                 jsonObject.put("adId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getAdId());
                 jsonObject.put("rtbFloor", casInternalRequestParameters.rtbBidFloor);
-                jsonObject.put("impressionId", this.auctionEngine
-                        .getRtbResponse()
-                            .getAdNetworkInterface()
-                            .getImpressionId());
-                jsonObject.put("campaignIncId", this.auctionEngine
-                        .getRtbResponse()
-                            .getChannelSegmentEntity()
-                            .getCampaignIncId());
-                jsonObject.put("campaignId", this.auctionEngine
-                        .getRtbResponse()
-                            .getChannelSegmentEntity()
-                            .getCampaignId());
+                jsonObject.put("impressionId", this.auctionEngine.getRtbResponse().getAdNetworkInterface()
+                        .getImpressionId());
+                jsonObject.put("campaignIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity()
+                        .getCampaignIncId());
+                jsonObject.put("campaignId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity()
+                        .getCampaignId());
                 InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
-                sendResponse(OK, jsonObject.toString(), adResponse.responseHeaders, event);
+                sendResponse(HttpResponseStatus.OK, jsonObject.toString(), adResponse.responseHeaders, channel);
                 LOG.debug("RTB reponse json to RE is {}", jsonObject);
             }
             catch (JSONException e) {
                 LOG.debug("Error while making json object for rule engine " + e.getMessage());
                 // Sending NOAD if error making json object
-                sendNoAdResponse(event);
+                sendNoAdResponse(channel);
             }
         }
     }
 
     // send response to the caller
     public void sendResponse(final HttpResponseStatus status, final String responseString, final Map responseHeaders,
-            final ChannelEvent event) throws NullPointerException {
+            final Channel channel) throws NullPointerException {
 
-        HttpResponse response = new DefaultHttpResponse(HTTP_1_1, status);
-        response.addHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-        response.addHeader("Expires", "-1");
-        response.addHeader("Pragma", "no-cache");
+        byte[] bytes = responseString.getBytes(Charsets.UTF_8);
+
+        // TODO: change to false after verification
+        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status,
+                Unpooled.wrappedBuffer(bytes), true);
+
+        HttpHeaders httpHeaders = response.headers();
+        httpHeaders.add(HttpHeaders.Names.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
+
+        httpHeaders.add(HttpHeaders.Names.EXPIRES, "-1");
+        httpHeaders.add(HttpHeaders.Names.PRAGMA, "no-cache");
 
         if (null != responseHeaders) {
-            for (Object key : responseHeaders.keySet()) {
-                response.addHeader(key.toString(), responseHeaders.get(key));
+            for (Map.Entry entry : (Set<Map.Entry>) responseHeaders.entrySet()) {
+                httpHeaders.add(entry.getKey().toString(), responseHeaders.get(entry.getValue()));
             }
         }
 
-        String finalResponse = responseString;
-        byte[] bytes = finalResponse.getBytes(Charsets.UTF_8);
+        httpHeaders.add(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
 
-        response.setHeader("Content-Length", bytes.length);
-        response.setContent(ChannelBuffers.copiedBuffer(bytes));
-
-        if (event != null) {
+        if (channel != null) {
             LOG.debug("event not null inside send Response");
-            Channel channel = event.getChannel();
             if (channel != null && channel.isWritable()) {
                 LOG.debug("channel not null inside send Response");
                 ChannelFuture future = channel.write(response);
@@ -233,8 +229,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     // send response to the caller
-    public void sendResponse(final String responseString, final ChannelEvent event) throws NullPointerException {
-        sendResponse(HttpResponseStatus.OK, responseString, null, event);
+    public void sendResponse(final String responseString, final Channel channel) throws NullPointerException {
+        sendResponse(HttpResponseStatus.OK, responseString, null, channel);
     }
 
     @Override
@@ -242,8 +238,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
         return auctionEngine;
     }
 
+    // TODO: does it need to be synchronized?
     @Override
-    public synchronized void sendNoAdResponse(final ChannelEvent event) throws NullPointerException {
+    public synchronized void sendNoAdResponse(final Channel channel) throws NullPointerException {
         // Making sure response is sent only once
         if (responseSent) {
             return;
@@ -259,16 +256,16 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
         LOG.debug("Sending No ads");
         if (getResponseFormat().equals("xhtml")) {
-            sendResponse(OK, noAdXhtml, headers, event);
+            sendResponse(HttpResponseStatus.OK, noAdXhtml, headers, channel);
         }
         else if (isJsAdRequest()) {
-            sendResponse(OK, String.format(noAdJsAdcode, sasParams.getRqIframe()), headers, event);
+            sendResponse(HttpResponseStatus.OK, String.format(noAdJsAdcode, sasParams.getRqIframe()), headers, channel);
         }
         else if (getResponseFormat().equalsIgnoreCase("imai")) {
-            sendResponse(NO_CONTENT, noAdImai, headers, event);
+            sendResponse(HttpResponseStatus.NO_CONTENT, noAdImai, headers, channel);
         }
         else {
-            sendResponse(OK, noAdHtml, headers, event);
+            sendResponse(HttpResponseStatus.OK, noAdHtml, headers, channel);
         }
     }
 
@@ -302,13 +299,13 @@ public class ResponseSender extends HttpRequestHandlerBase {
     // Iterates over the complete rank list and set the new value for
     // rankIndexToProcess.
     @Override
-    public void reassignRanks(final AdNetworkInterface adNetworkCaller, final MessageEvent event) {
+    public void reassignRanks(final AdNetworkInterface adNetworkCaller, final Channel channel) {
         int index = getRankIndex(adNetworkCaller);
         LOG.debug("reassignRanks called for {} and index is {}", adNetworkCaller.getName(), index);
 
         while (index < rankList.size()) {
-            ChannelSegment channel = rankList.get(index);
-            AdNetworkInterface adNetwork = channel.getAdNetworkInterface();
+            ChannelSegment channelSegment = rankList.get(index);
+            AdNetworkInterface adNetwork = channelSegment.getAdNetworkInterface();
 
             LOG.debug("reassignRanks iterating for {} and index is {}", adNetwork.getName(), index);
 
@@ -316,7 +313,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 if (adNetwork.getResponseAd().responseStatus == ThirdPartyAdResponse.ResponseStatus.SUCCESS) {
                     // Sends the response if request is completed for the
                     // specific adapter.
-                    sendAdResponse(adNetwork, event);
+                    sendAdResponse(adNetwork, channel);
                     break;
                 }
                 else {
@@ -333,7 +330,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
         // Sends no ad if reached to the end of the rank list.
         if (index == rankList.size()) {
-            sendNoAdResponse(event);
+            sendNoAdResponse(channel);
         }
     }
 
@@ -357,9 +354,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 rankList.get(index).getAdNetworkInterface().cleanUp();
             }
             catch (Exception exception) {
-                LOG.debug("Error in closing channel for index: {} Name: {} Exception: {}", index, rankList
-                        .get(index)
-                            .getAdNetworkInterface(), exception);
+                LOG.debug("Error in closing channel for index: {} Name: {} Exception: {}", index, rankList.get(index)
+                        .getAdNetworkInterface(), exception);
             }
         }
         for (int index = 0; rankList != null && index < rankList.size(); index++) {
@@ -379,9 +375,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 rtbList.get(index).getAdNetworkInterface().cleanUp();
             }
             catch (Exception exception) {
-                LOG.debug("Error in closing channel for index: {}  Name: {} Exception: {}", index, rtbList
-                        .get(index)
-                            .getAdNetworkInterface(), exception);
+                LOG.debug("Error in closing channel for index: {}  Name: {} Exception: {}", index, rtbList.get(index)
+                        .getAdNetworkInterface(), exception);
             }
         }
         for (int index = 0; rtbList != null && index < rtbList.size(); index++) {
@@ -425,12 +420,12 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     @Override
-    public void processDcpList(final MessageEvent serverEvent) {
+    public void processDcpList(final Channel channel) {
         // There would always be rtb partner before going to dcp list
         // So will iterate over the dcp list once.
         if (this.getRankList().isEmpty()) {
             LOG.debug("dcp list is empty so sending NoAd");
-            this.sendNoAdResponse(serverEvent);
+            this.sendNoAdResponse(channel);
             return;
         }
         int rankIndex = this.getRankIndexToProcess();
@@ -440,12 +435,12 @@ public class ResponseSender extends HttpRequestHandlerBase {
         ChannelSegment segment = this.getRankList().get(rankIndex);
         while (segment.getAdNetworkInterface().isRequestCompleted()) {
             if (segment.getAdNetworkInterface().getResponseAd().responseStatus == ResponseStatus.SUCCESS) {
-                this.sendAdResponse(segment.getAdNetworkInterface(), serverEvent);
+                this.sendAdResponse(segment.getAdNetworkInterface(), channel);
                 break;
             }
             rankIndex++;
             if (rankIndex >= this.getRankList().size()) {
-                this.sendNoAdResponse(serverEvent);
+                this.sendNoAdResponse(channel);
                 break;
             }
             segment = getRankList().get(rankIndex);
@@ -454,22 +449,22 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     @Override
-    public void processDcpPartner(final MessageEvent serverEvent, final AdNetworkInterface adNetworkInterface) {
+    public void processDcpPartner(final Channel channel, final AdNetworkInterface adNetworkInterface) {
         if (!this.isEligibleForProcess(adNetworkInterface)) {
             LOG.debug("{} is not eligible for processing", adNetworkInterface.getName());
             return;
         }
         LOG.debug("the channel is eligible for processing");
         if (adNetworkInterface.getResponseAd().responseStatus == ThirdPartyAdResponse.ResponseStatus.SUCCESS) {
-            sendAdResponse(adNetworkInterface, serverEvent);
+            sendAdResponse(adNetworkInterface, channel);
             cleanUp();
         }
         else if (isLastEntry(adNetworkInterface)) {
-            sendNoAdResponse(serverEvent);
+            sendNoAdResponse(channel);
             cleanUp();
         }
         else {
-            reassignRanks(adNetworkInterface, serverEvent);
+            reassignRanks(adNetworkInterface, channel);
         }
     }
 

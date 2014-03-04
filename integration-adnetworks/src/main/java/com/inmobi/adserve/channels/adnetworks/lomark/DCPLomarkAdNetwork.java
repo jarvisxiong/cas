@@ -1,5 +1,9 @@
 package com.inmobi.adserve.channels.adnetworks.lomark;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 import java.awt.Dimension;
 import java.io.IOException;
 import java.net.URI;
@@ -15,9 +19,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -83,9 +84,9 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
      * @param baseRequestHandler
      * @param serverEvent
      */
-    public DCPLomarkAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public DCPLomarkAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
     @Override
@@ -227,8 +228,8 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {} and response length is {}", response, response.length());
-        if (status.getCode() != 200 || StringUtils.isBlank(response)) {
-            statusCode = status.getCode();
+        if (status.code() != 200 || StringUtils.isBlank(response)) {
+            statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
             }
@@ -236,7 +237,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
             return;
         }
         else {
-            statusCode = status.getCode();
+            statusCode = status.code();
 
             try {
                 JSONObject jsonObject = new JSONObject(response);
@@ -287,7 +288,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
                 TemplateType type;
                 if (creativeType == 2) {
                     context.put(VelocityTemplateFieldConstants.AdText,
-                        displayInfo.getJSONObject("title").getString("text"));
+                            displayInfo.getJSONObject("title").getString("text"));
                     context.put(VelocityTemplateFieldConstants.Description, displayInfo.getString("subtitle"));
                     String vmTemplate = Formatter.getRichTextTemplateForSlot(slot);
                     if (StringUtils.isEmpty(vmTemplate)) {

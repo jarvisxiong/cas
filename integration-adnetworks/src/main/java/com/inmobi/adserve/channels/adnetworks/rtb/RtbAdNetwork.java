@@ -1,38 +1,71 @@
 package com.inmobi.adserve.channels.adnetworks.rtb;
 
-import com.google.gson.Gson;
-import com.inmobi.adserve.channels.api.*;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.util.*;
-import com.inmobi.casthrift.rtb.*;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.DefaultFullHttpRequest;
+import io.netty.handler.codec.http.DefaultHttpRequest;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
+import io.netty.util.CharsetUtil;
+
+import java.awt.Dimension;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+
 import lombok.Getter;
 import lombok.Setter;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TSimpleJSONProtocol;
 import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.*;
-import org.jboss.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.util.*;
-import java.util.List;
-import java.util.regex.Pattern;
+import com.google.gson.Gson;
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.util.IABCategoriesInterface;
+import com.inmobi.adserve.channels.util.IABCategoriesMap;
+import com.inmobi.adserve.channels.util.IABCitiesInterface;
+import com.inmobi.adserve.channels.util.IABCitiesMap;
+import com.inmobi.adserve.channels.util.IABCountriesInterface;
+import com.inmobi.adserve.channels.util.IABCountriesMap;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.casthrift.rtb.App;
+import com.inmobi.casthrift.rtb.Banner;
+import com.inmobi.casthrift.rtb.Bid;
+import com.inmobi.casthrift.rtb.BidRequest;
+import com.inmobi.casthrift.rtb.BidResponse;
+import com.inmobi.casthrift.rtb.Device;
+import com.inmobi.casthrift.rtb.Geo;
+import com.inmobi.casthrift.rtb.Impression;
+import com.inmobi.casthrift.rtb.SeatBid;
+import com.inmobi.casthrift.rtb.Site;
+import com.inmobi.casthrift.rtb.User;
 
 
 /**
@@ -89,11 +122,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     protected static final String          mraid                        = "<script src=\"mraid.js\" ></script>";
     private String                         encryptedBid;
     private static List<String>            mimes                        = Arrays.asList("image/jpeg", "image/gif",
-                                                                            "image/png");
+                                                                                "image/png");
     private static List<Integer>           fsBlockedAttributes          = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 13,
-                                                                            15, 16);
+                                                                                15, 16);
     private static List<Integer>           performanceBlockedAttributes = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-                                                                            11, 12, 13, 14, 15, 16);
+                                                                                11, 12, 13, 14, 15, 16);
     private static final String            FAMILY_SAFE_RATING           = "1";
     private static final String            PERFORMANCE_RATING           = "0";
     private static final String            RATING_KEY                   = "fs";
@@ -105,13 +138,13 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private static final String            USD                          = "USD";
     @Getter
     static List<String>                    currenciesSupported          = new ArrayList<String>(Arrays.asList("USD",
-                                                                            "RMB"));
+                                                                                "RMB"));
 
-    public RtbAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent, final String urlBase,
+    public RtbAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String urlBase,
             final String advertiserName, final int tmax, final RepositoryHelper repositoryHelper) {
 
-        super(baseRequestHandler, serverEvent);
+        super(baseRequestHandler, serverChannel);
         this.advertiserId = config.getString(advertiserName + ".advertiserId");
         this.urlArg = config.getString(advertiserName + ".urlArg");
         this.rtbVer = config.getString(advertiserName + ".rtbVer", "2.0");
@@ -209,11 +242,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             // Setting blocked categories
             if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
                 bidRequest.getBcat().addAll(
-                    iabCategoriesInterface.getIABCategories(IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES));
+                        iabCategoriesInterface.getIABCategories(IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES));
             }
             else {
                 bidRequest.getBcat().addAll(
-                    iabCategoriesInterface.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES));
+                        iabCategoriesInterface.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES));
             }
 
             if (null != casInternalRequestParameters.blockedAdvertisers) {
@@ -485,21 +518,16 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             LOG.debug("error in creating uri for callback");
         }
         StringBuilder content = new StringBuilder();
-        content.append("{\"bidid\"=")
-                    .append(bidResponse.bidid)
-                    .append(",\"seat\"=")
-                    .append(bidResponse.seatbid.get(0).getSeat());
-        content.append(",\"bid\"=")
-                    .append(bidResponse.seatbid.get(0).bid.get(0).id)
-                    .append(",\"adid\"=")
-                    .append(bidResponse.seatbid.get(0).bid.get(0).adid)
-                    .append("}");
+        content.append("{\"bidid\"=").append(bidResponse.bidid).append(",\"seat\"=")
+                .append(bidResponse.seatbid.get(0).getSeat());
+        content.append(",\"bid\"=").append(bidResponse.seatbid.get(0).bid.get(0).id).append(",\"adid\"=")
+                .append(bidResponse.seatbid.get(0).bid.get(0).adid).append("}");
+        ByteBuf buffer = Unpooled.copiedBuffer(content, Charset.defaultCharset());
+
         HttpRequest callBackRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET,
                 uriCallBack.toASCIIString());
-        callBackRequest.setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE);
-        ChannelBuffer buffer = ChannelBuffers.copiedBuffer(content, Charset.defaultCharset());
-        callBackRequest.addHeader(HttpHeaders.Names.CONTENT_LENGTH, buffer.readableBytes());
-        callBackRequest.setContent(buffer);
+        callBackRequest.headers().set(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE);
+        callBackRequest.headers().set(HttpHeaders.Names.CONTENT_LENGTH, buffer.readableBytes());
         boolean callbackResult = impressionCallbackHelper.writeResponse(clientBootstrap, uriCallBack, callBackRequest);
         if (callbackResult) {
             LOG.debug("Callback is sent successfully");
@@ -512,17 +540,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @SuppressWarnings("unused")
     private void setCallbackContent() {
         StringBuilder content = new StringBuilder();
-        content.append("{\"bidid\"=")
-                    .append(bidResponse.bidid)
-                    .append(",\"seat\"=")
-                    .append(bidResponse.seatbid.get(0).getSeat());
-        content.append(",\"bid\"=")
-                    .append(bidResponse.seatbid.get(0).bid.get(0).id)
-                    .append(",\"price\"=")
-                    .append(secondBidPriceInUsd)
-                    .append(",\"adid\"=")
-                    .append(bidResponse.seatbid.get(0).bid.get(0).adid)
-                    .append("}");
+        content.append("{\"bidid\"=").append(bidResponse.bidid).append(",\"seat\"=")
+                .append(bidResponse.seatbid.get(0).getSeat());
+        content.append(",\"bid\"=").append(bidResponse.seatbid.get(0).bid.get(0).id).append(",\"price\"=")
+                .append(secondBidPriceInUsd).append(",\"adid\"=").append(bidResponse.seatbid.get(0).bid.get(0).adid)
+                .append("}");
     }
 
     public String replaceRTBMacros(String url) {
@@ -531,29 +553,25 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (6 != sasParams.getDst()) {
             url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_PRICE_ENCRYPTED), encryptedBid);
             url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_PRICE),
-                Double.toString(secondBidPriceInLocal));
+                    Double.toString(secondBidPriceInLocal));
         }
         if (null != bidResponse.getSeatbid().get(0).getBid().get(0).getAdid()) {
             url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_AD_ID),
-                bidResponse.getSeatbid().get(0).getBid().get(0).getAdid());
+                    bidResponse.getSeatbid().get(0).getBid().get(0).getAdid());
         }
         if (null != bidResponse.bidid) {
             url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_BID_ID), bidResponse.bidid);
         }
         if (null != bidResponse.getSeatbid().get(0).getSeat()) {
-            url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_SEAT_ID), bidResponse
-                    .getSeatbid()
-                        .get(0)
-                        .getSeat());
+            url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_SEAT_ID), bidResponse.getSeatbid()
+                    .get(0).getSeat());
         }
         if (null == bidRequest) {
             LOG.info("bidrequest is null");
             return url;
         }
-        url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_IMP_ID), bidRequest
-                .getImp()
-                    .get(0)
-                    .getId());
+        url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_IMP_ID), bidRequest.getImp().get(0)
+                .getId());
         LOG.debug("String after replaceMacros is {}", url);
         return url;
     }
@@ -572,25 +590,25 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         try {
             URI uri = getRequestUri();
             requestUrl = (uri.toString());
-            request = (new DefaultHttpRequest(HttpVersion.HTTP_1_1, httpRequestMethod, uri.toASCIIString()));
+            ByteBuf buffer = Unpooled.copiedBuffer(bidRequestJson, CharsetUtil.UTF_8);
+
+            request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, httpRequestMethod, uri.toASCIIString());
             LOG.debug("host name is {}", uri.getHost());
-            request.setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json");
-            request.setHeader(X_OPENRTB_VERSION, rtbVer);
-            request.setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
-            request.setHeader(HttpHeaders.Names.HOST, uri.getHost());
+            request.headers().set(HttpHeaders.Names.CONTENT_TYPE, "application/json");
+            request.headers().set(X_OPENRTB_VERSION, rtbVer);
+            request.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
+            request.headers().set(HttpHeaders.Names.HOST, uri.getHost());
             if (null == bidRequest) {
                 LOG.debug("bidRequest is null so httpRequest is null");
                 return null;
             }
-            ChannelBuffer buffer = ChannelBuffers.copiedBuffer(bidRequestJson, CharsetUtil.UTF_8);
-            request.addHeader(HttpHeaders.Names.CONTENT_LENGTH, buffer.readableBytes());
-            request.setContent(buffer);
+            request.headers().set(HttpHeaders.Names.CONTENT_LENGTH, buffer.readableBytes());
         }
         catch (Exception ex) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.HTTPREQUEST_ERROR;
             LOG.info("Error in making http request for partner {} {}", advertiserName, ex);
         }
-        LOG.debug("content is {}", request.getContent());
+        LOG.debug("content is {}", bidRequestJson);
         return request;
     }
 
@@ -612,8 +630,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     public void parseResponse(final String response, final HttpResponseStatus status) {
         adStatus = "NO_AD";
         LOG.debug("response is {}", response);
-        if (status.getCode() != 200 || StringUtils.isBlank(response)) {
-            statusCode = status.getCode();
+        if (status.code() != 200 || StringUtils.isBlank(response)) {
+            statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
             }
@@ -621,7 +639,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             return;
         }
         else {
-            statusCode = status.getCode();
+            statusCode = status.code();
             boolean parsedResponse = deserializeResponse(response);
             if (!parsedResponse) {
                 adStatus = "NO_AD";
@@ -670,12 +688,12 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             velocityContext.put(VelocityTemplateFieldConstants.IMBeaconUrl, this.beaconUrl);
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.RTB_HTML, velocityContext, sasParams,
-                    null);
+                        null);
             }
             catch (Exception e) {
                 adStatus = "NO_AD";
                 LOG.info("Some exception is caught while filling the velocity template for partner{} {}",
-                    advertiserName, e);
+                        advertiserName, e);
             }
         }
         LOG.debug("response length is {}", responseContent.length());

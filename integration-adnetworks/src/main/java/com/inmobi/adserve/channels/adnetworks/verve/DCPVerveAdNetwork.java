@@ -1,5 +1,9 @@
 package com.inmobi.adserve.channels.adnetworks.verve;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -7,9 +11,6 @@ import java.net.URISyntaxException;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,9 +42,9 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final String TRUE_LAT_LONG_ONLY = "trueLatLongOnly";
     private boolean             sendTrueLatLongOnly;
 
-    public DCPVerveAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public DCPVerveAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
     @Override
@@ -61,9 +62,7 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
         }
         catch (JSONException e) {
             sendTrueLatLongOnly = false;
-            LOG
-                    .info("trueLatLong is not configured for the segment:{} {}", entity.getExternalSiteKey(),
-                        this.getName());
+            LOG.info("trueLatLong is not configured for the segment:{} {}", entity.getExternalSiteKey(), this.getName());
         }
 
         if (sendTrueLatLongOnly) {
@@ -196,8 +195,8 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {} and response length is {}", response, response.length());
-        if (status.getCode() != 200 || StringUtils.isBlank(response)) {
-            statusCode = status.getCode();
+        if (status.code() != 200 || StringUtils.isBlank(response)) {
+            statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
             }
@@ -205,7 +204,7 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
             return;
         }
         else {
-            statusCode = status.getCode();
+            statusCode = status.code();
             VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.IMBeaconUrl, beaconUrl);
             context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());

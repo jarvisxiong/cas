@@ -1,17 +1,16 @@
 package com.inmobi.adserve.channels.api;
 
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.CategoryList;
-import com.inmobi.adserve.channels.util.IABCategoriesInterface;
-import com.inmobi.adserve.channels.util.IABCategoriesMap;
-import org.apache.commons.lang.StringUtils;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.*;
-import org.jboss.netty.handler.codec.http.*;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelException;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.handler.codec.http.DefaultHttpRequest;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
 
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
@@ -19,7 +18,22 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
-import java.util.*;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import org.apache.commons.lang.StringUtils;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.util.CategoryList;
+import com.inmobi.adserve.channels.util.IABCategoriesInterface;
+import com.inmobi.adserve.channels.util.IABCategoriesMap;
 
 
 // This abstract class have base functionality of TPAN adapters.
@@ -29,7 +43,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                                                                                   .getLogger(BaseAdNetworkImpl.class);
 
     private ChannelFuture                         future;
-    protected ClientBootstrap                     clientBootstrap;
+    protected Bootstrap                           clientBootstrap;
     private Channel                               channel;
     protected HttpRequest                         request;
     protected long                                startTime;
@@ -45,7 +59,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected SASRequestParameters                sasParams;
     protected CasInternalRequestParameters        casInternalRequestParameters;
     protected HttpRequestHandlerBase              baseRequestHandler      = null;
-    protected final MessageEvent                  serverEvent;
     protected String                              requestUrl              = "";
     private ThirdPartyAdResponse                  responseStruct;
     private boolean                               isRtbPartner            = false;
@@ -62,6 +75,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     private static final String                   DEFAULT_EMPTY_STRING    = "";
     protected String                              format                  = "UTF-8";
     private String                                adapterName;
+
+    protected final Channel                       serverChannel;
     protected static String                       SITE_RATING_PERFORMANCE = "PERFORMANCE";
     protected static final String                 WAP                     = "WAP";
     private static final IABCategoriesInterface   iabCategoryMap          = new IABCategoriesMap();
@@ -75,9 +90,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected static final String                 COUNTRY                 = "country";
     protected static final String                 GENDER                  = "gender";
 
-    public BaseAdNetworkImpl(final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
+    public BaseAdNetworkImpl(final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         this.baseRequestHandler = baseRequestHandler;
-        this.serverEvent = serverEvent;
+        this.serverChannel = serverChannel;
     }
 
     @Override
@@ -104,7 +119,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         if (null == channel) {
             return null;
         }
-        return channel.getId();
+        return channel.hashCode();
     }
 
     // makes an async request to thirdparty network
@@ -121,9 +136,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         try {
             request = getHttpRequest();
             uri = new URI(request.getUri());
-            //request.setUri(uri.getPath());
+            // request.setUri(uri.getPath());
             LOG.debug("uri is {}", uri);
-            //LOG.debug("request is {}", request);
+            // LOG.debug("request is {}", request);
             LOG.info("url inside makeAsyncRequest is not null");
         }
         catch (Exception ex) {
@@ -140,14 +155,14 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             LOG.debug("Error creating socket... too many sockets open {}", e.getMessage());
             return false;
         }
-        channel = future.getChannel();
+        channel = future.channel();
         // waiting for connection to happen and then sending http request
         // through
         // channel
         future.addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(final ChannelFuture future) throws Exception {
-                MDC.put("requestId", serverEvent.getChannel().getId().toString());
+                MDC.put("requestId", String.valueOf(serverChannel.hashCode()));
 
                 connectionLatency = System.currentTimeMillis() - startTime;
                 if (!future.isSuccess()) {
@@ -160,24 +175,24 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     return;
                 }
                 if (channel.isWritable()) {
-                    channel.write(request);
+                    channel.writeAndFlush(request);
                 }
-                channel.getCloseFuture().addListener(new ChannelFutureListener() {
+                channel.closeFuture().addListener(new ChannelFutureListener() {
                     @Override
                     public void operationComplete(final ChannelFuture future) throws Exception {
-                        MDC.put("requestId", serverEvent.getChannel().getId().toString());
+                        MDC.put("requestId", String.valueOf(serverChannel.hashCode()));
 
                         latency = System.currentTimeMillis() - startTime;
                         if (!isRequestCompleted()) {
                             LOG.debug("Operation complete for channel partner: {}", getName());
-                            Channel channel1 = future.getChannel();
-                            LOG.debug("outbound channel id is {}", channel1.getId());
-                            if (null != ChannelsClientHandler.getMessage(channel1.getId())) {
-                                String response = (ChannelsClientHandler.getMessage(channel1.getId())).toString();
+                            Channel channel1 = future.channel();
+                            LOG.debug("outbound channel id is {}", channel1.hashCode());
+                            if (null != ChannelsClientHandler.getMessage(channel1.hashCode())) {
+                                String response = (ChannelsClientHandler.getMessage(channel1.hashCode())).toString();
                                 HttpResponseStatus httpResponseStatus = ChannelsClientHandler.statusMap.get(channel1
-                                        .getId());
-                                ChannelsClientHandler.removeEntry(channel1.getId());
-                                ChannelsClientHandler.statusMap.remove(channel1.getId());
+                                        .hashCode());
+                                ChannelsClientHandler.removeEntry(channel1.hashCode());
+                                ChannelsClientHandler.statusMap.remove(channel1.hashCode());
                                 parseResponse(response, httpResponseStatus);
                             }
                             else {
@@ -211,7 +226,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 if (baseRequestHandler.getAuctionEngine().isRtbResponseNull()) {
                     LOG.debug("rtb auction has returned null so processing dcp list");
                     // Process dcp partner response.
-                    baseRequestHandler.processDcpPartner(serverEvent, this);
+                    baseRequestHandler.processDcpPartner(serverChannel, this);
                     return;
                 }
                 LOG.debug("rtb response is not null so sending rtb response");
@@ -221,14 +236,14 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 AdNetworkInterface highestBid = baseRequestHandler.getAuctionEngine().runRtbSecondPriceAuctionEngine();
                 if (highestBid != null) {
                     LOG.debug("Sending rtb response of {}", highestBid.getName());
-                    baseRequestHandler.sendAdResponse(highestBid, serverEvent);
+                    baseRequestHandler.sendAdResponse(highestBid, serverChannel);
                     // highestBid.impressionCallback();
                     LOG.debug("sent rtb response");
                     return;
                 }
                 else {
                     LOG.debug("rtb auction has returned null so processing dcp list");
-                    baseRequestHandler.processDcpList(serverEvent);
+                    baseRequestHandler.processDcpList(serverChannel);
                 }
             }
         }
@@ -241,16 +256,18 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         try {
             URI uri = getRequestUri();
             requestUrl = uri.toString();
-            request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, uri.toASCIIString());
+            // TODO: make headers validation false later
+            request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, uri.toASCIIString(), true);
             LOG.debug("host name is {}", uri.getHost());
-            request.setHeader(HttpHeaders.Names.HOST, uri.getHost());
+            HttpHeaders headers = request.headers();
+            headers.set(HttpHeaders.Names.HOST, uri.getHost());
             LOG.debug("got the host");
-            request.setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent());
-            request.setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us");
-            request.setHeader(HttpHeaders.Names.REFERER, uri.toString());
-            request.setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
-            request.setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES);
-            request.setHeader("X-Forwarded-For", sasParams.getRemoteHostIp());
+            headers.set(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent());
+            headers.set(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us");
+            headers.set(HttpHeaders.Names.REFERER, uri.toString());
+            headers.set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
+            headers.set(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES);
+            headers.set("X-Forwarded-For", sasParams.getRemoteHostIp());
         }
         catch (Exception ex) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.HTTPREQUEST_ERROR;
@@ -314,19 +331,19 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 return;
             }
             else {
-                ChannelsClientHandler.removeEntry(channel.getId());
-                ChannelsClientHandler.statusMap.remove(channel.getId());
+                ChannelsClientHandler.removeEntry(channel.hashCode());
+                ChannelsClientHandler.statusMap.remove(channel.hashCode());
                 channel.close();
             }
             LOG.debug("inside cleanup for channel {}", this.getId());
             latency = System.currentTimeMillis() - startTime;
             adStatus = "TERM";
-            if (ChannelsClientHandler.adStatusMap.get(channel.getId()) != null
-                    && ChannelsClientHandler.adStatusMap.get(channel.getId()).equals("TIME_OUT")) {
+            if (ChannelsClientHandler.adStatusMap.get(channel.hashCode()) != null
+                    && ChannelsClientHandler.adStatusMap.get(channel.hashCode()).equals("TIME_OUT")) {
                 adStatus = "TIME_OUT";
-                ChannelsClientHandler.adStatusMap.remove(channel.getId());
-                ChannelsClientHandler.statusMap.remove(channel.getId());
-                ChannelsClientHandler.responseMap.remove(channel.getId());
+                ChannelsClientHandler.adStatusMap.remove(channel.hashCode());
+                ChannelsClientHandler.statusMap.remove(channel.hashCode());
+                ChannelsClientHandler.responseMap.remove(channel.hashCode());
             }
             responseStruct = new ThirdPartyAdResponse();
             responseStruct.latency = latency;
@@ -339,13 +356,13 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 responseStruct.adStatus = adStatus;
                 return;
             }
-            if (ChannelsClientHandler.adStatusMap.get(channel.getId()) != null
-                    && ChannelsClientHandler.adStatusMap.get(channel.getId()).equals("TIME_OUT")) {
+            if (ChannelsClientHandler.adStatusMap.get(channel.hashCode()) != null
+                    && ChannelsClientHandler.adStatusMap.get(channel.hashCode()).equals("TIME_OUT")) {
                 responseStruct = new ThirdPartyAdResponse();
                 adStatus = "TIME_OUT";
-                ChannelsClientHandler.adStatusMap.remove(channel.getId());
-                ChannelsClientHandler.statusMap.remove(channel.getId());
-                ChannelsClientHandler.responseMap.remove(channel.getId());
+                ChannelsClientHandler.adStatusMap.remove(channel.hashCode());
+                ChannelsClientHandler.statusMap.remove(channel.hashCode());
+                ChannelsClientHandler.responseMap.remove(channel.hashCode());
                 responseStruct.adStatus = adStatus;
                 responseStruct.latency = latency;
             }
@@ -460,8 +477,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     // parsing the response message to get HTTP response code and httpresponse
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {}", response);
-        if (StringUtils.isBlank(response) || status.getCode() != 200 || response.startsWith("<!--")) {
-            statusCode = status.getCode();
+        if (StringUtils.isBlank(response) || status.code() != 200 || response.startsWith("<!--")) {
+            statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
             }
@@ -470,7 +487,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         }
         else {
             responseContent = response;
-            statusCode = status.getCode();
+            statusCode = status.code();
             adStatus = "AD";
             responseContent = "<html><body>".concat(responseContent).concat("</body></html>");
         }

@@ -1,21 +1,22 @@
 package com.inmobi.adserve.channels.adnetworks.ifc;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.DefaultFullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
+import io.netty.util.CharsetUtil;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpMethod;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.jboss.netty.handler.codec.http.HttpVersion;
-import org.jboss.netty.util.CharsetUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -67,9 +68,9 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
 
     private String              adGroupID;
 
-    public IFCAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public IFCAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
         ifcURL = config.getString("ifc.host");
     }
 
@@ -213,17 +214,19 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         catch (URISyntaxException e) {
             return null;
         }
-        httpRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri.toASCIIString());
-        ChannelBuffer buffer = ChannelBuffers.copiedBuffer(getRequestBody(), CharsetUtil.UTF_8);
-        httpRequest.setHeader(HttpHeaders.Names.HOST, uri.toString());
+        ByteBuf buffer = Unpooled.copiedBuffer(getRequestBody(), CharsetUtil.UTF_8);
 
-        httpRequest.setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json");
+        // TODO: remove header validation
+        httpRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri.toASCIIString(), buffer,
+                true);
+        httpRequest.headers().set(HttpHeaders.Names.HOST, uri.toString());
 
-        httpRequest.setHeader(HttpHeaders.Names.ACCEPT, "application/json");
-        httpRequest.setHeader(HttpHeaders.Names.CONNECTION, "close");
-        httpRequest.setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(buffer.readableBytes()));
+        httpRequest.headers().set(HttpHeaders.Names.CONTENT_TYPE, "application/json");
 
-        httpRequest.setContent(buffer);
+        httpRequest.headers().set(HttpHeaders.Names.ACCEPT, "application/json");
+        httpRequest.headers().set(HttpHeaders.Names.CONNECTION, "close");
+        httpRequest.headers().set(HttpHeaders.Names.CONTENT_LENGTH, buffer.readableBytes());
+
         return httpRequest;
     }
 
@@ -360,9 +363,9 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         if (null == response
-                || (null != response && (status.getCode() != 200 || response.startsWith("<!--") || response.trim()
+                || (null != response && (status.code() != 200 || response.startsWith("<!--") || response.trim()
                         .isEmpty()))) {
-            statusCode = status.getCode();
+            statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
             }
@@ -371,7 +374,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         }
         else {
             responseContent = response;
-            statusCode = status.getCode();
+            statusCode = status.code();
             adStatus = "AD";
         }
         LOG.debug("response length is {}", responseContent.length());

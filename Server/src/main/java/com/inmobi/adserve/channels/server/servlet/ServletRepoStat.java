@@ -1,9 +1,10 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
+
 import javax.ws.rs.Path;
 
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,9 +21,10 @@ public class ServletRepoStat implements Servlet {
 
     @Override
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
-            final MessageEvent e) throws Exception {
+            final Channel serverChannel) throws Exception {
         LOG.debug("Inside repostat servlet");
-        hrh.responseSender.sendResponse(ServletHandler.repositoryHelper.getRepositoryStatsProvider().getStats(), e);
+        hrh.responseSender.sendResponse(ServletHandler.repositoryHelper.getRepositoryStatsProvider().getStats(),
+                serverChannel);
     }
 
     @Override

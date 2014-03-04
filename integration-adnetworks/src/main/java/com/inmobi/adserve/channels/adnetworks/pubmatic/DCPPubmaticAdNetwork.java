@@ -1,5 +1,17 @@
 package com.inmobi.adserve.channels.adnetworks.pubmatic;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.DefaultFullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
+import io.netty.util.CharsetUtil;
+
 import java.awt.Dimension;
 import java.net.URI;
 import java.text.SimpleDateFormat;
@@ -8,17 +20,6 @@ import java.util.Calendar;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpMethod;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.jboss.netty.handler.codec.http.HttpVersion;
-import org.jboss.netty.util.CharsetUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -54,9 +55,9 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
         iABCountries = new IABCountriesMap();
     }
 
-    public DCPPubmaticAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public DCPPubmaticAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
     @Override
@@ -159,20 +160,21 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
         try {
             URI uri = getRequestUri();
             requestUrl = uri.toString();
-            request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri.toASCIIString());
+            ByteBuf buffer = Unpooled.copiedBuffer(getRequestParams(), CharsetUtil.UTF_8);
+            // TODO: remove header validation
+            request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri.toASCIIString(), buffer,
+                    true);
             LOG.debug("host name is {}", uri.getHost());
-            request.setHeader(HttpHeaders.Names.HOST, uri.getHost());
+            request.headers().set(HttpHeaders.Names.HOST, uri.getHost());
             LOG.debug("got the host");
-            request.setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent());
-            request.setHeader(HttpHeaders.Names.REFERER, uri.toString());
-            request.setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
-            request.setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES);
-            request.setHeader("X-Forwarded-For", sasParams.getRemoteHostIp());
-            request.setHeader("RLNClientIpAddr", sasParams.getRemoteHostIp());
-            ChannelBuffer buffer = ChannelBuffers.copiedBuffer(getRequestParams(), CharsetUtil.UTF_8);
-            request.setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(buffer.readableBytes()));
-            request.setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/x-www-form-urlencoded");
-            request.setContent(buffer);
+            request.headers().set(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent());
+            request.headers().set(HttpHeaders.Names.REFERER, uri.toString());
+            request.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
+            request.headers().set(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES);
+            request.headers().set("X-Forwarded-For", sasParams.getRemoteHostIp());
+            request.headers().set("RLNClientIpAddr", sasParams.getRemoteHostIp());
+            request.headers().set(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(buffer.readableBytes()));
+            request.headers().set(HttpHeaders.Names.CONTENT_TYPE, "application/x-www-form-urlencoded");
         }
         catch (Exception ex) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.HTTPREQUEST_ERROR;
@@ -190,8 +192,8 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {}", response);
 
-        if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
-            statusCode = status.getCode();
+        if (null == response || status.code() != 200 || response.trim().isEmpty()) {
+            statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
             }
@@ -202,7 +204,7 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
             String htmlCode = "";
             String partnerBeacon = null;
             try {
-                statusCode = status.getCode();
+                statusCode = status.code();
                 JSONObject adResponse = new JSONObject(response.replace("\n", " "));
                 adResponse = adResponse.getJSONObject(pubMaticBid);
                 htmlCode = adResponse.getString(creativeTag).trim();

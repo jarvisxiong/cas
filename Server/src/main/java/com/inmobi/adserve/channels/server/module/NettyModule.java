@@ -1,27 +1,35 @@
 package com.inmobi.adserve.channels.server.module;
 
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
-import javax.inject.Singleton;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
 
 import org.apache.commons.configuration.Configuration;
-import org.jboss.netty.channel.ChannelFactory;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.group.ChannelGroup;
-import org.jboss.netty.channel.group.DefaultChannelGroup;
-import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
-import org.jboss.netty.util.HashedWheelTimer;
-import org.jboss.netty.util.Timer;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.google.inject.Singleton;
+import com.google.inject.TypeLiteral;
 import com.inmobi.adserve.channels.server.ChannelServerPipelineFactory;
 import com.inmobi.adserve.channels.server.ChannelStatServerPipelineFactory;
+import com.inmobi.adserve.channels.server.ConnectionLimitHandler;
+import com.inmobi.adserve.channels.server.DcpClientChannelInitializer;
+import com.inmobi.adserve.channels.server.RtbClientChannelInitializer;
+import com.inmobi.adserve.channels.server.annotations.BossGroup;
+import com.inmobi.adserve.channels.server.annotations.DcpClientBoostrap;
+import com.inmobi.adserve.channels.server.annotations.DcpConnectionLimitHandler;
+import com.inmobi.adserve.channels.server.annotations.IncomingConnectionLimitHandler;
+import com.inmobi.adserve.channels.server.annotations.RtbClientBoostrap;
+import com.inmobi.adserve.channels.server.annotations.RtbConnectionLimitHandler;
+import com.inmobi.adserve.channels.server.annotations.ServerChannelInitializer;
 import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
-import com.inmobi.adserve.channels.server.netty.NettyServer;
+import com.inmobi.adserve.channels.server.annotations.StatServerChannelInitializer;
+import com.inmobi.adserve.channels.server.annotations.WorkerGroup;
+import com.inmobi.adserve.channels.server.api.ConnectionType;
+import com.inmobi.adserve.channels.server.config.ServerConfig;
+import com.inmobi.adserve.channels.server.netty.CasNettyServer;
 
 
 /**
@@ -31,46 +39,61 @@ import com.inmobi.adserve.channels.server.netty.NettyServer;
 public class NettyModule extends AbstractModule {
 
     private final Configuration serverConfiguration;
-    private final Integer       port;
 
-    public NettyModule(final Configuration serverConfiguration, final Integer port) {
+    public NettyModule(final Configuration serverConfiguration) {
         this.serverConfiguration = serverConfiguration;
-        this.port = port;
     }
 
     @Override
     protected void configure() {
 
-        bind(Timer.class).toInstance(
-                new HashedWheelTimer(serverConfiguration.getInt("tickDuration", 100), TimeUnit.MILLISECONDS));
         bind(Configuration.class).annotatedWith(ServerConfiguration.class).toInstance(serverConfiguration);
 
-        bind(NettyServer.class).asEagerSingleton();
+        bind(CasNettyServer.class).asEagerSingleton();
 
-        if (port == 8800) {
-            bind(ChannelPipelineFactory.class).to(ChannelServerPipelineFactory.class).asEagerSingleton();
-        }
-        else if (port == 8801) {
-            bind(ChannelPipelineFactory.class).to(ChannelStatServerPipelineFactory.class).asEagerSingleton();
-        }
+        // event loopGroup
+        bind(EventLoopGroup.class).annotatedWith(BossGroup.class).to(NioEventLoopGroup.class).asEagerSingleton();
+        bind(EventLoopGroup.class).annotatedWith(WorkerGroup.class).to(NioEventLoopGroup.class).asEagerSingleton();
+
+        // server pipelines
+
+        TypeLiteral<ChannelInitializer<SocketChannel>> typeLiteral = new TypeLiteral<ChannelInitializer<SocketChannel>>() {
+        };
+
+        bind(typeLiteral).annotatedWith(ServerChannelInitializer.class).to(ChannelServerPipelineFactory.class)
+                .asEagerSingleton();
+        bind(typeLiteral).annotatedWith(StatServerChannelInitializer.class).to(ChannelStatServerPipelineFactory.class)
+                .asEagerSingleton();
+
+        // client pipelines
+        bind(DcpClientChannelInitializer.class).asEagerSingleton();
+        bind(RtbClientChannelInitializer.class).asEagerSingleton();
+
+        // client bootstrap
+        bind(Bootstrap.class).annotatedWith(DcpClientBoostrap.class).to(Bootstrap.class).asEagerSingleton();
+        bind(Bootstrap.class).annotatedWith(RtbClientBoostrap.class).to(Bootstrap.class).asEagerSingleton();
+
     }
 
-    @Singleton
     @Provides
-    SocketAddress provideSocketAddress() {
-        return new InetSocketAddress(port);
+    @Singleton
+    @IncomingConnectionLimitHandler
+    ConnectionLimitHandler incomingConnectionLimitHandler(final ServerConfig serverConfig) {
+        return new ConnectionLimitHandler(serverConfig, ConnectionType.INCOMING);
     }
 
     @Provides
     @Singleton
-    ChannelGroup provideChannelGroup() {
-        return new DefaultChannelGroup("http-server");
+    @RtbConnectionLimitHandler
+    ConnectionLimitHandler rtbConnectionLimitHandler(final ServerConfig serverConfig) {
+        return new ConnectionLimitHandler(serverConfig, ConnectionType.RTBD_OUTGOING);
     }
 
-    @Singleton
     @Provides
-    ChannelFactory provideChannelFactory() {
-        return new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
+    @Singleton
+    @DcpConnectionLimitHandler
+    ConnectionLimitHandler dcpConnectionLimitHandler(final ServerConfig serverConfig) {
+        return new ConnectionLimitHandler(serverConfig, ConnectionType.DCP_OUTGOING);
     }
 
 }

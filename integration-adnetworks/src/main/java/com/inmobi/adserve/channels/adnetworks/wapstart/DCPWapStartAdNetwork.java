@@ -1,5 +1,14 @@
 package com.inmobi.adserve.channels.adnetworks.wapstart;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.DefaultHttpRequest;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
+
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -11,14 +20,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpMethod;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -60,9 +61,9 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
         iABCountries = new IABCountriesMap();
     }
 
-    public DCPWapStartAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public DCPWapStartAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
         factory = DocumentBuilderFactory.newInstance();
         try {
             builder = factory.newDocumentBuilder();
@@ -157,7 +158,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
             baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
                 @Override
                 public Response onCompleted(final Response response) throws Exception {
-                    MDC.put("requestId", serverEvent.getChannel().getId().toString());
+                    MDC.put("requestId", String.valueOf(serverChannel.hashCode()));
 
                     if (!isRequestCompleted()) {
                         LOG.debug("Operation complete for channel partner: {}", getName());
@@ -173,7 +174,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 
                 @Override
                 public void onThrowable(final Throwable t) {
-                    MDC.put("requestId", serverEvent.getChannel().getId().toString());
+                    MDC.put("requestId", String.valueOf(serverChannel.hashCode()));
 
                     if (isRequestComplete) {
                         return;
@@ -218,8 +219,8 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {}", response);
 
-        if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
-            statusCode = status.getCode();
+        if (null == response || status.code() != 200 || response.trim().isEmpty()) {
+            statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
             }
@@ -272,7 +273,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
                     }
                 }
 
-                statusCode = status.getCode();
+                statusCode = status.code();
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
             }
@@ -302,16 +303,16 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
             requestUrl = uri.toString();
             request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri.toASCIIString());
             LOG.debug("host name is {}", uri.getHost());
-            request.setHeader(HttpHeaders.Names.HOST, uri.getHost());
+            request.headers().set(HttpHeaders.Names.HOST, uri.getHost());
             LOG.debug("got the host");
-            request.setHeader("x-display-metrics", String.format("%sx%s", width, height));
-            request.setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent());
-            request.setHeader("xplus1-user-agent", sasParams.getUserAgent());
-            request.setHeader(HttpHeaders.Names.REFERER, uri.toString());
-            request.setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
-            request.setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES);
-            request.setHeader("x-plus1-remote-addr", sasParams.getRemoteHostIp());
-            request.setHeader("X-Forwarded-For", sasParams.getRemoteHostIp());
+            request.headers().set("x-display-metrics", String.format("%sx%s", width, height));
+            request.headers().set(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent());
+            request.headers().set("xplus1-user-agent", sasParams.getUserAgent());
+            request.headers().set(HttpHeaders.Names.REFERER, uri.toString());
+            request.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
+            request.headers().set(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES);
+            request.headers().set("x-plus1-remote-addr", sasParams.getRemoteHostIp());
+            request.headers().set("X-Forwarded-For", sasParams.getRemoteHostIp());
         }
         catch (Exception ex) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.HTTPREQUEST_ERROR;

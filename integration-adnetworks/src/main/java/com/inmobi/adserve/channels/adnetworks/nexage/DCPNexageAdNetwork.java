@@ -1,5 +1,10 @@
 package com.inmobi.adserve.channels.adnetworks.nexage;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -7,10 +12,6 @@ import java.net.URISyntaxException;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,9 +56,9 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
         iABCountries = new IABCountriesMap();
     }
 
-    public DCPNexageAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public DCPNexageAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
     // Configure the request parameters for making the ad call
@@ -193,15 +194,15 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {} and response length is ", response, response.length());
-        if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
-            statusCode = status.getCode();
+        if (null == response || status.code() != 200 || response.trim().isEmpty()) {
+            statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
             }
             return;
         }
         else {
-            statusCode = status.getCode();
+            statusCode = status.code();
             VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
             try {
@@ -243,7 +244,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
                 @Override
                 public Response onCompleted(final Response response) throws Exception {
-                    MDC.put("requestId", serverEvent.getChannel().getId().toString());
+                    MDC.put("requestId", String.valueOf(serverChannel.hashCode()));
 
                     if (!isRequestCompleted()) {
                         LOG.debug("Operation complete for channel partner: {}", getName());
@@ -259,7 +260,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
 
                 @Override
                 public void onThrowable(final Throwable t) {
-                    MDC.put("requestId", serverEvent.getChannel().getId().toString());
+                    MDC.put("requestId", String.valueOf(serverChannel.hashCode()));
 
                     if (isRequestComplete) {
                         return;
@@ -290,7 +291,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public void generateJsAdResponse() {
-        statusCode = HttpResponseStatus.OK.getCode();
+        statusCode = HttpResponseStatus.OK.code();
         VelocityContext context = new VelocityContext();
         context.put(POS, pos);
         context.put(DCN, externalSiteId);

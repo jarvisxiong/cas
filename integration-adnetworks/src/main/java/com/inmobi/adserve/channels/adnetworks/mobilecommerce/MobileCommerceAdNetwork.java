@@ -1,14 +1,15 @@
 package com.inmobi.adserve.channels.adnetworks.mobilecommerce;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -29,9 +30,9 @@ public class MobileCommerceAdNetwork extends AbstractDCPAdNetworkImpl {
     private String              uid;
     private final String        responseFormat;
 
-    public MobileCommerceAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public MobileCommerceAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
         responseFormat = config.getString("mobilecommerce.responseFormat");
     }
 
@@ -109,8 +110,8 @@ public class MobileCommerceAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {} and response length is {}", response, response.length());
-        if (status.getCode() != 200 || StringUtils.isBlank(response)) {
-            statusCode = status.getCode();
+        if (status.code() != 200 || StringUtils.isBlank(response)) {
+            statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
             }
@@ -119,7 +120,7 @@ public class MobileCommerceAdNetwork extends AbstractDCPAdNetworkImpl {
         }
         else {
             try {
-                statusCode = status.getCode();
+                statusCode = status.code();
                 VelocityContext context = new VelocityContext();
                 TemplateType responseTemplate;
                 if ("html".equalsIgnoreCase(responseFormat)) {

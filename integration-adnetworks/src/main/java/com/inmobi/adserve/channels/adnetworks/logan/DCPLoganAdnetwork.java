@@ -1,5 +1,9 @@
 package com.inmobi.adserve.channels.adnetworks.logan;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -7,9 +11,6 @@ import java.net.URISyntaxException;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,8 +26,7 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
-public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl
-{
+public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
 
     private static final Logger LOG        = LoggerFactory.getLogger(DCPLoganAdnetwork.class);
 
@@ -48,15 +48,13 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl
      * @param baseRequestHandler
      * @param serverEvent
      */
-    public DCPLoganAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent)
-    {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public DCPLoganAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
     @Override
-    public boolean configureParameters()
-    {
+    public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing for logan so exiting adapter");
@@ -81,20 +79,17 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "logan";
     }
 
     @Override
-    public boolean isClickUrlRequired()
-    {
+    public boolean isClickUrlRequired() {
         return true;
     }
 
     @Override
-    public URI getRequestUri() throws Exception
-    {
+    public URI getRequestUri() throws Exception {
         try {
             StringBuilder url = new StringBuilder(host);
             appendQueryParam(url, IP, sasParams.getRemoteHostIp(), false);
@@ -144,12 +139,11 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl
     }
 
     @Override
-    public void parseResponse(final String response, final HttpResponseStatus status)
-    {
+    public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {}", response);
 
-        if (StringUtils.isEmpty(response) || status.getCode() != 200 || response.startsWith("[{\"error")) {
-            statusCode = status.getCode();
+        if (StringUtils.isEmpty(response) || status.code() != 200 || response.startsWith("[{\"error")) {
+            statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
             }
@@ -174,7 +168,7 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl
                     bannerAd = response.contains("\"img\" :") && !response.contains("\"img\" : \"\"");
                 }
 
-                statusCode = status.getCode();
+                statusCode = status.code();
                 VelocityContext context = new VelocityContext();
                 context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, adResponse.get("track"));
                 TemplateType t;
@@ -221,8 +215,7 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return (config.getString("logan.advertiserId"));
     }
 }

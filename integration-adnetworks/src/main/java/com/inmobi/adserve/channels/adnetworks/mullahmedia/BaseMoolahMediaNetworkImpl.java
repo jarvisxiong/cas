@@ -1,5 +1,9 @@
 package com.inmobi.adserve.channels.adnetworks.mullahmedia;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -9,9 +13,6 @@ import java.util.Map;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -70,9 +71,9 @@ public abstract class BaseMoolahMediaNetworkImpl extends AbstractDCPAdNetworkImp
      * @param baseRequestHandler
      * @param serverEvent
      */
-    protected BaseMoolahMediaNetworkImpl(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    protected BaseMoolahMediaNetworkImpl(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
     @Override
@@ -107,9 +108,9 @@ public abstract class BaseMoolahMediaNetworkImpl extends AbstractDCPAdNetworkImp
 
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
-        if (StringUtils.isBlank(response) || status.getCode() != 200 || !response.startsWith("{")
+        if (StringUtils.isBlank(response) || status.code() != 200 || !response.startsWith("{")
                 || response.startsWith("{\"error")) {
-            statusCode = status.getCode();
+            statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
             }
@@ -119,12 +120,11 @@ public abstract class BaseMoolahMediaNetworkImpl extends AbstractDCPAdNetworkImp
         else {
             LOG.debug("beacon url inside mullah media is {}", beaconUrl);
             try {
-                statusCode = status.getCode();
+                statusCode = status.code();
                 JSONObject adResponse = new JSONObject(response);
                 VelocityContext context = new VelocityContext();
-                context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse
-                        .getJSONArray("landing")
-                            .getString(0));
+                context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse.getJSONArray("landing")
+                        .getString(0));
                 context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getJSONArray("img").getString(0));
                 context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.IMAGE, context, sasParams, beaconUrl);
@@ -154,9 +154,8 @@ public abstract class BaseMoolahMediaNetworkImpl extends AbstractDCPAdNetworkImp
     public String getRequestParameters() throws Exception {
         StringBuilder sb = new StringBuilder();
         sb.append("user_agent=").append(getURLEncode(sasParams.getUserAgent(), format)).append("&user_ip=");
-        sb.append(sasParams.getRemoteHostIp())
-                    .append("&request_from=indirect&response_format=json&type=")
-                    .append(source);
+        sb.append(sasParams.getRemoteHostIp()).append("&request_from=indirect&response_format=json&type=")
+                .append(source);
         String uid = getUid();
         if (uid != null) {
             sb.append("&unique_key=").append(uid);
@@ -193,12 +192,8 @@ public abstract class BaseMoolahMediaNetworkImpl extends AbstractDCPAdNetworkImp
                 blindedSiteId += "-300x250";
             }
         }
-        sb.append("&sid=")
-                    .append(blindedSiteId)
-                    .append("&pid=")
-                    .append(publisherId)
-                    .append("&site_name=")
-                    .append(externalSiteId);
+        sb.append("&sid=").append(blindedSiteId).append("&pid=").append(publisherId).append("&site_name=")
+                .append(externalSiteId);
 
         sb.append("&cat=").append(getURLEncode(getCategory(), format));
         LOG.debug("post body inside mullah media is {}", sb);

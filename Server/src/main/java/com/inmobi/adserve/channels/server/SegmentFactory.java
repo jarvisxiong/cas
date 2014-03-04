@@ -1,5 +1,8 @@
 package com.inmobi.adserve.channels.server;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -7,8 +10,6 @@ import javax.inject.Singleton;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.configuration.Configuration;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,9 +33,9 @@ public class SegmentFactory {
     }
 
     public AdNetworkInterface getChannel(final String advertiserId, final String channelId, final Configuration config,
-            final ClientBootstrap clientBootstrap, final ClientBootstrap rtbClientBootstrap,
-            final HttpRequestHandlerBase base, final MessageEvent serverEvent, final Set<String> advertiserSet,
-            final boolean isRtbEnabled, final int rtbMaxTimemout, final int dst, final RepositoryHelper repositoryHelper) {
+            final Bootstrap dcpClientBootstrap, final Bootstrap rtbClientBootstrap, final HttpRequestHandlerBase base,
+            final Channel channel, final Set<String> advertiserSet, final boolean isRtbEnabled,
+            final int rtbMaxTimemout, final int dst, final RepositoryHelper repositoryHelper) {
 
         AdapterConfig adapterConfig = advertiserIdConfigMap.get(advertiserId);
 
@@ -49,9 +50,9 @@ public class SegmentFactory {
 
             try {
                 AdNetworkInterface rtbAdNetwork = adNetworkInterfaceClass.getConstructor(
-                        new Class[] { Configuration.class, ClientBootstrap.class, HttpRequestHandlerBase.class,
-                                MessageEvent.class, String.class, String.class, int.class, RepositoryHelper.class })
-                        .newInstance(config, rtbClientBootstrap, base, serverEvent, adapterConfig.getAdapterHost(),
+                        new Class[] { Configuration.class, Bootstrap.class, HttpRequestHandlerBase.class,
+                                Channel.class, String.class, String.class, int.class, RepositoryHelper.class })
+                        .newInstance(config, rtbClientBootstrap, base, channel, adapterConfig.getAdapterHost(),
                                 adapterConfig.getAdapterName(), rtbMaxTimemout, repositoryHelper);
                 rtbAdNetwork.setName(adapterConfig.getAdapterName());
                 LOG.debug("Created RTB adapter instance for advertiser id : {}", advertiserId);
@@ -66,9 +67,10 @@ public class SegmentFactory {
         else {
 
             try {
-                AdNetworkInterface adNetworkInterface = adNetworkInterfaceClass.getConstructor(
-                        new Class[] { Configuration.class, ClientBootstrap.class, HttpRequestHandlerBase.class,
-                                MessageEvent.class }).newInstance(config, clientBootstrap, base, serverEvent);
+                AdNetworkInterface adNetworkInterface = adNetworkInterfaceClass
+                        .getConstructor(
+                                new Class[] { Configuration.class, Bootstrap.class, HttpRequestHandlerBase.class,
+                                        Channel.class }).newInstance(config, dcpClientBootstrap, base, channel);
                 adNetworkInterface.setName(adapterConfig.getAdapterName());
                 return adNetworkInterface;
             }

@@ -1,5 +1,11 @@
 package com.inmobi.adserve.channels.server;
 
+import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.QueryStringDecoder;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -7,12 +13,6 @@ import java.util.Random;
 import javax.inject.Inject;
 
 import org.apache.commons.configuration.Configuration;
-import org.jboss.netty.channel.ChannelHandler.Sharable;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +27,7 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 
 @Sharable
 @Singleton
-public class ServletHandler extends SimpleChannelUpstreamHandler {
+public class ServletHandler extends SimpleChannelInboundHandler<HttpRequest> {
     private static final Logger    LOG                      = LoggerFactory.getLogger(ServletHandler.class);
 
     // TODO: clear up all these responses, configs to separate module
@@ -108,12 +108,10 @@ public class ServletHandler extends SimpleChannelUpstreamHandler {
     }
 
     @Override
-    public void messageReceived(final ChannelHandlerContext ctx, final MessageEvent e) throws Exception {
+    protected void channelRead0(final ChannelHandlerContext ctx, final HttpRequest httpRequest) throws Exception {
 
-        HttpRequest request = (HttpRequest) e.getMessage();
-
-        QueryStringDecoder queryStringDecoder = new QueryStringDecoder(request.getUri());
-        String path = queryStringDecoder.getPath();
+        QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httpRequest.getUri());
+        String path = queryStringDecoder.path();
 
         Servlet servlet = pathToServletMap.get(path);
 
@@ -125,7 +123,6 @@ public class ServletHandler extends SimpleChannelUpstreamHandler {
 
         scope.seed(Servlet.class, servlet);
 
-        ctx.sendUpstream(e);
-
+        ctx.fireChannelRead(httpRequest);
     }
 }

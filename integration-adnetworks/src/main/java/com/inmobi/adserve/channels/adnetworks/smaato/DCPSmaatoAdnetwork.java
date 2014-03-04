@@ -1,5 +1,14 @@
 package com.inmobi.adserve.channels.adnetworks.smaato;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.DefaultHttpRequest;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
+
 import java.awt.Dimension;
 import java.io.ByteArrayInputStream;
 import java.net.URI;
@@ -13,14 +22,6 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpMethod;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,14 +90,14 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         slotIdMap.put(13, "sky");
         slotIdMap.put(14, "full_320x480");
         slotIdMap.put(15, "mma");
-        slotIdMap.put(16,"full_768x1024");
-        slotIdMap.put(17,"full_800x1280");
+        slotIdMap.put(16, "full_768x1024");
+        slotIdMap.put(17, "full_800x1280");
 
     }
 
-    public DCPSmaatoAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public DCPSmaatoAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
 
         publisherId = config.getString("smaato.pubId");
         try {
@@ -185,7 +186,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
 
         if (StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)) {
             appendQueryParam(url, LATLONG, getURLEncode(String.format(latLongFormat, latitude, longitude), format),
-                false);
+                    false);
         }
         if (StringUtils.isNotBlank(sasParams.getGender())) {
             appendQueryParam(url, GENDER, sasParams.getGender(), false);
@@ -214,15 +215,15 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
             URI uri = getRequestUri();
             requestUrl = uri.toString();
             request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, uri.toASCIIString());
-            request.setHeader(HttpHeaders.Names.HOST, uri.getHost());
-            request.setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent());
-            request.setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us");
-            request.setHeader(HttpHeaders.Names.REFERER, uri.toString());
-            request.setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
-            request.setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES);
-            request.setHeader("x-mh-User-Agent", sasParams.getUserAgent());
-            request.setHeader("x-mh-X-Forwarded-For", sasParams.getRemoteHostIp());
-            request.setHeader("X-Forwarded-For", sasParams.getRemoteHostIp());
+            request.headers().set(HttpHeaders.Names.HOST, uri.getHost());
+            request.headers().set(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent());
+            request.headers().set(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us");
+            request.headers().set(HttpHeaders.Names.REFERER, uri.toString());
+            request.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
+            request.headers().set(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES);
+            request.headers().set("x-mh-User-Agent", sasParams.getUserAgent());
+            request.headers().set("x-mh-X-Forwarded-For", sasParams.getRemoteHostIp());
+            request.headers().set("X-Forwarded-For", sasParams.getRemoteHostIp());
         }
         catch (Exception ex) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.HTTPREQUEST_ERROR;
@@ -235,8 +236,8 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {}", response);
 
-        if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
-            statusCode = status.getCode();
+        if (null == response || status.code() != 200 || response.trim().isEmpty()) {
+            statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
             }
@@ -244,7 +245,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
             return;
         }
         else {
-            statusCode = status.getCode();
+            statusCode = status.code();
             VelocityContext context = new VelocityContext();
             try {
                 Response smaatoResponse = (Response) jaxbUnmarshaller.unmarshal(new ByteArrayInputStream(response

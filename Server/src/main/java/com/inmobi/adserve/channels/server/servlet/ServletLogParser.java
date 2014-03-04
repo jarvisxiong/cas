@@ -1,5 +1,12 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.QueryStringDecoder;
+import io.netty.util.CharsetUtil;
+
 import java.net.URLDecoder;
 import java.util.List;
 import java.util.Map;
@@ -7,11 +14,6 @@ import java.util.Map.Entry;
 
 import javax.ws.rs.Path;
 
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpMethod;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.QueryStringDecoder;
-import org.jboss.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,15 +30,16 @@ public class ServletLogParser implements Servlet {
 
     @Override
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
-            final MessageEvent e) throws Exception {
-        Map<String, List<String>> params = queryStringDecoder.getParameters();
-        HttpRequest request = (HttpRequest) e.getMessage();
+            final Channel serverChannel) throws Exception {
+        Map<String, List<String>> params = queryStringDecoder.parameters();
+        HttpRequest request = hrh.getHttpRequest();
         String targetStrings = "";
         String logFilePath = "";
         // Handle post request
         if (request.getMethod() == HttpMethod.POST) {
             @SuppressWarnings("deprecation")
-            String jObject = URLDecoder.decode(request.getContent().toString(CharsetUtil.UTF_8)).toString();
+            String jObject = URLDecoder.decode(((FullHttpRequest) request).content().toString(CharsetUtil.UTF_8))
+                    .toString();
             String[] array = jObject.split("&");
             targetStrings = array[0].split("=")[1];
             logFilePath = array[1].split("=")[1];
@@ -64,10 +67,10 @@ public class ServletLogParser implements Servlet {
         Process process = pb.start();
         int exitStatus = process.waitFor();
         if (exitStatus == 0) {
-            hrh.responseSender.sendResponse("PASS", e);
+            hrh.responseSender.sendResponse("PASS", serverChannel);
         }
         else {
-            hrh.responseSender.sendResponse("FAIL", e);
+            hrh.responseSender.sendResponse("FAIL", serverChannel);
         }
     }
 

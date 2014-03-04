@@ -1,5 +1,9 @@
 package com.inmobi.adserve.channels.adnetworks.mobfox;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 import java.awt.Dimension;
 import java.io.ByteArrayInputStream;
 import java.net.URI;
@@ -14,9 +18,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,9 +71,9 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
      * @param baseRequestHandler
      * @param serverEvent
      */
-    public DCPMobFoxAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public DCPMobFoxAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
         try {
             jaxbContext = JAXBContext.newInstance(Request.class);
             jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -168,8 +169,8 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {}", response);
 
-        if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
-            statusCode = status.getCode();
+        if (null == response || status.code() != 200 || response.trim().isEmpty()) {
+            statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
             }
@@ -177,7 +178,7 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
             return;
         }
         else {
-            statusCode = status.getCode();
+            statusCode = status.code();
             VelocityContext context = new VelocityContext();
             try {
                 Request request = (Request) jaxbUnmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes()));

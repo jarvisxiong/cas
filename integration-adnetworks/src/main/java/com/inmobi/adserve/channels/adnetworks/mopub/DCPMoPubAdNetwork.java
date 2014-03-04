@@ -1,15 +1,16 @@
 package com.inmobi.adserve.channels.adnetworks.mopub;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -32,9 +33,9 @@ public class DCPMoPubAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final String responseTemplate = "%s <img src='%s' height=1 width=1 border=0 style=\"display:none;\"/>";
     private Request             ningRequest;
 
-    public DCPMoPubAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public DCPMoPubAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
     @Override
@@ -96,8 +97,8 @@ public class DCPMoPubAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {}", response);
-        statusCode = status.getCode();
-        if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
+        statusCode = status.code();
+        if (null == response || status.code() != 200 || response.trim().isEmpty()) {
             if (200 == statusCode) {
                 statusCode = 500;
             }
@@ -129,7 +130,7 @@ public class DCPMoPubAdNetwork extends AbstractDCPAdNetworkImpl {
             baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
                 @Override
                 public Response onCompleted(final Response response) throws Exception {
-                    MDC.put("requestId", serverEvent.getChannel().getId().toString());
+                    MDC.put("requestId", String.valueOf(serverChannel.hashCode()));
 
                     if (!isRequestCompleted()) {
                         LOG.debug("Operation complete for channel partner: {}", getName());
@@ -147,7 +148,7 @@ public class DCPMoPubAdNetwork extends AbstractDCPAdNetworkImpl {
 
                 @Override
                 public void onThrowable(final Throwable t) {
-                    MDC.put("requestId", serverEvent.getChannel().getId().toString());
+                    MDC.put("requestId", String.valueOf(serverChannel.hashCode()));
 
                     if (isRequestComplete) {
                         return;

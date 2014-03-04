@@ -1,5 +1,9 @@
 package com.inmobi.adserve.channels.adnetworks.placeiq;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 import java.awt.Dimension;
 import java.net.URI;
 import java.text.SimpleDateFormat;
@@ -14,9 +18,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -110,9 +111,9 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
         categoryList.put(74, "wt");
     }
 
-    public DCPPlaceIQAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public DCPPlaceIQAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
         partnerId = config.getString("placeiq.partnerId");
         host = config.getString("placeiq.host");
         seed = config.getString("placeiq.seed");
@@ -197,7 +198,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
         appendQueryParam(url, PT, partnerId, false);
         String category = getCategory();
         String auId = String.format(auIdFormat, partnerId, category, Long.toHexString(sasParams.getSiteIncId()),
-            Long.toHexString(this.entity.getAdgroupIncId()));
+                Long.toHexString(this.entity.getAdgroupIncId()));
         appendQueryParam(url, ADUNIT, getURLEncode(auId, format), false);
         appendQueryParam(url, CLIENT_IP, sasParams.getRemoteHostIp(), false);
 
@@ -251,8 +252,8 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {}", response);
-        statusCode = status.getCode();
-        if (StringUtils.isBlank(response) || status.getCode() != 200
+        statusCode = status.code();
+        if (StringUtils.isBlank(response) || status.code() != 200
                 || ("xml".equalsIgnoreCase(requestFormat) && response.contains("<NOAD>"))) {
             if (200 == statusCode) {
                 statusCode = 500;
@@ -285,7 +286,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
                     context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response);
                 }
 
-                statusCode = status.getCode();
+                statusCode = status.code();
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
             }

@@ -1,5 +1,9 @@
 package com.inmobi.adserve.channels.adnetworks.httpool;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -7,9 +11,6 @@ import java.net.URISyntaxException;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -39,9 +40,9 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
      * @param baseRequestHandler
      * @param serverEvent
      */
-    public DCPHttPoolAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public DCPHttPoolAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
     @Override
@@ -136,8 +137,8 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {}", response);
 
-        if (StringUtils.isEmpty(response) || status.getCode() != 200) {
-            statusCode = status.getCode();
+        if (StringUtils.isEmpty(response) || status.code() != 200) {
+            statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
             }
@@ -154,7 +155,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
                     responseContent = "";
                     return;
                 }
-                statusCode = status.getCode();
+                statusCode = status.code();
                 TemplateType t;
                 VelocityContext context = new VelocityContext();
                 context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);

@@ -1,5 +1,9 @@
 package com.inmobi.adserve.channels.adnetworks.amobee;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -7,9 +11,6 @@ import java.net.URISyntaxException;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,9 +42,9 @@ public class DCPAmobeeAdnetwork extends AbstractDCPAdNetworkImpl {
      * @param baseRequestHandler
      * @param serverEvent
      */
-    public DCPAmobeeAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public DCPAmobeeAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
     @Override
@@ -104,24 +105,11 @@ public class DCPAmobeeAdnetwork extends AbstractDCPAdNetworkImpl {
             String host = config.getString("amobee.host");
             String adNetworkId = config.getString("amobee.adnetworkId");
             StringBuilder url = new StringBuilder(host);
-            url.append("?adn=")
-                        .append(adNetworkId)
-                        .append("&site=")
-                        .append(blindedSiteId)
-                        .append("&ua=")
-                        .append(getURLEncode(sasParams.getUserAgent(), format))
-                        .append("&i=")
-                        .append(sasParams.getRemoteHostIp())
-                        .append("&f=")
-                        .append(adType)
-                        .append("&uid=")
-                        .append(getUid())
-                        .append("&t=")
-                        .append(System.currentTimeMillis())
-                        .append("&tp=")
-                        .append(adTypeId)
-                        .append("&kw=")
-                        .append(getURLEncode(getCategories(',', true), format));
+            url.append("?adn=").append(adNetworkId).append("&site=").append(blindedSiteId).append("&ua=")
+                    .append(getURLEncode(sasParams.getUserAgent(), format)).append("&i=")
+                    .append(sasParams.getRemoteHostIp()).append("&f=").append(adType).append("&uid=").append(getUid())
+                    .append("&t=").append(System.currentTimeMillis()).append("&tp=").append(adTypeId).append("&kw=")
+                    .append(getURLEncode(getCategories(',', true), format));
             // TODO nk : get list
             if (width != 0 && height != 0) {
                 url.append("&adw=").append(width).append("&adh=").append(height);
@@ -179,8 +167,8 @@ public class DCPAmobeeAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {}", response);
-        statusCode = status.getCode();
-        if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
+        statusCode = status.code();
+        if (null == response || status.code() != 200 || response.trim().isEmpty()) {
             if (200 == statusCode) {
                 statusCode = 500;
             }

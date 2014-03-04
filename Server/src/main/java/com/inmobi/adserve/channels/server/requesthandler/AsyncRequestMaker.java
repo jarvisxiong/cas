@@ -1,5 +1,8 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,8 +14,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -27,6 +28,8 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.SegmentFactory;
+import com.inmobi.adserve.channels.server.annotations.DcpClientBoostrap;
+import com.inmobi.adserve.channels.server.annotations.RtbClientBoostrap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
@@ -36,8 +39,14 @@ import com.ning.http.client.AsyncHttpClient;
 public class AsyncRequestMaker {
     private static final Logger    LOG = LoggerFactory.getLogger(AsyncRequestMaker.class);
 
-    private static ClientBootstrap clientBootstrap;
-    private static ClientBootstrap rtbClientBootstrap;
+    @Inject
+    @DcpClientBoostrap
+    private static Bootstrap       dcpClientBootstrap;
+
+    @Inject
+    @RtbClientBoostrap
+    private static Bootstrap       rtbClientBootstrap;
+
     private static AsyncHttpClient asyncHttpClient;
 
     @Inject
@@ -47,10 +56,7 @@ public class AsyncRequestMaker {
         return asyncHttpClient;
     }
 
-    public static void init(final ClientBootstrap clientBootstrap, final ClientBootstrap rtbClientBootstrap,
-            final AsyncHttpClient asyncHttpClient) {
-        AsyncRequestMaker.clientBootstrap = clientBootstrap;
-        AsyncRequestMaker.rtbClientBootstrap = rtbClientBootstrap;
+    public static void init(final AsyncHttpClient asyncHttpClient) {
         AsyncRequestMaker.asyncHttpClient = asyncHttpClient;
     }
 
@@ -60,7 +66,7 @@ public class AsyncRequestMaker {
      */
     public static List<ChannelSegment> prepareForAsyncRequest(final List<ChannelSegment> rows,
             final Configuration config, final Configuration rtbConfig, final Configuration adapterConfig,
-            final HttpRequestHandlerBase base, final Set<String> advertiserSet, final MessageEvent e,
+            final HttpRequestHandlerBase base, final Set<String> advertiserSet, final Channel channel,
             final RepositoryHelper repositoryHelper, final JSONObject jObject, final SASRequestParameters sasParams,
             final CasInternalRequestParameters casInternalRequestParameterGlobal, final List<ChannelSegment> rtbSegments)
             throws Exception {
@@ -75,15 +81,14 @@ public class AsyncRequestMaker {
         for (ChannelSegment row : rows) {
             ChannelSegmentEntity channelSegmentEntity = row.getChannelSegmentEntity();
             AdNetworkInterface network = segmentFactory.getChannel(channelSegmentEntity.getAdvertiserId(), row
-                    .getChannelSegmentEntity()
-                        .getChannelId(), adapterConfig, clientBootstrap, rtbClientBootstrap, base, e, advertiserSet,
-                isRtbEnabled, rtbMaxTimeOut, sasParams.getDst(), repositoryHelper);
+                    .getChannelSegmentEntity().getChannelId(), adapterConfig, dcpClientBootstrap, rtbClientBootstrap,
+                    base, channel, advertiserSet, isRtbEnabled, rtbMaxTimeOut, sasParams.getDst(), repositoryHelper);
             if (null == network) {
                 LOG.debug("No adapter found for adGroup: {}", channelSegmentEntity.getAdgroupId());
                 continue;
             }
             LOG.debug("adapter found for adGroup: {} advertiserid is {} is {}", channelSegmentEntity.getAdgroupId(),
-                row.getChannelSegmentEntity().getAdvertiserId(), network.getName());
+                    row.getChannelSegmentEntity().getAdvertiserId(), network.getName());
             if (null == repositoryHelper.queryChannelRepository(channelSegmentEntity.getChannelId())) {
                 LOG.debug("No channel entity found for channel id: {}", channelSegmentEntity.getChannelId());
                 continue;
@@ -93,7 +98,7 @@ public class AsyncRequestMaker {
             String beaconUrl = null;
             sasParams.setImpressionId(getImpressionId(channelSegmentEntity.getIncId()));
             CasInternalRequestParameters casInternalRequestParameters = getCasInternalRequestParameters(sasParams,
-                casInternalRequestParameterGlobal);
+                    casInternalRequestParameterGlobal);
             controlEnrichment(casInternalRequestParameters, channelSegmentEntity);
             sasParams.setAdIncId(channelSegmentEntity.getIncId());
             LOG.debug("impression id is {}", sasParams.getImpressionId());
@@ -121,7 +126,7 @@ public class AsyncRequestMaker {
             LOG.debug("external site key is {}", channelSegmentEntity.getExternalSiteKey());
 
             if (network.configureParameters(sasParams, casInternalRequestParameters, channelSegmentEntity, clickUrl,
-                beaconUrl)) {
+                    beaconUrl)) {
                 InspectorStats.incrementStatCount(network.getName(), InspectorStrings.successfulConfigure);
                 row.setAdNetworkInterface(network);
                 if (network.isRtbPartner()) {
@@ -183,17 +188,16 @@ public class AsyncRequestMaker {
 
     }
 
-    public static List<ChannelSegment> makeAsyncRequests(final List<ChannelSegment> rankList, final MessageEvent e,
+    public static List<ChannelSegment> makeAsyncRequests(final List<ChannelSegment> rankList, final Channel channel,
             final List<ChannelSegment> rtbSegments) {
         Iterator<ChannelSegment> itr = rankList.iterator();
         while (itr.hasNext()) {
             ChannelSegment channelSegment = itr.next();
             InspectorStats.incrementStatCount(channelSegment.getAdNetworkInterface().getName(),
-                InspectorStrings.totalInvocations);
+                    InspectorStrings.totalInvocations);
             if (channelSegment.getAdNetworkInterface().makeAsyncRequest()) {
                 LOG.debug("Successfully sent request to channel of  advertiser id {} and channel id {}", channelSegment
-                        .getChannelSegmentEntity()
-                            .getId(), channelSegment.getChannelSegmentEntity().getChannelId());
+                        .getChannelSegmentEntity().getId(), channelSegment.getChannelSegmentEntity().getChannelId());
             }
             else {
                 itr.remove();
@@ -203,11 +207,10 @@ public class AsyncRequestMaker {
         while (rtbItr.hasNext()) {
             ChannelSegment channelSegment = rtbItr.next();
             InspectorStats.incrementStatCount(channelSegment.getAdNetworkInterface().getName(),
-                InspectorStrings.totalInvocations);
+                    InspectorStrings.totalInvocations);
             if (channelSegment.getAdNetworkInterface().makeAsyncRequest()) {
                 LOG.debug("Successfully sent request to rtb channel of  advertiser id {} and channel id {}",
-                    channelSegment.getChannelSegmentEntity().getId(), channelSegment
-                            .getChannelSegmentEntity()
+                        channelSegment.getChannelSegmentEntity().getId(), channelSegment.getChannelSegmentEntity()
                                 .getChannelId());
             }
             else {

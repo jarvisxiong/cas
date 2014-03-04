@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -18,11 +17,8 @@ import org.apache.commons.dbcp.PoolingDataSource;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.logging.InternalLoggerFactory;
 import org.jboss.netty.logging.Slf4JLoggerFactory;
-import org.jboss.netty.util.HashedWheelTimer;
-import org.jboss.netty.util.Timer;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -42,12 +38,9 @@ import com.inmobi.adserve.channels.repository.SiteEcpmRepository;
 import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
 import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
 import com.inmobi.adserve.channels.server.api.ConnectionType;
-import com.inmobi.adserve.channels.server.client.BootstrapCreation;
-import com.inmobi.adserve.channels.server.client.RtbBootstrapCreation;
 import com.inmobi.adserve.channels.server.module.NettyModule;
-import com.inmobi.adserve.channels.server.module.ScopeModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
-import com.inmobi.adserve.channels.server.netty.NettyServer;
+import com.inmobi.adserve.channels.server.netty.CasNettyServer;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
@@ -170,54 +163,28 @@ public class ChannelServer {
                 ServletHandler.getServerConfig().setProperty("dcpOutGoingMaxConnections", maxDCpOutGoingConnections);
             }
 
-            // Creating netty client for out-bound calls.
-            Timer timer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
-            BootstrapCreation.init(timer);
-            RtbBootstrapCreation.init(timer);
-            ClientBootstrap clientBootstrap = BootstrapCreation.createBootstrap(logger,
-                    configurationLoader.getServerConfiguration());
-            ClientBootstrap rtbClientBootstrap = RtbBootstrapCreation.createBootstrap(logger,
-                    configurationLoader.getRtbConfiguration());
-
             // For some partners netty client does not work thus
             // Creating a ning client for out-bound calls
             AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder()
-                    .setRequestTimeoutInMs(configurationLoader.getServerConfiguration().getInt("readtimeoutMillis") - 100)
-                    .setConnectionTimeoutInMs(configurationLoader.getServerConfiguration().getInt("readtimeoutMillis") - 200)
-                    .build();
+                    .setRequestTimeoutInMs(
+                            configurationLoader.getServerConfiguration().getInt("readtimeoutMillis") - 100)
+                    .setConnectionTimeoutInMs(
+                            configurationLoader.getServerConfiguration().getInt("readtimeoutMillis") - 200).build();
             AsyncHttpClient asyncHttpClient = new AsyncHttpClient(asyncHttpClientConfig);
 
-            if (null == clientBootstrap) {
-                ServerStatusInfo.statusCode = 404;
-                ServerStatusInfo.statusString = "StackTrace is: failed to create bootstrap";
-                logger.info("failed to create bootstrap");
-                return;
-            }
+            // Initialising request handler
+            AsyncRequestMaker.init(asyncHttpClient);
 
             // Configure the netty server.
-
-            // Initialising request handler
-            AsyncRequestMaker.init(clientBootstrap, rtbClientBootstrap, asyncHttpClient);
-
-            Injector parentInjector = Guice.createInjector(new ScopeModule());
-
-            Injector serverInjector = parentInjector.createChildInjector(
-                    new NettyModule(configurationLoader.getServerConfiguration(), 8800), new ServerModule(
-                            configurationLoader, repositoryHelper));
-            final NettyServer server = serverInjector.getInstance(NettyServer.class);
+            Injector injector = Guice.createInjector(new NettyModule(configurationLoader.getServerConfiguration()),
+                    new ServerModule(configurationLoader, repositoryHelper));
+            final CasNettyServer server = injector.getInstance(CasNettyServer.class);
             server.startAndWait();
-
-            Injector statInjector = parentInjector.createChildInjector(
-                    new NettyModule(configurationLoader.getServerConfiguration(), 8801), new ServerModule(
-                            configurationLoader, repositoryHelper));
-            final NettyServer statusServer = statInjector.getInstance(NettyServer.class);
-            statusServer.startAndWait();
 
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
                     server.stopAndWait();
-                    statusServer.stopAndWait();
                 }
             });
 
