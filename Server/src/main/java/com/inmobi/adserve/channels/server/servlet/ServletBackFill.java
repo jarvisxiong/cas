@@ -51,6 +51,11 @@ public class ServletBackFill implements Servlet {
                 return;
             }
 
+            //Setting isResponseOnlyFromDCP from config
+            boolean isResponseOnlyFromDcp = ServletHandler.getServerConfig().getBoolean("isResponseOnyFromDCP", false);
+            LOG.debug("isResponseOnlyFromDcp from config is {}", isResponseOnlyFromDcp);
+            sasParams.setResponseOnlyFromDcp(isResponseOnlyFromDcp);
+
             // Set imai content if r-format is imai
             String imaiBaseUrl = null;
             String rFormat = hrh.responseSender.getResponseFormat();
