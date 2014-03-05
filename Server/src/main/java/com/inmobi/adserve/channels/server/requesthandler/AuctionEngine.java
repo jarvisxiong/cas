@@ -254,11 +254,12 @@ public class AuctionEngine implements AuctionEngineInterface {
     }
 
     public double calculateRTBFloor(final double siteFloor, final double highestEcpm, final double segmentFloor,
-            final double countryFloor) {
+            final double countryFloor, final double networkEcpm) {
         double rtbFloor;
         rtbFloor = Math.max(siteFloor, highestEcpm);
         rtbFloor = Math.max(rtbFloor, segmentFloor);
         rtbFloor = Math.max(rtbFloor, countryFloor);
+        rtbFloor = Math.max(rtbFloor, networkEcpm);
         return rtbFloor;
     }
 }
