@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>com.inmobi.channels</groupId>
 		<artifactId>cas</artifactId>
-		<version>3.44-SNAPSHOT</version>
+		<version>3.50-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
@@ -19,6 +19,10 @@
              <groupId>com.inmobi.commons</groupId>
              <artifactId>datatypes-java</artifactId>
          </dependency>
+		<dependency>
+			<groupId>com.google.inject.extensions</groupId>
+			<artifactId>guice-assistedinject</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>

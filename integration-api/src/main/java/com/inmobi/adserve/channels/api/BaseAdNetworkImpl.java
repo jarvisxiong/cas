@@ -45,7 +45,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected SASRequestParameters                sasParams;
     protected CasInternalRequestParameters        casInternalRequestParameters;
     protected HttpRequestHandlerBase              baseRequestHandler      = null;
-    protected final MessageEvent                    serverEvent;
+    protected final MessageEvent                  serverEvent;
     protected String                              requestUrl              = "";
     private ThirdPartyAdResponse                  responseStruct;
     private boolean                               isRtbPartner            = false;
@@ -523,7 +523,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     if (cat == segmentCategories[i]) {
                         if (isIABCategory) {
                             return getValueFromListAsString(iabCategoryMap.getIABCategories(segmentCategories[i]),
-                                seperator);
+                                    seperator);
 
                         }
                         category = CategoryList.getCategory(cat);
@@ -563,6 +563,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         }
         if (StringUtils.isNotEmpty(casInternalRequestParameters.uidO1)) {
             return casInternalRequestParameters.uidO1;
+        }
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIDUS1)) {
+            return casInternalRequestParameters.uidIDUS1;
         }
         if (StringUtils.isNotEmpty(casInternalRequestParameters.uid)) {
             return casInternalRequestParameters.uid;

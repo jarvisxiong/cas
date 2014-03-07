@@ -203,18 +203,14 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
     private void setNingRequest(final String requestUrl) {
         String requestParams = getRequestParams();
         ChannelBuffer buffer = ChannelBuffers.copiedBuffer(requestParams, CharsetUtil.UTF_8);
-        ningRequest = new RequestBuilder("POST")
-                .setUrl(requestUrl)
-                    .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-                    .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
-                    .setHeader(HttpHeaders.Names.REFERER, requestUrl)
-                    .setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE)
-                    .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
-                    .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
-                    .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(buffer.readableBytes()))
-                    .setBody(requestParams)
-                    .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-                    .build();
+        ningRequest = new RequestBuilder("POST").setUrl(requestUrl)
+                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
+                .setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE)
+                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
+                .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
+                .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(buffer.readableBytes()))
+                .setBody(requestParams).setHeader("X-Forwarded-For", sasParams.getRemoteHostIp()).build();
         LOG.info("Mable request: {}", ningRequest);
         LOG.info("Mable request Body: {}", requestParams);
     }

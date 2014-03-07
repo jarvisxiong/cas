@@ -72,14 +72,9 @@ public class DCPMoPubAdNetwork extends AbstractDCPAdNetworkImpl {
         try {
             String host = config.getString("mopub.host");
             StringBuilder url = new StringBuilder(host);
-            url.append("?v=1&id=")
-                        .append(externalSiteId)
-                        .append("&ip=")
-                        .append(sasParams.getRemoteHostIp())
-                        .append("&udid=")
-                        .append(deviceId)
-                        .append("&q=")
-                        .append(getURLEncode(getCategories(',', true, false), format));
+            url.append("?v=1&id=").append(externalSiteId).append("&ip=").append(sasParams.getRemoteHostIp())
+                    .append("&udid=").append(deviceId).append("&q=")
+                    .append(getURLEncode(getCategories(',', true, false), format));
 
             if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
                     && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
@@ -179,15 +174,12 @@ public class DCPMoPubAdNetwork extends AbstractDCPAdNetworkImpl {
     }
 
     private void setNingRequest(final String requestUrl) {
-        ningRequest = new RequestBuilder()
-                .setUrl(requestUrl)
-                    .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-                    .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
-                    .setHeader(HttpHeaders.Names.REFERER, requestUrl)
-                    .setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE)
-                    .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
-                    .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-                    .build();
+        ningRequest = new RequestBuilder().setUrl(requestUrl)
+                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
+                .setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE)
+                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
+                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp()).build();
     }
 
 }

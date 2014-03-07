@@ -120,7 +120,7 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
 
             if (StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)) {
                 appendQueryParam(url, LOCATION,
-                    getURLEncode(String.format(latlongFormat, latitude, longitude), format), false);
+                        getURLEncode(String.format(latlongFormat, latitude, longitude), format), false);
             }
             if (null != sasParams.getPostalCode()) {
                 appendQueryParam(url, POSTAL_CODE, sasParams.getPostalCode().toString(), false);
@@ -129,14 +129,14 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
             if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
                 if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
                     appendQueryParam(url, ANDROID_ID_MD5, getURLEncode(casInternalRequestParameters.uidMd5, format),
-                        false);
+                            false);
                 }
                 else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
                     appendQueryParam(url, ANDROID_ID_MD5, getURLEncode(casInternalRequestParameters.uid, format), false);
                 }
                 if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
                     appendQueryParam(url, ANDROID_ID_SHA1, getURLEncode(casInternalRequestParameters.uidIDUS1, format),
-                        false);
+                            false);
                 }
 
             }
@@ -221,15 +221,12 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
     }
 
     private void setNingRequest(final String requestUrl) {
-        ningRequest = new RequestBuilder()
-                .setUrl(requestUrl)
-                    .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-                    .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
-                    .setHeader(HttpHeaders.Names.REFERER, requestUrl)
-                    .setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE)
-                    .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
-                    .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-                    .build();
+        ningRequest = new RequestBuilder().setUrl(requestUrl)
+                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
+                .setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE)
+                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
+                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp()).build();
     }
 
     @Override

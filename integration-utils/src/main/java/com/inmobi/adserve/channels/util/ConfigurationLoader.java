@@ -46,7 +46,13 @@ public class ConfigurationLoader {
     private ConfigurationLoader(final String configFile) {
 
         try {
-            configuration = new PropertiesConfiguration(configFile);
+            if (configFile.startsWith("/")) {
+                configuration = new PropertiesConfiguration(configFile);
+            }
+            else {
+                configuration = new PropertiesConfiguration(ConfigurationLoader.class.getClassLoader().getResource(
+                        configFile));
+            }
         }
         catch (ConfigurationException e) {
             LOG.error("error loading config {}", e);

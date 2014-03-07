@@ -41,7 +41,7 @@ public class MobileCommerceAdNetwork extends AbstractDCPAdNetworkImpl {
             LOG.info("mandate parameters missing for mobile commerce so exiting adapter");
             return false;
         }
-        host = config.getString("mobilecommerce.hostus");
+        host = config.getString("mobilecommerce.host");
         uid = externalSiteId;
         LOG.debug("Configure parameters inside mobile commerce returned true");
         return true;
@@ -66,16 +66,10 @@ public class MobileCommerceAdNetwork extends AbstractDCPAdNetworkImpl {
     public URI getRequestUri() throws Exception {
         try {
             StringBuilder url = new StringBuilder();
-            url.append(host)
-                        .append(responseFormat)
-                        .append("/?uid=")
-                        .append(uid)
-                        .append("&sid=")
-                        .append(blindedSiteId)
-                        .append("&gip=");
-            url.append(sasParams.getRemoteHostIp())
-                        .append("&ua=")
-                        .append(getURLEncode(sasParams.getUserAgent(), format));
+            url.append(host).append(responseFormat).append("/?uid=").append(uid).append("&sid=").append(blindedSiteId)
+                    .append("&gip=");
+            url.append(sasParams.getRemoteHostIp()).append("&ua=")
+                    .append(getURLEncode(sasParams.getUserAgent(), format));
             url.append("&filter=").append(config.getString("mobilecommerce.filter"));
             url.append("&test=").append(config.getString("mobilecommerce.isTest"));
 

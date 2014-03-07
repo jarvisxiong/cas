@@ -6,6 +6,8 @@ import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
 import com.inmobi.adserve.channels.server.requesthandler.RequestFilters;
+import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilterApplier;
+import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import org.jboss.netty.channel.MessageEvent;
@@ -24,14 +26,19 @@ public class ServletRtbd implements Servlet {
     private final MatchSegments matchSegments;
     private final Provider<Marker> traceMarkerProvider;
     private final RequestFilters requestFilters;
+    private final ChannelSegmentFilterApplier channelSegmentFilterApplier;
+    private final CasUtils casUtils;
 
 
     @Inject
     public ServletRtbd(final Provider<Marker> traceMarkerProvider, MatchSegments matchSegments,
-                       final RequestFilters requestFilters) {
+                       final RequestFilters requestFilters, final ChannelSegmentFilterApplier channelSegmentFilterApplier,
+                       final CasUtils casUtils) {
         this.traceMarkerProvider = traceMarkerProvider;
         this.matchSegments = matchSegments;
         this.requestFilters = requestFilters;
+        this.channelSegmentFilterApplier = channelSegmentFilterApplier;
+        this.casUtils = casUtils;
     }
 
     @Override
@@ -41,7 +48,8 @@ public class ServletRtbd implements Servlet {
         LOG.debug(traceMarker, "Inside RTBD servlet");
         InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
         InspectorStats.incrementStatCount(InspectorStrings.ruleEngineRequests);
-        ServletBackFill servletBackFill = new ServletBackFill(matchSegments, traceMarkerProvider, requestFilters);
+        ServletBackFill servletBackFill = new ServletBackFill(matchSegments, traceMarkerProvider,
+                channelSegmentFilterApplier, casUtils, requestFilters);
         servletBackFill.handleRequest(hrh, queryStringDecoder, e);
     }
 

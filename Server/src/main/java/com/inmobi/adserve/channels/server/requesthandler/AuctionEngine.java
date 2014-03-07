@@ -1,19 +1,21 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.AuctionEngineInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.server.annotations.AdvertiserIdNameMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 
 /***
@@ -30,6 +32,10 @@ public class AuctionEngine implements AuctionEngineInterface {
     public SASRequestParameters         sasParams;
     public CasInternalRequestParameters casInternalRequestParameters;
     private List<ChannelSegment>        rtbSegments;
+
+    @AdvertiserIdNameMap
+    @Inject
+    private static Map<String, String>  advertiserIdNameMap;
 
     public AuctionEngine() {
     }
@@ -68,16 +74,13 @@ public class AuctionEngine implements AuctionEngineInterface {
             rtbResponse = rtbList.get(0);
             // Take minimum of rtbFloor+0.01 and bid as secondBidprice if no of rtb
             // response are 1.
-            secondBidPrice = Math.min(casInternalRequestParameters.rtbBidFloor + 0.01, rtbResponse
-                    .getAdNetworkInterface()
-                        .getBidPriceInUsd());
+            secondBidPrice = Math.min(casInternalRequestParameters.rtbBidFloor, rtbResponse
+                    .getAdNetworkInterface().getBidPriceInUsd());
             // Set encrypted bid price.
             rtbResponse.getAdNetworkInterface().setEncryptedBid(getEncryptedBid(secondBidPrice));
             rtbResponse.getAdNetworkInterface().setSecondBidPrice(secondBidPrice);
-            LOG.debug("Completed auction, winner is {} and secondBidPrice is {}", rtbList
-                    .get(0)
-                        .getAdNetworkInterface()
-                        .getName(), secondBidPrice);
+            LOG.debug("Completed auction, winner is {} and secondBidPrice is {}", rtbList.get(0)
+                    .getAdNetworkInterface().getName(), secondBidPrice);
             // Return as there is no need to iterate over the list.
             return rtbList.get(0).getAdNetworkInterface();
         }
@@ -86,10 +89,8 @@ public class AuctionEngine implements AuctionEngineInterface {
         LOG.debug("RTB segments are {}", rtbList.size());
         for (int i = 0; i < rtbList.size(); i++) {
             for (int j = i + 1; j < rtbList.size(); j++) {
-                if (rtbList.get(i).getAdNetworkInterface().getBidPriceInUsd() < rtbList
-                        .get(j)
-                            .getAdNetworkInterface()
-                            .getBidPriceInUsd()) {
+                if (rtbList.get(i).getAdNetworkInterface().getBidPriceInUsd() < rtbList.get(j).getAdNetworkInterface()
+                        .getBidPriceInUsd()) {
                     ChannelSegment channelSegment = rtbList.get(i);
                     rtbList.set(i, rtbList.get(j));
                     rtbList.set(j, channelSegment);
@@ -106,10 +107,8 @@ public class AuctionEngine implements AuctionEngineInterface {
                 secondHighestBid = i;
                 break;
             }
-            else if (rtbList.get(i).getAdNetworkInterface().getLatency() < rtbList
-                    .get(lowestLatencyBid)
-                        .getAdNetworkInterface()
-                        .getLatency()) {
+            else if (rtbList.get(i).getAdNetworkInterface().getLatency() < rtbList.get(lowestLatencyBid)
+                    .getAdNetworkInterface().getLatency()) {
                 lowestLatencyBid = i;
             }
         }
@@ -121,20 +120,15 @@ public class AuctionEngine implements AuctionEngineInterface {
         secondBidPrice = rtbList.get(secondHighestBid).getAdNetworkInterface().getBidPriceInUsd();
         double winnerBid = rtbList.get(lowestLatencyBid).getAdNetworkInterface().getBidPriceInUsd();
         if (winnerBid == secondBidPrice) {
-            secondBidPrice = casInternalRequestParameters.rtbBidFloor + 0.01;
-        }
-        else {
-            secondBidPrice = secondBidPrice + 0.01;
+            secondBidPrice = casInternalRequestParameters.rtbBidFloor;
         }
 
         // Ensure secondHighestBidPrice never crosses response bid.
         secondBidPrice = Math.min(secondBidPrice, rtbResponse.getAdNetworkInterface().getBidPriceInUsd());
         rtbResponse.getAdNetworkInterface().setEncryptedBid(getEncryptedBid(secondBidPrice));
         rtbResponse.getAdNetworkInterface().setSecondBidPrice(secondBidPrice);
-        LOG.debug("Completed auction, winner is {} and secondBidPrice is {}", rtbList
-                .get(lowestLatencyBid)
-                    .getAdNetworkInterface()
-                    .getName(), secondBidPrice);
+        LOG.debug("Completed auction, winner is {} and secondBidPrice is {}", rtbList.get(lowestLatencyBid)
+                .getAdNetworkInterface().getName(), secondBidPrice);
         return rtbList.get(lowestLatencyBid).getAdNetworkInterface();
     }
 
@@ -158,69 +152,52 @@ public class AuctionEngine implements AuctionEngineInterface {
             if (channelSegment.getAdNetworkInterface().getBidPriceInUsd() < casInternalRequestParameters.rtbBidFloor) {
                 rtbListIterator.remove();
                 LOG.debug("Dropped in bidfloor filter {}", channelSegment.getAdNetworkInterface().getName());
-                if (Filters
-                        .getAdvertiserIdToNameMapping()
-                            .containsKey(channelSegment.getChannelEntity().getAccountId())) {
+                if (advertiserIdNameMap.containsKey(channelSegment.getChannelEntity().getAccountId())) {
                     InspectorStats.incrementStatCount(
-                        Filters.getAdvertiserIdToNameMapping().get(channelSegment.getChannelEntity().getAccountId()),
-                        InspectorStrings.droppedInRtbBidFloorFilter);
+                            advertiserIdNameMap.get(channelSegment.getChannelEntity().getAccountId()),
+                            InspectorStrings.droppedInRtbBidFloorFilter);
                 }
             }
-            else if (!channelSegment
-                    .getChannelEntity()
-                        .getAccountId()
-                        .equalsIgnoreCase(channelSegment.getAdNetworkInterface().getSeatId())) {
+            else if (!channelSegment.getChannelEntity().getAccountId()
+                    .equalsIgnoreCase(channelSegment.getAdNetworkInterface().getSeatId())) {
                 rtbListIterator.remove();
                 LOG.debug("Dropped in seat id mismatch filter {}", channelSegment.getAdNetworkInterface().getName());
-                if (Filters
-                        .getAdvertiserIdToNameMapping()
-                            .containsKey(channelSegment.getChannelEntity().getAccountId())) {
+                if (advertiserIdNameMap.containsKey(channelSegment.getChannelEntity().getAccountId())) {
                     InspectorStats.incrementStatCount(
-                        Filters.getAdvertiserIdToNameMapping().get(channelSegment.getChannelEntity().getAccountId()),
-                        InspectorStrings.droppedInRtbSeatidMisMatchFilter);
+                            advertiserIdNameMap.get(channelSegment.getChannelEntity().getAccountId()),
+                            InspectorStrings.droppedInRtbSeatidMisMatchFilter);
                 }
             }
-            else if (!channelSegment
-                    .getAdNetworkInterface()
-                        .getImpressionId()
-                        .equalsIgnoreCase(channelSegment.getAdNetworkInterface().getRtbImpressionId())) {
+            else if (!channelSegment.getAdNetworkInterface().getImpressionId()
+                    .equalsIgnoreCase(channelSegment.getAdNetworkInterface().getRtbImpressionId())) {
                 rtbListIterator.remove();
-                LOG.debug("Dropped in impression id mismatch filter {}", channelSegment
-                        .getAdNetworkInterface()
-                            .getName());
-                if (Filters
-                        .getAdvertiserIdToNameMapping()
-                            .containsKey(channelSegment.getChannelEntity().getAccountId())) {
+                LOG.debug("Dropped in impression id mismatch filter {}", channelSegment.getAdNetworkInterface()
+                        .getName());
+                if (advertiserIdNameMap.containsKey(channelSegment.getChannelEntity().getAccountId())) {
                     InspectorStats.incrementStatCount(
-                        Filters.getAdvertiserIdToNameMapping().get(channelSegment.getChannelEntity().getAccountId()),
-                        InspectorStrings.droppedInRtbImpressionIdMisMatchFilter);
+                            advertiserIdNameMap.get(channelSegment.getChannelEntity().getAccountId()),
+                            InspectorStrings.droppedInRtbImpressionIdMisMatchFilter);
                 }
             }
-            else if (!casInternalRequestParameters.auctionId.equalsIgnoreCase(channelSegment
-                    .getAdNetworkInterface()
-                        .getAuctionId())) {
+            else if (!casInternalRequestParameters.auctionId.equalsIgnoreCase(channelSegment.getAdNetworkInterface()
+                    .getAuctionId())) {
                 rtbListIterator.remove();
                 LOG.debug("Dropped in auction id mismatch filter {}", channelSegment.getAdNetworkInterface().getName());
-                if (Filters
-                        .getAdvertiserIdToNameMapping()
-                            .containsKey(channelSegment.getChannelEntity().getAccountId())) {
+                if (advertiserIdNameMap.containsKey(channelSegment.getChannelEntity().getAccountId())) {
                     InspectorStats.incrementStatCount(
-                        Filters.getAdvertiserIdToNameMapping().get(channelSegment.getChannelEntity().getAccountId()),
-                        InspectorStrings.droppedInRtbAuctionIdMisMatchFilter);
+                            advertiserIdNameMap.get(channelSegment.getChannelEntity().getAccountId()),
+                            InspectorStrings.droppedInRtbAuctionIdMisMatchFilter);
                 }
             }
             else if (!RtbAdNetwork.getCurrenciesSupported().contains(
-                channelSegment.getAdNetworkInterface().getCurrency())) {
+                    channelSegment.getAdNetworkInterface().getCurrency())) {
                 rtbListIterator.remove();
-                LOG.debug("Dropped in currency not supported filter {}", channelSegment
-                        .getAdNetworkInterface()
-                            .getName());
-                if (Filters
-                        .getAdvertiserIdToNameMapping()
-                            .containsKey(channelSegment.getChannelEntity().getAccountId())) {
+                LOG.debug("Dropped in currency not supported filter {}", channelSegment.getAdNetworkInterface()
+                        .getName());
+                if (advertiserIdNameMap.containsKey(channelSegment.getChannelEntity().getAccountId())) {
                     InspectorStats.incrementStatCount(
-                        Filters.getAdvertiserIdToNameMapping().get(channelSegment.getChannelEntity().getAccountId()),
-                        InspectorStrings.droppedInRtbCurrencyNotSupportedFilter);
+                            advertiserIdNameMap.get(channelSegment.getChannelEntity().getAccountId()),
+                            InspectorStrings.droppedInRtbCurrencyNotSupportedFilter);
                 }
             }
         }
@@ -277,11 +254,12 @@ public class AuctionEngine implements AuctionEngineInterface {
     }
 
     public double calculateRTBFloor(final double siteFloor, final double highestEcpm, final double segmentFloor,
-            final double countryFloor) {
+            final double countryFloor, final double networkEcpm) {
         double rtbFloor;
         rtbFloor = Math.max(siteFloor, highestEcpm);
         rtbFloor = Math.max(rtbFloor, segmentFloor);
         rtbFloor = Math.max(rtbFloor, countryFloor);
+        rtbFloor = Math.max(rtbFloor, networkEcpm);
         return rtbFloor;
     }
 }

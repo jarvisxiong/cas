@@ -19,13 +19,9 @@ public class RequestIdHandler extends SimpleChannelUpstreamHandler {
     public RequestIdHandler() {
     }
 
-    
     @Override
-    public void messageReceived(
-            ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+    public void messageReceived(final ChannelHandlerContext ctx, final MessageEvent e) throws Exception {
         MDC.put("requestId", e.getChannel().getId().toString());
-        super.messageReceived(ctx,e);
+        super.messageReceived(ctx, e);
     }
-     
-
 }

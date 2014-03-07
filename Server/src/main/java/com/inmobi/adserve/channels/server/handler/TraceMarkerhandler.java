@@ -11,6 +11,7 @@ import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
 import com.google.inject.Key;
+import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.SimpleScope;
 
 
@@ -19,6 +20,7 @@ import com.inmobi.adserve.channels.server.SimpleScope;
  * 
  */
 @Sharable
+@Singleton
 public class TraceMarkerhandler extends SimpleChannelUpstreamHandler {
 
     public static final Marker TRACE_MAKER = MarkerFactory.getMarker("TRACE_MAKER");

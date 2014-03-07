@@ -45,6 +45,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 
     private static final String           LAT           = "LT";
     private static final String           LONG          = "LG";
+    private static final String           RESPONSE_TYPE = "ST";
     private static final String           REQUEST_TYPE  = "RT";
     private static final String           SIZE          = "SZ";
     private static final String           ANDROIDMD5    = "AM";
@@ -57,20 +58,22 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String           OS            = "DO";
     private static final String           APPID         = "AP";
     private static final String           SITEID        = "SI";
-    private static final String           ZIP           = "ZP";
+    //private static final String           ZIP           = "ZP";
     private static final String           COUNTRY       = "CO";
-    private static final String           SECRET        = "SK";
+    //private static final String           SECRET        = "SK";
     private static final String           ADTYPE        = "AT";
-    private static final String           APPTYPE       = "STG";
-    private static final String           WAPTYPE       = "STG%2CSTW";
+    private static final String           APPTYPE       = "STG,RMG";
+    private static final String           WAPTYPE       = "STG,STW,RMG";
     private static final String           ANDROID       = "Android";
     private static final String           IOS           = "iOS";
     private static final String           auIdFormat    = "%s/%s/%s/%s";
+    private static final String           XMLFORMAT       = "xml";
     private final SimpleDateFormat        dateFormat    = new SimpleDateFormat("yyyy-MM-dd");
 
     private final String                  partnerId;
     private final String                  seed;
     private final String                  requestFormat;
+    private final String                  responseFormat;
     private static Map<Integer, String>   categoryList  = new HashMap<Integer, String>();
 
     private static DocumentBuilderFactory factory;
@@ -114,7 +117,8 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
         partnerId = config.getString("placeiq.partnerId");
         host = config.getString("placeiq.host");
         seed = config.getString("placeiq.seed");
-        requestFormat = config.getString("placeiq.format");
+        requestFormat = config.getString("placeiq.requestFormat");
+        responseFormat = config.getString("placeiq.responseFormat");
         factory = DocumentBuilderFactory.newInstance();
         try {
             builder = factory.newDocumentBuilder();
@@ -187,11 +191,11 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public URI getRequestUri() throws Exception {
-
         StringBuilder url = new StringBuilder(host);
         appendQueryParam(url, REQUEST_TYPE, requestFormat, true);
+        appendQueryParam(url,RESPONSE_TYPE, responseFormat,false);
         Calendar now = Calendar.getInstance();
-        appendQueryParam(url, SECRET, getHashedValue(dateFormat.format(now.getTime()) + seed, "MD5"), false);
+        //appendQueryParam(url, SECRET, getHashedValue(dateFormat.format(now.getTime()) + seed, "MD5"), false);
         appendQueryParam(url, PT, partnerId, false);
         String category = getCategory();
         String auId = String.format(auIdFormat, partnerId, category, Long.toHexString(sasParams.getSiteIncId()),
@@ -207,10 +211,10 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             appendQueryParam(url, LAT, latitude, false);
             appendQueryParam(url, LONG, longitude, false);
         }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.zipCode)) {
+        /*if (StringUtils.isNotEmpty(casInternalRequestParameters.zipCode)) {
             appendQueryParam(url, ZIP, casInternalRequestParameters.zipCode, false);
-        }
-        if (null != sasParams.getCountryCode()) {
+        }*/
+        if (StringUtils.isNotEmpty(sasParams.getCountryCode())) {
             appendQueryParam(url, COUNTRY, sasParams.getCountryCode().toUpperCase(), false);
         }
 
@@ -235,11 +239,12 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 
         if (isApp) {
             appendQueryParam(url, APPID, sasParams.getSiteIncId() + "", false);
-            appendQueryParam(url, ADTYPE, APPTYPE, false);
+            appendQueryParam(url, ADTYPE, getURLEncode(APPTYPE, format), false);
+            
         }
         else {
             appendQueryParam(url, SITEID, sasParams.getSiteIncId() + "", false);
-            appendQueryParam(url, ADTYPE, WAPTYPE, false);
+            appendQueryParam(url, ADTYPE, getURLEncode(WAPTYPE, format), false);
         }
         LOG.debug("PlaceIQ url is {}", url);
 
@@ -251,7 +256,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
         LOG.debug("response is {}", response);
         statusCode = status.getCode();
         if (StringUtils.isBlank(response) || status.getCode() != 200
-                || ("xml".equalsIgnoreCase(requestFormat) && response.contains("<NOAD>"))) {
+                || (XMLFORMAT.equalsIgnoreCase(responseFormat) && response.contains("<NOAD>"))) {
             if (200 == statusCode) {
                 statusCode = 500;
             }
@@ -262,7 +267,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
         else {
             try {
                 VelocityContext context = new VelocityContext();
-                if ("xml".equalsIgnoreCase(requestFormat)) {
+                if (XMLFORMAT.equalsIgnoreCase(responseFormat)) {
                     if (response.contains("<NOAD>")) {
                         adStatus = "NO_AD";
                         responseContent = "";

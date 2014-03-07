@@ -1,15 +1,30 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Singleton;
+
+import org.apache.hadoop.thirdparty.guava.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.google.inject.name.Named;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.*;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ServletHandler;
+import com.inmobi.adserve.channels.server.annotations.AdvertiserIdNameMap;
+import com.inmobi.adserve.channels.server.requesthandler.beans.AdvertiserMatchedSegmentDetail;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import org.slf4j.Logger;
@@ -37,7 +52,7 @@ public class MatchSegments {
 
     @Inject
     public MatchSegments(final RepositoryHelper repositoryHelper, final Provider<Marker> traceMarkerProvider,
-            @Named("advertiserIdToNameMap") final Map<String, String> advertiserIdToNameMap) {
+            @AdvertiserIdNameMap final Map<String, String> advertiserIdToNameMap) {
         this.traceMarkerProvider = traceMarkerProvider;
         this.repositoryHelper = repositoryHelper;
         this.advertiserIdToNameMap = advertiserIdToNameMap;
@@ -72,7 +87,7 @@ public class MatchSegments {
     }
 
     // select channel segment based on specified rules
-    public Map<String, HashMap<String, ChannelSegment>> matchSegments(final SASRequestParameters sasParams) {
+    public List<AdvertiserMatchedSegmentDetail> matchSegments(final SASRequestParameters sasParams) {
 
         Marker traceMarker = traceMarkerProvider.get();
         Short slotId = sasParams.getSlot();
@@ -108,7 +123,7 @@ public class MatchSegments {
             }
 
             return (matchSegments(slot, getCategories(sasParams), country, targetingPlatform, siteRating, osId,
-                sasParams, traceMarker));
+                    sasParams, traceMarker));
         }
         catch (NumberFormatException exception) {
             LOG.error(traceMarker, "Error parsing required arguments {}", exception);
@@ -144,10 +159,9 @@ public class MatchSegments {
         return categoryList;
     }
 
-    private Map<String, HashMap<String, ChannelSegment>> matchSegments(final long slotId, final List<Long> categories,
+    private List<AdvertiserMatchedSegmentDetail> matchSegments(final long slotId, final List<Long> categories,
             final long country, final Integer targetingPlatform, final Integer siteRating, final int osId,
             final SASRequestParameters sasParams, final Marker traceMarker) {
-        Map<String, HashMap<String, ChannelSegment>> result = new HashMap<String, HashMap<String, ChannelSegment>>();
         Set<ChannelSegmentEntity> allFilteredEntities = new HashSet<ChannelSegmentEntity>();
 
         // adding -1 for all categories
@@ -164,25 +178,21 @@ public class MatchSegments {
             for (long countryId : countries) {
                 for (int os : osIds) {
                     Collection<ChannelSegmentEntity> filteredEntities = loadEntities(slotId, category, countryId,
-                        targetingPlatform, siteRating, os, traceMarker);
+                            targetingPlatform, siteRating, os, traceMarker);
                     LOG.debug(traceMarker, "Found {} adGroups", filteredEntities.size());
                     allFilteredEntities.addAll(filteredEntities);
                 }
             }
         }
-        if (!allFilteredEntities.isEmpty()) {
-            LOG.debug(traceMarker, "AdGroups are :");
-            for (ChannelSegmentEntity entity : allFilteredEntities) {
-                LOG.debug(traceMarker, "AdGroup : {}", entity.getAdgroupId());
-                insertChannelSegmentToResultSet(result, entity, sasParams, traceMarker);
-            }
-        }
+
+        List<AdvertiserMatchedSegmentDetail> result = insertChannelSegmentToResultSet(allFilteredEntities, sasParams,
+                traceMarker);
+
         if (result.size() == 0) {
-            LOG
-                    .debug(
-                        traceMarker,
-                        "No matching records for the request - slot: {} categories: {} country: {} targetingPlatform: {} siteRating: {} osId: {}",
-                        slotId, categories, country, targetingPlatform, siteRating, osId);
+            LOG.debug(
+                    traceMarker,
+                    "No matching records for the request - slot: {} categories: {} country: {} targetingPlatform: {} siteRating: {} osId: {}",
+                    slotId, categories, country, targetingPlatform, siteRating, osId);
         }
         else {
             LOG.debug(traceMarker, "Final selected list of adGroups : ");
@@ -195,33 +205,45 @@ public class MatchSegments {
     private Collection<ChannelSegmentEntity> loadEntities(final long slotId, final long category, final long country,
             final Integer targetingPlatform, final Integer siteRating, final int osId, final Marker traceMarker) {
         LOG.debug(traceMarker,
-            "Loading adgroups for slot: {} category: {} country: {} targetingPlatform: {} siteRating: {} osId: {}",
-            slotId, category, country, targetingPlatform, siteRating, osId);
+                "Loading adgroups for slot: {} category: {} country: {} targetingPlatform: {} siteRating: {} osId: {}",
+                slotId, category, country, targetingPlatform, siteRating, osId);
         return channelAdGroupRepository.getEntities(slotId, category, country, targetingPlatform, siteRating, osId);
     }
 
-    private void insertChannelSegmentToResultSet(final Map<String, HashMap<String, ChannelSegment>> result,
-            final ChannelSegmentEntity channelSegmentEntity, final SASRequestParameters sasParams,
+    private List<AdvertiserMatchedSegmentDetail> insertChannelSegmentToResultSet(
+            final Set<ChannelSegmentEntity> allFilteredEntities, final SASRequestParameters sasParams,
             final Marker traceMarker) {
 
-        // select the segment only if advertiserIdToNameMap contains incoming Segment advertiserId
-        if (advertiserIdToNameMap.containsKey(channelSegmentEntity.getAdvertiserId())) {
-            InspectorStats.incrementStatCount(advertiserIdToNameMap.get(channelSegmentEntity.getAdvertiserId()),
-                InspectorStrings.totalMatchedSegments);
+        Map<String, AdvertiserMatchedSegmentDetail> advertiserToMatchedSegmentDetailMap = Maps.newHashMap();
 
-            ChannelSegment channelSegment = createSegment(channelSegmentEntity, sasParams, traceMarker);
+        LOG.debug(traceMarker, "AdGroups are :");
+        for (ChannelSegmentEntity channelSegmentEntity : allFilteredEntities) {
+            LOG.debug(traceMarker, "AdGroup : {}", channelSegmentEntity.getAdgroupId());
 
-            if (result.get(channelSegmentEntity.getAdvertiserId()) == null) {
-                HashMap<String, ChannelSegment> hashMap = new HashMap<String, ChannelSegment>();
-                hashMap.put(channelSegmentEntity.getAdgroupId(), channelSegment);
-                result.put(channelSegmentEntity.getAdvertiserId(), hashMap);
+            // select the segment only if advertiserIdToNameMap contains incoming Segment advertiserId
+            if (advertiserIdToNameMap.containsKey(channelSegmentEntity.getAdvertiserId())) {
+
+                InspectorStats.incrementStatCount(advertiserIdToNameMap.get(channelSegmentEntity.getAdvertiserId()),
+                        InspectorStrings.totalMatchedSegments);
+
+                ChannelSegment channelSegment = createSegment(channelSegmentEntity, sasParams, traceMarker);
+
+                AdvertiserMatchedSegmentDetail advertiserMatchedSegmentDetail = advertiserToMatchedSegmentDetailMap
+                        .get(channelSegmentEntity.getAdvertiserId());
+
+                if (advertiserMatchedSegmentDetail == null) {
+                    advertiserMatchedSegmentDetail = new AdvertiserMatchedSegmentDetail(new ArrayList<ChannelSegment>());
+                    advertiserToMatchedSegmentDetailMap.put(channelSegmentEntity.getAdvertiserId(),
+                            advertiserMatchedSegmentDetail);
+                }
+
+                advertiserMatchedSegmentDetail.getChannelSegmentList().add(channelSegment);
+
             }
-            else {
-                HashMap<String, ChannelSegment> hashMap = result.get(channelSegmentEntity.getAdvertiserId());
-                hashMap.put(channelSegmentEntity.getAdgroupId(), channelSegment);
-                result.put(channelSegmentEntity.getAdvertiserId(), hashMap);
-            }
+
         }
+
+        return Lists.newArrayList(advertiserToMatchedSegmentDetailMap.values());
 
     }
 
@@ -254,7 +276,7 @@ public class MatchSegments {
         if (segmentAdGroupFeedbackEntity != null) {
             if (segmentAdGroupFeedbackEntity.getAdGroupFeedbackMap() != null) {
                 channelSegmentCitrusLeafFeedbackEntity = segmentAdGroupFeedbackEntity.getAdGroupFeedbackMap().get(
-                    channelSegmentEntity.getExternalSiteKey());
+                        channelSegmentEntity.getExternalSiteKey());
             }
         }
         else {
@@ -271,16 +293,12 @@ public class MatchSegments {
                 channelSegmentFeedbackEntity, channelSegmentCitrusLeafFeedbackEntity, null, pEcpm);
     }
 
-    private void printSegments(final Map<String, HashMap<String, ChannelSegment>> matchedSegments,
-            final Marker traceMarker) {
+    private void printSegments(final List<AdvertiserMatchedSegmentDetail> result, final Marker traceMarker) {
         if (LOG.isDebugEnabled()) {
-            for (Map.Entry<String, HashMap<String, ChannelSegment>> advertiserEntry : matchedSegments.entrySet()) {
-                Map<String, ChannelSegment> adGroups = advertiserEntry.getValue();
-                for (Map.Entry<String, ChannelSegment> adGroupEntry : adGroups.entrySet()) {
-                    ChannelSegment channelSegment = adGroupEntry.getValue();
-                    LOG.debug(traceMarker, "Advertiser :{} , AdGroup : {}", channelSegment
-                            .getChannelSegmentEntity()
-                                .getAdvertiserId(), channelSegment.getChannelSegmentEntity().getAdgroupId());
+            for (AdvertiserMatchedSegmentDetail advertiserMatchedSegmentDetail : result) {
+                for (ChannelSegment channelSegment : advertiserMatchedSegmentDetail.getChannelSegmentList()) {
+                    LOG.debug(traceMarker, "Advertiser :{} , AdGroup : {}", channelSegment.getChannelSegmentEntity()
+                            .getAdvertiserId(), channelSegment.getChannelSegmentEntity().getAdgroupId());
                 }
             }
         }

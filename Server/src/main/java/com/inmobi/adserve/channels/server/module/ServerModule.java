@@ -9,9 +9,14 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ChannelServer;
+import com.inmobi.adserve.channels.server.annotations.LoggerConfiguration;
+import com.inmobi.adserve.channels.server.annotations.RtbConfiguration;
+import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
-import com.inmobi.adserve.channels.server.requesthandler.Filters;
+import com.inmobi.adserve.channels.server.requesthandler.AuctionEngine;
+import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
+import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
 import com.inmobi.adserve.channels.server.requesthandler.RequestFilters;
 import com.inmobi.adserve.creativetool.api.AdMakerFactory;
@@ -24,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.Path;
 import java.util.Map;
 import java.util.Set;
+import com.inmobi.adserve.channels.util.ConfigurationLoader;
 
 
 /**
@@ -36,11 +42,14 @@ public class ServerModule extends AbstractModule {
     private final RepositoryHelper repositoryHelper;
     private final Reflections      reflections;
     private final Configuration    adapterConfiguration;
+    private final Configuration    serverConfiguration;
+    private final Configuration    rtbConfiguration;
 
-    public ServerModule(final Configuration loggerConfiguration, final Configuration adapterConfiguration,
-            final RepositoryHelper repositoryHelper) {
-        this.loggerConfiguration = loggerConfiguration;
-        this.adapterConfiguration = adapterConfiguration;
+    public ServerModule(final ConfigurationLoader configurationLoader, final RepositoryHelper repositoryHelper) {
+        this.loggerConfiguration = configurationLoader.getLoggerConfiguration();
+        this.adapterConfiguration = configurationLoader.getAdapterConfiguration();
+        this.serverConfiguration = configurationLoader.getServerConfiguration();
+        this.rtbConfiguration = configurationLoader.getRtbConfiguration();
         this.repositoryHelper = repositoryHelper;
         this.reflections = new Reflections("com.inmobi.adserve.channels", new TypeAnnotationsScanner());
     }
@@ -52,13 +61,19 @@ public class ServerModule extends AbstractModule {
 
         bind(RepositoryHelper.class).toInstance(repositoryHelper);
         bind(MatchSegments.class).asEagerSingleton();
+        bind(Configuration.class).annotatedWith(ServerConfiguration.class).toInstance(serverConfiguration);
+        bind(Configuration.class).annotatedWith(LoggerConfiguration.class).toInstance(loggerConfiguration);
+        bind(Configuration.class).annotatedWith(RtbConfiguration.class).toInstance(rtbConfiguration);
 
         requestStaticInjection(AsyncRequestMaker.class);
-        requestStaticInjection(Filters.class);
-        requestStaticInjection(RequestFilters.class);
+        requestStaticInjection(ChannelSegment.class);
+        requestStaticInjection(Logging.class);
+        requestStaticInjection(AuctionEngine.class);
         requestStaticInjection(AdMakerFactory.class);
+        requestStaticInjection(RequestFilters.class);
 
         install(new AdapterConfigModule(adapterConfiguration, ChannelServer.dataCentreName));
+        install(new ChannelSegmentFilterModule());
 
     }
 

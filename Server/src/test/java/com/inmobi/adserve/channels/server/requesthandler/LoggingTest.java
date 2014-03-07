@@ -4,6 +4,7 @@ import com.inmobi.adserve.channels.adnetworks.tapit.DCPTapitAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilterApplierTest;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.messaging.Message;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
@@ -55,11 +56,12 @@ public class LoggingTest extends TestCase {
         Timestamp modified_on = null;
         Long[] slotIds = null;
         Integer[] siteRatings = null;
-        ChannelSegmentEntity channelSegmentEntity = new ChannelSegmentEntity(FilterTest.getChannelSegmentEntityBuilder(
-            "advertiserId", "adgroupId", "adId", "channelId", 1, rcList, tags, true, true, "externalSiteKey",
-            modified_on, "campaignId", slotIds, 1, true, "pricingModel", siteRatings, 1, null, false, false, false,
-            false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d, null, null, false,
-            emptySet, 0));
+        ChannelSegmentEntity channelSegmentEntity = new ChannelSegmentEntity(
+                ChannelSegmentFilterApplierTest.getChannelSegmentEntityBuilder("advertiserId", "adgroupId", "adId",
+                        "channelId", 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId",
+                        slotIds, 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false, false,
+                        false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d, null, null, false,
+                        emptySet, 0));
         List<ChannelSegment> rankList = createMock(ArrayList.class);
         AdNetworkInterface mockAdnetworkInterface = createMock(DCPTapitAdNetwork.class);
         ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
@@ -84,11 +86,12 @@ public class LoggingTest extends TestCase {
         Timestamp modified_on = null;
         Long[] slotIds = null;
         Integer[] siteRatings = null;
-        ChannelSegmentEntity channelSegmentEntity = new ChannelSegmentEntity(FilterTest.getChannelSegmentEntityBuilder(
-            "advertiserId", "adgroupId", "adId", "channelId", 1, rcList, tags, true, true, "externalSiteKey",
-            modified_on, "campaignId", slotIds, 1, true, "pricingModel", siteRatings, 1, null, false, false, false,
-            false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d, null, null, false,
-            emptySet, 0));
+        ChannelSegmentEntity channelSegmentEntity = new ChannelSegmentEntity(
+                ChannelSegmentFilterApplierTest.getChannelSegmentEntityBuilder("advertiserId", "adgroupId", "adId",
+                        "channelId", 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId",
+                        slotIds, 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false, false,
+                        false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d, null, null, false,
+                        emptySet, 0));
         List<ChannelSegment> rankList = createMock(ArrayList.class);
         AdNetworkInterface mockAdnetworkInterface = createMock(DCPTapitAdNetwork.class);
         ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
@@ -113,11 +116,12 @@ public class LoggingTest extends TestCase {
         Timestamp modified_on = null;
         Long[] slotIds = null;
         Integer[] siteRatings = null;
-        ChannelSegmentEntity channelSegmentEntity = new ChannelSegmentEntity(FilterTest.getChannelSegmentEntityBuilder(
-            "advertiserId", "adgroupId", "adId", "channelId", 1, rcList, tags, true, true, "externalSiteKey",
-            modified_on, "campaignId", slotIds, 1, true, "pricingModel", siteRatings, 1, null, false, false, false,
-            false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d, null, null, false,
-            emptySet, 0));
+        ChannelSegmentEntity channelSegmentEntity = new ChannelSegmentEntity(
+                ChannelSegmentFilterApplierTest.getChannelSegmentEntityBuilder("advertiserId", "adgroupId", "adId",
+                        "channelId", 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId",
+                        slotIds, 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false, false,
+                        false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d, null, null, false,
+                        emptySet, 0));
         List<ChannelSegment> rankList = createMock(ArrayList.class);
         AdNetworkInterface mockAdnetworkInterface = createMock(DCPTapitAdNetwork.class);
         ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
@@ -142,11 +146,12 @@ public class LoggingTest extends TestCase {
         Timestamp modified_on = null;
         Long[] slotIds = null;
         Integer[] siteRatings = null;
-        ChannelSegmentEntity channelSegmentEntity = new ChannelSegmentEntity(FilterTest.getChannelSegmentEntityBuilder(
-            "advertiserId", "adgroupId", "adId", "channelId", 1, rcList, tags, true, true, "externalSiteKey",
-            modified_on, "campaignId", slotIds, 1, true, "pricingModel", siteRatings, 1, null, false, false, false,
-            false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d, null, null, false,
-            emptySet, 0));
+        ChannelSegmentEntity channelSegmentEntity = new ChannelSegmentEntity(
+                ChannelSegmentFilterApplierTest.getChannelSegmentEntityBuilder("advertiserId", "adgroupId", "adId",
+                        "channelId", 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId",
+                        slotIds, 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false, false,
+                        false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d, null, null, false,
+                        emptySet, 0));
         List<ChannelSegment> rankList = createMock(ArrayList.class);
         AdNetworkInterface mockAdnetworkInterface = createMock(DCPTapitAdNetwork.class);
         ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
