@@ -1,25 +1,5 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Inject;
-import javax.ws.rs.Path;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.QueryStringDecoder;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
@@ -39,6 +19,18 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentF
 import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import org.apache.commons.collections.CollectionUtils;
+import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.handler.codec.http.QueryStringDecoder;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
+import javax.inject.Inject;
+import javax.ws.rs.Path;
+import java.util.*;
 
 
 @Singleton
@@ -229,13 +221,14 @@ public class ServletBackFill implements Servlet {
         LOG.debug(traceMarker, "blockedAdvertisers are {}", casInternalRequestParametersGlobal.blockedAdvertisers);
         double minimumRtbFloor = 0.05;
         double segmentFloor = casUtils.getRtbFloor(casContext, sasParams);
+        double networkEcpm = casUtils.getNetworkEcpm(casContext, sasParams);
         // RTB floor is being passed as segmentFloor
         LOG.debug(traceMarker, "RTB floor from the pricing engine entity is {}", segmentFloor);
 
         casInternalRequestParametersGlobal.rtbBidFloor = hrh.responseSender.getAuctionEngine().calculateRTBFloor(
-                sasParams.getSiteFloor(), 0.0, segmentFloor, minimumRtbFloor);
-        LOG.debug(traceMarker, "site floor was {}  segmentFloor was  {}  minimum rtb floor {}  and rtbFloor is {} ",
-                sasParams.getSiteFloor(), segmentFloor, minimumRtbFloor, casInternalRequestParametersGlobal.rtbBidFloor);
+                sasParams.getSiteFloor(), 0.0, segmentFloor, minimumRtbFloor, networkEcpm);
+        LOG.debug(traceMarker, "networkEcpm was {} site floor was {}  segmentFloor was  {}  minimum rtb floor {}  and rtbFloor is {} ",
+                networkEcpm, sasParams.getSiteFloor(), segmentFloor, minimumRtbFloor, casInternalRequestParametersGlobal.rtbBidFloor);
         // Generating auction id using site Inc Id
         casInternalRequestParametersGlobal.auctionId = AsyncRequestMaker.getImpressionId(sasParams.getSiteIncId());
         hrh.responseSender.casInternalRequestParameters = casInternalRequestParametersGlobal;
