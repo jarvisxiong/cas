@@ -97,7 +97,7 @@ public class AsyncRequestMaker {
                         && channelSegmentEntity.getPricingModel().equalsIgnoreCase("cpc")) {
                     isCpc = true;
                 }
-                ClickUrlMakerV6 clickUrlMakerV6 = setClickParams(isCpc, config, sasParams);
+                ClickUrlMakerV6 clickUrlMakerV6 = setClickParams(isCpc, config, sasParams, channelSegmentEntity.getDst());
                 clickUrlMakerV6.createClickUrls();
                 clickUrl = clickUrlMakerV6.getClickUrl();
                 beaconUrl = clickUrlMakerV6.getBeaconUrl();
@@ -214,7 +214,7 @@ public class AsyncRequestMaker {
     }
 
     private static ClickUrlMakerV6 setClickParams(boolean pricingModel, Configuration config,
-                                                  SASRequestParameters sasParams) {
+                                                  SASRequestParameters sasParams, Integer dst) {
         ClickUrlMakerV6.Builder builder = ClickUrlMakerV6.newBuilder();
         builder.setImpressionId(sasParams.getImpressionId());
         builder.setAge(null != sasParams.getAge() ? sasParams.getAge().intValue() : 0);
@@ -241,7 +241,7 @@ public class AsyncRequestMaker {
         builder.setTestRequest(false);
         builder.setLatlonval(sasParams.getLatLong());
         builder.setRtbSite(sasParams.getSst() != 0);//TODO:- Change this according to thrift enums
-        builder.setDst((String.valueOf(sasParams.getDst() - 1)));
+        builder.setDst(dst.toString());
         builder.setBudgetBucketId("101"); //Default Value
         return new ClickUrlMakerV6(builder);
     }
