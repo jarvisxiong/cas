@@ -28,9 +28,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     private final static Logger                   LOG                     = LoggerFactory
                                                                                   .getLogger(BaseAdNetworkImpl.class);
 
-    private ChannelFuture                         future;
+    protected ChannelFuture                       future;
     protected ClientBootstrap                     clientBootstrap;
-    private Channel                               channel;
+    protected Channel                             channel;
     protected HttpRequest                         request;
     protected long                                startTime;
     public volatile boolean                       isRequestComplete       = false;

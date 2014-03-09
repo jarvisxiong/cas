@@ -20,13 +20,15 @@ import org.apache.velocity.VelocityContext;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.channel.*;
 import org.jboss.netty.handler.codec.http.*;
 import org.jboss.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.awt.*;
+import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -800,5 +802,96 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Override
     public String getCurrency() {
         return bidderCurrency;
+    }
+
+    // makes an async request to thirdparty network
+    @Override
+    public boolean makeAsyncRequest() {
+        LOG.debug("inside rtbd async");
+        if (useJsAdTag()) {
+            generateJsAdResponse();
+            processResponse();
+            LOG.debug("sent jsadcode... returning from make NingRequest");
+            return true;
+        }
+
+        URI uri;
+        try {
+            request = getHttpRequest();
+            uri = new URI(request.getUri());
+            request.setUri(uri.getPath() + "?" + uri.getQuery());
+            LOG.debug("uri is {}", uri);
+            LOG.info("url inside makeAsyncRequest is not null");
+        }
+        catch (Exception ex) {
+            errorStatus = ThirdPartyAdResponse.ResponseStatus.HTTPREQUEST_ERROR;
+            LOG.debug("error in creating http request object");
+            return false;
+        }
+        startTime = System.currentTimeMillis();
+        try {
+            future = clientBootstrap.connect(new InetSocketAddress(uri.getHost(), uri.getPort() == -1 ? 80 : uri
+                    .getPort()));
+        }
+        catch (ChannelException e) {
+            LOG.debug("Error creating socket... too many sockets open {}", e.getMessage());
+            return false;
+        }
+        channel = future.getChannel();
+        // waiting for connection to happen and then sending http request
+        // through
+        // channel
+        future.addListener(new ChannelFutureListener() {
+            @Override
+            public void operationComplete(final ChannelFuture future) throws Exception {
+                MDC.put("requestId", serverEvent.getChannel().getId().toString());
+
+                connectionLatency = System.currentTimeMillis() - startTime;
+                if (!future.isSuccess()) {
+                    latency = System.currentTimeMillis() - startTime;
+                    adStatus = "TERM";
+                    LOG.info("error creating socket for partner:", getName());
+                    errorStatus = ThirdPartyAdResponse.ResponseStatus.SOCKET_ERROR;
+                    cleanUp();
+                    processResponse();
+                    return;
+                }
+                if (channel.isWritable()) {
+                    LOG.debug("request {} : ", request.toString());
+                    for (Map.Entry header : request.getHeaders()) {
+                        LOG.debug("header {} : {}", header.getKey(), header.getValue());
+                    }
+                    channel.write(request);
+                }
+                channel.getCloseFuture().addListener(new ChannelFutureListener() {
+                    @Override
+                    public void operationComplete(final ChannelFuture future) throws Exception {
+                        MDC.put("requestId", serverEvent.getChannel().getId().toString());
+
+                        latency = System.currentTimeMillis() - startTime;
+                        if (!isRequestCompleted()) {
+                            LOG.debug("Operation complete for channel partner: {}", getName());
+                            Channel channel1 = future.getChannel();
+                            LOG.debug("outbound channel id is {}", channel1.getId());
+                            if (null != ChannelsClientHandler.getMessage(channel1.getId())) {
+                                String response = (ChannelsClientHandler.getMessage(channel1.getId())).toString();
+                                HttpResponseStatus httpResponseStatus = ChannelsClientHandler.statusMap.get(channel1
+                                        .getId());
+                                ChannelsClientHandler.removeEntry(channel1.getId());
+                                ChannelsClientHandler.statusMap.remove(channel1.getId());
+                                parseResponse(response, httpResponseStatus);
+                            }
+                            else {
+                                errorStatus = ThirdPartyAdResponse.ResponseStatus.INVALID_RESPONSE;
+                            }
+                            channel1.close();
+                            processResponse();
+                        }
+                    }
+                });
+            }
+        });
+        LOG.debug("returning from make AsyncRequest");
+        return true;
     }
 }
