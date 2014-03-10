@@ -97,7 +97,7 @@ public class AsyncRequestMaker {
                         && channelSegmentEntity.getPricingModel().equalsIgnoreCase("cpc")) {
                     isCpc = true;
                 }
-                ClickUrlMakerV6 clickUrlMakerV6 = setClickParams(isCpc, config, sasParams, channelSegmentEntity.getDst());
+                ClickUrlMakerV6 clickUrlMakerV6 = setClickParams(isCpc, config, sasParams, channelSegmentEntity.getDst() - 1);
                 clickUrlMakerV6.createClickUrls();
                 clickUrl = clickUrlMakerV6.getClickUrl();
                 beaconUrl = clickUrlMakerV6.getBeaconUrl();
