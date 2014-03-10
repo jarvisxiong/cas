@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.velocity.VelocityContext;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
@@ -226,7 +227,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public boolean makeAsyncRequest() {
-        LOG.debug("In nexage async");
+        LOG.debug("In Adapter {}", this.getClass().getSimpleName());
 
         if (useJsAdTag()) {
             generateJsAdResponse();
@@ -240,7 +241,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             setNingRequest(requestUrl);
             LOG.debug("Nexage uri : {}", uri);
             startTime = System.currentTimeMillis();
-            baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
+            getAsyncHttpClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
                 @Override
                 public Response onCompleted(final Response response) throws Exception {
                     MDC.put("requestId", serverEvent.getChannel().getId().toString());
@@ -312,12 +313,18 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
     }
 
     @Override
-    protected void setNingRequest(final String requestUrl) {
-        ningRequest = new RequestBuilder().setUrl(requestUrl)
+    protected void setNingRequest(final String requestUrl) throws Exception {
+        URI uri = getRequestUri();
+        if (uri.getPort() == -1) {
+            uri = new URIBuilder(uri).setPort(80).build();
+        }
+
+        ningRequest = new RequestBuilder().setURI(uri)
                 .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
-                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp()).build();
+                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
+                .setHeader(HttpHeaders.Names.HOST, getRequestUri().getHost()).build();
     }
 
     @Override

@@ -7,6 +7,7 @@ import java.util.Calendar;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.velocity.VelocityContext;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
@@ -149,15 +150,21 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     protected void setNingRequest(final String requestUrl) throws Exception {
+        URI uri = getRequestUri();
+        if (uri.getPort() == -1) {
+            uri = new URIBuilder(uri).setPort(80).build();
+        }
+
         byte[] body = getRequestParams().getBytes(CharsetUtil.UTF_8);
 
-        ningRequest = new RequestBuilder("POST").setUrl(requestUrl)
+        ningRequest = new RequestBuilder("POST").setURI(uri)
                 .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
                 .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
                 .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/x-www-form-urlencoded")
-                .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length)).setBody(body)
+                .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length))
+                .setHeader(HttpHeaders.Names.HOST, getRequestUri().getHost()).setBody(body)
                 .setHeader("RLNClientIpAddr", sasParams.getRemoteHostIp()).build();
     }
 

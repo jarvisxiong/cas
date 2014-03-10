@@ -21,7 +21,6 @@ import org.apache.thrift.protocol.TSimpleJSONProtocol;
 import org.easymock.EasyMock;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.testng.annotations.Test;
 
@@ -37,6 +36,8 @@ import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.casthrift.rtb.Bid;
 import com.inmobi.casthrift.rtb.BidResponse;
 import com.inmobi.casthrift.rtb.SeatBid;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.Request;
 
 
 public class RtbAdnetworkTest extends TestCase {
@@ -127,8 +128,8 @@ public class RtbAdnetworkTest extends TestCase {
         rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
         RtbAdNetwork.impressionCallbackHelper = createMock(ImpressionCallbackHelper.class);
         expect(
-                RtbAdNetwork.impressionCallbackHelper.writeResponse(isA(ClientBootstrap.class), isA(URI.class),
-                        isA(DefaultHttpRequest.class))).andReturn(true).anyTimes();
+                RtbAdNetwork.impressionCallbackHelper.writeResponse(isA(URI.class), isA(Request.class),
+                        isA(AsyncHttpClient.class))).andReturn(true).anyTimes();
         replay(RtbAdNetwork.impressionCallbackHelper);
         rtbAdNetwork.setBidResponse(bidResponse);
         rtbAdNetwork.impressionCallback();
