@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -20,8 +19,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.jboss.netty.logging.InternalLoggerFactory;
 import org.jboss.netty.logging.Log4JLoggerFactory;
-import org.jboss.netty.util.HashedWheelTimer;
-import org.jboss.netty.util.Timer;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -41,8 +38,6 @@ import com.inmobi.adserve.channels.repository.SiteEcpmRepository;
 import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
 import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
 import com.inmobi.adserve.channels.server.api.ConnectionType;
-import com.inmobi.adserve.channels.server.client.BootstrapCreation;
-import com.inmobi.adserve.channels.server.client.RtbBootstrapCreation;
 import com.inmobi.adserve.channels.server.module.NettyModule;
 import com.inmobi.adserve.channels.server.module.ScopeModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
@@ -166,11 +161,6 @@ public class ChannelServer {
             if (null != maxIncomingConnections) {
                 ServletHandler.getServerConfig().setProperty("dcpOutGoingMaxConnections", maxDCpOutGoingConnections);
             }
-
-            // Creating netty client for out-bound calls.
-            Timer timer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
-            BootstrapCreation.init(timer);
-            RtbBootstrapCreation.init(timer);
 
             // Configure the netty server.
 
