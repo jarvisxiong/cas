@@ -9,7 +9,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -27,7 +26,6 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.Request;
-import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
 
 
@@ -225,15 +223,6 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
         }
         LOG.debug("{} returning from make NingRequest", getName());
         return true;
-    }
-
-    private void setNingRequest(final String requestUrl) {
-        ningRequest = new RequestBuilder().setUrl(requestUrl)
-                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
-                .setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE)
-                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
-                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp()).build();
     }
 
     @Override

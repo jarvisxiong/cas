@@ -211,11 +211,11 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
         return true;
     }
 
-    private void setNingRequest(final String requestUrl) {
+    @Override
+    protected void setNingRequest(final String requestUrl) {
         ningRequest = new RequestBuilder().setUrl(requestUrl)
                 .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
-                .setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE)
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
                 .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp()).build();
     }

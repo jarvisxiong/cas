@@ -19,6 +19,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.annotations.LoggerConfiguration;
@@ -70,6 +71,7 @@ public class ServerModule extends AbstractModule {
         requestStaticInjection(ChannelSegment.class);
         requestStaticInjection(Logging.class);
         requestStaticInjection(AuctionEngine.class);
+        requestStaticInjection(RtbAdNetwork.class);
 
         install(new AdapterConfigModule(adapterConfiguration, ChannelServer.dataCentreName));
         install(new ChannelSegmentFilterModule());

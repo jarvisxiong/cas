@@ -18,7 +18,6 @@ import org.apache.commons.dbcp.PoolingDataSource;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.logging.InternalLoggerFactory;
 import org.jboss.netty.logging.Log4JLoggerFactory;
 import org.jboss.netty.util.HashedWheelTimer;
@@ -56,8 +55,6 @@ import com.inmobi.casthrift.DataCenter;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import com.inmobi.messaging.publisher.MessagePublisherFactory;
 import com.inmobi.phoenix.exception.InitializationException;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
 
 
 /*
@@ -174,30 +171,11 @@ public class ChannelServer {
             Timer timer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
             BootstrapCreation.init(timer);
             RtbBootstrapCreation.init(timer);
-            ClientBootstrap clientBootstrap = BootstrapCreation.createBootstrap(logger,
-                    configurationLoader.getServerConfiguration());
-            ClientBootstrap rtbClientBootstrap = RtbBootstrapCreation.createBootstrap(logger,
-                    configurationLoader.getRtbConfiguration());
-
-            // For some partners netty client does not work thus
-            // Creating a ning client for out-bound calls
-            AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder()
-                    .setRequestTimeoutInMs(
-                            configurationLoader.getServerConfiguration().getInt("readtimeoutMillis") - 100)
-                    .setConnectionTimeoutInMs(600).build();
-            AsyncHttpClient asyncHttpClient = new AsyncHttpClient(asyncHttpClientConfig);
-
-            if (null == clientBootstrap) {
-                ServerStatusInfo.statusCode = 404;
-                ServerStatusInfo.statusString = "StackTrace is: failed to create bootstrap";
-                logger.info("failed to create bootstrap");
-                return;
-            }
 
             // Configure the netty server.
 
             // Initialising request handler
-            AsyncRequestMaker.init(clientBootstrap, rtbClientBootstrap, asyncHttpClient);
+            AsyncRequestMaker.init(null, null);
 
             Injector parentInjector = Guice.createInjector(new ScopeModule());
 

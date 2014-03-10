@@ -14,7 +14,6 @@ import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -84,12 +83,12 @@ public class DCPMableAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            mableAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"spot\":54235,\"pubId\":\"inmobi_1\"," + "\"site\":1234}"), new ArrayList<Integer>(), 0.0d,
-            null, null, 32));
+                mableAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"spot\":54235,\"pubId\":\"inmobi_1\"," + "\"site\":1234}"), new ArrayList<Integer>(), 0.0d,
+                null, null, 32));
         assertEquals(true,
-            dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+                dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
 
     @Test
@@ -104,11 +103,11 @@ public class DCPMableAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            mableAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                mableAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertEquals(false,
-            dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+                dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
 
     @Test
@@ -123,11 +122,11 @@ public class DCPMableAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            mableAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                mableAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertEquals(false,
-            dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+                dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
 
     @Test
@@ -141,11 +140,11 @@ public class DCPMableAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            mableAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                mableAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertEquals(false,
-            dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+                dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
 
     @Test
@@ -166,13 +165,12 @@ public class DCPMableAdnetworkTest extends TestCase {
         String externalKey = "0344343";
         SlotSizeMapping.init();
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            mableAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<Integer>(), 0.0d,
-            null, null, 0));
+                mableAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<Integer>(), 0.0d,
+                null, null, 0));
 
         if (dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
-            HttpRequest request = dcpMableAdNetwork.getHttpRequest();
             String actualUrl = dcpMableAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://ad.ipredictive.com/d/ads";
             assertEquals(expectedUrl, actualUrl);
@@ -202,10 +200,10 @@ public class DCPMableAdnetworkTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            mableAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<Integer>(), 0.0d,
-            null, null, 0));
+                mableAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<Integer>(), 0.0d,
+                null, null, 0));
         if (dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpMableAdNetwork.getRequestUri().toString();
             System.out.println(actualUrl);
@@ -228,17 +226,17 @@ public class DCPMableAdnetworkTest extends TestCase {
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
 
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            mableAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<Integer>(), 0.0d,
-            null, null, 32));
+                mableAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<Integer>(), 0.0d,
+                null, null, 32));
         dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl);
         String response = "<div style='margin:0px; padding:0px;'><a target=\"_top\" href=\"http://ad.ipredictive.com/d/track/click?zid=inmobi_1_0_1_testkey&sid=bde34925-a0da-11e2-851d-f112587bd4c2&crid=424&adid=8&oid=55&cid=50&spid=322&pubid=58&ez_p=H4sIAAAAAAAAAKuuBQBDv6ajAgAAAA&rd=http%3A%2F%2Fapp.appsflyer.com%2Fid381840917%3Fpid%3Dmable_int%26c%3DMable%26clickid%3Dbde34925-a0da-11e2-851d-f112587bd4c2%253A424%253A58%253A8%253A50%253A55%253Ainmobi_1_0_1_testkey\"><img src=\"http://ad.ipredictive.com/d/img/image?zid=inmobi_1_0_1_testkey&sid=bde34925-a0da-11e2-851d-f112587bd4c2&crid=424&adid=8&oid=55&cid=50&spid=322&pubid=58&ez_p=H4sIAAAAAAAAAKuuBQBDv6ajAgAAAA&rd=http%3A%2F%2Fd299n2tvhpuett.cloudfront.net%2Fimage%2Fmable%2Fmable5.png&rr=43207\" width=\"320\" height=\"50\"></img></a></div>";
         dcpMableAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(200, dcpMableAdNetwork.getHttpResponseStatusCode());
         assertEquals(
-            "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"mraid.js\"></script><div style='margin:0px; padding:0px;'><a target=\"_top\" href=\"http://ad.ipredictive.com/d/track/click?zid=inmobi_1_0_1_testkey&sid=bde34925-a0da-11e2-851d-f112587bd4c2&crid=424&adid=8&oid=55&cid=50&spid=322&pubid=58&ez_p=H4sIAAAAAAAAAKuuBQBDv6ajAgAAAA&rd=http%3A%2F%2Fapp.appsflyer.com%2Fid381840917%3Fpid%3Dmable_int%26c%3DMable%26clickid%3Dbde34925-a0da-11e2-851d-f112587bd4c2%253A424%253A58%253A8%253A50%253A55%253Ainmobi_1_0_1_testkey\"><img src=\"http://ad.ipredictive.com/d/img/image?zid=inmobi_1_0_1_testkey&sid=bde34925-a0da-11e2-851d-f112587bd4c2&crid=424&adid=8&oid=55&cid=50&spid=322&pubid=58&ez_p=H4sIAAAAAAAAAKuuBQBDv6ajAgAAAA&rd=http%3A%2F%2Fd299n2tvhpuett.cloudfront.net%2Fimage%2Fmable%2Fmable5.png&rr=43207\" width=\"320\" height=\"50\"></img></a></div><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>",
-            dcpMableAdNetwork.getHttpResponseContent());
+                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"mraid.js\"></script><div style='margin:0px; padding:0px;'><a target=\"_top\" href=\"http://ad.ipredictive.com/d/track/click?zid=inmobi_1_0_1_testkey&sid=bde34925-a0da-11e2-851d-f112587bd4c2&crid=424&adid=8&oid=55&cid=50&spid=322&pubid=58&ez_p=H4sIAAAAAAAAAKuuBQBDv6ajAgAAAA&rd=http%3A%2F%2Fapp.appsflyer.com%2Fid381840917%3Fpid%3Dmable_int%26c%3DMable%26clickid%3Dbde34925-a0da-11e2-851d-f112587bd4c2%253A424%253A58%253A8%253A50%253A55%253Ainmobi_1_0_1_testkey\"><img src=\"http://ad.ipredictive.com/d/img/image?zid=inmobi_1_0_1_testkey&sid=bde34925-a0da-11e2-851d-f112587bd4c2&crid=424&adid=8&oid=55&cid=50&spid=322&pubid=58&ez_p=H4sIAAAAAAAAAKuuBQBDv6ajAgAAAA&rd=http%3A%2F%2Fd299n2tvhpuett.cloudfront.net%2Fimage%2Fmable%2Fmable5.png&rr=43207\" width=\"320\" height=\"50\"></img></a></div><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>",
+                dcpMableAdNetwork.getHttpResponseContent());
     }
 
     @Test
@@ -256,17 +254,17 @@ public class DCPMableAdnetworkTest extends TestCase {
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
 
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            mableAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<Integer>(), 0.0d,
-            null, null, 32));
+                mableAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<Integer>(), 0.0d,
+                null, null, 32));
         dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl);
         String response = "<div style='margin:0px; padding:0px;'><a target=\"_top\" href=\"http://ad.ipredictive.com/d/track/click?zid=inmobi_1_0_1_testkey&sid=bde34925-a0da-11e2-851d-f112587bd4c2&crid=424&adid=8&oid=55&cid=50&spid=322&pubid=58&ez_p=H4sIAAAAAAAAAKuuBQBDv6ajAgAAAA&rd=http%3A%2F%2Fapp.appsflyer.com%2Fid381840917%3Fpid%3Dmable_int%26c%3DMable%26clickid%3Dbde34925-a0da-11e2-851d-f112587bd4c2%253A424%253A58%253A8%253A50%253A55%253Ainmobi_1_0_1_testkey\"><img src=\"http://ad.ipredictive.com/d/img/image?zid=inmobi_1_0_1_testkey&sid=bde34925-a0da-11e2-851d-f112587bd4c2&crid=424&adid=8&oid=55&cid=50&spid=322&pubid=58&ez_p=H4sIAAAAAAAAAKuuBQBDv6ajAgAAAA&rd=http%3A%2F%2Fd299n2tvhpuett.cloudfront.net%2Fimage%2Fmable%2Fmable5.png&rr=43207\" width=\"320\" height=\"50\"></img></a></div>";
         dcpMableAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(200, dcpMableAdNetwork.getHttpResponseStatusCode());
         assertEquals(
-            "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"mraid.js\"></script><div style='margin:0px; padding:0px;'><a target=\"_top\" href=\"http://ad.ipredictive.com/d/track/click?zid=inmobi_1_0_1_testkey&sid=bde34925-a0da-11e2-851d-f112587bd4c2&crid=424&adid=8&oid=55&cid=50&spid=322&pubid=58&ez_p=H4sIAAAAAAAAAKuuBQBDv6ajAgAAAA&rd=http%3A%2F%2Fapp.appsflyer.com%2Fid381840917%3Fpid%3Dmable_int%26c%3DMable%26clickid%3Dbde34925-a0da-11e2-851d-f112587bd4c2%253A424%253A58%253A8%253A50%253A55%253Ainmobi_1_0_1_testkey\"><img src=\"http://ad.ipredictive.com/d/img/image?zid=inmobi_1_0_1_testkey&sid=bde34925-a0da-11e2-851d-f112587bd4c2&crid=424&adid=8&oid=55&cid=50&spid=322&pubid=58&ez_p=H4sIAAAAAAAAAKuuBQBDv6ajAgAAAA&rd=http%3A%2F%2Fd299n2tvhpuett.cloudfront.net%2Fimage%2Fmable%2Fmable5.png&rr=43207\" width=\"320\" height=\"50\"></img></a></div><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>",
-            dcpMableAdNetwork.getHttpResponseContent());
+                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"mraid.js\"></script><div style='margin:0px; padding:0px;'><a target=\"_top\" href=\"http://ad.ipredictive.com/d/track/click?zid=inmobi_1_0_1_testkey&sid=bde34925-a0da-11e2-851d-f112587bd4c2&crid=424&adid=8&oid=55&cid=50&spid=322&pubid=58&ez_p=H4sIAAAAAAAAAKuuBQBDv6ajAgAAAA&rd=http%3A%2F%2Fapp.appsflyer.com%2Fid381840917%3Fpid%3Dmable_int%26c%3DMable%26clickid%3Dbde34925-a0da-11e2-851d-f112587bd4c2%253A424%253A58%253A8%253A50%253A55%253Ainmobi_1_0_1_testkey\"><img src=\"http://ad.ipredictive.com/d/img/image?zid=inmobi_1_0_1_testkey&sid=bde34925-a0da-11e2-851d-f112587bd4c2&crid=424&adid=8&oid=55&cid=50&spid=322&pubid=58&ez_p=H4sIAAAAAAAAAKuuBQBDv6ajAgAAAA&rd=http%3A%2F%2Fd299n2tvhpuett.cloudfront.net%2Fimage%2Fmable%2Fmable5.png&rr=43207\" width=\"320\" height=\"50\"></img></a></div><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>",
+                dcpMableAdNetwork.getHttpResponseContent());
     }
 
     @Test
@@ -303,10 +301,10 @@ public class DCPMableAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            mableAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<Integer>(), 0.0d,
-            null, null, 32));
+                mableAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<Integer>(), 0.0d,
+                null, null, 32));
         dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null);
         assertEquals("4f8d98e2-4bbd-40bc-8795-22da170700f9", dcpMableAdNetwork.getImpressionId());
     }

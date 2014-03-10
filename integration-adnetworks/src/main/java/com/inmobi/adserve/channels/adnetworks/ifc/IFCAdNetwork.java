@@ -1,21 +1,13 @@
 package com.inmobi.adserve.channels.adnetworks.ifc;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
 import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.jboss.netty.handler.codec.http.HttpVersion;
-import org.jboss.netty.util.CharsetUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,6 +19,7 @@ import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.util.CategoryList;
+import com.ning.http.client.RequestBuilder;
 
 
 /**
@@ -205,26 +198,15 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
     }
 
     @Override
-    public HttpRequest getHttpRequest() {
-        URI uri;
-        try {
-            uri = new URI(ifcURL);
-        }
-        catch (URISyntaxException e) {
-            return null;
-        }
-        httpRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri.toASCIIString());
-        ChannelBuffer buffer = ChannelBuffers.copiedBuffer(getRequestBody(), CharsetUtil.UTF_8);
-        httpRequest.setHeader(HttpHeaders.Names.HOST, uri.toString());
+    protected void setNingRequest(final String requestUrl) throws Exception {
 
-        httpRequest.setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json");
-
-        httpRequest.setHeader(HttpHeaders.Names.ACCEPT, "application/json");
-        httpRequest.setHeader(HttpHeaders.Names.CONNECTION, "close");
-        httpRequest.setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(buffer.readableBytes()));
-
-        httpRequest.setContent(buffer);
-        return httpRequest;
+        ningRequest = new RequestBuilder("POST").setUrl(requestUrl)
+                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
+                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
+                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
+                .addHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
+                .setHeader(HttpHeaders.Names.ACCEPT, "application/json").setBody(getRequestBody()).build();
     }
 
     // Returns the Channel Id for the TPAN as in our database. This will be
