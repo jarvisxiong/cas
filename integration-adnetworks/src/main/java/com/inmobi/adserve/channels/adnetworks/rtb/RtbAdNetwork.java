@@ -35,7 +35,6 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 
 import com.google.gson.Gson;
 import com.google.inject.Inject;
@@ -67,11 +66,9 @@ import com.inmobi.casthrift.rtb.Impression;
 import com.inmobi.casthrift.rtb.SeatBid;
 import com.inmobi.casthrift.rtb.Site;
 import com.inmobi.casthrift.rtb.User;
-import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.http.client.RequestBuilder;
-import com.ning.http.client.Response;
 
 
 /**
@@ -605,64 +602,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 .getId());
         LOG.debug("String after replaceMacros is {}", url);
         return url;
-    }
-
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    @Override
-    public boolean makeAsyncRequest() {
-        LOG.debug("In Adapter {}", this.getClass().getSimpleName());
-        try {
-            String uri = getRequestUri().toString();
-            requestUrl = uri;
-            setNingRequest(requestUrl);
-            LOG.debug(" uri : {}", uri);
-            startTime = System.currentTimeMillis();
-            baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
-                @Override
-                public Response onCompleted(final Response response) throws Exception {
-                    MDC.put("requestId", serverEvent.getChannel().getId().toString());
-
-                    if (!isRequestCompleted()) {
-                        LOG.debug("Operation complete for channel partner: {}", getName());
-                        latency = System.currentTimeMillis() - startTime;
-                        LOG.debug("{} operation complete latency {}", getName(), latency);
-                        String responseStr = response.getResponseBody();
-                        HttpResponseStatus httpResponseStatus = HttpResponseStatus.valueOf(response.getStatusCode());
-                        parseResponse(responseStr, httpResponseStatus);
-                        processResponse();
-                    }
-                    return response;
-                }
-
-                @Override
-                public void onThrowable(final Throwable t) {
-                    MDC.put("requestId", serverEvent.getChannel().getId().toString());
-
-                    if (isRequestComplete) {
-                        return;
-                    }
-
-                    if (t instanceof java.util.concurrent.TimeoutException) {
-                        latency = System.currentTimeMillis() - startTime;
-                        LOG.debug("{} timeout latency {}", getName(), latency);
-                        adStatus = "TIME_OUT";
-                        processResponse();
-                        return;
-                    }
-
-                    LOG.debug("{} error latency {}", getName(), latency);
-                    adStatus = "TERM";
-                    LOG.info("error while fetching response from: {} {}", getName(), t);
-                    processResponse();
-                    return;
-                }
-            });
-        }
-        catch (Exception e) {
-            LOG.debug("Exception in {} makeAsyncRequest : {}", getName(), e.getMessage());
-        }
-        LOG.debug("{} returning from make NingRequest", getName());
-        return true;
     }
 
     @Override
