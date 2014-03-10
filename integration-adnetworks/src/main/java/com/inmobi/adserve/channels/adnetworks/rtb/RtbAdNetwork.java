@@ -1,16 +1,22 @@
 package com.inmobi.adserve.channels.adnetworks.rtb;
 
-import com.google.gson.Gson;
-import com.inmobi.adserve.channels.api.*;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.util.*;
-import com.inmobi.casthrift.rtb.*;
+import java.awt.Dimension;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.regex.Pattern;
+
 import lombok.Getter;
 import lombok.Setter;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TException;
@@ -20,21 +26,49 @@ import org.apache.velocity.VelocityContext;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.*;
-import org.jboss.netty.handler.codec.http.*;
-import org.jboss.netty.util.CharsetUtil;
+import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
+import org.jboss.netty.handler.codec.http.HttpHeaders;
+import org.jboss.netty.handler.codec.http.HttpMethod;
+import org.jboss.netty.handler.codec.http.HttpRequest;
+import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 
-import java.awt.*;
-import java.net.InetSocketAddress;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.util.*;
-import java.util.List;
-import java.util.regex.Pattern;
+import com.google.gson.Gson;
+import com.google.inject.Inject;
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import com.inmobi.adserve.channels.util.IABCategoriesInterface;
+import com.inmobi.adserve.channels.util.IABCategoriesMap;
+import com.inmobi.adserve.channels.util.IABCitiesInterface;
+import com.inmobi.adserve.channels.util.IABCitiesMap;
+import com.inmobi.adserve.channels.util.IABCountriesInterface;
+import com.inmobi.adserve.channels.util.IABCountriesMap;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.casthrift.rtb.App;
+import com.inmobi.casthrift.rtb.Banner;
+import com.inmobi.casthrift.rtb.Bid;
+import com.inmobi.casthrift.rtb.BidRequest;
+import com.inmobi.casthrift.rtb.BidResponse;
+import com.inmobi.casthrift.rtb.Device;
+import com.inmobi.casthrift.rtb.Geo;
+import com.inmobi.casthrift.rtb.Impression;
+import com.inmobi.casthrift.rtb.SeatBid;
+import com.inmobi.casthrift.rtb.Site;
+import com.inmobi.casthrift.rtb.User;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
+import com.ning.http.client.RequestBuilder;
 
 
 /**
@@ -91,11 +125,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     protected static final String          mraid                        = "<script src=\"mraid.js\" ></script>";
     private String                         encryptedBid;
     private static List<String>            mimes                        = Arrays.asList("image/jpeg", "image/gif",
-                                                                            "image/png");
+                                                                                "image/png");
     private static List<Integer>           fsBlockedAttributes          = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 13,
-                                                                            15, 16);
+                                                                                15, 16);
     private static List<Integer>           performanceBlockedAttributes = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-                                                                            11, 12, 13, 14, 15, 16);
+                                                                                11, 12, 13, 14, 15, 16);
     private static final String            FAMILY_SAFE_RATING           = "1";
     private static final String            PERFORMANCE_RATING           = "0";
     private static final String            RATING_KEY                   = "fs";
@@ -107,7 +141,32 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private static final String            USD                          = "USD";
     @Getter
     static List<String>                    currenciesSupported          = new ArrayList<String>(Arrays.asList("USD",
-                                                                            "RMB"));
+                                                                                "RMB"));
+    private static AsyncHttpClient         asyncHttpClient;
+
+    @Inject
+    private static ExecutorService         executorService;
+
+    static {
+        ConfigurationLoader configurationLoader = ConfigurationLoader
+                .getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
+
+        AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder()
+                .setRequestTimeoutInMs(configurationLoader.getRtbConfiguration().getInt("RTBreadtimeoutMillis") - 100)
+                .setConnectionTimeoutInMs(
+                        configurationLoader.getRtbConfiguration().getInt("RTBreadtimeoutMillis") - 100)
+                .setAllowPoolingConnection(true)
+                .setMaximumConnectionsTotal(
+                        configurationLoader.getServerConfiguration().getInt("rtbOutGoingMaxConnections", 200))
+                .setExecutorService(executorService).build();
+        asyncHttpClient = new AsyncHttpClient(asyncHttpClientConfig);
+
+    }
+
+    @Override
+    protected AsyncHttpClient getAsyncHttpClient() {
+        return asyncHttpClient;
+    }
 
     public RtbAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent, final String urlBase,
@@ -211,11 +270,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             // Setting blocked categories
             if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
                 bidRequest.getBcat().addAll(
-                    iabCategoriesInterface.getIABCategories(IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES));
+                        iabCategoriesInterface.getIABCategories(IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES));
             }
             else {
                 bidRequest.getBcat().addAll(
-                    iabCategoriesInterface.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES));
+                        iabCategoriesInterface.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES));
             }
 
             if (null != casInternalRequestParameters.blockedAdvertisers) {
@@ -487,15 +546,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             LOG.debug("error in creating uri for callback");
         }
         StringBuilder content = new StringBuilder();
-        content.append("{\"bidid\"=")
-                    .append(bidResponse.bidid)
-                    .append(",\"seat\"=")
-                    .append(bidResponse.seatbid.get(0).getSeat());
-        content.append(",\"bid\"=")
-                    .append(bidResponse.seatbid.get(0).bid.get(0).id)
-                    .append(",\"adid\"=")
-                    .append(bidResponse.seatbid.get(0).bid.get(0).adid)
-                    .append("}");
+        content.append("{\"bidid\"=").append(bidResponse.bidid).append(",\"seat\"=")
+                .append(bidResponse.seatbid.get(0).getSeat());
+        content.append(",\"bid\"=").append(bidResponse.seatbid.get(0).bid.get(0).id).append(",\"adid\"=")
+                .append(bidResponse.seatbid.get(0).bid.get(0).adid).append("}");
         HttpRequest callBackRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET,
                 uriCallBack.toASCIIString());
         callBackRequest.setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE);
@@ -514,17 +568,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @SuppressWarnings("unused")
     private void setCallbackContent() {
         StringBuilder content = new StringBuilder();
-        content.append("{\"bidid\"=")
-                    .append(bidResponse.bidid)
-                    .append(",\"seat\"=")
-                    .append(bidResponse.seatbid.get(0).getSeat());
-        content.append(",\"bid\"=")
-                    .append(bidResponse.seatbid.get(0).bid.get(0).id)
-                    .append(",\"price\"=")
-                    .append(secondBidPriceInUsd)
-                    .append(",\"adid\"=")
-                    .append(bidResponse.seatbid.get(0).bid.get(0).adid)
-                    .append("}");
+        content.append("{\"bidid\"=").append(bidResponse.bidid).append(",\"seat\"=")
+                .append(bidResponse.seatbid.get(0).getSeat());
+        content.append(",\"bid\"=").append(bidResponse.seatbid.get(0).bid.get(0).id).append(",\"price\"=")
+                .append(secondBidPriceInUsd).append(",\"adid\"=").append(bidResponse.seatbid.get(0).bid.get(0).adid)
+                .append("}");
     }
 
     public String replaceRTBMacros(String url) {
@@ -533,67 +581,39 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (6 != sasParams.getDst()) {
             url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_PRICE_ENCRYPTED), encryptedBid);
             url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_PRICE),
-                Double.toString(secondBidPriceInLocal));
+                    Double.toString(secondBidPriceInLocal));
         }
         if (null != bidResponse.getSeatbid().get(0).getBid().get(0).getAdid()) {
             url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_AD_ID),
-                bidResponse.getSeatbid().get(0).getBid().get(0).getAdid());
+                    bidResponse.getSeatbid().get(0).getBid().get(0).getAdid());
         }
         if (null != bidResponse.bidid) {
             url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_BID_ID), bidResponse.bidid);
         }
         if (null != bidResponse.getSeatbid().get(0).getSeat()) {
-            url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_SEAT_ID), bidResponse
-                    .getSeatbid()
-                        .get(0)
-                        .getSeat());
+            url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_SEAT_ID), bidResponse.getSeatbid()
+                    .get(0).getSeat());
         }
         if (null == bidRequest) {
             LOG.info("bidrequest is null");
             return url;
         }
-        url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_IMP_ID), bidRequest
-                .getImp()
-                    .get(0)
-                    .getId());
+        url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_IMP_ID), bidRequest.getImp().get(0)
+                .getId());
         LOG.debug("String after replaceMacros is {}", url);
         return url;
     }
 
     @Override
-    public HttpRequest getHttpRequest() throws Exception {
+    protected void setNingRequest(final String requestUrl) throws Exception {
 
-        HttpMethod httpRequestMethod;
-        if (rtbMethod.equalsIgnoreCase("get")) {
-            httpRequestMethod = HttpMethod.GET;
-        }
-        else {
-            httpRequestMethod = HttpMethod.POST;
-        }
-        LOG.debug("HttpRequest method is : {}", httpRequestMethod);
-        try {
-            URI uri = getRequestUri();
-            requestUrl = (uri.toString());
-            request = (new DefaultHttpRequest(HttpVersion.HTTP_1_1, httpRequestMethod, uri.toASCIIString()));
-            LOG.debug("host name is {}", uri.getHost());
-            request.setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json");
-            request.setHeader(X_OPENRTB_VERSION, rtbVer);
-            request.setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
-            request.setHeader(HttpHeaders.Names.HOST, uri.getHost());
-            if (null == bidRequest) {
-                LOG.debug("bidRequest is null so httpRequest is null");
-                return null;
-            }
-            ChannelBuffer buffer = ChannelBuffers.copiedBuffer(bidRequestJson, CharsetUtil.UTF_8);
-            request.addHeader(HttpHeaders.Names.CONTENT_LENGTH, buffer.readableBytes());
-            request.setContent(buffer);
-        }
-        catch (Exception ex) {
-            errorStatus = ThirdPartyAdResponse.ResponseStatus.HTTPREQUEST_ERROR;
-            LOG.info("Error in making http request for partner {} {}", advertiserName, ex);
-        }
-        LOG.debug("content is {}", request.getContent());
-        return request;
+        ningRequest = new RequestBuilder("POST").setUrl(requestUrl)
+                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
+                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
+                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
+                .addHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json").setBody(bidRequestJson)
+                .setHeader(X_OPENRTB_VERSION, rtbVer).build();
     }
 
     @Override
@@ -672,12 +692,12 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             velocityContext.put(VelocityTemplateFieldConstants.IMBeaconUrl, this.beaconUrl);
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.RTB_HTML, velocityContext, sasParams,
-                    null);
+                        null);
             }
             catch (Exception e) {
                 adStatus = "NO_AD";
                 LOG.info("Some exception is caught while filling the velocity template for partner{} {}",
-                    advertiserName, e);
+                        advertiserName, e);
             }
         }
         LOG.debug("response length is {}", responseContent.length());
@@ -804,94 +824,4 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         return bidderCurrency;
     }
 
-    // makes an async request to thirdparty network
-    @Override
-    public boolean makeAsyncRequest() {
-        LOG.debug("inside rtbd async");
-        if (useJsAdTag()) {
-            generateJsAdResponse();
-            processResponse();
-            LOG.debug("sent jsadcode... returning from make NingRequest");
-            return true;
-        }
-
-        URI uri;
-        try {
-            request = getHttpRequest();
-            uri = new URI(request.getUri());
-            request.setUri(uri.getPath() + "?" + uri.getQuery());
-            LOG.debug("uri is {}", uri);
-            LOG.info("url inside makeAsyncRequest is not null");
-        }
-        catch (Exception ex) {
-            errorStatus = ThirdPartyAdResponse.ResponseStatus.HTTPREQUEST_ERROR;
-            LOG.debug("error in creating http request object");
-            return false;
-        }
-        startTime = System.currentTimeMillis();
-        try {
-            future = clientBootstrap.connect(new InetSocketAddress(uri.getHost(), uri.getPort() == -1 ? 80 : uri
-                    .getPort()));
-        }
-        catch (ChannelException e) {
-            LOG.debug("Error creating socket... too many sockets open {}", e.getMessage());
-            return false;
-        }
-        channel = future.getChannel();
-        // waiting for connection to happen and then sending http request
-        // through
-        // channel
-        future.addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(final ChannelFuture future) throws Exception {
-                MDC.put("requestId", serverEvent.getChannel().getId().toString());
-
-                connectionLatency = System.currentTimeMillis() - startTime;
-                if (!future.isSuccess()) {
-                    latency = System.currentTimeMillis() - startTime;
-                    adStatus = "TERM";
-                    LOG.info("error creating socket for partner:", getName());
-                    errorStatus = ThirdPartyAdResponse.ResponseStatus.SOCKET_ERROR;
-                    cleanUp();
-                    processResponse();
-                    return;
-                }
-                if (channel.isWritable()) {
-                    LOG.debug("request {} : ", request.toString());
-                    for (Map.Entry header : request.getHeaders()) {
-                        LOG.debug("header {} : {}", header.getKey(), header.getValue());
-                    }
-                    channel.write(request);
-                }
-                channel.getCloseFuture().addListener(new ChannelFutureListener() {
-                    @Override
-                    public void operationComplete(final ChannelFuture future) throws Exception {
-                        MDC.put("requestId", serverEvent.getChannel().getId().toString());
-
-                        latency = System.currentTimeMillis() - startTime;
-                        if (!isRequestCompleted()) {
-                            LOG.debug("Operation complete for channel partner: {}", getName());
-                            Channel channel1 = future.getChannel();
-                            LOG.debug("outbound channel id is {}", channel1.getId());
-                            if (null != ChannelsClientHandler.getMessage(channel1.getId())) {
-                                String response = (ChannelsClientHandler.getMessage(channel1.getId())).toString();
-                                HttpResponseStatus httpResponseStatus = ChannelsClientHandler.statusMap.get(channel1
-                                        .getId());
-                                ChannelsClientHandler.removeEntry(channel1.getId());
-                                ChannelsClientHandler.statusMap.remove(channel1.getId());
-                                parseResponse(response, httpResponseStatus);
-                            }
-                            else {
-                                errorStatus = ThirdPartyAdResponse.ResponseStatus.INVALID_RESPONSE;
-                            }
-                            channel1.close();
-                            processResponse();
-                        }
-                    }
-                });
-            }
-        });
-        LOG.debug("returning from make AsyncRequest");
-        return true;
-    }
 }

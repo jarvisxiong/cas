@@ -7,16 +7,9 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpMethod;
-import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.jboss.netty.handler.codec.http.HttpVersion;
-import org.jboss.netty.util.CharsetUtil;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +20,9 @@ import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.ning.http.client.Request;
+import com.ning.http.client.RequestBuilder;
 
 
 public class DCPAppierAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -41,6 +35,8 @@ public class DCPAppierAdNetwork extends AbstractDCPAdNetworkImpl {
     private String              os           = null;
     private static final String sizeFormat   = "%dx%d";
     private String              sourceType;
+
+    private Request             ningRequest;
 
     private static final String VERSION      = "version";
     private static final String REQID        = "reqid";
@@ -113,27 +109,15 @@ public class DCPAppierAdNetwork extends AbstractDCPAdNetworkImpl {
     }
 
     @Override
-    public HttpRequest getHttpRequest() throws Exception {
-        try {
-            URI uri = getRequestUri();
-            requestUrl = uri.toString();
-            request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri.toASCIIString());
-            LOG.debug("host name is {}", uri.getHost());
-            request.setHeader(HttpHeaders.Names.HOST, uri.getHost());
-            request.setHeader(HttpHeaders.Names.REFERER, uri.toString());
-            request.setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
-            request.setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES);
-            request.setHeader("X-Forwarded-For", sasParams.getRemoteHostIp());
-            ChannelBuffer buffer = ChannelBuffers.copiedBuffer(getRequestParams(), CharsetUtil.UTF_8);
-            request.setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(buffer.readableBytes()));
-            request.setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/x-www-form-urlencoded");
-            request.setContent(buffer);
-        }
-        catch (Exception ex) {
-            errorStatus = ThirdPartyAdResponse.ResponseStatus.HTTPREQUEST_ERROR;
-            LOG.error("Error in making http request {}", ex);
-        }
-        return request;
+    protected void setNingRequest(final String requestUrl) throws Exception {
+
+        ningRequest = new RequestBuilder("POST").setUrl(requestUrl)
+                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
+                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
+                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
+                .addHeader(HttpHeaders.Names.CONTENT_TYPE, "application/x-www-form-urlencoded")
+                .setBody(getRequestParams()).build();
     }
 
     @Override
