@@ -8,6 +8,7 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import org.jboss.netty.util.CharsetUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -200,13 +201,15 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     protected void setNingRequest(final String requestUrl) throws Exception {
 
+        byte[] body = getRequestBody().getBytes(CharsetUtil.UTF_8);
         ningRequest = new RequestBuilder("POST").setUrl(requestUrl)
                 .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
                 .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-                .addHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
-                .setHeader(HttpHeaders.Names.ACCEPT, "application/json").setBody(getRequestBody()).build();
+                .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
+                .setHeader(HttpHeaders.Names.ACCEPT, "application/json")
+                .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length)).setBody(body).build();
     }
 
     // Returns the Channel Id for the TPAN as in our database. This will be

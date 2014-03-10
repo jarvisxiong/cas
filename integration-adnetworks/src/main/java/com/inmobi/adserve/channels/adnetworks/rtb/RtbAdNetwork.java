@@ -33,6 +33,7 @@ import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
+import org.jboss.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -606,13 +607,15 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     @Override
     protected void setNingRequest(final String requestUrl) throws Exception {
+        byte[] body = bidRequestJson.getBytes(CharsetUtil.UTF_8);
 
         ningRequest = new RequestBuilder("POST").setUrl(requestUrl)
                 .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
                 .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-                .addHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json").setBody(bidRequestJson)
+                .addHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
+                .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length)).setBody(body)
                 .setHeader(X_OPENRTB_VERSION, rtbVer).build();
     }
 

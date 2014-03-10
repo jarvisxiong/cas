@@ -12,6 +12,7 @@ import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import org.jboss.netty.util.CharsetUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -148,14 +149,16 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     protected void setNingRequest(final String requestUrl) throws Exception {
+        byte[] body = getRequestParams().getBytes(CharsetUtil.UTF_8);
 
         ningRequest = new RequestBuilder("POST").setUrl(requestUrl)
                 .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
                 .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-                .addHeader(HttpHeaders.Names.CONTENT_TYPE, "application/x-www-form-urlencoded")
-                .setBody(getRequestParams()).setHeader("RLNClientIpAddr", sasParams.getRemoteHostIp()).build();
+                .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/x-www-form-urlencoded")
+                .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length)).setBody(body)
+                .setHeader("RLNClientIpAddr", sasParams.getRemoteHostIp()).build();
     }
 
     @Override
