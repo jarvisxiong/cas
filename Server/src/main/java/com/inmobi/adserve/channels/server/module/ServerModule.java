@@ -2,6 +2,8 @@ package com.inmobi.adserve.channels.server.module;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.ws.rs.Path;
 
@@ -66,6 +68,7 @@ public class ServerModule extends AbstractModule {
         bind(Configuration.class).annotatedWith(ServerConfiguration.class).toInstance(serverConfiguration);
         bind(Configuration.class).annotatedWith(LoggerConfiguration.class).toInstance(loggerConfiguration);
         bind(Configuration.class).annotatedWith(RtbConfiguration.class).toInstance(rtbConfiguration);
+        bind(ExecutorService.class).toInstance(Executors.newCachedThreadPool());
 
         requestStaticInjection(AsyncRequestMaker.class);
         requestStaticInjection(ChannelSegment.class);

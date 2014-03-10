@@ -204,7 +204,6 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
                 .setHeader("x-plus1-remote-addr", sasParams.getRemoteHostIp())
                 .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
-                .setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE)
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
                 .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp()).build();
     }

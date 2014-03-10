@@ -51,7 +51,6 @@ public class NettyModule extends AbstractModule {
             bind(ChannelPipelineFactory.class).to(ChannelStatServerPipelineFactory.class).asEagerSingleton();
         }
 
-        bind(ExecutorService.class).toInstance(Executors.newCachedThreadPool());
     }
 
     @Provides

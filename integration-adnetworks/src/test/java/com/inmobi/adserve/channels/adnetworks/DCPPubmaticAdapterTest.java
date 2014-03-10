@@ -170,8 +170,9 @@ public class DCPPubmaticAdapterTest extends TestCase {
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
                 new JSONObject("{\"9\":\"1231\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
         if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
+            dcpPubmaticAdnetwork.makeAsyncRequest();
             String actualUrl = dcpPubmaticAdnetwork.getRequestUrl();
-            assertEquals(actualUrl, pubmaticHost);
+            assertEquals(pubmaticHost, actualUrl);
         }
     }
 
