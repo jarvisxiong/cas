@@ -39,6 +39,9 @@ public class AuctionEngine implements AuctionEngineInterface {
     @Inject
     private static Map<String, String>  advertiserIdNameMap;
 
+    @Inject
+    private static AsyncRequestMaker    asyncRequestMaker;
+
     public AuctionEngine() {
     }
 
@@ -255,7 +258,7 @@ public class AuctionEngine implements AuctionEngineInterface {
 
     public String getEncryptedBid(final Double bid) {
         long winBid = (long) (bid * Math.pow(10, 6));
-        return AsyncRequestMaker.getImpressionId(winBid);
+        return asyncRequestMaker.getImpressionId(winBid);
     }
 
     public double calculateRTBFloor(final double siteFloor, final double highestEcpm, final double segmentFloor,

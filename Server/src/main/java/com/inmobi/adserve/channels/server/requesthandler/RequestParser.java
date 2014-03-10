@@ -1,7 +1,6 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.util.Arrays;
@@ -48,7 +47,7 @@ public class RequestParser {
             List<String> values = params.get(jsonKey);
             if (CollectionUtils.isNotEmpty(values)) {
                 String stringVal = values.iterator().next();
-                return new JSONObject(URLDecoder.decode(stringVal, "UTF-8"));
+                return new JSONObject(stringVal);
             }
         }
         return null;
@@ -69,7 +68,7 @@ public class RequestParser {
         Set<Integer> accountSegments = getAcoountSegments(jObject);
         boolean isResponseOnlyFromDcp = jObject.optBoolean("isResponseOnlyFromDcp", false);
         LOG.debug(traceMarker, "dst type is {} isResponseOnlyFromDcp  {} and account segments are {}", dst,
-            isResponseOnlyFromDcp, accountSegments);
+                isResponseOnlyFromDcp, accountSegments);
         params.setDst(dst);
         params.setResponseOnlyFromDcp(isResponseOnlyFromDcp);
         params.setAccountSegment(accountSegments);
@@ -110,7 +109,7 @@ public class RequestParser {
         params.setSiteSegmentId(jObject.optInt("sel-seg-id", 0));
         params.setModelId(jObject.optInt("model-id", 0));
         LOG.debug(traceMarker, "Site segment id is {} and model id is {}", params.getSiteSegmentId(),
-            params.getModelId());
+                params.getModelId());
         params.setIpFileVersion(jObject.optInt("rqIpFileVer", 1));
         LOG.debug(traceMarker, "country obtained is {}", params.getCountry());
         LOG.debug(traceMarker, "site floor is {}", params.getSiteFloor());

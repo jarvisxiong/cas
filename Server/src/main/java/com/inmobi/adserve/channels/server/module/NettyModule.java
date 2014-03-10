@@ -2,9 +2,12 @@ package com.inmobi.adserve.channels.server.module;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.logging.LoggingHandler;
 
 import org.apache.commons.configuration.Configuration;
 
@@ -30,6 +33,8 @@ import com.inmobi.adserve.channels.server.annotations.WorkerGroup;
 import com.inmobi.adserve.channels.server.api.ConnectionType;
 import com.inmobi.adserve.channels.server.config.ServerConfig;
 import com.inmobi.adserve.channels.server.netty.CasNettyServer;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
 
 
 /**
@@ -48,6 +53,8 @@ public class NettyModule extends AbstractModule {
     protected void configure() {
 
         bind(Configuration.class).annotatedWith(ServerConfiguration.class).toInstance(serverConfiguration);
+
+        bind(LoggingHandler.class).toInstance(new LoggingHandler());
 
         bind(CasNettyServer.class).asEagerSingleton();
 
@@ -69,9 +76,40 @@ public class NettyModule extends AbstractModule {
         bind(DcpClientChannelInitializer.class).asEagerSingleton();
         bind(RtbClientChannelInitializer.class).asEagerSingleton();
 
-        // client bootstrap
-        bind(Bootstrap.class).annotatedWith(DcpClientBoostrap.class).to(Bootstrap.class).asEagerSingleton();
-        bind(Bootstrap.class).annotatedWith(RtbClientBoostrap.class).to(Bootstrap.class).asEagerSingleton();
+    }
+
+    // ning client for out-bound calls, as for some partners netty client does not work
+    @Provides
+    @Singleton
+    AsyncHttpClient provideAsyncHttpClient(@WorkerGroup final EventLoopGroup workerGroup) {
+        AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder()
+                .setRequestTimeoutInMs(serverConfiguration.getInt("readtimeoutMillis") - 100)
+                .setConnectionTimeoutInMs(serverConfiguration.getInt("readtimeoutMillis") - 200)
+                .setAllowPoolingConnection(true).setExecutorService(workerGroup).build();
+        return new AsyncHttpClient(asyncHttpClientConfig);
+    }
+
+    // client bootstrap
+    @Provides
+    @Singleton
+    @DcpClientBoostrap
+    Bootstrap provideDcpClientBootStrap(final DcpClientChannelInitializer dcpClientChannelInitializer,
+            @WorkerGroup final EventLoopGroup workerGroup) {
+        return new Bootstrap().group(workerGroup).channel(NioSocketChannel.class).handler(dcpClientChannelInitializer)
+                .option(ChannelOption.SO_KEEPALIVE, true).option(ChannelOption.TCP_NODELAY, true)
+                .option(ChannelOption.SO_REUSEADDR, true);
+
+    }
+
+    // client bootstrap
+    @Provides
+    @Singleton
+    @RtbClientBoostrap
+    Bootstrap provideDcpClientBootStrap(final RtbClientChannelInitializer rtbClientChannelInitializer,
+            @WorkerGroup final EventLoopGroup workerGroup) {
+        return new Bootstrap().group(workerGroup).channel(NioSocketChannel.class).handler(rtbClientChannelInitializer)
+                .option(ChannelOption.SO_KEEPALIVE, true).option(ChannelOption.TCP_NODELAY, true)
+                .option(ChannelOption.SO_REUSEADDR, true);
 
     }
 

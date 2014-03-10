@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.server.utils;
 
+import io.netty.handler.codec.http.HttpHeaders;
+
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -10,6 +12,7 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.PricingEngineEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.beans.CasContext;
+import com.inmobi.adserve.channels.server.beans.CasRequest;
 
 
 /**
@@ -45,6 +48,22 @@ public class CasUtils {
         }
 
         return pricingEngineEntity == null ? 0 : pricingEngineEntity.getRtbFloor();
+    }
+
+    public static String getHost(final CasRequest casRequest) {
+        HttpHeaders headers = casRequest.getHttpRequest().headers();
+
+        return headers.get("Host");
+    }
+
+    public boolean isRequestFromLocalHost(final CasRequest casRequest) {
+        String host = getHost(casRequest);
+
+        if (host != null && host.startsWith("localhost")) {
+            return true;
+        }
+
+        return false;
     }
 
 }

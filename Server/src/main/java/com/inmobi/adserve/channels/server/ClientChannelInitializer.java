@@ -5,6 +5,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 
 import java.util.concurrent.TimeUnit;
@@ -23,17 +24,20 @@ public abstract class ClientChannelInitializer extends ChannelInitializer<Socket
     private final ChannelsClientHandler    channelHandler;
     protected final ConnectionLimitHandler connectionLimitUpstreamHandler;
     private final ServerConfig             serverConfig;
+    private final LoggingHandler           loggingHandler;
 
-    protected ClientChannelInitializer(final ServerConfig serverConfig, final ConnectionType connectionType) {
+    protected ClientChannelInitializer(final ServerConfig serverConfig, final ConnectionType connectionType,
+            final LoggingHandler loggingHandler) {
         channelHandler = new ChannelsClientHandler();
         connectionLimitUpstreamHandler = new ConnectionLimitHandler(serverConfig, connectionType);
         this.serverConfig = serverConfig;
+        this.loggingHandler = loggingHandler;
     }
 
     @Override
     protected void initChannel(final SocketChannel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();
-
+        pipeline.addLast("logging", loggingHandler);
         pipeline.addLast("connectionLimit", connectionLimitUpstreamHandler);
         pipeline.addLast("timeout", new ReadTimeoutHandler(serverConfig.getDcpRequestTimeoutInMillis(),
                 TimeUnit.MILLISECONDS));

@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.server.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.util.CategoryList;
 import com.inmobi.adserve.channels.util.IABCategoriesInterface;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
@@ -162,7 +163,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         future.addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(final ChannelFuture future) throws Exception {
-                MDC.put("requestId", String.valueOf(serverChannel.hashCode()));
+                MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
 
                 connectionLatency = System.currentTimeMillis() - startTime;
                 if (!future.isSuccess()) {
@@ -180,13 +181,13 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 channel.closeFuture().addListener(new ChannelFutureListener() {
                     @Override
                     public void operationComplete(final ChannelFuture future) throws Exception {
-                        MDC.put("requestId", String.valueOf(serverChannel.hashCode()));
+                        MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
 
                         latency = System.currentTimeMillis() - startTime;
                         if (!isRequestCompleted()) {
                             LOG.debug("Operation complete for channel partner: {}", getName());
                             Channel channel1 = future.channel();
-                            LOG.debug("outbound channel id is {}", channel1.hashCode());
+                            LOG.debug("outbound channel id is {}", String.format("0x%08x", serverChannel.hashCode()));
                             if (null != ChannelsClientHandler.getMessage(channel1.hashCode())) {
                                 String response = (ChannelsClientHandler.getMessage(channel1.hashCode())).toString();
                                 HttpResponseStatus httpResponseStatus = ChannelsClientHandler.statusMap.get(channel1

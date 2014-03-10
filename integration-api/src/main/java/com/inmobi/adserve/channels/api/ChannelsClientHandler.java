@@ -1,16 +1,19 @@
 package com.inmobi.adserve.channels.api;
 
 import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.util.CharsetUtil;
+import io.netty.util.ReferenceCountUtil;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 
+@Sharable
 public class ChannelsClientHandler extends ChannelDuplexHandler {
     public static final ConcurrentHashMap<Integer, StringBuffer>       responseMap = new ConcurrentHashMap<Integer, StringBuffer>();
     public static final ConcurrentHashMap<Integer, HttpResponseStatus> statusMap   = new ConcurrentHashMap<Integer, HttpResponseStatus>(
@@ -26,20 +29,19 @@ public class ChannelsClientHandler extends ChannelDuplexHandler {
         responseMap.remove(channelId);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see io.netty.channel.ChannelInboundHandlerAdapter#channelRead(io.netty.channel.ChannelHandlerContext,
-     * java.lang.Object)
-     */
     @Override
     public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
-        int channelId = ctx.channel().hashCode();
+        try {
+            int channelId = ctx.channel().hashCode();
 
-        StringBuffer msgContent = new StringBuffer(((FullHttpResponse) msg).content().toString(CharsetUtil.UTF_8));
-        responseMap.put(channelId, msgContent);
-        HttpResponseStatus status = ((HttpResponse) msg).getStatus();
-        statusMap.put(channelId, status);
+            StringBuffer msgContent = new StringBuffer(((FullHttpResponse) msg).content().toString(CharsetUtil.UTF_8));
+            responseMap.put(channelId, msgContent);
+            HttpResponseStatus status = ((HttpResponse) msg).getStatus();
+            statusMap.put(channelId, status);
+        }
+        finally {
+            ReferenceCountUtil.release(msg);
+        }
     }
 
     @Override

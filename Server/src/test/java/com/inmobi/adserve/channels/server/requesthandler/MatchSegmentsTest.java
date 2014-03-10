@@ -42,7 +42,7 @@ public class MatchSegmentsTest extends TestCase {
 
         ServletHandler.init(configurationLoder, repositoryHelper);
 
-        Injector injector = Guice.createInjector(new NettyModule(configurationLoder.getServerConfiguration(), 8800),
+        Injector injector = Guice.createInjector(new NettyModule(configurationLoder.getServerConfiguration()),
                 new ServerModule(configurationLoder, repositoryHelper), new ScopeModule());
 
         matchSegments = injector.getInstance(MatchSegments.class);

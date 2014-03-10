@@ -2,8 +2,7 @@ package com.inmobi.adserve.channels.server;
 
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.HttpRequest;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import org.slf4j.MDC;
 
@@ -13,12 +12,12 @@ import org.slf4j.MDC;
  * 
  */
 @Sharable
-public class RequestIdHandler extends SimpleChannelInboundHandler<HttpRequest> {
+public class RequestIdHandler extends ChannelInboundHandlerAdapter {
 
     @Override
-    protected void channelRead0(final ChannelHandlerContext ctx, final HttpRequest httpRequest) {
-        MDC.put("requestId", String.valueOf(ctx.channel().hashCode()));
-        ctx.fireChannelRead(httpRequest);
+    public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
+        MDC.put("requestId", String.format("0x%08x", ctx.channel().hashCode()));
+        ctx.fireChannelRead(msg);
     }
 
 }

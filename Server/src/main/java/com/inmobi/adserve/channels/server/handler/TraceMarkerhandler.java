@@ -2,7 +2,7 @@ package com.inmobi.adserve.channels.server.handler;
 
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.HttpRequest;
 
 import javax.inject.Inject;
@@ -21,7 +21,7 @@ import com.inmobi.adserve.channels.server.SimpleScope;
  */
 @Sharable
 @Singleton
-public class TraceMarkerhandler extends SimpleChannelInboundHandler<HttpRequest> {
+public class TraceMarkerhandler extends ChannelInboundHandlerAdapter {
 
     public static final Marker TRACE_MAKER = MarkerFactory.getMarker("TRACE_MAKER");
     private final SimpleScope  scope;
@@ -32,8 +32,8 @@ public class TraceMarkerhandler extends SimpleChannelInboundHandler<HttpRequest>
     }
 
     @Override
-    protected void channelRead0(final ChannelHandlerContext ctx, final HttpRequest httpRequest) {
-
+    public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
+        HttpRequest httpRequest = (HttpRequest) msg;
         boolean isTracer = Boolean.valueOf(httpRequest.headers().get("x-mkhoj-tracer"));
         Marker traceMarker = isTracer ? TRACE_MAKER : null;
         scope.enter();
@@ -44,7 +44,6 @@ public class TraceMarkerhandler extends SimpleChannelInboundHandler<HttpRequest>
         finally {
             scope.exit();
         }
-
     }
 
 }

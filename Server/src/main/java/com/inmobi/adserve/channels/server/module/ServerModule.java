@@ -25,11 +25,11 @@ import com.inmobi.adserve.channels.server.annotations.LoggerConfiguration;
 import com.inmobi.adserve.channels.server.annotations.RtbConfiguration;
 import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
 import com.inmobi.adserve.channels.server.api.Servlet;
-import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 import com.inmobi.adserve.channels.server.requesthandler.AuctionEngine;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
+import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 
 
@@ -66,10 +66,10 @@ public class ServerModule extends AbstractModule {
         bind(Configuration.class).annotatedWith(LoggerConfiguration.class).toInstance(loggerConfiguration);
         bind(Configuration.class).annotatedWith(RtbConfiguration.class).toInstance(rtbConfiguration);
 
-        requestStaticInjection(AsyncRequestMaker.class);
         requestStaticInjection(ChannelSegment.class);
         requestStaticInjection(Logging.class);
         requestStaticInjection(AuctionEngine.class);
+        requestStaticInjection(ResponseSender.class);
 
         install(new AdapterConfigModule(adapterConfiguration, ChannelServer.dataCentreName));
         install(new ChannelSegmentFilterModule());

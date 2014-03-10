@@ -2,7 +2,7 @@ package com.inmobi.adserve.channels.server;
 
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.QueryStringDecoder;
 
@@ -27,7 +27,7 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 
 @Sharable
 @Singleton
-public class ServletHandler extends SimpleChannelInboundHandler<HttpRequest> {
+public class ServletHandler extends ChannelInboundHandlerAdapter {
     private static final Logger    LOG                      = LoggerFactory.getLogger(ServletHandler.class);
 
     // TODO: clear up all these responses, configs to separate module
@@ -108,7 +108,8 @@ public class ServletHandler extends SimpleChannelInboundHandler<HttpRequest> {
     }
 
     @Override
-    protected void channelRead0(final ChannelHandlerContext ctx, final HttpRequest httpRequest) throws Exception {
+    public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
+        HttpRequest httpRequest = (HttpRequest) msg;
 
         QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httpRequest.getUri());
         String path = queryStringDecoder.path();

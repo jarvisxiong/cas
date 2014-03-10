@@ -20,9 +20,9 @@ import org.slf4j.MDC;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.server.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
@@ -244,7 +244,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
                 @Override
                 public Response onCompleted(final Response response) throws Exception {
-                    MDC.put("requestId", String.valueOf(serverChannel.hashCode()));
+                    MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
 
                     if (!isRequestCompleted()) {
                         LOG.debug("Operation complete for channel partner: {}", getName());
@@ -260,7 +260,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
 
                 @Override
                 public void onThrowable(final Throwable t) {
-                    MDC.put("requestId", String.valueOf(serverChannel.hashCode()));
+                    MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
 
                     if (isRequestComplete) {
                         return;

@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.server;
 
 import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -14,6 +15,7 @@ import com.inmobi.adserve.channels.server.api.ConnectionType;
 import com.inmobi.adserve.channels.server.config.ServerConfig;
 
 
+@Sharable
 public class ConnectionLimitHandler extends ChannelDuplexHandler {
     private final static Logger  LOG                = LoggerFactory.getLogger(ConnectionLimitHandler.class);
 
@@ -31,7 +33,7 @@ public class ConnectionLimitHandler extends ChannelDuplexHandler {
     }
 
     @Override
-    public void channelRegistered(final ChannelHandlerContext ctx) throws Exception {
+    public void channelActive(final ChannelHandlerContext ctx) throws Exception {
         int maxConnections = getMaxConnectionsLimit();
         if (maxConnections > 0) {
             int currentCount = activeConnections.getAndIncrement();
@@ -42,16 +44,16 @@ public class ConnectionLimitHandler extends ChannelDuplexHandler {
                 droppedConnections.incrementAndGet();
             }
         }
-        super.channelRegistered(ctx);
+        super.channelActive(ctx);
     }
 
     @Override
-    public void channelUnregistered(final ChannelHandlerContext ctx) throws Exception {
+    public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
         int maxConnections = getMaxConnectionsLimit();
         if (maxConnections > 0) {
             activeConnections.decrementAndGet();
         }
-        super.channelUnregistered(ctx);
+        super.channelInactive(ctx);
     }
 
     public int getMaxConnectionsLimit() {

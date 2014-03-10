@@ -1,5 +1,8 @@
 package com.inmobi.adserve.channels.server;
 
+import io.netty.util.internal.logging.InternalLoggerFactory;
+import io.netty.util.internal.logging.Slf4JLoggerFactory;
+
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -17,8 +20,6 @@ import org.apache.commons.dbcp.PoolingDataSource;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.jboss.netty.logging.InternalLoggerFactory;
-import org.jboss.netty.logging.Slf4JLoggerFactory;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -41,7 +42,6 @@ import com.inmobi.adserve.channels.server.api.ConnectionType;
 import com.inmobi.adserve.channels.server.module.NettyModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
 import com.inmobi.adserve.channels.server.netty.CasNettyServer;
-import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.MetricsManager;
@@ -49,8 +49,6 @@ import com.inmobi.casthrift.DataCenter;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import com.inmobi.messaging.publisher.MessagePublisherFactory;
 import com.inmobi.phoenix.exception.InitializationException;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
 
 
 /*
@@ -162,18 +160,6 @@ public class ChannelServer {
             if (null != maxIncomingConnections) {
                 ServletHandler.getServerConfig().setProperty("dcpOutGoingMaxConnections", maxDCpOutGoingConnections);
             }
-
-            // For some partners netty client does not work thus
-            // Creating a ning client for out-bound calls
-            AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder()
-                    .setRequestTimeoutInMs(
-                            configurationLoader.getServerConfiguration().getInt("readtimeoutMillis") - 100)
-                    .setConnectionTimeoutInMs(
-                            configurationLoader.getServerConfiguration().getInt("readtimeoutMillis") - 200).build();
-            AsyncHttpClient asyncHttpClient = new AsyncHttpClient(asyncHttpClientConfig);
-
-            // Initialising request handler
-            AsyncRequestMaker.init(asyncHttpClient);
 
             // Configure the netty server.
             Injector injector = Guice.createInjector(new NettyModule(configurationLoader.getServerConfiguration()),

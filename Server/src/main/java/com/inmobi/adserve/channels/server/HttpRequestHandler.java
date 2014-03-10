@@ -1,15 +1,18 @@
 package com.inmobi.adserve.channels.server;
 
-import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.QueryStringDecoder;
-import io.netty.handler.timeout.IdleStateEvent;
+import io.netty.handler.timeout.WriteTimeoutException;
+import io.netty.util.ReferenceCountUtil;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.channels.ClosedChannelException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -32,28 +35,28 @@ import org.slf4j.Marker;
 
 import com.google.inject.Provider;
 import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.beans.CasRequest;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
-import com.inmobi.adserve.channels.util.CommonUtils;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
 
-public class HttpRequestHandler extends ChannelDuplexHandler {
+public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
 
-    private static final Logger LOG               = LoggerFactory.getLogger(HttpRequestHandler.class);
+    private static final Logger     LOG               = LoggerFactory.getLogger(HttpRequestHandler.class);
 
-    public String               terminationReason = "NO";
-    public JSONObject           jObject           = null;
-    public ResponseSender       responseSender;
+    public String                   terminationReason = "NO";
+    public JSONObject               jObject           = null;
+    public ResponseSender           responseSender;
 
-    private Provider<Marker>    traceMarkerProvider;
-    private Marker              traceMarker;
+    private final Provider<Marker>  traceMarkerProvider;
+    private Marker                  traceMarker;
 
-    private Provider<Servlet>   servletProvider;
+    private final Provider<Servlet> servletProvider;
 
-    private HttpRequest         httpRequest;
+    private HttpRequest             httpRequest;
 
     public String getTerminationReason() {
         return terminationReason;
@@ -63,24 +66,22 @@ public class HttpRequestHandler extends ChannelDuplexHandler {
         this.terminationReason = terminationReason;
     }
 
-    HttpRequestHandler() {
-        responseSender = new ResponseSender(this);
-    }
-
     @Inject
     HttpRequestHandler(final Provider<Marker> traceMarkerProvider, final Provider<Servlet> servletProvider) {
         this.traceMarkerProvider = traceMarkerProvider;
         this.servletProvider = servletProvider;
-        responseSender = new ResponseSender(this);
     }
 
-    // Invoked when request timeout.
+    /**
+     * Invoked when an exception occurs whenever channel throws closedchannelexception increment the totalterminate
+     * means channel is closed by party who requested for the ad
+     */
     @Override
-    public void userEventTriggered(final ChannelHandlerContext ctx, final Object evt) throws Exception {
-        // MDC.put("requestId", e.getChannel().getId().toString());
+    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
+        MDC.put("requestId", String.format("0x%08x", ctx.channel().hashCode()));
 
-        if (evt instanceof IdleStateEvent) {
-            IdleStateEvent e = (IdleStateEvent) evt;
+        if (cause instanceof WriteTimeoutException) {
+
             if (ctx.channel().isOpen()) {
                 LOG.debug(traceMarker, "Channel is open in channelIdle handler");
                 if (responseSender.getRankList() != null) {
@@ -102,44 +103,38 @@ public class HttpRequestHandler extends ChannelDuplexHandler {
             LOG.debug(traceMarker, "inside channel idle event handler for Request channel ID: {}", ctx.channel());
             InspectorStats.incrementStatCount(InspectorStrings.totalTimeout);
             LOG.debug(traceMarker, "server timeout");
-        }
-    }
 
-    /**
-     * Invoked when an exception occurs whenever channel throws closedchannelexception increment the totalterminate
-     * means channel is closed by party who requested for the ad
-     */
-    @Override
-    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
-        MDC.put("requestId", String.valueOf(ctx.channel().hashCode()));
-
-        String exceptionString = cause.getClass().getSimpleName();
-        InspectorStats.incrementStatCount(InspectorStrings.channelException, exceptionString);
-        InspectorStats.incrementStatCount(InspectorStrings.channelException, InspectorStrings.count);
-        if (exceptionString.equalsIgnoreCase(ServletHandler.CLOSED_CHANNEL_EXCEPTION)
-                || exceptionString.equalsIgnoreCase(ServletHandler.CONNECTION_RESET_PEER)) {
-            InspectorStats.incrementStatCount(InspectorStrings.totalTerminate);
-            LOG.debug(traceMarker, "Channel is terminated {}", ctx.channel());
         }
-        LOG.info(traceMarker, "Getting netty error in HttpRequestHandler: {}", cause);
-        if (ctx.channel().isOpen()) {
-            responseSender.sendNoAdResponse(ctx.channel());
+        else {
+
+            String exceptionString = cause.getClass().getSimpleName();
+            InspectorStats.incrementStatCount(InspectorStrings.channelException, exceptionString);
+            InspectorStats.incrementStatCount(InspectorStrings.channelException, InspectorStrings.count);
+            if (cause instanceof ClosedChannelException || cause instanceof IOException) {
+                InspectorStats.incrementStatCount(InspectorStrings.totalTerminate);
+                LOG.debug(traceMarker, "Channel is terminated {}", ctx.channel());
+            }
+            LOG.info(traceMarker, "Getting netty error in HttpRequestHandler: {}", cause);
+            if (ctx.channel().isOpen()) {
+                responseSender.sendNoAdResponse(ctx.channel());
+            }
         }
 
-        ctx.channel().close();
     }
 
     // Invoked when message is received over the connection
     @Override
     public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
         try {
-            httpRequest = (HttpRequest) msg;
+            responseSender = new ResponseSender(this);
+
+            CasRequest casRequest = (CasRequest) msg;
 
             traceMarker = traceMarkerProvider.get();
 
             Servlet servlet = servletProvider.get();
 
-            LOG.debug(traceMarker, "Got the servlet {} , uri {}", servlet.getName(), httpRequest.getUri());
+            LOG.debug(traceMarker, "Got the servlet {} , uri {}", servlet.getName(), casRequest.httpRequest().getUri());
 
             servlet.handleRequest(this, new QueryStringDecoder(httpRequest.getUri()), ctx.channel());
             return;
@@ -159,6 +154,9 @@ public class HttpRequestHandler extends ChannelDuplexHandler {
             if (LOG.isDebugEnabled()) {
                 sendMail(exception.getMessage(), sw.toString());
             }
+        }
+        finally {
+            ReferenceCountUtil.release(msg);
         }
     }
 

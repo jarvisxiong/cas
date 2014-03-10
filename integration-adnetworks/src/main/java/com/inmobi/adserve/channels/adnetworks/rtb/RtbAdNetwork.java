@@ -42,12 +42,12 @@ import com.google.gson.Gson;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.server.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.util.IABCategoriesInterface;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.IABCitiesInterface;
@@ -592,7 +592,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             requestUrl = (uri.toString());
             ByteBuf buffer = Unpooled.copiedBuffer(bidRequestJson, CharsetUtil.UTF_8);
 
-            request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, httpRequestMethod, uri.toASCIIString());
+            // TODO: remove header validation
+            request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, httpRequestMethod, uri.toASCIIString(), buffer,
+                    true);
             LOG.debug("host name is {}", uri.getHost());
             request.headers().set(HttpHeaders.Names.CONTENT_TYPE, "application/json");
             request.headers().set(X_OPENRTB_VERSION, rtbVer);

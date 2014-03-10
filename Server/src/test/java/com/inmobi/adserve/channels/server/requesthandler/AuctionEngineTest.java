@@ -220,7 +220,7 @@ public class AuctionEngineTest {
         casInternalRequestParameters.rtbBidFloor = bidFloorInput;
         auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
-        AsyncRequestMaker.init(null, null, null);
+        AsyncRequestMaker.init(null);
 
         AdNetworkInterface auctionEngineResponse = auctionEngine.runRtbSecondPriceAuctionEngine();
 
@@ -322,7 +322,7 @@ public class AuctionEngineTest {
         casInternalRequestParameters.rtbBidFloor = bidFloorInput;
         auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
-        AsyncRequestMaker.init(null, null, null);
+        AsyncRequestMaker.init(null);
 
         AdNetworkInterface auctionEngineResponse = auctionEngine.runRtbSecondPriceAuctionEngine();
 
@@ -353,7 +353,7 @@ public class AuctionEngineTest {
         auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
         new AsyncRequestMaker();
-        AsyncRequestMaker.init(null, null, null);
+        AsyncRequestMaker.init(null);
 
         AdNetworkInterface auctionEngineResponse = auctionEngine.runRtbSecondPriceAuctionEngine();
 
@@ -390,7 +390,7 @@ public class AuctionEngineTest {
         casInternalRequestParameters.rtbBidFloor = bidFloorInput;
         auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
-        AsyncRequestMaker.init(null, null, null);
+        AsyncRequestMaker.init(null);
 
         AdNetworkInterface auctionEngineResponse = auctionEngine.runRtbSecondPriceAuctionEngine();
 
@@ -426,7 +426,7 @@ public class AuctionEngineTest {
         casInternalRequestParameters.rtbBidFloor = bidFloorInput;
         auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
-        AsyncRequestMaker.init(null, null, null);
+        AsyncRequestMaker.init(null);
 
         AdNetworkInterface auctionEngineResponse = auctionEngine.runRtbSecondPriceAuctionEngine();
 
@@ -456,7 +456,7 @@ public class AuctionEngineTest {
         casInternalRequestParameters.rtbBidFloor = bidFloorInput;
         auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
-        AsyncRequestMaker.init(null, null, null);
+        AsyncRequestMaker.init(null);
 
         AdNetworkInterface auctionEngineResponse = auctionEngine.runRtbSecondPriceAuctionEngine();
 

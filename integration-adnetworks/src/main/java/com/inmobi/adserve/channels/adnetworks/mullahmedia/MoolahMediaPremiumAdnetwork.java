@@ -5,7 +5,7 @@ import io.netty.channel.Channel;
 
 import org.apache.commons.configuration.Configuration;
 
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.server.HttpRequestHandlerBase;
 
 
 public class MoolahMediaPremiumAdnetwork extends BaseMoolahMediaNetworkImpl {

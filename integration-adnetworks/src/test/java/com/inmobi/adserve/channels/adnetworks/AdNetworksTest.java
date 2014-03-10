@@ -3,6 +3,9 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.io.File;
 import java.sql.Timestamp;
@@ -13,9 +16,6 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,11 +30,11 @@ import com.inmobi.adserve.channels.adnetworks.tapit.DCPTapitAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.webmoblink.WebmobLinkAdNetwork;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.server.HttpRequestHandlerBase;
 import com.inmobi.phoenix.logging.DebugLogger;
 
 
@@ -66,7 +66,7 @@ public class AdNetworksTest extends TestCase {
     // private final String loggerConf = "/tmp/channel-server.properties";
     private IFDAdNetwork            ifdAdNetwork;
     private ATNTAdNetwork           atntAdNetwork;
-    private final ClientBootstrap   clientBootstrap          = null;
+    private final Bootstrap         clientBootstrap          = null;
     private MobileCommerceAdNetwork mobileCommerceAdNetwork;
 
     private DrawBridgeAdNetwork     drawBridgeAdNetwork;
@@ -137,18 +137,18 @@ public class AdNetworksTest extends TestCase {
         if (!f.exists()) {
             f.createNewFile();
         }
-        MessageEvent serverEvent = createMock(MessageEvent.class);
+        Channel serverChannel = createMock(Channel.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         SlotSizeMapping.init();
         Formatter.init();
-        ifdAdNetwork = new IFDAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
-        atntAdNetwork = new ATNTAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
-        mobileCommerceAdNetwork = new MobileCommerceAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
-        drawBridgeAdNetwork = new DrawBridgeAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
-        openxAdNetwork = new OpenxAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
-        dcpTapitAdNetwork = new DCPTapitAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
-        webmoblinkAdNetwork = new WebmobLinkAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
+        ifdAdNetwork = new IFDAdNetwork(mockConfig, clientBootstrap, base, serverChannel);
+        atntAdNetwork = new ATNTAdNetwork(mockConfig, clientBootstrap, base, serverChannel);
+        mobileCommerceAdNetwork = new MobileCommerceAdNetwork(mockConfig, clientBootstrap, base, serverChannel);
+        drawBridgeAdNetwork = new DrawBridgeAdNetwork(mockConfig, clientBootstrap, base, serverChannel);
+        openxAdNetwork = new OpenxAdNetwork(mockConfig, clientBootstrap, base, serverChannel);
+        dcpTapitAdNetwork = new DCPTapitAdNetwork(mockConfig, clientBootstrap, base, serverChannel);
+        webmoblinkAdNetwork = new WebmobLinkAdNetwork(mockConfig, clientBootstrap, base, serverChannel);
     }
 
     @Test

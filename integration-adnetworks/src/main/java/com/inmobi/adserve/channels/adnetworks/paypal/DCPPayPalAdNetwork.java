@@ -21,10 +21,10 @@ import org.slf4j.MDC;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.server.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.Request;
@@ -167,7 +167,7 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
             baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
                 @Override
                 public Response onCompleted(final Response response) throws Exception {
-                    MDC.put("requestId", String.valueOf(serverChannel.hashCode()));
+                    MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
 
                     if (!isRequestCompleted()) {
                         LOG.debug("Operation complete for channel partner: {}", getName());
@@ -183,7 +183,7 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
 
                 @Override
                 public void onThrowable(final Throwable t) {
-                    MDC.put("requestId", String.valueOf(serverChannel.hashCode()));
+                    MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
 
                     if (isRequestComplete) {
                         return;

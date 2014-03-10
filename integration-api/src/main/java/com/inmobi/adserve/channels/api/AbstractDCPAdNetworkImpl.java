@@ -5,6 +5,8 @@ import io.netty.channel.Channel;
 
 import org.apache.commons.configuration.Configuration;
 
+import com.inmobi.adserve.channels.server.HttpRequestHandlerBase;
+
 
 /**
  * @author abhishek.parwal

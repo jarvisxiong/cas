@@ -44,7 +44,7 @@ public class ServletLbStatus implements Servlet {
         HttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND,
                 Unpooled.copiedBuffer(ServerStatusInfo.statusString, Charset.defaultCharset()));
         if (serverChannel != null && serverChannel.isWritable()) {
-            ChannelFuture future = serverChannel.write(response);
+            ChannelFuture future = serverChannel.writeAndFlush(response);
             future.addListener(ChannelFutureListener.CLOSE);
         }
     }

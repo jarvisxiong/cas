@@ -34,7 +34,7 @@ public class ServletInvalid implements Servlet {
                 Unpooled.copiedBuffer("Page not Found", Charset.defaultCharset()), true);
 
         if (serverChannel != null && serverChannel.isWritable()) {
-            ChannelFuture future = serverChannel.write(response);
+            ChannelFuture future = serverChannel.writeAndFlush(response);
             future.addListener(ChannelFutureListener.CLOSE);
         }
     }
