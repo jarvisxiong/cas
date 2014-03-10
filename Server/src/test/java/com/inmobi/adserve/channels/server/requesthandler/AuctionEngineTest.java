@@ -174,8 +174,8 @@ public class AuctionEngineTest {
                         "B", .95d, 100l, "C", .95d, 150l, .98d, "A", 1d },
 
                 // 18. First and Second bid with .01 difference. He will be charged same Bid he auctioned
-                { "testFirstAndSecondBidWith01difference", .70d, "A", 1d, 100l, "B", .99d, 100l, "C", .70d, 100l, 0.99d,
-                        "A", 1d },
+                { "testFirstAndSecondBidWith01difference", .70d, "A", 1d, 100l, "B", .99d, 100l, "C", .70d, 100l,
+                        0.99d, "A", 1d },
 
                 // 19. 2nd price same as floor price
                 { "testSecondPriceSameAsFloorPrice", .70d, "A", 1d, 100l, "B", .70d, 100l, "C", .70d, 100l, .70d, "A",
@@ -198,18 +198,15 @@ public class AuctionEngineTest {
         AuctionEngine auctionEngine = new AuctionEngine();
         List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
-        rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", rtbNameInput1, bidInput1,
-                latencyInput1));
-        rtbSegments.add(setBidder("advId2", "channelId2", "externalSiteKey2", rtbNameInput2, bidInput2,
-                latencyInput2));
-        rtbSegments.add(setBidder("advId3", "channelId3", "externalSiteKey3", rtbNameInput3, bidInput3,
-                latencyInput3));
+        rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", rtbNameInput1, bidInput1, latencyInput1));
+        rtbSegments.add(setBidder("advId2", "channelId2", "externalSiteKey2", rtbNameInput2, bidInput2, latencyInput2));
+        rtbSegments.add(setBidder("advId3", "channelId3", "externalSiteKey3", rtbNameInput3, bidInput3, latencyInput3));
         auctionEngine.setRtbSegments(rtbSegments);
 
         casInternalRequestParameters.rtbBidFloor = floorPrice;
         auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
-        AsyncRequestMaker.init(null, null, null);
+        AsyncRequestMaker.init(null, null);
 
         AdNetworkInterface auctionEngineResponse = auctionEngine.runRtbSecondPriceAuctionEngine();
 
@@ -285,20 +282,16 @@ public class AuctionEngineTest {
         AuctionEngine auctionEngine = new AuctionEngine();
         List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
-        rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", rtbNameInput1, bidInput1,
-                latencyInput1));
-        rtbSegments.add(setBidder("advId2", "channelId2", "externalSiteKey2", rtbNameInput2, bidInput2,
-                latencyInput2));
-        rtbSegments.add(setBidder("advId3", "channelId3", "externalSiteKey3", rtbNameInput3, bidInput3,
-                latencyInput3));
-        rtbSegments.add(setBidder("advId4", "channelId4", "externalSiteKey4", rtbNameInput4, bidInput4,
-                latencyInput4));
+        rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", rtbNameInput1, bidInput1, latencyInput1));
+        rtbSegments.add(setBidder("advId2", "channelId2", "externalSiteKey2", rtbNameInput2, bidInput2, latencyInput2));
+        rtbSegments.add(setBidder("advId3", "channelId3", "externalSiteKey3", rtbNameInput3, bidInput3, latencyInput3));
+        rtbSegments.add(setBidder("advId4", "channelId4", "externalSiteKey4", rtbNameInput4, bidInput4, latencyInput4));
         auctionEngine.setRtbSegments(rtbSegments);
 
         casInternalRequestParameters.rtbBidFloor = floorPrice;
         auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
-        AsyncRequestMaker.init(null, null, null);
+        AsyncRequestMaker.init(null, null);
 
         AdNetworkInterface auctionEngineResponse = auctionEngine.runRtbSecondPriceAuctionEngine();
 
@@ -328,7 +321,7 @@ public class AuctionEngineTest {
         auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
         new AsyncRequestMaker();
-        AsyncRequestMaker.init(null, null, null);
+        AsyncRequestMaker.init(null, null);
 
         AdNetworkInterface auctionEngineResponse = auctionEngine.runRtbSecondPriceAuctionEngine();
 
@@ -365,7 +358,7 @@ public class AuctionEngineTest {
         casInternalRequestParameters.rtbBidFloor = bidFloorInput;
         auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
-        AsyncRequestMaker.init(null, null, null);
+        AsyncRequestMaker.init(null, null);
 
         AdNetworkInterface auctionEngineResponse = auctionEngine.runRtbSecondPriceAuctionEngine();
 
@@ -400,7 +393,7 @@ public class AuctionEngineTest {
         casInternalRequestParameters.rtbBidFloor = bidFloorInput;
         auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
-        AsyncRequestMaker.init(null, null, null);
+        AsyncRequestMaker.init(null, null);
 
         AdNetworkInterface auctionEngineResponse = auctionEngine.runRtbSecondPriceAuctionEngine();
 
@@ -430,7 +423,7 @@ public class AuctionEngineTest {
         casInternalRequestParameters.rtbBidFloor = bidFloorInput;
         auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
-        AsyncRequestMaker.init(null, null, null);
+        AsyncRequestMaker.init(null, null);
 
         AdNetworkInterface auctionEngineResponse = auctionEngine.runRtbSecondPriceAuctionEngine();
 

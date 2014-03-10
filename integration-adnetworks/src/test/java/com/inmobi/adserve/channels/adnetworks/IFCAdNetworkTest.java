@@ -12,7 +12,6 @@ import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -239,8 +238,5 @@ public class IFCAdNetworkTest extends TestCase {
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
                 new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertEquals(ifcAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", ""), true);
-        HttpRequest httpRequest = ifcAdNetwork.getHttpRequest();
-        assertNotNull(httpRequest.getContent());
-        System.out.println(httpRequest.getContent());
     }
 }

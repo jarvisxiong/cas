@@ -11,18 +11,13 @@ import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpMethod;
-import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.jboss.netty.util.CharsetUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -32,10 +27,8 @@ import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
-import com.ning.http.client.Response;
 
 
 public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
@@ -156,69 +149,13 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
         return null;
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    public boolean makeAsyncRequest() {
-        try {
-            String uri = getRequestUri().toString();
-            requestUrl = uri;
-            setNingRequest(requestUrl);
-            startTime = System.currentTimeMillis();
-            baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
-                @Override
-                public Response onCompleted(final Response response) throws Exception {
-                    MDC.put("requestId", serverEvent.getChannel().getId().toString());
-
-                    if (!isRequestCompleted()) {
-                        LOG.debug("Operation complete for channel partner: {}", getName());
-                        latency = System.currentTimeMillis() - startTime;
-                        LOG.debug("{} operation complete latency {}", getName(), latency);
-                        String responseStr = response.getResponseBody();
-                        HttpResponseStatus httpResponseStatus = HttpResponseStatus.valueOf(response.getStatusCode());
-                        parseResponse(responseStr, httpResponseStatus);
-                        processResponse();
-                    }
-                    return response;
-                }
-
-                @Override
-                public void onThrowable(final Throwable t) {
-                    MDC.put("requestId", serverEvent.getChannel().getId().toString());
-
-                    if (isRequestComplete) {
-                        return;
-                    }
-
-                    if (t instanceof java.util.concurrent.TimeoutException) {
-                        latency = System.currentTimeMillis() - startTime;
-                        LOG.debug("{} timeout latency {}", getName(), latency);
-                        adStatus = "TIME_OUT";
-                        processResponse();
-                        return;
-                    }
-
-                    LOG.debug("{} error latency {}", getName(), latency);
-                    adStatus = "TERM";
-                    LOG.info("error while fetching response from: {} {}", getName(), t);
-                    processResponse();
-                    return;
-                }
-            });
-        }
-        catch (Exception e) {
-            LOG.debug("Exception in {} makeAsyncRequest : {}", getName(), e.getMessage());
-        }
-        LOG.debug("{} returning from make NingRequest", getName());
-        return true;
-    }
-
-    private void setNingRequest(final String requestUrl) {
+    protected void setNingRequest(final String requestUrl) {
         String requestParams = getRequestParams();
         ChannelBuffer buffer = ChannelBuffers.copiedBuffer(requestParams, CharsetUtil.UTF_8);
         ningRequest = new RequestBuilder("POST").setUrl(requestUrl)
                 .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
-                .setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE)
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
                 .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
                 .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(buffer.readableBytes()))
@@ -257,33 +194,6 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public String getId() {
         return (config.getString("mable.advertiserId"));
-    }
-
-    @Override
-    public HttpRequest getHttpRequest() throws Exception {
-        try {
-            URI uri = getRequestUri();
-            requestUrl = uri.toString();
-            request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri.toASCIIString());
-            LOG.debug("host name is {}", uri.getHost());
-            request.setHeader(HttpHeaders.Names.HOST, uri.getHost());
-            LOG.debug("got the host");
-            request.setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent());
-            request.setHeader(HttpHeaders.Names.REFERER, uri.toString());
-            request.setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
-            request.setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES);
-            request.setHeader("X-Forwarded-For", sasParams.getRemoteHostIp());
-
-            ChannelBuffer buffer = ChannelBuffers.copiedBuffer(getRequestParams(), CharsetUtil.UTF_8);
-            request.setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(buffer.readableBytes()));
-            request.setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json");
-            request.setContent(buffer);
-        }
-        catch (Exception ex) {
-            errorStatus = ThirdPartyAdResponse.ResponseStatus.HTTPREQUEST_ERROR;
-            LOG.error("Error in making http request {}", ex);
-        }
-        return request;
     }
 
     @Override
