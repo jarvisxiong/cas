@@ -48,7 +48,6 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
     private static DocumentBuilderFactory factory;
     private static DocumentBuilder        builder;
     private static final String           latlongFormat = "%s,%s";
-    private Request                       ningRequest;
 
     static {
         iABCountries = new IABCountriesMap();
@@ -198,19 +197,18 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
     //
 
     @Override
-    protected void setNingRequest(final String requestUrl) throws Exception {
+    protected Request getNingRequest() throws Exception {
         URI uri = getRequestUri();
         if (uri.getPort() == -1) {
             uri = new URIBuilder(uri).setPort(80).build();
         }
-        ningRequest = new RequestBuilder().setURI(uri)
-                .setHeader("x-display-metrics", String.format("%sx%s", width, height))
+        return new RequestBuilder().setURI(uri).setHeader("x-display-metrics", String.format("%sx%s", width, height))
                 .setHeader("xplus1-user-agent", sasParams.getUserAgent())
                 .setHeader("x-plus1-remote-addr", sasParams.getRemoteHostIp())
                 .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
-                .setHeader(HttpHeaders.Names.HOST, getRequestUri().getHost())
+                .setHeader(HttpHeaders.Names.HOST, uri.getHost())
                 .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp()).build();
     }
 

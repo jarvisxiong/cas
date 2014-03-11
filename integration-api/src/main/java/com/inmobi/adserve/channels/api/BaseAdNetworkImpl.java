@@ -77,7 +77,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected String                              format                  = "UTF-8";
     private String                                adapterName;
 
-    protected Request                             ningRequest;
     protected static String                       SITE_RATING_PERFORMANCE = "PERFORMANCE";
     protected static final String                 WAP                     = "WAP";
     private static final IABCategoriesInterface   iabCategoryMap          = new IABCategoriesMap();
@@ -167,10 +166,17 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     @Override
     public boolean makeAsyncRequest() {
         LOG.debug("In Adapter {}", this.getClass().getSimpleName());
+        if (useJsAdTag()) {
+            generateJsAdResponse();
+            processResponse();
+            LOG.debug("sent jsadcode ... returning from make NingRequest");
+            return true;
+        }
+
         try {
             String uri = getRequestUri().toString();
             requestUrl = uri;
-            setNingRequest(requestUrl);
+            Request ningRequest = getNingRequest();
             LOG.debug(" uri : {}", uri);
             startTime = System.currentTimeMillis();
             getAsyncHttpClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
@@ -225,19 +231,18 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         return baseRequestHandler.getAsyncClient();
     }
 
-    protected void setNingRequest(final String requestUrl) throws Exception {
+    protected Request getNingRequest() throws Exception {
 
         URI uri = getRequestUri();
         if (uri.getPort() == -1) {
             uri = new URIBuilder(uri).setPort(80).build();
         }
 
-        ningRequest = new RequestBuilder().setURI(uri)
-                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
+        return new RequestBuilder().setURI(uri).setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
                 .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-                .setHeader(HttpHeaders.Names.HOST, getRequestUri().getHost()).build();
+                .setHeader(HttpHeaders.Names.HOST, uri.getHost()).build();
     }
 
     // request url of each adapter for logging
@@ -273,9 +278,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     @Override
-    public URI getRequestUri() throws Exception {
-        return null;
-    }
+    abstract public URI getRequestUri() throws Exception;
 
     @Override
     public String getId() {

@@ -6,11 +6,9 @@ import java.net.URISyntaxException;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.velocity.VelocityContext;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,8 +23,6 @@ import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.ning.http.client.Request;
-import com.ning.http.client.RequestBuilder;
 
 
 public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -39,7 +35,6 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
     private int                 height;
     private String              deviceId;
     private String              responseFormat;
-    private Request             ningRequest;
 
     public DCPPayPalAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
@@ -149,20 +144,6 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
             LOG.error("{}", exception);
         }
         return null;
-    }
-
-    @Override
-    protected void setNingRequest(final String requestUrl) throws Exception {
-        URI uri = getRequestUri();
-        if (uri.getPort() == -1) {
-            uri = new URIBuilder(uri).setPort(80).build();
-        }
-        ningRequest = new RequestBuilder().setURI(uri)
-                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
-                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
-                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-                .setHeader(HttpHeaders.Names.HOST, getRequestUri().getHost()).build();
     }
 
     @Override

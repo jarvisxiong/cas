@@ -22,6 +22,7 @@ import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.util.CategoryList;
+import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 
 
@@ -201,7 +202,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
     }
 
     @Override
-    protected void setNingRequest(final String requestUrl) throws Exception {
+    protected Request getNingRequest() throws Exception {
 
         URI uri = getRequestUri();
         if (uri.getPort() == -1) {
@@ -209,14 +210,13 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         }
 
         byte[] body = getRequestBody().getBytes(CharsetUtil.UTF_8);
-        ningRequest = new RequestBuilder("POST").setURI(uri)
-                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
+        return new RequestBuilder("POST").setURI(uri).setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
                 .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
                 .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
                 .setHeader(HttpHeaders.Names.ACCEPT, "application/json")
-                .setHeader(HttpHeaders.Names.HOST, getRequestUri().getHost()).setBody(body).build();
+                .setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(body).build();
     }
 
     // Returns the Channel Id for the TPAN as in our database. This will be
@@ -368,4 +368,15 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         }
         LOG.debug("response length is {}", responseContent.length());
     }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.inmobi.adserve.channels.api.BaseAdNetworkImpl#getRequestUri()
+     */
+    @Override
+    public URI getRequestUri() throws Exception {
+        return new URI(ifcURL);
+    }
+
 }

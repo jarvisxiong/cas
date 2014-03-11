@@ -30,7 +30,6 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 
 import com.google.gson.Gson;
 import com.google.inject.Inject;
@@ -62,12 +61,10 @@ import com.inmobi.casthrift.rtb.Impression;
 import com.inmobi.casthrift.rtb.SeatBid;
 import com.inmobi.casthrift.rtb.Site;
 import com.inmobi.casthrift.rtb.User;
-import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
-import com.ning.http.client.Response;
 
 
 /**
@@ -604,75 +601,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         return url;
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    public boolean makeAsyncRequest() {
-        LOG.debug("In Adapter {}", this.getClass().getSimpleName());
-
-        if (useJsAdTag()) {
-            generateJsAdResponse();
-            processResponse();
-            LOG.debug("sent jsadcode ... returning from make NingRequest");
-            return true;
-        }
-        try {
-            String uri = getRequestUri().toString();
-            requestUrl = uri;
-            setNingRequest(requestUrl);
-            LOG.debug(" uri : {}", uri);
-            startTime = System.currentTimeMillis();
-            getAsyncHttpClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
-                @Override
-                public Response onCompleted(final Response response) throws Exception {
-                    MDC.put("requestId", serverEvent.getChannel().getId().toString());
-
-                    if (!isRequestCompleted()) {
-                        LOG.debug("Operation complete for channel partner: {}", getName());
-                        latency = System.currentTimeMillis() - startTime;
-                        LOG.debug(" operation complete latency {}", latency);
-                        String responseStr = response.getResponseBody();
-                        HttpResponseStatus httpResponseStatus = HttpResponseStatus.valueOf(response.getStatusCode());
-                        LOG.debug("response from {} , is  {} with status {}", getName(), responseStr,
-                                httpResponseStatus);
-                        parseResponse(responseStr, httpResponseStatus);
-                        processResponse();
-                    }
-                    return response;
-                }
-
-                @Override
-                public void onThrowable(final Throwable t) {
-                    MDC.put("requestId", serverEvent.getChannel().getId().toString());
-
-                    if (isRequestComplete) {
-                        return;
-                    }
-
-                    if (t instanceof java.util.concurrent.TimeoutException) {
-                        latency = System.currentTimeMillis() - startTime;
-                        LOG.debug(" timeout latency {}", latency);
-                        adStatus = "TIME_OUT";
-                        processResponse();
-                        return;
-                    }
-
-                    LOG.debug(" error latency {}", latency);
-                    adStatus = "TERM";
-                    LOG.info("error while fetching response from: {} {}", getName(), t);
-                    processResponse();
-                    return;
-                }
-            });
-        }
-        catch (Exception e) {
-            LOG.debug("Exception in makeAsyncRequest : {}", e);
-        }
-        LOG.debug("returning from make NingRequest");
-        return true;
-    }
-
-    @Override
-    protected void setNingRequest(final String requestUrl) throws Exception {
+    protected Request getNingRequest() throws Exception {
         byte[] body = bidRequestJson.getBytes(CharsetUtil.UTF_8);
 
         URI uri = getRequestUri();
@@ -688,10 +618,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             httpRequestMethod = "POST";
         }
 
-        ningRequest = new RequestBuilder(httpRequestMethod).setURI(uri)
+        return new RequestBuilder(httpRequestMethod).setURI(uri)
                 .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json").setBody(body)
-                .setHeader(X_OPENRTB_VERSION, rtbVer).setHeader(HttpHeaders.Names.HOST, getRequestUri().getHost())
-                .build();
+                .setHeader(X_OPENRTB_VERSION, rtbVer).setHeader(HttpHeaders.Names.HOST, uri.getHost()).build();
     }
 
     @Override

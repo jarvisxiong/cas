@@ -27,6 +27,7 @@ import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 
 
@@ -149,7 +150,7 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
     }
 
     @Override
-    protected void setNingRequest(final String requestUrl) throws Exception {
+    protected Request getNingRequest() throws Exception {
         URI uri = getRequestUri();
         if (uri.getPort() == -1) {
             uri = new URIBuilder(uri).setPort(80).build();
@@ -157,13 +158,12 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
 
         byte[] body = getRequestParams().getBytes(CharsetUtil.UTF_8);
 
-        ningRequest = new RequestBuilder("POST").setURI(uri)
-                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
+        return new RequestBuilder("POST").setURI(uri).setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
                 .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
                 .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/x-www-form-urlencoded")
-                .setHeader(HttpHeaders.Names.HOST, getRequestUri().getHost()).setBody(body)
+                .setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(body)
                 .setHeader("RLNClientIpAddr", sasParams.getRemoteHostIp()).build();
     }
 
