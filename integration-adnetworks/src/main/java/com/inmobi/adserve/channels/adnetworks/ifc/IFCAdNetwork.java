@@ -1,8 +1,10 @@
 package com.inmobi.adserve.channels.adnetworks.ifc;
 
+import java.net.URI;
 import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.http.client.utils.URIBuilder;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
@@ -201,15 +203,20 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     protected void setNingRequest(final String requestUrl) throws Exception {
 
+        URI uri = getRequestUri();
+        if (uri.getPort() == -1) {
+            uri = new URIBuilder(uri).setPort(80).build();
+        }
+
         byte[] body = getRequestBody().getBytes(CharsetUtil.UTF_8);
-        ningRequest = new RequestBuilder("POST").setUrl(requestUrl)
+        ningRequest = new RequestBuilder("POST").setURI(uri)
                 .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
                 .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
                 .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
                 .setHeader(HttpHeaders.Names.ACCEPT, "application/json")
-                .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length)).setBody(body).build();
+                .setHeader(HttpHeaders.Names.HOST, getRequestUri().getHost()).setBody(body).build();
     }
 
     // Returns the Channel Id for the TPAN as in our database. This will be

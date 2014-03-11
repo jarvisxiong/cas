@@ -3,7 +3,6 @@ package com.inmobi.adserve.channels.adnetworks.rtb;
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -19,23 +18,19 @@ import lombok.Setter;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TSimpleJSONProtocol;
 import org.apache.velocity.VelocityContext;
 import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpMethod;
-import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.jboss.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import com.google.gson.Gson;
 import com.google.inject.Inject;
@@ -67,9 +62,12 @@ import com.inmobi.casthrift.rtb.Impression;
 import com.inmobi.casthrift.rtb.SeatBid;
 import com.inmobi.casthrift.rtb.Site;
 import com.inmobi.casthrift.rtb.User;
+import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
+import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
+import com.ning.http.client.Response;
 
 
 /**
@@ -153,9 +151,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 .getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
 
         AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder()
-                .setRequestTimeoutInMs(configurationLoader.getRtbConfiguration().getInt("RTBreadtimeoutMillis") - 100)
-                .setConnectionTimeoutInMs(
-                        configurationLoader.getRtbConfiguration().getInt("RTBreadtimeoutMillis") - 100)
+                .setRequestTimeoutInMs(configurationLoader.getRtbConfiguration().getInt("RTBreadtimeoutMillis"))
+                .setConnectionTimeoutInMs(configurationLoader.getRtbConfiguration().getInt("RTBreadtimeoutMillis"))
                 .setAllowPoolingConnection(true)
                 .setMaximumConnectionsTotal(
                         configurationLoader.getServerConfiguration().getInt("rtbOutGoingMaxConnections", 200))
@@ -534,7 +531,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         return device;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void impressionCallback() {
         URI uriCallBack = null;
@@ -546,18 +542,21 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         catch (URISyntaxException e) {
             LOG.debug("error in creating uri for callback");
         }
+
         StringBuilder content = new StringBuilder();
         content.append("{\"bidid\"=").append(bidResponse.bidid).append(",\"seat\"=")
                 .append(bidResponse.seatbid.get(0).getSeat());
         content.append(",\"bid\"=").append(bidResponse.seatbid.get(0).bid.get(0).id).append(",\"adid\"=")
                 .append(bidResponse.seatbid.get(0).bid.get(0).adid).append("}");
-        HttpRequest callBackRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET,
-                uriCallBack.toASCIIString());
-        callBackRequest.setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE);
-        ChannelBuffer buffer = ChannelBuffers.copiedBuffer(content, Charset.defaultCharset());
-        callBackRequest.addHeader(HttpHeaders.Names.CONTENT_LENGTH, buffer.readableBytes());
-        callBackRequest.setContent(buffer);
-        boolean callbackResult = impressionCallbackHelper.writeResponse(clientBootstrap, uriCallBack, callBackRequest);
+
+        byte[] body = content.toString().getBytes(CharsetUtil.UTF_8);
+
+        Request ningRequest = new RequestBuilder().setUrl(uriCallBack.toASCIIString())
+                .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
+                .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length)).setBody(body)
+                .setHeader(HttpHeaders.Names.HOST, uriCallBack.getHost()).build();
+
+        boolean callbackResult = impressionCallbackHelper.writeResponse(uriCallBack, ningRequest, asyncHttpClient);
         if (callbackResult) {
             LOG.debug("Callback is sent successfully");
         }
@@ -605,24 +604,99 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         return url;
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Override
+    public boolean makeAsyncRequest() {
+        LOG.debug("In Adapter {}", this.getClass().getSimpleName());
+
+        if (useJsAdTag()) {
+            generateJsAdResponse();
+            processResponse();
+            LOG.debug("sent jsadcode ... returning from make NingRequest");
+            return true;
+        }
+        try {
+            String uri = getRequestUri().toString();
+            requestUrl = uri;
+            setNingRequest(requestUrl);
+            LOG.debug(" uri : {}", uri);
+            startTime = System.currentTimeMillis();
+            getAsyncHttpClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
+                @Override
+                public Response onCompleted(final Response response) throws Exception {
+                    MDC.put("requestId", serverEvent.getChannel().getId().toString());
+
+                    if (!isRequestCompleted()) {
+                        LOG.debug("Operation complete for channel partner: {}", getName());
+                        latency = System.currentTimeMillis() - startTime;
+                        LOG.debug(" operation complete latency {}", latency);
+                        String responseStr = response.getResponseBody();
+                        HttpResponseStatus httpResponseStatus = HttpResponseStatus.valueOf(response.getStatusCode());
+                        LOG.debug("response from {} , is  {} with status {}", getName(), responseStr,
+                                httpResponseStatus);
+                        parseResponse(responseStr, httpResponseStatus);
+                        processResponse();
+                    }
+                    return response;
+                }
+
+                @Override
+                public void onThrowable(final Throwable t) {
+                    MDC.put("requestId", serverEvent.getChannel().getId().toString());
+
+                    if (isRequestComplete) {
+                        return;
+                    }
+
+                    if (t instanceof java.util.concurrent.TimeoutException) {
+                        latency = System.currentTimeMillis() - startTime;
+                        LOG.debug(" timeout latency {}", latency);
+                        adStatus = "TIME_OUT";
+                        processResponse();
+                        return;
+                    }
+
+                    LOG.debug(" error latency {}", latency);
+                    adStatus = "TERM";
+                    LOG.info("error while fetching response from: {} {}", getName(), t);
+                    processResponse();
+                    return;
+                }
+            });
+        }
+        catch (Exception e) {
+            LOG.debug("Exception in makeAsyncRequest : {}", e);
+        }
+        LOG.debug("returning from make NingRequest");
+        return true;
+    }
+
     @Override
     protected void setNingRequest(final String requestUrl) throws Exception {
         byte[] body = bidRequestJson.getBytes(CharsetUtil.UTF_8);
 
-        ningRequest = new RequestBuilder("POST").setUrl(requestUrl)
-                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
-                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
-                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-                .addHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
-                .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length)).setBody(body)
-                .setHeader(X_OPENRTB_VERSION, rtbVer).build();
+        URI uri = getRequestUri();
+        if (uri.getPort() == -1) {
+            uri = new URIBuilder(uri).setPort(80).build();
+        }
+
+        String httpRequestMethod;
+        if (rtbMethod.equalsIgnoreCase("get")) {
+            httpRequestMethod = "GET";
+        }
+        else {
+            httpRequestMethod = "POST";
+        }
+
+        ningRequest = new RequestBuilder(httpRequestMethod).setURI(uri)
+                .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json").setBody(body)
+                .setHeader(X_OPENRTB_VERSION, rtbVer).setHeader(HttpHeaders.Names.HOST, getRequestUri().getHost())
+                .build();
     }
 
     @Override
-    public URI getRequestUri() {
-        StringBuilder url;
-        url = new StringBuilder();
+    public URI getRequestUri() throws URISyntaxException {
+        StringBuilder url = new StringBuilder();
         if (rtbMethod.equalsIgnoreCase("get")) {
             url.append(urlBase).append('?').append(urlArg).append('=');
         }
@@ -630,7 +704,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             url.append(urlBase);
         }
         LOG.debug("{} url is {}", getName(), url.toString());
-        return (URI.create(url.toString()));
+        return URI.create(url.toString());
     }
 
     @Override
