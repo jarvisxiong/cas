@@ -125,7 +125,6 @@ public class DCPAppierAdNetwork extends AbstractDCPAdNetworkImpl {
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
                 .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
                 .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/x-www-form-urlencoded")
-                .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length))
                 .setHeader(HttpHeaders.Names.HOST, getRequestUri().getHost()).setBody(body).build();
     }
 

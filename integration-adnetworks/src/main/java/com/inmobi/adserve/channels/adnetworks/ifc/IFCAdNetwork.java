@@ -216,8 +216,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
                 .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
                 .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
                 .setHeader(HttpHeaders.Names.ACCEPT, "application/json")
-                .setHeader(HttpHeaders.Names.HOST, getRequestUri().getHost())
-                .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length)).setBody(body).build();
+                .setHeader(HttpHeaders.Names.HOST, getRequestUri().getHost()).setBody(body).build();
     }
 
     // Returns the Channel Id for the TPAN as in our database. This will be

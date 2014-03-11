@@ -689,8 +689,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
 
         ningRequest = new RequestBuilder(httpRequestMethod).setURI(uri)
-                .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
-                .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length)).setBody(body)
+                .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json").setBody(body)
                 .setHeader(X_OPENRTB_VERSION, rtbVer).setHeader(HttpHeaders.Names.HOST, getRequestUri().getHost())
                 .build();
     }
