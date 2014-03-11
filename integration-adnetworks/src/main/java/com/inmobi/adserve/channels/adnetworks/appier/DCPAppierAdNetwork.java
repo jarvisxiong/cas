@@ -38,8 +38,6 @@ public class DCPAppierAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final String sizeFormat   = "%dx%d";
     private String              sourceType;
 
-    private Request             ningRequest;
-
     private static final String VERSION      = "version";
     private static final String REQID        = "reqid";
     private static final String SEGKEY       = "segkey";
@@ -111,7 +109,7 @@ public class DCPAppierAdNetwork extends AbstractDCPAdNetworkImpl {
     }
 
     @Override
-    protected void setNingRequest(final String requestUrl) throws Exception {
+    protected Request getNingRequest() throws Exception {
 
         URI uri = getRequestUri();
         if (uri.getPort() == -1) {
@@ -119,13 +117,12 @@ public class DCPAppierAdNetwork extends AbstractDCPAdNetworkImpl {
         }
 
         byte[] body = getRequestParams().getBytes(CharsetUtil.UTF_8);
-        ningRequest = new RequestBuilder("POST").setURI(uri)
-                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
+        return new RequestBuilder("POST").setURI(uri).setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
                 .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
                 .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/x-www-form-urlencoded")
-                .setHeader(HttpHeaders.Names.HOST, getRequestUri().getHost()).setBody(body).build();
+                .setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(body).build();
     }
 
     @Override

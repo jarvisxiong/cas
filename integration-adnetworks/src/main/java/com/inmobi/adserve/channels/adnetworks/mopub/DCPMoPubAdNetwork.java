@@ -5,10 +5,8 @@ import java.net.URISyntaxException;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,8 +15,6 @@ import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.ning.http.client.Request;
-import com.ning.http.client.RequestBuilder;
 
 
 public class DCPMoPubAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -27,7 +23,6 @@ public class DCPMoPubAdNetwork extends AbstractDCPAdNetworkImpl {
     private String              deviceId;
     private static final String name             = "mopub";
     private static final String responseTemplate = "%s <img src='%s' height=1 width=1 border=0 style=\"display:none;\"/>";
-    private Request             ningRequest;
 
     public DCPMoPubAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
@@ -111,21 +106,6 @@ public class DCPMoPubAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public String getId() {
         return (config.getString("mopub.advertiserId"));
-    }
-
-    @Override
-    protected void setNingRequest(final String requestUrl) throws Exception {
-        URI uri = getRequestUri();
-        if (uri.getPort() == -1) {
-            uri = new URIBuilder(uri).setPort(80).build();
-        }
-
-        ningRequest = new RequestBuilder().setURI(uri)
-                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
-                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
-                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-                .setHeader(HttpHeaders.Names.HOST, getRequestUri().getHost()).build();
     }
 
 }

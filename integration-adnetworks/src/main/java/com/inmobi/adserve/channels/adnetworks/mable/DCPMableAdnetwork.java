@@ -43,7 +43,6 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String odinFormat   = "ODIN1";
     private static final String sodin1Format = "SODIN1";
     private static final String ifaFormat    = "IFA";
-    private Request             ningRequest;
 
     public DCPMableAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
@@ -148,22 +147,23 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
     }
 
     @Override
-    protected void setNingRequest(final String requestUrl) throws IllegalArgumentException, Exception {
+    protected Request getNingRequest() throws Exception {
         URI uri = getRequestUri();
         if (uri.getPort() == -1) {
             uri = new URIBuilder(uri).setPort(80).build();
         }
 
         String requestParams = getRequestParams();
-        ningRequest = new RequestBuilder("POST").setURI(uri)
+        Request ningRequest = new RequestBuilder("POST").setURI(uri)
                 .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
+                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
-                .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json").setBody(requestParams)
+                .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
                 .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-                .setHeader(HttpHeaders.Names.HOST, getRequestUri().getHost()).build();
+                .setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(requestParams).build();
         LOG.info("Mable request: {}", ningRequest);
         LOG.info("Mable request Body: {}", requestParams);
+        return ningRequest;
     }
 
     @Override
