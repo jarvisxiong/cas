@@ -632,6 +632,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                         LOG.debug(" operation complete latency {}", latency);
                         String responseStr = response.getResponseBody();
                         HttpResponseStatus httpResponseStatus = HttpResponseStatus.valueOf(response.getStatusCode());
+                        LOG.debug("response from {} , is  {} with status {}", getName(), responseStr,
+                                httpResponseStatus);
                         parseResponse(responseStr, httpResponseStatus);
                         processResponse();
                     }
@@ -689,7 +691,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         ningRequest = new RequestBuilder(httpRequestMethod).setURI(uri)
                 .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
                 .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length)).setBody(body)
-                .setHeader(X_OPENRTB_VERSION, rtbVer).setHeader(HttpHeaders.Names.HOST, uri.getHost()).build();
+                .setHeader(X_OPENRTB_VERSION, rtbVer).setHeader(HttpHeaders.Names.HOST, getRequestUri().getHost())
+                .build();
     }
 
     @Override
