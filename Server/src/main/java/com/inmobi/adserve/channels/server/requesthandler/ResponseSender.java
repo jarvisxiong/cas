@@ -1,10 +1,7 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
 import com.google.common.base.Charsets;
-import com.inmobi.adserve.adpool.AdInfo;
-import com.inmobi.adserve.adpool.AdPoolResponse;
-import com.inmobi.adserve.adpool.AuctionType;
-import com.inmobi.adserve.adpool.Creative;
+import com.inmobi.adserve.adpool.*;
 import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
@@ -15,6 +12,7 @@ import com.inmobi.phoenix.util.WilburyUUID;
 import com.inmobi.types.AdIdChain;
 import com.inmobi.types.GUID;
 import com.ning.http.client.AsyncHttpClient;
+import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -61,6 +59,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private boolean                     requestCleaned;
     public CasInternalRequestParameters casInternalRequestParameters;
     private final AuctionEngine         auctionEngine;
+    private Set<String>                 unSupportedFormats = Sets.newHashSet("xml", "rtbs", "native", "json");
 
     public List<ChannelSegment> getRankList() {
         return this.rankList;
@@ -151,7 +150,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         else {
             AdPoolResponse rtbdResponse = createThriftResponse(adResponse.response);
             LOG.debug("RTB response json to RE is {}", rtbdResponse);
-            if (null == rtbdResponse) {
+            if (null == rtbdResponse || unSupportedFormats.contains(sasParams.getRFormat())) {
                 sendNoAdResponse(event);
             } else {
                     try {
@@ -190,8 +189,10 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 .getCampaignIncId());
         rtbdAd.setAdIds(adIdChain);
         rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);
-        rtbdAd.setBid((long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface().getBidPriceInUsd() * Math.pow(10, 6)));
-        rtbdAd.setMinChargedValue((long)(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getSecondBidPriceInUsd() * Math.pow(10, 6)));
+        rtbdAd.setPricingModel(PricingModel.CPM);
+        long bid = (long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface().getBidPriceInUsd() * Math.pow(10, 6));
+        rtbdAd.setPrice(bid);
+        rtbdAd.setBid(bid);
         UUID uuid = WilburyUUID.extractUUID(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getImpressionId());
         rtbdAd.setImpressionId(new GUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits()));
         rtbdAd.setSlotServed(sasParams.getSlot());
@@ -199,6 +200,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         rtbdCreative.setValue(finalResponse);
         rtbdAd.setCreative(rtbdCreative);
         adPoolResponse.setAds(Arrays.asList(rtbdAd));
+        adPoolResponse.setMinChargedValue((long)(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getSecondBidPriceInUsd() * Math.pow(10, 6)));
         if (!"USD".equalsIgnoreCase(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getCurrency())) {
             rtbdAd.setOriginalCurrencyName(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getCurrency());
             rtbdAd.setBidInOriginalCurrency((long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface().getBidPriceInLocal() * Math.pow(10, 6)));

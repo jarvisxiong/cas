@@ -42,7 +42,7 @@ public static void main(String[] args) throws Exception {
     device.setModelId(2);
     device.setManufacturerId(2);
     device.setOsId(3);
-    device.setOsMajorVersion(3.2);
+    device.setOsMajorVersion("3.2");
     
     Carrier carrier = new Carrier();
     carrier.setCarrierId(123);
