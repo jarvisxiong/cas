@@ -1,30 +1,41 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import com.google.common.base.Charsets;
-import com.inmobi.adserve.channels.api.*;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
-import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.ning.http.client.AsyncHttpClient;
+import static org.jboss.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static org.jboss.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
+
+import java.awt.Dimension;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.*;
+import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelEvent;
+import org.jboss.netty.channel.ChannelFuture;
+import org.jboss.netty.channel.ChannelFutureListener;
+import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.jboss.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
-import static org.jboss.netty.handler.codec.http.HttpResponseStatus.OK;
-import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
+import com.google.common.base.Charsets;
+import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.ChannelsClientHandler;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
+import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.ning.http.client.AsyncHttpClient;
 
 
 public class ResponseSender extends HttpRequestHandlerBase {
@@ -144,41 +155,25 @@ public class ResponseSender extends HttpRequestHandlerBase {
         else {
             JSONObject jsonObject = new JSONObject();
             try {
-                jsonObject.put("secondHighestBid", this
-                        .getAuctionEngine()
-                            .getRtbResponse()
-                            .getAdNetworkInterface()
-                            .getSecondBidPriceInUsd());
-                jsonObject.put("winnerBid", this
-                        .getAuctionEngine()
-                            .getRtbResponse()
-                            .getAdNetworkInterface()
-                            .getBidPriceInUsd());
+                jsonObject.put("secondHighestBid", this.getAuctionEngine().getRtbResponse().getAdNetworkInterface()
+                        .getSecondBidPriceInUsd());
+                jsonObject.put("winnerBid", this.getAuctionEngine().getRtbResponse().getAdNetworkInterface()
+                        .getBidPriceInUsd());
                 jsonObject.put("adm", finalReponse);
                 jsonObject.put("advertiserId", this.auctionEngine.getRtbResponse().getChannelEntity().getAccountId());
-                jsonObject.put("adgroupId", this.auctionEngine
-                        .getRtbResponse()
-                            .getChannelSegmentEntity()
-                            .getAdgroupId());
-                jsonObject.put("adgroupIncId", this.auctionEngine
-                        .getRtbResponse()
-                            .getChannelSegmentEntity()
-                            .getAdgroupIncId());
+                jsonObject.put("adgroupId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity()
+                        .getAdgroupId());
+                jsonObject.put("adgroupIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity()
+                        .getAdgroupIncId());
                 jsonObject.put("adIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getIncId());
                 jsonObject.put("adId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getAdId());
                 jsonObject.put("rtbFloor", casInternalRequestParameters.rtbBidFloor);
-                jsonObject.put("impressionId", this.auctionEngine
-                        .getRtbResponse()
-                            .getAdNetworkInterface()
-                            .getImpressionId());
-                jsonObject.put("campaignIncId", this.auctionEngine
-                        .getRtbResponse()
-                            .getChannelSegmentEntity()
-                            .getCampaignIncId());
-                jsonObject.put("campaignId", this.auctionEngine
-                        .getRtbResponse()
-                            .getChannelSegmentEntity()
-                            .getCampaignId());
+                jsonObject.put("impressionId", this.auctionEngine.getRtbResponse().getAdNetworkInterface()
+                        .getImpressionId());
+                jsonObject.put("campaignIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity()
+                        .getCampaignIncId());
+                jsonObject.put("campaignId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity()
+                        .getCampaignId());
                 InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
                 sendResponse(OK, jsonObject.toString(), adResponse.responseHeaders, event);
                 LOG.debug("RTB reponse json to RE is {}", jsonObject);
@@ -196,20 +191,21 @@ public class ResponseSender extends HttpRequestHandlerBase {
             final ChannelEvent event) throws NullPointerException {
 
         HttpResponse response = new DefaultHttpResponse(HTTP_1_1, status);
-        response.addHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-        response.addHeader("Expires", "-1");
-        response.addHeader("Pragma", "no-cache");
+        response.headers().add("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.headers().add("Expires", "-1");
+        response.headers().add("Pragma", "no-cache");
 
         if (null != responseHeaders) {
             for (Object key : responseHeaders.keySet()) {
-                response.addHeader(key.toString(), responseHeaders.get(key));
+                response.headers().add(key.toString(), responseHeaders.get(key));
             }
         }
 
         String finalResponse = responseString;
         byte[] bytes = finalResponse.getBytes(Charsets.UTF_8);
 
-        response.setHeader("Content-Length", bytes.length);
+        response.headers().set("Content-Length", bytes.length);
+
         response.setContent(ChannelBuffers.copiedBuffer(bytes));
 
         if (event != null) {
@@ -357,9 +353,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 rankList.get(index).getAdNetworkInterface().cleanUp();
             }
             catch (Exception exception) {
-                LOG.debug("Error in closing channel for index: {} Name: {} Exception: {}", index, rankList
-                        .get(index)
-                            .getAdNetworkInterface(), exception);
+                LOG.debug("Error in closing channel for index: {} Name: {} Exception: {}", index, rankList.get(index)
+                        .getAdNetworkInterface(), exception);
             }
         }
         for (int index = 0; rankList != null && index < rankList.size(); index++) {
@@ -379,9 +374,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 rtbList.get(index).getAdNetworkInterface().cleanUp();
             }
             catch (Exception exception) {
-                LOG.debug("Error in closing channel for index: {}  Name: {} Exception: {}", index, rtbList
-                        .get(index)
-                            .getAdNetworkInterface(), exception);
+                LOG.debug("Error in closing channel for index: {}  Name: {} Exception: {}", index, rtbList.get(index)
+                        .getAdNetworkInterface(), exception);
             }
         }
         for (int index = 0; rtbList != null && index < rtbList.size(); index++) {

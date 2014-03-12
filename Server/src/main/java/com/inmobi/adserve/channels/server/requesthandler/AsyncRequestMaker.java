@@ -61,8 +61,8 @@ public class AsyncRequestMaker {
                 .getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
 
         AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder()
-                .setRequestTimeoutInMs(configurationLoader.getServerConfiguration().getInt("readtimeoutMillis") - 100)
-                .setConnectionTimeoutInMs(600)
+                .setRequestTimeoutInMs(configurationLoader.getServerConfiguration().getInt("readtimeoutMillis"))
+                .setConnectionTimeoutInMs(configurationLoader.getServerConfiguration().getInt("readtimeoutMillis"))
                 .setAllowPoolingConnection(true)
                 .setMaximumConnectionsTotal(
                         configurationLoader.getServerConfiguration().getInt("dcpOutGoingMaxConnections", 200))

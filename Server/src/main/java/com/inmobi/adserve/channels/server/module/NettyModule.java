@@ -41,7 +41,7 @@ public class NettyModule extends AbstractModule {
     @Override
     protected void configure() {
 
-        bind(Timer.class).toInstance(new HashedWheelTimer(5, TimeUnit.MILLISECONDS));
+        bind(Timer.class).toInstance(new HashedWheelTimer(100, TimeUnit.MILLISECONDS));
         bind(Configuration.class).annotatedWith(ServerConfiguration.class).toInstance(serverConfiguration);
 
         if (port == 8800) {
