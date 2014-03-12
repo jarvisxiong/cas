@@ -69,7 +69,7 @@ public class RequestParser {
         Set<Integer> accountSegments = getAcoountSegments(jObject);
         boolean isResponseOnlyFromDcp = jObject.optBoolean("isResponseOnlyFromDcp", false);
         LOG.debug(traceMarker, "dst type is {} isResponseOnlyFromDcp  {} and account segments are {}", dst,
-            isResponseOnlyFromDcp, accountSegments);
+                isResponseOnlyFromDcp, accountSegments);
         params.setDst(dst);
         params.setResponseOnlyFromDcp(isResponseOnlyFromDcp);
         params.setAccountSegment(accountSegments);
@@ -110,8 +110,8 @@ public class RequestParser {
         params.setSiteSegmentId(jObject.optInt("sel-seg-id", 0));
         params.setModelId(jObject.optInt("model-id", 0));
         LOG.debug(traceMarker, "Site segment id is {} and model id is {}", params.getSiteSegmentId(),
-            params.getModelId());
-        params.setIpFileVersion(jObject.optInt("rqIpFileVer", 1));
+                params.getModelId());
+        params.setIpFileVersion(jObject.optInt("rqIpFileVer", 7));
         LOG.debug(traceMarker, "country obtained is {}", params.getCountry());
         LOG.debug(traceMarker, "site floor is {}", params.getSiteFloor());
         LOG.debug(traceMarker, "osId is {}", params.getPlatformOsId());
@@ -144,7 +144,7 @@ public class RequestParser {
         params.setRichMedia(jObject.optBoolean("rich-media", false));
         params.setRqAdType(stringify(jObject, "rqAdtype"));
         params.setAppUrl(stringify(jObject, "site-url"));
-        LOG.debug(traceMarker, "successfully parsed params");
+        LOG.debug(traceMarker, "successfully parsed params : {}", params);
     }
 
     public String stringify(final JSONObject jObject, final String field) {
