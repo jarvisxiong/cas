@@ -68,8 +68,6 @@ public interface AdNetworkInterface {
     // Constructs the request url
     URI getRequestUri() throws Exception;
 
-    // Constructs the http request object.
-    HttpRequest getHttpRequest() throws Exception;
 
     // whether click url is used by adapter
     boolean isBeaconUrlRequired();

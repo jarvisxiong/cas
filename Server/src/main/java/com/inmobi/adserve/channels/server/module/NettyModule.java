@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.server.module;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -40,7 +41,7 @@ public class NettyModule extends AbstractModule {
     @Override
     protected void configure() {
 
-        bind(Timer.class).toInstance(new HashedWheelTimer(5, TimeUnit.MILLISECONDS));
+        bind(Timer.class).toInstance(new HashedWheelTimer(100, TimeUnit.MILLISECONDS));
         bind(Configuration.class).annotatedWith(ServerConfiguration.class).toInstance(serverConfiguration);
 
         if (port == 8800) {
@@ -49,6 +50,7 @@ public class NettyModule extends AbstractModule {
         else if (port == 8801) {
             bind(ChannelPipelineFactory.class).to(ChannelStatServerPipelineFactory.class).asEagerSingleton();
         }
+
     }
 
     @Provides
@@ -63,8 +65,8 @@ public class NettyModule extends AbstractModule {
     }
 
     @Provides
-    ChannelFactory provideChannelFactory() {
-        return new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
+    ChannelFactory provideChannelFactory(final ExecutorService executorService) {
+        return new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), executorService);
     }
 
 }
