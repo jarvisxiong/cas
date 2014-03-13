@@ -7,7 +7,6 @@ import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.json.JSONObject;
 
 import com.google.inject.Singleton;
-import com.inmobi.adserve.channels.api.ChannelsClientHandler;
 import com.inmobi.adserve.channels.server.ConnectionLimitHandler;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
@@ -24,9 +23,6 @@ public class ServletMapsizes implements Servlet {
         ConnectionLimitHandler incomingConnectionLimitHandler = e.getChannel().getPipeline()
                 .get(ConnectionLimitHandler.class);
         JSONObject mapsizes = new JSONObject();
-        mapsizes.put("ResponseMap", ChannelsClientHandler.responseMap.size());
-        mapsizes.put("StatusMap", ChannelsClientHandler.responseMap.size());
-        mapsizes.put("AdStatusMap", ChannelsClientHandler.responseMap.size());
         mapsizes.put("SampledAdvertiserLog", Logging.getSampledadvertiserlognos().size());
         if (null != incomingConnectionLimitHandler) {
             mapsizes.put("IncomingMaxConnections", incomingConnectionLimitHandler.getMaxConnectionsLimit());
