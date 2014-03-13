@@ -59,7 +59,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private boolean                     requestCleaned;
     public CasInternalRequestParameters casInternalRequestParameters;
     private final AuctionEngine         auctionEngine;
-    private Set<String>                 unSupportedFormats = Sets.newHashSet("xml", "rtbs", "native", "json");
+    private static Set<String>          supportedResponseFormats = Sets.newHashSet("html", "xhtml", "axml", "imai");
 
     public List<ChannelSegment> getRankList() {
         return this.rankList;
@@ -150,7 +150,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         else {
             AdPoolResponse rtbdResponse = createThriftResponse(adResponse.response);
             LOG.debug("RTB response json to RE is {}", rtbdResponse);
-            if (null == rtbdResponse || unSupportedFormats.contains(sasParams.getRFormat())) {
+            if (null == rtbdResponse || !supportedResponseFormats.contains(sasParams.getRFormat())) {
                 sendNoAdResponse(event);
             } else {
                     try {
