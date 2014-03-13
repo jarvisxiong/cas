@@ -234,10 +234,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             log.put("adv", getId());
             log.put("3psiteid", adGroupID);
             log.put("resp", adStatus);
-            if (latency == 0) {
-                latency = System.currentTimeMillis() - startTime;
-            }
-            log.put("latency", latency);
+            log.put("latency", getLatency());
             return log;
         }
         catch (JSONException exception) {
