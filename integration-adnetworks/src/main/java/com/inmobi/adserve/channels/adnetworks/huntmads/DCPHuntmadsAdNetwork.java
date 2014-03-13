@@ -165,7 +165,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
 
                 statusCode = status.getCode();
                 VelocityContext context = new VelocityContext();
-                context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse.getString("url"));
+                /*context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse.getString("url"));
                 String partnerBeacon = adResponse.getString("track");
                 if (StringUtils.isNotBlank(partnerBeacon) && !"null".equalsIgnoreCase(partnerBeacon)) {
                     context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, adResponse.getString("track"));
@@ -186,7 +186,37 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
                 else {
                     context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getString("img"));
                     t = TemplateType.IMAGE;
+                }*/
+                TemplateType t=TemplateType.HTML;
+                if (adResponse.has("content")&& StringUtils.isNotBlank(adResponse.getString("content"))){
+                	context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, adResponse.getString("content"));
                 }
+                else
+                {
+                	context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse.getString("url"));
+                    String partnerBeacon = adResponse.getString("track");
+                    if (StringUtils.isNotBlank(partnerBeacon) && !"null".equalsIgnoreCase(partnerBeacon)) {
+                        context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, adResponse.getString("track"));
+                    }
+                    context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
+                    
+                    if (textAd && StringUtils.isNotBlank(adResponse.getString("text"))) {
+                        context.put(VelocityTemplateFieldConstants.AdText, adResponse.getString("text"));
+                        String vmTemplate = Formatter.getRichTextTemplateForSlot(slot);
+                        if (!StringUtils.isEmpty(vmTemplate)) {
+                            context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
+                            t = TemplateType.RICH;
+                        }
+                        else {
+                            t = TemplateType.PLAIN;
+                        }
+                    }
+                    else {
+                        context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getString("img"));
+                        t = TemplateType.IMAGE;
+                    }
+                }
+               
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
             }
