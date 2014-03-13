@@ -49,7 +49,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected int                                 statusCode;
     public String                                 responseContent;
     public Map                                    responseHeaders;
-    private long                                  latency                 = 0;
+    private long                                  latency;
     public long                                   connectionLatency;
     public String                                 adStatus                = "NO_AD";
     protected ThirdPartyAdResponse.ResponseStatus errorStatus             = ThirdPartyAdResponse.ResponseStatus.SUCCESS;
@@ -159,6 +159,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         if (useJsAdTag()) {
             startTime = System.currentTimeMillis();
             generateJsAdResponse();
+            latency = System.currentTimeMillis() - startTime;
+            LOG.debug("{} operation complete latency {}", getName(), latency);
             processResponse();
             LOG.debug("sent jsadcode ... returning from make NingRequest");
             return true;
