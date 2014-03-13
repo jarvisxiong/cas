@@ -165,6 +165,7 @@ public class ChannelServer {
             Injector injector = Guice.createInjector(new NettyModule(configurationLoader.getServerConfiguration()),
                     new ServerModule(configurationLoader, repositoryHelper));
             final CasNettyServer server = injector.getInstance(CasNettyServer.class);
+
             server.startAndWait();
 
             Runtime.getRuntime().addShutdownHook(new Thread() {

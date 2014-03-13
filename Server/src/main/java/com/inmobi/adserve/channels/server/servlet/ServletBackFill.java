@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.server.servlet;
 
 import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +31,6 @@ import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.ServletHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.beans.CasContext;
-import com.inmobi.adserve.channels.server.beans.CasRequest;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
@@ -67,7 +67,8 @@ public class ServletBackFill implements Servlet {
     }
 
     @Override
-    public void handleRequest(final HttpRequestHandler hrh, final CasRequest casRequest) throws Exception {
+    public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
+            final Channel serverChannel) throws Exception {
 
         Marker traceMarker = traceMarkerProvider.get();
 
@@ -75,9 +76,7 @@ public class ServletBackFill implements Servlet {
 
         InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
 
-        Map<String, List<String>> params = casRequest.queryStringDecoder().parameters();
-
-        Channel serverChannel = casRequest.serverChannel();
+        Map<String, List<String>> params = queryStringDecoder.parameters();
 
         try {
             hrh.jObject = requestParser.extractParams(params);
@@ -234,13 +233,17 @@ public class ServletBackFill implements Servlet {
         LOG.debug(traceMarker, "blockedAdvertisers are {}", casInternalRequestParametersGlobal.blockedAdvertisers);
         double minimumRtbFloor = 0.05;
         double segmentFloor = casUtils.getRtbFloor(casContext, sasParams);
+        double networkEcpm = casUtils.getNetworkEcpm(casContext, sasParams);
         // RTB floor is being passed as segmentFloor
         LOG.debug(traceMarker, "RTB floor from the pricing engine entity is {}", segmentFloor);
 
         casInternalRequestParametersGlobal.rtbBidFloor = hrh.responseSender.getAuctionEngine().calculateRTBFloor(
-                sasParams.getSiteFloor(), 0.0, segmentFloor, minimumRtbFloor);
-        LOG.debug(traceMarker, "site floor was {}  segmentFloor was  {}  minimum rtb floor {}  and rtbFloor is {} ",
-                sasParams.getSiteFloor(), segmentFloor, minimumRtbFloor, casInternalRequestParametersGlobal.rtbBidFloor);
+                sasParams.getSiteFloor(), 0.0, segmentFloor, minimumRtbFloor, networkEcpm);
+        LOG.debug(
+                traceMarker,
+                "networkEcpm was {} site floor was {}  segmentFloor was  {}  minimum rtb floor {}  and rtbFloor is {} ",
+                networkEcpm, sasParams.getSiteFloor(), segmentFloor, minimumRtbFloor,
+                casInternalRequestParametersGlobal.rtbBidFloor);
         // Generating auction id using site Inc Id
         casInternalRequestParametersGlobal.auctionId = asyncRequestMaker.getImpressionId(sasParams.getSiteIncId());
         hrh.responseSender.casInternalRequestParameters = casInternalRequestParametersGlobal;
@@ -262,7 +265,8 @@ public class ServletBackFill implements Servlet {
             return;
         }
 
-        List<ChannelSegment> tempRankList = asyncRequestMaker.makeAsyncRequests(dcpSegments, serverChannel, rtbSegments);
+        List<ChannelSegment> tempRankList = asyncRequestMaker
+                .makeAsyncRequests(dcpSegments, serverChannel, rtbSegments);
 
         hrh.responseSender.setRankList(tempRankList);
         hrh.responseSender.getAuctionEngine().setRtbSegments(rtbSegments);

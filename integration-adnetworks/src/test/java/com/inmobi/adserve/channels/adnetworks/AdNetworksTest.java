@@ -30,11 +30,11 @@ import com.inmobi.adserve.channels.adnetworks.tapit.DCPTapitAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.webmoblink.WebmobLinkAdNetwork;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.server.HttpRequestHandlerBase;
 import com.inmobi.phoenix.logging.DebugLogger;
 
 

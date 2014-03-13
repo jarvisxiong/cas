@@ -1,6 +1,5 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 
 import java.util.ArrayList;
@@ -20,39 +19,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ChannelServer;
-import com.inmobi.adserve.channels.server.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.server.SegmentFactory;
-import com.inmobi.adserve.channels.server.annotations.DcpClientBoostrap;
-import com.inmobi.adserve.channels.server.annotations.RtbClientBoostrap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
 import com.ning.http.client.AsyncHttpClient;
 
 
+@Singleton
 public class AsyncRequestMaker {
     private static final Logger   LOG = LoggerFactory.getLogger(AsyncRequestMaker.class);
-
-    private final Bootstrap       dcpClientBootstrap;
-
-    private final Bootstrap       rtbClientBootstrap;
 
     private final AsyncHttpClient asyncHttpClient;
 
     private final SegmentFactory  segmentFactory;
 
     @Inject
-    public AsyncRequestMaker(@DcpClientBoostrap final Bootstrap dcpClientBootstrap,
-            @RtbClientBoostrap final Bootstrap rtbClientBootstrap, final AsyncHttpClient asyncHttpClient,
-            final SegmentFactory segmentFactory) {
-        this.dcpClientBootstrap = dcpClientBootstrap;
-        this.rtbClientBootstrap = rtbClientBootstrap;
+    public AsyncRequestMaker(final AsyncHttpClient asyncHttpClient, final SegmentFactory segmentFactory) {
         this.asyncHttpClient = asyncHttpClient;
         this.segmentFactory = segmentFactory;
     }
@@ -82,8 +73,8 @@ public class AsyncRequestMaker {
         for (ChannelSegment row : rows) {
             ChannelSegmentEntity channelSegmentEntity = row.getChannelSegmentEntity();
             AdNetworkInterface network = segmentFactory.getChannel(channelSegmentEntity.getAdvertiserId(), row
-                    .getChannelSegmentEntity().getChannelId(), adapterConfig, dcpClientBootstrap, rtbClientBootstrap,
-                    base, channel, advertiserSet, isRtbEnabled, rtbMaxTimeOut, sasParams.getDst(), repositoryHelper);
+                    .getChannelSegmentEntity().getChannelId(), adapterConfig, null, null, base, channel, advertiserSet,
+                    isRtbEnabled, rtbMaxTimeOut, sasParams.getDst(), repositoryHelper);
             if (null == network) {
                 LOG.debug("No adapter found for adGroup: {}", channelSegmentEntity.getAdgroupId());
                 continue;

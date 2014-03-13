@@ -2,12 +2,8 @@ package com.inmobi.adserve.channels.adnetworks.smaato;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
-import io.netty.handler.codec.http.DefaultHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
 
 import java.awt.Dimension;
 import java.io.ByteArrayInputStream;
@@ -21,6 +17,7 @@ import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +25,11 @@ import org.slf4j.LoggerFactory;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.server.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.ning.http.client.Request;
+import com.ning.http.client.RequestBuilder;
 import com.smaato.soma.oapi.Response;
 import com.smaato.soma.oapi.Response.Ads.Ad;
 
@@ -210,26 +208,19 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     }
 
     @Override
-    public HttpRequest getHttpRequest() throws Exception {
-        try {
-            URI uri = getRequestUri();
-            requestUrl = uri.toString();
-            request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, uri.toASCIIString());
-            request.headers().set(HttpHeaders.Names.HOST, uri.getHost());
-            request.headers().set(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent());
-            request.headers().set(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us");
-            request.headers().set(HttpHeaders.Names.REFERER, uri.toString());
-            request.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
-            request.headers().set(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES);
-            request.headers().set("x-mh-User-Agent", sasParams.getUserAgent());
-            request.headers().set("x-mh-X-Forwarded-For", sasParams.getRemoteHostIp());
-            request.headers().set("X-Forwarded-For", sasParams.getRemoteHostIp());
+    protected Request getNingRequest() throws Exception {
+        URI uri = getRequestUri();
+        if (uri.getPort() == -1) {
+            uri = new URIBuilder(uri).setPort(80).build();
         }
-        catch (Exception ex) {
-            errorStatus = ThirdPartyAdResponse.ResponseStatus.HTTPREQUEST_ERROR;
-            LOG.info("Error in making http request {}  for partner : {}", ex.getMessage(), getName());
-        }
-        return request;
+
+        return new RequestBuilder().setURI(uri).setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
+                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
+                .setHeader("x-mh-User-Agent", sasParams.getUserAgent())
+                .setHeader("x-mh-X-Forwarded-For", sasParams.getRemoteHostIp())
+                .setHeader(HttpHeaders.Names.HOST, uri.getHost())
+                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp()).build();
     }
 
     @Override

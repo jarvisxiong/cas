@@ -1,11 +1,5 @@
 package com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl;
 
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
@@ -14,10 +8,17 @@ import com.inmobi.adserve.channels.entity.PricingEngineEntity;
 import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.beans.CasContext;
+import com.inmobi.adserve.channels.server.config.AdapterConfig;
 import com.inmobi.adserve.channels.server.config.ServerConfig;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AbstractAdGroupLevelFilter;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
+import javax.inject.Inject;
+import java.util.Map;
 
 
 /**
@@ -29,13 +30,15 @@ public class AdGroupSupplyDemandClassificationFilter extends AbstractAdGroupLeve
     private static final Logger    LOG = LoggerFactory.getLogger(AdGroupSupplyDemandClassificationFilter.class);
     private final RepositoryHelper repositoryHelper;
     private final ServerConfig     serverConfig;
+    private final Map<String, AdapterConfig> advertiserIdConfigMap;
 
     @Inject
     protected AdGroupSupplyDemandClassificationFilter(final Provider<Marker> traceMarkerProvider,
-            final RepositoryHelper repositoryHelper, final ServerConfig serverConfig) {
+            final RepositoryHelper repositoryHelper, final ServerConfig serverConfig, final Map<String, AdapterConfig> advertiserIdConfigMap) {
         super(traceMarkerProvider, InspectorStrings.droppedInSupplyDemandClassificationFilter);
         this.repositoryHelper = repositoryHelper;
         this.serverConfig = serverConfig;
+        this.advertiserIdConfigMap = advertiserIdConfigMap;
     }
 
     @Override
@@ -43,6 +46,11 @@ public class AdGroupSupplyDemandClassificationFilter extends AbstractAdGroupLeve
             final CasContext casContext) {
 
         Marker traceMarker = traceMarkerProvider.get();
+
+        if (advertiserIdConfigMap.get(channelSegment.getChannelEntity().getAccountId()).isRtb()) {
+            LOG.debug(traceMarker, "SDC is disabled for RTBD partners");
+            return false;
+        }
 
         SiteEcpmEntity siteEcpmEntity = getSiteEcpmEntity(sasParams);
         byte supplyClass = getSupplyClass(siteEcpmEntity);

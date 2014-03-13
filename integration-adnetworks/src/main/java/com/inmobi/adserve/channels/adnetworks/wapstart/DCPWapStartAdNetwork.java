@@ -2,12 +2,8 @@ package com.inmobi.adserve.channels.adnetworks.wapstart;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
-import io.netty.handler.codec.http.DefaultHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
 
 import java.awt.Dimension;
 import java.net.URI;
@@ -19,10 +15,10 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -32,16 +28,14 @@ import org.xml.sax.InputSource;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.server.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
-import com.ning.http.client.Response;
 
 
 public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -55,7 +49,6 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
     private static DocumentBuilderFactory factory;
     private static DocumentBuilder        builder;
     private static final String           latlongFormat = "%s,%s";
-    private Request                       ningRequest;
 
     static {
         iABCountries = new IABCountriesMap();
@@ -146,71 +139,18 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
     }
 
     @Override
-    public boolean makeAsyncRequest() {
-        LOG.debug("In PayPal async");
-        try {
-            String uri = getRequestUri().toString();
-            requestUrl = uri;
-            setNingRequest(requestUrl);
-            LOG.debug("Nexage uri : {}", uri);
-            startTime = System.currentTimeMillis();
-            baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler<Response>() {
-                @Override
-                public Response onCompleted(final Response response) throws Exception {
-                    MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
-
-                    if (!isRequestCompleted()) {
-                        LOG.debug("Operation complete for channel partner: {}", getName());
-                        latency = System.currentTimeMillis() - startTime;
-                        LOG.debug("{} operation complete latency {}", getName(), latency);
-                        String responseStr = response.getResponseBody();
-                        HttpResponseStatus httpResponseStatus = HttpResponseStatus.valueOf(response.getStatusCode());
-                        parseResponse(responseStr, httpResponseStatus);
-                        processResponse();
-                    }
-                    return response;
-                }
-
-                @Override
-                public void onThrowable(final Throwable t) {
-                    MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
-
-                    if (isRequestComplete) {
-                        return;
-                    }
-
-                    if (t instanceof java.util.concurrent.TimeoutException) {
-                        latency = System.currentTimeMillis() - startTime;
-                        LOG.debug("{} timeout latency {}", getName(), latency);
-                        adStatus = "TIME_OUT";
-                        processResponse();
-                        return;
-                    }
-
-                    LOG.debug("{} error latency {}", getName(), latency);
-                    adStatus = "TERM";
-                    LOG.info("error while fetching response from: {} {}", getName(), t);
-                    processResponse();
-                    return;
-                }
-            });
+    protected Request getNingRequest() throws Exception {
+        URI uri = getRequestUri();
+        if (uri.getPort() == -1) {
+            uri = new URIBuilder(uri).setPort(80).build();
         }
-        catch (Exception e) {
-            LOG.debug("Exception in {} makeAsyncRequest : {}", getName(), e.getMessage());
-        }
-        LOG.debug("{} returning from make NingRequest", getName());
-        return true;
-    }
-
-    private void setNingRequest(final String requestUrl) {
-        ningRequest = new RequestBuilder().setUrl(requestUrl)
-                .setHeader("x-display-metrics", String.format("%sx%s", width, height))
+        return new RequestBuilder().setURI(uri).setHeader("x-display-metrics", String.format("%sx%s", width, height))
                 .setHeader("xplus1-user-agent", sasParams.getUserAgent())
                 .setHeader("x-plus1-remote-addr", sasParams.getRemoteHostIp())
                 .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
-                .setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE)
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
+                .setHeader(HttpHeaders.Names.HOST, uri.getHost())
                 .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp()).build();
     }
 
@@ -294,29 +234,4 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
         return true;
     }
 
-    // form httprequest
-    @Override
-    public HttpRequest getHttpRequest() throws Exception {
-        try {
-            URI uri = getRequestUri();
-            requestUrl = uri.toString();
-            request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri.toASCIIString());
-            LOG.debug("host name is {}", uri.getHost());
-            request.headers().set(HttpHeaders.Names.HOST, uri.getHost());
-            LOG.debug("got the host");
-            request.headers().set("x-display-metrics", String.format("%sx%s", width, height));
-            request.headers().set(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent());
-            request.headers().set("xplus1-user-agent", sasParams.getUserAgent());
-            request.headers().set(HttpHeaders.Names.REFERER, uri.toString());
-            request.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
-            request.headers().set(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES);
-            request.headers().set("x-plus1-remote-addr", sasParams.getRemoteHostIp());
-            request.headers().set("X-Forwarded-For", sasParams.getRemoteHostIp());
-        }
-        catch (Exception ex) {
-            errorStatus = ThirdPartyAdResponse.ResponseStatus.HTTPREQUEST_ERROR;
-            LOG.info("Error in making http request {}", ex);
-        }
-        return request;
-    }
 }

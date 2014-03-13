@@ -2,18 +2,12 @@ package com.inmobi.adserve.channels.api;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelException;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.handler.codec.http.DefaultHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
 
 import java.io.UnsupportedEncodingException;
-import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -25,16 +19,21 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.server.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.util.CategoryList;
 import com.inmobi.adserve.channels.util.IABCategoriesInterface;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
+import com.ning.http.client.AsyncCompletionHandler;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.Request;
+import com.ning.http.client.RequestBuilder;
+import com.ning.http.client.Response;
 
 
 // This abstract class have base functionality of TPAN adapters.
@@ -123,94 +122,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         return channel.hashCode();
     }
 
-    // makes an async request to thirdparty network
-    @Override
-    public boolean makeAsyncRequest() {
-        if (useJsAdTag()) {
-            generateJsAdResponse();
-            processResponse();
-            LOG.debug("sent jsadcode... returning from make NingRequest");
-            return true;
-        }
-
-        URI uri = null;
-        try {
-            request = getHttpRequest();
-            uri = new URI(request.getUri());
-            // request.setUri(uri.getPath());
-            LOG.debug("uri is {}", uri);
-            // LOG.debug("request is {}", request);
-            LOG.info("url inside makeAsyncRequest is not null");
-        }
-        catch (Exception ex) {
-            errorStatus = ThirdPartyAdResponse.ResponseStatus.HTTPREQUEST_ERROR;
-            LOG.debug("error in creating http request object");
-            return false;
-        }
-        startTime = System.currentTimeMillis();
-        try {
-            future = clientBootstrap.connect(new InetSocketAddress(uri.getHost(), uri.getPort() == -1 ? 80 : uri
-                    .getPort()));
-        }
-        catch (ChannelException e) {
-            LOG.debug("Error creating socket... too many sockets open {}", e.getMessage());
-            return false;
-        }
-        channel = future.channel();
-        // waiting for connection to happen and then sending http request
-        // through
-        // channel
-        future.addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(final ChannelFuture future) throws Exception {
-                MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
-
-                connectionLatency = System.currentTimeMillis() - startTime;
-                if (!future.isSuccess()) {
-                    latency = System.currentTimeMillis() - startTime;
-                    adStatus = "TERM";
-                    LOG.info("error creating socket for partner:", getName());
-                    errorStatus = ThirdPartyAdResponse.ResponseStatus.SOCKET_ERROR;
-                    cleanUp();
-                    processResponse();
-                    return;
-                }
-                if (channel.isWritable()) {
-                    channel.writeAndFlush(request);
-                }
-                channel.closeFuture().addListener(new ChannelFutureListener() {
-                    @Override
-                    public void operationComplete(final ChannelFuture future) throws Exception {
-                        MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
-
-                        latency = System.currentTimeMillis() - startTime;
-                        if (!isRequestCompleted()) {
-                            LOG.debug("Operation complete for channel partner: {}", getName());
-                            Channel channel1 = future.channel();
-                            LOG.debug("outbound channel id is {}", String.format("0x%08x", serverChannel.hashCode()));
-                            if (null != ChannelsClientHandler.getMessage(channel1.hashCode())) {
-                                String response = (ChannelsClientHandler.getMessage(channel1.hashCode())).toString();
-                                HttpResponseStatus httpResponseStatus = ChannelsClientHandler.statusMap.get(channel1
-                                        .hashCode());
-                                ChannelsClientHandler.removeEntry(channel1.hashCode());
-                                ChannelsClientHandler.statusMap.remove(channel1.hashCode());
-                                parseResponse(response, httpResponseStatus);
-                            }
-                            else {
-                                errorStatus = ThirdPartyAdResponse.ResponseStatus.INVALID_RESPONSE;
-                            }
-                            channel1.close();
-                            processResponse();
-                            return;
-                        }
-                    }
-                });
-            }
-        });
-        LOG.debug("returning from make AsyncRequest");
-        return true;
-    }
-
     public void processResponse() {
         LOG.debug("Inside process Response for the partner: {}", getName());
         if (isRequestComplete) {
@@ -251,30 +162,87 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         LOG.debug("rtb auction has not run so waiting....");
     }
 
-    // form httprequest
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    public HttpRequest getHttpRequest() throws Exception {
+    public boolean makeAsyncRequest() {
+        LOG.debug("In Adapter {}", this.getClass().getSimpleName());
+        if (useJsAdTag()) {
+            generateJsAdResponse();
+            processResponse();
+            LOG.debug("sent jsadcode ... returning from make NingRequest");
+            return true;
+        }
+
         try {
-            URI uri = getRequestUri();
-            requestUrl = uri.toString();
-            // TODO: make headers validation false later
-            request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, uri.toASCIIString(), true);
-            LOG.debug("host name is {}", uri.getHost());
-            HttpHeaders headers = request.headers();
-            headers.set(HttpHeaders.Names.HOST, uri.getHost());
-            LOG.debug("got the host");
-            headers.set(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent());
-            headers.set(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us");
-            headers.set(HttpHeaders.Names.REFERER, uri.toString());
-            headers.set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
-            headers.set(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES);
-            headers.set("X-Forwarded-For", sasParams.getRemoteHostIp());
+            String uri = getRequestUri().toString();
+            requestUrl = uri;
+            Request ningRequest = getNingRequest();
+            LOG.debug(" uri : {}", uri);
+            startTime = System.currentTimeMillis();
+            getAsyncHttpClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
+                @Override
+                public Response onCompleted(final Response response) throws Exception {
+                    latency = System.currentTimeMillis() - startTime;
+                    MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
+
+                    if (!isRequestCompleted()) {
+                        LOG.debug("Operation complete for channel partner: {}", getName());
+                        LOG.debug("{} operation complete latency {}", getName(), latency);
+                        String responseStr = response.getResponseBody();
+                        HttpResponseStatus httpResponseStatus = HttpResponseStatus.valueOf(response.getStatusCode());
+                        parseResponse(responseStr, httpResponseStatus);
+                        processResponse();
+                    }
+                    return response;
+                }
+
+                @Override
+                public void onThrowable(final Throwable t) {
+                    latency = System.currentTimeMillis() - startTime;
+                    MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
+
+                    if (isRequestComplete) {
+                        return;
+                    }
+
+                    if (t instanceof java.util.concurrent.TimeoutException) {
+                        LOG.debug("{} timeout latency {}", getName(), latency);
+                        adStatus = "TIME_OUT";
+                        processResponse();
+                        return;
+                    }
+
+                    LOG.debug("{} error latency {}", getName(), latency);
+                    adStatus = "TERM";
+                    LOG.info("error while fetching response from: {} {}", getName(), t);
+                    processResponse();
+                    return;
+                }
+            });
         }
-        catch (Exception ex) {
-            errorStatus = ThirdPartyAdResponse.ResponseStatus.HTTPREQUEST_ERROR;
-            LOG.info("Error in making http request {} for partner : {}", ex, getName());
+        catch (Exception e) {
+            LOG.debug("Exception in {} makeAsyncRequest : {}", getName(), e.getMessage());
         }
-        return request;
+        LOG.debug("{} returning from make NingRequest", getName());
+        return true;
+    }
+
+    protected AsyncHttpClient getAsyncHttpClient() {
+        return baseRequestHandler.getAsyncClient();
+    }
+
+    protected Request getNingRequest() throws Exception {
+
+        URI uri = getRequestUri();
+        if (uri.getPort() == -1) {
+            uri = new URIBuilder(uri).setPort(80).build();
+        }
+
+        return new RequestBuilder().setURI(uri).setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
+                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
+                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
+                .setHeader(HttpHeaders.Names.HOST, uri.getHost()).build();
     }
 
     // request url of each adapter for logging
@@ -310,9 +278,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     @Override
-    public URI getRequestUri() throws Exception {
-        return null;
-    }
+    abstract public URI getRequestUri() throws Exception;
 
     @Override
     public String getId() {

@@ -1,8 +1,10 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import io.netty.channel.Channel;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.CharsetUtil;
 
 import java.net.URLDecoder;
@@ -19,7 +21,6 @@ import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.ServletHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
-import com.inmobi.adserve.channels.server.beans.CasRequest;
 
 
 @Path("/logParser")
@@ -28,8 +29,9 @@ public class ServletLogParser implements Servlet {
     private static final Logger LOG = LoggerFactory.getLogger(ServletLogParser.class);
 
     @Override
-    public void handleRequest(final HttpRequestHandler hrh, final CasRequest casRequest) throws Exception {
-        Map<String, List<String>> params = casRequest.queryStringDecoder().parameters();
+    public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
+            final Channel serverChannel) throws Exception {
+        Map<String, List<String>> params = queryStringDecoder.parameters();
         HttpRequest request = hrh.getHttpRequest();
         String targetStrings = "";
         String logFilePath = "";
@@ -65,10 +67,10 @@ public class ServletLogParser implements Servlet {
         Process process = pb.start();
         int exitStatus = process.waitFor();
         if (exitStatus == 0) {
-            hrh.responseSender.sendResponse("PASS", casRequest.serverChannel());
+            hrh.responseSender.sendResponse("PASS", serverChannel);
         }
         else {
-            hrh.responseSender.sendResponse("FAIL", casRequest.serverChannel());
+            hrh.responseSender.sendResponse("FAIL", serverChannel);
         }
     }
 

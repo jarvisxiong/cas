@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.server.utils;
 
 import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpRequest;
 
 import javax.inject.Inject;
 
@@ -10,9 +11,9 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.PricingEngineEntity;
+import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.beans.CasContext;
-import com.inmobi.adserve.channels.server.beans.CasRequest;
 
 
 /**
@@ -50,20 +51,29 @@ public class CasUtils {
         return pricingEngineEntity == null ? 0 : pricingEngineEntity.getRtbFloor();
     }
 
-    public static String getHost(final CasRequest casRequest) {
-        HttpHeaders headers = casRequest.getHttpRequest().headers();
-
+    public static String getHost(final HttpRequest httpRequest) {
+        HttpHeaders headers = httpRequest.headers();
         return headers.get("Host");
     }
 
-    public boolean isRequestFromLocalHost(final CasRequest casRequest) {
-        String host = getHost(casRequest);
+    public boolean isRequestFromLocalHost(final HttpRequest httpRequest) {
+        String host = getHost(httpRequest);
 
         if (host != null && host.startsWith("localhost")) {
             return true;
         }
 
         return false;
+    }
+
+    public Double getNetworkEcpm(final CasContext casContext, final SASRequestParameters sasParams) {
+        SiteEcpmEntity siteEcpmEntity = repositoryHelper.querySiteEcpmRepository(sasParams.getSiteId(),
+                Integer.valueOf(sasParams.getCountryStr()), sasParams.getOsId());
+        double networkEcpm = 0.0;
+        if (null != siteEcpmEntity) {
+            networkEcpm = siteEcpmEntity.getNetworkEcpm();
+        }
+        return networkEcpm;
     }
 
 }

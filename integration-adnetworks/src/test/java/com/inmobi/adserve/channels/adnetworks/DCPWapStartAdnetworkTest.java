@@ -3,6 +3,8 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -11,18 +13,15 @@ import java.util.Arrays;
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.adnetworks.wapstart.DCPWapStartAdNetwork;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.server.HttpRequestHandlerBase;
 
 
 /**
@@ -30,15 +29,14 @@ import com.inmobi.adserve.channels.server.HttpRequestHandlerBase;
  * 
  */
 public class DCPWapStartAdnetworkTest extends TestCase {
-    private Configuration         mockConfig      = null;
-    private final String          debug           = "debug";
-    private final String          loggerConf      = "/tmp/channel-server.properties";
-    private final ClientBootstrap clientBootstrap = null;
-    private DCPWapStartAdNetwork  dcpWapstartAdNetwork;
-    private final String          wapstartHost    = "http://ro.plus1.wapstart.ru";
-    private final String          wapstartStatus  = "on";
-    private final String          wapstartAdvId   = "wapstartadv1";
-    private final String          wapstartTest    = "1";
+    private Configuration        mockConfig     = null;
+    private final String         debug          = "debug";
+    private final String         loggerConf     = "/tmp/channel-server.properties";
+    private DCPWapStartAdNetwork dcpWapstartAdNetwork;
+    private final String         wapstartHost   = "http://ro.plus1.wapstart.ru";
+    private final String         wapstartStatus = "on";
+    private final String         wapstartAdvId  = "wapstartadv1";
+    private final String         wapstartTest   = "1";
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -60,11 +58,11 @@ public class DCPWapStartAdnetworkTest extends TestCase {
             f.createNewFile();
         }
         Formatter.init();
-        MessageEvent serverEvent = createMock(MessageEvent.class);
+        Channel serverChannel = createMock(Channel.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         SlotSizeMapping.init();
-        dcpWapstartAdNetwork = new DCPWapStartAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
+        dcpWapstartAdNetwork = new DCPWapStartAdNetwork(mockConfig, null, base, serverChannel);
     }
 
     @Test
@@ -80,12 +78,12 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertEquals(
-            dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
-            true);
+                dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
+                true);
     }
 
     @Test
@@ -100,12 +98,12 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertEquals(
-            dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
-            false);
+                dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
+                false);
     }
 
     @Test
@@ -121,12 +119,12 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertEquals(
-            dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
-            false);
+                dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
+                false);
     }
 
     @Test
@@ -142,12 +140,12 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertEquals(
-            dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
-            false);
+                dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
+                false);
     }
 
     @Test
@@ -162,12 +160,12 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertEquals(
-            dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
-            false);
+                dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
+                false);
     }
 
     @Test
@@ -185,9 +183,9 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         if (dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpWapstartAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://ro.plus1.wapstart.ru?version=2&encoding=1&area=viewBannerXml&ip=206.29.182.240&id=1324&pageId=0000000000000000000000200000000000000000&kws=Food+%26+Drink%3BAdventure%3BWord&location=37.4429%2C-122.1514";
@@ -211,9 +209,9 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
                 + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11" + "?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         if (dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpWapstartAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://ro.plus1.wapstart.ru?version=2&encoding=1&area=viewBannerXml&ip=206.29.182.240&id=1324&pageId=0000000000000000000000200000000000000000&kws=Food+%26+Drink%3BAdventure%3BWord";
@@ -233,16 +231,16 @@ public class DCPWapStartAdnetworkTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
                 + "-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl);
         String response = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><banner>  <id>11864</id>    <title></title>    <content></content>    <link>http://ro.plus1.wapstart.ru/index.php?area=redirector&amp;type=1&amp;rsId=at_f42938923cbe508082fcc174d9add416371b57e9_041200&amp;site=2562&amp;banner=11864&amp;usr=99895f</link>    <pictureUrl>http://img.ads.wapstart.com/img/4f6/345/c8115c2/image_320x50.gif</pictureUrl>    <cookieSetterUrl>http://ro.plus1.wapstart.ru//?area=counter&amp;clientSession=c9101a8da8de89d9f93357b0615778dc314eef18&amp;bannerId=11864&amp;site=2562</cookieSetterUrl>    <singleLineContent>Новый мобильный сайт AVITO.ru!</singleLineContent></banner>";
         dcpWapstartAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpWapstartAdNetwork.getHttpResponseStatusCode(), 200);
         assertEquals(
-            "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"mraid.js\"></script><a href='http://ro.plus1.wapstart.ru/index.php?area=redirector&type=1&rsId=at_f42938923cbe508082fcc174d9add416371b57e9_041200&site=2562&banner=11864&usr=99895f' onclick=\"document.getElementById('click').src='$IMClickUrl';\" target=\"_blank\" style=\"text-decoration: none\"><img src='http://img.ads.wapstart.com/img/4f6/345/c8115c2/image_320x50.gif'  /></a><img src='http://ro.plus1.wapstart.ru//?area=counter&clientSession=c9101a8da8de89d9f93357b0615778dc314eef18&bannerId=11864&site=2562' height=1 width=1 border=0 style=\"display:none;\"/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1' height=1 width=1 border=0 style=\"display:none;\"/><img id=\"click\" width=\"1\" height=\"1\" style=\"display:none;\"/></body></html>",
-            dcpWapstartAdNetwork.getHttpResponseContent());
+                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"mraid.js\"></script><a href='http://ro.plus1.wapstart.ru/index.php?area=redirector&type=1&rsId=at_f42938923cbe508082fcc174d9add416371b57e9_041200&site=2562&banner=11864&usr=99895f' onclick=\"document.getElementById('click').src='$IMClickUrl';\" target=\"_blank\" style=\"text-decoration: none\"><img src='http://img.ads.wapstart.com/img/4f6/345/c8115c2/image_320x50.gif'  /></a><img src='http://ro.plus1.wapstart.ru//?area=counter&clientSession=c9101a8da8de89d9f93357b0615778dc314eef18&bannerId=11864&site=2562' height=1 width=1 border=0 style=\"display:none;\"/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1' height=1 width=1 border=0 style=\"display:none;\"/><img id=\"click\" width=\"1\" height=\"1\" style=\"display:none;\"/></body></html>",
+                dcpWapstartAdNetwork.getHttpResponseContent());
     }
 
     @Test
@@ -260,16 +258,16 @@ public class DCPWapStartAdnetworkTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
                 + "-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl);
         String response = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><banner>  <id>11864</id>    <title></title>    <content></content>    <link>http://ro.plus1.wapstart.ru/index.php?area=redirector&amp;type=1&amp;rsId=at_f42938923cbe508082fcc174d9add416371b57e9_041200&amp;site=2562&amp;banner=11864&amp;usr=99895f</link>    <pictureUrl>http://img.ads.wapstart.com/img/4f6/345/c8115c2/image_320x50.gif</pictureUrl>    <cookieSetterUrl>http://ro.plus1.wapstart.ru//?area=counter&amp;clientSession=c9101a8da8de89d9f93357b0615778dc314eef18&amp;bannerId=11864&amp;site=2562</cookieSetterUrl>    <singleLineContent>Новый мобильный сайт AVITO.ru!</singleLineContent></banner>";
         dcpWapstartAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpWapstartAdNetwork.getHttpResponseStatusCode(), 200);
         assertEquals(
-            "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"http://cdn.inmobi.com/android/mraid.js\"></script><a href='http://ro.plus1.wapstart.ru/index.php?area=redirector&type=1&rsId=at_f42938923cbe508082fcc174d9add416371b57e9_041200&site=2562&banner=11864&usr=99895f' onclick=\"document.getElementById('click').src='$IMClickUrl';mraid.openExternal('http://ro.plus1.wapstart.ru/index.php?area=redirector&type=1&rsId=at_f42938923cbe508082fcc174d9add416371b57e9_041200&site=2562&banner=11864&usr=99895f'); return false;\" target=\"_blank\" style=\"text-decoration: none\"><img src='http://img.ads.wapstart.com/img/4f6/345/c8115c2/image_320x50.gif'  /></a><img src='http://ro.plus1.wapstart.ru//?area=counter&clientSession=c9101a8da8de89d9f93357b0615778dc314eef18&bannerId=11864&site=2562' height=1 width=1 border=0 style=\"display:none;\"/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1' height=1 width=1 border=0 style=\"display:none;\"/><img id=\"click\" width=\"1\" height=\"1\" style=\"display:none;\"/></body></html>",
-            dcpWapstartAdNetwork.getHttpResponseContent());
+                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"http://cdn.inmobi.com/android/mraid.js\"></script><a href='http://ro.plus1.wapstart.ru/index.php?area=redirector&type=1&rsId=at_f42938923cbe508082fcc174d9add416371b57e9_041200&site=2562&banner=11864&usr=99895f' onclick=\"document.getElementById('click').src='$IMClickUrl';mraid.openExternal('http://ro.plus1.wapstart.ru/index.php?area=redirector&type=1&rsId=at_f42938923cbe508082fcc174d9add416371b57e9_041200&site=2562&banner=11864&usr=99895f'); return false;\" target=\"_blank\" style=\"text-decoration: none\"><img src='http://img.ads.wapstart.com/img/4f6/345/c8115c2/image_320x50.gif'  /></a><img src='http://ro.plus1.wapstart.ru//?area=counter&clientSession=c9101a8da8de89d9f93357b0615778dc314eef18&bannerId=11864&site=2562' height=1 width=1 border=0 style=\"display:none;\"/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1' height=1 width=1 border=0 style=\"display:none;\"/><img id=\"click\" width=\"1\" height=\"1\" style=\"display:none;\"/></body></html>",
+                dcpWapstartAdNetwork.getHttpResponseContent());
     }
 
     @Test
@@ -288,9 +286,9 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         String clickUrl = "http://c2.w.inmobi.com/c"
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
         String response = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><banner>  <id>11864</id>    <title>Новый мобильный сайт AVITO.ru!</title>    <content>Узнай сколько стоит твой беспорядок</content>    <link>http://ro.plus1.wapstart.ru/index.php?area=redirector&amp;type=1&amp;rsId=at_f42938923cbe508082fcc174d9add416371b57e9_041200&amp;site=2562&amp;banner=11864&amp;usr=99895f</link>    <pictureUrl></pictureUrl>    <cookieSetterUrl>http://ro.plus1.wapstart.ru//?area=counter&amp;clientSession=c9101a8da8de89d9f93357b0615778dc314eef18&amp;bannerId=11864&amp;site=2562</cookieSetterUrl>    <singleLineContent>Новый мобильный сайт AVITO.ru!</singleLineContent></banner>";
@@ -317,9 +315,9 @@ public class DCPWapStartAdnetworkTest extends TestCase {
                 + "-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
         String response = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><banner>  <id>11864</id>    <title>Новый мобильный сайт AVITO.ru!</title>    <content>Узнай сколько стоит твой беспорядок</content>    <link>http://ro.plus1.wapstart.ru/index.php?area=redirector&amp;type=1&amp;rsId=at_f42938923cbe508082fcc174d9add416371b57e9_041200&amp;site=2562&amp;banner=11864&amp;usr=99895f</link>    <pictureUrl></pictureUrl>    <cookieSetterUrl>http://ro.plus1.wapstart.ru//?area=counter&amp;clientSession=c9101a8da8de89d9f93357b0615778dc314eef18&amp;bannerId=11864&amp;site=2562</cookieSetterUrl>    <singleLineContent>Новый мобильный сайт AVITO.ru!</singleLineContent></banner>";
@@ -364,9 +362,9 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null);
         assertEquals(dcpWapstartAdNetwork.getImpressionId(), "4f8d98e2-4bbd-40bc-8795-22da170700f9");
     }

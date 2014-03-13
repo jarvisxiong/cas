@@ -1,15 +1,5 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.AuctionEngineInterface;
@@ -18,6 +8,14 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.annotations.AdvertiserIdNameMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 
 /***
@@ -79,7 +77,7 @@ public class AuctionEngine implements AuctionEngineInterface {
             rtbResponse = rtbList.get(0);
             // Take minimum of rtbFloor+0.01 and bid as secondBidprice if no of rtb
             // response are 1.
-            secondBidPrice = Math.min(casInternalRequestParameters.rtbBidFloor + 0.01, rtbResponse
+            secondBidPrice = Math.min(casInternalRequestParameters.rtbBidFloor, rtbResponse
                     .getAdNetworkInterface().getBidPriceInUsd());
             // Set encrypted bid price.
             rtbResponse.getAdNetworkInterface().setEncryptedBid(getEncryptedBid(secondBidPrice));
@@ -125,10 +123,7 @@ public class AuctionEngine implements AuctionEngineInterface {
         secondBidPrice = rtbList.get(secondHighestBid).getAdNetworkInterface().getBidPriceInUsd();
         double winnerBid = rtbList.get(lowestLatencyBid).getAdNetworkInterface().getBidPriceInUsd();
         if (winnerBid == secondBidPrice) {
-            secondBidPrice = casInternalRequestParameters.rtbBidFloor + 0.01;
-        }
-        else {
-            secondBidPrice = secondBidPrice + 0.01;
+            secondBidPrice = casInternalRequestParameters.rtbBidFloor;
         }
 
         // Ensure secondHighestBidPrice never crosses response bid.
@@ -262,11 +257,12 @@ public class AuctionEngine implements AuctionEngineInterface {
     }
 
     public double calculateRTBFloor(final double siteFloor, final double highestEcpm, final double segmentFloor,
-            final double countryFloor) {
+            final double countryFloor, final double networkEcpm) {
         double rtbFloor;
         rtbFloor = Math.max(siteFloor, highestEcpm);
         rtbFloor = Math.max(rtbFloor, segmentFloor);
         rtbFloor = Math.max(rtbFloor, countryFloor);
+        rtbFloor = Math.max(rtbFloor, networkEcpm);
         return rtbFloor;
     }
 }

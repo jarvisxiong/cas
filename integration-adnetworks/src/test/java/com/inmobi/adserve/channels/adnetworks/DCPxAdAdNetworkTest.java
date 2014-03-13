@@ -3,6 +3,8 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -12,31 +14,27 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.adnetworks.xad.DCPxAdAdNetwork;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.server.HttpRequestHandlerBase;
 
 
 public class DCPxAdAdNetworkTest extends TestCase {
-    private Configuration         mockConfig      = null;
-    private final String          debug           = "debug";
-    private final String          loggerConf      = "/tmp/channel-server.properties";
-    private final ClientBootstrap clientBootstrap = null;
+    private Configuration   mockConfig = null;
+    private final String    debug      = "debug";
+    private final String    loggerConf = "/tmp/channel-server.properties";
 
-    private DCPxAdAdNetwork       dcpxAdAdnetwork;
-    private final String          xAdHost         = "http://xad.com/rest/banner";
-    private final String          xAdStatus       = "on";
-    private final String          xAdAdvId        = "xadadv1";
-    private final String          xAdTest         = "1";
+    private DCPxAdAdNetwork dcpxAdAdnetwork;
+    private final String    xAdHost    = "http://xad.com/rest/banner";
+    private final String    xAdStatus  = "on";
+    private final String    xAdAdvId   = "xadadv1";
+    private final String    xAdTest    = "1";
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -57,12 +55,12 @@ public class DCPxAdAdNetworkTest extends TestCase {
         if (!f.exists()) {
             f.createNewFile();
         }
-        MessageEvent serverEvent = createMock(MessageEvent.class);
+        Channel serverChannel = createMock(Channel.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         SlotSizeMapping.init();
         Formatter.init();
-        dcpxAdAdnetwork = new DCPxAdAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
+        dcpxAdAdnetwork = new DCPxAdAdNetwork(mockConfig, null, base, serverChannel);
     }
 
     @Test
@@ -79,9 +77,9 @@ public class DCPxAdAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId,
-            null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
-            false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-            null, null, 32));
+                null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0,
+                null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertTrue(dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
 
@@ -98,9 +96,9 @@ public class DCPxAdAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId,
-            null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
-            false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-            null, null, 32));
+                null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0,
+                null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertTrue(dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
 
@@ -116,11 +114,11 @@ public class DCPxAdAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId,
-            null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
-            false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-            null, null, 32));
+                null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0,
+                null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertEquals(dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
-            false);
+                false);
     }
 
     @Test
@@ -135,11 +133,11 @@ public class DCPxAdAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId,
-            null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
-            false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-            null, null, 32));
+                null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0,
+                null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertEquals(dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
-            false);
+                false);
     }
 
     @Test
@@ -153,11 +151,11 @@ public class DCPxAdAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId,
-            null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
-            false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-            null, null, 32));
+                null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0,
+                null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertEquals(dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
-            false);
+                false);
     }
 
     @Test
@@ -178,9 +176,9 @@ public class DCPxAdAdNetworkTest extends TestCase {
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId,
-            null, null, null, 0, null, segmentCategories, true, true, externalKey, null, null, null, 0, false, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 0));
+                null, null, null, 0, null, segmentCategories, true, true, externalKey, null, null, null, 0, false,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpxAdAdnetwork.getRequestUri().toString();
             String expectedUrl = "http://xad.com/rest/banner?v=1.1&o_fmt=html5&ip=206.29.182.240&k=1324&appid=00000000-0000-0000-0000-000000000000_Food_&_Drink&devid=Mozilla&lat=37.4429&long=-122.1514&uid=202cb962ac59075b964b07152d234b70&uid_type=android_id%7Cmd5&size=320x48&category=Food+%26+Drink&os=Android";
@@ -210,9 +208,9 @@ public class DCPxAdAdNetworkTest extends TestCase {
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId,
-            null, null, null, 0, null, segmentCategories, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 0));
+                null, null, null, 0, null, segmentCategories, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpxAdAdnetwork.getRequestUri().toString();
             String expectedUrl = "http://xad.com/rest/banner?v=1.1&o_fmt=html5&ip=206.29.182.240&k=1324&appid=00000000-0000-0000-0000-000000000000_Action&devid=Mozilla&lat=37.4429&long=-122.1514&uid=202cb962ac59075b964b07152d234b70&uid_type=idfa%7Cplain&size=320x48&category=Action%3AAdventure&os=iPhone_OS";
@@ -240,9 +238,9 @@ public class DCPxAdAdNetworkTest extends TestCase {
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
                 + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11" + "?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId,
-            null, null, null, 0, null, segmentCategories, true, true, externalKey, null, null, null, 0, false, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 0));
+                null, null, null, 0, null, segmentCategories, true, true, externalKey, null, null, null, 0, false,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpxAdAdnetwork.getRequestUri().toString();
             String expectedUrl = "http://xad.com/rest/banner?v=1.1&o_fmt=html5&ip=206.29.182.240&k=1324&appid=00000000-0000-0000-0000-000000000000_Food_&_Drink&devid=iPhone&uid=202cb962ac59075b964b07152d234b70&uid_type=uuid%7Csha1&size=320x48&category=Food+%26+Drink&os=iPhone_OS";
@@ -268,9 +266,9 @@ public class DCPxAdAdNetworkTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
                 + "-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId,
-            null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
-            false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-            null, null, 32));
+                null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0,
+                null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertTrue(dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
 
@@ -292,9 +290,9 @@ public class DCPxAdAdNetworkTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
                 + "-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId,
-            null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
-            false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-            null, null, 0));
+                null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0,
+                null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpxAdAdnetwork.getRequestUri().toString();
             String expectedUrl = "http://xad.com/rest/banner?v=1.1&o_fmt=html5&ip=206.29.182.240&k=1324&appid=00000000-0000-0000-0000-000000000000_miscellenous&devid=Mozilla&lat=11.6&long=-11.87&uid=7a31d90b848f70062e6281b058cc52fc&uid_type=uuid%7Cmd5&size=320x50&category=miscellenous&os=Android";
@@ -319,9 +317,9 @@ public class DCPxAdAdNetworkTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
                 + "-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId,
-            null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
-            false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-            null, null, 32));
+                null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0,
+                null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertFalse(dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
 
@@ -340,9 +338,9 @@ public class DCPxAdAdNetworkTest extends TestCase {
                 + "?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId,
-            null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
-            false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-            null, null, 32));
+                null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0,
+                null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         if (dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl)) {
             String response = "<meta charset=\"utf-8\"/> <meta name=\"viewport\" content=\"width=device-width; initial-scale=1.0; maximum-scale=1.0;\"/> <script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/zepto.min.js\"></script> <link rel=\"stylesheet\" media=\"all\" href=\"http://test.xad.com/rest/xadbanner/layout/sb15/_ui/css/main_short.css\"/><script type=\"text/javascript\" src= \"http://test.xad.com/rest/xadbanner/layout/validation/validation.js\"> </script> <div id=\"xad-banner-wrapper_outer\"><div id=\"xad-banner-wrapper\"> <a href=\"http://test.xad.com/wap/?l_id=L3rwAq7nP7&appid=Dummy221\" style=\"text-decoration:none\"><div id=\"bus-holder\"> <img src=\"http://test.xad.com/rest/xadbanner/layout/sb15/template/map_small.png\" id=\"bus-logo\" alt=\"Gs\"/> </div> <p id=\"xad-banner-description\"> <span class=\"descr descr-height\">Fashionable Eyewear for Men &amp; Women in San Anselmo. Stop by Our Store!... </span> <span class=\"location\"> <span id=\"bus\">Focus Opticians</span> </span> </p> </a> <div id=\"banner-action\"> <a class=\"call-it\" href=\"http://test.xad.com/wap/?l_id=L3rwAq7nP7&appid=Dummy221\">call</a> <sub>xAd</sub></div> </div> <img src=\"http://test.xad.com/rest/notify?t=imp&tid=0&k=X3vZEQ0smjqdLj0sRi49wdtRkUulP9SP&v=1.1&uid=null&l_id=L3rwAq7nP7%7E9AYDW0evP7-0%7E1%7E1%7E1%7E3%7ECA%7Eus%7E9AYDW0evP7%7E1%7E0%7E0%7E%7E0%7E1&type=banner\" width=\"0\" height=\"0\"/> </div> <script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/main.js\"></script><script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/textSizer.js\"></script><script type=\"text/javascript\">$(window).bind('orientationchange', resizeText);$(window).resize(resizeText)</script>";
             dcpxAdAdnetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -366,9 +364,9 @@ public class DCPxAdAdNetworkTest extends TestCase {
                 + "-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId,
-            null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
-            false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-            null, null, 32));
+                null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0,
+                null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
         String response = "<meta charset=\"utf-8\"/> <meta name=\"viewport\" content=\"width=device-width; initial-scale=1.0; maximum-scale=1.0;\"/> <script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/zepto.min.js\"></script> <link rel=\"stylesheet\" media=\"all\" href=\"http://test.xad.com/rest/xadbanner/layout/sb15/_ui/css/main_short.css\"/><script type=\"text/javascript\" src= \"http://test.xad.com/rest/xadbanner/layout/validation/validation.js\"> </script> <div id=\"xad-banner-wrapper_outer\"><div id=\"xad-banner-wrapper\"> <a href=\"http://test.xad.com/wap/?l_id=L3rwAq7nP7&appid=Dummy221\" style=\"text-decoration:none\"><div id=\"bus-holder\"> <img src=\"http://test.xad.com/rest/xadbanner/layout/sb15/template/map_small.png\" id=\"bus-logo\" alt=\"Gs\"/> </div> <p id=\"xad-banner-description\"> <span class=\"descr descr-height\">Fashionable Eyewear for Men &amp; Women in San Anselmo. Stop by Our Store!... </span> <span class=\"location\"> <span id=\"bus\">Focus Opticians</span> </span> </p> </a> <div id=\"banner-action\"> <a class=\"call-it\" href=\"http://test.xad.com/wap/?l_id=L3rwAq7nP7&appid=Dummy221\">call</a> <sub>xAd</sub></div> </div> <img src=\"http://test.xad.com/rest/notify?t=imp&tid=0&k=X3vZEQ0smjqdLj0sRi49wdtRkUulP9SP&v=1.1&uid=null&l_id=L3rwAq7nP7%7E9AYDW0evP7-0%7E1%7E1%7E1%7E3%7ECA%7Eus%7E9AYDW0evP7%7E1%7E0%7E0%7E%7E0%7E1&type=banner\" width=\"0\" height=\"0\"/> </div> <script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/main.js\"></script><script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/textSizer.js\"></script><script type=\"text/javascript\">$(window).bind('orientationchange', resizeText);$(window).resize(resizeText)</script>";
@@ -392,9 +390,9 @@ public class DCPxAdAdNetworkTest extends TestCase {
                 + "-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId,
-            null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
-            false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-            null, null, 32));
+                null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0,
+                null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
         String response = "<meta charset=\"utf-8\"/> <meta name=\"viewport\" content=\"width=device-width; initial-scale=1.0; maximum-scale=1.0;\"/> <script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/zepto.min.js\"></script> <link rel=\"stylesheet\" media=\"all\" href=\"http://test.xad.com/rest/xadbanner/layout/sb15/_ui/css/main_short.css\"/><script type=\"text/javascript\" src= \"http://test.xad.com/rest/xadbanner/layout/validation/validation.js\"> </script> <div id=\"xad-banner-wrapper_outer\"><div id=\"xad-banner-wrapper\"> <a href=\"http://test.xad.com/wap/?l_id=L3rwAq7nP7&appid=Dummy221\" style=\"text-decoration:none\"><div id=\"bus-holder\"> <img src=\"http://test.xad.com/rest/xadbanner/layout/sb15/template/map_small.png\" id=\"bus-logo\" alt=\"Gs\"/> </div> <p id=\"xad-banner-description\"> <span class=\"descr descr-height\">Fashionable Eyewear for Men &amp; Women in San Anselmo. Stop by Our Store!... </span> <span class=\"location\"> <span id=\"bus\">Focus Opticians</span> </span> </p> </a> <div id=\"banner-action\"> <a class=\"call-it\" href=\"http://test.xad.com/wap/?l_id=L3rwAq7nP7&appid=Dummy221\">call</a> <sub>xAd</sub></div> </div> <img src=\"http://test.xad.com/rest/notify?t=imp&tid=0&k=X3vZEQ0smjqdLj0sRi49wdtRkUulP9SP&v=1.1&uid=null&l_id=L3rwAq7nP7%7E9AYDW0evP7-0%7E1%7E1%7E1%7E3%7ECA%7Eus%7E9AYDW0evP7%7E1%7E0%7E0%7E%7E0%7E1&type=banner\" width=\"0\" height=\"0\"/> </div> <script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/main.js\"></script><script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/textSizer.js\"></script><script type=\"text/javascript\">$(window).bind('orientationchange', resizeText);$(window).resize(resizeText)</script>";
@@ -420,9 +418,9 @@ public class DCPxAdAdNetworkTest extends TestCase {
                 + "-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId,
-            null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
-            false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-            null, null, 32));
+                null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0,
+                null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
         String response = "<meta charset=\"utf-8\"/> <meta name=\"viewport\" content=\"width=device-width; initial-scale=1.0; maximum-scale=1.0;\"/> <script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/zepto.min.js\"></script> <link rel=\"stylesheet\" media=\"all\" href=\"http://test.xad.com/rest/xadbanner/layout/sb15/_ui/css/main_short.css\"/><script type=\"text/javascript\" src= \"http://test.xad.com/rest/xadbanner/layout/validation/validation.js\"> </script> <div id=\"xad-banner-wrapper_outer\"><div id=\"xad-banner-wrapper\"> <a href=\"http://test.xad.com/wap/?l_id=L3rwAq7nP7&appid=Dummy221\" style=\"text-decoration:none\"><div id=\"bus-holder\"> <img src=\"http://test.xad.com/rest/xadbanner/layout/sb15/template/map_small.png\" id=\"bus-logo\" alt=\"Gs\"/> </div> <p id=\"xad-banner-description\"> <span class=\"descr descr-height\">Fashionable Eyewear for Men &amp; Women in San Anselmo. Stop by Our Store!... </span> <span class=\"location\"> <span id=\"bus\">Focus Opticians</span> </span> </p> </a> <div id=\"banner-action\"> <a class=\"call-it\" href=\"http://test.xad.com/wap/?l_id=L3rwAq7nP7&appid=Dummy221\">call</a> <sub>xAd</sub></div> </div> <img src=\"http://test.xad.com/rest/notify?t=imp&tid=0&k=X3vZEQ0smjqdLj0sRi49wdtRkUulP9SP&v=1.1&uid=null&l_id=L3rwAq7nP7%7E9AYDW0evP7-0%7E1%7E1%7E1%7E3%7ECA%7Eus%7E9AYDW0evP7%7E1%7E0%7E0%7E%7E0%7E1&type=banner\" width=\"0\" height=\"0\"/> </div> <script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/main.js\"></script><script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/textSizer.js\"></script><script type=\"text/javascript\">$(window).bind('orientationchange', resizeText);$(window).resize(resizeText)</script>";
@@ -464,9 +462,9 @@ public class DCPxAdAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId,
-            null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
-            false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-            null, null, 32));
+                null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0,
+                null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null);
         assertEquals(dcpxAdAdnetwork.getImpressionId(), "4f8d98e2-4bbd-40bc-8795-22da170700f9");
     }

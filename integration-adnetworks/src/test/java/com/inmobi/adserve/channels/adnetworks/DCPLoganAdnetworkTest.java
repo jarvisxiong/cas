@@ -3,6 +3,8 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -10,34 +12,28 @@ import java.util.ArrayList;
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.adnetworks.logan.DCPLoganAdnetwork;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.server.HttpRequestHandlerBase;
 
 
-public class DCPLoganAdnetworkTest extends TestCase
-{
-    private Configuration         mockConfig      = null;
-    private final String          debug           = "debug";
-    private final String          loggerConf      = "/tmp/channel-server.properties";
-    private final ClientBootstrap clientBootstrap = null;
-    private DCPLoganAdnetwork     dcpLoganAdNetwork;
-    private final String          loganHost       = "http://ads.mocean.mobi/ad?track=1&key=6&type=3&over_18=0";
-    private final String          loganStatus     = "on";
-    private final String          loganAdvId      = "loganadv1";
-    private final String          loganTest       = "1";
+public class DCPLoganAdnetworkTest extends TestCase {
+    private Configuration     mockConfig  = null;
+    private final String      debug       = "debug";
+    private final String      loggerConf  = "/tmp/channel-server.properties";
+    private DCPLoganAdnetwork dcpLoganAdNetwork;
+    private final String      loganHost   = "http://ads.mocean.mobi/ad?track=1&key=6&type=3&over_18=0";
+    private final String      loganStatus = "on";
+    private final String      loganAdvId  = "loganadv1";
+    private final String      loganTest   = "1";
 
-    public void prepareMockConfig()
-    {
+    public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("logan.host")).andReturn(loganHost).anyTimes();
         expect(mockConfig.getString("logan.status")).andReturn(loganStatus).anyTimes();
@@ -50,23 +46,21 @@ public class DCPLoganAdnetworkTest extends TestCase
     }
 
     @Override
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         File f;
         f = new File(loggerConf);
         if (!f.exists()) {
             f.createNewFile();
         }
         Formatter.init();
-        MessageEvent serverEvent = createMock(MessageEvent.class);
+        Channel serverChannel = createMock(Channel.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        dcpLoganAdNetwork = new DCPLoganAdnetwork(mockConfig, clientBootstrap, base, serverEvent);
+        dcpLoganAdNetwork = new DCPLoganAdnetwork(mockConfig, null, base, serverChannel);
     }
 
     @Test
-    public void testDCPLoganConfigureParameters()
-    {
+    public void testDCPLoganConfigureParameters() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -77,16 +71,16 @@ public class DCPLoganAdnetworkTest extends TestCase
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertEquals(
-            dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null), true);
+                dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
+                true);
     }
 
     @Test
-    public void testDCPLoganConfigureParametersBlankIP()
-    {
+    public void testDCPLoganConfigureParametersBlankIP() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
@@ -97,16 +91,16 @@ public class DCPLoganAdnetworkTest extends TestCase
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertEquals(
-            dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null), false);
+                dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
+                false);
     }
 
     @Test
-    public void testDCPLoganConfigureParametersBlankExtKey()
-    {
+    public void testDCPLoganConfigureParametersBlankExtKey() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -117,16 +111,16 @@ public class DCPLoganAdnetworkTest extends TestCase
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertEquals(
-            dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null), false);
+                dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
+                false);
     }
 
     @Test
-    public void testDCPLoganConfigureParametersBlankUA()
-    {
+    public void testDCPLoganConfigureParametersBlankUA() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -136,16 +130,16 @@ public class DCPLoganAdnetworkTest extends TestCase
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertEquals(
-            dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null), false);
+                dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
+                false);
     }
 
     @Test
-    public void testDCPLoganRequestUri() throws Exception
-    {
+    public void testDCPLoganRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -160,9 +154,9 @@ public class DCPLoganAdnetworkTest extends TestCase
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
                 + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1" + "/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 0));
+                loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpLoganAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://ads.mocean.mobi/ad?track=1&key=6&type=3&over_18=0&ip=206.29.182.240&zone=1324&site=00000000-0000-0000-0000-000000000000&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.2.2%3B+es-us%3B+Movistar+Prime+Build%2FFRF91%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&lat=37.4429&long=-122.1514&udid=202cb962ac59075b964b07152d234b70&min_size_x=288&min_size_y=45&size_x=320&size_y=50";
@@ -171,8 +165,7 @@ public class DCPLoganAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLoganRequestUriBlankLatLong() throws Exception
-    {
+    public void testDCPLoganRequestUriBlankLatLong() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -187,9 +180,9 @@ public class DCPLoganAdnetworkTest extends TestCase
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 0));
+                loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpLoganAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://ads.mocean.mobi/ad?track=1&key=6&type=3&over_18=0&ip=206.29.182.240&zone=1324&site=00000000-0000-0000-0000-000000000000&ua=Mozilla&udid=202cb962ac59075b964b07152d234b70&min_size_x=288&min_size_y=45&size_x=320&size_y=50";
@@ -198,8 +191,7 @@ public class DCPLoganAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLoganRequestUriBlankSlot() throws Exception
-    {
+    public void testDCPLoganRequestUriBlankSlot() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -214,9 +206,9 @@ public class DCPLoganAdnetworkTest extends TestCase
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 0));
+                loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpLoganAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://ads.mocean.mobi/ad?track=1&key=6&type=3&over_18=0&ip=206.29.182.240&zone=1324&site=00000000-0000-0000-0000-000000000000&ua=Mozilla&lat=37.4429&long=-122.1514&udid=202cb962ac59075b964b07152d234b70";
@@ -225,8 +217,7 @@ public class DCPLoganAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLoganParseResponseImg() throws Exception
-    {
+    public void testDCPLoganParseResponseImg() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -237,21 +228,20 @@ public class DCPLoganAdnetworkTest extends TestCase
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
         String response = "[{\"url\" : \"http://ads.mocean.mobi/2/redir/0eea1b23-c13f-11e2-aeff-a0369f167751/0/425387\",\"img\" : \"http://img.ads.mocean.mobi/img/31/fd/0d/image_7a2b3ca79ed4eda26487061a0f_728x90.png\",\"type\": \"image/png\",\"track\" : \"http://ads.mocean.mobi/2/img/0eea1b23-c13f-11e2-aeff-a0369f167751\"}];";
         dcpLoganAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpLoganAdNetwork.getHttpResponseStatusCode(), 200);
         assertEquals(
-            "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"mraid.js\"></script><a href='http://ads.mocean.mobi/2/redir/0eea1b23-c13f-11e2-aeff-a0369f167751/0/425387' onclick=\"document.getElementById('click').src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1';\" target=\"_blank\" style=\"text-decoration: none\"><img src='http://img.ads.mocean.mobi/img/31/fd/0d/image_7a2b3ca79ed4eda26487061a0f_728x90.png'  /></a><img src='http://ads.mocean.mobi/2/img/0eea1b23-c13f-11e2-aeff-a0369f167751' height=1 width=1 border=0 style=\"display:none;\"/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1' height=1 width=1 border=0 style=\"display:none;\"/><img id=\"click\" width=\"1\" height=\"1\" style=\"display:none;\"/></body></html>",
-            dcpLoganAdNetwork.getHttpResponseContent());
+                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"mraid.js\"></script><a href='http://ads.mocean.mobi/2/redir/0eea1b23-c13f-11e2-aeff-a0369f167751/0/425387' onclick=\"document.getElementById('click').src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1';\" target=\"_blank\" style=\"text-decoration: none\"><img src='http://img.ads.mocean.mobi/img/31/fd/0d/image_7a2b3ca79ed4eda26487061a0f_728x90.png'  /></a><img src='http://ads.mocean.mobi/2/img/0eea1b23-c13f-11e2-aeff-a0369f167751' height=1 width=1 border=0 style=\"display:none;\"/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1' height=1 width=1 border=0 style=\"display:none;\"/><img id=\"click\" width=\"1\" height=\"1\" style=\"display:none;\"/></body></html>",
+                dcpLoganAdNetwork.getHttpResponseContent());
     }
 
     @Test
-    public void testDCPLoganParseResponseHtml() throws Exception
-    {
+    public void testDCPLoganParseResponseHtml() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -262,21 +252,20 @@ public class DCPLoganAdnetworkTest extends TestCase
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
         String response = "[{\"url\" : \"http://ads.mocean.mobi/8/redir/0beda220-76e8-11e3-9ca3-b8ca3a685e3a/0/413716\", \"track\" : \"http://ads.mocean.mobi/8/img/0beda220-76e8-11e3-9ca3-b8ca3a685e3a?redir=http%3A%2F%2Ffalcon828.startdedicated.com%2Foapi%2FgetAd%3Bjsessionid%3DCE95AD7724915C3AF30B6A9251A05F1C.falcon828\", \"content\" : \"<a href=\\\"http://ads.mocean.mobi/8/redir/0beda220-76e8-11e3-9ca3-b8ca3a685e3a/0/413716\\\" target=\\\"_blank\\\"><img width=\\\"320\\\" height=\\\"50\\\" style=\\\"border-style: none\\\" src=\\\"http://cdn.adnxs.com/p/ac/e3/11/39/ace3113973d0b2f42bb7fafc21f1303c.png\\\"/></a><img src=\\\"http://falcon828.startdedicated.com/oapi/getAd;jsessionid=CE95AD7724915C3AF30B6A9251A05F1C.falcon828\\\" width=\\\"1\\\" height=\\\"1\\\" /><img src=\\\"http://ads.mocean.mobi/8/img/0beda220-76e8-11e3-9ca3-b8ca3a685e3a\\\" width=\\\"1\\\" height=\\\"1\\\" alt=\\\"\\\"/>\", \"response\" : \"<?xml version=\\\"1.0\\\"?><response xmlns=\\\"http://soma.smaato.com/oapi/\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" xsi:schemaLocation=\\\"http://soma.smaato.com/oapi/ http://www.smaato.com/definitions/xsd/smaatoapi_v2.xsd\\\"><sessionid>CE95AD7724915C3AF30B6A9251A05F1C.falcon828</sessionid><status>success</status><user><id>900</id><ownid>a18145ffe52571ee0b5bf2bbb906f6e6</ownid></user><ads><ad id=\\\"0\\\" type=\\\"RICHMEDIA\\\" width=\\\"320\\\" height=\\\"50\\\"><log-id></log-id><valid start=\\\"0\\\" end=\\\"0\\\" max=\\\"1\\\"/><mediadata><![CDATA[<a href=\\\"http://nym1.mobile.adnxs.com/click?dtZuu9Bcsz8CQ7Fw7Z-tPwisHFpkO98_AkOxcO2frT931m670FyzP9IG4za7jJwsxcyUYtQDuWULzcpSAAAAAHAmGQDYBgAA5gcAAAIAAADmUqIAckUEAAAAAQBVU0QAVVNEAEABMgD9twAAvJ0BAQUCAQIAAIoAOyliMwAAAAA./cnd=%21nQVeMwiKhJcBEOaliQUY8ooRIAA./referrer=www.loganmedia.mobi/clickenc=http%3A%2F%2Fhastrk1.com%2Fserve%3Faction%3Dclick%26publisher_id%3D44840%26site_id%3D15984%26offer_id%3D248966%26odin%3D%26device_id_md5%3D%26device_id_sha1%3D%26ref_id%3Dnym1CMWZ05TG-sDcZRACGNKNjLezl6POLCIPMjAxLjEzOS4xNTQuMTI5KAE.\\\" target=\\\"_blank\\\"><img width=\\\"320\\\" height=\\\"50\\\" style=\\\"border-style: none\\\" src=\\\"http://cdn.adnxs.com/p/ac/e3/11/39/ace3113973d0b2f42bb7fafc21f1303c.png\\\"/></a>]]></mediadata><link></link><action target=\\\"\\\" type=\\\"\\\"/><beacons><beacon>http://falcon828.startdedicated.com/oapi/getAd;jsessionid=CE95AD7724915C3AF30B6A9251A05F1C.falcon828</beacon></beacons></ad></ads></response>\" }];";
         dcpLoganAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpLoganAdNetwork.getHttpResponseStatusCode(), 200);
         assertEquals(
-            "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"mraid.js\"></script><a href=\"http://ads.mocean.mobi/8/redir/0beda220-76e8-11e3-9ca3-b8ca3a685e3a/0/413716\" target=\"_blank\"><img width=\"320\" height=\"50\" style=\"border-style: none\" src=\"http://cdn.adnxs.com/p/ac/e3/11/39/ace3113973d0b2f42bb7fafc21f1303c.png\"/></a><img src=\"http://falcon828.startdedicated.com/oapi/getAd;jsessionid=CE95AD7724915C3AF30B6A9251A05F1C.falcon828\" width=\"1\" height=\"1\" /><img src=\"http://ads.mocean.mobi/8/img/0beda220-76e8-11e3-9ca3-b8ca3a685e3a\" width=\"1\" height=\"1\" alt=\"\"/><img src='http://ads.mocean.mobi/8/img/0beda220-76e8-11e3-9ca3-b8ca3a685e3a?redir=http%3A%2F%2Ffalcon828.startdedicated.com%2Foapi%2FgetAd%3Bjsessionid%3DCE95AD7724915C3AF30B6A9251A05F1C.falcon828' height=1 width=1 border=0 style=\"display:none;\"/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1' height=1 width=1 border=0 style=\"display:none;\"/></body></html>",
-            dcpLoganAdNetwork.getHttpResponseContent());
+                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"mraid.js\"></script><a href=\"http://ads.mocean.mobi/8/redir/0beda220-76e8-11e3-9ca3-b8ca3a685e3a/0/413716\" target=\"_blank\"><img width=\"320\" height=\"50\" style=\"border-style: none\" src=\"http://cdn.adnxs.com/p/ac/e3/11/39/ace3113973d0b2f42bb7fafc21f1303c.png\"/></a><img src=\"http://falcon828.startdedicated.com/oapi/getAd;jsessionid=CE95AD7724915C3AF30B6A9251A05F1C.falcon828\" width=\"1\" height=\"1\" /><img src=\"http://ads.mocean.mobi/8/img/0beda220-76e8-11e3-9ca3-b8ca3a685e3a\" width=\"1\" height=\"1\" alt=\"\"/><img src='http://ads.mocean.mobi/8/img/0beda220-76e8-11e3-9ca3-b8ca3a685e3a?redir=http%3A%2F%2Ffalcon828.startdedicated.com%2Foapi%2FgetAd%3Bjsessionid%3DCE95AD7724915C3AF30B6A9251A05F1C.falcon828' height=1 width=1 border=0 style=\"display:none;\"/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1' height=1 width=1 border=0 style=\"display:none;\"/></body></html>",
+                dcpLoganAdNetwork.getHttpResponseContent());
     }
 
     @Test
-    public void testDCPLoganParseResponseImgAppSDK360() throws Exception
-    {
+    public void testDCPLoganParseResponseImgAppSDK360() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -288,21 +277,20 @@ public class DCPLoganAdnetworkTest extends TestCase
         String beaconUrl = "http://c2.w.inmobi.com/c"
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl);
         String response = "[{\"url\" : \"http://ads.mocean.mobi/2/redir/0eea1b23-c13f-11e2-aeff-a0369f167751/0/425387\",\"img\" : \"http://img.ads.mocean.mobi/img/31/fd/0d/image_7a2b3ca79ed4eda26487061a0f_728x90.png\",\"type\": \"image/png\",\"track\" : \"http://ads.mocean.mobi/2/img/0eea1b23-c13f-11e2-aeff-a0369f167751\"}];";
         dcpLoganAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpLoganAdNetwork.getHttpResponseStatusCode(), 200);
         assertEquals(
-            "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"http://cdn.inmobi.com/android/mraid.js\"></script><a href='http://ads.mocean.mobi/2/redir/0eea1b23-c13f-11e2-aeff-a0369f167751/0/425387' onclick=\"document.getElementById('click').src='$IMClickUrl';mraid.openExternal('http://ads.mocean.mobi/2/redir/0eea1b23-c13f-11e2-aeff-a0369f167751/0/425387'); return false;\" target=\"_blank\" style=\"text-decoration: none\"><img src='http://img.ads.mocean.mobi/img/31/fd/0d/image_7a2b3ca79ed4eda26487061a0f_728x90.png'  /></a><img src='http://ads.mocean.mobi/2/img/0eea1b23-c13f-11e2-aeff-a0369f167751' height=1 width=1 border=0 style=\"display:none;\"/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1' height=1 width=1 border=0 style=\"display:none;\"/><img id=\"click\" width=\"1\" height=\"1\" style=\"display:none;\"/></body></html>",
-            dcpLoganAdNetwork.getHttpResponseContent());
+                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"http://cdn.inmobi.com/android/mraid.js\"></script><a href='http://ads.mocean.mobi/2/redir/0eea1b23-c13f-11e2-aeff-a0369f167751/0/425387' onclick=\"document.getElementById('click').src='$IMClickUrl';mraid.openExternal('http://ads.mocean.mobi/2/redir/0eea1b23-c13f-11e2-aeff-a0369f167751/0/425387'); return false;\" target=\"_blank\" style=\"text-decoration: none\"><img src='http://img.ads.mocean.mobi/img/31/fd/0d/image_7a2b3ca79ed4eda26487061a0f_728x90.png'  /></a><img src='http://ads.mocean.mobi/2/img/0eea1b23-c13f-11e2-aeff-a0369f167751' height=1 width=1 border=0 style=\"display:none;\"/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1' height=1 width=1 border=0 style=\"display:none;\"/><img id=\"click\" width=\"1\" height=\"1\" style=\"display:none;\"/></body></html>",
+                dcpLoganAdNetwork.getHttpResponseContent());
     }
 
     @Test
-    public void testDCPLoganParseResponseTextAdWAP() throws Exception
-    {
+    public void testDCPLoganParseResponseTextAdWAP() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -315,9 +303,9 @@ public class DCPLoganAdnetworkTest extends TestCase
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
         String response = "[{\"url\" : \"http://ads.mocean.mobi/2/redir/0eea1b23-c13f-11e2-aeff-a0369f167751/0/425387\",\"text\" : \"Test Campaign for Integration Testing\", \"track\" : \"http://ads.mocean.mobi/2/img/0eea1b23-c13f-11e2-aeff-a0369f167751\"}];";
@@ -328,8 +316,7 @@ public class DCPLoganAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLoganParseResponseTextAdAapSDK360() throws Exception
-    {
+    public void testDCPLoganParseResponseTextAdAapSDK360() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -344,9 +331,9 @@ public class DCPLoganAdnetworkTest extends TestCase
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
         String response = "[{\"url\" : \"http://ads.mocean.mobi/2/redir/0eea1b23-c13f-11e2-aeff-a0369f167751/0/425387\",\"text\" : \"Test Campaign for Integration Testing\", \"track\" : \"http://ads.mocean.mobi/2/img/0eea1b23-c13f-11e2-aeff-a0369f167751\"}];";
@@ -357,16 +344,14 @@ public class DCPLoganAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLoganParseInvalidResponse() throws Exception
-    {
+    public void testDCPLoganParseInvalidResponse() throws Exception {
         String response = "[{\"error\" : \"No ads available\"}];";
         dcpLoganAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpLoganAdNetwork.getHttpResponseStatusCode(), 500);
     }
 
     @Test
-    public void testDCPLoganParseNoAd() throws Exception
-    {
+    public void testDCPLoganParseNoAd() throws Exception {
         String response = "[{\"error\" : \"No ads available\"}];";
         dcpLoganAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpLoganAdNetwork.getHttpResponseStatusCode(), 500);
@@ -374,8 +359,7 @@ public class DCPLoganAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLoganParseEmptyResponseCode() throws Exception
-    {
+    public void testDCPLoganParseEmptyResponseCode() throws Exception {
         String response = "";
         dcpLoganAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpLoganAdNetwork.getHttpResponseStatusCode(), 500);
@@ -383,14 +367,12 @@ public class DCPLoganAdnetworkTest extends TestCase
     }
 
     @Test
-    public void testDCPLoganGetId() throws Exception
-    {
+    public void testDCPLoganGetId() throws Exception {
         assertEquals(dcpLoganAdNetwork.getId(), "loganadv1");
     }
 
     @Test
-    public void testDCPLoganGetImpressionId() throws Exception
-    {
+    public void testDCPLoganGetImpressionId() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -401,22 +383,20 @@ public class DCPLoganAdnetworkTest extends TestCase
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null);
         assertEquals(dcpLoganAdNetwork.getImpressionId(), "4f8d98e2-4bbd-40bc-8795-22da170700f9");
     }
 
     @Test
-    public void testDCPLoganGetName() throws Exception
-    {
+    public void testDCPLoganGetName() throws Exception {
         assertEquals(dcpLoganAdNetwork.getName(), "logan");
     }
 
     @Test
-    public void testDCPLoganIsClickUrlReq() throws Exception
-    {
+    public void testDCPLoganIsClickUrlReq() throws Exception {
         assertEquals(dcpLoganAdNetwork.isClickUrlRequired(), true);
     }
 }

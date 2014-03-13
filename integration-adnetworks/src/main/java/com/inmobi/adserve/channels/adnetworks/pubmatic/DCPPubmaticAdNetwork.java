@@ -1,15 +1,9 @@
 package com.inmobi.adserve.channels.adnetworks.pubmatic;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
-import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
 import io.netty.util.CharsetUtil;
 
 import java.awt.Dimension;
@@ -19,6 +13,7 @@ import java.util.Calendar;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.velocity.VelocityContext;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,12 +23,13 @@ import org.slf4j.LoggerFactory;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.server.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.ning.http.client.Request;
+import com.ning.http.client.RequestBuilder;
 
 
 public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -154,33 +150,22 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
         return params.toString();
     }
 
-    // form httprequest
     @Override
-    public HttpRequest getHttpRequest() throws Exception {
-        try {
-            URI uri = getRequestUri();
-            requestUrl = uri.toString();
-            ByteBuf buffer = Unpooled.copiedBuffer(getRequestParams(), CharsetUtil.UTF_8);
-            // TODO: remove header validation
-            request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri.toASCIIString(), buffer,
-                    true);
-            LOG.debug("host name is {}", uri.getHost());
-            request.headers().set(HttpHeaders.Names.HOST, uri.getHost());
-            LOG.debug("got the host");
-            request.headers().set(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent());
-            request.headers().set(HttpHeaders.Names.REFERER, uri.toString());
-            request.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
-            request.headers().set(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES);
-            request.headers().set("X-Forwarded-For", sasParams.getRemoteHostIp());
-            request.headers().set("RLNClientIpAddr", sasParams.getRemoteHostIp());
-            request.headers().set(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(buffer.readableBytes()));
-            request.headers().set(HttpHeaders.Names.CONTENT_TYPE, "application/x-www-form-urlencoded");
+    protected Request getNingRequest() throws Exception {
+        URI uri = getRequestUri();
+        if (uri.getPort() == -1) {
+            uri = new URIBuilder(uri).setPort(80).build();
         }
-        catch (Exception ex) {
-            errorStatus = ThirdPartyAdResponse.ResponseStatus.HTTPREQUEST_ERROR;
-            LOG.info("Error in making http request {}", ex);
-        }
-        return request;
+
+        byte[] body = getRequestParams().getBytes(CharsetUtil.UTF_8);
+
+        return new RequestBuilder("POST").setURI(uri).setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
+                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
+                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
+                .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/x-www-form-urlencoded")
+                .setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(body)
+                .setHeader("RLNClientIpAddr", sasParams.getRemoteHostIp()).build();
     }
 
     @Override

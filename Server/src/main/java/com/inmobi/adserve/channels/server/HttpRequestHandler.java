@@ -35,10 +35,10 @@ import org.slf4j.Marker;
 
 import com.google.inject.Provider;
 import com.inmobi.adserve.channels.server.api.Servlet;
-import com.inmobi.adserve.channels.server.beans.CasRequest;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
+import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
@@ -128,13 +128,13 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
         try {
             responseSender = new ResponseSender(this);
 
-            CasRequest casRequest = (CasRequest) msg;
+            httpRequest = (HttpRequest) msg;
 
             traceMarker = traceMarkerProvider.get();
 
             Servlet servlet = servletProvider.get();
 
-            LOG.debug(traceMarker, "Got the servlet {} , uri {}", servlet.getName(), casRequest.httpRequest().getUri());
+            LOG.debug(traceMarker, "Got the servlet {} , uri {}", servlet.getName(), httpRequest.getUri());
 
             servlet.handleRequest(this, new QueryStringDecoder(httpRequest.getUri()), ctx.channel());
             return;
@@ -161,7 +161,7 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
     }
 
     public boolean isRequestFromLocalHost() {
-        String host = CommonUtils.getHost(httpRequest);
+        String host = CasUtils.getHost(httpRequest);
 
         if (host != null && host.startsWith("localhost")) {
             return true;

@@ -1,17 +1,8 @@
 package com.inmobi.adserve.channels.adnetworks.generic;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
-import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.DefaultHttpRequest;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
-import io.netty.util.CharsetUtil;
 
 import java.awt.Dimension;
 import java.net.URI;
@@ -25,9 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.server.HttpRequestHandlerBase;
 
 
 /**
@@ -106,45 +97,6 @@ public class GenericAdapter extends BaseAdNetworkImpl {
     @Override
     public String getId() {
         return (config.getString(advertiserName.concat(MacrosAndStrings.ADVERTISER_ID)));
-    }
-
-    @Override
-    public HttpRequest getHttpRequest() throws Exception {
-        HttpRequest httpRequest = null;
-        URI uri;
-        try {
-            uri = getRequestUri();
-        }
-        catch (URISyntaxException e) {
-            return null;
-        }
-        LOG.debug("host name is {}", uri.getHost());
-        if (requestMethod.equals(MacrosAndStrings.GET)) {
-            try {
-                httpRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, uri.toASCIIString());
-                httpRequest.headers().set(HttpHeaders.Names.HOST, uri.getHost());
-                LOG.debug("got the host");
-                httpRequest.headers().set(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent());
-                httpRequest.headers().set(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us");
-                httpRequest.headers().set(HttpHeaders.Names.REFERER, uri.toString());
-                httpRequest.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
-                httpRequest.headers().set(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES);
-                httpRequest.headers().set("X-Forwarded-For", sasParams.getRemoteHostIp());
-            }
-            catch (Exception ex) {
-                errorStatus = ThirdPartyAdResponse.ResponseStatus.HTTPREQUEST_ERROR;
-                LOG.info("Error in making http request {}", ex);
-            }
-        }
-        else {
-            LOG.debug("got uri inside {} , uri is {}", advertiserName, uri);
-            ByteBuf buffer = Unpooled.copiedBuffer(getRequestParams(), CharsetUtil.UTF_8);
-            httpRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri.toASCIIString(), buffer);
-            httpRequest.headers().set(HttpHeaders.Names.HOST, uri.getHost());
-            httpRequest.headers().set(HttpHeaders.Names.CONTENT_LENGTH, buffer.readableBytes());
-            httpRequest.headers().set(HttpHeaders.Names.CONTENT_TYPE, "application/x-www-form-urlencoded");
-        }
-        return httpRequest;
     }
 
     @Override

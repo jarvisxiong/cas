@@ -19,10 +19,10 @@ import org.testng.annotations.Test;
 import com.inmobi.adserve.channels.adnetworks.ajillion.DCPAjillionAdnetwork;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.server.HttpRequestHandlerBase;
 
 
 public class DCPAjillionAdnetworkTest extends TestCase {

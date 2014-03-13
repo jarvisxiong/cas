@@ -22,6 +22,7 @@ import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
+import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 
@@ -29,6 +30,8 @@ import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 public class ServerTest extends TestCase {
 
     private HttpRequestHandler         httpRequestHandler;
+    private ResponseSender             responseSender;
+
     private Configuration              mockConfig       = null;
     private static ConfigurationLoader config;
     private final String               debug            = "debug";
@@ -57,7 +60,9 @@ public class ServerTest extends TestCase {
         }
         prepareConfig();
         ServletHandler.init(config, null);
-        httpRequestHandler = new HttpRequestHandler();
+        httpRequestHandler = new HttpRequestHandler(null, null);
+        responseSender = new ResponseSender(httpRequestHandler);
+
         AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
         Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-channel", "cas-advertisement", mockConfig);
 
@@ -100,9 +105,8 @@ public class ServerTest extends TestCase {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("debug")).andReturn(debug).anyTimes();
         expect(mockConfig.getInt("clickmaker.ipFileVersion")).andReturn(ipFileVersion).anyTimes();
-        expect(mockConfig.getString("clickmaker.clickURLHashingSecretKeyVersion"))
-                .andReturn(secretKeyVersion)
-                    .anyTimes();
+        expect(mockConfig.getString("clickmaker.clickURLHashingSecretKeyVersion")).andReturn(secretKeyVersion)
+                .anyTimes();
         expect(mockConfig.getString("clickmaker.key.1.value")).andReturn(keyValue).anyTimes();
         expect(mockConfig.getString("clickmaker.clickURLPrefix")).andReturn(clickURLPrefix).anyTimes();
         expect(mockConfig.getString("clickmaker.beaconURLPrefix")).andReturn(beaconURLPrefix).anyTimes();
@@ -149,7 +153,7 @@ public class ServerTest extends TestCase {
 
     @Test
     public void testResponseFormat() throws Exception {
-        assertEquals(httpRequestHandler.responseSender.getResponseFormat(), "html");
+        assertEquals(responseSender.getResponseFormat(), "html");
     }
 
     @Test
@@ -175,7 +179,7 @@ public class ServerTest extends TestCase {
         JSONObject jsonObject = prepareParameters();
         Long[] category = { 1l, 2l };
         assertTrue("Category are expected to be equal",
-            requestParser.getCategory(jsonObject, "category").equals(Arrays.asList(category)));
+                requestParser.getCategory(jsonObject, "category").equals(Arrays.asList(category)));
     }
 
     /*

@@ -3,6 +3,7 @@ package com.inmobi.adserve.channels.server.requesthandler;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -26,13 +27,12 @@ import com.google.common.base.Charsets;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.ChannelsClientHandler;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.server.beans.CasRequest;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.ning.http.client.AsyncHttpClient;
@@ -115,15 +115,15 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     @Override
-    public void sendAdResponse(final AdNetworkInterface selectedAdNetwork, final CasRequest casRequest) {
+    public void sendAdResponse(final AdNetworkInterface selectedAdNetwork, final Channel serverChannel) {
         adResponse = selectedAdNetwork.getResponseAd();
         selectedAdIndex = getRankIndex(selectedAdNetwork);
-        sendAdResponse(adResponse, casRequest);
+        sendAdResponse(adResponse, serverChannel);
     }
 
     // send Ad Response
     // TODO: does it need to be synchronized?
-    public synchronized void sendAdResponse(final ThirdPartyAdResponse adResponse, final CasRequest casRequest)
+    public synchronized void sendAdResponse(final ThirdPartyAdResponse adResponse, final Channel serverChannel)
             throws NullPointerException {
         // Making sure response is sent only once
         if (responseSent) {
@@ -150,11 +150,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
             if (getResponseFormat().equals("xhtml")) {
                 finalReponse = noAdXhtml;
             }
-            sendResponse(HttpResponseStatus.OK, finalReponse, adResponse.responseHeaders, casRequest);
+            sendResponse(HttpResponseStatus.OK, finalReponse, adResponse.responseHeaders, serverChannel);
             return;
         }
         if (6 != sasParams.getDst()) {
-            sendResponse(HttpResponseStatus.OK, finalReponse, adResponse.responseHeaders, casRequest);
+            sendResponse(HttpResponseStatus.OK, finalReponse, adResponse.responseHeaders, serverChannel);
         }
         else {
             JSONObject jsonObject = new JSONObject();
@@ -179,33 +179,44 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 jsonObject.put("campaignId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity()
                         .getCampaignId());
                 InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
-                sendResponse(HttpResponseStatus.OK, jsonObject.toString(), adResponse.responseHeaders, casRequest);
+                sendResponse(HttpResponseStatus.OK, jsonObject.toString(), adResponse.responseHeaders, serverChannel);
                 LOG.debug("RTB reponse json to RE is {}", jsonObject);
             }
             catch (JSONException e) {
                 LOG.debug("Error while making json object for rule engine " + e.getMessage());
                 // Sending NOAD if error making json object
-                sendNoAdResponse(casRequest);
+                sendNoAdResponse(serverChannel);
             }
         }
     }
 
     // send response to the caller
     public void sendResponse(final HttpResponseStatus status, final String responseString, final Map responseHeaders,
-            final CasRequest casRequest) throws NullPointerException {
+            final Channel serverChannel) throws NullPointerException {
 
         byte[] bytes = responseString.getBytes(Charsets.UTF_8);
 
         // TODO: change to false after verification
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status,
                 Unpooled.wrappedBuffer(bytes), true);
+        response.headers().add("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.headers().add("Expires", "-1");
+        response.headers().add("Pragma", "no-cache");
+
+        if (null != responseHeaders) {
+            for (Object key : responseHeaders.keySet()) {
+                response.headers().add(key.toString(), responseHeaders.get(key));
+            }
+        }
 
         response.headers().add(HttpHeaders.Names.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
-        HttpHeaders.setKeepAlive(response, casRequest.isKeepAlive());
+        // TODO: to fix keep alive, we need to fix whole flow
+        // HttpHeaders.setKeepAlive(response, serverChannel.isKeepAlive());
         response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
 
         response.headers().add(HttpHeaders.Names.EXPIRES, "-1");
         response.headers().add(HttpHeaders.Names.PRAGMA, "no-cache");
+        response.headers().set("Content-Length", bytes.length);
 
         if (null != responseHeaders) {
             for (Map.Entry entry : (Set<Map.Entry>) responseHeaders.entrySet()) {
@@ -214,10 +225,10 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
 
         LOG.debug("event not null inside send Response");
-        if (casRequest.channel().isWritable()) {
+        if (serverChannel.isWritable()) {
             LOG.debug("channel not null inside send Response");
-            ChannelFuture future = casRequest.channel().writeAndFlush(response);
-            // future.addListener(ChannelFutureListener.CLOSE);
+            ChannelFuture future = serverChannel.writeAndFlush(response);
+            future.addListener(ChannelFutureListener.CLOSE);
         }
         else {
             LOG.debug("Request Channel is null or channel is not writeable.");
@@ -231,8 +242,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     // send response to the caller
-    public void sendResponse(final String responseString, final CasRequest casRequest) throws NullPointerException {
-        sendResponse(HttpResponseStatus.OK, responseString, null, casRequest);
+    public void sendResponse(final String responseString, final Channel serverChannel) throws NullPointerException {
+        sendResponse(HttpResponseStatus.OK, responseString, null, serverChannel);
     }
 
     @Override
@@ -242,7 +253,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
     // TODO: does it need to be synchronized?
     @Override
-    public synchronized void sendNoAdResponse(final CasRequest casRequest) throws NullPointerException {
+    public synchronized void sendNoAdResponse(final Channel serverChannel) throws NullPointerException {
         // Making sure response is sent only once
         if (responseSent) {
             return;
@@ -258,17 +269,17 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
         LOG.debug("Sending No ads");
         if (getResponseFormat().equals("xhtml")) {
-            sendResponse(HttpResponseStatus.OK, noAdXhtml, headers, casRequest);
+            sendResponse(HttpResponseStatus.OK, noAdXhtml, headers, serverChannel);
         }
         else if (isJsAdRequest()) {
             sendResponse(HttpResponseStatus.OK, String.format(noAdJsAdcode, sasParams.getRqIframe()), headers,
-                    casRequest);
+                    serverChannel);
         }
         else if (getResponseFormat().equalsIgnoreCase("imai")) {
-            sendResponse(HttpResponseStatus.NO_CONTENT, noAdImai, headers, casRequest);
+            sendResponse(HttpResponseStatus.NO_CONTENT, noAdImai, headers, serverChannel);
         }
         else {
-            sendResponse(HttpResponseStatus.OK, noAdHtml, headers, casRequest);
+            sendResponse(HttpResponseStatus.OK, noAdHtml, headers, serverChannel);
         }
     }
 
@@ -302,7 +313,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     // Iterates over the complete rank list and set the new value for
     // rankIndexToProcess.
     @Override
-    public void reassignRanks(final AdNetworkInterface adNetworkCaller, final CasRequest casRequest) {
+    public void reassignRanks(final AdNetworkInterface adNetworkCaller, final Channel serverChannel) {
         int index = getRankIndex(adNetworkCaller);
         LOG.debug("reassignRanks called for {} and index is {}", adNetworkCaller.getName(), index);
 
@@ -316,7 +327,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 if (adNetwork.getResponseAd().responseStatus == ThirdPartyAdResponse.ResponseStatus.SUCCESS) {
                     // Sends the response if request is completed for the
                     // specific adapter.
-                    sendAdResponse(adNetwork, ca);
+                    sendAdResponse(adNetwork, serverChannel);
                     break;
                 }
                 else {
@@ -333,7 +344,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
         // Sends no ad if reached to the end of the rank list.
         if (index == rankList.size()) {
-            sendNoAdResponse(channel);
+            sendNoAdResponse(serverChannel);
         }
     }
 

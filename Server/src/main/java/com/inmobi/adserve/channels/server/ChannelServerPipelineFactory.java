@@ -6,6 +6,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.timeout.WriteTimeoutHandler;
 
 import java.util.concurrent.TimeUnit;
 
@@ -16,7 +17,6 @@ import lombok.Getter;
 import com.google.inject.Provider;
 import com.inmobi.adserve.channels.server.annotations.IncomingConnectionLimitHandler;
 import com.inmobi.adserve.channels.server.config.ServerConfig;
-import com.inmobi.adserve.channels.server.handler.CasCodec;
 import com.inmobi.adserve.channels.server.handler.TraceMarkerhandler;
 
 
@@ -39,7 +39,6 @@ public class ChannelServerPipelineFactory extends ChannelInitializer<SocketChann
             final LoggingHandler loggingHandler) {
 
         this.serverConfig = serverConfig;
-
         this.httpRequestHandlerProvider = httpRequestHandlerProvider;
         this.traceMarkerhandler = traceMarkerhandler;
         this.requestIdHandler = new RequestIdHandler();
@@ -51,16 +50,20 @@ public class ChannelServerPipelineFactory extends ChannelInitializer<SocketChann
     @Override
     protected void initChannel(final SocketChannel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();
-        pipeline.addLast("logging", loggingHandler);
+        // enable logging handler only for dev purpose
+        // pipeline.addLast("logging", loggingHandler);
         pipeline.addLast("incomingLimitHandler", incomingConnectionLimitHandler);
         pipeline.addLast("decoderEncoder", new HttpServerCodec());
         pipeline.addLast("aggregator", new HttpObjectAggregator(1024 * 1024));// 1 MB data size
         pipeline.addLast("requestIdHandler", requestIdHandler);
-        pipeline.addLast("casWriteTimeoutHandler", new CasWriteTimeOutHandler(serverConfig.getServerTimeoutInMillis(),
+        // pipeline.addLast("casWriteTimeoutHandler", new
+        // CasWriteTimeOutHandler(serverConfig.getServerTimeoutInMillis(),
+        // TimeUnit.MILLISECONDS));
+        pipeline.addLast("casWriteTimeoutHandler", new WriteTimeoutHandler(serverConfig.getServerTimeoutInMillis(),
                 TimeUnit.MILLISECONDS));
         pipeline.addLast("traceMarkerhandler", traceMarkerhandler);
         pipeline.addLast("servletHandler", servletHandler);
-        pipeline.addLast("casCodec", new CasCodec());
+        // pipeline.addLast("casCodec", new CasCodec());
         pipeline.addLast("handler", httpRequestHandlerProvider.get());
     }
 }

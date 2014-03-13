@@ -1,12 +1,15 @@
 package com.inmobi.adserve.channels.server.api;
 
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
+
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.beans.CasRequest;
 
 
 public interface Servlet {
 
-    void handleRequest(final HttpRequestHandler hrh, final CasRequest casRequest) throws Exception;
+    void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
+            final Channel severChannel) throws Exception;
 
     String getName();
 

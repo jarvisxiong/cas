@@ -231,19 +231,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         sasParams.setRqAdType("int");
         sasParams.setSiteId("siteid");
 
-        injector = Guice.createInjector(new ServerModule(configurationLoder, repositoryHelper), new AbstractModule() {
-
-            @Override
-            protected void configure() {
-                bind(Marker.class).toProvider(new Provider<Marker>() {
-                    @Override
-                    public Marker get() {
-                        return null;
-                    }
-                });
-
-            }
-        });
+        injector = Guice.createInjector(new ServerModule(configurationLoder, repositoryHelper));
 
         channelSegmentFilterApplier = injector.getInstance(ChannelSegmentFilterApplier.class);
 
@@ -785,20 +773,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         sasParams.setCountryStr("1");
         sasParams.setOsId(2);
 
-        Injector injector = Guice.createInjector(new ServerModule(configurationLoder, repositoryHelper),
-                new AbstractModule() {
-
-                    @Override
-                    protected void configure() {
-                        bind(Marker.class).toProvider(new Provider<Marker>() {
-                            @Override
-                            public Marker get() {
-                                return null;
-                            }
-                        });
-
-                    }
-                });
+        Injector injector = Guice.createInjector(new ServerModule(configurationLoder, repositoryHelper));
 
         AdGroupSupplyDemandClassificationFilter adGroupSupplyDemandClassificationFilter = injector
                 .getInstance(AdGroupSupplyDemandClassificationFilter.class);

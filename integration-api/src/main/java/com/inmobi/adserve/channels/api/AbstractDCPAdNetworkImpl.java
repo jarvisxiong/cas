@@ -5,14 +5,12 @@ import io.netty.channel.Channel;
 
 import org.apache.commons.configuration.Configuration;
 
-import com.inmobi.adserve.channels.server.HttpRequestHandlerBase;
-
 
 /**
  * @author abhishek.parwal
  * 
  */
-public class AbstractDCPAdNetworkImpl extends BaseAdNetworkImpl {
+public abstract class AbstractDCPAdNetworkImpl extends BaseAdNetworkImpl {
 
     protected final Configuration config;
 

@@ -1,23 +1,18 @@
 package com.inmobi.adserve.channels.adnetworks.appier;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
-import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
 
 import java.awt.Dimension;
 import java.net.URI;
-import java.nio.charset.Charset;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.velocity.VelocityContext;
+import org.jboss.netty.util.CharsetUtil;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,11 +20,12 @@ import org.slf4j.LoggerFactory;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.server.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.ning.http.client.Request;
+import com.ning.http.client.RequestBuilder;
 
 
 public class DCPAppierAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -114,29 +110,20 @@ public class DCPAppierAdNetwork extends AbstractDCPAdNetworkImpl {
     }
 
     @Override
-    public HttpRequest getHttpRequest() throws Exception {
-        try {
-            URI uri = getRequestUri();
-            requestUrl = uri.toString();
-            ByteBuf buffer = Unpooled.copiedBuffer(getRequestParams(), Charset.defaultCharset());
-            // TODO: make header validation false later
-            request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri.toASCIIString(), buffer,
-                    true);
-            LOG.debug("host name is {}", uri.getHost());
-            HttpHeaders headers = request.headers();
-            headers.set(HttpHeaders.Names.HOST, uri.getHost());
-            headers.set(HttpHeaders.Names.REFERER, uri.toString());
-            headers.set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
-            headers.set(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES);
-            headers.set("X-Forwarded-For", sasParams.getRemoteHostIp());
-            headers.set(HttpHeaders.Names.CONTENT_LENGTH, buffer.readableBytes());
-            headers.set(HttpHeaders.Names.CONTENT_TYPE, "application/x-www-form-urlencoded");
+    protected Request getNingRequest() throws Exception {
+
+        URI uri = getRequestUri();
+        if (uri.getPort() == -1) {
+            uri = new URIBuilder(uri).setPort(80).build();
         }
-        catch (Exception ex) {
-            errorStatus = ThirdPartyAdResponse.ResponseStatus.HTTPREQUEST_ERROR;
-            LOG.error("Error in making http request {}", ex);
-        }
-        return request;
+
+        byte[] body = getRequestParams().getBytes(CharsetUtil.UTF_8);
+        return new RequestBuilder("POST").setURI(uri).setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
+                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
+                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
+                .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/x-www-form-urlencoded")
+                .setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(body).build();
     }
 
     @Override
