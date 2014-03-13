@@ -53,9 +53,6 @@ public interface AdNetworkInterface {
     // Returns the Channel Id for the TPAN as in our database.
     String getId();
 
-    // Returns the channel id for adapter
-    Integer getChannelId();
-
     // Updates the request parameters according to the Ad Network. Returns true on
     // success.
     boolean configureParameters(final SASRequestParameters param,
@@ -67,7 +64,6 @@ public interface AdNetworkInterface {
 
     // Constructs the request url
     URI getRequestUri() throws Exception;
-
 
     // whether click url is used by adapter
     boolean isBeaconUrlRequired();

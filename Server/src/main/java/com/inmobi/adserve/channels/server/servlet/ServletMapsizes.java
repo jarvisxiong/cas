@@ -9,7 +9,6 @@ import org.json.JSONObject;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.inmobi.adserve.channels.api.ChannelsClientHandler;
 import com.inmobi.adserve.channels.server.ConnectionLimitHandler;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.annotations.IncomingConnectionLimitHandler;
@@ -31,9 +30,6 @@ public class ServletMapsizes implements Servlet {
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
             final Channel serverChannel) throws Exception {
         JSONObject mapsizes = new JSONObject();
-        mapsizes.put("ResponseMap", ChannelsClientHandler.responseMap.size());
-        mapsizes.put("StatusMap", ChannelsClientHandler.responseMap.size());
-        mapsizes.put("AdStatusMap", ChannelsClientHandler.responseMap.size());
         mapsizes.put("SampledAdvertiserLog", Logging.getSampledadvertiserlognos().size());
 
         if (null != incomingConnectionLimitHandler) {

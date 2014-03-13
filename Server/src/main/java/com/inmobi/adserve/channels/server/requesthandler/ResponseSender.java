@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Charsets;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.ChannelsClientHandler;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
@@ -372,13 +371,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
                         .getAdNetworkInterface(), exception);
             }
         }
-        for (int index = 0; rankList != null && index < rankList.size(); index++) {
-            if (null != rankList.get(index).getAdNetworkInterface().getChannelId()) {
-                ChannelsClientHandler.responseMap.remove(rankList.get(index).getAdNetworkInterface().getChannelId());
-                ChannelsClientHandler.statusMap.remove(rankList.get(index).getAdNetworkInterface().getChannelId());
-                ChannelsClientHandler.adStatusMap.remove(rankList.get(index).getAdNetworkInterface().getChannelId());
-            }
-        }
 
         // Closing RTB channels
         List<ChannelSegment> rtbList = auctionEngine.getRtbSegments();
@@ -393,18 +385,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
                         .getAdNetworkInterface(), exception);
             }
         }
-        for (int index = 0; rtbList != null && index < rtbList.size(); index++) {
-            if (null != rtbList.get(index).getAdNetworkInterface().getChannelId()) {
-                ChannelsClientHandler.responseMap.remove(rtbList.get(index).getAdNetworkInterface().getChannelId());
-                ChannelsClientHandler.statusMap.remove(rtbList.get(index).getAdNetworkInterface().getChannelId());
-                ChannelsClientHandler.adStatusMap.remove(rtbList.get(index).getAdNetworkInterface().getChannelId());
-            }
-        }
 
         LOG.debug("done with closing channels");
-        LOG.debug("responsemap size is : {}", ChannelsClientHandler.responseMap.size());
-        LOG.debug("adstatus map size is : {}", ChannelsClientHandler.adStatusMap.size());
-        LOG.debug("status map size is: {}", ChannelsClientHandler.statusMap.size());
         hrh.writeLogs(this);
     }
 

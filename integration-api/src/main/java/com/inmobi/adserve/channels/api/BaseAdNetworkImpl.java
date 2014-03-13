@@ -42,16 +42,15 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     private final static Logger                   LOG                     = LoggerFactory
                                                                                   .getLogger(BaseAdNetworkImpl.class);
 
-    private ChannelFuture                         future;
+    protected ChannelFuture                       future;
     protected Bootstrap                           clientBootstrap;
-    private Channel                               channel;
     protected HttpRequest                         request;
     protected long                                startTime;
     public volatile boolean                       isRequestComplete       = false;
     protected int                                 statusCode;
     public String                                 responseContent;
     public Map                                    responseHeaders;
-    public long                                   latency;
+    private long                                  latency;
     public long                                   connectionLatency;
     public String                                 adStatus                = "NO_AD";
     protected ThirdPartyAdResponse.ResponseStatus errorStatus             = ThirdPartyAdResponse.ResponseStatus.SUCCESS;
@@ -114,14 +113,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         this.isRtbPartner = isRtbPartner;
     }
 
-    @Override
-    public Integer getChannelId() {
-        if (null == channel) {
-            return null;
-        }
-        return channel.hashCode();
-    }
-
     public void processResponse() {
         LOG.debug("Inside process Response for the partner: {}", getName());
         if (isRequestComplete) {
@@ -167,7 +158,10 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     public boolean makeAsyncRequest() {
         LOG.debug("In Adapter {}", this.getClass().getSimpleName());
         if (useJsAdTag()) {
+            startTime = System.currentTimeMillis();
             generateJsAdResponse();
+            latency = System.currentTimeMillis() - startTime;
+            LOG.debug("{} operation complete latency {}", getName(), latency);
             processResponse();
             LOG.debug("sent jsadcode ... returning from make NingRequest");
             return true;
@@ -289,50 +283,12 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     public void cleanUp() {
         if (!isRequestCompleted()) {
             isRequestComplete = true;
-            if (channel == null) {
-                responseStruct = new ThirdPartyAdResponse();
-                latency = System.currentTimeMillis() - startTime;
-                responseStruct.latency = latency;
-                adStatus = "TERM";
-                responseStruct.adStatus = adStatus;
-                return;
-            }
-            else {
-                ChannelsClientHandler.removeEntry(channel.hashCode());
-                ChannelsClientHandler.statusMap.remove(channel.hashCode());
-                channel.close();
-            }
+
             LOG.debug("inside cleanup for channel {}", this.getId());
-            latency = System.currentTimeMillis() - startTime;
             adStatus = "TERM";
-            if (ChannelsClientHandler.adStatusMap.get(channel.hashCode()) != null
-                    && ChannelsClientHandler.adStatusMap.get(channel.hashCode()).equals("TIME_OUT")) {
-                adStatus = "TIME_OUT";
-                ChannelsClientHandler.adStatusMap.remove(channel.hashCode());
-                ChannelsClientHandler.statusMap.remove(channel.hashCode());
-                ChannelsClientHandler.responseMap.remove(channel.hashCode());
-            }
             responseStruct = new ThirdPartyAdResponse();
             responseStruct.latency = latency;
             responseStruct.adStatus = adStatus;
-        }
-        else {
-            if (channel == null) {
-                responseStruct = new ThirdPartyAdResponse();
-                responseStruct.latency = latency;
-                responseStruct.adStatus = adStatus;
-                return;
-            }
-            if (ChannelsClientHandler.adStatusMap.get(channel.hashCode()) != null
-                    && ChannelsClientHandler.adStatusMap.get(channel.hashCode()).equals("TIME_OUT")) {
-                responseStruct = new ThirdPartyAdResponse();
-                adStatus = "TIME_OUT";
-                ChannelsClientHandler.adStatusMap.remove(channel.hashCode());
-                ChannelsClientHandler.statusMap.remove(channel.hashCode());
-                ChannelsClientHandler.responseMap.remove(channel.hashCode());
-                responseStruct.adStatus = adStatus;
-                responseStruct.latency = latency;
-            }
         }
     }
 

@@ -31,7 +31,7 @@ public class AdvertiserDetailsInvalidFilter extends AbstractAdvertiserLevelFilte
     @Inject
     public AdvertiserDetailsInvalidFilter(final Provider<Marker> traceMarkerProvider,
             final Map<String, AdapterConfig> advertiserIdConfigMap) {
-        super(traceMarkerProvider, InspectorStrings.droppedInburnFilter);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_INVALID_DETAILS_FILTER);
         this.advertiserIdConfigMap = advertiserIdConfigMap;
     }
 
