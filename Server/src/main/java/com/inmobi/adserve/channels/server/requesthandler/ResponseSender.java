@@ -11,6 +11,7 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.phoenix.util.WilburyUUID;
 import com.inmobi.types.AdIdChain;
 import com.inmobi.types.GUID;
+import com.inmobi.types.PricingModel;
 import com.ning.http.client.AsyncHttpClient;
 import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
 import org.apache.thrift.TException;
