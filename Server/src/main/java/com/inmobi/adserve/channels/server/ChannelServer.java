@@ -154,10 +154,10 @@ public class ChannelServer {
             if (null != maxIncomingConnections) {
                 ServletHandler.getServerConfig().setProperty("incomingMaxConnections", maxIncomingConnections);
             }
-            if (null != maxIncomingConnections) {
+            if (null != maxRTbdOutGoingConnections) {
                 ServletHandler.getServerConfig().setProperty("rtbOutGoingMaxConnections", maxRTbdOutGoingConnections);
             }
-            if (null != maxIncomingConnections) {
+            if (null != maxDCpOutGoingConnections) {
                 ServletHandler.getServerConfig().setProperty("dcpOutGoingMaxConnections", maxDCpOutGoingConnections);
             }
 
