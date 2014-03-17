@@ -170,7 +170,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             String uri = getRequestUri().toString();
             requestUrl = uri;
             Request ningRequest = getNingRequest();
-            LOG.debug(" uri : {}", uri);
+            LOG.debug("request : {}", ningRequest);
             startTime = System.currentTimeMillis();
             getAsyncHttpClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
                 @Override
@@ -194,6 +194,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     latency = System.currentTimeMillis() - startTime;
                     MDC.put("requestId", serverEvent.getChannel().getId().toString());
 
+                    LOG.error("error while fetching response from: {} {}", getName(), t);
+
                     if (isRequestComplete) {
                         return;
                     }
@@ -207,7 +209,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
                     LOG.debug("{} error latency {}", getName(), latency);
                     adStatus = "TERM";
-                    LOG.info("error while fetching response from: {} {}", getName(), t);
                     processResponse();
                     return;
                 }
