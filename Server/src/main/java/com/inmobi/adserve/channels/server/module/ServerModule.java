@@ -1,5 +1,18 @@
 package com.inmobi.adserve.channels.server.module;
 
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import javax.ws.rs.Path;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.hadoop.thirdparty.guava.common.collect.Maps;
+import org.reflections.Reflections;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.slf4j.LoggerFactory;
+
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
@@ -7,6 +20,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.annotations.LoggerConfiguration;
@@ -64,6 +78,7 @@ public class ServerModule extends AbstractModule {
         bind(Configuration.class).annotatedWith(ServerConfiguration.class).toInstance(serverConfiguration);
         bind(Configuration.class).annotatedWith(LoggerConfiguration.class).toInstance(loggerConfiguration);
         bind(Configuration.class).annotatedWith(RtbConfiguration.class).toInstance(rtbConfiguration);
+        bind(ExecutorService.class).toInstance(Executors.newCachedThreadPool());
 
         requestStaticInjection(AsyncRequestMaker.class);
         requestStaticInjection(ChannelSegment.class);
@@ -71,6 +86,7 @@ public class ServerModule extends AbstractModule {
         requestStaticInjection(AuctionEngine.class);
         requestStaticInjection(AdMakerFactory.class);
         requestStaticInjection(RequestFilters.class);
+        requestStaticInjection(RtbAdNetwork.class);
 
         install(new AdapterConfigModule(adapterConfiguration, ChannelServer.dataCentreName));
         install(new ChannelSegmentFilterModule());

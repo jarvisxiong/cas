@@ -9,7 +9,7 @@ import org.jboss.netty.channel.MessageEvent;
  * @author abhishek.parwal
  * 
  */
-public class AbstractDCPAdNetworkImpl extends BaseAdNetworkImpl {
+public abstract class AbstractDCPAdNetworkImpl extends BaseAdNetworkImpl {
 
     protected final Configuration config;
 

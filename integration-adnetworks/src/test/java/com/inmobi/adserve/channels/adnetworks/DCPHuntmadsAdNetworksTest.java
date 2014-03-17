@@ -350,6 +350,40 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
     }
 
     @Test
+    public void testDCPHuntmadsParseResponseWithContent() throws Exception {
+        SASRequestParameters sasParams = new SASRequestParameters();
+        CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        sasParams.setRemoteHostIp("206.29.182.240");
+        sasParams.setUserAgent("Mozilla");
+        sasParams.setSlot((short)4);
+        sasParams.setSdkVersion("i360");
+        sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
+        sasParams.setSource("app");
+        sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
+        String externalKey = "19100";
+        String beaconUrl = "http://c2.w.inmobi.com/c"
+                + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
+                + "-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
+        String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
+        ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
+            huntmadsAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+            new ArrayList<Integer>(), 0.0d, null, null, 32));
+        dcpHuntmadsAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
+
+        String response = "[{\"url\" : \"http://ads.huntmad.com/6/redir/1bacab71-a839-11e3-92f1-a0369f0a5201/0/550667\", \"text\" : \"\", \"img\" : \"http://admarvel.s3.amazonaws.com/ads/c195800/13934438747851_300x50.png\", \"track\" : \"http://ads.huntmad.com/6/img/1bacab71-a839-11e3-92f1-a0369f0a5201?redir=http%3A%2F%2F184.73.151.140%2Ffam%2Fview.php%3Fp%3D__pid%3D80a39249e06655a3__sid%3D75833__bid%3D951143__cb%3Dc0442f5b13__h%3D1394444898__uid%3D8d7e3052bf2d166aeb6605e97903f71432012870__tp%3D19352aca746c090f32e6edae176f5e39__os%3DAndroid__s%3D197ce8c07776458ff77e7a4d51cf5d06\", \"content\" : \"<a href='http://ads.huntmad.com/6/redir/1bacab71-a839-11e3-92f1-a0369f0a5201/0/550667' target='_self'><img src='http://admarvel.s3.amazonaws.com/ads/c195800/13934438747851_300x50.png' width='300' height='50' alt='' title='' border='0' /></a><img src=\\\"http://184.73.151.140/fam/view.php?p=__pid=80a39249e06655a3__sid=75833__bid=951143__cb=c0442f5b13__h=1394444898__uid=8d7e3052bf2d166aeb6605e97903f71432012870__tp=19352aca746c090f32e6edae176f5e39__os=Android__s=197ce8c07776458ff77e7a4d51cf5d06\\\" alt=\\\"\\\" width=\\\"1\\\" height=\\\"1\\\" /><img src=\\\"http://ads.huntmad.com/6/img/1bacab71-a839-11e3-92f1-a0369f0a5201\\\" width=\\\"1\\\" height=\\\"1\\\" alt=\\\"\\\"/>\", \"response\" : \"<a href='http://184.73.151.140/fam/ck.php?p=__pid=80a39249e06655a3__sid=75833__bid=951143__cb=17757dc446__h=1394444898__uid=8d7e3052bf2d166aeb6605e97903f71432012870__tp=19352aca746c090f32e6edae176f5e39__os=Android__s=51684c5491c2dc651ecbd604f853b143' target='_self'><img src='http://admarvel.s3.amazonaws.com/ads/c195800/13934438747851_300x50.png' width='300' height='50' alt='' title='' border='0' /></a><img src=\\\"http://184.73.151.140/fam/view.php?p=__pid=80a39249e06655a3__sid=75833__bid=951143__cb=c0442f5b13__h=1394444898__uid=8d7e3052bf2d166aeb6605e97903f71432012870__tp=19352aca746c090f32e6edae176f5e39__os=Android__s=197ce8c07776458ff77e7a4d51cf5d06\\\" alt=\\\"\\\" width=\\\"1\\\" height=\\\"1\\\" />\" }]";
+
+        dcpHuntmadsAdNetwork.parseResponse(response, HttpResponseStatus.OK);
+        assertEquals(dcpHuntmadsAdNetwork.getHttpResponseStatusCode(), 200);
+        String expectedResponse = "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"http://cdn.inmobi.com/android/mraid.js\"></script><a href='http://ads.huntmad.com/6/redir/1bacab71-a839-11e3-92f1-a0369f0a5201/0/550667' target='_self'><img src='http://admarvel.s3.amazonaws.com/ads/c195800/13934438747851_300x50.png' width='300' height='50' alt='' title='' border='0' /></a><img src=\"http://184.73.151.140/fam/view.php?p=__pid=80a39249e06655a3__sid=75833__bid=951143__cb=c0442f5b13__h=1394444898__uid=8d7e3052bf2d166aeb6605e97903f71432012870__tp=19352aca746c090f32e6edae176f5e39__os=Android__s=197ce8c07776458ff77e7a4d51cf5d06\" alt=\"\" width=\"1\" height=\"1\" /><img src=\"http://ads.huntmad.com/6/img/1bacab71-a839-11e3-92f1-a0369f0a5201\" width=\"1\" height=\"1\" alt=\"\"/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>";
+        assertEquals(expectedResponse, dcpHuntmadsAdNetwork.getHttpResponseContent());
+    }
+
+    
+    
+    
+    
+    @Test
     public void testDCPHuntmadsParseInvalidResponse() throws Exception {
         String response = "HTTP/1.1 20a OK\nServer=Netscape-Enterprise/4.1\n\n[{\"error\" : \"No ads available\"}];";
         dcpHuntmadsAdNetwork.parseResponse(response, HttpResponseStatus.OK);

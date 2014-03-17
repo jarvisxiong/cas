@@ -1,5 +1,25 @@
 package com.inmobi.adserve.channels.server;
 
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Properties;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.dbcp.ConnectionFactory;
+import org.apache.commons.dbcp.DriverManagerConnectionFactory;
+import org.apache.commons.dbcp.PoolableConnectionFactory;
+import org.apache.commons.dbcp.PoolingDataSource;
+import org.apache.commons.pool.impl.GenericObjectPool;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.jboss.netty.logging.InternalLoggerFactory;
+import org.jboss.netty.logging.Log4JLoggerFactory;
+
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -18,8 +38,6 @@ import com.inmobi.adserve.channels.repository.SiteEcpmRepository;
 import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
 import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
 import com.inmobi.adserve.channels.server.api.ConnectionType;
-import com.inmobi.adserve.channels.server.client.BootstrapCreation;
-import com.inmobi.adserve.channels.server.client.RtbBootstrapCreation;
 import com.inmobi.adserve.channels.server.module.NettyModule;
 import com.inmobi.adserve.channels.server.module.ScopeModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
@@ -168,34 +186,10 @@ public class ChannelServer {
                 ServletHandler.getServerConfig().setProperty("dcpOutGoingMaxConnections", maxDCpOutGoingConnections);
             }
 
-            // Creating netty client for out-bound calls.
-            Timer timer = new HashedWheelTimer(5, TimeUnit.MILLISECONDS);
-            BootstrapCreation.init(timer);
-            RtbBootstrapCreation.init(timer);
-            ClientBootstrap clientBootstrap = BootstrapCreation.createBootstrap(logger,
-                    configurationLoader.getServerConfiguration());
-            ClientBootstrap rtbClientBootstrap = RtbBootstrapCreation.createBootstrap(logger,
-                    configurationLoader.getRtbConfiguration());
-
-            // For some partners netty client does not work thus
-            // Creating a ning client for out-bound calls
-            AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder()
-                    .setRequestTimeoutInMs(
-                            configurationLoader.getServerConfiguration().getInt("readtimeoutMillis") - 100)
-                    .setConnectionTimeoutInMs(600).build();
-            AsyncHttpClient asyncHttpClient = new AsyncHttpClient(asyncHttpClientConfig);
-
-            if (null == clientBootstrap) {
-                ServerStatusInfo.statusCode = 404;
-                ServerStatusInfo.statusString = "StackTrace is: failed to create bootstrap";
-                logger.info("failed to create bootstrap");
-                return;
-            }
-
             // Configure the netty server.
 
             // Initialising request handler
-            AsyncRequestMaker.init(clientBootstrap, rtbClientBootstrap, asyncHttpClient);
+            AsyncRequestMaker.init(null, null);
 
             Injector parentInjector = Guice.createInjector(new ScopeModule());
 

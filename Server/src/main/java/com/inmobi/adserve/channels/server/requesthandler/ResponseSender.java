@@ -17,8 +17,23 @@ import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TBinaryProtocol;
+import static org.jboss.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static org.jboss.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
+
+import java.awt.Dimension;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.*;
+import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelEvent;
+import org.jboss.netty.channel.ChannelFuture;
+import org.jboss.netty.channel.ChannelFutureListener;
+import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
@@ -32,6 +47,18 @@ import java.util.List;
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
+import com.google.common.base.Charsets;
+import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
+import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.ning.http.client.AsyncHttpClient;
 
 
 public class ResponseSender extends HttpRequestHandlerBase {
@@ -222,13 +249,13 @@ public class ResponseSender extends HttpRequestHandlerBase {
             final ChannelEvent event) throws NullPointerException {
 
         HttpResponse response = new DefaultHttpResponse(HTTP_1_1, status);
-        response.addHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-        response.addHeader("Expires", "-1");
-        response.addHeader("Pragma", "no-cache");
+        response.headers().add("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.headers().add("Expires", "-1");
+        response.headers().add("Pragma", "no-cache");
 
         if (null != responseHeaders) {
             for (Object key : responseHeaders.keySet()) {
-                response.addHeader(key.toString(), responseHeaders.get(key));
+                response.headers().add(key.toString(), responseHeaders.get(key));
             }
         }
 
@@ -387,16 +414,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 rankList.get(index).getAdNetworkInterface().cleanUp();
             }
             catch (Exception exception) {
-                LOG.debug("Error in closing channel for index: {} Name: {} Exception: {}", index, rankList
-                        .get(index)
-                            .getAdNetworkInterface(), exception);
-            }
-        }
-        for (int index = 0; rankList != null && index < rankList.size(); index++) {
-            if (null != rankList.get(index).getAdNetworkInterface().getChannelId()) {
-                ChannelsClientHandler.responseMap.remove(rankList.get(index).getAdNetworkInterface().getChannelId());
-                ChannelsClientHandler.statusMap.remove(rankList.get(index).getAdNetworkInterface().getChannelId());
-                ChannelsClientHandler.adStatusMap.remove(rankList.get(index).getAdNetworkInterface().getChannelId());
+                LOG.debug("Error in closing channel for index: {} Name: {} Exception: {}", index, rankList.get(index)
+                        .getAdNetworkInterface(), exception);
             }
         }
 
@@ -409,23 +428,12 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 rtbList.get(index).getAdNetworkInterface().cleanUp();
             }
             catch (Exception exception) {
-                LOG.debug("Error in closing channel for index: {}  Name: {} Exception: {}", index, rtbList
-                        .get(index)
-                            .getAdNetworkInterface(), exception);
-            }
-        }
-        for (int index = 0; rtbList != null && index < rtbList.size(); index++) {
-            if (null != rtbList.get(index).getAdNetworkInterface().getChannelId()) {
-                ChannelsClientHandler.responseMap.remove(rtbList.get(index).getAdNetworkInterface().getChannelId());
-                ChannelsClientHandler.statusMap.remove(rtbList.get(index).getAdNetworkInterface().getChannelId());
-                ChannelsClientHandler.adStatusMap.remove(rtbList.get(index).getAdNetworkInterface().getChannelId());
+                LOG.debug("Error in closing channel for index: {}  Name: {} Exception: {}", index, rtbList.get(index)
+                        .getAdNetworkInterface(), exception);
             }
         }
 
         LOG.debug("done with closing channels");
-        LOG.debug("responsemap size is : {}", ChannelsClientHandler.responseMap.size());
-        LOG.debug("adstatus map size is : {}", ChannelsClientHandler.adStatusMap.size());
-        LOG.debug("status map size is: {}", ChannelsClientHandler.statusMap.size());
         hrh.writeLogs(this);
     }
 
