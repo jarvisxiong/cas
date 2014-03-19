@@ -8,16 +8,8 @@ import java.util.Arrays;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpMethod;
-import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.jboss.netty.handler.codec.http.HttpVersion;
-import org.jboss.netty.util.CharsetUtil;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,59 +84,18 @@ public class GenericAdapter extends BaseAdNetworkImpl {
     @Override
     public boolean isBeaconUrlRequired() {
         return config.getString(advertiserName.concat(MacrosAndStrings.IS_BEACON_REQUIRED)).equals(
-            MacrosAndStrings.TRUE);
+                MacrosAndStrings.TRUE);
     }
 
     @Override
     public boolean isClickUrlRequired() {
-        return config
-                .getString(advertiserName.concat(MacrosAndStrings.IS_CLICK_REQUIRED))
-                    .equals(MacrosAndStrings.TRUE);
+        return config.getString(advertiserName.concat(MacrosAndStrings.IS_CLICK_REQUIRED))
+                .equals(MacrosAndStrings.TRUE);
     }
 
     @Override
     public String getId() {
         return (config.getString(advertiserName.concat(MacrosAndStrings.ADVERTISER_ID)));
-    }
-
-    @Override
-    public HttpRequest getHttpRequest() throws Exception {
-        HttpRequest httpRequest = null;
-        URI uri;
-        try {
-            uri = getRequestUri();
-        }
-        catch (URISyntaxException e) {
-            return null;
-        }
-        LOG.debug("host name is {}", uri.getHost());
-        if (requestMethod.equals(MacrosAndStrings.GET)) {
-            try {
-                httpRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, uri.toASCIIString());
-                httpRequest.setHeader(HttpHeaders.Names.HOST, uri.getHost());
-                LOG.debug("got the host");
-                httpRequest.setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent());
-                httpRequest.setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us");
-                httpRequest.setHeader(HttpHeaders.Names.REFERER, uri.toString());
-                httpRequest.setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
-                httpRequest.setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES);
-                httpRequest.setHeader("X-Forwarded-For", sasParams.getRemoteHostIp());
-            }
-            catch (Exception ex) {
-                errorStatus = ThirdPartyAdResponse.ResponseStatus.HTTPREQUEST_ERROR;
-                LOG.info("Error in making http request {}", ex);
-            }
-        }
-        else {
-            LOG.debug("got uri inside {} , uri is {}", advertiserName, uri);
-            httpRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri.toASCIIString());
-            ChannelBuffer buffer = ChannelBuffers.copiedBuffer(getRequestParams(), CharsetUtil.UTF_8);
-            httpRequest.setHeader(HttpHeaders.Names.HOST, uri.getHost());
-            httpRequest.setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(buffer.readableBytes()));
-            httpRequest.setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/x-www-form-urlencoded");
-            httpRequest.setContent(buffer);
-        }
-        return httpRequest;
     }
 
     @Override
@@ -205,9 +156,8 @@ public class GenericAdapter extends BaseAdNetworkImpl {
             else {
                 try {
                     JSONObject responseInJson = new JSONObject(response);
-                    if (responseInJson
-                            .getString(config.getString(advertiserName + MacrosAndStrings.RESPONSE_STATUS))
-                                .equals(config.getString(advertiserName + MacrosAndStrings.STATUS_NO_AD))) {
+                    if (responseInJson.getString(config.getString(advertiserName + MacrosAndStrings.RESPONSE_STATUS))
+                            .equals(config.getString(advertiserName + MacrosAndStrings.STATUS_NO_AD))) {
                         statusCode = 500;
                         responseContent = "";
                     }
@@ -219,8 +169,8 @@ public class GenericAdapter extends BaseAdNetworkImpl {
                         String impressionUrl = responseInJson.getString(config.getString(advertiserName
                                 .concat(MacrosAndStrings.IMPRESSION_URL_FIELD)));
                         responseContent = responseWithoutImpressionUrl.replaceAll(MacrosAndStrings.HTML_ENDING,
-                            "<img src=\"" + impressionUrl + "\" height=1 width=1 border=0 />"
-                                    + MacrosAndStrings.HTML_ENDING);
+                                "<img src=\"" + impressionUrl + "\" height=1 width=1 border=0 />"
+                                        + MacrosAndStrings.HTML_ENDING);
                     }
                 }
                 catch (Exception e) {

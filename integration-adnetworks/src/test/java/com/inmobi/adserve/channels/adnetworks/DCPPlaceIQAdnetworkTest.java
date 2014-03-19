@@ -39,13 +39,14 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
     private final ClientBootstrap clientBootstrap  = null;
 
     private DCPPlaceIQAdnetwork   dcpPlaceIQAdNetwork;
-    private final String          placeiqHost      = "http://test.ads.placeiq.com/1.41/ad";
+    private final String          placeiqHost      = "http://test.ads.placeiq.com/2/ad";
     private final String          placeiqStatus    = "on";
     private final String          placeiqAdvId     = "placeiqadv1";
     private final String          placeiqTest      = "1";
     private final String          placeiqSeed      = "EJoU6f9DsqDyyxB";
     private final String          placeiqPartnerId = "IMB";
-    private final String          placeiqFormat    = "xml";
+    private final String          placeiqRequestFormat    = "ss";
+    private final String          placeiqResponseFormat    = "xml";
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -55,7 +56,8 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
         expect(mockConfig.getString("placeiq.advertiserId")).andReturn(placeiqAdvId).anyTimes();
         expect(mockConfig.getString("placeiq.partnerId")).andReturn(placeiqPartnerId).anyTimes();
         expect(mockConfig.getString("placeiq.seed")).andReturn(placeiqSeed).anyTimes();
-        expect(mockConfig.getString("placeiq.format")).andReturn(placeiqFormat).anyTimes();
+        expect(mockConfig.getString("placeiq.requestFormat")).andReturn(placeiqRequestFormat).anyTimes();
+        expect(mockConfig.getString("placeiq.responseFormat")).andReturn(placeiqResponseFormat).anyTimes();
         expect(mockConfig.getString("debug")).andReturn(debug).anyTimes();
         expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
         expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
@@ -228,9 +230,7 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
             new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpPlaceIQAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
             String actualUrl = dcpPlaceIQAdNetwork.getRequestUri().toString();
-            String expectedUrl = "http://test.ads.placeiq.com/1.41/ad?RT=xml&SK="
-                    + secret
-                    + "&PT=IMB&AU=IMB%2Fbz%2F6456fc%2F0&IP=206.29.182.240&UA=Mozilla&DO=Android&LT=37.4429&LG=-122.1514&SZ=320x50&AM=202cb962ac59075b964b07152d234b70&AP=6575868&AT=STG";
+            String expectedUrl = "http://test.ads.placeiq.com/2/ad?RT=ss&ST=xml&PT=IMB&AU=IMB%2Fbz%2F6456fc%2F0&IP=206.29.182.240&UA=Mozilla&DO=Android&LT=37.4429&LG=-122.1514&SZ=320x50&AM=202cb962ac59075b964b07152d234b70&AP=6575868&AT=STG%2CRMG";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -263,9 +263,7 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
             new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpPlaceIQAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
             String actualUrl = dcpPlaceIQAdNetwork.getRequestUri().toString();
-            String expectedUrl = "http://test.ads.placeiq.com/1.41/ad?RT=xml&SK="
-                    + secret
-                    + "&PT=IMB&AU=IMB%2Fuc%2F6456fc%2F0&IP=206.29.182.240&UA=Mozilla&DO=Android&LT=37.4429&LG=-122.1514&SZ=320x50&AM=202cb962ac59075b964b07152d234b70&AP=6575868&AT=STG";
+            String expectedUrl = "http://test.ads.placeiq.com/2/ad?RT=ss&ST=xml&PT=IMB&AU=IMB%2Fuc%2F6456fc%2F0&IP=206.29.182.240&UA=Mozilla&DO=Android&LT=37.4429&LG=-122.1514&SZ=320x50&AM=202cb962ac59075b964b07152d234b70&AP=6575868&AT=STG%2CRMG";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -300,6 +298,38 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
             dcpPlaceIQAdNetwork.getHttpResponseContent());
     }
 
+    @Test
+    public void testDCPPlaceiqParseAdApiV2() throws Exception {
+        SASRequestParameters sasParams = new SASRequestParameters();
+        CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
+        sasParams.setRemoteHostIp("206.29.182.240");
+        sasParams.setUserAgent("Mozilla");
+        sasParams.setSlot("15");
+        casInternalRequestParameters.latLong = "37.4429,-122.1514";
+        sasParams.setOsId(HandSetOS.Android.getValue());
+        casInternalRequestParameters.uid = "23e2ewq445545saasw232323";
+        String externalKey = "19100";
+        String beaconUrl = "http://c2.w.inmobi.com/c"
+                + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
+                + "-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
+
+        ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
+            placeiqAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                    "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<Integer>(), 0.0d,
+            null, null, 32));
+        dcpPlaceIQAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl);
+        String response = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE PLACEIQ_AD_RESPONSE SYSTEM \"http://ads.placeiq.com/1/ad/placeiq_ad_response.dtd\"><PLACEIQ><AD><CONTENT><![CDATA[<div class=\"piq_creative\"><a href=\"http://adclick.g.doubleclick.net/aclk?sa=L&ai=BBF86NyAYU8XHGc_IlwfetoCQC7LfoYwEAAAAEAEgquv7HjgAWLLLsv57YMmGgIDIo5AZugEJZ2ZwX2ltYWdlyAEJmAL4VcACAuACAOoCGzUxMDI0MjkwL0lNQi9iei8yMjM5ZC9jNTA2Y_gC_dEekAPwAZgDpAOoAwHgBAGgBh_YBgI&num=0&sig=AOD64_1F9gXWVq4ylpsGiQZ9qnfnS36NLQ&client=ca-pub-9004609665008229&adurl=http://ad.doubleclick.net/clk;279559162;106636670;q\"><img width=\"320\" height=\"50\" border=\"0\" src=\"http://pagead2.googlesyndication.com/pagead/imgad?id=CICAgKDjqb-JxwEQARgBMggy5RQCEdqLCA\"/></a><img src=\"http://ad.doubleclick.net/ad/N763.1227592.PLACEIQ.COM/B7992138.10;sz=1x1;ord=117643749?\" width=\"1\" height=\"1\" border=\"0\"> <img src=\"http://pubads.g.doubleclick.net/pagead/adview?ai=BBF86NyAYU8XHGc_IlwfetoCQC7LfoYwEAAAAEAEgquv7HjgAWLLLsv57YMmGgIDIo5AZugEJZ2ZwX2ltYWdlyAEJmAL4VcACAuACAOoCGzUxMDI0MjkwL0lNQi9iei8yMjM5ZC9jNTA2Y_gC_dEekAPwAZgDpAOoAwHgBAGgBh_YBgI&sigh=REoZLoiBLvA&template_id=10025290&adurl=http://t1.pub.placeiq.com/tracking_pixel.gif?LA=33.61920166015625&LO=-112.00399780273438&AP=DFP&AU=50024410&PT=IMB&OI=148950370&LI=51563770&CC=33282631090&RI=IMB1394089984.2872542855534&IP=72.62.90.104&DM=69ff1e29aed56894442d43ce94cb47d7&DS=&DI=&UM=&UO=&DA=\" width=\"0\" height=\"0\" border=\"0\"><span id=\"te-clearads-js-truste01cont1\"><script type=\"text/javascript\" src=\"http://choices.truste.com/ca?pid=placeiq01&aid=placeiq01&cid=51563770&c=truste01cont1&plc=tr&w=320&h=50&sid=m8yahC5-_5X9qFjPLtwWBcrqcUwdEHFGax3SgpqPsy8I51t3IDE4ZYU-0pNNVYkv_XVrKqwR1AlexYSis3yKqrirEjDvfU23EBEeEZc3f-by5tPAN59MIt_gwl_MGYkFViBpKkTo2addzvxwGUXps5YCFV43fVOPvYJLNT40LT4\"></script></span></div>]]></CONTENT><NETWORK>50024410</NETWORK><CREATIVEID>33282631090</CREATIVEID><LINEITEMID>51563770</LINEITEMID><CLICKTHRU><![CDATA[http://adclick.g.doubleclick.net/aclk?sa=L&ai=BBF86NyAYU8XHGc_IlwfetoCQC7LfoYwEAAAAEAEgquv7HjgAWLLLsv57YMmGgIDIo5AZugEJZ2ZwX2ltYWdlyAEJmAL4VcACAuACAOoCGzUxMDI0MjkwL0lNQi9iei8yMjM5ZC9jNTA2Y_gC_dEekAPwAZgDpAOoAwHgBAGgBh_YBgI&num=0&sig=AOD64_1F9gXWVq4ylpsGiQZ9qnfnS36NLQ&client=ca-pub-9004609665008229&adurl=]]></CLICKTHRU><ADTYPE>STG</ADTYPE></AD></PLACEIQ>";
+        dcpPlaceIQAdNetwork.parseResponse(response, HttpResponseStatus.OK);
+        assertEquals(200, dcpPlaceIQAdNetwork.getHttpResponseStatusCode());
+        assertEquals(
+            "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"mraid.js\"></script><div class=\"piq_creative\"><a href=\"http://adclick.g.doubleclick.net/aclk?sa=L&ai=BBF86NyAYU8XHGc_IlwfetoCQC7LfoYwEAAAAEAEgquv7HjgAWLLLsv57YMmGgIDIo5AZugEJZ2ZwX2ltYWdlyAEJmAL4VcACAuACAOoCGzUxMDI0MjkwL0lNQi9iei8yMjM5ZC9jNTA2Y_gC_dEekAPwAZgDpAOoAwHgBAGgBh_YBgI&num=0&sig=AOD64_1F9gXWVq4ylpsGiQZ9qnfnS36NLQ&client=ca-pub-9004609665008229&adurl=http://ad.doubleclick.net/clk;279559162;106636670;q\"><img width=\"320\" height=\"50\" border=\"0\" src=\"http://pagead2.googlesyndication.com/pagead/imgad?id=CICAgKDjqb-JxwEQARgBMggy5RQCEdqLCA\"/></a><img src=\"http://ad.doubleclick.net/ad/N763.1227592.PLACEIQ.COM/B7992138.10;sz=1x1;ord=117643749?\" width=\"1\" height=\"1\" border=\"0\"> <img src=\"http://pubads.g.doubleclick.net/pagead/adview?ai=BBF86NyAYU8XHGc_IlwfetoCQC7LfoYwEAAAAEAEgquv7HjgAWLLLsv57YMmGgIDIo5AZugEJZ2ZwX2ltYWdlyAEJmAL4VcACAuACAOoCGzUxMDI0MjkwL0lNQi9iei8yMjM5ZC9jNTA2Y_gC_dEekAPwAZgDpAOoAwHgBAGgBh_YBgI&sigh=REoZLoiBLvA&template_id=10025290&adurl=http://t1.pub.placeiq.com/tracking_pixel.gif?LA=33.61920166015625&LO=-112.00399780273438&AP=DFP&AU=50024410&PT=IMB&OI=148950370&LI=51563770&CC=33282631090&RI=IMB1394089984.2872542855534&IP=72.62.90.104&DM=69ff1e29aed56894442d43ce94cb47d7&DS=&DI=&UM=&UO=&DA=\" width=\"0\" height=\"0\" border=\"0\"><span id=\"te-clearads-js-truste01cont1\"><script type=\"text/javascript\" src=\"http://choices.truste.com/ca?pid=placeiq01&aid=placeiq01&cid=51563770&c=truste01cont1&plc=tr&w=320&h=50&sid=m8yahC5-_5X9qFjPLtwWBcrqcUwdEHFGax3SgpqPsy8I51t3IDE4ZYU-0pNNVYkv_XVrKqwR1AlexYSis3yKqrirEjDvfU23EBEeEZc3f-by5tPAN59MIt_gwl_MGYkFViBpKkTo2addzvxwGUXps5YCFV43fVOPvYJLNT40LT4\"></script></span></div><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>",
+            dcpPlaceIQAdNetwork.getHttpResponseContent());
+    }
+
+    
+    
     @Test
     public void testDCPPlaceiqParseNoAd() throws Exception {
         String response = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE PLACEIQ_AD_RESPONSE SYSTEM \"http://ads.placeiq.com/1/ad/placeiq_no_ad_response.dtd\"><PLACEIQ><NOAD></NOAD></PLACEIQ>";

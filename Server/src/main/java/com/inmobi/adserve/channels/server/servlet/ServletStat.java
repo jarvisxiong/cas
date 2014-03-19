@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
-import com.inmobi.adserve.channels.server.client.BootstrapCreation;
 import com.inmobi.adserve.channels.util.InspectorStats;
 
 
@@ -23,9 +22,7 @@ public class ServletStat implements Servlet {
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
             final MessageEvent e) throws Exception {
         LOG.debug("Inside stat servlet");
-        hrh.responseSender.sendResponse(
-            InspectorStats.getStats(BootstrapCreation.getMaxConnections(), BootstrapCreation.getDroppedConnections()),
-            e);
+        hrh.responseSender.sendResponse(InspectorStats.getStats(), e);
     }
 
     @Override
