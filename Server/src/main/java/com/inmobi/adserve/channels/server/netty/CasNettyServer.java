@@ -10,8 +10,6 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.ResourceLeakDetector;
 import io.netty.util.ResourceLeakDetector.Level;
 
-import java.net.InetSocketAddress;
-
 import javax.inject.Inject;
 
 import com.google.common.util.concurrent.AbstractIdleService;
@@ -31,7 +29,7 @@ public class CasNettyServer extends AbstractIdleService {
     private final EventLoopGroup                    workerGroup;
     private final ChannelInitializer<SocketChannel> statServerChannelInitializer;
     private final ChannelInitializer<SocketChannel> serverChannelInitializer;
-    private final ServerBootstrap                   statServerBootstrap;
+    private ServerBootstrap                         statServerBootstrap;
 
     @Inject
     CasNettyServer(@ServerChannelInitializer final ChannelInitializer<SocketChannel> serverChannelInitializer,
@@ -55,20 +53,17 @@ public class CasNettyServer extends AbstractIdleService {
 
         // initialize and start server
         serverBootstrap = serverBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
-                .localAddress(new InetSocketAddress(8800)).childHandler(serverChannelInitializer)
-                .childOption(ChannelOption.SO_KEEPALIVE, true).childOption(ChannelOption.TCP_NODELAY, true)
-                .childOption(ChannelOption.SO_REUSEADDR, true).childOption(ChannelOption.CONNECT_TIMEOUT_MILLIS, 100);
+                .childHandler(serverChannelInitializer).childOption(ChannelOption.TCP_NODELAY, true) // disable nagle's
+                                                                                                     // algorithm
+                .childOption(ChannelOption.SO_REUSEADDR, true); // allow binding channel on same ip, port
 
-        ChannelFuture serverChannelFuture = serverBootstrap.bind().sync();
-        serverChannelFuture.channel().closeFuture().sync();
+        ChannelFuture serverChannelFuture = serverBootstrap.bind(8800).sync();
 
         // initialize and start stat server
-        // statServerBootstrap = statServerBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
-        // .localAddress(new InetSocketAddress(8801)).childHandler(statServerChannelInitializer)
-        // .childOption(ChannelOption.SO_KEEPALIVE, true).childOption(ChannelOption.TCP_NODELAY, true)
-        // .childOption(ChannelOption.SO_REUSEADDR, true).childOption(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5);
-        // ChannelFuture statFuture = statServerBootstrap.bind().sync();
-        // statFuture.channel().closeFuture().sync();
+        statServerBootstrap = statServerBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
+                .childHandler(statServerChannelInitializer).childOption(ChannelOption.TCP_NODELAY, true)
+                .childOption(ChannelOption.SO_REUSEADDR, true);
+        ChannelFuture statFuture = statServerBootstrap.bind(8801).sync();
 
     }
 

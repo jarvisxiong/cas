@@ -14,17 +14,14 @@ import junit.framework.TestCase;
 
 import org.apache.commons.collections.map.HashedMap;
 import org.json.JSONObject;
-import org.slf4j.Marker;
 import org.testng.annotations.Test;
 import org.testng.collections.Lists;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
-import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
 import com.google.inject.util.Modules;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
@@ -775,7 +772,8 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         sasParams.setCountryStr("1");
         sasParams.setOsId(2);
 
-        Injector injector = Guice.createInjector(new ServerModule(configurationLoder, repositoryHelper));
+        Injector injector = Guice.createInjector(Modules.override(
+                new ServerModule(configurationLoder, repositoryHelper)).with(new TestScopeModule()));
 
         AdGroupSupplyDemandClassificationFilter adGroupSupplyDemandClassificationFilter = injector
                 .getInstance(AdGroupSupplyDemandClassificationFilter.class);
@@ -799,20 +797,8 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         sasParams.setCountryStr("1");
         sasParams.setOsId(2);
 
-        Injector injector = Guice.createInjector(new ServerModule(configurationLoder, repositoryHelper),
-                new AbstractModule() {
-
-                    @Override
-                    protected void configure() {
-                        bind(Marker.class).toProvider(new Provider<Marker>() {
-                            @Override
-                            public Marker get() {
-                                return null;
-                            }
-                        });
-
-                    }
-                });
+        Injector injector = Guice.createInjector(Modules.override(
+                new ServerModule(configurationLoder, repositoryHelper)).with(new TestScopeModule()));
 
         AdGroupSupplyDemandClassificationFilter adGroupSupplyDemandClassificationFilter = injector
                 .getInstance(AdGroupSupplyDemandClassificationFilter.class);
@@ -844,20 +830,8 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         sasParams.setCountryStr("1");
         sasParams.setOsId(2);
 
-        Injector injector = Guice.createInjector(new ServerModule(configurationLoder, repositoryHelper),
-                new AbstractModule() {
-
-                    @Override
-                    protected void configure() {
-                        bind(Marker.class).toProvider(new Provider<Marker>() {
-                            @Override
-                            public Marker get() {
-                                return null;
-                            }
-                        });
-
-                    }
-                });
+        Injector injector = Guice.createInjector(Modules.override(
+                new ServerModule(configurationLoder, repositoryHelper)).with(new TestScopeModule()));
 
         AdGroupSupplyDemandClassificationFilter adGroupSupplyDemandClassificationFilter = injector
                 .getInstance(AdGroupSupplyDemandClassificationFilter.class);
@@ -895,20 +869,8 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         expect(repositoryHelper.querySiteEcpmRepository("siteid", 1, 2)).andReturn(null).anyTimes();
         replay(repositoryHelper);
 
-        Injector injector = Guice.createInjector(new ServerModule(configurationLoder, repositoryHelper),
-                new AbstractModule() {
-
-                    @Override
-                    protected void configure() {
-                        bind(Marker.class).toProvider(new Provider<Marker>() {
-                            @Override
-                            public Marker get() {
-                                return null;
-                            }
-                        });
-
-                    }
-                });
+        Injector injector = Guice.createInjector(Modules.override(
+                new ServerModule(configurationLoder, repositoryHelper)).with(new TestScopeModule()));
 
         sasParams.setSiteId("siteid");
         sasParams.setCountryStr("1");
@@ -952,20 +914,8 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         sasParams.setCountryStr("1");
         sasParams.setOsId(2);
 
-        Injector injector = Guice.createInjector(new ServerModule(configurationLoder, repositoryHelper),
-                new AbstractModule() {
-
-                    @Override
-                    protected void configure() {
-                        bind(Marker.class).toProvider(new Provider<Marker>() {
-                            @Override
-                            public Marker get() {
-                                return null;
-                            }
-                        });
-
-                    }
-                });
+        Injector injector = Guice.createInjector(Modules.override(
+                new ServerModule(configurationLoder, repositoryHelper)).with(new TestScopeModule()));
 
         CasContext casContext = new CasContext();
         casContext.setPricingEngineEntity(injector.getInstance(CasUtils.class).fetchPricingEngineEntity(sasParams));

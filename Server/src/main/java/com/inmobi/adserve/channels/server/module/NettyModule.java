@@ -56,12 +56,12 @@ public class NettyModule extends AbstractModule {
 
         // server pipelines
 
-        TypeLiteral<ChannelInitializer<SocketChannel>> typeLiteral = new TypeLiteral<ChannelInitializer<SocketChannel>>() {
+        TypeLiteral<ChannelInitializer<SocketChannel>> channelInitializerType = new TypeLiteral<ChannelInitializer<SocketChannel>>() {
         };
 
-        bind(typeLiteral).annotatedWith(ServerChannelInitializer.class).to(ChannelServerPipelineFactory.class)
+        bind(channelInitializerType).annotatedWith(ServerChannelInitializer.class).to(ChannelServerPipelineFactory.class)
                 .asEagerSingleton();
-        bind(typeLiteral).annotatedWith(StatServerChannelInitializer.class).to(ChannelStatServerPipelineFactory.class)
+        bind(channelInitializerType).annotatedWith(StatServerChannelInitializer.class).to(ChannelStatServerPipelineFactory.class)
                 .asEagerSingleton();
 
     }
