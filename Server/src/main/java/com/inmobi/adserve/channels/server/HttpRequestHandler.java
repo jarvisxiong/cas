@@ -99,7 +99,6 @@ public class HttpRequestHandler extends IdleStateAwareChannelUpstreamHandler {
         if (e.getChannel().isOpen()) {
             responseSender.sendNoAdResponse(e);
         }
-        e.getCause().printStackTrace();
         e.getChannel().close();
     }
 
