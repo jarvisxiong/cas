@@ -1,7 +1,10 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
 import com.google.common.base.Charsets;
-import com.inmobi.adserve.adpool.*;
+import com.inmobi.adserve.adpool.AdInfo;
+import com.inmobi.adserve.adpool.AdPoolResponse;
+import com.inmobi.adserve.adpool.AuctionType;
+import com.inmobi.adserve.adpool.Creative;
 import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
@@ -17,23 +20,8 @@ import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TBinaryProtocol;
-import static org.jboss.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
-import static org.jboss.netty.handler.codec.http.HttpResponseStatus.OK;
-import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
-
-import java.awt.Dimension;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelEvent;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
-import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.channel.*;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
@@ -47,18 +35,6 @@ import java.util.List;
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
-import com.google.common.base.Charsets;
-import com.inmobi.adserve.channels.api.AdNetworkInterface;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
-import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.ning.http.client.AsyncHttpClient;
 
 
 public class ResponseSender extends HttpRequestHandlerBase {
@@ -215,7 +191,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 .getAdgroupIncId());
         adIdChain.setCampaign(channelSegmentEntity
                 .getCampaignIncId());
-        rtbdAd.setAdIds(adIdChain);
+        List<AdIdChain> adIdChains = new ArrayList<AdIdChain>();
+        adIdChains.add(adIdChain);
+        rtbdAd.setAdIds(adIdChains);
         rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);
         rtbdAd.setPricingModel(PricingModel.CPM);
         long bid = (long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface().getBidPriceInUsd() * Math.pow(10, 6));
