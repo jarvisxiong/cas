@@ -1,11 +1,12 @@
 package com.inmobi.adserve.channels.server;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
-import javax.inject.Inject;
-
+import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.servlet.ServletInvalid;
+import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 import org.apache.commons.configuration.Configuration;
 import org.jboss.netty.channel.ChannelHandler.Sharable;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -16,13 +17,10 @@ import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.Singleton;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.server.api.Servlet;
-import com.inmobi.adserve.channels.server.servlet.ServletInvalid;
-import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
+import javax.inject.Inject;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 
 @Sharable
@@ -32,6 +30,7 @@ public class ServletHandler extends SimpleChannelUpstreamHandler {
 
     // TODO: clear up all these responses, configs to separate module
     public static final String     jsonParsingError         = "EJSON";
+    public static final String     thriftParsingError       = "ETHRIFT";
     public static final String     processingError          = "ESERVER";
     public static final String     missingSiteId            = "NOSITE";
     public static final String     incompatibleSiteType     = "ESITE";

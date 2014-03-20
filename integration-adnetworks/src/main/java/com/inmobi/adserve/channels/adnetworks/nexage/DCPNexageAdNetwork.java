@@ -1,9 +1,14 @@
 package com.inmobi.adserve.channels.adnetworks.nexage;
 
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.util.IABCountriesInterface;
+import com.inmobi.adserve.channels.util.IABCountriesMap;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.ning.http.client.AsyncCompletionHandler;
+import com.ning.http.client.Request;
+import com.ning.http.client.RequestBuilder;
+import com.ning.http.client.Response;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -14,6 +19,9 @@ import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -67,9 +75,9 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             isGeo = true;
         }
 
-        if (!StringUtils.isBlank(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+        if (null != sasParams.getSlot()
+                && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long)sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
@@ -140,7 +148,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
 
         finalUrl.append("&cn=").append(getCategories(',', true, true).split(",")[0].trim());
 
-        if (StringUtils.isNotBlank(sasParams.getAge())) {
+        if (null != sasParams.getAge()) {
             finalUrl.append("&u(age)=").append(sasParams.getAge());
         }
 
@@ -154,10 +162,10 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
 
         finalUrl.append("&p(blind_id)=").append(blindedSiteId); // send blindedSiteid instead of url
 
-        finalUrl.append("&u(country)=").append(iABCountries.getIabCountry(sasParams.getCountry()));
+        finalUrl.append("&u(country)=").append(iABCountries.getIabCountry(sasParams.getCountryCode()));
 
-        if (StringUtils.isNotBlank(sasParams.getArea())) {
-            finalUrl.append("&u(dma)=").append(sasParams.getArea());
+        if (null != sasParams.getState()) {
+            finalUrl.append("&u(dma)=").append(sasParams.getState());
         }
 
         String[] urlParams = finalUrl.toString().split("&");
@@ -186,7 +194,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {} and response length is ", response, response.length());
-        if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
+        if (status.getCode() != 200 || response.trim().isEmpty()) {
             statusCode = status.getCode();
             if (200 == statusCode) {
                 statusCode = 500;

@@ -1,11 +1,10 @@
 package com.inmobi.adserve.channels.api;
 
-import java.util.List;
-import java.util.Set;
-
-import org.json.JSONArray;
-
 import lombok.Data;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 @Data
@@ -16,25 +15,18 @@ public class SASRequestParameters {
     private String       userAgent;
 
     private String       source;               // WAP/APP
-    private int          platformOsId;
-
-    private String       age;
+    private Short        age;
     private String       gender;
-    private String       uid;
     private String       locSrc;               // wifi/ip
-    private String       postalCode;
+    private Integer      postalCode;
     // User location parameters
     private String       latLong;
-    private String       country;
-    private String       countryStr;
-    private String       userLocation;
+    private String       countryCode;      //Country Code like US for USA
+    private Long         countryId;        // Integer value for country
     private String       impressionId;
     private String       clurl;
     private String       siteId;
-    private String       genderOrig;
-    private String       area;
-    private String       slot;
-    private String       host;
+    private Short        slot;
     // TODO: Convert this to ENUM.
     private String       siteType;
     private String       sdkVersion;
@@ -46,32 +38,34 @@ public class SASRequestParameters {
     private Double       siteFloor      = 0.0d;
     private Boolean      allowBannerAds = true;
     private Integer      siteSegmentId;
-    private String       keywords;             // List of comma separated keywords describing site
     // Uid parameters
     private String       uidParams;
+    private Map<String, String>     tUidParams;
 
-    private String       rqIframe;
-    private String       rFormat;
+    private String      rqIframe;
+    private String      rFormat;
 
     private int          osId;
-    private String       rqMkAdcount;
+    private Short        rqMkAdcount;
     private String       tid;
-    private String       tp;
-    private JSONArray    handset;
-    private JSONArray    carrier;
-    private String       rqMkSlot;
+    private long         handsetInternalId;
+    private int          carrierId;
+    private Integer      city;
+    private Integer      state;
+    private List<Short>  rqMkSlot;
     private Integer      ipFileVersion;
     private boolean      isRichMedia;
     private String       rqAdType;
     private String       imaiBaseUrl;
     private String       appUrl;
     private int          modelId;
+    private Set<String>  uAdapters;
 
     private int          dst;                  // This will describe the type of request dcp or rtbd
-    private Set<Integer> accountSegment;       // This will tell from which all type of segments you can fill for
-                                                // example dso brancd, dso performance etc.
+    private Set<Integer> accountSegment;      
     private boolean      isResponseOnlyFromDcp;
-
+    private int          sst;//0 for Network 
+    
     public SASRequestParameters() {
         // Do Nothing.
     }

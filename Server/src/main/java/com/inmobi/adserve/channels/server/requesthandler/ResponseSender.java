@@ -1,40 +1,40 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import static org.jboss.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
-import static org.jboss.netty.handler.codec.http.HttpResponseStatus.OK;
-import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
-
-import java.awt.Dimension;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
+import com.google.common.base.Charsets;
+import com.inmobi.adserve.adpool.AdInfo;
+import com.inmobi.adserve.adpool.AdPoolResponse;
+import com.inmobi.adserve.adpool.AuctionType;
+import com.inmobi.adserve.adpool.Creative;
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.phoenix.util.WilburyUUID;
+import com.inmobi.types.AdIdChain;
+import com.inmobi.types.GUID;
+import com.inmobi.types.PricingModel;
+import com.ning.http.client.AsyncHttpClient;
+import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TBinaryProtocol;
 import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelEvent;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
-import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.channel.*;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Charsets;
-import com.inmobi.adserve.channels.api.AdNetworkInterface;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
-import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.ning.http.client.AsyncHttpClient;
+import java.awt.*;
+import java.util.*;
+import java.util.List;
+
+import static org.jboss.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static org.jboss.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 
 public class ResponseSender extends HttpRequestHandlerBase {
@@ -63,7 +63,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private boolean                     requestCleaned;
     public CasInternalRequestParameters casInternalRequestParameters;
     private final AuctionEngine         auctionEngine;
-    private static final String         NO_AD_HEADER    = "X-MKHOJ-NOAD";
+    private static Set<String>          supportedResponseFormats = Sets.newHashSet("html", "xhtml", "axml", "imai");
 
     public List<ChannelSegment> getRankList() {
         return this.rankList;
@@ -127,11 +127,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
         responseSent = true;
         LOG.debug("ad received so trying to send ad response");
         String finalReponse = adResponse.response;
-        if (sasParams.getSlot() != null && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
+        if (sasParams.getSlot() != null && SlotSizeMapping.getDimension(Long.valueOf(sasParams.getSlot())) != null) {
             LOG.debug("slot served is {}", sasParams.getSlot());
             InspectorStats.incrementStatCount(InspectorStrings.totalFills);
             if (getResponseFormat().equals("xhtml")) {
-                Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+                Dimension dim = SlotSizeMapping.getDimension(Long.valueOf(sasParams.getSlot()));
                 String startElement = String.format(startTags, (int) dim.getWidth(), (int) dim.getHeight());
                 finalReponse = startElement + finalReponse + endTags;
             }
@@ -152,41 +152,80 @@ public class ResponseSender extends HttpRequestHandlerBase {
             sendResponse(OK, finalReponse, adResponse.responseHeaders, event);
         }
         else {
-            JSONObject jsonObject = new JSONObject();
-            try {
-                jsonObject.put("secondHighestBid", this.getAuctionEngine().getRtbResponse().getAdNetworkInterface()
-                        .getSecondBidPriceInUsd());
-                jsonObject.put("winnerBid", this.getAuctionEngine().getRtbResponse().getAdNetworkInterface()
-                        .getBidPriceInUsd());
-                jsonObject.put("adm", finalReponse);
-                jsonObject.put("advertiserId", this.auctionEngine.getRtbResponse().getChannelEntity().getAccountId());
-                jsonObject.put("adgroupId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity()
-                        .getAdgroupId());
-                jsonObject.put("adgroupIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity()
-                        .getAdgroupIncId());
-                jsonObject.put("adIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getIncId());
-                jsonObject.put("adId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getAdId());
-                jsonObject.put("rtbFloor", casInternalRequestParameters.rtbBidFloor);
-                jsonObject.put("impressionId", this.auctionEngine.getRtbResponse().getAdNetworkInterface()
-                        .getImpressionId());
-                jsonObject.put("campaignIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity()
-                        .getCampaignIncId());
-                jsonObject.put("campaignId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity()
-                        .getCampaignId());
-                InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
-                sendResponse(OK, jsonObject.toString(), adResponse.responseHeaders, event);
-                LOG.debug("RTB reponse json to RE is {}", jsonObject);
-            }
-            catch (JSONException e) {
-                LOG.debug("Error while making json object for rule engine " + e.getMessage());
-                // Sending NOAD if error making json object
+            AdPoolResponse rtbdResponse = createThriftResponse(adResponse.response);
+            LOG.debug("RTB response json to RE is {}", rtbdResponse);
+            if (null == rtbdResponse || !supportedResponseFormats.contains(sasParams.getRFormat())) {
+                responseSent = false;
                 sendNoAdResponse(event);
+            } else {
+                    try {
+                        TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
+                        byte[] serializedResponse = serializer.serialize(rtbdResponse);
+                        sendResponse(OK, serializedResponse, adResponse.responseHeaders, event);
+                        InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
+                    } catch (TException e) {
+                        LOG.error("Error in serializing the adPool response ", e);
+                        responseSent = false;
+                        sendNoAdResponse(event);
+                    }
             }
         }
     }
 
+    private AdPoolResponse createThriftResponse (String finalResponse) {
+        AdPoolResponse adPoolResponse = new AdPoolResponse();
+        AdInfo rtbdAd = new AdInfo();
+        AdIdChain adIdChain = new AdIdChain();
+        ChannelSegmentEntity channelSegmentEntity = this.auctionEngine
+                .getRtbResponse()
+                .getChannelSegmentEntity();
+        adIdChain.setAdgroup_guid(channelSegmentEntity
+                .getAdgroupId());
+        adIdChain.setAd_guid(channelSegmentEntity
+                .getAdId());
+        adIdChain.setAdvertiser_guid(channelSegmentEntity
+                .getAdvertiserId());
+        adIdChain.setCampaign_guid(channelSegmentEntity
+                .getCampaignId());
+        adIdChain.setAd(channelSegmentEntity
+                .getIncId());
+        adIdChain.setGroup(channelSegmentEntity
+                .getAdgroupIncId());
+        adIdChain.setCampaign(channelSegmentEntity
+                .getCampaignIncId());
+        List<AdIdChain> adIdChains = new ArrayList<AdIdChain>();
+        adIdChains.add(adIdChain);
+        rtbdAd.setAdIds(adIdChains);
+        rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);
+        rtbdAd.setPricingModel(PricingModel.CPM);
+        long bid = (long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface().getBidPriceInUsd() * Math.pow(10, 6));
+        rtbdAd.setPrice(bid);
+        rtbdAd.setBid(bid);
+        UUID uuid = WilburyUUID.extractUUID(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getImpressionId());
+        rtbdAd.setImpressionId(new GUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits()));
+        rtbdAd.setSlotServed(sasParams.getSlot());
+        Creative rtbdCreative = new Creative();
+        rtbdCreative.setValue(finalResponse);
+        rtbdAd.setCreative(rtbdCreative);
+        adPoolResponse.setAds(Arrays.asList(rtbdAd));
+        adPoolResponse.setMinChargedValue((long)(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getSecondBidPriceInUsd() * Math.pow(10, 6)));
+        if (!"USD".equalsIgnoreCase(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getCurrency())) {
+            rtbdAd.setOriginalCurrencyName(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getCurrency());
+            rtbdAd.setBidInOriginalCurrency((long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface().getBidPriceInLocal() * Math.pow(10, 6)));
+        }
+        return adPoolResponse;
+    }
+
     // send response to the caller
-    public void sendResponse(final HttpResponseStatus status, final String responseString, final Map responseHeaders,
+    public void sendResponse(HttpResponseStatus status, String responseString, Map responseHeaders, ChannelEvent event)
+            throws NullPointerException {
+        byte[] bytes = responseString.getBytes(Charsets.UTF_8);
+        sendResponse(status, bytes, responseHeaders, event);
+
+    }
+    
+    // send response to the caller
+    public void sendResponse(final HttpResponseStatus status, final byte[] bytes, final Map responseHeaders,
             final ChannelEvent event) throws NullPointerException {
 
         HttpResponse response = new DefaultHttpResponse(HTTP_1_1, status);
@@ -200,13 +239,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
             }
         }
 
-        String finalResponse = responseString;
-        byte[] bytes = finalResponse.getBytes(Charsets.UTF_8);
-
-        response.headers().set("Content-Length", bytes.length);
-
+        response.setHeader("Content-Length", bytes.length);
         response.setContent(ChannelBuffers.copiedBuffer(bytes));
-
         if (event != null) {
             LOG.debug("event not null inside send Response");
             Channel channel = event.getChannel();
@@ -247,12 +281,20 @@ public class ResponseSender extends HttpRequestHandlerBase {
         InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
 
         Map<String, String> headers = null;
+        LOG.debug("Sending No ads");
         if (null != sasParams && 6 == sasParams.getDst()) {
             headers = new HashMap<String, String>();
-            headers.put(NO_AD_HEADER, "true");
+            AdPoolResponse rtbdResponse = new AdPoolResponse();
+            try {
+                TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
+                byte[] serializedResponse = serializer.serialize(rtbdResponse);
+                sendResponse(OK, serializedResponse, headers, event);
+                return;
+            } catch (TException e) {
+                LOG.error("Error in serializing the adPool response ", e);
+            }
         }
 
-        LOG.debug("Sending No ads");
         if (getResponseFormat().equals("xhtml")) {
             sendResponse(OK, noAdXhtml, headers, event);
         }

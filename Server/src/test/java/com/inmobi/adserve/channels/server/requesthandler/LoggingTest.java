@@ -1,22 +1,5 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.isA;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import junit.framework.TestCase;
-
-import org.apache.commons.configuration.Configuration;
-import org.easymock.EasyMock;
-import org.testng.annotations.Test;
-
 import com.inmobi.adserve.channels.adnetworks.tapit.DCPTapitAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
@@ -25,6 +8,21 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentF
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.messaging.Message;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
+import junit.framework.TestCase;
+import org.apache.commons.configuration.Configuration;
+import org.easymock.EasyMock;
+import org.testng.annotations.Test;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.isA;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 
 public class LoggingTest extends TestCase {
@@ -48,7 +46,7 @@ public class LoggingTest extends TestCase {
         dataBusPublisher.publish(isA(String.class), isA(Message.class));
         EasyMock.expectLastCall().times(3);
         replay(dataBusPublisher);
-        Logging.init(dataBusPublisher, "null", "null", "null", mockConfig);
+        Logging.init(dataBusPublisher, "null", "null", mockConfig);
     }
 
     @Test

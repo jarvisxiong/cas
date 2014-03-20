@@ -33,6 +33,17 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
 import com.ning.http.client.AsyncHttpClient;
+import org.apache.commons.configuration.Configuration;
+import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.channel.MessageEvent;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import com.ning.http.client.AsyncHttpClientConfig;
 
 
@@ -120,15 +131,10 @@ public class AsyncRequestMaker {
                         && channelSegmentEntity.getPricingModel().equalsIgnoreCase("cpc")) {
                     isCpc = true;
                 }
-                ClickUrlMakerV6 clickUrlMakerV6 = setClickParams(isCpc, config, sasParams, jObject);
-                Map<String, String> clickGetParams = new HashMap<String, String>();
-                clickGetParams.put("ds", "1");
-                Map<String, String> beaconGetParams = new HashMap<String, String>();
-                beaconGetParams.put("ds", "1");
-                beaconGetParams.put("event", "beacon");
+                ClickUrlMakerV6 clickUrlMakerV6 = setClickParams(isCpc, config, sasParams, channelSegmentEntity.getDst() - 1);
                 clickUrlMakerV6.createClickUrls();
-                clickUrl = clickUrlMakerV6.getClickUrl(clickGetParams);
-                beaconUrl = clickUrlMakerV6.getBeaconUrl(beaconGetParams);
+                clickUrl = clickUrlMakerV6.getClickUrl();
+                beaconUrl = clickUrlMakerV6.getBeaconUrl();
                 LOG.debug("click url : {}", clickUrl);
                 LOG.debug("beacon url : {}", beaconUrl);
             }
@@ -169,7 +175,9 @@ public class AsyncRequestMaker {
         casInternalRequestParameters.uidIDUS1 = casInternalRequestParameterGlobal.uidIDUS1;
         casInternalRequestParameters.uidMd5 = casInternalRequestParameterGlobal.uidMd5;
         casInternalRequestParameters.uidADT = casInternalRequestParameterGlobal.uidADT;
-        casInternalRequestParameters.zipCode = sasParams.getPostalCode();
+        if (null != sasParams.getPostalCode()) {
+                       casInternalRequestParameters.zipCode = sasParams.getPostalCode().toString();
+        }
         casInternalRequestParameters.latLong = sasParams.getLatLong();
         casInternalRequestParameters.appUrl = sasParams.getAppUrl();
         return casInternalRequestParameters;
@@ -237,110 +245,36 @@ public class AsyncRequestMaker {
         return (WilburyUUID.setDataCenterId(uuidMachineKey, ChannelServer.dataCenterIdCode)).toString();
     }
 
-    private static ClickUrlMakerV6 setClickParams(final boolean pricingModel, final Configuration config,
-            final SASRequestParameters sasParams, final JSONObject jObject) {
-        Set<String> unhashable = new HashSet<String>();
-        unhashable.addAll(Arrays.asList(config.getStringArray("clickmaker.unhashable")));
-        ClickUrlMakerV6 clickUrlMakerV6 = new ClickUrlMakerV6(unhashable);
-        try {
-            if (null != sasParams.getAge()) {
-                clickUrlMakerV6.setAge(Integer.parseInt(sasParams.getAge()));
-            }
-        }
-        catch (NumberFormatException e) {
-            LOG.debug("Wrong format for Age {}", e);
-        }
-        if (null != sasParams.getGender()) {
-            clickUrlMakerV6.setGender(sasParams.getGender());
-        }
-        clickUrlMakerV6.setCPC(pricingModel);
-        Integer carrierId = null;
-        if (null != sasParams.getCarrier()) {
-            try {
-                carrierId = sasParams.getCarrier().getInt(0);
-            }
-            catch (JSONException e) {
-                LOG.debug("carrierId is not present in the request");
-            }
-        }
-        if (null != carrierId) {
-            clickUrlMakerV6.setCarrierId(carrierId);
-        }
-        try {
-            if (null != sasParams.getCountryStr()) {
-                clickUrlMakerV6.setCountryId(Integer.parseInt(sasParams.getCountryStr()));
-            }
-        }
-        catch (NumberFormatException e) {
-            LOG.debug("Wrong format for CountryString {}", e);
-        }
-        try {
-            if (null != sasParams.getHandset()) {
-                clickUrlMakerV6.setHandsetInternalId(Long.parseLong(sasParams.getHandset().get(0).toString()));
-            }
-        }
-        catch (NumberFormatException e1) {
-            LOG.debug("NumberFormatException while parsing handset");
-        }
-        catch (JSONException e1) {
-            LOG.debug("CountryId is not present in the sasParams");
-        }
-
-        if (null == sasParams.getImpressionId()) {
-            LOG.debug("impression id is null");
-        }
-        else {
-            clickUrlMakerV6.setImpressionId(sasParams.getImpressionId());
-        }
-        clickUrlMakerV6.setIpFileVersion(sasParams.getIpFileVersion().longValue());
-        clickUrlMakerV6.setIsBillableDemog(false);
-        try {
-            if (null != sasParams.getArea()) {
-                clickUrlMakerV6.setLocation(Integer.parseInt(sasParams.getArea()));
-            }
-        }
-        catch (NumberFormatException e) {
-            LOG.debug("Wrong format for Area {}", e);
-        }
-        if (null != sasParams.getSiteSegmentId()) {
-            clickUrlMakerV6.setSegmentId(sasParams.getSiteSegmentId());
-        }
-        clickUrlMakerV6.setSiteIncId(sasParams.getSiteIncId());
-        Map<String, String> uidMap = new HashMap<String, String>();
-        JSONObject userIdMap = null;
-        try {
-            userIdMap = (JSONObject) jObject.get("u-id-params");
-        }
-        catch (JSONException e) {
-            LOG.debug("u-id-params is not present in the request");
-        }
-
-        if (null != userIdMap) {
-            Iterator userMapIterator = userIdMap.keys();
-            while (userMapIterator.hasNext()) {
-                String key = (String) userMapIterator.next();
-                String value = null;
-                try {
-                    value = (String) userIdMap.get(key);
-                }
-                catch (JSONException e) {
-                    LOG.debug("value corresponding to uid key is not present in the uidMap");
-                }
-                if (null != value) {
-                    uidMap.put(key.toUpperCase(Locale.ENGLISH), value);
-                }
-            }
-        }
-        clickUrlMakerV6.setUdIdVal(uidMap);
-        clickUrlMakerV6.setCryptoSecretKey(config.getString("clickmaker.key.1.value"));
-        clickUrlMakerV6.setTestCryptoSecretKey(config.getString("clickmaker.key.2.value"));
-        clickUrlMakerV6.setImageBeaconFlag(true);// true/false
-        clickUrlMakerV6.setBeaconEnabledOnSite(true);// do not know
-        clickUrlMakerV6.setTestMode(false);
-        clickUrlMakerV6.setRmAd(jObject.optBoolean("rich-media", false));
-        clickUrlMakerV6.setRmBeaconURLPrefix(config.getString("clickmaker.beaconURLPrefix"));
-        clickUrlMakerV6.setClickURLPrefix(config.getString("clickmaker.clickURLPrefix"));
-        clickUrlMakerV6.setImageBeaconURLPrefix(config.getString("clickmaker.beaconURLPrefix"));
-        return clickUrlMakerV6;
+    private static ClickUrlMakerV6 setClickParams(boolean pricingModel, Configuration config,
+                                                  SASRequestParameters sasParams, Integer dst) {
+        ClickUrlMakerV6.Builder builder = ClickUrlMakerV6.newBuilder();
+        builder.setImpressionId(sasParams.getImpressionId());
+        builder.setAge(null != sasParams.getAge() ? sasParams.getAge().intValue() : 0);
+        builder.setCountryId(null != sasParams.getCountryId() ? sasParams.getCountryId().intValue() : 0);
+        builder.setLocation(null != sasParams.getState() ? sasParams.getState() : 0);
+        builder.setSegmentId(null != sasParams.getSiteSegmentId() ? sasParams.getSiteSegmentId() : 0);
+        builder.setGender(null != sasParams.getGender() ? sasParams.getGender() : "");
+        builder.setCPC(pricingModel);
+        builder.setCarrierId(sasParams.getCarrierId());
+        builder.setHandsetInternalId(sasParams.getHandsetInternalId());
+        builder.setIpFileVersion(sasParams.getIpFileVersion().longValue());
+        builder.setIsBillableDemog(false);
+        builder.setSiteIncId(sasParams.getSiteIncId());
+        builder.setUdIdVal(sasParams.getTUidParams());
+        builder.setCryptoSecretKey(config.getString("clickmaker.key.1.value"));
+        builder.setTestCryptoSecretKey(config.getString("clickmaker.key.2.value"));
+        builder.setImageBeaconFlag(true);// true/false
+        builder.setBeaconEnabledOnSite(true);// do not know
+        builder.setTestMode(false);
+        builder.setRmAd(sasParams.isRichMedia());
+        builder.setRmBeaconURLPrefix(config.getString("clickmaker.beaconURLPrefix"));
+        builder.setClickURLPrefix(config.getString("clickmaker.clickURLPrefix"));
+        builder.setImageBeaconURLPrefix(config.getString("clickmaker.beaconURLPrefix"));
+        builder.setTestRequest(false);
+        builder.setLatlonval(sasParams.getLatLong());
+        builder.setRtbSite(sasParams.getSst() != 0);//TODO:- Change this according to thrift enums
+        builder.setDst(dst.toString());
+        builder.setBudgetBucketId("101"); //Default Value
+        return new ClickUrlMakerV6(builder);
     }
 }

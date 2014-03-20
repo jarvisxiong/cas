@@ -1,8 +1,17 @@
 package com.inmobi.adserve.channels.server;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import com.google.inject.Provider;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.server.requesthandler.Logging;
+import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
+import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import com.inmobi.messaging.publisher.AbstractMessagePublisher;
+import junit.framework.TestCase;
+import org.apache.commons.configuration.Configuration;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.slf4j.Marker;
+import org.testng.annotations.Test;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -10,20 +19,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import junit.framework.TestCase;
-
-import org.apache.commons.configuration.Configuration;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.slf4j.Marker;
-import org.testng.annotations.Test;
-
-import com.google.inject.Provider;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.server.requesthandler.Logging;
-import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
-import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import com.inmobi.messaging.publisher.AbstractMessagePublisher;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 
 public class ServerTest extends TestCase {
@@ -59,7 +57,7 @@ public class ServerTest extends TestCase {
         ServletHandler.init(config, null);
         httpRequestHandler = new HttpRequestHandler();
         AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
-        Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-channel", "cas-advertisement", mockConfig);
+        Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-advertisement", mockConfig);
 
         requestParser = new RequestParser(new Provider<Marker>() {
             @Override
@@ -123,7 +121,7 @@ public class ServerTest extends TestCase {
     public JSONObject prepareParameters() throws Exception {
         JSONObject args = new JSONObject();
         sasParam = new SASRequestParameters();
-        sasParam.setAge("35");
+        sasParam.setAge((short)35);
         sasParam.setGender("m");
         sasParam.setImpressionId("4f8d98e2-4bbd-40bc-8729-22da000900f9");
         int myarr[] = { 1, 2 };
@@ -163,7 +161,7 @@ public class ServerTest extends TestCase {
         JSONObject jsonObject = prepareParameters();
         SASRequestParameters params = new SASRequestParameters();
         params = requestParser.getUserParams(params, jsonObject);
-        assertEquals(params.getAge(), "35");
+        assertEquals(params.getAge().shortValue(), (short)35);
     }
 
     /*

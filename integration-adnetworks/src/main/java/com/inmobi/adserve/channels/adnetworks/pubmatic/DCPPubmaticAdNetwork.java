@@ -1,16 +1,17 @@
 package com.inmobi.adserve.channels.adnetworks.pubmatic;
 
-import java.awt.Dimension;
-import java.net.URI;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.util.IABCountriesInterface;
+import com.inmobi.adserve.channels.util.IABCountriesMap;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.velocity.VelocityContext;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.handler.codec.http.*;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.util.CharsetUtil;
@@ -19,6 +20,10 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
+import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -66,16 +71,16 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
         host = config.getString("pubmatic.host");
         pubId = config.getString("pubmatic.pubId");
 
-        if (!StringUtils.isBlank(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+        if (null != sasParams.getSlot()
+                && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long)sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
             try {
                 JSONObject additionalParams = entity.getAdditionalParams();
                 // ad id is configured as the additional param in the
                 // segment table
-                adId = additionalParams.getString(sasParams.getSlot());
+                adId = additionalParams.getString((sasParams.getSlot()).toString());
 
             }
             catch (Exception e) {
@@ -132,8 +137,8 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
             params.append("&zip=").append(casInternalRequestParameters.zipCode);
         }
 
-        if (sasParams.getCountry() != null) {
-            params.append("&country=").append(iABCountries.getIabCountry(sasParams.getCountry()));
+        if (sasParams.getCountryCode() != null) {
+            params.append("&country=").append(iABCountries.getIabCountry(sasParams.getCountryCode()));
         }
 
         params.append("&udid=").append(deviceId);

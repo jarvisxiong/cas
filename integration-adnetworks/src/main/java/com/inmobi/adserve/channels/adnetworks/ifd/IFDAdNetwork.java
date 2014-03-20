@@ -1,15 +1,9 @@
 package com.inmobi.adserve.channels.adnetworks.ifd;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import org.apache.commons.configuration.Configuration;
 import org.codehaus.plexus.util.StringUtils;
 import org.jboss.netty.bootstrap.ClientBootstrap;
@@ -18,10 +12,11 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.util.*;
 
 
 public class IFDAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -96,7 +91,7 @@ public class IFDAdNetwork extends AbstractDCPAdNetworkImpl {
         }
 
         try {
-            paramMap.put("mk-ad-slot", sasParams.getSlot());
+            paramMap.put("mk-ad-slot", sasParams.getSlot().toString());
         }
         catch (Exception exception) {
             throw new Exception("mandatory parameter mk-ad-slot value is missing");
@@ -115,16 +110,16 @@ public class IFDAdNetwork extends AbstractDCPAdNetworkImpl {
         }
 
         try {
-            paramMap.put("h-id", sasParams.getHandset().getString(0));
+            paramMap.put("h-id", sasParams.getHandsetInternalId() + "");
         }
         catch (Exception exception) {
             throw new Exception("mandatory parameter handset value is either null or not formatted properly.");
         }
 
         try {
-            paramMap.put("cid", sasParams.getCarrier().getString(0));
-            paramMap.put("cnid", sasParams.getCarrier().getString(1));
-            paramMap.put("cc", sasParams.getCarrier().getString(2).toUpperCase());
+            paramMap.put("cid", sasParams.getCarrierId() + "");
+            paramMap.put("cnid", sasParams.getCountryCode());
+            paramMap.put("cc", sasParams.getCountryId().toString());
         }
         catch (Exception exception) {
             throw new Exception("mandatory parameter carrier value is either null or not formatted properly.");

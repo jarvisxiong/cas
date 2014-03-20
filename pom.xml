@@ -22,6 +22,7 @@
 		<guice.version>3.0</guice.version>
 		<guice-multibindings.version>3.0</guice-multibindings.version>
 		<guice-servlet.version>3.0</guice-servlet.version>
+		<creative-validator>5.0.90</creative-validator>
 		<guice-assistedinject.version>3.0</guice-assistedinject.version>
 	</properties>
 
@@ -35,6 +36,11 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>com.inmobi.commons</groupId>
+				<artifactId>datatypes-java</artifactId>
+				<version>1.5.0</version>
+			</dependency>
 			<dependency>
 				<groupId>com.google.inject.extensions</groupId>
 				<artifactId>guice-assistedinject</artifactId>

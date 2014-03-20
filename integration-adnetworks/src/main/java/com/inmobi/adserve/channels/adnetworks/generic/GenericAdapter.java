@@ -1,23 +1,24 @@
 package com.inmobi.adserve.channels.adnetworks.generic;
 
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.handler.codec.http.*;
+import org.jboss.netty.util.CharsetUtil;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
 
 
 /**
@@ -223,7 +224,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
             return casInternalRequestParameters.uid;
         }
         if (macro.equals(MacrosAndStrings.FORMAT)) {
-            Dimension format = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+            Dimension format = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot().toString()));
             if (format != null) {
                 return (int) format.getWidth() + "x" + (int) format.getHeight();
             }
