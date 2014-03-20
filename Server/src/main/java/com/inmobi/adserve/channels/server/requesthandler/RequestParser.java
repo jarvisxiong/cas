@@ -79,8 +79,16 @@ public class RequestParser {
         params.setCarrierId(Integer.parseInt(parseArray(jObject, "carrier", 0)));
         params.setCountryId(Long.parseLong(parseArray(jObject, "carrier", 1)));
         params.setCountryCode(parseArray(jObject, "carrier", 2));
-        params.setCity(Integer.parseInt(parseArray(jObject, "carrier", 3)));
-        params.setState(Integer.parseInt(parseArray(jObject, "carrier", 4)));
+        try {
+            params.setCity(Integer.parseInt(parseArray(jObject, "carrier", 3)));
+        } catch (NumberFormatException e) {
+            LOG.error(traceMarker, "City not found in request");
+        }
+        try {
+            params.setState(Integer.parseInt(parseArray(jObject, "carrier", 4)));
+        } catch (NumberFormatException e) {
+            LOG.error(traceMarker, "State not found in request");
+        }
         String slot = stringify(jObject, "slot-served");
         if (StringUtils.isNotEmpty(slot)) {
                 params.setSlot(Short.parseShort(slot));
