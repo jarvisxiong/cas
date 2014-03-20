@@ -97,9 +97,8 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (!StringUtils.isBlank(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
@@ -156,8 +155,8 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
         if (height != 0) {
             appendQueryParam(url, HEIGHT, height + "", false);
         }
-        if (StringUtils.isNotBlank(sasParams.getAge())) {
-            appendQueryParam(url, AGE, sasParams.getAge(), false);
+        if (null != sasParams.getAge()) {
+            appendQueryParam(url, AGE, sasParams.getAge().toString(), false);
         }
         appendQueryParam(url, B_SITE_ID, blindedSiteId, false);
 

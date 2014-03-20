@@ -64,7 +64,7 @@ public class ServerTest extends TestCase {
         responseSender = new ResponseSender(httpRequestHandler);
 
         AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
-        Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-channel", "cas-advertisement", mockConfig);
+        Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-advertisement", mockConfig);
 
         requestParser = new RequestParser(new Provider<Marker>() {
             @Override
@@ -127,7 +127,7 @@ public class ServerTest extends TestCase {
     public JSONObject prepareParameters() throws Exception {
         JSONObject args = new JSONObject();
         sasParam = new SASRequestParameters();
-        sasParam.setAge("35");
+        sasParam.setAge((short) 35);
         sasParam.setGender("m");
         sasParam.setImpressionId("4f8d98e2-4bbd-40bc-8729-22da000900f9");
         int myarr[] = { 1, 2 };
@@ -167,7 +167,7 @@ public class ServerTest extends TestCase {
         JSONObject jsonObject = prepareParameters();
         SASRequestParameters params = new SASRequestParameters();
         params = requestParser.getUserParams(params, jsonObject);
-        assertEquals(params.getAge(), "35");
+        assertEquals(params.getAge().shortValue(), (short) 35);
     }
 
     /*

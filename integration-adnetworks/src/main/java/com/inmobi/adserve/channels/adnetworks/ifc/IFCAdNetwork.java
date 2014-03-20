@@ -7,6 +7,7 @@ import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
 
+import java.awt.Dimension;
 import java.net.URI;
 import java.util.List;
 
@@ -154,10 +155,10 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             LOG.info("IFC Mandatory Parameter missing: SiteName");
             return false;
         }
-        if (sasParams.getSlot() != null && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
-            slotHeight = String.valueOf(SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())).getHeight());
-            slotWidth = String.valueOf(SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())).getWidth());
+        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
+            slotHeight = String.valueOf(dim.getHeight());
+            slotWidth = String.valueOf(dim.getWidth());
         }
         else {
             LOG.info("IFC Mandatory Parameter missing: Slot");
@@ -267,11 +268,9 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         jsonObject.addProperty("publisherID", publisherID);
         jsonObject.addProperty("source", sasParams.getSource());
         jsonObject.addProperty("locSrc", sasParams.getLocSrc());
-        jsonObject.addProperty("userLocation", sasParams.getUserLocation());
         jsonObject.addProperty("impressionId", casInternalRequestParameters.impressionId);
-        jsonObject.addProperty("genderOrig", sasParams.getGenderOrig());
-        jsonObject.addProperty("area", sasParams.getArea());
-        jsonObject.addProperty("host", sasParams.getHost());
+        jsonObject.addProperty("genderOrig", sasParams.getGender());
+        jsonObject.addProperty("area", sasParams.getState());
         jsonObject.addProperty("beaconURL", beaconUrl);
         jsonObject.addProperty("appType", appType);
         jsonObject.addProperty("categories", getCategoryString(sasParams.getCategories()));
@@ -284,7 +283,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         jsonObject.addProperty("age", sasParams.getAge());
         jsonObject.addProperty("gender", gender);
         jsonObject.addProperty("latLong", casInternalRequestParameters.latLong);
-        jsonObject.addProperty("country", sasParams.getCountry());
+        jsonObject.addProperty("country", sasParams.getCountryId());
         jsonObject.addProperty("siteID", siteID);
         jsonObject.addProperty("adGroupID", adGroupID);
         jsonObject.addProperty("richMedia", richMedia);

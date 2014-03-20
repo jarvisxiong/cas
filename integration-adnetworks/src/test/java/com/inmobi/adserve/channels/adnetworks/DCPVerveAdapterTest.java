@@ -21,8 +21,8 @@ import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 
 
@@ -69,7 +69,7 @@ public class DCPVerveAdapterTest extends TestCase {
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
         sasParams.setOsId(HandSetOS.iPhone_OS.getValue());
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
@@ -90,7 +90,7 @@ public class DCPVerveAdapterTest extends TestCase {
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
         sasParams.setOsId(HandSetOS.iPhone_OS.getValue());
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
@@ -111,7 +111,7 @@ public class DCPVerveAdapterTest extends TestCase {
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
         sasParams.setOsId(HandSetOS.iPhone_OS.getValue());
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
@@ -227,7 +227,7 @@ public class DCPVerveAdapterTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         sasParams.setOsId(HandSetOS.iPhone_OS.getValue());
         sasParams.setLocSrc("true-lat-lon");
         String externalKey = "1324";
@@ -253,7 +253,7 @@ public class DCPVerveAdapterTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         sasParams.setOsId(HandSetOS.iPhone_OS.getValue());
         sasParams.setLocSrc("derived-lat-lon");
         String externalKey = "1324";
@@ -279,7 +279,7 @@ public class DCPVerveAdapterTest extends TestCase {
         casInternalRequestParameters.latLong = ",-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
+        sasParams.setSlot(Short.valueOf("15"));
         sasParams.setOsId(HandSetOS.Android.getValue());
         String externalKey = "1324";
         sasParams.setLocSrc("true-lat-lon");
@@ -305,7 +305,7 @@ public class DCPVerveAdapterTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         sasParams.setSource("wap");
         String externalKey = "1324";
         sasParams.setLocSrc("true-lat-lon");
@@ -328,7 +328,7 @@ public class DCPVerveAdapterTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot(Short.valueOf("4"));
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
@@ -351,7 +351,7 @@ public class DCPVerveAdapterTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot(Short.valueOf("4"));
         sasParams.setSource("wap");
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
@@ -375,7 +375,7 @@ public class DCPVerveAdapterTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot(Short.valueOf("4"));
         sasParams.setSource("app");
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
@@ -401,7 +401,7 @@ public class DCPVerveAdapterTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot(Short.valueOf("4"));
         sasParams.setSource("app");
         sasParams.setSdkVersion("a371");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");

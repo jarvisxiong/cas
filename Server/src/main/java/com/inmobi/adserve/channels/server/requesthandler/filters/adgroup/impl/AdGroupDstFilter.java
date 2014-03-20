@@ -41,9 +41,7 @@ public class AdGroupDstFilter extends AbstractAdGroupLevelFilter {
     @Override
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
             final CasContext casContext) {
-        return (sasParams.getDst() == 6 && channelSegment.getChannelSegmentEntity().getDst() != sasParams.getDst())
-                || (sasParams.getDst() == 2 && sasParams.isResponseOnlyFromDcp() && channelSegment
-                        .getChannelSegmentEntity().getDst() != sasParams.getDst());
+        return channelSegment.getChannelSegmentEntity().getDst() != sasParams.getDst();
 
     }
 

@@ -27,10 +27,10 @@ import org.xml.sax.InputSource;
 
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
@@ -75,9 +75,8 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
         }
         host = config.getString("wapstart.host");
 
-        if (!StringUtils.isBlank(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
@@ -119,8 +118,8 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
             if (sasParams.getAge() != null) {
                 url.append("&age=").append(sasParams.getAge());
             }
-            if (sasParams.getCountry() != null) {
-                url.append("&countryCode=").append(iABCountries.getIabCountry(sasParams.getCountry()));
+            if (sasParams.getCountryCode() != null) {
+                url.append("&countryCode=").append(iABCountries.getIabCountry(sasParams.getCountryCode()));
             }
             if (StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)) {
                 url.append("&location=")
@@ -164,7 +163,6 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
                 statusCode = 500;
             }
             responseContent = "";
-            return;
         }
         else {
             try {
@@ -201,7 +199,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
                         Element description = (Element) rootElement.getElementsByTagName("content").item(0);
                         context.put(VelocityTemplateFieldConstants.AdText, title.getTextContent());
                         context.put(VelocityTemplateFieldConstants.Description, description.getTextContent());
-                        String vmTemplate = Formatter.getRichTextTemplateForSlot(slot);
+                        String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                         if (!StringUtils.isEmpty(vmTemplate)) {
                             context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
                             t = TemplateType.RICH;

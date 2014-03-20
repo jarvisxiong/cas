@@ -67,16 +67,15 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
         host = config.getString("pubmatic.host");
         pubId = config.getString("pubmatic.pubId");
 
-        if (!StringUtils.isBlank(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
             try {
                 JSONObject additionalParams = entity.getAdditionalParams();
                 // ad id is configured as the additional param in the
                 // segment table
-                adId = additionalParams.getString(sasParams.getSlot());
+                adId = additionalParams.getString((sasParams.getSlot()).toString());
 
             }
             catch (Exception e) {
@@ -133,8 +132,8 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
             params.append("&zip=").append(casInternalRequestParameters.zipCode);
         }
 
-        if (sasParams.getCountry() != null) {
-            params.append("&country=").append(iABCountries.getIabCountry(sasParams.getCountry()));
+        if (sasParams.getCountryCode() != null) {
+            params.append("&country=").append(iABCountries.getIabCountry(sasParams.getCountryCode()));
         }
 
         params.append("&udid=").append(deviceId);

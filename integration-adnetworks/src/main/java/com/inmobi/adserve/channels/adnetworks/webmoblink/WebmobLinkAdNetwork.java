@@ -15,8 +15,6 @@ import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,13 +89,7 @@ public class WebmobLinkAdNetwork extends AbstractDCPAdNetworkImpl {
             channels = sb.toString();
         }
         result = config.getString("webmoblink.resformat");
-        try {
-            JSONArray carrier = sasParams.getCarrier();
-            country = carrier.getString(2);
-        }
-        catch (JSONException e) {
-            LOG.debug("Failed to fetch the country code from allParametersJson");
-        }
+        country = sasParams.getCountryCode();
         LOG.debug("Configure parameters inside webmoblink returned true");
         return true;
     }

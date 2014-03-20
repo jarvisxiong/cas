@@ -34,6 +34,7 @@ import org.slf4j.MDC;
 import org.slf4j.Marker;
 
 import com.google.inject.Provider;
+import com.inmobi.adserve.adpool.AdPoolRequest;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
@@ -49,6 +50,7 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
 
     public String               terminationReason = "NO";
     public JSONObject           jObject           = null;
+    public AdPoolRequest        tObject;
     public ResponseSender       responseSender;
 
     private Provider<Marker>    traceMarkerProvider;
@@ -131,7 +133,12 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
         try {
-            httpRequest = (HttpRequest) msg;
+
+            RequestParameterHolder requestParameterHolder = (RequestParameterHolder) msg;
+            this.terminationReason = requestParameterHolder.getTerminationReason();
+            this.responseSender.sasParams = requestParameterHolder.getSasParams();
+            this.responseSender.casInternalRequestParameters = requestParameterHolder.getCasInternalRequestParameters();
+            httpRequest = requestParameterHolder.getHttpRequest();
 
             traceMarker = traceMarkerProvider.get();
 
@@ -147,8 +154,6 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
             InspectorStats.incrementStatCount(InspectorStrings.processingError, InspectorStrings.count);
             responseSender.sendNoAdResponse(ctx.channel());
             String exceptionClass = exception.getClass().getSimpleName();
-            // incrementing the count of the number of exceptions thrown in the
-            // server code
             InspectorStats.incrementStatCount(exceptionClass, InspectorStrings.count);
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
@@ -193,40 +198,24 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
             totalTime = 0;
         }
         try {
-            if (responseSender.getAdResponse() == null) {
-                Logging.channelLogline(list, null, ServletHandler.getLoggerConfig(), responseSender.sasParams,
-                        totalTime);
-                Logging.rrLogging(null, list, ServletHandler.getLoggerConfig(), responseSender.sasParams,
-                        terminationReason);
-                Logging.advertiserLogging(list, ServletHandler.getLoggerConfig());
-                Logging.sampledAdvertiserLogging(list, ServletHandler.getLoggerConfig());
+            ChannelSegment adResponseChannelSegment = null;
+            if (null != responseSender.getRtbResponse()) {
+                adResponseChannelSegment = responseSender.getRtbResponse();
             }
-            else {
-                Logging.channelLogline(list, responseSender.getAdResponse().clickUrl, ServletHandler.getLoggerConfig(),
-                        responseSender.sasParams, totalTime);
-                if (responseSender.getRtbResponse() == null) {
-                    LOG.debug(traceMarker, "rtb response is null so logging dcp response in rr");
-                    Logging.rrLogging(responseSender.getRankList().get(responseSender.getSelectedAdIndex()), list,
-                            ServletHandler.getLoggerConfig(), responseSender.sasParams, terminationReason);
-                }
-                else {
-                    LOG.debug(traceMarker, "rtb response is not null so logging rtb response in rr");
-                    Logging.rrLogging(responseSender.getRtbResponse(), list, ServletHandler.getLoggerConfig(),
-                            responseSender.sasParams, terminationReason);
-                }
-                Logging.advertiserLogging(list, ServletHandler.getLoggerConfig());
-                Logging.sampledAdvertiserLogging(list, ServletHandler.getLoggerConfig());
+            else if (null != responseSender.getAdResponse()) {
+                adResponseChannelSegment = responseSender.getRankList().get(responseSender.getSelectedAdIndex());
             }
+            Logging.rrLogging(adResponseChannelSegment, list, responseSender.sasParams, terminationReason, totalTime);
+            Logging.advertiserLogging(list, ServletHandler.getLoggerConfig());
+            Logging.sampledAdvertiserLogging(list, ServletHandler.getLoggerConfig());
         }
         catch (JSONException exception) {
-            LOG.debug(traceMarker, "{}", exception);
-            return;
+            LOG.debug(ChannelServer.getMyStackTrace(exception));
         }
         catch (TException exception) {
-            LOG.debug(traceMarker, "{}", exception);
-            return;
+            LOG.debug(ChannelServer.getMyStackTrace(exception));
         }
-        LOG.debug(traceMarker, "done with logging");
+        LOG.debug("done with logging");
     }
 
     // send Mail if channel server crashes

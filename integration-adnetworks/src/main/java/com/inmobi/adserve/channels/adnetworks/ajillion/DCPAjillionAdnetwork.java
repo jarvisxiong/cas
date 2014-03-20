@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
@@ -91,8 +91,8 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
             if (StringUtils.isNotBlank(sasParams.getGender())) {
                 appendQueryParam(url, GENDER, sasParams.getGender(), false);
             }
-            if (StringUtils.isNotBlank(sasParams.getAge())) {
-                appendQueryParam(url, AGE, sasParams.getAge(), false);
+            if (null != sasParams.getAge()) {
+                appendQueryParam(url, AGE, sasParams.getAge().toString(), false);
             }
             LOG.debug("{} url is {}", name, url);
             return (new URI(url.toString()));

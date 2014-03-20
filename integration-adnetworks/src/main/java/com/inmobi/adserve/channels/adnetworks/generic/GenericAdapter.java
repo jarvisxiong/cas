@@ -224,7 +224,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
             return casInternalRequestParameters.uid;
         }
         if (macro.equals(MacrosAndStrings.FORMAT)) {
-            Dimension format = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+            Dimension format = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot().toString()));
             if (format != null) {
                 return (int) format.getWidth() + "x" + (int) format.getHeight();
             }

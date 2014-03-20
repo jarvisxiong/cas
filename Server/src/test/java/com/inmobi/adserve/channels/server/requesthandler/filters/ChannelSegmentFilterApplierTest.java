@@ -224,7 +224,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         replay(s2);
         sasParams = new SASRequestParameters();
         sasParams.setUidParams("xxx");
-        sasParams.setPostalCode("110051");
+        sasParams.setPostalCode(110051);
         sasParams.setLatLong("11.35&12.56");
         sasParams.setRichMedia(true);
         sasParams.setRqAdType("int");
@@ -451,7 +451,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
 
         SASRequestParameters sasParams = new SASRequestParameters();
         sasParams.setSiteFloor(0.3);
-        sasParams.setCountryStr("1");
+        sasParams.setCountryId((long) 1);
         sasParams.setOsId(1);
         sasParams.setDst(2);
         sasParams.setSiteId("siteid");
@@ -770,7 +770,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         expect(repositoryHelper.querySiteEcpmRepository("siteid", 1, 2)).andReturn(null).anyTimes();
         replay(repositoryHelper);
 
-        sasParams.setCountryStr("1");
+        sasParams.setCountryId((long) 1);
         sasParams.setOsId(2);
 
         Injector injector = Guice.createInjector(Modules.override(
@@ -796,7 +796,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         replay(repositoryHelper);
 
         sasParams.setSiteId("siteid");
-        sasParams.setCountryStr("1");
+        sasParams.setCountryId((long) 1);
         sasParams.setOsId(2);
 
         Injector injector = Guice.createInjector(Modules.override(
@@ -830,7 +830,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         replay(repositoryHelper);
 
         sasParams.setSiteId("siteid");
-        sasParams.setCountryStr("1");
+        sasParams.setCountryId((long) 1);
         sasParams.setOsId(2);
 
         Injector injector = Guice.createInjector(Modules.override(
@@ -878,7 +878,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
                 new CasNettyModule(configurationLoder.getServerConfiguration())).with(new TestScopeModule()));
 
         sasParams.setSiteId("siteid");
-        sasParams.setCountryStr("1");
+        sasParams.setCountryId((long) 1);
         sasParams.setOsId(2);
 
         CasContext casContext = new CasContext();
@@ -916,7 +916,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         replay(repositoryHelper);
 
         sasParams.setSiteId("siteid");
-        sasParams.setCountryStr("1");
+        sasParams.setCountryId((long) 1);
         sasParams.setOsId(2);
 
         Injector injector = Guice.createInjector(Modules.override(

@@ -146,7 +146,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         sasParams.setCategories(new ArrayList<Long>());
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot((short) 9);
         String externalKey = "1324";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
@@ -172,7 +172,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         sasParams.setGender("M");
         sasParams.setCategories(new ArrayList<Long>());
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot((short) 9);
         String externalKey = "1324";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
@@ -198,7 +198,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         sasParams.setGender("f");
         sasParams.setCategories(new ArrayList<Long>());
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot((short) 9);
         String externalKey = "1324";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
@@ -223,7 +223,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot((short) 9);
         sasParams.setCategories(new ArrayList<Long>());
         String externalKey = "1324";
         Long[] segmentCategories = new Long[] { 13l, 15l };
@@ -251,7 +251,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot((short) 9);
         String externalKey = "1324";
         Long[] cats = new Long[] { 13l, 15l };
         sasParams.setCategories(Arrays.asList(cats));
@@ -279,7 +279,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         casInternalRequestParameters.latLong = " ,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
+        sasParams.setSlot((short) 15);
         sasParams.setCategories(new ArrayList<Long>());
         String externalKey = "1324";
         SlotSizeMapping.init();
@@ -306,7 +306,6 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("");
         sasParams.setCategories(new ArrayList<Long>());
         String externalKey = "1324";
         SlotSizeMapping.init();
@@ -329,7 +328,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("15");
+        sasParams.setSlot((short) 15);
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
                 + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11"
@@ -354,7 +353,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("15");
+        sasParams.setSlot((short) 15);
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c"
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
@@ -379,7 +378,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short) 4);
         sasParams.setSource("WAP");
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c"
@@ -404,7 +403,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short) 4);
         sasParams.setSource("App");
         sasParams.setSdkVersion("i367");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");

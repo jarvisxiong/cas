@@ -18,10 +18,10 @@ import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
@@ -56,9 +56,8 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (!StringUtils.isBlank(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = dim.getWidth();
             height = dim.getHeight();
         }
@@ -147,7 +146,7 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
                     context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
                     if (adResponse.getString("type").equals("text")) {
                         context.put(VelocityTemplateFieldConstants.AdText, adResponse.getString("adtext"));
-                        String vmTemplate = Formatter.getRichTextTemplateForSlot(slot);
+                        String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                         if (StringUtils.isEmpty(vmTemplate)) {
                             t = TemplateType.PLAIN;
                         }

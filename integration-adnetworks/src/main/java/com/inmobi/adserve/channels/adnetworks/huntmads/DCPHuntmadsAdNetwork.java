@@ -19,10 +19,10 @@ import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
@@ -65,9 +65,8 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (!StringUtils.isBlank(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
@@ -117,8 +116,8 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             if (casInternalRequestParameters.zipCode != null) {
                 url.append("&zip=").append(casInternalRequestParameters.zipCode);
             }
-            if (sasParams.getCountry() != null) {
-                url.append("&country=").append(sasParams.getCountry().toUpperCase());
+            if (sasParams.getCountryCode() != null) {
+                url.append("&country=").append(sasParams.getCountryCode().toUpperCase());
             }
 
             if (width != 0 && height != 0) {
@@ -166,23 +165,22 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
 
                 statusCode = status.code();
                 VelocityContext context = new VelocityContext();
-                
-                TemplateType t=TemplateType.HTML;
-                if (adResponse.has("content")&& StringUtils.isNotBlank(adResponse.getString("content"))){
-                	context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, adResponse.getString("content"));
+
+                TemplateType t = TemplateType.HTML;
+                if (adResponse.has("content") && StringUtils.isNotBlank(adResponse.getString("content"))) {
+                    context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, adResponse.getString("content"));
                 }
-                else
-                {
-                	context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse.getString("url"));
+                else {
+                    context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse.getString("url"));
                     String partnerBeacon = adResponse.getString("track");
                     if (StringUtils.isNotBlank(partnerBeacon) && !"null".equalsIgnoreCase(partnerBeacon)) {
                         context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, adResponse.getString("track"));
                     }
                     context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
-                    
+
                     if (textAd && StringUtils.isNotBlank(adResponse.getString("text"))) {
                         context.put(VelocityTemplateFieldConstants.AdText, adResponse.getString("text"));
-                        String vmTemplate = Formatter.getRichTextTemplateForSlot(slot);
+                        String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                         if (!StringUtils.isEmpty(vmTemplate)) {
                             context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
                             t = TemplateType.RICH;
@@ -196,7 +194,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
                         t = TemplateType.IMAGE;
                     }
                 }
-               
+
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
             }

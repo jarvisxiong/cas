@@ -106,11 +106,10 @@ public class ChannelServer {
             // Initialising logging - Write to databus
             AbstractMessagePublisher dataBusPublisher = (AbstractMessagePublisher) MessagePublisherFactory
                     .create(configFile);
+
             String rrLogKey = configurationLoader.getServerConfiguration().getString("rrLogKey");
-            String channelLogKey = configurationLoader.getServerConfiguration().getString("channelLogKey");
             String advertisementLogKey = configurationLoader.getServerConfiguration().getString("adsLogKey");
-            Logging.init(dataBusPublisher, rrLogKey, channelLogKey, advertisementLogKey,
-                    configurationLoader.getServerConfiguration());
+            Logging.init(dataBusPublisher, rrLogKey, advertisementLogKey, configurationLoader.getServerConfiguration());
 
             // Initializing graphite stats
             MetricsManager.init(

@@ -13,7 +13,6 @@ import java.util.Arrays;
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
-import org.json.JSONArray;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.adnetworks.mullahmedia.MullahMediaNetwork;
@@ -155,10 +154,11 @@ public class MullahMediaAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
+        sasParams.setSlot(Short.valueOf("15"));
         String externalKey = "1324";
-        JSONArray jsonArray = new JSONArray("[406,94,\"US\",15753,15787]");
-        sasParams.setCarrier(jsonArray);
+        sasParams.setCarrierId(406);
+        sasParams.setCountryId(94l);
+        sasParams.setCountryCode("US");
         sasParams.setSiteIncId(56789);
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
@@ -170,7 +170,7 @@ public class MullahMediaAdNetworkTest extends TestCase {
                 false, null, new ArrayList<Integer>(), 0.0d, null, null, 123456));
         if (dcpMMAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, blurl)) {
             String actualUrl = dcpMMAdNetwork.getRequestUri().toString();
-            String expectedUrl = "http://ads.160tracker.com/mobile_ad_api_indirect.php?user_agent=Mozilla&user_ip=206.29.182.240&request_from=indirect&response_format=json&type=web&unique_key=202cb962ac59075b964b07152d234b70&hash_scheme=md5&lat=37.4429&long=-122.1514&w=320.0&h=50.0&sid=00000000-0001-e240-0000-00000000ddd5&pid=1423&site_name=1324&cat=Adventure";
+            String expectedUrl = "http://ads.160tracker.com/mobile_ad_api_indirect.php?user_agent=Mozilla&user_ip=206.29.182.240&request_from=indirect&response_format=json&type=web&unique_key=202cb962ac59075b964b07152d234b70&hash_scheme=md5&country=US&lat=37.4429&long=-122.1514&w=320.0&h=50.0&sid=00000000-0001-e240-0000-00000000ddd5&pid=1423&site_name=1324&cat=Adventure";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -184,9 +184,10 @@ public class MullahMediaAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        JSONArray jsonArray = new JSONArray("[406,94,\"US\",15753,15787]");
-        sasParams.setCarrier(jsonArray);
-        sasParams.setSlot("15");
+        sasParams.setCarrierId(406);
+        sasParams.setCountryId(94l);
+        sasParams.setCountryCode("US");
+        sasParams.setSlot((short) 15);
         String externalKey = "1324";
         sasParams.setSiteIncId(56789);
         Long[] cat = new Long[] { 15l, 13l };
@@ -201,7 +202,7 @@ public class MullahMediaAdNetworkTest extends TestCase {
                 false, null, new ArrayList<Integer>(), 0.0d, null, null, 123456));
         if (dcpMMAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, blurl)) {
             String actualUrl = dcpMMAdNetwork.getRequestUri().toString();
-            String expectedUrl = "http://ads.160tracker.com/mobile_ad_api_indirect.php?user_agent=Mozilla&user_ip=206.29.182.240&request_from=indirect&response_format=json&type=web&unique_key=202cb962ac59075b964b07152d234b70&hash_scheme=md5&lat=37.4429&long=-122.1514&w=320.0&h=50.0&sid=00000000-0001-e240-0000-00000000ddd5&pid=1423&site_name=1324&cat=Board";
+            String expectedUrl = "http://ads.160tracker.com/mobile_ad_api_indirect.php?user_agent=Mozilla&user_ip=206.29.182.240&request_from=indirect&response_format=json&type=web&unique_key=202cb962ac59075b964b07152d234b70&hash_scheme=md5&country=US&lat=37.4429&long=-122.1514&w=320.0&h=50.0&sid=00000000-0001-e240-0000-00000000ddd5&pid=1423&site_name=1324&cat=Board";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -215,9 +216,10 @@ public class MullahMediaAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
-        JSONArray jsonArray = new JSONArray("[406,94,\"US\",15753,15787]");
-        sasParams.setCarrier(jsonArray);
+        sasParams.setSlot(Short.valueOf("15"));
+        sasParams.setCarrierId(406);
+        sasParams.setCountryId(94l);
+        sasParams.setCountryCode("US");
         String externalKey = "1324";
         sasParams.setSiteIncId(56789);
         SlotSizeMapping.init();
@@ -230,7 +232,7 @@ public class MullahMediaAdNetworkTest extends TestCase {
                 false, null, new ArrayList<Integer>(), 0.0d, null, null, 123456));
         if (dcpMMAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, blurl)) {
             String actualUrl = dcpMMAdNetwork.getRequestUri().toString();
-            String expectedUrl = "http://ads.160tracker.com/mobile_ad_api_indirect.php?user_agent=Mozilla&user_ip=206.29.182.240&request_from=indirect&response_format=json&type=web&unique_key=202cb962ac59075b964b07152d234b70&hash_scheme=md5&lat=37.4429&long=-122.1514&w=320.0&h=50.0&sid=00000000-0001-e240-0000-00000000ddd5&pid=1423&site_name=1324&cat=miscellenous";
+            String expectedUrl = "http://ads.160tracker.com/mobile_ad_api_indirect.php?user_agent=Mozilla&user_ip=206.29.182.240&request_from=indirect&response_format=json&type=web&unique_key=202cb962ac59075b964b07152d234b70&hash_scheme=md5&country=US&lat=37.4429&long=-122.1514&w=320.0&h=50.0&sid=00000000-0001-e240-0000-00000000ddd5&pid=1423&site_name=1324&cat=miscellenous";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -243,10 +245,11 @@ public class MullahMediaAdNetworkTest extends TestCase {
         sasParams.setUserAgent("Mozilla");
         casInternalRequestParameters.latLong = " ,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-        JSONArray jsonArray = new JSONArray("[406,94,\"US\",15753,15787]");
-        sasParams.setCarrier(jsonArray);
+        sasParams.setCarrierId(406);
+        sasParams.setCountryId(94l);
+        sasParams.setCountryCode("US");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
+        sasParams.setSlot(Short.valueOf("15"));
         String externalKey = "1324";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
@@ -267,13 +270,12 @@ public class MullahMediaAdNetworkTest extends TestCase {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
-        JSONArray jsonArray = new JSONArray("[516,94,\"US\",15753,15787]");
-        sasParams.setCarrier(jsonArray);
-        sasParams.setUserAgent("Mozilla");
+        sasParams.setCarrierId(516);
+        sasParams.setCountryId(94l);
+        sasParams.setCountryCode("US");
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uidMd5 = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("");
         String externalKey = "1324";
         sasParams.setSiteIncId(56789);
         SlotSizeMapping.init();
@@ -287,7 +289,7 @@ public class MullahMediaAdNetworkTest extends TestCase {
                 null, new ArrayList<Integer>(), 0.0d, null, null, 123456));
         if (dcpMMAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, blurl)) {
             String actualUrl = dcpMMAdNetwork.getRequestUri().toString();
-            String expectedUrl = "http://ads.160tracker.com/mobile_ad_api_indirect.php?user_agent=Mozilla&user_ip=206.29.182.240&request_from=indirect&response_format=json&type=web&unique_key=202cb962ac59075b964b07152d234b70&hash_scheme=md5&lat=37.4429&long=-122.1514&carrier_id=537&sid=00000000-0001-e240-0000-00000000ddd5&pid=1423&site_name=1324&cat=miscellenous";
+            String expectedUrl = "http://ads.160tracker.com/mobile_ad_api_indirect.php?user_agent=Mozilla&user_ip=206.29.182.240&request_from=indirect&response_format=json&type=web&unique_key=202cb962ac59075b964b07152d234b70&hash_scheme=md5&country=US&lat=37.4429&long=-122.1514&carrier_id=537&sid=00000000-0001-e240-0000-00000000ddd5&pid=1423&site_name=1324&cat=miscellenous";
             assertEquals(expectedUrl, actualUrl);
         }
     }

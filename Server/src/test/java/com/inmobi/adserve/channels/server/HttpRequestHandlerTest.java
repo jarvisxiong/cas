@@ -78,14 +78,14 @@ public class HttpRequestHandlerTest extends TestCase {
                 };
                 bind(advertiserIdNameMapType).annotatedWith(AdvertiserIdNameMap.class).toInstance(
                         new HashMap<String, String>());
-                AsyncRequestMaker asyncRequestMaker = new AsyncRequestMaker(null, null);
+                AsyncRequestMaker asyncRequestMaker = new AsyncRequestMaker(null);
                 bind(AsyncRequestMaker.class).toInstance(asyncRequestMaker);
                 requestStaticInjection(AuctionEngine.class);
             }
         });
 
         AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
-        Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-channel", "cas-advertisement", mockServerConfig);
+        Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-advertisement", mockServerConfig);
     }
 
     @Test

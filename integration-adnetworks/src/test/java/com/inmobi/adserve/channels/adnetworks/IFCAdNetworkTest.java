@@ -82,7 +82,7 @@ public class IFCAdNetworkTest extends TestCase {
         jsonObject.put("adcode", "NON-JS");
         sasParams.setAllParametersJson(jsonObject.toString());
         sasParams.setSiteId("12");
-        sasParams.setSlot("11");
+        sasParams.setSlot(Short.valueOf("11"));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -113,7 +113,7 @@ public class IFCAdNetworkTest extends TestCase {
         jsonObject.put("sdk-version", "i351");
         sasParams.setAllParametersJson(jsonObject.toString());
         sasParams.setSiteId("12");
-        sasParams.setSlot("1");
+        sasParams.setSlot(Short.valueOf("1"));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -144,7 +144,7 @@ public class IFCAdNetworkTest extends TestCase {
         jsonObject.put("sdk-version", "i301");
         sasParams.setAllParametersJson(jsonObject.toString());
         sasParams.setSiteId("12");
-        sasParams.setSlot("1");
+        sasParams.setSlot(Short.valueOf("1"));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -185,7 +185,7 @@ public class IFCAdNetworkTest extends TestCase {
         jsonObject.put("sdk-version", "i351");
         sasParams.setAllParametersJson(jsonObject.toString());
         sasParams.setSiteId("12");
-        sasParams.setSlot("1");
+        sasParams.setSlot(Short.valueOf("1"));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -224,7 +224,7 @@ public class IFCAdNetworkTest extends TestCase {
         jsonObject.put("adcode", "JS");
         sasParams.setAllParametersJson(jsonObject.toString());
         sasParams.setSiteId("12");
-        sasParams.setSlot("1");
+        sasParams.setSlot(Short.valueOf("1"));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");

@@ -135,7 +135,7 @@ public class AdGroupSupplyDemandClassificationFilter extends AbstractAdGroupLeve
      */
     private SiteEcpmEntity getSiteEcpmEntity(final SASRequestParameters sasParams) {
         return repositoryHelper.querySiteEcpmRepository(sasParams.getSiteId(),
-                Integer.valueOf(sasParams.getCountryStr()), sasParams.getOsId());
+                sasParams.getCountryId().intValue(), sasParams.getOsId());
     }
 
     private byte getEcpmClass(final Double ecpm, final Double networkEcpm) {

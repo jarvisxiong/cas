@@ -21,10 +21,10 @@ import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
@@ -121,7 +121,7 @@ public class DCPSiquisAdNetwork extends AbstractDCPAdNetworkImpl {
                 }
                 context.put(VelocityTemplateFieldConstants.SmallFont, "1");
                 context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
-                String vmTemplate = Formatter.getRichTextTemplateForSlot(slot);
+                String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                 if (StringUtils.isEmpty(vmTemplate)) {
                     responseContent = Formatter.getResponseFromTemplate(TemplateType.PLAIN, context, sasParams,
                             beaconUrl);
@@ -132,6 +132,7 @@ public class DCPSiquisAdNetwork extends AbstractDCPAdNetworkImpl {
                             beaconUrl);
                 }
                 adStatus = "AD";
+                LOG.debug("response length is {} responseContent is {}", responseContent.length(), responseContent);
             }
             catch (JSONException exception) {
                 adStatus = "NO_AD";
@@ -150,7 +151,6 @@ public class DCPSiquisAdNetwork extends AbstractDCPAdNetworkImpl {
                 }
             }
         }
-        LOG.debug("response length is {} responseContent is {}", responseContent.length(), responseContent);
     }
 
     /**

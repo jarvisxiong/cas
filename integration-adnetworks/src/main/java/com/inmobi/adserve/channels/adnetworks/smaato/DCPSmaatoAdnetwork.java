@@ -121,14 +121,13 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (!StringUtils.isBlank(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            dimension = slotIdMap.get(Integer.parseInt(sasParams.getSlot()));
+        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
+            dimension = slotIdMap.get((sasParams.getSlot()).intValue());
             if (StringUtils.isBlank(dimension)) {
                 LOG.debug("mandatory parameters missing for smaato so exiting adapter");
                 return false;
             }
-            Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+            Dimension dim = SlotSizeMapping.getDimension((sasParams.getSlot()).longValue());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
 
@@ -189,8 +188,8 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isNotBlank(sasParams.getGender())) {
             appendQueryParam(url, GENDER, sasParams.getGender(), false);
         }
-        if (StringUtils.isNotBlank(sasParams.getPostalCode())) {
-            appendQueryParam(url, ZIP, sasParams.getPostalCode(), false);
+        if (null != sasParams.getPostalCode()) {
+            appendQueryParam(url, ZIP, sasParams.getPostalCode().toString(), false);
         }
         appendQueryParam(url, KEYWORDS, getURLEncode(getCategories(',', true, false), format), false);
         if (width != 0) {
@@ -199,8 +198,8 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         if (height != 0) {
             appendQueryParam(url, HEIGHT, height + "", false);
         }
-        if (StringUtils.isNotBlank(sasParams.getAge())) {
-            appendQueryParam(url, AGE, sasParams.getAge(), false);
+        if (null != sasParams.getAge()) {
+            appendQueryParam(url, AGE, sasParams.getAge().toString(), false);
         }
 
         LOG.debug("Smaato url is {}", url);
@@ -262,7 +261,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
                 }
                 else if (TEXT_TYPE.equalsIgnoreCase(ad.getType()) && StringUtils.isNotBlank(ad.getAdtext())) {
                     context.put(VelocityTemplateFieldConstants.AdText, ad.getAdtext());
-                    String vmTemplate = Formatter.getRichTextTemplateForSlot(slot);
+                    String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                     if (StringUtils.isEmpty(vmTemplate)) {
                         t = TemplateType.PLAIN;
                     }

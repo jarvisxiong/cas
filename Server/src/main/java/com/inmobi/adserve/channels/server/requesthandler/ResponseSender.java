@@ -11,19 +11,28 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 
 import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.inject.Inject;
 
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
+import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TBinaryProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Charsets;
+import com.inmobi.adserve.adpool.AdInfo;
+import com.inmobi.adserve.adpool.AdPoolResponse;
+import com.inmobi.adserve.adpool.AuctionType;
+import com.inmobi.adserve.adpool.Creative;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
@@ -31,27 +40,31 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.ning.http.client.AsyncHttpClient;
+import com.inmobi.phoenix.util.WilburyUUID;
+import com.inmobi.types.AdIdChain;
+import com.inmobi.types.GUID;
+import com.inmobi.types.PricingModel;
 
 
 public class ResponseSender extends HttpRequestHandlerBase {
 
-    private final static Logger         LOG             = LoggerFactory.getLogger(ResponseSender.class);
+    private final static Logger         LOG                      = LoggerFactory.getLogger(ResponseSender.class);
 
-    private static final String         startTags       = "<AdResponse><Ads number=\"1\"><Ad type=\"rm\" width=\"%s\" height=\"%s\"><![CDATA[";
-    private static final String         endTags         = " ]]></Ad></Ads></AdResponse>";
-    private static final String         adImaiStartTags = "<!DOCTYPE html>";
-    private static final String         noAdImai        = "";
-    private static final String         noAdXhtml       = "<AdResponse><Ads></Ads></AdResponse>";
-    private static final String         noAdHtml        = "<!-- mKhoj: No advt for this position -->";
-    private static final String         noAdJsAdcode    = "<html><head><title></title><style type=\"text/css\">"
-                                                                + " body {margin: 0; overflow: hidden; background-color: transparent}"
-                                                                + " </style></head><body class=\"nofill\"><!-- NO FILL -->"
-                                                                + "<script type=\"text/javascript\" charset=\"utf-8\">"
-                                                                + "parent.postMessage('{\"topic\":\"nfr\",\"container\" : \"%s\"}', '*');</script></body></html>";
+    private static final String         startTags                = "<AdResponse><Ads number=\"1\"><Ad type=\"rm\" width=\"%s\" height=\"%s\"><![CDATA[";
+    private static final String         endTags                  = " ]]></Ad></Ads></AdResponse>";
+    private static final String         adImaiStartTags          = "<!DOCTYPE html>";
+    private static final String         noAdImai                 = "";
+    private static final String         noAdXhtml                = "<AdResponse><Ads></Ads></AdResponse>";
+    private static final String         noAdHtml                 = "<!-- mKhoj: No advt for this position -->";
+    private static final String         noAdJsAdcode             = "<html><head><title></title><style type=\"text/css\">"
+                                                                         + " body {margin: 0; overflow: hidden; background-color: transparent}"
+                                                                         + " </style></head><body class=\"nofill\"><!-- NO FILL -->"
+                                                                         + "<script type=\"text/javascript\" charset=\"utf-8\">"
+                                                                         + "parent.postMessage('{\"topic\":\"nfr\",\"container\" : \"%s\"}', '*');</script></body></html>";
     private final HttpRequestHandler    hrh;
     private long                        totalTime;
     private List<ChannelSegment>        rankList;
@@ -63,7 +76,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private boolean                     requestCleaned;
     public CasInternalRequestParameters casInternalRequestParameters;
     private final AuctionEngine         auctionEngine;
-    private static final String         NO_AD_HEADER    = "X-MKHOJ-NOAD";
+    private static Set<String>          supportedResponseFormats = Sets.newHashSet("html", "xhtml", "axml", "imai");
 
     @Inject
     private static AsyncRequestMaker    asyncRequestMaker;
@@ -131,11 +144,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
         responseSent = true;
         LOG.debug("ad received so trying to send ad response");
         String finalReponse = adResponse.response;
-        if (sasParams.getSlot() != null && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
+        if (sasParams.getSlot() != null && SlotSizeMapping.getDimension(Long.valueOf(sasParams.getSlot())) != null) {
             LOG.debug("slot served is {}", sasParams.getSlot());
             InspectorStats.incrementStatCount(InspectorStrings.totalFills);
             if (getResponseFormat().equals("xhtml")) {
-                Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+                Dimension dim = SlotSizeMapping.getDimension(Long.valueOf(sasParams.getSlot()));
                 String startElement = String.format(startTags, (int) dim.getWidth(), (int) dim.getHeight());
                 finalReponse = startElement + finalReponse + endTags;
             }
@@ -156,37 +169,65 @@ public class ResponseSender extends HttpRequestHandlerBase {
             sendResponse(HttpResponseStatus.OK, finalReponse, adResponse.responseHeaders, serverChannel);
         }
         else {
-            JSONObject jsonObject = new JSONObject();
-            try {
-                jsonObject.put("secondHighestBid", this.getAuctionEngine().getRtbResponse().getAdNetworkInterface()
-                        .getSecondBidPriceInUsd());
-                jsonObject.put("winnerBid", this.getAuctionEngine().getRtbResponse().getAdNetworkInterface()
-                        .getBidPriceInUsd());
-                jsonObject.put("adm", finalReponse);
-                jsonObject.put("advertiserId", this.auctionEngine.getRtbResponse().getChannelEntity().getAccountId());
-                jsonObject.put("adgroupId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity()
-                        .getAdgroupId());
-                jsonObject.put("adgroupIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity()
-                        .getAdgroupIncId());
-                jsonObject.put("adIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getIncId());
-                jsonObject.put("adId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity().getAdId());
-                jsonObject.put("rtbFloor", casInternalRequestParameters.rtbBidFloor);
-                jsonObject.put("impressionId", this.auctionEngine.getRtbResponse().getAdNetworkInterface()
-                        .getImpressionId());
-                jsonObject.put("campaignIncId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity()
-                        .getCampaignIncId());
-                jsonObject.put("campaignId", this.auctionEngine.getRtbResponse().getChannelSegmentEntity()
-                        .getCampaignId());
-                InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
-                sendResponse(HttpResponseStatus.OK, jsonObject.toString(), adResponse.responseHeaders, serverChannel);
-                LOG.debug("RTB reponse json to RE is {}", jsonObject);
-            }
-            catch (JSONException e) {
-                LOG.debug("Error while making json object for rule engine " + e.getMessage());
-                // Sending NOAD if error making json object
+            AdPoolResponse rtbdResponse = createThriftResponse(adResponse.response);
+            LOG.debug("RTB response json to RE is {}", rtbdResponse);
+            if (null == rtbdResponse || !supportedResponseFormats.contains(sasParams.getRFormat())) {
+                responseSent = false;
                 sendNoAdResponse(serverChannel);
             }
+            else {
+                try {
+                    TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
+                    byte[] serializedResponse = serializer.serialize(rtbdResponse);
+                    sendResponse(HttpResponseStatus.OK, serializedResponse, adResponse.responseHeaders, serverChannel);
+                    InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
+                }
+                catch (TException e) {
+                    LOG.error("Error in serializing the adPool response ", e);
+                    responseSent = false;
+                    sendNoAdResponse(serverChannel);
+                }
+            }
         }
+    }
+
+    private AdPoolResponse createThriftResponse(final String finalResponse) {
+        AdPoolResponse adPoolResponse = new AdPoolResponse();
+        AdInfo rtbdAd = new AdInfo();
+        AdIdChain adIdChain = new AdIdChain();
+        ChannelSegmentEntity channelSegmentEntity = this.auctionEngine.getRtbResponse().getChannelSegmentEntity();
+        adIdChain.setAdgroup_guid(channelSegmentEntity.getAdgroupId());
+        adIdChain.setAd_guid(channelSegmentEntity.getAdId());
+        adIdChain.setAdvertiser_guid(channelSegmentEntity.getAdvertiserId());
+        adIdChain.setCampaign_guid(channelSegmentEntity.getCampaignId());
+        adIdChain.setAd(channelSegmentEntity.getIncId());
+        adIdChain.setGroup(channelSegmentEntity.getAdgroupIncId());
+        adIdChain.setCampaign(channelSegmentEntity.getCampaignIncId());
+        List<AdIdChain> adIdChains = new ArrayList<AdIdChain>();
+        adIdChains.add(adIdChain);
+        rtbdAd.setAdIds(adIdChains);
+        rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);
+        rtbdAd.setPricingModel(PricingModel.CPM);
+        long bid = (long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface().getBidPriceInUsd() * Math.pow(
+                10, 6));
+        rtbdAd.setPrice(bid);
+        rtbdAd.setBid(bid);
+        UUID uuid = WilburyUUID.extractUUID(this.auctionEngine.getRtbResponse().getAdNetworkInterface()
+                .getImpressionId());
+        rtbdAd.setImpressionId(new GUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits()));
+        rtbdAd.setSlotServed(sasParams.getSlot());
+        Creative rtbdCreative = new Creative();
+        rtbdCreative.setValue(finalResponse);
+        rtbdAd.setCreative(rtbdCreative);
+        adPoolResponse.setAds(Arrays.asList(rtbdAd));
+        adPoolResponse.setMinChargedValue((long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface()
+                .getSecondBidPriceInUsd() * Math.pow(10, 6)));
+        if (!"USD".equalsIgnoreCase(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getCurrency())) {
+            rtbdAd.setOriginalCurrencyName(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getCurrency());
+            rtbdAd.setBidInOriginalCurrency((long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface()
+                    .getBidPriceInLocal() * Math.pow(10, 6)));
+        }
+        return adPoolResponse;
     }
 
     // send response to the caller
@@ -194,34 +235,32 @@ public class ResponseSender extends HttpRequestHandlerBase {
             final Channel serverChannel) throws NullPointerException {
 
         byte[] bytes = responseString.getBytes(Charsets.UTF_8);
+        sendResponse(status, bytes, responseHeaders, serverChannel);
+
+    }
+
+    // send response to the caller
+    public void sendResponse(final HttpResponseStatus status, final byte[] bytes, final Map responseHeaders,
+            final Channel serverChannel) throws NullPointerException {
 
         // TODO: change to false after verification
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status,
                 Unpooled.wrappedBuffer(bytes), true);
-        response.headers().add("Cache-Control", "no-cache, no-store, must-revalidate");
-        response.headers().add("Expires", "-1");
-        response.headers().add("Pragma", "no-cache");
-
-        if (null != responseHeaders) {
-            for (Object key : responseHeaders.keySet()) {
-                response.headers().add(key.toString(), responseHeaders.get(key));
-            }
-        }
-
-        response.headers().add(HttpHeaders.Names.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
-        // TODO: to fix keep alive, we need to fix whole flow
-        // HttpHeaders.setKeepAlive(response, serverChannel.isKeepAlive());
-        response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
-
-        response.headers().add(HttpHeaders.Names.EXPIRES, "-1");
-        response.headers().add(HttpHeaders.Names.PRAGMA, "no-cache");
-        response.headers().set("Content-Length", bytes.length);
 
         if (null != responseHeaders) {
             for (Map.Entry entry : (Set<Map.Entry>) responseHeaders.entrySet()) {
                 response.headers().add(entry.getKey().toString(), responseHeaders.get(entry.getValue()));
             }
         }
+
+        response.headers().add(HttpHeaders.Names.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
+
+        // TODO: to fix keep alive, we need to fix whole flow
+        // HttpHeaders.setKeepAlive(response, serverChannel.isKeepAlive());
+        response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
+
+        response.headers().add(HttpHeaders.Names.EXPIRES, "-1");
+        response.headers().add(HttpHeaders.Names.PRAGMA, "no-cache");
 
         LOG.debug("event not null inside send Response");
         if (serverChannel.isWritable()) {
@@ -232,6 +271,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         else {
             LOG.debug("Request Channel is null or channel is not writeable.");
         }
+
         totalTime = System.currentTimeMillis() - totalTime;
         LOG.debug("successfully sent response");
         if (null != sasParams) {
@@ -261,12 +301,21 @@ public class ResponseSender extends HttpRequestHandlerBase {
         InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
 
         Map<String, String> headers = null;
+        LOG.debug("Sending No ads");
         if (null != sasParams && 6 == sasParams.getDst()) {
             headers = new HashMap<String, String>();
-            headers.put(NO_AD_HEADER, "true");
+            AdPoolResponse rtbdResponse = new AdPoolResponse();
+            try {
+                TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
+                byte[] serializedResponse = serializer.serialize(rtbdResponse);
+                sendResponse(HttpResponseStatus.OK, serializedResponse, headers, serverChannel);
+                return;
+            }
+            catch (TException e) {
+                LOG.error("Error in serializing the adPool response ", e);
+            }
         }
 
-        LOG.debug("Sending No ads");
         if (getResponseFormat().equals("xhtml")) {
             sendResponse(HttpResponseStatus.OK, noAdXhtml, headers, serverChannel);
         }
@@ -462,11 +511,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
         else {
             reassignRanks(adNetworkInterface, channel);
         }
-    }
-
-    @Override
-    public AsyncHttpClient getAsyncClient() {
-        return asyncRequestMaker.getAsyncHttpClient();
     }
 
 }

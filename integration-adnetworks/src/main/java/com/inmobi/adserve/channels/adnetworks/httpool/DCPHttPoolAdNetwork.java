@@ -18,10 +18,10 @@ import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
@@ -60,9 +60,8 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (!StringUtils.isBlank(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            Long slotSize = Long.parseLong(sasParams.getSlot());
+        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
+            Long slotSize = (long) sasParams.getSlot();
             // Httpool doesnt support 320x48 & 320x53. so mapping to 320x50
             if (slotSize == 9l || slotSize == 24l) {
                 slotSize = 15l;
@@ -111,7 +110,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
                 did = "nodeviceid-1234567890";
             }
             url.append("&did=").append(did);
-            if (!StringUtils.isEmpty(slot)) {
+            if (null != slot) {
                 url.append("&format=").append(slotFormat);
             }
             String category = getCategories(';');
@@ -172,7 +171,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
                     context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getString("image_url"));
                     if ("shop".equalsIgnoreCase(adType)) {
                         context.put(VelocityTemplateFieldConstants.AdText, adResponse.getString("content"));
-                        String vmTemplate = Formatter.getRichTextTemplateForSlot(slot);
+                        String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                         if (StringUtils.isEmpty(vmTemplate)) {
                             LOG.info("No template found for the slot");
                             adStatus = "NO_AD";

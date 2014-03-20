@@ -24,15 +24,18 @@ public class ChannelStatServerPipelineFactory extends ChannelInitializer<SocketC
     private final TraceMarkerhandler           traceMarkerhandler;
     @Getter
     private final ServletHandler               servletHandler;
+    private final RequestParserHandler         requestParserHandler;
 
     @Inject
     ChannelStatServerPipelineFactory(@ServerConfiguration final Configuration configuration,
             final Provider<HttpRequestHandler> httpRequestHandlerProvider, final ServletHandler servletHandler,
-            final TraceMarkerhandler traceMarkerhandler) {
+            final TraceMarkerhandler traceMarkerhandler, final RequestParserHandler requestParserHandler) {
+
         this.httpRequestHandlerProvider = httpRequestHandlerProvider;
         this.traceMarkerhandler = traceMarkerhandler;
         this.requestIdHandler = new RequestIdHandler();
         this.servletHandler = servletHandler;
+        this.requestParserHandler = requestParserHandler;
     }
 
     @Override
@@ -43,6 +46,7 @@ public class ChannelStatServerPipelineFactory extends ChannelInitializer<SocketC
         pipeline.addLast("requestIdHandler", requestIdHandler);
         pipeline.addLast("traceMarkerhandler", traceMarkerhandler);
         pipeline.addLast("servletHandler", servletHandler);
+        pipeline.addLast("requestParserHandler", requestParserHandler);
         pipeline.addLast("handler", httpRequestHandlerProvider.get());
     }
 

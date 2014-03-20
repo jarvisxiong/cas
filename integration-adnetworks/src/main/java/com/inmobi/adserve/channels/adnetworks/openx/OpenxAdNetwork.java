@@ -15,10 +15,10 @@ import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
@@ -68,8 +68,8 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         StringBuilder finalUrl = new StringBuilder(config.getString("openx.host"));
-        finalUrl.append(externalSiteId).append("&cnt=").append(sasParams.getCountry().toLowerCase()).append("&dma=")
-                .append(sasParams.getArea());
+        finalUrl.append(externalSiteId).append("&cnt=").append(sasParams.getCountryCode().toLowerCase())
+                .append("&dma=").append(sasParams.getState());
         finalUrl.append("&net=").append(sasParams.getLocSrc()).append("&age=").append(sasParams.getAge());
         if (sasParams.getGender() != null) {
             finalUrl.append("&gen=").append(sasParams.getGender().toUpperCase());

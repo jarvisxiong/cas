@@ -23,8 +23,8 @@ import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 
 
@@ -70,7 +70,7 @@ public class DCPMadNetAdNetworkTest extends TestCase {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setSlot("11");
+        sasParams.setSlot(Short.valueOf("11"));
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
@@ -140,7 +140,7 @@ public class DCPMadNetAdNetworkTest extends TestCase {
         category.add(3l);
         sasParams.setCategories(category);
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
+        sasParams.setSlot(Short.valueOf("15"));
         sasParams.setOsId(HandSetOS.iPhone_OS.getValue());
         casInternalRequestParameters.uidIFA = "23e2ewq445545";
         casInternalRequestParameters.uidADT = "0";
@@ -168,7 +168,7 @@ public class DCPMadNetAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "38.5,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
+        sasParams.setSlot(Short.valueOf("15"));
         sasParams.setOsId(HandSetOS.iPhone_OS.getValue());
         casInternalRequestParameters.uidIFA = "23e2ewq445545";
         casInternalRequestParameters.uidADT = "0";
@@ -201,7 +201,7 @@ public class DCPMadNetAdNetworkTest extends TestCase {
         casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("15");
+        sasParams.setSlot(Short.valueOf("15"));
         sasParams.setOsId(HandSetOS.iPhone_OS.getValue());
         casInternalRequestParameters.uidIFA = "23e2ewq445545";
         casInternalRequestParameters.uidADT = "0";
@@ -230,7 +230,7 @@ public class DCPMadNetAdNetworkTest extends TestCase {
         casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("15");
+        sasParams.setSlot(Short.valueOf("15"));
         sasParams.setOsId(HandSetOS.iPhone_OS.getValue());
         casInternalRequestParameters.uidIFA = "23e2ewq445545";
         casInternalRequestParameters.uidADT = "0";

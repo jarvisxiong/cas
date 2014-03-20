@@ -19,10 +19,10 @@ import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
@@ -68,9 +68,8 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (!StringUtils.isBlank(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
@@ -119,8 +118,8 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
             if (casInternalRequestParameters.zipCode != null) {
                 appendQueryParam(url, ZIP, casInternalRequestParameters.zipCode, false);
             }
-            if (sasParams.getCountry() != null) {
-                appendQueryParam(url, COUNTRY, sasParams.getCountry().toUpperCase(), false);
+            if (sasParams.getCountryId() != null) {
+                appendQueryParam(url, COUNTRY, sasParams.getCountryId().toString(), false);
             }
             if (width != 0 && height != 0) {
                 appendQueryParam(url, MIN_SIZE_X, (int) (width * .9) + "", false);
@@ -177,7 +176,7 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
                     context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
                     if (textAd && StringUtils.isNotBlank(adResponse.getString("text"))) {
                         context.put(VelocityTemplateFieldConstants.AdText, adResponse.getString("text"));
-                        String vmTemplate = Formatter.getRichTextTemplateForSlot(slot);
+                        String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                         if (!StringUtils.isEmpty(vmTemplate)) {
                             context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
                             t = TemplateType.RICH;

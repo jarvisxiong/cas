@@ -2,8 +2,6 @@ package com.inmobi.adserve.channels.api;
 
 import io.netty.channel.Channel;
 
-import com.ning.http.client.AsyncHttpClient;
-
 
 public abstract class HttpRequestHandlerBase {
 
@@ -25,5 +23,4 @@ public abstract class HttpRequestHandlerBase {
 
     public abstract AuctionEngineInterface getAuctionEngine();
 
-    public abstract AsyncHttpClient getAsyncClient();
 }

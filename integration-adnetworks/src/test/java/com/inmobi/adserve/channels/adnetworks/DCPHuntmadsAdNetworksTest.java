@@ -152,7 +152,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
+        sasParams.setSlot((short) 15);
         sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "1324";
         SlotSizeMapping.init();
@@ -177,7 +177,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("12");
+        sasParams.setSlot((short) 12);
         sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "1324";
         SlotSizeMapping.init();
@@ -202,7 +202,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         casInternalRequestParameters.latLong = " ,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
+        sasParams.setSlot((short) 15);
         sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "1324";
         SlotSizeMapping.init();
@@ -228,7 +228,6 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("");
         sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "1324";
         SlotSizeMapping.init();
@@ -303,7 +302,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short) 4);
         sasParams.setSource("wap");
         sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "19100";
@@ -331,7 +330,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short) 4);
         sasParams.setSdkVersion("i360");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
         sasParams.setSource("app");
@@ -360,7 +359,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short) 4);
         sasParams.setSdkVersion("i360");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
         sasParams.setSource("app");
@@ -371,9 +370,9 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
                 + "-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            huntmadsAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                huntmadsAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpHuntmadsAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
         String response = "[{\"url\" : \"http://ads.huntmad.com/6/redir/1bacab71-a839-11e3-92f1-a0369f0a5201/0/550667\", \"text\" : \"\", \"img\" : \"http://admarvel.s3.amazonaws.com/ads/c195800/13934438747851_300x50.png\", \"track\" : \"http://ads.huntmad.com/6/img/1bacab71-a839-11e3-92f1-a0369f0a5201?redir=http%3A%2F%2F184.73.151.140%2Ffam%2Fview.php%3Fp%3D__pid%3D80a39249e06655a3__sid%3D75833__bid%3D951143__cb%3Dc0442f5b13__h%3D1394444898__uid%3D8d7e3052bf2d166aeb6605e97903f71432012870__tp%3D19352aca746c090f32e6edae176f5e39__os%3DAndroid__s%3D197ce8c07776458ff77e7a4d51cf5d06\", \"content\" : \"<a href='http://ads.huntmad.com/6/redir/1bacab71-a839-11e3-92f1-a0369f0a5201/0/550667' target='_self'><img src='http://admarvel.s3.amazonaws.com/ads/c195800/13934438747851_300x50.png' width='300' height='50' alt='' title='' border='0' /></a><img src=\\\"http://184.73.151.140/fam/view.php?p=__pid=80a39249e06655a3__sid=75833__bid=951143__cb=c0442f5b13__h=1394444898__uid=8d7e3052bf2d166aeb6605e97903f71432012870__tp=19352aca746c090f32e6edae176f5e39__os=Android__s=197ce8c07776458ff77e7a4d51cf5d06\\\" alt=\\\"\\\" width=\\\"1\\\" height=\\\"1\\\" /><img src=\\\"http://ads.huntmad.com/6/img/1bacab71-a839-11e3-92f1-a0369f0a5201\\\" width=\\\"1\\\" height=\\\"1\\\" alt=\\\"\\\"/>\", \"response\" : \"<a href='http://184.73.151.140/fam/ck.php?p=__pid=80a39249e06655a3__sid=75833__bid=951143__cb=17757dc446__h=1394444898__uid=8d7e3052bf2d166aeb6605e97903f71432012870__tp=19352aca746c090f32e6edae176f5e39__os=Android__s=51684c5491c2dc651ecbd604f853b143' target='_self'><img src='http://admarvel.s3.amazonaws.com/ads/c195800/13934438747851_300x50.png' width='300' height='50' alt='' title='' border='0' /></a><img src=\\\"http://184.73.151.140/fam/view.php?p=__pid=80a39249e06655a3__sid=75833__bid=951143__cb=c0442f5b13__h=1394444898__uid=8d7e3052bf2d166aeb6605e97903f71432012870__tp=19352aca746c090f32e6edae176f5e39__os=Android__s=197ce8c07776458ff77e7a4d51cf5d06\\\" alt=\\\"\\\" width=\\\"1\\\" height=\\\"1\\\" />\" }]";
@@ -384,10 +383,6 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         assertEquals(expectedResponse, dcpHuntmadsAdNetwork.getHttpResponseContent());
     }
 
-    
-    
-    
-    
     @Test
     public void testDCPHuntmadsParseInvalidResponse() throws Exception {
         String response = "HTTP/1.1 20a OK\nServer=Netscape-Enterprise/4.1\n\n[{\"error\" : \"No ads available\"}];";

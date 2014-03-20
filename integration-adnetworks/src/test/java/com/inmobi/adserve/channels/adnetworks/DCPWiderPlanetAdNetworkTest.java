@@ -186,7 +186,7 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
+        sasParams.setSlot(Short.valueOf("15"));
         String externalKey = "7211";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c"
@@ -214,7 +214,7 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
+        sasParams.setSlot(Short.valueOf("15"));
         String externalKey = "7211";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c"
@@ -242,7 +242,7 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase {
         sasParams.setSource("WAP");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
+        sasParams.setSlot(Short.valueOf("15"));
         String externalKey = "7211";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c"

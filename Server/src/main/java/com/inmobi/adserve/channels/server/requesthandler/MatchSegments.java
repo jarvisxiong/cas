@@ -89,14 +89,14 @@ public class MatchSegments {
     public List<AdvertiserMatchedSegmentDetail> matchSegments(final SASRequestParameters sasParams) {
 
         Marker traceMarker = traceMarkerProvider.get();
-        String slotStr = sasParams.getSlot();
-        String countryStr = sasParams.getCountryStr();
+        Short slotId = sasParams.getSlot();
+        Long countryId = sasParams.getCountryId();
         int osId = sasParams.getOsId();
         String sourceStr = sasParams.getSource();
         String siteRatingStr = sasParams.getSiteType();
         Integer targetingPlatform = (sourceStr == null || sourceStr.equalsIgnoreCase("wap")) ? 2 : 1 /* app */;
         Integer siteRating = -1;
-        if (null == siteRatingStr || slotStr == null || sasParams.getCategories() == null
+        if (null == siteRatingStr || slotId == null || sasParams.getCategories() == null
                 || sasParams.getCategories().isEmpty()) {
             return null;
         }
@@ -113,11 +113,11 @@ public class MatchSegments {
             LOG.debug(
                     traceMarker,
                     "Requesting Parameters :  slot: {} categories: {} country: {} targetingPlatform: {} siteRating: {} osId: {}",
-                    slotStr, sasParams.getCategories(), countryStr, targetingPlatform, siteRating, osId);
-            long slot = Long.parseLong(slotStr);
+                    slotId, sasParams.getCategories(), countryId, targetingPlatform, siteRating, osId);
+            long slot = slotId.longValue();
             long country = -1;
-            if (countryStr != null) {
-                country = Long.parseLong(countryStr);
+            if (countryId != null) {
+                country = countryId;
             }
 
             return (matchSegments(slot, getCategories(sasParams), country, targetingPlatform, siteRating, osId,

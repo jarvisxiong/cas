@@ -20,11 +20,11 @@ import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
@@ -149,8 +149,8 @@ public class DrawBridgeAdNetwork extends AbstractDCPAdNetworkImpl {
         if (null != dim) {
             finalUrl.append("&_adw=").append((int) dim.getWidth()).append("&_adh=").append((int) dim.getHeight());
         }
-        if (!(StringUtils.isEmpty(sasParams.getCountry()) || sasParams.getCountry().equals("null"))) {
-            finalUrl.append("&_dco=").append(getCountry(sasParams.getCountry()));
+        if (!(StringUtils.isEmpty(sasParams.getCountryCode()) || sasParams.getCountryCode().equals("null"))) {
+            finalUrl.append("&_dco=").append(getCountry(sasParams.getCountryCode()));
         }
         finalUrl.append("&_clickbeacon=").append(getURLEncode(clickUrl, format));
         finalUrl.append("&_aid=").append(blindedSiteId);
@@ -247,8 +247,8 @@ public class DrawBridgeAdNetwork extends AbstractDCPAdNetworkImpl {
 
     // get ad dimension
     public Dimension getAdDimension() {
-        if (sasParams.getSlot() != null && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            return (SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())));
+        if (sasParams.getSlot() != null && SlotSizeMapping.getDimension((long) (sasParams.getSlot())) != null) {
+            return (SlotSizeMapping.getDimension((long) sasParams.getSlot()));
         }
         return (new Dimension(320, 50));
     }

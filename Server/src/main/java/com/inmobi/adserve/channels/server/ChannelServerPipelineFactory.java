@@ -32,13 +32,14 @@ public class ChannelServerPipelineFactory extends ChannelInitializer<SocketChann
     private final ServletHandler               servletHandler;
     private final ServerConfig                 serverConfig;
     private final LoggingHandler               loggingHandler;
+    private final RequestParserHandler         requestParserHandler;
 
     @Inject
     ChannelServerPipelineFactory(final ServerConfig serverConfig,
             final Provider<HttpRequestHandler> httpRequestHandlerProvider, final TraceMarkerhandler traceMarkerhandler,
             final ServletHandler servletHandler,
             @IncomingConnectionLimitHandler final ConnectionLimitHandler incomingConnectionLimitHandler,
-            final LoggingHandler loggingHandler) {
+            final LoggingHandler loggingHandler, final RequestParserHandler requestParserHandler) {
 
         this.serverConfig = serverConfig;
         this.httpRequestHandlerProvider = httpRequestHandlerProvider;
@@ -47,6 +48,7 @@ public class ChannelServerPipelineFactory extends ChannelInitializer<SocketChann
         this.incomingConnectionLimitHandler = incomingConnectionLimitHandler;
         this.servletHandler = servletHandler;
         this.loggingHandler = loggingHandler;
+        this.requestParserHandler = requestParserHandler;
     }
 
     @Override
@@ -66,6 +68,7 @@ public class ChannelServerPipelineFactory extends ChannelInitializer<SocketChann
         pipeline.addLast("traceMarkerhandler", traceMarkerhandler);
         pipeline.addLast("servletHandler", servletHandler);
         // pipeline.addLast("casCodec", new CasCodec());
+        pipeline.addLast("requestParserHandler", requestParserHandler);
         pipeline.addLast("handler", httpRequestHandlerProvider.get());
     }
 }

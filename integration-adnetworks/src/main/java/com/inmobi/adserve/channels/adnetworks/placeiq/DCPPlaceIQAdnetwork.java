@@ -27,8 +27,8 @@ import org.xml.sax.InputSource;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
@@ -142,9 +142,8 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             isGeoOrDeviceIdPresent = true;
         }
 
-        if (!StringUtils.isBlank(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
@@ -212,8 +211,8 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
          * if (StringUtils.isNotEmpty(casInternalRequestParameters.zipCode)) { appendQueryParam(url, ZIP,
          * casInternalRequestParameters.zipCode, false); }
          */
-        if (StringUtils.isNotEmpty(sasParams.getCountry())) {
-            appendQueryParam(url, COUNTRY, sasParams.getCountry().toUpperCase(), false);
+        if (StringUtils.isNotEmpty(sasParams.getCountryCode())) {
+            appendQueryParam(url, COUNTRY, sasParams.getCountryCode().toUpperCase(), false);
         }
 
         appendQueryParam(url, SIZE, String.format(sizeFormat, width, height), false);

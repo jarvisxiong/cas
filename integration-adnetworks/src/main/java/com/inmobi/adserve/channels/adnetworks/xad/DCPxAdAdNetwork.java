@@ -18,11 +18,11 @@ import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
@@ -58,9 +58,8 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
         }
         host = config.getString("xad.host");
 
-        if (!StringUtils.isBlank(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
@@ -125,8 +124,8 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
                 url.append("&uid_tr=").append(casInternalRequestParameters.uidADT);
             }
             url.append("&size=").append(width).append("x").append(height);
-            if (sasParams.getCountry() != null) {
-                url.append("&co=").append(sasParams.getCountry().toUpperCase());
+            if (sasParams.getCountryCode() != null) {
+                url.append("&co=").append(sasParams.getCountryCode().toUpperCase());
             }
             url.append("&category=").append(getURLEncode(categories, format));
             int osId = sasParams.getOsId() - 1;

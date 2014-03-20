@@ -8,10 +8,14 @@
 	<parent>
 		<groupId>com.inmobi.channels</groupId>
 		<artifactId>cas</artifactId>
-		<version>3.60-SNAPSHOT</version>
+		<version>3.62-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
+        <dependency>
+             <groupId>com.inmobi.commons</groupId>
+             <artifactId>datatypes-java</artifactId>
+         </dependency>
 		<dependency>
 			<groupId>com.google.inject.extensions</groupId>
 			<artifactId>guice-assistedinject</artifactId>
@@ -162,7 +166,11 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>com.inmobi.commons</groupId>
+            <artifactId>datatypes-java</artifactId>
+        </dependency>
+    </dependencies>
 	<build>
 		<plugins>
 			<plugin>

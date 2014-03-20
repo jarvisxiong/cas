@@ -17,11 +17,11 @@ import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
@@ -86,9 +86,8 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
                 && StringUtils.isNotBlank(sasParams.getLocSrc())) { // request has true lat-long
             return false;
         }
-        if (!StringUtils.isBlank(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
@@ -133,7 +132,7 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
             if (!StringUtils.isEmpty(sasParams.getGender())) {
                 url.append("&ei=gender=").append(sasParams.getGender().toLowerCase());
             }
-            if (!StringUtils.isEmpty(sasParams.getAge())) {
+            if (null != sasParams.getAge()) {
                 url.append(";age=").append(sasParams.getAge());
             }
             url.append("&ua=").append(getURLEncode(sasParams.getUserAgent(), format));

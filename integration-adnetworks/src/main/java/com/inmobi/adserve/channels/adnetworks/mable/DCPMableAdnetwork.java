@@ -20,11 +20,11 @@ import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
@@ -60,9 +60,8 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
 
-        if (!StringUtils.isBlank(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
@@ -118,8 +117,8 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
             if (sasParams.getAge() != null) {
                 request.put("age", sasParams.getAge());
             }
-            if (sasParams.getCountry() != null) {
-                request.put("country", sasParams.getCountry());
+            if (sasParams.getCountryCode() != null) {
+                request.put("country", sasParams.getCountryCode());
             }
             if (sasParams.getPostalCode() != null) {
                 request.put("zip", sasParams.getPostalCode());

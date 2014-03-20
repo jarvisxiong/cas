@@ -97,7 +97,7 @@ public class IFDAdNetwork extends AbstractDCPAdNetworkImpl {
         }
 
         try {
-            paramMap.put("mk-ad-slot", sasParams.getSlot());
+            paramMap.put("mk-ad-slot", sasParams.getSlot().toString());
         }
         catch (Exception exception) {
             throw new Exception("mandatory parameter mk-ad-slot value is missing");
@@ -116,16 +116,16 @@ public class IFDAdNetwork extends AbstractDCPAdNetworkImpl {
         }
 
         try {
-            paramMap.put("h-id", sasParams.getHandset().getString(0));
+            paramMap.put("h-id", sasParams.getHandsetInternalId() + "");
         }
         catch (Exception exception) {
             throw new Exception("mandatory parameter handset value is either null or not formatted properly.");
         }
 
         try {
-            paramMap.put("cid", sasParams.getCarrier().getString(0));
-            paramMap.put("cnid", sasParams.getCarrier().getString(1));
-            paramMap.put("cc", sasParams.getCarrier().getString(2).toUpperCase());
+            paramMap.put("cid", sasParams.getCarrierId() + "");
+            paramMap.put("cnid", sasParams.getCountryCode());
+            paramMap.put("cc", sasParams.getCountryId().toString());
         }
         catch (Exception exception) {
             throw new Exception("mandatory parameter carrier value is either null or not formatted properly.");

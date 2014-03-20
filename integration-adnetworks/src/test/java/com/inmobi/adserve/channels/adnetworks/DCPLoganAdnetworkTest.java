@@ -148,7 +148,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
+        sasParams.setSlot((short) 15);
         String externalKey = "1324";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
@@ -173,7 +173,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
         casInternalRequestParameters.latLong = " ,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
+        sasParams.setSlot((short) 15);
         String externalKey = "1324";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c"
@@ -199,7 +199,6 @@ public class DCPLoganAdnetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("");
         String externalKey = "1324";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c"
@@ -295,7 +294,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short) 4);
         sasParams.setSource("wap");
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c"
@@ -321,7 +320,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short) 4);
         sasParams.setSdkVersion("i360");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
         sasParams.setSource("app");
