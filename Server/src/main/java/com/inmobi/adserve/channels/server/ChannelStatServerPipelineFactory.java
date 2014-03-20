@@ -13,8 +13,8 @@ import lombok.Getter;
 import org.apache.commons.configuration.Configuration;
 
 import com.google.inject.Provider;
-import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
 import com.inmobi.adserve.channels.server.handler.TraceMarkerhandler;
+import com.inmobi.adserve.channels.util.annotations.ServerConfiguration;
 
 
 public class ChannelStatServerPipelineFactory extends ChannelInitializer<SocketChannel> {

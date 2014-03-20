@@ -11,7 +11,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.google.inject.name.Named;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
-import com.inmobi.adserve.channels.server.AdapterType;
+import com.inmobi.adserve.channels.util.AdapterType;
 
 
 /**

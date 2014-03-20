@@ -11,9 +11,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.ConnectionLimitHandler;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.annotations.IncomingConnectionLimitHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
+import com.inmobi.adserve.channels.util.annotations.IncomingConnectionLimitHandler;
 
 
 @Singleton

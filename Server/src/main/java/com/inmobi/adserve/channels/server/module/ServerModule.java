@@ -2,8 +2,6 @@ package com.inmobi.adserve.channels.server.module;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.ws.rs.Path;
 
@@ -21,12 +19,9 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.module.AdapterConfigModule;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ChannelServer;
-import com.inmobi.adserve.channels.server.annotations.LoggerConfiguration;
-import com.inmobi.adserve.channels.server.annotations.RtbConfiguration;
-import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.AuctionEngine;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
@@ -34,6 +29,9 @@ import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import com.inmobi.adserve.channels.util.annotations.LoggerConfiguration;
+import com.inmobi.adserve.channels.util.annotations.RtbConfiguration;
+import com.inmobi.adserve.channels.util.annotations.ServerConfiguration;
 
 
 /**
@@ -68,13 +66,11 @@ public class ServerModule extends AbstractModule {
         bind(Configuration.class).annotatedWith(ServerConfiguration.class).toInstance(serverConfiguration);
         bind(Configuration.class).annotatedWith(LoggerConfiguration.class).toInstance(loggerConfiguration);
         bind(Configuration.class).annotatedWith(RtbConfiguration.class).toInstance(rtbConfiguration);
-        bind(ExecutorService.class).toInstance(Executors.newCachedThreadPool());
 
         requestStaticInjection(ChannelSegment.class);
         requestStaticInjection(Logging.class);
         requestStaticInjection(AuctionEngine.class);
         requestStaticInjection(ResponseSender.class);
-        requestStaticInjection(RtbAdNetwork.class);
 
         install(new AdapterConfigModule(adapterConfiguration, ChannelServer.dataCentreName));
         install(new ChannelSegmentFilterModule());

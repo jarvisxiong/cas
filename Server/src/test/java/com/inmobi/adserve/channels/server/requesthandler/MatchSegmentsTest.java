@@ -21,7 +21,7 @@ import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ServletHandler;
-import com.inmobi.adserve.channels.server.module.NettyModule;
+import com.inmobi.adserve.channels.server.module.CasNettyModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 
@@ -41,7 +41,7 @@ public class MatchSegmentsTest extends TestCase {
 
         ServletHandler.init(configurationLoder, repositoryHelper);
 
-        Injector injector = Guice.createInjector(new NettyModule(configurationLoder.getServerConfiguration()),
+        Injector injector = Guice.createInjector(new CasNettyModule(configurationLoder.getServerConfiguration()),
                 new ServerModule(configurationLoder, repositoryHelper));
 
         matchSegments = injector.getInstance(MatchSegments.class);

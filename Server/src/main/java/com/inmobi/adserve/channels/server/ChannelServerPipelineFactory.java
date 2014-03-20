@@ -15,11 +15,13 @@ import javax.inject.Inject;
 import lombok.Getter;
 
 import com.google.inject.Provider;
-import com.inmobi.adserve.channels.server.annotations.IncomingConnectionLimitHandler;
+import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.config.ServerConfig;
 import com.inmobi.adserve.channels.server.handler.TraceMarkerhandler;
+import com.inmobi.adserve.channels.util.annotations.IncomingConnectionLimitHandler;
 
 
+@Singleton
 public class ChannelServerPipelineFactory extends ChannelInitializer<SocketChannel> {
 
     private final RequestIdHandler             requestIdHandler;

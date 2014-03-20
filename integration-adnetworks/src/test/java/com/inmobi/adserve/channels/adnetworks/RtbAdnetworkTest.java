@@ -8,11 +8,13 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 import junit.framework.TestCase;
 
@@ -29,9 +31,11 @@ import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.server.config.ServerConfig;
 import com.inmobi.casthrift.rtb.Bid;
 import com.inmobi.casthrift.rtb.BidResponse;
 import com.inmobi.casthrift.rtb.SeatBid;
@@ -88,7 +92,22 @@ public class RtbAdnetworkTest extends TestCase {
         EasyMock.expect(repositoryHelper.queryCurrencyConversionRepository(EasyMock.isA(String.class)))
                 .andReturn(currencyConversionEntity).anyTimes();
         EasyMock.replay(repositoryHelper);
+
         rtbAdNetwork = new RtbAdNetwork(mockConfig, null, base, serverChannel, urlBase, "rtb", 200, repositoryHelper);
+
+        Field asyncHttpClientProviderField = RtbAdNetwork.class.getDeclaredField("asyncHttpClientProvider");
+        asyncHttpClientProviderField.setAccessible(true);
+        ServerConfig serverConfig = createMock(ServerConfig.class);
+        expect(serverConfig.getDcpRequestTimeoutInMillis()).andReturn(800).anyTimes();
+        expect(serverConfig.getRtbRequestTimeoutInMillis()).andReturn(200).anyTimes();
+        expect(serverConfig.getMaxDcpOutGoingConnections()).andReturn(200).anyTimes();
+        expect(serverConfig.getMaxRtbOutGoingConnections()).andReturn(200).anyTimes();
+        replay(serverConfig);
+        AsyncHttpClientProvider asyncHttpClientProvider = new AsyncHttpClientProvider(serverConfig,
+                Executors.newCachedThreadPool());
+        asyncHttpClientProvider.setup();
+        asyncHttpClientProviderField.set(null, asyncHttpClientProvider);
+
         Bid bid2 = new Bid();
         bid2.id = "ab73dd4868a0bbadf8fd7527d95136b4";
         bid2.adid = "1335571993285";

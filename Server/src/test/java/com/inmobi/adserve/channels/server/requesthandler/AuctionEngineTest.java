@@ -18,21 +18,20 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
-import com.google.inject.Module;
+import com.google.inject.util.Modules;
 import com.inmobi.adserve.channels.adnetworks.tapit.DCPTapitAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.server.ChannelServer;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ServletHandler;
-import com.inmobi.adserve.channels.server.annotations.RtbConfiguration;
-import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
-import com.inmobi.adserve.channels.server.module.AdapterConfigModule;
+import com.inmobi.adserve.channels.server.module.CasNettyModule;
+import com.inmobi.adserve.channels.server.module.ServerModule;
 import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilterApplierTest;
+import com.inmobi.adserve.channels.server.requesthandler.filters.TestScopeModule;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 
 
@@ -73,21 +72,8 @@ public class AuctionEngineTest {
         casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.auctionId = "auctionId";
 
-        Module module = new AbstractModule() {
-
-            @Override
-            protected void configure() {
-                bind(Configuration.class).annotatedWith(ServerConfiguration.class).toInstance(
-                        config.getServerConfiguration());
-                bind(Configuration.class).annotatedWith(RtbConfiguration.class)
-                        .toInstance(config.getRtbConfiguration());
-
-                install(new AdapterConfigModule(config.getAdapterConfiguration(), ChannelServer.dataCentreName));
-                requestStaticInjection(AuctionEngine.class);
-            }
-        };
-
-        Guice.createInjector(module);
+        Guice.createInjector(Modules.override(new ServerModule(config, createMock(RepositoryHelper.class)),
+                new CasNettyModule(config.getServerConfiguration())).with(new TestScopeModule()));
 
     }
 

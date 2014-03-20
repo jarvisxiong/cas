@@ -16,8 +16,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
 import java.util.regex.Pattern;
+
+import javax.inject.Inject;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -33,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
-import com.google.inject.Inject;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -41,9 +41,9 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.IABCategoriesInterface;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.IABCitiesInterface;
@@ -63,7 +63,6 @@ import com.inmobi.casthrift.rtb.SeatBid;
 import com.inmobi.casthrift.rtb.Site;
 import com.inmobi.casthrift.rtb.User;
 import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 
@@ -139,29 +138,12 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Getter
     static List<String>                    currenciesSupported          = new ArrayList<String>(Arrays.asList("USD",
                                                                                 "RMB"));
-    private static AsyncHttpClient         asyncHttpClient;
-
     @Inject
-    private static ExecutorService         executorService;
-
-    static {
-        ConfigurationLoader configurationLoader = ConfigurationLoader
-                .getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
-
-        AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder()
-                .setRequestTimeoutInMs(configurationLoader.getRtbConfiguration().getInt("RTBreadtimeoutMillis"))
-                .setConnectionTimeoutInMs(configurationLoader.getRtbConfiguration().getInt("RTBreadtimeoutMillis"))
-                .setAllowPoolingConnection(true)
-                .setMaximumConnectionsTotal(
-                        configurationLoader.getServerConfiguration().getInt("rtbOutGoingMaxConnections", 200))
-                .setExecutorService(executorService).build();
-        asyncHttpClient = new AsyncHttpClient(asyncHttpClientConfig);
-
-    }
+    private static AsyncHttpClientProvider asyncHttpClientProvider;
 
     @Override
     protected AsyncHttpClient getAsyncHttpClient() {
-        return asyncHttpClient;
+        return asyncHttpClientProvider.getRtbAsyncHttpClient();
     }
 
     public RtbAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
@@ -554,7 +536,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length)).setBody(body)
                 .setHeader(HttpHeaders.Names.HOST, uriCallBack.getHost()).build();
 
-        boolean callbackResult = impressionCallbackHelper.writeResponse(uriCallBack, ningRequest, asyncHttpClient);
+        boolean callbackResult = impressionCallbackHelper.writeResponse(uriCallBack, ningRequest, getAsyncHttpClient());
         if (callbackResult) {
             LOG.debug("Callback is sent successfully");
         }

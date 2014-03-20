@@ -45,18 +45,18 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 
 public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
 
-    private static final Logger     LOG               = LoggerFactory.getLogger(HttpRequestHandler.class);
+    private static final Logger LOG               = LoggerFactory.getLogger(HttpRequestHandler.class);
 
-    public String                   terminationReason = "NO";
-    public JSONObject               jObject           = null;
-    public ResponseSender           responseSender;
+    public String               terminationReason = "NO";
+    public JSONObject           jObject           = null;
+    public ResponseSender       responseSender;
 
-    private final Provider<Marker>  traceMarkerProvider;
-    private Marker                  traceMarker;
+    private Provider<Marker>    traceMarkerProvider;
+    private Marker              traceMarker;
 
-    private final Provider<Servlet> servletProvider;
+    private Provider<Servlet>   servletProvider;
 
-    private HttpRequest             httpRequest;
+    private HttpRequest         httpRequest;
 
     public String getTerminationReason() {
         return terminationReason;
@@ -66,10 +66,15 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
         this.terminationReason = terminationReason;
     }
 
+    public HttpRequestHandler() {
+        responseSender = new ResponseSender(this);
+    }
+
     @Inject
     HttpRequestHandler(final Provider<Marker> traceMarkerProvider, final Provider<Servlet> servletProvider) {
         this.traceMarkerProvider = traceMarkerProvider;
         this.servletProvider = servletProvider;
+        responseSender = new ResponseSender(this);
     }
 
     /**
@@ -126,8 +131,6 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
         try {
-            responseSender = new ResponseSender(this);
-
             httpRequest = (HttpRequest) msg;
 
             traceMarker = traceMarkerProvider.get();

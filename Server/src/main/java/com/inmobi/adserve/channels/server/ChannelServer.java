@@ -21,8 +21,8 @@ import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.util.Modules;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
@@ -39,9 +39,8 @@ import com.inmobi.adserve.channels.repository.SiteEcpmRepository;
 import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
 import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
 import com.inmobi.adserve.channels.server.api.ConnectionType;
-import com.inmobi.adserve.channels.server.module.NettyModule;
+import com.inmobi.adserve.channels.server.module.CasNettyModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
-import com.inmobi.adserve.channels.server.netty.CasNettyServer;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.MetricsManager;
@@ -49,6 +48,8 @@ import com.inmobi.casthrift.DataCenter;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import com.inmobi.messaging.publisher.MessagePublisherFactory;
 import com.inmobi.phoenix.exception.InitializationException;
+import com.netflix.governator.guice.LifecycleInjector;
+import com.netflix.governator.lifecycle.LifecycleManager;
 
 
 /*
@@ -162,16 +163,22 @@ public class ChannelServer {
             }
 
             // Configure the netty server.
-            Injector injector = Guice.createInjector(new NettyModule(configurationLoader.getServerConfiguration()),
-                    new ServerModule(configurationLoader, repositoryHelper));
-            final CasNettyServer server = injector.getInstance(CasNettyServer.class);
+            Injector injector = LifecycleInjector
+                    .builder()
+                    .withModules(
+                            Modules.combine(new CasNettyModule(configurationLoader.getServerConfiguration()),
+                                    new ServerModule(configurationLoader, repositoryHelper)))
+                    .usingBasePackages("com.inmobi.adserve.channels.server.netty",
+                            "com.inmobi.adserve.channels.api.provider").build().createInjector();
 
-            server.startAndWait();
+            final LifecycleManager manager = injector.getInstance(LifecycleManager.class);
+            manager.start();
 
             Runtime.getRuntime().addShutdownHook(new Thread() {
+
                 @Override
                 public void run() {
-                    server.stopAndWait();
+                    manager.close();
                 }
             });
 

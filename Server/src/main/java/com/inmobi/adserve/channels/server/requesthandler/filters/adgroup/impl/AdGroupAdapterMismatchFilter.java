@@ -10,12 +10,12 @@ import org.slf4j.Marker;
 
 import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.server.AdapterType;
 import com.inmobi.adserve.channels.server.beans.CasContext;
 import com.inmobi.adserve.channels.server.config.AdapterConfig;
 import com.inmobi.adserve.channels.server.config.ServerConfig;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AbstractAdGroupLevelFilter;
+import com.inmobi.adserve.channels.util.AdapterType;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
 

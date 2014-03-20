@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONObject;
@@ -25,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.CategoryList;
 import com.inmobi.adserve.channels.util.IABCategoriesInterface;
@@ -88,6 +91,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected static final String                 ZIP                     = "zip";
     protected static final String                 COUNTRY                 = "country";
     protected static final String                 GENDER                  = "gender";
+
+    @Inject
+    private static AsyncHttpClientProvider        asyncHttpClientProvider;
 
     public BaseAdNetworkImpl(final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         this.baseRequestHandler = baseRequestHandler;
@@ -223,7 +229,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     protected AsyncHttpClient getAsyncHttpClient() {
-        return baseRequestHandler.getAsyncClient();
+        return asyncHttpClientProvider.getDcpAsyncHttpClient();
     }
 
     protected Request getNingRequest() throws Exception {
