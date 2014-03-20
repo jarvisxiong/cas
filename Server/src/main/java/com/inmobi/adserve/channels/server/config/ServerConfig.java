@@ -8,6 +8,7 @@ import org.apache.commons.configuration.Configuration;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.api.config.CasConfig;
 import com.inmobi.adserve.channels.util.annotations.RtbConfiguration;
 import com.inmobi.adserve.channels.util.annotations.ServerConfiguration;
 

@@ -16,8 +16,8 @@ import com.google.inject.name.Names;
 import com.google.inject.util.Providers;
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
-import com.inmobi.adserve.channels.server.config.AdapterConfig;
-import com.inmobi.adserve.channels.server.config.AdapterConfigFactory;
+import com.inmobi.adserve.channels.api.config.AdapterConfig;
+import com.inmobi.adserve.channels.api.config.AdapterConfigFactory;
 import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
 
 

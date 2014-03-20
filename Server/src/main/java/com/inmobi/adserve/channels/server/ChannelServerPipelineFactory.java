@@ -16,7 +16,7 @@ import lombok.Getter;
 
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import com.inmobi.adserve.channels.server.config.ServerConfig;
+import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.server.handler.TraceMarkerhandler;
 import com.inmobi.adserve.channels.util.annotations.IncomingConnectionLimitHandler;
 
