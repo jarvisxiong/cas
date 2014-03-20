@@ -1,13 +1,9 @@
 package com.inmobi.adserve.channels.server;
 
-import static org.jboss.netty.channel.Channels.pipeline;
-
-import java.util.concurrent.TimeUnit;
-
-import javax.inject.Inject;
-
+import com.google.inject.Provider;
+import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
+import com.inmobi.adserve.channels.server.handler.TraceMarkerhandler;
 import lombok.Getter;
-
 import org.apache.commons.configuration.Configuration;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -17,9 +13,10 @@ import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
 import org.jboss.netty.handler.timeout.IdleStateHandler;
 import org.jboss.netty.util.Timer;
 
-import com.google.inject.Provider;
-import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
-import com.inmobi.adserve.channels.server.handler.TraceMarkerhandler;
+import javax.inject.Inject;
+import java.util.concurrent.TimeUnit;
+
+import static org.jboss.netty.channel.Channels.pipeline;
 
 
 public class ChannelStatServerPipelineFactory implements ChannelPipelineFactory {
@@ -32,11 +29,13 @@ public class ChannelStatServerPipelineFactory implements ChannelPipelineFactory 
     // private final ExecutionHandler executionHandler;
     @Getter
     private final ServletHandler               servletHandler;
+    private final RequestParserHandler         requestParserHandler;
+
 
     @Inject
     ChannelStatServerPipelineFactory(final Timer timer, @ServerConfiguration final Configuration configuration,
             final Provider<HttpRequestHandler> httpRequestHandlerProvider, final ServletHandler servletHandler,
-            final TraceMarkerhandler traceMarkerhandler) {
+            final TraceMarkerhandler traceMarkerhandler, final RequestParserHandler requestParserHandler) {
         this.timer = timer;
         this.serverTimeoutMillis = configuration.getInt("serverTimeoutMillis", 825);
         // executionHandler = new ExecutionHandler(new OrderedMemoryAwareThreadPoolExecutor(80, 1048576, 1048576, 3,
@@ -45,6 +44,7 @@ public class ChannelStatServerPipelineFactory implements ChannelPipelineFactory 
         this.traceMarkerhandler = traceMarkerhandler;
         this.requestIdHandler = new RequestIdHandler();
         this.servletHandler = servletHandler;
+        this.requestParserHandler = requestParserHandler;
     }
 
     @Override
@@ -59,6 +59,7 @@ public class ChannelStatServerPipelineFactory implements ChannelPipelineFactory 
                 TimeUnit.MILLISECONDS));
         pipeline.addLast("traceMarkerhandler", traceMarkerhandler);
         pipeline.addLast("servletHandler", servletHandler);
+        pipeline.addLast("requestParserHandler", requestParserHandler);
         pipeline.addLast("handler", httpRequestHandlerProvider.get());
         return pipeline;
     }
