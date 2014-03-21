@@ -315,7 +315,7 @@ public class ClickUrlMakerV6 {
             cryptoHashGenerator = new CryptoHashGenerator(cryptoSecretKey);
         }
         adUrlSuffix.append(appendSeparator(cryptoHashGenerator.generateHash(adUrlSuffix.toString())));
-        beaconUrlSuffix.append(appendSeparator(cryptoHashGenerator.generateHash(adUrlSuffix.toString())));
+        beaconUrlSuffix.append(appendSeparator(cryptoHashGenerator.generateHash(beaconUrlSuffix.toString())));
         if (null != clickURLPrefix) {
             clickUrl = this.clickURLPrefix + adUrlSuffix.toString();
         }
