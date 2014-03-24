@@ -5,11 +5,8 @@ import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
 
 import java.io.File;
-import java.security.MessageDigest;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -18,7 +15,6 @@ import org.apache.commons.configuration.Configuration;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
 
@@ -38,11 +34,11 @@ public class DcpBaiduAdNetworkTest extends TestCase {
     private final ClientBootstrap clientBootstrap  = null;
 
     private DCPBaiduAdNetwork     dcpBaiduAdNetwork;
-    private final String          baiduHost      = "http://mobads.baidu.com/cpro/ui/mads.php?u=default&ie=1&n=1&tm=512&cm=512&md=1&at=3&v=api_inmobi&q=debug_cpr&tpl=2";
+    private final String          baiduHost      = "http://mobads.baidu.com/cpro/ui/mads.php?u=default&ie=1&n=1&tm=512&cm=512&md=1&at=3&v=api_inmobi&tpl=2";
     private final String          baiduStatus    = "on";
     private final String          baiduAdvId     = "baiduadv1";
     private final String          baiduTest      = "1";
-    private final String          baiduSeed      = "EJoU6f9DsqDyyxB";
+   
     
     private final String          baiduFormat    = "xml";
 
@@ -177,8 +173,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
         sasParams.setOsId(HandSetOS.Android.getValue());
         String externalKey = "debug";
         SlotSizeMapping.init();
-        Calendar now = Calendar.getInstance();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         String beaconUrl = "http://c2.w.inmobi.com/c"
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
@@ -191,7 +186,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
         if (dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, beaconUrl)) {
             String actualUrl = dcpBaiduAdNetwork.getRequestUri().toString();
             
-            String expectedUrl = "http://mobads.baidu.com/cpro/ui/mads.php?u=default&ie=1&n=1&tm=512&cm=512&md=1&at=3&v=api_inmobi&q=debug_cpr&tpl=2&appid=debug&w=320&h=50&ip=206.29.182.240&impt=http%3A%2F%2Fc2.w.inmobi.com%2Fc.asm%2F4%2Fb%2Fbx5%2Fyaz%2F2%2Fb%2Fa5%2Fm%2F0%2F0%2F0%2F202cb962ac59075b964b07152d234b70%2F4f8d98e2-4bbd-40bc-87e5-22da170600f9%2F-1%2F1%2F9cddca11%3Fbeacon%3Dtrue&clkt=http%3A%2F%2Fc2.w.inmobi.com%2Fc.asm%2F4%2Fb%2Fbx5%2Fyaz%2F2%2Fb%2Fa5%2Fm%2F0%2F0%2F0%2F202cb962ac59075b964b07152d234b70%2F4f8d98e2-4bbd-40bc-87e5-22da170600f9%2F-1%2F1%2F9cddca11%3Fds%3D1&sn=202cb962ac59075b964b07152d234b70&act=LP%2CPH%2CDL%2CMAP%2CSMS%2CMAI%2CVD%2CRM";
+            String expectedUrl = "http://mobads.baidu.com/cpro/ui/mads.php?u=default&ie=1&n=1&tm=512&cm=512&md=1&at=3&v=api_inmobi&tpl=2&appid=debug&w=320&h=50&ip=206.29.182.240&impt=http%3A%2F%2Fc2.w.inmobi.com%2Fc.asm%2F4%2Fb%2Fbx5%2Fyaz%2F2%2Fb%2Fa5%2Fm%2F0%2F0%2F0%2F202cb962ac59075b964b07152d234b70%2F4f8d98e2-4bbd-40bc-87e5-22da170600f9%2F-1%2F1%2F9cddca11%3Fbeacon%3Dtrue&clkt=http%3A%2F%2Fc2.w.inmobi.com%2Fc.asm%2F4%2Fb%2Fbx5%2Fyaz%2F2%2Fb%2Fa5%2Fm%2F0%2F0%2F0%2F202cb962ac59075b964b07152d234b70%2F4f8d98e2-4bbd-40bc-87e5-22da170600f9%2F-1%2F1%2F9cddca11%3Fds%3D1&sn=202cb962ac59075b964b07152d234b70&q=debug_cpr&act=LP%2CPH%2CDL%2CMAP%2CSMS%2CMAI%2CVD%2CRM";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -215,9 +210,9 @@ public class DcpBaiduAdNetworkTest extends TestCase {
         sasParams.setOsId(HandSetOS.Android.getValue());
         String externalKey = "debug";
         SlotSizeMapping.init();
-        Calendar now = Calendar.getInstance();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String secret = getHashedValue(dateFormat.format(now.getTime()) + baiduSeed, "MD5");
+      
+        
+       
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
             baiduAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
             null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
@@ -225,7 +220,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
         if (dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
             String actualUrl = dcpBaiduAdNetwork.getRequestUri().toString();
             String urlWithOutGeo = actualUrl.substring(0,actualUrl.indexOf("&g="));
-            String expectedUrl = "http://mobads.baidu.com/cpro/ui/mads.php?u=default&ie=1&n=1&tm=512&cm=512&md=1&at=3&v=api_inmobi&q=debug_cpr&tpl=2&appid=debug&w=320&h=50&ip=206.29.182.240&impt=&clkt=&sn=202cb962ac59075b964b07152d234b70&act=LP%2CPH%2CDL%2CMAP%2CSMS%2CMAI%2CVD%2CRM";
+            String expectedUrl = "http://mobads.baidu.com/cpro/ui/mads.php?u=default&ie=1&n=1&tm=512&cm=512&md=1&at=3&v=api_inmobi&tpl=2&appid=debug&w=320&h=50&ip=206.29.182.240&impt=&clkt=&sn=202cb962ac59075b964b07152d234b70&q=debug_cpr&act=LP%2CPH%2CDL%2CMAP%2CSMS%2CMAI%2CVD%2CRM";
             assertEquals(expectedUrl, urlWithOutGeo);
         }
     }
@@ -312,20 +307,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
         assertEquals(true,dcpBaiduAdNetwork.isClickUrlRequired());
     }
 
-    private String getHashedValue(final String message, final String hashingType) {
-        try {
-            MessageDigest md = MessageDigest.getInstance(hashingType);
-            byte[] array = md.digest(message.getBytes());
-            StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < array.length; ++i) {
-                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
-            }
-            return sb.toString();
-        }
-        catch (java.security.NoSuchAlgorithmException e) {
-        }
-        return null;
-    }
+   
 }
 
 

@@ -2,16 +2,8 @@ package com.inmobi.adserve.channels.adnetworks.baidu;
 
 import java.awt.Dimension;
 import java.net.URI;
-import java.text.SimpleDateFormat;
+
 import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -20,19 +12,12 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-
 import com.inmobi.adserve.channels.adnetworks.baidu.DCPBaiduAdNetwork;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -43,6 +28,7 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
     private int                           width;
     private int                           height;
     private String                        uid;  
+    
     
     private static final String         APP_ID          = "appid";       
     private static final String         WIDTH           = "w";
@@ -55,7 +41,8 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final String         LP_ACT_VALUE    = "LP,PH,DL,MAP,SMS,MAI,VD,RM";
     private static final String         LP_ACT_TYPE     = "act";
     private static final String         GEO_TEMPLATE    = "%s_%s_%s";     
-    
+    private static final String         Q_FORMAT        = "%s_cpr";
+    private static final String         Q_APPID         = "q";
  
   
    
@@ -128,6 +115,7 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
         appendQueryParam(url, IMP_T_URL, getURLEncode(beaconUrl,format), false);
         appendQueryParam(url, CLK_T_URL, getURLEncode(getClickUrl(),format), false);
         appendQueryParam(url, SN, uid, false);
+        appendQueryParam(url, Q_APPID,String.format(Q_FORMAT,externalSiteId),false);
         appendQueryParam(url, LP_ACT_TYPE,getURLEncode(LP_ACT_VALUE,format),false);
         
         if (StringUtils.isNotEmpty(latitude) && StringUtils.isNotEmpty(longitude) ) {
