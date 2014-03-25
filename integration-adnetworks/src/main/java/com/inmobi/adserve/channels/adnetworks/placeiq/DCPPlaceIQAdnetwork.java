@@ -198,7 +198,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
         //appendQueryParam(url, SECRET, getHashedValue(dateFormat.format(now.getTime()) + seed, "MD5"), false);
         appendQueryParam(url, PT, partnerId, false);
         String category = getCategory();
-        String auId = String.format(auIdFormat, partnerId, category, Long.toHexString(sasParams.getSiteIncId()),
+        String auId = String.format(auIdFormat, externalSiteId, category, Long.toHexString(sasParams.getSiteIncId()),
             Long.toHexString(this.entity.getAdgroupIncId()));
         appendQueryParam(url, ADUNIT, getURLEncode(auId, format), false);
         appendQueryParam(url, CLIENT_IP, sasParams.getRemoteHostIp(), false);
