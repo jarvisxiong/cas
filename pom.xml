@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.inmobi.channels</groupId>
 	<artifactId>cas</artifactId>
-	<version>3.34-SNAPSHOT</version>
+	<version>3.60-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<url>https://github.corp.inmobi.com/channel-adserve</url>
 	<parent>
@@ -22,6 +22,7 @@
 		<guice.version>3.0</guice.version>
 		<guice-multibindings.version>3.0</guice-multibindings.version>
 		<guice-servlet.version>3.0</guice-servlet.version>
+		<guice-assistedinject.version>3.0</guice-assistedinject.version>
 	</properties>
 
 	<modules>
@@ -34,6 +35,11 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>com.google.inject.extensions</groupId>
+				<artifactId>guice-assistedinject</artifactId>
+				<version>${guice-assistedinject.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>com.inmobi.channels</groupId>
 				<artifactId>server</artifactId>
@@ -87,7 +93,7 @@
 			<dependency>
 				<groupId>com.ning</groupId>
 				<artifactId>async-http-client</artifactId>
-				<version>1.6.4</version>
+				<version>1.8.3</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.maven</groupId>

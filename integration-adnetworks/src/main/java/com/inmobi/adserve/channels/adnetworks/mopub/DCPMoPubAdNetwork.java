@@ -2,13 +2,11 @@ package com.inmobi.adserve.channels.adnetworks.mopub;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +15,6 @@ import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.ning.http.client.AsyncCompletionHandler;
-import com.ning.http.client.Request;
-import com.ning.http.client.RequestBuilder;
-import com.ning.http.client.Response;
 
 
 public class DCPMoPubAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -29,7 +23,6 @@ public class DCPMoPubAdNetwork extends AbstractDCPAdNetworkImpl {
     private String              deviceId;
     private static final String name             = "mopub";
     private static final String responseTemplate = "%s <img src='%s' height=1 width=1 border=0 style=\"display:none;\"/>";
-    private Request             ningRequest;
 
     public DCPMoPubAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
@@ -72,14 +65,9 @@ public class DCPMoPubAdNetwork extends AbstractDCPAdNetworkImpl {
         try {
             String host = config.getString("mopub.host");
             StringBuilder url = new StringBuilder(host);
-            url.append("?v=1&id=")
-                        .append(externalSiteId)
-                        .append("&ip=")
-                        .append(sasParams.getRemoteHostIp())
-                        .append("&udid=")
-                        .append(deviceId)
-                        .append("&q=")
-                        .append(getURLEncode(getCategories(',', true, false), format));
+            url.append("?v=1&id=").append(externalSiteId).append("&ip=").append(sasParams.getRemoteHostIp())
+                    .append("&udid=").append(deviceId).append("&q=")
+                    .append(getURLEncode(getCategories(',', true, false), format));
 
             if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
                     && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
@@ -118,74 +106,6 @@ public class DCPMoPubAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public String getId() {
         return (config.getString("mopub.advertiserId"));
-    }
-
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    @Override
-    public boolean makeAsyncRequest() {
-        LOG.debug("In mopub async");
-        try {
-            String uri = getRequestUri().toString();
-            requestUrl = uri;
-            setNingRequest(requestUrl);
-            LOG.debug("Nexage uri : {}", uri);
-            startTime = System.currentTimeMillis();
-            baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
-                @Override
-                public Response onCompleted(final Response response) throws Exception {
-                    if (!isRequestCompleted()) {
-                        LOG.debug("Operation complete for channel partner: {}", getName());
-                        latency = System.currentTimeMillis() - startTime;
-                        LOG.debug("{} operation complete latency {}", getName(), latency);
-                        String responseStr = response.getResponseBody();
-                        responseHeaders = new HashMap<String, String>();
-                        responseHeaders.put("X-Clickthrough", response.getHeader("X-Clickthrough"));
-                        HttpResponseStatus httpResponseStatus = HttpResponseStatus.valueOf(response.getStatusCode());
-                        parseResponse(responseStr, httpResponseStatus);
-                        processResponse();
-                    }
-                    return response;
-                }
-
-                @Override
-                public void onThrowable(final Throwable t) {
-                    if (isRequestComplete) {
-                        return;
-                    }
-
-                    if (t instanceof java.util.concurrent.TimeoutException) {
-                        latency = System.currentTimeMillis() - startTime;
-                        LOG.debug("{} timeout latency ", getName(), latency);
-                        adStatus = "TIME_OUT";
-                        processResponse();
-                        return;
-                    }
-
-                    LOG.debug("{} error latency {}", getName(), latency);
-                    adStatus = "TERM";
-                    LOG.info("error while fetching response from: {} {}", getName(), t);
-                    processResponse();
-                    return;
-                }
-            });
-        }
-        catch (Exception e) {
-            LOG.debug("Exception in {} makeAsyncRequest : {}", getName(), e);
-        }
-        LOG.debug("{} returning from make NingRequest", getName());
-        return true;
-    }
-
-    private void setNingRequest(final String requestUrl) {
-        ningRequest = new RequestBuilder()
-                .setUrl(requestUrl)
-                    .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-                    .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
-                    .setHeader(HttpHeaders.Names.REFERER, requestUrl)
-                    .setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE)
-                    .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
-                    .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-                    .build();
     }
 
 }

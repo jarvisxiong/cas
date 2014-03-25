@@ -5,9 +5,13 @@ import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.inject.Inject;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.thrift.TException;
@@ -24,6 +28,7 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.server.annotations.AdvertiserIdNameMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.MetricsManager;
@@ -66,6 +71,10 @@ public class Logging {
                                                                                            2000);
     private final static Logger                            LOG                     = LoggerFactory
                                                                                            .getLogger(Logging.class);
+
+    @AdvertiserIdNameMap
+    @Inject
+    private static Map<String, String>                     advertiserIdNameMap;
 
     public static ConcurrentHashMap<String, String> getSampledadvertiserlognos() {
         return sampledAdvertiserLogNos;
@@ -320,6 +329,7 @@ public class Logging {
             impressions.add(impression);
         }
         AdRR adRR = new AdRR(host, timestamp, request, impressions, isTerminated, terminationReason);
+        adRR.setTime_stamp(new Date().getTime());
         List<Channel> channels = createChannelsLog(rankList);
         adRR.setChannels(channels);
         if (enableDatabusLogging) {
@@ -337,8 +347,8 @@ public class Logging {
                     osName = HandSetOS.values()[sasParamsOsId - 1].toString();
                 }
                 MetricsManager.updateStats(Integer.parseInt(sasParams.getCountryStr()), sasParams.getCountry(),
-                        sasParams.getOsId(), osName, Filters.getAdvertiserIdToNameMapping().get(advertiserId), false,
-                        false, isServerImpression, 0.0, (long) 0.0, impression.getAd().getWinBid());
+                        sasParams.getOsId(), osName, advertiserIdNameMap.get(advertiserId), false, false,
+                        isServerImpression, 0.0, (long) 0.0, impression.getAd().getWinBid());
             }
         }
         catch (Exception e) {
@@ -371,7 +381,9 @@ public class Logging {
         casAdChain.setCampaign_inc_id(channelSegment.getChannelSegmentEntity().getCampaignIncId());
         casAdChain.setAdgroup_inc_id(channelSegment.getChannelSegmentEntity().getAdgroupIncId());
         casAdChain.setExternalSiteKey(channelSegment.getChannelSegmentEntity().getExternalSiteKey());
-        casAdChain.setDst(DemandSourceType.findByValue(channelSegment.getChannelSegmentEntity().getDst()));
+        // Hardcoded dst for data team to switch RTBD from DCP to RTBD
+        // Will remove and use adgroup dst once their release completes
+        casAdChain.setDst(DemandSourceType.DCP);
         return casAdChain;
     }
 
@@ -464,8 +476,8 @@ public class Logging {
                             osName = HandSetOS.values()[sasParamsOsId - 1].toString();
                         }
                         MetricsManager.updateStats(Integer.parseInt(sasParams.getCountryStr()), sasParams.getCountry(),
-                                sasParams.getOsId(), osName, Filters.getAdvertiserIdToNameMapping().get(advertiserId),
-                                isFilled, true, false, bid, latency, 0.0);
+                                sasParams.getOsId(), osName, advertiserIdNameMap.get(advertiserId), isFilled, true,
+                                false, bid, latency, 0.0);
                     }
                 }
                 catch (Exception e) {

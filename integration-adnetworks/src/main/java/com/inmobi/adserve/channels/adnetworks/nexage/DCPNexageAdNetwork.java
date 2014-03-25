@@ -9,7 +9,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONException;
 import org.slf4j.Logger;
@@ -24,10 +23,6 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.ning.http.client.AsyncCompletionHandler;
-import com.ning.http.client.Request;
-import com.ning.http.client.RequestBuilder;
-import com.ning.http.client.Response;
 
 
 public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -38,7 +33,6 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
     private int                          height          = 0;
     private int                          width           = 0;
     private static IABCountriesInterface iABCountries;
-    private Request                      ningRequest;
     private String                       pos;
     protected boolean                    jsAdTag         = false;
     private boolean                      isGeo           = false;
@@ -222,67 +216,6 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
         LOG.debug("response length is {}", responseContent.length());
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    @Override
-    public boolean makeAsyncRequest() {
-        LOG.debug("In nexage async");
-
-        if (useJsAdTag()) {
-            generateJsAdResponse();
-            processResponse();
-            LOG.debug("sent jsadcode ... returning from make NingRequest");
-            return true;
-        }
-        try {
-            String uri = getRequestUri().toString();
-            requestUrl = uri;
-            setNingRequest(requestUrl);
-            LOG.debug("Nexage uri : {}", uri);
-            startTime = System.currentTimeMillis();
-            baseRequestHandler.getAsyncClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
-                @Override
-                public Response onCompleted(final Response response) throws Exception {
-                    if (!isRequestCompleted()) {
-                        LOG.debug("Operation complete for channel partner: {}", getName());
-                        latency = System.currentTimeMillis() - startTime;
-                        LOG.debug("Nexage operation complete latency {}", latency);
-                        String responseStr = response.getResponseBody();
-                        HttpResponseStatus httpResponseStatus = HttpResponseStatus.valueOf(response.getStatusCode());
-                        parseResponse(responseStr, httpResponseStatus);
-                        processResponse();
-                    }
-                    return response;
-                }
-
-                @Override
-                public void onThrowable(final Throwable t) {
-                    if (isRequestComplete) {
-                        return;
-                    }
-
-                    if (t instanceof java.util.concurrent.TimeoutException) {
-                        latency = System.currentTimeMillis() - startTime;
-                        LOG.debug("Nexage timeout latency {}", latency);
-                        adStatus = "TIME_OUT";
-                        processResponse();
-                        return;
-                    }
-
-                    LOG.debug("Nexage error latency {}", latency);
-                    adStatus = "TERM";
-                    LOG.info("error while fetching response from: {} {}", getName(), t);
-                    processResponse();
-                    return;
-                }
-            });
-        }
-        catch (Exception e) {
-            LOG.debug("Exception in Nexage makeAsyncRequest : {}", e);
-        }
-        LOG.debug("returning from make NingRequest");
-        return true;
-    }
-
     @Override
     public void generateJsAdResponse() {
         statusCode = HttpResponseStatus.OK.getCode();
@@ -296,7 +229,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
         }
         try {
             responseContent = Formatter.getResponseFromTemplate(TemplateType.NEXAGE_JS_AD_TAG, context, sasParams,
-                beaconUrl);
+                    beaconUrl);
             adStatus = "AD";
         }
         catch (Exception exception) {
@@ -304,18 +237,6 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             LOG.info("Error generating Static Js adtag for nexage  : {}", exception);
         }
         LOG.debug("response length is {}", responseContent.length());
-    }
-
-    private void setNingRequest(final String requestUrl) {
-        ningRequest = new RequestBuilder()
-                .setUrl(requestUrl)
-                    .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-                    .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
-                    .setHeader(HttpHeaders.Names.REFERER, requestUrl)
-                    .setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE)
-                    .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
-                    .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-                    .build();
     }
 
     @Override

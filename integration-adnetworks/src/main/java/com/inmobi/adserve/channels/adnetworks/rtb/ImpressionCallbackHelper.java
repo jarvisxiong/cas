@@ -1,51 +1,31 @@
 package com.inmobi.adserve.channels.adnetworks.rtb;
 
-import java.net.InetSocketAddress;
 import java.net.URI;
 
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
-import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.Request;
 
 
 public class ImpressionCallbackHelper {
     private final static Logger LOG = LoggerFactory.getLogger(ImpressionCallbackHelper.class);
 
-    public boolean writeResponse(final ClientBootstrap clientBootstrap, final URI uriCallBack,
-            final HttpRequest callBackRequest) {
-        ChannelFuture channelFuture = clientBootstrap.connect(new InetSocketAddress(uriCallBack.getHost(), uriCallBack
-                .getPort() == -1 ? 80 : uriCallBack.getPort()));
-        ChannelFuture futureCallBack = null;
+    public boolean writeResponse(final URI uriCallBack, final Request callBackRequest,
+            final AsyncHttpClient asyncHttpClient) {
+
+        LOG.debug("In Adapter {}", this.getClass().getSimpleName());
+
         try {
-            if (channelFuture.getChannel().isWritable()) {
-                futureCallBack = channelFuture.getChannel().write(callBackRequest);
-            }
+            asyncHttpClient.executeRequest(callBackRequest);
+
         }
         catch (Exception e) {
-            LOG.info("Error in making callback request {}", e);
+            LOG.debug("Exception in makeAsyncRequest : {}", e);
         }
-        if (null == futureCallBack) {
-            LOG.debug("Could not make callback connection ");
-            return false;
-        }
-        futureCallBack.addListener(new ChannelFutureListener() {
 
-            @Override
-            public void operationComplete(final ChannelFuture future) throws Exception {
-
-                if (!future.isSuccess()) {
-                    LOG.info("error sending callback");
-                    return;
-                }
-                LOG.debug("CallBack is sent");
-                return;
-            }
-        });
-        futureCallBack.addListener(ChannelFutureListener.CLOSE);
-        LOG.debug("Callback channel is closed");
         return true;
+
     }
 }

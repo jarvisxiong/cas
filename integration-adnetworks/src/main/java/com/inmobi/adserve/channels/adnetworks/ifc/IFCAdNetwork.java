@@ -1,20 +1,15 @@
 package com.inmobi.adserve.channels.adnetworks.ifc;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.http.client.utils.URIBuilder;
 import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.jboss.netty.util.CharsetUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,6 +22,8 @@ import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.util.CategoryList;
+import com.ning.http.client.Request;
+import com.ning.http.client.RequestBuilder;
 
 
 /**
@@ -70,7 +67,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
     public IFCAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
         super(config, clientBootstrap, baseRequestHandler, serverEvent);
-        ifcURL = config.getString("ifc.url");
+        ifcURL = config.getString("ifc.host");
     }
 
     @Override
@@ -128,6 +125,9 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             String sdkVersion = stringifyParam(jsonObject, "sdk-version", false);
             if (sdkVersion != null
                     && (sdkVersion.toLowerCase().startsWith("i30") || sdkVersion.toLowerCase().startsWith("a30"))) {
+                return false;
+            }
+            if ((sdkVersion == null || sdkVersion.toLowerCase().equals("0")) && adcode.equalsIgnoreCase("non-js")) {
                 return false;
             }
         }
@@ -202,26 +202,21 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
     }
 
     @Override
-    public HttpRequest getHttpRequest() {
-        URI uri;
-        try {
-            uri = new URI(ifcURL);
+    protected Request getNingRequest() throws Exception {
+
+        URI uri = getRequestUri();
+        if (uri.getPort() == -1) {
+            uri = new URIBuilder(uri).setPort(80).build();
         }
-        catch (URISyntaxException e) {
-            return null;
-        }
-        httpRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri.toASCIIString());
-        ChannelBuffer buffer = ChannelBuffers.copiedBuffer(getRequestBody(), CharsetUtil.UTF_8);
-        httpRequest.setHeader(HttpHeaders.Names.HOST, uri.toString());
 
-        httpRequest.setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json");
-
-        httpRequest.setHeader(HttpHeaders.Names.ACCEPT, "application/json");
-        httpRequest.setHeader(HttpHeaders.Names.CONNECTION, "close");
-        httpRequest.setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(buffer.readableBytes()));
-
-        httpRequest.setContent(buffer);
-        return httpRequest;
+        byte[] body = getRequestBody().getBytes(CharsetUtil.UTF_8);
+        return new RequestBuilder("POST").setURI(uri).setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
+                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
+                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
+                .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
+                .setHeader(HttpHeaders.Names.ACCEPT, "application/json")
+                .setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(body).build();
     }
 
     // Returns the Channel Id for the TPAN as in our database. This will be
@@ -239,10 +234,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             log.put("adv", getId());
             log.put("3psiteid", adGroupID);
             log.put("resp", adStatus);
-            if (latency == 0) {
-                latency = System.currentTimeMillis() - startTime;
-            }
-            log.put("latency", latency);
+            log.put("latency", getLatency());
             return log;
         }
         catch (JSONException exception) {
@@ -373,4 +365,15 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         }
         LOG.debug("response length is {}", responseContent.length());
     }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.inmobi.adserve.channels.api.BaseAdNetworkImpl#getRequestUri()
+     */
+    @Override
+    public URI getRequestUri() throws Exception {
+        return new URI(ifcURL);
+    }
+
 }

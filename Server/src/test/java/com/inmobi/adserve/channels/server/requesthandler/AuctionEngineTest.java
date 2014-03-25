@@ -18,13 +18,21 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Module;
 import com.inmobi.adserve.channels.adnetworks.tapit.DCPTapitAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.ServletHandler;
+import com.inmobi.adserve.channels.server.annotations.RtbConfiguration;
+import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
+import com.inmobi.adserve.channels.server.module.AdapterConfigModule;
+import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilterApplierTest;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 
 
@@ -38,9 +46,8 @@ public class AuctionEngineTest {
 
     @BeforeMethod
     public void setUp() throws IOException {
-        ConfigurationLoader config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
+        final ConfigurationLoader config = ConfigurationLoader.getInstance("channel-server.properties");
         ServletHandler.init(config, null);
-        Filters.init(config.getAdapterConfiguration());
         // this is done, to track the encryptedBid variable getting set inside the AuctionEngine.
         encryptedBid1 = new Capture<String>();
 
@@ -66,6 +73,22 @@ public class AuctionEngineTest {
         casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.auctionId = "auctionId";
 
+        Module module = new AbstractModule() {
+
+            @Override
+            protected void configure() {
+                bind(Configuration.class).annotatedWith(ServerConfiguration.class).toInstance(
+                        config.getServerConfiguration());
+                bind(Configuration.class).annotatedWith(RtbConfiguration.class)
+                        .toInstance(config.getRtbConfiguration());
+
+                install(new AdapterConfigModule(config.getAdapterConfiguration(), ChannelServer.dataCentreName));
+                requestStaticInjection(AuctionEngine.class);
+            }
+        };
+
+        Guice.createInjector(module);
+
     }
 
     private ChannelSegment setBidder(final String advId, final String channelId, final String externalSiteKey,
@@ -77,10 +100,10 @@ public class AuctionEngineTest {
         Long[] slotIds = null;
         Integer[] siteRatings = null;
         ChannelSegmentEntity channelSegmentEntity1 = new ChannelSegmentEntity(
-                FilterTest.getChannelSegmentEntityBuilder(advId, "adgroupId", "adId", channelId, 1, rcList, tags, true,
-                    true, externalSiteKey, modified_on, "campaignId", slotIds, 1, true, "pricingModel", siteRatings, 1,
-                    null, false, false, false, false, false, false, false, false, false, false, null, null, 0.0d, null,
-                    null, false, new HashSet<String>(), 0));
+                ChannelSegmentFilterApplierTest.getChannelSegmentEntityBuilder(advId, "adgroupId", "adId", channelId,
+                        1, rcList, tags, true, true, externalSiteKey, modified_on, "campaignId", slotIds, 1, true,
+                        "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, false, false,
+                        false, false, null, null, 0.0d, null, null, false, new HashSet<String>(), 0));
         ChannelEntity.Builder builder = ChannelEntity.newBuilder();
         builder.setAccountId(advId);
         ChannelEntity channelEntity = builder.build();
@@ -123,44 +146,44 @@ public class AuctionEngineTest {
     public Object[][] paramDataProviderWith3Bidders() {
         return new Object[][] {
                 // 9. 2 same second bids, higher than floor price
-                { "testTwoSameBidsHigherThanFloorPrice", .70d, "A", 1d, 120l, "B", .80d, 100l, "C", .80d, 150l, .81d,
+                { "testTwoSameBidsHigherThanFloorPrice", .70d, "A", 1d, 120l, "B", .80d, 100l, "C", .80d, 150l, .80d,
                         "A", 1d },
 
                 // 10. 2 same second bids, with same latency, higher than floor price
                 { "testTwoSameSecondBidsWithSameLatencyHigherThanFloorPrice", .70d, "A", 1d, 120l, "B", .80d, 100l,
-                        "C", .80d, 100l, .81d, "A", 1d },
+                        "C", .80d, 100l, .80d, "A", 1d },
 
                 // 11. 2 same second bids, lower than floor price
                 { "testTwoSameSecondBidsLowerThanFloorPrice", .70d, "A", 1d, 120l, "B", .60d, 100l, "C", .60d, 150l,
-                        .71d, "A", 1d },
+                        .70d, "A", 1d },
 
                 // 12. 2 same second bids, lower than 90% of Highest bid but more than floor price
                 { "testTwoSameSecondBidsLowerThan90PercentOfHighestBidButMoreThanFloorPrice", .70d, "A", 1d, 120l, "B",
-                        .85d, 100l, "C", .85d, 150l, .86d, "A", 1d },
+                        .85d, 100l, "C", .85d, 150l, .85d, "A", 1d },
 
                 // 13. 2 same second bids, lower than 90% of Highest bid and lower than floor price
                 { "testTwoSameSecondBidsLowerThan90PercentOfHighestBidAndLowerThanFloorPrice", .70d, "A", 1d, 120l,
-                        "B", .65d, 100l, "C", .65d, 150l, .71d, "A", 1d },
+                        "B", .65d, 100l, "C", .65d, 150l, .70d, "A", 1d },
 
                 // 14. 2 same second bids, higher than 90% of Highest bid but more than floor price
                 { "testTwoSameSecondBidsHigherThan90PercentOfHighestBidButMoreThanFloorPrice", .70d, "A", 1d, 120l,
-                        "B", .95d, 100l, "C", .95d, 150l, .96d, "A", 1d },
+                        "B", .95d, 100l, "C", .95d, 150l, .95d, "A", 1d },
 
                 // 15. 2 same second bids, higher than 90% of Highest bid and lower than floor price
                 { "testTwoSameSecondBidsHigherThan90PercentOfHighestBidButLowerThanFloorPrice", .98d, "A", 1d, 120l,
-                        "B", .95d, 100l, "C", .95d, 150l, .99d, "A", 1d },
+                        "B", .95d, 100l, "C", .95d, 150l, .98d, "A", 1d },
 
                 // 18. First and Second bid with .01 difference. He will be charged same Bid he auctioned
-                { "testFirstAndSecondBidWith01difference", .70d, "A", 1d, 100l, "B", .99d, 100l, "C", .70d, 100l, 1d,
-                        "A", 1d },
+                { "testFirstAndSecondBidWith01difference", .70d, "A", 1d, 100l, "B", .99d, 100l, "C", .70d, 100l,
+                        0.99d, "A", 1d },
 
                 // 19. 2nd price same as floor price
-                { "testSecondPriceSameAsFloorPrice", .70d, "A", 1d, 100l, "B", .70d, 100l, "C", .70d, 100l, .71d, "A",
+                { "testSecondPriceSameAsFloorPrice", .70d, "A", 1d, 100l, "B", .70d, 100l, "C", .70d, 100l, .70d, "A",
                         1d },
 
                 // 20. 2nd price same as floor price and 90% price
                 { "testSecondPriceSameAsFloorPriceAnd90PercentPrice", .90d, "A", 1d, 100l, "B", .90d, 100l, "C", .70d,
-                        100l, .91d, "A", 1d }
+                        100l, .90d, "A", 1d }
 
         };
     }
@@ -172,38 +195,24 @@ public class AuctionEngineTest {
             final Long latencyInput3, final Double expectedSecondPriceValue, final String expectedRTBName,
             final Double expectedWinnerBidValue) {
 
-        Double bidFloorInput = floorPrice;
-        Double bidInputVal1 = bidInput1;
-        Long latencyInputVal1 = latencyInput1;
-        Double bidInputVal2 = bidInput2;
-        Long latencyInputVal2 = latencyInput2;
-        Double bidInputVal3 = bidInput3;
-        Long latencyInputVal3 = latencyInput3;
-        Double expectedSecondPriceVal = expectedSecondPriceValue;
-        String expectedRTBAdNetworkName = expectedRTBName;
-        Double expectedWinnerBid = expectedWinnerBidValue;
-
         AuctionEngine auctionEngine = new AuctionEngine();
         List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
-        rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", rtbNameInput1, bidInputVal1,
-            latencyInputVal1));
-        rtbSegments.add(setBidder("advId2", "channelId2", "externalSiteKey2", rtbNameInput2, bidInputVal2,
-            latencyInputVal2));
-        rtbSegments.add(setBidder("advId3", "channelId3", "externalSiteKey3", rtbNameInput3, bidInputVal3,
-            latencyInputVal3));
+        rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", rtbNameInput1, bidInput1, latencyInput1));
+        rtbSegments.add(setBidder("advId2", "channelId2", "externalSiteKey2", rtbNameInput2, bidInput2, latencyInput2));
+        rtbSegments.add(setBidder("advId3", "channelId3", "externalSiteKey3", rtbNameInput3, bidInput3, latencyInput3));
         auctionEngine.setRtbSegments(rtbSegments);
 
-        casInternalRequestParameters.rtbBidFloor = bidFloorInput;
+        casInternalRequestParameters.rtbBidFloor = floorPrice;
         auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
-        AsyncRequestMaker.init(null, null, null);
+        AsyncRequestMaker.init(null, null);
 
         AdNetworkInterface auctionEngineResponse = auctionEngine.runRtbSecondPriceAuctionEngine();
 
-        Assert.assertEquals(secondPrice1.getValue(), expectedSecondPriceVal);
-        Assert.assertEquals(auctionEngineResponse.getName(), expectedRTBAdNetworkName);
-        Assert.assertEquals(auctionEngineResponse.getBidPriceInUsd(), expectedWinnerBid);
+        Assert.assertEquals(secondPrice1.getValue(), expectedSecondPriceValue);
+        Assert.assertEquals(auctionEngineResponse.getName(), expectedRTBName);
+        Assert.assertEquals(auctionEngineResponse.getBidPriceInUsd(), expectedWinnerBidValue);
 
     }
 
@@ -213,52 +222,52 @@ public class AuctionEngineTest {
         return new Object[][] {
                 // 1. more than floor price, 2nd price
                 { "testBidHigherThanFloorPriceAndSecondPrice", .70d, "A", 1d, 50l, "B", .90d, 100l, "C", .80d, 150l,
-                        "D", .70d, 100l, .91d, "A", 1d },
+                        "D", .70d, 100l, .90d, "A", 1d },
 
                 // 2. same first bid price
-                { "testSameFirstBidPrice", .70d, "A", 1d, 100l, "B", 1d, 75l, "C", 1d, 50l, "D", .70d, 100l, .71d, "C",
+                { "testSameFirstBidPrice", .70d, "A", 1d, 100l, "B", 1d, 75l, "C", 1d, 50l, "D", .70d, 100l, .70d, "C",
                         1d },
 
                 // 3. same second bid price
                 { "testSameSecondBidPrice", .70d, "A", 1d, 100l, "B", .80d, 50l, "C", .80d, 150l, "D", .70d, 100l,
-                        .81d, "A", 1d },
+                        .80d, "A", 1d },
 
                 // 4. 2 win bid with same latency
                 { "testTwoWinBidsWithSameLantency", .70d, "A", 1d, 100l, "B", 1d, 100l, "C", .80d, 150l, "D", .70d,
-                        100l, .81d, "A", 1d },
+                        100l, .80d, "A", 1d },
 
                 // 6. lower than floor price, the second bid onwards
                 { "testBidLowerThanFloorPriceFromSecondBidOnwards", .70d, "A", 1d, 100l, "B", .40d, 100l, "C", .20d,
-                        150l, "D", .45d, 100l, .71d, "A", 1d },
+                        150l, "D", .45d, 100l, .70d, "A", 1d },
 
                 // 8. all same bids, then latency is considered
                 { "testAllSameBidsWithDifferentLatency", .70d, "A", 1d, 120l, "B", 1d, 100l, "C", 1d, 150l, "D", 1d,
-                        70l, .71d, "D", 1d },
+                        70l, .70d, "D", 1d },
 
                 // 16. 2 same first bid with 2nd Highest bid with 0.01 difference
                 { "testTwoSameFirstBidWithSecondHighestBidWith01difference", .70d, "A", 1d, 100l, "B", 1d, 100l, "C",
-                        .99d, 150l, "D", .70d, 100l, 1d, "A", 1d },
+                        .99d, 150l, "D", .70d, 100l, 0.99d, "A", 1d },
 
                 // 17. First and Second bid with .01 difference and double 2nd entry. He will charged sameBid he
                 // auctioned
                 { "testFirstAndSecondBidWith01differenceAndDoubleSecondEntry", .70d, "A", 1d, 100l, "B", .99d, 100l,
-                        "C", .99d, 150l, "D", .70, 100l, 1d, "A", 1d },
+                        "C", .99d, 150l, "D", .70, 100l, 0.99d, "A", 1d },
 
                 // 21. 2 Highest price, and 2 same Second price
                 { "testSecondHighestPriceAndTwoSameSecondPrice", .70d, "A", 1d, 100l, "B", 1d, 100l, "C", .90d, 150l,
-                        "D", .90d, 100l, .91d, "A", 1d },
+                        "D", .90d, 100l, .90d, "A", 1d },
 
                 // 22. 2 Highest price, and 2 same Second price, lower than floor price
                 { "testTwoSecondHighestPriceAndTwoSameSecondPriceButLowerThanFloorPrice", .70d, "A", 1d, 100l, "B", 1d,
-                        100l, "C", .60d, 150l, "D", .60d, 100l, .71d, "A", 1d },
+                        100l, "C", .60d, 150l, "D", .60d, 100l, .70d, "A", 1d },
 
                 // 23. 2nd price is 0.1 above floor price
                 { "testSecondPriceIs1AboveFloorPrice", .70d, "A", .71d, 100l, "B", 1d, 100l, "C", .60d, 150l, "D",
-                        .60d, 100l, .72d, "B", 1d },
+                        .60d, 100l, .71d, "B", 1d },
 
                 // 24. 2nd price is 0.1 below floor price. this bid will get directly cut off at floor price filter
                 { "testSecondPriceIs1BelowFloorPrice", .70d, "A", 1d, 100l, "B", .69d, 100l, "C", .60d, 150l, "D",
-                        .60d, 100l, .71d, "A", 1d }
+                        .60d, 100l, .70d, "A", 1d }
 
         };
     }
@@ -270,42 +279,25 @@ public class AuctionEngineTest {
             final Long latencyInput3, final String rtbNameInput4, final Double bidInput4, final Long latencyInput4,
             final Double expectedSecondPriceValue, final String expectedRTBName, final Double expectedWinnerBidValue) {
 
-        Double bidFloorInput = floorPrice;
-        Double bidInputVal1 = bidInput1;
-        Long latencyInputVal1 = latencyInput1;
-        Double bidInputVal2 = bidInput2;
-        Long latencyInputVal2 = latencyInput2;
-        Double bidInputVal3 = bidInput3;
-        Long latencyInputVal3 = latencyInput3;
-        Double bidInputVal4 = bidInput4;
-        Long latencyInputVal4 = latencyInput4;
-        Double expectedSecondPriceVal = expectedSecondPriceValue;
-        String expectedRTBAdNetworkName = expectedRTBName;
-        Double expectedWinnerBid = expectedWinnerBidValue;
-
         AuctionEngine auctionEngine = new AuctionEngine();
         List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
-        rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", rtbNameInput1, bidInputVal1,
-            latencyInputVal1));
-        rtbSegments.add(setBidder("advId2", "channelId2", "externalSiteKey2", rtbNameInput2, bidInputVal2,
-            latencyInputVal2));
-        rtbSegments.add(setBidder("advId3", "channelId3", "externalSiteKey3", rtbNameInput3, bidInputVal3,
-            latencyInputVal3));
-        rtbSegments.add(setBidder("advId4", "channelId4", "externalSiteKey4", rtbNameInput4, bidInputVal4,
-            latencyInputVal4));
+        rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", rtbNameInput1, bidInput1, latencyInput1));
+        rtbSegments.add(setBidder("advId2", "channelId2", "externalSiteKey2", rtbNameInput2, bidInput2, latencyInput2));
+        rtbSegments.add(setBidder("advId3", "channelId3", "externalSiteKey3", rtbNameInput3, bidInput3, latencyInput3));
+        rtbSegments.add(setBidder("advId4", "channelId4", "externalSiteKey4", rtbNameInput4, bidInput4, latencyInput4));
         auctionEngine.setRtbSegments(rtbSegments);
 
-        casInternalRequestParameters.rtbBidFloor = bidFloorInput;
+        casInternalRequestParameters.rtbBidFloor = floorPrice;
         auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
-        AsyncRequestMaker.init(null, null, null);
+        AsyncRequestMaker.init(null, null);
 
         AdNetworkInterface auctionEngineResponse = auctionEngine.runRtbSecondPriceAuctionEngine();
 
-        Assert.assertEquals(secondPrice1.getValue(), expectedSecondPriceVal);
-        Assert.assertEquals(auctionEngineResponse.getName(), expectedRTBAdNetworkName);
-        Assert.assertEquals(auctionEngineResponse.getBidPriceInUsd(), expectedWinnerBid);
+        Assert.assertEquals(secondPrice1.getValue(), expectedSecondPriceValue);
+        Assert.assertEquals(auctionEngineResponse.getName(), expectedRTBName);
+        Assert.assertEquals(auctionEngineResponse.getBidPriceInUsd(), expectedWinnerBidValue);
 
     }
 
@@ -316,9 +308,8 @@ public class AuctionEngineTest {
         Double bidFloorInput = .70d;
         Double bidInputVal1 = 1d;
         Long latencyInputVal1 = 100l;
-        Double expectedSecondPriceVal = .71d;
+        Double expectedSecondPriceVal = .70d;
         String expectedRTBAdNetworkName = "A";
-        Double expectedWinnerBid = bidInputVal1;
 
         AuctionEngine auctionEngine = new AuctionEngine();
         List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
@@ -330,13 +321,13 @@ public class AuctionEngineTest {
         auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
         new AsyncRequestMaker();
-        AsyncRequestMaker.init(null, null, null);
+        AsyncRequestMaker.init(null, null);
 
         AdNetworkInterface auctionEngineResponse = auctionEngine.runRtbSecondPriceAuctionEngine();
 
         Assert.assertEquals(secondPrice1.getValue(), expectedSecondPriceVal);
         Assert.assertEquals(auctionEngineResponse.getName(), expectedRTBAdNetworkName);
-        Assert.assertEquals(auctionEngineResponse.getBidPriceInUsd(), expectedWinnerBid);
+        Assert.assertEquals(auctionEngineResponse.getBidPriceInUsd(), bidInputVal1);
 
     }
 
@@ -367,7 +358,7 @@ public class AuctionEngineTest {
         casInternalRequestParameters.rtbBidFloor = bidFloorInput;
         auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
-        AsyncRequestMaker.init(null, null, null);
+        AsyncRequestMaker.init(null, null);
 
         AdNetworkInterface auctionEngineResponse = auctionEngine.runRtbSecondPriceAuctionEngine();
 
@@ -389,9 +380,8 @@ public class AuctionEngineTest {
         Double bidFloorInput = .70d;
         Double bidInputVal1 = .71d;
         Long latencyInputVal1 = 100l;
-        Double expectedSecondPriceVal = .71d;
+        Double expectedSecondPriceVal = .70d;
         String expectedRTBAdNetworkName = "A";
-        Double expectedWinnerBid = bidInputVal1;
 
         AuctionEngine auctionEngine = new AuctionEngine();
         List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
@@ -403,13 +393,13 @@ public class AuctionEngineTest {
         casInternalRequestParameters.rtbBidFloor = bidFloorInput;
         auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
-        AsyncRequestMaker.init(null, null, null);
+        AsyncRequestMaker.init(null, null);
 
         AdNetworkInterface auctionEngineResponse = auctionEngine.runRtbSecondPriceAuctionEngine();
 
         Assert.assertEquals(secondPrice1.getValue(), expectedSecondPriceVal);
         Assert.assertEquals(auctionEngineResponse.getName(), expectedRTBAdNetworkName);
-        Assert.assertEquals(auctionEngineResponse.getBidPriceInUsd(), expectedWinnerBid);
+        Assert.assertEquals(auctionEngineResponse.getBidPriceInUsd(), bidInputVal1);
 
     }
 
@@ -433,7 +423,7 @@ public class AuctionEngineTest {
         casInternalRequestParameters.rtbBidFloor = bidFloorInput;
         auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
-        AsyncRequestMaker.init(null, null, null);
+        AsyncRequestMaker.init(null, null);
 
         AdNetworkInterface auctionEngineResponse = auctionEngine.runRtbSecondPriceAuctionEngine();
 
