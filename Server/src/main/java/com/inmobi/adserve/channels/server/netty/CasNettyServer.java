@@ -8,8 +8,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.util.ResourceLeakDetector;
-import io.netty.util.ResourceLeakDetector.Level;
 
 import java.net.InetSocketAddress;
 
@@ -49,8 +47,6 @@ public class CasNettyServer {
 
     @PostConstruct
     public void setup() throws InterruptedException {
-        // TODO: remove this
-        ResourceLeakDetector.setLevel(Level.PARANOID);
         // initialize and start server
         serverBootstrap = serverBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
                 .localAddress(new InetSocketAddress(8800)).childHandler(serverChannelInitializer)

@@ -55,7 +55,7 @@ public class ChannelServerPipelineFactory extends ChannelInitializer<SocketChann
     protected void initChannel(final SocketChannel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();
         // enable logging handler only for dev purpose
-        pipeline.addLast("logging", loggingHandler);
+        // pipeline.addLast("logging", loggingHandler);
         pipeline.addLast("incomingLimitHandler", incomingConnectionLimitHandler);
         pipeline.addLast("decoderEncoder", new HttpServerCodec());
         pipeline.addLast("aggregator", new HttpObjectAggregator(1024 * 1024));// 1 MB data size

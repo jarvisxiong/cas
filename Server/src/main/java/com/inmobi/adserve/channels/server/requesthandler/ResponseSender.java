@@ -243,9 +243,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
     public void sendResponse(final HttpResponseStatus status, final byte[] bytes, final Map responseHeaders,
             final Channel serverChannel) throws NullPointerException {
 
-        // TODO: change to false after verification
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status,
-                Unpooled.wrappedBuffer(bytes), true);
+                Unpooled.wrappedBuffer(bytes), false);
 
         if (null != responseHeaders) {
             for (Map.Entry entry : (Set<Map.Entry>) responseHeaders.entrySet()) {
