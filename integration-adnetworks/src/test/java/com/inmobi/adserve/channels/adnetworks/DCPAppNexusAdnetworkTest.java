@@ -160,7 +160,7 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
             new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpAppNexusAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpAppNexusAdNetwork.getRequestUri().toString();
-            String expectedUrl = "http://mobile.adnxs.com/mob?psa=0&format=json&ip=206.29.182.240&ua=Mozilla&id=240&size=300x50&loc=37.4429%2C-122.1514";
+            String expectedUrl = "http://mobile.adnxs.com/mob?psa=0&format=json&ip=206.29.182.240&ua=Mozilla&id=240&st=mobile_web&size=300x50&loc=37.4429%2C-122.1514";
             assertEquals(expectedUrl, actualUrl);
         }
     }

@@ -148,7 +148,10 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
         if (null != sasParams.getSlot()
                 && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
         	
-            Dimension dim = SlotSizeMapping.getDimension((long)sasParams.getSlot());
+        	Long slotSize = (long)sasParams.getSlot();
+        	if(slotSize == 9l )
+        		slotSize = 15l;
+            Dimension dim = SlotSizeMapping.getDimension(slotSize);
 
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
@@ -201,7 +204,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
         //appendQueryParam(url, SECRET, getHashedValue(dateFormat.format(now.getTime()) + seed, "MD5"), false);
         appendQueryParam(url, PT, partnerId, false);
         String category = getCategory();
-        String auId = String.format(auIdFormat, externalSiteId, category, Long.toHexString(sasParams.getSiteIncId()),
+        String auId = String.format(auIdFormat,externalSiteId, category, Long.toHexString(sasParams.getSiteIncId()),
             Long.toHexString(this.entity.getAdgroupIncId()));
         appendQueryParam(url, ADUNIT, getURLEncode(auId, format), false);
         appendQueryParam(url, CLIENT_IP, sasParams.getRemoteHostIp(), false);
