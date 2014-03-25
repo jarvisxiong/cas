@@ -151,7 +151,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
                 && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
         	Long slot = Long.parseLong(sasParams.getSlot());
         	if(slot == 9l){
-        		slot = 4l;
+        		slot = 15l;
         	}
             Dimension dim = SlotSizeMapping.getDimension(slot);
             width = (int) Math.ceil(dim.getWidth());
