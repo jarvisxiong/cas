@@ -1,8 +1,11 @@
 package com.inmobi.adserve.channels.adnetworks.mobilecommerce;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -14,12 +17,8 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 
 public class MobileCommerceAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -81,8 +80,8 @@ public class MobileCommerceAdNetwork extends AbstractDCPAdNetworkImpl {
                 url.append("&inm_img=").append(getURLEncode(beaconUrl, format));
             }
 
-            if (sasParams.getCountry() != null) {
-                url.append("&region=").append(sasParams.getCountry());
+            if (sasParams.getCountryCode() != null) {
+                url.append("&region=").append(sasParams.getCountryCode());
             }
             String categoryId = null;
             if ((categoryId = getCategoryId()) != null) {
@@ -180,7 +179,7 @@ public class MobileCommerceAdNetwork extends AbstractDCPAdNetworkImpl {
         }
         context.put(VelocityTemplateFieldConstants.AdTag, true);
         addPartnerBeaconUrls(context, responseJson);
-        String vmTemplate = Formatter.getRichTextTemplateForSlot(slot);
+        String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
         if (StringUtils.isEmpty(vmTemplate)) {
             responseTemplate = TemplateType.PLAIN;
         }

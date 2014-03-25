@@ -50,6 +50,30 @@ import com.inmobi.casthrift.DataCenter;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import com.inmobi.messaging.publisher.MessagePublisherFactory;
 import com.inmobi.phoenix.exception.InitializationException;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.dbcp.ConnectionFactory;
+import org.apache.commons.dbcp.DriverManagerConnectionFactory;
+import org.apache.commons.dbcp.PoolableConnectionFactory;
+import org.apache.commons.dbcp.PoolingDataSource;
+import org.apache.commons.pool.impl.GenericObjectPool;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.logging.InternalLoggerFactory;
+import org.jboss.netty.logging.Log4JLoggerFactory;
+import org.jboss.netty.util.HashedWheelTimer;
+import org.jboss.netty.util.Timer;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 
 /*
@@ -106,10 +130,10 @@ public class ChannelServer {
             // Initialising logging - Write to databus
             AbstractMessagePublisher dataBusPublisher = (AbstractMessagePublisher) MessagePublisherFactory
                     .create(configFile);
+
             String rrLogKey = configurationLoader.getServerConfiguration().getString("rrLogKey");
-            String channelLogKey = configurationLoader.getServerConfiguration().getString("channelLogKey");
             String advertisementLogKey = configurationLoader.getServerConfiguration().getString("adsLogKey");
-            Logging.init(dataBusPublisher, rrLogKey, channelLogKey, advertisementLogKey,
+            Logging.init(dataBusPublisher, rrLogKey, advertisementLogKey,
                     configurationLoader.getServerConfiguration());
 
             // Initializing graphite stats

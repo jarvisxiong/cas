@@ -1,9 +1,8 @@
 package com.inmobi.adserve.channels.adnetworks.huntmads;
 
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -16,13 +15,9 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 
 public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -64,9 +59,9 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (!StringUtils.isBlank(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+        if (null != sasParams.getSlot()
+                && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long)sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
@@ -116,8 +111,8 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             if (casInternalRequestParameters.zipCode != null) {
                 url.append("&zip=").append(casInternalRequestParameters.zipCode);
             }
-            if (sasParams.getCountry() != null) {
-                url.append("&country=").append(sasParams.getCountry().toUpperCase());
+            if (sasParams.getCountryCode() != null) {
+                url.append("&country=").append(sasParams.getCountryCode().toUpperCase());
             }
 
             if (width != 0 && height != 0) {
@@ -181,7 +176,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
                     
                     if (textAd && StringUtils.isNotBlank(adResponse.getString("text"))) {
                         context.put(VelocityTemplateFieldConstants.AdText, adResponse.getString("text"));
-                        String vmTemplate = Formatter.getRichTextTemplateForSlot(slot);
+                        String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                         if (!StringUtils.isEmpty(vmTemplate)) {
                             context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
                             t = TemplateType.RICH;

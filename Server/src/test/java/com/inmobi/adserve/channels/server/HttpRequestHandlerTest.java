@@ -63,7 +63,7 @@ public class HttpRequestHandlerTest extends TestCase {
         replay(mockConfigLoader);
 
         AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
-        Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-channel", "cas-advertisement", mockServerConfig);
+        Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-advertisement", mockServerConfig);
     }
 
     @Test

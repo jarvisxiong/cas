@@ -1,14 +1,13 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Map;
-
+import com.google.common.collect.Maps;
+import com.inmobi.adserve.channels.adnetworks.siquis.DCPSiquisAdNetwork;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import junit.framework.TestCase;
-
 import org.apache.commons.configuration.Configuration;
 import org.easymock.EasyMock;
 import org.jboss.netty.bootstrap.ClientBootstrap;
@@ -18,13 +17,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
 
-import com.google.common.collect.Maps;
-import com.inmobi.adserve.channels.adnetworks.siquis.DCPSiquisAdNetwork;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Map;
+
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
 
 
 /**

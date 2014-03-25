@@ -1,27 +1,25 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import com.google.inject.Provider;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
 import junit.framework.TestCase;
-
 import org.apache.commons.configuration.Configuration;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Marker;
 import org.testng.annotations.Test;
 
-import com.google.inject.Provider;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 
-public class RequestParserTest extends TestCase {
-
-    private RequestParser requestParser;
-
-    @Override
-    public void setUp() {
+public class RequestParserTest extends TestCase
+{
+    RequestParser requestParser;
+    public void setUp()
+    {
         Configuration mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
         expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
@@ -36,7 +34,8 @@ public class RequestParserTest extends TestCase {
     }
 
     @Test
-    public void testParseRequestParameters() throws JSONException {
+    public void testParseRequestParameters() throws JSONException
+    {
         JSONObject jObject = new JSONObject(
                 "{\"site-type\":\"PE (iPod; U; CPU iPhone OS 4_3_1 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Mobile/8G4\""
                         + ",\"handset\":[42279,\"apple_ipod_touch_ver4_3_1_subua\"],\"rqMkAdcount\":\"1\",\"new-category\":[70,42],\"site-floor\":0"
@@ -49,29 +48,32 @@ public class RequestParserTest extends TestCase {
                         + ",\"pub-id\":\"4028cb9731d7d0ad0131e1d1996101ef\",\"os-id\":6}");
         SASRequestParameters sasRequestParameters = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-
         requestParser.parseRequestParameters(jObject, sasRequestParameters, casInternalRequestParameters);
         assertNotNull(sasRequestParameters);
         assertEquals(
-            "PE (iPod; U; CPU iPhone OS 4_3_1 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Mobile/8G4"
-                    .toUpperCase(),
-            sasRequestParameters.getSiteType());
-        assertEquals(sasRequestParameters.getHandset().toString(), "[42279,\"apple_ipod_touch_ver4_3_1_subua\"]");
-        assertEquals(sasRequestParameters.getRqMkAdcount(), "1");
+                "PE (iPod; U; CPU iPhone OS 4_3_1 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Mobile/8G4"
+                        .toUpperCase(),
+                sasRequestParameters.getSiteType());
+        assertEquals(sasRequestParameters.getHandsetInternalId(), 42279);
+        assertEquals(sasRequestParameters.getRqMkAdcount(), new Short("1"));
         assertEquals(sasRequestParameters.getSiteFloor(), 0.0);
         assertEquals(sasRequestParameters.getOsId(), 6);
-        assertEquals(sasRequestParameters.getRqMkSlot(), "9");
+        assertEquals(sasRequestParameters.getRqMkSlot().get(0), new Short("9"));
         assertEquals(sasRequestParameters.getUidParams(),
-            "{\"O1\":\"8d10846582eef7c6f5873883b09a5a63\",\"u-id-s\":\"O1\",\"IX\":\"4fa7!506c!508902de!iPod3,1!8G4!19800\"}");
-        assertEquals(sasRequestParameters.getCarrier().toString(), "[406,94,\"US\",12328,31118]");
+                "{\"O1\":\"8d10846582eef7c6f5873883b09a5a63\",\"u-id-s\":\"O1\",\"IX\":\"4fa7!506c!508902de!iPod3,1!8G4!19800\"}");
+        assertEquals(sasRequestParameters.getCarrierId(), 406);
+        assertEquals(sasRequestParameters.getCountryId(), new Long(94));
+        assertEquals(sasRequestParameters.getCountryCode(), "US");
+        assertEquals(sasRequestParameters.getState(), new Integer(31118));
+        assertEquals(sasRequestParameters.getCity(), new Integer(12328));
         assertEquals(sasRequestParameters.getTid(), "0e919b0a-73c4-44cb-90ec-2b37b2249219");
         assertEquals(sasRequestParameters.getSiteId(), "4028cba631d63df10131e1d3191d00cb");
         assertEquals(sasRequestParameters.getSiteIncId(), 34093);
         assertEquals(sasRequestParameters.getRemoteHostIp(), "3.0.0.0");
         assertEquals(sasRequestParameters.getLocSrc(), "wifi");
-        assertEquals(sasRequestParameters.getSlot(), "9");
+        assertEquals(sasRequestParameters.getSlot(), new Short("9"));
         assertEquals(sasRequestParameters.getRFormat(), "xhtml");
-        assertEquals(sasRequestParameters.getAllowBannerAds(), new Boolean(true));
+        assertEquals(sasRequestParameters.getAllowBannerAds(), Boolean.TRUE);
         assertEquals(sasRequestParameters.getCategories().toString(), "[70, 42]");
         assertEquals(sasRequestParameters.getSource(), "APP");
         assertEquals(sasRequestParameters.getAdcode(), "NON-JS");

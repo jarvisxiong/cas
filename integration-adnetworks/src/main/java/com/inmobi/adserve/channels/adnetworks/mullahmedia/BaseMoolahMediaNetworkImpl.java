@@ -1,11 +1,10 @@
 package com.inmobi.adserve.channels.adnetworks.mullahmedia;
 
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.util.CategoryList;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -17,15 +16,11 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.CategoryList;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public abstract class BaseMoolahMediaNetworkImpl extends AbstractDCPAdNetworkImpl {
@@ -173,8 +168,8 @@ public abstract class BaseMoolahMediaNetworkImpl extends AbstractDCPAdNetworkImp
         if (casInternalRequestParameters.zipCode != null) {
             sb.append("&zip=").append(casInternalRequestParameters.zipCode);
         }
-        if (sasParams.getCountry() != null) {
-            sb.append("&country=").append(sasParams.getCountry());
+        if (sasParams.getCountryCode() != null) {
+            sb.append("&country=").append(sasParams.getCountryCode());
         }
         if (casInternalRequestParameters.latLong != null && casInternalRequestParameters.latLong.contains(",")) {
             String[] latlong = casInternalRequestParameters.latLong.split(",");
@@ -184,9 +179,9 @@ public abstract class BaseMoolahMediaNetworkImpl extends AbstractDCPAdNetworkImp
         if (carrierId != null) {
             sb.append("&carrier_id=").append(carrierId);
         }
-        if (!StringUtils.isEmpty(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+        if (null != sasParams.getSlot()
+                && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long)sasParams.getSlot());
             sb.append("&w=").append(dim.getWidth()).append("&h=").append(dim.getHeight());
             if (sasParams.getSlot().equals("10")) // 300x250
             {
@@ -241,13 +236,7 @@ public abstract class BaseMoolahMediaNetworkImpl extends AbstractDCPAdNetworkImp
     }
 
     public Integer getCarrierId() {
-        try {
-            return carrierIdMap.get(sasParams.getCarrier().getInt(0));
-        }
-        catch (JSONException e) {
-            LOG.info("Cannot map carrier Id for MM");
-            return null;
-        }
+        return carrierIdMap.get(sasParams.getCarrierId());
     }
 
     /**

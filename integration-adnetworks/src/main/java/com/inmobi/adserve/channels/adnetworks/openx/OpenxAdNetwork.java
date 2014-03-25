@@ -1,8 +1,12 @@
 package com.inmobi.adserve.channels.adnetworks.openx;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -12,13 +16,8 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 
 public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -69,9 +68,9 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
         StringBuilder finalUrl = new StringBuilder(config.getString("openx.host"));
         finalUrl.append(externalSiteId)
                     .append("&cnt=")
-                    .append(sasParams.getCountry().toLowerCase())
+                    .append(sasParams.getCountryCode().toLowerCase())
                     .append("&dma=")
-                    .append(sasParams.getArea());
+                    .append(sasParams.getState());
         finalUrl.append("&net=").append(sasParams.getLocSrc()).append("&age=").append(sasParams.getAge());
         if (sasParams.getGender() != null) {
             finalUrl.append("&gen=").append(sasParams.getGender().toUpperCase());
@@ -130,7 +129,7 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {} and response length is {}", response, response.length());
-        if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
+        if (status.getCode() != 200 || response.trim().isEmpty()) {
             statusCode = status.getCode();
             if (200 == statusCode) {
                 statusCode = 500;
