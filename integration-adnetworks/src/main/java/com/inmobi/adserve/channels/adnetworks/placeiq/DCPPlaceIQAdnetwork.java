@@ -146,9 +146,14 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             isGeoOrDeviceIdPresent = true;
         }
 
+        
         if (!StringUtils.isBlank(sasParams.getSlot())
                 && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+        	Long slot = Long.parseLong(sasParams.getSlot());
+        	if(slot == 9l){
+        		slot = 15l;
+        	}
+            Dimension dim = SlotSizeMapping.getDimension(slot);
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
