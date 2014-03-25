@@ -50,11 +50,13 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String ANDROID_ID_SHA1 = "md5udid";
     private static final String ANDROID_ID_MD5  = "sha1udid";
     private static final String ODIN1           = "sha1mac";
+    private static final String ST           	= "st";
+    private static final String TRAFFIC_TYPE    = "mobile_web";
     // private static final String CLICKURL = "pubclick";
 
     private static final String sizeFormat      = "%dx%d";
     private static final String latlongFormat   = "%s,%s";
-    private Request             ningRequest;
+    
     private String              name;
     private boolean             isApp;
 
@@ -122,6 +124,9 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
             appendQueryParam(url, ID, externalSiteId, false);
             if (isApp) {
                 appendQueryParam(url, APP_ID, blindedSiteId, false);
+            }
+            else{
+            	appendQueryParam(url, ST, TRAFFIC_TYPE, false);
             }
             appendQueryParam(url, SIZE, String.format(sizeFormat, width, height), false);
 
