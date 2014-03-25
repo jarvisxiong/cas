@@ -66,14 +66,14 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
             longitude = latlong[1];
         }
 
-        if (!StringUtils.isBlank(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+        if (null != sasParams.getSlot()
+                && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long)sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
         else {
-            LOG.debug("mandatory parameters missing for baidu so exiting adapter");
+            LOG.debug("mandate parameters missing for Baidu, so returning from adapter");
             return false;
         }
         uid = getUid();
