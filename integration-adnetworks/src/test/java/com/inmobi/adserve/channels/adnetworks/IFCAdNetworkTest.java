@@ -1,14 +1,13 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-
-import java.io.File;
-import java.util.ArrayList;
-
+import com.inmobi.adserve.channels.adnetworks.ifc.IFCAdNetwork;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.phoenix.logging.DebugLogger;
 import junit.framework.TestCase;
-
 import org.apache.commons.configuration.Configuration;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
@@ -18,13 +17,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
 
-import com.inmobi.adserve.channels.adnetworks.ifc.IFCAdNetwork;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.phoenix.logging.DebugLogger;
+import java.io.File;
+import java.util.ArrayList;
+
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 
 public class IFCAdNetworkTest extends TestCase {
@@ -84,7 +82,7 @@ public class IFCAdNetworkTest extends TestCase {
         jsonObject.put("adcode", "NON-JS");
         sasParams.setAllParametersJson(jsonObject.toString());
         sasParams.setSiteId("12");
-        sasParams.setSlot("11");
+        sasParams.setSlot(Short.valueOf("11"));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -115,7 +113,7 @@ public class IFCAdNetworkTest extends TestCase {
         jsonObject.put("sdk-version", "i351");
         sasParams.setAllParametersJson(jsonObject.toString());
         sasParams.setSiteId("12");
-        sasParams.setSlot("1");
+        sasParams.setSlot(Short.valueOf("1"));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -146,7 +144,7 @@ public class IFCAdNetworkTest extends TestCase {
         jsonObject.put("sdk-version", "i301");
         sasParams.setAllParametersJson(jsonObject.toString());
         sasParams.setSiteId("12");
-        sasParams.setSlot("1");
+        sasParams.setSlot(Short.valueOf("1"));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -187,7 +185,7 @@ public class IFCAdNetworkTest extends TestCase {
         jsonObject.put("sdk-version", "i351");
         sasParams.setAllParametersJson(jsonObject.toString());
         sasParams.setSiteId("12");
-        sasParams.setSlot("1");
+        sasParams.setSlot(Short.valueOf("1"));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -226,7 +224,7 @@ public class IFCAdNetworkTest extends TestCase {
         jsonObject.put("adcode", "JS");
         sasParams.setAllParametersJson(jsonObject.toString());
         sasParams.setSiteId("12");
-        sasParams.setSlot("1");
+        sasParams.setSlot(Short.valueOf("1"));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");

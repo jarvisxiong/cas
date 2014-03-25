@@ -70,7 +70,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected String                              beaconUrl;
     protected String                              source;
     protected String                              blindedSiteId;
-    protected String                              slot;
+    protected Short                               slot;
     private static final String                   DEFAULT_EMPTY_STRING    = "";
     protected String                              format                  = "UTF-8";
     private String                                adapterName;
@@ -539,9 +539,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     // return year of birth
     protected String getYearofBirth() {
-        if (sasParams.getAge() != null && sasParams.getAge().matches("\\d+")) {
+        if (sasParams.getAge() != null && sasParams.getAge().toString().matches("\\d+")) {
             Calendar cal = new GregorianCalendar();
-            return (Integer.toString(cal.get(Calendar.YEAR) - Integer.parseInt(sasParams.getAge())));
+            return (Integer.toString(cal.get(Calendar.YEAR) - sasParams.getAge()));
         }
         return null;
     }

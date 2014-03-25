@@ -1,28 +1,22 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-
+import com.inmobi.adserve.channels.adnetworks.huntmads.DCPHuntmadsAdNetwork;
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import junit.framework.TestCase;
-
 import org.apache.commons.configuration.Configuration;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.testng.annotations.Test;
 
-import com.inmobi.adserve.channels.adnetworks.huntmads.DCPHuntmadsAdNetwork;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 
 /**
@@ -154,7 +148,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
+        sasParams.setSlot((short)15);
         sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "1324";
         SlotSizeMapping.init();
@@ -179,7 +173,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("12");
+        sasParams.setSlot((short)12);
         sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "1324";
         SlotSizeMapping.init();
@@ -204,7 +198,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         casInternalRequestParameters.latLong = " ,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
+        sasParams.setSlot((short)15);
         sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "1324";
         SlotSizeMapping.init();
@@ -230,7 +224,6 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("");
         sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "1324";
         SlotSizeMapping.init();
@@ -305,7 +298,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short)4);
         sasParams.setSource("wap");
         sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "19100";
@@ -333,7 +326,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short)4);
         sasParams.setSdkVersion("i360");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
         sasParams.setSource("app");
@@ -362,7 +355,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot("4");
+        sasParams.setSlot((short)4);
         sasParams.setSdkVersion("i360");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
         sasParams.setSource("app");

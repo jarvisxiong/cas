@@ -1,21 +1,28 @@
 package com.inmobi.adserve.channels.adnetworks.smaato;
 
-import java.awt.Dimension;
-import java.io.ByteArrayInputStream;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.smaato.soma.oapi.Response;
+import com.smaato.soma.oapi.Response.Ads.Ad;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.velocity.VelocityContext;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.handler.codec.http.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.awt.*;
+import java.io.ByteArrayInputStream;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
@@ -120,14 +127,14 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (!StringUtils.isBlank(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            dimension = slotIdMap.get(Integer.parseInt(sasParams.getSlot()));
+        if (null != sasParams.getSlot()
+                && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
+            dimension = slotIdMap.get((sasParams.getSlot()).intValue());
             if (StringUtils.isBlank(dimension)) {
                 LOG.debug("mandatory parameters missing for smaato so exiting adapter");
                 return false;
             }
-            Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+            Dimension dim = SlotSizeMapping.getDimension((sasParams.getSlot()).longValue());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
 
@@ -188,8 +195,8 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isNotBlank(sasParams.getGender())) {
             appendQueryParam(url, GENDER, sasParams.getGender(), false);
         }
-        if (StringUtils.isNotBlank(sasParams.getPostalCode())) {
-            appendQueryParam(url, ZIP, sasParams.getPostalCode(), false);
+        if (null != sasParams.getPostalCode()) {
+            appendQueryParam(url, ZIP, sasParams.getPostalCode().toString(), false);
         }
         appendQueryParam(url, KEYWORDS, getURLEncode(getCategories(',', true, false), format), false);
         if (width != 0) {
@@ -198,8 +205,8 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         if (height != 0) {
             appendQueryParam(url, HEIGHT, height + "", false);
         }
-        if (StringUtils.isNotBlank(sasParams.getAge())) {
-            appendQueryParam(url, AGE, sasParams.getAge(), false);
+        if (null != sasParams.getAge()) {
+            appendQueryParam(url, AGE, sasParams.getAge().toString(), false);
         }
 
         LOG.debug("Smaato url is {}", url);
@@ -261,7 +268,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
                 }
                 else if (TEXT_TYPE.equalsIgnoreCase(ad.getType()) && StringUtils.isNotBlank(ad.getAdtext())) {
                     context.put(VelocityTemplateFieldConstants.AdText, ad.getAdtext());
-                    String vmTemplate = Formatter.getRichTextTemplateForSlot(slot);
+                    String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                     if (StringUtils.isEmpty(vmTemplate)) {
                         t = TemplateType.PLAIN;
                     }

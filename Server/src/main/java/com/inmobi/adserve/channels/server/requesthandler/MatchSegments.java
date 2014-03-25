@@ -19,12 +19,7 @@ import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.entity.ChannelEntity;
-import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
-import com.inmobi.adserve.channels.entity.SegmentAdGroupFeedbackEntity;
-import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
+import com.inmobi.adserve.channels.entity.*;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ServletHandler;
@@ -32,6 +27,12 @@ import com.inmobi.adserve.channels.server.annotations.AdvertiserIdNameMap;
 import com.inmobi.adserve.channels.server.requesthandler.beans.AdvertiserMatchedSegmentDetail;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
+import javax.inject.Singleton;
+import java.util.*;
 
 
 @Singleton
@@ -89,14 +90,14 @@ public class MatchSegments {
     public List<AdvertiserMatchedSegmentDetail> matchSegments(final SASRequestParameters sasParams) {
 
         Marker traceMarker = traceMarkerProvider.get();
-        String slotStr = sasParams.getSlot();
-        String countryStr = sasParams.getCountryStr();
+        Short slotId = sasParams.getSlot();
+        Long countryId = sasParams.getCountryId();
         int osId = sasParams.getOsId();
         String sourceStr = sasParams.getSource();
         String siteRatingStr = sasParams.getSiteType();
         Integer targetingPlatform = (sourceStr == null || sourceStr.equalsIgnoreCase("wap")) ? 2 : 1 /* app */;
         Integer siteRating = -1;
-        if (null == siteRatingStr || slotStr == null || sasParams.getCategories() == null
+        if (null == siteRatingStr || slotId == null || sasParams.getCategories() == null
                 || sasParams.getCategories().isEmpty()) {
             return null;
         }
@@ -110,14 +111,15 @@ public class MatchSegments {
             siteRating = 2;
         }
         try {
-            LOG.debug(
-                    traceMarker,
-                    "Requesting Parameters :  slot: {} categories: {} country: {} targetingPlatform: {} siteRating: {} osId: {}",
-                    slotStr, sasParams.getCategories(), countryStr, targetingPlatform, siteRating, osId);
-            long slot = Long.parseLong(slotStr);
+            LOG
+                    .debug(
+                        traceMarker,
+                        "Requesting Parameters :  slot: {} categories: {} country: {} targetingPlatform: {} siteRating: {} osId: {}",
+                        slotId, sasParams.getCategories(), countryId, targetingPlatform, siteRating, osId);
+            long slot = slotId.longValue();
             long country = -1;
-            if (countryStr != null) {
-                country = Long.parseLong(countryStr);
+            if (countryId != null) {
+                country = countryId;
             }
 
             return (matchSegments(slot, getCategories(sasParams), country, targetingPlatform, siteRating, osId,

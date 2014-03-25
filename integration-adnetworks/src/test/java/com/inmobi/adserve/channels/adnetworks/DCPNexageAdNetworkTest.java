@@ -1,16 +1,9 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import com.inmobi.adserve.channels.adnetworks.nexage.DCPNexageAdNetwork;
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import junit.framework.TestCase;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.jboss.netty.bootstrap.ClientBootstrap;
@@ -20,13 +13,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
 
-import com.inmobi.adserve.channels.adnetworks.nexage.DCPNexageAdNetwork;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 
 public class DCPNexageAdNetworkTest extends TestCase {
@@ -76,7 +70,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
         String burl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
@@ -96,7 +90,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         String burl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "8a809449013c3c643cad82cb412b5857";
@@ -115,7 +109,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
         String burl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
@@ -190,7 +184,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         List<Long> cat = new ArrayList<Long>();
         cat.add(13l);
         sasParams.setCategories(cat);
@@ -221,7 +215,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         sasParams.setCategories(Arrays.asList(new Long[] { 10l, 26l }));
         String externalKey = "8a809449013c3c643cad82cb412b5857";
         SlotSizeMapping.init();
@@ -249,7 +243,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
@@ -279,7 +273,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         List<Long> cat = new ArrayList<Long>();
         cat.add(63l);
         sasParams.setCategories(cat);
@@ -309,7 +303,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         List<Long> cat = new ArrayList<Long>();
         cat.add(48l);
         sasParams.setCategories(cat);
@@ -340,7 +334,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
@@ -369,7 +363,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
@@ -398,11 +392,11 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
-        sasParams.setCountry("US");
+        sasParams.setCountryCode("US");
         String externalKey = "8a809449013c3c643cad82cb412b5857";
         SlotSizeMapping.init();
         String burl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
@@ -427,7 +421,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
@@ -455,11 +449,11 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
-        sasParams.setArea("area");
+        sasParams.setState(1);
         String externalKey = "8a809449013c3c643cad82cb412b5857";
         SlotSizeMapping.init();
         String burl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
@@ -469,7 +463,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                     "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000&u(dma)=area";
+            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000&u(dma)=1";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -484,7 +478,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
@@ -512,7 +506,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
@@ -541,7 +535,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
@@ -569,7 +563,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
@@ -598,7 +592,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
@@ -626,11 +620,11 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
-        sasParams.setAge("30");
+        sasParams.setAge(Short.valueOf("30"));
         String externalKey = "8a809449013c3c643cad82cb412b5857";
         SlotSizeMapping.init();
         String burl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
@@ -655,7 +649,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
@@ -683,7 +677,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
@@ -712,7 +706,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
@@ -741,7 +735,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("15");
+        sasParams.setSlot(Short.valueOf("15"));
         List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
@@ -769,7 +763,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
@@ -794,7 +788,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla/5.0 (Linux; U; Android 4.1.1; en-us; Galaxy Nexus Build/JRO03O) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
-        sasParams.setSlot("4");
+        sasParams.setSlot(Short.valueOf("4"));
         sasParams.setSource("APP");
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c"
@@ -820,7 +814,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla/5.0 (Linux; U; Android 4.1.1; en-us; Galaxy Nexus Build/JRO03O) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
-        sasParams.setSlot("4");
+        sasParams.setSlot(Short.valueOf("4"));
         sasParams.setSource("wap");
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c"
@@ -846,7 +840,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla/5.0 (Linux; U; Android 4.1.1; en-us; Galaxy Nexus "
                 + "Build/JRO03O) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534" + ".30");
-        sasParams.setSlot("4");
+        sasParams.setSlot(Short.valueOf("4"));
         sasParams.setSource("app");
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
@@ -871,7 +865,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla/5.0 (Linux; U; Android 4.1.1; en-us; Galaxy Nexus Build/JRO03O) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
-        sasParams.setSlot("4");
+        sasParams.setSlot(Short.valueOf("4"));
         sasParams.setSource("app");
         sasParams.setSdkVersion("a370");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
@@ -898,7 +892,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla/5.0 (Linux; U; Android 4.1.1; en-us; Galaxy Nexus Build/JRO03O) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
-        sasParams.setSlot("4");
+        sasParams.setSlot(Short.valueOf("4"));
         sasParams.setSource("app");
         sasParams.setSdkVersion("a370");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
@@ -927,7 +921,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla/5.0 (Linux; U; Android 4.1.1; en-us; Galaxy Nexus Build/JRO03O) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
-        sasParams.setSlot("4");
+        sasParams.setSlot(Short.valueOf("4"));
         sasParams.setSource("app");
         sasParams.setSdkVersion("a370");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");

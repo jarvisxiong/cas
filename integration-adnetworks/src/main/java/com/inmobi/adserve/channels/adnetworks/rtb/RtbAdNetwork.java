@@ -307,9 +307,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             LOG.info("Configure parameters inside rtb returned false {}", advertiserName);
             return false;
         }
-        if (StringUtils.isNotBlank(beaconUrl)) {
-            beaconUrl = beaconUrl + "&b=${WIN_BID}";
-        }
         LOG.info("Configure parameters inside rtb returned true");
         return true;
     }
@@ -349,9 +346,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private Banner createBannerObject() {
         Banner banner = new Banner();
         banner.setId(casInternalRequestParameters.impressionId);
-        if (!StringUtils.isBlank(sasParams.getSlot())
-                && SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot())) != null) {
-            Dimension dim = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot()));
+        if (null != sasParams.getSlot()
+                && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long)sasParams.getSlot());
             banner.setW((int) dim.getWidth());
             banner.setH((int) dim.getHeight());
         }
@@ -384,11 +381,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             geo.setLat(Float.parseFloat(latlong[0]));
             geo.setLon(Float.parseFloat(latlong[1]));
         }
-        if (null != sasParams.getCountry()) {
-            geo.setCountry(iabCountriesInterface.getIabCountry(sasParams.getCountry()));
+        if (null != sasParams.getCountryCode()) {
+            geo.setCountry(iabCountriesInterface.getIabCountry(sasParams.getCountryCode()));
         }
-        if (null != sasParams.getUserLocation() && null != iabCitiesInterface.getIABCity(sasParams.getUserLocation())) {
-            geo.setCity(iabCitiesInterface.getIABCity(sasParams.getUserLocation()));
+        if (null != iabCitiesInterface.getIABCity(sasParams.getCity() + "")) {
+            geo.setCity(iabCitiesInterface.getIABCity(sasParams.getCity() + ""));
         }
         geo.setZip(casInternalRequestParameters.zipCode);
         // Setting type of geo data
@@ -403,7 +400,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     private User createUserObject() {
         User user = new User();
-        user.setGender(sasParams.getGenderOrig());
+        user.setGender(sasParams.getGender());
         if (casInternalRequestParameters.uid != null) {
             user.setId(casInternalRequestParameters.uid);
             user.setBuyeruid(casInternalRequestParameters.uid);
@@ -411,7 +408,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         try {
             if (sasParams.getAge() != null) {
-                int age = Integer.parseInt(sasParams.getAge());
+                int age = sasParams.getAge();
                 int year = Calendar.getInstance().get(Calendar.YEAR);
                 int yob = year - age;
                 user.setYob(yob);
@@ -430,9 +427,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         else {
             site = new Site(sasParams.getSiteId());
-        }
-        if (null != sasParams.getKeywords()) {
-            site.setKeywords(sasParams.getKeywords());
         }
         if (null != sasParams.getCategories()) {
             site.setCat(iabCategoriesInterface.getIABCategories(sasParams.getCategories()));

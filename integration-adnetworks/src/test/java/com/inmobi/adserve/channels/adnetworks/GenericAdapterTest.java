@@ -1,20 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-
-import java.io.File;
-import java.util.ArrayList;
-
-import junit.framework.TestCase;
-
-import org.apache.commons.configuration.Configuration;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.testng.annotations.Test;
-
 import com.inmobi.adserve.channels.adnetworks.generic.GenericAdapter;
 import com.inmobi.adserve.channels.adnetworks.generic.MacrosAndStrings;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -22,6 +7,19 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import junit.framework.TestCase;
+import org.apache.commons.configuration.Configuration;
+import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import org.testng.annotations.Test;
+
+import java.io.File;
+import java.util.ArrayList;
+
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 
 public class GenericAdapterTest extends TestCase {
@@ -85,7 +83,7 @@ public class GenericAdapterTest extends TestCase {
         sasParams.setUserAgent("Mozilla");
         casInternalRequestParameters.uid = "1234";
         String externalKey = "118398";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
             httpoolAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
@@ -104,7 +102,7 @@ public class GenericAdapterTest extends TestCase {
         casInternalRequestParameters.uid = "1234";
         sasParams.setAdIncId(32);
         sasParams.setSiteIncId(18);
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
             httpoolAdvertiserId, null, null, null, 0, null, null, true, true, null, null, null, null, 0, true, null,
             null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
@@ -121,7 +119,7 @@ public class GenericAdapterTest extends TestCase {
         sasParams.setUserAgent("Mozilla");
         casInternalRequestParameters.uid = "1234";
         String externalKey = "118398";
-        sasParams.setSlot("9");
+        sasParams.setSlot(Short.valueOf("9"));
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
             httpoolAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,

@@ -1,13 +1,5 @@
 package com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl;
 
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
@@ -17,6 +9,12 @@ import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AbstractAdGroupLevelFilter;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
+import javax.inject.Inject;
+import java.util.Map;
 
 
 /**
@@ -41,9 +39,7 @@ public class AdGroupDstFilter extends AbstractAdGroupLevelFilter {
     @Override
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
             final CasContext casContext) {
-        return (sasParams.getDst() == 6 && channelSegment.getChannelSegmentEntity().getDst() != sasParams.getDst())
-                || (sasParams.getDst() == 2 && sasParams.isResponseOnlyFromDcp() && channelSegment
-                        .getChannelSegmentEntity().getDst() != sasParams.getDst());
+        return channelSegment.getChannelSegmentEntity().getDst() != sasParams.getDst();
 
     }
 

@@ -1,12 +1,10 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import java.net.URLDecoder;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.ws.rs.Path;
-
+import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.server.RequestParameterHolder;
+import com.inmobi.adserve.channels.server.ServletHandler;
+import com.inmobi.adserve.channels.server.api.Servlet;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
@@ -15,10 +13,11 @@ import org.jboss.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.Singleton;
-import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.ServletHandler;
-import com.inmobi.adserve.channels.server.api.Servlet;
+import javax.ws.rs.Path;
+import java.net.URLDecoder;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 
 @Path("/logParser")
@@ -30,7 +29,8 @@ public class ServletLogParser implements Servlet {
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
             final MessageEvent e) throws Exception {
         Map<String, List<String>> params = queryStringDecoder.getParameters();
-        HttpRequest request = (HttpRequest) e.getMessage();
+        RequestParameterHolder requestParameterHolder = (RequestParameterHolder) e.getMessage();
+        HttpRequest request = requestParameterHolder.getHttpRequest();
         String targetStrings = "";
         String logFilePath = "";
         // Handle post request

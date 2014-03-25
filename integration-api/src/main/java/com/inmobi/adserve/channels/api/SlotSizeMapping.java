@@ -1,6 +1,6 @@
 package com.inmobi.adserve.channels.api;
 
-import java.awt.Dimension;
+import java.awt.*;
 import java.util.HashMap;
 
 

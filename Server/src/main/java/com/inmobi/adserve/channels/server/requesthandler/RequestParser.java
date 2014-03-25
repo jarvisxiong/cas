@@ -76,11 +76,27 @@ public class RequestParser {
         params.setLatLong(stringify(jObject, "latlong"));
         params.setSiteId(stringify(jObject, "rqMkSiteid"));
         params.setSource(stringify(jObject, "source"));
-        params.setCountry(parseArray(jObject, "carrier", 2));
-        params.setCountryStr(parseArray(jObject, "carrier", 1));
-        params.setArea(parseArray(jObject, "carrier", 4));
-        params.setSlot(stringify(jObject, "slot-served"));
-        params.setRqMkSlot(stringify(jObject, "rqMkAdSlot"));
+        params.setCarrierId(Integer.parseInt(parseArray(jObject, "carrier", 0)));
+        params.setCountryId(Long.parseLong(parseArray(jObject, "carrier", 1)));
+        params.setCountryCode(parseArray(jObject, "carrier", 2));
+        try {
+            params.setCity(Integer.parseInt(parseArray(jObject, "carrier", 3)));
+        } catch (NumberFormatException e) {
+            LOG.error(traceMarker, "City not found in request");
+        }
+        try {
+            params.setState(Integer.parseInt(parseArray(jObject, "carrier", 4)));
+        } catch (NumberFormatException e) {
+            LOG.error(traceMarker, "State not found in request");
+        }
+        String slot = stringify(jObject, "slot-served");
+        if (StringUtils.isNotEmpty(slot)) {
+                params.setSlot(Short.parseShort(slot));
+            }
+        String rqMkSlot = stringify(jObject, "rqMkAdSlot");
+        if (StringUtils.isNotEmpty(rqMkSlot)) {
+                params.setRqMkSlot(Arrays.asList(Short.parseShort(rqMkSlot)));
+            }
         String sdkVersion = stringify(jObject, "sdk-version");
         if (StringUtils.isBlank(sdkVersion) || "null".equalsIgnoreCase(sdkVersion)) {
             sdkVersion = null;
@@ -88,16 +104,15 @@ public class RequestParser {
         params.setSdkVersion(sdkVersion);
         params.setSiteType(stringify(jObject, "site-type"));
         params.setAdcode(stringify(jObject, "adcode"));
-        params.setPlatformOsId(jObject.optInt("os-id", -1));
         if (params.getSiteType() != null) {
             params.setSiteType(params.getSiteType().toUpperCase());
         }
         params.setCategories(getCategory(jObject, "new-category"));
         params.setRqIframe(stringify(jObject, "rqIframe"));
         params.setRFormat(stringify(jObject, "r-format"));
-        params.setRqMkAdcount(stringify(jObject, "rqMkAdcount"));
-        params.setTid(stringify(jObject, "tid"));
-        params.setTp(stringify(jObject, "tp"));
+        String adCountStr =  stringify(jObject, "rqMkAdcount");
+        adCountStr = StringUtils.isEmpty(adCountStr) ? "1" : adCountStr;
+        params.setRqMkAdcount(Short.parseShort(adCountStr));        params.setTid(stringify(jObject, "tid"));
 
         params.setAllowBannerAds(jObject.optBoolean("site-allowBanner", true));
         params.setSiteFloor(jObject.optDouble("site-floor", 0.0));
@@ -106,9 +121,9 @@ public class RequestParser {
         LOG.debug(traceMarker, "Site segment id is {} and model id is {}", params.getSiteSegmentId(),
                 params.getModelId());
         params.setIpFileVersion(jObject.optInt("rqIpFileVer", 7));
-        LOG.debug(traceMarker, "country obtained is {}", params.getCountry());
+        LOG.debug(traceMarker, "country obtained is {}", params.getCountryCode());
         LOG.debug(traceMarker, "site floor is {}", params.getSiteFloor());
-        LOG.debug(traceMarker, "osId is {}", params.getPlatformOsId());
+        LOG.debug(traceMarker, "osId is {}", params.getOsId());
         params.setUidParams(stringify(jObject, "raw-uid"));
         setUserIdParams(casInternalRequestParameters, jObject);
         params = getUserParams(params, jObject);
@@ -123,16 +138,11 @@ public class RequestParser {
             params.setSiteIncId(0);
         }
         try {
-            params.setHandset(jObject.getJSONArray("handset"));
+            JSONArray jsonArray = jObject.getJSONArray("handset");
+            params.setHandsetInternalId(Long.parseLong(jsonArray.get(0).toString()));
         }
         catch (JSONException e) {
             LOG.error(traceMarker, "Handset array not found");
-        }
-        try {
-            params.setCarrier(jObject.getJSONArray("carrier"));
-        }
-        catch (JSONException e) {
-            LOG.error(traceMarker, "carrier array not found");
         }
         params.setOsId(jObject.optInt("os-id", -1));
         params.setRichMedia(jObject.optBoolean("rich-media", false));
@@ -218,24 +228,28 @@ public class RequestParser {
         String utf8 = "UTF-8";
         try {
             JSONObject userMap = (JSONObject) jObject.get("uparams");
-            parameter.setAge(stringify(userMap, "u-age"));
+            parameter.setAge(Short.valueOf(stringify(userMap, "u-age")));
             parameter.setGender(stringify(userMap, "u-gender"));
-            parameter.setPostalCode(stringify(userMap, "u-postalcode"));
-            if (!StringUtils.isEmpty(parameter.getPostalCode())) {
-                parameter.setPostalCode(parameter.getPostalCode().replaceAll(" ", ""));
-            }
-            parameter.setUserLocation(stringify(userMap, "u-location"));
-            parameter.setGenderOrig(stringify(userMap, "u-gender-orig"));
+            parameter.setPostalCode(Integer.parseInt(stringify(userMap, "u-postalcode")));
             try {
                 if (null != parameter.getAge()) {
-                    parameter.setAge(URLEncoder.encode(parameter.getAge(), utf8));
+                    parameter.setAge(Short.valueOf(URLEncoder.encode(String.valueOf(parameter.getAge()), utf8)));
                 }
                 if (null != parameter.getGender()) {
                     parameter.setGender(URLEncoder.encode(parameter.getGender(), utf8));
                 }
                 if (null != parameter.getPostalCode()) {
-                    parameter.setPostalCode(URLEncoder.encode(parameter.getPostalCode(), utf8));
+                    parameter.setPostalCode(Integer.valueOf(URLEncoder.encode(String.valueOf(parameter.getPostalCode()), utf8)));
                 }
+               String[] advertiserList = null;
+                if (userMap.get("u-adapter") != null) {
+                        advertiserList = ((String) userMap.get("u-adapter")).split(",");
+                }
+                Set<String> advertiserSet = new HashSet<String>();
+                if (advertiserList != null) {
+                        Collections.addAll(advertiserSet, advertiserList);
+                        parameter.setUAdapters(advertiserSet);
+                 }
             }
             catch (UnsupportedEncodingException e) {
                 LOG.debug(traceMarker, "Error in encoding u params {}", e);
@@ -243,6 +257,9 @@ public class RequestParser {
         }
         catch (JSONException exception) {
             LOG.debug(traceMarker, "json exception in parsing u params {}", exception);
+        }
+        catch (NumberFormatException e) {
+            LOG.error(traceMarker, "number format exception in u params {}", e);
         }
         return parameter;
     }
