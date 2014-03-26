@@ -146,6 +146,9 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
                     if (casInternalRequestParameters.uidIFA != null) {
                         url.append("&uis=a&ui=").append(casInternalRequestParameters.uidIFA);
                     }
+                    else if (casInternalRequestParameters.uidSO1 != null) {
+                        url.append("&uis=us&ui=").append(casInternalRequestParameters.uidSO1);
+                    }
                     else if (casInternalRequestParameters.uidO1 != null) {
                         url.append("&uis=us&ui=").append(casInternalRequestParameters.uidO1);
                     }
@@ -158,8 +161,8 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
                     }
                 }
                 else if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
-                    if (casInternalRequestParameters.uidO1 != null) {
-                        url.append("&uis=ds&ui=").append(casInternalRequestParameters.uidO1);
+                    if (casInternalRequestParameters.uidIDUS1 != null) {
+                        url.append("&uis=ds&ui=").append(casInternalRequestParameters.uidIDUS1);
                     }
                     else if (casInternalRequestParameters.uidMd5 != null) {
                         url.append("&uis=dm&ui=").append(casInternalRequestParameters.uidMd5);
