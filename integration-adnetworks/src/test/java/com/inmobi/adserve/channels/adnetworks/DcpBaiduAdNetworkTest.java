@@ -183,7 +183,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
         if (dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, beaconUrl)) {
             String actualUrl = dcpBaiduAdNetwork.getRequestUri().toString();
 
-            String expectedUrl = "http://mobads.baidu.com/cpro/ui/mads.php?u=default&ie=1&n=1&tm=512&cm=512&md=1&at=3&v=api_inmobi&tpl=2&appid=debug&w=320&h=50&ip=206.29.182.240&impt=http%3A%2F%2Fc2.w.inmobi.com%2Fc.asm%2F4%2Fb%2Fbx5%2Fyaz%2F2%2Fb%2Fa5%2Fm%2F0%2F0%2F0%2F202cb962ac59075b964b07152d234b70%2F4f8d98e2-4bbd-40bc-87e5-22da170600f9%2F-1%2F1%2F9cddca11%3Fbeacon%3Dtrue&clkt=http%3A%2F%2Fc2.w.inmobi.com%2Fc.asm%2F4%2Fb%2Fbx5%2Fyaz%2F2%2Fb%2Fa5%2Fm%2F0%2F0%2F0%2F202cb962ac59075b964b07152d234b70%2F4f8d98e2-4bbd-40bc-87e5-22da170600f9%2F-1%2F1%2F9cddca11%3Fds%3D1&sn=202cb962ac59075b964b07152d234b70&q=debug_cpr&act=LP%2CPH%2CDL%2CMAP%2CSMS%2CMAI%2CVD%2CRM";
+            String expectedUrl = "http://mobads.baidu.com/cpro/ui/mads.php?u=default&ie=1&n=1&tm=512&cm=512&md=1&at=3&v=api_inmobi&tpl=2&appid=debug&os=android&w=50&h=320&ip=206.29.182.240&impt=http%3A%2F%2Fc2.w.inmobi.com%2Fc.asm%2F4%2Fb%2Fbx5%2Fyaz%2F2%2Fb%2Fa5%2Fm%2F0%2F0%2F0%2F202cb962ac59075b964b07152d234b70%2F4f8d98e2-4bbd-40bc-87e5-22da170600f9%2F-1%2F1%2F9cddca11%3Fbeacon%3Dtrue&clkt=http%3A%2F%2Fc2.w.inmobi.com%2Fc.asm%2F4%2Fb%2Fbx5%2Fyaz%2F2%2Fb%2Fa5%2Fm%2F0%2F0%2F0%2F202cb962ac59075b964b07152d234b70%2F4f8d98e2-4bbd-40bc-87e5-22da170600f9%2F-1%2F1%2F9cddca11%3Fds%3D1&sn=202cb962ac59075b964b07152d234b70&q=debug_cpr&act=LP%2CPH%2CDL%2CMAP%2CSMS%2CMAI%2CVD%2CRM";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -215,7 +215,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
         if (dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
             String actualUrl = dcpBaiduAdNetwork.getRequestUri().toString();
             String urlWithOutGeo = actualUrl.substring(0, actualUrl.indexOf("&g="));
-            String expectedUrl = "http://mobads.baidu.com/cpro/ui/mads.php?u=default&ie=1&n=1&tm=512&cm=512&md=1&at=3&v=api_inmobi&tpl=2&appid=debug&w=320&h=50&ip=206.29.182.240&impt=&clkt=&sn=202cb962ac59075b964b07152d234b70&q=debug_cpr&act=LP%2CPH%2CDL%2CMAP%2CSMS%2CMAI%2CVD%2CRM";
+            String expectedUrl = "http://mobads.baidu.com/cpro/ui/mads.php?u=default&ie=1&n=1&tm=512&cm=512&md=1&at=3&v=api_inmobi&tpl=2&appid=debug&os=android&w=50&h=320&ip=206.29.182.240&impt=&clkt=&sn=202cb962ac59075b964b07152d234b70&q=debug_cpr&act=LP%2CPH%2CDL%2CMAP%2CSMS%2CMAI%2CVD%2CRM";
             assertEquals(expectedUrl, urlWithOutGeo);
         }
     }
