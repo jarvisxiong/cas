@@ -1,24 +1,30 @@
 package com.inmobi.adserve.channels.adnetworks.adelphic;
 
-import com.inmobi.adserve.channels.api.*;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.util.IABCategoriesInterface;
-import com.inmobi.adserve.channels.util.IABCategoriesMap;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
+import java.awt.Dimension;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.util.IABCategoriesInterface;
+import com.inmobi.adserve.channels.util.IABCategoriesMap;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
 public class DCPAdelphicAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -43,9 +49,9 @@ public class DCPAdelphicAdNetwork extends AbstractDCPAdNetworkImpl {
      * @param baseRequestHandler
      * @param serverEvent
      */
-    public DCPAdelphicAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public DCPAdelphicAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
     @Override
@@ -56,9 +62,8 @@ public class DCPAdelphicAdNetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
 
-        if (null != sasParams.getSlot()
-                                && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
-                        Dimension dim = SlotSizeMapping.getDimension((long)sasParams.getSlot());
+        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
@@ -105,29 +110,12 @@ public class DCPAdelphicAdNetwork extends AbstractDCPAdNetworkImpl {
         try {
             String host = config.getString("adelphic.host");
             StringBuilder url = new StringBuilder(host);
-            url.append("?pub=")
-                        .append(publisherId)
-                        .append("&site=")
-                        .append(siteId)
-                        .append("&spot=")
-                        .append(spotId)
-                        .append("&msi.name=")
-                        .append(blindedSiteId)
-                        .append("&msi.id=")
-                        .append(blindedSiteId)
-                        .append("&msi.type=")
-                        .append(sourceType)
-                        .append("&version=1.0")
-                        .append("&ua=")
-                        .append(getURLEncode(sasParams.getUserAgent(), format))
-                        .append("&cliend_ip=")
-                        .append(sasParams.getRemoteHostIp())
-                        .append("&ctype=")
-                        .append(getAdType())
-                        .append("&csize=")
-                        .append(width)
-                        .append("x")
-                        .append(height);
+            url.append("?pub=").append(publisherId).append("&site=").append(siteId).append("&spot=").append(spotId)
+                    .append("&msi.name=").append(blindedSiteId).append("&msi.id=").append(blindedSiteId)
+                    .append("&msi.type=").append(sourceType).append("&version=1.0").append("&ua=")
+                    .append(getURLEncode(sasParams.getUserAgent(), format)).append("&cliend_ip=")
+                    .append(sasParams.getRemoteHostIp()).append("&ctype=").append(getAdType()).append("&csize=")
+                    .append(width).append("x").append(height);
             if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
                 url.append("&ifa_sha1=").append(casInternalRequestParameters.uidIFA);
             }
@@ -163,7 +151,7 @@ public class DCPAdelphicAdNetwork extends AbstractDCPAdNetworkImpl {
                 bCat.add(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES);
             }
             url.append("&bcat=").append(
-                getURLEncode(getValueFromListAsString(iabCategoryMap.getIABCategories(bCat)), format));
+                    getURLEncode(getValueFromListAsString(iabCategoryMap.getIABCategories(bCat)), format));
             url.append("&scat=").append(getURLEncode(getCategories(',', true, true), format));
             LOG.debug("Adelphic url is {}", url);
 
@@ -179,8 +167,8 @@ public class DCPAdelphicAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {}", response);
-        statusCode = status.getCode();
-        if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
+        statusCode = status.code();
+        if (null == response || status.code() != 200 || response.trim().isEmpty()) {
             if (200 == statusCode) {
                 statusCode = 500;
             }

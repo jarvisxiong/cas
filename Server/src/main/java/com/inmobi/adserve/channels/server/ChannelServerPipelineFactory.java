@@ -1,69 +1,74 @@
 package com.inmobi.adserve.channels.server;
 
-import com.google.inject.Provider;
-import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
-import com.inmobi.adserve.channels.server.api.ConnectionType;
-import com.inmobi.adserve.channels.server.handler.TraceMarkerhandler;
-import lombok.Getter;
-import org.apache.commons.configuration.Configuration;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.handler.codec.http.HttpChunkAggregator;
-import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
-import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
-import org.jboss.netty.handler.timeout.IdleStateHandler;
-import org.jboss.netty.util.Timer;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.timeout.WriteTimeoutHandler;
 
-import javax.inject.Inject;
 import java.util.concurrent.TimeUnit;
 
-import static org.jboss.netty.channel.Channels.pipeline;
+import javax.inject.Inject;
+
+import lombok.Getter;
+
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.api.config.ServerConfig;
+import com.inmobi.adserve.channels.server.handler.TraceMarkerhandler;
+import com.inmobi.adserve.channels.util.annotations.IncomingConnectionLimitHandler;
 
 
-public class ChannelServerPipelineFactory implements ChannelPipelineFactory {
+@Singleton
+public class ChannelServerPipelineFactory extends ChannelInitializer<SocketChannel> {
 
     private final RequestIdHandler             requestIdHandler;
     private final Provider<HttpRequestHandler> httpRequestHandlerProvider;
     private final TraceMarkerhandler           traceMarkerhandler;
-    private final Timer                        timer;
-    private final int                          serverTimeoutMillis;
-    // private final ExecutionHandler executionHandler;
     @Getter
     private final ConnectionLimitHandler       incomingConnectionLimitHandler;
     private final ServletHandler               servletHandler;
+    private final ServerConfig                 serverConfig;
+    private final LoggingHandler               loggingHandler;
     private final RequestParserHandler         requestParserHandler;
 
     @Inject
-    ChannelServerPipelineFactory(final Timer timer, @ServerConfiguration final Configuration configuration,
+    ChannelServerPipelineFactory(final ServerConfig serverConfig,
             final Provider<HttpRequestHandler> httpRequestHandlerProvider, final TraceMarkerhandler traceMarkerhandler,
-            final ServletHandler servletHandler, final RequestParserHandler requestParserHandler) {
-        this.timer = timer;
-        this.serverTimeoutMillis = configuration.getInt("serverTimeoutMillis", 825);
-        // executionHandler = new ExecutionHandler(new OrderedMemoryAwareThreadPoolExecutor(80, 1048576, 1048576, 3,
-        // TimeUnit.HOURS));
+            final ServletHandler servletHandler,
+            @IncomingConnectionLimitHandler final ConnectionLimitHandler incomingConnectionLimitHandler,
+            final LoggingHandler loggingHandler, final RequestParserHandler requestParserHandler) {
+
+        this.serverConfig = serverConfig;
         this.httpRequestHandlerProvider = httpRequestHandlerProvider;
         this.traceMarkerhandler = traceMarkerhandler;
         this.requestIdHandler = new RequestIdHandler();
-        this.incomingConnectionLimitHandler = new ConnectionLimitHandler(configuration, ConnectionType.INCOMING);
+        this.incomingConnectionLimitHandler = incomingConnectionLimitHandler;
         this.servletHandler = servletHandler;
+        this.loggingHandler = loggingHandler;
         this.requestParserHandler = requestParserHandler;
     }
 
     @Override
-    public ChannelPipeline getPipeline() throws Exception {
-        ChannelPipeline pipeline = pipeline();
+    protected void initChannel(final SocketChannel ch) throws Exception {
+        ChannelPipeline pipeline = ch.pipeline();
+        // enable logging handler only for dev purpose
+        // pipeline.addLast("logging", loggingHandler);
         pipeline.addLast("incomingLimitHandler", incomingConnectionLimitHandler);
-        pipeline.addLast("decoder", new HttpRequestDecoder());
-        pipeline.addLast("encoder", new HttpResponseEncoder());
-        pipeline.addLast("httpchunkhandler", new HttpChunkAggregator(100000000));
-        // pipeline.addLast("executionHandler", executionHandler);
+        pipeline.addLast("decoderEncoder", new HttpServerCodec());
+        pipeline.addLast("aggregator", new HttpObjectAggregator(1024 * 1024));// 1 MB data size
         pipeline.addLast("requestIdHandler", requestIdHandler);
-        pipeline.addLast("idleStateHandler", new IdleStateHandler(this.timer, 0, 0, serverTimeoutMillis,
+        // pipeline.addLast("casWriteTimeoutHandler", new
+        // CasWriteTimeOutHandler(serverConfig.getServerTimeoutInMillis(),
+        // TimeUnit.MILLISECONDS));
+        pipeline.addLast("casWriteTimeoutHandler", new WriteTimeoutHandler(serverConfig.getServerTimeoutInMillis(),
                 TimeUnit.MILLISECONDS));
         pipeline.addLast("traceMarkerhandler", traceMarkerhandler);
         pipeline.addLast("servletHandler", servletHandler);
+        // pipeline.addLast("casCodec", new CasCodec());
         pipeline.addLast("requestParserHandler", requestParserHandler);
         pipeline.addLast("handler", httpRequestHandlerProvider.get());
-        return pipeline;
     }
 }

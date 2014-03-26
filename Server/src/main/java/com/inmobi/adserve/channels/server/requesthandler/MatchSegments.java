@@ -19,20 +19,19 @@ import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.entity.*;
+import com.inmobi.adserve.channels.entity.ChannelEntity;
+import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
+import com.inmobi.adserve.channels.entity.SegmentAdGroupFeedbackEntity;
+import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ServletHandler;
-import com.inmobi.adserve.channels.server.annotations.AdvertiserIdNameMap;
 import com.inmobi.adserve.channels.server.requesthandler.beans.AdvertiserMatchedSegmentDetail;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
-import javax.inject.Singleton;
-import java.util.*;
+import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
 
 
 @Singleton
@@ -111,11 +110,10 @@ public class MatchSegments {
             siteRating = 2;
         }
         try {
-            LOG
-                    .debug(
-                        traceMarker,
-                        "Requesting Parameters :  slot: {} categories: {} country: {} targetingPlatform: {} siteRating: {} osId: {}",
-                        slotId, sasParams.getCategories(), countryId, targetingPlatform, siteRating, osId);
+            LOG.debug(
+                    traceMarker,
+                    "Requesting Parameters :  slot: {} categories: {} country: {} targetingPlatform: {} siteRating: {} osId: {}",
+                    slotId, sasParams.getCategories(), countryId, targetingPlatform, siteRating, osId);
             long slot = slotId.longValue();
             long country = -1;
             if (countryId != null) {

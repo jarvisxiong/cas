@@ -1,25 +1,19 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import io.netty.channel.Channel;
+
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.configuration.Configuration;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
@@ -28,68 +22,30 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.SegmentFactory;
-import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
-import com.ning.http.client.AsyncHttpClient;
-import org.apache.commons.configuration.Configuration;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import com.ning.http.client.AsyncHttpClientConfig;
 
 
+@Singleton
 public class AsyncRequestMaker {
-    private static final Logger    LOG = LoggerFactory.getLogger(AsyncRequestMaker.class);
+    private static final Logger  LOG = LoggerFactory.getLogger(AsyncRequestMaker.class);
 
-    private static ClientBootstrap clientBootstrap;
-    private static ClientBootstrap rtbClientBootstrap;
-    private static AsyncHttpClient asyncHttpClient;
+    private final SegmentFactory segmentFactory;
 
     @Inject
-    private static SegmentFactory  segmentFactory;
-
-    @Inject
-    private static ExecutorService executorService;
-
-    public static AsyncHttpClient getAsyncHttpClient() {
-        return asyncHttpClient;
-    }
-
-    public static void init(final ClientBootstrap clientBootstrap, final ClientBootstrap rtbClientBootstrap) {
-        AsyncRequestMaker.clientBootstrap = clientBootstrap;
-        AsyncRequestMaker.rtbClientBootstrap = rtbClientBootstrap;
-
-        ConfigurationLoader configurationLoader = ConfigurationLoader
-                .getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
-
-        AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder()
-                .setRequestTimeoutInMs(configurationLoader.getServerConfiguration().getInt("readtimeoutMillis"))
-                .setConnectionTimeoutInMs(configurationLoader.getServerConfiguration().getInt("readtimeoutMillis"))
-                .setAllowPoolingConnection(true)
-                .setMaximumConnectionsTotal(
-                        configurationLoader.getServerConfiguration().getInt("dcpOutGoingMaxConnections", 200))
-                .setExecutorService(executorService).build();
-        asyncHttpClient = new AsyncHttpClient(asyncHttpClientConfig);
-
+    public AsyncRequestMaker(final SegmentFactory segmentFactory) {
+        this.segmentFactory = segmentFactory;
     }
 
     /**
      * For each channel we configure the parameters and make the async request if the async request is successful we add
      * it to segment list else we drop it
      */
-    public static List<ChannelSegment> prepareForAsyncRequest(final List<ChannelSegment> rows,
-            final Configuration config, final Configuration rtbConfig, final Configuration adapterConfig,
-            final HttpRequestHandlerBase base, final Set<String> advertiserSet, final MessageEvent e,
-            final RepositoryHelper repositoryHelper, final JSONObject jObject, final SASRequestParameters sasParams,
+    public List<ChannelSegment> prepareForAsyncRequest(final List<ChannelSegment> rows, final Configuration config,
+            final Configuration rtbConfig, final Configuration adapterConfig, final HttpRequestHandlerBase base,
+            final Set<String> advertiserSet, final Channel channel, final RepositoryHelper repositoryHelper,
+            final JSONObject jObject, final SASRequestParameters sasParams,
             final CasInternalRequestParameters casInternalRequestParameterGlobal, final List<ChannelSegment> rtbSegments)
             throws Exception {
 
@@ -103,8 +59,8 @@ public class AsyncRequestMaker {
         for (ChannelSegment row : rows) {
             ChannelSegmentEntity channelSegmentEntity = row.getChannelSegmentEntity();
             AdNetworkInterface network = segmentFactory.getChannel(channelSegmentEntity.getAdvertiserId(), row
-                    .getChannelSegmentEntity().getChannelId(), adapterConfig, clientBootstrap, rtbClientBootstrap,
-                    base, e, advertiserSet, isRtbEnabled, rtbMaxTimeOut, sasParams.getDst(), repositoryHelper);
+                    .getChannelSegmentEntity().getChannelId(), adapterConfig, null, null, base, channel, advertiserSet,
+                    isRtbEnabled, rtbMaxTimeOut, sasParams.getDst(), repositoryHelper);
             if (null == network) {
                 LOG.debug("No adapter found for adGroup: {}", channelSegmentEntity.getAdgroupId());
                 continue;
@@ -131,7 +87,8 @@ public class AsyncRequestMaker {
                         && channelSegmentEntity.getPricingModel().equalsIgnoreCase("cpc")) {
                     isCpc = true;
                 }
-                ClickUrlMakerV6 clickUrlMakerV6 = setClickParams(isCpc, config, sasParams, channelSegmentEntity.getDst() - 1);
+                ClickUrlMakerV6 clickUrlMakerV6 = setClickParams(isCpc, config, sasParams,
+                        channelSegmentEntity.getDst() - 1);
                 clickUrlMakerV6.createClickUrls();
                 clickUrl = clickUrlMakerV6.getClickUrl();
                 beaconUrl = clickUrlMakerV6.getBeaconUrl();
@@ -158,7 +115,7 @@ public class AsyncRequestMaker {
         return segments;
     }
 
-    private static CasInternalRequestParameters getCasInternalRequestParameters(final SASRequestParameters sasParams,
+    private CasInternalRequestParameters getCasInternalRequestParameters(final SASRequestParameters sasParams,
             final CasInternalRequestParameters casInternalRequestParameterGlobal) {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.impressionId = sasParams.getImpressionId();
@@ -176,14 +133,14 @@ public class AsyncRequestMaker {
         casInternalRequestParameters.uidMd5 = casInternalRequestParameterGlobal.uidMd5;
         casInternalRequestParameters.uidADT = casInternalRequestParameterGlobal.uidADT;
         if (null != sasParams.getPostalCode()) {
-                       casInternalRequestParameters.zipCode = sasParams.getPostalCode().toString();
+            casInternalRequestParameters.zipCode = sasParams.getPostalCode().toString();
         }
         casInternalRequestParameters.latLong = sasParams.getLatLong();
         casInternalRequestParameters.appUrl = sasParams.getAppUrl();
         return casInternalRequestParameters;
     }
 
-    private static void controlEnrichment(final CasInternalRequestParameters casInternalRequestParameters,
+    private void controlEnrichment(final CasInternalRequestParameters casInternalRequestParameters,
             final ChannelSegmentEntity channelSegmentEntity) {
         if (channelSegmentEntity.isStripUdId()) {
             casInternalRequestParameters.uid = null;
@@ -207,7 +164,7 @@ public class AsyncRequestMaker {
 
     }
 
-    public static List<ChannelSegment> makeAsyncRequests(final List<ChannelSegment> rankList, final MessageEvent e,
+    public List<ChannelSegment> makeAsyncRequests(final List<ChannelSegment> rankList, final Channel channel,
             final List<ChannelSegment> rtbSegments) {
         Iterator<ChannelSegment> itr = rankList.iterator();
         while (itr.hasNext()) {
@@ -239,14 +196,14 @@ public class AsyncRequestMaker {
         return rankList;
     }
 
-    public static String getImpressionId(final long adId) {
+    public String getImpressionId(final long adId) {
         String uuidIntKey = (WilburyUUID.setIntKey(WilburyUUID.getUUID().toString(), (int) adId)).toString();
         String uuidMachineKey = (WilburyUUID.setMachineId(uuidIntKey, ChannelServer.hostIdCode)).toString();
         return (WilburyUUID.setDataCenterId(uuidMachineKey, ChannelServer.dataCenterIdCode)).toString();
     }
 
-    private static ClickUrlMakerV6 setClickParams(boolean pricingModel, Configuration config,
-                                                  SASRequestParameters sasParams, Integer dst) {
+    private static ClickUrlMakerV6 setClickParams(final boolean pricingModel, final Configuration config,
+            final SASRequestParameters sasParams, final Integer dst) {
         ClickUrlMakerV6.Builder builder = ClickUrlMakerV6.newBuilder();
         builder.setImpressionId(sasParams.getImpressionId());
         builder.setAge(null != sasParams.getAge() ? sasParams.getAge().intValue() : 0);
@@ -272,9 +229,9 @@ public class AsyncRequestMaker {
         builder.setImageBeaconURLPrefix(config.getString("clickmaker.beaconURLPrefix"));
         builder.setTestRequest(false);
         builder.setLatlonval(sasParams.getLatLong());
-        builder.setRtbSite(sasParams.getSst() != 0);//TODO:- Change this according to thrift enums
+        builder.setRtbSite(sasParams.getSst() != 0);// TODO:- Change this according to thrift enums
         builder.setDst(dst.toString());
-        builder.setBudgetBucketId("101"); //Default Value
+        builder.setBudgetBucketId("101"); // Default Value
         return new ClickUrlMakerV6(builder);
     }
 }

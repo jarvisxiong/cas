@@ -1,35 +1,39 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-import com.inmobi.adserve.channels.adnetworks.httpool.DCPHttPoolAdNetwork;
-import com.inmobi.adserve.channels.api.*;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import junit.framework.TestCase;
-import org.apache.commons.configuration.Configuration;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.testng.annotations.Test;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import junit.framework.TestCase;
+
+import org.apache.commons.configuration.Configuration;
+import org.testng.annotations.Test;
+
+import com.inmobi.adserve.channels.adnetworks.httpool.DCPHttPoolAdNetwork;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 
 
 public class DCPHttpoolAdnetworkTest extends TestCase {
-    private Configuration         mockConfig      = null;
-    private final String          debug           = "debug";
-    private final String          loggerConf      = "/tmp/channel-server.properties";
-    private final ClientBootstrap clientBootstrap = null;
+    private Configuration       mockConfig    = null;
+    private final String        debug         = "debug";
+    private final String        loggerConf    = "/tmp/channel-server.properties";
     // Httpool
-    private DCPHttPoolAdNetwork   dcpHttpoolAdNetwork;
-    private final String          httpoolHost     = "http://a.mobile.toboads.com/get?ormma=0&fh=0&sdkid=api&sdkver=100&";
-    private final String          httpoolStatus   = "on";
-    private final String          httpoolAdvId    = "httpooladv1";
-    private final String          httpoolTest     = "1";
+    private DCPHttPoolAdNetwork dcpHttpoolAdNetwork;
+    private final String        httpoolHost   = "http://a.mobile.toboads.com/get?ormma=0&fh=0&sdkid=api&sdkver=100&";
+    private final String        httpoolStatus = "on";
+    private final String        httpoolAdvId  = "httpooladv1";
+    private final String        httpoolTest   = "1";
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -50,11 +54,11 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         if (!f.exists()) {
             f.createNewFile();
         }
-        MessageEvent serverEvent = createMock(MessageEvent.class);
+        Channel serverChannel = createMock(Channel.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         Formatter.init();
-        dcpHttpoolAdNetwork = new DCPHttPoolAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
+        dcpHttpoolAdNetwork = new DCPHttPoolAdNetwork(mockConfig, null, base, serverChannel);
     }
 
     @Test
@@ -69,11 +73,11 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertEquals(true,
-            dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+                dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
 
     @Test
@@ -88,11 +92,11 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertEquals(false,
-            dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+                dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
 
     @Test
@@ -107,11 +111,11 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertEquals(false,
-            dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+                dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
 
     @Test
@@ -125,11 +129,11 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertEquals(false,
-            dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+                dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
 
     @Test
@@ -142,14 +146,14 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         sasParams.setCategories(new ArrayList<Long>());
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot((short)9);
+        sasParams.setSlot((short) 9);
         String externalKey = "1324";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://a.mobile.toboads.com/get?ormma=0&fh=0&sdkid=api&sdkver=100&type=rich%2Ctpt%2Cshop&uip=206.29.182.240&zid=1324&ua=Mozilla&test=1&geo_lat=37.4429&geo_lng=-122.1514&did=202cb962ac59075b964b07152d234b70&format=320x50&ct=miscellenous";
@@ -168,14 +172,14 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         sasParams.setGender("M");
         sasParams.setCategories(new ArrayList<Long>());
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot((short)9);
+        sasParams.setSlot((short) 9);
         String externalKey = "1324";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://a.mobile.toboads.com/get?ormma=0&fh=0&sdkid=api&sdkver=100&type=rich%2Ctpt%2Cshop&uip=206.29.182.240&zid=1324&ua=Mozilla&test=1&geo_lat=37.4429&geo_lng=-122.1514&did=202cb962ac59075b964b07152d234b70&format=320x50&ct=miscellenous&dd_gnd=1";
@@ -194,15 +198,15 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         sasParams.setGender("f");
         sasParams.setCategories(new ArrayList<Long>());
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot((short)9);
+        sasParams.setSlot((short) 9);
         String externalKey = "1324";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
                 + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11" + "?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://a.mobile.toboads.com/get?ormma=0&fh=0&sdkid=api&sdkver=100&type=rich%2Ctpt%2Cshop&uip=206.29.182.240&zid=1324&ua=Mozilla&test=1&geo_lat=37.4429&geo_lng=-122.1514&did=202cb962ac59075b964b07152d234b70&format=320x50&ct=miscellenous&dd_gnd=2";
@@ -219,7 +223,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot((short)9);
+        sasParams.setSlot((short) 9);
         sasParams.setCategories(new ArrayList<Long>());
         String externalKey = "1324";
         Long[] segmentCategories = new Long[] { 13l, 15l };
@@ -228,9 +232,9 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
                 + "-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            httpoolAdvId, null, null, null, 0, null, segmentCategories, true, true, externalKey, null, null, null, 0,
-            true, null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                httpoolAdvId, null, null, null, 0, null, segmentCategories, true, true, externalKey, null, null, null,
+                0, true, null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
+                null, new ArrayList<Integer>(), 0.0d, null, null, 32));
         if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://a.mobile.toboads.com/get?ormma=0&fh=0&sdkid=api&sdkver=100&type=rich%2Ctpt%2Cshop&uip=206.29.182.240&zid=1324&ua=Mozilla&test=1&geo_lat=37.4429&geo_lng=-122.1514&did=202cb962ac59075b964b07152d234b70&format=320x50&ct=miscellenous";
@@ -247,7 +251,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot((short)9);
+        sasParams.setSlot((short) 9);
         String externalKey = "1324";
         Long[] cats = new Long[] { 13l, 15l };
         sasParams.setCategories(Arrays.asList(cats));
@@ -256,9 +260,9 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
                 + "-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://a.mobile.toboads.com/get?ormma=0&fh=0&sdkid=api&sdkver=100&type=rich%2Ctpt%2Cshop&uip=206.29.182.240&zid=1324&ua=Mozilla&test=1&geo_lat=37.4429&geo_lng=-122.1514&did=202cb962ac59075b964b07152d234b70&format=320x50&ct=Adventure%3BBoard";
@@ -275,7 +279,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         casInternalRequestParameters.latLong = " ,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot((short)15);
+        sasParams.setSlot((short) 15);
         sasParams.setCategories(new ArrayList<Long>());
         String externalKey = "1324";
         SlotSizeMapping.init();
@@ -283,9 +287,9 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
                 + "-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://a.mobile.toboads.com/get?ormma=0&fh=0&sdkid=api&sdkver=100&type=rich%2Ctpt%2Cshop&uip=206.29.182.240&zid=1324&ua=Mozilla&test=1&did=202cb962ac59075b964b07152d234b70&format=320x50&ct=miscellenous";
@@ -308,9 +312,9 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         String clurl = "http://c2.w.inmobi.com/c"
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://a.mobile.toboads.com/get?ormma=0&fh=0&sdkid=api&sdkver=100&type=rich%2Ctpt&uip=206.29.182.240&zid=1324&ua=Mozilla&test=1&geo_lat=37.4429&geo_lng=-122.1514&did=202cb962ac59075b964b07152d234b70&ct=miscellenous";
@@ -324,23 +328,23 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot((short)15);
+        sasParams.setSlot((short) 15);
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
                 + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11"
                 + "?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
         String response = "{\"status\":1337,\"ad_type\":\"rich\",\"image_url\":\"http://a.mobile.toboads.com/image?t=rich&aid=0e75e1fd-b715-46be-91df-54a6f12a639d&format=320x50\",\"impression_url\":\"http://a.mobile.toboads.com/impress?adh=7001b459-0268-4bcc-9907-da11289e592d&add=H89xkxbwcmVD-bcL-Xg5shKWiaC_yATHamJQWPRpOF1tjuLb5TADYnVNQGPqfudt4G33Q4QK38Y.&did=nodeviceid-1234567890\",\"click_url\":\"http://a.mobile.toboads.com/click?adh=7001b459-0268-4bcc-9907-da11289e592d&add=H89xkxbwcmVD-bcL-Xg5shKWiaC_yATHamJQWPRpOF1tjuLb5TADYnVNQGPqfudt4G33Q4QK38Y.&did=nodeviceid-1234567890\",\"redirect_url\":\"http://sofialive.bg/mobile\",\"extra\":{\"bg_color\":\"#000000\",\"text_color\":\"#FFFFFF\",\"refresh_time\":\"0\",\"transition\":\"0\"}}";
         dcpHttpoolAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(200, dcpHttpoolAdNetwork.getHttpResponseStatusCode());
         assertEquals(
-            "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"mraid.js\"></script><a href='http://a.mobile.toboads.com/click?adh=7001b459-0268-4bcc-9907-da11289e592d&add=H89xkxbwcmVD-bcL-Xg5shKWiaC_yATHamJQWPRpOF1tjuLb5TADYnVNQGPqfudt4G33Q4QK38Y.&did=nodeviceid-1234567890&url=http://sofialive.bg/mobile' onclick=\"document.getElementById('click').src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1';\" target=\"_blank\" style=\"text-decoration: none\"><img src='http://a.mobile.toboads.com/image?t=rich&aid=0e75e1fd-b715-46be-91df-54a6f12a639d&format=320x50'  /></a><img src='http://a.mobile.toboads.com/impress?adh=7001b459-0268-4bcc-9907-da11289e592d&add=H89xkxbwcmVD-bcL-Xg5shKWiaC_yATHamJQWPRpOF1tjuLb5TADYnVNQGPqfudt4G33Q4QK38Y.&did=nodeviceid-1234567890' height=1 width=1 border=0 style=\"display:none;\"/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/><img id=\"click\" width=\"1\" height=\"1\" style=\"display:none;\"/></body></html>",
-            dcpHttpoolAdNetwork.getHttpResponseContent());
+                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"mraid.js\"></script><a href='http://a.mobile.toboads.com/click?adh=7001b459-0268-4bcc-9907-da11289e592d&add=H89xkxbwcmVD-bcL-Xg5shKWiaC_yATHamJQWPRpOF1tjuLb5TADYnVNQGPqfudt4G33Q4QK38Y.&did=nodeviceid-1234567890&url=http://sofialive.bg/mobile' onclick=\"document.getElementById('click').src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1';\" target=\"_blank\" style=\"text-decoration: none\"><img src='http://a.mobile.toboads.com/image?t=rich&aid=0e75e1fd-b715-46be-91df-54a6f12a639d&format=320x50'  /></a><img src='http://a.mobile.toboads.com/impress?adh=7001b459-0268-4bcc-9907-da11289e592d&add=H89xkxbwcmVD-bcL-Xg5shKWiaC_yATHamJQWPRpOF1tjuLb5TADYnVNQGPqfudt4G33Q4QK38Y.&did=nodeviceid-1234567890' height=1 width=1 border=0 style=\"display:none;\"/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/><img id=\"click\" width=\"1\" height=\"1\" style=\"display:none;\"/></body></html>",
+                dcpHttpoolAdNetwork.getHttpResponseContent());
     }
 
     @Test
@@ -349,23 +353,23 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot((short)15);
+        sasParams.setSlot((short) 15);
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c"
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
                 + "-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
         String response = "{\"status\": 1337,\"ad_type\": \"tpt\",\"content\": \"<a href=\\\"http://a.mobile.toboads.com/click?adh=dd992e3a-192b-429a-9c22-709efca656e1&add=RegibO8TU8mLvGbkwfKZzdOMhDa--dmGlIFZIELVZ5gP1DZXyAiG8N8xDOKctXZ44G33Q4QK38Y.&test=1&did=123456789&url=http://labs.httpool.com\\\"><img src=\\\"http://labs.httpool.com/your_ad_here.png\\\" width=\\\"320\\\" height=\\\"50\\\" /></a>\",\"impression_url\": \"http://a.mobile.toboads.com/impress?adh=dd992e3a-192b-429a-9c22-709efca656e1&add=RegibO8TU8mLvGbkwfKZzdOMhDa--dmGlIFZIELVZ5gP1DZXyAiG8N8xDOKctXZ44G33Q4QK38Y.&test=1&did=123456789\",\"extra\": {\"bg_color\": \"#000000\",\"text_color\": \"#FFFFFF\",\"refresh_time\": \"0\",\"transition\": \"0\"}}";
         dcpHttpoolAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(200, dcpHttpoolAdNetwork.getHttpResponseStatusCode());
         assertEquals(
-            "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"mraid.js\"></script><a href=\"http://a.mobile.toboads.com/click?adh=dd992e3a-192b-429a-9c22-709efca656e1&add=RegibO8TU8mLvGbkwfKZzdOMhDa--dmGlIFZIELVZ5gP1DZXyAiG8N8xDOKctXZ44G33Q4QK38Y.&test=1&did=123456789&url=http://labs.httpool.com\"><img src=\"http://labs.httpool.com/your_ad_here.png\" width=\"320\" height=\"50\" /></a><img src='http://a.mobile.toboads.com/impress?adh=dd992e3a-192b-429a-9c22-709efca656e1&add=RegibO8TU8mLvGbkwfKZzdOMhDa--dmGlIFZIELVZ5gP1DZXyAiG8N8xDOKctXZ44G33Q4QK38Y.&test=1&did=123456789' height=1 width=1 border=0 style=\"display:none;\"/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>",
-            dcpHttpoolAdNetwork.getHttpResponseContent());
+                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"mraid.js\"></script><a href=\"http://a.mobile.toboads.com/click?adh=dd992e3a-192b-429a-9c22-709efca656e1&add=RegibO8TU8mLvGbkwfKZzdOMhDa--dmGlIFZIELVZ5gP1DZXyAiG8N8xDOKctXZ44G33Q4QK38Y.&test=1&did=123456789&url=http://labs.httpool.com\"><img src=\"http://labs.httpool.com/your_ad_here.png\" width=\"320\" height=\"50\" /></a><img src='http://a.mobile.toboads.com/impress?adh=dd992e3a-192b-429a-9c22-709efca656e1&add=RegibO8TU8mLvGbkwfKZzdOMhDa--dmGlIFZIELVZ5gP1DZXyAiG8N8xDOKctXZ44G33Q4QK38Y.&test=1&did=123456789' height=1 width=1 border=0 style=\"display:none;\"/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>",
+                dcpHttpoolAdNetwork.getHttpResponseContent());
     }
 
     @Test
@@ -374,7 +378,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot((short)4);
+        sasParams.setSlot((short) 4);
         sasParams.setSource("WAP");
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c"
@@ -382,9 +386,9 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                 + "-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
         String response = "{\"status\":1337,\"ad_type\":\"shop\",\"image_url\":\"http://a.mobile.toboads.com/image?t=text&aid=5f404c6e-8278-436e-838b-5daa39fe2d96&format=320x50\",\"impression_url\":\"http://a.mobile.toboads.com/impress?adh=1475ad9d-66cf-43ac-9c59-026b3ab39593&add=NwgHspu71tCynGXEHCsy95jvkB4B4dLEBTIPESU3ODEIaudDRPK4998xDOKctXZ44G33Q4QK38Y.&test=1&did=202cb962ac59075b964b07152d234b70\",\"click_url\":\"http://a.mobile.toboads.com/click?adh=1475ad9d-66cf-43ac-9c59-026b3ab39593&add=NwgHspu71tCynGXEHCsy95jvkB4B4dLEBTIPESU3ODEIaudDRPK4998xDOKctXZ44G33Q4QK38Y.&test=1&did=202cb962ac59075b964b07152d234b70\",\"redirect_url\":\"http://labs.httpool.com\",\"extra\":{\"bg_color\":\"#000000\",\"text_color\":\"#FFFFFF\",\"refresh_time\":\"0\",\"transition\":\"0\"},\"content\":\"Claritas est etiam processus dynamicus, qui sequi.\"}";
         dcpHttpoolAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -399,7 +403,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot((short)4);
+        sasParams.setSlot((short) 4);
         sasParams.setSource("App");
         sasParams.setSdkVersion("i367");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
@@ -409,9 +413,9 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                 + "-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
         String response = "{\"status\":1337,\"ad_type\":\"shop\",\"image_url\":\"http://a.mobile.toboads.com/image?t=text&aid=5f404c6e-8278-436e-838b-5daa39fe2d96&format=320x50\",\"impression_url\":\"http://a.mobile.toboads.com/impress?adh=1475ad9d-66cf-43ac-9c59-026b3ab39593&add=NwgHspu71tCynGXEHCsy95jvkB4B4dLEBTIPESU3ODEIaudDRPK4998xDOKctXZ44G33Q4QK38Y.&test=1&did=202cb962ac59075b964b07152d234b70\",\"click_url\":\"http://a.mobile.toboads.com/click?adh=1475ad9d-66cf-43ac-9c59-026b3ab39593&add=NwgHspu71tCynGXEHCsy95jvkB4B4dLEBTIPESU3ODEIaudDRPK4998xDOKctXZ44G33Q4QK38Y.&test=1&did=202cb962ac59075b964b07152d234b70\",\"redirect_url\":\"http://labs.httpool.com\",\"extra\":{\"bg_color\":\"#000000\",\"text_color\":\"#FFFFFF\",\"refresh_time\":\"0\",\"transition\":\"0\"},\"content\":\"Claritas est etiam processus dynamicus, qui sequi.\"}";
         dcpHttpoolAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -452,9 +456,9 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                httpoolAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null);
         assertEquals("4f8d98e2-4bbd-40bc-8795-22da170700f9", dcpHttpoolAdNetwork.getImpressionId());
     }

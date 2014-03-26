@@ -1,9 +1,17 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import com.google.inject.Provider;
-import com.google.inject.Singleton;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
@@ -13,12 +21,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
-import javax.inject.Inject;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.security.MessageDigest;
-import java.util.*;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
 
 
 @Singleton
@@ -42,7 +48,7 @@ public class RequestParser {
             List<String> values = params.get(jsonKey);
             if (CollectionUtils.isNotEmpty(values)) {
                 String stringVal = values.iterator().next();
-                return new JSONObject(URLDecoder.decode(stringVal, "UTF-8"));
+                return new JSONObject(stringVal);
             }
         }
         return null;
@@ -91,12 +97,12 @@ public class RequestParser {
         }
         String slot = stringify(jObject, "slot-served");
         if (StringUtils.isNotEmpty(slot)) {
-                params.setSlot(Short.parseShort(slot));
-            }
+            params.setSlot(Short.parseShort(slot));
+        }
         String rqMkSlot = stringify(jObject, "rqMkAdSlot");
         if (StringUtils.isNotEmpty(rqMkSlot)) {
-                params.setRqMkSlot(Arrays.asList(Short.parseShort(rqMkSlot)));
-            }
+            params.setRqMkSlot(Arrays.asList(Short.parseShort(rqMkSlot)));
+        }
         String sdkVersion = stringify(jObject, "sdk-version");
         if (StringUtils.isBlank(sdkVersion) || "null".equalsIgnoreCase(sdkVersion)) {
             sdkVersion = null;
@@ -110,9 +116,10 @@ public class RequestParser {
         params.setCategories(getCategory(jObject, "new-category"));
         params.setRqIframe(stringify(jObject, "rqIframe"));
         params.setRFormat(stringify(jObject, "r-format"));
-        String adCountStr =  stringify(jObject, "rqMkAdcount");
+        String adCountStr = stringify(jObject, "rqMkAdcount");
         adCountStr = StringUtils.isEmpty(adCountStr) ? "1" : adCountStr;
-        params.setRqMkAdcount(Short.parseShort(adCountStr));        params.setTid(stringify(jObject, "tid"));
+        params.setRqMkAdcount(Short.parseShort(adCountStr));
+        params.setTid(stringify(jObject, "tid"));
 
         params.setAllowBannerAds(jObject.optBoolean("site-allowBanner", true));
         params.setSiteFloor(jObject.optDouble("site-floor", 0.0));
@@ -239,17 +246,18 @@ public class RequestParser {
                     parameter.setGender(URLEncoder.encode(parameter.getGender(), utf8));
                 }
                 if (null != parameter.getPostalCode()) {
-                    parameter.setPostalCode(Integer.valueOf(URLEncoder.encode(String.valueOf(parameter.getPostalCode()), utf8)));
+                    parameter.setPostalCode(Integer.valueOf(URLEncoder.encode(
+                            String.valueOf(parameter.getPostalCode()), utf8)));
                 }
-               String[] advertiserList = null;
+                String[] advertiserList = null;
                 if (userMap.get("u-adapter") != null) {
-                        advertiserList = ((String) userMap.get("u-adapter")).split(",");
+                    advertiserList = ((String) userMap.get("u-adapter")).split(",");
                 }
                 Set<String> advertiserSet = new HashSet<String>();
                 if (advertiserList != null) {
-                        Collections.addAll(advertiserSet, advertiserList);
-                        parameter.setUAdapters(advertiserSet);
-                 }
+                    Collections.addAll(advertiserSet, advertiserList);
+                    parameter.setUAdapters(advertiserSet);
+                }
             }
             catch (UnsupportedEncodingException e) {
                 LOG.debug(traceMarker, "Error in encoding u params {}", e);

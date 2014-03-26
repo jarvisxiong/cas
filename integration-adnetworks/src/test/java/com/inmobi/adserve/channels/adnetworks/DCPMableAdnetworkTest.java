@@ -1,39 +1,43 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-import com.inmobi.adserve.channels.adnetworks.mable.DCPMableAdnetwork;
-import com.inmobi.adserve.channels.api.*;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import junit.framework.TestCase;
-import org.apache.commons.configuration.Configuration;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.testng.annotations.Test;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import junit.framework.TestCase;
+
+import org.apache.commons.configuration.Configuration;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.testng.annotations.Test;
+
+import com.inmobi.adserve.channels.adnetworks.mable.DCPMableAdnetwork;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 
 
 public class DCPMableAdnetworkTest extends TestCase {
-    private Configuration         mockConfig      = null;
-    private final String          debug           = "debug";
-    private final String          loggerConf      = "/tmp/channel-server.properties";
-    private final ClientBootstrap clientBootstrap = null;
+    private Configuration     mockConfig   = null;
+    private final String      debug        = "debug";
+    private final String      loggerConf   = "/tmp/channel-server.properties";
 
-    private DCPMableAdnetwork     dcpMableAdNetwork;
-    private final String          mableHost       = "http://ad.ipredictive.com/d/ads";
-    private final String          mableStatus     = "on";
-    private final String          mableAdvId      = "mableadv1";
-    private final String          mableTest       = "1";
-    private final String          mableAuthKey    = "335eaf2639079ffa40b5f7d69f3051fb";
+    private DCPMableAdnetwork dcpMableAdNetwork;
+    private final String      mableHost    = "http://ad.ipredictive.com/d/ads";
+    private final String      mableStatus  = "on";
+    private final String      mableAdvId   = "mableadv1";
+    private final String      mableTest    = "1";
+    private final String      mableAuthKey = "335eaf2639079ffa40b5f7d69f3051fb";
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -55,12 +59,12 @@ public class DCPMableAdnetworkTest extends TestCase {
         if (!f.exists()) {
             f.createNewFile();
         }
-        MessageEvent serverEvent = createMock(MessageEvent.class);
+        Channel serverChannel = createMock(Channel.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         SlotSizeMapping.init();
         Formatter.init();
-        dcpMableAdNetwork = new DCPMableAdnetwork(mockConfig, clientBootstrap, base, serverEvent);
+        dcpMableAdNetwork = new DCPMableAdnetwork(mockConfig, null, base, serverChannel);
     }
 
     @Test

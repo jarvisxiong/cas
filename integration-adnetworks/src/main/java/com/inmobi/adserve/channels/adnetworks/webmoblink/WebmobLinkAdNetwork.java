@@ -1,19 +1,26 @@
 package com.inmobi.adserve.channels.adnetworks.webmoblink;
 
-import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 
 
 public class WebmobLinkAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -47,9 +54,9 @@ public class WebmobLinkAdNetwork extends AbstractDCPAdNetworkImpl {
         channelList.put(11l, 23l);
     }
 
-    public WebmobLinkAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public WebmobLinkAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
     @Override
@@ -106,21 +113,13 @@ public class WebmobLinkAdNetwork extends AbstractDCPAdNetworkImpl {
     public URI getRequestUri() throws Exception {
         try {
             LOG.debug("pid={}, mo={}, ua={}, ip={}, format={}, result={}, country={}, channels={}", externalSiteId,
-                mode, sasParams.getUserAgent(), sasParams.getRemoteHostIp(), responseFormat, result, country, channels);
+                    mode, sasParams.getUserAgent(), sasParams.getRemoteHostIp(), responseFormat, result, country,
+                    channels);
             StringBuilder url = new StringBuilder();
-            url.append(host)
-                        .append("?pid=")
-                        .append(externalSiteId)
-                        .append("&mo=")
-                        .append(mode)
-                        .append("&ua=")
-                        .append(getURLEncode(sasParams.getUserAgent(), format));
-            url.append("&ip=")
-                        .append(sasParams.getRemoteHostIp())
-                        .append("&format=")
-                        .append(responseFormat)
-                        .append("&result=")
-                        .append(result);
+            url.append(host).append("?pid=").append(externalSiteId).append("&mo=").append(mode).append("&ua=")
+                    .append(getURLEncode(sasParams.getUserAgent(), format));
+            url.append("&ip=").append(sasParams.getRemoteHostIp()).append("&format=").append(responseFormat)
+                    .append("&result=").append(result);
             if (!StringUtils.isBlank(country)) {
                 url.append("&cc=").append(country);
             }

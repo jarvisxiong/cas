@@ -1,5 +1,9 @@
 package com.inmobi.adserve.channels.adnetworks.baidu;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 import java.awt.Dimension;
 import java.net.URI;
 import java.util.Calendar;
@@ -7,17 +11,14 @@ import java.util.Calendar;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
@@ -30,7 +31,7 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
     private int                 width;
     private int                 height;
     private String              uid;
-    private String 				os;
+    private String              os;
 
     private static final String APP_ID       = "appid";
     private static final String WIDTH        = "w";
@@ -45,17 +46,15 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final String GEO_TEMPLATE = "%s_%s_%s";
     private static final String Q_FORMAT     = "%s_cpr";
     private static final String Q_APPID      = "q";
-    private static final String OS      	 = "os";
-    private static final String ANDROID		 = "android";
-    private static final String IOS		 	 = "iOS";
-    private static final String SYMBIAN	 	 = "symbian";
-    private static final String WEB		 	 = "web";
-       
-    
-    public DCPBaiduAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    private static final String OS           = "os";
+    private static final String ANDROID      = "android";
+    private static final String IOS          = "iOS";
+    private static final String SYMBIAN      = "symbian";
+    private static final String WEB          = "web";
 
+    public DCPBaiduAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
         host = config.getString("baidu.host");
     }
 
@@ -73,11 +72,9 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
             latitude = latlong[0];
             longitude = latlong[1];
         }
-
-        if (null != sasParams.getSlot()
-                && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
-            Dimension dim = SlotSizeMapping.getDimension((long)sasParams.getSlot());
-            //Baidu wanted in that format
+        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
+            // Baidu wanted in that format
             height = (int) Math.ceil(dim.getWidth());
             width = (int) Math.ceil(dim.getHeight());
         }
@@ -86,25 +83,24 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
         uid = getUid();
-        
 
         if (StringUtils.isBlank(uid)) {
             LOG.debug("mandatory parameters missing for baidu so exiting adapter");
             return false;
 
         }
-        
+
         if (sasParams.getOsId() == HandSetOS.iPhone_OS.getValue()) {
-        	os=IOS;
+            os = IOS;
         }
         else if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
-        	os=ANDROID;
+            os = ANDROID;
         }
         else if (sasParams.getOsId() == HandSetOS.Symbian_OS.getValue()) {
-        	os=SYMBIAN;
+            os = SYMBIAN;
         }
-        else{
-        	os= WEB;
+        else {
+            os = WEB;
         }
         LOG.info("Configure parameters inside baidu returned true");
         return true;
@@ -151,8 +147,8 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {} and response length is {}", response, response.length());
-        if (status.getCode() != 200 || StringUtils.isBlank(response)) {
-            statusCode = status.getCode();
+        if (status.code() != 200 || StringUtils.isBlank(response)) {
+            statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
             }
@@ -160,7 +156,7 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
             return;
         }
         else {
-            statusCode = status.getCode();
+            statusCode = status.code();
             VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
 

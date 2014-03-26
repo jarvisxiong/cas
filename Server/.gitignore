@@ -10,3 +10,4 @@
 /.classpath
 /velocity.log
 /.project
+/dependency-reduced-pom.xml

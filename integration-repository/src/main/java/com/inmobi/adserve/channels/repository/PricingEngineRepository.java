@@ -1,7 +1,15 @@
 package com.inmobi.adserve.channels.repository;
 
+import java.lang.reflect.Type;
+import java.sql.Timestamp;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.inmobi.adserve.channels.entity.PricingEngineEntity;
 import com.inmobi.adserve.channels.query.PricingEngineQuery;
 import com.inmobi.phoenix.batteries.data.AbstractStatsMaintainingDBRepository;
@@ -15,10 +23,6 @@ import com.inmobi.phoenix.data.RepositoryManager;
 import com.inmobi.phoenix.data.RepositoryQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
 
-import java.lang.reflect.Type;
-import java.sql.Timestamp;
-import java.util.*;
-
 
 public class PricingEngineRepository extends
         AbstractStatsMaintainingDBRepository<PricingEngineEntity, PricingEngineQuery> implements Repository,
@@ -27,7 +31,7 @@ public class PricingEngineRepository extends
     private static final String JSON_ERROR = "JSON_ERROR";
 
     @Override
-    public PricingEngineEntity queryUniqueResult(RepositoryQuery pricingEngineIdQuery) throws RepositoryException {
+    public PricingEngineEntity queryUniqueResult(final RepositoryQuery pricingEngineIdQuery) throws RepositoryException {
         Collection<PricingEngineEntity> pricingEngineEntityResultSet = query(pricingEngineIdQuery);
         if (pricingEngineEntityResultSet == null || pricingEngineEntityResultSet.size() == 0) {
             return null;
@@ -39,7 +43,7 @@ public class PricingEngineRepository extends
     }
 
     @Override
-    public DBEntity<PricingEngineEntity, PricingEngineQuery> buildObjectFromRow(ResultSetRow resultSetRow)
+    public DBEntity<PricingEngineEntity, PricingEngineQuery> buildObjectFromRow(final ResultSetRow resultSetRow)
             throws RepositoryException {
         NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
         Timestamp modifyTime = row.getTimestamp("modified_on");
@@ -65,7 +69,7 @@ public class PricingEngineRepository extends
         return new DBEntity<PricingEngineEntity, PricingEngineQuery>(entity, modifyTime);
     }
 
-    Map<String, Set<String>> getSupplyToDemandMap(String supplyDemandJson) {
+    Map<String, Set<String>> getSupplyToDemandMap(final String supplyDemandJson) {
         if (supplyDemandJson == null) {
             return null;
         }
@@ -76,12 +80,12 @@ public class PricingEngineRepository extends
     }
 
     @Override
-    public HashIndexKeyBuilder<PricingEngineEntity> getHashIndexKeyBuilder(String className) {
+    public HashIndexKeyBuilder<PricingEngineEntity> getHashIndexKeyBuilder(final String className) {
         return null;
     }
 
     @Override
-    public boolean isObjectToBeDeleted(PricingEngineEntity pricingEngineEntity) {
+    public boolean isObjectToBeDeleted(final PricingEngineEntity pricingEngineEntity) {
         return pricingEngineEntity.getRtbFloor() == 0.0 && pricingEngineEntity.getDcpFloor() == 0.0;
     }
 }

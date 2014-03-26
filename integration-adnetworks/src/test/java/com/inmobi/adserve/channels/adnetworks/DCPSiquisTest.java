@@ -1,5 +1,22 @@
 package com.inmobi.adserve.channels.adnetworks;
 
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Map;
+
+import junit.framework.TestCase;
+
+import org.apache.commons.configuration.Configuration;
+import org.easymock.EasyMock;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.testng.annotations.Test;
+
 import com.google.common.collect.Maps;
 import com.inmobi.adserve.channels.adnetworks.siquis.DCPSiquisAdNetwork;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -7,22 +24,6 @@ import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import junit.framework.TestCase;
-import org.apache.commons.configuration.Configuration;
-import org.easymock.EasyMock;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.testng.annotations.Test;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Map;
-
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
 
 
 /**
@@ -30,18 +31,16 @@ import static org.easymock.classextension.EasyMock.createMock;
  * 
  */
 public class DCPSiquisTest extends TestCase {
-    private Configuration         mockConfig         = null;
-    private final String          debug              = "debug";
+    private Configuration      mockConfig         = null;
+    private final String       debug              = "debug";
 
-    private DCPSiquisAdNetwork    dcpSiquisAdNetwork;
-    private final String          siquisHost         = "http://api.adsquare.co.kr/api/ovmob_sh.php?charset=UTF-8";
-    private final String          status             = "on";
-    private final String          responseFormat     = "html";
-    private final String          siquisAdvertiserId = "54321";
-    private final String          testFlag           = "0";
-    private final String          partnerId          = "inmobikorea";
-
-    private final ClientBootstrap clientBootstrap    = null;
+    private DCPSiquisAdNetwork dcpSiquisAdNetwork;
+    private final String       siquisHost         = "http://api.adsquare.co.kr/api/ovmob_sh.php?charset=UTF-8";
+    private final String       status             = "on";
+    private final String       responseFormat     = "html";
+    private final String       siquisAdvertiserId = "54321";
+    private final String       testFlag           = "0";
+    private final String       partnerId          = "inmobikorea";
 
     public void prepareMockConfig() {
         mockConfig = EasyMock.createMock(Configuration.class);
@@ -64,11 +63,11 @@ public class DCPSiquisTest extends TestCase {
         if (!f.exists()) {
             f.createNewFile();
         }
-        MessageEvent serverEvent = createMock(MessageEvent.class);
+        Channel serverChannel = createMock(Channel.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         Formatter.init();
-        dcpSiquisAdNetwork = new DCPSiquisAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
+        dcpSiquisAdNetwork = new DCPSiquisAdNetwork(mockConfig, null, base, serverChannel);
     }
 
     @Test
@@ -81,11 +80,12 @@ public class DCPSiquisTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            siquisAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
-            null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                siquisAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0,
+                true, null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertEquals(
-            dcpSiquisAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null), true);
+                dcpSiquisAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null),
+                true);
     }
 
     @Test
@@ -97,11 +97,12 @@ public class DCPSiquisTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            siquisAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
-            null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                siquisAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0,
+                true, null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertEquals(
-            dcpSiquisAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null), false);
+                dcpSiquisAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null),
+                false);
     }
 
     @Test
@@ -114,11 +115,12 @@ public class DCPSiquisTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = " ";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            siquisAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
-            null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                siquisAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0,
+                true, null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertEquals(
-            dcpSiquisAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null), false);
+                dcpSiquisAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null),
+                false);
     }
 
     @Test
@@ -133,9 +135,9 @@ public class DCPSiquisTest extends TestCase {
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
 
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            siquisAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
-            null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                siquisAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0,
+                true, null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpSiquisAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null);
 
         String actualUrl = dcpSiquisAdNetwork.getRequestUri().toString();
@@ -185,14 +187,12 @@ public class DCPSiquisTest extends TestCase {
         Map<String, String> testMap = Maps.newHashMap();
 
         testMap.put("title", "Ä¯ khamm");
-        testMap
-                .put(
-                    "description",
-                    "ÇÁ¸®¹Ì¾î È£ÅÚÄ§±¸, ½ÉÇÃº£µù, ±¸½º´Ù¿î, Ä¿Æ°, Äí¼Ç, ÇÚµå¸ÞÀÌµå ÆÐºê¸¯.");
-        testMap
-                .put(
-                    "clickurl",
-                    "http://click.adsquare.co.kr/click/ovmob_click.php?url=http%3A%2F%2Frc.us-west.srv.overture.com%2Fd%2Fsr%2F%3Fxargs%3D20AcvbtslD4B5-lkI1OH60WpHQjOMqSILVcSjSbJ2u3yf6MAOF3BvwZocMreqwcBcdBJ");
+        testMap.put(
+                "description",
+                "ÇÁ¸®¹Ì¾î È£ÅÚÄ§±¸, ½ÉÇÃº£µù, ±¸½º´Ù¿î, Ä¿Æ°, Äí¼Ç, ÇÚµå¸ÞÀÌµå ÆÐºê¸¯.");
+        testMap.put(
+                "clickurl",
+                "http://click.adsquare.co.kr/click/ovmob_click.php?url=http%3A%2F%2Frc.us-west.srv.overture.com%2Fd%2Fsr%2F%3Fxargs%3D20AcvbtslD4B5-lkI1OH60WpHQjOMqSILVcSjSbJ2u3yf6MAOF3BvwZocMreqwcBcdBJ");
         JSONObject json = new JSONObject(testMap);
         JSONArray jsonArray = new JSONArray();
         jsonArray.put(json);
@@ -204,9 +204,9 @@ public class DCPSiquisTest extends TestCase {
         String externalKey = "f6wqjq1r5v";
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            siquisAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
-            null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                siquisAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0,
+                true, null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpSiquisAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null);
         dcpSiquisAdNetwork.parseResponse(jsonArray.toString(), HttpResponseStatus.OK);
     }
