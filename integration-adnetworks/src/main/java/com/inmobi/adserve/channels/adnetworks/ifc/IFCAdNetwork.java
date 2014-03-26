@@ -283,7 +283,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         jsonObject.addProperty("age", sasParams.getAge());
         jsonObject.addProperty("gender", gender);
         jsonObject.addProperty("latLong", casInternalRequestParameters.latLong);
-        jsonObject.addProperty("country", sasParams.getCountryId());
+        jsonObject.addProperty("country", sasParams.getCountryCode());
         jsonObject.addProperty("siteID", siteID);
         jsonObject.addProperty("adGroupID", adGroupID);
         jsonObject.addProperty("richMedia", richMedia);
