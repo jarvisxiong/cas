@@ -3,8 +3,6 @@ package com.inmobi.adserve.channels.adnetworks.baidu;
 import java.awt.Dimension;
 import java.net.URI;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
