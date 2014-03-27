@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.api.provider;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -36,7 +37,7 @@ public class AsyncHttpClientProvider {
                 .setRequestTimeoutInMs(serverConfig.getDcpRequestTimeoutInMillis())
                 .setConnectionTimeoutInMs(serverConfig.getDcpRequestTimeoutInMillis())
                 .setMaximumConnectionsTotal(serverConfig.getMaxDcpOutGoingConnections())
-                .setAllowPoolingConnection(true).setExecutorService(executorService).build();
+                .setAllowPoolingConnection(true).setExecutorService(Executors.newCachedThreadPool()).build();
 
         dcpAsyncHttpClient = new AsyncHttpClient(asyncHttpClientConfig);
 
@@ -44,7 +45,7 @@ public class AsyncHttpClientProvider {
                 .setRequestTimeoutInMs(serverConfig.getRtbRequestTimeoutInMillis())
                 .setConnectionTimeoutInMs(serverConfig.getRtbRequestTimeoutInMillis())
                 .setMaximumConnectionsTotal(serverConfig.getMaxRtbOutGoingConnections())
-                .setAllowPoolingConnection(true).setExecutorService(executorService).build();
+                .setAllowPoolingConnection(true).setExecutorService(Executors.newCachedThreadPool()).build();
 
         rtbAsyncHttpClient = new AsyncHttpClient(asyncHttpClientConfig);
 

@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.server.netty;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -44,18 +45,21 @@ public class CasNettyServer {
 
     @PostConstruct
     public void setup() throws InterruptedException {
+        PooledByteBufAllocator allocator = new PooledByteBufAllocator(true);
         // initialize and start server
         serverBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
                 .localAddress(new InetSocketAddress(8800)).childHandler(serverChannelInitializer)
                 // disable nagle's algorithm
                 .childOption(ChannelOption.TCP_NODELAY, true)
                 // allow binding channel on same ip, port
-                .childOption(ChannelOption.SO_REUSEADDR, true).bind().sync();
+                .childOption(ChannelOption.SO_REUSEADDR, true).childOption(ChannelOption.ALLOCATOR, allocator).bind()
+                .sync();
 
         // initialize and start stat server
         statServerBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
                 .localAddress(new InetSocketAddress(8801)).childHandler(statServerChannelInitializer)
-                .childOption(ChannelOption.SO_REUSEADDR, true).bind().sync();
+                .childOption(ChannelOption.SO_REUSEADDR, true).childOption(ChannelOption.ALLOCATOR, allocator).bind()
+                .sync();
 
     }
 
