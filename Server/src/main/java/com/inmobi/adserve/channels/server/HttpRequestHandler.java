@@ -4,7 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.QueryStringDecoder;
-import io.netty.handler.timeout.WriteTimeoutException;
+import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.util.ReferenceCountUtil;
 
 import java.io.IOException;
@@ -87,7 +87,7 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
     public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
         MDC.put("requestId", String.format("0x%08x", ctx.channel().hashCode()));
 
-        if (cause instanceof WriteTimeoutException) {
+        if (cause instanceof ReadTimeoutException) {
 
             if (ctx.channel().isOpen()) {
                 LOG.debug(traceMarker, "Channel is open in channelIdle handler");
@@ -104,8 +104,7 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
                 }
                 responseSender.sendNoAdResponse(ctx.channel());
             }
-            // Whenever channel is Write_idle, increment the totalTimeout. It means
-            // server
+            // increment the totalTimeout. It means server
             // could not write the response with in 800 ms
             LOG.debug(traceMarker, "inside channel idle event handler for Request channel ID: {}", ctx.channel());
             InspectorStats.incrementStatCount(InspectorStrings.totalTimeout);

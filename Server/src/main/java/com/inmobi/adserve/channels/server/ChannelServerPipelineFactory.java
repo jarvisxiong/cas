@@ -6,9 +6,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.logging.LoggingHandler;
-import io.netty.handler.timeout.WriteTimeoutHandler;
-
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -60,11 +57,7 @@ public class ChannelServerPipelineFactory extends ChannelInitializer<SocketChann
         pipeline.addLast("decoderEncoder", new HttpServerCodec());
         pipeline.addLast("aggregator", new HttpObjectAggregator(1024 * 1024));// 1 MB data size
         pipeline.addLast("requestIdHandler", requestIdHandler);
-        // pipeline.addLast("casWriteTimeoutHandler", new
-        // CasWriteTimeOutHandler(serverConfig.getServerTimeoutInMillis(),
-        // TimeUnit.MILLISECONDS));
-        pipeline.addLast("casWriteTimeoutHandler", new WriteTimeoutHandler(serverConfig.getServerTimeoutInMillis(),
-                TimeUnit.MILLISECONDS));
+        pipeline.addLast("casWriteTimeoutHandler", new CasTimeoutHandler(serverConfig.getServerTimeoutInMillis()));
         pipeline.addLast("traceMarkerhandler", traceMarkerhandler);
         pipeline.addLast("servletHandler", servletHandler);
         // pipeline.addLast("casCodec", new CasCodec());
