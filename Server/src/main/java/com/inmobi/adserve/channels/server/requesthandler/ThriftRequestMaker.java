@@ -4,15 +4,18 @@ import com.inmobi.adserve.adpool.*;
 import com.inmobi.types.ContentRating;
 import com.inmobi.types.InventoryType;
 import com.inmobi.types.LocationSource;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import sun.net.www.protocol.http.HttpURLConnection;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -80,9 +83,78 @@ public static void main(String[] args) throws Exception {
     adPoolRequest.setSupplyCapabilities(supplyCapabilities);
     adPoolRequest.setRequestedAdCount((short)1);
     System.out.println("Request is : " + adPoolRequest);
-    sendPost(adPoolRequest);
+    sendClientGet(adPoolRequest);
 
 }
+
+
+    // HTTP GET request
+    private static void sendClientGet(AdPoolRequest adPoolRequest) throws Exception {
+
+        String url = "http://localhost:8800/backfill";
+
+        HttpClient client = new DefaultHttpClient();
+        HttpGet request = new HttpGet(url);
+
+        // add request header
+
+        TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
+        byte[] urlParameters = serializer.serialize(adPoolRequest);
+        // optional default is GET
+        //con.setRequestMethod("GET");
+
+        //add request header
+        request.addHeader("adPoolRequest", URLEncoder.encode(new String(urlParameters), "UTF-8"));
+
+        //request.addHeader("User-Agent", USER_AGENT);
+
+        HttpResponse response = client.execute(request);
+
+        System.out.println("Response Code : " +
+                response.getStatusLine().getStatusCode());
+
+        BufferedReader rd = new BufferedReader(
+                new InputStreamReader(response.getEntity().getContent()));
+
+        StringBuffer result = new StringBuffer();
+        String line = "";
+        while ((line = rd.readLine()) != null) {
+            result.append(line);
+        }
+
+        System.out.println(result.toString());
+
+    }
+
+    private static void sendGet(AdPoolRequest adPoolRequest) throws Exception {
+
+        String url = "http://localhost:8800/backfill";
+
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+        TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
+        byte[] urlParameters = serializer.serialize(adPoolRequest);
+        // optional default is GET
+        con.setRequestMethod("GET");
+
+        //add request header
+        con.setRequestProperty("adPoolRequest", URLEncoder.encode(new String(urlParameters), "UTF-8"));
+
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuilder response = new StringBuilder();
+
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        //print result
+        System.out.println(response.toString());
+
+    }
+
     private static void sendPost(AdPoolRequest adPoolRequest) throws Exception {
 
         String targetUrl = "http://localhost:8800/rtbdFill";
@@ -104,7 +176,7 @@ public static void main(String[] args) throws Exception {
             connection.setRequestProperty("Content-Length", "" +
                     123456);
 
-            connection.setUseCaches (false);
+            connection.setUseCaches(false);
             connection.setDoInput(true);
             connection.setDoOutput(true);
 

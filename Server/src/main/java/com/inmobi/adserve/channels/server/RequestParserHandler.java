@@ -9,6 +9,7 @@ import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
 import com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParser;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -27,6 +28,7 @@ import org.slf4j.Marker;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.net.URLDecoder;
 import java.util.List;
 import java.util.Map;
 
@@ -72,7 +74,7 @@ public class RequestParserHandler extends OneToOneDecoder {
         } else if (servletName.equalsIgnoreCase("BackFill")) {
             dst = 2;
         }
-
+        LOG.debug("Method is  {}", request.getMethod());
         if (request.getMethod() == HttpMethod.POST && null != dst) {
             AdPoolRequest adPoolRequest = new AdPoolRequest();
             TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
@@ -96,7 +98,23 @@ public class RequestParserHandler extends OneToOneDecoder {
                 InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
             }
             requestParser.parseRequestParameters(jsonObject, sasParams, casInternalRequestParameters);
+        } else if (request.getMethod() == HttpMethod.GET && null != dst) {
+            AdPoolRequest adPoolRequest = new AdPoolRequest();
+            String rawContent = request.getHeader("adPoolRequest");
+            LOG.debug("Raw content for backfill thrift is {}", rawContent);
+            if (StringUtils.isNotEmpty(rawContent)) {
+                LOG.debug("Raw content for is inside if {}", rawContent);
+                TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
+                try {
+                    tDeserializer.deserialize(adPoolRequest, URLDecoder.decode(rawContent, "utf-8").getBytes());
+                    thriftRequestParser.parseRequestParameters(adPoolRequest, sasParams, casInternalRequestParameters, dst);
+                } catch (TException ex) {
+                    terminationReason = ServletHandler.thriftParsingError;
+                    LOG.error(traceMarker, "Error in de serializing thrift ", ex);
+                    InspectorStats.incrementStatCount(InspectorStrings.thriftParsingError, InspectorStrings.count);
+                }
+            }
         }
-       return new RequestParameterHolder(sasParams, casInternalRequestParameters, request.getUri(), terminationReason, request);
+        return new RequestParameterHolder(sasParams, casInternalRequestParameters, request.getUri(), terminationReason, request);
     }
 }
