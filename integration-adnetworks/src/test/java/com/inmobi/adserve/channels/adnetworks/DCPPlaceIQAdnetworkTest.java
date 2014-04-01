@@ -7,11 +7,8 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.io.File;
-import java.security.MessageDigest;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -219,16 +216,13 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
         sasParams.setOsId(HandSetOS.Android.getValue());
         String externalKey = "PlaceIQ_test_7";
         SlotSizeMapping.init();
-        Calendar now = Calendar.getInstance();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String secret = getHashedValue(dateFormat.format(now.getTime()) + placeiqSeed, "MD5");
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
                 placeiqAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
                 new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpPlaceIQAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
             String actualUrl = dcpPlaceIQAdNetwork.getRequestUri().toString();
-            String expectedUrl = "http://test.ads.placeiq.com/2/ad?RT=ss&ST=xml&PT=IMB&AU=PlaceIQ_test_7%2Fbz%2F6456fc%2F0&IP=206.29.182.240&UA=Mozilla&DO=Android&LT=37.4429&LG=-122.1514&SZ=320x50&AM=202cb962ac59075b964b07152d234b70&AP=6575868&AT=STG%2CRMG";
+            String expectedUrl = "http://test.ads.placeiq.com/2/ad?RT=ss&ST=xml&PT=IMB&AU=PlaceIQ_test_7%2Fbz%2F6456fc%2F0&IP=206.29.182.240&UA=Mozilla&DO=Android&LT=37.4429&LG=-122.1514&SZ=320x50&AM=202cb962ac59075b964b07152d234b70&AP=6575868&AT=STG%2CRMG%2CMRD";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -252,16 +246,13 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
         sasParams.setOsId(HandSetOS.Android.getValue());
         String externalKey = "PlaceIQ_test_7";
         SlotSizeMapping.init();
-        Calendar now = Calendar.getInstance();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String secret = getHashedValue(dateFormat.format(now.getTime()) + placeiqSeed, "MD5");
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
                 placeiqAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
                 new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpPlaceIQAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
             String actualUrl = dcpPlaceIQAdNetwork.getRequestUri().toString();
-            String expectedUrl = "http://test.ads.placeiq.com/2/ad?RT=ss&ST=xml&PT=IMB&AU=PlaceIQ_test_7%2Fuc%2F6456fc%2F0&IP=206.29.182.240&UA=Mozilla&DO=Android&LT=37.4429&LG=-122.1514&SZ=320x50&AM=202cb962ac59075b964b07152d234b70&AP=6575868&AT=STG%2CRMG";
+            String expectedUrl = "http://test.ads.placeiq.com/2/ad?RT=ss&ST=xml&PT=IMB&AU=PlaceIQ_test_7%2Fuc%2F6456fc%2F0&IP=206.29.182.240&UA=Mozilla&DO=Android&LT=37.4429&LG=-122.1514&SZ=320x50&AM=202cb962ac59075b964b07152d234b70&AP=6575868&AT=STG%2CRMG%2CMRD";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -291,7 +282,7 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
                 new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpPlaceIQAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
             String actualUrl = dcpPlaceIQAdNetwork.getRequestUri().toString();
-            String expectedUrl = "http://test.ads.placeiq.com/2/ad?RT=ss&ST=xml&PT=IMB&AU=PlaceIQ_test_7%2Fuc%2F6456fc%2F0&IP=206.29.182.240&UA=Mozilla&DO=Android&LT=37.4429&LG=-122.1514&SZ=320x50&AM=202cb962ac59075b964b07152d234b70&AP=6575868&AT=STG%2CRMG";
+            String expectedUrl = "http://test.ads.placeiq.com/2/ad?RT=ss&ST=xml&PT=IMB&AU=PlaceIQ_test_7%2Fuc%2F6456fc%2F0&IP=206.29.182.240&UA=Mozilla&DO=Android&LT=37.4429&LG=-122.1514&SZ=320x50&AM=202cb962ac59075b964b07152d234b70&AP=6575868&AT=STG%2CRMG%2CMRD";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -406,20 +397,5 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
     @Test
     public void testDCPPlaceiqIsClickUrlReq() throws Exception {
         assertEquals(false, dcpPlaceIQAdNetwork.isClickUrlRequired());
-    }
-
-    private String getHashedValue(final String message, final String hashingType) {
-        try {
-            MessageDigest md = MessageDigest.getInstance(hashingType);
-            byte[] array = md.digest(message.getBytes());
-            StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < array.length; ++i) {
-                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
-            }
-            return sb.toString();
-        }
-        catch (java.security.NoSuchAlgorithmException e) {
-        }
-        return null;
     }
 }
