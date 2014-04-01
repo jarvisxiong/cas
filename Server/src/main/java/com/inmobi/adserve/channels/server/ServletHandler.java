@@ -1,31 +1,33 @@
 package com.inmobi.adserve.channels.server;
 
-import com.google.inject.Singleton;
+import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.QueryStringDecoder;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.apache.commons.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.servlet.ServletInvalid;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import org.apache.commons.configuration.Configuration;
-import org.jboss.netty.channel.ChannelHandler.Sharable;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.QueryStringDecoder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 
 @Sharable
 @Singleton
-public class ServletHandler extends SimpleChannelUpstreamHandler {
+public class ServletHandler extends ChannelInboundHandlerAdapter {
     private static final Logger    LOG                      = LoggerFactory.getLogger(ServletHandler.class);
 
     // TODO: clear up all these responses, configs to separate module
@@ -107,12 +109,11 @@ public class ServletHandler extends SimpleChannelUpstreamHandler {
     }
 
     @Override
-    public void messageReceived(final ChannelHandlerContext ctx, final MessageEvent e) throws Exception {
+    public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
+        HttpRequest httpRequest = (HttpRequest) msg;
 
-        HttpRequest request = (HttpRequest) e.getMessage();
-
-        QueryStringDecoder queryStringDecoder = new QueryStringDecoder(request.getUri());
-        String path = queryStringDecoder.getPath();
+        QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httpRequest.getUri());
+        String path = queryStringDecoder.path();
 
         Servlet servlet = pathToServletMap.get(path);
 
@@ -124,7 +125,6 @@ public class ServletHandler extends SimpleChannelUpstreamHandler {
 
         scope.seed(Servlet.class, servlet);
 
-        ctx.sendUpstream(e);
-
+        ctx.fireChannelRead(httpRequest);
     }
 }

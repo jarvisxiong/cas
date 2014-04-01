@@ -1,17 +1,8 @@
 package com.inmobi.adserve.channels.server;
 
-import com.google.inject.Provider;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.server.requesthandler.Logging;
-import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
-import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import com.inmobi.messaging.publisher.AbstractMessagePublisher;
-import junit.framework.TestCase;
-import org.apache.commons.configuration.Configuration;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.slf4j.Marker;
-import org.testng.annotations.Test;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -19,14 +10,28 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import junit.framework.TestCase;
+
+import org.apache.commons.configuration.Configuration;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.slf4j.Marker;
+import org.testng.annotations.Test;
+
+import com.google.inject.Provider;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.server.requesthandler.Logging;
+import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
+import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
+import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 
 
 public class ServerTest extends TestCase {
 
     private HttpRequestHandler         httpRequestHandler;
+    private ResponseSender             responseSender;
+
     private Configuration              mockConfig       = null;
     private static ConfigurationLoader config;
     private final String               debug            = "debug";
@@ -55,7 +60,9 @@ public class ServerTest extends TestCase {
         }
         prepareConfig();
         ServletHandler.init(config, null);
-        httpRequestHandler = new HttpRequestHandler();
+        httpRequestHandler = new HttpRequestHandler(null, null);
+        responseSender = new ResponseSender(httpRequestHandler);
+
         AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
         Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-advertisement", mockConfig);
 
@@ -98,9 +105,8 @@ public class ServerTest extends TestCase {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("debug")).andReturn(debug).anyTimes();
         expect(mockConfig.getInt("clickmaker.ipFileVersion")).andReturn(ipFileVersion).anyTimes();
-        expect(mockConfig.getString("clickmaker.clickURLHashingSecretKeyVersion"))
-                .andReturn(secretKeyVersion)
-                    .anyTimes();
+        expect(mockConfig.getString("clickmaker.clickURLHashingSecretKeyVersion")).andReturn(secretKeyVersion)
+                .anyTimes();
         expect(mockConfig.getString("clickmaker.key.1.value")).andReturn(keyValue).anyTimes();
         expect(mockConfig.getString("clickmaker.clickURLPrefix")).andReturn(clickURLPrefix).anyTimes();
         expect(mockConfig.getString("clickmaker.beaconURLPrefix")).andReturn(beaconURLPrefix).anyTimes();
@@ -121,7 +127,7 @@ public class ServerTest extends TestCase {
     public JSONObject prepareParameters() throws Exception {
         JSONObject args = new JSONObject();
         sasParam = new SASRequestParameters();
-        sasParam.setAge((short)35);
+        sasParam.setAge((short) 35);
         sasParam.setGender("m");
         sasParam.setImpressionId("4f8d98e2-4bbd-40bc-8729-22da000900f9");
         int myarr[] = { 1, 2 };
@@ -147,7 +153,7 @@ public class ServerTest extends TestCase {
 
     @Test
     public void testResponseFormat() throws Exception {
-        assertEquals(httpRequestHandler.responseSender.getResponseFormat(), "html");
+        assertEquals(responseSender.getResponseFormat(), "html");
     }
 
     @Test
@@ -161,7 +167,7 @@ public class ServerTest extends TestCase {
         JSONObject jsonObject = prepareParameters();
         SASRequestParameters params = new SASRequestParameters();
         params = requestParser.getUserParams(params, jsonObject);
-        assertEquals(params.getAge().shortValue(), (short)35);
+        assertEquals(params.getAge().shortValue(), (short) 35);
     }
 
     /*
@@ -173,7 +179,7 @@ public class ServerTest extends TestCase {
         JSONObject jsonObject = prepareParameters();
         Long[] category = { 1l, 2l };
         assertTrue("Category are expected to be equal",
-            requestParser.getCategory(jsonObject, "category").equals(Arrays.asList(category)));
+                requestParser.getCategory(jsonObject, "category").equals(Arrays.asList(category)));
     }
 
     /*

@@ -1,22 +1,28 @@
 package com.inmobi.adserve.channels.adnetworks.httpool;
 
-import com.inmobi.adserve.channels.api.*;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
+import java.awt.Dimension;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
-import java.net.URI;
-import java.net.URISyntaxException;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
 public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -34,9 +40,9 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
      * @param baseRequestHandler
      * @param serverEvent
      */
-    public DCPHttPoolAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public DCPHttPoolAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
     @Override
@@ -54,9 +60,8 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (null != sasParams.getSlot()
-                                && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
-                        Long slotSize = (long)sasParams.getSlot();
+        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
+            Long slotSize = (long) sasParams.getSlot();
             // Httpool doesnt support 320x48 & 320x53. so mapping to 320x50
             if (slotSize == 9l || slotSize == 24l) {
                 slotSize = 15l;
@@ -131,8 +136,8 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {}", response);
 
-        if (StringUtils.isEmpty(response) || status.getCode() != 200) {
-            statusCode = status.getCode();
+        if (StringUtils.isEmpty(response) || status.code() != 200) {
+            statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
             }
@@ -149,7 +154,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
                     responseContent = "";
                     return;
                 }
-                statusCode = status.getCode();
+                statusCode = status.code();
                 TemplateType t;
                 VelocityContext context = new VelocityContext();
                 context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);

@@ -1,25 +1,31 @@
 package com.inmobi.adserve.channels.adnetworks.drawbridge;
 
-import com.inmobi.adserve.channels.api.*;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
 import java.util.MissingResourceException;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
 public class DrawBridgeAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -38,9 +44,9 @@ public class DrawBridgeAdNetwork extends AbstractDCPAdNetworkImpl {
                                                                                                     // filter
     private static final String FILTER_IPOD   = "filter_iPod";
 
-    public DrawBridgeAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public DrawBridgeAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
     // Configure the request parameters for making the ad call
@@ -86,10 +92,8 @@ public class DrawBridgeAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         StringBuilder finalUrl = new StringBuilder();
-        finalUrl.append(config.getString("drawbridge.host"))
-                    .append(config.getString("drawbridge.partnerId"))
-                    .append("&_psign=")
-                    .append(config.getString("drawbridge.partnerSignature"));
+        finalUrl.append(config.getString("drawbridge.host")).append(config.getString("drawbridge.partnerId"))
+                .append("&_psign=").append(config.getString("drawbridge.partnerSignature"));
         if (!(StringUtils.isEmpty(sasParams.getRemoteHostIp()) || sasParams.getRemoteHostIp().equals("null"))) {
             finalUrl.append("&_clip=").append(sasParams.getRemoteHostIp());
         }
@@ -146,7 +150,7 @@ public class DrawBridgeAdNetwork extends AbstractDCPAdNetworkImpl {
             finalUrl.append("&_adw=").append((int) dim.getWidth()).append("&_adh=").append((int) dim.getHeight());
         }
         if (!(StringUtils.isEmpty(sasParams.getCountryCode()) || sasParams.getCountryCode().equals("null"))) {
-                        finalUrl.append("&_dco=").append(getCountry(sasParams.getCountryCode()));
+            finalUrl.append("&_dco=").append(getCountry(sasParams.getCountryCode()));
         }
         finalUrl.append("&_clickbeacon=").append(getURLEncode(clickUrl, format));
         finalUrl.append("&_aid=").append(blindedSiteId);
@@ -188,8 +192,8 @@ public class DrawBridgeAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {} and response length is {}", response, response.length());
-        if (status.getCode() != 200 || StringUtils.isBlank(response)) {
-            statusCode = status.getCode();
+        if (status.code() != 200 || StringUtils.isBlank(response)) {
+            statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
             }
@@ -197,7 +201,7 @@ public class DrawBridgeAdNetwork extends AbstractDCPAdNetworkImpl {
             return;
         }
         else {
-            statusCode = status.getCode();
+            statusCode = status.code();
             VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
             context.remove(VelocityTemplateFieldConstants.IMBeaconUrl);
@@ -243,8 +247,8 @@ public class DrawBridgeAdNetwork extends AbstractDCPAdNetworkImpl {
 
     // get ad dimension
     public Dimension getAdDimension() {
-        if (sasParams.getSlot() != null && SlotSizeMapping.getDimension((long)(sasParams.getSlot())) != null) {
-                        return (SlotSizeMapping.getDimension((long)sasParams.getSlot()));
+        if (sasParams.getSlot() != null && SlotSizeMapping.getDimension((long) (sasParams.getSlot())) != null) {
+            return (SlotSizeMapping.getDimension((long) sasParams.getSlot()));
         }
         return (new Dimension(320, 50));
     }

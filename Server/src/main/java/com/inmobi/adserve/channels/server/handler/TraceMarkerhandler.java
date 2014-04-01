@@ -1,12 +1,12 @@
 package com.inmobi.adserve.channels.server.handler;
 
+import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.codec.http.HttpRequest;
+
 import javax.inject.Inject;
 
-import org.jboss.netty.channel.ChannelHandler.Sharable;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
-import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
@@ -21,7 +21,7 @@ import com.inmobi.adserve.channels.server.SimpleScope;
  */
 @Sharable
 @Singleton
-public class TraceMarkerhandler extends SimpleChannelUpstreamHandler {
+public class TraceMarkerhandler extends ChannelInboundHandlerAdapter {
 
     public static final Marker TRACE_MAKER = MarkerFactory.getMarker("TRACE_MAKER");
     private final SimpleScope  scope;
@@ -32,20 +32,18 @@ public class TraceMarkerhandler extends SimpleChannelUpstreamHandler {
     }
 
     @Override
-    public void messageReceived(final ChannelHandlerContext ctx, final MessageEvent e) throws Exception {
-
-        HttpRequest httpRequest = (HttpRequest) e.getMessage();
-
-        boolean isTracer = Boolean.valueOf(httpRequest.getHeader("x-mkhoj-tracer"));
+    public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
+        HttpRequest httpRequest = (HttpRequest) msg;
+        boolean isTracer = Boolean.valueOf(httpRequest.headers().get("x-mkhoj-tracer"));
         Marker traceMarker = isTracer ? TRACE_MAKER : null;
         scope.enter();
         try {
             scope.seed(Key.get(Marker.class), traceMarker);
-            ctx.sendUpstream(e);
+            ctx.fireChannelRead(httpRequest);
         }
         finally {
             scope.exit();
         }
-
     }
+
 }

@@ -1,18 +1,21 @@
 package com.inmobi.adserve.channels.adnetworks.placeiq;
 
-import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
+import java.awt.Dimension;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -21,15 +24,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.awt.*;
-import java.net.URI;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
 public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
@@ -58,20 +59,18 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String           OS            = "DO";
     private static final String           APPID         = "AP";
     private static final String           SITEID        = "SI";
-    //private static final String           ZIP           = "ZP";
+    // private static final String ZIP = "ZP";
     private static final String           COUNTRY       = "CO";
-    //private static final String           SECRET        = "SK";
+    // private static final String SECRET = "SK";
     private static final String           ADTYPE        = "AT";
-    private static final String           APPTYPE       = "STG,RMG";
-    private static final String           WAPTYPE       = "STG,STW,RMG";
+    private static final String           APPTYPE       = "STG,RMG,MRD";
+    private static final String           WAPTYPE       = "STG,STW,RMG,MRD";
     private static final String           ANDROID       = "Android";
     private static final String           IOS           = "iOS";
     private static final String           auIdFormat    = "%s/%s/%s/%s";
-    private static final String           XMLFORMAT       = "xml";
-    private final SimpleDateFormat        dateFormat    = new SimpleDateFormat("yyyy-MM-dd");
+    private static final String           XMLFORMAT     = "xml";
 
     private final String                  partnerId;
-    private final String                  seed;
     private final String                  requestFormat;
     private final String                  responseFormat;
     private static Map<Integer, String>   categoryList  = new HashMap<Integer, String>();
@@ -111,12 +110,11 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
         categoryList.put(74, "wt");
     }
 
-    public DCPPlaceIQAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public DCPPlaceIQAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
         partnerId = config.getString("placeiq.partnerId");
         host = config.getString("placeiq.host");
-        seed = config.getString("placeiq.seed");
         requestFormat = config.getString("placeiq.requestFormat");
         responseFormat = config.getString("placeiq.responseFormat");
         factory = DocumentBuilderFactory.newInstance();
@@ -145,14 +143,13 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
         }
 
 
-        if (null != sasParams.getSlot()
-                && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
-        	
-        	Long slotSize = (long)sasParams.getSlot();
-        	if(slotSize == 9l )
-        		slotSize = 15l;
-            Dimension dim = SlotSizeMapping.getDimension(slotSize);
+        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
 
+            Long slotSize = (long) sasParams.getSlot();
+            if (slotSize == 9l) {
+                slotSize = 15l;
+            }
+            Dimension dim = SlotSizeMapping.getDimension(slotSize);
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
@@ -199,13 +196,12 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
     public URI getRequestUri() throws Exception {
         StringBuilder url = new StringBuilder(host);
         appendQueryParam(url, REQUEST_TYPE, requestFormat, true);
-        appendQueryParam(url,RESPONSE_TYPE, responseFormat,false);
-        Calendar now = Calendar.getInstance();
-        //appendQueryParam(url, SECRET, getHashedValue(dateFormat.format(now.getTime()) + seed, "MD5"), false);
+        appendQueryParam(url, RESPONSE_TYPE, responseFormat, false);
+        // appendQueryParam(url, SECRET, getHashedValue(dateFormat.format(now.getTime()) + seed, "MD5"), false);
         appendQueryParam(url, PT, partnerId, false);
         String category = getCategory();
-        String auId = String.format(auIdFormat,externalSiteId, category, Long.toHexString(sasParams.getSiteIncId()),
-            Long.toHexString(this.entity.getAdgroupIncId()));
+        String auId = String.format(auIdFormat, externalSiteId, category, Long.toHexString(sasParams.getSiteIncId()),
+                Long.toHexString(this.entity.getAdgroupIncId()));
         appendQueryParam(url, ADUNIT, getURLEncode(auId, format), false);
         appendQueryParam(url, CLIENT_IP, sasParams.getRemoteHostIp(), false);
 
@@ -217,9 +213,10 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             appendQueryParam(url, LAT, latitude, false);
             appendQueryParam(url, LONG, longitude, false);
         }
-        /*if (StringUtils.isNotEmpty(casInternalRequestParameters.zipCode)) {
-            appendQueryParam(url, ZIP, casInternalRequestParameters.zipCode, false);
-        }*/
+        /*
+         * if (StringUtils.isNotEmpty(casInternalRequestParameters.zipCode)) { appendQueryParam(url, ZIP,
+         * casInternalRequestParameters.zipCode, false); }
+         */
         if (StringUtils.isNotEmpty(sasParams.getCountryCode())) {
             appendQueryParam(url, COUNTRY, sasParams.getCountryCode().toUpperCase(), false);
         }
@@ -246,7 +243,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
         if (isApp) {
             appendQueryParam(url, APPID, sasParams.getSiteIncId() + "", false);
             appendQueryParam(url, ADTYPE, getURLEncode(APPTYPE, format), false);
-            
+
         }
         else {
             appendQueryParam(url, SITEID, sasParams.getSiteIncId() + "", false);
@@ -260,8 +257,8 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {}", response);
-        statusCode = status.getCode();
-        if (StringUtils.isBlank(response) || status.getCode() != 200
+        statusCode = status.code();
+        if (StringUtils.isBlank(response) || status.code() != 200
                 || (XMLFORMAT.equalsIgnoreCase(responseFormat) && response.contains("<NOAD>"))) {
             if (200 == statusCode) {
                 statusCode = 500;
@@ -294,7 +291,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
                     context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response);
                 }
 
-                statusCode = status.getCode();
+                statusCode = status.code();
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
             }

@@ -1,26 +1,5 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import com.inmobi.adserve.channels.api.AdNetworkInterface;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.server.annotations.AdvertiserIdNameMap;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.MetricsManager;
-import com.inmobi.casthrift.*;
-import com.inmobi.messaging.Message;
-import com.inmobi.messaging.publisher.AbstractMessagePublisher;
-import org.apache.commons.configuration.Configuration;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.json.JSONException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -29,9 +8,50 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.inject.Inject;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.MetricsManager;
+import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
+import com.inmobi.casthrift.Ad;
+import com.inmobi.casthrift.AdIdChain;
+import com.inmobi.casthrift.AdMeta;
+import com.inmobi.casthrift.AdRR;
+import com.inmobi.casthrift.AdStatus;
+import com.inmobi.casthrift.CasAdChain;
+import com.inmobi.casthrift.CasAdvertisementLog;
+import com.inmobi.casthrift.Channel;
+import com.inmobi.casthrift.ContentRating;
+import com.inmobi.casthrift.DemandSourceType;
+import com.inmobi.casthrift.Gender;
+import com.inmobi.casthrift.Geo;
+import com.inmobi.casthrift.HandsetMeta;
+import com.inmobi.casthrift.Impression;
+import com.inmobi.casthrift.InventoryType;
+import com.inmobi.casthrift.PricingModel;
+import com.inmobi.casthrift.Request;
+import com.inmobi.casthrift.User;
+import com.inmobi.messaging.Message;
+import com.inmobi.messaging.publisher.AbstractMessagePublisher;
+
 
 public class Logging {
-    private static final Logger    LOG = LoggerFactory.getLogger(AsyncRequestMaker.class);
+    private static final Logger                            LOG                     = LoggerFactory
+                                                                                           .getLogger(AsyncRequestMaker.class);
 
     private static AbstractMessagePublisher                dataBusPublisher;
     private static String                                  rrLogKey;
@@ -39,7 +59,7 @@ public class Logging {
     private static boolean                                 enableFileLogging;
     private static boolean                                 enableDatabusLogging;
     private final static ConcurrentHashMap<String, String> sampledAdvertiserLogNos = new ConcurrentHashMap<String, String>(
-            2000);
+                                                                                           2000);
 
     @AdvertiserIdNameMap
     @Inject
@@ -51,8 +71,8 @@ public class Logging {
 
     private static int totalCount;
 
-    public static void init(AbstractMessagePublisher dataBusPublisher, String rrLogKey, String advertisementLogKey,
-                            Configuration config) {
+    public static void init(final AbstractMessagePublisher dataBusPublisher, final String rrLogKey,
+            final String advertisementLogKey, final Configuration config) {
         Logging.dataBusPublisher = dataBusPublisher;
         Logging.rrLogKey = rrLogKey;
         Logging.sampledAdvertisementLogKey = advertisementLogKey;
@@ -62,8 +82,9 @@ public class Logging {
     }
 
     // Writing rrlogs
-    public static void rrLogging(ChannelSegment channelSegment, List<ChannelSegment> rankList,
-                                 SASRequestParameters sasParams, String terminationReason, long totalTime) throws JSONException, TException {
+    public static void rrLogging(final ChannelSegment channelSegment, final List<ChannelSegment> rankList,
+            final SASRequestParameters sasParams, final String terminationReason, final long totalTime)
+            throws JSONException, TException {
         InspectorStats.incrementStatCount(InspectorStrings.latency, totalTime);
         boolean isTerminated = false;
         if (null != terminationReason) {
@@ -200,9 +221,9 @@ public class Logging {
                 if (sasParamsOsId > 0 && sasParamsOsId < 21) {
                     osName = HandSetOS.values()[sasParamsOsId - 1].toString();
                 }
-                MetricsManager.updateStats(sasParams.getCountryId(), sasParams.getCountryCode(),
-                        sasParams.getOsId(), osName, advertiserIdNameMap.get(advertiserId), false,
-                        false, isServerImpression, 0.0, (long) 0.0, impression.getAd().getWinBid());
+                MetricsManager.updateStats(sasParams.getCountryId(), sasParams.getCountryCode(), sasParams.getOsId(),
+                        osName, advertiserIdNameMap.get(advertiserId), false, false, isServerImpression, 0.0,
+                        (long) 0.0, impression.getAd().getWinBid());
             }
         }
         catch (Exception e) {
@@ -210,7 +231,7 @@ public class Logging {
         }
     }
 
-    public static List<Channel> createChannelsLog(List<ChannelSegment> rankList) {
+    public static List<Channel> createChannelsLog(final List<ChannelSegment> rankList) {
         if (null == rankList) {
             return new ArrayList<Channel>();
         }
@@ -248,7 +269,7 @@ public class Logging {
         return channels;
     }
 
-    public static CasAdChain createCasAdChain(ChannelSegment channelSegment) {
+    public static CasAdChain createCasAdChain(final ChannelSegment channelSegment) {
         CasAdChain casAdChain = new CasAdChain();
         casAdChain.setAdvertiserId(channelSegment.getChannelEntity().getAccountId());
         casAdChain.setCampaign_inc_id(channelSegment.getChannelSegmentEntity().getCampaignIncId());
@@ -258,7 +279,7 @@ public class Logging {
         return casAdChain;
     }
 
-    public static AdStatus getAdStatus(String adStatus) {
+    public static AdStatus getAdStatus(final String adStatus) {
         if ("AD".equalsIgnoreCase(adStatus)) {
             return AdStatus.AD;
         }
@@ -271,7 +292,7 @@ public class Logging {
         return AdStatus.DROPPED;
     }
 
-    public static void advertiserLogging(List<ChannelSegment> rankList, Configuration config) {
+    public static void advertiserLogging(final List<ChannelSegment> rankList, final Configuration config) {
         LOG.debug("came inside advertiser log");
         Logger advertiserLogger = LoggerFactory.getLogger(config.getString("advertiser"));
         if (!advertiserLogger.isDebugEnabled()) {
@@ -306,7 +327,7 @@ public class Logging {
         }
     }
 
-    public static void sampledAdvertiserLogging(List<ChannelSegment> rankList, Configuration config) {
+    public static void sampledAdvertiserLogging(final List<ChannelSegment> rankList, final Configuration config) {
         LOG.debug("came inside sampledAdvertiser log");
         Logger sampledAdvertiserLogger = LoggerFactory.getLogger(config.getString("sampledadvertiser"));
         if (!sampledAdvertiserLogger.isDebugEnabled()) {
@@ -317,7 +338,7 @@ public class Logging {
         LOG.debug("got logger handle for sampledAdvertiser logs");
 
         for (int index = 0; rankList != null && index < rankList.size(); index++) {
-            AdNetworkInterface adNetworkInterface = ((ChannelSegment) rankList.get(index)).getAdNetworkInterface();
+            AdNetworkInterface adNetworkInterface = rankList.get(index).getAdNetworkInterface();
             ThirdPartyAdResponse adResponse = adNetworkInterface.getResponseStruct();
             String adstatus = adResponse.adStatus;
             if (!adstatus.equalsIgnoreCase("AD")) {
@@ -345,8 +366,7 @@ public class Logging {
                     if (index > 0 && partnerName.length() > 0 && log.length() > 0) {
                         log.append("\n");
                     }
-                    log.append(partnerName)
-                            .append(sep)
+                    log.append(partnerName).append(sep)
                             .append(rankList.get(index).getChannelSegmentEntity().getExternalSiteKey());
                     log.append(sep).append(requestUrl).append(sep).append(adResponse.adStatus);
                     log.append(sep).append(response).append(sep).append(advertiserId);
@@ -368,8 +388,7 @@ public class Logging {
                 if (index > 0 && partnerName.length() > 0 && log.length() > 0) {
                     log.append("\n");
                 }
-                log.append(partnerName)
-                        .append(sep)
+                log.append(partnerName).append(sep)
                         .append(rankList.get(index).getChannelSegmentEntity().getExternalSiteKey());
                 log.append(sep).append(requestUrl).append(sep).append(adResponse.adStatus);
                 log.append(sep).append(response).append(sep).append(advertiserId);
@@ -401,7 +420,7 @@ public class Logging {
         }
     }
 
-    public static ContentRating getContentRating(SASRequestParameters sasParams) {
+    public static ContentRating getContentRating(final SASRequestParameters sasParams) {
         if (sasParams == null || null == sasParams.getSiteType()) {
             return null;
         }
@@ -417,7 +436,7 @@ public class Logging {
         return null;
     }
 
-    public static PricingModel getPricingModel(String pricingModel) {
+    public static PricingModel getPricingModel(final String pricingModel) {
         if (pricingModel == null) {
             return null;
         }
@@ -430,14 +449,14 @@ public class Logging {
         return null;
     }
 
-    public static InventoryType getInventoryType(SASRequestParameters sasParams) {
+    public static InventoryType getInventoryType(final SASRequestParameters sasParams) {
         if (null != sasParams && sasParams.getSdkVersion() != null && sasParams.getSdkVersion().equalsIgnoreCase("0")) {
             return InventoryType.BROWSER;
         }
         return InventoryType.APP;
     }
 
-    public static Gender getGender(SASRequestParameters sasParams) {
+    public static Gender getGender(final SASRequestParameters sasParams) {
         if (sasParams == null) {
             return null;
         }

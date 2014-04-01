@@ -1,11 +1,12 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
+
 import java.util.List;
 
 import javax.ws.rs.Path;
 
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,18 +25,18 @@ public class ServletChangeRollout implements Servlet {
 
     @Override
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
-            final MessageEvent e) throws Exception {
+            final Channel serverChannel) throws Exception {
         try {
-            List<String> rollout = (queryStringDecoder.getParameters().get("percentRollout"));
+            List<String> rollout = (queryStringDecoder.parameters().get("percentRollout"));
             ServletHandler.percentRollout = Integer.parseInt(rollout.get(0));
         }
         catch (NumberFormatException ex) {
             LOG.info("invalid attempt to change rollout percentage {}", ex);
-            hrh.responseSender.sendResponse("INVALIDPERCENT", e);
+            hrh.responseSender.sendResponse("INVALIDPERCENT", serverChannel);
         }
         InspectorStats.setWorkflowStats(InspectorStrings.percentRollout, Long.valueOf(ServletHandler.percentRollout));
         LOG.debug("new roll out percentage is {}", ServletHandler.percentRollout);
-        hrh.responseSender.sendResponse("OK", e);
+        hrh.responseSender.sendResponse("OK", serverChannel);
     }
 
     @Override

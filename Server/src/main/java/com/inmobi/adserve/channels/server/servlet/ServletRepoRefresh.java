@@ -1,5 +1,8 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -10,8 +13,6 @@ import java.util.Map;
 
 import javax.ws.rs.Path;
 
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -36,8 +37,8 @@ public class ServletRepoRefresh implements Servlet {
 
     @Override
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
-            final MessageEvent e) throws Exception {
-        Map<String, List<String>> params = queryStringDecoder.getParameters();
+            final Channel serverChannel) throws Exception {
+        Map<String, List<String>> params = queryStringDecoder.parameters();
         String requestParam = params.get("args").toString();
         JSONArray jsonArray = new JSONArray(requestParam);
         JSONObject jObject = jsonArray.getJSONObject(0);
@@ -124,15 +125,15 @@ public class ServletRepoRefresh implements Servlet {
                         resultSet);
             }
             LOG.debug("Successfully updated {}", repoName);
-            hrh.responseSender.sendResponse("OK", e);
+            hrh.responseSender.sendResponse("OK", serverChannel);
         }
         catch (SQLException e1) {
             LOG.info("error is {}", e1);
-            hrh.responseSender.sendResponse("NOTOK", e);
+            hrh.responseSender.sendResponse("NOTOK", serverChannel);
         }
         catch (RepositoryException e2) {
             LOG.info("error is {}", e2);
-            hrh.responseSender.sendResponse("NOTOK", e);
+            hrh.responseSender.sendResponse("NOTOK", serverChannel);
         }
         finally {
             if (null != statement) {
