@@ -9,6 +9,7 @@ import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
 import com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParser;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
@@ -28,7 +29,6 @@ import org.slf4j.Marker;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.net.URLDecoder;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +41,8 @@ public class RequestParserHandler extends OneToOneDecoder {
     private final ThriftRequestParser thriftRequestParser;
     private final Provider<Marker>    traceMarkerProvider;
     private final Provider<Servlet>   servletProvider;
+    private final URLCodec urlCodec = new URLCodec();
+
 
 
     @Inject
@@ -101,12 +103,10 @@ public class RequestParserHandler extends OneToOneDecoder {
         } else if (request.getMethod() == HttpMethod.GET && null != dst) {
             AdPoolRequest adPoolRequest = new AdPoolRequest();
             String rawContent = request.getHeader("adPoolRequest");
-            LOG.debug("Raw content for backfill thrift is {}", rawContent);
             if (StringUtils.isNotEmpty(rawContent)) {
-                LOG.debug("Raw content for is inside if {}", rawContent);
                 TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
                 try {
-                    tDeserializer.deserialize(adPoolRequest, URLDecoder.decode(rawContent, "utf-8").getBytes());
+                    tDeserializer.deserialize(adPoolRequest, urlCodec.decode(rawContent.getBytes()));
                     thriftRequestParser.parseRequestParameters(adPoolRequest, sasParams, casInternalRequestParameters, dst);
                 } catch (TException ex) {
                     terminationReason = ServletHandler.thriftParsingError;
