@@ -1,10 +1,11 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
+
 import javax.ws.rs.Path;
 
 import org.apache.commons.configuration.ConfigurationConverter;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.json.JSONObject;
 
 import com.google.inject.Singleton;
@@ -19,9 +20,10 @@ public class ServletGetAdapterConfig implements Servlet {
 
     @Override
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
-            final MessageEvent e) throws Exception {
+            final Channel serverChannel) throws Exception {
         hrh.responseSender.sendResponse(
-            new JSONObject(ConfigurationConverter.getMap(ServletHandler.getAdapterConfig())).toString(), e);
+                new JSONObject(ConfigurationConverter.getMap(ServletHandler.getAdapterConfig())).toString(),
+                serverChannel);
     }
 
     @Override

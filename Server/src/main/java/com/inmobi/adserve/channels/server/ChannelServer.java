@@ -1,5 +1,8 @@
 package com.inmobi.adserve.channels.server;
 
+import io.netty.util.internal.logging.InternalLoggerFactory;
+import io.netty.util.internal.logging.Slf4JLoggerFactory;
+
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -17,11 +20,9 @@ import org.apache.commons.dbcp.PoolingDataSource;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.jboss.netty.logging.InternalLoggerFactory;
-import org.jboss.netty.logging.Log4JLoggerFactory;
 
-import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.util.Modules;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
@@ -38,11 +39,8 @@ import com.inmobi.adserve.channels.repository.SiteEcpmRepository;
 import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
 import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
 import com.inmobi.adserve.channels.server.api.ConnectionType;
-import com.inmobi.adserve.channels.server.module.NettyModule;
-import com.inmobi.adserve.channels.server.module.ScopeModule;
+import com.inmobi.adserve.channels.server.module.CasNettyModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
-import com.inmobi.adserve.channels.server.netty.NettyServer;
-import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.MetricsManager;
@@ -50,30 +48,8 @@ import com.inmobi.casthrift.DataCenter;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import com.inmobi.messaging.publisher.MessagePublisherFactory;
 import com.inmobi.phoenix.exception.InitializationException;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.dbcp.ConnectionFactory;
-import org.apache.commons.dbcp.DriverManagerConnectionFactory;
-import org.apache.commons.dbcp.PoolableConnectionFactory;
-import org.apache.commons.dbcp.PoolingDataSource;
-import org.apache.commons.pool.impl.GenericObjectPool;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.logging.InternalLoggerFactory;
-import org.jboss.netty.logging.Log4JLoggerFactory;
-import org.jboss.netty.util.HashedWheelTimer;
-import org.jboss.netty.util.Timer;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
+import com.netflix.governator.guice.LifecycleInjector;
+import com.netflix.governator.lifecycle.LifecycleManager;
 
 
 /*
@@ -125,7 +101,7 @@ public class ChannelServer {
             dataCentreName = channelServerHelper.getDataCentreName(ChannelServerStringLiterals.DATA_CENTRE_NAME_KEY);
 
             // Initialising Internal logger factory for Netty
-            InternalLoggerFactory.setDefaultFactory(new Log4JLoggerFactory());
+            InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
 
             // Initialising logging - Write to databus
             AbstractMessagePublisher dataBusPublisher = (AbstractMessagePublisher) MessagePublisherFactory
@@ -133,8 +109,7 @@ public class ChannelServer {
 
             String rrLogKey = configurationLoader.getServerConfiguration().getString("rrLogKey");
             String advertisementLogKey = configurationLoader.getServerConfiguration().getString("adsLogKey");
-            Logging.init(dataBusPublisher, rrLogKey, advertisementLogKey,
-                    configurationLoader.getServerConfiguration());
+            Logging.init(dataBusPublisher, rrLogKey, advertisementLogKey, configurationLoader.getServerConfiguration());
 
             // Initializing graphite stats
             MetricsManager.init(
@@ -179,37 +154,30 @@ public class ChannelServer {
             if (null != maxIncomingConnections) {
                 ServletHandler.getServerConfig().setProperty("incomingMaxConnections", maxIncomingConnections);
             }
-            if (null != maxIncomingConnections) {
+            if (null != maxRTbdOutGoingConnections) {
                 ServletHandler.getServerConfig().setProperty("rtbOutGoingMaxConnections", maxRTbdOutGoingConnections);
             }
-            if (null != maxIncomingConnections) {
+            if (null != maxDCpOutGoingConnections) {
                 ServletHandler.getServerConfig().setProperty("dcpOutGoingMaxConnections", maxDCpOutGoingConnections);
             }
 
             // Configure the netty server.
+            Injector injector = LifecycleInjector
+                    .builder()
+                    .withModules(
+                            Modules.combine(new CasNettyModule(configurationLoader.getServerConfiguration()),
+                                    new ServerModule(configurationLoader, repositoryHelper)))
+                    .usingBasePackages("com.inmobi.adserve.channels.server.netty",
+                            "com.inmobi.adserve.channels.api.provider").build().createInjector();
 
-            // Initialising request handler
-            AsyncRequestMaker.init(null, null);
-
-            Injector parentInjector = Guice.createInjector(new ScopeModule());
-
-            Injector serverInjector = parentInjector.createChildInjector(
-                    new NettyModule(configurationLoader.getServerConfiguration(), 8800), new ServerModule(
-                            configurationLoader, repositoryHelper));
-            final NettyServer server = serverInjector.getInstance(NettyServer.class);
-            server.startAndWait();
-
-            Injector statInjector = parentInjector.createChildInjector(
-                    new NettyModule(configurationLoader.getServerConfiguration(), 8801), new ServerModule(
-                            configurationLoader, repositoryHelper));
-            final NettyServer statusServer = statInjector.getInstance(NettyServer.class);
-            statusServer.startAndWait();
+            final LifecycleManager manager = injector.getInstance(LifecycleManager.class);
+            manager.start();
 
             Runtime.getRuntime().addShutdownHook(new Thread() {
+
                 @Override
                 public void run() {
-                    server.stopAndWait();
-                    statusServer.stopAndWait();
+                    manager.close();
                 }
             });
 

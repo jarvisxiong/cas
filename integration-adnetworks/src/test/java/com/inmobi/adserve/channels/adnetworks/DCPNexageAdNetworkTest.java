@@ -1,39 +1,43 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-import com.inmobi.adserve.channels.adnetworks.nexage.DCPNexageAdNetwork;
-import com.inmobi.adserve.channels.api.*;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import junit.framework.TestCase;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.testng.annotations.Test;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import junit.framework.TestCase;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.testng.annotations.Test;
+
+import com.inmobi.adserve.channels.adnetworks.nexage.DCPNexageAdNetwork;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 
 
 public class DCPNexageAdNetworkTest extends TestCase {
-    private Configuration         mockConfig      = null;
-    private final String          debug           = "debug";
-    private final String          loggerConf      = "/tmp/channel-server.properties";
-    private final ClientBootstrap clientBootstrap = null;
+    private Configuration      mockConfig   = null;
+    private final String       debug        = "debug";
+    private final String       loggerConf   = "/tmp/channel-server.properties";
 
-    private DCPNexageAdNetwork    dcpNexageAdnetwork;
-    private final String          NexageHost      = "http://bos.ads.nexage.com/adServe?";
-    private final String          NexageStatus    = "on";
-    private final String          NexageAdvId     = "nexageadv1";
-    private final String          NexageTest      = "test";
+    private DCPNexageAdNetwork dcpNexageAdnetwork;
+    private final String       NexageHost   = "http://bos.ads.nexage.com/adServe?";
+    private final String       NexageStatus = "on";
+    private final String       NexageAdvId  = "nexageadv1";
+    private final String       NexageTest   = "test";
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -54,12 +58,12 @@ public class DCPNexageAdNetworkTest extends TestCase {
         if (!f.exists()) {
             f.createNewFile();
         }
-        MessageEvent serverEvent = createMock(MessageEvent.class);
+        Channel serverChannel = createMock(Channel.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         SlotSizeMapping.init();
         Formatter.init();
-        dcpNexageAdnetwork = new DCPNexageAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
+        dcpNexageAdnetwork = new DCPNexageAdNetwork(mockConfig, null, base, serverChannel);
     }
 
     @Test
@@ -76,9 +80,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "8a809449013c3c643cad82cb412b5857";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertTrue(dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl));
     }
 
@@ -95,9 +99,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "8a809449013c3c643cad82cb412b5857";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertTrue(dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl));
     }
 
@@ -115,9 +119,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "8a809449013c3c643cad82cb412b5857";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject("{}"),
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertFalse(dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl));
     }
 
@@ -133,9 +137,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "8a809449013c3c643cad82cb412b5857";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertFalse(dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl));
     }
 
@@ -151,9 +155,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertFalse(dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl));
     }
 
@@ -168,9 +172,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "8a809449013c3c643cad82cb412b5857";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-            new ArrayList<Integer>(), 0.0d, null, null, 32));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32));
         assertFalse(dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl));
     }
 
@@ -195,9 +199,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11"
                 + "?ds=1&event=beacon";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, categories, true, true, externalKey, null, null, null, 0, false,
-            null, null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    new JSONObject("{\"pos\":\"header\"}")), new ArrayList<Integer>(), 0.0d, null, null, 32));
+                NexageAdvId, null, null, null, 0, null, categories, true, true, externalKey, null, null, null, 0,
+                false, null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
+                new JSONObject(new JSONObject("{\"pos\":\"header\"}")), new ArrayList<Integer>(), 0.0d, null, null, 32));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=Adventure&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -223,9 +227,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
                 + "-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -253,9 +257,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
                 + "-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -283,9 +287,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
                 + "-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"leader\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"leader\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=leader&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28iPad%3B+U%3B+CPU+OS+3_2+like+Mac+OS+X%3B+en-us%29+AppleWebKit%2F531.21.10+%28KHTML%2C+like+Gecko%29+Version%2F4.0.4+Mobile%2F7B334b+Safari%2F531.21.10&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB20&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -314,9 +318,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
                 + "-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 56789, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 56789));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 56789, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
+                new JSONObject("{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 56789));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB7&p(blind_id)=00000000-0000-ddd5-0000-00000001e240";
@@ -343,9 +347,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         String burl = "http://c2.w.inmobi.com/c"
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=NokiaC3-00%2F5.0+%2808.65%29+Profile%2FMIDP-2.1+Configuration%2FCLDC-1.1+Mozilla%2F5.0+AppleWebKit%2F420++%28KHTML%2C+like+Gecko%29+Safari%2F420&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -372,9 +376,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         String burl = "http://c2.w.inmobi.com/c"
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -401,9 +405,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         SlotSizeMapping.init();
         String burl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000&u(country)=USA";
@@ -429,9 +433,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         SlotSizeMapping.init();
         String burl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -458,9 +462,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         SlotSizeMapping.init();
         String burl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000&u(dma)=1";
@@ -486,9 +490,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         SlotSizeMapping.init();
         String burl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -515,9 +519,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         SlotSizeMapping.init();
         String burl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&req(zip)=123456&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -543,9 +547,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         SlotSizeMapping.init();
         String burl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -572,9 +576,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         SlotSizeMapping.init();
         String burl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&u(gender)=m&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -600,9 +604,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         SlotSizeMapping.init();
         String burl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -629,9 +633,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         SlotSizeMapping.init();
         String burl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&u(age)=30&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -657,9 +661,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         SlotSizeMapping.init();
         String burl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -686,9 +690,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         SlotSizeMapping.init();
         String burl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=p&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -715,9 +719,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         SlotSizeMapping.init();
         String burl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -743,9 +747,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         SlotSizeMapping.init();
         String blurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, blurl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x50&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -771,9 +775,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         SlotSizeMapping.init();
         String burl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -795,9 +799,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
         String response = "<!-- AdPlacement : header --><img src=\"http://bos.ads.nexage.com:80/admax/adEvent.do?dcn=8a809449013c3c643cad82cb412b5857&amp;pos=header&amp;nl=1359535663796&amp;pix=1&amp;et=1&amp;tid=8a808aee3c264c09013c82e8b49e0205&amp;mode=test&amp;xd=R2FsYXh5IE5leHVzfFNhbXN1bmd8NC4xLjF8QW5kcm9pZA..&amp;xo=V0lGSXxVU0E.\" style=\"display:none;width:1px;height:1px;border:0;\" width=\"1\" height=\"1\" alt=\"\" /><div> <a href=\"http://bos.ads.nexage.com:80/admax/adClick.do?dcn=8a809449013c3c643cad82cb412b5857&amp;n=Nexage&amp;id=8a80941f013c3c64abf38aa3eab36ceb&amp;tid=8a808aee3c264c09013c82e8b49e0205&amp;nid=8a808aee32b23b0e013311fe47710e86&amp;pos=header&amp;mode=test&amp;nl=1359535663795\"> <img src=\"http://files.nexage.com/testads/300x50-Nexage-Test-Adv2.gif\" /></a></div>";
@@ -821,9 +825,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
         String response = "<!-- AdPlacement : header --><img src=\"http://bos.ads.nexage.com:80/admax/adEvent.do?dcn=8a809449013c3c643cad82cb412b5857&amp;pos=header&amp;nl=1359535663796&amp;pix=1&amp;et=1&amp;tid=8a808aee3c264c09013c82e8b49e0205&amp;mode=test&amp;xd=R2FsYXh5IE5leHVzfFNhbXN1bmd8NC4xLjF8QW5kcm9pZA..&amp;xo=V0lGSXxVU0E.\" style=\"display:none;width:1px;height:1px;border:0;\" width=\"1\" height=\"1\" alt=\"\" /><div> <a href=\"http://bos.ads.nexage.com:80/admax/adClick.do?dcn=8a809449013c3c643cad82cb412b5857&amp;n=Nexage&amp;id=8a80941f013c3c64abf38aa3eab36ceb&amp;tid=8a808aee3c264c09013c82e8b49e0205&amp;nid=8a808aee32b23b0e013311fe47710e86&amp;pos=header&amp;mode=test&amp;nl=1359535663795\"> <img src=\"http://files.nexage.com/testads/300x50-Nexage-Test-Adv2.gif\" /></a></div>";
@@ -846,9 +850,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
         String response = "<!-- AdPlacement : header --><img src=\"http://bos.ads.nexage.com:80/admax/adEvent.do?dcn=8a809449013c3c643cad82cb412b5857&amp;pos=header&amp;nl=1359535663796&amp;pix=1&amp;et=1&amp;tid=8a808aee3c264c09013c82e8b49e0205&amp;mode=test&amp;xd=R2FsYXh5IE5leHVzfFNhbXN1bmd8NC4xLjF8QW5kcm9pZA..&amp;xo=V0lGSXxVU0E.\" style=\"display:none;width:1px;height:1px;border:0;\" width=\"1\" height=\"1\" alt=\"\" /><div> <a href=\"http://bos.ads.nexage.com:80/admax/adClick.do?dcn=8a809449013c3c643cad82cb412b5857&amp;n=Nexage&amp;id=8a80941f013c3c64abf38aa3eab36ceb&amp;tid=8a808aee3c264c09013c82e8b49e0205&amp;nid=8a808aee32b23b0e013311fe47710e86&amp;pos=header&amp;mode=test&amp;nl=1359535663795\"> <img src=\"http://files.nexage.com/testads/300x50-Nexage-Test-Adv2.gif\" /></a></div>";
@@ -873,9 +877,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
         String response = "<!-- AdPlacement : header --><img src=\"http://bos.ads.nexage.com:80/admax/adEvent.do?dcn=8a809449013c3c643cad82cb412b5857&amp;pos=header&amp;nl=1359535663796&amp;pix=1&amp;et=1&amp;tid=8a808aee3c264c09013c82e8b49e0205&amp;mode=test&amp;xd=R2FsYXh5IE5leHVzfFNhbXN1bmd8NC4xLjF8QW5kcm9pZA..&amp;xo=V0lGSXxVU0E.\" style=\"display:none;width:1px;height:1px;border:0;\" width=\"1\" height=\"1\" alt=\"\" /><div> <a href=\"http://bos.ads.nexage.com:80/admax/adClick.do?dcn=8a809449013c3c643cad82cb412b5857&amp;n=Nexage&amp;id=8a80941f013c3c64abf38aa3eab36ceb&amp;tid=8a808aee3c264c09013c82e8b49e0205&amp;nid=8a808aee32b23b0e013311fe47710e86&amp;pos=header&amp;mode=test&amp;nl=1359535663795\"> <img src=\"http://files.nexage.com/testads/300x50-Nexage-Test-Adv2.gif\" /></a></div>";
@@ -903,9 +907,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\",\"jsAdTag\":\"true\"}}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\",\"jsAdTag\":\"true\"}}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
         dcpNexageAdnetwork.generateJsAdResponse();
@@ -932,9 +936,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\",\"jsAdTag\":\"true\"}}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\",\"jsAdTag\":\"true\"}}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
         dcpNexageAdnetwork.generateJsAdResponse();
@@ -975,9 +979,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "8a809449013c3c643cad82cb412b5857";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-            NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-            null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
+                NexageAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, blurl);
         assertEquals(dcpNexageAdnetwork.getImpressionId(), "4f8d98e2-4bbd-40bc-8795-22da170700f9");
     }

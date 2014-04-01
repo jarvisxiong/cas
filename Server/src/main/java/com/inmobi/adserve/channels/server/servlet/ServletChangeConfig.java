@@ -1,5 +1,8 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -7,8 +10,6 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.ws.rs.Path;
 
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -36,9 +37,9 @@ public class ServletChangeConfig implements Servlet {
 
     @Override
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
-            final MessageEvent e) throws Exception {
+            final Channel serverChannel) throws Exception {
 
-        Map<String, List<String>> params = queryStringDecoder.getParameters();
+        Map<String, List<String>> params = queryStringDecoder.parameters();
         JSONObject jObject = null;
         try {
             jObject = requestParser.extractParams(params, "update");
@@ -47,13 +48,13 @@ public class ServletChangeConfig implements Servlet {
             LOG.debug("Encountered Json Error while creating json object inside servlet");
             hrh.setTerminationReason(ServletHandler.jsonParsingError);
             InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
-            hrh.responseSender.sendResponse("Incorrect Json", e);
+            hrh.responseSender.sendResponse("Incorrect Json", serverChannel);
             return;
         }
         if (jObject == null) {
             LOG.debug("jobject is null so returning");
             hrh.setTerminationReason(ServletHandler.jsonParsingError);
-            hrh.responseSender.sendResponse("Incorrect Json", e);
+            hrh.responseSender.sendResponse("Incorrect Json", serverChannel);
             return;
         }
         LOG.debug("Successfully got json for config change");
@@ -67,23 +68,21 @@ public class ServletChangeConfig implements Servlet {
                 if (configKey.startsWith("adapter")
                         && ServletHandler.getAdapterConfig().containsKey(configKey.replace("adapter.", ""))) {
                     ServletHandler.getAdapterConfig().setProperty(configKey.replace("adapter.", ""),
-                        jObject.getString(configKey));
-                    updates.append(configKey)
-                                .append("=")
-                                .append(ServletHandler.getAdapterConfig().getString(configKey.replace("adapter.", "")))
-                                .append("\n");
+                            jObject.getString(configKey));
+                    updates.append(configKey).append("=")
+                            .append(ServletHandler.getAdapterConfig().getString(configKey.replace("adapter.", "")))
+                            .append("\n");
                 }
                 if (configKey.startsWith("server")
                         && ServletHandler.getServerConfig().containsKey(configKey.replace("server.", ""))) {
                     ServletHandler.getServerConfig().setProperty(configKey.replace("server.", ""),
-                        jObject.getString(configKey));
-                    updates.append(configKey)
-                                .append("=")
-                                .append(ServletHandler.getServerConfig().getString(configKey.replace("server.", "")))
-                                .append("\n");
+                            jObject.getString(configKey));
+                    updates.append(configKey).append("=")
+                            .append(ServletHandler.getServerConfig().getString(configKey.replace("server.", "")))
+                            .append("\n");
                 }
             }
-            hrh.responseSender.sendResponse(updates.toString(), e);
+            hrh.responseSender.sendResponse(updates.toString(), serverChannel);
         }
         catch (JSONException ex) {
             LOG.debug("Encountered Json Error while creating json object inside HttpRequest Handler for config change");

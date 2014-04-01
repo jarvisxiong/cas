@@ -73,6 +73,7 @@ public class InspectorStrings {
     public final static String droppedInAccountSegmentFilter             = "DroppedInAccountSegmentFilter";
     public static final String droppedInSupplyDemandClassificationFilter = "DroppedInSupplyDemandClassificationFilter";
     public static final String droppedInRtbCurrencyNotSupportedFilter    = "DroppedInRtbCurrencyNotSupportedFilter";
-    public static final String ADAPTER_MISMATCH                           = "AdapterMismatch";
+    public static final String ADAPTER_MISMATCH                          = "AdapterMismatch";
+    public static final String DROPPED_IN_INVALID_DETAILS_FILTER         = "DroppedInInvalidDetailsFilter";
 
 }

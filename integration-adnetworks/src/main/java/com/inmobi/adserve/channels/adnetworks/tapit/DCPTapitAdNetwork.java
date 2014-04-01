@@ -1,22 +1,28 @@
 package com.inmobi.adserve.channels.adnetworks.tapit;
 
-import com.inmobi.adserve.channels.api.*;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
+import java.awt.Dimension;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
-import java.net.URI;
-import java.net.URISyntaxException;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
 public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -27,9 +33,9 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
     private double              width;
     private double              height;
 
-    public DCPTapitAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public DCPTapitAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
     @Override
@@ -50,9 +56,8 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (null != sasParams.getSlot()
-                && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
-            Dimension dim = SlotSizeMapping.getDimension((long)sasParams.getSlot());
+        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = dim.getWidth();
             height = dim.getHeight();
         }
@@ -75,9 +80,8 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
         try {
             StringBuilder url = new StringBuilder();
             url.append(host).append("?format=").append(config.getString("tapit.responseFormat")).append("&ip=");
-            url.append(sasParams.getRemoteHostIp())
-                        .append("&ua=")
-                        .append(getURLEncode(sasParams.getUserAgent(), format));
+            url.append(sasParams.getRemoteHostIp()).append("&ua=")
+                    .append(getURLEncode(sasParams.getUserAgent(), format));
             if ("1".equals(config.getString("tapit.test"))) {
                 url.append("&mode=test");
             }
@@ -86,7 +90,7 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
                 url.append("&lat=").append(latitude);
                 url.append("&long=").append(longitude);
             }
-            
+
             if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
                 url.append("&enctype=raw&idfa=").append(casInternalRequestParameters.uidIFA);
             }
@@ -96,7 +100,7 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
             else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
                 url.append("&enctype=md5&udid=").append(casInternalRequestParameters.uidMd5);
             }
-        
+
             if (width != 0 && height != 0) {
                 url.append("&w=").append(width);
                 url.append("&h=").append(height);
@@ -116,8 +120,8 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {}", response);
-        if (StringUtils.isEmpty(response) || status.getCode() != 200 || response.contains("{\"error")) {
-            statusCode = status.getCode();
+        if (StringUtils.isEmpty(response) || status.code() != 200 || response.contains("{\"error")) {
+            statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
             }
@@ -127,7 +131,7 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
         else {
             LOG.debug("beacon url inside mullah media is {}", beaconUrl);
             try {
-                statusCode = status.getCode();
+                statusCode = status.code();
                 JSONObject adResponse = new JSONObject(response);
                 VelocityContext context = new VelocityContext();
                 TemplateType t;

@@ -1,5 +1,24 @@
 package com.inmobi.adserve.channels.adnetworks.siquis;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.util.Calendar;
+
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.VelocityContext;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -7,23 +26,6 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLDecoder;
-import java.util.Calendar;
 
 
 public class DCPSiquisAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -32,9 +34,9 @@ public class DCPSiquisAdNetwork extends AbstractDCPAdNetworkImpl {
 
     private boolean             isAndroid;
 
-    public DCPSiquisAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public DCPSiquisAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
     @Override
@@ -88,8 +90,8 @@ public class DCPSiquisAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {} and response length is {}", response, response.length());
-        if (status.getCode() != 200 || StringUtils.isBlank(response) || !response.startsWith("[{\"")) {
-            statusCode = status.getCode();
+        if (status.code() != 200 || StringUtils.isBlank(response) || !response.startsWith("[{\"")) {
+            statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
             }
@@ -98,13 +100,13 @@ public class DCPSiquisAdNetwork extends AbstractDCPAdNetworkImpl {
         }
         else {
             try {
-                statusCode = status.getCode();
+                statusCode = status.code();
                 JSONArray adResponseArray = new JSONArray(response);
                 JSONObject adResponse = adResponseArray.getJSONObject(0);
                 VelocityContext context = new VelocityContext();
                 context.put(VelocityTemplateFieldConstants.AdText, adResponse.get("title"));
                 context.put(VelocityTemplateFieldConstants.Description,
-                    adResponse.get(VelocityTemplateFieldConstants.Description));
+                        adResponse.get(VelocityTemplateFieldConstants.Description));
                 if (isAndroid) {
                     String url = reformatClickUr(adResponse.get("clickurl").toString());
                     if (url != null) {
@@ -122,12 +124,12 @@ public class DCPSiquisAdNetwork extends AbstractDCPAdNetworkImpl {
                 String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                 if (StringUtils.isEmpty(vmTemplate)) {
                     responseContent = Formatter.getResponseFromTemplate(TemplateType.PLAIN, context, sasParams,
-                        beaconUrl);
+                            beaconUrl);
                 }
                 else {
                     context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
                     responseContent = Formatter.getResponseFromTemplate(TemplateType.RICH, context, sasParams,
-                        beaconUrl);
+                            beaconUrl);
                 }
                 adStatus = "AD";
                 LOG.debug("response length is {} responseContent is {}", responseContent.length(), responseContent);
@@ -166,11 +168,8 @@ public class DCPSiquisAdNetwork extends AbstractDCPAdNetworkImpl {
 
             // URLDecoder.decode(clickUrl, "UTF-8")
             for (int i = 0; i < urlParams.length; i += 2) {
-                formattedUrl
-                        .append(URLDecoder.decode(urlParams[i], utf8))
-                            .append('=')
-                            .append(URLDecoder.decode(urlParams[i + 1], utf8))
-                            .append('&');
+                formattedUrl.append(URLDecoder.decode(urlParams[i], utf8)).append('=')
+                        .append(URLDecoder.decode(urlParams[i + 1], utf8)).append('&');
             }
         }
         catch (Exception ex) {

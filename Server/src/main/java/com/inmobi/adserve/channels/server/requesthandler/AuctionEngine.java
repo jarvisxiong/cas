@@ -5,13 +5,15 @@ import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.AuctionEngineInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.server.annotations.AdvertiserIdNameMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -36,6 +38,9 @@ public class AuctionEngine implements AuctionEngineInterface {
     @AdvertiserIdNameMap
     @Inject
     private static Map<String, String>  advertiserIdNameMap;
+
+    @Inject
+    private static AsyncRequestMaker    asyncRequestMaker;
 
     public AuctionEngine() {
     }
@@ -250,7 +255,7 @@ public class AuctionEngine implements AuctionEngineInterface {
 
     public String getEncryptedBid(final Double bid) {
         long winBid = (long) (bid * Math.pow(10, 6));
-        return AsyncRequestMaker.getImpressionId(winBid);
+        return asyncRequestMaker.getImpressionId(winBid);
     }
 
     public double calculateRTBFloor(final double siteFloor, final double highestEcpm, final double segmentFloor,

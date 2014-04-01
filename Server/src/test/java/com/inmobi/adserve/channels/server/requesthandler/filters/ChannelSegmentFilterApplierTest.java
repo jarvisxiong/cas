@@ -1,28 +1,8 @@
 package com.inmobi.adserve.channels.server.requesthandler.filters;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.inject.*;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.entity.*;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.server.ServletHandler;
-import com.inmobi.adserve.channels.server.beans.CasContext;
-import com.inmobi.adserve.channels.server.module.ServerModule;
-import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
-import com.inmobi.adserve.channels.server.requesthandler.beans.AdvertiserMatchedSegmentDetail;
-import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AdGroupLevelFilter;
-import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.*;
-import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AdvertiserLevelFilter;
-import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserExcludedFilter;
-import com.inmobi.adserve.channels.server.utils.CasUtils;
-import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import junit.framework.TestCase;
-import org.apache.commons.collections.map.HashedMap;
-import org.json.JSONObject;
-import org.slf4j.Marker;
-import org.testng.annotations.Test;
-import org.testng.collections.Lists;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -30,9 +10,45 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import junit.framework.TestCase;
+
+import org.apache.commons.collections.map.HashedMap;
+import org.json.JSONObject;
+import org.testng.annotations.Test;
+import org.testng.collections.Lists;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import com.google.inject.util.Modules;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.entity.ChannelEntity;
+import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
+import com.inmobi.adserve.channels.entity.PricingEngineEntity;
+import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
+import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.server.ServletHandler;
+import com.inmobi.adserve.channels.server.beans.CasContext;
+import com.inmobi.adserve.channels.server.module.CasNettyModule;
+import com.inmobi.adserve.channels.server.module.ServerModule;
+import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
+import com.inmobi.adserve.channels.server.requesthandler.beans.AdvertiserMatchedSegmentDetail;
+import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AdGroupLevelFilter;
+import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupDailyImpressionCountFilter;
+import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupPropertyViolationFilter;
+import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupSiteExclusionFilter;
+import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupSupplyDemandClassificationFilter;
+import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupTotalCountFilter;
+import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AdvertiserLevelFilter;
+import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserExcludedFilter;
+import com.inmobi.adserve.channels.server.utils.CasUtils;
+import com.inmobi.adserve.channels.util.ConfigurationLoader;
 
 
 public class ChannelSegmentFilterApplierTest extends TestCase {
@@ -214,19 +230,8 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         sasParams.setRqAdType("int");
         sasParams.setSiteId("siteid");
 
-        injector = Guice.createInjector(new ServerModule(configurationLoder, repositoryHelper), new AbstractModule() {
-
-            @Override
-            protected void configure() {
-                bind(Marker.class).toProvider(new Provider<Marker>() {
-                    @Override
-                    public Marker get() {
-                        return null;
-                    }
-                });
-
-            }
-        });
+        injector = Guice.createInjector(Modules.override(new ServerModule(configurationLoder, repositoryHelper),
+                new CasNettyModule(configurationLoder.getServerConfiguration())).with(new TestScopeModule()));
 
         channelSegmentFilterApplier = injector.getInstance(ChannelSegmentFilterApplier.class);
 
@@ -446,7 +451,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
 
         SASRequestParameters sasParams = new SASRequestParameters();
         sasParams.setSiteFloor(0.3);
-        sasParams.setCountryId((long)1);
+        sasParams.setCountryId((long) 1);
         sasParams.setOsId(1);
         sasParams.setDst(2);
         sasParams.setSiteId("siteid");
@@ -765,23 +770,12 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         expect(repositoryHelper.querySiteEcpmRepository("siteid", 1, 2)).andReturn(null).anyTimes();
         replay(repositoryHelper);
 
-        sasParams.setCountryId((long)1);
+        sasParams.setCountryId((long) 1);
         sasParams.setOsId(2);
 
-        Injector injector = Guice.createInjector(new ServerModule(configurationLoder, repositoryHelper),
-                new AbstractModule() {
-
-                    @Override
-                    protected void configure() {
-                        bind(Marker.class).toProvider(new Provider<Marker>() {
-                            @Override
-                            public Marker get() {
-                                return null;
-                            }
-                        });
-
-                    }
-                });
+        Injector injector = Guice.createInjector(Modules.override(
+                new ServerModule(configurationLoder, repositoryHelper),
+                new CasNettyModule(configurationLoder.getServerConfiguration())).with(new TestScopeModule()));
 
         AdGroupSupplyDemandClassificationFilter adGroupSupplyDemandClassificationFilter = injector
                 .getInstance(AdGroupSupplyDemandClassificationFilter.class);
@@ -802,23 +796,12 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         replay(repositoryHelper);
 
         sasParams.setSiteId("siteid");
-        sasParams.setCountryId((long)1);
+        sasParams.setCountryId((long) 1);
         sasParams.setOsId(2);
 
-        Injector injector = Guice.createInjector(new ServerModule(configurationLoder, repositoryHelper),
-                new AbstractModule() {
-
-                    @Override
-                    protected void configure() {
-                        bind(Marker.class).toProvider(new Provider<Marker>() {
-                            @Override
-                            public Marker get() {
-                                return null;
-                            }
-                        });
-
-                    }
-                });
+        Injector injector = Guice.createInjector(Modules.override(
+                new ServerModule(configurationLoder, repositoryHelper),
+                new CasNettyModule(configurationLoder.getServerConfiguration())).with(new TestScopeModule()));
 
         AdGroupSupplyDemandClassificationFilter adGroupSupplyDemandClassificationFilter = injector
                 .getInstance(AdGroupSupplyDemandClassificationFilter.class);
@@ -847,23 +830,12 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         replay(repositoryHelper);
 
         sasParams.setSiteId("siteid");
-        sasParams.setCountryId((long)1);
+        sasParams.setCountryId((long) 1);
         sasParams.setOsId(2);
 
-        Injector injector = Guice.createInjector(new ServerModule(configurationLoder, repositoryHelper),
-                new AbstractModule() {
-
-                    @Override
-                    protected void configure() {
-                        bind(Marker.class).toProvider(new Provider<Marker>() {
-                            @Override
-                            public Marker get() {
-                                return null;
-                            }
-                        });
-
-                    }
-                });
+        Injector injector = Guice.createInjector(Modules.override(
+                new ServerModule(configurationLoder, repositoryHelper),
+                new CasNettyModule(configurationLoder.getServerConfiguration())).with(new TestScopeModule()));
 
         AdGroupSupplyDemandClassificationFilter adGroupSupplyDemandClassificationFilter = injector
                 .getInstance(AdGroupSupplyDemandClassificationFilter.class);
@@ -901,23 +873,12 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         expect(repositoryHelper.querySiteEcpmRepository("siteid", 1, 2)).andReturn(null).anyTimes();
         replay(repositoryHelper);
 
-        Injector injector = Guice.createInjector(new ServerModule(configurationLoder, repositoryHelper),
-                new AbstractModule() {
-
-                    @Override
-                    protected void configure() {
-                        bind(Marker.class).toProvider(new Provider<Marker>() {
-                            @Override
-                            public Marker get() {
-                                return null;
-                            }
-                        });
-
-                    }
-                });
+        Injector injector = Guice.createInjector(Modules.override(
+                new ServerModule(configurationLoder, repositoryHelper),
+                new CasNettyModule(configurationLoder.getServerConfiguration())).with(new TestScopeModule()));
 
         sasParams.setSiteId("siteid");
-        sasParams.setCountryId((long)1);
+        sasParams.setCountryId((long) 1);
         sasParams.setOsId(2);
 
         CasContext casContext = new CasContext();
@@ -955,23 +916,12 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         replay(repositoryHelper);
 
         sasParams.setSiteId("siteid");
-        sasParams.setCountryId((long)1);
+        sasParams.setCountryId((long) 1);
         sasParams.setOsId(2);
 
-        Injector injector = Guice.createInjector(new ServerModule(configurationLoder, repositoryHelper),
-                new AbstractModule() {
-
-                    @Override
-                    protected void configure() {
-                        bind(Marker.class).toProvider(new Provider<Marker>() {
-                            @Override
-                            public Marker get() {
-                                return null;
-                            }
-                        });
-
-                    }
-                });
+        Injector injector = Guice.createInjector(Modules.override(
+                new ServerModule(configurationLoder, repositoryHelper),
+                new CasNettyModule(configurationLoder.getServerConfiguration())).with(new TestScopeModule()));
 
         CasContext casContext = new CasContext();
         casContext.setPricingEngineEntity(injector.getInstance(CasUtils.class).fetchPricingEngineEntity(sasParams));

@@ -1,22 +1,28 @@
 package com.inmobi.adserve.channels.adnetworks.amobee;
 
-import com.inmobi.adserve.channels.api.*;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.util.CategoryList;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
+import java.awt.Dimension;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
-import java.net.URI;
-import java.net.URISyntaxException;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.util.CategoryList;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
 public class DCPAmobeeAdnetwork extends AbstractDCPAdNetworkImpl {
@@ -36,9 +42,9 @@ public class DCPAmobeeAdnetwork extends AbstractDCPAdNetworkImpl {
      * @param baseRequestHandler
      * @param serverEvent
      */
-    public DCPAmobeeAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public DCPAmobeeAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
     @Override
@@ -55,9 +61,8 @@ public class DCPAmobeeAdnetwork extends AbstractDCPAdNetworkImpl {
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (null != sasParams.getSlot()
-                && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
-            Dimension dim = SlotSizeMapping.getDimension((long)sasParams.getSlot());
+        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
 
@@ -99,24 +104,11 @@ public class DCPAmobeeAdnetwork extends AbstractDCPAdNetworkImpl {
             String host = config.getString("amobee.host");
             String adNetworkId = config.getString("amobee.adnetworkId");
             StringBuilder url = new StringBuilder(host);
-            url.append("?adn=")
-                        .append(adNetworkId)
-                        .append("&site=")
-                        .append(blindedSiteId)
-                        .append("&ua=")
-                        .append(getURLEncode(sasParams.getUserAgent(), format))
-                        .append("&i=")
-                        .append(sasParams.getRemoteHostIp())
-                        .append("&f=")
-                        .append(adType)
-                        .append("&uid=")
-                        .append(getUid())
-                        .append("&t=")
-                        .append(System.currentTimeMillis())
-                        .append("&tp=")
-                        .append(adTypeId)
-                        .append("&kw=")
-                        .append(getURLEncode(getCategories(',', true), format));
+            url.append("?adn=").append(adNetworkId).append("&site=").append(blindedSiteId).append("&ua=")
+                    .append(getURLEncode(sasParams.getUserAgent(), format)).append("&i=")
+                    .append(sasParams.getRemoteHostIp()).append("&f=").append(adType).append("&uid=").append(getUid())
+                    .append("&t=").append(System.currentTimeMillis()).append("&tp=").append(adTypeId).append("&kw=")
+                    .append(getURLEncode(getCategories(',', true), format));
             // TODO nk : get list
             if (width != 0 && height != 0) {
                 url.append("&adw=").append(width).append("&adh=").append(height);
@@ -174,8 +166,8 @@ public class DCPAmobeeAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {}", response);
-        statusCode = status.getCode();
-        if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
+        statusCode = status.code();
+        if (null == response || status.code() != 200 || response.trim().isEmpty()) {
             if (200 == statusCode) {
                 statusCode = 500;
             }

@@ -1,36 +1,40 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-import com.inmobi.adserve.channels.adnetworks.pubmatic.DCPPubmaticAdNetwork;
-import com.inmobi.adserve.channels.api.*;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import junit.framework.TestCase;
-import org.apache.commons.configuration.Configuration;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.testng.annotations.Test;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import junit.framework.TestCase;
+
+import org.apache.commons.configuration.Configuration;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.testng.annotations.Test;
+
+import com.inmobi.adserve.channels.adnetworks.pubmatic.DCPPubmaticAdNetwork;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 
 
 public class DCPPubmaticAdapterTest extends TestCase {
-    private Configuration         mockConfig      = null;
-    private final String          debug           = "debug";
-    private final String          loggerConf      = "/tmp/channel-server.properties";
-    private final ClientBootstrap clientBootstrap = null;
-    private DCPPubmaticAdNetwork  dcpPubmaticAdnetwork;
-    private final String          pubmaticHost    = "http://showads.pubmatic.com/AdServer/AdServerServlet";
-    private final String          pubmaticStatus  = "on";
-    private final String          pubmaticAdvId   = "pubmaticadv1";
-    private final String          pubId           = "2685";
+    private Configuration        mockConfig     = null;
+    private final String         debug          = "debug";
+    private final String         loggerConf     = "/tmp/channel-server.properties";
+    private DCPPubmaticAdNetwork dcpPubmaticAdnetwork;
+    private final String         pubmaticHost   = "http://showads.pubmatic.com/AdServer/AdServerServlet";
+    private final String         pubmaticStatus = "on";
+    private final String         pubmaticAdvId  = "pubmaticadv1";
+    private final String         pubId          = "2685";
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -51,13 +55,13 @@ public class DCPPubmaticAdapterTest extends TestCase {
         if (!f.exists()) {
             f.createNewFile();
         }
-        MessageEvent serverEvent = createMock(MessageEvent.class);
+        Channel serverChannel = createMock(Channel.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         SlotSizeMapping.init();
         prepareMockConfig();
         SlotSizeMapping.init();
         Formatter.init();
-        dcpPubmaticAdnetwork = new DCPPubmaticAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
+        dcpPubmaticAdnetwork = new DCPPubmaticAdNetwork(mockConfig, null, base, serverChannel);
     }
 
     @Test

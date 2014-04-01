@@ -1,13 +1,14 @@
 package com.inmobi.adserve.channels.adnetworks.atnt;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Random;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,9 +32,9 @@ public class ATNTAdNetwork extends AbstractDCPAdNetworkImpl {
      * @param baseRequestHandler
      * @param serverEvent
      */
-    public ATNTAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public ATNTAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
     // Assign the value to the parameters
@@ -72,23 +73,12 @@ public class ATNTAdNetwork extends AbstractDCPAdNetworkImpl {
     public URI getRequestUri() throws Exception {
         try {
             StringBuilder finalUrl = new StringBuilder(config.getString("atnt.host"));
-            finalUrl.append(externalSiteId)
-                        .append("&ip=")
-                        .append(sasParams.getRemoteHostIp())
-                        .append("&useragent=")
-                        .append(getURLEncode(sasParams.getUserAgent(), format));
-            finalUrl.append("&loc=")
-                        .append(loc)
-                        .append("&gender=")
-                        .append(sasParams.getGender())
-                        .append("&age=")
-                        .append(sasParams.getAge());
-            finalUrl.append("&listingcount=1")
-                        .append("&udid=")
-                        .append(casInternalRequestParameters.uid)
-                        .append("&visitorid=")
-                        .append(getVisitorId())
-                        .append("&platform=");
+            finalUrl.append(externalSiteId).append("&ip=").append(sasParams.getRemoteHostIp()).append("&useragent=")
+                    .append(getURLEncode(sasParams.getUserAgent(), format));
+            finalUrl.append("&loc=").append(loc).append("&gender=").append(sasParams.getGender()).append("&age=")
+                    .append(sasParams.getAge());
+            finalUrl.append("&listingcount=1").append("&udid=").append(casInternalRequestParameters.uid)
+                    .append("&visitorid=").append(getVisitorId()).append("&platform=");
             finalUrl.append(platform).append("&clkpxl=").append(getURLEncode(getClickUrl(), format));
 
             String[] urlParams = finalUrl.toString().split("&");

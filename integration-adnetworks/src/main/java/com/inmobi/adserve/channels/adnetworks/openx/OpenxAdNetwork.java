@@ -1,5 +1,18 @@
 package com.inmobi.adserve.channels.adnetworks.openx;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -7,17 +20,6 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.net.URI;
-import java.net.URISyntaxException;
 
 
 public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -28,9 +30,9 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
     private String              latitude  = null;
     private String              longitude = null;
 
-    public OpenxAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public OpenxAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
         this.clientBootstrap = clientBootstrap;
     }
 
@@ -66,28 +68,19 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         StringBuilder finalUrl = new StringBuilder(config.getString("openx.host"));
-        finalUrl.append(externalSiteId)
-                    .append("&cnt=")
-                    .append(sasParams.getCountryCode().toLowerCase())
-                    .append("&dma=")
-                    .append(sasParams.getState());
+        finalUrl.append(externalSiteId).append("&cnt=").append(sasParams.getCountryCode().toLowerCase())
+                .append("&dma=").append(sasParams.getState());
         finalUrl.append("&net=").append(sasParams.getLocSrc()).append("&age=").append(sasParams.getAge());
         if (sasParams.getGender() != null) {
             finalUrl.append("&gen=").append(sasParams.getGender().toUpperCase());
         }
-        finalUrl.append("&ip=")
-                    .append(sasParams.getRemoteHostIp())
-                    .append("&lat=")
-                    .append(latitude)
-                    .append("&lon=")
-                    .append(longitude);
+        finalUrl.append("&ip=").append(sasParams.getRemoteHostIp()).append("&lat=").append(latitude).append("&lon=")
+                .append(longitude);
         if (StringUtils.isNotEmpty(latitude)) {
             finalUrl.append("&lt=3");
         }
-        finalUrl.append("&zip=")
-                    .append(casInternalRequestParameters.zipCode)
-                    .append("&c.siteId=")
-                    .append(blindedSiteId);
+        finalUrl.append("&zip=").append(casInternalRequestParameters.zipCode).append("&c.siteId=")
+                .append(blindedSiteId);
 
         if (HandSetOS.iPhone_OS.getValue() == sasParams.getOsId()) {
             finalUrl.append("&did.ia=").append(casInternalRequestParameters.uidIFA);
@@ -129,8 +122,8 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {} and response length is {}", response, response.length());
-        if (status.getCode() != 200 || response.trim().isEmpty()) {
-            statusCode = status.getCode();
+        if (null == response || status.code() != 200 || response.trim().isEmpty()) {
+            statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
             }
@@ -138,7 +131,7 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
             return;
         }
         else {
-            statusCode = status.getCode();
+            statusCode = status.code();
             VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
             try {

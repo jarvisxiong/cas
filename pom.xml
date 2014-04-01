@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.inmobi.channels</groupId>
 	<artifactId>cas</artifactId>
-	<version>3.64-SNAPSHOT</version>
+	<version>3.70-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<url>https://github.corp.inmobi.com/channel-adserve</url>
 	<parent>
@@ -29,9 +29,9 @@
 	<modules>
 		<module>Server</module>
 		<module>integration-adnetworks</module>
-		<module>integration-api</module>
 		<module>integration-repository</module>
 		<module>integration-utils</module>
+		<module>integration-api</module>
 	</modules>
 
 	<dependencyManagement>
@@ -77,6 +77,11 @@
 				<version>${guice.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>com.netflix.governator</groupId>
+				<artifactId>governator</artifactId>
+				<version>1.2.7</version>
+			</dependency>
+			<dependency>
 				<groupId>com.google.inject.extensions</groupId>
 				<artifactId>guice-multibindings</artifactId>
 				<version>${guice-multibindings.version}</version>
@@ -113,9 +118,9 @@
 				<scope>compile</scope>
 			</dependency>
 			<dependency>
-				<groupId>org.jboss.netty</groupId>
-				<artifactId>netty</artifactId>
-				<version>3.2.1.Final</version>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-all</artifactId>
+				<version>4.0.17.Final</version>
 			</dependency>
 			<dependency>
 				<groupId>org.json</groupId>
@@ -255,7 +260,7 @@
 			<dependency>
 				<groupId>com.inmobi.commons</groupId>
 				<artifactId>casthrift</artifactId>
-				<version>[1.19,2.0)</version>
+				<version>[1.23,3.0)</version>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.jackson</groupId>

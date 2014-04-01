@@ -8,8 +8,9 @@ import org.apache.commons.configuration.Configuration;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Singleton;
-import com.inmobi.adserve.channels.server.annotations.RtbConfiguration;
-import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
+import com.inmobi.adserve.channels.api.config.CasConfig;
+import com.inmobi.adserve.channels.util.annotations.RtbConfiguration;
+import com.inmobi.adserve.channels.util.annotations.ServerConfiguration;
 
 
 /**
@@ -65,6 +66,10 @@ public class ServerConfig implements CasConfig {
         return serverConfiguration.getByte("defaultDemandClass", (byte) 0);
     }
 
+    public int getDcpRequestTimeoutInMillis() {
+        return serverConfiguration.getInt("readtimeoutMillis");
+    }
+
     public List<Double> getSupplyClassFloors() {
         String[] supplyClassFloorStringArray = serverConfiguration.getStringArray("supplyClassFloors");
 
@@ -75,4 +80,21 @@ public class ServerConfig implements CasConfig {
 
         return supplyClassFloors;
     }
+
+    public int getMaxDcpOutGoingConnections() {
+        return serverConfiguration.getInt("dcpOutGoingMaxConnections", 200);
+    }
+
+    public int getMaxRtbOutGoingConnections() {
+        return serverConfiguration.getInt("rtbOutGoingMaxConnections", 200);
+    }
+
+    public int getMaxIncomingConnections() {
+        return serverConfiguration.getInt("incomingMaxConnections", 500);
+    }
+
+    public int getServerTimeoutInMillis() {
+        return serverConfiguration.getInt("serverTimeoutMillis", 825);
+    }
+
 }

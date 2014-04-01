@@ -1,5 +1,8 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,8 +10,6 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.ws.rs.Path;
 
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,9 +44,9 @@ public class ServletGetSegment implements Servlet {
 
     @Override
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
-            final MessageEvent e) throws Exception {
+            final Channel serverChannel) throws Exception {
 
-        Map<String, List<String>> params = queryStringDecoder.getParameters();
+        Map<String, List<String>> params = queryStringDecoder.parameters();
         JSONObject jObject;
         try {
             jObject = requestParser.extractParams(params, "segments");
@@ -54,12 +55,12 @@ public class ServletGetSegment implements Servlet {
             LOG.debug("Encountered Json Error while creating json object inside servlet");
             hrh.setTerminationReason(ServletHandler.jsonParsingError);
             InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
-            hrh.responseSender.sendResponse("Incorrect Json", e);
+            hrh.responseSender.sendResponse("Incorrect Json", serverChannel);
             return;
         }
 
         if (null == jObject) {
-            hrh.responseSender.sendResponse("Incorrect Json", e);
+            hrh.responseSender.sendResponse("Incorrect Json", serverChannel);
             return;
         }
 
@@ -100,19 +101,19 @@ public class ServletGetSegment implements Servlet {
             else if (repoName != null
                     && repoName.equalsIgnoreCase(ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY)) {
                 entity = ServletHandler.repositoryHelper.queryPricingEngineRepository(
-                    Integer.parseInt(id.split("_")[0]), Integer.parseInt(id.split("_")[1]));
+                        Integer.parseInt(id.split("_")[0]), Integer.parseInt(id.split("_")[1]));
             }
             else if (repoName != null
                     && repoName.equalsIgnoreCase(ChannelServerStringLiterals.PUBLISHER_FILTER_REPOSITORY)) {
                 entity = ServletHandler.repositoryHelper.queryPublisherFilterRepository(id.split("_")[0],
-                    Integer.parseInt(id.split("_")[1]));
+                        Integer.parseInt(id.split("_")[1]));
             }
             else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CITRUS_LEAF_FEEDBACK)) {
                 entity = ServletHandler.repositoryHelper.querySiteCitrusLeafFeedbackRepository(id);
             }
             else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY)) {
                 entity = ServletHandler.repositoryHelper.querySiteEcpmRepository(id.split("_")[0],
-                    Integer.parseInt(id.split("_")[1]), Integer.parseInt(id.split("_")[2]));
+                        Integer.parseInt(id.split("_")[1]), Integer.parseInt(id.split("_")[2]));
             }
             else if (repoName != null
                     && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY)) {
@@ -121,7 +122,7 @@ public class ServletGetSegment implements Servlet {
             segmentInfo.put(key, entity);
         }
         Gson gson = new Gson();
-        hrh.responseSender.sendResponse(gson.toJson(segmentInfo), e);
+        hrh.responseSender.sendResponse(gson.toJson(segmentInfo), serverChannel);
     }
 
     @Override

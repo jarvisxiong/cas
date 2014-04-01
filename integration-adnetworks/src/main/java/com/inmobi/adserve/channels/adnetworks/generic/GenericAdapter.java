@@ -1,24 +1,24 @@
 package com.inmobi.adserve.channels.adnetworks.generic;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
+import java.awt.Dimension;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.*;
-import org.jboss.netty.util.CharsetUtil;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 
 
 /**
@@ -43,9 +43,9 @@ public class GenericAdapter extends BaseAdNetworkImpl {
     private String              requestMethod  = "";
     private String              responseFormat = "";
 
-    public GenericAdapter(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent, final String advertiserName) {
-        super(baseRequestHandler, serverEvent);
+    public GenericAdapter(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String advertiserName) {
+        super(baseRequestHandler, serverChannel);
         this.config = config;
         this.clientBootstrap = clientBootstrap;
         this.advertiserName = advertiserName;
@@ -146,8 +146,8 @@ public class GenericAdapter extends BaseAdNetworkImpl {
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {} and response length is {}", response, response.length());
         if (responseFormat.equals(MacrosAndStrings.JSON)) {
-            if (status.getCode() != 200 || StringUtils.isBlank(response)) {
-                statusCode = status.getCode();
+            if (status.code() != 200 || StringUtils.isBlank(response)) {
+                statusCode = status.code();
                 if (200 == statusCode) {
                     statusCode = 500;
                 }
@@ -163,7 +163,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
                         responseContent = "";
                     }
                     else {
-                        statusCode = status.getCode();
+                        statusCode = status.code();
                         adStatus = "AD";
                         String responseWithoutImpressionUrl = responseInJson.getString(config.getString(advertiserName
                                 + MacrosAndStrings.CONTENT));
@@ -180,8 +180,8 @@ public class GenericAdapter extends BaseAdNetworkImpl {
             }
         }
         else if (responseFormat.equals(MacrosAndStrings.HTML)) {
-            if (status.getCode() != 200 || StringUtils.isBlank(response)) {
-                statusCode = status.getCode();
+            if (status.code() != 200 || StringUtils.isBlank(response)) {
+                statusCode = status.code();
                 if (200 == statusCode) {
                     statusCode = 500;
                 }
@@ -189,7 +189,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
                 return;
             }
             else {
-                statusCode = status.getCode();
+                statusCode = status.code();
                 adStatus = "AD";
                 StringBuilder responseBuilder = new StringBuilder();
                 responseBuilder.append(MacrosAndStrings.HTML_STARTING);
