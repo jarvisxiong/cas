@@ -17,6 +17,7 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import org.apache.commons.codec.net.URLCodec;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
@@ -103,10 +104,19 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
                 InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
             }
             requestParser.parseRequestParameters(jsonObject, sasParams, casInternalRequestParameters);
-        } else if (request.getMethod() == HttpMethod.GET && null != dst) {
+        } else if (request.getMethod() == HttpMethod.GET && null != dst && params.containsKey("adPoolRequest")) {
+
+            String rawContent = null;
+            if (!params.isEmpty()) {
+                List<String> values = params.get("adPoolRequest");
+                if (CollectionUtils.isNotEmpty(values)) {
+                    rawContent = values.iterator().next();
+                }
+            }
+
+            LOG.debug("adPoolRequest: {}", rawContent);
+
             AdPoolRequest adPoolRequest = new AdPoolRequest();
-            HttpHeaders headers = request.headers();
-            String rawContent = headers.get("adPoolRequest");
 
             if (StringUtils.isNotEmpty(rawContent)) {
                 TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
