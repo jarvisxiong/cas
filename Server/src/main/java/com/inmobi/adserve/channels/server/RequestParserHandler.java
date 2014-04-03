@@ -119,9 +119,11 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
             AdPoolRequest adPoolRequest = new AdPoolRequest();
 
             if (StringUtils.isNotEmpty(rawContent)) {
+                byte[] decodedContent = urlCodec.decode(rawContent.getBytes());
+                LOG.debug("Decoded String : {}", decodedContent.toString());
                 TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
                 try {
-                    tDeserializer.deserialize(adPoolRequest, urlCodec.decode(rawContent.getBytes()));
+                    tDeserializer.deserialize(adPoolRequest, decodedContent);
                     thriftRequestParser.parseRequestParameters(adPoolRequest, sasParams, casInternalRequestParameters, dst);
                 } catch (TException ex) {
                     terminationReason = ServletHandler.thriftParsingError;
