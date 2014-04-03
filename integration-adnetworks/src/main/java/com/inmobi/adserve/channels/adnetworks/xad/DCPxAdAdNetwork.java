@@ -7,6 +7,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.configuration.Configuration;
@@ -23,6 +24,8 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.util.IABCategoriesInterface;
+import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
@@ -35,14 +38,19 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
     private int                 height;
     private String              deviceId;
     private String              deviceIdType;
+    private String              sourceType;
     private static final String DERIVED_LAT_LONG = "derived-lat-lon";
     private boolean             isLocSourceDerived;
     private static final String APP_ID_FORMAT    = "%s_%s";                                       // <blinded_id>_<category>
-    private static final String UUID_MD5         = "uuid|md5";
-    private static final String UUID_SHA1        = "uuid|sha1";
-    private static final String ANDROID_ID_MD5   = "android_id|md5";
-    private static final String ANDROID_ID_SHA1  = "android_id|sha1";
-    private static final String IDFA_PLAIN       = "idfa|plain";
+    private static final String UUID_MD5         = "UUID|MD5";
+    private static final String UUID_SHA1        = "UUID|SHA1";
+    private static final String ANDROID_ID_MD5   = "Android_Id|MD5";
+    private static final String ANDROID_ID_SHA1  = "Android_Id|SHA1";
+    private static final String IDFA_PLAIN       = "IDFA|RAW";
+    private static final String APP 			 = "app";
+    private static final String WEB 			 = "web";
+    
+    private static final IABCategoriesInterface iabCategoryMap = new IABCategoriesMap();
 
     public DCPxAdAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
@@ -80,6 +88,8 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
                 longitude = latlong[1];
             }
         }
+        sourceType = (StringUtils.isBlank(sasParams.getSource()) || "WAP".equalsIgnoreCase(sasParams.getSource())) ? WEB
+                : APP;
 
         LOG.info("Configure parameters inside xad returned true");
         return true;
@@ -94,9 +104,9 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
     public URI getRequestUri() throws Exception {
         try {
             StringBuilder url = new StringBuilder(host);
-            url.append("?v=1.1&o_fmt=html5&ip=").append(sasParams.getRemoteHostIp());
+            url.append("?v=1.2&o_fmt=html5&ip=").append(sasParams.getRemoteHostIp());
             url.append("&k=").append(externalSiteId);
-            String categories = getCategories(':');
+            String categories = getCategories(',',true,true);
             String appId = String.format(APP_ID_FORMAT, blindedSiteId, categories.split(":")[0].replace(' ', '_'));
             url.append("&appid=").append(appId);
 
@@ -127,13 +137,32 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
             if (sasParams.getCountryCode() != null) {
                 url.append("&co=").append(sasParams.getCountryCode().toUpperCase());
             }
-            url.append("&category=").append(getURLEncode(categories, format));
+            for(String cat:categories.split(":")){
+            	url.append("&cat=").append(cat);
+            }
             int osId = sasParams.getOsId() - 1;
             if (osId < 0) {
                 osId = 0;
             }
             url.append("&os=").append(HandSetOS.values()[osId].toString());
+            url.append("&instl=").append(getAdType());
+            url.append("&pt=").append(sourceType);
+            
+            ArrayList<Long> bCat = new ArrayList<Long>();
 
+            if (casInternalRequestParameters.blockedCategories != null) {
+                bCat.addAll(casInternalRequestParameters.blockedCategories);
+            }
+
+            if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
+                bCat.add(IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES);
+            }
+            else {
+                bCat.add(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES);
+            }
+            for(String bCategory:iabCategoryMap.getIABCategories(bCat)){
+            	url.append("&bcat=").append(bCategory);
+            }
             LOG.debug("xAd url is {}", url);
 
             return (new URI(url.toString()));
@@ -256,5 +285,17 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
         else {
             deviceId = DigestUtils.md5Hex(deviceId);
         }
+    }
+    
+    private int getAdType() {
+        Short slot = sasParams.getSlot();
+        if (10 == slot // 300X250
+                || 14 == slot // 320X480
+                || 16 == slot) /* 768X1024 */{
+        	//interstitial
+            return 1;
+        }
+        //banner
+        return 0;
     }
 }
