@@ -137,7 +137,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
             if (sasParams.getCountryCode() != null) {
                 url.append("&co=").append(sasParams.getCountryCode().toUpperCase());
             }
-            for(String cat:categories.split(":")){
+            for(String cat:categories.split(",")){
             	url.append("&cat=").append(cat);
             }
             int osId = sasParams.getOsId() - 1;
