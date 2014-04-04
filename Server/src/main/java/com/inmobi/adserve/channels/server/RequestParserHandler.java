@@ -104,6 +104,7 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
         }
         out.add(new RequestParameterHolder(sasParams, casInternalRequestParameters, request.getUri(),
                 terminationReason, request));
+        request.retain();
     }
 
 }
