@@ -131,7 +131,6 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
         RequestParameterHolder requestParameterHolder = (RequestParameterHolder) msg;
-
         try {
             this.terminationReason = requestParameterHolder.getTerminationReason();
             this.responseSender.sasParams = requestParameterHolder.getSasParams();
