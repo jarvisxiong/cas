@@ -6,7 +6,6 @@ import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.QueryStringDecoder;
-import io.netty.util.CharsetUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -85,7 +84,9 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
             AdPoolRequest adPoolRequest = new AdPoolRequest();
             TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
             try {
-                tDeserializer.deserialize(adPoolRequest, request.content().toString(CharsetUtil.UTF_8).getBytes());
+                byte[] adPoolRequestBytes = new byte[request.content().readableBytes()];
+                request.content().getBytes(0, adPoolRequestBytes);
+                tDeserializer.deserialize(adPoolRequest, adPoolRequestBytes);
                 thriftRequestParser.parseRequestParameters(adPoolRequest, sasParams, casInternalRequestParameters, dst);
             }
             catch (TException ex) {
@@ -141,5 +142,4 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
                 terminationReason, request));
         request.retain();
     }
-
 }
