@@ -4,14 +4,18 @@ import com.inmobi.adserve.adpool.*;
 import com.inmobi.types.ContentRating;
 import com.inmobi.types.InventoryType;
 import com.inmobi.types.LocationSource;
+import org.apache.commons.codec.net.URLCodec;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.thrift.TDeserializer;
+import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import sun.net.www.protocol.http.HttpURLConnection;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -80,9 +84,53 @@ public static void main(String[] args) throws Exception {
     adPoolRequest.setSupplyCapabilities(supplyCapabilities);
     adPoolRequest.setRequestedAdCount((short)1);
     System.out.println("Request is : " + adPoolRequest);
-    sendPost(adPoolRequest);
+    sendClientGet(adPoolRequest);
 
 }
+
+
+    // HTTP GET request
+    private static void sendClientGet(AdPoolRequest adPoolRequest) throws Exception {
+
+        String url = "http://localhost:8800/backfill";
+
+        HttpClient client = new DefaultHttpClient();
+        HttpGet request = new HttpGet(url);
+
+        TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
+        byte[] requestContent = serializer.serialize(adPoolRequest);
+        URLCodec urlCodec = new URLCodec();
+        String content = new String(urlCodec.encode(requestContent));
+        request.addHeader("adPoolRequest", content);
+
+        AdPoolRequest adPoolRequest1 = new AdPoolRequest();
+        TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
+        try {
+            tDeserializer.deserialize(adPoolRequest1, urlCodec.decode(content.getBytes()));
+        } catch (TException ex) {
+            ex.printStackTrace();
+        }
+
+
+
+        HttpResponse response = client.execute(request);
+
+        System.out.println("Response Code : " +
+                response.getStatusLine().getStatusCode());
+
+        BufferedReader rd = new BufferedReader(
+                new InputStreamReader(response.getEntity().getContent()));
+
+        StringBuffer result = new StringBuffer();
+        String line = "";
+        while ((line = rd.readLine()) != null) {
+            result.append(line);
+        }
+
+        System.out.println(result.toString());
+
+    }
+
     private static void sendPost(AdPoolRequest adPoolRequest) throws Exception {
 
         String targetUrl = "http://localhost:8800/rtbdFill";
@@ -104,7 +152,7 @@ public static void main(String[] args) throws Exception {
             connection.setRequestProperty("Content-Length", "" +
                     123456);
 
-            connection.setUseCaches (false);
+            connection.setUseCaches(false);
             connection.setDoInput(true);
             connection.setDoOutput(true);
 

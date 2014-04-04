@@ -13,6 +13,9 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.codec.net.URLCodec;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -36,12 +39,13 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Sharable
 @Singleton
 public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHttpRequest> {
-    private static final Logger       LOG = LoggerFactory.getLogger(RequestParserHandler.class);
+    private static final Logger       LOG      = LoggerFactory.getLogger(RequestParserHandler.class);
 
     private final RequestParser       requestParser;
     private final ThriftRequestParser thriftRequestParser;
     private final Provider<Marker>    traceMarkerProvider;
     private final Provider<Servlet>   servletProvider;
+    private final URLCodec            urlCodec = new URLCodec();
 
     @Inject
     RequestParserHandler(final RequestParser requestParser, final ThriftRequestParser thriftRequestParser,
@@ -75,12 +79,14 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
         else if (servletName.equalsIgnoreCase("BackFill")) {
             dst = 2;
         }
-
+        LOG.debug("Method is  {}", request.getMethod());
         if (request.getMethod() == HttpMethod.POST && null != dst) {
             AdPoolRequest adPoolRequest = new AdPoolRequest();
             TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
             try {
-                tDeserializer.deserialize(adPoolRequest, request.content().array());
+                byte[] adPoolRequestBytes = new byte[request.content().readableBytes()];
+                request.content().getBytes(0, adPoolRequestBytes);
+                tDeserializer.deserialize(adPoolRequest, adPoolRequestBytes);
                 thriftRequestParser.parseRequestParameters(adPoolRequest, sasParams, casInternalRequestParameters, dst);
             }
             catch (TException ex) {
@@ -102,9 +108,38 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
             }
             requestParser.parseRequestParameters(jsonObject, sasParams, casInternalRequestParameters);
         }
+        else if (request.getMethod() == HttpMethod.GET && null != dst && params.containsKey("adPoolRequest")) {
+
+            String rawContent = null;
+            if (!params.isEmpty()) {
+                List<String> values = params.get("adPoolRequest");
+                if (CollectionUtils.isNotEmpty(values)) {
+                    rawContent = values.iterator().next();
+                }
+            }
+
+            LOG.debug("adPoolRequest: {}", rawContent);
+
+            AdPoolRequest adPoolRequest = new AdPoolRequest();
+
+            if (StringUtils.isNotEmpty(rawContent)) {
+                byte[] decodedContent = urlCodec.decode(rawContent.getBytes());
+                LOG.debug("Decoded String : {}", decodedContent.toString());
+                TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
+                try {
+                    tDeserializer.deserialize(adPoolRequest, decodedContent);
+                    thriftRequestParser.parseRequestParameters(adPoolRequest, sasParams, casInternalRequestParameters,
+                            dst);
+                }
+                catch (TException ex) {
+                    terminationReason = ServletHandler.thriftParsingError;
+                    LOG.error(traceMarker, "Error in de serializing thrift ", ex);
+                    InspectorStats.incrementStatCount(InspectorStrings.thriftParsingError, InspectorStrings.count);
+                }
+            }
+        }
         out.add(new RequestParameterHolder(sasParams, casInternalRequestParameters, request.getUri(),
                 terminationReason, request));
         request.retain();
     }
-
 }

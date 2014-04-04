@@ -163,6 +163,7 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
         finally {
             requestParameterHolder.getHttpRequest().release();
         }
+
     }
 
     public boolean isRequestFromLocalHost() {
