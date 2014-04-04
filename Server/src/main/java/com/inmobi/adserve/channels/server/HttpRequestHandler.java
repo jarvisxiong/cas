@@ -5,7 +5,6 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.handler.timeout.ReadTimeoutException;
-import io.netty.util.ReferenceCountUtil;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -131,9 +130,9 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
     // Invoked when message is received over the connection
     @Override
     public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
-        try {
+        RequestParameterHolder requestParameterHolder = (RequestParameterHolder) msg;
 
-            RequestParameterHolder requestParameterHolder = (RequestParameterHolder) msg;
+        try {
             this.terminationReason = requestParameterHolder.getTerminationReason();
             this.responseSender.sasParams = requestParameterHolder.getSasParams();
             this.responseSender.casInternalRequestParameters = requestParameterHolder.getCasInternalRequestParameters();
@@ -163,8 +162,9 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
             }
         }
         finally {
-            ReferenceCountUtil.release(msg);
+            requestParameterHolder.getHttpRequest().release();
         }
+
     }
 
     public boolean isRequestFromLocalHost() {

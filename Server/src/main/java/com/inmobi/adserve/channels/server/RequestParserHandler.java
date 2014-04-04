@@ -1,21 +1,19 @@
 package com.inmobi.adserve.channels.server;
 
-import com.google.inject.Provider;
-import com.inmobi.adserve.adpool.AdPoolRequest;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.server.api.Servlet;
-import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
-import com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParser;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.QueryStringDecoder;
+import io.netty.util.CharsetUtil;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -28,23 +26,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.List;
-import java.util.Map;
+import com.google.inject.Provider;
+import com.inmobi.adserve.adpool.AdPoolRequest;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
+import com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParser;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 
 
 @Sharable
 @Singleton
 public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHttpRequest> {
-    private static final Logger       LOG = LoggerFactory.getLogger(RequestParserHandler.class);
+    private static final Logger       LOG      = LoggerFactory.getLogger(RequestParserHandler.class);
 
     private final RequestParser       requestParser;
     private final ThriftRequestParser thriftRequestParser;
     private final Provider<Marker>    traceMarkerProvider;
     private final Provider<Servlet>   servletProvider;
-    private final URLCodec urlCodec = new URLCodec();
-
+    private final URLCodec            urlCodec = new URLCodec();
 
     @Inject
     RequestParserHandler(final RequestParser requestParser, final ThriftRequestParser thriftRequestParser,
@@ -83,7 +85,7 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
             AdPoolRequest adPoolRequest = new AdPoolRequest();
             TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
             try {
-                tDeserializer.deserialize(adPoolRequest, request.content().array());
+                tDeserializer.deserialize(adPoolRequest, request.content().toString(CharsetUtil.UTF_8).getBytes());
                 thriftRequestParser.parseRequestParameters(adPoolRequest, sasParams, casInternalRequestParameters, dst);
             }
             catch (TException ex) {
@@ -104,7 +106,8 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
                 InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
             }
             requestParser.parseRequestParameters(jsonObject, sasParams, casInternalRequestParameters);
-        } else if (request.getMethod() == HttpMethod.GET && null != dst && params.containsKey("adPoolRequest")) {
+        }
+        else if (request.getMethod() == HttpMethod.GET && null != dst && params.containsKey("adPoolRequest")) {
 
             String rawContent = null;
             if (!params.isEmpty()) {
@@ -124,8 +127,10 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
                 TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
                 try {
                     tDeserializer.deserialize(adPoolRequest, decodedContent);
-                    thriftRequestParser.parseRequestParameters(adPoolRequest, sasParams, casInternalRequestParameters, dst);
-                } catch (TException ex) {
+                    thriftRequestParser.parseRequestParameters(adPoolRequest, sasParams, casInternalRequestParameters,
+                            dst);
+                }
+                catch (TException ex) {
                     terminationReason = ServletHandler.thriftParsingError;
                     LOG.error(traceMarker, "Error in de serializing thrift ", ex);
                     InspectorStats.incrementStatCount(InspectorStrings.thriftParsingError, InspectorStrings.count);
@@ -134,6 +139,7 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
         }
         out.add(new RequestParameterHolder(sasParams, casInternalRequestParameters, request.getUri(),
                 terminationReason, request));
+        request.retain();
     }
 
 }
