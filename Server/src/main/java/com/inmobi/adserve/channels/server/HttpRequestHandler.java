@@ -7,8 +7,6 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.handler.timeout.ReadTimeoutException;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.channels.ClosedChannelException;
@@ -152,13 +150,7 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
             responseSender.sendNoAdResponse(ctx.channel());
             String exceptionClass = exception.getClass().getSimpleName();
             InspectorStats.incrementStatCount(exceptionClass, InspectorStrings.count);
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            exception.printStackTrace(pw);
-            LOG.info(traceMarker, "stack trace is {}", sw);
-            if (LOG.isDebugEnabled()) {
-                sendMail(exception.getMessage(), sw.toString());
-            }
+            LOG.info(traceMarker, "stack trace is {}", exception);
         }
         finally {
             requestParameterHolder.getHttpRequest().release();
