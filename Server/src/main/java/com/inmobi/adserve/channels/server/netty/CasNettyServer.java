@@ -49,6 +49,7 @@ public class CasNettyServer {
         // initialize and start server
         serverBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
                 .localAddress(new InetSocketAddress(8800)).childHandler(serverChannelInitializer)
+                .option(ChannelOption.SO_BACKLOG, 128)
                 // disable nagle's algorithm
                 .childOption(ChannelOption.TCP_NODELAY, true)
                 // allow binding channel on same ip, port
@@ -58,8 +59,8 @@ public class CasNettyServer {
         // initialize and start stat server
         statServerBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
                 .localAddress(new InetSocketAddress(8801)).childHandler(statServerChannelInitializer)
-                .childOption(ChannelOption.SO_REUSEADDR, true).childOption(ChannelOption.ALLOCATOR, allocator).bind()
-                .sync();
+                .option(ChannelOption.SO_BACKLOG, 128).childOption(ChannelOption.SO_REUSEADDR, true)
+                .childOption(ChannelOption.ALLOCATOR, allocator).bind().sync();
 
     }
 

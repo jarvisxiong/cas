@@ -88,6 +88,7 @@ public class CasTimeoutHandler extends ChannelDuplexHandler {
     }
 
     private void readTimedOut(final ChannelHandlerContext ctx) {
+        flag = false;
         ctx.fireExceptionCaught(ReadTimeoutException.INSTANCE);
     }
 
