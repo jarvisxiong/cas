@@ -48,7 +48,9 @@ public class ThriftRequestParser {
         //Fill params from integration details object
         if (tObject.isSetIntegrationDetails()) {
             params.setRqIframe(tObject.integrationDetails.iFrameId);
-            params.setAdcode(tObject.integrationDetails.adCodeType.toString());
+            if (tObject.integrationDetails.isSetAdCodeType()) {
+                params.setAdcode(tObject.integrationDetails.adCodeType.toString());
+            }
             params.setSdkVersion(getSdkVersion(tObject.integrationDetails.integrationType, tObject.integrationDetails.integrationVersion));
             //TODO Wait for the final contract from Devashish
             params.setAdcode(getAdCode(tObject.integrationDetails.integrationType));
