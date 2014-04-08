@@ -122,7 +122,7 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {} and response length is {}", response, response.length());
-        if (null == response || status.code() != 200 || response.trim().isEmpty()) {
+        if (status.code() != 200 || response.trim().isEmpty()) {
             statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;

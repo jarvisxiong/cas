@@ -237,30 +237,26 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         List<String> seatList = new ArrayList<String>();
         seatList.add(advertiserId);
         bidRequest.setWseat(seatList);
-        if (casInternalRequestParameters != null) {
-            LOG.debug("blockedCategories are {}", casInternalRequestParameters.blockedCategories);
-            LOG.debug("blockedAdvertisers are {}", casInternalRequestParameters.blockedAdvertisers);
-            bidRequest.setBcat(new ArrayList<String>());
-            if (null != casInternalRequestParameters.blockedCategories) {
-                bidRequest.setBcat(iabCategoriesInterface
-                        .getIABCategories(casInternalRequestParameters.blockedCategories));
-            }
-            // Setting blocked categories
-            if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
-                bidRequest.getBcat().addAll(
-                        iabCategoriesInterface.getIABCategories(IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES));
-            }
-            else {
-                bidRequest.getBcat().addAll(
-                        iabCategoriesInterface.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES));
-            }
 
-            if (null != casInternalRequestParameters.blockedAdvertisers) {
-                bidRequest.setBadv(casInternalRequestParameters.blockedAdvertisers);
-            }
+        LOG.debug("blockedCategories are {}", casInternalRequestParameters.blockedCategories);
+        LOG.debug("blockedAdvertisers are {}", casInternalRequestParameters.blockedAdvertisers);
+
+        bidRequest.setBcat(new ArrayList<String>());
+        if (null != casInternalRequestParameters.blockedCategories) {
+            bidRequest.setBcat(iabCategoriesInterface.getIABCategories(casInternalRequestParameters.blockedCategories));
+        }
+        // Setting blocked categories
+        if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
+            bidRequest.getBcat().addAll(
+                    iabCategoriesInterface.getIABCategories(IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES));
         }
         else {
-            LOG.debug("casInternalRequestParameters is null, so not setting blocked advertisers and categories");
+            bidRequest.getBcat().addAll(
+                    iabCategoriesInterface.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES));
+        }
+
+        if (null != casInternalRequestParameters.blockedAdvertisers) {
+            bidRequest.setBadv(casInternalRequestParameters.blockedAdvertisers);
         }
 
         if (site != null) {
@@ -313,10 +309,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         else {
             impression.setInstl(0);
         }
-        if (casInternalRequestParameters != null) {
-            impression.setBidfloor(casInternalRequestParameters.rtbBidFloor);
-            LOG.debug("Bid floor is {}", impression.getBidfloor());
-        }
+        impression.setBidfloor(casInternalRequestParameters.rtbBidFloor);
+        LOG.debug("Bid floor is {}", impression.getBidfloor());
         if (null != displayManager) {
             impression.setDisplaymanager(displayManager);
         }
@@ -329,9 +323,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private Banner createBannerObject() {
         Banner banner = new Banner();
         banner.setId(casInternalRequestParameters.impressionId);
-        if (null != sasParams.getSlot()
-                && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
-            Dimension dim = SlotSizeMapping.getDimension((long)sasParams.getSlot());
+        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             banner.setW((int) dim.getWidth());
             banner.setH((int) dim.getHeight());
         }
@@ -515,6 +508,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         catch (URISyntaxException e) {
             LOG.debug("error in creating uri for callback");
+            throw new RuntimeException(e);
         }
 
         StringBuilder content = new StringBuilder();

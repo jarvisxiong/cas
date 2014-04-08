@@ -1,5 +1,18 @@
 package com.inmobi.adserve.channels.repository;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.phoenix.batteries.data.AbstractStatsMaintainingDBRepository;
 import com.inmobi.phoenix.batteries.data.DBEntity;
@@ -10,19 +23,13 @@ import com.inmobi.phoenix.batteries.data.rdbmsrow.ResultSetRow;
 import com.inmobi.phoenix.data.RepositoryManager;
 import com.inmobi.phoenix.data.RepositoryQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.sql.Timestamp;
-import java.util.*;
 
 
 public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBRepository<ChannelSegmentEntity, String>
         implements RepositoryManager {
 
     @Override
-    public DBEntity<ChannelSegmentEntity, String> buildObjectFromRow(ResultSetRow resultSetRow)
+    public DBEntity<ChannelSegmentEntity, String> buildObjectFromRow(final ResultSetRow resultSetRow)
             throws RepositoryException {
         NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
         String adgroupId = row.getString("adgroup_id");
@@ -77,7 +84,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
             else {
                 categoryTaxomony = new Long[catTax.length];
                 for (int i = 0; i < catTax.length; i++) {
-                    categoryTaxomony[i] = new Long(catTax[i]);
+                    categoryTaxomony[i] = Long.valueOf(catTax[i]);
                 }
             }
             String sIEJson = row.getString("sie_json");
@@ -150,18 +157,13 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
             return new DBEntity<ChannelSegmentEntity, String>(entity, modifyTime);
         }
         catch (Exception e) {
-            if (e instanceof RepositoryException) {
-                RepositoryException r = new RepositoryException(e.getMessage());
-                r.setStackTrace(e.getStackTrace());
-                throw r;
-            }
             logger.error("Error in resultset row", e);
             return new DBEntity<ChannelSegmentEntity, String>(new EntityError<String>(adgroupId,
                     "ERROR_IN_EXTRACTING_SEGMENT"), modifyTime);
         }
     }
 
-    JSONObject getJSONFromString(String additionalParams) {
+    JSONObject getJSONFromString(final String additionalParams) {
         if (additionalParams != null) {
             try {
                 return new JSONObject(additionalParams);
@@ -174,7 +176,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
     }
 
     // Made protected for testing visibility.
-    ArrayList<Integer> parseOsIds(String osVersionTargeting) {
+    ArrayList<Integer> parseOsIds(final String osVersionTargeting) {
         ArrayList<Integer> osIds = null;
         try {
             if (osVersionTargeting != null) {
@@ -192,7 +194,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
     }
 
     // Made protected for testing visibility.
-    public ArrayList<Integer> parseManufacturingIds(String manufModelTargeting) {
+    public ArrayList<Integer> parseManufacturingIds(final String manufModelTargeting) {
         ArrayList<Integer> modelIds = null;
         try {
             if (manufModelTargeting != null) {
@@ -212,7 +214,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
         return modelIds;
     }
 
-    boolean getMode(String sIEJson) {
+    boolean getMode(final String sIEJson) {
         boolean mode = false;
         if (sIEJson != null) {
             try {
@@ -226,7 +228,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
         return mode;
     }
 
-    Set<String> getSites(String sIEJson) {
+    Set<String> getSites(final String sIEJson) {
         Set<String> sitesIE = new HashSet<String>();
         if (sIEJson != null) {
             try {
@@ -244,7 +246,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
     }
 
     @Override
-    public boolean isObjectToBeDeleted(ChannelSegmentEntity entity) {
+    public boolean isObjectToBeDeleted(final ChannelSegmentEntity entity) {
         List<String> matchingKeys;
         try {
             ChannelSegmentEntity oldEntity = query(entity.getId());
@@ -268,17 +270,17 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
     }
 
     @Override
-    public HashIndexKeyBuilder<ChannelSegmentEntity> getHashIndexKeyBuilder(String arg0) {
+    public HashIndexKeyBuilder<ChannelSegmentEntity> getHashIndexKeyBuilder(final String arg0) {
         return null;
     }
 
     @Override
-    public ChannelSegmentEntity queryUniqueResult(RepositoryQuery arg0) throws RepositoryException {
+    public ChannelSegmentEntity queryUniqueResult(final RepositoryQuery arg0) throws RepositoryException {
         return null;
     }
 
-    public Collection<ChannelSegmentEntity> getEntities(long slotId, long category, long country,
-            Integer targetingPlatform, Integer siteRating, Integer osId) {
+    public Collection<ChannelSegmentEntity> getEntities(final long slotId, final long category, final long country,
+            final Integer targetingPlatform, final Integer siteRating, final Integer osId) {
         return ChannelSegmentMatchingCache.getEntities(slotId, category, country, targetingPlatform, siteRating, osId);
     }
 

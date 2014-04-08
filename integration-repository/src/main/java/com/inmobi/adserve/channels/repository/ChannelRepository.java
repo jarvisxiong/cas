@@ -1,5 +1,13 @@
 package com.inmobi.adserve.channels.repository;
 
+import java.sql.Timestamp;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.phoenix.batteries.data.AbstractStatsMaintainingDBRepository;
 import com.inmobi.phoenix.batteries.data.DBEntity;
@@ -10,20 +18,13 @@ import com.inmobi.phoenix.batteries.data.rdbmsrow.ResultSetRow;
 import com.inmobi.phoenix.data.RepositoryManager;
 import com.inmobi.phoenix.data.RepositoryQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.sql.Timestamp;
-import java.util.HashSet;
-import java.util.Set;
 
 
 public class ChannelRepository extends AbstractStatsMaintainingDBRepository<ChannelEntity, String> implements
         RepositoryManager {
 
     @Override
-    public DBEntity<ChannelEntity, String> buildObjectFromRow(ResultSetRow resultSetRow) throws RepositoryException {
+    public DBEntity<ChannelEntity, String> buildObjectFromRow(final ResultSetRow resultSetRow) {
         NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
         Timestamp modifiedOn = row.getTimestamp("modified_on");
         String id = row.getString("id");
@@ -75,18 +76,13 @@ public class ChannelRepository extends AbstractStatsMaintainingDBRepository<Chan
             return new DBEntity<ChannelEntity, String>(entity, modifiedOn);
         }
         catch (Exception e) {
-            if (e instanceof RepositoryException) {
-                RepositoryException r = new RepositoryException(e.getMessage());
-                r.setStackTrace(e.getStackTrace());
-                throw r;
-            }
             logger.error("Error in resultset row", e);
             return new DBEntity<ChannelEntity, String>(new EntityError<String>(id, "ERROR_IN_EXTRACTING_CHANNEL"),
                     modifiedOn);
         }
     }
 
-    private boolean getMode(String sIEJson) {
+    private boolean getMode(final String sIEJson) {
         boolean mode = false;
         if (sIEJson != null) {
             try {
@@ -100,7 +96,7 @@ public class ChannelRepository extends AbstractStatsMaintainingDBRepository<Chan
         return mode;
     }
 
-    private Set<String> getSites(String sIEJson) {
+    private Set<String> getSites(final String sIEJson) {
         Set<String> sitesIE = new HashSet<String>();
         if (sIEJson != null) {
             try {
@@ -118,7 +114,7 @@ public class ChannelRepository extends AbstractStatsMaintainingDBRepository<Chan
     }
 
     @Override
-    public boolean isObjectToBeDeleted(ChannelEntity entity) {
+    public boolean isObjectToBeDeleted(final ChannelEntity entity) {
         if (entity.getId() == null) {
             return true;
         }
@@ -126,13 +122,13 @@ public class ChannelRepository extends AbstractStatsMaintainingDBRepository<Chan
     }
 
     @Override
-    public HashIndexKeyBuilder<ChannelEntity> getHashIndexKeyBuilder(String className) {
+    public HashIndexKeyBuilder<ChannelEntity> getHashIndexKeyBuilder(final String className) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public ChannelEntity queryUniqueResult(RepositoryQuery q) throws RepositoryException {
+    public ChannelEntity queryUniqueResult(final RepositoryQuery q) throws RepositoryException {
         // TODO Auto-generated method stub
         return null;
     }

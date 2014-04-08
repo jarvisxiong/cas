@@ -35,51 +35,50 @@ import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 
-    private static final Logger           LOG           = LoggerFactory.getLogger(DCPPlaceIQAdnetwork.class);
+    private static final Logger         LOG           = LoggerFactory.getLogger(DCPPlaceIQAdnetwork.class);
 
-    private transient String              latitude;
-    private transient String              longitude;
-    private int                           width;
-    private int                           height;
-    private String                        os            = null;
-    private static final String           sizeFormat    = "%dx%d";
+    private transient String            latitude;
+    private transient String            longitude;
+    private int                         width;
+    private int                         height;
+    private String                      os            = null;
+    private static final String         sizeFormat    = "%dx%d";
 
-    private static final String           LAT           = "LT";
-    private static final String           LONG          = "LG";
-    private static final String           RESPONSE_TYPE = "ST";
-    private static final String           REQUEST_TYPE  = "RT";
-    private static final String           SIZE          = "SZ";
-    private static final String           ANDROIDMD5    = "AM";
-    private static final String           ANDROIDIDSHA1 = "AH";
-    private static final String           IDFA          = "IA";
-    private static final String           UA            = "UA";
-    private static final String           CLIENT_IP     = "IP";
-    private static final String           PT            = "PT";
-    private static final String           ADUNIT        = "AU";
-    private static final String           OS            = "DO";
-    private static final String           APPID         = "AP";
-    private static final String           SITEID        = "SI";
+    private static final String         LAT           = "LT";
+    private static final String         LONG          = "LG";
+    private static final String         RESPONSE_TYPE = "ST";
+    private static final String         REQUEST_TYPE  = "RT";
+    private static final String         SIZE          = "SZ";
+    private static final String         ANDROIDMD5    = "AM";
+    private static final String         ANDROIDIDSHA1 = "AH";
+    private static final String         IDFA          = "IA";
+    private static final String         UA            = "UA";
+    private static final String         CLIENT_IP     = "IP";
+    private static final String         PT            = "PT";
+    private static final String         ADUNIT        = "AU";
+    private static final String         OS            = "DO";
+    private static final String         APPID         = "AP";
+    private static final String         SITEID        = "SI";
     // private static final String ZIP = "ZP";
-    private static final String           COUNTRY       = "CO";
+    private static final String         COUNTRY       = "CO";
     // private static final String SECRET = "SK";
-    private static final String           ADTYPE        = "AT";
-    private static final String           APPTYPE       = "STG,RMG,MRD";
-    private static final String           WAPTYPE       = "STG,STW,RMG,MRD";
-    private static final String           ANDROID       = "Android";
-    private static final String           IOS           = "iOS";
-    private static final String           auIdFormat    = "%s/%s/%s/%s";
-    private static final String           XMLFORMAT     = "xml";
+    private static final String         ADTYPE        = "AT";
+    private static final String         APPTYPE       = "STG,RMG,MRD";
+    private static final String         WAPTYPE       = "STG,STW,RMG,MRD";
+    private static final String         ANDROID       = "Android";
+    private static final String         IOS           = "iOS";
+    private static final String         auIdFormat    = "%s/%s/%s/%s";
+    private static final String         XMLFORMAT     = "xml";
 
-    private final String                  partnerId;
-    private final String                  requestFormat;
-    private final String                  responseFormat;
-    private static Map<Integer, String>   categoryList  = new HashMap<Integer, String>();
+    private final String                partnerId;
+    private final String                requestFormat;
+    private final String                responseFormat;
+    private static Map<Integer, String> categoryList  = new HashMap<Integer, String>();
 
-    private static DocumentBuilderFactory factory;
-    private static DocumentBuilder        builder;
+    private static DocumentBuilder      builder;
 
-    private boolean                       isApp;
-    private boolean                       isGeoOrDeviceIdPresent;
+    private boolean                     isApp;
+    private boolean                     isGeoOrDeviceIdPresent;
 
     static {
 
@@ -108,6 +107,12 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
         categoryList.put(72, "tr");
         categoryList.put(71, "tl");
         categoryList.put(74, "wt");
+        try {
+            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        }
+        catch (ParserConfigurationException e) {
+            LOG.error("XML Parser Builder initialization failed");
+        }
     }
 
     public DCPPlaceIQAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
@@ -117,13 +122,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
         host = config.getString("placeiq.host");
         requestFormat = config.getString("placeiq.requestFormat");
         responseFormat = config.getString("placeiq.responseFormat");
-        factory = DocumentBuilderFactory.newInstance();
-        try {
-            builder = factory.newDocumentBuilder();
-        }
-        catch (ParserConfigurationException e) {
-            LOG.error("XML Parser Builder initialization failed");
-        }
+
     }
 
     @Override
@@ -141,7 +140,6 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             longitude = latlong[1];
             isGeoOrDeviceIdPresent = true;
         }
-
 
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
 

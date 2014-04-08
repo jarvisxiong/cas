@@ -62,8 +62,16 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String   apiVersion   = "2.0";
     private static final String   requestType  = "api";
 
-    private static JAXBContext    jaxbContext;
     private static Unmarshaller   jaxbUnmarshaller;
+
+    static {
+        try {
+            jaxbUnmarshaller = JAXBContext.newInstance(Request.class).createUnmarshaller();
+        }
+        catch (JAXBException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * @param config
@@ -74,13 +82,6 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
     public DCPMobFoxAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         super(config, clientBootstrap, baseRequestHandler, serverChannel);
-        try {
-            jaxbContext = JAXBContext.newInstance(Request.class);
-            jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-        }
-        catch (JAXBException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.repository;
 
+import java.sql.Timestamp;
+
 import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
 import com.inmobi.phoenix.batteries.data.AbstractStatsMaintainingDBRepository;
 import com.inmobi.phoenix.batteries.data.DBEntity;
@@ -11,14 +13,12 @@ import com.inmobi.phoenix.data.RepositoryManager;
 import com.inmobi.phoenix.data.RepositoryQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
 
-import java.sql.Timestamp;
-
 
 public class ChannelFeedbackRepository extends AbstractStatsMaintainingDBRepository<ChannelFeedbackEntity, String>
         implements RepositoryManager {
 
     @Override
-    public DBEntity<ChannelFeedbackEntity, String> buildObjectFromRow(ResultSetRow resultSetRow)
+    public DBEntity<ChannelFeedbackEntity, String> buildObjectFromRow(final ResultSetRow resultSetRow)
             throws RepositoryException {
         NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
         logger.debug("result set is not null");
@@ -49,11 +49,6 @@ public class ChannelFeedbackRepository extends AbstractStatsMaintainingDBReposit
             return new DBEntity<ChannelFeedbackEntity, String>(entity, modifiedOn);
         }
         catch (Exception e) {
-            if (e instanceof RepositoryException) {
-                RepositoryException r = new RepositoryException(e.getMessage());
-                r.setStackTrace(e.getStackTrace());
-                throw r;
-            }
             logger.error("Error in resultset row", e);
             return new DBEntity<ChannelFeedbackEntity, String>(new EntityError<String>(advertiserId,
                     "ERROR_IN_EXTRACTING_CHANNEL"), modifiedOn);
@@ -61,7 +56,7 @@ public class ChannelFeedbackRepository extends AbstractStatsMaintainingDBReposit
     }
 
     @Override
-    public boolean isObjectToBeDeleted(ChannelFeedbackEntity entity) {
+    public boolean isObjectToBeDeleted(final ChannelFeedbackEntity entity) {
         if (entity.getAdvertiserId() == null) {
             return true;
         }
@@ -69,12 +64,12 @@ public class ChannelFeedbackRepository extends AbstractStatsMaintainingDBReposit
     }
 
     @Override
-    public HashIndexKeyBuilder<ChannelFeedbackEntity> getHashIndexKeyBuilder(String className) {
+    public HashIndexKeyBuilder<ChannelFeedbackEntity> getHashIndexKeyBuilder(final String className) {
         return null;
     }
 
     @Override
-    public ChannelFeedbackEntity queryUniqueResult(RepositoryQuery q) throws RepositoryException {
+    public ChannelFeedbackEntity queryUniqueResult(final RepositoryQuery q) throws RepositoryException {
         return null;
     }
 

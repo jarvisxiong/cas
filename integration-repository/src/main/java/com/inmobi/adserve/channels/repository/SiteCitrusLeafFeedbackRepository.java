@@ -34,7 +34,7 @@ import com.inmobi.casthrift.SiteFeedback;
 
 public class SiteCitrusLeafFeedbackRepository {
 
-    private static CitrusleafClient                                   citrusleafClient;
+    private CitrusleafClient                                          citrusleafClient;
     private String                                                    namespace;
     private String                                                    set;
     private DataCenter                                                colo;
@@ -52,8 +52,7 @@ public class SiteCitrusLeafFeedbackRepository {
     public void init(final Configuration config, final DataCenter colo) {
         this.namespace = config.getString("namespace");
         this.set = config.getString("set");
-        SiteCitrusLeafFeedbackRepository.citrusleafClient = new CitrusleafClient(config.getString("host"),
-                config.getInt("port"));
+        this.citrusleafClient = new CitrusleafClient(config.getString("host"), config.getInt("port"));
         this.siteSegmentFeedbackCache = new ConcurrentHashMap<String, SiteFeedbackEntity>();
         this.currentlyUpdatingSites = new ConcurrentHashMap<String, Boolean>();
         this.refreshTime = config.getInt("refreshTime");

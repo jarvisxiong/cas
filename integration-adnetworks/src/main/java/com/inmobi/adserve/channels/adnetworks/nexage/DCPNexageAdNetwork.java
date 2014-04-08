@@ -185,8 +185,8 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
     // parse the response received from nexage
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
-        LOG.debug("response is {} and response length is ", response, response.length());
-        if (null == response || status.code() != 200 || response.trim().isEmpty()) {
+        LOG.debug("response is {} and response length is {}", response, response.length());
+        if (status.code() != 200 || response.trim().isEmpty()) {
             statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;

@@ -87,12 +87,14 @@ public class RequestParser {
         params.setCountryCode(parseArray(jObject, "carrier", 2));
         try {
             params.setCity(Integer.parseInt(parseArray(jObject, "carrier", 3)));
-        } catch (NumberFormatException e) {
+        }
+        catch (NumberFormatException e) {
             LOG.error(traceMarker, "City not found in request");
         }
         try {
             params.setState(Integer.parseInt(parseArray(jObject, "carrier", 4)));
-        } catch (NumberFormatException e) {
+        }
+        catch (NumberFormatException e) {
             LOG.error(traceMarker, "State not found in request");
         }
         String slot = stringify(jObject, "slot-served");
@@ -214,9 +216,9 @@ public class RequestParser {
         Marker traceMarker = traceMarkerProvider.get();
 
         try {
-            JSONArray segments = jObject.getJSONArray("segments");
+            JSONArray segments = jObject.optJSONArray("segments");
             HashSet<Integer> accountSegments = new HashSet<Integer>();
-            for (int index = 0; index < segments.length(); index++) {
+            for (int index = 0; segments != null && index < segments.length(); index++) {
                 accountSegments.add(segments.getInt(index));
             }
             return accountSegments;

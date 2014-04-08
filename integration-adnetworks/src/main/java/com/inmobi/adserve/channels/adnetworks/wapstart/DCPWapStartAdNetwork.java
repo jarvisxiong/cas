@@ -39,31 +39,30 @@ import com.ning.http.client.RequestBuilder;
 
 
 public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
-    private static final Logger           LOG           = LoggerFactory.getLogger(DCPWapStartAdNetwork.class);
+    private static final Logger          LOG           = LoggerFactory.getLogger(DCPWapStartAdNetwork.class);
 
-    private String                        latitude      = null;
-    private String                        longitude     = null;
-    private int                           width;
-    private int                           height;
-    private static IABCountriesInterface  iABCountries;
-    private static DocumentBuilderFactory factory;
-    private static DocumentBuilder        builder;
-    private static final String           latlongFormat = "%s,%s";
+    private String                       latitude      = null;
+    private String                       longitude     = null;
+    private int                          width;
+    private int                          height;
+    private static IABCountriesInterface iABCountries;
+    private static DocumentBuilder       builder;
+    private static final String          latlongFormat = "%s,%s";
 
     static {
         iABCountries = new IABCountriesMap();
+        try {
+            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        }
+        catch (ParserConfigurationException e) {
+            LOG.error("XML Parser Builder initialization failed");
+        }
     }
 
     public DCPWapStartAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         super(config, clientBootstrap, baseRequestHandler, serverChannel);
-        factory = DocumentBuilderFactory.newInstance();
-        try {
-            builder = factory.newDocumentBuilder();
-        }
-        catch (ParserConfigurationException e) {
-            LOG.error("XML Parser Builder initialization failed");
-        }
+
     }
 
     @Override
