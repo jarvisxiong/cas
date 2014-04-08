@@ -6,14 +6,9 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.awt.Dimension;
-import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -73,7 +68,6 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String         latLongFormat    = "%s,%s";
     private final String                publisherId;
 
-    private static Unmarshaller         jaxbUnmarshaller;
     private static Map<Integer, String> slotIdMap;
 
     static {
@@ -89,13 +83,6 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         slotIdMap.put(15, "mma");
         slotIdMap.put(16, "full_768x1024");
         slotIdMap.put(17, "full_800x1280");
-        try {
-            jaxbUnmarshaller = JAXBContext.newInstance(Response.class).createUnmarshaller();
-        }
-        catch (JAXBException e) {
-            LOG.error("error creating unmarshaller for DCPSmaatoAdnetwork {}", e);
-        }
-
     }
 
     public DCPSmaatoAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
@@ -236,8 +223,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
             statusCode = status.code();
             VelocityContext context = new VelocityContext();
             try {
-                Response smaatoResponse = (Response) jaxbUnmarshaller.unmarshal(new ByteArrayInputStream(response
-                        .getBytes()));
+                Response smaatoResponse = jaxbHelper.unmarshal(response, Response.class);
 
                 if (!SUCCESS.equalsIgnoreCase(smaatoResponse.getStatus()) || smaatoResponse.getAds().getAd() == null) {
                     adStatus = "NO_AD";

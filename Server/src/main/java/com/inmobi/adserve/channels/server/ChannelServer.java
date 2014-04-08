@@ -13,11 +13,12 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.dbcp.ConnectionFactory;
-import org.apache.commons.dbcp.DriverManagerConnectionFactory;
-import org.apache.commons.dbcp.PoolableConnectionFactory;
-import org.apache.commons.dbcp.PoolingDataSource;
-import org.apache.commons.pool.impl.GenericObjectPool;
+import org.apache.commons.dbcp2.ConnectionFactory;
+import org.apache.commons.dbcp2.DriverManagerConnectionFactory;
+import org.apache.commons.dbcp2.PoolableConnection;
+import org.apache.commons.dbcp2.PoolableConnectionFactory;
+import org.apache.commons.dbcp2.PoolingDataSource;
+import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -230,25 +231,26 @@ public class ChannelServer {
 
             String validationQuery = databaseConfig.getString("validationQuery");
             int maxActive = databaseConfig.getInt("maxActive", 20);
-            int maxIdle = databaseConfig.getInt("maxIdle", 1);
-            int maxWait = databaseConfig.getInt("maxWait", -1);
-            boolean testWhileIdle = databaseConfig.getBoolean("testWhileIdle", true);
+            int maxIdle = databaseConfig.getInt("maxActive", 20);
+            int maxWait = 60 * 1000; // time in millis - 60 seconds
             boolean testOnBorrow = databaseConfig.getBoolean("testOnBorrow", true);
-            final GenericObjectPool connectionPool = new GenericObjectPool(null);
-            connectionPool.setMaxActive(maxActive);
+            GenericObjectPool<PoolableConnection> connectionPool = new GenericObjectPool<>(null);
+            connectionPool.setMaxTotal(maxActive);
             connectionPool.setMaxIdle(maxIdle);
-            connectionPool.setMaxWait(maxWait);
-            connectionPool.setTestWhileIdle(testWhileIdle);
+            connectionPool.setMaxWaitMillis(maxWait);
             connectionPool.setTestOnBorrow(testOnBorrow);
             String connectUri = "jdbc:postgresql://" + databaseConfig.getString("host") + ":"
                     + databaseConfig.getInt("port") + "/"
                     + databaseConfig.getString(ChannelServerStringLiterals.DATABASE) + "?socketTimeout="
                     + databaseConfig.getString("socketTimeout");
-            final ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectUri, props);
-            PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(connectionFactory,
-                    connectionPool, null, validationQuery, true, false);
+            ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectUri, props);
+            PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(connectionFactory, null);
+            poolableConnectionFactory.setPool(connectionPool);
+            poolableConnectionFactory.setValidationQuery(validationQuery);
+            poolableConnectionFactory.setDefaultReadOnly(true);
+            poolableConnectionFactory.setDefaultAutoCommit(false);
 
-            final PoolingDataSource ds = new PoolingDataSource(poolableConnectionFactory.getPool());
+            PoolingDataSource<PoolableConnection> ds = new PoolingDataSource<>(connectionPool);
 
             initialContext.bind("java:comp/env/jdbc", ds);
 

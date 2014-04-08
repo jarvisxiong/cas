@@ -5,6 +5,7 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.awt.Dimension;
+import java.io.StringReader;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -274,7 +275,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
                         responseContent = "";
                         return;
                     }
-                    Document doc = builder.parse(new InputSource(new java.io.StringReader(response)));
+                    Document doc = builder.parse(new InputSource(new StringReader(response)));
                     doc.getDocumentElement().normalize();
                     NodeList reportNodes = doc.getElementsByTagName("PLACEIQ");
                     Node rootNode = reportNodes.item(0);

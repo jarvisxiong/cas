@@ -5,12 +5,8 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.awt.Dimension;
-import java.io.ByteArrayInputStream;
 import java.net.URI;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -61,17 +57,6 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String   mraidType    = "1";
     private static final String   apiVersion   = "2.0";
     private static final String   requestType  = "api";
-
-    private static Unmarshaller   jaxbUnmarshaller;
-
-    static {
-        try {
-            jaxbUnmarshaller = JAXBContext.newInstance(Request.class).createUnmarshaller();
-        }
-        catch (JAXBException e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * @param config
@@ -181,7 +166,7 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
             statusCode = status.code();
             VelocityContext context = new VelocityContext();
             try {
-                Request request = (Request) jaxbUnmarshaller.unmarshal(new ByteArrayInputStream(response.getBytes()));
+                Request request = jaxbHelper.unmarshal(response, Request.class);
                 String htmlContent = request.getHtmlString();
                 if (StringUtils.isBlank(htmlContent)) {
                     adStatus = "NO_AD";
