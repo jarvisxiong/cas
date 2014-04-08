@@ -73,7 +73,6 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String         latLongFormat    = "%s,%s";
     private final String                publisherId;
 
-    private static JAXBContext          jaxbContext;
     private static Unmarshaller         jaxbUnmarshaller;
     private static Map<Integer, String> slotIdMap;
 
@@ -90,6 +89,12 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         slotIdMap.put(15, "mma");
         slotIdMap.put(16, "full_768x1024");
         slotIdMap.put(17, "full_800x1280");
+        try {
+            jaxbUnmarshaller = JAXBContext.newInstance(Response.class).createUnmarshaller();
+        }
+        catch (JAXBException e) {
+            LOG.error("error creating unmarshaller for DCPSmaatoAdnetwork {}", e);
+        }
 
     }
 
@@ -98,13 +103,6 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         super(config, clientBootstrap, baseRequestHandler, serverChannel);
 
         publisherId = config.getString("smaato.pubId");
-        try {
-            jaxbContext = JAXBContext.newInstance(Response.class);
-            jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-        }
-        catch (JAXBException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
