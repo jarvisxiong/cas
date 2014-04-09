@@ -34,12 +34,16 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
     private int                 width;
     private int                 height;
     private String              portalKeyword;
+    private String              adUnit;
     private static final String IPHONE_KEYWORD     = "iphn";
     private static final String ANDROID_KEYWORD    = "anap";
     private static final String WAP_KEYWORD        = "ptnr";
     private static final String WAP                = "wap";
     private static final String DERIVED_LAT_LONG   = "derived-lat-lon";
     private static final String TRUE_LAT_LONG_ONLY = "trueLatLongOnly";
+    private static final String MMA				   = "mma";
+    private static final String BANNER			   = "banner";
+    private static final String INTER			   = "inter";
     private boolean             sendTrueLatLongOnly;
 
     public DCPVerveAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
@@ -86,10 +90,17 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
                 && StringUtils.isNotBlank(sasParams.getLocSrc())) { // request has true lat-long
             return false;
         }
+        adUnit = MMA;
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
             Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
+            if(sasParams.getSlot() == 11){
+            	adUnit = BANNER;
+            }
+            else if(sasParams.getSlot() == 10 || sasParams.getSlot() == 14){
+            	adUnit = INTER;
+            }
         }
 
         if (WAP.equalsIgnoreCase(sasParams.getSource())) {
@@ -111,6 +122,8 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
             LOG.info("Configure parameters inside verve returned false");
             return false;
         }
+        
+        
 
         LOG.info("Configure parameters inside verve returned true");
         return true;
@@ -181,7 +194,8 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
             url.append("&c=97");// get category map
 
             if (width != 0 && height != 0) {
-                url.append("&adunit=").append(width).append('x').append(height);
+                url.append("&size=").append(width).append('x').append(height);
+                url.append("&adunit=").append(adUnit);
             }
 
             LOG.debug("Verve url is {}", url);

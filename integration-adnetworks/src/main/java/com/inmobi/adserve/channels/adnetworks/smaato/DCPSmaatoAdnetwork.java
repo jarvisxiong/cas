@@ -90,14 +90,6 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         slotIdMap.put(15, "mma");
         slotIdMap.put(16, "full_768x1024");
         slotIdMap.put(17, "full_800x1280");
-
-    }
-
-    public DCPSmaatoAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
-        super(config, clientBootstrap, baseRequestHandler, serverChannel);
-
-        publisherId = config.getString("smaato.pubId");
         try {
             jaxbContext = JAXBContext.newInstance(Response.class);
             jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -105,6 +97,14 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         catch (JAXBException e) {
             e.printStackTrace();
         }
+
+    }
+
+    public DCPSmaatoAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
+        publisherId = config.getString("smaato.pubId");
+        
     }
 
     @Override
