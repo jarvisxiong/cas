@@ -62,7 +62,7 @@ public class ThriftRequestParser {
             params.setSiteId(tObject.site.siteId);
             params.setSource(tObject.site.isSetInventoryType() && tObject.site.inventoryType == InventoryType.APP ? "APP" : "WAP");
             params.setSiteType(tObject.site.isSetContentRating() ? tObject.site.contentRating.toString() : "FAMILY_SAFE");
-            params.setCategories(convertIntToLong(tObject.site.siteTags));
+            params.setCategories(convertIntToLong(tObject.site.siteTaxonomies));
             double ecpmFloor = Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor);
             params.setSiteFloor(ecpmFloor);
             params.setSiteIncId(tObject.site.siteIncId);
