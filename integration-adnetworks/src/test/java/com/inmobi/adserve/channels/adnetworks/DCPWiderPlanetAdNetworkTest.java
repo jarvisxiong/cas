@@ -1,26 +1,20 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import com.inmobi.adserve.channels.adnetworks.widerplanet.DCPWiderPlanetAdnetwork;
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import junit.framework.TestCase;
+import org.apache.commons.configuration.Configuration;
+import org.testng.annotations.Test;
 
 import java.io.File;
 import java.util.ArrayList;
 
-import junit.framework.TestCase;
-
-import org.apache.commons.configuration.Configuration;
-import org.testng.annotations.Test;
-
-import com.inmobi.adserve.channels.adnetworks.widerplanet.DCPWiderPlanetAdnetwork;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 
 public class DCPWiderPlanetAdNetworkTest extends TestCase {
@@ -64,7 +58,7 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setUidParams("{\"imuc__5\":\"90c8fdb9-f109-4d1c-a791-830ff869f358\"}");
+        casInternalRequestParameters.uuidFromUidCookie = "90c8fdb9-f109-4d1c-a791-830ff869f358";
         sasParams.setSource("WAP");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
