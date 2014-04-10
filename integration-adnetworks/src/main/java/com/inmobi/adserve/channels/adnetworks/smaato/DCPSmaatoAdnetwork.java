@@ -10,8 +10,6 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.bind.JAXBContext;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
@@ -72,8 +70,6 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     private final String                publisherId;
 
     private static Map<Integer, String> slotIdMap;
-
-    private static JAXBContext          jaxbContext;
 
     static {
         slotIdMap = new HashMap<Integer, String>();

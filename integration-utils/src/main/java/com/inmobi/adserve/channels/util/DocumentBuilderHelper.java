@@ -56,20 +56,24 @@ public class DocumentBuilderHelper {
 
     }
 
+    /**
+     * parses the xml and returns the Document
+     * 
+     * @param data
+     * @return
+     * @throws Exception
+     */
     public Document parse(final String data) throws Exception {
 
-        DocumentBuilder obj = documentBuilderPool.borrowObject();
+        DocumentBuilder documentBuilder = documentBuilderPool.borrowObject();
 
         try {
-            Document document = obj.parse(new InputSource(new StringReader(data)));
-
-            documentBuilderPool.returnObject(obj);
-
+            Document document = documentBuilder.parse(new InputSource(new StringReader(data)));
+            documentBuilderPool.returnObject(documentBuilder);
             return document;
-
         }
         catch (Exception e) {
-            documentBuilderPool.invalidateObject(obj);
+            documentBuilderPool.invalidateObject(documentBuilder);
             throw new RuntimeException(e);
         }
 

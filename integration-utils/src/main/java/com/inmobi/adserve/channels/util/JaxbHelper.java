@@ -70,9 +70,9 @@ public class JaxbHelper {
                     jaxbContext = poolKeyToJaxbContext.get(key);
                     if (jaxbContext == null) {
                         jaxbContext = JAXBContext.newInstance(key.getClazz());
+                        poolKeyToJaxbContext.put(key, jaxbContext);
                     }
 
-                    poolKeyToJaxbContext.put(key, jaxbContext);
                 }
             }
 
@@ -96,9 +96,8 @@ public class JaxbHelper {
                     jaxbContext = poolKeyToJaxbContext.get(key);
                     if (jaxbContext == null) {
                         jaxbContext = JAXBContext.newInstance(key.getClazz());
+                        poolKeyToJaxbContext.put(key, jaxbContext);
                     }
-
-                    poolKeyToJaxbContext.put(key, jaxbContext);
                 }
             }
 
@@ -131,6 +130,14 @@ public class JaxbHelper {
         }
     }
 
+    /**
+     * parses the data and returns the clazz object
+     * 
+     * @param data
+     * @param clazz
+     * @return
+     * @throws Exception
+     */
     @SuppressWarnings("unchecked")
     public <T> T unmarshal(final String data, final Class<T> clazz) throws Exception {
         T result;
