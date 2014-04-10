@@ -67,6 +67,7 @@ public class ThriftRequestParser {
             params.setSiteFloor(ecpmFloor);
             params.setSiteIncId(tObject.site.siteIncId);
             params.setAppUrl(tObject.site.siteUrl);
+            params.setPubId(tObject.site.publisherId);
         }
         
         
@@ -77,6 +78,7 @@ public class ThriftRequestParser {
             params.setOsId(new Long(tObject.device.osId).intValue());
             params.setModelId(new Long(tObject.device.modelId).intValue());
             params.setHandsetInternalId(tObject.device.getHandsetInternalId());
+            params.setOsMajorVersion(tObject.device.getOsMajorVersion());
         }
 
         //Fill params from Geo Object
