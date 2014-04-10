@@ -67,6 +67,7 @@ public class ThriftRequestParser {
             params.setSiteFloor(ecpmFloor);
             params.setSiteIncId(tObject.site.siteIncId);
             params.setAppUrl(tObject.site.siteUrl);
+            params.setPubId(tObject.site.publisherId);
         }
         
         
