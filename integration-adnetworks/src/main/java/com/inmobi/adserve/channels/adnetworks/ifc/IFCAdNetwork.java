@@ -1,18 +1,18 @@
 package com.inmobi.adserve.channels.adnetworks.ifc;
 
-import java.awt.*;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.util.CharsetUtil;
+
+import java.awt.Dimension;
 import java.net.URI;
 import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.http.client.utils.URIBuilder;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.*;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.jboss.netty.util.CharsetUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,9 +29,9 @@ import com.ning.http.client.RequestBuilder;
 
 
 /**
- *
+ * 
  * @author Sandeep.Barange
- *
+ * 
  */
 public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
 
@@ -66,9 +66,9 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
 
     private String              adGroupID;
 
-    public IFCAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-                        final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public IFCAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
         ifcURL = config.getString("ifc.host");
     }
 
@@ -156,10 +156,9 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-          Dimension dim = SlotSizeMapping.getDimension((long) sasParams
-                  .getSlot());
-          slotHeight = String.valueOf(dim.getHeight());
-          slotWidth = String.valueOf(dim.getWidth());
+            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
+            slotHeight = String.valueOf(dim.getHeight());
+            slotWidth = String.valueOf(dim.getWidth());
         }
         else {
             LOG.info("IFC Mandatory Parameter missing: Slot");
@@ -284,7 +283,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         jsonObject.addProperty("age", sasParams.getAge());
         jsonObject.addProperty("gender", gender);
         jsonObject.addProperty("latLong", casInternalRequestParameters.latLong);
-        jsonObject.addProperty("country", sasParams.getCountryId());
+        jsonObject.addProperty("country", sasParams.getCountryCode());
         jsonObject.addProperty("siteID", siteID);
         jsonObject.addProperty("adGroupID", adGroupID);
         jsonObject.addProperty("richMedia", richMedia);
@@ -350,9 +349,9 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         if (null == response
-                || (null != response && (status.getCode() != 200 || response.startsWith("<!--") || response.trim()
-                .isEmpty()))) {
-            statusCode = status.getCode();
+                || (null != response && (status.code() != 200 || response.startsWith("<!--") || response.trim()
+                        .isEmpty()))) {
+            statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
             }
@@ -361,7 +360,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         }
         else {
             responseContent = response;
-            statusCode = status.getCode();
+            statusCode = status.code();
             adStatus = "AD";
         }
         LOG.debug("response length is {}", responseContent.length());

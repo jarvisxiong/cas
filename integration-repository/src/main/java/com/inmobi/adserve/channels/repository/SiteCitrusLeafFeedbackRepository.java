@@ -79,8 +79,7 @@ public class SiteCitrusLeafFeedbackRepository {
                 LOG.debug("siteFeedback entity is fresh for query {} {}", siteId, segmentId);
                 InspectorStats.incrementStatCount(InspectorStrings.siteFeedbackCacheHit);
                 return siteFeedbackEntity.getSegmentAdGroupFeedbackMap() == null ? null : siteFeedbackEntity
-                        .getSegmentAdGroupFeedbackMap()
-                            .get(segmentId);
+                        .getSegmentAdGroupFeedbackMap().get(segmentId);
             }
             LOG.debug("siteFeedback entity is stale for query {}_{}", siteId, segmentId);
         }
@@ -88,7 +87,7 @@ public class SiteCitrusLeafFeedbackRepository {
             LOG.debug("siteFeedback not found for siteId: {}", siteId);
         }
         LOG.debug("Returning default/old siteFeedback entity and Fetching new data from citrus leaf for siteId: {}",
-            siteId);
+                siteId);
         InspectorStats.incrementStatCount(InspectorStrings.siteFeedbackCacheMiss);
         asynchronouslyFetchFeedbackFromCitrusLeaf(siteId);
         siteFeedbackEntity = siteSegmentFeedbackCache.get(siteId);
@@ -176,7 +175,7 @@ public class SiteCitrusLeafFeedbackRepository {
                         }
                         catch (TException exception) {
                             LOG.debug("Error in deserializing thrift for global feedback for segment {} {}", segmentId,
-                                exception);
+                                    exception);
                             globalFeedback = null;
                         }
                         bin = DataCenter.RCT.toString() + "\u0001" + segmentId;
@@ -191,7 +190,7 @@ public class SiteCitrusLeafFeedbackRepository {
                         }
                         catch (TException exception) {
                             LOG.debug("Error in deserializing thrift for rct feedback for segment {} {}", segmentId,
-                                exception);
+                                    exception);
                             rctFeedback = null;
                         }
                         bin = colo.toString() + "\u0001" + segmentId;
@@ -206,14 +205,14 @@ public class SiteCitrusLeafFeedbackRepository {
                         }
                         catch (TException exception) {
                             LOG.debug("Error in deserializing thrift for local feedback for segment {} {}", segmentId,
-                                exception);
+                                    exception);
                             coloFeedback = null;
                         }
                         SegmentAdGroupFeedbackEntity segmentAdGroupFeedbackEntity = buildSiteFeedbackEntity(
-                            globalFeedback, rctFeedback, coloFeedback);
+                                globalFeedback, rctFeedback, coloFeedback);
                         if (segmentAdGroupFeedbackEntity != null) {
                             segmentAdGroupFeedbackEntityMap.put(segmentAdGroupFeedbackEntity.getSegmentId(),
-                                segmentAdGroupFeedbackEntity);
+                                    segmentAdGroupFeedbackEntity);
                         }
                     }
                 }
@@ -245,7 +244,7 @@ public class SiteCitrusLeafFeedbackRepository {
             if (globalFeedback != null) {
                 for (AdGroupFeedback adGroupFeedback : globalFeedback.getAdGroupFeedbacks()) {
                     ChannelSegmentFeedbackEntity.Builder globalBuilder = buildChannelSegmentFeedbackEntityBuilder(
-                        adGroupFeedback, dateFormat, date, today);
+                            adGroupFeedback, dateFormat, date, today);
                     // adding feedback at global level
                     adGroupFeedbackBuilderMap.put(adGroupFeedback.getExternalSiteKey(), globalBuilder);
                 }
@@ -253,7 +252,7 @@ public class SiteCitrusLeafFeedbackRepository {
             if (rctFeedback != null) {
                 for (AdGroupFeedback adGroupFeedback : rctFeedback.getAdGroupFeedbacks()) {
                     ChannelSegmentFeedbackEntity.Builder rctBuilder = buildChannelSegmentFeedbackEntityBuilder(
-                        adGroupFeedback, dateFormat, date, today);
+                            adGroupFeedback, dateFormat, date, today);
                     if (adGroupFeedbackBuilderMap.containsKey(adGroupFeedback.getExternalSiteKey())) {
                         ChannelSegmentFeedbackEntity.Builder builder = adGroupFeedbackBuilderMap.get(adGroupFeedback
                                 .getExternalSiteKey());
@@ -270,7 +269,7 @@ public class SiteCitrusLeafFeedbackRepository {
             if (coloFeedback != null) {
                 for (AdGroupFeedback adGroupFeedback : coloFeedback.getAdGroupFeedbacks()) {
                     ChannelSegmentFeedbackEntity.Builder coloBuilder = buildChannelSegmentFeedbackEntityBuilder(
-                        adGroupFeedback, dateFormat, date, today);
+                            adGroupFeedback, dateFormat, date, today);
                     // Setting latency and Fill Ratio to colo local if global level
                     // feedback
                     // already there

@@ -1,32 +1,37 @@
 package com.inmobi.adserve.channels.server.module;
 
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.joran.JoranConfigurator;
-import ch.qos.logback.core.joran.spi.JoranException;
-import com.google.inject.AbstractModule;
-import com.google.inject.Injector;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
-import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.server.ChannelServer;
-import com.inmobi.adserve.channels.server.annotations.LoggerConfiguration;
-import com.inmobi.adserve.channels.server.annotations.RtbConfiguration;
-import com.inmobi.adserve.channels.server.annotations.ServerConfiguration;
-import com.inmobi.adserve.channels.server.api.Servlet;
-import com.inmobi.adserve.channels.server.requesthandler.*;
-import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import java.util.Map;
+import java.util.Set;
+
+import javax.ws.rs.Path;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.hadoop.thirdparty.guava.common.collect.Maps;
 import org.reflections.Reflections;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.Path;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.joran.spi.JoranException;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Injector;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.adnetworks.module.AdapterConfigModule;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.server.ChannelServer;
+import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.requesthandler.AuctionEngine;
+import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
+import com.inmobi.adserve.channels.server.requesthandler.Logging;
+import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
+import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
+import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import com.inmobi.adserve.channels.util.annotations.LoggerConfiguration;
+import com.inmobi.adserve.channels.util.annotations.RtbConfiguration;
+import com.inmobi.adserve.channels.util.annotations.ServerConfiguration;
 
 
 /**
@@ -61,17 +66,15 @@ public class ServerModule extends AbstractModule {
         bind(Configuration.class).annotatedWith(ServerConfiguration.class).toInstance(serverConfiguration);
         bind(Configuration.class).annotatedWith(LoggerConfiguration.class).toInstance(loggerConfiguration);
         bind(Configuration.class).annotatedWith(RtbConfiguration.class).toInstance(rtbConfiguration);
-        bind(ExecutorService.class).toInstance(Executors.newCachedThreadPool());
 
-        requestStaticInjection(AsyncRequestMaker.class);
         requestStaticInjection(ChannelSegment.class);
         requestStaticInjection(Logging.class);
         requestStaticInjection(AuctionEngine.class);
-        requestStaticInjection(RequestFilters.class);
-        requestStaticInjection(RtbAdNetwork.class);
+        requestStaticInjection(ResponseSender.class);
 
         install(new AdapterConfigModule(adapterConfiguration, ChannelServer.dataCentreName));
         install(new ChannelSegmentFilterModule());
+        install(new ScopeModule());
 
     }
 

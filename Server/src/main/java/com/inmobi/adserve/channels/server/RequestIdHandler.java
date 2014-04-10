@@ -1,10 +1,10 @@
 package com.inmobi.adserve.channels.server;
 
+import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
-import org.jboss.netty.channel.ChannelHandler.Sharable;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
+
 import org.slf4j.MDC;
 
 
@@ -14,14 +14,14 @@ import org.slf4j.MDC;
  */
 @Sharable
 @Slf4j
-public class RequestIdHandler extends SimpleChannelUpstreamHandler {
+public class RequestIdHandler extends ChannelInboundHandlerAdapter {
 
     public RequestIdHandler() {
     }
 
     @Override
-    public void messageReceived(final ChannelHandlerContext ctx, final MessageEvent e) throws Exception {
-        MDC.put("requestId", e.getChannel().getId().toString());
-        super.messageReceived(ctx, e);
+    public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
+        MDC.put("requestId", String.format("0x%08x", ctx.channel().hashCode()));
+        ctx.fireChannelRead(msg);
     }
 }

@@ -1,23 +1,29 @@
 package com.inmobi.adserve.channels.adnetworks.huntmads;
 
-import com.inmobi.adserve.channels.api.*;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
+import java.awt.Dimension;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
-import java.net.URI;
-import java.net.URISyntaxException;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
 public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -35,9 +41,9 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
      * @param baseRequestHandler
      * @param serverEvent
      */
-    public DCPHuntmadsAdNetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public DCPHuntmadsAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
     @Override
@@ -59,9 +65,8 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (null != sasParams.getSlot()
-                && SlotSizeMapping.getDimension((long)sasParams.getSlot()) != null) {
-            Dimension dim = SlotSizeMapping.getDimension((long)sasParams.getSlot());
+        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
@@ -141,9 +146,9 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {}", response);
 
-        if (StringUtils.isEmpty(response) || status.getCode() != 200 || !response.startsWith("[{\"")
+        if (StringUtils.isEmpty(response) || status.code() != 200 || !response.startsWith("[{\"")
                 || response.startsWith("[{\"error")) {
-            statusCode = status.getCode();
+            statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
             }
@@ -158,22 +163,21 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
                 JSONObject adResponse = jArray.getJSONObject(0);
                 boolean textAd = !response.contains("type\": \"image");
 
-                statusCode = status.getCode();
+                statusCode = status.code();
                 VelocityContext context = new VelocityContext();
-                
-                TemplateType t=TemplateType.HTML;
-                if (adResponse.has("content")&& StringUtils.isNotBlank(adResponse.getString("content"))){
-                	context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, adResponse.getString("content"));
+
+                TemplateType t = TemplateType.HTML;
+                if (adResponse.has("content") && StringUtils.isNotBlank(adResponse.getString("content"))) {
+                    context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, adResponse.getString("content"));
                 }
-                else
-                {
-                	context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse.getString("url"));
+                else {
+                    context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse.getString("url"));
                     String partnerBeacon = adResponse.getString("track");
                     if (StringUtils.isNotBlank(partnerBeacon) && !"null".equalsIgnoreCase(partnerBeacon)) {
                         context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, adResponse.getString("track"));
                     }
                     context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
-                    
+
                     if (textAd && StringUtils.isNotBlank(adResponse.getString("text"))) {
                         context.put(VelocityTemplateFieldConstants.AdText, adResponse.getString("text"));
                         String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
@@ -190,7 +194,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
                         t = TemplateType.IMAGE;
                     }
                 }
-               
+
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
             }

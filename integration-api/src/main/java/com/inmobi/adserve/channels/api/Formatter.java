@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.api;
 
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;

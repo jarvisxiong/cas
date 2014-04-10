@@ -37,8 +37,6 @@ public class ConfigurationLoader {
     @Getter
     private final Configuration        loggerConfiguration;
     @Getter
-    private final Configuration        reportConfiguration;
-    @Getter
     private final Configuration        log4jConfiguration;
     @Getter
     private final Configuration        rtbConfiguration;
@@ -69,7 +67,6 @@ public class ConfigurationLoader {
         databaseConfiguration = configuration.subset("database");
         serverConfiguration = configuration.subset("server");
         loggerConfiguration = configuration.subset("logger");
-        reportConfiguration = configuration.subset("report");
         log4jConfiguration = configuration.subset("log4j");
         rtbConfiguration = configuration.subset("rtb");
 

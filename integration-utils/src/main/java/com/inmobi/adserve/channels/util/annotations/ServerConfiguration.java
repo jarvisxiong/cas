@@ -1,4 +1,4 @@
-package com.inmobi.adserve.channels.server.annotations;
+package com.inmobi.adserve.channels.util.annotations;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
@@ -18,6 +18,6 @@ import com.google.inject.BindingAnnotation;
 @BindingAnnotation
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ FIELD, METHOD, PARAMETER })
-public @interface LoggerConfiguration {
+public @interface ServerConfiguration {
 
 }

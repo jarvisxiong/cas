@@ -4,8 +4,8 @@ import org.slf4j.Marker;
 
 import com.google.inject.AbstractModule;
 import com.inmobi.adserve.channels.server.SimpleScope;
-import com.inmobi.adserve.channels.server.annotations.BatchScoped;
 import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.util.annotations.BatchScoped;
 
 
 /**

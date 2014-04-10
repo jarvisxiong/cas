@@ -1,5 +1,22 @@
 package com.inmobi.adserve.channels.adnetworks;
 
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
+import java.io.File;
+import java.util.ArrayList;
+
+import junit.framework.TestCase;
+
+import org.apache.commons.configuration.Configuration;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.testng.annotations.Test;
+
 import com.inmobi.adserve.channels.adnetworks.ifc.IFCAdNetwork;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
@@ -7,36 +24,19 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.phoenix.logging.DebugLogger;
-import junit.framework.TestCase;
-import org.apache.commons.configuration.Configuration;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.testng.annotations.Test;
-
-import java.io.File;
-import java.util.ArrayList;
-
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
 
 
 public class IFCAdNetworkTest extends TestCase {
-    private IFCAdNetwork          ifcAdNetwork;
-    private Configuration         mockConfig        = null;
-    private final String          ifcHostus         = "http://10.14.118.91:8083/IFCPlatform/";
-    private final String          ifcAdvertiserId   = "1234";
-    private final ClientBootstrap clientBootstrap   = new ClientBootstrap();
-    private final String          ifcResponseFormat = "json";
-    private final String          isTest            = "0";
-    private final String          filter            = "clean";
-    private final String          debug             = "debug";
-    private final String          loggerConf        = "/tmp/channel-server.properties";
-    private DebugLogger           logger;
+    private IFCAdNetwork  ifcAdNetwork;
+    private Configuration mockConfig        = null;
+    private final String  ifcHostus         = "http://10.14.118.91:8083/IFCPlatform/";
+    private final String  ifcAdvertiserId   = "1234";
+    private final String  ifcResponseFormat = "json";
+    private final String  isTest            = "0";
+    private final String  filter            = "clean";
+    private final String  debug             = "debug";
+    private final String  loggerConf        = "/tmp/channel-server.properties";
+    private DebugLogger   logger;
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -59,11 +59,11 @@ public class IFCAdNetworkTest extends TestCase {
         if (!f.exists()) {
             f.createNewFile();
         }
-        MessageEvent serverEvent = createMock(MessageEvent.class);
+        Channel serverChannel = createMock(Channel.class);
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         SlotSizeMapping.init();
-        ifcAdNetwork = new IFCAdNetwork(mockConfig, clientBootstrap, base, serverEvent);
+        ifcAdNetwork = new IFCAdNetwork(mockConfig, null, base, serverChannel);
     }
 
     @Test

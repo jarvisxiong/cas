@@ -1,14 +1,15 @@
 package com.inmobi.adserve.channels.adnetworks.widerplanet;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +17,9 @@ import org.slf4j.LoggerFactory;
 import com.inmobi.adserve.channels.adnetworks.adelphic.DCPAdelphicAdNetwork;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
@@ -27,9 +28,9 @@ public class DCPWiderPlanetAdnetwork extends AbstractDCPAdNetworkImpl {
 
     private String              inmobiCookieId;
 
-    public DCPWiderPlanetAdnetwork(final Configuration config, final ClientBootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final MessageEvent serverEvent) {
-        super(config, clientBootstrap, baseRequestHandler, serverEvent);
+    public DCPWiderPlanetAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+        super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
     @Override
@@ -73,14 +74,9 @@ public class DCPWiderPlanetAdnetwork extends AbstractDCPAdNetworkImpl {
         try {
             String host = config.getString("widerplanet.host");
             StringBuilder url = new StringBuilder(host);
-            url.append("?zoneid=")
-                        .append(externalSiteId)
-                        .append("&useragent=")
-                        .append(getURLEncode(sasParams.getUserAgent(), format))
-                        .append("&uip=")
-                        .append(sasParams.getRemoteHostIp())
-                        .append("&wuid=")
-                        .append(getHashedValue(inmobiCookieId, "MD5"));
+            url.append("?zoneid=").append(externalSiteId).append("&useragent=")
+                    .append(getURLEncode(sasParams.getUserAgent(), format)).append("&uip=")
+                    .append(sasParams.getRemoteHostIp()).append("&wuid=").append(getHashedValue(inmobiCookieId, "MD5"));
             if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)) {
                 url.append("&location=").append(getURLEncode(casInternalRequestParameters.latLong, format));
             }
@@ -102,8 +98,8 @@ public class DCPWiderPlanetAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {}", response);
-        statusCode = status.getCode();
-        if (null == response || status.getCode() != 200 || response.trim().isEmpty()) {
+        statusCode = status.code();
+        if (null == response || status.code() != 200 || response.trim().isEmpty()) {
             if (200 == statusCode) {
                 statusCode = 500;
             }
@@ -125,11 +121,11 @@ public class DCPWiderPlanetAdnetwork extends AbstractDCPAdNetworkImpl {
 
                     if (response.contains("beacon_ext1")) {
                         context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl1,
-                            adResponse.getString("beacon_ext1"));
+                                adResponse.getString("beacon_ext1"));
                     }
                     if (response.contains("beacon_ext2")) {
                         context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl2,
-                            adResponse.getString("beacon_ext2"));
+                                adResponse.getString("beacon_ext2"));
                     }
                     responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                     adStatus = "AD";

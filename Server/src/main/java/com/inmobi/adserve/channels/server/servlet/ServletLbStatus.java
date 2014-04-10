@@ -1,20 +1,20 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import static org.jboss.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
-import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.QueryStringDecoder;
 
 import java.nio.charset.Charset;
 
 import javax.ws.rs.Path;
 
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
-import org.jboss.netty.handler.codec.http.HttpResponse;
-import org.jboss.netty.handler.codec.http.QueryStringDecoder;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.Singleton;
@@ -28,27 +28,24 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 @Path("/lbstatus")
 public class ServletLbStatus implements Servlet {
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(ServletLbStatus.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ServletLbStatus.class);
 
-    @SuppressWarnings("deprecation")
     @Override
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
-            final MessageEvent e) throws Exception {
+            final Channel serverChannel) throws Exception {
         LOG.debug("asked for load balancer status");
         InspectorStats.incrementStatCount("LbStatus", InspectorStrings.totalRequests);
         if (ServerStatusInfo.statusCode != 404) {
             InspectorStats.incrementStatCount("LbStatus", InspectorStrings.successfulRequests);
-            hrh.responseSender.sendResponse("OK", e);
+            hrh.responseSender.sendResponse("OK", serverChannel);
             return;
         }
-        HttpResponse response = new DefaultHttpResponse(HTTP_1_1, NOT_FOUND);
-        response.setContent(ChannelBuffers.copiedBuffer(ServerStatusInfo.statusString, Charset.forName("UTF-8").name()));
-        if (e != null) {
-            Channel channel = e.getChannel();
-            if (channel != null && channel.isWritable()) {
-                ChannelFuture future = channel.write(response);
-                future.addListener(ChannelFutureListener.CLOSE);
-            }
+        // TODO: remove header validation
+        HttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND,
+                Unpooled.copiedBuffer(ServerStatusInfo.statusString, Charset.defaultCharset()));
+        if (serverChannel != null && serverChannel.isWritable()) {
+            ChannelFuture future = serverChannel.writeAndFlush(response);
+            future.addListener(ChannelFutureListener.CLOSE);
         }
     }
 
