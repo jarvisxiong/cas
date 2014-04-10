@@ -67,6 +67,7 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
     public DCPMobFoxAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         super(config, clientBootstrap, baseRequestHandler, serverChannel);
+
     }
 
     @Override

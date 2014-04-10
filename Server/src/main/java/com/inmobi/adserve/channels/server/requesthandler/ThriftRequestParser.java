@@ -68,7 +68,9 @@ public class ThriftRequestParser {
         // Fill params from integration details object
         if (tObject.isSetIntegrationDetails()) {
             params.setRqIframe(tObject.integrationDetails.iFrameId);
-            params.setAdcode(tObject.integrationDetails.adCodeType.toString());
+            if (tObject.integrationDetails.isSetAdCodeType()) {
+                params.setAdcode(tObject.integrationDetails.adCodeType.toString());
+            }
             params.setSdkVersion(getSdkVersion(tObject.integrationDetails.integrationType,
                     tObject.integrationDetails.integrationVersion));
             // TODO Wait for the final contract from Devashish
@@ -82,11 +84,12 @@ public class ThriftRequestParser {
                     : "WAP");
             params.setSiteType(tObject.site.isSetContentRating() ? tObject.site.contentRating.toString()
                     : "FAMILY_SAFE");
-            params.setCategories(convertIntToLong(tObject.site.siteTags));
+            params.setCategories(convertIntToLong(tObject.site.siteTaxonomies));
             double ecpmFloor = Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor);
             params.setSiteFloor(ecpmFloor);
             params.setSiteIncId(tObject.site.siteIncId);
             params.setAppUrl(tObject.site.siteUrl);
+            params.setPubId(tObject.site.publisherId);
         }
 
         // Fill params from Device Object
@@ -96,6 +99,7 @@ public class ThriftRequestParser {
             params.setOsId(new Long(tObject.device.osId).intValue());
             params.setModelId(new Long(tObject.device.modelId).intValue());
             params.setHandsetInternalId(tObject.device.getHandsetInternalId());
+            params.setOsMajorVersion(tObject.device.getOsMajorVersion());
         }
 
         // Fill params from Geo Object

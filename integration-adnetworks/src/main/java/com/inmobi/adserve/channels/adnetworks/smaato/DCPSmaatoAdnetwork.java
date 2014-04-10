@@ -10,6 +10,8 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.bind.JAXBContext;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
@@ -30,6 +32,7 @@ import com.smaato.soma.oapi.Response.Ads.Ad;
 
 
 public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
+
     private static final Logger         LOG              = LoggerFactory.getLogger(DCPSmaatoAdnetwork.class);
 
     private transient String            latitude;
@@ -70,6 +73,8 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
 
     private static Map<Integer, String> slotIdMap;
 
+    private static JAXBContext          jaxbContext;
+
     static {
         slotIdMap = new HashMap<Integer, String>();
         slotIdMap.put(1, "mma");
@@ -88,7 +93,6 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     public DCPSmaatoAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         super(config, clientBootstrap, baseRequestHandler, serverChannel);
-
         publisherId = config.getString("smaato.pubId");
     }
 

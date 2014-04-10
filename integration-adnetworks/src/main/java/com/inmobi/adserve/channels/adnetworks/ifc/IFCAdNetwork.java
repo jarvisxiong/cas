@@ -1,16 +1,18 @@
 package com.inmobi.adserve.channels.adnetworks.ifc;
 
+import com.google.gson.JsonObject;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.util.CategoryList;
+import com.ning.http.client.Request;
+import com.ning.http.client.RequestBuilder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.util.List;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONArray;
@@ -19,13 +21,9 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.JsonObject;
-import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.util.CategoryList;
-import com.ning.http.client.Request;
-import com.ning.http.client.RequestBuilder;
+import java.awt.*;
+import java.net.URI;
+import java.util.List;
 
 
 /**
@@ -42,18 +40,13 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
     private String              deviceOSVersion;                                          // Mandatory Param
     private String              handset;                                                  // Mandatory Param
     private String              carrier;                                                  // Mandatory Param
-    private String              isTest;
-    private String              zone;
-    private String              listingCount;
     private String              city;
     private String              state;
-    private String              ccid;
     private String              userAgent;
     private String              gender;
     private String              siteID;                                                   // Mandatory Param
     private String              slotWidth;                                                // Mandatory Param
     private String              slotHeight;                                               // Mandatory Param
-    private String              appType;
     private String              publisherID;                                              // Mandatory Param
     private Boolean             siteAllowBanner;
     private Boolean             richMedia;
@@ -84,57 +77,72 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             jsonObject = new JSONObject(sasParams.getAllParametersJson());
         }
         catch (Exception e) {
-            jsonObject = new JSONObject();
+            //
         }
-        try {
-            requestId = stringifyParam(jsonObject, "tid", true);
-            deviceOs = stringifyParam(jsonObject, "deviceOs", false);
-            deviceOSVersion = stringifyParam(jsonObject, "deviceOSVersion", false);
-            isTest = stringifyParam(jsonObject, "isTest", false);
-            zone = stringifyParam(jsonObject, "zone", false);
-            listingCount = stringifyParam(jsonObject, "listingCount", false);
-            city = stringifyParam(jsonObject, "city", false);
-            state = stringifyParam(jsonObject, "state", false);
-            ccid = stringifyParam(jsonObject, "ccid", false);
-            appType = stringifyParam(jsonObject, "appType", false);
-            publisherID = stringifyParam(jsonObject, "pub-id", true);
-            richMedia = getFlagParams(jsonObject, "rich-media", false);
-            siteAllowBanner = getFlagParams(jsonObject, "site-allowBanner", false);
-            adcode = stringifyParam(jsonObject, "adcode", true);
-            adGroupID = externalSiteId;
-        }
-        catch (JSONException e) {
-            return false;
-        }
-        try {
-            handset = getHandsetString(jsonObject.getJSONArray("handset"));
-        }
-        catch (JSONException e) {
-            LOG.info("IFC Mandatory Parameter missing: handset");
-            return false;
-        }
-        try {
-            carrier = getCarrierString(jsonObject.getJSONArray("carrier"));
-        }
-        catch (JSONException e) {
-            LOG.info("IFC Mandatory Parameter missing: carrier");
-            return false;
-        }
+        if (null != jsonObject) {
+            try {
+                requestId = stringifyParam(jsonObject, "tid", true);
+                deviceOs = stringifyParam(jsonObject, "deviceOs", false);
+                deviceOSVersion = stringifyParam(jsonObject, "deviceOSVersion", false);
+                city = stringifyParam(jsonObject, "city", false);
+                state = stringifyParam(jsonObject, "state", false);
+                publisherID = stringifyParam(jsonObject, "pub-id", true);
+                richMedia = getFlagParams(jsonObject, "rich-media", false);
+                siteAllowBanner = getFlagParams(jsonObject, "site-allowBanner", false);
+                adcode = stringifyParam(jsonObject, "adcode", true);
+                adGroupID = externalSiteId;
+            }
+            catch (JSONException e) {
+                return false;
+            }
+            try {
+                handset = getHandsetString(jsonObject.getJSONArray("handset"));
+            }
+            catch (JSONException e) {
+                LOG.info("IFC Mandatory Parameter missing: handset");
+                return false;
+            }
+            try {
+                carrier = getCarrierString(jsonObject.getJSONArray("carrier"));
+            }
+            catch (JSONException e) {
+                LOG.info("IFC Mandatory Parameter missing: carrier");
+                return false;
+            }
 
-        // This is temporary fix, proper handling should be identified, bug
-        // id:41499
-        try {
-            String sdkVersion = stringifyParam(jsonObject, "sdk-version", false);
-            if (sdkVersion != null
-                    && (sdkVersion.toLowerCase().startsWith("i30") || sdkVersion.toLowerCase().startsWith("a30"))) {
+            // This is temporary fix, proper handling should be identified, bug
+            // id:41499
+            try {
+                String sdkVersion = stringifyParam(jsonObject, "sdk-version", false);
+                if (sdkVersion != null
+                        && (sdkVersion.toLowerCase().startsWith("i30") || sdkVersion.toLowerCase().startsWith("a30"))) {
+                    return false;
+                }
+                if ((sdkVersion == null || sdkVersion.toLowerCase().equals("0")) && adcode.equalsIgnoreCase("non-js")) {
+                    return false;
+                }
+            }
+            catch (JSONException e) {
+                LOG.info("Error while parsing 'sdk-version'");
+            }
+        } else {
+            requestId = sasParams.getTid();
+            deviceOs = sasParams.getOsId() +"";
+            city = sasParams.getCity().toString();
+            state = sasParams.getState().toString();
+            publisherID = sasParams.getPubId();
+            richMedia = sasParams.isRichMedia();
+            siteAllowBanner = sasParams.getAllowBannerAds();
+            adcode = sasParams.getAdcode();
+            adGroupID = externalSiteId;
+            handset = sasParams.getHandsetInternalId() + "";
+            carrier = sasParams.getCarrierId() + "";
+            deviceOSVersion = sasParams.getOsMajorVersion();
+
+            if (sasParams.getSdkVersion() != null
+                    && (sasParams.getSdkVersion().toLowerCase().startsWith("i30") || sasParams.getSdkVersion().toLowerCase().startsWith("a30"))) {
                 return false;
             }
-            if ((sdkVersion == null || sdkVersion.toLowerCase().equals("0")) && adcode.equalsIgnoreCase("non-js")) {
-                return false;
-            }
-        }
-        catch (JSONException e) {
-            LOG.info("Error while parsing 'sdk-version'");
         }
 
         if (!isEmpty(sasParams.getUserAgent())) {
@@ -258,13 +266,9 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         jsonObject.addProperty("deviceOSVersion", deviceOSVersion);
         jsonObject.addProperty("handset", handset);
         jsonObject.addProperty("carrier", carrier);
-        jsonObject.addProperty("isTest", isTest);
-        jsonObject.addProperty("zone", zone);
-        jsonObject.addProperty("listingCount", listingCount);
         jsonObject.addProperty("city", city);
         jsonObject.addProperty("state", state);
         jsonObject.addProperty("postalCode", casInternalRequestParameters.zipCode);
-        jsonObject.addProperty("ccid", ccid);
         jsonObject.addProperty("publisherID", publisherID);
         jsonObject.addProperty("source", sasParams.getSource());
         jsonObject.addProperty("locSrc", sasParams.getLocSrc());
@@ -272,7 +276,6 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         jsonObject.addProperty("genderOrig", sasParams.getGender());
         jsonObject.addProperty("area", sasParams.getState());
         jsonObject.addProperty("beaconURL", beaconUrl);
-        jsonObject.addProperty("appType", appType);
         jsonObject.addProperty("categories", getCategoryString(sasParams.getCategories()));
         jsonObject.addProperty("remoteHostIp", sasParams.getRemoteHostIp());
         jsonObject.addProperty("userAgent", userAgent);
@@ -288,7 +291,6 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         jsonObject.addProperty("adGroupID", adGroupID);
         jsonObject.addProperty("richMedia", richMedia);
         jsonObject.addProperty("siteAllowBanner", siteAllowBanner);
-        jsonObject.addProperty("jsonFromNAS", sasParams.getAllParametersJson());
         jsonObject.addProperty("adCode", adcode);
         jsonObject.addProperty("imaiBaseUrl", sasParams.getImaiBaseUrl());
         jsonObject.addProperty("supplySource", suppySource);

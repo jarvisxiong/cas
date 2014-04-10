@@ -71,10 +71,8 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
     private static Map<Integer, String> categoryList  = new HashMap<Integer, String>();
 
     private boolean                     isApp;
-    private boolean                     isGeoOrDeviceIdPresent;
 
     static {
-
         categoryList.put(2, "bk");
         categoryList.put(3, "bz");
         categoryList.put(7, "ed");
@@ -119,13 +117,11 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
             return false;
         }
-        isGeoOrDeviceIdPresent = false;
         if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
                 && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
             String[] latlong = casInternalRequestParameters.latLong.split(",");
             latitude = latlong[0];
             longitude = latlong[1];
-            isGeoOrDeviceIdPresent = true;
         }
 
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
@@ -146,26 +142,24 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
         if (sasParams.getOsId() == HandSetOS.Android.getValue()) { // android
             os = ANDROID;
             isApp = true;
-            if (!(StringUtils.isEmpty(casInternalRequestParameters.uidMd5)
+            if ((StringUtils.isEmpty(casInternalRequestParameters.uidMd5)
                     && StringUtils.isEmpty(casInternalRequestParameters.uid) && StringUtils
                         .isEmpty(casInternalRequestParameters.uidIDUS1))) {
-                isGeoOrDeviceIdPresent = true;
+                LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
+                return false;
             }
         }
         else if (sasParams.getOsId() == HandSetOS.iPhone_OS.getValue()) { // iPhone
             os = IOS;
             isApp = true;
-            if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
-                isGeoOrDeviceIdPresent = true;
+            if (StringUtils.isEmpty(casInternalRequestParameters.uidIFA)) {
+                LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
+                return false;
             }
         }
         else {
             isApp = false;
             os = "Windows";
-        }
-        if (!isGeoOrDeviceIdPresent) {
-            LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
-            return false;
         }
 
         LOG.info("Configure parameters inside PlaceIQ returned true");
@@ -182,7 +176,9 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
         StringBuilder url = new StringBuilder(host);
         appendQueryParam(url, REQUEST_TYPE, requestFormat, true);
         appendQueryParam(url, RESPONSE_TYPE, responseFormat, false);
-        // appendQueryParam(url, SECRET, getHashedValue(dateFormat.format(now.getTime()) + seed, "MD5"), false);
+        // appendQueryParam(url, SECRET,
+        // getHashedValue(dateFormat.format(now.getTime()) + seed, "MD5"),
+        // false);
         appendQueryParam(url, PT, partnerId, false);
         String category = getCategory();
         String auId = String.format(auIdFormat, externalSiteId, category, Long.toHexString(sasParams.getSiteIncId()),
