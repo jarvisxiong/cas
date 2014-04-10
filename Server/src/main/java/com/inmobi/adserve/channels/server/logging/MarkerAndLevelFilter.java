@@ -16,9 +16,9 @@ import com.inmobi.adserve.channels.server.handler.TraceMarkerhandler;
  */
 public class MarkerAndLevelFilter extends TurboFilter {
     private static final Marker TRACE_MARKER               = TraceMarkerhandler.TRACE_MAKER;
-    private static Level        levelToEnforce             = Level.ERROR;
+    private Level               levelToEnforce             = Level.ERROR;
 
-    private static String       excludedTurboFilteringLogs = "";
+    private String              excludedTurboFilteringLogs = "";
 
     @Override
     public void start() {
@@ -49,7 +49,7 @@ public class MarkerAndLevelFilter extends TurboFilter {
      */
     public void setLevel(final String levelStr) {
         if (levelStr != null) {
-            MarkerAndLevelFilter.levelToEnforce = Level.toLevel(levelStr);
+            this.levelToEnforce = Level.toLevel(levelStr);
         }
     }
 
@@ -59,7 +59,7 @@ public class MarkerAndLevelFilter extends TurboFilter {
      */
     public void setExcludedTurboFilteringLogs(final String excludedTurboFilteringLogs) {
         if (excludedTurboFilteringLogs != null) {
-            MarkerAndLevelFilter.excludedTurboFilteringLogs = excludedTurboFilteringLogs;
+            this.excludedTurboFilteringLogs = excludedTurboFilteringLogs;
         }
     }
 
