@@ -127,9 +127,13 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             }
         } else {
             requestId = sasParams.getTid();
-            deviceOs = sasParams.getOsId() +"";
-            city = sasParams.getCity().toString();
-            state = sasParams.getState().toString();
+            deviceOs = sasParams.getOsId() + "";
+            if (null != sasParams.getCity()) {
+                city = sasParams.getCity().toString();
+            }
+            if (null != sasParams.getState()) {
+                state = sasParams.getState().toString();
+            }
             publisherID = sasParams.getPubId();
             richMedia = sasParams.isRichMedia();
             siteAllowBanner = sasParams.getAllowBannerAds();
@@ -176,6 +180,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             LOG.info("IFC Mandatory Parameter missing: BeaconURL");
             return false;
         }
+        LOG.info("IFC Configure Parameter returning true");
         return true;
     }
 
