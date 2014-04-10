@@ -1,12 +1,15 @@
 package com.inmobi.adserve.channels.adnetworks.widerplanet;
 
+import com.inmobi.adserve.channels.adnetworks.adelphic.DCPAdelphicAdNetwork;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -14,13 +17,8 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.adnetworks.adelphic.DCPAdelphicAdNetwork;
-import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 
 public class DCPWiderPlanetAdnetwork extends AbstractDCPAdNetworkImpl {
@@ -44,10 +42,18 @@ public class DCPWiderPlanetAdnetwork extends AbstractDCPAdNetworkImpl {
             LOG.debug("Only WAP traffic allowed. So exiting the adapter");
         }
         try {
-            JSONObject userParams = new JSONObject(sasParams.getUidParams());
-            inmobiCookieId = userParams.getString("imuc__5");
-            if (StringUtils.isBlank(inmobiCookieId)) {
-                inmobiCookieId = userParams.getString("WC");
+            if (null != sasParams.getUidParams()) {
+                JSONObject userParams = new JSONObject(sasParams.getUidParams());
+                inmobiCookieId = userParams.getString("imuc__5");
+                if (StringUtils.isBlank(inmobiCookieId)) {
+                    inmobiCookieId = userParams.getString("WC");
+                }
+
+            } else if (null != sasParams.getTUidParams()) {
+                inmobiCookieId = casInternalRequestParameters.uuidFromUidCookie;
+                if (StringUtils.isBlank(inmobiCookieId)) {
+                    inmobiCookieId = casInternalRequestParameters.uidWC;
+                }
             }
             if (StringUtils.isEmpty(inmobiCookieId)) {
                 LOG.debug("imucId is not present. So exiting the adapter");

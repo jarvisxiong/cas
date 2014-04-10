@@ -1,14 +1,14 @@
 package com.inmobi.adserve.channels.adnetworks.xad;
 
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.util.IABCategoriesInterface;
+import com.inmobi.adserve.channels.util.IABCategoriesMap;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -17,16 +17,10 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.IABCategoriesInterface;
-import com.inmobi.adserve.channels.util.IABCategoriesMap;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 
 public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -265,15 +259,21 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
             return;
         }
         try {
-            JSONObject userParams = new JSONObject(sasParams.getUidParams());
-            deviceId = userParams.getString("imuc__5");
-            if (StringUtils.isBlank(deviceId)) {
-                deviceId = userParams.getString("WC");
+            if (null != sasParams.getUidParams()) {
+                JSONObject userParams = new JSONObject(sasParams.getUidParams());
+                deviceId = userParams.getString("imuc__5");
+                if (StringUtils.isBlank(deviceId)) {
+                    deviceId = userParams.getString("WC");
+                }
+            } else if (null != sasParams.getTUidParams()) {
+                deviceId = casInternalRequestParameters.uuidFromUidCookie;
+                if (StringUtils.isBlank(deviceId)) {
+                    deviceId = casInternalRequestParameters.uidWC;
+                }
             }
             if (StringUtils.isEmpty(deviceId)) {
                 LOG.debug("setting deviceid to null for xAd");
             }
-
         }
         catch (Exception e) {
             LOG.debug("setting deviceid to null for xAd");
