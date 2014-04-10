@@ -41,27 +41,11 @@ public class DCPWiderPlanetAdnetwork extends AbstractDCPAdNetworkImpl {
         if (!"WAP".equalsIgnoreCase(sasParams.getSource())) {
             LOG.debug("Only WAP traffic allowed. So exiting the adapter");
         }
-        try {
-            if (null != sasParams.getUidParams()) {
-                JSONObject userParams = new JSONObject(sasParams.getUidParams());
-                inmobiCookieId = userParams.getString("imuc__5");
-                if (StringUtils.isBlank(inmobiCookieId)) {
-                    inmobiCookieId = userParams.getString("WC");
-                }
-
-            } else if (null != sasParams.getTUidParams()) {
-                inmobiCookieId = casInternalRequestParameters.uuidFromUidCookie;
-                if (StringUtils.isBlank(inmobiCookieId)) {
-                    inmobiCookieId = casInternalRequestParameters.uidWC;
-                }
-            }
-            if (StringUtils.isEmpty(inmobiCookieId)) {
-                LOG.debug("imucId is not present. So exiting the adapter");
-                return false;
-            }
-
+        inmobiCookieId = casInternalRequestParameters.uuidFromUidCookie;
+        if (StringUtils.isBlank(inmobiCookieId)) {
+            inmobiCookieId = casInternalRequestParameters.uidWC;
         }
-        catch (Exception e) {
+        if (StringUtils.isEmpty(inmobiCookieId)) {
             LOG.debug("imucId is not present. So exiting the adapter");
             return false;
         }

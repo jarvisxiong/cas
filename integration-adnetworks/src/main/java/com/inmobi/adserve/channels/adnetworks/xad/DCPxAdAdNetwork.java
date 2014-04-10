@@ -13,7 +13,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -258,24 +257,11 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
             deviceId = casInternalRequestParameters.uid;
             return;
         }
-        try {
-            if (null != sasParams.getUidParams()) {
-                JSONObject userParams = new JSONObject(sasParams.getUidParams());
-                deviceId = userParams.getString("imuc__5");
-                if (StringUtils.isBlank(deviceId)) {
-                    deviceId = userParams.getString("WC");
-                }
-            } else if (null != sasParams.getTUidParams()) {
-                deviceId = casInternalRequestParameters.uuidFromUidCookie;
-                if (StringUtils.isBlank(deviceId)) {
-                    deviceId = casInternalRequestParameters.uidWC;
-                }
-            }
-            if (StringUtils.isEmpty(deviceId)) {
-                LOG.debug("setting deviceid to null for xAd");
-            }
+        deviceId = casInternalRequestParameters.uuidFromUidCookie;
+        if (StringUtils.isBlank(deviceId)) {
+            deviceId = casInternalRequestParameters.uidWC;
         }
-        catch (Exception e) {
+        if (StringUtils.isEmpty(deviceId)) {
             LOG.debug("setting deviceid to null for xAd");
         }
 
