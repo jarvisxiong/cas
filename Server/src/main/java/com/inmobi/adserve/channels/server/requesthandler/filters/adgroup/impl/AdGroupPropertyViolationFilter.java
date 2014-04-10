@@ -37,7 +37,7 @@ public class AdGroupPropertyViolationFilter extends AbstractAdGroupLevelFilter {
 
         if (channelSegmentEntity.isUdIdRequired()
                 && ((StringUtils.isEmpty(sasParams.getUidParams()) || sasParams.getUidParams().equals("{}"))
-                || (null != sasParams.getTUidParams() && !sasParams.getTUidParams().isEmpty()))) {
+                && (null == sasParams.getTUidParams() || sasParams.getTUidParams().isEmpty()))) {
             channelSegment.incrementInspectorStats(InspectorStrings.droppedInUdidFilter);
             return true;
         }
