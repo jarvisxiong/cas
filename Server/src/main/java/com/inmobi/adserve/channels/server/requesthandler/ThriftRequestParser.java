@@ -199,6 +199,7 @@ public class ThriftRequestParser {
     private void setUserIdParams(CasInternalRequestParameters parameter, UidParams uidParams) {
         Map<UidType, String> uidMap =  uidParams.getRawUidValues();
         parameter.uidADT = uidParams.isLimitIOSAdTracking() ? "0" : "1";
+        parameter.uuidFromUidCookie= uidParams.getUuidFromUidCookie();
         for (UidType uidType : uidMap.keySet()) {
             switch (uidType) {
                 case UDID:
@@ -223,6 +224,9 @@ public class ThriftRequestParser {
                     break;
                 case IUDS1:
                     parameter.uidIDUS1 = uidMap.get(uidType);
+                    break;
+                case WC:
+                    parameter.uidWC = uidMap.get(uidType);
                     break;
                 default:
                     break;
