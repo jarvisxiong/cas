@@ -78,6 +78,7 @@ public class ThriftRequestParser {
             params.setOsId(new Long(tObject.device.osId).intValue());
             params.setModelId(new Long(tObject.device.modelId).intValue());
             params.setHandsetInternalId(tObject.device.getHandsetInternalId());
+            params.setOsMajorVersion(tObject.device.getOsMajorVersion());
         }
 
         //Fill params from Geo Object

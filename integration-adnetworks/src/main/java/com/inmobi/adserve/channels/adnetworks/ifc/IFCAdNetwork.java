@@ -37,6 +37,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
 
     private String              requestId;
     private String              deviceOs;                                                 // Mandatory Param
+    private String              deviceOSVersion;                                          // Mandatory Param
     private String              handset;                                                  // Mandatory Param
     private String              carrier;                                                  // Mandatory Param
     private String              city;
@@ -82,6 +83,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             try {
                 requestId = stringifyParam(jsonObject, "tid", true);
                 deviceOs = stringifyParam(jsonObject, "deviceOs", false);
+                deviceOSVersion = stringifyParam(jsonObject, "deviceOSVersion", false);
                 city = stringifyParam(jsonObject, "city", false);
                 state = stringifyParam(jsonObject, "state", false);
                 publisherID = stringifyParam(jsonObject, "pub-id", true);
@@ -135,6 +137,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             adGroupID = externalSiteId;
             handset = sasParams.getHandsetInternalId() + "";
             carrier = sasParams.getCarrierId() + "";
+            deviceOSVersion = sasParams.getOsMajorVersion();
 
             if (sasParams.getSdkVersion() != null
                     && (sasParams.getSdkVersion().toLowerCase().startsWith("i30") || sasParams.getSdkVersion().toLowerCase().startsWith("a30"))) {
@@ -260,6 +263,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
 
         jsonObject.addProperty("requestId", requestId);
         jsonObject.addProperty("deviceOs", deviceOs);
+        jsonObject.addProperty("deviceOSVersion", deviceOSVersion);
         jsonObject.addProperty("handset", handset);
         jsonObject.addProperty("carrier", carrier);
         jsonObject.addProperty("city", city);
