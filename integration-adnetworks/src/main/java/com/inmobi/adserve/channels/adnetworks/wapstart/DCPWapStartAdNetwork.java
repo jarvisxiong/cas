@@ -9,10 +9,6 @@ import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
@@ -23,7 +19,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -46,17 +41,10 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
     private int                          width;
     private int                          height;
     private static IABCountriesInterface iABCountries;
-    private static DocumentBuilder       builder;
     private static final String          latlongFormat = "%s,%s";
 
     static {
         iABCountries = new IABCountriesMap();
-        try {
-            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        }
-        catch (ParserConfigurationException e) {
-            LOG.error("XML Parser Builder initialization failed");
-        }
     }
 
     public DCPWapStartAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
@@ -167,7 +155,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
             try {
                 VelocityContext context = new VelocityContext();
                 TemplateType t = null;
-                Document doc = builder.parse(new InputSource(new java.io.StringReader(response)));
+                Document doc = documentBuilderHelper.parse(response);
                 doc.getDocumentElement().normalize();
                 NodeList reportNodes = doc.getElementsByTagName("banner");
 

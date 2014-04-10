@@ -20,6 +20,7 @@ import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.adnetworks.module.AdapterConfigModule;
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.api.Servlet;
@@ -29,6 +30,8 @@ import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import com.inmobi.adserve.channels.util.DocumentBuilderHelper;
+import com.inmobi.adserve.channels.util.JaxbHelper;
 import com.inmobi.adserve.channels.util.annotations.LoggerConfiguration;
 import com.inmobi.adserve.channels.util.annotations.RtbConfiguration;
 import com.inmobi.adserve.channels.util.annotations.ServerConfiguration;
@@ -66,7 +69,10 @@ public class ServerModule extends AbstractModule {
         bind(Configuration.class).annotatedWith(ServerConfiguration.class).toInstance(serverConfiguration);
         bind(Configuration.class).annotatedWith(LoggerConfiguration.class).toInstance(loggerConfiguration);
         bind(Configuration.class).annotatedWith(RtbConfiguration.class).toInstance(rtbConfiguration);
+        bind(JaxbHelper.class).asEagerSingleton();
+        bind(DocumentBuilderHelper.class).asEagerSingleton();
 
+        requestStaticInjection(BaseAdNetworkImpl.class);
         requestStaticInjection(ChannelSegment.class);
         requestStaticInjection(Logging.class);
         requestStaticInjection(AuctionEngine.class);

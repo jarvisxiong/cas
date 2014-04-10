@@ -5,14 +5,9 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.awt.Dimension;
-import java.io.StringReader;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -23,7 +18,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -76,8 +70,6 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
     private final String                responseFormat;
     private static Map<Integer, String> categoryList  = new HashMap<Integer, String>();
 
-    private static DocumentBuilder      builder;
-
     private boolean                     isApp;
     private boolean                     isGeoOrDeviceIdPresent;
 
@@ -108,12 +100,6 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
         categoryList.put(72, "tr");
         categoryList.put(71, "tl");
         categoryList.put(74, "wt");
-        try {
-            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        }
-        catch (ParserConfigurationException e) {
-            LOG.error("XML Parser Builder initialization failed");
-        }
     }
 
     public DCPPlaceIQAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
@@ -275,7 +261,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
                         responseContent = "";
                         return;
                     }
-                    Document doc = builder.parse(new InputSource(new StringReader(response)));
+                    Document doc = documentBuilderHelper.parse(response);
                     doc.getDocumentElement().normalize();
                     NodeList reportNodes = doc.getElementsByTagName("PLACEIQ");
                     Node rootNode = reportNodes.item(0);

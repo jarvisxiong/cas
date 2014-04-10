@@ -44,7 +44,7 @@ public class JaxbHelper {
         poolConfig = new GenericKeyedObjectPoolConfig();
         poolConfig.setMaxIdlePerKey(GenericKeyedObjectPoolConfig.DEFAULT_MAX_IDLE_PER_KEY);
         poolConfig.setMaxTotal(GenericKeyedObjectPoolConfig.DEFAULT_MAX_TOTAL);
-        poolConfig.setMaxTotalPerKey(GenericKeyedObjectPoolConfig.DEFAULT_MAX_TOTAL_PER_KEY);
+        poolConfig.setMaxTotalPerKey(-1);
         poolConfig.setBlockWhenExhausted(false);
         poolConfig.setMaxWaitMillis(0);
         poolConfig.setTestWhileIdle(false);

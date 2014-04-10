@@ -60,7 +60,7 @@ public class RequestParser {
 
         LOG.debug(traceMarker, "Inside parameter parser");
         if (null == jObject) {
-            LOG.error(traceMarker, "Returning null as jObject is null.");
+            LOG.debug(traceMarker, "Returning null as jObject is null.");
             params = null;
             return;
         }
@@ -89,13 +89,13 @@ public class RequestParser {
             params.setCity(Integer.parseInt(parseArray(jObject, "carrier", 3)));
         }
         catch (NumberFormatException e) {
-            LOG.error(traceMarker, "City not found in request");
+            LOG.debug(traceMarker, "City not found in request");
         }
         try {
             params.setState(Integer.parseInt(parseArray(jObject, "carrier", 4)));
         }
         catch (NumberFormatException e) {
-            LOG.error(traceMarker, "State not found in request");
+            LOG.debug(traceMarker, "State not found in request");
         }
         String slot = stringify(jObject, "slot-served");
         if (StringUtils.isNotEmpty(slot)) {
@@ -143,7 +143,7 @@ public class RequestParser {
             }
         }
         catch (JSONException exception) {
-            LOG.error(traceMarker, "site object not found in request");
+            LOG.debug(traceMarker, "site object not found in request");
             params.setSiteIncId(0);
         }
         try {
@@ -151,7 +151,7 @@ public class RequestParser {
             params.setHandsetInternalId(Long.parseLong(jsonArray.get(0).toString()));
         }
         catch (JSONException e) {
-            LOG.error(traceMarker, "Handset array not found");
+            LOG.debug(traceMarker, "Handset array not found");
         }
         params.setOsId(jObject.optInt("os-id", -1));
         params.setRichMedia(jObject.optBoolean("rich-media", false));
@@ -207,7 +207,7 @@ public class RequestParser {
             return Arrays.asList(category);
         }
         catch (JSONException e) {
-            LOG.error(traceMarker, "error while reading category array {}", e);
+            LOG.debug(traceMarker, "error while reading category array {}", e);
             return null;
         }
     }
@@ -269,7 +269,7 @@ public class RequestParser {
             LOG.debug(traceMarker, "json exception in parsing u params {}", exception);
         }
         catch (NumberFormatException e) {
-            LOG.error(traceMarker, "number format exception in u params {}", e);
+            LOG.debug(traceMarker, "number format exception in u params {}", e);
         }
         return parameter;
     }

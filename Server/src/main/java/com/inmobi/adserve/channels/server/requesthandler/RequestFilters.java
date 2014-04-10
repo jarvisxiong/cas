@@ -79,7 +79,7 @@ public class RequestFilters {
                     return true;
                 }
                 else {
-                    LOG.debug("sdk-version : " + hrh.responseSender.sasParams.getSdkVersion());
+                    LOG.debug("sdk-version : {}", hrh.responseSender.sasParams.getSdkVersion());
                 }
             }
             catch (StringIndexOutOfBoundsException exception) {

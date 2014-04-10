@@ -234,17 +234,22 @@ public class ChannelServer {
             int maxIdle = databaseConfig.getInt("maxActive", 20);
             int maxWait = 60 * 1000; // time in millis - 60 seconds
             boolean testOnBorrow = databaseConfig.getBoolean("testOnBorrow", true);
-            GenericObjectPool<PoolableConnection> connectionPool = new GenericObjectPool<>(null);
-            connectionPool.setMaxTotal(maxActive);
-            connectionPool.setMaxIdle(maxIdle);
-            connectionPool.setMaxWaitMillis(maxWait);
-            connectionPool.setTestOnBorrow(testOnBorrow);
+
             String connectUri = "jdbc:postgresql://" + databaseConfig.getString("host") + ":"
                     + databaseConfig.getInt("port") + "/"
                     + databaseConfig.getString(ChannelServerStringLiterals.DATABASE) + "?socketTimeout="
                     + databaseConfig.getString("socketTimeout");
+
             ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectUri, props);
+
             PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(connectionFactory, null);
+
+            GenericObjectPool<PoolableConnection> connectionPool = new GenericObjectPool<>(poolableConnectionFactory);
+            connectionPool.setMaxTotal(maxActive);
+            connectionPool.setMaxIdle(maxIdle);
+            connectionPool.setMaxWaitMillis(maxWait);
+            connectionPool.setTestOnBorrow(testOnBorrow);
+
             poolableConnectionFactory.setPool(connectionPool);
             poolableConnectionFactory.setValidationQuery(validationQuery);
             poolableConnectionFactory.setDefaultReadOnly(true);
