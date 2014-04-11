@@ -498,6 +498,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             if (null == deviceExtensions) {
                 deviceExtensions = new HashMap<String, String>();
             }
+	    deviceExtensions.put("idfa", casInternalRequestParameters.uidIFA);
             deviceExtensions.put("idfasha1", getHashedValue(casInternalRequestParameters.uidIFA, "SHA-1"));
             deviceExtensions.put("idfamd5", getHashedValue(casInternalRequestParameters.uidIFA, "MD5"));
             device.setExt(deviceExtensions);
