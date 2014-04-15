@@ -204,6 +204,7 @@ public class IFCAdNetworkTest extends TestCase {
             ifcAdNetwork.parseResponse("fkjhsdfkjahfkjsa", HttpResponseStatus.OK);
         }
         catch (Exception e) {
+            e.printStackTrace();
             fail();
         }
     }
