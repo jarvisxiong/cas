@@ -21,6 +21,8 @@ public class CasInternalRequestParameters {
     public String       uidSO1;
     public String       uidIDUS1;
     public String       uidADT;
+    public String       uidWC;
+    public String       uuidFromUidCookie; //imuc_5
     public String       zipCode;
     public String       latLong;
     public String       appUrl;

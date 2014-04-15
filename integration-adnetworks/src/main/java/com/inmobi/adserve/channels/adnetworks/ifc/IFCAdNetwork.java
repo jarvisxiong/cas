@@ -265,7 +265,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
 
     private String getRequestBody() {
         JsonObject jsonObject = new JsonObject();
-
+        jsonObject.addProperty("sdkVersion", sasParams.getSdkVersion());
         jsonObject.addProperty("requestId", requestId);
         jsonObject.addProperty("deviceOs", deviceOs);
         jsonObject.addProperty("deviceOSVersion", deviceOSVersion);

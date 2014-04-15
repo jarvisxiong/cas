@@ -67,7 +67,7 @@ public class SASRequestParameters {
     private int          sst;//0 for Network
     private String       pubId;
     private String       osMajorVersion;
-    
+
     public SASRequestParameters() {
         // Do Nothing.
     }
