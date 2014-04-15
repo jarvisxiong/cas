@@ -30,8 +30,10 @@ import org.slf4j.MDC;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.CategoryList;
+import com.inmobi.adserve.channels.util.DocumentBuilderHelper;
 import com.inmobi.adserve.channels.util.IABCategoriesInterface;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
+import com.inmobi.adserve.channels.util.JaxbHelper;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
@@ -94,6 +96,12 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     @Inject
     private static AsyncHttpClientProvider        asyncHttpClientProvider;
+
+    @Inject
+    protected static JaxbHelper                   jaxbHelper;
+
+    @Inject
+    protected static DocumentBuilderHelper        documentBuilderHelper;
 
     public BaseAdNetworkImpl(final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         this.baseRequestHandler = baseRequestHandler;

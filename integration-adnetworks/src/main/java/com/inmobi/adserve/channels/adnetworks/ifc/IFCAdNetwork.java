@@ -355,9 +355,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
-        if (null == response
-                || (null != response && (status.code() != 200 || response.startsWith("<!--") || response.trim()
-                        .isEmpty()))) {
+        if ((null != response && (status.code() != 200 || response.startsWith("<!--") || response.trim().isEmpty()))) {
             statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;

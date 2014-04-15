@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.repository;
 
+import java.sql.Timestamp;
+
 import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
 import com.inmobi.phoenix.batteries.data.AbstractStatsMaintainingDBRepository;
 import com.inmobi.phoenix.batteries.data.DBEntity;
@@ -11,15 +13,12 @@ import com.inmobi.phoenix.data.RepositoryManager;
 import com.inmobi.phoenix.data.RepositoryQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
 
-import java.sql.Timestamp;
-
 
 public class ChannelSegmentFeedbackRepository extends
         AbstractStatsMaintainingDBRepository<ChannelSegmentFeedbackEntity, String> implements RepositoryManager {
 
     @Override
-    public DBEntity<ChannelSegmentFeedbackEntity, String> buildObjectFromRow(ResultSetRow resultSetRow)
-            throws RepositoryException {
+    public DBEntity<ChannelSegmentFeedbackEntity, String> buildObjectFromRow(final ResultSetRow resultSetRow) {
         NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
         logger.debug("result set is not null");
         String adGroupId = row.getString("ad_group_id");
@@ -43,11 +42,6 @@ public class ChannelSegmentFeedbackRepository extends
             return new DBEntity<ChannelSegmentFeedbackEntity, String>(entity, modifiedOn);
         }
         catch (Exception e) {
-            if (e instanceof RepositoryException) {
-                RepositoryException r = new RepositoryException(e.getMessage());
-                r.setStackTrace(e.getStackTrace());
-                throw r;
-            }
             logger.error("Error in resultset row", e);
             return new DBEntity<ChannelSegmentFeedbackEntity, String>(new EntityError<String>(adGroupId,
                     "ERROR_IN_EXTRACTING_SEGMENT"), modifiedOn);
@@ -55,7 +49,7 @@ public class ChannelSegmentFeedbackRepository extends
     }
 
     @Override
-    public boolean isObjectToBeDeleted(ChannelSegmentFeedbackEntity entity) {
+    public boolean isObjectToBeDeleted(final ChannelSegmentFeedbackEntity entity) {
         if (entity.getAdGroupId() == null) {
             return true;
         }
@@ -63,12 +57,12 @@ public class ChannelSegmentFeedbackRepository extends
     }
 
     @Override
-    public HashIndexKeyBuilder<ChannelSegmentFeedbackEntity> getHashIndexKeyBuilder(String className) {
+    public HashIndexKeyBuilder<ChannelSegmentFeedbackEntity> getHashIndexKeyBuilder(final String className) {
         return null;
     }
 
     @Override
-    public ChannelSegmentFeedbackEntity queryUniqueResult(RepositoryQuery q) throws RepositoryException {
+    public ChannelSegmentFeedbackEntity queryUniqueResult(final RepositoryQuery q) throws RepositoryException {
         return null;
     }
 

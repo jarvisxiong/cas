@@ -91,7 +91,7 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
             }
             catch (TException ex) {
                 terminationReason = ServletHandler.thriftParsingError;
-                LOG.error(traceMarker, "Error in de serializing thrift ", ex);
+                LOG.debug(traceMarker, "Error in de serializing thrift ", ex);
                 InspectorStats.incrementStatCount(InspectorStrings.thriftParsingError, InspectorStrings.count);
             }
         }
@@ -124,7 +124,7 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
 
             if (StringUtils.isNotEmpty(rawContent)) {
                 byte[] decodedContent = urlCodec.decode(rawContent.getBytes());
-                LOG.debug("Decoded String : {}", decodedContent.toString());
+                LOG.debug("Decoded String : {}", decodedContent);
                 TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
                 try {
                     tDeserializer.deserialize(adPoolRequest, decodedContent);
@@ -133,7 +133,7 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
                 }
                 catch (TException ex) {
                     terminationReason = ServletHandler.thriftParsingError;
-                    LOG.error(traceMarker, "Error in de serializing thrift ", ex);
+                    LOG.debug(traceMarker, "Error in de serializing thrift ", ex);
                     InspectorStats.incrementStatCount(InspectorStrings.thriftParsingError, InspectorStrings.count);
                 }
             }

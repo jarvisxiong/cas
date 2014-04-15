@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.repository;
 
+import java.sql.Timestamp;
+
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.phoenix.batteries.data.AbstractStatsMaintainingDBRepository;
 import com.inmobi.phoenix.batteries.data.DBEntity;
@@ -11,18 +13,15 @@ import com.inmobi.phoenix.data.RepositoryManager;
 import com.inmobi.phoenix.data.RepositoryQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
 
-import java.sql.Timestamp;
-
 
 public class CurrencyConversionRepository extends
         AbstractStatsMaintainingDBRepository<CurrencyConversionEntity, String> implements RepositoryManager {
 
     @Override
-    public DBEntity<CurrencyConversionEntity, String> buildObjectFromRow(ResultSetRow resultSetRow)
+    public DBEntity<CurrencyConversionEntity, String> buildObjectFromRow(final ResultSetRow resultSetRow)
             throws RepositoryException {
         NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
         Timestamp modifiedOn = row.getTimestamp("modified_on");
-        Integer id = row.getInt("id");
         String currencyId = row.getString("currency_id");
         try {
             Double conversionRate = row.getDouble("conversion_rate");
@@ -49,17 +48,17 @@ public class CurrencyConversionRepository extends
     }
 
     @Override
-    public boolean isObjectToBeDeleted(CurrencyConversionEntity entity) {
+    public boolean isObjectToBeDeleted(final CurrencyConversionEntity entity) {
         return false;
     }
 
     @Override
-    public HashIndexKeyBuilder<CurrencyConversionEntity> getHashIndexKeyBuilder(String className) {
+    public HashIndexKeyBuilder<CurrencyConversionEntity> getHashIndexKeyBuilder(final String className) {
         return null;
     }
 
     @Override
-    public CurrencyConversionEntity queryUniqueResult(RepositoryQuery q) throws RepositoryException {
+    public CurrencyConversionEntity queryUniqueResult(final RepositoryQuery q) throws RepositoryException {
         return null;
     }
 

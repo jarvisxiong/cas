@@ -44,10 +44,6 @@ public class CasUtils {
 
     public Double getRtbFloor(final CasContext casContext, final SASRequestParameters sasRequestParameters) {
         PricingEngineEntity pricingEngineEntity = casContext.getPricingEngineEntity();
-        if (pricingEngineEntity == null) {
-            casContext.setPricingEngineEntity(pricingEngineEntity);
-        }
-
         return pricingEngineEntity == null ? 0 : pricingEngineEntity.getRtbFloor();
     }
 
@@ -67,8 +63,8 @@ public class CasUtils {
     }
 
     public Double getNetworkEcpm(final CasContext casContext, final SASRequestParameters sasParams) {
-        SiteEcpmEntity siteEcpmEntity = repositoryHelper.querySiteEcpmRepository(sasParams.getSiteId(),
-                sasParams.getCountryId().intValue(), sasParams.getOsId());
+        SiteEcpmEntity siteEcpmEntity = repositoryHelper.querySiteEcpmRepository(sasParams.getSiteId(), sasParams
+                .getCountryId().intValue(), sasParams.getOsId());
         double networkEcpm = 0.0;
         if (null != siteEcpmEntity) {
             networkEcpm = siteEcpmEntity.getNetworkEcpm();

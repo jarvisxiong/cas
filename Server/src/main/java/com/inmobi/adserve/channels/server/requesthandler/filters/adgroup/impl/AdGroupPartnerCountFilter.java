@@ -3,6 +3,7 @@ package com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.inject.Inject;
 
@@ -52,8 +53,9 @@ public class AdGroupPartnerCountFilter implements AdGroupLevelFilter {
 
         Map<String, List<ChannelSegment>> advertiserSegmentListMap = getAdvertiserSegmentListMap(channelSegments);
 
-        for (String advertiserId : advertiserSegmentListMap.keySet()) {
-            List<ChannelSegment> segmentListForAdvertiser = advertiserSegmentListMap.get(advertiserId);
+        for (Entry<String, List<ChannelSegment>> entry : advertiserSegmentListMap.entrySet()) {
+            List<ChannelSegment> segmentListForAdvertiser = entry.getValue();
+            String advertiserId = entry.getKey();
             Collections.sort(segmentListForAdvertiser, ChannelSegment.CHANNEL_SEGMENT_REVERSE_COMPARATOR);
 
             List<ChannelSegment> selectedSegmentListForAdvertiser = Lists.newArrayList();
