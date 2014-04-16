@@ -1,28 +1,25 @@
 package com.inmobi.adserve.channels.adnetworks.rtb;
 
+import com.google.gson.Gson;
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
+import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.util.*;
+import com.inmobi.casthrift.rtb.*;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.Request;
+import com.ning.http.client.RequestBuilder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-
-import javax.inject.Inject;
-
 import lombok.Getter;
 import lombok.Setter;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
@@ -33,38 +30,13 @@ import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
-import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.util.IABCategoriesInterface;
-import com.inmobi.adserve.channels.util.IABCategoriesMap;
-import com.inmobi.adserve.channels.util.IABCitiesInterface;
-import com.inmobi.adserve.channels.util.IABCitiesMap;
-import com.inmobi.adserve.channels.util.IABCountriesInterface;
-import com.inmobi.adserve.channels.util.IABCountriesMap;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.inmobi.casthrift.rtb.App;
-import com.inmobi.casthrift.rtb.Banner;
-import com.inmobi.casthrift.rtb.Bid;
-import com.inmobi.casthrift.rtb.BidRequest;
-import com.inmobi.casthrift.rtb.BidResponse;
-import com.inmobi.casthrift.rtb.Device;
-import com.inmobi.casthrift.rtb.Geo;
-import com.inmobi.casthrift.rtb.Impression;
-import com.inmobi.casthrift.rtb.SeatBid;
-import com.inmobi.casthrift.rtb.Site;
-import com.inmobi.casthrift.rtb.User;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.Request;
-import com.ning.http.client.RequestBuilder;
+import javax.inject.Inject;
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
+import java.util.List;
+import java.util.regex.Pattern;
 
 
 /**
@@ -455,6 +427,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     private Device createDeviceObject(final Geo geo) {
         Device device = new Device();
+        device.setDevicetype(1);//Tablets and Mobiles
         device.setIp(sasParams.getRemoteHostIp());
         device.setUa(sasParams.getUserAgent());
         device.setGeo(geo);
