@@ -18,13 +18,21 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Injector;
+import com.google.inject.util.Modules;
 import com.inmobi.adserve.channels.adnetworks.smaato.DCPSmaatoAdnetwork;
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.util.DocumentBuilderHelper;
+import com.inmobi.adserve.channels.util.JaxbHelper;
+import com.netflix.governator.guice.LifecycleInjector;
 
 
 public class DCPSmaatoAdnetworkTest extends TestCase {
@@ -64,6 +72,17 @@ public class DCPSmaatoAdnetworkTest extends TestCase {
         prepareMockConfig();
         SlotSizeMapping.init();
         Formatter.init();
+        Injector injector = LifecycleInjector.builder().withModules(Modules.combine(new AbstractModule() {
+
+            @Override
+            public void configure() {
+                bind(AsyncHttpClientProvider.class).toInstance(createMock(AsyncHttpClientProvider.class));
+                bind(JaxbHelper.class).asEagerSingleton();
+                bind(DocumentBuilderHelper.class).asEagerSingleton();
+                requestStaticInjection(BaseAdNetworkImpl.class);
+            }
+        })).usingBasePackages("com.inmobi.adserve.channels.server.netty", "com.inmobi.adserve.channels.api.provider")
+                .build().createInjector();
         dcpSmaatoAdNetwork = new DCPSmaatoAdnetwork(mockConfig, null, base, serverChannel);
     }
 
