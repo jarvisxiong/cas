@@ -23,7 +23,8 @@ public class DCPAmoAdAdNetwork extends AbstractDCPAdNetworkImpl {
     // success.i
     private static final Logger LOG = LoggerFactory.getLogger(DCPAmoAdAdNetwork.class);
 
-    private static final String tag = "<!-- AMoAd Zone: [Inmobi ] --><div class=\"amoad_frame sid_62056d310111552c1081c48959720547417af886416a2ebac81d12f901043a9a container_div color_#0000cc-#444444-#ffffff-#0000FF-#009900 sp\"></div>";
+    private static final String tag = "<!-- AMoAd Zone: [Inmobi ] --><div class=\"amoad_frame sid_62056d310111552c1081c48959720547417af886416a2ebac81d12f901043a9a container_div color_#0000cc-#444444-#ffffff-#0000FF-#009900 sp\"></div>"
+                                      + "<script src='http://j.amoad.com/js/aa.js' type='text/javascript' charset='utf-8'></script>";
 
     public DCPAmoAdAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
