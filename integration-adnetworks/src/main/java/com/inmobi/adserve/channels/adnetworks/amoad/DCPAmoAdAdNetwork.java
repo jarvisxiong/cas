@@ -39,7 +39,7 @@ public class DCPAmoAdAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "AmoAd";
+        return "amoad";
     }
 
     @Override
