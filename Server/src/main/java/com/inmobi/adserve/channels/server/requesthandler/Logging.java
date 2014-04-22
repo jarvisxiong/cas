@@ -1,23 +1,5 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.inject.Inject;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.json.JSONException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
@@ -27,26 +9,25 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.MetricsManager;
 import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
-import com.inmobi.casthrift.Ad;
-import com.inmobi.casthrift.AdIdChain;
-import com.inmobi.casthrift.AdMeta;
-import com.inmobi.casthrift.AdRR;
-import com.inmobi.casthrift.AdStatus;
-import com.inmobi.casthrift.CasAdChain;
-import com.inmobi.casthrift.CasAdvertisementLog;
-import com.inmobi.casthrift.Channel;
-import com.inmobi.casthrift.ContentRating;
-import com.inmobi.casthrift.DemandSourceType;
-import com.inmobi.casthrift.Gender;
-import com.inmobi.casthrift.Geo;
-import com.inmobi.casthrift.HandsetMeta;
-import com.inmobi.casthrift.Impression;
-import com.inmobi.casthrift.InventoryType;
-import com.inmobi.casthrift.PricingModel;
-import com.inmobi.casthrift.Request;
-import com.inmobi.casthrift.User;
+import com.inmobi.casthrift.*;
 import com.inmobi.messaging.Message;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
+import org.apache.commons.configuration.Configuration;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class Logging {
@@ -87,7 +68,7 @@ public class Logging {
             throws JSONException, TException {
         InspectorStats.incrementStatCount(InspectorStrings.latency, totalTime);
         boolean isTerminated = false;
-        if (null != terminationReason) {
+        if (null != terminationReason && !"NO".equalsIgnoreCase(terminationReason)) {
             isTerminated = true;
         }
         short adsServed = 0;
