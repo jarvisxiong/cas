@@ -1,35 +1,5 @@
 package com.inmobi.adserve.channels.server;
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.QueryStringDecoder;
-import io.netty.handler.timeout.ReadTimeoutException;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.nio.channels.ClosedChannelException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
-import javax.inject.Inject;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-
-import org.apache.thrift.TException;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
-import org.slf4j.Marker;
-
 import com.google.inject.Provider;
 import com.inmobi.adserve.adpool.AdPoolRequest;
 import com.inmobi.adserve.channels.server.api.Servlet;
@@ -39,6 +9,33 @@ import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.QueryStringDecoder;
+import io.netty.handler.timeout.ReadTimeoutException;
+import org.apache.thrift.TException;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+import org.slf4j.Marker;
+
+import javax.inject.Inject;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.channels.ClosedChannelException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 
 public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
@@ -130,7 +127,9 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
         RequestParameterHolder requestParameterHolder = (RequestParameterHolder) msg;
         try {
-            this.terminationReason = requestParameterHolder.getTerminationReason();
+            if (null != requestParameterHolder.getTerminationReason()) {
+                this.terminationReason = requestParameterHolder.getTerminationReason();
+            }
             this.responseSender.sasParams = requestParameterHolder.getSasParams();
             this.responseSender.casInternalRequestParameters = requestParameterHolder.getCasInternalRequestParameters();
             httpRequest = requestParameterHolder.getHttpRequest();
