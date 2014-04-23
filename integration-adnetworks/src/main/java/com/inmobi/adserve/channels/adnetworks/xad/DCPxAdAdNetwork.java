@@ -111,7 +111,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 			url.append("?v=1.2&o_fmt=html5&ip=").append(
 					sasParams.getRemoteHostIp());
 			url.append("&k=").append(externalSiteId);
-			String categories = getCategories(',', false, true);
+			String categories = getCategories(',', true, true);
 			String appId = String.format(APP_ID_FORMAT, blindedSiteId,
 					categories.split(",")[0].replace(' ', '_'));
 			url.append("&appid=").append(appId);
