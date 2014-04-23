@@ -72,8 +72,9 @@ public class RequestFilters {
             try {
                 if ((hrh.responseSender.sasParams.getSdkVersion().substring(0, 1).equalsIgnoreCase("i") || hrh.responseSender.sasParams
                         .getSdkVersion().substring(0, 1).equalsIgnoreCase("a"))
-                        && (Integer.parseInt(hrh.responseSender.sasParams.getSdkVersion().substring(1, 2)) < 3 || "430"
-                                .equals(hrh.responseSender.sasParams.getSdkVersion().substring(1)))) {
+                        && (Integer.parseInt(hrh.responseSender.sasParams.getSdkVersion().substring(1, 2)) < 3 || (hrh.responseSender.sasParams
+                                .getDst() == 2 && "430".equals(hrh.responseSender.sasParams.getSdkVersion()
+                                .substring(1))))) {
                     LOG.error("Terminating request as sdkVersion is less than 3 or is 430");
                     hrh.setTerminationReason(ServletHandler.lowSdkVersion);
                     InspectorStats.incrementStatCount(InspectorStrings.lowSdkVersion, InspectorStrings.count);
