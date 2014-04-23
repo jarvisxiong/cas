@@ -64,12 +64,14 @@ public class Logging {
 
     // Writing rrlogs
     public static void rrLogging(final ChannelSegment channelSegment, final List<ChannelSegment> rankList,
-            final SASRequestParameters sasParams, final String terminationReason, final long totalTime)
+            final SASRequestParameters sasParams, String terminationReason, final long totalTime)
             throws JSONException, TException {
         InspectorStats.incrementStatCount(InspectorStrings.latency, totalTime);
         boolean isTerminated = false;
-        if (null != terminationReason && !"NO".equalsIgnoreCase(terminationReason)) {
+        if (null != terminationReason) {
             isTerminated = true;
+        } else {
+            terminationReason = "NO";
         }
         short adsServed = 0;
         String host;
