@@ -1,7 +1,25 @@
 package com.inmobi.adserve.channels.server;
 
-import com.google.inject.Provider;
-import com.inmobi.adserve.adpool.AdPoolRequest;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.QueryStringDecoder;
+import io.netty.handler.timeout.ReadTimeoutException;
+
+import java.io.IOException;
+import java.nio.channels.ClosedChannelException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.apache.thrift.TException;
+import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+import org.slf4j.Marker;
+
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
@@ -9,48 +27,17 @@ import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.QueryStringDecoder;
-import io.netty.handler.timeout.ReadTimeoutException;
-import org.apache.thrift.TException;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
-import org.slf4j.Marker;
-
-import javax.inject.Inject;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.nio.channels.ClosedChannelException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
 
 
 public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
 
-    private static final Logger LOG               = LoggerFactory.getLogger(HttpRequestHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HttpRequestHandler.class);
 
-    public String               terminationReason = "NO";
-    public JSONObject           jObject           = null;
-    public AdPoolRequest        tObject;
+    public String               terminationReason;
     public ResponseSender       responseSender;
 
-    private Provider<Marker>    traceMarkerProvider;
     private Marker              traceMarker;
-
-    private Provider<Servlet>   servletProvider;
+    private Servlet             servlet;
 
     private HttpRequest         httpRequest;
 
@@ -67,9 +54,9 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Inject
-    HttpRequestHandler(final Provider<Marker> traceMarkerProvider, final Provider<Servlet> servletProvider) {
-        this.traceMarkerProvider = traceMarkerProvider;
-        this.servletProvider = servletProvider;
+    HttpRequestHandler(final Marker traceMarker, final Servlet servlet) {
+        this.traceMarker = traceMarker;
+        this.servlet = servlet;
         responseSender = new ResponseSender(this);
     }
 
@@ -131,10 +118,6 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
             this.responseSender.sasParams = requestParameterHolder.getSasParams();
             this.responseSender.casInternalRequestParameters = requestParameterHolder.getCasInternalRequestParameters();
             httpRequest = requestParameterHolder.getHttpRequest();
-
-            traceMarker = traceMarkerProvider.get();
-
-            Servlet servlet = servletProvider.get();
 
             LOG.debug(traceMarker, "Got the servlet {} , uri {}", servlet.getName(), httpRequest.getUri());
 
@@ -203,37 +186,6 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
             LOG.debug(ChannelServer.getMyStackTrace(exception));
         }
         LOG.debug("done with logging");
-    }
-
-    // send Mail if channel server crashes
-    public static void sendMail(final String errorMessage, final String stackTrace) {
-        Properties properties = System.getProperties();
-        properties.setProperty("mail.smtp.host", ServletHandler.getServerConfig().getString("smtpServer"));
-        Session session = Session.getDefaultInstance(properties);
-        try {
-            MimeMessage message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(ServletHandler.getServerConfig().getString("sender")));
-            List<String> recipients = ServletHandler.getServerConfig().getList("recipients");
-            javax.mail.internet.InternetAddress[] addressTo = new javax.mail.internet.InternetAddress[recipients.size()];
-
-            for (int index = 0; index < recipients.size(); index++) {
-                addressTo[index] = new javax.mail.internet.InternetAddress(recipients.get(index));
-            }
-
-            message.setRecipients(Message.RecipientType.TO, addressTo);
-            InetAddress addr = InetAddress.getLocalHost();
-            message.setSubject("Channel Ad Server Crashed on Host " + addr.getHostName());
-            message.setText(errorMessage + stackTrace);
-            Transport.send(message);
-        }
-        catch (MessagingException mex) {
-            // logger.info("Error while sending mail");
-            mex.printStackTrace();
-        }
-        catch (UnknownHostException ex) {
-            // logger.debug("could not resolve host inside send mail");
-            ex.printStackTrace();
-        }
     }
 
 }

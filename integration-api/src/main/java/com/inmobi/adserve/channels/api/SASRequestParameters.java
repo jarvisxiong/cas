@@ -1,72 +1,73 @@
 package com.inmobi.adserve.channels.api;
 
-import lombok.Data;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import lombok.Data;
 
 
 @Data
 public class SASRequestParameters {
 
-    private String       allParametersJson;
-    private String       remoteHostIp;
-    private String       userAgent;
+    private String              allParametersJson;
+    private String              remoteHostIp;
+    private String              userAgent;
 
-    private String       source;               // WAP/APP
-    private Short        age;
-    private String       gender;
-    private String       locSrc;               // wifi/ip
-    private Integer      postalCode;
+    private String              source;               // WAP/APP
+    private Short               age;
+    private String              gender;
+    private String              locSrc;               // wifi/ip
+    private Integer             postalCode;
     // User location parameters
-    private String       latLong;
-    private String       countryCode;      //Country Code like US for USA
-    private Long         countryId;        // Integer value for country
-    private String       impressionId;
-    private String       clurl;
-    private String       siteId;
-    private Short        slot;
+    private String              latLong;
+    private String              countryCode;          // Country Code like US for USA
+    private Long                countryId;            // Integer value for country
+    private String              impressionId;
+    private String              clurl;
+    private String              siteId;
+    private Short               slot;
     // TODO: Convert this to ENUM.
-    private String       siteType;
-    private String       sdkVersion;
-    private long         siteIncId;
-    private long         adIncId;
-    private String       adcode;
+    private String              siteType;
+    private String              sdkVersion;
+    private long                siteIncId;
+    private long                adIncId;
+    private String              adcode;
     // Site parameters
-    private List<Long>   categories;
-    private Double       siteFloor      = 0.0d;
-    private Boolean      allowBannerAds = true;
-    private Integer      siteSegmentId;
+    private List<Long>          categories;
+    private Double              siteFloor      = 0.0d;
+    private Boolean             allowBannerAds = true;
+    private Integer             siteSegmentId;
     // Uid parameters
-    private String       uidParams;
-    private Map<String, String>     tUidParams;
+    private String              uidParams;
+    private Map<String, String> tUidParams;
 
-    private String      rqIframe;
-    private String      rFormat;
+    private String              rqIframe;
+    private String              rFormat;
 
-    private int          osId;
-    private Short        rqMkAdcount;
-    private String       tid;
-    private long         handsetInternalId;
-    private int          carrierId;
-    private Integer      city;
-    private Integer      state;
-    private List<Short>  rqMkSlot;
-    private Integer      ipFileVersion;
-    private boolean      isRichMedia;
-    private String       rqAdType;
-    private String       imaiBaseUrl;
-    private String       appUrl;
-    private int          modelId;
-    private Set<String>  uAdapters;
+    private int                 osId;
+    private Short               rqMkAdcount;
+    private String              tid;
+    private long                handsetInternalId;
+    private int                 carrierId;
+    private Integer             city;
+    private Integer             state;
+    private List<Short>         rqMkSlot;
+    private Integer             ipFileVersion;
+    private boolean             isRichMedia;
+    private String              rqAdType;
+    private String              imaiBaseUrl;
+    private String              appUrl;
+    private int                 modelId;
+    private Set<String>         uAdapters;
 
-    private int          dst;                  // This will describe the type of request dcp or rtbd
-    private Set<Integer> accountSegment;      
-    private boolean      isResponseOnlyFromDcp;
-    private int          sst;//0 for Network
-    private String       pubId;
-    private String       osMajorVersion;
+    private int                 dst;                  // This will describe the type of request dcp or rtbd
+    private Set<Integer>        accountSegment;
+    private boolean             isResponseOnlyFromDcp;
+    private int                 sst;                  // 0 for Network
+    private String              pubId;
+    private String              osMajorVersion;
+    private boolean             isKeepAlive;
 
     public SASRequestParameters() {
         // Do Nothing.
@@ -96,7 +97,7 @@ public class SASRequestParameters {
 
         private final int id;
 
-        HandSetOS(int id) {
+        HandSetOS(final int id) {
             this.id = id;
         }
 
@@ -104,4 +105,5 @@ public class SASRequestParameters {
             return id;
         }
     }
+
 }

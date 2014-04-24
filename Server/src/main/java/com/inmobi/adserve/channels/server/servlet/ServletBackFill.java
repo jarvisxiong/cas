@@ -130,8 +130,8 @@ public class ServletBackFill implements Servlet {
 
         dcpSegments = asyncRequestMaker.prepareForAsyncRequest(filteredSegments, ServletHandler.getServerConfig(),
                 ServletHandler.getRtbConfig(), ServletHandler.getAdapterConfig(), hrh.responseSender,
-                sasParams.getUAdapters(), serverChannel, ServletHandler.repositoryHelper, hrh.jObject,
-                hrh.responseSender.sasParams, casInternalRequestParametersGlobal, rtbSegments);
+                sasParams.getUAdapters(), serverChannel, ServletHandler.repositoryHelper, hrh.responseSender.sasParams,
+                casInternalRequestParametersGlobal, rtbSegments);
 
         LOG.debug("rtb rankList size is {}", rtbSegments.size());
         if (dcpSegments.isEmpty() && rtbSegments.isEmpty()) {

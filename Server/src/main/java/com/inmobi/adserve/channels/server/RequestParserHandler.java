@@ -1,9 +1,12 @@
 package com.inmobi.adserve.channels.server;
 
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.QueryStringDecoder;
 
@@ -39,34 +42,39 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Sharable
 @Singleton
 public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHttpRequest> {
-    private static final Logger       LOG      = LoggerFactory.getLogger(RequestParserHandler.class);
+    private static final Logger                LOG      = LoggerFactory.getLogger(RequestParserHandler.class);
 
-    private final RequestParser       requestParser;
-    private final ThriftRequestParser thriftRequestParser;
-    private final Provider<Marker>    traceMarkerProvider;
-    private final Provider<Servlet>   servletProvider;
-    private final URLCodec            urlCodec = new URLCodec();
+    private final RequestParser                requestParser;
+    private final ThriftRequestParser          thriftRequestParser;
+    private final Provider<Marker>             traceMarkerProvider;
+    private final Provider<Servlet>            servletProvider;
+    private final URLCodec                     urlCodec = new URLCodec();
+    private final Provider<HttpRequestHandler> httpRequestHandlerProvider;
 
     @Inject
     RequestParserHandler(final RequestParser requestParser, final ThriftRequestParser thriftRequestParser,
-            final Provider<Marker> traceMarkerProvider, final Provider<Servlet> servletProvider) {
+            final Provider<Marker> traceMarkerProvider, final Provider<Servlet> servletProvider,
+            final Provider<HttpRequestHandler> httpRequestHandlerProvider) {
         this.requestParser = requestParser;
         this.thriftRequestParser = thriftRequestParser;
         this.traceMarkerProvider = traceMarkerProvider;
         this.servletProvider = servletProvider;
+        this.httpRequestHandlerProvider = httpRequestHandlerProvider;
     }
 
     @Override
-    protected void decode(final ChannelHandlerContext ctx, final DefaultFullHttpRequest msg, final List<Object> out)
+    protected void decode(final ChannelHandlerContext ctx, final DefaultFullHttpRequest request, final List<Object> out)
             throws Exception {
 
         LOG.debug("inside RequestParserHandler");
         Marker traceMarker = traceMarkerProvider.get();
-        DefaultFullHttpRequest request = msg;
 
         QueryStringDecoder queryStringDecoder = new QueryStringDecoder(request.getUri());
         Map<String, List<String>> params = queryStringDecoder.parameters();
+
         SASRequestParameters sasParams = new SASRequestParameters();
+        sasParams.setKeepAlive(HttpHeaders.isKeepAlive(request));
+
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         String terminationReason = null;
         Servlet servlet = servletProvider.get();
@@ -141,5 +149,12 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
         out.add(new RequestParameterHolder(sasParams, casInternalRequestParameters, request.getUri(),
                 terminationReason, request));
         request.retain();
+
+        ChannelPipeline pipeline = ctx.pipeline();
+        Map<String, ChannelHandler> channelHandlerMap = pipeline.toMap();
+        if (channelHandlerMap.containsKey("casHandler")) {
+            pipeline.remove("casHandler");
+        }
+        pipeline.addLast("casHandler", httpRequestHandlerProvider.get());
     }
 }
