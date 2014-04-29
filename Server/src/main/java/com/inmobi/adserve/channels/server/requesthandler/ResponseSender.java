@@ -135,7 +135,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
             throws NullPointerException {
 
         // Making sure response is sent only once
-        checkResponseSent();
+        if (checkResponseSent()) {
+            return;
+        }
 
         LOG.debug("ad received so trying to send ad response");
         String finalReponse = adResponse.response;
@@ -185,18 +187,18 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
     }
 
-    private void checkResponseSent() {
+    private boolean checkResponseSent() {
         if (responseSent) {
-            return;
+            return true;
         }
 
         synchronized (lock) {
             if (!responseSent) {
                 responseSent = true;
-                return;
+                return false;
             }
             else {
-                return;
+                return true;
             }
         }
     }
@@ -304,7 +306,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
     @Override
     public void sendNoAdResponse(final Channel serverChannel) throws NullPointerException {
         // Making sure response is sent only once
-        checkResponseSent();
+        if (checkResponseSent()) {
+            return;
+        }
 
         InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
 
