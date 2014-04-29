@@ -127,9 +127,7 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
         RequestParameterHolder requestParameterHolder = (RequestParameterHolder) msg;
         try {
-            if (null != requestParameterHolder.getTerminationReason()) {
-                this.terminationReason = requestParameterHolder.getTerminationReason();
-            }
+            this.terminationReason = requestParameterHolder.getTerminationReason();
             this.responseSender.sasParams = requestParameterHolder.getSasParams();
             this.responseSender.casInternalRequestParameters = requestParameterHolder.getCasInternalRequestParameters();
             httpRequest = requestParameterHolder.getHttpRequest();
