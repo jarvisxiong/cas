@@ -1,20 +1,15 @@
 package com.inmobi.adserve.channels.util.httpclient;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.EventLoop;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.util.concurrent.Future;
 
 
 /**
  * @author abhishek.parwal
  * 
  */
-public class NettyHttpClient {
+public interface NettyHttpClient {
 
-    private void setRequestTimeoutInMs() {
-        Bootstrap bootstrap = null;
-        ChannelHandlerContext ctx = null;
-        bootstrap.group(ctx.channel().eventLoop());
-        // TODO Auto-generated method stub
-
-    }
+    Future<DefaultFullHttpResponse> sendRequest(final NettyRequest nettyRequest, final EventLoop eventLoop);
 }
