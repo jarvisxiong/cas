@@ -15,14 +15,15 @@ import io.netty.handler.codec.http.HttpResponseDecoder;
 import java.net.URI;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import lombok.Data;
+import net.sf.ehcache.util.NamedThreadFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.inmobi.adserve.channels.util.httpclient.NettyHttpClientImpl.ChannelWriteListener;
-import com.inmobi.adserve.channels.util.httpclient.NettyHttpClientImpl.HttpResponseNotifier;
 
 
 /**
@@ -31,16 +32,25 @@ import com.inmobi.adserve.channels.util.httpclient.NettyHttpClientImpl.HttpRespo
  */
 public class ConnectionPoolImpl implements ConnectionPool {
 
-    private final static Logger                                              LOG          = LoggerFactory
-                                                                                                  .getLogger(ConnectionPoolImpl.class);
+    private final static Logger                                              LOG                = LoggerFactory
+                                                                                                        .getLogger(ConnectionPoolImpl.class);
+    public static final int                                                  MAX_HELPER_THREADS = 20;
 
-    private final ConcurrentHashMap<PoolKey, ConcurrentLinkedQueue<Channel>> freeChannels = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<PoolKey, ConcurrentLinkedQueue<Channel>> freeChannels       = new ConcurrentHashMap<>();
 
     private final int                                                        connectTimeoutInMillis;
 
-    private final Object                                                     lock        = new Object();
+    private final Object                                                     lock               = new Object();
 
     private final int                                                        maximumConnectionsTotal;
+
+    private final Executor                                                   executor           = Executors
+                                                                                                        .newFixedThreadPool(
+                                                                                                                MAX_HELPER_THREADS,
+                                                                                                                new NamedThreadFactory(
+                                                                                                                        "httpHelpers"));
+
+    private final AtomicInteger                                              connectionCount    = new AtomicInteger(0);
 
     public ConnectionPoolImpl(final int connectTimeoutInMillis, final int requestTimeoutInMillis,
             final int maximumConnectionsTotal) {
@@ -55,12 +65,11 @@ public class ConnectionPoolImpl implements ConnectionPool {
     }
 
     @Override
-    public Channel getChannel(final NettyRequest nettyRequest, final EventLoop eventLoop,
+    public void getChannel(final NettyRequest nettyRequest, final EventLoop eventLoop,
             final ChannelWriteListener channelWriteListener) throws Exception {
 
         final PoolKey poolKey = new PoolKey(nettyRequest.getUri(), eventLoop);
-        Channel channel = borrowChannel(poolKey, channelWriteListener);
-        return channel;
+        borrowChannel(poolKey, channelWriteListener);
 
     }
 
@@ -72,13 +81,12 @@ public class ConnectionPoolImpl implements ConnectionPool {
         }
     }
 
-    private Channel borrowChannel(final PoolKey poolKey, final ChannelWriteListener channelWriteListener) {
+    private void borrowChannel(final PoolKey poolKey, final ChannelWriteListener channelWriteListener) {
         Channel channel = getAvailableChannel(poolKey);
         if (channel == null) {
-            channel = openChannel(channelWriteListener, poolKey);
+            newChannel(channelWriteListener, poolKey);
         }
         else {
-            LOG.debug("Using Existing channel {}, of pool key {}", channel, poolKey);
             try {
                 channelWriteListener.operationComplete(channel.newSucceededFuture());
             }
@@ -87,34 +95,42 @@ public class ConnectionPoolImpl implements ConnectionPool {
             }
         }
 
-        return channel;
-
     }
 
-    private Channel openChannel(final ChannelWriteListener channelWriteListener, final PoolKey poolKey) {
+    private void newChannel(final ChannelWriteListener channelWriteListener, final PoolKey poolKey) {
 
-        Bootstrap bootstrap = new Bootstrap();
-        bootstrap.channel(NioSocketChannel.class).option(ChannelOption.AUTO_READ, false)
-                .option(ChannelOption.SO_REUSEADDR, true)
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeoutInMillis).group(poolKey.getEventLoop())
-                .handler(new ChannelInitializer<Channel>() {
-                    @Override
-                    protected void initChannel(final Channel ch) throws Exception {
-                        ChannelPipeline p = ch.pipeline();
-                        p.addLast("httpRequestEncoder", new HttpRequestEncoder());
-                        p.addLast("httpObjectAggregator", new HttpObjectAggregator(4 * 1024 * 1024));
-                        p.addLast("httpResponseNotifier", new HttpResponseNotifier(ConnectionPoolImpl.this, poolKey));
-                        p.addLast("httpResponseEncoder", new HttpResponseDecoder());
-                    }
-                });
+        if (connectionCount.incrementAndGet() > maximumConnectionsTotal) {
+            connectionCount.decrementAndGet();
+            throw new RuntimeException(String.format("Cant open more than  %s Connection", maximumConnectionsTotal));
+        }
 
-        ChannelFuture channelFuture = bootstrap.connect(poolKey.getUri().getHost(), poolKey.getUri().getPort());
-        channelFuture.addListener(channelWriteListener);
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                Bootstrap bootstrap = new Bootstrap();
+                bootstrap.channel(NioSocketChannel.class).option(ChannelOption.AUTO_READ, false)
+                        .option(ChannelOption.SO_REUSEADDR, true)
+                        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeoutInMillis)
+                        .group(poolKey.getEventLoop()).handler(new ChannelInitializer<Channel>() {
+                            @Override
+                            protected void initChannel(final Channel ch) throws Exception {
+                                ChannelPipeline p = ch.pipeline();
+                                p.addLast("httpRequestEncoder", new HttpRequestEncoder());
+                                p.addLast("httpObjectAggregator", new HttpObjectAggregator(4 * 1024 * 1024));
+                                p.addLast("httpResponseNotifier", new HttpResponseNotifier(ConnectionPoolImpl.this,
+                                        poolKey));
+                                p.addLast("httpResponseEncoder", new HttpResponseDecoder());
+                            }
+                        });
 
-        Channel channel = channelFuture.channel();
-        LOG.debug("Opened a new channel {}", channel);
+                ChannelFuture channelFuture = bootstrap.connect(poolKey.getUri().getHost(), poolKey.getUri().getPort());
+                channelFuture.addListener(channelWriteListener);
+                Channel channel = channelFuture.channel();
 
-        return channel;
+                LOG.debug("Opened a new channel {}", channel);
+            }
+        });
+
     }
 
     private Channel getAvailableChannel(final PoolKey poolKey) {
@@ -122,6 +138,7 @@ public class ConnectionPoolImpl implements ConnectionPool {
             Channel channel;
             while ((channel = freeChannels.get(poolKey).poll()) != null) {
                 if (channel.isWritable()) {
+                    LOG.debug("Using Existing channel {}, of pool key {}", channel, poolKey);
                     return channel;
                 }
             }
