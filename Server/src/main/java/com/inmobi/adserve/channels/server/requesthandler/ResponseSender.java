@@ -1,25 +1,26 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import com.google.common.base.Charsets;
-import com.inmobi.adserve.adpool.AdInfo;
-import com.inmobi.adserve.adpool.AdPoolResponse;
-import com.inmobi.adserve.adpool.AuctionType;
-import com.inmobi.adserve.adpool.Creative;
-import com.inmobi.adserve.channels.api.*;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.phoenix.util.WilburyUUID;
-import com.inmobi.types.AdIdChain;
-import com.inmobi.types.GUID;
-import com.inmobi.types.PricingModel;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.handler.codec.http.*;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
+
+import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import javax.inject.Inject;
+
 import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
@@ -27,27 +28,50 @@ import org.apache.thrift.protocol.TBinaryProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import java.awt.*;
-import java.util.*;
-import java.util.List;
+import com.google.common.base.Charsets;
+import com.inmobi.adserve.adpool.AdInfo;
+import com.inmobi.adserve.adpool.AdPoolResponse;
+import com.inmobi.adserve.adpool.AuctionType;
+import com.inmobi.adserve.adpool.Creative;
+import com.inmobi.adserve.adpool.EncryptionKeys;
+import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.commons.security.api.InmobiSession;
+import com.inmobi.commons.security.impl.InmobiSecurityImpl;
+import com.inmobi.commons.security.util.exception.InmobiSecureException;
+import com.inmobi.commons.security.util.exception.InvalidMessageException;
+import com.inmobi.phoenix.util.WilburyUUID;
+import com.inmobi.types.AdIdChain;
+import com.inmobi.types.GUID;
+import com.inmobi.types.PricingModel;
 
 
 public class ResponseSender extends HttpRequestHandlerBase {
 
-    private final static Logger         LOG                      = LoggerFactory.getLogger(ResponseSender.class);
+    private static final int            ENCRYPTED_SDK_BASE_VERSION = 430;
 
-    private static final String         startTags                = "<AdResponse><Ads number=\"1\"><Ad type=\"rm\" width=\"%s\" height=\"%s\"><![CDATA[";
-    private static final String         endTags                  = " ]]></Ad></Ads></AdResponse>";
-    private static final String         adImaiStartTags          = "<!DOCTYPE html>";
-    private static final String         noAdImai                 = "";
-    private static final String         noAdXhtml                = "<AdResponse><Ads></Ads></AdResponse>";
-    private static final String         noAdHtml                 = "<!-- mKhoj: No advt for this position -->";
-    private static final String         noAdJsAdcode             = "<html><head><title></title><style type=\"text/css\">"
-                                                                         + " body {margin: 0; overflow: hidden; background-color: transparent}"
-                                                                         + " </style></head><body class=\"nofill\"><!-- NO FILL -->"
-                                                                         + "<script type=\"text/javascript\" charset=\"utf-8\">"
-                                                                         + "parent.postMessage('{\"topic\":\"nfr\",\"container\" : \"%s\"}', '*');</script></body></html>";
+    private final static Logger         LOG                        = LoggerFactory.getLogger(ResponseSender.class);
+
+    private static final String         startTags                  = "<AdResponse><Ads number=\"1\"><Ad type=\"rm\" width=\"%s\" height=\"%s\"><![CDATA[";
+    private static final String         endTags                    = " ]]></Ad></Ads></AdResponse>";
+    private static final String         adImaiStartTags            = "<!DOCTYPE html>";
+    private static final String         noAdImai                   = "";
+    private static final String         noAdXhtml                  = "<AdResponse><Ads></Ads></AdResponse>";
+    private static final String         noAdHtml                   = "<!-- mKhoj: No advt for this position -->";
+    private static final String         noAdJsAdcode               = "<html><head><title></title><style type=\"text/css\">"
+                                                                           + " body {margin: 0; overflow: hidden; background-color: transparent}"
+                                                                           + " </style></head><body class=\"nofill\"><!-- NO FILL -->"
+                                                                           + "<script type=\"text/javascript\" charset=\"utf-8\">"
+                                                                           + "parent.postMessage('{\"topic\":\"nfr\",\"container\" : \"%s\"}', '*');</script></body></html>";
     private final HttpRequestHandler    hrh;
     private long                        totalTime;
     private List<ChannelSegment>        rankList;
@@ -59,7 +83,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private boolean                     requestCleaned;
     public CasInternalRequestParameters casInternalRequestParameters;
     private final AuctionEngine         auctionEngine;
-    private static Set<String>          supportedResponseFormats = Sets.newHashSet("html", "xhtml", "axml", "imai");
+    private static Set<String>          supportedResponseFormats   = Sets.newHashSet("html", "xhtml", "axml", "imai");
 
     @Inject
     private static AsyncRequestMaker    asyncRequestMaker;
@@ -224,8 +248,23 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     // send response to the caller
-    public void sendResponse(final HttpResponseStatus status, final byte[] bytes, final Map responseHeaders,
+    public void sendResponse(final HttpResponseStatus status, byte[] bytes, final Map responseHeaders,
             final Channel serverChannel) throws NullPointerException {
+
+        if (Integer.parseInt(hrh.responseSender.sasParams.getSdkVersion().substring(1)) >= ENCRYPTED_SDK_BASE_VERSION) {
+            EncryptionKeys encryptionKey = sasParams.getEncryptionKey();
+
+            InmobiSession inmobiSession = new InmobiSecurityImpl(null).newSession(null);
+
+            try {
+                bytes = inmobiSession.write(bytes, encryptionKey.getAesKey().array(), encryptionKey
+                        .getInitializationVector().array());
+            }
+            catch (InmobiSecureException | InvalidMessageException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
 
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status,
                 Unpooled.wrappedBuffer(bytes), false);
