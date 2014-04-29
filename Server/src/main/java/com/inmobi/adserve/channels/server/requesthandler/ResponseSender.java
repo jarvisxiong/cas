@@ -252,7 +252,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
             final Channel serverChannel) throws NullPointerException {
 
         if (hrh.responseSender.sasParams.getSdkVersion() != null
-                && Integer.parseInt(hrh.responseSender.sasParams.getSdkVersion().substring(1)) >= ENCRYPTED_SDK_BASE_VERSION) {
+                && Integer.parseInt(hrh.responseSender.sasParams.getSdkVersion().substring(1)) >= ENCRYPTED_SDK_BASE_VERSION
+                && sasParams.getDst() == 2) {
             EncryptionKeys encryptionKey = sasParams.getEncryptionKey();
 
             InmobiSession inmobiSession = new InmobiSecurityImpl(null).newSession(null);
