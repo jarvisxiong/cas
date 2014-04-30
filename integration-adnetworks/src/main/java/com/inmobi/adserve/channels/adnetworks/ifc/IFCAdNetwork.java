@@ -120,9 +120,9 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
                         && (sdkVersion.toLowerCase().startsWith("i30") || sdkVersion.toLowerCase().startsWith("a30"))) {
                     return false;
                 }
-                if ((sdkVersion == null || sdkVersion.toLowerCase().equals("0")) && adcode.equalsIgnoreCase("non-js")) {
+                /*if ((sdkVersion == null || sdkVersion.toLowerCase().equals("0")) && adcode.equalsIgnoreCase("non-js")) {
                     return false;
-                }
+                }*/
             }
             catch (JSONException e) {
                 LOG.info("Error while parsing 'sdk-version'");
