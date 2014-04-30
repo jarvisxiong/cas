@@ -1,14 +1,14 @@
 package com.inmobi.adserve.channels.adnetworks.xad;
 
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.util.IABCategoriesInterface;
+import com.inmobi.adserve.channels.util.IABCategoriesMap;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -16,16 +16,10 @@ import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.IABCategoriesInterface;
-import com.inmobi.adserve.channels.util.IABCategoriesMap;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 	private static final Logger LOG = LoggerFactory
@@ -38,7 +32,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 	private String deviceId;
 	private String deviceIdType;
 	private String sourceType;
-	private static final String DERIVED_LAT_LONG = "derived-lat-lon";
+	private static final String DERIVED_LAT_LONG = "DERIVED_LAT_LON";
 	private boolean isLocSourceDerived;
 	private static final String APP_ID_FORMAT = "%s_%s"; // <blinded_id>_<category>
 	private static final String UUID_MD5 = "UUID|MD5";
