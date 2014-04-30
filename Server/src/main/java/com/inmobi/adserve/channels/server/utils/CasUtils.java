@@ -65,7 +65,7 @@ public class CasUtils {
                 .getCountryId().intValue(), sasParams.getOsId());
         double networkEcpm = 0.0;
         if (null != siteEcpmEntity) {
-            networkEcpm = siteEcpmEntity.getEcpm();
+            networkEcpm = 0.5 * siteEcpmEntity.getEcpm();
         }
         return networkEcpm;
     }
