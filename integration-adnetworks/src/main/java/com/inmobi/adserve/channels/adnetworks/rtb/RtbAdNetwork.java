@@ -343,10 +343,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         geo.setZip(casInternalRequestParameters.zipCode);
         // Setting type of geo data
-        if ("derived-lat-lon".equalsIgnoreCase(sasParams.getLocSrc())) {
+        if ("DERIVED_LAT_LON".equalsIgnoreCase(sasParams.getLocSrc())) {
             geo.setType(1);
         }
-        else if ("lat-lon".equalsIgnoreCase(sasParams.getLocSrc())) {
+        else if ("LATLON".equalsIgnoreCase(sasParams.getLocSrc())) {
             geo.setType(2);
         }
         return geo;

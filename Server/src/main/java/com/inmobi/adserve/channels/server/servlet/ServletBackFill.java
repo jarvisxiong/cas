@@ -1,20 +1,5 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.QueryStringDecoder;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.inject.Inject;
-import javax.ws.rs.Path;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
@@ -34,6 +19,18 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentF
 import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
+import javax.inject.Inject;
+import javax.ws.rs.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 @Singleton
@@ -117,10 +114,10 @@ public class ServletBackFill implements Servlet {
             return;
         }
 
-        double networkEcpm = casUtils.getNetworkEcpm(casContext, sasParams);
+        double networkSiteEcpm = casUtils.getNetworkSiteEcpm(casContext, sasParams);
         double segmentFloor = casUtils.getRtbFloor(casContext, hrh.responseSender.sasParams);
         enrichCasInternalRequestParameters(hrh, filteredSegments, casInternalRequestParametersGlobal.rtbBidFloor,
-                sasParams.getSiteFloor(), sasParams.getSiteIncId(), networkEcpm, segmentFloor);
+                sasParams.getSiteFloor(), sasParams.getSiteIncId(), networkSiteEcpm, segmentFloor);
         hrh.responseSender.casInternalRequestParameters = casInternalRequestParametersGlobal;
         hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternalRequestParametersGlobal;
 
@@ -179,14 +176,14 @@ public class ServletBackFill implements Servlet {
 
     private void enrichCasInternalRequestParameters(final HttpRequestHandler hrh,
             final List<ChannelSegment> filteredSegments, final Double rtbdFloor, final Double siteFloor,
-            final long siteIncId, final double networkEcpm, final double segmentFloor) {
+            final long siteIncId, final double networkSiteEcpm, final double segmentFloor) {
         CasInternalRequestParameters casInternalRequestParametersGlobal = hrh.responseSender.casInternalRequestParameters;
         casInternalRequestParametersGlobal.highestEcpm = getHighestEcpm(filteredSegments);
         casInternalRequestParametersGlobal.blockedCategories = getBlockedCategories(hrh);
         casInternalRequestParametersGlobal.blockedAdvertisers = getBlockedAdvertisers(hrh);
         double minimumRtbFloor = 0.05;
         casInternalRequestParametersGlobal.rtbBidFloor = hrh.responseSender.getAuctionEngine().calculateRTBFloor(
-                hrh.responseSender.sasParams.getSiteFloor(), 0.0, segmentFloor, minimumRtbFloor, networkEcpm);
+                hrh.responseSender.sasParams.getSiteFloor(), 0.0, segmentFloor, minimumRtbFloor, networkSiteEcpm);
         casInternalRequestParametersGlobal.auctionId = asyncRequestMaker.getImpressionId(siteIncId);
         LOG.debug("RTB floor from the pricing engine entity is {}", rtbdFloor);
         LOG.debug("RTB floor from the pricing engine entity is {}", segmentFloor);
@@ -194,7 +191,7 @@ public class ServletBackFill implements Servlet {
         LOG.debug("BlockedCategories are {}", casInternalRequestParametersGlobal.blockedCategories);
         LOG.debug("BlockedAdvertisers are {}", casInternalRequestParametersGlobal.blockedAdvertisers);
         LOG.debug("Site floor is {}", siteFloor);
-        LOG.debug("NetworkEcpm is {}", networkEcpm);
+        LOG.debug("NetworkSiteEcpm is {}", networkSiteEcpm);
         LOG.debug("SegmentFloor is {}", segmentFloor);
         LOG.debug("Minimum rtb floor is {}", minimumRtbFloor);
         LOG.debug("Final rtbFloor is {}", casInternalRequestParametersGlobal.rtbBidFloor);

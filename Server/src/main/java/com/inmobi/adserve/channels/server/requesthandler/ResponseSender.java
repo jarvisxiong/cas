@@ -44,7 +44,6 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.phoenix.util.WilburyUUID;
 import com.inmobi.types.AdIdChain;
 import com.inmobi.types.GUID;
 import com.inmobi.types.PricingModel;
@@ -224,7 +223,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 10, 6));
         rtbdAd.setPrice(bid);
         rtbdAd.setBid(bid);
-        UUID uuid = WilburyUUID.extractUUID(this.auctionEngine.getRtbResponse().getAdNetworkInterface()
+        UUID uuid = UUID.fromString(this.auctionEngine.getRtbResponse().getAdNetworkInterface()
                 .getImpressionId());
         rtbdAd.setImpressionId(new GUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits()));
         rtbdAd.setSlotServed(sasParams.getSlot());
