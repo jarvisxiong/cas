@@ -259,8 +259,13 @@ public class ResponseSender extends HttpRequestHandlerBase {
             InmobiSession inmobiSession = new InmobiSecurityImpl(null).newSession(null);
 
             try {
-                bytes = inmobiSession.write(bytes, encryptionKey.getAesKey().array(), encryptionKey
-                        .getInitializationVector().array());
+                byte[] encryptionKeyBytes = new byte[encryptionKey.getAesKey().remaining()];
+                encryptionKey.getAesKey().get(encryptionKeyBytes);
+
+                byte[] ivBytes = new byte[encryptionKey.getInitializationVector().remaining()];
+                encryptionKey.getInitializationVector().get(ivBytes);
+
+                bytes = inmobiSession.write(bytes, encryptionKeyBytes, ivBytes);
             }
             catch (InmobiSecureException | InvalidMessageException e) {
                 throw new RuntimeException(e);
