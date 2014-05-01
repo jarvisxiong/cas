@@ -11,6 +11,7 @@ import java.nio.channels.ClosedChannelException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import org.apache.thrift.TException;
@@ -54,7 +55,7 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Inject
-    HttpRequestHandler(final Marker traceMarker, final Servlet servlet) {
+    HttpRequestHandler(@Nullable final Marker traceMarker, final Servlet servlet) {
         this.traceMarker = traceMarker;
         this.servlet = servlet;
         responseSender = new ResponseSender(this);
