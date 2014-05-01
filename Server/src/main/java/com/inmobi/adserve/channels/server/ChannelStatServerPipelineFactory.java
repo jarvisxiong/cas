@@ -47,7 +47,6 @@ public class ChannelStatServerPipelineFactory extends ChannelInitializer<SocketC
         pipeline.addLast("traceMarkerhandler", traceMarkerhandler);
         pipeline.addLast("servletHandler", servletHandler);
         pipeline.addLast("requestParserHandler", requestParserHandler);
-        pipeline.addLast("handler", httpRequestHandlerProvider.get());
     }
 
 }
