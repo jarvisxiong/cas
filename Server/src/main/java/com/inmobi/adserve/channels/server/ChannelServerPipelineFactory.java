@@ -11,7 +11,6 @@ import javax.inject.Inject;
 
 import lombok.Getter;
 
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.server.handler.TraceMarkerhandler;
@@ -21,25 +20,22 @@ import com.inmobi.adserve.channels.util.annotations.IncomingConnectionLimitHandl
 @Singleton
 public class ChannelServerPipelineFactory extends ChannelInitializer<SocketChannel> {
 
-    private final RequestIdHandler             requestIdHandler;
-    private final Provider<HttpRequestHandler> httpRequestHandlerProvider;
-    private final TraceMarkerhandler           traceMarkerhandler;
+    private final RequestIdHandler       requestIdHandler;
+    private final TraceMarkerhandler     traceMarkerhandler;
     @Getter
-    private final ConnectionLimitHandler       incomingConnectionLimitHandler;
-    private final ServletHandler               servletHandler;
-    private final ServerConfig                 serverConfig;
-    private final LoggingHandler               loggingHandler;
-    private final RequestParserHandler         requestParserHandler;
+    private final ConnectionLimitHandler incomingConnectionLimitHandler;
+    private final ServletHandler         servletHandler;
+    private final ServerConfig           serverConfig;
+    private final LoggingHandler         loggingHandler;
+    private final RequestParserHandler   requestParserHandler;
 
     @Inject
-    ChannelServerPipelineFactory(final ServerConfig serverConfig,
-            final Provider<HttpRequestHandler> httpRequestHandlerProvider, final TraceMarkerhandler traceMarkerhandler,
+    ChannelServerPipelineFactory(final ServerConfig serverConfig, final TraceMarkerhandler traceMarkerhandler,
             final ServletHandler servletHandler,
             @IncomingConnectionLimitHandler final ConnectionLimitHandler incomingConnectionLimitHandler,
             final LoggingHandler loggingHandler, final RequestParserHandler requestParserHandler) {
 
         this.serverConfig = serverConfig;
-        this.httpRequestHandlerProvider = httpRequestHandlerProvider;
         this.traceMarkerhandler = traceMarkerhandler;
         this.requestIdHandler = new RequestIdHandler();
         this.incomingConnectionLimitHandler = incomingConnectionLimitHandler;
@@ -62,6 +58,5 @@ public class ChannelServerPipelineFactory extends ChannelInitializer<SocketChann
         pipeline.addLast("servletHandler", servletHandler);
         // pipeline.addLast("casCodec", new CasCodec());
         pipeline.addLast("requestParserHandler", requestParserHandler);
-        pipeline.addLast("handler", httpRequestHandlerProvider.get());
     }
 }
