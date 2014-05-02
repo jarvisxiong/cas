@@ -1,9 +1,10 @@
 package com.inmobi.adserve.channels.api;
 
-import java.net.URI;
-import java.util.Map;
-
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
 
 
 public interface AdNetworkInterface {
@@ -13,6 +14,18 @@ public interface AdNetworkInterface {
 
     // Return the latency.
     long getLatency();
+
+    // Return the creative id.
+    String getCreativeId();
+
+    // Return the sample image url.
+    String getIUrl();
+
+    // Return the creative attributes.
+    List<Integer> getAttribute();
+
+    // Return the advertiser domains.
+    List<String> getADomain();
 
     // Return the bid price for rtb, for other will return the -1.
     double getBidPriceInUsd();
