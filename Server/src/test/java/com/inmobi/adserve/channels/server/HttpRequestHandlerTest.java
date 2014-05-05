@@ -1,37 +1,31 @@
 package com.inmobi.adserve.channels.server;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import junit.framework.TestCase;
-
-import org.apache.commons.configuration.Configuration;
-import org.easymock.classextension.EasyMock;
-import org.testng.annotations.Test;
-
-import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
-import com.google.inject.TypeLiteral;
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
-import com.inmobi.adserve.channels.server.requesthandler.AuctionEngine;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.server.module.CasNettyModule;
+import com.inmobi.adserve.channels.server.module.ServerModule;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
+import junit.framework.TestCase;
+import org.apache.commons.configuration.Configuration;
+import org.easymock.classextension.EasyMock;
+import org.testng.annotations.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 
 public class HttpRequestHandlerTest extends TestCase {
@@ -70,19 +64,7 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(mockConfigLoader.getDatabaseConfiguration()).andReturn(null).anyTimes();
         replay(mockConfigLoader);
 
-        Guice.createInjector(new AbstractModule() {
-
-            @Override
-            protected void configure() {
-                TypeLiteral<Map<String, String>> advertiserIdNameMapType = new TypeLiteral<Map<String, String>>() {
-                };
-                bind(advertiserIdNameMapType).annotatedWith(AdvertiserIdNameMap.class).toInstance(
-                        new HashMap<String, String>());
-                AsyncRequestMaker asyncRequestMaker = new AsyncRequestMaker(null);
-                bind(AsyncRequestMaker.class).toInstance(asyncRequestMaker);
-                requestStaticInjection(AuctionEngine.class);
-            }
-        });
+        Guice.createInjector(new ServerModule(config, createMock(RepositoryHelper.class)) ,  new CasNettyModule(config.getServerConfiguration()));
 
         AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
         Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-advertisement", mockServerConfig);

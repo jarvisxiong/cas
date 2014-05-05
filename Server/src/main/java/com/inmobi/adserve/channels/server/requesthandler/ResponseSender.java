@@ -1,26 +1,25 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import com.google.common.base.Charsets;
+import com.inmobi.adserve.adpool.AdInfo;
+import com.inmobi.adserve.adpool.AdPoolResponse;
+import com.inmobi.adserve.adpool.AuctionType;
+import com.inmobi.adserve.adpool.Creative;
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.server.auction.AuctionEngine;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.types.AdIdChain;
+import com.inmobi.types.GUID;
+import com.inmobi.types.PricingModel;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
-
-import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.inject.Inject;
-
+import io.netty.handler.codec.http.*;
 import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
@@ -28,25 +27,10 @@ import org.apache.thrift.protocol.TBinaryProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Charsets;
-import com.inmobi.adserve.adpool.AdInfo;
-import com.inmobi.adserve.adpool.AdPoolResponse;
-import com.inmobi.adserve.adpool.AuctionType;
-import com.inmobi.adserve.adpool.Creative;
-import com.inmobi.adserve.channels.api.AdNetworkInterface;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.types.AdIdChain;
-import com.inmobi.types.GUID;
-import com.inmobi.types.PricingModel;
+import javax.inject.Inject;
+import java.awt.*;
+import java.util.*;
+import java.util.List;
 
 
 public class ResponseSender extends HttpRequestHandlerBase {

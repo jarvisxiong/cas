@@ -10,6 +10,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import com.google.inject.Injector;
+import com.inmobi.adserve.channels.server.auction.AuctionEngine;
+import com.inmobi.adserve.channels.server.auction.AuctionFilterApplier;
+import com.inmobi.adserve.channels.server.auction.AuctionFilterModule;
+import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilterApplier;
+import com.inmobi.adserve.channels.types.AccountType;
 import org.apache.commons.configuration.Configuration;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
@@ -42,6 +48,7 @@ public class AuctionEngineTest {
     Capture<String>              encryptedBid1;
     Capture<Double>              secondPrice1;
     CasInternalRequestParameters casInternalRequestParameters;
+    AuctionFilterApplier         auctionFilterApplier;
 
     @BeforeMethod
     public void setUp() throws IOException {
@@ -71,9 +78,16 @@ public class AuctionEngineTest {
 
         casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.auctionId = "auctionId";
+        casInternalRequestParameters.siteAccountType = AccountType.SELF_SERVE;
+        RepositoryHelper repositoryHelper = createMock(RepositoryHelper.class);
+        expect(repositoryHelper.queryCreativeRepository(EasyMock.isA(String.class), EasyMock.isA(String.class))).andReturn(null).anyTimes();
+        expect(repositoryHelper.getChannelAdGroupRepository()).andReturn(null).anyTimes();
+        replay(repositoryHelper);
 
-        Guice.createInjector(Modules.override(new ServerModule(config, createMock(RepositoryHelper.class)),
+        Injector injector = Guice.createInjector(Modules.override(new ServerModule(config, repositoryHelper),
                 new CasNettyModule(config.getServerConfiguration())).with(new TestScopeModule()));
+        auctionFilterApplier = injector.getInstance(AuctionFilterApplier.class);
+
 
     }
 
@@ -113,6 +127,15 @@ public class AuctionEngineTest {
         expect(mockAdnetworkInterface.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(mockAdnetworkInterface.getSeatId()).andReturn(advId).anyTimes();
         expect(mockAdnetworkInterface.getCurrency()).andReturn("USD").anyTimes();
+        expect(mockAdnetworkInterface.getCreativeId()).andReturn("creativeId").anyTimes();
+        List<String> adomains = new ArrayList<String>();
+        adomains.add("a.com");
+        expect(mockAdnetworkInterface.getADomain()).andReturn(adomains).anyTimes();
+        List<Integer> cAttributes = new ArrayList<Integer>();
+        cAttributes.add(1);
+        expect(mockAdnetworkInterface.getAttribute()).andReturn(cAttributes).anyTimes();
+        expect(mockAdnetworkInterface.getIUrl()).andReturn("iurl").anyTimes();
+
         // this is done, to track the encryptedBid variable getting set inside the AuctionEngine.
         mockAdnetworkInterface.setEncryptedBid(EasyMock.capture(encryptedBid1));
         EasyMock.expectLastCall().anyTimes();
@@ -346,7 +369,6 @@ public class AuctionEngineTest {
         catch (AssertionError er) {
 
         }
-
         Assert.assertEquals(auctionEngineResponse, expectedAuctionEngineResponse);
     }
 

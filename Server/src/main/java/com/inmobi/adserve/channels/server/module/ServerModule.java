@@ -1,20 +1,8 @@
 package com.inmobi.adserve.channels.server.module;
 
-import java.util.Map;
-import java.util.Set;
-
-import javax.ws.rs.Path;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.hadoop.thirdparty.guava.common.collect.Maps;
-import org.reflections.Reflections;
-import org.reflections.scanners.TypeAnnotationsScanner;
-import org.slf4j.LoggerFactory;
-
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
@@ -24,7 +12,8 @@ import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.api.Servlet;
-import com.inmobi.adserve.channels.server.requesthandler.AuctionEngine;
+import com.inmobi.adserve.channels.server.auction.AuctionEngine;
+import com.inmobi.adserve.channels.server.auction.AuctionFilterModule;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
@@ -35,6 +24,15 @@ import com.inmobi.adserve.channels.util.JaxbHelper;
 import com.inmobi.adserve.channels.util.annotations.LoggerConfiguration;
 import com.inmobi.adserve.channels.util.annotations.RtbConfiguration;
 import com.inmobi.adserve.channels.util.annotations.ServerConfiguration;
+import org.apache.commons.configuration.Configuration;
+import org.apache.hadoop.thirdparty.guava.common.collect.Maps;
+import org.reflections.Reflections;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.slf4j.LoggerFactory;
+
+import javax.ws.rs.Path;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -81,6 +79,7 @@ public class ServerModule extends AbstractModule {
         install(new AdapterConfigModule(adapterConfiguration, ChannelServer.dataCentreName));
         install(new ChannelSegmentFilterModule());
         install(new ScopeModule());
+        install(new AuctionFilterModule());
 
     }
 

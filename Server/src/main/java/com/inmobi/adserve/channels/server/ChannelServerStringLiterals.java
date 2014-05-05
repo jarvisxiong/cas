@@ -20,4 +20,5 @@ public class ChannelServerStringLiterals {
     public static final String RTBD_OUTGING_CONNECTIONS            = "rtboutbound.connections";
     public static final String SITE_ECPM_REPOSITORY                = "SiteEcpmRepository";
     public static final String CURRENCY_CONVERSION_REPOSITORY      = "CurrencyConversionRepository";
+    public static final String CREATIVE_REPOSITORY                 = "CreativeRepository";
 }

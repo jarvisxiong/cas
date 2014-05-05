@@ -1,53 +1,10 @@
 package com.inmobi.adserve.channels.server;
 
-import io.netty.util.internal.logging.InternalLoggerFactory;
-import io.netty.util.internal.logging.Slf4JLoggerFactory;
-
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.List;
-import java.util.Properties;
-
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.dbcp2.ConnectionFactory;
-import org.apache.commons.dbcp2.DriverManagerConnectionFactory;
-import org.apache.commons.dbcp2.PoolableConnection;
-import org.apache.commons.dbcp2.PoolableConnectionFactory;
-import org.apache.commons.dbcp2.PoolingDataSource;
-import org.apache.commons.pool2.impl.GenericObjectPool;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
 import com.google.inject.Injector;
 import com.google.inject.util.Modules;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
-import com.inmobi.adserve.channels.repository.ChannelFeedbackRepository;
-import com.inmobi.adserve.channels.repository.ChannelRepository;
-import com.inmobi.adserve.channels.repository.ChannelSegmentFeedbackRepository;
-import com.inmobi.adserve.channels.repository.ChannelSegmentMatchingCache;
-import com.inmobi.adserve.channels.repository.CurrencyConversionRepository;
-import com.inmobi.adserve.channels.repository.PricingEngineRepository;
-import com.inmobi.adserve.channels.repository.PublisherFilterRepository;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.repository.SiteCitrusLeafFeedbackRepository;
-import com.inmobi.adserve.channels.repository.SiteEcpmRepository;
-import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
-import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
+import com.inmobi.adserve.channels.repository.*;
 import com.inmobi.adserve.channels.server.api.ConnectionType;
 import com.inmobi.adserve.channels.server.module.CasNettyModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
@@ -60,6 +17,30 @@ import com.inmobi.messaging.publisher.MessagePublisherFactory;
 import com.inmobi.phoenix.exception.InitializationException;
 import com.netflix.governator.guice.LifecycleInjector;
 import com.netflix.governator.lifecycle.LifecycleManager;
+import io.netty.util.internal.logging.InternalLoggerFactory;
+import io.netty.util.internal.logging.Slf4JLoggerFactory;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.dbcp2.*;
+import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.List;
+import java.util.Properties;
 
 
 /*
@@ -80,6 +61,7 @@ public class ChannelServer {
     private static PublisherFilterRepository        publisherFilterRepository;
     private static SiteEcpmRepository               siteEcpmRepository;
     private static CurrencyConversionRepository     currencyConversionRepository;
+    private static CreativeRepository               creativeRepository;
     private static final String                     configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
     public static byte                              dataCenterIdCode;
     public static short                             hostIdCode;
@@ -270,6 +252,9 @@ public class ChannelServer {
 
             ChannelSegmentMatchingCache.init(logger);
             // Reusing the repository from phoenix adserving framework.
+            creativeRepository.init(logger,
+                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.CREATIVE_REPOSITORY),
+                    ChannelServerStringLiterals.CREATIVE_REPOSITORY);
             currencyConversionRepository.init(logger,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY),
                     ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY);

@@ -382,8 +382,7 @@ public class Logging {
                 if (count >= totalCount) {
                     continue;
                 }
-                CasAdvertisementLog casAdvertisementLog = new CasAdvertisementLog(partnerName, requestUrl, response,
-                        adstatus, extsiteKey, advertiserId);
+                CasAdvertisementLog casAdvertisementLog = new CasAdvertisementLog(partnerName, requestUrl, response, adstatus, extsiteKey, advertiserId);
                 Message msg = null;
                 try {
                     TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());

@@ -73,6 +73,7 @@ public class InspectorStrings {
     public final static String droppedInSampleImageUrlMissingFilter      = "DroppedInSampleImageUrlMissingFilter";
     public final static String droppedInAdvertiserDomainsMissingFilter   = "DroppedInAdvertiserDomainsFilter";
     public final static String droppedInCreativeAttributesMissingFilter  = "DroppedInCreativeAttributesFilter";
+    public final static String droppedInCreativeValidatorFilter          = "DroppedInCreativeValidatorFilter";
     public final static String droppedInDstFilter                        = "DroppedInDstFilter";
     public final static String droppedInAccountSegmentFilter             = "DroppedInAccountSegmentFilter";
     public static final String droppedInSupplyDemandClassificationFilter = "DroppedInSupplyDemandClassificationFilter";

@@ -1,9 +1,11 @@
-package com.inmobi.adserve.channels.server.requesthandler;
+package com.inmobi.adserve.channels.server.auction;
 
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.AuctionEngineInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
+import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +35,10 @@ public class AuctionEngine implements AuctionEngineInterface {
     private static Map<String, String>  advertiserIdNameMap;
 
     @Inject
-    private static AsyncRequestMaker    asyncRequestMaker;
+    private static AsyncRequestMaker asyncRequestMaker;
+
+    @Inject
+    private static AuctionFilterApplier auctionFilterApplier;
 
     public AuctionEngine() {
     }
@@ -46,20 +51,18 @@ public class AuctionEngine implements AuctionEngineInterface {
      * sending response and will be charged the highest of secondHighest price or 90% of bidFloor
      */
     @Override
-    public AdNetworkInterface runRtbSecondPriceAuctionEngine() {
+    public synchronized AdNetworkInterface runRtbSecondPriceAuctionEngine() {
         // Do not run auction 2 times.
-        synchronized (this) {
-            if (auctionComplete) {
-                return rtbResponse == null ? null : rtbResponse.getAdNetworkInterface();
-            }
-            auctionComplete = true;
+
+        if (auctionComplete) {
+            return rtbResponse == null ? null : rtbResponse.getAdNetworkInterface();
         }
+        auctionComplete = true;
 
         LOG.debug("Inside RTB auction engine");
         List<ChannelSegment> rtbList;
         // Apply rtb filters.
-        AuctionFilters auctionFilters = new AuctionFilters();
-        rtbList = auctionFilters.rtbFilters(rtbSegments, casInternalRequestParameters);
+        rtbList = auctionFilterApplier.applyFilters(rtbSegments, casInternalRequestParameters);
 
         // Send null as auction response in case of 0 rtb responses.
         if (rtbList.size() == 0) {
