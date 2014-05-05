@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.server.auction.auctionfilter.impl;
 
 import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.server.auction.auctionfilter.AbstractAuctionFilter;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -14,8 +15,8 @@ import javax.inject.Singleton;
 public class AuctionAdvertiserDomainFilter extends AbstractAuctionFilter {
 
     @Inject
-    protected AuctionAdvertiserDomainFilter(Provider<Marker> traceMarkerProvider) {
-        super(traceMarkerProvider, InspectorStrings.droppedInAdvertiserDomainsMissingFilter);
+    protected AuctionAdvertiserDomainFilter(Provider<Marker> traceMarkerProvider,final ServerConfig serverConfiguration) {
+        super(traceMarkerProvider, InspectorStrings.droppedInAdvertiserDomainsMissingFilter, serverConfiguration);
     }
 
     @Override

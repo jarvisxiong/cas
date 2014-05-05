@@ -1,15 +1,13 @@
 package com.inmobi.adserve.channels.api.config;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
-import org.apache.commons.configuration.Configuration;
-
 import com.google.common.collect.Lists;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.util.annotations.RtbConfiguration;
 import com.inmobi.adserve.channels.util.annotations.ServerConfiguration;
+import org.apache.commons.configuration.Configuration;
+
+import javax.inject.Inject;
+import java.util.List;
 
 
 /**
@@ -21,12 +19,22 @@ public class ServerConfig implements CasConfig {
 
     private final Configuration serverConfiguration;
     private final Configuration rtbConfiguration;
+    private final List auctionAdvertiserDomainFilterExcludedList;
+    private final List auctionCreativeAttributeFilterExcludedList;
+    private final List auctionCreativeIdFilterExcludedList;
+    private final List auctionCreativeValidatorFilterExcludedList;
+    private final List auctionIUrlFilterExcludedList;
 
     @Inject
     public ServerConfig(@ServerConfiguration final Configuration serverConfiguration,
             @RtbConfiguration final Configuration rtbConfiguration) {
         this.serverConfiguration = serverConfiguration;
         this.rtbConfiguration = rtbConfiguration;
+        this.auctionAdvertiserDomainFilterExcludedList = serverConfiguration.getList("auction.exclude.AuctionAdvertiserDomainFilter", Lists.newArrayList());
+        this.auctionCreativeAttributeFilterExcludedList = serverConfiguration.getList("auction.exclude.AuctionCreativeAttributeFilter", Lists.newArrayList());
+        this.auctionCreativeIdFilterExcludedList = serverConfiguration.getList("auction.exclude.AuctionCreativeIdFilter", Lists.newArrayList());
+        this.auctionCreativeValidatorFilterExcludedList = serverConfiguration.getList("auction.exclude.AuctionCreativeValidatorFilter", Lists.newArrayList());
+        this.auctionIUrlFilterExcludedList = serverConfiguration.getList("auction.exclude.AuctionIUrlFilter", Lists.newArrayList());
     }
 
     public boolean isRtbEnabled() {
@@ -94,6 +102,23 @@ public class ServerConfig implements CasConfig {
 
     public int getServerTimeoutInMillis() {
         return serverConfiguration.getInt("serverTimeoutMillis", 825);
+    }
+
+    public List getExcludedAdvertisers(String filter) {
+        switch (filter)  {
+            case "AuctionAdvertiserDomainFilter" :
+                return auctionAdvertiserDomainFilterExcludedList;
+            case "AuctionCreativeAttributeFilter" :
+                return auctionCreativeAttributeFilterExcludedList;
+            case "AuctionCreativeIdFilter" :
+                return auctionCreativeIdFilterExcludedList;
+            case "AuctionCreativeValidatorFilter" :
+                return auctionCreativeValidatorFilterExcludedList;
+            case "AuctionIUrlFilter" :
+                return auctionIUrlFilterExcludedList;
+            default:
+                return Lists.newArrayList();
+        }
     }
 
 }

@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.server.auction.auctionfilter.impl;
 
 import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.entity.CreativeEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.auction.auctionfilter.AbstractAuctionFilter;
@@ -20,8 +21,8 @@ public class AuctionCreativeValidatorFilter extends AbstractAuctionFilter {
     private final RepositoryHelper repositoryHelper;
 
     @Inject
-    protected AuctionCreativeValidatorFilter(Provider<Marker> traceMarkerProvider, final RepositoryHelper repositoryHelper) {
-        super(traceMarkerProvider, InspectorStrings.droppedInCreativeValidatorFilter);
+    protected AuctionCreativeValidatorFilter(Provider<Marker> traceMarkerProvider, final RepositoryHelper repositoryHelper, final ServerConfig serverConfiguration) {
+        super(traceMarkerProvider, InspectorStrings.droppedInCreativeValidatorFilter, serverConfiguration);
         this.repositoryHelper = repositoryHelper;
     }
 

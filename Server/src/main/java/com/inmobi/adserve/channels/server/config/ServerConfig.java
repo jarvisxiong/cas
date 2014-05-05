@@ -1,16 +1,14 @@
 package com.inmobi.adserve.channels.server.config;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
-import org.apache.commons.configuration.Configuration;
-
 import com.google.common.collect.Lists;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.config.CasConfig;
 import com.inmobi.adserve.channels.util.annotations.RtbConfiguration;
 import com.inmobi.adserve.channels.util.annotations.ServerConfiguration;
+import org.apache.commons.configuration.Configuration;
+
+import javax.inject.Inject;
+import java.util.List;
 
 
 /**
