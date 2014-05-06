@@ -7,8 +7,6 @@ import io.netty.handler.logging.LoggingHandler;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.inject.Singleton;
-
 import org.apache.commons.configuration.Configuration;
 
 import com.google.inject.AbstractModule;
@@ -19,9 +17,7 @@ import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.server.ChannelServerPipelineFactory;
 import com.inmobi.adserve.channels.server.ChannelStatServerPipelineFactory;
 import com.inmobi.adserve.channels.server.ConnectionLimitHandler;
-import com.inmobi.adserve.channels.server.api.ConnectionType;
 import com.inmobi.adserve.channels.server.netty.CasNettyServer;
-import com.inmobi.adserve.channels.util.annotations.IncomingConnectionLimitHandler;
 import com.inmobi.adserve.channels.util.annotations.ServerChannelInitializer;
 import com.inmobi.adserve.channels.util.annotations.ServerConfiguration;
 import com.inmobi.adserve.channels.util.annotations.StatServerChannelInitializer;
@@ -65,10 +61,8 @@ public class CasNettyModule extends AbstractModule {
     }
 
     @Provides
-    @Singleton
-    @IncomingConnectionLimitHandler
     ConnectionLimitHandler incomingConnectionLimitHandler(final ServerConfig serverConfig) {
-        return new ConnectionLimitHandler(serverConfig, ConnectionType.INCOMING);
+        return new ConnectionLimitHandler(serverConfig);
     }
 
 }

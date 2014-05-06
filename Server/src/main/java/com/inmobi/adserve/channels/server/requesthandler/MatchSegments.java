@@ -27,7 +27,7 @@ import com.inmobi.adserve.channels.entity.SegmentAdGroupFeedbackEntity;
 import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.server.ServletHandler;
+import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.requesthandler.beans.AdvertiserMatchedSegmentDetail;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -56,7 +56,7 @@ public class MatchSegments {
         this.repositoryHelper = repositoryHelper;
         this.advertiserIdToNameMap = advertiserIdToNameMap;
 
-        Double defaultEcpm = ServletHandler.getServerConfig().getDouble("default.ecpm", 0.1);
+        Double defaultEcpm = CasConfigUtil.getServerConfig().getDouble("default.ecpm", 0.1);
         channelAdGroupRepository = repositoryHelper.getChannelAdGroupRepository();
 
         ChannelEntity.Builder channelEntityBuilder = ChannelEntity.newBuilder();
