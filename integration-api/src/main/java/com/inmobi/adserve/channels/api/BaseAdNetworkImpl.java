@@ -658,9 +658,14 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     protected StringBuilder appendQueryParam(final StringBuilder builder, final String paramName,
+            final int paramValue, final boolean isFirstParam) {
+        return builder.append(isFirstParam ? '?' : '&').append(paramName).append('=').append(paramValue);
+   }
+    protected StringBuilder appendQueryParam(final StringBuilder builder, final String paramName,
             final String paramValue, final boolean isFirstParam) {
         return builder.append(isFirstParam ? '?' : '&').append(paramName).append('=').append(paramValue);
     }
+    
 
     @Override
     public String getAuctionId() {
