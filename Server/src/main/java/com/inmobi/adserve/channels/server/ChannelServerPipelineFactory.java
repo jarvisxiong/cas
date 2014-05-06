@@ -13,35 +13,36 @@ import lombok.Getter;
 
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
-import com.inmobi.adserve.channels.server.handler.TraceMarkerhandler;
-import com.inmobi.adserve.channels.util.annotations.IncomingConnectionLimitHandler;
+import com.inmobi.adserve.channels.server.handler.NettyRequestScopeSeedHandler;
 
 
 @Singleton
 public class ChannelServerPipelineFactory extends ChannelInitializer<SocketChannel> {
 
-    private final RequestIdHandler       requestIdHandler;
-    private final TraceMarkerhandler     traceMarkerhandler;
+    private final RequestIdHandler             requestIdHandler;
+    private final NettyRequestScopeSeedHandler nettyRequestScopeSeedHandler;
     @Getter
-    private final ConnectionLimitHandler incomingConnectionLimitHandler;
-    private final ServletHandler         servletHandler;
-    private final ServerConfig           serverConfig;
-    private final LoggingHandler         loggingHandler;
-    private final RequestParserHandler   requestParserHandler;
+    private final ConnectionLimitHandler       incomingConnectionLimitHandler;
+    private final CasConfigUtil                servletHandler;
+    private final ServerConfig                 serverConfig;
+    private final LoggingHandler               loggingHandler;
+    private final RequestParserHandler         requestParserHandler;
+    private final CasExceptionHandler          casExceptionHandler;
 
     @Inject
-    ChannelServerPipelineFactory(final ServerConfig serverConfig, final TraceMarkerhandler traceMarkerhandler,
-            final ServletHandler servletHandler,
-            @IncomingConnectionLimitHandler final ConnectionLimitHandler incomingConnectionLimitHandler,
-            final LoggingHandler loggingHandler, final RequestParserHandler requestParserHandler) {
+    ChannelServerPipelineFactory(final ServerConfig serverConfig,
+            final NettyRequestScopeSeedHandler nettyRequestScopeSeedHandler, final CasConfigUtil servletHandler,
+            final ConnectionLimitHandler incomingConnectionLimitHandler, final LoggingHandler loggingHandler,
+            final RequestParserHandler requestParserHandler, final CasExceptionHandler casExceptionHandler) {
 
         this.serverConfig = serverConfig;
-        this.traceMarkerhandler = traceMarkerhandler;
+        this.nettyRequestScopeSeedHandler = nettyRequestScopeSeedHandler;
         this.requestIdHandler = new RequestIdHandler();
         this.incomingConnectionLimitHandler = incomingConnectionLimitHandler;
         this.servletHandler = servletHandler;
         this.loggingHandler = loggingHandler;
         this.requestParserHandler = requestParserHandler;
+        this.casExceptionHandler = casExceptionHandler;
     }
 
     @Override
@@ -50,13 +51,11 @@ public class ChannelServerPipelineFactory extends ChannelInitializer<SocketChann
         // enable logging handler only for dev purpose
         // pipeline.addLast("logging", loggingHandler);
         pipeline.addLast("incomingLimitHandler", incomingConnectionLimitHandler);
+        pipeline.addLast("casWriteTimeoutHandler", new CasTimeoutHandler(serverConfig.getServerTimeoutInMillis()));
         pipeline.addLast("decoderEncoder", new HttpServerCodec());
         pipeline.addLast("aggregator", new HttpObjectAggregator(1024 * 1024));// 1 MB data size
         pipeline.addLast("requestIdHandler", requestIdHandler);
-        pipeline.addLast("casWriteTimeoutHandler", new CasTimeoutHandler(serverConfig.getServerTimeoutInMillis()));
-        pipeline.addLast("traceMarkerhandler", traceMarkerhandler);
-        pipeline.addLast("servletHandler", servletHandler);
-        // pipeline.addLast("casCodec", new CasCodec());
+        pipeline.addLast("nettyRequestScopeSeedHandler", nettyRequestScopeSeedHandler);
         pipeline.addLast("requestParserHandler", requestParserHandler);
     }
 }
