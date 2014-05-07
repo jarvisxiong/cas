@@ -9,6 +9,7 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.util.CharsetUtil;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -248,33 +249,44 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     // send response to the caller
-    public void sendResponse(final HttpResponseStatus status, byte[] bytes, final Map responseHeaders,
+    public void sendResponse(final HttpResponseStatus status, byte[] responseBytes, final Map responseHeaders,
             final Channel serverChannel) throws NullPointerException {
 
         if (hrh.responseSender.sasParams.getSdkVersion() != null
                 && Integer.parseInt(hrh.responseSender.sasParams.getSdkVersion().substring(1)) >= ENCRYPTED_SDK_BASE_VERSION
                 && sasParams.getDst() == 2) {
+
+            LOG.debug("Encrypting the response {}", ENCRYPTED_SDK_BASE_VERSION);
             EncryptionKeys encryptionKey = sasParams.getEncryptionKey();
 
             InmobiSession inmobiSession = new InmobiSecurityImpl(null).newSession(null);
 
             try {
+
                 byte[] encryptionKeyBytes = new byte[encryptionKey.getAesKey().remaining()];
                 encryptionKey.getAesKey().get(encryptionKeyBytes);
 
                 byte[] ivBytes = new byte[encryptionKey.getInitializationVector().remaining()];
                 encryptionKey.getInitializationVector().get(ivBytes);
 
-                bytes = inmobiSession.write(bytes, encryptionKeyBytes, ivBytes);
+                responseBytes = inmobiSession.write(responseBytes, encryptionKeyBytes, ivBytes);
+
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Encyption Details:  EncryptionKey: {}  IVBytes: {}  Response: {}", new String(
+                            encryptionKeyBytes, CharsetUtil.UTF_8), new String(ivBytes, CharsetUtil.UTF_8), new String(
+                            responseBytes, CharsetUtil.UTF_8));
+                }
+
             }
             catch (InmobiSecureException | InvalidMessageException e) {
+                LOG.info("Exception while encrypting response from {}", e);
                 throw new RuntimeException(e);
             }
 
         }
 
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status,
-                Unpooled.wrappedBuffer(bytes), false);
+                Unpooled.wrappedBuffer(responseBytes), false);
 
         if (null != responseHeaders) {
             for (Map.Entry entry : (Set<Map.Entry>) responseHeaders.entrySet()) {
@@ -286,7 +298,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
         // TODO: to fix keep alive, we need to fix whole flow
         // HttpHeaders.setKeepAlive(response, serverChannel.isKeepAlive());
-        response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
+        response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, responseBytes.length);
 
         response.headers().add(HttpHeaders.Names.EXPIRES, "-1");
         response.headers().add(HttpHeaders.Names.PRAGMA, "no-cache");
