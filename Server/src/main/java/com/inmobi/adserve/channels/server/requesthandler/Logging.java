@@ -181,6 +181,10 @@ public class Logging {
             request.setSegmentId(sasParams.getSiteSegmentId());
         }
 
+        if (null != sasParams) {
+            request.setRequestDst(getDst(sasParams.getDst()));
+        }
+
         List<Impression> impressions = null;
         if (null != impression) {
             impressions = new ArrayList<Impression>();
@@ -258,8 +262,20 @@ public class Logging {
         casAdChain.setCampaign_inc_id(channelSegment.getChannelSegmentEntity().getCampaignIncId());
         casAdChain.setAdgroup_inc_id(channelSegment.getChannelSegmentEntity().getAdgroupIncId());
         casAdChain.setExternalSiteKey(channelSegment.getChannelSegmentEntity().getExternalSiteKey());
-        casAdChain.setDst(DemandSourceType.findByValue(channelSegment.getChannelSegmentEntity().getDst()));
+        casAdChain.setDst(getDst(channelSegment.getChannelSegmentEntity().getDst()));
         return casAdChain;
+    }
+
+    private static DemandSourceType getDst(int dst) {
+        switch (dst) {
+            case 2 :
+                return DemandSourceType.DCP;
+            case 6:
+                return DemandSourceType.RTBD;
+            default:
+                return DemandSourceType.DCP;
+
+        }
     }
 
     public static AdStatus getAdStatus(final String adStatus) {
