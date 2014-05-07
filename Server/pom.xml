@@ -164,7 +164,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.inmobi.commons</groupId>
-			<artifactId>datatypes-java</artifactId>
+			<artifactId>datatypes-java-0.8</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.inmobi.commons</groupId>

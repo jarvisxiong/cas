@@ -258,23 +258,18 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
             LOG.debug("Encrypting the response {}", ENCRYPTED_SDK_BASE_VERSION);
             EncryptionKeys encryptionKey = sasParams.getEncryptionKey();
-
             InmobiSession inmobiSession = new InmobiSecurityImpl(null).newSession(null);
 
             try {
 
-                byte[] encryptionKeyBytes = new byte[encryptionKey.getAesKey().remaining()];
-                encryptionKey.getAesKey().get(encryptionKeyBytes);
-
-                byte[] ivBytes = new byte[encryptionKey.getInitializationVector().remaining()];
-                encryptionKey.getInitializationVector().get(ivBytes);
-
-                responseBytes = inmobiSession.write(responseBytes, encryptionKeyBytes, ivBytes);
+                responseBytes = inmobiSession.write(responseBytes, encryptionKey.getAesKey(),
+                        encryptionKey.getInitializationVector());
 
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Encyption Details:  EncryptionKey: {}  IVBytes: {}  Response: {}", new String(
-                            encryptionKeyBytes, CharsetUtil.UTF_8), new String(ivBytes, CharsetUtil.UTF_8), new String(
-                            responseBytes, CharsetUtil.UTF_8));
+                            encryptionKey.getAesKey(), CharsetUtil.UTF_8),
+                            new String(encryptionKey.getInitializationVector(), CharsetUtil.UTF_8), new String(
+                                    responseBytes, CharsetUtil.UTF_8));
                 }
 
             }
