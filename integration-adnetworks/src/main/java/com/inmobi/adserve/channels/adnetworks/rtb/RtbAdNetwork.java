@@ -108,6 +108,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private String                         sampleImageUrl;
     private List<String>                   advertiserDomains;
     private List<Integer>                  creativeAttributes;
+    private boolean                        logCreative                  = false;
     private final RepositoryHelper         repositoryHelper;
     private String                         bidderCurrency               = "USD";
     private static final String            USD                          = "USD";
@@ -807,6 +808,16 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Override
     public List<String> getADomain() {
         return advertiserDomains;
+    }
+
+    @Override
+    public boolean isLogCreative() {
+        return false;
+    }
+
+    @Override
+    public void setLogCreative(boolean logCreative) {
+        this.logCreative = logCreative;
     }
 
 }

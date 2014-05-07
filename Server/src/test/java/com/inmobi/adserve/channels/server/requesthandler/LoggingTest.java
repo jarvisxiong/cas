@@ -46,7 +46,7 @@ public class LoggingTest extends TestCase {
         dataBusPublisher.publish(isA(String.class), isA(Message.class));
         EasyMock.expectLastCall().times(3);
         replay(dataBusPublisher);
-        Logging.init(dataBusPublisher, "null", "null", mockConfig);
+        Logging.init(dataBusPublisher, "null", "null", "null", mockConfig);
     }
 
     @Test

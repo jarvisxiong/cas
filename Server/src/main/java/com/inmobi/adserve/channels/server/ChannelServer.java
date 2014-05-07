@@ -101,7 +101,8 @@ public class ChannelServer {
 
             String rrLogKey = configurationLoader.getServerConfiguration().getString("rrLogKey");
             String advertisementLogKey = configurationLoader.getServerConfiguration().getString("adsLogKey");
-            Logging.init(dataBusPublisher, rrLogKey, advertisementLogKey, configurationLoader.getServerConfiguration());
+            String umpAdsLogKey = configurationLoader.getServerConfiguration().getString("umpAdsLogKey");
+            Logging.init(dataBusPublisher, rrLogKey, advertisementLogKey, umpAdsLogKey, configurationLoader.getServerConfiguration());
 
             // Initializing graphite stats
             MetricsManager.init(

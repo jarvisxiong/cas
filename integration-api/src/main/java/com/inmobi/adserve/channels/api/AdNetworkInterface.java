@@ -27,6 +27,12 @@ public interface AdNetworkInterface {
     // Return the advertiser domains.
     List<String> getADomain();
 
+    // Returns whether to log creative or not
+    boolean isLogCreative();
+
+    // Set whether creative logging is required or not
+    void setLogCreative(boolean logCreative);
+
     // Return the bid price for rtb, for other will return the -1.
     double getBidPriceInUsd();
 

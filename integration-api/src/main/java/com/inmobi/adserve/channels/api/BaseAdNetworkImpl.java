@@ -686,4 +686,15 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     public List<String> getADomain() {
         return null;
     }
+
+    @Override
+    public boolean isLogCreative() {
+        return false;
+    }
+
+    @Override
+    public void setLogCreative(boolean logCreative) {
+        //
+    }
+
 }

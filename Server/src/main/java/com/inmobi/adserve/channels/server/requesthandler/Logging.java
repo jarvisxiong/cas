@@ -5,6 +5,7 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.server.CreativeCache;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.MetricsManager;
@@ -20,13 +21,11 @@ import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.concurrent.GuardedBy;
 import javax.inject.Inject;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -37,11 +36,11 @@ public class Logging {
     private static AbstractMessagePublisher                dataBusPublisher;
     private static String                                  rrLogKey;
     private static String                                  sampledAdvertisementLogKey;
+    private static String                                  umpAdsLogKey;
     private static boolean                                 enableFileLogging;
     private static boolean                                 enableDatabusLogging;
     private final static ConcurrentHashMap<String, String> sampledAdvertiserLogNos = new ConcurrentHashMap<String, String>(
                                                                                            2000);
-
     @AdvertiserIdNameMap
     @Inject
     private static Map<String, String>                     advertiserIdNameMap;
@@ -53,10 +52,11 @@ public class Logging {
     private static int totalCount;
 
     public static void init(final AbstractMessagePublisher dataBusPublisher, final String rrLogKey,
-            final String advertisementLogKey, final Configuration config) {
+            final String advertisementLogKey, final String umpAdsLogKey, final Configuration config) {
         Logging.dataBusPublisher = dataBusPublisher;
         Logging.rrLogKey = rrLogKey;
         Logging.sampledAdvertisementLogKey = advertisementLogKey;
+        Logging.umpAdsLogKey = umpAdsLogKey;
         enableFileLogging = config.getBoolean("enableFileLogging");
         enableDatabusLogging = config.getBoolean("enableDatabusLogging");
         totalCount = config.getInt("sampledadvertisercount");
@@ -211,6 +211,47 @@ public class Logging {
         }
         catch (Exception e) {
             LOG.info("error while writing to graphite in rrLog", e);
+        }
+    }
+
+    // Writing creatives
+    public static void creativeLogging(final List<ChannelSegment> channelSegments, final SASRequestParameters sasRequestParameters) {
+        if (null == channelSegments || channelSegments.isEmpty()) {
+            return;
+        }
+
+        for (ChannelSegment channelSegment : channelSegments) {
+            AdNetworkInterface adNetworkInterface = channelSegment.getAdNetworkInterface();
+            if (adNetworkInterface.isRtbPartner() && adNetworkInterface.isLogCreative()) {
+                String response = adNetworkInterface.getHttpResponseContent();
+                String requestUrl = adNetworkInterface.getRequestUrl();
+                ThirdPartyAdResponse adResponse = adNetworkInterface.getResponseStruct();
+                String partnerName = adNetworkInterface.getName();
+                String externalSiteKey = channelSegment.getChannelSegmentEntity().getExternalSiteKey();
+                String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
+                String adStatus = adResponse.adStatus;
+
+                CasAdvertisementLog casAdvertisementLog = new CasAdvertisementLog(partnerName, requestUrl, response,
+                        adStatus, externalSiteKey, advertiserId);
+                casAdvertisementLog.setCountryId(sasRequestParameters.getCountryId().intValue());
+                casAdvertisementLog.setCreativeId(adNetworkInterface.getCreativeId());
+                casAdvertisementLog.setImageUrl(adNetworkInterface.getIUrl());
+                //casAdvertisementLog.setAdm
+                casAdvertisementLog.setCreativeAttributes(adNetworkInterface.getAttribute());
+                casAdvertisementLog.setAdvertiserDomains(adNetworkInterface.getADomain());
+                casAdvertisementLog.setTime_stamp(new Date().getTime());
+                Message msg = null;
+                try {
+                    TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
+                    msg = new Message(tSerializer.serialize(casAdvertisementLog));
+                }
+                catch (TException e) {
+                    LOG.debug("Error while creating creative logs for databus ");
+                }
+                if (null != msg) {
+                    dataBusPublisher.publish(umpAdsLogKey, msg);
+                }
+            }
         }
     }
 

@@ -67,7 +67,7 @@ public class HttpRequestHandlerTest extends TestCase {
         Guice.createInjector(new ServerModule(config, createMock(RepositoryHelper.class)) ,  new CasNettyModule(config.getServerConfiguration()));
 
         AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
-        Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-advertisement", mockServerConfig);
+        Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-advertisement", "null", mockServerConfig);
     }
 
     @Test
