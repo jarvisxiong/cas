@@ -74,7 +74,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                                                                            + "<script type=\"text/javascript\" charset=\"utf-8\">"
                                                                            + "parent.postMessage('{\"topic\":\"nfr\",\"container\" : \"%s\"}', '*');</script></body></html>";
     private final HttpRequestHandler    hrh;
-    private final long                  totalTime;
+    private long                        totalTime;
     private List<ChannelSegment>        rankList;
     private ThirdPartyAdResponse        adResponse;
     private boolean                     responseSent;
