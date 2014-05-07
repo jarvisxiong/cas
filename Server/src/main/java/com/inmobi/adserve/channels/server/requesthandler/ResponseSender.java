@@ -74,7 +74,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                                                                            + "<script type=\"text/javascript\" charset=\"utf-8\">"
                                                                            + "parent.postMessage('{\"topic\":\"nfr\",\"container\" : \"%s\"}', '*');</script></body></html>";
     private final HttpRequestHandler    hrh;
-    private long                        totalTime;
+    private final long                  totalTime;
     private List<ChannelSegment>        rankList;
     private ThirdPartyAdResponse        adResponse;
     private boolean                     responseSent;
@@ -252,11 +252,12 @@ public class ResponseSender extends HttpRequestHandlerBase {
     public void sendResponse(final HttpResponseStatus status, byte[] responseBytes, final Map responseHeaders,
             final Channel serverChannel) throws NullPointerException {
 
-        if (hrh.responseSender.sasParams.getSdkVersion() != null
-                && Integer.parseInt(hrh.responseSender.sasParams.getSdkVersion().substring(1)) >= ENCRYPTED_SDK_BASE_VERSION
+        int sdkVersion = Integer.parseInt(hrh.responseSender.sasParams.getSdkVersion().substring(1));
+        if (hrh.responseSender.sasParams.getSdkVersion() != null && sdkVersion >= ENCRYPTED_SDK_BASE_VERSION
                 && sasParams.getDst() == 2) {
 
-            LOG.debug("Encrypting the response {}", ENCRYPTED_SDK_BASE_VERSION);
+            LOG.debug("Encrypting the response as request is from SDK: {}",
+                    hrh.responseSender.sasParams.getSdkVersion());
             EncryptionKeys encryptionKey = sasParams.getEncryptionKey();
             InmobiSession inmobiSession = new InmobiSecurityImpl(null).newSession(null);
 
