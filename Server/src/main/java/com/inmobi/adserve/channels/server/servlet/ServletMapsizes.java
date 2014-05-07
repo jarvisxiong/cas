@@ -13,7 +13,6 @@ import com.inmobi.adserve.channels.server.ConnectionLimitHandler;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
-import com.inmobi.adserve.channels.util.annotations.IncomingConnectionLimitHandler;
 
 
 @Singleton
@@ -22,7 +21,7 @@ public class ServletMapsizes implements Servlet {
     private final ConnectionLimitHandler incomingConnectionLimitHandler;
 
     @Inject
-    public ServletMapsizes(@IncomingConnectionLimitHandler final ConnectionLimitHandler incomingConnectionLimitHandler) {
+    public ServletMapsizes(final ConnectionLimitHandler incomingConnectionLimitHandler) {
         this.incomingConnectionLimitHandler = incomingConnectionLimitHandler;
     }
 

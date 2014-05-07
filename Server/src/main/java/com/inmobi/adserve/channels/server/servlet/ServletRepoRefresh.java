@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.ChannelServerStringLiterals;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.ServletHandler;
+import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.phoenix.exception.RepositoryException;
@@ -65,7 +65,7 @@ public class ServletRepoRefresh implements Servlet {
                         .subset(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY)
                         .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
-                ServletHandler.repositoryHelper.getChannelAdGroupRepository().newUpdateFromResultSetToOptimizeUpdate(
+                CasConfigUtil.repositoryHelper.getChannelAdGroupRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
             }
             else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_REPOSITORY)) {
@@ -73,7 +73,7 @@ public class ServletRepoRefresh implements Servlet {
                         .subset(ChannelServerStringLiterals.CHANNEL_REPOSITORY)
                         .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
-                ServletHandler.repositoryHelper.getChannelRepository()
+                CasConfigUtil.repositoryHelper.getChannelRepository()
                         .newUpdateFromResultSetToOptimizeUpdate(resultSet);
             }
             else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY)) {
@@ -81,7 +81,7 @@ public class ServletRepoRefresh implements Servlet {
                         .subset(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY)
                         .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
-                ServletHandler.repositoryHelper.getChannelFeedbackRepository().newUpdateFromResultSetToOptimizeUpdate(
+                CasConfigUtil.repositoryHelper.getChannelFeedbackRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
             }
             else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY)) {
@@ -89,7 +89,7 @@ public class ServletRepoRefresh implements Servlet {
                         .subset(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY)
                         .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
-                ServletHandler.repositoryHelper.getChannelSegmentFeedbackRepository()
+                CasConfigUtil.repositoryHelper.getChannelSegmentFeedbackRepository()
                         .newUpdateFromResultSetToOptimizeUpdate(resultSet);
             }
             else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)) {
@@ -97,7 +97,7 @@ public class ServletRepoRefresh implements Servlet {
                         .subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)
                         .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
-                ServletHandler.repositoryHelper.getSiteMetaDataRepository().newUpdateFromResultSetToOptimizeUpdate(
+                CasConfigUtil.repositoryHelper.getSiteMetaDataRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
             }
             else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY)) {
@@ -105,7 +105,7 @@ public class ServletRepoRefresh implements Servlet {
                         .subset(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY)
                         .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
-                ServletHandler.repositoryHelper.getSiteTaxonomyRepository().newUpdateFromResultSetToOptimizeUpdate(
+                CasConfigUtil.repositoryHelper.getSiteTaxonomyRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
             }
             else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY)) {
@@ -113,7 +113,7 @@ public class ServletRepoRefresh implements Servlet {
                         .subset(ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY)
                         .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
-                ServletHandler.repositoryHelper.getPricingEngineRepository().newUpdateFromResultSetToOptimizeUpdate(
+                CasConfigUtil.repositoryHelper.getPricingEngineRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
             }
             else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY)) {
@@ -121,7 +121,7 @@ public class ServletRepoRefresh implements Servlet {
                         .subset(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY)
                         .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
-                ServletHandler.repositoryHelper.getSiteEcpmRepository().newUpdateFromResultSetToOptimizeUpdate(
+                CasConfigUtil.repositoryHelper.getSiteEcpmRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
             }
             LOG.debug("Successfully updated {}", repoName);

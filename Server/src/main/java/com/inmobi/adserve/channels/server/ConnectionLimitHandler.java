@@ -11,62 +11,53 @@ import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
-import com.inmobi.adserve.channels.server.api.ConnectionType;
 
 
+@Singleton
 @Sharable
 public class ConnectionLimitHandler extends ChannelDuplexHandler {
-    private final static Logger  LOG                = LoggerFactory.getLogger(ConnectionLimitHandler.class);
+
+    private final static Logger LOG                = LoggerFactory.getLogger(ConnectionLimitHandler.class);
 
     @Getter
-    private final AtomicInteger  activeConnections  = new AtomicInteger(0);
+    private final AtomicInteger activeConnections  = new AtomicInteger(0);
     @Getter
-    private final AtomicInteger  droppedConnections = new AtomicInteger(0);
-    private final ConnectionType connectionType;
+    private final AtomicInteger droppedConnections = new AtomicInteger(0);
 
-    private final ServerConfig   serverConfig;
+    private final ServerConfig  serverConfig;
 
-    public ConnectionLimitHandler(final ServerConfig serverConfig, final ConnectionType connType) {
+    public ConnectionLimitHandler(final ServerConfig serverConfig) {
         this.serverConfig = serverConfig;
-        connectionType = connType;
     }
 
     @Override
-    public void channelActive(final ChannelHandlerContext ctx) throws Exception {
+    public void channelRegistered(final ChannelHandlerContext ctx) throws Exception {
         int maxConnections = getMaxConnectionsLimit();
         if (maxConnections > 0) {
-            int currentCount = activeConnections.getAndIncrement();
-            if (currentCount > maxConnections) {
-                LOG.info("{} MaxLimit of connections {} exceeded so closing channel", connectionType.name(),
-                        maxConnections);
+            if (activeConnections.getAndIncrement() > maxConnections) {
                 ctx.channel().close();
+                LOG.info("Incoming MaxLimit of connections {} exceeded so closing channel", maxConnections);
                 droppedConnections.incrementAndGet();
             }
         }
-        super.channelActive(ctx);
+        super.channelRegistered(ctx);
     }
 
     @Override
-    public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
+    public void channelUnregistered(final ChannelHandlerContext ctx) throws Exception {
         int maxConnections = getMaxConnectionsLimit();
         if (maxConnections > 0) {
-            activeConnections.decrementAndGet();
+            if (activeConnections.decrementAndGet() < 0) {
+                LOG.error("BUG in ConnectionLimitHandler");
+            }
         }
-        super.channelInactive(ctx);
+        super.channelUnregistered(ctx);
     }
 
     public int getMaxConnectionsLimit() {
-        switch (connectionType) {
-            case DCP_OUTGOING:
-                return serverConfig.getMaxDcpOutGoingConnections();
-            case RTBD_OUTGOING:
-                return serverConfig.getMaxRtbOutGoingConnections();
-            case INCOMING:
-                return serverConfig.getMaxIncomingConnections();
-            default:
-                throw new RuntimeException();
-        }
+        return serverConfig.getMaxIncomingConnections();
     }
 
 }

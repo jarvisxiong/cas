@@ -137,7 +137,7 @@ public class ChannelServer {
             RepositoryHelper repositoryHelper = repoHelperBuilder.build();
 
             instantiateRepository(logger, configurationLoader);
-            ServletHandler.init(configurationLoader, repositoryHelper);
+            CasConfigUtil.init(configurationLoader, repositoryHelper);
             Integer maxIncomingConnections = channelServerHelper.getMaxConnections(
                     ChannelServerStringLiterals.INCOMING_CONNECTIONS, ConnectionType.INCOMING);
             Integer maxRTbdOutGoingConnections = channelServerHelper.getMaxConnections(
@@ -145,13 +145,13 @@ public class ChannelServer {
             Integer maxDCpOutGoingConnections = channelServerHelper.getMaxConnections(
                     ChannelServerStringLiterals.DCP_OUTGOING_CONNECTIONS, ConnectionType.DCP_OUTGOING);
             if (null != maxIncomingConnections) {
-                ServletHandler.getServerConfig().setProperty("incomingMaxConnections", maxIncomingConnections);
+                CasConfigUtil.getServerConfig().setProperty("incomingMaxConnections", maxIncomingConnections);
             }
             if (null != maxRTbdOutGoingConnections) {
-                ServletHandler.getServerConfig().setProperty("rtbOutGoingMaxConnections", maxRTbdOutGoingConnections);
+                CasConfigUtil.getServerConfig().setProperty("rtbOutGoingMaxConnections", maxRTbdOutGoingConnections);
             }
             if (null != maxDCpOutGoingConnections) {
-                ServletHandler.getServerConfig().setProperty("dcpOutGoingMaxConnections", maxDCpOutGoingConnections);
+                CasConfigUtil.getServerConfig().setProperty("dcpOutGoingMaxConnections", maxDCpOutGoingConnections);
             }
 
             // Configure the netty server.
@@ -372,12 +372,12 @@ public class ChannelServer {
     // send Mail if channel server crashes
     private static void sendMail(final String errorMessage, final String stackTrace) {
         Properties properties = System.getProperties();
-        properties.setProperty("mail.smtp.host", ServletHandler.getServerConfig().getString("smtpServer"));
+        properties.setProperty("mail.smtp.host", CasConfigUtil.getServerConfig().getString("smtpServer"));
         Session session = Session.getDefaultInstance(properties);
         try {
             MimeMessage message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(ServletHandler.getServerConfig().getString("sender")));
-            List<String> recipients = ServletHandler.getServerConfig().getList("recipients");
+            message.setFrom(new InternetAddress(CasConfigUtil.getServerConfig().getString("sender")));
+            List<String> recipients = CasConfigUtil.getServerConfig().getList("recipients");
             javax.mail.internet.InternetAddress[] addressTo = new javax.mail.internet.InternetAddress[recipients.size()];
 
             for (int index = 0; index < recipients.size(); index++) {

@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.ServletHandler;
+import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
@@ -17,7 +17,7 @@ public class RequestFilters {
     public boolean isDroppedInRequestFilters(final HttpRequestHandler hrh) {
         if (null != hrh.getTerminationReason()) {
             LOG.debug("Request not being served because of the termination reason {}", hrh.getTerminationReason());
-            if (ServletHandler.jsonParsingError.equalsIgnoreCase(hrh.getTerminationReason())) {
+            if (CasConfigUtil.jsonParsingError.equalsIgnoreCase(hrh.getTerminationReason())) {
                 InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
             }
             else {
@@ -27,7 +27,7 @@ public class RequestFilters {
         }
 
         // Send noad if new-category is not present in the request
-        if (ServletHandler.random.nextInt(100) >= ServletHandler.percentRollout) {
+        if (CasConfigUtil.random.nextInt(100) >= CasConfigUtil.percentRollout) {
             LOG.debug("Request not being served because of limited percentage rollout");
             InspectorStats.incrementStatCount(InspectorStrings.droppedRollout, InspectorStrings.count);
             return true;
@@ -35,7 +35,7 @@ public class RequestFilters {
 
         if (null == hrh.responseSender.sasParams) {
             LOG.error("Terminating request as sasParam is null");
-            hrh.setTerminationReason(ServletHandler.jsonParsingError);
+            hrh.setTerminationReason(CasConfigUtil.jsonParsingError);
             InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
             return true;
         }
@@ -43,14 +43,14 @@ public class RequestFilters {
         if (null == hrh.responseSender.sasParams.getCategories()) {
             LOG.error("Category field is not present in the request so sending noad");
             hrh.responseSender.sasParams.setCategories(new ArrayList<Long>());
-            hrh.setTerminationReason(ServletHandler.MISSING_CATEGORY);
+            hrh.setTerminationReason(CasConfigUtil.MISSING_CATEGORY);
             InspectorStats.incrementStatCount(InspectorStrings.missingCategory, InspectorStrings.count);
             return true;
         }
 
         if (null == hrh.responseSender.sasParams.getSiteId()) {
             LOG.error("Terminating request as site id was missing");
-            hrh.setTerminationReason(ServletHandler.missingSiteId);
+            hrh.setTerminationReason(CasConfigUtil.missingSiteId);
             InspectorStats.incrementStatCount(InspectorStrings.missingSiteId, InspectorStrings.count);
             return true;
         }
@@ -61,9 +61,9 @@ public class RequestFilters {
         }
 
         if (hrh.responseSender.sasParams.getSiteType() != null
-                && !ServletHandler.allowedSiteTypes.contains(hrh.responseSender.sasParams.getSiteType())) {
+                && !CasConfigUtil.allowedSiteTypes.contains(hrh.responseSender.sasParams.getSiteType())) {
             LOG.error("Terminating request as incompatible content type");
-            hrh.setTerminationReason(ServletHandler.incompatibleSiteType);
+            hrh.setTerminationReason(CasConfigUtil.incompatibleSiteType);
             InspectorStats.incrementStatCount(InspectorStrings.incompatibleSiteType, InspectorStrings.count);
             return true;
         }
@@ -76,7 +76,7 @@ public class RequestFilters {
                                 .getDst() == 2 && "430".equals(hrh.responseSender.sasParams.getSdkVersion()
                                 .substring(1))))) {
                     LOG.error("Terminating request as sdkVersion is less than 3 or is 430");
-                    hrh.setTerminationReason(ServletHandler.lowSdkVersion);
+                    hrh.setTerminationReason(CasConfigUtil.lowSdkVersion);
                     InspectorStats.incrementStatCount(InspectorStrings.lowSdkVersion, InspectorStrings.count);
                     return true;
                 }

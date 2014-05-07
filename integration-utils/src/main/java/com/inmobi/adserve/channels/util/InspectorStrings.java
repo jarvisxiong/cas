@@ -13,6 +13,7 @@ public class InspectorStrings {
     public static final String connectionLatency                         = "ConnectionLatency";
     public static final String count                                     = "Count";
     public static final String totalTimeout                              = "TotalTimeout";
+    public static final String connectionTimeout                         = "ConnectionTimeout";
     public static final String totalTerminate                            = "TotalTerminate";
     public static final String successfulRequests                        = "success";
     public static final String jsonParsingError                          = "Terminated_JsonError";

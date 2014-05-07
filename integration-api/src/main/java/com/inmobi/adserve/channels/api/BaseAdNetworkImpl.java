@@ -200,6 +200,14 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                         return;
                     }
 
+                    if (t instanceof java.net.ConnectException) {
+                        LOG.debug("{} connection timeout latency {}", getName(), latency);
+                        adStatus = "TIME_OUT";
+                        InspectorStats.incrementStatCount(getName(), InspectorStrings.connectionTimeout);
+                        processResponse();
+                        return;
+                    }
+
                     if (t instanceof java.util.concurrent.TimeoutException) {
                         LOG.debug("{} timeout latency {}", getName(), latency);
                         adStatus = "TIME_OUT";
@@ -643,9 +651,14 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     protected StringBuilder appendQueryParam(final StringBuilder builder, final String paramName,
+            final int paramValue, final boolean isFirstParam) {
+        return builder.append(isFirstParam ? '?' : '&').append(paramName).append('=').append(paramValue);
+   }
+    protected StringBuilder appendQueryParam(final StringBuilder builder, final String paramName,
             final String paramValue, final boolean isFirstParam) {
         return builder.append(isFirstParam ? '?' : '&').append(paramName).append('=').append(paramValue);
     }
+    
 
     @Override
     public String getAuctionId() {

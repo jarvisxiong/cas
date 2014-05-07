@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.ServletHandler;
+import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.api.Servlet;
 
 
@@ -23,7 +23,7 @@ public class ServletErrorDetails implements Servlet {
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
             final Channel serverChannel) throws Exception {
         LOG.debug("Inside repostat servlet");
-        hrh.responseSender.sendResponse(ServletHandler.repositoryHelper.getRepositoryStatsProvider().getErrorDetails(),
+        hrh.responseSender.sendResponse(CasConfigUtil.repositoryHelper.getRepositoryStatsProvider().getErrorDetails(),
                 serverChannel);
     }
 

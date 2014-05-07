@@ -27,7 +27,6 @@ import static org.easymock.classextension.EasyMock.replay;
 
 public class ServerTest extends TestCase {
 
-    private HttpRequestHandler         httpRequestHandler;
     private ResponseSender             responseSender;
 
     private Configuration              mockConfig       = null;
@@ -57,9 +56,8 @@ public class ServerTest extends TestCase {
             count++;
         }
         prepareConfig();
-        ServletHandler.init(config, null);
-        httpRequestHandler = new HttpRequestHandler(null, null);
-        responseSender = new ResponseSender(httpRequestHandler);
+        CasConfigUtil.init(config, null);
+        responseSender = new ResponseSender();
 
         AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
         Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-advertisement", "null", mockConfig);

@@ -8,7 +8,7 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.PublisherFilterEntity;
 import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.ServletHandler;
+import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.beans.CasContext;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
@@ -75,7 +75,7 @@ public class ServletBackFill implements Servlet {
         }
 
         // Setting isResponseOnlyFromDCP from config
-        boolean isResponseOnlyFromDcp = ServletHandler.getServerConfig().getBoolean("isResponseOnyFromDCP", false);
+        boolean isResponseOnlyFromDcp = CasConfigUtil.getServerConfig().getBoolean("isResponseOnyFromDCP", false);
         LOG.debug("isResponseOnlyFromDcp from config is {}", isResponseOnlyFromDcp);
         sasParams.setResponseOnlyFromDcp(isResponseOnlyFromDcp);
 
@@ -84,10 +84,10 @@ public class ServletBackFill implements Servlet {
         String rFormat = hrh.responseSender.getResponseFormat();
         if (rFormat.equalsIgnoreCase("imai")) {
             if (hrh.responseSender.sasParams.getOsId() == 3) {
-                imaiBaseUrl = ServletHandler.getServerConfig().getString("androidBaseUrl");
+                imaiBaseUrl = CasConfigUtil.getServerConfig().getString("androidBaseUrl");
             }
             else {
-                imaiBaseUrl = ServletHandler.getServerConfig().getString("iPhoneBaseUrl");
+                imaiBaseUrl = CasConfigUtil.getServerConfig().getString("iPhoneBaseUrl");
             }
         }
         hrh.responseSender.sasParams.setImaiBaseUrl(imaiBaseUrl);
@@ -129,9 +129,9 @@ public class ServletBackFill implements Servlet {
         List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
         List<ChannelSegment> dcpSegments;
 
-        dcpSegments = asyncRequestMaker.prepareForAsyncRequest(filteredSegments, ServletHandler.getServerConfig(),
-                ServletHandler.getRtbConfig(), ServletHandler.getAdapterConfig(), hrh.responseSender,
-                sasParams.getUAdapters(), serverChannel, ServletHandler.repositoryHelper, hrh.responseSender.sasParams,
+        dcpSegments = asyncRequestMaker.prepareForAsyncRequest(filteredSegments, CasConfigUtil.getServerConfig(),
+                CasConfigUtil.getRtbConfig(), CasConfigUtil.getAdapterConfig(), hrh.responseSender,
+                sasParams.getUAdapters(), serverChannel, CasConfigUtil.repositoryHelper, hrh.responseSender.sasParams,
                 casInternalRequestParametersGlobal, rtbSegments);
 
         LOG.debug("rtb rankList size is {}", rtbSegments.size());
@@ -216,7 +216,7 @@ public class ServletBackFill implements Servlet {
     private List<Long> getBlockedCategories(final HttpRequestHandler hrh) {
         List<Long> blockedCategories = null;
         if (null != hrh.responseSender.sasParams.getSiteId()) {
-            PublisherFilterEntity publisherFilterEntity = ServletHandler.repositoryHelper
+            PublisherFilterEntity publisherFilterEntity = CasConfigUtil.repositoryHelper
                     .queryPublisherFilterRepository(hrh.responseSender.sasParams.getSiteId(), 4);
             if (null != publisherFilterEntity && publisherFilterEntity.getBlockedCategories() != null) {
                 blockedCategories = Arrays.asList(publisherFilterEntity.getBlockedCategories());
@@ -228,7 +228,7 @@ public class ServletBackFill implements Servlet {
     private List<String> getBlockedAdvertisers(final HttpRequestHandler hrh) {
         List<String> blockedAdvertisers = null;
         if (null != hrh.responseSender.sasParams.getSiteId()) {
-            PublisherFilterEntity publisherFilterEntity = ServletHandler.repositoryHelper
+            PublisherFilterEntity publisherFilterEntity = CasConfigUtil.repositoryHelper
                     .queryPublisherFilterRepository(hrh.responseSender.sasParams.getSiteId(), 6);
             if (null != publisherFilterEntity && publisherFilterEntity.getBlockedAdvertisers() != null) {
                 blockedAdvertisers = Arrays.asList(publisherFilterEntity.getBlockedAdvertisers());

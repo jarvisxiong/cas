@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.ServletHandler;
+import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.api.Servlet;
 
 
@@ -62,7 +62,7 @@ public class ServletLogParser implements Servlet {
             logFilePath = "/opt/mkhoj/logs/cas/debug/";
         }
 
-        ProcessBuilder pb = new ProcessBuilder(ServletHandler.getServerConfig().getString("logParserScript"), "-t",
+        ProcessBuilder pb = new ProcessBuilder(CasConfigUtil.getServerConfig().getString("logParserScript"), "-t",
                 targetStrings, "-l", logFilePath);
         Process process = pb.start();
         int exitStatus = process.waitFor();
