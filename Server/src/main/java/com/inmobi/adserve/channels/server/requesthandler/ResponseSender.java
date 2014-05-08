@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.server.requesthandler;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -40,8 +41,8 @@ import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
+import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.types.AdIdChain;
@@ -51,19 +52,19 @@ import com.inmobi.types.PricingModel;
 
 public class ResponseSender extends HttpRequestHandlerBase {
 
-    private final static Logger         LOG                      = LoggerFactory.getLogger(ResponseSender.class);
+    private final static Logger         LOG                        = LoggerFactory.getLogger(ResponseSender.class);
 
-    private static final String         START_TAG                = "<AdResponse><Ads number=\"1\"><Ad type=\"rm\" width=\"%s\" height=\"%s\"><![CDATA[";
-    private static final String         END_TAG                  = " ]]></Ad></Ads></AdResponse>";
-    private static final String         AD_IMAI_START_TAG        = "<!DOCTYPE html>";
-    private static final String         NO_AD_IMAI               = "";
-    private static final String         NO_AD_XHTML              = "<AdResponse><Ads></Ads></AdResponse>";
-    private static final String         NO_AD_HTML               = "<!-- mKhoj: No advt for this position -->";
-    private static final String         NO_AD_JS_ADCODE          = "<html><head><title></title><style type=\"text/css\">"
-                                                                         + " body {margin: 0; overflow: hidden; background-color: transparent}"
-                                                                         + " </style></head><body class=\"nofill\"><!-- NO FILL -->"
-                                                                         + "<script type=\"text/javascript\" charset=\"utf-8\">"
-                                                                         + "parent.postMessage('{\"topic\":\"nfr\",\"container\" : \"%s\"}', '*');</script></body></html>";
+    private static final String         START_TAG                  = "<AdResponse><Ads number=\"1\"><Ad type=\"rm\" width=\"%s\" height=\"%s\"><![CDATA[";
+    private static final String         END_TAG                    = " ]]></Ad></Ads></AdResponse>";
+    private static final String         AD_IMAI_START_TAG          = "<!DOCTYPE html>";
+    private static final String         NO_AD_IMAI                 = "";
+    private static final String         NO_AD_XHTML                = "<AdResponse><Ads></Ads></AdResponse>";
+    private static final String         NO_AD_HTML                 = "<!-- mKhoj: No advt for this position -->";
+    private static final String         NO_AD_JS_ADCODE            = "<html><head><title></title><style type=\"text/css\">"
+                                                                           + " body {margin: 0; overflow: hidden; background-color: transparent}"
+                                                                           + " </style></head><body class=\"nofill\"><!-- NO FILL -->"
+                                                                           + "<script type=\"text/javascript\" charset=\"utf-8\">"
+                                                                           + "parent.postMessage('{\"topic\":\"nfr\",\"container\" : \"%s\"}', '*');</script></body></html>";
     private static Set<String>          SUPPORTED_RESPONSE_FORMATS = Sets.newHashSet("html", "xhtml", "axml", "imai");
 
     private long                        totalTime;
@@ -76,7 +77,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private boolean                     requestCleaned;
     public CasInternalRequestParameters casInternalRequestParameters;
     private final AuctionEngine         auctionEngine;
-    private final Object                lock                     = new Object();
+    private final Object                lock                       = new Object();
     private String                      terminationReason;
 
     public String getTerminationReason() {
@@ -259,6 +260,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private void sendResponse(final HttpResponseStatus status, final byte[] bytes, final Map responseHeaders,
             final Channel serverChannel) throws NullPointerException {
 
+        LOG.debug("Inside send Response");
+
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status,
                 Unpooled.wrappedBuffer(bytes), false);
 
@@ -278,13 +281,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
         response.headers().add(HttpHeaders.Names.PRAGMA, "no-cache");
         HttpHeaders.setKeepAlive(response, sasParams.isKeepAlive());
 
-        LOG.debug("event not null inside send Response");
-        if (serverChannel.isWritable()) {
-            LOG.debug("channel not null inside send Response");
+        if (sasParams.isKeepAlive()) {
             serverChannel.writeAndFlush(response);
         }
         else {
-            LOG.debug("Request Channel is null or channel is not writeable.");
+            serverChannel.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
         }
 
         totalTime = System.currentTimeMillis() - totalTime;

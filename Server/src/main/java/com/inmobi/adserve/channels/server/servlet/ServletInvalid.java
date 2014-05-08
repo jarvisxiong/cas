@@ -1,17 +1,23 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import com.google.inject.Singleton;
-import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.api.Servlet;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.handler.codec.http.*;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.QueryStringDecoder;
+
+import java.nio.charset.Charset;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.charset.Charset;
+import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.server.api.Servlet;
 
 
 @Singleton
@@ -27,10 +33,8 @@ public class ServletInvalid implements Servlet {
         HttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND,
                 Unpooled.copiedBuffer("Page not Found", Charset.defaultCharset()), true);
 
-        if (serverChannel != null && serverChannel.isWritable()) {
-            ChannelFuture future = serverChannel.writeAndFlush(response);
-            future.addListener(ChannelFutureListener.CLOSE);
-        }
+        ChannelFuture future = serverChannel.writeAndFlush(response);
+        future.addListener(ChannelFutureListener.CLOSE);
     }
 
     @Override
