@@ -28,6 +28,9 @@ public interface AdNetworkInterface {
     List<String> getADomain();
 
     // Returns whether to log creative or not
+    String getAdMarkUp();
+
+    // Returns whether to log creative or not
     boolean isLogCreative();
 
     // Set whether creative logging is required or not

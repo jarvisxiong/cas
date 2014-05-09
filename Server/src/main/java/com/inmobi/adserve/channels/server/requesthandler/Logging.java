@@ -5,7 +5,6 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.server.CreativeCache;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.MetricsManager;
@@ -21,11 +20,13 @@ import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.concurrent.GuardedBy;
 import javax.inject.Inject;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -236,7 +237,7 @@ public class Logging {
                 casAdvertisementLog.setCountryId(sasRequestParameters.getCountryId().intValue());
                 casAdvertisementLog.setCreativeId(adNetworkInterface.getCreativeId());
                 casAdvertisementLog.setImageUrl(adNetworkInterface.getIUrl());
-                //casAdvertisementLog.setAdm
+                casAdvertisementLog.setAdm(adNetworkInterface.getAdMarkUp());
                 casAdvertisementLog.setCreativeAttributes(adNetworkInterface.getAttribute());
                 casAdvertisementLog.setAdvertiserDomains(adNetworkInterface.getADomain());
                 casAdvertisementLog.setTime_stamp(new Date().getTime());
@@ -300,6 +301,9 @@ public class Logging {
         casAdChain.setAdgroup_inc_id(channelSegment.getChannelSegmentEntity().getAdgroupIncId());
         casAdChain.setExternalSiteKey(channelSegment.getChannelSegmentEntity().getExternalSiteKey());
         casAdChain.setDst(DemandSourceType.findByValue(channelSegment.getChannelSegmentEntity().getDst()));
+        if (null != channelSegment.getAdNetworkInterface().getCreativeId()) {
+            casAdChain.setCreativeId(channelSegment.getAdNetworkInterface().getCreativeId());
+        }
         return casAdChain;
     }
 

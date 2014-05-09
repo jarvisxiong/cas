@@ -13,7 +13,7 @@ import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.auction.AuctionEngine;
-import com.inmobi.adserve.channels.server.auction.AuctionFilterModule;
+import com.inmobi.adserve.channels.server.auction.AuctionFilterApplier;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
@@ -73,8 +73,10 @@ public class ServerModule extends AbstractModule {
         requestStaticInjection(BaseAdNetworkImpl.class);
         requestStaticInjection(ChannelSegment.class);
         requestStaticInjection(Logging.class);
+        requestStaticInjection(AuctionFilterApplier.class);
         requestStaticInjection(AuctionEngine.class);
         requestStaticInjection(ResponseSender.class);
+
 
         install(new AdapterConfigModule(adapterConfiguration, ChannelServer.dataCentreName));
         install(new ChannelSegmentFilterModule());

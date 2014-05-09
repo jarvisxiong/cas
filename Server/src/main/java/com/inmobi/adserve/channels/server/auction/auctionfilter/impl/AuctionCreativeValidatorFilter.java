@@ -30,8 +30,6 @@ public class AuctionCreativeValidatorFilter extends AbstractAuctionFilter {
         this.creativeCache = creativeCache;
     }
 
-    @Inject
-
     @Override
     protected boolean failedInFilter(ChannelSegment rtbSegment, CasInternalRequestParameters casInternalRequestParameters) {
         CreativeEntity creativeEntity = repositoryHelper.queryCreativeRepository(rtbSegment.getChannelEntity().getAccountId(), rtbSegment.getAdNetworkInterface().getCreativeId());

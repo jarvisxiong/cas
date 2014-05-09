@@ -710,4 +710,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         //
     }
 
+    @Override
+    public String getAdMarkUp()  {
+      return null;
+    }
+
 }

@@ -11,10 +11,9 @@ import java.util.HashSet;
 import java.util.List;
 
 import com.google.inject.Injector;
+import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.server.auction.AuctionEngine;
 import com.inmobi.adserve.channels.server.auction.AuctionFilterApplier;
-import com.inmobi.adserve.channels.server.auction.AuctionFilterModule;
-import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilterApplier;
 import com.inmobi.adserve.channels.types.AccountType;
 import org.apache.commons.configuration.Configuration;
 import org.easymock.Capture;
@@ -26,7 +25,6 @@ import org.testng.annotations.Test;
 
 import com.google.inject.Guice;
 import com.google.inject.util.Modules;
-import com.inmobi.adserve.channels.adnetworks.tapit.DCPTapitAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
@@ -49,6 +47,7 @@ public class AuctionEngineTest {
     Capture<Double>              secondPrice1;
     CasInternalRequestParameters casInternalRequestParameters;
     AuctionFilterApplier         auctionFilterApplier;
+    AuctionEngine auctionEngine;
 
     @BeforeMethod
     public void setUp() throws IOException {
@@ -87,6 +86,7 @@ public class AuctionEngineTest {
         Injector injector = Guice.createInjector(Modules.override(new ServerModule(config, repositoryHelper),
                 new CasNettyModule(config.getServerConfiguration())).with(new TestScopeModule()));
         auctionFilterApplier = injector.getInstance(AuctionFilterApplier.class);
+        auctionEngine = injector.getInstance(AuctionEngine.class);
 
 
     }
@@ -108,7 +108,7 @@ public class AuctionEngineTest {
         builder.setAccountId(advId);
         ChannelEntity channelEntity = builder.build();
 
-        AdNetworkInterface mockAdnetworkInterface = createMock(DCPTapitAdNetwork.class);
+        AdNetworkInterface mockAdnetworkInterface = createMock(RtbAdNetwork.class);
         ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
         thirdPartyAdResponse.adStatus = "AD";
         expect(mockAdnetworkInterface.getAdStatus()).andReturn("AD").anyTimes();
@@ -128,6 +128,8 @@ public class AuctionEngineTest {
         expect(mockAdnetworkInterface.getSeatId()).andReturn(advId).anyTimes();
         expect(mockAdnetworkInterface.getCurrency()).andReturn("USD").anyTimes();
         expect(mockAdnetworkInterface.getCreativeId()).andReturn("creativeId").anyTimes();
+        mockAdnetworkInterface.setLogCreative(true);
+        EasyMock.expectLastCall().anyTimes();
         List<String> adomains = new ArrayList<String>();
         adomains.add("a.com");
         expect(mockAdnetworkInterface.getADomain()).andReturn(adomains).anyTimes();

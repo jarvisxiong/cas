@@ -4,7 +4,7 @@ package com.inmobi.adserve.channels.server.constants;
  * @author abhishek.parwal
  * 
  */
-public enum ChannelSegmentFilterOrder {
+public enum FilterOrder {
 
     FIRST(0),
     SECOND(1),
@@ -23,7 +23,7 @@ public enum ChannelSegmentFilterOrder {
 
     private int value;
 
-    private ChannelSegmentFilterOrder(final int value) {
+    private FilterOrder(final int value) {
         this.value = value;
     }
 

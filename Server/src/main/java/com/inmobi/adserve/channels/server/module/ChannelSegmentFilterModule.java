@@ -1,22 +1,11 @@
 package com.inmobi.adserve.channels.server.module;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
-import org.reflections.util.FilterBuilder;
-
 import com.google.common.collect.Lists;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import com.inmobi.adserve.channels.server.constants.ChannelSegmentFilterOrder;
+import com.inmobi.adserve.channels.server.constants.FilterOrder;
 import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AbstractAdGroupLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AdGroupLevelFilter;
@@ -27,6 +16,16 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.Abst
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AdvertiserLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserDetailsInvalidFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserExcludedFilter;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -75,13 +74,13 @@ public class ChannelSegmentFilterModule extends AbstractModule {
         for (Class<? extends AdvertiserLevelFilter> class1 : classes) {
             AdvertiserLevelFilter filter = injector.getInstance(class1);
             if (filter instanceof AdvertiserDetailsInvalidFilter) {
-                filter.setOrder(ChannelSegmentFilterOrder.FIRST);
+                filter.setOrder(FilterOrder.FIRST);
             }
             else if (filter instanceof AdvertiserExcludedFilter) {
-                filter.setOrder(ChannelSegmentFilterOrder.SECOND);
+                filter.setOrder(FilterOrder.SECOND);
             }
             else {
-                filter.setOrder(ChannelSegmentFilterOrder.DEFAULT);
+                filter.setOrder(FilterOrder.DEFAULT);
             }
 
             advertiserLevelFilterList.add(filter);
@@ -103,16 +102,16 @@ public class ChannelSegmentFilterModule extends AbstractModule {
         for (Class<? extends AdGroupLevelFilter> class1 : classes) {
             AdGroupLevelFilter filter = injector.getInstance(class1);
             if (filter instanceof AdGroupSupplyDemandClassificationFilter) {
-                filter.setOrder(ChannelSegmentFilterOrder.FIRST);
+                filter.setOrder(FilterOrder.FIRST);
             }
             else if (filter instanceof AdGroupTotalCountFilter) {
-                filter.setOrder(ChannelSegmentFilterOrder.LAST);
+                filter.setOrder(FilterOrder.LAST);
             }
             else if (filter instanceof AdGroupPartnerCountFilter) {
-                filter.setOrder(ChannelSegmentFilterOrder.SECOND_LAST);
+                filter.setOrder(FilterOrder.SECOND_LAST);
             }
             else {
-                filter.setOrder(ChannelSegmentFilterOrder.DEFAULT);
+                filter.setOrder(FilterOrder.DEFAULT);
             }
 
             adGroupLevelFilterList.add(filter);

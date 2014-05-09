@@ -1,34 +1,34 @@
-package com.inmobi.adserve.channels.server.auction;
+package com.inmobi.adserve.channels.server.module;
 
 import com.google.common.collect.Lists;
-import com.google.inject.*;
-import com.inmobi.adserve.channels.server.constants.ChannelSegmentFilterOrder;
+import com.google.inject.AbstractModule;
+import com.google.inject.Injector;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.auction.auctionfilter.AbstractAuctionFilter;
 import com.inmobi.adserve.channels.server.auction.auctionfilter.AuctionFilter;
 import com.inmobi.adserve.channels.server.auction.auctionfilter.impl.*;
+import com.inmobi.adserve.channels.server.constants.FilterOrder;
+import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilter;
 import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
-import org.reflections.util.FilterBuilder;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
 public class AuctionFilterModule extends AbstractModule {
 
     private final Reflections reflections;
+    private final static Comparator<ChannelSegmentFilter> FILTER_COMPARATOR = new Comparator<ChannelSegmentFilter>() {
+        @Override
+        public int compare(final ChannelSegmentFilter o1, final ChannelSegmentFilter o2) {
+            return o1.getOrder().getValue() - o2.getOrder().getValue();
+        }
+    };
 
     public AuctionFilterModule() {
-        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
-                .filterInputsBy(
-                        new FilterBuilder().includePackage(
-                                "com.inmobi.adserve.channels.server.auction.auctionfilter.impl")
-                                .includePackage(
-                                        "com.inmobi.adserve.channels.server.auction.auctionfilter.impl"))
-                .setUrls(ClasspathHelper.forClassLoader()).setScanners(new SubTypesScanner());
-
-        reflections = new Reflections(configurationBuilder);
+        reflections = new Reflections("com.inmobi.adserve.channels.server.auction.auctionfilter.impl");
     }
     @Override
     protected void configure() {
@@ -46,44 +46,46 @@ public class AuctionFilterModule extends AbstractModule {
         for (Class<? extends AuctionFilter> class1 : classes) {
             AuctionFilter filter = injector.getInstance(class1);
             if (filter instanceof AuctionNoAdFilter) {
-                filter.setOrder(ChannelSegmentFilterOrder.FIRST);
+                filter.setOrder(FilterOrder.FIRST);
             }
             else if (filter instanceof AuctionBidFloorFilter) {
-                filter.setOrder(ChannelSegmentFilterOrder.SECOND);
+                filter.setOrder(FilterOrder.SECOND);
             }
             else if (filter instanceof AuctionSeatIdFilter) {
-                filter.setOrder(ChannelSegmentFilterOrder.THIRD);
+                filter.setOrder(FilterOrder.THIRD);
             }
             else if (filter instanceof AuctionImpressionIdFilter) {
-                filter.setOrder(ChannelSegmentFilterOrder.FOURTH);
+                filter.setOrder(FilterOrder.FOURTH);
             }
             else if (filter instanceof AuctionIdFilter) {
-                filter.setOrder(ChannelSegmentFilterOrder.FIFTH);
+                filter.setOrder(FilterOrder.FIFTH);
             }
             else if (filter instanceof AuctionCurrencyFilter) {
-                filter.setOrder(ChannelSegmentFilterOrder.SIXTH);
+                filter.setOrder(FilterOrder.SIXTH);
             }
             else if (filter instanceof AuctionCreativeIdFilter) {
-                filter.setOrder(ChannelSegmentFilterOrder.SEVENTH);
+                filter.setOrder(FilterOrder.SEVENTH);
             }
             else if (filter instanceof AuctionIUrlFilter) {
-                filter.setOrder(ChannelSegmentFilterOrder.EIGHT);
+                filter.setOrder(FilterOrder.EIGHT);
             }
             else if (filter instanceof AuctionAdvertiserDomainFilter) {
-                filter.setOrder(ChannelSegmentFilterOrder.NINTH);
+                filter.setOrder(FilterOrder.NINTH);
             }
             else if (filter instanceof AuctionCreativeAttributeFilter) {
-                filter.setOrder(ChannelSegmentFilterOrder.TENTH);
+                filter.setOrder(FilterOrder.TENTH);
             }
             else if (filter instanceof AuctionCreativeValidatorFilter) {
-                filter.setOrder(ChannelSegmentFilterOrder.LAST);
+                filter.setOrder(FilterOrder.LAST);
             }
             else {
-                filter.setOrder(ChannelSegmentFilterOrder.DEFAULT);
+                filter.setOrder(FilterOrder.DEFAULT);
             }
 
             auctionFilterList.add(filter);
         }
+
+        Collections.sort(auctionFilterList, FILTER_COMPARATOR);
 
         return auctionFilterList;
     }

@@ -3,7 +3,7 @@ package com.inmobi.adserve.channels.server.auction.auctionfilter;
 import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
-import com.inmobi.adserve.channels.server.constants.ChannelSegmentFilterOrder;
+import com.inmobi.adserve.channels.server.constants.FilterOrder;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -19,7 +19,7 @@ public abstract class AbstractAuctionFilter implements AuctionFilter {
 
     protected final Provider<Marker> traceMarkerProvider;
     private final String              inspectorString;
-    private ChannelSegmentFilterOrder order;
+    private FilterOrder order;
     private ServerConfig serverConfiguration;
 
 
@@ -40,7 +40,7 @@ public abstract class AbstractAuctionFilter implements AuctionFilter {
             boolean result = false;
 
             if (isApplicable(channelSegment.getChannelEntity().getAccountId())) {
-                failedInFilter(channelSegment, casInternalRequestParameters);
+                result = failedInFilter(channelSegment, casInternalRequestParameters);
             }
 
             if (result) {
@@ -72,12 +72,12 @@ public abstract class AbstractAuctionFilter implements AuctionFilter {
     }
 
     @Override
-    final public void setOrder(final ChannelSegmentFilterOrder order) {
+    final public void setOrder(final FilterOrder order) {
         this.order = order;
     }
 
     @Override
-    public ChannelSegmentFilterOrder getOrder() {
+    public FilterOrder getOrder() {
         return order;
     }
 

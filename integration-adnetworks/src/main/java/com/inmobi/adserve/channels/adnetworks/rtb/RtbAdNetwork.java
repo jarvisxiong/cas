@@ -109,6 +109,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private List<String>                   advertiserDomains;
     private List<Integer>                  creativeAttributes;
     private boolean                        logCreative                  = false;
+    private String                         adm;
     private final RepositoryHelper         repositoryHelper;
     private String                         bidderCurrency               = "USD";
     private static final String            USD                          = "USD";
@@ -617,12 +618,12 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             VelocityContext velocityContext = new VelocityContext();
             SeatBid seatBid = bidResponse.getSeatbid().get(0);
             Bid bid = seatBid.getBid().get(0);
-            String image = bid.getAdm();
+            adm = bid.getAdm();
             if ("wap".equalsIgnoreCase(sasParams.getSource())) {
-                velocityContext.put(VelocityTemplateFieldConstants.PartnerHtmlCode, image);
+                velocityContext.put(VelocityTemplateFieldConstants.PartnerHtmlCode, adm);
             }
             else {
-                velocityContext.put(VelocityTemplateFieldConstants.PartnerHtmlCode, mraid + image);
+                velocityContext.put(VelocityTemplateFieldConstants.PartnerHtmlCode, mraid + adm);
                 if (StringUtils.isNotBlank(sasParams.getImaiBaseUrl())) {
                     velocityContext.put(VelocityTemplateFieldConstants.IMAIBaseUrl, sasParams.getImaiBaseUrl());
                 }
@@ -812,12 +813,17 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     @Override
     public boolean isLogCreative() {
-        return false;
+        return logCreative;
     }
 
     @Override
     public void setLogCreative(boolean logCreative) {
         this.logCreative = logCreative;
+    }
+
+    @Override
+    public String getAdMarkUp() {
+        return adm;
     }
 
 }

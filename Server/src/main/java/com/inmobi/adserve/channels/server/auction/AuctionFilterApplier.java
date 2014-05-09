@@ -16,6 +16,7 @@ public class AuctionFilterApplier {
     @Inject
     public AuctionFilterApplier(final List<AuctionFilter> auctionFilters) {
         this.auctionFilters = auctionFilters;
+
     }
 
     public List<ChannelSegment> applyFilters(final List<ChannelSegment> rtbdSegments, final CasInternalRequestParameters casInternalRequestParameters) {

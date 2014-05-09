@@ -60,9 +60,8 @@ public class AuctionEngine implements AuctionEngineInterface {
         auctionComplete = true;
 
         LOG.debug("Inside RTB auction engine");
-        List<ChannelSegment> rtbList;
-        // Apply rtb filters.
-        rtbList = auctionFilterApplier.applyFilters(rtbSegments, casInternalRequestParameters);
+
+        List<ChannelSegment> rtbList = auctionFilterApplier.applyFilters(rtbSegments, casInternalRequestParameters);
 
         // Send null as auction response in case of 0 rtb responses.
         if (rtbList.size() == 0) {

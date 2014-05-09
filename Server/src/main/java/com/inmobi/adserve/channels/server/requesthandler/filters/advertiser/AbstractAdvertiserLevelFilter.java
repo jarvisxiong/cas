@@ -2,7 +2,7 @@ package com.inmobi.adserve.channels.server.requesthandler.filters.advertiser;
 
 import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.server.constants.ChannelSegmentFilterOrder;
+import com.inmobi.adserve.channels.server.constants.FilterOrder;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.beans.AdvertiserMatchedSegmentDetail;
 import org.slf4j.Logger;
@@ -25,7 +25,7 @@ public abstract class AbstractAdvertiserLevelFilter implements AdvertiserLevelFi
 
     private final String              inspectorString;
 
-    private ChannelSegmentFilterOrder order;
+    private FilterOrder order;
 
     protected AbstractAdvertiserLevelFilter(final Provider<Marker> traceMarkerProvider, final String inspectorString) {
         this.traceMarkerProvider = traceMarkerProvider;
@@ -75,12 +75,12 @@ public abstract class AbstractAdvertiserLevelFilter implements AdvertiserLevelFi
     protected abstract boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams);
 
     @Override
-    final public void setOrder(final ChannelSegmentFilterOrder order) {
+    final public void setOrder(final FilterOrder order) {
         this.order = order;
     }
 
     @Override
-    public ChannelSegmentFilterOrder getOrder() {
+    public FilterOrder getOrder() {
         return order;
     }
 }
