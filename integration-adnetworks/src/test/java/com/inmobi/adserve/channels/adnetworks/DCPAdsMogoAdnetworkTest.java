@@ -73,7 +73,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         if (!f.exists()) {
             f.createNewFile();
         }
-
+	
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         Channel serverChannel = createMock(Channel.class);
         prepareMockConfig();
@@ -364,7 +364,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
                 dcpadsmogoAdNetwork.getHttpResponseContent());
     }
 
-
+    
     @Test
     public void testDCPadsmogoParseNoAd() throws Exception {
         String response = "";
@@ -372,7 +372,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         assertEquals(500, dcpadsmogoAdNetwork.getHttpResponseStatusCode());
     }
 
-
+    
     @Test
     public void testDCPadsmogoGetId() throws Exception {
         assertEquals(adsmogoAdvId, dcpadsmogoAdNetwork.getId());
