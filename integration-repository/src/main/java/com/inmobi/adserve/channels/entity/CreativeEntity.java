@@ -1,7 +1,7 @@
 package com.inmobi.adserve.channels.entity;
 
 import com.inmobi.adserve.channels.query.CreativeQuery;
-import com.inmobi.adserve.channels.types.CreativeStatus;
+import com.inmobi.adserve.channels.types.CreativeExposure;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 import lombok.Data;
 import lombok.Setter;
@@ -13,12 +13,14 @@ public class CreativeEntity implements IdentifiableEntity<CreativeQuery> {
     private static final long              serialVersionUID              = 1L;
     private final String                    advertiserId;
     private final String                    creativeId;
-    private final CreativeStatus            creativeStatus;
+    private final CreativeExposure          exposureLevel;
+    private final String                    imageUrl;
 
     public CreativeEntity(Builder builder) {
         this.advertiserId = builder.advertiserId;
         this.creativeId = builder.creativeId;
-        this.creativeStatus = builder.creativeStatus;
+        this.exposureLevel = builder.exposureLevel;
+        this.imageUrl = builder.imageUrl;
     }
 
     public static CreativeEntity.Builder newBuilder() {
@@ -29,7 +31,8 @@ public class CreativeEntity implements IdentifiableEntity<CreativeQuery> {
     public static class Builder {
         private String                  advertiserId;
         private String                  creativeId;
-        private CreativeStatus          creativeStatus;
+        private CreativeExposure        exposureLevel;
+        private String                  imageUrl;
 
         public CreativeEntity build() {
             return new CreativeEntity(this);

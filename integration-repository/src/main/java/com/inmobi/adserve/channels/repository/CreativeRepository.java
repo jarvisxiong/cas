@@ -2,7 +2,7 @@ package com.inmobi.adserve.channels.repository;
 
 import com.inmobi.adserve.channels.entity.CreativeEntity;
 import com.inmobi.adserve.channels.query.CreativeQuery;
-import com.inmobi.adserve.channels.types.CreativeStatus;
+import com.inmobi.adserve.channels.types.CreativeExposure;
 import com.inmobi.phoenix.batteries.data.AbstractStatsMaintainingDBRepository;
 import com.inmobi.phoenix.batteries.data.DBEntity;
 import com.inmobi.phoenix.batteries.data.HashIndexKeyBuilder;
@@ -41,10 +41,12 @@ public class CreativeRepository extends
         CreativeEntity.Builder builder = CreativeEntity.newBuilder();
         String advertiserId = row.getString("advertiser_id");
         String creativeId = row.getString("creative_id");
-        String status = row.getString("status");
+        String exposureLevel = row.getString("exposure_level");
+        String imageUrl = row.getString("sample_url");
         builder.setAdvertiserId(advertiserId);
         builder.setCreativeId(creativeId);
-        builder.setCreativeStatus(CreativeStatus.valueOf(status));
+        builder.setExposureLevel(CreativeExposure.valueOf(exposureLevel));
+        builder.setImageUrl(imageUrl);
         CreativeEntity entity = builder.build();
 
         if (logger.isDebugEnabled()) {

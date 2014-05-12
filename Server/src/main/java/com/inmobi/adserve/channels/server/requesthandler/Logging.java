@@ -232,19 +232,19 @@ public class Logging {
                 String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
                 String adStatus = adResponse.adStatus;
 
-                CasAdvertisementLog casAdvertisementLog = new CasAdvertisementLog(partnerName, requestUrl, response,
+                CasAdvertisementLog creativeLog = new CasAdvertisementLog(partnerName, requestUrl, response,
                         adStatus, externalSiteKey, advertiserId);
-                casAdvertisementLog.setCountryId(sasRequestParameters.getCountryId().intValue());
-                casAdvertisementLog.setCreativeId(adNetworkInterface.getCreativeId());
-                casAdvertisementLog.setImageUrl(adNetworkInterface.getIUrl());
-                casAdvertisementLog.setAdm(adNetworkInterface.getAdMarkUp());
-                casAdvertisementLog.setCreativeAttributes(adNetworkInterface.getAttribute());
-                casAdvertisementLog.setAdvertiserDomains(adNetworkInterface.getADomain());
-                casAdvertisementLog.setTime_stamp(new Date().getTime());
+                creativeLog.setCountryId(sasRequestParameters.getCountryId().intValue());
+                creativeLog.setCreativeId(adNetworkInterface.getCreativeId());
+                creativeLog.setImageUrl(adNetworkInterface.getIUrl());
+                creativeLog.setAdm(adNetworkInterface.getAdMarkUp());
+                creativeLog.setCreativeAttributes(adNetworkInterface.getAttribute());
+                creativeLog.setAdvertiserDomains(adNetworkInterface.getADomain());
+                creativeLog.setTime_stamp(new Date().getTime());
                 Message msg = null;
                 try {
                     TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
-                    msg = new Message(tSerializer.serialize(casAdvertisementLog));
+                    msg = new Message(tSerializer.serialize(creativeLog));
                 }
                 catch (TException e) {
                     LOG.debug("Error while creating creative logs for databus ");

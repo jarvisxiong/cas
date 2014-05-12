@@ -9,7 +9,7 @@ import com.inmobi.adserve.channels.server.CreativeCache;
 import com.inmobi.adserve.channels.server.auction.auctionfilter.AbstractAuctionFilter;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.types.AccountType;
-import com.inmobi.adserve.channels.types.CreativeStatus;
+import com.inmobi.adserve.channels.types.CreativeExposure;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import org.slf4j.Marker;
 
@@ -33,23 +33,32 @@ public class AuctionCreativeValidatorFilter extends AbstractAuctionFilter {
     @Override
     protected boolean failedInFilter(ChannelSegment rtbSegment, CasInternalRequestParameters casInternalRequestParameters) {
         CreativeEntity creativeEntity = repositoryHelper.queryCreativeRepository(rtbSegment.getChannelEntity().getAccountId(), rtbSegment.getAdNetworkInterface().getCreativeId());
-        CreativeStatus creativeStatus = CreativeStatus.APPROVED;
-        boolean presentInCache = creativeCache.isPresentInCache(rtbSegment.getChannelEntity().getAccountId(), rtbSegment.getAdNetworkInterface().getCreativeId());
+        CreativeExposure creativeExposure = CreativeExposure.SELF_SERVE;
+
+        //Setting appropriate exposure level
         if (null != creativeEntity) {
-            creativeStatus = creativeEntity.getCreativeStatus();
-            if (presentInCache) {
-                creativeCache.removeFromCache(rtbSegment.getChannelEntity().getAccountId(), rtbSegment.getAdNetworkInterface().getCreativeId());
+            creativeExposure = creativeEntity.getExposureLevel();
+            if (creativeExposure == CreativeExposure.ALL && !creativeEntity.getImageUrl().equalsIgnoreCase(rtbSegment.getAdNetworkInterface().getIUrl())) {
+                creativeExposure = CreativeExposure.SELF_SERVE;
             }
-        } else if (!presentInCache) {
+        }
+
+        //Handling de-duping in Cache
+        boolean presentInCache = creativeCache.isPresentInCache(rtbSegment.getChannelEntity().getAccountId(), rtbSegment.getAdNetworkInterface().getCreativeId());
+        if (null == creativeEntity && !presentInCache) {
             rtbSegment.getAdNetworkInterface().setLogCreative(true);
             creativeCache.addToCache(rtbSegment.getChannelEntity().getAccountId(), rtbSegment.getAdNetworkInterface().getCreativeId());
+        } else if (null != creativeEntity && presentInCache) {
+            creativeCache.removeFromCache(rtbSegment.getChannelEntity().getAccountId(), rtbSegment.getAdNetworkInterface().getCreativeId());
         }
-        if (creativeStatus == CreativeStatus.APPROVED && casInternalRequestParameters.siteAccountType == AccountType.MANAGED) {
+
+        //Filtering logic
+        if (creativeExposure == CreativeExposure.ALL) {
+           return false;
+        } else if ((creativeExposure == CreativeExposure.SELF_SERVE) && casInternalRequestParameters.siteAccountType == AccountType.SELF_SERVE) {
            return false;
         }
-        if (creativeStatus == CreativeStatus.APPROVED || creativeStatus == CreativeStatus.PENDING && casInternalRequestParameters.siteAccountType == AccountType.SELF_SERVE) {
-           return false;
-        }
+
         return true;
     }
 }

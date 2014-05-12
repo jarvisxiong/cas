@@ -5,7 +5,7 @@ DECLARE
     row1    rtbd_creative_type%ROWTYPE;
 BEGIN
     FOR row1 IN
-	 select advertiser_id, creative_id, status
+	 select advertiser_id, creative_id, exposure_level, sample_url
 	 from rtbd_creative
 	 WHERE rtbd_creative.modified_on >= last_updated
 LOOP
