@@ -567,8 +567,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
     // return the response format
     public ResponseFormat getResponseFormat() {
-        String responseFormat = sasParams.getRFormat();
+        if (sasParams == null) {
+            return ResponseFormat.HTML;
+        }
 
+        String responseFormat = sasParams.getRFormat();
         if (isJsAdRequest()) {
             return ResponseFormat.JS_AD_CODE;
         }
