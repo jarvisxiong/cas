@@ -6,6 +6,7 @@ import static org.easymock.classextension.EasyMock.replay;
 import io.netty.channel.Channel;
 
 import java.io.File;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +37,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
     private final Bootstrap clientBootstrap = null;
 
     private DCPAdsMogoAdnetwork dcpadsmogoAdNetwork;
-    private final String adsmogoHost = "http://api2.adsmogo.com/ad/?ver=100&fmt=0";
+    private final String adsmogoHost = "http://api2.adsmogo.com/ad/?ver=100&fmt=0&mk=H";
     private final String adsmogoStatus = "on";
     private final String adsmogoAdvId = "adsmogoadv1";
     private final String adsmogoTest = "1";
@@ -72,7 +73,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         if (!f.exists()) {
             f.createNewFile();
         }
-        
+	
         HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         Channel serverChannel = createMock(Channel.class);
         prepareMockConfig();
@@ -232,7 +233,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         casInternalRequestParameters.blockedCategories = new ArrayList<Long>(
                 Arrays.asList(new Long[] { 50l, 51l }));
         sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setUserAgent("Mozilla");
+        sasParams.setUserAgent(URLEncoder.encode("Mozilla/5.0 (iPhone; CPU iPhone OS 7_0_5 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Mobile/11B601", "UTF-8"));
         sasParams.setSource("APP");
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
@@ -252,12 +253,19 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false,
                         false, false, false, null, new ArrayList<Integer>(),
                         0.0d, null, null, 0));
-        if (dcpadsmogoAdNetwork.configureParameters(sasParams,
-                casInternalRequestParameters, entity, null, null)) {
-            String actualUrl = dcpadsmogoAdNetwork.getRequestUri().toString();
-            String expectedUrl = "http://api2.adsmogo.com/ad/?ver=100&fmt=0&aid=adsmogo_test_7&ip=206.29.182.240&ast=banner&ua=Mozilla&lat=37.4429&lon=-122.1514&w=320&h=50&anid=202cb962ac59075b964b07152d234b70";
-            assertEquals(expectedUrl, actualUrl);
-        }
+
+      dcpadsmogoAdNetwork.configureParameters(sasParams,casInternalRequestParameters, entity, null, null);
+
+      String actualUrl = dcpadsmogoAdNetwork.getRequestUri().toString();
+      String expectedUrl = "http://api2.adsmogo.com/ad/?ver=100&fmt=0&mk=H&aid=adsmogo_test_7&ip=206.29.182.240&ast=banner&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&lat=37.4429&lon=-122.1514&w=320&h=50&anid=202cb962ac59075b964b07152d234b70";
+
+      assertEquals(expectedUrl, actualUrl);
+
+      com.ning.http.client.Request request = dcpadsmogoAdNetwork.getNingRequest();
+      String actualMd5Value = ((List<String>)request.getHeaders().get("MOGO_API_SIGNATURE")).get(0);
+
+      // Verifying the expected MD5 for the Query String.
+      assertEquals("91f3cbeba1d5c9600b7ed726c3ec2be8", actualMd5Value);
     }
 
     @Test
@@ -289,7 +297,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         if (dcpadsmogoAdNetwork.configureParameters(sasParams,
                 casInternalRequestParameters, entity, null, null)) {
             String actualUrl = dcpadsmogoAdNetwork.getRequestUri().toString();
-            String expectedUrl = "http://api2.adsmogo.com/ad/?ver=100&fmt=0&aid=adsmogo_test_7&ip=206.29.182.240&ast=banner&ua=Mozilla&lat=37.4429&lon=-122.1514&w=320&h=50&anid=202cb962ac59075b964b07152d234b70";
+            String expectedUrl = "http://api2.adsmogo.com/ad/?ver=100&fmt=0&mk=H&aid=adsmogo_test_7&ip=206.29.182.240&ast=banner&ua=Mozilla&lat=37.4429&lon=-122.1514&w=320&h=50&anid=202cb962ac59075b964b07152d234b70";
             assertEquals(expectedUrl, actualUrl);
         }
     }
