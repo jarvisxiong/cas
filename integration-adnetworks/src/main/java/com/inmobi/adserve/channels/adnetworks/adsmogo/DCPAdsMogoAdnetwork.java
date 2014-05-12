@@ -6,6 +6,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.awt.Dimension;
 import java.net.URI;
+import java.net.URLDecoder;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -136,8 +137,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
                 appendQueryParam(url, IOS_ID,
                         casInternalRequestParameters.uidIFA, false);
 
-            }
-            if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
+            } else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
                 appendQueryParam(url, IOS_ID, casInternalRequestParameters.uid,
                         false);
             }
@@ -170,7 +170,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
         }
         LOG.debug("AdsMogo url is {}", url);
         URI requestUrl = new URI(url.toString());
-        StringBuilder query = new StringBuilder(requestUrl.getQuery())
+        StringBuilder query = new StringBuilder(URLDecoder.decode(requestUrl.getQuery()))
                 .append(authSecret);
         authSignature = getHashedValue(query.toString(), "MD5");
 
@@ -188,7 +188,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
     }
 
     @Override
-    protected Request getNingRequest() throws Exception {
+    public Request getNingRequest() throws Exception {
 
         URI uri = getRequestUri();
         if (uri.getPort() == -1) {
