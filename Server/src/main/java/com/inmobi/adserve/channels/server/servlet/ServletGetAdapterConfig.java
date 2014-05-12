@@ -10,7 +10,7 @@ import org.json.JSONObject;
 
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.ServletHandler;
+import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.api.Servlet;
 
 
@@ -22,7 +22,7 @@ public class ServletGetAdapterConfig implements Servlet {
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
             final Channel serverChannel) throws Exception {
         hrh.responseSender.sendResponse(
-                new JSONObject(ConfigurationConverter.getMap(ServletHandler.getAdapterConfig())).toString(),
+                new JSONObject(ConfigurationConverter.getMap(CasConfigUtil.getAdapterConfig())).toString(),
                 serverChannel);
     }
 

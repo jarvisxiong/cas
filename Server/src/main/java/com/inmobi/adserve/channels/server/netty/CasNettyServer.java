@@ -52,14 +52,14 @@ public class CasNettyServer {
                 // disable nagle's algorithm
                 .childOption(ChannelOption.TCP_NODELAY, true)
                 // allow binding channel on same ip, port
-                .childOption(ChannelOption.SO_REUSEADDR, true).childOption(ChannelOption.ALLOCATOR, allocator).bind()
-                .sync();
+                .childOption(ChannelOption.SO_REUSEADDR, true).childOption(ChannelOption.SO_KEEPALIVE, true)
+                .childOption(ChannelOption.ALLOCATOR, allocator).bind().sync();
 
         // initialize and start stat server
         statServerBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
                 .localAddress(new InetSocketAddress(8801)).childHandler(statServerChannelInitializer)
-                .childOption(ChannelOption.SO_REUSEADDR, true).childOption(ChannelOption.ALLOCATOR, allocator).bind()
-                .sync();
+                .childOption(ChannelOption.SO_REUSEADDR, true).childOption(ChannelOption.SO_KEEPALIVE, true)
+                .childOption(ChannelOption.ALLOCATOR, allocator).bind().sync();
 
     }
 

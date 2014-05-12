@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,9 +44,8 @@ public class AsyncRequestMaker {
     public List<ChannelSegment> prepareForAsyncRequest(final List<ChannelSegment> rows, final Configuration config,
             final Configuration rtbConfig, final Configuration adapterConfig, final HttpRequestHandlerBase base,
             final Set<String> advertiserSet, final Channel channel, final RepositoryHelper repositoryHelper,
-            final JSONObject jObject, final SASRequestParameters sasParams,
-            final CasInternalRequestParameters casInternalRequestParameterGlobal, final List<ChannelSegment> rtbSegments)
-            throws Exception {
+            final SASRequestParameters sasParams, final CasInternalRequestParameters casInternalRequestParameterGlobal,
+            final List<ChannelSegment> rtbSegments) throws Exception {
 
         List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
 

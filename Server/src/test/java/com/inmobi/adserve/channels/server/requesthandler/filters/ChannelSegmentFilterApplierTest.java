@@ -33,7 +33,7 @@ import com.inmobi.adserve.channels.entity.PricingEngineEntity;
 import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
 import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.server.ServletHandler;
+import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.beans.CasContext;
 import com.inmobi.adserve.channels.server.module.CasNettyModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
@@ -94,7 +94,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
     public void setUp() throws Exception {
 
         configurationLoder = ConfigurationLoader.getInstance("channel-server.properties");
-        ServletHandler.init(configurationLoder, null);
+        CasConfigUtil.init(configurationLoder, null);
         emptySet = new HashSet<String>();
         emptySet2 = new HashSet<String>();
 

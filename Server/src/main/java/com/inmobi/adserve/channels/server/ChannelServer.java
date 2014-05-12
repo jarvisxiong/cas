@@ -6,8 +6,17 @@ import io.netty.util.internal.logging.Slf4JLoggerFactory;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.List;
 import java.util.Properties;
 
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -145,7 +154,7 @@ public class ChannelServer {
             RepositoryHelper repositoryHelper = repoHelperBuilder.build();
 
             instantiateRepository(logger, configurationLoader);
-            ServletHandler.init(configurationLoader, repositoryHelper);
+            CasConfigUtil.init(configurationLoader, repositoryHelper);
             Integer maxIncomingConnections = channelServerHelper.getMaxConnections(
                     ChannelServerStringLiterals.INCOMING_CONNECTIONS, ConnectionType.INCOMING);
             Integer maxRTbdOutGoingConnections = channelServerHelper.getMaxConnections(
@@ -153,13 +162,13 @@ public class ChannelServer {
             Integer maxDCpOutGoingConnections = channelServerHelper.getMaxConnections(
                     ChannelServerStringLiterals.DCP_OUTGOING_CONNECTIONS, ConnectionType.DCP_OUTGOING);
             if (null != maxIncomingConnections) {
-                ServletHandler.getServerConfig().setProperty("incomingMaxConnections", maxIncomingConnections);
+                CasConfigUtil.getServerConfig().setProperty("incomingMaxConnections", maxIncomingConnections);
             }
             if (null != maxRTbdOutGoingConnections) {
-                ServletHandler.getServerConfig().setProperty("rtbOutGoingMaxConnections", maxRTbdOutGoingConnections);
+                CasConfigUtil.getServerConfig().setProperty("rtbOutGoingMaxConnections", maxRTbdOutGoingConnections);
             }
             if (null != maxDCpOutGoingConnections) {
-                ServletHandler.getServerConfig().setProperty("dcpOutGoingMaxConnections", maxDCpOutGoingConnections);
+                CasConfigUtil.getServerConfig().setProperty("dcpOutGoingMaxConnections", maxDCpOutGoingConnections);
             }
 
             // Configure the netty server.
@@ -193,8 +202,8 @@ public class ChannelServer {
             ServerStatusInfo.statusCode = 404;
             logger.info("stack trace is " + getMyStackTrace(exception));
             if (logger.isDebugEnabled()) {
-                logger.debug(exception.getMessage());
-                HttpRequestHandler.sendMail(exception.getMessage(), getMyStackTrace(exception));
+                logger.debug("{}", exception);
+                sendMail(exception.getMessage(), getMyStackTrace(exception));
             }
         }
     }
@@ -372,5 +381,36 @@ public class ChannelServer {
         ServerStatusInfo.statusCode = 404;
         ServerStatusInfo.statusString = "StackTrace is: one or more log folders missing";
         return false;
+    }
+
+    // send Mail if channel server crashes
+    private static void sendMail(final String errorMessage, final String stackTrace) {
+        Properties properties = System.getProperties();
+        properties.setProperty("mail.smtp.host", CasConfigUtil.getServerConfig().getString("smtpServer"));
+        Session session = Session.getDefaultInstance(properties);
+        try {
+            MimeMessage message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(CasConfigUtil.getServerConfig().getString("sender")));
+            List<String> recipients = CasConfigUtil.getServerConfig().getList("recipients");
+            javax.mail.internet.InternetAddress[] addressTo = new javax.mail.internet.InternetAddress[recipients.size()];
+
+            for (int index = 0; index < recipients.size(); index++) {
+                addressTo[index] = new javax.mail.internet.InternetAddress(recipients.get(index));
+            }
+
+            message.setRecipients(Message.RecipientType.TO, addressTo);
+            InetAddress addr = InetAddress.getLocalHost();
+            message.setSubject("Channel Ad Server Crashed on Host " + addr.getHostName());
+            message.setText(errorMessage + stackTrace);
+            Transport.send(message);
+        }
+        catch (MessagingException mex) {
+            // logger.info("Error while sending mail");
+            mex.printStackTrace();
+        }
+        catch (UnknownHostException ex) {
+            // logger.debug("could not resolve host inside send mail");
+            ex.printStackTrace();
+        }
     }
 }

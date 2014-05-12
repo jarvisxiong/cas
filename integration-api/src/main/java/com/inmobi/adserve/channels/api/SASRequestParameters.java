@@ -71,6 +71,7 @@ public class SASRequestParameters {
     private String              osMajorVersion;
 
     private EncryptionKeys      encryptionKey;
+    private boolean             isKeepAlive;
 
     public SASRequestParameters() {
         // Do Nothing.
