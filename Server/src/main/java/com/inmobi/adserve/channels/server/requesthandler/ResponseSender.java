@@ -312,8 +312,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
      * @return
      */
     private byte[] encryptResponseIfRequired(byte[] responseBytes) {
-        int sdkVersion = Integer.parseInt(sasParams.getSdkVersion().substring(1));
-        if (sasParams.getSdkVersion() != null && sdkVersion >= ENCRYPTED_SDK_BASE_VERSION && sasParams.getDst() == 2) {
+        if (sasParams.getSdkVersion() != null
+                && Integer.parseInt(sasParams.getSdkVersion().substring(1)) >= ENCRYPTED_SDK_BASE_VERSION
+                && sasParams.getDst() == 2) {
 
             LOG.debug("Encrypting the response as request is from SDK: {}", sasParams.getSdkVersion());
             EncryptionKeys encryptionKey = sasParams.getEncryptionKey();
