@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.adpool.AdPoolRequest;
 import com.inmobi.adserve.adpool.DemandType;
+import com.inmobi.adserve.adpool.EncryptionKeys;
 import com.inmobi.adserve.adpool.IntegrationType;
 import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.adpool.ResponseFormat;
@@ -64,6 +65,8 @@ public class ThriftRequestParser {
         params.setAccountSegment(getAccountSegments(tObject.demandTypesAllowed));
         params.setIpFileVersion(new Long(tObject.ipFileVersion).intValue());
         params.setSst(tObject.isSetSupplySource() ? tObject.supplySource.getValue() : 0);
+        EncryptionKeys encryptionKeys = tObject.getEncryptionKeys();
+        params.setEncryptionKey(encryptionKeys);
 
         // Fill params from integration details object
         if (tObject.isSetIntegrationDetails()) {

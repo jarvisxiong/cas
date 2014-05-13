@@ -23,6 +23,7 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
+import com.inmobi.adserve.channels.server.requesthandler.ResponseSender.ResponseFormat;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 
@@ -151,7 +152,7 @@ public class ServerTest extends TestCase {
 
     @Test
     public void testResponseFormat() throws Exception {
-        assertEquals(responseSender.getResponseFormat(), "html");
+        assertEquals(responseSender.getResponseFormat(), ResponseFormat.HTML);
     }
 
     @Test

@@ -8,6 +8,7 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.util.CharsetUtil;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -29,10 +30,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.Maps;
 import com.inmobi.adserve.adpool.AdInfo;
 import com.inmobi.adserve.adpool.AdPoolResponse;
 import com.inmobi.adserve.adpool.AuctionType;
 import com.inmobi.adserve.adpool.Creative;
+import com.inmobi.adserve.adpool.EncryptionKeys;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
@@ -45,12 +48,18 @@ import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.commons.security.api.InmobiSession;
+import com.inmobi.commons.security.impl.InmobiSecurityImpl;
+import com.inmobi.commons.security.util.exception.InmobiSecureException;
+import com.inmobi.commons.security.util.exception.InvalidMessageException;
 import com.inmobi.types.AdIdChain;
 import com.inmobi.types.GUID;
 import com.inmobi.types.PricingModel;
 
 
 public class ResponseSender extends HttpRequestHandlerBase {
+
+    private static final int            ENCRYPTED_SDK_BASE_VERSION = 430;
 
     private final static Logger         LOG                        = LoggerFactory.getLogger(ResponseSender.class);
 
@@ -77,6 +86,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private boolean                     requestCleaned;
     public CasInternalRequestParameters casInternalRequestParameters;
     private final AuctionEngine         auctionEngine;
+    private static Set<String>          supportedResponseFormats   = Sets.newHashSet("html", "xhtml", "axml", "imai");
     private final Object                lock                       = new Object();
     private String                      terminationReason;
 
@@ -150,19 +160,19 @@ public class ResponseSender extends HttpRequestHandlerBase {
         if (sasParams.getSlot() != null && SlotSizeMapping.getDimension(Long.valueOf(sasParams.getSlot())) != null) {
             LOG.debug("slot served is {}", sasParams.getSlot());
             InspectorStats.incrementStatCount(InspectorStrings.totalFills);
-            if (getResponseFormat().equals("xhtml")) {
+            if (getResponseFormat() == ResponseFormat.XHTML) {
                 Dimension dim = SlotSizeMapping.getDimension(Long.valueOf(sasParams.getSlot()));
                 String startElement = String.format(START_TAG, (int) dim.getWidth(), (int) dim.getHeight());
                 finalReponse = startElement + finalReponse + END_TAG;
             }
-            else if (getResponseFormat().equalsIgnoreCase("imai")) {
+            else if (getResponseFormat() == ResponseFormat.IMAI) {
                 finalReponse = AD_IMAI_START_TAG + finalReponse;
             }
         }
         else {
             LOG.info("invalid slot, so not returning response, even though we got an ad");
             InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
-            if (getResponseFormat().equals("xhtml")) {
+            if (getResponseFormat() == ResponseFormat.XHTML) {
                 finalReponse = NO_AD_XHTML;
             }
             sendResponse(HttpResponseStatus.OK, finalReponse, adResponse.responseHeaders, serverChannel);
@@ -257,13 +267,14 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     // send response to the caller
-    private void sendResponse(final HttpResponseStatus status, final byte[] bytes, final Map responseHeaders,
+    private void sendResponse(final HttpResponseStatus status, byte[] responseBytes, final Map responseHeaders,
             final Channel serverChannel) throws NullPointerException {
-
         LOG.debug("Inside send Response");
 
+        responseBytes = encryptResponseIfRequired(responseBytes);
+
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status,
-                Unpooled.wrappedBuffer(bytes), false);
+                Unpooled.wrappedBuffer(responseBytes), false);
 
         if (null != responseHeaders) {
             for (Map.Entry entry : (Set<Map.Entry>) responseHeaders.entrySet()) {
@@ -275,7 +286,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
         // TODO: to fix keep alive, we need to fix whole flow
         // HttpHeaders.setKeepAlive(response, serverChannel.isKeepAlive());
-        response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
+        response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, responseBytes.length);
 
         response.headers().add(HttpHeaders.Names.EXPIRES, "-1");
         response.headers().add(HttpHeaders.Names.PRAGMA, "no-cache");
@@ -296,6 +307,41 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
     }
 
+    /**
+     * @param responseBytes
+     * @return
+     */
+    private byte[] encryptResponseIfRequired(byte[] responseBytes) {
+        if (sasParams.getSdkVersion() != null
+                && Integer.parseInt(sasParams.getSdkVersion().substring(1)) >= ENCRYPTED_SDK_BASE_VERSION
+                && sasParams.getDst() == 2) {
+
+            LOG.debug("Encrypting the response as request is from SDK: {}", sasParams.getSdkVersion());
+            EncryptionKeys encryptionKey = sasParams.getEncryptionKey();
+            InmobiSession inmobiSession = new InmobiSecurityImpl(null).newSession(null);
+
+            try {
+
+                responseBytes = inmobiSession.write(responseBytes, encryptionKey.getAesKey(),
+                        encryptionKey.getInitializationVector());
+
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Encyption Details:  EncryptionKey: {}  IVBytes: {}  Response: {}", new String(
+                            encryptionKey.getAesKey(), CharsetUtil.UTF_8),
+                            new String(encryptionKey.getInitializationVector(), CharsetUtil.UTF_8), new String(
+                                    responseBytes, CharsetUtil.UTF_8));
+                }
+
+            }
+            catch (InmobiSecureException | InvalidMessageException e) {
+                LOG.info("Exception while encrypting response from {}", e);
+                throw new RuntimeException(e);
+            }
+
+        }
+        return responseBytes;
+    }
+
     // send response to the caller
     public void sendResponse(final String responseString, final Channel serverChannel) throws NullPointerException {
         sendResponse(HttpResponseStatus.OK, responseString, null, serverChannel);
@@ -313,38 +359,60 @@ public class ResponseSender extends HttpRequestHandlerBase {
         if (checkResponseSent()) {
             return;
         }
+        LOG.debug("Sending No ads");
+
+        responseSent = true;
 
         InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
 
-        Map<String, String> headers = null;
-        LOG.debug("Sending No ads");
-        if (null != sasParams && 6 == sasParams.getDst()) {
-            headers = new HashMap<String, String>();
+        HttpResponseStatus httpResponseStatus;
+        String defaultContent;
+        switch (getResponseFormat()) {
+            case IMAI:
+                // status code 204 whenever format=imai
+                httpResponseStatus = HttpResponseStatus.NO_CONTENT;
+                defaultContent = NO_AD_IMAI;
+                break;
+            case NATIVE:
+                // status code 200 and empty ad content( i.e. ads:[]) for format = native
+                httpResponseStatus = HttpResponseStatus.OK;
+                defaultContent = "";
+                break;
+            case XHTML:
+                // status code 200 & empty ad content (i.e. adUnit missing) for format=xml
+                httpResponseStatus = HttpResponseStatus.OK;
+                defaultContent = NO_AD_XHTML;
+                break;
+            case HTML:
+                httpResponseStatus = HttpResponseStatus.OK;
+                defaultContent = NO_AD_HTML;
+                break;
+            case JS_AD_CODE:
+                httpResponseStatus = HttpResponseStatus.OK;
+                defaultContent = String.format(NO_AD_JS_ADCODE, sasParams.getRqIframe());
+            default:
+                httpResponseStatus = HttpResponseStatus.OK;
+                defaultContent = NO_AD_HTML;
+                break;
+        }
+
+        sendResponse(httpResponseStatus, getResponseBytes(sasParams.getDst(), defaultContent),
+                new HashMap<String, String>(), serverChannel);
+    }
+
+    private byte[] getResponseBytes(final int dstType, final String defaultResponse) {
+        if (dstType == 6) {
             AdPoolResponse rtbdResponse = new AdPoolResponse();
             try {
                 TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
-                byte[] serializedResponse = serializer.serialize(rtbdResponse);
-                sendResponse(HttpResponseStatus.OK, serializedResponse, headers, serverChannel);
-                return;
+                return serializer.serialize(rtbdResponse);
             }
             catch (TException e) {
                 LOG.error("Error in serializing the adPool response ", e);
+                return "".getBytes(Charsets.UTF_8);
             }
         }
-
-        if (getResponseFormat().equals("xhtml")) {
-            sendResponse(HttpResponseStatus.OK, NO_AD_XHTML, headers, serverChannel);
-        }
-        else if (isJsAdRequest()) {
-            sendResponse(HttpResponseStatus.OK, String.format(NO_AD_JS_ADCODE, sasParams.getRqIframe()), headers,
-                    serverChannel);
-        }
-        else if (getResponseFormat().equalsIgnoreCase("imai")) {
-            sendResponse(HttpResponseStatus.NO_CONTENT, NO_AD_IMAI, headers, serverChannel);
-        }
-        else {
-            sendResponse(HttpResponseStatus.OK, NO_AD_HTML, headers, serverChannel);
-        }
+        return defaultResponse.getBytes(Charsets.UTF_8);
     }
 
     // Return true if request contains Iframe Id and is a request from js adcode.
@@ -499,18 +567,22 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     // return the response format
-    public String getResponseFormat() {
-        if (null != sasParams) {
-            String responseFormat = sasParams.getRFormat();
-            if (null == responseFormat) {
-                return "html";
-            }
-            else if ("axml".equalsIgnoreCase(responseFormat)) {
-                responseFormat = "xhtml";
-            }
-            return responseFormat;
+    public ResponseFormat getResponseFormat() {
+        if (sasParams == null) {
+            return ResponseFormat.HTML;
         }
-        return "html";
+
+        String responseFormat = sasParams.getRFormat();
+        if (isJsAdRequest()) {
+            return ResponseFormat.JS_AD_CODE;
+        }
+        else if (null == responseFormat) {
+            return ResponseFormat.HTML;
+        }
+        else if ("axml".equalsIgnoreCase(responseFormat)) {
+            return ResponseFormat.XHTML;
+        }
+        return ResponseFormat.getValue(responseFormat);
     }
 
     @Override
@@ -560,6 +632,36 @@ public class ResponseSender extends HttpRequestHandlerBase {
         else {
             reassignRanks(adNetworkInterface, channel);
         }
+    }
+
+    public enum ResponseFormat {
+        XHTML("axml", "xhtml"),
+        HTML("html"),
+        IMAI("imai"),
+        NATIVE("native"),
+        JS_AD_CODE("jsAdCode");
+
+        private String[]                                 formats;
+
+        private static final Map<String, ResponseFormat> stringToFormatMap = Maps.newHashMap();
+
+        static {
+            for (ResponseFormat responseFormat : ResponseFormat.values()) {
+                for (String format : responseFormat.formats) {
+                    stringToFormatMap.put(format, responseFormat);
+                }
+            }
+
+        }
+
+        private ResponseFormat(final String... formats) {
+            this.formats = formats;
+        }
+
+        public static ResponseFormat getValue(final String format) {
+            return stringToFormatMap.get(format.toLowerCase());
+        }
+
     }
 
 }

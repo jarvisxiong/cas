@@ -1,5 +1,20 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.ws.rs.Path;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
@@ -14,23 +29,12 @@ import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
 import com.inmobi.adserve.channels.server.requesthandler.RequestFilters;
+import com.inmobi.adserve.channels.server.requesthandler.ResponseSender.ResponseFormat;
 import com.inmobi.adserve.channels.server.requesthandler.beans.AdvertiserMatchedSegmentDetail;
 import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilterApplier;
 import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.QueryStringDecoder;
-import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
-import javax.inject.Inject;
-import javax.ws.rs.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 
 @Singleton
@@ -80,8 +84,7 @@ public class ServletBackFill implements Servlet {
 
         // Set imai content if r-format is imai
         String imaiBaseUrl = null;
-        String rFormat = hrh.responseSender.getResponseFormat();
-        if (rFormat.equalsIgnoreCase("imai")) {
+        if (hrh.responseSender.getResponseFormat() == ResponseFormat.IMAI) {
             if (hrh.responseSender.sasParams.getOsId() == 3) {
                 imaiBaseUrl = CasConfigUtil.getServerConfig().getString("androidBaseUrl");
             }
