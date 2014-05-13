@@ -267,7 +267,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     // send response to the caller
-    public void sendResponse(final HttpResponseStatus status, byte[] responseBytes, final Map responseHeaders,
+    private void sendResponse(final HttpResponseStatus status, byte[] responseBytes, final Map responseHeaders,
             final Channel serverChannel) throws NullPointerException {
         LOG.debug("Inside send Response");
 
