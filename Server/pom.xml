@@ -7,14 +7,10 @@
 	<parent>
 		<groupId>com.inmobi.channels</groupId>
 		<artifactId>cas</artifactId>
-		<version>3.95-SNAPSHOT</version>
+		<version>3.100-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
-		<dependency>
-			<groupId>com.inmobi.commons</groupId>
-			<artifactId>datatypes-java</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>com.google.inject.extensions</groupId>
 			<artifactId>guice-assistedinject</artifactId>
@@ -67,6 +63,10 @@
 					<artifactId>servlet-api</artifactId>
 					<groupId>javax.servlet</groupId>
 				</exclusion>
+				<exclusion>
+					<artifactId>libthrift</artifactId>
+					<groupId>org.apache.thrift</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -99,10 +99,22 @@
 		<dependency>
 			<groupId>com.inmobi.channels</groupId>
 			<artifactId>adnetworks</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>libthrift</artifactId>
+					<groupId>org.apache.thrift</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.inmobi.messaging</groupId>
 			<artifactId>messaging-client-core</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>libthrift</artifactId>
+					<groupId>org.apache.thrift</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>
@@ -167,7 +179,11 @@
 		</dependency>
 		<dependency>
 			<groupId>com.inmobi.commons</groupId>
-			<artifactId>datatypes-java</artifactId>
+			<artifactId>datatypes-java-0.8</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.inmobi.commons</groupId>
+			<artifactId>security</artifactId>
 		</dependency>
 	</dependencies>
 	<build>

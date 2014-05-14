@@ -1,25 +1,48 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import com.inmobi.adserve.adpool.*;
-import com.inmobi.adserve.adpool.Geo;
-import com.inmobi.adserve.adpool.Site;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.types.*;
-import junit.framework.TestCase;
-import org.apache.commons.configuration.Configuration;
-
-import java.util.*;
-
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import junit.framework.TestCase;
+
+import org.apache.commons.configuration.Configuration;
+
+import com.inmobi.adserve.adpool.AdCodeType;
+import com.inmobi.adserve.adpool.AdPoolRequest;
+import com.inmobi.adserve.adpool.Carrier;
+import com.inmobi.adserve.adpool.Device;
+import com.inmobi.adserve.adpool.DeviceType;
+import com.inmobi.adserve.adpool.Geo;
+import com.inmobi.adserve.adpool.IntegrationDetails;
+import com.inmobi.adserve.adpool.IntegrationType;
+import com.inmobi.adserve.adpool.LatLong;
+import com.inmobi.adserve.adpool.RequestedAdType;
+import com.inmobi.adserve.adpool.ResponseFormat;
+import com.inmobi.adserve.adpool.Site;
+import com.inmobi.adserve.adpool.SupplyCapability;
+import com.inmobi.adserve.adpool.User;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.types.ContentRating;
+import com.inmobi.types.Gender;
+import com.inmobi.types.InventoryType;
+import com.inmobi.types.LocationSource;
+import com.inmobi.types.SupplySource;
+
+
 public class ThriftRequestParserTest extends TestCase {
 
     ThriftRequestParser thriftRequestParser;
-    public void setUp()
-    {
+
+    @Override
+    public void setUp() {
         Configuration mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
         expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
@@ -27,9 +50,8 @@ public class ThriftRequestParserTest extends TestCase {
         replay(mockConfig);
         thriftRequestParser = new ThriftRequestParser();
     }
-    
-    public void testParseRequestParameters() 
-    {
+
+    public void testParseRequestParameters() {
         Site site = new Site();
         site.setContentRating(ContentRating.FAMILY_SAFE);
         site.setCpcFloor(1);
@@ -46,12 +68,12 @@ public class ThriftRequestParserTest extends TestCase {
         device.setOsId(123);
         device.setModelId(234);
         device.setHandsetInternalId(456);
-        
+
         Carrier carrier = new Carrier();
         carrier.setCarrierId(12345);
-        
+
         User user = new User();
-        user.setYearOfBirth((short)1930);
+        user.setYearOfBirth((short) 1930);
         user.setGender(Gender.MALE);
 
         Geo geo = new Geo();
@@ -68,7 +90,7 @@ public class ThriftRequestParserTest extends TestCase {
         Set<Integer> stateIds = new HashSet<Integer>();
         stateIds.add(123);
         geo.setStateIds(stateIds);
-        
+
         IntegrationDetails integrationDetails = new IntegrationDetails();
         integrationDetails.setAdCodeType(AdCodeType.BASIC);
         integrationDetails.setIFrameId("009");
@@ -99,7 +121,8 @@ public class ThriftRequestParserTest extends TestCase {
 
         SASRequestParameters sasRequestParameters = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        thriftRequestParser.parseRequestParameters(adPoolRequest, sasRequestParameters, casInternalRequestParameters, 6);
+        thriftRequestParser
+                .parseRequestParameters(adPoolRequest, sasRequestParameters, casInternalRequestParameters, 6);
 
         assertEquals(sasRequestParameters.getRemoteHostIp(), "10.14.118.143");
         assertEquals(sasRequestParameters.getUserAgent(), "UserAgent");
@@ -107,25 +130,25 @@ public class ThriftRequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getAge(), new Short("84"));
         assertEquals(sasRequestParameters.getGender(), "M");
         assertEquals(sasRequestParameters.getLocSrc(), "LATLON");
-        assertEquals(sasRequestParameters.getPostalCode(), new Integer(123)); 
+        assertEquals(sasRequestParameters.getPostalCode(), new Integer(123));
         assertEquals(sasRequestParameters.getCountryCode(), "US");
         assertEquals(sasRequestParameters.getCountryId(), new Long(94));
-        assertEquals(sasRequestParameters.getImpressionId(), null); //Internal, Populated in cas
-        assertEquals(sasRequestParameters.getClurl(), null); //Internal, Populated in cas
+        assertEquals(sasRequestParameters.getImpressionId(), null); // Internal, Populated in cas
+        assertEquals(sasRequestParameters.getClurl(), null); // Internal, Populated in cas
         assertEquals(sasRequestParameters.getSiteId(), "siteId");
         assertEquals(sasRequestParameters.getSlot(), new Short("12"));
         assertEquals(sasRequestParameters.getSiteType(), "FAMILY_SAFE");
-        assertEquals(sasRequestParameters.getSdkVersion(), "i231"); 
+        assertEquals(sasRequestParameters.getSdkVersion(), "i231");
         assertEquals(sasRequestParameters.getSiteIncId(), 12345);
-        assertEquals(sasRequestParameters.getAdIncId(), 0);  //Internal, Populated in cas
+        assertEquals(sasRequestParameters.getAdIncId(), 0); // Internal, Populated in cas
         assertEquals(sasRequestParameters.getAdcode(), "NON-JS");
-        assertEquals(sasRequestParameters.getCategories(), Collections.<Long>emptyList());
+        assertEquals(sasRequestParameters.getCategories(), Collections.<Long> emptyList());
         assertEquals(sasRequestParameters.getSiteFloor(), 3.2);
         assertEquals(sasRequestParameters.getAllowBannerAds(), Boolean.FALSE);
         assertEquals(sasRequestParameters.getSiteSegmentId(), new Integer(234));
         assertEquals(sasRequestParameters.getUidParams(), null);
         assertEquals(sasRequestParameters.getTUidParams(), null);
-        assertEquals(sasRequestParameters.getRqIframe(), "009"); 
+        assertEquals(sasRequestParameters.getRqIframe(), "009");
         assertEquals(sasRequestParameters.getRFormat(), "xhtml");
         assertEquals(sasRequestParameters.getOsId(), 123);
         assertEquals(sasRequestParameters.getRqMkAdcount(), new Short("1"));
@@ -133,16 +156,16 @@ public class ThriftRequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getHandsetInternalId(), 456);
         assertEquals(sasRequestParameters.getCarrierId(), 12345);
         assertEquals(sasRequestParameters.getCity(), new Integer(12));
-        assertEquals(sasRequestParameters.getState(), new Integer(123)); 
+        assertEquals(sasRequestParameters.getState(), new Integer(123));
         assertEquals(sasRequestParameters.getRqMkSlot().get(0), new Short("12"));
-        assertEquals(sasRequestParameters.getIpFileVersion(), new Integer(3456)); 
+        assertEquals(sasRequestParameters.getIpFileVersion(), new Integer(3456));
         assertEquals(sasRequestParameters.isRichMedia(), false);
         assertEquals(sasRequestParameters.getRqAdType(), "int");
-        assertEquals(sasRequestParameters.getImaiBaseUrl(), null);  //Internal, Populated in cas
+        assertEquals(sasRequestParameters.getImaiBaseUrl(), null); // Internal, Populated in cas
         assertEquals(sasRequestParameters.getAppUrl(), "siteUrl");
         assertEquals(sasRequestParameters.getModelId(), 234);
         assertEquals(sasRequestParameters.getDst(), 6);
-        assertEquals(sasRequestParameters.getAccountSegment(), Collections.<Integer>emptySet());
+        assertEquals(sasRequestParameters.getAccountSegment(), Collections.<Integer> emptySet());
         assertEquals(sasRequestParameters.isResponseOnlyFromDcp(), false);
         assertEquals(sasRequestParameters.getSst(), 100);
     }

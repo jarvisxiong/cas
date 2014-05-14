@@ -6,7 +6,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.filter.Filter;
 import ch.qos.logback.core.spi.FilterReply;
 
-import com.inmobi.adserve.channels.server.handler.TraceMarkerhandler;
+import com.inmobi.adserve.channels.server.handler.NettyRequestScopeSeedHandler;
 
 
 /**
@@ -15,7 +15,7 @@ import com.inmobi.adserve.channels.server.handler.TraceMarkerhandler;
  */
 public class TraceFilter extends Filter<ILoggingEvent> {
 
-    private static final Marker TRACE_MARKER = TraceMarkerhandler.TRACE_MAKER;
+    private static final Marker TRACE_MARKER = NettyRequestScopeSeedHandler.TRACE_MAKER;
 
     @Override
     public FilterReply decide(final ILoggingEvent event) {

@@ -1,25 +1,15 @@
 package com.inmobi.adserve.channels.api;
 
+import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.util.*;
+import com.ning.http.client.*;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.security.MessageDigest;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import javax.inject.Inject;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONObject;
@@ -27,18 +17,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
-import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.CategoryList;
-import com.inmobi.adserve.channels.util.DocumentBuilderHelper;
-import com.inmobi.adserve.channels.util.IABCategoriesInterface;
-import com.inmobi.adserve.channels.util.IABCategoriesMap;
-import com.inmobi.adserve.channels.util.JaxbHelper;
-import com.ning.http.client.AsyncCompletionHandler;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.Request;
-import com.ning.http.client.RequestBuilder;
-import com.ning.http.client.Response;
+import javax.inject.Inject;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.util.*;
 
 
 // This abstract class have base functionality of TPAN adapters.
@@ -212,6 +197,14 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     LOG.error("error while fetching response from: {} {}", getName(), t);
 
                     if (isRequestComplete) {
+                        return;
+                    }
+
+                    if (t instanceof java.net.ConnectException) {
+                        LOG.debug("{} connection timeout latency {}", getName(), latency);
+                        adStatus = "TIME_OUT";
+                        InspectorStats.incrementStatCount(getName(), InspectorStrings.connectionTimeout);
+                        processResponse();
                         return;
                     }
 

@@ -23,13 +23,13 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
+import com.inmobi.adserve.channels.server.requesthandler.ResponseSender.ResponseFormat;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 
 
 public class ServerTest extends TestCase {
 
-    private HttpRequestHandler         httpRequestHandler;
     private ResponseSender             responseSender;
 
     private Configuration              mockConfig       = null;
@@ -59,9 +59,8 @@ public class ServerTest extends TestCase {
             count++;
         }
         prepareConfig();
-        ServletHandler.init(config, null);
-        httpRequestHandler = new HttpRequestHandler(null, null);
-        responseSender = new ResponseSender(httpRequestHandler);
+        CasConfigUtil.init(config, null);
+        responseSender = new ResponseSender();
 
         AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
         Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-advertisement", mockConfig);
@@ -153,7 +152,7 @@ public class ServerTest extends TestCase {
 
     @Test
     public void testResponseFormat() throws Exception {
-        assertEquals(responseSender.getResponseFormat(), "html");
+        assertEquals(responseSender.getResponseFormat(), ResponseFormat.HTML);
     }
 
     @Test

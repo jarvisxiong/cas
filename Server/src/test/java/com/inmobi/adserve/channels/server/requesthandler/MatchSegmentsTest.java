@@ -6,7 +6,7 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.server.ServletHandler;
+import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.module.CasNettyModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
@@ -37,7 +37,7 @@ public class MatchSegmentsTest extends TestCase {
 
         RepositoryHelper repositoryHelper = createMock(RepositoryHelper.class);
 
-        ServletHandler.init(configurationLoder, repositoryHelper);
+        CasConfigUtil.init(configurationLoder, repositoryHelper);
 
         Injector injector = Guice.createInjector(new CasNettyModule(configurationLoder.getServerConfiguration()),
                 new ServerModule(configurationLoder, repositoryHelper));
@@ -50,7 +50,7 @@ public class MatchSegmentsTest extends TestCase {
     public void testGetCategories() throws SecurityException, NoSuchMethodException, IllegalArgumentException,
             IllegalAccessException, InvocationTargetException {
 
-        ServletHandler.init(configurationLoder, null);
+        CasConfigUtil.init(configurationLoder, null);
         Configuration mockConfig = createMock(Configuration.class);
         SASRequestParameters sasRequestParameters = new SASRequestParameters();
         sasRequestParameters.setSiteId("1");

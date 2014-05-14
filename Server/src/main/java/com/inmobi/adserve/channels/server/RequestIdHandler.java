@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.slf4j.MDC;
 
+import com.google.inject.Singleton;
+
 
 /**
  * @author abhishek.parwal
@@ -14,6 +16,7 @@ import org.slf4j.MDC;
  */
 @Sharable
 @Slf4j
+@Singleton
 public class RequestIdHandler extends ChannelInboundHandlerAdapter {
 
     public RequestIdHandler() {

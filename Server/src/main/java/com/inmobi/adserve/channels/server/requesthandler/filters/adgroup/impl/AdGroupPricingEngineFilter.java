@@ -12,7 +12,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.PricingEngineEntity;
-import com.inmobi.adserve.channels.server.ServletHandler;
+import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.beans.CasContext;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AbstractAdGroupLevelFilter;
@@ -81,7 +81,7 @@ public class AdGroupPricingEngineFilter extends AbstractAdGroupLevelFilter {
                 percentage = 1;
             }
 
-            return ServletHandler.random.nextInt(100) >= percentage;
+            return CasConfigUtil.random.nextInt(100) >= percentage;
         }
 
         return false;

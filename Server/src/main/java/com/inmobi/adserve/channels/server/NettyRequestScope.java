@@ -45,7 +45,7 @@ import com.google.inject.Scope;
  * @author Fedor Karpelevitch
  * @author abhishek.parwal
  */
-public class SimpleScope implements Scope {
+public class NettyRequestScope implements Scope {
 
     private static final Provider<Object>          SEEDED_KEY_PROVIDER = new Provider<Object>() {
                                                                            @Override

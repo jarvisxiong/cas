@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.ServletHandler;
+import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
 import com.inmobi.adserve.channels.util.InspectorStats;
@@ -46,14 +46,14 @@ public class ServletChangeConfig implements Servlet {
         }
         catch (JSONException exeption) {
             LOG.debug("Encountered Json Error while creating json object inside servlet");
-            hrh.setTerminationReason(ServletHandler.jsonParsingError);
+            hrh.setTerminationReason(CasConfigUtil.jsonParsingError);
             InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
             hrh.responseSender.sendResponse("Incorrect Json", serverChannel);
             return;
         }
         if (jObject == null) {
             LOG.debug("jobject is null so returning");
-            hrh.setTerminationReason(ServletHandler.jsonParsingError);
+            hrh.setTerminationReason(CasConfigUtil.jsonParsingError);
             hrh.responseSender.sendResponse("Incorrect Json", serverChannel);
             return;
         }
@@ -66,19 +66,19 @@ public class ServletChangeConfig implements Servlet {
             while (itr.hasNext()) {
                 String configKey = itr.next().toString();
                 if (configKey.startsWith("adapter")
-                        && ServletHandler.getAdapterConfig().containsKey(configKey.replace("adapter.", ""))) {
-                    ServletHandler.getAdapterConfig().setProperty(configKey.replace("adapter.", ""),
+                        && CasConfigUtil.getAdapterConfig().containsKey(configKey.replace("adapter.", ""))) {
+                    CasConfigUtil.getAdapterConfig().setProperty(configKey.replace("adapter.", ""),
                             jObject.getString(configKey));
                     updates.append(configKey).append("=")
-                            .append(ServletHandler.getAdapterConfig().getString(configKey.replace("adapter.", "")))
+                            .append(CasConfigUtil.getAdapterConfig().getString(configKey.replace("adapter.", "")))
                             .append("\n");
                 }
                 if (configKey.startsWith("server")
-                        && ServletHandler.getServerConfig().containsKey(configKey.replace("server.", ""))) {
-                    ServletHandler.getServerConfig().setProperty(configKey.replace("server.", ""),
+                        && CasConfigUtil.getServerConfig().containsKey(configKey.replace("server.", ""))) {
+                    CasConfigUtil.getServerConfig().setProperty(configKey.replace("server.", ""),
                             jObject.getString(configKey));
                     updates.append(configKey).append("=")
-                            .append(ServletHandler.getServerConfig().getString(configKey.replace("server.", "")))
+                            .append(CasConfigUtil.getServerConfig().getString(configKey.replace("server.", "")))
                             .append("\n");
                 }
             }
@@ -86,7 +86,7 @@ public class ServletChangeConfig implements Servlet {
         }
         catch (JSONException ex) {
             LOG.debug("Encountered Json Error while creating json object inside HttpRequest Handler for config change");
-            hrh.terminationReason = ServletHandler.jsonParsingError;
+            hrh.responseSender.setTerminationReason(CasConfigUtil.jsonParsingError);
         }
     }
 

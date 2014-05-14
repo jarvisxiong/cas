@@ -2,13 +2,13 @@ package com.inmobi.adserve.channels.server.requesthandler;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.util.CharsetUtil;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -25,14 +25,17 @@ import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TBinaryProtocol;
+import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.Maps;
 import com.inmobi.adserve.adpool.AdInfo;
 import com.inmobi.adserve.adpool.AdPoolResponse;
 import com.inmobi.adserve.adpool.AuctionType;
 import com.inmobi.adserve.adpool.Creative;
+import com.inmobi.adserve.adpool.EncryptionKeys;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
@@ -41,9 +44,14 @@ import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.server.CasConfigUtil;
+import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.commons.security.api.InmobiSession;
+import com.inmobi.commons.security.impl.InmobiSecurityImpl;
+import com.inmobi.commons.security.util.exception.InmobiSecureException;
+import com.inmobi.commons.security.util.exception.InvalidMessageException;
 import com.inmobi.types.AdIdChain;
 import com.inmobi.types.GUID;
 import com.inmobi.types.PricingModel;
@@ -51,20 +59,23 @@ import com.inmobi.types.PricingModel;
 
 public class ResponseSender extends HttpRequestHandlerBase {
 
-    private final static Logger         LOG                      = LoggerFactory.getLogger(ResponseSender.class);
+    private static final int            ENCRYPTED_SDK_BASE_VERSION = 430;
 
-    private static final String         startTags                = "<AdResponse><Ads number=\"1\"><Ad type=\"rm\" width=\"%s\" height=\"%s\"><![CDATA[";
-    private static final String         endTags                  = " ]]></Ad></Ads></AdResponse>";
-    private static final String         adImaiStartTags          = "<!DOCTYPE html>";
-    private static final String         noAdImai                 = "";
-    private static final String         noAdXhtml                = "<AdResponse><Ads></Ads></AdResponse>";
-    private static final String         noAdHtml                 = "<!-- mKhoj: No advt for this position -->";
-    private static final String         noAdJsAdcode             = "<html><head><title></title><style type=\"text/css\">"
-                                                                         + " body {margin: 0; overflow: hidden; background-color: transparent}"
-                                                                         + " </style></head><body class=\"nofill\"><!-- NO FILL -->"
-                                                                         + "<script type=\"text/javascript\" charset=\"utf-8\">"
-                                                                         + "parent.postMessage('{\"topic\":\"nfr\",\"container\" : \"%s\"}', '*');</script></body></html>";
-    private final HttpRequestHandler    hrh;
+    private final static Logger         LOG                        = LoggerFactory.getLogger(ResponseSender.class);
+
+    private static final String         START_TAG                  = "<AdResponse><Ads number=\"1\"><Ad type=\"rm\" width=\"%s\" height=\"%s\"><![CDATA[";
+    private static final String         END_TAG                    = " ]]></Ad></Ads></AdResponse>";
+    private static final String         AD_IMAI_START_TAG          = "<!DOCTYPE html>";
+    private static final String         NO_AD_IMAI                 = "";
+    private static final String         NO_AD_XHTML                = "<AdResponse><Ads></Ads></AdResponse>";
+    private static final String         NO_AD_HTML                 = "<!-- mKhoj: No advt for this position -->";
+    private static final String         NO_AD_JS_ADCODE            = "<html><head><title></title><style type=\"text/css\">"
+                                                                           + " body {margin: 0; overflow: hidden; background-color: transparent}"
+                                                                           + " </style></head><body class=\"nofill\"><!-- NO FILL -->"
+                                                                           + "<script type=\"text/javascript\" charset=\"utf-8\">"
+                                                                           + "parent.postMessage('{\"topic\":\"nfr\",\"container\" : \"%s\"}', '*');</script></body></html>";
+    private static Set<String>          SUPPORTED_RESPONSE_FORMATS = Sets.newHashSet("html", "xhtml", "axml", "imai");
+
     private long                        totalTime;
     private List<ChannelSegment>        rankList;
     private ThirdPartyAdResponse        adResponse;
@@ -75,11 +86,17 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private boolean                     requestCleaned;
     public CasInternalRequestParameters casInternalRequestParameters;
     private final AuctionEngine         auctionEngine;
-    private static Set<String>          supportedResponseFormats = Sets.newHashSet("html", "xhtml", "axml", "imai");
-    private final Object                lock                     = new Object();
+    private static Set<String>          supportedResponseFormats   = Sets.newHashSet("html", "xhtml", "axml", "imai");
+    private final Object                lock                       = new Object();
+    private String                      terminationReason;
 
-    @Inject
-    private static AsyncRequestMaker    asyncRequestMaker;
+    public String getTerminationReason() {
+        return terminationReason;
+    }
+
+    public void setTerminationReason(final String terminationReason) {
+        this.terminationReason = terminationReason;
+    }
 
     public List<ChannelSegment> getRankList() {
         return this.rankList;
@@ -109,8 +126,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
         return this.totalTime;
     }
 
-    public ResponseSender(final HttpRequestHandler hrh) {
-        this.hrh = hrh;
+    @Inject
+    public ResponseSender() {
         this.totalTime = System.currentTimeMillis();
         this.rankList = null;
         this.adResponse = null;
@@ -143,20 +160,20 @@ public class ResponseSender extends HttpRequestHandlerBase {
         if (sasParams.getSlot() != null && SlotSizeMapping.getDimension(Long.valueOf(sasParams.getSlot())) != null) {
             LOG.debug("slot served is {}", sasParams.getSlot());
             InspectorStats.incrementStatCount(InspectorStrings.totalFills);
-            if (getResponseFormat().equals("xhtml")) {
+            if (getResponseFormat() == ResponseFormat.XHTML) {
                 Dimension dim = SlotSizeMapping.getDimension(Long.valueOf(sasParams.getSlot()));
-                String startElement = String.format(startTags, (int) dim.getWidth(), (int) dim.getHeight());
-                finalReponse = startElement + finalReponse + endTags;
+                String startElement = String.format(START_TAG, (int) dim.getWidth(), (int) dim.getHeight());
+                finalReponse = startElement + finalReponse + END_TAG;
             }
-            else if (getResponseFormat().equalsIgnoreCase("imai")) {
-                finalReponse = adImaiStartTags + finalReponse;
+            else if (getResponseFormat() == ResponseFormat.IMAI) {
+                finalReponse = AD_IMAI_START_TAG + finalReponse;
             }
         }
         else {
             LOG.info("invalid slot, so not returning response, even though we got an ad");
             InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
-            if (getResponseFormat().equals("xhtml")) {
-                finalReponse = noAdXhtml;
+            if (getResponseFormat() == ResponseFormat.XHTML) {
+                finalReponse = NO_AD_XHTML;
             }
             sendResponse(HttpResponseStatus.OK, finalReponse, adResponse.responseHeaders, serverChannel);
             return;
@@ -167,7 +184,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         else {
             AdPoolResponse rtbdResponse = createThriftResponse(adResponse.response);
             LOG.debug("RTB response json to RE is {}", rtbdResponse);
-            if (null == rtbdResponse || !supportedResponseFormats.contains(sasParams.getRFormat())) {
+            if (null == rtbdResponse || !SUPPORTED_RESPONSE_FORMATS.contains(sasParams.getRFormat())) {
                 sendNoAdResponse(serverChannel);
             }
             else {
@@ -223,8 +240,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 10, 6));
         rtbdAd.setPrice(bid);
         rtbdAd.setBid(bid);
-        UUID uuid = UUID.fromString(this.auctionEngine.getRtbResponse().getAdNetworkInterface()
-                .getImpressionId());
+        UUID uuid = UUID.fromString(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getImpressionId());
         rtbdAd.setImpressionId(new GUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits()));
         rtbdAd.setSlotServed(sasParams.getSlot());
         Creative rtbdCreative = new Creative();
@@ -251,11 +267,14 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     // send response to the caller
-    private void sendResponse(final HttpResponseStatus status, final byte[] bytes, final Map responseHeaders,
+    private void sendResponse(final HttpResponseStatus status, byte[] responseBytes, final Map responseHeaders,
             final Channel serverChannel) throws NullPointerException {
+        LOG.debug("Inside send Response");
+
+        responseBytes = encryptResponseIfRequired(responseBytes);
 
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status,
-                Unpooled.wrappedBuffer(bytes), false);
+                Unpooled.wrappedBuffer(responseBytes), false);
 
         if (null != responseHeaders) {
             for (Map.Entry entry : (Set<Map.Entry>) responseHeaders.entrySet()) {
@@ -267,20 +286,17 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
         // TODO: to fix keep alive, we need to fix whole flow
         // HttpHeaders.setKeepAlive(response, serverChannel.isKeepAlive());
-        response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
+        response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, responseBytes.length);
 
         response.headers().add(HttpHeaders.Names.EXPIRES, "-1");
         response.headers().add(HttpHeaders.Names.PRAGMA, "no-cache");
         HttpHeaders.setKeepAlive(response, sasParams.isKeepAlive());
 
-        LOG.debug("event not null inside send Response");
-        if (serverChannel.isWritable()) {
-            LOG.debug("channel not null inside send Response");
-            ChannelFuture future = serverChannel.writeAndFlush(response);
-            future.addListener(ChannelFutureListener.CLOSE);
+        if (sasParams.isKeepAlive()) {
+            serverChannel.writeAndFlush(response);
         }
         else {
-            LOG.debug("Request Channel is null or channel is not writeable.");
+            serverChannel.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
         }
 
         totalTime = System.currentTimeMillis() - totalTime;
@@ -289,6 +305,41 @@ public class ResponseSender extends HttpRequestHandlerBase {
             cleanUp();
             LOG.debug("successfully called cleanUp()");
         }
+    }
+
+    /**
+     * @param responseBytes
+     * @return
+     */
+    private byte[] encryptResponseIfRequired(byte[] responseBytes) {
+        if (sasParams.getSdkVersion() != null
+                && Integer.parseInt(sasParams.getSdkVersion().substring(1)) >= ENCRYPTED_SDK_BASE_VERSION
+                && sasParams.getDst() == 2) {
+
+            LOG.debug("Encrypting the response as request is from SDK: {}", sasParams.getSdkVersion());
+            EncryptionKeys encryptionKey = sasParams.getEncryptionKey();
+            InmobiSession inmobiSession = new InmobiSecurityImpl(null).newSession(null);
+
+            try {
+
+                responseBytes = inmobiSession.write(responseBytes, encryptionKey.getAesKey(),
+                        encryptionKey.getInitializationVector());
+
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Encyption Details:  EncryptionKey: {}  IVBytes: {}  Response: {}", new String(
+                            encryptionKey.getAesKey(), CharsetUtil.UTF_8),
+                            new String(encryptionKey.getInitializationVector(), CharsetUtil.UTF_8), new String(
+                                    responseBytes, CharsetUtil.UTF_8));
+                }
+
+            }
+            catch (InmobiSecureException | InvalidMessageException e) {
+                LOG.info("Exception while encrypting response from {}", e);
+                throw new RuntimeException(e);
+            }
+
+        }
+        return responseBytes;
     }
 
     // send response to the caller
@@ -308,38 +359,60 @@ public class ResponseSender extends HttpRequestHandlerBase {
         if (checkResponseSent()) {
             return;
         }
+        LOG.debug("Sending No ads");
+
+        responseSent = true;
 
         InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
 
-        Map<String, String> headers = null;
-        LOG.debug("Sending No ads");
-        if (null != sasParams && 6 == sasParams.getDst()) {
-            headers = new HashMap<String, String>();
+        HttpResponseStatus httpResponseStatus;
+        String defaultContent;
+        switch (getResponseFormat()) {
+            case IMAI:
+                // status code 204 whenever format=imai
+                httpResponseStatus = HttpResponseStatus.NO_CONTENT;
+                defaultContent = NO_AD_IMAI;
+                break;
+            case NATIVE:
+                // status code 200 and empty ad content( i.e. ads:[]) for format = native
+                httpResponseStatus = HttpResponseStatus.OK;
+                defaultContent = "";
+                break;
+            case XHTML:
+                // status code 200 & empty ad content (i.e. adUnit missing) for format=xml
+                httpResponseStatus = HttpResponseStatus.OK;
+                defaultContent = NO_AD_XHTML;
+                break;
+            case HTML:
+                httpResponseStatus = HttpResponseStatus.OK;
+                defaultContent = NO_AD_HTML;
+                break;
+            case JS_AD_CODE:
+                httpResponseStatus = HttpResponseStatus.OK;
+                defaultContent = String.format(NO_AD_JS_ADCODE, sasParams.getRqIframe());
+            default:
+                httpResponseStatus = HttpResponseStatus.OK;
+                defaultContent = NO_AD_HTML;
+                break;
+        }
+
+        sendResponse(httpResponseStatus, getResponseBytes(sasParams.getDst(), defaultContent),
+                new HashMap<String, String>(), serverChannel);
+    }
+
+    private byte[] getResponseBytes(final int dstType, final String defaultResponse) {
+        if (dstType == 6) {
             AdPoolResponse rtbdResponse = new AdPoolResponse();
             try {
                 TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
-                byte[] serializedResponse = serializer.serialize(rtbdResponse);
-                sendResponse(HttpResponseStatus.OK, serializedResponse, headers, serverChannel);
-                return;
+                return serializer.serialize(rtbdResponse);
             }
             catch (TException e) {
                 LOG.error("Error in serializing the adPool response ", e);
+                return "".getBytes(Charsets.UTF_8);
             }
         }
-
-        if (getResponseFormat().equals("xhtml")) {
-            sendResponse(HttpResponseStatus.OK, noAdXhtml, headers, serverChannel);
-        }
-        else if (isJsAdRequest()) {
-            sendResponse(HttpResponseStatus.OK, String.format(noAdJsAdcode, sasParams.getRqIframe()), headers,
-                    serverChannel);
-        }
-        else if (getResponseFormat().equalsIgnoreCase("imai")) {
-            sendResponse(HttpResponseStatus.NO_CONTENT, noAdImai, headers, serverChannel);
-        }
-        else {
-            sendResponse(HttpResponseStatus.OK, noAdHtml, headers, serverChannel);
-        }
+        return defaultResponse.getBytes(Charsets.UTF_8);
     }
 
     // Return true if request contains Iframe Id and is a request from js adcode.
@@ -447,7 +520,40 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
 
         LOG.debug("done with closing channels");
-        hrh.writeLogs(this);
+        writeLogs();
+    }
+
+    public void writeLogs() {
+        List<ChannelSegment> list = new ArrayList<ChannelSegment>();
+        if (null != getRankList()) {
+            list.addAll(getRankList());
+        }
+        if (null != getAuctionEngine().getRtbSegments()) {
+            list.addAll(getAuctionEngine().getRtbSegments());
+        }
+        long totalTime = getTotalTime();
+        if (totalTime > 2000) {
+            totalTime = 0;
+        }
+        try {
+            ChannelSegment adResponseChannelSegment = null;
+            if (null != getRtbResponse()) {
+                adResponseChannelSegment = getRtbResponse();
+            }
+            else if (null != getAdResponse()) {
+                adResponseChannelSegment = getRankList().get(getSelectedAdIndex());
+            }
+            Logging.rrLogging(adResponseChannelSegment, list, sasParams, terminationReason, totalTime);
+            Logging.advertiserLogging(list, CasConfigUtil.getLoggerConfig());
+            Logging.sampledAdvertiserLogging(list, CasConfigUtil.getLoggerConfig());
+        }
+        catch (JSONException exception) {
+            LOG.debug(ChannelServer.getMyStackTrace(exception));
+        }
+        catch (TException exception) {
+            LOG.debug(ChannelServer.getMyStackTrace(exception));
+        }
+        LOG.debug("done with logging");
     }
 
     private int getRankIndex(final AdNetworkInterface adNetwork) {
@@ -461,18 +567,22 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     // return the response format
-    public String getResponseFormat() {
-        if (null != sasParams) {
-            String responseFormat = sasParams.getRFormat();
-            if (null == responseFormat) {
-                return "html";
-            }
-            else if ("axml".equalsIgnoreCase(responseFormat)) {
-                responseFormat = "xhtml";
-            }
-            return responseFormat;
+    public ResponseFormat getResponseFormat() {
+        if (sasParams == null) {
+            return ResponseFormat.HTML;
         }
-        return "html";
+
+        String responseFormat = sasParams.getRFormat();
+        if (isJsAdRequest()) {
+            return ResponseFormat.JS_AD_CODE;
+        }
+        else if (null == responseFormat) {
+            return ResponseFormat.HTML;
+        }
+        else if ("axml".equalsIgnoreCase(responseFormat)) {
+            return ResponseFormat.XHTML;
+        }
+        return ResponseFormat.getValue(responseFormat);
     }
 
     @Override
@@ -522,6 +632,36 @@ public class ResponseSender extends HttpRequestHandlerBase {
         else {
             reassignRanks(adNetworkInterface, channel);
         }
+    }
+
+    public enum ResponseFormat {
+        XHTML("axml", "xhtml"),
+        HTML("html"),
+        IMAI("imai"),
+        NATIVE("native"),
+        JS_AD_CODE("jsAdCode");
+
+        private String[]                                 formats;
+
+        private static final Map<String, ResponseFormat> stringToFormatMap = Maps.newHashMap();
+
+        static {
+            for (ResponseFormat responseFormat : ResponseFormat.values()) {
+                for (String format : responseFormat.formats) {
+                    stringToFormatMap.put(format, responseFormat);
+                }
+            }
+
+        }
+
+        private ResponseFormat(final String... formats) {
+            this.formats = formats;
+        }
+
+        public static ResponseFormat getValue(final String format) {
+            return stringToFormatMap.get(format.toLowerCase());
+        }
+
     }
 
 }
