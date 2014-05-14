@@ -18,6 +18,7 @@ import com.inmobi.adserve.channels.server.requesthandler.RequestFilters;
 import com.inmobi.adserve.channels.server.requesthandler.beans.AdvertiserMatchedSegmentDetail;
 import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilterApplier;
 import com.inmobi.adserve.channels.server.utils.CasUtils;
+import com.inmobi.adserve.channels.types.AccountType;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import io.netty.channel.Channel;
@@ -106,7 +107,10 @@ public class ServletBackFill implements Servlet {
         hrh.responseSender.sasParams.setSiteFloor(0.0);
 
         SiteMetaDataEntity siteMetaDataEntity = matchSegments.getRepositoryHelper().querySiteMetaDetaRepository(sasParams.getSiteId());
-        casInternalRequestParametersGlobal.siteAccountType = siteMetaDataEntity.getAccountTypesAllowed();
+        casInternalRequestParametersGlobal.siteAccountType = AccountType.SELF_SERVE;
+        if (null != siteMetaDataEntity) {
+            casInternalRequestParametersGlobal.siteAccountType = siteMetaDataEntity.getAccountTypesAllowed();
+        }
 
         // applying all the filters
         List<ChannelSegment> filteredSegments = channelSegmentFilterApplier.getChannelSegments(matchedSegmentDetails,

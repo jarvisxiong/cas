@@ -121,6 +121,7 @@ public class ChannelServer {
             publisherFilterRepository = new PublisherFilterRepository();
             siteEcpmRepository = new SiteEcpmRepository();
             currencyConversionRepository = new CurrencyConversionRepository();
+            creativeRepository = new CreativeRepository();
 
             RepositoryHelper.Builder repoHelperBuilder = RepositoryHelper.newBuilder();
             repoHelperBuilder.setChannelRepository(channelRepository);
@@ -134,6 +135,7 @@ public class ChannelServer {
             repoHelperBuilder.setPublisherFilterRepository(publisherFilterRepository);
             repoHelperBuilder.setSiteEcpmRepository(siteEcpmRepository);
             repoHelperBuilder.setCurrencyConversionRepository(currencyConversionRepository);
+            repoHelperBuilder.setCreativeRepository(creativeRepository);
             RepositoryHelper repositoryHelper = repoHelperBuilder.build();
 
             instantiateRepository(logger, configurationLoader);

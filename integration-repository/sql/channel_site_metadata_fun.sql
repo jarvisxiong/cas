@@ -22,7 +22,7 @@ BEGIN
                 ) as a,
                 dcp_site_advertiser_preference as b,
                 publisher_advertiser_preference as c
-        WHERE   a.id(+) = b.site_id(+) AND a.pub_id(+) = c.pub_id(+)
+        WHERE   a.id = b.site_id(+) AND a.pub_id = c.pub_id(+)
         AND     (
                     a.modified_on >= last_updated
                     OR b.modified_on >= last_updated

@@ -31,7 +31,7 @@ public class ThriftRequestMaker {
     public static void main(final String[] args) throws Exception {
         AdPoolRequest adPoolRequest = createAdPoolRequest();
         System.out.println("Request is : " + adPoolRequest);
-        sendBackFillGet(adPoolRequest);
+        sendUMPPost(adPoolRequest);
 
     }
 
@@ -41,7 +41,7 @@ public class ThriftRequestMaker {
         site.setSiteUrl("siteurl");
         site.setCpcFloor(0.03);
         site.setEcpmFloor(.3);
-        site.setSiteId("site");
+        site.setSiteId("4028cb1334ef46a9013578fe1c1f18fc");
         site.setPublisherId("sitepub");
         site.setContentRating(ContentRating.PERFORMANCE);
         site.setInventoryType(InventoryType.APP);
