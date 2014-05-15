@@ -31,7 +31,7 @@ public class ThriftRequestMaker {
     public static void main(final String[] args) throws Exception {
         AdPoolRequest adPoolRequest = createAdPoolRequest();
         System.out.println("Request is : " + adPoolRequest);
-        sendBackFillGet(adPoolRequest);
+        sendUMPPost(adPoolRequest);
 
     }
 
@@ -78,11 +78,16 @@ public class ThriftRequestMaker {
         adPoolRequest.setSite(site); adPoolRequest.setDevice(device);
         adPoolRequest.setCarrier(carrier);
 
-        adPoolRequest.setRequestedAdType(RequestedAdType.INTERSTITIAL);
+        IntegrationDetails integrationDetails = new IntegrationDetails();
+        integrationDetails.setIntegrationType(IntegrationType.ANDROID_SDK);
+        integrationDetails.setIntegrationVersion(370);
+
+        adPoolRequest.setRequestedAdType(RequestedAdType.ADHESION);
         adPoolRequest.setResponseFormat(ResponseFormat.XHTML); adPoolRequest.setGeo(geo);
         adPoolRequest.setIpFileVersion(1234);
+        adPoolRequest.setIntegrationDetails(integrationDetails);
         List<Short> list = new ArrayList<Short>();
-        list.add((short)1);
+        list.add((short)9);
         adPoolRequest.setSelectedSlots(list);
         List<SupplyCapability> supplyCapabilities = new ArrayList<>();
         supplyCapabilities.add(SupplyCapability.BANNER);

@@ -46,9 +46,11 @@ public class SegmentFactory {
             LOG.debug("dcname is {} and urlBase is {}", ChannelServer.dataCentreName, adapterConfig.getAdapterHost());
 
             try {
+
+                LOG.debug("adapterConfig.templateWinNotification() {}", adapterConfig.templateWinNotification());
                 AdNetworkInterface rtbAdNetwork = adNetworkInterfaceClass.getConstructor(
                         new Class[] { Configuration.class, Bootstrap.class, HttpRequestHandlerBase.class,
-                                Channel.class, String.class, String.class, int.class, RepositoryHelper.class })
+                                Channel.class, String.class, String.class, int.class, RepositoryHelper.class, boolean.class })
                         .newInstance(config, rtbClientBootstrap, base, channel, adapterConfig.getAdapterHost(),
                                 adapterConfig.getAdapterName(), rtbMaxTimemout, repositoryHelper, adapterConfig.templateWinNotification());
                 rtbAdNetwork.setName(adapterConfig.getAdapterName());
