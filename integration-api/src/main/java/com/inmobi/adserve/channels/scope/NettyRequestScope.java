@@ -1,14 +1,16 @@
-package com.inmobi.adserve.channels.server;
-
-import static com.google.common.base.Preconditions.checkState;
-
-import java.util.Map;
+package com.inmobi.adserve.channels.scope;
 
 import com.google.common.collect.Maps;
 import com.google.inject.Key;
 import com.google.inject.OutOfScopeException;
 import com.google.inject.Provider;
 import com.google.inject.Scope;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
+
+import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkState;
 
 
 /**
@@ -60,6 +62,9 @@ public class NettyRequestScope implements Scope {
                                                                            }
                                                                        };
     private final ThreadLocal<Map<Key<?>, Object>> values              = new ThreadLocal<Map<Key<?>, Object>>();
+
+    public static final Marker TRACE_MAKER = MarkerFactory.getMarker("TRACE_MAKER");
+
 
     public void enter() {
         checkState(values.get() == null, "A scoping block is already in progress");

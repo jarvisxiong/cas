@@ -13,6 +13,7 @@ public class CasInternalRequestParameters {
     public AccountType  siteAccountType; //Whether site account is managed or selfserve
     public double       rtbBidFloor;
     public String       auctionId;
+    public boolean      traceEnabled;
 
     public String       impressionId;
     // Control enrichment params

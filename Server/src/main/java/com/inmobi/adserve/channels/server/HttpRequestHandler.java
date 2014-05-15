@@ -1,8 +1,6 @@
 package com.inmobi.adserve.channels.server;
 
 import com.inmobi.adserve.channels.server.api.Servlet;
-import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
-import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.InspectorStats;
@@ -11,28 +9,12 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.QueryStringDecoder;
-import io.netty.handler.timeout.ReadTimeoutException;
-import org.apache.thrift.TException;
-import org.json.JSONException;
-
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import java.io.IOException;
-import java.nio.channels.ClosedChannelException;
-import java.util.ArrayList;
-import java.util.List;
-import com.inmobi.adserve.channels.server.api.Servlet;
-import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
-import com.inmobi.adserve.channels.server.utils.CasUtils;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
 
 
 public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
@@ -75,7 +57,6 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
             LOG.debug(traceMarker, "Got the servlet {} , uri {}", servlet.getName(), httpRequest.getUri());
 
             servlet.handleRequest(this, new QueryStringDecoder(httpRequest.getUri()), ctx.channel());
-            return;
         }
         catch (Exception exception) {
             responseSender.setTerminationReason(CasConfigUtil.processingError);
