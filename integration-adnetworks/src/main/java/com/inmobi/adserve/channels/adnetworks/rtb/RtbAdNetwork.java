@@ -208,7 +208,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         bidRequest.setAt(auctionType);
         bidRequest.setCur(Collections.<String> emptyList());
         List<String> seatList = new ArrayList<String>();
-        seatList.add("f55c9d46d7704f8789015a64153a7015");
+        seatList.add(advertiserId);
         bidRequest.setWseat(seatList);
         if (casInternalRequestParameters != null) {
             LOG.debug("blockedCategories are {}", casInternalRequestParameters.blockedCategories);
