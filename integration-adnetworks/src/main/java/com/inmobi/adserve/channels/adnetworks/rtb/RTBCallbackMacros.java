@@ -9,5 +9,8 @@ public class RTBCallbackMacros {
     public static final String AUCTION_AD_ID           = "${AUCTION_AD_ID}";
     public static final String AUCTION_PRICE           = "${AUCTION_PRICE}";
     public static final String AUCTION_CURRENCY        = "${AUCTION_CURRENCY}";
+    //InMobi specific macros
     public static final String AUCTION_PRICE_ENCRYPTED = "${WIN_BID}";
+    public static final String AUCTION_WIN_URL         = "${BILLABLE_BEACON}";
+
 }

@@ -76,6 +76,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private final boolean                  wnRequired;
     private final int                      auctionType                  = 2;
     private int                            tmax                         = 200;
+    private boolean                        templateWN                   = true;
     private static final String            X_OPENRTB_VERSION            = "x-openrtb-version";
     private static final String            CONTENT_TYPE                 = "application/json";
     private static final String            DISPLAY_MANAGER_INMOBI_SDK   = "inmobi_sdk";
@@ -120,7 +121,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     public RtbAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String urlBase,
-            final String advertiserName, final int tmax, final RepositoryHelper repositoryHelper) {
+            final String advertiserName, final int tmax, final RepositoryHelper repositoryHelper, final boolean templateWinNotification) {
 
         super(baseRequestHandler, serverChannel);
         this.advertiserId = config.getString(advertiserName + ".advertiserId");
@@ -139,6 +140,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         this.advertiserName = advertiserName;
         this.tmax = tmax;
         this.repositoryHelper = repositoryHelper;
+        this.templateWN = templateWinNotification;
     }
 
     @Override
@@ -547,6 +549,12 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_IMP_ID), bidRequest.getImp().get(0)
                 .getId());
+
+        if (!templateWN) {
+            String winUrl = this.beaconUrl + "?b=${WIN_BID}";
+            url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_WIN_URL), winUrl);
+        }
+
         LOG.debug("String after replaceMacros is {}", url);
         return url;
     }
@@ -645,7 +653,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 }
 
             }
-            velocityContext.put(VelocityTemplateFieldConstants.IMBeaconUrl, this.beaconUrl);
+            if (templateWN) {
+                velocityContext.put(VelocityTemplateFieldConstants.IMBeaconUrl, this.beaconUrl);
+            }
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.RTB_HTML, velocityContext, sasParams,
                         null);
