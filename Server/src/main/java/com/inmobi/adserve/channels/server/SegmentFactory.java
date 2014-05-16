@@ -1,23 +1,20 @@
 package com.inmobi.adserve.channels.server;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Singleton;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.configuration.Configuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.inject.Inject;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.config.AdapterConfig;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Singleton;
+import java.util.Map;
+import java.util.Set;
 
 
 @Singleton
@@ -49,11 +46,13 @@ public class SegmentFactory {
             LOG.debug("dcname is {} and urlBase is {}", ChannelServer.dataCentreName, adapterConfig.getAdapterHost());
 
             try {
+
+                LOG.debug("adapterConfig.templateWinNotification() {}", adapterConfig.templateWinNotification());
                 AdNetworkInterface rtbAdNetwork = adNetworkInterfaceClass.getConstructor(
                         new Class[] { Configuration.class, Bootstrap.class, HttpRequestHandlerBase.class,
-                                Channel.class, String.class, String.class, int.class, RepositoryHelper.class })
+                                Channel.class, String.class, String.class, int.class, RepositoryHelper.class, boolean.class })
                         .newInstance(config, rtbClientBootstrap, base, channel, adapterConfig.getAdapterHost(),
-                                adapterConfig.getAdapterName(), rtbMaxTimemout, repositoryHelper);
+                                adapterConfig.getAdapterName(), rtbMaxTimemout, repositoryHelper, adapterConfig.templateWinNotification());
                 rtbAdNetwork.setName(adapterConfig.getAdapterName());
                 LOG.debug("Created RTB adapter instance for advertiser id : {}", advertiserId);
                 return rtbAdNetwork;

@@ -1,17 +1,15 @@
 package com.inmobi.adserve.channels.api.config;
 
-import javax.annotation.Nullable;
-
-import lombok.EqualsAndHashCode;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.google.inject.name.Named;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.util.AdapterType;
+import lombok.EqualsAndHashCode;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+
+import javax.annotation.Nullable;
 
 
 /**
@@ -49,6 +47,13 @@ public class AdapterConfig implements CasConfig {
      */
     public String getAdvertiserId() {
         return adapterConfig.getString("advertiserId");
+    }
+
+    /**
+     * @return true for explicit wn, false otherwise
+     */
+    public boolean templateWinNotification() {
+        return adapterConfig.getBoolean("templateWinNotification", true);
     }
 
     /**

@@ -36,7 +36,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.List;
-import java.util.regex.Pattern;
 
 
 /**
@@ -76,6 +75,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private final boolean                  wnRequired;
     private final int                      auctionType                  = 2;
     private int                            tmax                         = 200;
+    private boolean                        templateWN                   = true;
     private static final String            X_OPENRTB_VERSION            = "x-openrtb-version";
     private static final String            CONTENT_TYPE                 = "application/json";
     private static final String            DISPLAY_MANAGER_INMOBI_SDK   = "inmobi_sdk";
@@ -120,7 +120,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     public RtbAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String urlBase,
-            final String advertiserName, final int tmax, final RepositoryHelper repositoryHelper) {
+            final String advertiserName, final int tmax, final RepositoryHelper repositoryHelper, final boolean templateWinNotification) {
 
         super(baseRequestHandler, serverChannel);
         this.advertiserId = config.getString(advertiserName + ".advertiserId");
@@ -139,6 +139,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         this.advertiserName = advertiserName;
         this.tmax = tmax;
         this.repositoryHelper = repositoryHelper;
+        this.templateWN = templateWinNotification;
     }
 
     @Override
@@ -523,30 +524,31 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     public String replaceRTBMacros(String url) {
-        url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_ID), bidResponse.id);
-        url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_CURRENCY), bidderCurrency);
+        url = url.replaceAll(RTBCallbackMacros.AUCTION_ID_INSENSITIVE, bidResponse.id);
+        url = url.replaceAll(RTBCallbackMacros.AUCTION_CURRENCY_INSENSITIVE, bidderCurrency);
         if (6 != sasParams.getDst()) {
-            url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_PRICE_ENCRYPTED), encryptedBid);
-            url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_PRICE),
+            url = url.replaceAll(RTBCallbackMacros.AUCTION_PRICE_ENCRYPTED_INSENSITIVE, encryptedBid);
+            url = url.replaceAll(RTBCallbackMacros.AUCTION_PRICE_INSENSITIVE,
                     Double.toString(secondBidPriceInLocal));
         }
         if (null != bidResponse.getSeatbid().get(0).getBid().get(0).getAdid()) {
-            url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_AD_ID),
+            url = url.replaceAll(RTBCallbackMacros.AUCTION_AD_ID_INSENSITIVE,
                     bidResponse.getSeatbid().get(0).getBid().get(0).getAdid());
         }
         if (null != bidResponse.bidid) {
-            url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_BID_ID), bidResponse.bidid);
+            url = url.replaceAll(RTBCallbackMacros.AUCTION_BID_ID_INSENSITIVE, bidResponse.bidid);
         }
         if (null != bidResponse.getSeatbid().get(0).getSeat()) {
-            url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_SEAT_ID), bidResponse.getSeatbid()
+            url = url.replaceAll(RTBCallbackMacros.AUCTION_SEAT_ID_INSENSITIVE, bidResponse.getSeatbid()
                     .get(0).getSeat());
         }
         if (null == bidRequest) {
             LOG.info("bidrequest is null");
             return url;
         }
-        url = url.replaceAll("(?i)" + Pattern.quote(RTBCallbackMacros.AUCTION_IMP_ID), bidRequest.getImp().get(0)
+        url = url.replaceAll(RTBCallbackMacros.AUCTION_IMP_ID_INSENSITIVE, bidRequest.getImp().get(0)
                 .getId());
+
         LOG.debug("String after replaceMacros is {}", url);
         return url;
     }
@@ -612,12 +614,20 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             VelocityContext velocityContext = new VelocityContext();
             SeatBid seatBid = bidResponse.getSeatbid().get(0);
             Bid bid = seatBid.getBid().get(0);
-            String image = bid.getAdm();
+            String admContent = bid.getAdm();
+
+            int admSize = admContent.length();
+            if (!templateWN) {
+                String winUrl = this.beaconUrl + "?b=${WIN_BID}";
+                admContent = admContent.replace(RTBCallbackMacros.AUCTION_WIN_URL, winUrl);
+            }
+            int admAfterMacroSize = admContent.length();
+
             if ("wap".equalsIgnoreCase(sasParams.getSource())) {
-                velocityContext.put(VelocityTemplateFieldConstants.PartnerHtmlCode, image);
+                velocityContext.put(VelocityTemplateFieldConstants.PartnerHtmlCode, admContent);
             }
             else {
-                velocityContext.put(VelocityTemplateFieldConstants.PartnerHtmlCode, mraid + image);
+                velocityContext.put(VelocityTemplateFieldConstants.PartnerHtmlCode, mraid + admContent);
                 if (StringUtils.isNotBlank(sasParams.getImaiBaseUrl())) {
                     velocityContext.put(VelocityTemplateFieldConstants.IMAIBaseUrl, sasParams.getImaiBaseUrl());
                 }
@@ -645,7 +655,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 }
 
             }
-            velocityContext.put(VelocityTemplateFieldConstants.IMBeaconUrl, this.beaconUrl);
+            if (templateWN || (admAfterMacroSize ==  admSize)) {
+                velocityContext.put(VelocityTemplateFieldConstants.IMBeaconUrl, this.beaconUrl);
+            }
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.RTB_HTML, velocityContext, sasParams,
                         null);
