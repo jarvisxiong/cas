@@ -69,8 +69,7 @@ public class ServletBackFill implements Servlet {
         hrh.responseSender.getAuctionEngine().sasParams = hrh.responseSender.sasParams;
         CasInternalRequestParameters casInternalRequestParametersGlobal = hrh.responseSender.casInternalRequestParameters;
 
-        boolean isTracer = Boolean.valueOf(hrh.getHttpRequest().headers().get("x-mkhoj-tracer"));
-        casInternalRequestParametersGlobal.traceEnabled = isTracer;
+        casInternalRequestParametersGlobal.traceEnabled = Boolean.valueOf(hrh.getHttpRequest().headers().get("x-mkhoj-tracer"));
 
         if (requestFilters.isDroppedInRequestFilters(hrh)) {
             LOG.debug("Request is dropped in request filters");

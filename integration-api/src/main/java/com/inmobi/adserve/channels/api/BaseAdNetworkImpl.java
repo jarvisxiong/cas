@@ -92,7 +92,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected static DocumentBuilderHelper        documentBuilderHelper;
 
     @Inject
-    private NettyRequestScope                     scope;
+    private static NettyRequestScope              scope;
 
     public BaseAdNetworkImpl(final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         this.baseRequestHandler = baseRequestHandler;
@@ -173,8 +173,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         }
 
         try {
-            String uri = getRequestUri().toString();
-            requestUrl = uri;
+            requestUrl = getRequestUri().toString();
             Request ningRequest = getNingRequest();
             LOG.debug("request : {}", ningRequest);
             startTime = System.currentTimeMillis();
@@ -183,7 +182,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 @Override
                 public Response onCompleted(final Response response) throws Exception {
                     latency = System.currentTimeMillis() - startTime;
-                    MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
+                    MDC.put("onCompleted requestId", String.format("0x%08x", serverChannel.hashCode()));
+                    LOG.debug("isTraceEnabled {} scope : {}", isTraceEnabled, scope);
 
                     if (isTraceEnabled) {
                         scope.enter();
@@ -210,7 +210,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 public void onThrowable(final Throwable t) {
                     latency = System.currentTimeMillis() - startTime;
                     MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
-
+                    LOG.debug("onThrowable isTraceEnabled {} scope : {}", isTraceEnabled, scope);
                     if (isTraceEnabled) {
                         scope.enter();
                         try {
@@ -247,7 +247,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     LOG.debug("{} error latency {}", getName(), latency);
                     adStatus = "TERM";
                     processResponse();
-                    return;
                 }
             });
         }

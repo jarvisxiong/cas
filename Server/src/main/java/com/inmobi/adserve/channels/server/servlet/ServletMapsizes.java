@@ -1,18 +1,17 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.QueryStringDecoder;
-
-import javax.ws.rs.Path;
-
-import org.json.JSONObject;
-
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.ConnectionLimitHandler;
+import com.inmobi.adserve.channels.server.CreativeCache;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
+import org.json.JSONObject;
+
+import javax.ws.rs.Path;
 
 
 @Singleton
@@ -30,6 +29,7 @@ public class ServletMapsizes implements Servlet {
             final Channel serverChannel) throws Exception {
         JSONObject mapsizes = new JSONObject();
         mapsizes.put("SampledAdvertiserLog", Logging.getSampledadvertiserlognos().size());
+        mapsizes.put("creativeCache", CreativeCache.creativeCache.size());
 
         if (null != incomingConnectionLimitHandler) {
             mapsizes.put("IncomingMaxConnections", incomingConnectionLimitHandler.getMaxConnectionsLimit());

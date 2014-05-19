@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 public class CreativeCache {
-    private final static ConcurrentHashMap<String, HashSet<String>> creativeCache = new ConcurrentHashMap<String, HashSet<String>>();
+    public final static ConcurrentHashMap<String, HashSet<String>> creativeCache = new ConcurrentHashMap<String, HashSet<String>>();
 
     private final Object lock = new Object();
 

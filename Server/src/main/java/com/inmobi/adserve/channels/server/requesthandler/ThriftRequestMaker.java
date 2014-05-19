@@ -177,7 +177,7 @@ public class ThriftRequestMaker {
             connection.setUseCaches(false);
             connection.setDoInput(true);
             connection.setDoOutput(true);
-
+            connection.setRequestProperty("x-mkhoj-tracer", "true");
             // Send request
             DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
             wr.write(urlParameters);
