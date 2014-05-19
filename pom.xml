@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.inmobi.channels</groupId>
 	<artifactId>cas</artifactId>
-	<version>3.99-SNAPSHOT</version>
+	<version>3.101-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<url>https://github.corp.inmobi.com/channel-adserve</url>
 	<parent>
@@ -39,8 +39,8 @@
 		<dependencies>
 			<dependency>
 				<groupId>com.inmobi.commons</groupId>
-				<artifactId>datatypes-java</artifactId>
-				<version>1.5.0</version>
+				<artifactId>datatypes-java-0.8</artifactId>
+				<version>1.5.4</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
@@ -159,7 +159,7 @@
 			<dependency>
 				<groupId>org.apache.thrift</groupId>
 				<artifactId>libthrift</artifactId>
-				<version>0.4.0</version>
+				<version>0.8.0</version>
 			</dependency>
 			<dependency>
 				<groupId>inmobi.phoenix.batteries</groupId>
@@ -338,6 +338,11 @@
 				<groupId>net.sf.ehcache</groupId>
 				<artifactId>ehcache-core</artifactId>
 				<version>2.4.4</version>
+			</dependency>
+			<dependency>
+				<groupId>com.inmobi.commons</groupId>
+				<artifactId>security</artifactId>
+				<version>1.0.3</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

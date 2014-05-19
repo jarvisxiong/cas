@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
+import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
@@ -72,10 +72,8 @@ public class RequestFilters {
             try {
                 if ((hrh.responseSender.sasParams.getSdkVersion().substring(0, 1).equalsIgnoreCase("i") || hrh.responseSender.sasParams
                         .getSdkVersion().substring(0, 1).equalsIgnoreCase("a"))
-                        && (Integer.parseInt(hrh.responseSender.sasParams.getSdkVersion().substring(1, 2)) < 3 || (hrh.responseSender.sasParams
-                                .getDst() == 2 && "430".equals(hrh.responseSender.sasParams.getSdkVersion()
-                                .substring(1))))) {
-                    LOG.error("Terminating request as sdkVersion is less than 3 or is 430");
+                        && Integer.parseInt(hrh.responseSender.sasParams.getSdkVersion().substring(1, 2)) < 3) {
+                    LOG.error("Terminating request as sdkVersion is less than 3");
                     hrh.setTerminationReason(CasConfigUtil.lowSdkVersion);
                     InspectorStats.incrementStatCount(InspectorStrings.lowSdkVersion, InspectorStrings.count);
                     return true;

@@ -34,6 +34,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
     private transient String    longitude;
     private int                 width;
     private int                 height;
+    private boolean             isweb;
 
     /**
      * @param config
@@ -54,6 +55,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
         host = config.getString("huntmads.host");
+        
         // blocking opera traffic
         if (sasParams.getUserAgent().toUpperCase().contains("OPERA")) {
             LOG.debug("Opera user agent found. So exiting the adapter");
@@ -70,6 +72,9 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
+   isweb = (StringUtils.isBlank(sasParams.getSource()) || "WAP".equalsIgnoreCase(sasParams.getSource())) ? true
+                : false;
+        
         LOG.info("Configure parameters inside huntmads returned true");
         return true;
     }
@@ -116,10 +121,21 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             if (casInternalRequestParameters.zipCode != null) {
                 url.append("&zip=").append(casInternalRequestParameters.zipCode);
             }
+            if (isweb)
+            {
+                url.append("&isweb=yes");
+            }
+            else
+            {
+              url.append("&isweb=no");    
+            }
             if (sasParams.getCountryCode() != null) {
                 url.append("&country=").append(sasParams.getCountryCode().toUpperCase());
             }
 
+           
+            
+            
             if (width != 0 && height != 0) {
                 url.append("&min_size_x=").append((int) (width * .9));
                 url.append("&min_size_y=").append((int) (height * .9));
