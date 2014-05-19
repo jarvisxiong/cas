@@ -83,6 +83,6 @@ public abstract class AbstractAuctionFilter implements AuctionFilter {
 
     @Override
     public boolean isApplicable(final String advertiserId) {
-        return !this.serverConfiguration.getExcludedAdvertisers(this.getClass().getName()).contains(advertiserId);
+        return !this.serverConfiguration.getExcludedAdvertisers(this.getClass().getSimpleName()).contains(advertiserId);
     }
 }
