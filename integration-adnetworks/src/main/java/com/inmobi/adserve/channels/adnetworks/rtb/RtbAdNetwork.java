@@ -109,7 +109,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private static final String            USD                          = "USD";
     @Getter
     static List<String>                    currenciesSupported          = new ArrayList<String>(Arrays.asList("USD",
-                                                                                "RMB","JPY","EUR","KRW","RUB"));
+                                                                                "CNY","JPY","EUR","KRW","RUB"));
     @Inject
     private static AsyncHttpClientProvider asyncHttpClientProvider;
 
