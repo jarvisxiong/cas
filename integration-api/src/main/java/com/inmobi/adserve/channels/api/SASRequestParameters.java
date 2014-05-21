@@ -7,6 +7,7 @@ import java.util.Set;
 import lombok.Data;
 
 import com.inmobi.adserve.adpool.EncryptionKeys;
+import com.inmobi.adserve.adpool.NetworkType;
 
 
 @Data
@@ -69,6 +70,7 @@ public class SASRequestParameters {
     private int                 sst;                  // 0 for Network
     private String              pubId;
     private String              osMajorVersion;
+    private NetworkType         networkType; 
 
     private EncryptionKeys      encryptionKey;
     private boolean             isKeepAlive;
@@ -82,7 +84,7 @@ public class SASRequestParameters {
         Linux_Smartphone_OS(2),
         Android(3),
         Nokia_OS(4),
-        iPhone_OS(5),
+        iOS(5),
         RIM_OS(6),
         MTK_Nucleus_OS(7),
         Symbian_OS(8),
@@ -109,5 +111,19 @@ public class SASRequestParameters {
             return id;
         }
     }
-
+    
+    public enum ConnectionType {
+    	WIFI(1),
+    	NO_WIFI(2);
+    	
+    	private final int id;
+    	
+    	ConnectionType(final int id){
+    		this.id=id;
+    	}
+    	
+    	public int getValue(){
+    		return id;
+    	}
+    }
 }

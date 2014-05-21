@@ -102,7 +102,7 @@ public class ThriftRequestParser {
             params.setOsId(new Long(tObject.device.osId).intValue());
             params.setModelId(new Long(tObject.device.modelId).intValue());
             params.setHandsetInternalId(tObject.device.getHandsetInternalId());
-            params.setOsMajorVersion(tObject.device.getOsMajorVersion());
+            params.setOsMajorVersion(tObject.device.getOsMajorVersion());            
         }
 
         // Fill params from Geo Object
@@ -147,6 +147,7 @@ public class ThriftRequestParser {
         // Fill params from Carrier Object
         if (tObject.isSetCarrier()) {
             params.setCarrierId(new Long(tObject.carrier.carrierId).intValue());
+            params.setNetworkType(tObject.carrier.networkType);
         }
 
         LOG.debug("Successfully parsed tObject, SAS params are : {}", params.toString());
