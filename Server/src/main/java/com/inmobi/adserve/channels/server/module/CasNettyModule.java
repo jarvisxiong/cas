@@ -1,16 +1,8 @@
 package com.inmobi.adserve.channels.server.module;
 
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.logging.LoggingHandler;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import org.apache.commons.configuration.Configuration;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
@@ -22,6 +14,13 @@ import com.inmobi.adserve.channels.util.annotations.ServerChannelInitializer;
 import com.inmobi.adserve.channels.util.annotations.ServerConfiguration;
 import com.inmobi.adserve.channels.util.annotations.StatServerChannelInitializer;
 import com.inmobi.adserve.channels.util.annotations.WorkerExecutorService;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.logging.LoggingHandler;
+import org.apache.commons.configuration.Configuration;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 /**
@@ -40,7 +39,6 @@ public class CasNettyModule extends AbstractModule {
     protected void configure() {
 
         bind(Configuration.class).annotatedWith(ServerConfiguration.class).toInstance(serverConfiguration);
-
         bind(LoggingHandler.class).toInstance(new LoggingHandler());
 
         // server pipelines
@@ -61,6 +59,7 @@ public class CasNettyModule extends AbstractModule {
     }
 
     @Provides
+    @Singleton
     ConnectionLimitHandler incomingConnectionLimitHandler(final ServerConfig serverConfig) {
         return new ConnectionLimitHandler(serverConfig);
     }
