@@ -84,7 +84,7 @@ public class SASRequestParameters {
         Linux_Smartphone_OS(2),
         Android(3),
         Nokia_OS(4),
-        iOS(5),
+        iPhone_OS(5),
         RIM_OS(6),
         MTK_Nucleus_OS(7),
         Symbian_OS(8),
@@ -112,18 +112,4 @@ public class SASRequestParameters {
         }
     }
     
-    public enum ConnectionType {
-    	WIFI(1),
-    	NO_WIFI(2);
-    	
-    	private final int id;
-    	
-    	ConnectionType(final int id){
-    		this.id=id;
-    	}
-    	
-    	public int getValue(){
-    		return id;
-    	}
-    }
 }
