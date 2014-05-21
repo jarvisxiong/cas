@@ -7,6 +7,7 @@ import java.util.Set;
 import lombok.Data;
 
 import com.inmobi.adserve.adpool.EncryptionKeys;
+import com.inmobi.adserve.adpool.NetworkType;
 
 
 @Data
@@ -69,6 +70,7 @@ public class SASRequestParameters {
     private int                 sst;                  // 0 for Network
     private String              pubId;
     private String              osMajorVersion;
+    private NetworkType         networkType; 
 
     private EncryptionKeys      encryptionKey;
     private boolean             isKeepAlive;
@@ -109,5 +111,5 @@ public class SASRequestParameters {
             return id;
         }
     }
-
+    
 }
