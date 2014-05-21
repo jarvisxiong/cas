@@ -8,10 +8,12 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
+import org.json.JSONObject;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.adnetworks.logan.DCPLoganAdnetwork;
@@ -214,6 +216,63 @@ public class DCPLoganAdnetworkTest extends TestCase {
             assertEquals(actualUrl, expectedUrl);
         }
     }
+    
+    
+    @Test
+    public void testDCPLoganRequestUriWithCountry() throws Exception {
+        SASRequestParameters sasParams = new SASRequestParameters();
+        CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        sasParams.setRemoteHostIp("206.29.182.240");
+        sasParams
+                .setUserAgent("Mozilla/5.0 (Linux; U; Android 2.2.2; es-us; Movistar Prime Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1");
+        casInternalRequestParameters.latLong = "37.4429,-122.1514";
+        sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
+        casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
+        sasParams.setCountryCode("US");
+        sasParams.setSlot((short) 15);
+        String externalKey = "1324";
+        SlotSizeMapping.init();
+        String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
+                + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1" + "/9cddca11?ds=1";
+        ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
+                loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 0));
+        if (dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, clurl)) {
+            String actualUrl = dcpLoganAdNetwork.getRequestUri().toString();
+            String expectedUrl = "http://ads.mocean.mobi/ad?track=1&key=6&type=3&over_18=0&ip=206.29.182.240&zone=1324&site=00000000-0000-0000-0000-000000000000&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.2.2%3B+es-us%3B+Movistar+Prime+Build%2FFRF91%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&lat=37.4429&long=-122.1514&udid=202cb962ac59075b964b07152d234b70&country=US&min_size_x=288&min_size_y=45&size_x=320&size_y=50";
+            assertEquals(expectedUrl, actualUrl);
+        }
+    }
+
+    @Test
+    public void testDCPLoganRequestUriWithoutCountry() throws Exception {
+        SASRequestParameters sasParams = new SASRequestParameters();
+        CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        sasParams.setRemoteHostIp("206.29.182.240");
+        sasParams
+                .setUserAgent("Mozilla/5.0 (Linux; U; Android 2.2.2; es-us; Movistar Prime Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1");
+        casInternalRequestParameters.latLong = "37.4429,-122.1514";
+        sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
+        casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
+        sasParams.setSlot((short) 15);
+        String externalKey = "1324";
+        SlotSizeMapping.init();
+        String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
+                + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1" + "/9cddca11?ds=1";
+        ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
+                loganAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 0));
+        if (dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, clurl)) {
+            String actualUrl = dcpLoganAdNetwork.getRequestUri().toString();
+            String expectedUrl = "http://ads.mocean.mobi/ad?track=1&key=6&type=3&over_18=0&ip=206.29.182.240&zone=1324&site=00000000-0000-0000-0000-000000000000&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.2.2%3B+es-us%3B+Movistar+Prime+Build%2FFRF91%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&lat=37.4429&long=-122.1514&udid=202cb962ac59075b964b07152d234b70&min_size_x=288&min_size_y=45&size_x=320&size_y=50";
+            assertEquals(expectedUrl, actualUrl);
+        }
+    }
+    
+    
+    
 
     @Test
     public void testDCPLoganParseResponseImg() throws Exception {
