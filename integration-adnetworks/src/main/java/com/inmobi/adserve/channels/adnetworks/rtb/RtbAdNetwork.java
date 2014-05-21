@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.adnetworks.rtb;
 
 import com.google.gson.Gson;
+import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -107,6 +108,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private final RepositoryHelper         repositoryHelper;
     private String                         bidderCurrency               = "USD";
     private static final String            USD                          = "USD";
+    
     @Getter
     static List<String>                    currenciesSupported          = new ArrayList<String>(Arrays.asList("USD",
                                                                                 "CNY","JPY","EUR","KRW","RUB"));
@@ -435,6 +437,16 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         Integer sasParamsOsId = sasParams.getOsId();
         if (sasParamsOsId > 0 && sasParamsOsId < 21) {
             device.setOs(HandSetOS.values()[sasParamsOsId - 1].toString());
+        }
+        
+        if(StringUtils.isNotBlank(sasParams.getOsMajorVersion())){
+        	device.setOsv(sasParams.getOsMajorVersion());
+        }
+        if(NetworkType.WIFI == sasParams.getNetworkType()){
+        	device.setConnectiontype(2);
+        }
+        else{
+        	device.setConnectiontype(0);
         }
         // Setting do not track
         if (null != casInternalRequestParameters.uidADT) {
