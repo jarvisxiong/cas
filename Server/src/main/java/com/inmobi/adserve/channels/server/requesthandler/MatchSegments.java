@@ -1,30 +1,11 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Singleton;
-
-import org.apache.hadoop.thirdparty.guava.common.collect.Maps;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.entity.ChannelEntity;
-import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
-import com.inmobi.adserve.channels.entity.SegmentAdGroupFeedbackEntity;
-import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
+import com.inmobi.adserve.channels.entity.*;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
@@ -32,6 +13,14 @@ import com.inmobi.adserve.channels.server.requesthandler.beans.AdvertiserMatched
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
+import lombok.Getter;
+import org.apache.hadoop.thirdparty.guava.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
+import javax.inject.Singleton;
+import java.util.*;
 
 
 @Singleton
@@ -39,6 +28,7 @@ public class MatchSegments {
     private static final Logger                LOG     = LoggerFactory.getLogger(MatchSegments.class);
 
     private static final String                DEFAULT = "default";
+    @Getter
     private final RepositoryHelper             repositoryHelper;
     private final ChannelAdGroupRepository     channelAdGroupRepository;
     private final ChannelEntity                defaultChannelEntity;

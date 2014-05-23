@@ -1,28 +1,14 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.QueryStringDecoder;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.inject.Inject;
-import javax.ws.rs.Path;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.PublisherFilterEntity;
-import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
+import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.beans.CasContext;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
@@ -33,8 +19,21 @@ import com.inmobi.adserve.channels.server.requesthandler.ResponseSender.Response
 import com.inmobi.adserve.channels.server.requesthandler.beans.AdvertiserMatchedSegmentDetail;
 import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilterApplier;
 import com.inmobi.adserve.channels.server.utils.CasUtils;
+import com.inmobi.adserve.channels.types.AccountType;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
+import javax.inject.Inject;
+import javax.ws.rs.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 @Singleton
@@ -71,6 +70,8 @@ public class ServletBackFill implements Servlet {
         hrh.responseSender.getAuctionEngine().sasParams = hrh.responseSender.sasParams;
         CasInternalRequestParameters casInternalRequestParametersGlobal = hrh.responseSender.casInternalRequestParameters;
 
+        casInternalRequestParametersGlobal.traceEnabled = Boolean.valueOf(hrh.getHttpRequest().headers().get("x-mkhoj-tracer"));
+
         if (requestFilters.isDroppedInRequestFilters(hrh)) {
             LOG.debug("Request is dropped in request filters");
             hrh.responseSender.sendNoAdResponse(serverChannel);
@@ -105,7 +106,11 @@ public class ServletBackFill implements Servlet {
             return;
         }
 
-        hrh.responseSender.sasParams.setSiteFloor(0.0);
+        SiteMetaDataEntity siteMetaDataEntity = matchSegments.getRepositoryHelper().querySiteMetaDetaRepository(sasParams.getSiteId());
+        casInternalRequestParametersGlobal.siteAccountType = AccountType.SELF_SERVE;
+        if (null != siteMetaDataEntity) {
+            casInternalRequestParametersGlobal.siteAccountType = siteMetaDataEntity.getAccountTypesAllowed();
+        }
 
         // applying all the filters
         List<ChannelSegment> filteredSegments = channelSegmentFilterApplier.getChannelSegments(matchedSegmentDetails,

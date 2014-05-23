@@ -25,6 +25,7 @@ public class SiteMetaDataRepository extends AbstractStatsMaintainingDBRepository
         NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
         String siteId = row.getString("site_id");
         String pubId = row.getString("pub_id");
+        Boolean selfServeAllowed = row.getBoolean("allow_self_serve");
         Timestamp modifiedOn = row.getTimestamp("modified_on");
         String[] siteAdvertisers = (String[]) row.getArray("site_advertiser_incl_list");
         String[] publisherAdvertisers = (String[]) row.getArray("pub_advertiser_incl_list");
@@ -39,6 +40,7 @@ public class SiteMetaDataRepository extends AbstractStatsMaintainingDBRepository
         SiteMetaDataEntity.Builder builder = SiteMetaDataEntity.newBuilder();
         builder.setSiteId(siteId);
         builder.setPubId(pubId);
+        builder.setSelfServeAllowed(selfServeAllowed);
         builder.setModified_on(modifiedOn);
         builder.setAdvertisersIncludedBySite(advertisersIncludedBySite);
         builder.setAdvertisersIncludedByPublisher(advertisersIncludedByPublisher);

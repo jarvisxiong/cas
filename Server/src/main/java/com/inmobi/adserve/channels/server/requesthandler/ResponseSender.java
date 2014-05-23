@@ -35,6 +35,7 @@ import com.inmobi.adserve.adpool.AdInfo;
 import com.inmobi.adserve.adpool.AdPoolResponse;
 import com.inmobi.adserve.adpool.AuctionType;
 import com.inmobi.adserve.adpool.Creative;
+import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.adpool.EncryptionKeys;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -44,6 +45,9 @@ import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.server.auction.AuctionEngine;
+import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.util.InspectorStats;
@@ -55,6 +59,22 @@ import com.inmobi.commons.security.util.exception.InvalidMessageException;
 import com.inmobi.types.AdIdChain;
 import com.inmobi.types.GUID;
 import com.inmobi.types.PricingModel;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.handler.codec.http.*;
+import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import java.awt.*;
+import java.util.*;
+import java.util.List;
 
 
 public class ResponseSender extends HttpRequestHandlerBase {
@@ -546,6 +566,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
             Logging.rrLogging(adResponseChannelSegment, list, sasParams, terminationReason, totalTime);
             Logging.advertiserLogging(list, CasConfigUtil.getLoggerConfig());
             Logging.sampledAdvertiserLogging(list, CasConfigUtil.getLoggerConfig());
+            Logging.creativeLogging(list, sasParams);
         }
         catch (JSONException exception) {
             LOG.debug(ChannelServer.getMyStackTrace(exception));

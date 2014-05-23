@@ -1,23 +1,5 @@
 package com.inmobi.adserve.channels.server;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-
-import junit.framework.TestCase;
-
-import org.apache.commons.configuration.Configuration;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.slf4j.Marker;
-import org.testng.annotations.Test;
-
 import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
@@ -26,6 +8,22 @@ import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender.ResponseFormat;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
+import junit.framework.TestCase;
+import org.apache.commons.configuration.Configuration;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.slf4j.Marker;
+import org.testng.annotations.Test;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 
 public class ServerTest extends TestCase {
@@ -63,7 +61,7 @@ public class ServerTest extends TestCase {
         responseSender = new ResponseSender();
 
         AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
-        Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-advertisement", mockConfig);
+        Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-advertisement", "null", mockConfig);
 
         requestParser = new RequestParser(new Provider<Marker>() {
             @Override

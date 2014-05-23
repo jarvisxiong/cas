@@ -1,12 +1,10 @@
 package com.inmobi.adserve.channels.server.logging;
 
-import org.slf4j.Marker;
-
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.filter.Filter;
 import ch.qos.logback.core.spi.FilterReply;
-
-import com.inmobi.adserve.channels.server.handler.NettyRequestScopeSeedHandler;
+import com.inmobi.adserve.channels.scope.NettyRequestScope;
+import org.slf4j.Marker;
 
 
 /**
@@ -15,7 +13,7 @@ import com.inmobi.adserve.channels.server.handler.NettyRequestScopeSeedHandler;
  */
 public class TraceFilter extends Filter<ILoggingEvent> {
 
-    private static final Marker TRACE_MARKER = NettyRequestScopeSeedHandler.TRACE_MAKER;
+    private static final Marker TRACE_MARKER = NettyRequestScope.TRACE_MAKER;
 
     @Override
     public FilterReply decide(final ILoggingEvent event) {

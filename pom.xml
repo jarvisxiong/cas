@@ -272,7 +272,7 @@
 			<dependency>
 				<groupId>com.inmobi.commons</groupId>
 				<artifactId>casthrift</artifactId>
-				<version>[1.23,3.0)</version>
+				<version>1.25-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.jackson</groupId>
