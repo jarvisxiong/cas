@@ -9,6 +9,7 @@ import com.inmobi.adserve.channels.server.CreativeCache;
 import com.inmobi.adserve.channels.server.auction.auctionfilter.AbstractAuctionFilter;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Marker;
 
 import javax.inject.Inject;
@@ -27,9 +28,13 @@ public class AuctionLogCreative extends AbstractAuctionFilter {
 
     @Override
     protected boolean failedInFilter(ChannelSegment rtbSegment, CasInternalRequestParameters casInternalRequestParameters) {
-        CreativeEntity creativeEntity = repositoryHelper.queryCreativeRepository(rtbSegment.getChannelEntity().getAccountId(), rtbSegment.getAdNetworkInterface().getCreativeId());
+
+        if (StringUtils.isEmpty(rtbSegment.getAdNetworkInterface().getCreativeId())) {
+            return false;
+        }
 
         //Handling de-duping in Cache
+        CreativeEntity creativeEntity = repositoryHelper.queryCreativeRepository(rtbSegment.getChannelEntity().getAccountId(), rtbSegment.getAdNetworkInterface().getCreativeId());
         boolean presentInCache = creativeCache.isPresentInCache(rtbSegment.getChannelEntity().getAccountId(), rtbSegment.getAdNetworkInterface().getCreativeId());
         if (null == creativeEntity && !presentInCache) {
             rtbSegment.getAdNetworkInterface().setLogCreative(true);
