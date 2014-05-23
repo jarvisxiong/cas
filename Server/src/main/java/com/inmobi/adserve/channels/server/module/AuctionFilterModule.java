@@ -76,6 +76,9 @@ public class AuctionFilterModule extends AbstractModule {
                 filter.setOrder(FilterOrder.TENTH);
             }
             else if (filter instanceof AuctionCreativeValidatorFilter) {
+                filter.setOrder(FilterOrder.SECOND_LAST);
+            }
+            else if (filter instanceof AuctionLogCreative) {
                 filter.setOrder(FilterOrder.LAST);
             }
             else {

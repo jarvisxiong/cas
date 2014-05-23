@@ -70,6 +70,7 @@ public class LoggingTest extends TestCase {
         expect(mockAdnetworkInterface.getName()).andReturn("DummyAdNetwork1").anyTimes();
         expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
         expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("DummyResponsecontent").anyTimes();
+        expect(mockAdnetworkInterface.isRtbPartner()).andReturn(false).anyTimes();
         replay(mockAdnetworkInterface);
         ChannelSegment channelSegment = new ChannelSegment(channelSegmentEntity, null, null, null, null,
                 mockAdnetworkInterface, 0);
@@ -100,6 +101,7 @@ public class LoggingTest extends TestCase {
         expect(mockAdnetworkInterface.getName()).andReturn("DummyAdNetwork2").anyTimes();
         expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
         expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("").anyTimes();
+        expect(mockAdnetworkInterface.isRtbPartner()).andReturn(false).anyTimes();
         replay(mockAdnetworkInterface);
         ChannelSegment channelSegment = new ChannelSegment(channelSegmentEntity, null, null, null, null,
                 mockAdnetworkInterface, 0);
@@ -130,6 +132,7 @@ public class LoggingTest extends TestCase {
         expect(mockAdnetworkInterface.getName()).andReturn("DummyAdNetwork2").anyTimes();
         expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
         expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("").anyTimes();
+        expect(mockAdnetworkInterface.isRtbPartner()).andReturn(false).anyTimes();
         replay(mockAdnetworkInterface);
         ChannelSegment channelSegment = new ChannelSegment(channelSegmentEntity, null, null, null, null,
                 mockAdnetworkInterface, 0);
@@ -160,6 +163,7 @@ public class LoggingTest extends TestCase {
         expect(mockAdnetworkInterface.getName()).andReturn("DummyAdNetwork2").anyTimes();
         expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
         expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("response").anyTimes();
+        expect(mockAdnetworkInterface.isRtbPartner()).andReturn(false).anyTimes();
         replay(mockAdnetworkInterface);
         ChannelSegment channelSegment = new ChannelSegment(channelSegmentEntity, null, null, null, null,
                 mockAdnetworkInterface, 0);

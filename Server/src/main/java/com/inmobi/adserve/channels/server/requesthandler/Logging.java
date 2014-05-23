@@ -386,9 +386,10 @@ public class Logging {
 
         for (int index = 0; rankList != null && index < rankList.size(); index++) {
             AdNetworkInterface adNetworkInterface = rankList.get(index).getAdNetworkInterface();
+
             ThirdPartyAdResponse adResponse = adNetworkInterface.getResponseStruct();
             String adstatus = adResponse.adStatus;
-            if (!adstatus.equalsIgnoreCase("AD")) {
+            if (adNetworkInterface.isRtbPartner() || !adstatus.equalsIgnoreCase("AD")) {
                 continue;
             }
             String partnerName = adNetworkInterface.getName();

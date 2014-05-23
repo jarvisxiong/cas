@@ -5,7 +5,6 @@ import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.entity.CreativeEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.server.CreativeCache;
 import com.inmobi.adserve.channels.server.auction.auctionfilter.AbstractAuctionFilter;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.types.AccountType;
@@ -20,14 +19,12 @@ import javax.inject.Singleton;
 public class AuctionCreativeValidatorFilter extends AbstractAuctionFilter {
 
     private final RepositoryHelper repositoryHelper;
-    private CreativeCache creativeCache;
 
     @Inject
     protected AuctionCreativeValidatorFilter(Provider<Marker> traceMarkerProvider, final RepositoryHelper repositoryHelper,
-                                             final ServerConfig serverConfiguration, final CreativeCache creativeCache) {
+                                             final ServerConfig serverConfiguration) {
         super(traceMarkerProvider, InspectorStrings.droppedInCreativeValidatorFilter, serverConfiguration);
         this.repositoryHelper = repositoryHelper;
-        this.creativeCache = creativeCache;
     }
 
     @Override
@@ -41,15 +38,6 @@ public class AuctionCreativeValidatorFilter extends AbstractAuctionFilter {
             if (creativeExposure == CreativeExposure.ALL && !creativeEntity.getImageUrl().equalsIgnoreCase(rtbSegment.getAdNetworkInterface().getIUrl())) {
                 creativeExposure = CreativeExposure.SELF_SERVE;
             }
-        }
-
-        //Handling de-duping in Cache
-        boolean presentInCache = creativeCache.isPresentInCache(rtbSegment.getChannelEntity().getAccountId(), rtbSegment.getAdNetworkInterface().getCreativeId());
-        if (null == creativeEntity && !presentInCache) {
-            rtbSegment.getAdNetworkInterface().setLogCreative(true);
-            creativeCache.addToCache(rtbSegment.getChannelEntity().getAccountId(), rtbSegment.getAdNetworkInterface().getCreativeId());
-        } else if (null != creativeEntity && presentInCache) {
-            creativeCache.removeFromCache(rtbSegment.getChannelEntity().getAccountId(), rtbSegment.getAdNetworkInterface().getCreativeId());
         }
 
         //Filtering logic

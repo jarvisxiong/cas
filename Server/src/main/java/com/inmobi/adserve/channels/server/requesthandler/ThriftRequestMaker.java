@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
 import com.inmobi.adserve.adpool.*;
+import com.inmobi.phoenix.batteries.util.WilburyUUID;
 import com.inmobi.types.ContentRating;
 import com.inmobi.types.InventoryType;
 import com.inmobi.types.LocationSource;
@@ -29,11 +30,16 @@ public class ThriftRequestMaker {
     private static final URLCodec urlCodec = new URLCodec();
 
     public static void main(final String[] args) throws Exception {
+        Integer adIncId = WilburyUUID.getIntKey("227ee495-0146-1000-2251-e49510070000");
+        System.out.println("ad_inc_id " + adIncId);
+
+
         AdPoolRequest adPoolRequest = createAdPoolRequest();
         System.out.println("Request is : " + adPoolRequest);
         sendUMPPost(adPoolRequest);
 
     }
+
 
     private static AdPoolRequest createAdPoolRequest() {
         Site site = new Site();
