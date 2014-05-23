@@ -105,6 +105,12 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private String                         responseSeatId;
     private String                         responseImpressionId;
     private String                         responseAuctionId;
+    private String                         creativeId;
+    private String                         sampleImageUrl;
+    private List<String>                   advertiserDomains;
+    private List<Integer>                  creativeAttributes;
+    private boolean                        logCreative                  = false;
+    private String                         adm;
     private final RepositoryHelper         repositoryHelper;
     private String                         bidderCurrency               = "USD";
     private static final String            USD                          = "USD";
@@ -512,7 +518,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         byte[] body = content.toString().getBytes(CharsetUtil.UTF_8);
 
         Request ningRequest = new RequestBuilder().setUrl(uriCallBack.toASCIIString())
-                .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
+                .setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE)
                 .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length)).setBody(body)
                 .setHeader(HttpHeaders.Names.HOST, uriCallBack.getHost()).build();
 
@@ -698,7 +704,12 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             setBidPriceInLocal(bidResponse.getSeatbid().get(0).getBid().get(0).getPrice());
             setBidPriceInUsd(calculatePriceInUSD(getBidPriceInLocal(), bidderCurrency));
             responseSeatId = bidResponse.getSeatbid().get(0).getSeat();
-            responseImpressionId = bidResponse.getSeatbid().get(0).getBid().get(0).getImpid();
+            Bid bid =  bidResponse.getSeatbid().get(0).getBid().get(0);
+            responseImpressionId = bid.getImpid();
+            creativeId = bid.getCrid();
+            sampleImageUrl = bid.getIurl();
+            advertiserDomains = bid.getAdomain();
+            creativeAttributes = bid.getAttr();
             responseAuctionId = bidResponse.getId();
             return true;
         }
@@ -802,6 +813,41 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Override
     public String getCurrency() {
         return bidderCurrency;
+    }
+
+    @Override
+    public String getCreativeId() {
+        return creativeId;
+    }
+
+    @Override
+    public String getIUrl() {
+        return sampleImageUrl;
+    }
+
+    @Override
+    public List<Integer> getAttribute() {
+        return  creativeAttributes;
+    }
+
+    @Override
+    public List<String> getADomain() {
+        return advertiserDomains;
+    }
+
+    @Override
+    public boolean isLogCreative() {
+        return logCreative;
+    }
+
+    @Override
+    public void setLogCreative(boolean logCreative) {
+        this.logCreative = logCreative;
+    }
+
+    @Override
+    public String getAdMarkUp() {
+        return adm;
     }
 
 }

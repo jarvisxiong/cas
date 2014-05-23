@@ -1,42 +1,41 @@
 package com.inmobi.adserve.channels.server;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import junit.framework.TestCase;
-
-import org.apache.commons.configuration.Configuration;
-import org.easymock.classextension.EasyMock;
-import org.testng.annotations.Test;
-
-import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
-import com.google.inject.TypeLiteral;
+import com.google.inject.util.Modules;
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
-import com.inmobi.adserve.channels.server.requesthandler.AuctionEngine;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.server.module.CasNettyModule;
+import com.inmobi.adserve.channels.server.module.ServerModule;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
+import com.inmobi.adserve.channels.server.requesthandler.filters.TestScopeModule;
+import com.inmobi.adserve.channels.types.AccountType;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
+import junit.framework.TestCase;
+import org.apache.commons.configuration.Configuration;
+import org.easymock.classextension.EasyMock;
+import org.testng.annotations.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 
 public class HttpRequestHandlerTest extends TestCase {
 
     private static ChannelEntity channelentity;
+    private static List<String> aDomains = new ArrayList<>();
+    private static List<Integer> cAttributes = new ArrayList<>();
 
     @Override
     public void setUp() throws Exception {
@@ -70,22 +69,19 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(mockConfigLoader.getDatabaseConfiguration()).andReturn(null).anyTimes();
         replay(mockConfigLoader);
 
-        Guice.createInjector(new AbstractModule() {
+        RepositoryHelper repositoryHelper = createMock(RepositoryHelper.class);
+        expect(repositoryHelper.queryCreativeRepository(org.easymock.EasyMock.isA(String.class), org.easymock.EasyMock.isA(String.class))).andReturn(null).anyTimes();
+        expect(repositoryHelper.getChannelAdGroupRepository()).andReturn(null).anyTimes();
+        replay(repositoryHelper);
 
-            @Override
-            protected void configure() {
-                TypeLiteral<Map<String, String>> advertiserIdNameMapType = new TypeLiteral<Map<String, String>>() {
-                };
-                bind(advertiserIdNameMapType).annotatedWith(AdvertiserIdNameMap.class).toInstance(
-                        new HashMap<String, String>());
-                AsyncRequestMaker asyncRequestMaker = new AsyncRequestMaker(null);
-                bind(AsyncRequestMaker.class).toInstance(asyncRequestMaker);
-                requestStaticInjection(AuctionEngine.class);
-            }
-        });
+        Guice.createInjector(Modules.override(
+                new ServerModule(config, repositoryHelper),
+                new CasNettyModule(config.getServerConfiguration())).with(new TestScopeModule()));
 
         AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
-        Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-advertisement", mockServerConfig);
+        Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-advertisement", "null", mockServerConfig);
+        aDomains.add("a.com");
+        cAttributes.add(1);
     }
 
     @Test
@@ -101,6 +97,12 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface1.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface1.getCurrency()).andReturn("USD").anyTimes();
+        expect(adNetworkInterface1.getCreativeId()).andReturn("creativeId").anyTimes();
+        adNetworkInterface1.setLogCreative(true);
+        org.easymock.EasyMock.expectLastCall().anyTimes();
+        expect(adNetworkInterface1.getADomain()).andReturn(aDomains).anyTimes();
+        expect(adNetworkInterface1.getAttribute()).andReturn(cAttributes).anyTimes();
+        expect(adNetworkInterface1.getIUrl()).andReturn("iurl").anyTimes();
         replay(adNetworkInterface1);
         AdNetworkInterface adNetworkInterface2 = createMock(RtbAdNetwork.class);
         expect(adNetworkInterface2.getBidPriceInUsd()).andReturn((double) 4).anyTimes();
@@ -112,6 +114,12 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface2.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface2.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface2.getCurrency()).andReturn("USD").anyTimes();
+        expect(adNetworkInterface2.getCreativeId()).andReturn("creativeId").anyTimes();
+        adNetworkInterface2.setLogCreative(true);
+        org.easymock.EasyMock.expectLastCall().anyTimes();
+        expect(adNetworkInterface2.getADomain()).andReturn(aDomains).anyTimes();
+        expect(adNetworkInterface2.getAttribute()).andReturn(cAttributes).anyTimes();
+        expect(adNetworkInterface2.getIUrl()).andReturn("iurl").anyTimes();
         adNetworkInterface2.setSecondBidPrice(EasyMock.isA(Double.class));
         adNetworkInterface2.setEncryptedBid(EasyMock.isA(String.class));
         EasyMock.expectLastCall();
@@ -126,6 +134,7 @@ public class HttpRequestHandlerTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.rtbBidFloor = 0;
         casInternalRequestParameters.auctionId = "auctionId";
+        casInternalRequestParameters.siteAccountType = AccountType.SELF_SERVE;
         httpRequestHandler.getAuctionEngine().casInternalRequestParameters = casInternalRequestParameters;
         AdNetworkInterface adNetworkInterfaceResult = httpRequestHandler.getAuctionEngine()
                 .runRtbSecondPriceAuctionEngine();
@@ -145,6 +154,12 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface1.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface1.getCurrency()).andReturn("USD").anyTimes();
+        expect(adNetworkInterface1.getCreativeId()).andReturn("creativeId").anyTimes();
+        adNetworkInterface1.setLogCreative(true);
+        org.easymock.EasyMock.expectLastCall().anyTimes();
+        expect(adNetworkInterface1.getADomain()).andReturn(aDomains).anyTimes();
+        expect(adNetworkInterface1.getAttribute()).andReturn(cAttributes).anyTimes();
+        expect(adNetworkInterface1.getIUrl()).andReturn("iurl").anyTimes();
         adNetworkInterface1.setSecondBidPrice(EasyMock.isA(Double.class));
         adNetworkInterface1.setEncryptedBid(EasyMock.isA(String.class));
         EasyMock.expectLastCall();
@@ -156,6 +171,7 @@ public class HttpRequestHandlerTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.rtbBidFloor = 0;
         casInternalRequestParameters.auctionId = "auctionId";
+        casInternalRequestParameters.siteAccountType = AccountType.SELF_SERVE;
         httpRequestHandler.getAuctionEngine().casInternalRequestParameters = casInternalRequestParameters;
         AdNetworkInterface adNetworkInterfaceResult = httpRequestHandler.getAuctionEngine()
                 .runRtbSecondPriceAuctionEngine();
@@ -168,6 +184,7 @@ public class HttpRequestHandlerTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.rtbBidFloor = 0;
         casInternalRequestParameters.auctionId = "auctionId";
+        casInternalRequestParameters.siteAccountType = AccountType.SELF_SERVE;
         httpRequestHandler.getAuctionEngine().setRtbSegments(new ArrayList<ChannelSegment>());
         httpRequestHandler.getAuctionEngine().casInternalRequestParameters = casInternalRequestParameters;
         AdNetworkInterface adNetworkInterfaceResult = httpRequestHandler.getAuctionEngine()
@@ -188,6 +205,12 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface1.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface1.getCurrency()).andReturn("USD").anyTimes();
+        expect(adNetworkInterface1.getCreativeId()).andReturn("creativeId").anyTimes();
+        adNetworkInterface1.setLogCreative(true);
+        org.easymock.EasyMock.expectLastCall().anyTimes();
+        expect(adNetworkInterface1.getADomain()).andReturn(aDomains).anyTimes();
+        expect(adNetworkInterface1.getAttribute()).andReturn(cAttributes).anyTimes();
+        expect(adNetworkInterface1.getIUrl()).andReturn("iurl").anyTimes();
         replay(adNetworkInterface1);
         AdNetworkInterface adNetworkInterface2 = createMock(RtbAdNetwork.class);
         expect(adNetworkInterface2.getBidPriceInUsd()).andReturn((double) 2).anyTimes();
@@ -199,6 +222,12 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface2.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface2.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface2.getCurrency()).andReturn("USD").anyTimes();
+        expect(adNetworkInterface2.getCreativeId()).andReturn("creativeId").anyTimes();
+        adNetworkInterface2.setLogCreative(true);
+        org.easymock.EasyMock.expectLastCall().anyTimes();
+        expect(adNetworkInterface2.getADomain()).andReturn(aDomains).anyTimes();
+        expect(adNetworkInterface2.getAttribute()).andReturn(cAttributes).anyTimes();
+        expect(adNetworkInterface2.getIUrl()).andReturn("iurl").anyTimes();
         replay(adNetworkInterface2);
         AdNetworkInterface adNetworkInterface3 = createMock(RtbAdNetwork.class);
         expect(adNetworkInterface3.getBidPriceInUsd()).andReturn((double) 2).anyTimes();
@@ -212,6 +241,12 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface3.getCurrency()).andReturn("USD").anyTimes();
         adNetworkInterface3.setSecondBidPrice(EasyMock.isA(Double.class));
         adNetworkInterface3.setEncryptedBid(EasyMock.isA(String.class));
+        expect(adNetworkInterface3.getCreativeId()).andReturn("creativeId").anyTimes();
+        adNetworkInterface3.setLogCreative(true);
+        org.easymock.EasyMock.expectLastCall().anyTimes();
+        expect(adNetworkInterface3.getADomain()).andReturn(aDomains).anyTimes();
+        expect(adNetworkInterface3.getAttribute()).andReturn(cAttributes).anyTimes();
+        expect(adNetworkInterface3.getIUrl()).andReturn("iurl").anyTimes();
         EasyMock.expectLastCall();
         replay(adNetworkInterface3);
         ChannelSegment channelSegment1 = new ChannelSegment(null, channelentity, null, null, null, adNetworkInterface1,
@@ -223,6 +258,7 @@ public class HttpRequestHandlerTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.rtbBidFloor = 0;
         casInternalRequestParameters.auctionId = "auctionId";
+        casInternalRequestParameters.siteAccountType = AccountType.SELF_SERVE;
         httpRequestHandler.getAuctionEngine().casInternalRequestParameters = casInternalRequestParameters;
         httpRequestHandler.getAuctionEngine().setRtbSegments(new ArrayList<ChannelSegment>());
         httpRequestHandler.getAuctionEngine().getRtbSegments().add(channelSegment1);
@@ -246,6 +282,12 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface1.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface1.getCurrency()).andReturn("USD").anyTimes();
+        expect(adNetworkInterface1.getCreativeId()).andReturn("creativeId").anyTimes();
+        adNetworkInterface1.setLogCreative(true);
+        org.easymock.EasyMock.expectLastCall().anyTimes();
+        expect(adNetworkInterface1.getADomain()).andReturn(aDomains).anyTimes();
+        expect(adNetworkInterface1.getAttribute()).andReturn(cAttributes).anyTimes();
+        expect(adNetworkInterface1.getIUrl()).andReturn("iurl").anyTimes();
         adNetworkInterface1.setSecondBidPrice(EasyMock.isA(Double.class));
         adNetworkInterface1.setEncryptedBid(EasyMock.isA(String.class));
         EasyMock.expectLastCall();
@@ -260,6 +302,12 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface2.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface2.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface2.getCurrency()).andReturn("USD").anyTimes();
+        expect(adNetworkInterface2.getCreativeId()).andReturn("creativeId").anyTimes();
+        adNetworkInterface2.setLogCreative(true);
+        org.easymock.EasyMock.expectLastCall().anyTimes();
+        expect(adNetworkInterface2.getADomain()).andReturn(aDomains).anyTimes();
+        expect(adNetworkInterface2.getAttribute()).andReturn(cAttributes).anyTimes();
+        expect(adNetworkInterface2.getIUrl()).andReturn("iurl").anyTimes();
         replay(adNetworkInterface2);
         AdNetworkInterface adNetworkInterface3 = createMock(RtbAdNetwork.class);
         expect(adNetworkInterface3.getBidPriceInUsd()).andReturn((double) 1).anyTimes();
@@ -271,6 +319,12 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface3.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface3.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface3.getCurrency()).andReturn("USD").anyTimes();
+        expect(adNetworkInterface3.getCreativeId()).andReturn("creativeId").anyTimes();
+        adNetworkInterface3.setLogCreative(true);
+        org.easymock.EasyMock.expectLastCall().anyTimes();
+        expect(adNetworkInterface3.getADomain()).andReturn(aDomains).anyTimes();
+        expect(adNetworkInterface3.getAttribute()).andReturn(cAttributes).anyTimes();
+        expect(adNetworkInterface3.getIUrl()).andReturn("iurl").anyTimes();
         replay(adNetworkInterface3);
         ChannelSegment channelSegment1 = new ChannelSegment(null, channelentity, null, null, null, adNetworkInterface1,
                 0);
@@ -281,6 +335,7 @@ public class HttpRequestHandlerTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.rtbBidFloor = 0;
         casInternalRequestParameters.auctionId = "auctionId";
+        casInternalRequestParameters.siteAccountType = AccountType.SELF_SERVE;
         httpRequestHandler.getAuctionEngine().casInternalRequestParameters = casInternalRequestParameters;
         httpRequestHandler.getAuctionEngine().setRtbSegments(new ArrayList<ChannelSegment>());
         httpRequestHandler.getAuctionEngine().getRtbSegments().add(channelSegment1);
@@ -304,6 +359,12 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface1.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface1.getCurrency()).andReturn("USD").anyTimes();
+        expect(adNetworkInterface1.getCreativeId()).andReturn("creativeId").anyTimes();
+        adNetworkInterface1.setLogCreative(true);
+        org.easymock.EasyMock.expectLastCall().anyTimes();
+        expect(adNetworkInterface1.getADomain()).andReturn(aDomains).anyTimes();
+        expect(adNetworkInterface1.getAttribute()).andReturn(cAttributes).anyTimes();
+        expect(adNetworkInterface1.getIUrl()).andReturn("iurl").anyTimes();
         adNetworkInterface1.setSecondBidPrice(EasyMock.isA(Double.class));
         adNetworkInterface1.setEncryptedBid(EasyMock.isA(String.class));
         EasyMock.expectLastCall();
@@ -318,6 +379,12 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface2.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface2.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface2.getCurrency()).andReturn("USD").anyTimes();
+        expect(adNetworkInterface2.getCreativeId()).andReturn("creativeId").anyTimes();
+        adNetworkInterface2.setLogCreative(true);
+        org.easymock.EasyMock.expectLastCall().anyTimes();
+        expect(adNetworkInterface2.getADomain()).andReturn(aDomains).anyTimes();
+        expect(adNetworkInterface2.getAttribute()).andReturn(cAttributes).anyTimes();
+        expect(adNetworkInterface2.getIUrl()).andReturn("iurl").anyTimes();
         replay(adNetworkInterface2);
         AdNetworkInterface adNetworkInterface3 = createMock(RtbAdNetwork.class);
         expect(adNetworkInterface3.getBidPriceInUsd()).andReturn((double) 0).anyTimes();
@@ -329,6 +396,12 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface3.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface3.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface3.getCurrency()).andReturn("USD").anyTimes();
+        expect(adNetworkInterface3.getCreativeId()).andReturn("creativeId").anyTimes();
+        adNetworkInterface3.setLogCreative(true);
+        org.easymock.EasyMock.expectLastCall().anyTimes();
+        expect(adNetworkInterface3.getADomain()).andReturn(aDomains).anyTimes();
+        expect(adNetworkInterface3.getAttribute()).andReturn(cAttributes).anyTimes();
+        expect(adNetworkInterface3.getIUrl()).andReturn("iurl").anyTimes();
         replay(adNetworkInterface3);
         ChannelSegment channelSegment1 = new ChannelSegment(null, channelentity, null, null, null, adNetworkInterface1,
                 0);
@@ -339,6 +412,7 @@ public class HttpRequestHandlerTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.rtbBidFloor = 0;
         casInternalRequestParameters.auctionId = "auctionId";
+        casInternalRequestParameters.siteAccountType = AccountType.SELF_SERVE;
         rs.getAuctionEngine().casInternalRequestParameters = casInternalRequestParameters;
         rs.getAuctionEngine().setRtbSegments(new ArrayList<ChannelSegment>());
         rs.getAuctionEngine().getRtbSegments().add(channelSegment1);
@@ -361,6 +435,12 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface1.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface1.getCurrency()).andReturn("USD").anyTimes();
+        expect(adNetworkInterface1.getCreativeId()).andReturn("creativeId").anyTimes();
+        adNetworkInterface1.setLogCreative(true);
+        org.easymock.EasyMock.expectLastCall().anyTimes();
+        expect(adNetworkInterface1.getADomain()).andReturn(aDomains).anyTimes();
+        expect(adNetworkInterface1.getAttribute()).andReturn(cAttributes).anyTimes();
+        expect(adNetworkInterface1.getIUrl()).andReturn("iurl").anyTimes();
         replay(adNetworkInterface1);
         AdNetworkInterface adNetworkInterface2 = createMock(RtbAdNetwork.class);
         expect(adNetworkInterface2.getBidPriceInUsd()).andReturn((double) 1).anyTimes();
@@ -372,6 +452,12 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface2.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface2.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface2.getCurrency()).andReturn("USD").anyTimes();
+        expect(adNetworkInterface2.getCreativeId()).andReturn("creativeId").anyTimes();
+        adNetworkInterface2.setLogCreative(true);
+        org.easymock.EasyMock.expectLastCall().anyTimes();
+        expect(adNetworkInterface2.getADomain()).andReturn(aDomains).anyTimes();
+        expect(adNetworkInterface2.getAttribute()).andReturn(cAttributes).anyTimes();
+        expect(adNetworkInterface2.getIUrl()).andReturn("iurl").anyTimes();
         replay(adNetworkInterface2);
         AdNetworkInterface adNetworkInterface3 = createMock(RtbAdNetwork.class);
         expect(adNetworkInterface3.getBidPriceInUsd()).andReturn((double) 0).anyTimes();
@@ -383,6 +469,12 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface3.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface3.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface3.getCurrency()).andReturn("USD").anyTimes();
+        expect(adNetworkInterface3.getCreativeId()).andReturn("creativeId").anyTimes();
+        adNetworkInterface3.setLogCreative(true);
+        org.easymock.EasyMock.expectLastCall().anyTimes();
+        expect(adNetworkInterface3.getADomain()).andReturn(aDomains).anyTimes();
+        expect(adNetworkInterface3.getAttribute()).andReturn(cAttributes).anyTimes();
+        expect(adNetworkInterface3.getIUrl()).andReturn("iurl").anyTimes();
         replay(adNetworkInterface3);
         ChannelSegment channelSegment1 = new ChannelSegment(null, channelentity, null, null, null, adNetworkInterface1,
                 0);
@@ -393,6 +485,7 @@ public class HttpRequestHandlerTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.rtbBidFloor = 0;
         casInternalRequestParameters.auctionId = "auctionId";
+        casInternalRequestParameters.siteAccountType = AccountType.SELF_SERVE;
         httpRequestHandler.getAuctionEngine().casInternalRequestParameters = casInternalRequestParameters;
         httpRequestHandler.getAuctionEngine().setRtbSegments(new ArrayList<ChannelSegment>());
         httpRequestHandler.getAuctionEngine().getRtbSegments().add(channelSegment1);
@@ -416,6 +509,12 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface1.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface1.getCurrency()).andReturn("USD").anyTimes();
+        expect(adNetworkInterface1.getCreativeId()).andReturn("creativeId").anyTimes();
+        adNetworkInterface1.setLogCreative(true);
+        org.easymock.EasyMock.expectLastCall().anyTimes();
+        expect(adNetworkInterface1.getADomain()).andReturn(aDomains).anyTimes();
+        expect(adNetworkInterface1.getAttribute()).andReturn(cAttributes).anyTimes();
+        expect(adNetworkInterface1.getIUrl()).andReturn("iurl").anyTimes();
         replay(adNetworkInterface1);
         AdNetworkInterface adNetworkInterface2 = createMock(RtbAdNetwork.class);
         expect(adNetworkInterface2.getBidPriceInUsd()).andReturn((double) 1).anyTimes();
@@ -428,6 +527,12 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface2.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface2.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface2.getCurrency()).andReturn("USD").anyTimes();
+        expect(adNetworkInterface2.getCreativeId()).andReturn("creativeId").anyTimes();
+        adNetworkInterface2.setLogCreative(true);
+        org.easymock.EasyMock.expectLastCall().anyTimes();
+        expect(adNetworkInterface2.getADomain()).andReturn(aDomains).anyTimes();
+        expect(adNetworkInterface2.getAttribute()).andReturn(cAttributes).anyTimes();
+        expect(adNetworkInterface2.getIUrl()).andReturn("iurl").anyTimes();
         replay(adNetworkInterface2);
         AdNetworkInterface adNetworkInterface3 = createMock(RtbAdNetwork.class);
         expect(adNetworkInterface3.getBidPriceInUsd()).andReturn((double) 0).anyTimes();
@@ -440,6 +545,12 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface3.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface3.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface3.getCurrency()).andReturn("USD").anyTimes();
+        expect(adNetworkInterface3.getCreativeId()).andReturn("creativeId").anyTimes();
+        adNetworkInterface3.setLogCreative(true);
+        org.easymock.EasyMock.expectLastCall().anyTimes();
+        expect(adNetworkInterface3.getADomain()).andReturn(aDomains).anyTimes();
+        expect(adNetworkInterface3.getAttribute()).andReturn(cAttributes).anyTimes();
+        expect(adNetworkInterface3.getIUrl()).andReturn("iurl").anyTimes();
         replay(adNetworkInterface3);
         ChannelSegment channelSegment1 = new ChannelSegment(null, channelentity, null, null, null, adNetworkInterface1,
                 0);
@@ -450,6 +561,7 @@ public class HttpRequestHandlerTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.rtbBidFloor = 0;
         casInternalRequestParameters.auctionId = "auctionId";
+        casInternalRequestParameters.siteAccountType = AccountType.SELF_SERVE;
         httpRequestHandler.getAuctionEngine().casInternalRequestParameters = casInternalRequestParameters;
         httpRequestHandler.getAuctionEngine().setRtbSegments(new ArrayList<ChannelSegment>());
         httpRequestHandler.getAuctionEngine().getRtbSegments().add(channelSegment1);
@@ -482,6 +594,14 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface1.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface1.getCurrency()).andReturn("USD").anyTimes();
+        expect(adNetworkInterface1.isRtbPartner()).andReturn(true).anyTimes();
+        expect(adNetworkInterface1.isLogCreative()).andReturn(false).anyTimes();
+        expect(adNetworkInterface1.getCreativeId()).andReturn("creativeId").anyTimes();
+        adNetworkInterface1.setLogCreative(true);
+        org.easymock.EasyMock.expectLastCall().anyTimes();
+        expect(adNetworkInterface1.getADomain()).andReturn(aDomains).anyTimes();
+        expect(adNetworkInterface1.getAttribute()).andReturn(cAttributes).anyTimes();
+        expect(adNetworkInterface1.getIUrl()).andReturn("iurl").anyTimes();
         ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
         thirdPartyAdResponse.adStatus = "AD";
         thirdPartyAdResponse.latency = 12;

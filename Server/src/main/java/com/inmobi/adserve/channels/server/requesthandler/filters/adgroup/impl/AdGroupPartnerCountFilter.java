@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 
 import javax.inject.Inject;
 
+import com.inmobi.adserve.channels.server.constants.FilterOrder;
 import org.apache.hadoop.thirdparty.guava.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,6 @@ import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.config.AdapterConfig;
 import com.inmobi.adserve.channels.server.beans.CasContext;
-import com.inmobi.adserve.channels.server.constants.ChannelSegmentFilterOrder;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AdGroupLevelFilter;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -33,7 +33,7 @@ public class AdGroupPartnerCountFilter implements AdGroupLevelFilter {
     private static final Logger              LOG = LoggerFactory.getLogger(AdGroupPartnerCountFilter.class);
     private final Map<String, AdapterConfig> advertiserIdConfigMap;
     private final Provider<Marker>           traceMarkerProvider;
-    private ChannelSegmentFilterOrder        order;
+    private FilterOrder order;
 
     /**
      * @param traceMarkerProvider
@@ -124,12 +124,12 @@ public class AdGroupPartnerCountFilter implements AdGroupLevelFilter {
     }
 
     @Override
-    final public void setOrder(final ChannelSegmentFilterOrder order) {
+    final public void setOrder(final FilterOrder order) {
         this.order = order;
     }
 
     @Override
-    public ChannelSegmentFilterOrder getOrder() {
+    public FilterOrder getOrder() {
         return order;
     }
 

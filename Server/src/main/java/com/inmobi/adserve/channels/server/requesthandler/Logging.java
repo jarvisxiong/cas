@@ -1,23 +1,5 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.inject.Inject;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.json.JSONException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
@@ -27,26 +9,25 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.MetricsManager;
 import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
-import com.inmobi.casthrift.Ad;
-import com.inmobi.casthrift.AdIdChain;
-import com.inmobi.casthrift.AdMeta;
-import com.inmobi.casthrift.AdRR;
-import com.inmobi.casthrift.AdStatus;
-import com.inmobi.casthrift.CasAdChain;
-import com.inmobi.casthrift.CasAdvertisementLog;
-import com.inmobi.casthrift.Channel;
-import com.inmobi.casthrift.ContentRating;
-import com.inmobi.casthrift.DemandSourceType;
-import com.inmobi.casthrift.Gender;
-import com.inmobi.casthrift.Geo;
-import com.inmobi.casthrift.HandsetMeta;
-import com.inmobi.casthrift.Impression;
-import com.inmobi.casthrift.InventoryType;
-import com.inmobi.casthrift.PricingModel;
-import com.inmobi.casthrift.Request;
-import com.inmobi.casthrift.User;
+import com.inmobi.casthrift.*;
 import com.inmobi.messaging.Message;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
+import org.apache.commons.configuration.Configuration;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class Logging {
@@ -56,11 +37,11 @@ public class Logging {
     private static AbstractMessagePublisher                dataBusPublisher;
     private static String                                  rrLogKey;
     private static String                                  sampledAdvertisementLogKey;
+    private static String                                  umpAdsLogKey;
     private static boolean                                 enableFileLogging;
     private static boolean                                 enableDatabusLogging;
     private final static ConcurrentHashMap<String, String> sampledAdvertiserLogNos = new ConcurrentHashMap<String, String>(
                                                                                            2000);
-
     @AdvertiserIdNameMap
     @Inject
     private static Map<String, String>                     advertiserIdNameMap;
@@ -72,10 +53,11 @@ public class Logging {
     private static int totalCount;
 
     public static void init(final AbstractMessagePublisher dataBusPublisher, final String rrLogKey,
-            final String advertisementLogKey, final Configuration config) {
+            final String advertisementLogKey, final String umpAdsLogKey, final Configuration config) {
         Logging.dataBusPublisher = dataBusPublisher;
         Logging.rrLogKey = rrLogKey;
         Logging.sampledAdvertisementLogKey = advertisementLogKey;
+        Logging.umpAdsLogKey = umpAdsLogKey;
         enableFileLogging = config.getBoolean("enableFileLogging");
         enableDatabusLogging = config.getBoolean("enableDatabusLogging");
         totalCount = config.getInt("sampledadvertisercount");
@@ -238,6 +220,49 @@ public class Logging {
         }
     }
 
+    // Writing creatives
+    public static void creativeLogging(final List<ChannelSegment> channelSegments, final SASRequestParameters sasRequestParameters) {
+        LOG.debug("inside creativeLogging");
+        if (null == channelSegments || channelSegments.isEmpty()) {
+            return;
+        }
+
+        for (ChannelSegment channelSegment : channelSegments) {
+            AdNetworkInterface adNetworkInterface = channelSegment.getAdNetworkInterface();
+            if (adNetworkInterface.isRtbPartner() && adNetworkInterface.isLogCreative()) {
+                String response = adNetworkInterface.getHttpResponseContent();
+                String requestUrl = adNetworkInterface.getRequestUrl();
+                ThirdPartyAdResponse adResponse = adNetworkInterface.getResponseStruct();
+                String partnerName = adNetworkInterface.getName();
+                String externalSiteKey = channelSegment.getChannelSegmentEntity().getExternalSiteKey();
+                String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
+                String adStatus = adResponse.adStatus;
+
+                CasAdvertisementLog creativeLog = new CasAdvertisementLog(partnerName, requestUrl, response,
+                        adStatus, externalSiteKey, advertiserId);
+                creativeLog.setCountryId(sasRequestParameters.getCountryId().intValue());
+                creativeLog.setCreativeId(adNetworkInterface.getCreativeId());
+                creativeLog.setImageUrl(adNetworkInterface.getIUrl());
+                creativeLog.setAdm(adNetworkInterface.getAdMarkUp());
+                creativeLog.setCreativeAttributes(adNetworkInterface.getAttribute());
+                creativeLog.setAdvertiserDomains(adNetworkInterface.getADomain());
+                creativeLog.setTime_stamp(new Date().getTime());
+                LOG.info("Creative msg is {}", creativeLog);
+                Message msg = null;
+                try {
+                    TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
+                    msg = new Message(tSerializer.serialize(creativeLog));
+                }
+                catch (TException e) {
+                    LOG.debug("Error while creating creative logs for databus ");
+                }
+                if (null != msg) {
+                    dataBusPublisher.publish(umpAdsLogKey, msg);
+                }
+            }
+        }
+    }
+
     public static List<Channel> createChannelsLog(final List<ChannelSegment> rankList) {
         if (null == rankList) {
             return new ArrayList<Channel>();
@@ -283,6 +308,9 @@ public class Logging {
         casAdChain.setAdgroup_inc_id(channelSegment.getChannelSegmentEntity().getAdgroupIncId());
         casAdChain.setExternalSiteKey(channelSegment.getChannelSegmentEntity().getExternalSiteKey());
         casAdChain.setDst(getDst(channelSegment.getChannelSegmentEntity().getDst()));
+        if (null != channelSegment.getAdNetworkInterface().getCreativeId()) {
+            casAdChain.setCreativeId(channelSegment.getAdNetworkInterface().getCreativeId());
+        }
         return casAdChain;
     }
 
@@ -358,9 +386,10 @@ public class Logging {
 
         for (int index = 0; rankList != null && index < rankList.size(); index++) {
             AdNetworkInterface adNetworkInterface = rankList.get(index).getAdNetworkInterface();
+
             ThirdPartyAdResponse adResponse = adNetworkInterface.getResponseStruct();
             String adstatus = adResponse.adStatus;
-            if (!adstatus.equalsIgnoreCase("AD")) {
+            if (adNetworkInterface.isRtbPartner() || !adstatus.equalsIgnoreCase("AD")) {
                 continue;
             }
             String partnerName = adNetworkInterface.getName();
@@ -418,8 +447,7 @@ public class Logging {
                 if (count >= totalCount) {
                     continue;
                 }
-                CasAdvertisementLog casAdvertisementLog = new CasAdvertisementLog(partnerName, requestUrl, response,
-                        adstatus, extsiteKey, advertiserId);
+                CasAdvertisementLog casAdvertisementLog = new CasAdvertisementLog(partnerName, requestUrl, response, adstatus, extsiteKey, advertiserId);
                 Message msg = null;
                 try {
                     TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());

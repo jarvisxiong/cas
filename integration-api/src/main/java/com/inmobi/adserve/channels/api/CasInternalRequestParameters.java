@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.api;
 
+import com.inmobi.adserve.channels.types.AccountType;
+
 import java.util.List;
 
 
@@ -8,8 +10,10 @@ public class CasInternalRequestParameters {
     public double       highestEcpm;
     public List<Long>   blockedCategories;
     public List<String> blockedAdvertisers;
+    public AccountType  siteAccountType; //Whether site account is managed or selfserve
     public double       rtbBidFloor;
     public String       auctionId;
+    public boolean      traceEnabled;
 
     public String       impressionId;
     // Control enrichment params

@@ -1,6 +1,6 @@
 package com.inmobi.adserve.channels.server.requesthandler.filters;
 
-import com.inmobi.adserve.channels.server.constants.ChannelSegmentFilterOrder;
+import com.inmobi.adserve.channels.server.constants.FilterOrder;
 
 
 /**
@@ -9,8 +9,8 @@ import com.inmobi.adserve.channels.server.constants.ChannelSegmentFilterOrder;
  */
 public interface ChannelSegmentFilter {
 
-    void setOrder(final ChannelSegmentFilterOrder priority);
+    void setOrder(final FilterOrder priority);
 
-    ChannelSegmentFilterOrder getOrder();
+    FilterOrder getOrder();
 
 }

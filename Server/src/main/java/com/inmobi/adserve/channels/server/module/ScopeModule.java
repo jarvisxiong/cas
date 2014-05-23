@@ -1,12 +1,11 @@
 package com.inmobi.adserve.channels.server.module;
 
-import org.slf4j.Marker;
-
 import com.google.inject.AbstractModule;
-import com.inmobi.adserve.channels.server.NettyRequestScope;
+import com.inmobi.adserve.channels.scope.NettyRequestScope;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.util.annotations.BatchScoped;
+import org.slf4j.Marker;
 
 
 /**

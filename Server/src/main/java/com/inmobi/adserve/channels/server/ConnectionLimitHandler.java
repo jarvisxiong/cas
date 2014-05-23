@@ -1,18 +1,16 @@
 package com.inmobi.adserve.channels.server;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.api.config.ServerConfig;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
-
-import java.util.concurrent.atomic.AtomicInteger;
-
 import lombok.Getter;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.Singleton;
-import com.inmobi.adserve.channels.api.config.ServerConfig;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Singleton
@@ -28,6 +26,7 @@ public class ConnectionLimitHandler extends ChannelDuplexHandler {
 
     private final ServerConfig  serverConfig;
 
+    @Inject
     public ConnectionLimitHandler(final ServerConfig serverConfig) {
         this.serverConfig = serverConfig;
     }
