@@ -389,7 +389,7 @@ public class Logging {
 
             ThirdPartyAdResponse adResponse = adNetworkInterface.getResponseStruct();
             String adstatus = adResponse.adStatus;
-            if (adNetworkInterface.isRtbPartner() || !adstatus.equalsIgnoreCase("AD")) {
+            if (!adstatus.equalsIgnoreCase("AD")) {
                 continue;
             }
             String partnerName = adNetworkInterface.getName();
