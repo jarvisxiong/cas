@@ -35,7 +35,7 @@ public class GoogleAdXNetworkTest extends TestCase {
 
   private GoogleAdXAdNetwork googleAdXNetwork;
   private final String googleAdXStatus = "on";
-  private final String googleAdXAdvertiserId = "ca-pub-7457767528341420";
+  private final String googleAdXAdvertiserId = "inmobi_advertiser_id";
 
   public void prepareMockConfig() {
     mockConfig = createMock(Configuration.class);

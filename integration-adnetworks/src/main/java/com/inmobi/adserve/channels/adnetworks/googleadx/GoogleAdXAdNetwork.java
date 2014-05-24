@@ -29,6 +29,7 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
   private static final Logger LOG = LoggerFactory.getLogger(GoogleAdXAdNetwork.class);
 
   private static final String SCRIPT_END_PART = "<script type=\"text/javascript\" src=\"//pagead2.googlesyndication.com/pagead/show_ads.js\"></script>";
+  private static final String GOOGLE_INMOBI_PUBID = "ca-pub-7457767528341420";
 
   private String siteId = null;
   private int width, height;
@@ -75,7 +76,7 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
     VelocityContext context = new VelocityContext();
 
     StringBuffer sb = new StringBuffer("<script type=\"text/javascript\">");
-    sb.append("google_ad_client = \"").append(getId()).append("\";");
+    sb.append("google_ad_client = \"").append(GOOGLE_INMOBI_PUBID).append("\";");
     sb.append("google_ad_slot = \"").append(siteId).append("\";");
     sb.append("google_ad_width = \"").append(width).append("\";");
     sb.append("google_ad_height = \"").append(height).append("\";");
