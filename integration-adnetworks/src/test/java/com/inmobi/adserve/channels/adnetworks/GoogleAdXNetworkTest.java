@@ -79,7 +79,7 @@ public class GoogleAdXNetworkTest extends TestCase {
   }
 
   @Test
-  public void testDCPNexageParseResponseAdApp() throws Exception {
+  public void testGoogleAdXNetworkResponse() throws Exception {
     SASRequestParameters sasParams = new SASRequestParameters();
     CasInternalRequestParameters
         casInternalRequestParameters = new CasInternalRequestParameters();
