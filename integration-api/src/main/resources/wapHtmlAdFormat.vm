@@ -1,0 +1,1 @@
+<html><head><title></title><style type="text/css">body {margin: 0px; overflow: hidden;} </style></head><body>$PartnerHtmlCode#if($PartnerBeaconUrl)<img src='$PartnerBeaconUrl' height=1 width=1 border=0 style="display:none;"/>#end#if($IMBeaconUrl)<img src='$IMBeaconUrl' height=1 width=1 border=0 style="display:none;"/>#end</body></html>

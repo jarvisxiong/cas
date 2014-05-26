@@ -182,7 +182,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 @Override
                 public Response onCompleted(final Response response) throws Exception {
                     latency = System.currentTimeMillis() - startTime;
-                    MDC.put("onCompleted requestId", String.format("0x%08x", serverChannel.hashCode()));
+                    MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
                     LOG.debug("isTraceEnabled {} scope : {}", isTraceEnabled, scope);
 
                     if (isTraceEnabled) {
@@ -222,8 +222,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     }
 
                     LOG.error("error while fetching response from: {} {}", getName(), t);
-                    t.printStackTrace();
-                    System.err.println("exception" + t);
 
                     if (isRequestComplete) {
                         return;
