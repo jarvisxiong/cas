@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -61,7 +62,7 @@ public class AuctionEngine implements AuctionEngineInterface {
 
         LOG.debug("Inside RTB auction engine");
 
-        List<ChannelSegment> rtbList = auctionFilterApplier.applyFilters(rtbSegments, casInternalRequestParameters);
+        List<ChannelSegment> rtbList = auctionFilterApplier.applyFilters(new ArrayList<>(rtbSegments), casInternalRequestParameters);
 
         // Send null as auction response in case of 0 rtb responses.
         if (rtbList.size() == 0) {
