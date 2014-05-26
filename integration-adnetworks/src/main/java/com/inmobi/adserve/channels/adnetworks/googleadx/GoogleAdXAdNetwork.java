@@ -3,22 +3,22 @@ package com.inmobi.adserve.channels.adnetworks.googleadx;
 import com.google.common.base.Strings;
 
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.velocity.VelocityContext;
-import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -28,10 +28,11 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
 
   private static final Logger LOG = LoggerFactory.getLogger(GoogleAdXAdNetwork.class);
 
-  private static final String SCRIPT_END_PART = "<script type=\"text/javascript\" src=\"//pagead2.googlesyndication.com/pagead/show_ads.js\"></script>";
-  private static final String GOOGLE_INMOBI_PUBID = "ca-pub-7457767528341420";
+  private static final String SCRIPT_END_PART = "<script type=\"text/javascript\" "
+                                                + "src=\"//pagead2.googlesyndication.com/pagead/show_ads.js\"></script>";
 
-  private String siteId = null;
+  private String googleInMobiPubID = null;
+  private String googleAdUnitID = null;
   private int width, height;
 
   public GoogleAdXAdNetwork(final Configuration config,
@@ -41,23 +42,40 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
     super(config, clientBootstrap, baseRequestHandler, serverChannel);
   }
 
-  @Override
-  public boolean configureParameters() {
+  protected boolean configureParameters() {
+    googleInMobiPubID = config.getString("googleadx.googleAdXPublisherID");
 
     if (sasParams.getSlot() != null
-                            && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
+        && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
       Dimension dim = SlotSizeMapping.getDimension((long) sasParams
           .getSlot());
       width = (int) Math.ceil(dim.getWidth());
       height = (int) Math.ceil(dim.getHeight());
     }
 
-    if (!Strings.isNullOrEmpty(sasParams.getSiteId())) {
-      siteId = sasParams.getSiteId();
+    if (!Strings.isNullOrEmpty(entity.getExternalSiteKey())) {
+      googleAdUnitID = entity.getExternalSiteKey();
     }
 
     LOG.debug("Configure parameters inside GoogleAdX returned true");
     return true;
+  }
+
+  @Override
+  public boolean configureParameters(final SASRequestParameters param,
+                                     final CasInternalRequestParameters casInternalRequestParameters,
+                                     final ChannelSegmentEntity entity,
+                                     final String clickUrl, final String beaconUrl) {
+    this.sasParams = param;
+    this.casInternalRequestParameters = casInternalRequestParameters;
+    this.externalSiteId = entity.getExternalSiteKey();
+    this.slot = sasParams.getSlot();
+    this.clickUrl = clickUrl;
+    this.beaconUrl = beaconUrl;
+    this.impressionId = param.getImpressionId();
+    this.blindedSiteId = getBlindedSiteId(param.getSiteIncId(), entity.getAdgroupIncId());
+    this.entity = entity;
+    return configureParameters();
   }
 
   @Override
@@ -76,8 +94,8 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
     VelocityContext context = new VelocityContext();
 
     StringBuffer sb = new StringBuffer("<script type=\"text/javascript\">");
-    sb.append("google_ad_client = \"").append(GOOGLE_INMOBI_PUBID).append("\";");
-    sb.append("google_ad_slot = \"").append(siteId).append("\";");
+    sb.append("google_ad_client = \"").append(googleInMobiPubID).append("\";");
+    sb.append("google_ad_slot = \"").append(googleAdUnitID).append("\";");
     sb.append("google_ad_width = \"").append(width).append("\";");
     sb.append("google_ad_height = \"").append(height).append("\";");
     sb.append("</script>");
@@ -86,7 +104,7 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
     context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, sb.toString());
     try {
       responseContent = Formatter.getResponseFromTemplate(
-          TemplateType.HTML, context, sasParams, beaconUrl);
+          TemplateType.WAP_HTML_JS_AD_TAG, context, sasParams, beaconUrl);
       adStatus = "AD";
     } catch (Exception exception) {
       adStatus = "NO_AD";
@@ -103,7 +121,6 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
 
   @Override
   public URI getRequestUri() throws Exception {
-    // TODO Auto-generated method stub
     return null;
   }
 }
