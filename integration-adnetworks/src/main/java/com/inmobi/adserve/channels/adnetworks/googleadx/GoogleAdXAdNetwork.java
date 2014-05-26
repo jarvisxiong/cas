@@ -13,6 +13,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,8 +83,13 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
 
     context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, sb.toString());
     try {
+      TemplateType templateType = TemplateType.HTML;
+      if (StringUtils.isBlank(sasParams.getSource()) || "WAP".equalsIgnoreCase(sasParams.getSource())) {
+        templateType = TemplateType.WAP_HTML_JS_AD_TAG;
+      }
+
       responseContent = Formatter.getResponseFromTemplate(
-          TemplateType.WAP_HTML_JS_AD_TAG, context, sasParams, beaconUrl);
+          templateType, context, sasParams, beaconUrl);
       adStatus = "AD";
     } catch (Exception exception) {
       adStatus = "NO_AD";
