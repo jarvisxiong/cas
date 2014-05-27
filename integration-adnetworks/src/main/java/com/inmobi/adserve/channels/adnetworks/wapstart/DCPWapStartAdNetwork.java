@@ -153,6 +153,12 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
             return;
         }
         else {
+        	//TODO fix me
+        	if(response.trim().length() < 50){
+        		adStatus = "NO_AD";
+        		statusCode = 500;
+        		return;
+        	}
             statusCode = status.code();
             VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
