@@ -93,7 +93,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
     public URI getRequestUri() throws Exception {
         try {
             StringBuilder url = new StringBuilder(host);
-            url.append("?version=2&encoding=1&area=viewBannerXml&ip=").append(sasParams.getRemoteHostIp());
+            url.append("?version=2&encoding=1&area=viewBanner&ip=").append(sasParams.getRemoteHostIp());
             url.append("&id=").append(externalSiteId);
             String bsiteId = StringUtils.replace(blindedSiteId, "-", "");
             url.append("&pageId=00000000").append(bsiteId);
@@ -112,6 +112,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
                 url.append("&location=")
                         .append(getURLEncode(String.format(latlongFormat, latitude, longitude), format));
             }
+            url.append("&callbackurl=").append(getURLEncode(clickUrl, format));
 
             LOG.debug("WapStart url is {}", url);
 
@@ -142,71 +143,32 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
-        LOG.debug("response is {}", response);
-
-        if (null == response || status.code() != 200 || response.trim().isEmpty()) {
+        LOG.debug("response is {} and response length is {}", response, response.length());
+        if (status.code() != 200 || StringUtils.isBlank(response)) {
             statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
             }
             responseContent = "";
+            return;
         }
         else {
+            statusCode = status.code();
+            VelocityContext context = new VelocityContext();
+            context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
+
             try {
-                VelocityContext context = new VelocityContext();
-                TemplateType t = null;
-                Document doc = documentBuilderHelper.parse(response);
-                doc.getDocumentElement().normalize();
-                NodeList reportNodes = doc.getElementsByTagName("banner");
-
-                Node rootNode = reportNodes.item(0);
-                if (rootNode.getNodeType() == Node.ELEMENT_NODE) {
-                    Element rootElement = (Element) rootNode;
-
-                    Element partnerClickUrl = (Element) rootElement.getElementsByTagName("link").item(0);
-                    Element partnerBeaconElement = (Element) rootElement.getElementsByTagName("cookieSetterUrl")
-                            .item(0);
-
-                    String partnerBeacon = partnerBeaconElement.getTextContent();
-                    if (StringUtils.isNotEmpty(partnerBeacon)) {
-                        context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, partnerBeacon);
-                    }
-
-                    context.put(VelocityTemplateFieldConstants.PartnerClickUrl, partnerClickUrl.getTextContent());
-                    context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
-
-                    Element pictureUrl = (Element) rootElement.getElementsByTagName("pictureUrl").item(0);
-                    String pictureUrlTxt = pictureUrl.getTextContent();
-                    if (StringUtils.isNotEmpty(pictureUrlTxt)) {
-                        context.put(VelocityTemplateFieldConstants.PartnerImgUrl, pictureUrlTxt);
-                        t = TemplateType.IMAGE;
-                    }
-                    else {
-                        Element title = (Element) rootElement.getElementsByTagName("title").item(0);
-                        Element description = (Element) rootElement.getElementsByTagName("content").item(0);
-                        context.put(VelocityTemplateFieldConstants.AdText, title.getTextContent());
-                        context.put(VelocityTemplateFieldConstants.Description, description.getTextContent());
-                        String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
-                        if (!StringUtils.isEmpty(vmTemplate)) {
-                            context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
-                            t = TemplateType.RICH;
-                        }
-                        else {
-                            t = TemplateType.PLAIN;
-                        }
-                    }
-                }
-
-                statusCode = status.code();
-                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
-                adStatus = "AD";
+                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
             }
             catch (Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from WapStart : {}", exception);
+                LOG.info("Error parsing response from Wapstart : {}", exception);
                 LOG.info("Response from WapStart: {}", response);
+                return;
             }
+            adStatus = "AD";
         }
+        LOG.debug("response length is {}", responseContent.length());
     }
 
     @Override
