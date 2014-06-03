@@ -70,6 +70,17 @@ public class FormatterTest {
     }
 
     @Test
+    public void testupdateVelocityContextWithAppAndNoSDK() {
+        SASRequestParameters sasParams = new SASRequestParameters();
+        sasParams.setSource("APP");
+        VelocityContext context = new VelocityContext();
+        Formatter.updateVelocityContext(context, sasParams, null);
+        assertNull(context.get(VelocityTemplateFieldConstants.SDK));
+        assertNull(context.get(VelocityTemplateFieldConstants.SDK360Onwards));
+        assertNull(context.get(VelocityTemplateFieldConstants.IMAIBaseUrl));
+    }
+    
+    @Test
     public void testupdateVelocityContextWithBeaconUrlAndAppRequestNonIMAI() {
         SASRequestParameters sasParams = new SASRequestParameters();
         sasParams.setSource("APP");
