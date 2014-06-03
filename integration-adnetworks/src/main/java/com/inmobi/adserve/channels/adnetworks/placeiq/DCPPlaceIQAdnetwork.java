@@ -147,7 +147,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
                 return false;
             }
         }
-        else if (sasParams.getOsId() == HandSetOS.iPhone_OS.getValue()) { // iPhone
+        else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) { // iPhone
             os = IOS;
             isApp = true;
             if (StringUtils.isEmpty(casInternalRequestParameters.uidIFA)) {

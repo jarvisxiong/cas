@@ -435,7 +435,7 @@ public class AdNetworksTest extends TestCase {
         casInternalRequestParameters.uid = "1234";
         casInternalRequestParameters.uidIFA = "dfjksahfdjksahdkaw2e23231";
         sasParams.setCountryCode("us");
-        sasParams.setOsId(HandSetOS.iPhone_OS.getValue());
+        sasParams.setOsId(HandSetOS.iOS.getValue());
         String externalKey = "118398";
         sasParams.setSiteIncId(18);
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(openxAdvertiserId, null,
@@ -459,7 +459,7 @@ public class AdNetworksTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "1234";
         casInternalRequestParameters.uidO1 = "dfjksahfdjksahdkaw2e23231";
-        sasParams.setOsId(HandSetOS.iPhone_OS.getValue());
+        sasParams.setOsId(HandSetOS.iOS.getValue());
         sasParams.setCountryCode("us");
         String externalKey = "118398";
         sasParams.setSiteIncId(18);
@@ -720,7 +720,7 @@ public class AdNetworksTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         sasParams.setCategories(new ArrayList<Long>());
         casInternalRequestParameters.uid = "1234";
-        sasParams.setOsId(HandSetOS.iPhone_OS.getValue());
+        sasParams.setOsId(HandSetOS.iOS.getValue());
         casInternalRequestParameters.uidIFA = "dac95d86b46afdce78e1b36c082fda03";
         casInternalRequestParameters.uidADT = "0";
         sasParams

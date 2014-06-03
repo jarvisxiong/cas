@@ -84,7 +84,7 @@ public class SASRequestParameters {
         Linux_Smartphone_OS(2),
         Android(3),
         Nokia_OS(4),
-        iPhone_OS(5),
+        iOS(5),
         RIM_OS(6),
         MTK_Nucleus_OS(7),
         Symbian_OS(8),

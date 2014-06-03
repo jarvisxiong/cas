@@ -106,7 +106,7 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
 
 		if (WAP.equalsIgnoreCase(sasParams.getSource())) {
 			portalKeyword = WAP_KEYWORD;
-		} else if (sasParams.getOsId() == HandSetOS.iPhone_OS.getValue()) {
+		} else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
 			portalKeyword = IPHONE_KEYWORD;
 		} else if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
 			if (StringUtils.isBlank(sasParams.getSdkVersion())
@@ -154,7 +154,7 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
 			}
 
 			if (!"wap".equalsIgnoreCase(sasParams.getSource())) {
-				if (sasParams.getOsId() == HandSetOS.iPhone_OS.getValue()) {
+				if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
 					if (casInternalRequestParameters.uidIFA != null) {
 						url.append("&uis=a&ui=").append(
 								casInternalRequestParameters.uidIFA);

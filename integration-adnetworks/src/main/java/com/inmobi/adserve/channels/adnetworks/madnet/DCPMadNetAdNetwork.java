@@ -105,7 +105,7 @@ public class DCPMadNetAdNetwork extends AbstractDCPAdNetworkImpl {
                 url.append("&gps=").append(getURLEncode(casInternalRequestParameters.latLong, format));
             }
 
-            if (sasParams.getOsId() == HandSetOS.iPhone_OS.getValue()) {
+            if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
                 if (casInternalRequestParameters.uidIFA != null) {
                     url.append("&idfa=").append(casInternalRequestParameters.uidIFA);
                     url.append("&idfatracking=").append(casInternalRequestParameters.uidADT);

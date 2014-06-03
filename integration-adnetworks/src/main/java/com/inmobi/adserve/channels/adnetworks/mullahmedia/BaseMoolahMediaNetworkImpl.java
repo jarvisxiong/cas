@@ -245,7 +245,7 @@ public abstract class BaseMoolahMediaNetworkImpl extends AbstractDCPAdNetworkImp
      */
     @Override
     protected String getUid() {
-        if (sasParams.getOsId() == HandSetOS.iPhone_OS.getValue()
+        if (sasParams.getOsId() == HandSetOS.iOS.getValue()
                 && StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
             return casInternalRequestParameters.uidIFA;
         }

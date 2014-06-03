@@ -82,7 +82,7 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
         finalUrl.append("&zip=").append(casInternalRequestParameters.zipCode).append("&c.siteId=")
                 .append(blindedSiteId);
 
-        if (HandSetOS.iPhone_OS.getValue() == sasParams.getOsId()) {
+        if (HandSetOS.iOS.getValue() == sasParams.getOsId()) {
             finalUrl.append("&did.ia=").append(casInternalRequestParameters.uidIFA);
             finalUrl.append("&did.iat=").append(casInternalRequestParameters.uidADT);
             finalUrl.append("&did.o1=").append(casInternalRequestParameters.uidO1);
