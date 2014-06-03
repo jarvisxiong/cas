@@ -38,7 +38,7 @@ public class DCPMoPubAdNetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
 
-        if (HandSetOS.iPhone_OS.getValue() == sasParams.getOsId()) {
+        if (HandSetOS.iOS.getValue() == sasParams.getOsId()) {
             if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
                 deviceId = "ifa:" + casInternalRequestParameters.uidIFA + "&dnt=" + casInternalRequestParameters.uidADT;
             }

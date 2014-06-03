@@ -76,7 +76,7 @@ public class DCPVerveAdapterTest extends TestCase {
 		casInternalRequestParameters.latLong = "37.4429,-122.1514";
 		sasParams.setSlot(Short.valueOf("9"));
 		casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-		sasParams.setOsId(HandSetOS.iPhone_OS.getValue());
+		sasParams.setOsId(HandSetOS.iOS.getValue());
 		String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
 		sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
 		String externalKey = "f6wqjq1r5v";
@@ -101,7 +101,7 @@ public class DCPVerveAdapterTest extends TestCase {
 		casInternalRequestParameters.latLong = "37.4429,-122.1514";
 		sasParams.setSlot(Short.valueOf("9"));
 		casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-		sasParams.setOsId(HandSetOS.iPhone_OS.getValue());
+		sasParams.setOsId(HandSetOS.iOS.getValue());
 		String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
 		sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
 		String externalKey = "f6wqjq1r5v";
@@ -128,7 +128,7 @@ public class DCPVerveAdapterTest extends TestCase {
 		casInternalRequestParameters.latLong = "37.4429,-122.1514";
 		sasParams.setSlot(Short.valueOf("9"));
 		casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-		sasParams.setOsId(HandSetOS.iPhone_OS.getValue());
+		sasParams.setOsId(HandSetOS.iOS.getValue());
 		String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
 		sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
 		String externalKey = "f6wqjq1r5v";
@@ -268,7 +268,7 @@ public class DCPVerveAdapterTest extends TestCase {
 		sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
 		casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
 		sasParams.setSlot(Short.valueOf("9"));
-		sasParams.setOsId(HandSetOS.iPhone_OS.getValue());
+		sasParams.setOsId(HandSetOS.iOS.getValue());
 		sasParams.setLocSrc("true-lat-lon");
 		String externalKey = "1324";
 		SlotSizeMapping.init();
@@ -299,7 +299,7 @@ public class DCPVerveAdapterTest extends TestCase {
 		sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
 		casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
 		sasParams.setSlot(Short.valueOf("10"));
-		sasParams.setOsId(HandSetOS.iPhone_OS.getValue());
+		sasParams.setOsId(HandSetOS.iOS.getValue());
 		sasParams.setLocSrc("derived-lat-lon");
 		String externalKey = "1324";
 		SlotSizeMapping.init();

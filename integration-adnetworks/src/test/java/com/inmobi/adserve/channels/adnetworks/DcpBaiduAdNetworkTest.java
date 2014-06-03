@@ -77,7 +77,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setSlot((short) 11);
-        sasParams.setOsId(HandSetOS.iPhone_OS.getValue());
+        sasParams.setOsId(HandSetOS.iOS.getValue());
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
@@ -99,7 +99,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setSlot((short) 11);
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setOsId(HandSetOS.iPhone_OS.getValue());
+        sasParams.setOsId(HandSetOS.iOS.getValue());
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.latLong = "37.4429,-122.1514";

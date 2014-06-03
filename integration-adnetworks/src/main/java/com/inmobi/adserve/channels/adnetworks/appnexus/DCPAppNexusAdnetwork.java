@@ -92,7 +92,7 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
         }
 
         if (sasParams.getOsId() == HandSetOS.Android.getValue()
-                || sasParams.getOsId() == HandSetOS.iPhone_OS.getValue()) {
+                || sasParams.getOsId() == HandSetOS.iOS.getValue()) {
             isApp = true;
         }
         else {
@@ -145,7 +145,7 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
                 }
 
             }
-            if (sasParams.getOsId() == HandSetOS.iPhone_OS.getValue()) {
+            if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
                 if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
                     appendQueryParam(url, ODIN1, getURLEncode(casInternalRequestParameters.uidO1, format), false);
                 }

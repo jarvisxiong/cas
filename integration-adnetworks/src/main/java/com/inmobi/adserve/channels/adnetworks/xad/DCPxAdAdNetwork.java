@@ -221,7 +221,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 	 * @return
 	 */
 	private void setDeviceIdandType() {
-		if (sasParams.getOsId() == HandSetOS.iPhone_OS.getValue()) {
+		if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
 			if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
 				deviceId = casInternalRequestParameters.uidIFA;
 				deviceIdType = IDFA_PLAIN;
