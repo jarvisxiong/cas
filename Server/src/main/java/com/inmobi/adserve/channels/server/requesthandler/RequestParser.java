@@ -230,8 +230,16 @@ public class RequestParser {
         String utf8 = "UTF-8";
         try {
             JSONObject userMap = (JSONObject) jObject.get("uparams");
-            parameter.setAge(Short.valueOf(stringify(userMap, "u-age")));
-            parameter.setGender(stringify(userMap, "u-gender"));
+            Short age = Short.valueOf(stringify(userMap, "u-age"));
+            if(age > 15 && age < 100){
+                parameter.setAge(age);
+            }
+            
+            String gender = stringify(userMap, "u-gender");
+            if(StringUtils.isNotEmpty(gender)&&(gender.equalsIgnoreCase("M")||gender.equalsIgnoreCase("F")))
+            {
+                parameter.setGender(gender);
+            }
             parameter.setPostalCode(Integer.parseInt(stringify(userMap, "u-postalcode")));
             try {
                 if (null != parameter.getAge()) {
