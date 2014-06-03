@@ -90,7 +90,7 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
 
         }
 
-        if (sasParams.getOsId() == HandSetOS.iPhone_OS.getValue()) {
+        if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
             os = IOS;
         }
         else if (sasParams.getOsId() == HandSetOS.Android.getValue()) {

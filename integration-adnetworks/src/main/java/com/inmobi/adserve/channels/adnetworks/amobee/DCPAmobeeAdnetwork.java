@@ -86,7 +86,7 @@ public class DCPAmobeeAdnetwork extends AbstractDCPAdNetworkImpl {
             client = 1;
 
         }
-        else if (sasParams.getOsId() == HandSetOS.iPhone_OS.getValue()) { // iPhone
+        else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) { // iPhone
             client = 2;
         }
         LOG.info("Configure parameters inside amobee returned true");

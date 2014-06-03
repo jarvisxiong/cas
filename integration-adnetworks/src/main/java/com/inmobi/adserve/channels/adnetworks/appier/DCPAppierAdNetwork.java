@@ -89,7 +89,7 @@ public class DCPAppierAdNetwork extends AbstractDCPAdNetworkImpl {
         if (sasParams.getOsId() == HandSetOS.Android.getValue()) { // android
             os = "android";
         }
-        else if (sasParams.getOsId() == HandSetOS.iPhone_OS.getValue()) { // iPhone
+        else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) { // iPhone
             os = "ios";
         }
         sourceType = (StringUtils.isBlank(sasParams.getSource()) || "WAP".equalsIgnoreCase(sasParams.getSource())) ? "1"

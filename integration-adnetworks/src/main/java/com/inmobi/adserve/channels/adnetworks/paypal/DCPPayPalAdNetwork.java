@@ -62,7 +62,7 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
         if (sasParams.getOsId() == HandSetOS.Android.getValue()
-                || sasParams.getOsId() == HandSetOS.iPhone_OS.getValue()) {
+                || sasParams.getOsId() == HandSetOS.iOS.getValue()) {
             deviceId = getUid();
             if (StringUtils.isBlank(deviceId) || deviceId == null) {
                 LOG.debug("mandate parameters missing for paypal, so returning from adapter");
@@ -110,7 +110,7 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
                 url.append("&zip=").append(casInternalRequestParameters.zipCode);
             }
 
-            if (sasParams.getOsId() == HandSetOS.iPhone_OS.getValue()) {
+            if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
                 if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
                     url.append("&idfa=").append(casInternalRequestParameters.uidIFA);
                     url.append("&ate=").append(casInternalRequestParameters.uidADT);

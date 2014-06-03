@@ -97,7 +97,7 @@ public class DrawBridgeAdNetwork extends AbstractDCPAdNetworkImpl {
         if (!(StringUtils.isEmpty(sasParams.getRemoteHostIp()) || sasParams.getRemoteHostIp().equals("null"))) {
             finalUrl.append("&_clip=").append(sasParams.getRemoteHostIp());
         }
-        if (sasParams.getOsId() == HandSetOS.iPhone_OS.getValue()) {
+        if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
             if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
                 finalUrl.append("&_ifa=").append(casInternalRequestParameters.uidIFA);
             }

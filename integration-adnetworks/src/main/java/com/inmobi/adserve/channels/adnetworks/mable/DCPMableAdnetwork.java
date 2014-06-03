@@ -200,7 +200,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     protected String getUid() {
-        if (sasParams.getOsId() == HandSetOS.iPhone_OS.getValue()
+        if (sasParams.getOsId() == HandSetOS.iOS.getValue()
                 && StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
             uidType = ifaFormat;
             return casInternalRequestParameters.uidIFA;
