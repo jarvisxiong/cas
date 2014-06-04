@@ -68,6 +68,20 @@ public class Logging {
             final SASRequestParameters sasParams, String terminationReason, final long totalTime) throws JSONException,
             TException {
         InspectorStats.incrementStatCount(InspectorStrings.latency, totalTime);
+
+        if (null != sasParams) {
+            DemandSourceType dst = getDst(sasParams.getDst());
+            InspectorStats.incrementStatCount(dst + "-" +InspectorStrings.latency, totalTime);
+            if (null != sasParams.getAllParametersJson() && (rankList == null || rankList.isEmpty())) {
+                InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.nomatchsegmentcount);
+                InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.nomatchsegmentlatency, totalTime);
+                InspectorStats.incrementStatCount(InspectorStrings.nomatchsegmentcount);
+                InspectorStats.incrementStatCount(InspectorStrings.nomatchsegmentlatency, totalTime);
+            }
+        }
+
+
+
         boolean isTerminated = false;
         if (null != terminationReason) {
             isTerminated = true;

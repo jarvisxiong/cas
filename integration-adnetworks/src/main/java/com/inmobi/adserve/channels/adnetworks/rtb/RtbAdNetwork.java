@@ -341,15 +341,15 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
                 && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
             String[] latlong = casInternalRequestParameters.latLong.split(",");
-            geo.setLat(Float.parseFloat(latlong[0]));
-            geo.setLon(Float.parseFloat(latlong[1]));
+            geo.setLat(Float.parseFloat(String.format("%.2f", Float.parseFloat(latlong[0]))));
+            geo.setLon(Float.parseFloat(String.format("%.2f", Float.parseFloat(latlong[1]))));
         }
         if (null != sasParams.getCountryCode()) {
             geo.setCountry(iabCountriesInterface.getIabCountry(sasParams.getCountryCode()));
         }
-        if (null != iabCitiesInterface.getIABCity(sasParams.getCity() + "")) {
+        /*if (null != iabCitiesInterface.getIABCity(sasParams.getCity() + "")) {
             geo.setCity(iabCitiesInterface.getIABCity(sasParams.getCity() + ""));
-        }
+        }*/
         geo.setZip(casInternalRequestParameters.zipCode);
         // Setting type of geo data
         if ("DERIVED_LAT_LON".equalsIgnoreCase(sasParams.getLocSrc())) {
@@ -363,7 +363,12 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     private User createUserObject() {
         User user = new User();
-        user.setGender(sasParams.getGender());
+        String gender = sasParams.getGender();
+        if ( StringUtils.isNotEmpty(gender)&&(gender.equalsIgnoreCase("M")||gender.equalsIgnoreCase("F")));
+        {
+            user.setGender(sasParams.getGender());  
+        }
+        
         if (casInternalRequestParameters.uid != null) {
             user.setId(casInternalRequestParameters.uid);
             user.setBuyeruid(casInternalRequestParameters.uid);
@@ -372,9 +377,12 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         try {
             if (sasParams.getAge() != null) {
                 int age = sasParams.getAge();
+                if ((age>15)&&(age<100))
+                {
                 int year = Calendar.getInstance().get(Calendar.YEAR);
                 int yob = year - age;
                 user.setYob(yob);
+            }
             }
         }
         catch (NumberFormatException e) {
@@ -446,13 +454,13 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         
         if(StringUtils.isNotBlank(sasParams.getOsMajorVersion())){
-        	device.setOsv(sasParams.getOsMajorVersion());
+            device.setOsv(sasParams.getOsMajorVersion());
         }
         if(NetworkType.WIFI == sasParams.getNetworkType()){
-        	device.setConnectiontype(2);
+            device.setConnectiontype(2);
         }
         else{
-        	device.setConnectiontype(0);
+            device.setConnectiontype(0);
         }
         // Setting do not track
         if (null != casInternalRequestParameters.uidADT) {
