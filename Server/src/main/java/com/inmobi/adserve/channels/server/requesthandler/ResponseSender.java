@@ -66,7 +66,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private boolean                     requestCleaned;
     public CasInternalRequestParameters casInternalRequestParameters;
     private final AuctionEngine         auctionEngine;
-    private static Set<String>          supportedResponseFormats   = Sets.newHashSet("html", "xhtml", "axml", "imai");
     private final Object                lock                       = new Object();
     private String                      terminationReason;
 

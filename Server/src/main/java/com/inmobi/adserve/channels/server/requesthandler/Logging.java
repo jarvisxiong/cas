@@ -72,16 +72,15 @@ public class Logging {
         if (null != sasParams) {
             DemandSourceType dst = getDst(sasParams.getDst());
             InspectorStats.incrementStatCount(dst + "-" +InspectorStrings.latency, totalTime);
-            if (rankList == null || rankList.size() < 1) {
+            if (null != sasParams.getAllParametersJson() && (rankList == null || rankList.isEmpty())) {
                 InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.nomatchsegmentcount);
                 InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.nomatchsegmentlatency, totalTime);
+                InspectorStats.incrementStatCount(InspectorStrings.nomatchsegmentcount);
+                InspectorStats.incrementStatCount(InspectorStrings.nomatchsegmentlatency, totalTime);
             }
         }
 
-        if (rankList == null || rankList.size() < 1) {
-            InspectorStats.incrementStatCount(InspectorStrings.nomatchsegmentcount);
-            InspectorStats.incrementStatCount(InspectorStrings.nomatchsegmentlatency, totalTime);
-        }
+
 
         boolean isTerminated = false;
         if (null != terminationReason) {
