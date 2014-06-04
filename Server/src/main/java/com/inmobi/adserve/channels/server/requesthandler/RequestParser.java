@@ -231,7 +231,6 @@ public class RequestParser {
         try {
             JSONObject userMap = (JSONObject) jObject.get("uparams");
             parameter.setAge(Short.valueOf(stringify(userMap, "u-age")));
-            
             parameter.setGender(stringify(userMap, "u-gender"));
             parameter.setPostalCode(Integer.parseInt(stringify(userMap, "u-postalcode")));
             try {
