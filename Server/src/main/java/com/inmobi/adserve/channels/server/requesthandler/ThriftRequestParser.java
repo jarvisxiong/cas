@@ -27,6 +27,7 @@ import com.inmobi.adserve.adpool.UidParams;
 import com.inmobi.adserve.adpool.UidType;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.types.Gender;
 import com.inmobi.types.InventoryType;
 
 
@@ -132,10 +133,23 @@ public class ThriftRequestParser {
             // TODO Change age to integer in DCP
             int currentYear = (short) Calendar.getInstance().get(Calendar.YEAR);
             int yob = tObject.user.yearOfBirth;
-            int age = currentYear - yob;
-            params.setAge((short) age);
-            String gender = null != tObject.user.gender ? tObject.user.gender.name() : "Male";
-            params.setGender(gender.equalsIgnoreCase("Male") ? "M" : "F");
+            //Condition to check whether user's age is less than 100
+            if ((yob>currentYear-100) && (yob<currentYear))
+            {
+                int age = currentYear - yob;
+                params.setAge((short) age);
+            }
+            if(null != tObject.user.gender ){
+                switch(tObject.user.gender){
+                    case FEMALE: params.setGender("F");
+                        break;
+                    case MALE: params.setGender("M");
+                        break;
+                    default:params.setGender(null);
+                        break;
+                }
+                
+            }
         }
 
         // Fill params from UIDParams Object

@@ -364,9 +364,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private User createUserObject() {
         User user = new User();
         String gender = sasParams.getGender();
-        if ( StringUtils.isNotEmpty(gender)&&(gender.equalsIgnoreCase("M")||gender.equalsIgnoreCase("F")));
+        if ( StringUtils.isNotEmpty(gender));
         {
-            user.setGender(sasParams.getGender());  
+            user.setGender(gender);  
         }
         
         if (casInternalRequestParameters.uid != null) {
@@ -377,12 +377,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         try {
             if (sasParams.getAge() != null) {
                 int age = sasParams.getAge();
-                if ((age>15)&&(age<100))
-                {
                 int year = Calendar.getInstance().get(Calendar.YEAR);
                 int yob = year - age;
                 user.setYob(yob);
-            }
             }
         }
         catch (NumberFormatException e) {
