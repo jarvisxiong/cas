@@ -5,6 +5,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -15,6 +16,8 @@ public class MetricsManager {
     private static Map<Integer/* country */, ConcurrentHashMap<Integer/* os */, ConcurrentHashMap<String/* advertiserName */, RealTimeStats>>> realTimeCountryOsAdvertiserStats = new ConcurrentHashMap<Integer, ConcurrentHashMap<Integer, ConcurrentHashMap<String, RealTimeStats>>>();
     private static Map<Integer/* country */, ConcurrentHashMap<Integer/* os */, RealTimeStats>>                                                realTimeCountryOsStats           = new ConcurrentHashMap<Integer, ConcurrentHashMap<Integer, RealTimeStats>>();
     private static Map<Integer/* country */, RealTimeStats>                                                                                    realTimeCountryStats             = new ConcurrentHashMap<Integer, RealTimeStats>();
+    private static Map<String, RealTimeStats> dstRealTimeStats = new HashMap<>();
+
 
     public static void init(String graphiteServer, int graphitePort, int graphiteInterval) {
         String metricProducer;
@@ -65,6 +68,15 @@ public class MetricsManager {
             realTimeCountryStats.put(countryId, realTimeStats);
         }
         return realTimeCountryStats.get(countryId);
+    }
+
+    public static void updateLatency(String dst, long latency) {
+        if (null == dstRealTimeStats.get(dst)) {
+            RealTimeStats realTimeStats = new RealTimeStats(dst);
+            dstRealTimeStats.put(dst, realTimeStats);
+        }
+        RealTimeStats realTimeStats = dstRealTimeStats.get(dst);
+        realTimeStats.getLatency().update(latency);
     }
 
     public static void updateStats(Long countryId, String countryName, int osId, String osName, String advertiserName,
