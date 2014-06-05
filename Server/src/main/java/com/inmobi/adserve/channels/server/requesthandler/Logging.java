@@ -458,7 +458,7 @@ public class Logging {
                 sampledAdvertiserLogNos.put(partnerName + extsiteKey, time + "_" + count);
             }
             if (enableDatabusLogging) {
-                if (count >= totalCount) {
+                if (count > totalCount) {
                     continue;
                 }
                 CasAdvertisementLog casAdvertisementLog = new CasAdvertisementLog(partnerName, requestUrl, response, adstatus, extsiteKey, advertiserId);
@@ -472,6 +472,7 @@ public class Logging {
                 }
                 if (null != msg) {
                     dataBusPublisher.publish(sampledAdvertisementLogKey, msg);
+                    LOG.debug("sampledAdvertiser log pushed to stream");
                 }
             }
         }
