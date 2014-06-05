@@ -139,7 +139,9 @@ public class ThriftRequestParser {
                 int age = currentYear - yob;
                 params.setAge((short) age);
             }
-            if(null != tObject.user.gender ){
+            String gender = null != tObject.user.gender ? tObject.user.gender.name() : "Male";
+            params.setGender(gender.equalsIgnoreCase("Male") ? "M" : "F");
+            /*if(null != tObject.user.gender ){
                 switch(tObject.user.gender){
                     case FEMALE: params.setGender("F");
                         break;
@@ -149,7 +151,7 @@ public class ThriftRequestParser {
                         break;
                 }
                 
-            }
+            }*/
         }
 
         // Fill params from UIDParams Object
