@@ -217,6 +217,10 @@ public class Logging {
             LOG.debug("ADRR is : {}", adRR);
         }
         // Logging real time stats for graphite
+        if (null != sasParams) {
+            DemandSourceType dst = getDst(sasParams.getDst());
+            MetricsManager.updateLatency(dst.name(), totalTime);
+        }
         String osName = "";
         try {
             if (null != sasParams && null != advertiserId && null != impression && null != impression.getAd()) {
