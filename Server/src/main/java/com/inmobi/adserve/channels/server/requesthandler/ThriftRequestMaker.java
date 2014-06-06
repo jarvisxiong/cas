@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
 import com.inmobi.adserve.adpool.*;
+import com.inmobi.phoenix.batteries.util.WilburyUUID;
 import com.inmobi.types.ContentRating;
 import com.inmobi.types.InventoryType;
 import com.inmobi.types.LocationSource;
@@ -23,16 +24,27 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class ThriftRequestMaker {
     private static final URLCodec urlCodec = new URLCodec();
+    static AtomicInteger atomicInteger = new AtomicInteger();
+
+    private static String getImpressionId() {
+        String uuidIntKey = (WilburyUUID.setIntKey(WilburyUUID.getUUID().toString(), 12)).toString();
+        String uuidMachineKey = (WilburyUUID.setMachineId(uuidIntKey, (short)2003)).toString();
+        String uuidWithCyclicCounter = (WilburyUUID.setCyclicCounter(uuidMachineKey, (byte) atomicInteger.getAndIncrement())).toString();
+        return (WilburyUUID.setDataCenterId(uuidWithCyclicCounter, (byte) 123)).toString();
+    }
 
     public static void main(final String[] args) throws Exception {
         /*
         Integer adIncId = WilburyUUID.getIntKey("227ee495-0146-1000-2251-e49510070000");
         System.out.println("ad_inc_id " + adIncId);
         */
+        System.out.println(WilburyUUID.getCyclicCounter(getImpressionId()));
+        System.out.println(WilburyUUID.getCyclicCounter(getImpressionId()));
 
         AdPoolRequest adPoolRequest = createAdPoolRequest();
         System.out.println("Request is : " + adPoolRequest);
