@@ -658,6 +658,10 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             final String paramValue, final boolean isFirstParam) {
         return builder.append(isFirstParam ? '?' : '&').append(paramName).append('=').append(paramValue);
     }
+    protected StringBuilder appendQueryParam(final StringBuilder builder, final String paramName,
+            final double paramValue, final boolean isFirstParam) {
+        return builder.append(isFirstParam ? '?' : '&').append(paramName).append('=').append(paramValue);
+    }
     
 
     @Override
