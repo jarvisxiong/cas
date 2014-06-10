@@ -4,11 +4,18 @@ package com.inmobi.adserve.channels.server.constants;
  * @author abhishek.parwal
  * 
  */
-public enum ChannelSegmentFilterOrder {
+public enum FilterOrder {
 
     FIRST(0),
     SECOND(1),
     THIRD(2),
+    FOURTH(3),
+    FIFTH(4),
+    SIXTH(5),
+    SEVENTH(6),
+    EIGHT(7),
+    NINTH(8),
+    TENTH(9),
     DEFAULT(100),
     THIRD_LAST(998),
     SECOND_LAST(999),
@@ -16,7 +23,7 @@ public enum ChannelSegmentFilterOrder {
 
     private int value;
 
-    private ChannelSegmentFilterOrder(final int value) {
+    private FilterOrder(final int value) {
         this.value = value;
     }
 

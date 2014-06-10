@@ -1,16 +1,5 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import io.netty.channel.Channel;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
-import org.apache.commons.configuration.Configuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
@@ -24,11 +13,22 @@ import com.inmobi.adserve.channels.server.SegmentFactory;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
+import io.netty.channel.Channel;
+import org.apache.commons.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Singleton
 public class AsyncRequestMaker {
     private static final Logger  LOG = LoggerFactory.getLogger(AsyncRequestMaker.class);
+    private static final AtomicInteger counter = new AtomicInteger();
 
     private final SegmentFactory segmentFactory;
 
@@ -135,6 +135,8 @@ public class AsyncRequestMaker {
         }
         casInternalRequestParameters.latLong = sasParams.getLatLong();
         casInternalRequestParameters.appUrl = sasParams.getAppUrl();
+        casInternalRequestParameters.traceEnabled = casInternalRequestParameterGlobal.traceEnabled;
+        casInternalRequestParameters.siteAccountType = casInternalRequestParameterGlobal.siteAccountType;
         return casInternalRequestParameters;
     }
 
@@ -197,7 +199,8 @@ public class AsyncRequestMaker {
     public String getImpressionId(final long adId) {
         String uuidIntKey = (WilburyUUID.setIntKey(WilburyUUID.getUUID().toString(), (int) adId)).toString();
         String uuidMachineKey = (WilburyUUID.setMachineId(uuidIntKey, ChannelServer.hostIdCode)).toString();
-        return (WilburyUUID.setDataCenterId(uuidMachineKey, ChannelServer.dataCenterIdCode)).toString();
+        String uuidWithCyclicCounter = (WilburyUUID.setCyclicCounter(uuidMachineKey, (byte) counter.getAndIncrement())).toString();
+        return (WilburyUUID.setDataCenterId(uuidWithCyclicCounter, ChannelServer.dataCenterIdCode)).toString();
     }
 
     private static ClickUrlMakerV6 setClickParams(final boolean pricingModel, final Configuration config,

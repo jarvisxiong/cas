@@ -118,8 +118,8 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
             if (casInternalRequestParameters.zipCode != null) {
                 appendQueryParam(url, ZIP, casInternalRequestParameters.zipCode, false);
             }
-            if (sasParams.getCountryId() != null) {
-                appendQueryParam(url, COUNTRY, sasParams.getCountryId().toString(), false);
+            if (sasParams.getCountryCode() != null) {
+                appendQueryParam(url, COUNTRY, sasParams.getCountryCode(), false);
             }
             if (width != 0 && height != 0) {
                 appendQueryParam(url, MIN_SIZE_X, (int) (width * .9) + "", false);

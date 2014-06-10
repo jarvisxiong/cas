@@ -1,7 +1,9 @@
 package com.inmobi.adserve.channels.api;
 
+import com.google.inject.Key;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.scope.NettyRequestScope;
 import com.inmobi.adserve.channels.util.*;
 import com.ning.http.client.*;
 import io.netty.bootstrap.Bootstrap;
@@ -16,6 +18,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.slf4j.Marker;
 
 import javax.inject.Inject;
 import java.io.UnsupportedEncodingException;
@@ -87,6 +90,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     @Inject
     protected static DocumentBuilderHelper        documentBuilderHelper;
+
+    @Inject
+    private static NettyRequestScope              scope;
 
     public BaseAdNetworkImpl(final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         this.baseRequestHandler = baseRequestHandler;
@@ -167,16 +173,27 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         }
 
         try {
-            String uri = getRequestUri().toString();
-            requestUrl = uri;
+            requestUrl = getRequestUri().toString();
             Request ningRequest = getNingRequest();
             LOG.debug("request : {}", ningRequest);
             startTime = System.currentTimeMillis();
+            final boolean isTraceEnabled = casInternalRequestParameters.traceEnabled;
             getAsyncHttpClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
                 @Override
                 public Response onCompleted(final Response response) throws Exception {
                     latency = System.currentTimeMillis() - startTime;
                     MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
+                    LOG.debug("isTraceEnabled {} scope : {}", isTraceEnabled, scope);
+
+                    if (isTraceEnabled) {
+                        scope.enter();
+                        try {
+                            scope.seed(Key.get(Marker.class), NettyRequestScope.TRACE_MAKER);
+                        }
+                        finally {
+                            scope.exit();
+                        }
+                    }
 
                     if (!isRequestCompleted()) {
                         LOG.debug("Operation complete for channel partner: {}", getName());
@@ -193,6 +210,16 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 public void onThrowable(final Throwable t) {
                     latency = System.currentTimeMillis() - startTime;
                     MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
+                    LOG.debug("onThrowable isTraceEnabled {} scope : {}", isTraceEnabled, scope);
+                    if (isTraceEnabled) {
+                        scope.enter();
+                        try {
+                            scope.seed(Key.get(Marker.class), NettyRequestScope.TRACE_MAKER);
+                        }
+                        finally {
+                            scope.exit();
+                        }
+                    }
 
                     LOG.error("error while fetching response from: {} {}", getName(), t);
 
@@ -218,7 +245,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     LOG.debug("{} error latency {}", getName(), latency);
                     adStatus = "TERM";
                     processResponse();
-                    return;
                 }
             });
         }
@@ -683,4 +709,40 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     public String getCurrency() {
         return "USD";
     }
+
+    @Override
+    public String getCreativeId() {
+        return null;
+    }
+
+    @Override
+    public String getIUrl() {
+        return null;
+    }
+
+    @Override
+    public List<Integer> getAttribute() {
+        return  null;
+    }
+
+    @Override
+    public List<String> getADomain() {
+        return null;
+    }
+
+    @Override
+    public boolean isLogCreative() {
+        return false;
+    }
+
+    @Override
+    public void setLogCreative(boolean logCreative) {
+        //
+    }
+
+    @Override
+    public String getAdMarkUp()  {
+      return null;
+    }
+
 }

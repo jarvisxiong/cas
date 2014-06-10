@@ -232,7 +232,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
+            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -250,6 +250,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams.setSlot(Short.valueOf("9"));
         List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
+        sasParams.setSource("APP");
         sasParams.setCategories(cat);
         String externalKey = "8a809449013c3c643cad82cb412b5857";
         SlotSizeMapping.init();
@@ -262,7 +263,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
+            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&d(id12)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -292,7 +293,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         "{\"pos\":\"leader\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=leader&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28iPad%3B+U%3B+CPU+OS+3_2+like+Mac+OS+X%3B+en-us%29+AppleWebKit%2F531.21.10+%28KHTML%2C+like+Gecko%29+Version%2F4.0.4+Mobile%2F7B334b+Safari%2F531.21.10&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB20&p(blind_id)=00000000-0000-0000-0000-000000000000";
+            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=leader&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28iPad%3B+U%3B+CPU+OS+3_2+like+Mac+OS+X%3B+en-us%29+AppleWebKit%2F531.21.10+%28KHTML%2C+like+Gecko%29+Version%2F4.0.4+Mobile%2F7B334b+Safari%2F531.21.10&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB20&p(blind_id)=00000000-0000-0000-0000-000000000000";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -323,7 +324,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new JSONObject("{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 56789));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB7&p(blind_id)=00000000-0000-ddd5-0000-00000001e240";
+            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB7&p(blind_id)=00000000-0000-ddd5-0000-00000001e240";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -352,7 +353,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=NokiaC3-00%2F5.0+%2808.65%29+Profile%2FMIDP-2.1+Configuration%2FCLDC-1.1+Mozilla%2F5.0+AppleWebKit%2F420++%28KHTML%2C+like+Gecko%29+Safari%2F420&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
+            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=NokiaC3-00%2F5.0+%2808.65%29+Profile%2FMIDP-2.1+Configuration%2FCLDC-1.1+Mozilla%2F5.0+AppleWebKit%2F420++%28KHTML%2C+like+Gecko%29+Safari%2F420&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -381,7 +382,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
+            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -410,7 +411,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000&u(country)=USA";
+            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000&u(country)=USA";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -438,7 +439,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
+            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -467,7 +468,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000&u(dma)=1";
+            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000&u(dma)=1";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -495,7 +496,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
+            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -524,7 +525,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&req(zip)=123456&p(blind_id)=00000000-0000-0000-0000-000000000000";
+            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&req(zip)=123456&p(blind_id)=00000000-0000-0000-0000-000000000000";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -552,7 +553,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
+            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -581,7 +582,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&u(gender)=m&p(blind_id)=00000000-0000-0000-0000-000000000000";
+            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&u(gender)=m&p(blind_id)=00000000-0000-0000-0000-000000000000";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -609,7 +610,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
+            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -638,7 +639,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&u(age)=30&p(blind_id)=00000000-0000-0000-0000-000000000000";
+            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&u(age)=30&p(blind_id)=00000000-0000-0000-0000-000000000000";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -666,7 +667,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
+            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -695,7 +696,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=p&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
+            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=p&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -724,7 +725,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
+            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -752,7 +753,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, blurl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x50&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
+            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x50&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -780,7 +781,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
             String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
-            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
+            String expectedUrl = "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
             assertEquals(expectedUrl, actualUrl);
         }
     }

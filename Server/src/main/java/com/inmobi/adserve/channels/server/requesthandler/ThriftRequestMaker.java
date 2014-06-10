@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
 import com.inmobi.adserve.adpool.*;
+import com.inmobi.phoenix.batteries.util.WilburyUUID;
 import com.inmobi.types.ContentRating;
 import com.inmobi.types.InventoryType;
 import com.inmobi.types.LocationSource;
@@ -23,17 +24,34 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class ThriftRequestMaker {
     private static final URLCodec urlCodec = new URLCodec();
+    static AtomicInteger atomicInteger = new AtomicInteger();
+
+    private static String getImpressionId() {
+        String uuidIntKey = (WilburyUUID.setIntKey(WilburyUUID.getUUID().toString(), 12)).toString();
+        String uuidMachineKey = (WilburyUUID.setMachineId(uuidIntKey, (short)2003)).toString();
+        String uuidWithCyclicCounter = (WilburyUUID.setCyclicCounter(uuidMachineKey, (byte) atomicInteger.getAndIncrement())).toString();
+        return (WilburyUUID.setDataCenterId(uuidWithCyclicCounter, (byte) 123)).toString();
+    }
 
     public static void main(final String[] args) throws Exception {
+        /*
+        Integer adIncId = WilburyUUID.getIntKey("227ee495-0146-1000-2251-e49510070000");
+        System.out.println("ad_inc_id " + adIncId);
+        */
+        System.out.println(WilburyUUID.getCyclicCounter(getImpressionId()));
+        System.out.println(WilburyUUID.getCyclicCounter(getImpressionId()));
+
         AdPoolRequest adPoolRequest = createAdPoolRequest();
         System.out.println("Request is : " + adPoolRequest);
         sendUMPPost(adPoolRequest);
 
     }
+
 
     private static AdPoolRequest createAdPoolRequest() {
         Site site = new Site();
@@ -41,12 +59,16 @@ public class ThriftRequestMaker {
         site.setSiteUrl("siteurl");
         site.setCpcFloor(0.03);
         site.setEcpmFloor(.3);
-        site.setSiteId("site");
+        site.setSiteId("4028cb1334ef46a9013578fe1c1f18fc");
         site.setPublisherId("sitepub");
         site.setContentRating(ContentRating.PERFORMANCE);
         site.setInventoryType(InventoryType.APP);
         Set<Integer> tags = new HashSet<Integer>();
-        tags.add(17);
+        tags.add(10);
+        tags.add(11);
+        tags.add(13);
+        tags.add(9);
+        tags.add(16);
         site.setSiteTags(tags);
         site.setSiteTaxonomies(tags);
 
@@ -54,7 +76,7 @@ public class ThriftRequestMaker {
         device.setUserAgent("useragent");
         device.setModelId(2);
         device.setManufacturerId(2);
-        device.setOsId(5);
+        device.setOsId(3);
         device.setOsMajorVersion("3.2");
 
         Carrier carrier = new Carrier();
@@ -182,7 +204,7 @@ public class ThriftRequestMaker {
             connection.setUseCaches(false);
             connection.setDoInput(true);
             connection.setDoOutput(true);
-
+            connection.setRequestProperty("x-mkhoj-tracer", "true");
             // Send request
             DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
             wr.write(urlParameters);
