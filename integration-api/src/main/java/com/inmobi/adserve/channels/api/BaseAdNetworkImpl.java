@@ -47,6 +47,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     public long                                   connectionLatency;
     public String                                 adStatus                = "NO_AD";
     protected ThirdPartyAdResponse.ResponseStatus errorStatus             = ThirdPartyAdResponse.ResponseStatus.SUCCESS;
+    
+    protected boolean 							  isHTMLResponseSupported = true;
+    protected boolean 							  isNativeResponseSuported = false;
 
     protected SASRequestParameters                sasParams;
     protected CasInternalRequestParameters        casInternalRequestParameters;

@@ -10,13 +10,16 @@ import com.inmobi.adserve.channels.server.ChannelServerPipelineFactory;
 import com.inmobi.adserve.channels.server.ChannelStatServerPipelineFactory;
 import com.inmobi.adserve.channels.server.ConnectionLimitHandler;
 import com.inmobi.adserve.channels.server.netty.CasNettyServer;
+import com.inmobi.adserve.channels.util.NativeTemplateAttributeFinder;
 import com.inmobi.adserve.channels.util.annotations.ServerChannelInitializer;
 import com.inmobi.adserve.channels.util.annotations.ServerConfiguration;
 import com.inmobi.adserve.channels.util.annotations.StatServerChannelInitializer;
 import com.inmobi.adserve.channels.util.annotations.WorkerExecutorService;
+
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.logging.LoggingHandler;
+
 import org.apache.commons.configuration.Configuration;
 
 import java.util.concurrent.ExecutorService;
@@ -51,6 +54,7 @@ public class CasNettyModule extends AbstractModule {
 
         bind(CasNettyServer.class).asEagerSingleton();
         bind(AsyncHttpClientProvider.class).asEagerSingleton();
+        bind(NativeTemplateAttributeFinder.class).asEagerSingleton();
 
         // thread pool to be used in AsyncHttpClient
         bind(ExecutorService.class).annotatedWith(WorkerExecutorService.class).toInstance(
