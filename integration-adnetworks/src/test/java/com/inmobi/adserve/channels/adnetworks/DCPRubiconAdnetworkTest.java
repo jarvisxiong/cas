@@ -299,6 +299,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
         sasParams.setSlot(Short.valueOf("9"));
         sasParams.setSiteIncId(6575868);
+        sasParams.setSource("APP");
         sasParams.setOsId(HandSetOS.Android.getValue());
         String externalKey = "38132";
         SlotSizeMapping.init();

@@ -220,11 +220,15 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		}
 		if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
 			appendQueryParam(url, AD_SENSITIVE, SENSITIVITY_LOW, false);
-			appendQueryParam(url, APP_RATING, getURLEncode(PERFORMANCE_RATING,format), false);
+			if(isApp){
+				appendQueryParam(url, APP_RATING, getURLEncode(PERFORMANCE_RATING,format), false);
+			}
         }
         else {
         	appendQueryParam(url, AD_SENSITIVE, SENSITIVITY_HIGH, false);
-        	appendQueryParam(url, APP_RATING, getURLEncode(FS_RATING,format), false);
+        	if(isApp){
+        		appendQueryParam(url, APP_RATING, getURLEncode(FS_RATING,format), false);
+        	}
         }
 		if(casInternalRequestParameters.rtbBidFloor > 0){
 			appendQueryParam(url, FLOOR_PRICE,casInternalRequestParameters.rtbBidFloor,false );
