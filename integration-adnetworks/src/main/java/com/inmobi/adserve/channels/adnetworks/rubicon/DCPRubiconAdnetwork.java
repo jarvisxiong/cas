@@ -39,11 +39,12 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	private String latitude;
 	private String longitude;
 	private String zoneId;
+	private String siteId;
 	private int width;
 	private int height;
 
 	private static final String APP_BUNDLE = "app.bundle";
-	private static final String B_SITE_ID = "site_id";
+	private static final String SITE_ID = "site_id";
 	private static final String ZONE_ID = "zone_id";
 	private static final String SIZE_ID = "size_id";
 	private static final String SIZE = "screen_res";
@@ -61,10 +62,17 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	private static final String AD_SENSITIVE  = "i.aq_sensitivity";
 	protected static final String KEYWORDS = "kw";
 	protected static final String FLOOR_PRICE = "rp_floor";
+	protected static final String APP_RATING = "app.rating";
+	protected static final String DISPLAY_TYPE = "display";
+	protected static final String IAB_CATEGORY = "i.iab";
+	protected static final String INMOBI_CATEGORY = "i.category";
 
 	private static final String SIZE_FORMAT = "%dx%d";
 	private static final String SENSITIVITY_LOW = "low";
 	private static final String SENSITIVITY_HIGH = "high";
+	private static final String SITE_KEY_ADDL_PARAM = "site";
+	protected static final String FS_RATING = "4+";
+	protected static final String PERFORMANCE_RATING = "9+";
 	
 	private final String userName;
 	private final String password;
@@ -152,6 +160,12 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		
 		JSONObject additionalParams = entity.getAdditionalParams();
 		zoneId = getZoneId(additionalParams);
+		try {
+			siteId = additionalParams.getString(SITE_KEY_ADDL_PARAM);
+		} catch (JSONException e) {
+			LOG.debug("Site Id is not configured in rubicon so exiting adapter");
+			return false;
+		}
 		if(null == zoneId){
 			LOG.debug("Zone Id is not configured in rubicon so exiting adapter");
 			return false;
@@ -170,6 +184,8 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	@Override
 	public URI getRequestUri() throws Exception {
 		StringBuilder url = new StringBuilder(host);
+		//TODO p_block_keys,app.category
+		//if Dnt is on don't send the idfa 
 		appendQueryParam(url, ZONE_ID, zoneId, false);
 		if(isApp){
 			appendQueryParam(url, APP_BUNDLE, blindedSiteId, false);
@@ -177,7 +193,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		appendQueryParam(url, UA,
 				getURLEncode(sasParams.getUserAgent(), format), false);
 		appendQueryParam(url, CLIENT_IP, sasParams.getRemoteHostIp(), false);
-		appendQueryParam(url, B_SITE_ID, externalSiteId, false);
+		appendQueryParam(url, SITE_ID, siteId, false);
 		Integer sasParamsOsId = sasParams.getOsId();
 		if (sasParamsOsId > 0 && sasParamsOsId < 21) {
 			appendQueryParam(url, DEVICE_OS,
@@ -204,17 +220,27 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		}
 		if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
 			appendQueryParam(url, AD_SENSITIVE, SENSITIVITY_LOW, false);
+			appendQueryParam(url, APP_RATING, getURLEncode(PERFORMANCE_RATING,format), false);
         }
         else {
         	appendQueryParam(url, AD_SENSITIVE, SENSITIVITY_HIGH, false);
+        	appendQueryParam(url, APP_RATING, getURLEncode(FS_RATING,format), false);
         }
 		if(casInternalRequestParameters.rtbBidFloor > 0){
 			appendQueryParam(url, FLOOR_PRICE,casInternalRequestParameters.rtbBidFloor,false );
 		}
+		if(isInterstitial()){
+			//display type 1 for interstitial
+			appendQueryParam(url, DISPLAY_TYPE,1,false );
+		}
+		
+		
+		appendQueryParam(url,INMOBI_CATEGORY,getURLEncode(getCategories(',', false,false),format),false);
+		appendQueryParam(url,IAB_CATEGORY,getURLEncode(getCategories(',', true,true),format),false);
 		appendDeviceIds(url);
 		
 		appendQueryParam(url, KEYWORDS,
-				blindedSiteId, false);
+				externalSiteId, false);
 		LOG.debug("Rubicon url is {}", url);
 		return new URI(url.toString());
 	}
@@ -244,7 +270,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 			
 		}
 		else if(sasParams.getOsId() == HandSetOS.iOS.getValue()) {
-			if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
+			if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA) && "1".equals(casInternalRequestParameters.uidADT)) {
 				appendQueryParam(url, DEVICE_ID, casInternalRequestParameters.uidIFA,
 						false);
 				appendQueryParam(url, DEVICE_ID_TYPE, 1,
@@ -290,7 +316,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	@Override
 	public void parseResponse(final String response,
 			final HttpResponseStatus status) {
-		LOG.debug("response is {}", response);
+		LOG.debug(" Rubicon response is {}", response);
 
 		if (null == response || status.code() != 200
 				|| response.trim().isEmpty()) {
@@ -307,12 +333,12 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 				JSONObject adResponse = new JSONObject(response);
 				if(adResponse.getString("status").equalsIgnoreCase("ok")){
 					JSONObject ad = adResponse.getJSONArray("ads").getJSONObject(0);
-					String htmlContent = ad.getString("script");
+					
 					if(ad.has("impression_url")){
 						String partnerBeacon = ad.getString("impression_url");
 						context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, partnerBeacon);
 					}
-					
+					String htmlContent = ad.has("script") ? ad.getString("script") : null;
 					if (StringUtils.isBlank(htmlContent)) {
 						adStatus = "NO_AD";
 						statusCode = 500;
@@ -370,6 +396,16 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	        	LOG.equals("Unable to get zone_id for Rubicon");
 	        }
 	        return null;
+	    }
+	 
+	 private boolean isInterstitial() {
+	        Short slot = sasParams.getSlot();
+	        if (10 == slot // 300X250
+	                || 14 == slot // 320X480
+	                || 16 == slot) /* 768X1024 */{
+	            return true;
+	        }
+	        return false;
 	    }
 
 

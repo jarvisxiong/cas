@@ -37,7 +37,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
     private final Bootstrap clientBootstrap = null;
 
     private DCPRubiconAdnetwork dcpRubiconAdNetwork;
-    private final String rubiconHost = "http://staged-by.rubiconproject.com/a/api/server.js/a/api/server.js?account_id=11726&rp_pmp_tier=2";
+    private final String rubiconHost = "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2";
     private final String rubiconStatus = "on";
     private final String rubiconAdvId = "rubiconadv1";
     private final String rubiconTest = "1";
@@ -104,7 +104,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
                         externalKey, null, null, null, 0, true, null, null, 0,
                         null, false, false, false, false, false, false, false,
                         false, false, false, new JSONObject(
-                                "{\"3\":\"160212\"}"), new ArrayList<Integer>(),
+                                "{\"3\":\"160212\",\"site\":\"191002\"}"), new ArrayList<Integer>(),
                         0.0d, null, null, 32));
         assertEquals(false, dcpRubiconAdNetwork.configureParameters(sasParams,
                 casInternalRequestParameters, entity, clurl, null));
@@ -132,7 +132,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
                         externalKey, null, null, null, 0, true, null, null, 0,
                         null, false, false, false, false, false, false, false,
                         false, false, false, new JSONObject(
-                                "{\"3\":\"160212\"}"), new ArrayList<Integer>(),
+                                "{\"3\":\"160212\",\"site\":\"191002\"}"), new ArrayList<Integer>(),
                         0.0d, null, null, 32));
         assertEquals(true, dcpRubiconAdNetwork.configureParameters(sasParams,
                 casInternalRequestParameters, entity, clurl, null));
@@ -164,7 +164,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
                         externalKey, null, null, null, 0, true, null, null, 0,
                         null, false, false, false, false, false, false, false,
                         false, false, false, new JSONObject(
-                                "{\"3\":\"160212\"}"), new ArrayList<Integer>(),
+                                "{\"3\":\"160212\",\"site\":\"191002\"}"), new ArrayList<Integer>(),
                         0.0d, null, null, 32));
         assertEquals(true, dcpRubiconAdNetwork.configureParameters(sasParams,
                 casInternalRequestParameters, entity, clurl, null));
@@ -192,7 +192,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
                         externalKey, null, null, null, 0, true, null, null, 0,
                         null, false, false, false, false, false, false, false,
                         false, false, false, new JSONObject(
-                                "{\"3\":\"160212\"}"), new ArrayList<Integer>(),
+                                "{\"3\":\"160212\",\"site\":\"191002\"}"), new ArrayList<Integer>(),
                         0.0d, null, null, 32));
         assertEquals(true, dcpRubiconAdNetwork.configureParameters(sasParams,
                 casInternalRequestParameters, entity, clurl, null));
@@ -215,7 +215,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
                         externalKey, null, null, null, 0, true, null, null, 0,
                         null, false, false, false, false, false, false, false,
                         false, false, false, new JSONObject(
-                                "{\"3\":\"160212\"}"), new ArrayList<Integer>(),
+                                "{\"3\":\"160212\",\"site\":\"191002\"}"), new ArrayList<Integer>(),
                         0.0d, null, null, 32));
         assertEquals(false, dcpRubiconAdNetwork.configureParameters(sasParams,
                 casInternalRequestParameters, entity, clurl, null));
@@ -237,7 +237,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
                         externalKey, null, null, null, 0, true, null, null, 0,
                         null, false, false, false, false, false, false, false,
                         false, false, false, new JSONObject(
-                                "{\"3\":\"160212\"}"), new ArrayList<Integer>(),
+                                "{\"3\":\"160212\",\"site\":\"191002\"}"), new ArrayList<Integer>(),
                         0.0d, null, null, 32));
         assertEquals(false, dcpRubiconAdNetwork.configureParameters(sasParams,
                 casInternalRequestParameters, entity, clurl, null));
@@ -269,20 +269,20 @@ public class DCPRubiconAdnetworkTest extends TestCase {
                         externalKey, null, null, null, 0, true, null, null, 0,
                         null, false, false, false, false, false, false, false,
                         false, false, false, new JSONObject(
-                                "{\"3\":\"160212\"}"), new ArrayList<Integer>(),
+                                "{\"3\":\"160212\",\"site\":\"38132\"}"), new ArrayList<Integer>(),
                         0.0d, null, null, 0));
 
       dcpRubiconAdNetwork.configureParameters(sasParams,casInternalRequestParameters, entity, null, null);
 
       String actualUrl = dcpRubiconAdNetwork.getRequestUri().toString();
-      String expectedUrl = "http://staged-by.rubiconproject.com/a/api/server.js/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=00000000-0000-0000-0000-0000006456fc&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&ip=206.29.182.240&site_id=38132&device.os=Android&screen_res=320x50&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpid_type=2&kw=00000000-0000-0000-0000-0000006456fc";
+      String expectedUrl = "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=00000000-0000-0000-0000-0000006456fc&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&ip=206.29.182.240&site_id=38132&device.os=Android&screen_res=320x50&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&app.rating=4&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpid_type=2&kw=38132";
 
       assertEquals(expectedUrl, actualUrl);
       dcpRubiconAdNetwork.getNingRequest();
     }
 
     @Test
-    public void testDCPrubiconRequestUriWithNoCat() throws Exception {
+    public void testDCPrubiconRequestUriWithSpecificSlot() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.blockedCategories = new ArrayList<Long>(
@@ -308,12 +308,12 @@ public class DCPRubiconAdnetworkTest extends TestCase {
                         externalKey, null, null, null, 0, true, null, null, 0,
                         null, false, false, false, false, false, false, false,
                         false, false, false, new JSONObject(
-                                "{\"3\":\"160212\"}"), new ArrayList<Integer>(),
+                                "{\"3\":\"160212\",\"site\":\"38132\"}"), new ArrayList<Integer>(),
                         0.0d, null, null, 0));
         dcpRubiconAdNetwork.configureParameters(sasParams,
                 casInternalRequestParameters, entity, null, null); 
             String actualUrl = dcpRubiconAdNetwork.getRequestUri().toString();
-            String expectedUrl = "http://staged-by.rubiconproject.com/a/api/server.js/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=00000000-0000-0000-0000-0000006456fc&ua=Mozilla&ip=206.29.182.240&site_id=38132&device.os=Android&screen_res=320x50&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpid_type=2&kw=00000000-0000-0000-0000-0000006456fc";
+            String expectedUrl = "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=00000000-0000-0000-0000-0000006456fc&ua=Mozilla&ip=206.29.182.240&site_id=38132&device.os=Android&screen_res=320x50&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&app.rating=4&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpid_type=2&kw=38132";
             assertEquals(expectedUrl, actualUrl);
             
     }
@@ -368,7 +368,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
                                 false,
                                 false,
                                 new JSONObject(
-                                        "{\"3\":\"160212\"}"),
+                                        "{\"3\":\"160212\",\"site\":\"19100\"}"),
                                 new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpRubiconAdNetwork.configureParameters(sasParams,
                 casInternalRequestParameters, entity, null, beaconUrl);
