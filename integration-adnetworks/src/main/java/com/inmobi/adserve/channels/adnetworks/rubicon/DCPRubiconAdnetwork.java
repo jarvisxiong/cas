@@ -6,7 +6,6 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.net.URI;
-import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -339,7 +338,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 								return;
 							}
 							context.put(VelocityTemplateFieldConstants.PartnerHtmlCode,
-									URLDecoder.decode(htmlContent));
+									htmlContent);
 
 							responseContent = Formatter.getResponseFromTemplate(
 									TemplateType.HTML, context, sasParams, beaconUrl);
