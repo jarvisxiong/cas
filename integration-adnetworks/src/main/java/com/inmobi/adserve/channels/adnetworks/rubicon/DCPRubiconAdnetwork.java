@@ -44,7 +44,6 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	private static final String SITE_ID = "site_id";
 	private static final String ZONE_ID = "zone_id";
 	private static final String SIZE_ID = "size_id";
-	private static final String SIZE = "screen_res";
 	private static final String UA = "ua";
 	private static final String CLIENT_IP = "ip";
 	private static final String DEVICE_OS = "device.os";
@@ -63,12 +62,14 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	private static final String DISPLAY_TYPE = "display";
 	private static final String IAB_CATEGORY = "i.iab";
 	private static final String INMOBI_CATEGORY = "i.category";
+	private static final String RESPONSE_TEMPLATE = "<script>%s</script>";
 
 	private static final String SENSITIVITY_LOW = "low";
 	private static final String SENSITIVITY_HIGH = "high";
 	private static final String SITE_KEY_ADDL_PARAM = "site";
 	private static final String FS_RATING = "4+";
 	private static final String PERFORMANCE_RATING = "9+";
+
 
 	private final String userName;
 	private final String password;
@@ -338,10 +339,14 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 								return;
 							}
 							context.put(VelocityTemplateFieldConstants.PartnerHtmlCode,
-									htmlContent);
+									String.format(RESPONSE_TEMPLATE,htmlContent));
+							TemplateType templateType = TemplateType.HTML;
+							if(!isApp){
+								templateType = TemplateType.WAP_HTML_JS_AD_TAG;
+							}
 
 							responseContent = Formatter.getResponseFromTemplate(
-									TemplateType.HTML, context, sasParams, beaconUrl);
+									templateType, context, sasParams, beaconUrl);
 							adStatus = "AD";
 				} else {
 					adStatus = "NO_AD";
