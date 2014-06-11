@@ -61,8 +61,9 @@ public class Formatter {
 		}
 		
 		if (isRequestFromSdk(sasParams)) {
-				context.put(VelocityTemplateFieldConstants.SDK, true);
-				context.put(VelocityTemplateFieldConstants.SDK360Onwards, requestFromSDK360Onwards(sasParams));
+				context.put(VelocityTemplateFieldConstants.APP, true);
+				context.put(VelocityTemplateFieldConstants.SDK360Onwards,
+						requestFromSDK360Onwards(sasParams));
 			if (StringUtils.isNotBlank(sasParams.getImaiBaseUrl())) {
 				context.put(VelocityTemplateFieldConstants.IMAIBaseUrl,
 						sasParams.getImaiBaseUrl());
