@@ -64,22 +64,11 @@ public class FormatterTest {
         VelocityContext context = new VelocityContext();
         Formatter.updateVelocityContext(context, sasParams, null);
         assertNull(context.get(VelocityTemplateFieldConstants.IMBeaconUrl));
-        assertNull(context.get(VelocityTemplateFieldConstants.SDK));
+        assertNull(context.get(VelocityTemplateFieldConstants.APP));
         assertNull(context.get(VelocityTemplateFieldConstants.SDK360Onwards));
         assertNull(context.get(VelocityTemplateFieldConstants.IMAIBaseUrl));
     }
 
-    @Test
-    public void testupdateVelocityContextWithAppAndNoSDK() {
-        SASRequestParameters sasParams = new SASRequestParameters();
-        sasParams.setSource("APP");
-        VelocityContext context = new VelocityContext();
-        Formatter.updateVelocityContext(context, sasParams, null);
-        assertNull(context.get(VelocityTemplateFieldConstants.SDK));
-        assertNull(context.get(VelocityTemplateFieldConstants.SDK360Onwards));
-        assertNull(context.get(VelocityTemplateFieldConstants.IMAIBaseUrl));
-    }
-    
     @Test
     public void testupdateVelocityContextWithBeaconUrlAndAppRequestNonIMAI() {
         SASRequestParameters sasParams = new SASRequestParameters();
@@ -88,7 +77,7 @@ public class FormatterTest {
         VelocityContext context = new VelocityContext();
         Formatter.updateVelocityContext(context, sasParams, "beacon");
         assertEquals(context.get(VelocityTemplateFieldConstants.IMBeaconUrl), "beacon");
-        assertEquals(context.get(VelocityTemplateFieldConstants.SDK), true);
+        assertEquals(context.get(VelocityTemplateFieldConstants.APP), true);
         assertEquals(context.get(VelocityTemplateFieldConstants.SDK360Onwards), true);
         assertNull(context.get(VelocityTemplateFieldConstants.IMAIBaseUrl));
     }

@@ -19,6 +19,6 @@ public class VelocityTemplateFieldConstants {
     public static final String Template           = "Template";
     public static final String Width              = "width";
     public static final String Height             = "height";
-    public static final String SDK                = "SDK";
+    public static final String APP                = "APP";
     public static final String SDK360Onwards      = "SDK360Onwards";
 }

@@ -31,7 +31,7 @@ public class Formatter {
         WAP_HTML_JS_AD_TAG
     }
 
-    private static final String   APP = "APP";
+    private static final String   WAP = "WAP";
     private static VelocityEngine velocityEngine;
     private static Template       velocityTemplateHtml;
     private static Template       velocityTemplatePlainTxt;
@@ -55,28 +55,18 @@ public class Formatter {
     }
 
     static void updateVelocityContext(final VelocityContext context, final SASRequestParameters sasParams,
- final String beaconUrl) {
-		if (StringUtils.isNotBlank(beaconUrl)) {
-			context.put(VelocityTemplateFieldConstants.IMBeaconUrl, beaconUrl);
-		}
-		
-		if (isRequestFromSdk(sasParams)) {
-				context.put(VelocityTemplateFieldConstants.SDK, true);
-				context.put(VelocityTemplateFieldConstants.SDK360Onwards, requestFromSDK360Onwards(sasParams));
-			if (StringUtils.isNotBlank(sasParams.getImaiBaseUrl())) {
-				context.put(VelocityTemplateFieldConstants.IMAIBaseUrl,
-						sasParams.getImaiBaseUrl());
-			}
-		}
-		
-	}
-
-    /**
-     * The request has to come from inmobi sdk residing in the mobile app
-     */
-	private static boolean isRequestFromSdk(final SASRequestParameters sasParams) {
-		return APP.equalsIgnoreCase(sasParams.getSource()) && StringUtils.isNotBlank(sasParams.getSdkVersion());
-	}
+            final String beaconUrl) {
+        if (StringUtils.isNotBlank(beaconUrl)) {
+            context.put(VelocityTemplateFieldConstants.IMBeaconUrl, beaconUrl);
+        }
+        if (!WAP.equalsIgnoreCase(sasParams.getSource())) {
+            context.put(VelocityTemplateFieldConstants.APP, true);
+            context.put(VelocityTemplateFieldConstants.SDK360Onwards, requestFromSDK360Onwards(sasParams));
+            if (StringUtils.isNotBlank(sasParams.getImaiBaseUrl())) {
+                context.put(VelocityTemplateFieldConstants.IMAIBaseUrl, sasParams.getImaiBaseUrl());
+            }
+        }
+    }
 
     static boolean requestFromSDK360Onwards(final SASRequestParameters sasParams) {
         if (StringUtils.isBlank(sasParams.getSdkVersion())) {
