@@ -5,8 +5,8 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
-import java.awt.Dimension;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,10 +23,10 @@ import org.slf4j.LoggerFactory;
 import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
@@ -40,8 +40,6 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	private String longitude;
 	private String zoneId;
 	private String siteId;
-	private int width;
-	private int height;
 
 	private static final String APP_BUNDLE = "app.bundle";
 	private static final String SITE_ID = "site_id";
@@ -59,46 +57,43 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	private static final String CONNECTION_TYPE = "device.connectiontype";
 	private static final String LAT = "geo.latitude";
 	private static final String LONG = "geo.longitude";
-	private static final String AD_SENSITIVE  = "i.aq_sensitivity";
-	protected static final String KEYWORDS = "kw";
-	protected static final String FLOOR_PRICE = "rp_floor";
-	protected static final String APP_RATING = "app.rating";
-	protected static final String DISPLAY_TYPE = "display";
-	protected static final String IAB_CATEGORY = "i.iab";
-	protected static final String INMOBI_CATEGORY = "i.category";
+	private static final String AD_SENSITIVE = "i.aq_sensitivity";
+	private static final String KEYWORDS = "kw";
+	private static final String FLOOR_PRICE = "rp_floor";
+	private static final String APP_RATING = "app.rating";
+	private static final String DISPLAY_TYPE = "display";
+	private static final String IAB_CATEGORY = "i.iab";
+	private static final String INMOBI_CATEGORY = "i.category";
 
-	private static final String SIZE_FORMAT = "%dx%d";
 	private static final String SENSITIVITY_LOW = "low";
 	private static final String SENSITIVITY_HIGH = "high";
 	private static final String SITE_KEY_ADDL_PARAM = "site";
-	protected static final String FS_RATING = "4+";
-	protected static final String PERFORMANCE_RATING = "9+";
-	
+	private static final String FS_RATING = "4+";
+	private static final String PERFORMANCE_RATING = "9+";
+
 	private final String userName;
 	private final String password;
-	
+
 	private boolean isApp;
 
 	private static Map<Short, Integer> slotIdMap;
 	static {
 		slotIdMap = new HashMap<Short, Integer>();
 		slotIdMap.put((short) 4, 44);
-		//Mapping 320x48 to 320x50
-		slotIdMap.put((short)9, 43);
-		slotIdMap.put((short)10, 15);
-		slotIdMap.put((short)11, 2);
-		slotIdMap.put((short)12, 1);
-		slotIdMap.put((short)13, 8);
-		slotIdMap.put((short)15, 43);
-		slotIdMap.put((short)18, 9);
-		slotIdMap.put((short)19, 50);
-		slotIdMap.put((short)21, 45);
-		slotIdMap.put((short)23, 46);
+		// Mapping 320x48 to 320x50
+		slotIdMap.put((short) 9, 43);
+		slotIdMap.put((short) 10, 15);
+		slotIdMap.put((short) 11, 2);
+		slotIdMap.put((short) 12, 1);
+		slotIdMap.put((short) 13, 8);
+		slotIdMap.put((short) 15, 43);
+		slotIdMap.put((short) 18, 9);
+		slotIdMap.put((short) 19, 50);
+		slotIdMap.put((short) 21, 45);
+		slotIdMap.put((short) 23, 46);
 	}
 
-	
-	
-		/**
+	/**
 	 * @param config
 	 * @param clientBootstrap
 	 * @param baseRequestHandler
@@ -132,16 +127,6 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		}
 		if (null != sasParams.getSlot()
 				&& SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-			Dimension dim=null;
-			if((long) sasParams.getSlot() == 9){
-				dim = SlotSizeMapping.getDimension(15l);
-			}
-			else{
-				dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
-			}
-					
-			width = (int) Math.ceil(dim.getWidth());
-			height = (int) Math.ceil(dim.getHeight());
 			if (!slotIdMap.containsKey(sasParams.getSlot())) {
 				LOG.debug("Size not allowed for rubicon so exiting adapter");
 				return false;
@@ -150,28 +135,29 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 			LOG.debug("mandatory parameter size missing for rubicon so exiting adapter");
 			return false;
 		}
-		
-		isApp = (StringUtils.isBlank(sasParams.getSource()) || "WAP"
+
+		isApp = (StringUtils.isBlank(sasParams.getSource()) || WAP
 				.equalsIgnoreCase(sasParams.getSource())) ? false : true;
-		if(isApp && StringUtils.isEmpty(getUid())){
+		if (isApp && StringUtils.isEmpty(getUid())) {
 			LOG.debug("mandatory parameter udid is missing for APP traffic in rubicon so exiting adapter");
 			return false;
 		}
-		
+
 		JSONObject additionalParams = entity.getAdditionalParams();
-		zoneId = getZoneId(additionalParams);
+
 		try {
 			siteId = additionalParams.getString(SITE_KEY_ADDL_PARAM);
 		} catch (JSONException e) {
 			LOG.debug("Site Id is not configured in rubicon so exiting adapter");
 			return false;
 		}
-		if(null == zoneId){
+		zoneId = getZoneId(additionalParams);
+		if (null == zoneId) {
 			LOG.debug("Zone Id is not configured in rubicon so exiting adapter");
 			return false;
-	
+
 		}
-		
+
 		LOG.info("Configure parameters inside Rubicon returned true");
 		return true;
 	}
@@ -184,10 +170,10 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	@Override
 	public URI getRequestUri() throws Exception {
 		StringBuilder url = new StringBuilder(host);
-		//TODO p_block_keys,app.category
-		//if Dnt is on don't send the idfa 
+		// TODO p_block_keys,app.category
+		// if Dnt is on don't send the idfa
 		appendQueryParam(url, ZONE_ID, zoneId, false);
-		if(isApp){
+		if (isApp) {
 			appendQueryParam(url, APP_BUNDLE, blindedSiteId, false);
 		}
 		appendQueryParam(url, UA,
@@ -204,8 +190,6 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 			appendQueryParam(url, OS_VERSION, sasParams.getOsMajorVersion(),
 					false);
 		}
-		appendQueryParam(url, SIZE, String.format(SIZE_FORMAT, width, height),
-				false);
 		appendQueryParam(url, SIZE_ID, slotIdMap.get(sasParams.getSlot()),
 				false);
 		if (StringUtils.isNotBlank(latitude)
@@ -220,101 +204,102 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		}
 		if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
 			appendQueryParam(url, AD_SENSITIVE, SENSITIVITY_LOW, false);
-			if(isApp){
-				appendQueryParam(url, APP_RATING, getURLEncode(PERFORMANCE_RATING,format), false);
+			if (isApp) {
+				appendQueryParam(url, APP_RATING,
+						getURLEncode(PERFORMANCE_RATING, format), false);
 			}
-        }
-        else {
-        	appendQueryParam(url, AD_SENSITIVE, SENSITIVITY_HIGH, false);
-        	if(isApp){
-        		appendQueryParam(url, APP_RATING, getURLEncode(FS_RATING,format), false);
-        	}
-        }
-		if(casInternalRequestParameters.rtbBidFloor > 0){
-			appendQueryParam(url, FLOOR_PRICE,casInternalRequestParameters.rtbBidFloor,false );
+		} else {
+			appendQueryParam(url, AD_SENSITIVE, SENSITIVITY_HIGH, false);
+			if (isApp) {
+				appendQueryParam(url, APP_RATING,
+						getURLEncode(FS_RATING, format), false);
+			}
 		}
-		if(isInterstitial()){
-			//display type 1 for interstitial
-			appendQueryParam(url, DISPLAY_TYPE,1,false );
+		if (casInternalRequestParameters.rtbBidFloor > 0) {
+			appendQueryParam(url, FLOOR_PRICE,
+					casInternalRequestParameters.rtbBidFloor, false);
 		}
-		
-		
-		appendQueryParam(url,INMOBI_CATEGORY,getURLEncode(getCategories(',', false,false),format),false);
-		appendQueryParam(url,IAB_CATEGORY,getURLEncode(getCategories(',', true,true),format),false);
+		if (isInterstitial()) {
+			// display type 1 for interstitial
+			appendQueryParam(url, DISPLAY_TYPE, 1, false);
+		}
+
+		appendQueryParam(url, INMOBI_CATEGORY,
+				getURLEncode(getCategories(',', false, false), format), false);
+		appendQueryParam(url, IAB_CATEGORY,
+				getURLEncode(getCategories(',', true, true), format), false);
 		appendDeviceIds(url);
-		
-		appendQueryParam(url, KEYWORDS,
-				externalSiteId, false);
+
+		appendQueryParam(url, KEYWORDS, externalSiteId, false);
 		LOG.debug("Rubicon url is {}", url);
 		return new URI(url.toString());
 	}
 
 	private void appendDeviceIds(StringBuilder url) {
-		//Device id type 1 (IDFA), 2 (OpenUDID), 3 (Apple UDID), 4 (Android device ID)
+		// Device id type 1 (IDFA), 2 (OpenUDID), 3 (Apple UDID), 4 (Android
+		// device ID)
 		if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
 			if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
-				appendQueryParam(url, MD5_DEVICE_ID, casInternalRequestParameters.uidMd5,
-						false);
-				appendQueryParam(url, DEVICE_ID_TYPE, 4,
-						false);
-			}
-			else if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
-				appendQueryParam(url, SHA1_DEVICE_ID, casInternalRequestParameters.uidIDUS1,
-						false);
-				appendQueryParam(url, DEVICE_ID_TYPE, 4,
-						false);
+				appendQueryParam(url, MD5_DEVICE_ID,
+						casInternalRequestParameters.uidMd5, false);
+				appendQueryParam(url, DEVICE_ID_TYPE, 4, false);
+			} else if (StringUtils
+					.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
+				appendQueryParam(url, SHA1_DEVICE_ID,
+						casInternalRequestParameters.uidIDUS1, false);
+				appendQueryParam(url, DEVICE_ID_TYPE, 4, false);
 
+			} else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
+				appendQueryParam(url, MD5_DEVICE_ID,
+						casInternalRequestParameters.uid, false);
+				appendQueryParam(url, DEVICE_ID_TYPE, 2, false);
 			}
-			else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)){
-				appendQueryParam(url, MD5_DEVICE_ID, casInternalRequestParameters.uid,
-						false);
-				appendQueryParam(url, DEVICE_ID_TYPE, 2,
-						false);
-			}
-			
-		}
-		else if(sasParams.getOsId() == HandSetOS.iOS.getValue()) {
-			if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA) && "1".equals(casInternalRequestParameters.uidADT)) {
-				appendQueryParam(url, DEVICE_ID, casInternalRequestParameters.uidIFA,
-						false);
-				appendQueryParam(url, DEVICE_ID_TYPE, 1,
-						false);
-			} else if (StringUtils.isNotBlank(casInternalRequestParameters.uidSO1)) {
+
+		} else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
+			if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
+					&& "1".equals(casInternalRequestParameters.uidADT)) {
+				appendQueryParam(url, DEVICE_ID,
+						casInternalRequestParameters.uidIFA, false);
+				appendQueryParam(url, DEVICE_ID_TYPE, 1, false);
+			} else if (StringUtils
+					.isNotBlank(casInternalRequestParameters.uidSO1)) {
 				appendQueryParam(url, SHA1_DEVICE_ID,
 						casInternalRequestParameters.uidSO1, false);
-				appendQueryParam(url, DEVICE_ID_TYPE, 3,
-						false);
-			} else if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
-				appendQueryParam(url, SHA1_DEVICE_ID, casInternalRequestParameters.uidO1,
-						false);
-				appendQueryParam(url, DEVICE_ID_TYPE, 3,
-						false);
-			} else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)){
-				appendQueryParam(url, MD5_DEVICE_ID, casInternalRequestParameters.uid,
-						false);
-				appendQueryParam(url, DEVICE_ID_TYPE, 2,
-						false);
+				appendQueryParam(url, DEVICE_ID_TYPE, 3, false);
+			} else if (StringUtils
+					.isNotBlank(casInternalRequestParameters.uidO1)) {
+				appendQueryParam(url, SHA1_DEVICE_ID,
+						casInternalRequestParameters.uidO1, false);
+				appendQueryParam(url, DEVICE_ID_TYPE, 3, false);
+			} else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
+				appendQueryParam(url, MD5_DEVICE_ID,
+						casInternalRequestParameters.uid, false);
+				appendQueryParam(url, DEVICE_ID_TYPE, 2, false);
 			}
-			
+
 		}
 	}
-	
+
 	@Override
 	public Request getNingRequest() throws Exception {
 
-	        URI uri = getRequestUri();
-	        if (uri.getPort() == -1) {
-	            uri = new URIBuilder(uri).setPort(80).build();
-	        }
-	        String authStr = userName + ":" + password;
-	        String authEncoded = new String(Base64.encodeBase64(authStr.getBytes()));
-	        return new RequestBuilder().setURI(uri).setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-	                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
-	                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
-	                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-	                .setHeader("Authorization", "Basic " + authEncoded)
-	                .setHeader(HttpHeaders.Names.HOST, uri.getHost()).build();
-	   
+		URI uri = getRequestUri();
+		if (uri.getPort() == -1) {
+			uri = new URIBuilder(uri).setPort(80).build();
+		}
+		String authStr = userName + ":" + password;
+		String authEncoded = new String(Base64.encodeBase64(authStr.getBytes()));
+		return new RequestBuilder()
+		.setURI(uri)
+		.setHeader(HttpHeaders.Names.USER_AGENT,
+				sasParams.getUserAgent())
+				.setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
+				.setHeader(HttpHeaders.Names.ACCEPT_ENCODING,
+						HttpHeaders.Values.BYTES)
+						.setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
+						.setHeader("Authorization", "Basic " + authEncoded)
+						.setHeader(HttpHeaders.Names.HOST, uri.getHost()).build();
+
 	}
 
 	@Override
@@ -335,28 +320,31 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 			VelocityContext context = new VelocityContext();
 			try {
 				JSONObject adResponse = new JSONObject(response);
-				if(adResponse.getString("status").equalsIgnoreCase("ok")){
-					JSONObject ad = adResponse.getJSONArray("ads").getJSONObject(0);
-					
-					if(ad.has("impression_url")){
+				if (adResponse.getString("status").equalsIgnoreCase("ok")) {
+					JSONObject ad = adResponse.getJSONArray("ads")
+							.getJSONObject(0);
+
+					if (ad.has("impression_url")) {
 						String partnerBeacon = ad.getString("impression_url");
-						context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, partnerBeacon);
+						context.put(
+								VelocityTemplateFieldConstants.PartnerBeaconUrl,
+								partnerBeacon);
 					}
-					String htmlContent = ad.has("script") ? ad.getString("script") : null;
-					if (StringUtils.isBlank(htmlContent)) {
-						adStatus = "NO_AD";
-						statusCode = 500;
-						responseContent = "";
-						return;
-					}
-					context.put(VelocityTemplateFieldConstants.PartnerHtmlCode,
-							htmlContent);
-	
-					responseContent = Formatter.getResponseFromTemplate(
-							TemplateType.HTML, context, sasParams, beaconUrl);
-					adStatus = "AD";
-				}
-				else{
+					String htmlContent = ad.has("script") ? ad
+							.getString("script") : null;
+							if (StringUtils.isBlank(htmlContent)) {
+								adStatus = "NO_AD";
+								statusCode = 204;
+								responseContent = "";
+								return;
+							}
+							context.put(VelocityTemplateFieldConstants.PartnerHtmlCode,
+									URLDecoder.decode(htmlContent));
+
+							responseContent = Formatter.getResponseFromTemplate(
+									TemplateType.HTML, context, sasParams, beaconUrl);
+							adStatus = "AD";
+				} else {
 					adStatus = "NO_AD";
 					return;
 				}
@@ -372,45 +360,43 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	public String getId() {
 		return (config.getString("rubicon.advertiserId"));
 	}
-	
-	 public String getZoneId(JSONObject additionalParams) {
-	        Long[] segmentCategories = entity.getTags();
-	        try{
-		        if (segmentCategories != null && segmentCategories[0] != 1) {
-		            for (int index = 0; index < segmentCategories.length; index++) {
-		                String category = additionalParams.getString(segmentCategories[index].toString());
-		                LOG.debug("segment category is {}", category);
-		                if (category != null) {
-		                    return category;
-		                }
-		            }
-		        }
-		        else if (sasParams.getCategories() != null) {
-		            for (int index = 0; index < sasParams.getCategories().size(); index++) {
-		                String category = additionalParams.getString(sasParams.getCategories().get(index).toString());
-		                LOG.debug("category is {}", category);
-		                if (category != null) {
-		                    return category;
-		                }
-		            }
-		        }
-	        }
-	        catch(JSONException exception)
-	        {
-	        	LOG.equals("Unable to get zone_id for Rubicon");
-	        }
-	        return null;
-	    }
-	 
-	 private boolean isInterstitial() {
-	        Short slot = sasParams.getSlot();
-	        if (10 == slot // 300X250
-	                || 14 == slot // 320X480
-	                || 16 == slot) /* 768X1024 */{
-	            return true;
-	        }
-	        return false;
-	    }
 
-
+	public String getZoneId(JSONObject additionalParams) {
+		Long[] segmentCategories = entity.getTags();
+		try {
+			if (segmentCategories != null && segmentCategories.length > 0 && segmentCategories[0] != 1) {
+				for (int index = 0; index < segmentCategories.length; index++) {
+					String category = additionalParams
+							.getString(segmentCategories[index].toString());
+					LOG.debug("segment category is {}", category);
+					if (category != null) {
+						return category;
+					}
+				}
+			} else if (sasParams.getCategories() != null) {
+				for (int index = 0; index < sasParams.getCategories().size(); index++) {
+					String category = additionalParams.getString(sasParams
+							.getCategories().get(index).toString());
+					LOG.debug("category is {}", category);
+					if (category != null) {
+						return category;
+					}
+				}
+			}
+		} catch (JSONException exception) {
+			LOG.equals("Unable to get zone_id for Rubicon");
+		}
+		return null;
 	}
+
+	private boolean isInterstitial() {
+		Short slot = sasParams.getSlot();
+		if (10 == slot // 300X250
+				|| 14 == slot // 320X480
+				|| 16 == slot) /* 768X1024 */{
+			return true;
+		}
+		return false;
+	}
+
+}
