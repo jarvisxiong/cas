@@ -319,7 +319,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 	}
 
 	@Test
-	public void testDCPrubiconParseAd() throws Exception {
+	public void testDCPrubiconParseAdWap() throws Exception {
 		SASRequestParameters sasParams = new SASRequestParameters();
 		CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
 		casInternalRequestParameters.blockedCategories = new ArrayList<Long>(
@@ -376,7 +376,70 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 		dcpRubiconAdNetwork.parseResponse(response, HttpResponseStatus.OK);
 		assertEquals(200, dcpRubiconAdNetwork.getHttpResponseStatusCode());
 		assertEquals(
-				"<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"mraid.js\"></script><div>testing rubicon</div><img src='http://ad.tracker/impression/ed4122f3-f4ac-477b-9abd-89c44f252100' height=1 width=1 border=0 style=\"display:none;\"/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>",
+				"<html><head><title></title><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script><div>testing rubicon</div></script><img src='http://ad.tracker/impression/ed4122f3-f4ac-477b-9abd-89c44f252100' height=1 width=1 border=0 style=\"display:none;\"/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>",
+				dcpRubiconAdNetwork.getHttpResponseContent());
+	}
+
+	@Test
+	public void testDCPrubiconParseAdApp() throws Exception {
+		SASRequestParameters sasParams = new SASRequestParameters();
+		CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+		casInternalRequestParameters.blockedCategories = new ArrayList<Long>(
+				Arrays.asList(new Long[] { 50l, 51l }));
+		sasParams.setRemoteHostIp("206.29.182.240");
+		sasParams.setUserAgent("Mozilla");
+		sasParams.setSlot(Short.valueOf("15"));
+		casInternalRequestParameters.latLong = "37.4429,-122.1514";
+		sasParams.setOsId(HandSetOS.Android.getValue());
+		sasParams.setSource("APP");
+		casInternalRequestParameters.uid = "23e2ewq445545saasw232323";
+		String externalKey = "19100";
+		String beaconUrl = "http://c2.w.inmobi.com/c"
+				+ ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
+				+ "-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
+
+		ChannelSegmentEntity entity = new ChannelSegmentEntity(
+				AdNetworksTest
+				.getChannelSegmentEntityBuilder(
+						rubiconAdvId,
+						null,
+						null,
+						null,
+						0,
+						null,
+						null,
+						true,
+						true,
+						externalKey,
+						null,
+						null,
+						null,
+						0,
+						true,
+						null,
+						null,
+						0,
+						null,
+						false,
+						false,
+						false,
+						false,
+						false,
+						false,
+						false,
+						false,
+						false,
+						false,
+						new JSONObject(
+								"{\"3\":\"160212\",\"site\":\"19100\"}"),
+								new ArrayList<Integer>(), 0.0d, null, null, 32));
+		dcpRubiconAdNetwork.configureParameters(sasParams,
+				casInternalRequestParameters, entity, null, beaconUrl);
+		String response = "{\"status\" : \"ok\",\"tracking\" : \"affiliate-1234\",\"inventory\" : { \"deals\" : \"12345,98765\" },\"ads\" : [{\"status\" : \"ok\",\"impression_id\" : \"ed4122f3-f4ac-477b-9abd-89c44f252100\",\"size_id\" : \"2\",\"advertiser\" : 7,\"network\" : 123,\"seat\" : 456,\"deal\" : 789,\"type\" : \"MRAIDv2\",\"creativeapi\" : 1000,\"impression_url\" : \"http://ad.tracker/impression/ed4122f3-f4ac-477b-9abd-89c44f252100\",\"script\" :\"<div>testing rubicon</div>\"}]}";
+		dcpRubiconAdNetwork.parseResponse(response, HttpResponseStatus.OK);
+		assertEquals(200, dcpRubiconAdNetwork.getHttpResponseStatusCode());
+		assertEquals(
+				"<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"mraid.js\"></script><script><div>testing rubicon</div></script><img src='http://ad.tracker/impression/ed4122f3-f4ac-477b-9abd-89c44f252100' height=1 width=1 border=0 style=\"display:none;\"/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>",
 				dcpRubiconAdNetwork.getHttpResponseContent());
 	}
 
