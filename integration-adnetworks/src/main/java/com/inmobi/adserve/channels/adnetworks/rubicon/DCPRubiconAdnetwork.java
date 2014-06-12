@@ -64,6 +64,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	private static final String INMOBI_CATEGORY = "i.category";
 	private static final String RESPONSE_TEMPLATE = "<script>%s</script>";
 
+	private static final String DEFAULT_ZONE = "default";
 	private static final String SENSITIVITY_LOW = "low";
 	private static final String SENSITIVITY_HIGH = "high";
 	private static final String SITE_KEY_ADDL_PARAM = "site";
@@ -86,7 +87,9 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		slotIdMap.put((short) 11, 2);
 		slotIdMap.put((short) 12, 1);
 		slotIdMap.put((short) 13, 8);
+		slotIdMap.put((short) 14, 84);
 		slotIdMap.put((short) 15, 43);
+		slotIdMap.put((short) 16, 102);
 		slotIdMap.put((short) 18, 9);
 		slotIdMap.put((short) 19, 50);
 		slotIdMap.put((short) 21, 45);
@@ -153,7 +156,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		}
 		zoneId = getZoneId(additionalParams);
 		if (null == zoneId) {
-			LOG.debug("Zone Id is not configured in rubicon so exiting adapter");
+			LOG.error("Zone Id is not configured in rubicon so exiting adapter");
 			return false;
 
 		}
@@ -366,38 +369,37 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	}
 
 	public String getZoneId(JSONObject additionalParams) {
-		Long[] segmentCategories = entity.getTags();
+		String categoryZoneId=null;
 		try {
-			if (segmentCategories != null && segmentCategories.length > 0 && segmentCategories[0] != 1) {
-				for (int index = 0; index < segmentCategories.length; index++) {
-					String category = additionalParams
-							.getString(segmentCategories[index].toString());
-					LOG.debug("segment category is {}", category);
-					if (category != null) {
-						return category;
-					}
-				}
-			} else if (sasParams.getCategories() != null) {
+			if (sasParams.getCategories() != null) {
 				for (int index = 0; index < sasParams.getCategories().size(); index++) {
-					String category = additionalParams.getString(sasParams
-							.getCategories().get(index).toString());
-					LOG.debug("category is {}", category);
-					if (category != null) {
-						return category;
+					String categoryIdKey = sasParams.getCategories().get(index).toString();
+					if(additionalParams.has(categoryIdKey))
+					{
+						categoryZoneId = additionalParams.getString(categoryIdKey);
+						LOG.debug("category Id is {}", categoryZoneId);
+					}
+					if (categoryZoneId != null) {
+						return categoryZoneId;
 					}
 				}
 			}
+			if(additionalParams.has(DEFAULT_ZONE)){
+				categoryZoneId = additionalParams.getString(DEFAULT_ZONE);
+			}
+
 		} catch (JSONException exception) {
-			LOG.equals("Unable to get zone_id for Rubicon");
+			LOG.error("Unable to get zone_id for Rubicon ");
 		}
-		return null;
+		return categoryZoneId;
 	}
 
 	private boolean isInterstitial() {
 		Short slot = sasParams.getSlot();
 		if (10 == slot // 300X250
 				|| 14 == slot // 320X480
-				|| 16 == slot) /* 768X1024 */{
+				|| 16 == slot // 768X1024
+				|| 17 == slot)/* 800x1280 */ {
 			return true;
 		}
 		return false;
