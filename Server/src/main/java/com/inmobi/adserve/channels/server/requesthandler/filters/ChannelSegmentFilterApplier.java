@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.server.requesthandler.filters;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -81,6 +82,7 @@ public class ChannelSegmentFilterApplier {
             adGroupLevelFilter.filter(channelSegmentList, sasParams, casContext);
         }
 
+        Collections.sort(channelSegmentList, ChannelSegment.CHANNEL_SEGMENT_REVERSE_COMPARATOR);
         printSegments(traceMarker, channelSegmentList);
 
         return channelSegmentList;
