@@ -373,18 +373,23 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		try {
 			if (sasParams.getCategories() != null) {
 				for (int index = 0; index < sasParams.getCategories().size(); index++) {
-					categoryZoneId = additionalParams.getString(sasParams
-							.getCategories().get(index).toString());
-					LOG.debug("category is {}", categoryZoneId);
+					String categoryIdKey = sasParams.getCategories().get(index).toString();
+					if(additionalParams.has(categoryIdKey))
+					{
+						categoryZoneId = additionalParams.getString(categoryIdKey);
+						LOG.debug("category Id is {}", categoryZoneId);
+					}
 					if (categoryZoneId != null) {
 						return categoryZoneId;
 					}
 				}
 			}
-			categoryZoneId = additionalParams.getString(DEFAULT_ZONE);
+			if(additionalParams.has(DEFAULT_ZONE)){
+				categoryZoneId = additionalParams.getString(DEFAULT_ZONE);
+			}
 
 		} catch (JSONException exception) {
-			LOG.error("Unable to get zone_id for Rubicon");
+			LOG.error("Unable to get zone_id for Rubicon ");
 		}
 		return categoryZoneId;
 	}
