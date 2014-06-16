@@ -100,8 +100,12 @@ public class ServerConfig implements CasConfig {
         return serverConfiguration.getInt("incomingMaxConnections", 500);
     }
 
-    public int getServerTimeoutInMillis() {
-        return serverConfiguration.getInt("serverTimeoutMillis", 825);
+    public int getServerTimeoutInMillisForRTB() {
+        return serverConfiguration.getInt("serverTimeoutMillisForRTB", 200);
+    }
+    
+    public int getServerTimeoutInMillisForDCP() {
+        return serverConfiguration.getInt("serverTimeoutMillisForDCP", 825);
     }
 
     public List getExcludedAdvertisers(String filter) {

@@ -44,9 +44,9 @@ public class ChannelStatServerPipelineFactory extends ChannelInitializer<SocketC
     @Override
     protected void initChannel(final SocketChannel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();
-        pipeline.addLast("casWriteTimeoutHandler", new CasTimeoutHandler(serverConfig.getServerTimeoutInMillis()));
         pipeline.addLast("decoderEncoder", new HttpServerCodec());
         pipeline.addLast("aggregator", new HttpObjectAggregator(1024 * 1024));// 1 MB data size
+        pipeline.addLast("casWriteTimeoutHandler", new CasTimeoutHandler(serverConfig.getServerTimeoutInMillisForRTB(), serverConfig.getServerTimeoutInMillisForDCP()));
         pipeline.addLast("requestIdHandler", requestIdHandler);
         pipeline.addLast("nettyRequestScopeSeedHandler", nettyRequestScopeSeedHandler);
         pipeline.addLast("requestParserHandler", requestParserHandler);

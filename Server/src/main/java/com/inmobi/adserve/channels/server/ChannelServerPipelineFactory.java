@@ -51,9 +51,9 @@ public class ChannelServerPipelineFactory extends ChannelInitializer<SocketChann
         // enable logging handler only for dev purpose
         // pipeline.addLast("logging", loggingHandler);
         pipeline.addLast("incomingLimitHandler", incomingConnectionLimitHandler);
-        pipeline.addLast("casWriteTimeoutHandler", new CasTimeoutHandler(serverConfig.getServerTimeoutInMillis()));
         pipeline.addLast("decoderEncoder", new HttpServerCodec());
         pipeline.addLast("aggregator", new HttpObjectAggregator(1024 * 1024));// 1 MB data size
+        pipeline.addLast("casWriteTimeoutHandler", new CasTimeoutHandler(serverConfig.getServerTimeoutInMillisForRTB(), serverConfig.getServerTimeoutInMillisForDCP()));
         pipeline.addLast("requestIdHandler", requestIdHandler);
         pipeline.addLast("nettyRequestScopeSeedHandler", nettyRequestScopeSeedHandler);
         pipeline.addLast("requestParserHandler", requestParserHandler);

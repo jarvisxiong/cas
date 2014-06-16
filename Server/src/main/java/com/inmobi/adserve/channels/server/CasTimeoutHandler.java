@@ -3,6 +3,7 @@ package com.inmobi.adserve.channels.server;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
+import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.util.concurrent.ScheduledFuture;
 
@@ -15,7 +16,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class CasTimeoutHandler extends ChannelDuplexHandler {
 
-    private final long                  timeoutMillis;
+	private volatile long 				timeoutMillis;
+    private final long                  timeoutMillisForRTB;
+    private final long                  timeoutMillisForDCP;
     private volatile boolean            flag = false;
     private volatile long               lastReadTime;
 
@@ -24,14 +27,24 @@ public class CasTimeoutHandler extends ChannelDuplexHandler {
     /**
      * @param timeoutMillis
      */
-    public CasTimeoutHandler(final int timeoutMillis) {
-        this.timeoutMillis = timeoutMillis;
+    public CasTimeoutHandler(final int timeoutMillisForRTB, final int timeoutMillisForDCP) {
+        this.timeoutMillisForRTB = timeoutMillisForRTB;
+        this.timeoutMillisForDCP = timeoutMillisForDCP;
     }
 
     @Override
     public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
         flag = true;
         lastReadTime = System.currentTimeMillis();
+        
+        // if rtbd we are going with timeout of 190ms 
+        // else if dcp we are going with timeout of 600 ms
+        if(((DefaultFullHttpRequest)msg).getUri() == "/rtbdFill"){
+        	timeoutMillis = timeoutMillisForRTB;
+        }else{
+        	timeoutMillis = timeoutMillisForDCP;
+        }
+        
         super.channelRead(ctx, msg);
     }
 
@@ -105,9 +118,14 @@ public class CasTimeoutHandler extends ChannelDuplexHandler {
             if (!ctx.channel().isOpen()) {
                 return;
             }
-
+            
             long currentTime = System.currentTimeMillis();
+            
+            // if rtbd we are going with timeout of 190ms 
+            // else if dcp we are going with timeout of 600 ms
+            
             long nextDelay = timeoutMillis - (currentTime - lastReadTime);
+            
             if (nextDelay <= 0) {
                 // Read timed out - set a new timeout and notify the callback.
                 timeout = ctx.executor().schedule(this, timeoutMillis, TimeUnit.MILLISECONDS);
