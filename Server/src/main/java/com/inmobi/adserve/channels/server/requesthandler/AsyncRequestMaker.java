@@ -199,8 +199,8 @@ public class AsyncRequestMaker {
     public String getImpressionId(final long adId) {
         String uuidIntKey = (WilburyUUID.setIntKey(WilburyUUID.getUUID().toString(), (int) adId)).toString();
         String uuidMachineKey = (WilburyUUID.setMachineId(uuidIntKey, ChannelServer.hostIdCode)).toString();
-        String uuidWithCyclicCounter = (WilburyUUID.setCyclicCounter(uuidMachineKey, (byte) counter.getAndIncrement())).toString();
-        return (WilburyUUID.setDataCenterId(uuidWithCyclicCounter, ChannelServer.dataCenterIdCode)).toString();
+        // String uuidWithCyclicCounter = (WilburyUUID.setCyclicCounter(uuidMachineKey, (byte) counter.getAndIncrement())).toString();
+        return (WilburyUUID.setDataCenterId(uuidMachineKey, ChannelServer.dataCenterIdCode)).toString();
     }
 
     private static ClickUrlMakerV6 setClickParams(final boolean pricingModel, final Configuration config,
