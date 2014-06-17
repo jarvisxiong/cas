@@ -105,7 +105,7 @@ public class ThriftRequestMaker {
         integrationDetails.setIntegrationVersion(370);
 
         adPoolRequest.setRequestedAdType(RequestedAdType.ADHESION);
-        adPoolRequest.setResponseFormat(ResponseFormat.XHTML); adPoolRequest.setGeo(geo);
+        adPoolRequest.setResponseFormat(ResponseFormat.NATIVE); adPoolRequest.setGeo(geo);
         adPoolRequest.setIpFileVersion(1234);
         adPoolRequest.setIntegrationDetails(integrationDetails);
         List<Short> list = new ArrayList<Short>();

@@ -275,6 +275,11 @@
 				<version>1.25</version>
 			</dependency>
 			<dependency>
+				<groupId>com.inmobi.commons</groupId>
+				<artifactId>rtb</artifactId>
+				<version>1.26-SNAPSHOT</version>
+			 </dependency>
+			<dependency>
 				<groupId>org.codehaus.jackson</groupId>
 				<artifactId>jackson-jaxrs</artifactId>
 				<version>1.9.9</version>

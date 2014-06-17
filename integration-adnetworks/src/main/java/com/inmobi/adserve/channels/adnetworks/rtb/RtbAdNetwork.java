@@ -11,6 +11,7 @@ import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.*;
 import com.inmobi.casthrift.rtb.*;
+import com.inmobi.casthrift.rtb.Image;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
@@ -126,6 +127,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     
     @Inject
     private static NativeTemplateAttributeFinder nativeTemplateAttributeFinder;
+    
+    @Inject
+    private static NativeTemplateFormatter nativeTemplateFormatter;
     
     @Override
     protected AsyncHttpClient getAsyncHttpClient() {
@@ -293,7 +297,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             LOG.info("Impression id can not be null in sasparam");
             return null;
         }
-        impression.setBanner(banner);
+        
+        if(!isNativeRequest()){
+        	impression.setBanner(banner);
+        }
         impression.setBidfloorcur(USD);
         // Set interstitial or not
         if (null != sasParams.getRqAdType() && "int".equalsIgnoreCase(sasParams.getRqAdType())) {
@@ -313,39 +320,25 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             impression.setDisplaymanagerver(displayManagerVersion);
         }
         
-        if(isNativeResponseSuported){
+        if(isNativeResponseSuported && isNativeRequest()){
         	impression.setExt(createNativeExtensionObject());
         }
         return impression;
     }
     
     
-    
-    
     private ImpressionExtensions createNativeExtensionObject(){
     	Native nat = new Native();
-    	nat.mandatory.addAll(nativeTemplateAttributeFinder.findAttribute(new MandatoryNativeAttributeType()));
-    	nat.image.aspectratio = 1.77;
-    	nat.image.maxwidth = 1280;
-    	nat.image.minwidth = 568;
+    	nat.setMandatory(nativeTemplateAttributeFinder.findAttribute(new MandatoryNativeAttributeType()));
+    	nat.setImage(nativeTemplateAttributeFinder.findAttribute(new ImageNativeAttributeType()));
     	
-    	if(!StringUtils.isEmpty(sasParams.getSdkVersion())){
-    	   nat.api.add(3);
-    	}
-    	
-    	nat.battr.add(7);
-    	nat.battr.add(9);
-    	nat.battr.add(10);
-    	nat.battr.add(14);
-    	
-    	nat.suggested.add(0);
-    	
-    	nat.btype.add(1);
-    	nat.btype.add(2);
-    	nat.btype.add(3);
-    	nat.btype.add(4);
-    	
-    	
+    	//TODO: for native currently there is no way to identify MRAID traffic/container upported by publisher.
+//    	if(!StringUtils.isEmpty(sasParams.getSdkVersion())){
+//    	   nat.api.add(3);
+//    	}
+    	nat.setBattr(nativeTemplateAttributeFinder.findAttribute(new BAttrNativeType()));
+    	nat.setSuggested(nativeTemplateAttributeFinder.findAttribute(new SuggestedNativeAttributeType()));
+    	nat.setBtype(nativeTemplateAttributeFinder.findAttribute(new BTypeNativeAttributeType()));
     	
     	ImpressionExtensions iext = new ImpressionExtensions();
     	iext.setNativeObject(nat);
@@ -684,7 +677,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 return;
             }
             adStatus = "AD";
-            if(isNativeResponse()){
+            if(isNativeRequest()){
             	nativeAdBuilding();
             }else{
             	nonNativeAdBuilding();
@@ -770,21 +763,23 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
     
     
-    private boolean isNativeResponse(){
+    private boolean isNativeRequest(){
     	return "native".equals(sasParams.getRFormat());
     }
     
     private void nativeAdBuilding(){
     	
+    	Map<String, String> params = new HashMap<String, String>();
+    	params.put("beaconUrl",beaconUrl);
+    	try {
+    		responseContent = nativeTemplateFormatter.getFormatterValue(null, bidResponse, params);
+		} catch (TException e) {
+			e.printStackTrace();
+		}
+    	
+    	
     }
     
-    private boolean isValidNativeResponse(){
-    	if(isNativeResponseSuported){
-//    		bidResponse.ext;
-    	}
-    	
-    	return false;
-    }
 
     public boolean deserializeResponse(final String response) {
         Gson gson = new Gson();

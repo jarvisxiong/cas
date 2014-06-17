@@ -56,6 +56,10 @@
 			<artifactId>casthrift</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.inmobi.commons</groupId>
+			<artifactId>rtb</artifactId>
+	 	</dependency>
+		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-jaxrs</artifactId>
 		</dependency>
