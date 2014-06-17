@@ -140,7 +140,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setSlot(Short.valueOf("11"));
-        sasParams.setOsId(HandSetOS.iPhone_OS.getValue());
+        sasParams.setOsId(HandSetOS.iOS.getValue());
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
@@ -356,12 +356,11 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
                                 new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpadsmogoAdNetwork.configureParameters(sasParams,
                 casInternalRequestParameters, entity, null, beaconUrl);
-        String response = "<meta http-equiv='Content-Type'content='text/html; charset=UTF-8'/><style type='text/css'>*{padding:0px;margin:0px;-webkit-touch-callout: none;} a:link{text-decoration:none;}.tit{ font-size:[font_1]em;text-decoration: underline;font-weight;}.desc{ font-size:[font_2]em;margin-top:2px;}</style><a href='’http://#####'style='display: block; width: 100%; height: 100%;background-color: #000000'><table border='0'cellpadding='0'cellspacing='0'style='width: 320px; height: 50px;'><tr><td style='padding: 0px 2px; color: #ffffff'id='con'><span class='tit'>ad tilte</span><p class='desc'> Ad Text</p></td></tr></table></a>";
+        String response = "<meta http-equiv='Content-Type'content='text/html; charset=UTF-8'/><style type='text/css'>*{padding:0px;margin:0px;-webkit-touch-callout: none;} a:link{text-decoration:none;}.tit{ font-size:[font_1]em;text-decoration: underline;font-weight;}.desc{ font-size:[font_2]em;margin-top:2px;}</style><a href='���http://#####'style='display: block; width: 100%; height: 100%;background-color: #000000'><table border='0'cellpadding='0'cellspacing='0'style='width: 320px; height: 50px;'><tr><td style='padding: 0px 2px; color: #ffffff'id='con'><span class='tit'>ad tilte</span><p class='desc'> Ad Text</p></td></tr></table></a>";
         dcpadsmogoAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(200, dcpadsmogoAdNetwork.getHttpResponseStatusCode());
-        assertEquals(
-                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"mraid.js\"></script><meta http-equiv='Content-Type'content='text/html; charset=UTF-8'/><style type='text/css'>*{padding:0px;margin:0px;-webkit-touch-callout: none;} a:link{text-decoration:none;}.tit{ font-size:[font_1]em;text-decoration: underline;font-weight;}.desc{ font-size:[font_2]em;margin-top:2px;}</style><a href='’http://#####'style='display: block; width: 100%; height: 100%;background-color: #000000'><table border='0'cellpadding='0'cellspacing='0'style='width: 320px; height: 50px;'><tr><td style='padding: 0px 2px; color: #ffffff'id='con'><span class='tit'>ad tilte</span><p class='desc'> Ad Text</p></td></tr></table></a><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>",
-                dcpadsmogoAdNetwork.getHttpResponseContent());
+        String outputHttpResponseContent = "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><meta http-equiv='Content-Type'content='text/html; charset=UTF-8'/><style type='text/css'>*{padding:0px;margin:0px;-webkit-touch-callout: none;} a:link{text-decoration:none;}.tit{ font-size:[font_1]em;text-decoration: underline;font-weight;}.desc{ font-size:[font_2]em;margin-top:2px;}</style><a href='���http://#####'style='display: block; width: 100%; height: 100%;background-color: #000000'><table border='0'cellpadding='0'cellspacing='0'style='width: 320px; height: 50px;'><tr><td style='padding: 0px 2px; color: #ffffff'id='con'><span class='tit'>ad tilte</span><p class='desc'> Ad Text</p></td></tr></table></a><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>";
+        assertEquals(outputHttpResponseContent, dcpadsmogoAdNetwork.getHttpResponseContent());
     }
 
     

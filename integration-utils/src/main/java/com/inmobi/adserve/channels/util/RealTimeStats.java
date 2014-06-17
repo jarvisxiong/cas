@@ -1,10 +1,9 @@
 package com.inmobi.adserve.channels.util;
 
-import lombok.Getter;
-
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Counter;
 import com.yammer.metrics.core.Histogram;
+import lombok.Getter;
 
 
 // Yammer objects for country,os,advertiser

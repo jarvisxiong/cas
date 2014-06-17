@@ -132,7 +132,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
         appendQueryParam(url, ADSPACE_WIDTH, width, false);
         appendQueryParam(url, ADSPACE_HEIGHT, height, false);
 
-        if (sasParams.getOsId() == HandSetOS.iPhone_OS.getValue()) {
+        if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
             if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
                 appendQueryParam(url, IOS_ID,
                         casInternalRequestParameters.uidIFA, false);
