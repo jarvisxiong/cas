@@ -22,11 +22,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Singleton
 public class AsyncRequestMaker {
     private static final Logger  LOG = LoggerFactory.getLogger(AsyncRequestMaker.class);
+    private static final AtomicInteger counter = new AtomicInteger();
 
     private final SegmentFactory segmentFactory;
 
@@ -197,7 +199,9 @@ public class AsyncRequestMaker {
     public String getImpressionId(final long adId) {
         String uuidIntKey = (WilburyUUID.setIntKey(WilburyUUID.getUUID().toString(), (int) adId)).toString();
         String uuidMachineKey = (WilburyUUID.setMachineId(uuidIntKey, ChannelServer.hostIdCode)).toString();
-        return (WilburyUUID.setDataCenterId(uuidMachineKey, ChannelServer.dataCenterIdCode)).toString();
+        String uuidWithCyclicCounter = (WilburyUUID.setCyclicCounter(uuidMachineKey,
+                (byte) (counter.getAndIncrement() % 128))).toString();
+        return (WilburyUUID.setDataCenterId(uuidWithCyclicCounter, ChannelServer.dataCenterIdCode)).toString();
     }
 
     private static ClickUrlMakerV6 setClickParams(final boolean pricingModel, final Configuration config,

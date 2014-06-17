@@ -1,10 +1,16 @@
 package com.inmobi.adserve.channels.adnetworks;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import com.inmobi.adserve.channels.adnetworks.rubicon.DCPRubiconAdnetwork;
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import junit.framework.TestCase;
+import org.apache.commons.configuration.Configuration;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.testng.annotations.Test;
 
 import java.io.File;
 import java.net.URLEncoder;
@@ -12,21 +18,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.TestCase;
-
-import org.apache.commons.configuration.Configuration;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.testng.annotations.Test;
-
-import com.inmobi.adserve.channels.adnetworks.rubicon.DCPRubiconAdnetwork;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 
 public class DCPRubiconAdnetworkTest extends TestCase {
@@ -439,7 +433,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 		dcpRubiconAdNetwork.parseResponse(response, HttpResponseStatus.OK);
 		assertEquals(200, dcpRubiconAdNetwork.getHttpResponseStatusCode());
 		assertEquals(
-				"<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"mraid.js\"></script><script><div>testing rubicon</div></script><img src='http://ad.tracker/impression/ed4122f3-f4ac-477b-9abd-89c44f252100' height=1 width=1 border=0 style=\"display:none;\"/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>",
+				"<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script><div>testing rubicon</div></script><img src='http://ad.tracker/impression/ed4122f3-f4ac-477b-9abd-89c44f252100' height=1 width=1 border=0 style=\"display:none;\"/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>",
 				dcpRubiconAdNetwork.getHttpResponseContent());
 	}
 

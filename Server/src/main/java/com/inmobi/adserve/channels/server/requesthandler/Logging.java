@@ -423,29 +423,9 @@ public class Logging {
             Integer count = Integer.parseInt(sampledAdvertiserLogNos.get(partnerName + extsiteKey).split("_")[1]);
 
             if (System.currentTimeMillis() - time < 3600000) {
-                if (count < totalCount) {
-                    requestUrl = adNetworkInterface.getRequestUrl();
-                    response = adNetworkInterface.getHttpResponseContent();
-                    if (requestUrl.equals("") || response.equals("")) {
-                        continue;
-                    }
-                    if (index > 0 && partnerName.length() > 0 && log.length() > 0) {
-                        log.append("\n");
-                    }
-                    log.append(partnerName).append(sep)
-                            .append(rankList.get(index).getChannelSegmentEntity().getExternalSiteKey());
-                    log.append(sep).append(requestUrl).append(sep).append(adResponse.adStatus);
-                    log.append(sep).append(response).append(sep).append(advertiserId);
-                    count++;
-                    sampledAdvertiserLogNos.put(partnerName + extsiteKey, time + "_" + count);
+                if (count >= totalCount) {
+                    continue;
                 }
-            }
-            else {
-                LOG.debug("creating new sampledadvertiser logs");
-                count = 0;
-                sampledAdvertiserLogNos.put(partnerName + extsiteKey, System.currentTimeMillis() + "_" + 0);
-                time = Long.parseLong(sampledAdvertiserLogNos.get(partnerName + extsiteKey).split("_")[0]);
-                count = Integer.parseInt(sampledAdvertiserLogNos.get(partnerName + extsiteKey).split("_")[1]);
                 requestUrl = adNetworkInterface.getRequestUrl();
                 response = adNetworkInterface.getHttpResponseContent();
                 if (requestUrl.equals("") || response.equals("")) {
@@ -461,10 +441,31 @@ public class Logging {
                 count++;
                 sampledAdvertiserLogNos.put(partnerName + extsiteKey, time + "_" + count);
             }
-            if (enableDatabusLogging) {
-                if (count > totalCount) {
+            else {
+                LOG.debug("creating new sampledadvertiser logs");
+                count = 0;
+                sampledAdvertiserLogNos.put(partnerName + extsiteKey, System.currentTimeMillis() + "_" + 0);
+                time = Long.parseLong(sampledAdvertiserLogNos.get(partnerName + extsiteKey).split("_")[0]);
+                count = Integer.parseInt(sampledAdvertiserLogNos.get(partnerName + extsiteKey).split("_")[1]);
+                requestUrl = adNetworkInterface.getRequestUrl();
+                response = adNetworkInterface.getHttpResponseContent();
+                if (count >= totalCount) {
                     continue;
                 }
+                if (requestUrl.equals("") || response.equals("")) {
+                    continue;
+                }
+                if (index > 0 && partnerName.length() > 0 && log.length() > 0) {
+                    log.append("\n");
+                }
+                log.append(partnerName).append(sep)
+                        .append(rankList.get(index).getChannelSegmentEntity().getExternalSiteKey());
+                log.append(sep).append(requestUrl).append(sep).append(adResponse.adStatus);
+                log.append(sep).append(response).append(sep).append(advertiserId);
+                count++;
+                sampledAdvertiserLogNos.put(partnerName + extsiteKey, time + "_" + count);
+            }
+            if (enableDatabusLogging) {
                 CasAdvertisementLog casAdvertisementLog = new CasAdvertisementLog(partnerName, requestUrl, response, adstatus, extsiteKey, advertiserId);
                 Message msg = null;
                 try {

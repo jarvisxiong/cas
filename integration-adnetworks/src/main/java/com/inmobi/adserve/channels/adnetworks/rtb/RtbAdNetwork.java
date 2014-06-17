@@ -95,8 +95,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private String                         encryptedBid;
     private static List<String>            mimes                        = Arrays.asList("image/jpeg", "image/gif",
                                                                                 "image/png");
-    private static List<Integer>           fsBlockedAttributes          = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 13,
-                                                                                15, 16);
+    private static List<Integer>           fsBlockedAttributes          = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13,
+                                                                                14, 15, 16);
     private static List<Integer>           performanceBlockedAttributes = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
                                                                                 11, 12, 13, 14, 15, 16);
     private static final String            FAMILY_SAFE_RATING           = "1";
@@ -341,8 +341,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
                 && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
             String[] latlong = casInternalRequestParameters.latLong.split(",");
-            geo.setLat(Float.parseFloat(String.format("%.2f", Float.parseFloat(latlong[0]))));
-            geo.setLon(Float.parseFloat(String.format("%.2f", Float.parseFloat(latlong[1]))));
+            geo.setLat(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[0]))));
+            geo.setLon(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[1]))));
         }
         if (null != sasParams.getCountryCode()) {
             geo.setCountry(iabCountriesInterface.getIabCountry(sasParams.getCountryCode()));
@@ -364,9 +364,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private User createUserObject() {
         User user = new User();
         String gender = sasParams.getGender();
-        if ( StringUtils.isNotEmpty(gender)&&(gender.equalsIgnoreCase("M")||gender.equalsIgnoreCase("F")));
+        if ( StringUtils.isNotEmpty(gender));
         {
-            user.setGender(sasParams.getGender());  
+            user.setGender(gender);  
         }
         
         if (casInternalRequestParameters.uid != null) {
@@ -377,12 +377,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         try {
             if (sasParams.getAge() != null) {
                 int age = sasParams.getAge();
-                if ((age>15)&&(age<100))
-                {
                 int year = Calendar.getInstance().get(Calendar.YEAR);
                 int yob = year - age;
                 user.setYob(yob);
-            }
             }
         }
         catch (NumberFormatException e) {
