@@ -48,7 +48,7 @@ public class ThriftRequestMaker {
 
         AdPoolRequest adPoolRequest = createAdPoolRequest();
         System.out.println("Request is : " + adPoolRequest);
-        sendUMPPost(adPoolRequest);
+        sendBackFillGet(adPoolRequest);
 
     }
 
@@ -59,7 +59,7 @@ public class ThriftRequestMaker {
         site.setSiteUrl("siteurl");
         site.setCpcFloor(0.03);
         site.setEcpmFloor(.3);
-        site.setSiteId("4028cb1334ef46a9013578fe1c1f18fc");
+        site.setSiteId("b79bb8cbab6e479bbd1c14b2dd448f7e");
         site.setPublisherId("sitepub");
         site.setContentRating(ContentRating.PERFORMANCE);
         site.setInventoryType(InventoryType.APP);
@@ -97,7 +97,9 @@ public class ThriftRequestMaker {
         AdPoolRequest adPoolRequest = new AdPoolRequest();
         adPoolRequest.setRequestId("requestId");
         adPoolRequest.setRemoteHostIp("10.14.118.13");
-        adPoolRequest.setSite(site); adPoolRequest.setDevice(device);
+        adPoolRequest.setSite(site);
+        adPoolRequest.setSegmentId(0);
+        adPoolRequest.setDevice(device);
         adPoolRequest.setCarrier(carrier);
 
         IntegrationDetails integrationDetails = new IntegrationDetails();
