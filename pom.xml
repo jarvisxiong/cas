@@ -277,7 +277,7 @@
 			<dependency>
 				<groupId>com.inmobi.commons</groupId>
 				<artifactId>rtb</artifactId>
-				<version>1.26-SNAPSHOT</version>
+				<version>1.26</version>
 			 </dependency>
 			<dependency>
 				<groupId>org.codehaus.jackson</groupId>

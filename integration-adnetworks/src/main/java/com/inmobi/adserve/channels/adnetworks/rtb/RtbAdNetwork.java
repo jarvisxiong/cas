@@ -131,6 +131,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Inject
     private static NativeTemplateFormatter nativeTemplateFormatter;
     
+    
+    private static final String nativeString = "native";
+    
     @Override
     protected AsyncHttpClient getAsyncHttpClient() {
         return asyncHttpClientProvider.getRtbAsyncHttpClient();
@@ -276,6 +279,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
         try {
             bidRequestJson = serializer.toString(bidRequest);
+            if(isNativeRequest()){
+            	bidRequestJson.replaceFirst("nativeObject", "native");
+            }
             LOG.info("RTB request json is : {}", bidRequestJson);
         }
         catch (TException e) {
@@ -332,7 +338,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     	nat.setMandatory(nativeTemplateAttributeFinder.findAttribute(new MandatoryNativeAttributeType()));
     	nat.setImage(nativeTemplateAttributeFinder.findAttribute(new ImageNativeAttributeType()));
     	
-    	//TODO: for native currently there is no way to identify MRAID traffic/container upported by publisher.
+    	//TODO: for native currently there is no way to identify MRAID traffic/container supported by publisher.
 //    	if(!StringUtils.isEmpty(sasParams.getSdkVersion())){
 //    	   nat.api.add(3);
 //    	}
@@ -761,7 +767,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     
     
     private boolean isNativeRequest(){
-    	return "native".equals(sasParams.getRFormat());
+    	return nativeString.equals(sasParams.getRFormat());
     }
     
     private void nativeAdBuilding(){
@@ -770,8 +776,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     	params.put("beaconUrl",beaconUrl);
     	try {
     		responseContent = nativeTemplateFormatter.getFormatterValue(null, bidResponse, params);
-		} catch (TException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			 adStatus = "NO_AD";
+	         LOG.info("Some exception is caught while filling the native template for partner{} {}",
+	                    advertiserName, e);
 		}
     	
     	

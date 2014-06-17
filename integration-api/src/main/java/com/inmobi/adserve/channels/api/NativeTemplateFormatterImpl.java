@@ -93,7 +93,7 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 	
 
 	@Override
-	public String getFormatterValue(String template, BidResponse response,Map<String, String> params) throws TException {
+	public String getFormatterValue(String template, BidResponse response,Map<String, String> params) throws Exception {
 		
 		
 		
@@ -113,43 +113,49 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 		return nativeAd(pubContent, contextCode, namespace);
 	}
 	
+	private void throwException(String message) throws Exception{
+		throw new Exception(message);
+	}
 	
-	private void validateResponse(NativeResponse response){
+	private void validateResponse(NativeResponse response) throws Exception{
 		
 		if(StringUtils.isEmpty(response.getIconurl())){
-			//throw new Exception();
+			throwException("Missing iconurl");
 		}
 		
 		if(StringUtils.isEmpty(response.getTitle())){
-			
+			throwException("Missing title");
 		}
 		
 		if(StringUtils.isEmpty(response.getDescription())){
-			
+			throwException("Missing description");
 		}
 		
 		if(StringUtils.isEmpty(response.getActionlink())){
-			
+			throwException("Missing action link");
 		}
 		
 		if(StringUtils.isEmpty(response.getActiontext())){
-			
+			throwException("Missing action text");
 		}
 		
 		if(response.getPixelurlSize()<1){
-			
+			throwException("Missing pixelurl");
 		}
 		
 		if(response.getClickurlSize()<1){
-			
+			throwException("missing clickurl");
 		}
 		
 		if(response.isSetImage()){
-			
+			throwException("Missing Image");
 		}else if(StringUtils.isEmpty(response.getImage().getImageurl())){
-			
+			throwException("Missing image url");
+		}else if(response.getImage().getW()<1){
+			throwException("Image width is not defined.");
+		}else if(response.getImage().getH()<1){
+			throwException("Image height is not defined");
 		}
-		
 		
 		
 	}
@@ -271,7 +277,7 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 	}
 	
 	
-	public static void main(String args[]) throws TException{
+	public static void main(String args[]) throws Exception{
 //		
 //		NativeResponse natResponse = new NativeResponse();
 //		
