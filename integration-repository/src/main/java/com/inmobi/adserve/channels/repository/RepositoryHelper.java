@@ -1,14 +1,24 @@
 package com.inmobi.adserve.channels.repository;
 
-import com.inmobi.adserve.channels.entity.*;
-import com.inmobi.adserve.channels.query.CreativeQuery;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Preconditions;
+import com.inmobi.adserve.channels.entity.ChannelEntity;
+import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
+import com.inmobi.adserve.channels.entity.CreativeEntity;
+import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.entity.PricingEngineEntity;
+import com.inmobi.adserve.channels.entity.PublisherFilterEntity;
+import com.inmobi.adserve.channels.entity.SegmentAdGroupFeedbackEntity;
+import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
+import com.inmobi.adserve.channels.entity.SiteFeedbackEntity;
+import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
+import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
+import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
+import com.inmobi.adserve.channels.query.CreativeQuery;
 import com.inmobi.adserve.channels.query.PricingEngineQuery;
 import com.inmobi.adserve.channels.query.PublisherFilterQuery;
 import com.inmobi.adserve.channels.query.SiteEcpmQuery;
@@ -28,9 +38,10 @@ public class RepositoryHelper {
     private final PublisherFilterRepository        publisherFilterRepository;
     private final SiteEcpmRepository               siteEcpmRepository;
     private final CurrencyConversionRepository     currencyConversionRepository;
+    private final WapSiteUACRepository             wapSiteUACRepository;
     private final CreativeRepository               creativeRepository;
     private final RepositoryStatsProvider          repositoryStatsProvider;
-    private static final Logger                    LOG = LoggerFactory.getLogger(RepositoryHelper.class);
+    // private static final Logger                    LOG = LoggerFactory.getLogger(RepositoryHelper.class);
 
     public RepositoryHelper(final Builder builder) {
         this.channelRepository = builder.channelRepository;
@@ -44,6 +55,7 @@ public class RepositoryHelper {
         this.publisherFilterRepository = builder.publisherFilterRepository;
         this.siteEcpmRepository = builder.siteEcpmRepository;
         this.currencyConversionRepository = builder.currencyConversionRepository;
+        this.wapSiteUACRepository = builder.wapSiteUACRepository;
         this.creativeRepository = builder.creativeRepository;
         this.repositoryStatsProvider = new RepositoryStatsProvider();
         this.repositoryStatsProvider
@@ -57,6 +69,7 @@ public class RepositoryHelper {
                     .addRepositoryToStats(this.publisherFilterRepository)
                     .addRepositoryToStats(this.siteEcpmRepository)
                     .addRepositoryToStats(this.currencyConversionRepository)
+                    .addRepositoryToStats(this.wapSiteUACRepository)
                     .addRepositoryToStats(this.creativeRepository);
 
     }
@@ -78,6 +91,7 @@ public class RepositoryHelper {
         private PublisherFilterRepository        publisherFilterRepository;
         private SiteEcpmRepository               siteEcpmRepository;
         private CurrencyConversionRepository     currencyConversionRepository;
+        private WapSiteUACRepository             wapSiteUACRepository;
         private CreativeRepository               creativeRepository;
 
         public RepositoryHelper build() {
@@ -92,6 +106,7 @@ public class RepositoryHelper {
             Preconditions.checkNotNull(publisherFilterRepository);
             Preconditions.checkNotNull(siteEcpmRepository);
             Preconditions.checkNotNull(currencyConversionRepository);
+            Preconditions.checkNotNull(wapSiteUACRepository);
             Preconditions.checkNotNull(creativeRepository);
             return new RepositoryHelper(this);
         }
@@ -199,6 +214,15 @@ public class RepositoryHelper {
     public CurrencyConversionEntity queryCurrencyConversionRepository(final String countryId) {
         try {
             return currencyConversionRepository.query(countryId);
+        }
+        catch (RepositoryException ignored) {
+        }
+        return null;
+    }
+    
+    public WapSiteUACEntity queryWapSiteUACRepository(final String id) {
+        try {
+            return wapSiteUACRepository.query(id);
         }
         catch (RepositoryException ignored) {
         }

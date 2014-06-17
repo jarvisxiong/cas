@@ -61,6 +61,7 @@ public class ChannelServer {
     private static PublisherFilterRepository        publisherFilterRepository;
     private static SiteEcpmRepository               siteEcpmRepository;
     private static CurrencyConversionRepository     currencyConversionRepository;
+    private static WapSiteUACRepository             wapSiteUACRepository;
     private static CreativeRepository               creativeRepository;
     private static final String                     configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
     public static byte                              dataCenterIdCode;
@@ -121,6 +122,7 @@ public class ChannelServer {
             publisherFilterRepository = new PublisherFilterRepository();
             siteEcpmRepository = new SiteEcpmRepository();
             currencyConversionRepository = new CurrencyConversionRepository();
+            wapSiteUACRepository = new WapSiteUACRepository();
             creativeRepository = new CreativeRepository();
 
             RepositoryHelper.Builder repoHelperBuilder = RepositoryHelper.newBuilder();
@@ -135,6 +137,7 @@ public class ChannelServer {
             repoHelperBuilder.setPublisherFilterRepository(publisherFilterRepository);
             repoHelperBuilder.setSiteEcpmRepository(siteEcpmRepository);
             repoHelperBuilder.setCurrencyConversionRepository(currencyConversionRepository);
+            repoHelperBuilder.setWapSiteUACRepository(wapSiteUACRepository);
             repoHelperBuilder.setCreativeRepository(creativeRepository);
             RepositoryHelper repositoryHelper = repoHelperBuilder.build();
 
@@ -261,6 +264,9 @@ public class ChannelServer {
             currencyConversionRepository.init(logger,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY),
                     ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY);
+            wapSiteUACRepository.init(logger,
+                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY),
+                    ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY);
             channelAdGroupRepository.init(logger,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY),
                     ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY);
