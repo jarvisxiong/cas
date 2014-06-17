@@ -99,8 +99,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private String                         encryptedBid;
     private static List<String>            mimes                        = Arrays.asList("image/jpeg", "image/gif",
                                                                                 "image/png");
-    private static List<Integer>           fsBlockedAttributes          = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 13,
-                                                                                15, 16);
+    private static List<Integer>           fsBlockedAttributes          = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13,
+                                                                                14, 15, 16);
     private static List<Integer>           performanceBlockedAttributes = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
                                                                                 11, 12, 13, 14, 15, 16);
     private static final String            FAMILY_SAFE_RATING           = "1";
@@ -404,9 +404,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private User createUserObject() {
         User user = new User();
         String gender = sasParams.getGender();
-        if ( StringUtils.isNotEmpty(gender)&&(gender.equalsIgnoreCase("M")||gender.equalsIgnoreCase("F")));
+        if ( StringUtils.isNotEmpty(gender));
         {
-            user.setGender(sasParams.getGender());  
+            user.setGender(gender);  
         }
         
         if (casInternalRequestParameters.uid != null) {
@@ -417,12 +417,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         try {
             if (sasParams.getAge() != null) {
                 int age = sasParams.getAge();
-                if ((age>15)&&(age<100))
-                {
                 int year = Calendar.getInstance().get(Calendar.YEAR);
                 int yob = year - age;
                 user.setYob(yob);
-            }
             }
         }
         catch (NumberFormatException e) {
