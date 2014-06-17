@@ -147,7 +147,7 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 			throwException("missing clickurl");
 		}
 		
-		if(response.isSetImage()){
+		if(!response.isSetImage()){
 			throwException("Missing Image");
 		}else if(StringUtils.isEmpty(response.getImage().getImageurl())){
 			throwException("Missing image url");

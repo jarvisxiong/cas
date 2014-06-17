@@ -338,7 +338,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             return responseStruct;
         }
         responseStruct = new ThirdPartyAdResponse();
-        responseStruct.responseFormat = ThirdPartyAdResponse.ResponseFormat.HTML;
+        responseStruct.responseFormat = isNativeRequest()?ThirdPartyAdResponse.ResponseFormat.JSON:ThirdPartyAdResponse.ResponseFormat.HTML;
         responseStruct.response = getHttpResponseContent();
         responseStruct.responseHeaders = getResponseHeaders();
         if (statusCode >= 400) {
@@ -662,6 +662,10 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     @Override
     public void setEncryptedBid(final String encryptedBid) {
 
+    }
+    
+    protected boolean isNativeRequest(){
+    	return false;
     }
 
     protected String getHashedValue(final String message, final String hashingType) {

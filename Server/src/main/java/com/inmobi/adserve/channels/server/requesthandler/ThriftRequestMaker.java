@@ -59,7 +59,9 @@ public class ThriftRequestMaker {
         site.setSiteUrl("siteurl");
         site.setCpcFloor(0.03);
         site.setEcpmFloor(.3);
-        site.setSiteId("4028cb1334ef46a9013578fe1c1f18fc");
+//        site.setSiteId("4028cb1334ef46a9013578fe1c1f18fc");
+        //tango siteid
+        site.setSiteId("69d6ab27d03f407f9f6fa9c5fad77afd");
         site.setPublisherId("sitepub");
         site.setContentRating(ContentRating.PERFORMANCE);
         site.setInventoryType(InventoryType.APP);
@@ -112,7 +114,7 @@ public class ThriftRequestMaker {
         list.add((short)9);
         adPoolRequest.setSelectedSlots(list);
         List<SupplyCapability> supplyCapabilities = new ArrayList<>();
-        supplyCapabilities.add(SupplyCapability.BANNER);
+        //supplyCapabilities.add(SupplyCapability.BANNER);
         adPoolRequest.setSupplyCapabilities(supplyCapabilities);
         adPoolRequest.setRequestedAdCount((short)1);
         return adPoolRequest;

@@ -11,7 +11,6 @@ import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.*;
 import com.inmobi.casthrift.rtb.*;
-import com.inmobi.casthrift.rtb.Image;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
@@ -280,7 +279,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         try {
             bidRequestJson = serializer.toString(bidRequest);
             if(isNativeRequest()){
-            	bidRequestJson.replaceFirst("nativeObject", "native");
+            	bidRequestJson = bidRequestJson.replaceFirst("nativeObject", "native");
             }
             LOG.info("RTB request json is : {}", bidRequestJson);
         }
@@ -765,8 +764,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
     }
     
-    
-    private boolean isNativeRequest(){
+    @Override
+    protected boolean isNativeRequest(){
     	return nativeString.equals(sasParams.getRFormat());
     }
     
