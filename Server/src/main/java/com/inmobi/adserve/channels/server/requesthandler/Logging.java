@@ -432,10 +432,11 @@ public class Logging {
             }
             log.append(partnerName).append(sep)
                     .append(rankList.get(index).getChannelSegmentEntity().getExternalSiteKey());
-            log.append(sep).append(requestUrl).append(sep).append(adResponse.adStatus);
+            log.append(sep).append(requestUrl).append(sep).append(adStatus);
             log.append(sep).append(response).append(sep).append(advertiserId);
         }
 
+        //Actual File Logging
         if (enableFileLogging && log.length() > 0) {
             sampledAdvertiserLogger.debug(log.toString());
             LOG.debug("done with sampledAdvertiser logging");
@@ -464,25 +465,25 @@ public class Logging {
     /**
      *
      * @param partnerName
-     * @param extsiteKey
+     * @param externalSiteId
      * @return true if logging required otherwise false
      */
-    private static boolean decideToLog(String partnerName, String extsiteKey) {
+    private static boolean decideToLog(String partnerName, String externalSiteId) {
         long currentTime = System.currentTimeMillis();
-        if (null == sampledAdvertiserLogNos.get(partnerName + extsiteKey)) {
-            sampledAdvertiserLogNos.put(partnerName + extsiteKey, currentTime + "_" + 0);
+        if (null == sampledAdvertiserLogNos.get(partnerName + externalSiteId)) {
+            sampledAdvertiserLogNos.put(partnerName + externalSiteId, currentTime + "_" + 0);
         }
-        Long time = Long.parseLong(sampledAdvertiserLogNos.get(partnerName + extsiteKey).split("_")[0]);
+        Long time = Long.parseLong(sampledAdvertiserLogNos.get(partnerName + externalSiteId).split("_")[0]);
         if (currentTime - time >= 3600000) {
-            sampledAdvertiserLogNos.put(partnerName + extsiteKey, currentTime + "_" + 0);
-            time = Long.parseLong(sampledAdvertiserLogNos.get(partnerName + extsiteKey).split("_")[0]);
+            sampledAdvertiserLogNos.put(partnerName + externalSiteId, currentTime + "_" + 0);
+            time = Long.parseLong(sampledAdvertiserLogNos.get(partnerName + externalSiteId).split("_")[0]);
         }
-        Integer count = Integer.parseInt(sampledAdvertiserLogNos.get(partnerName + extsiteKey).split("_")[1]);
+        Integer count = Integer.parseInt(sampledAdvertiserLogNos.get(partnerName + externalSiteId).split("_")[1]);
         if (count >= totalCount) {
             return false;
         }
         count++;
-        sampledAdvertiserLogNos.put(partnerName + extsiteKey, time + "_" + count);
+        sampledAdvertiserLogNos.put(partnerName + externalSiteId, time + "_" + count);
         return true;
     }
 
