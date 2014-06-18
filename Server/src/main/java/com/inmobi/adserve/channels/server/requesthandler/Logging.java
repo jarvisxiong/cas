@@ -423,7 +423,7 @@ public class Logging {
             if (enableDatabusLogging && decideToLog(partnerName, externalSiteKey)) {
                 //Actual Logging to stream
                 CasAdvertisementLog casAdvertisementLog = new CasAdvertisementLog(partnerName, requestUrl, response, adStatus, externalSiteKey, advertiserId);
-                sendToDatabus(casAdvertisementLog);
+                sendToDatabus(casAdvertisementLog, sampledAdvertisementLogKey);
             }
 
             //File Logging
@@ -447,7 +447,7 @@ public class Logging {
      *
      * @param casAdvertisementLog
      */
-    private static void sendToDatabus(CasAdvertisementLog casAdvertisementLog) {
+    private static void sendToDatabus(CasAdvertisementLog casAdvertisementLog, String sampledAdvertisementLogKey) {
         Message msg = null;
         try {
             TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
