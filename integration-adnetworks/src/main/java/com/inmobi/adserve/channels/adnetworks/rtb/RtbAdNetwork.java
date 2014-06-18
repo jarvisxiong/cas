@@ -781,7 +781,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 	                    advertiserName, e);
 		}
     	
-    	
     }
     
 

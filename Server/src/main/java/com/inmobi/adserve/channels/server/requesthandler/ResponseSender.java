@@ -54,7 +54,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                                                                            + " </style></head><body class=\"nofill\"><!-- NO FILL -->"
                                                                            + "<script type=\"text/javascript\" charset=\"utf-8\">"
                                                                            + "parent.postMessage('{\"topic\":\"nfr\",\"container\" : \"%s\"}', '*');</script></body></html>";
-    private static Set<String>          SUPPORTED_RESPONSE_FORMATS = Sets.newHashSet("html", "xhtml", "axml", "imai");
+    private static Set<String>          SUPPORTED_RESPONSE_FORMATS = Sets.newHashSet("html", "xhtml", "axml", "imai","native");
 
     private long                        totalTime;
     private List<ChannelSegment>        rankList;
@@ -556,6 +556,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
         else if ("axml".equalsIgnoreCase(responseFormat)) {
             return ResponseFormat.XHTML;
+        }else if("native".equalsIgnoreCase(responseFormat)){
+        	return ResponseFormat.NATIVE;
         }
         return ResponseFormat.getValue(responseFormat);
     }

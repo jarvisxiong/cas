@@ -9,8 +9,7 @@ public class MandatoryNativeAttributeType implements NativeAttributeType<List<In
 		ICON,
 		MEDIA,
 		HEADLINE,
-		DESCRIPTION,
-		ACTION
+		DESCRIPTION
 	}
 	
 	static List<Integer> attrs = new ArrayList<Integer>(MandatoryType.values().length);
@@ -19,7 +18,6 @@ public class MandatoryNativeAttributeType implements NativeAttributeType<List<In
 		attrs.add(MandatoryType.MEDIA.ordinal());
 		attrs.add(MandatoryType.HEADLINE.ordinal());
 		attrs.add(MandatoryType.DESCRIPTION.ordinal());
-		attrs.add(MandatoryType.ACTION.ordinal());
 	}
 
 	@Override

@@ -114,7 +114,7 @@ public class ThriftRequestMaker {
         list.add((short)9);
         adPoolRequest.setSelectedSlots(list);
         List<SupplyCapability> supplyCapabilities = new ArrayList<>();
-        //supplyCapabilities.add(SupplyCapability.BANNER);
+        supplyCapabilities.add(SupplyCapability.BANNER);
         adPoolRequest.setSupplyCapabilities(supplyCapabilities);
         adPoolRequest.setRequestedAdCount((short)1);
         return adPoolRequest;
