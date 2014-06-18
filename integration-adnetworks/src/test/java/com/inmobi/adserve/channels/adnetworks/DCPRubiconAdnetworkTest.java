@@ -1,10 +1,16 @@
 package com.inmobi.adserve.channels.adnetworks;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import com.inmobi.adserve.channels.adnetworks.rubicon.DCPRubiconAdnetwork;
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import junit.framework.TestCase;
+import org.apache.commons.configuration.Configuration;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.testng.annotations.Test;
 
 import java.io.File;
 import java.net.URLEncoder;
@@ -12,21 +18,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.TestCase;
-
-import org.apache.commons.configuration.Configuration;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.testng.annotations.Test;
-
-import com.inmobi.adserve.channels.adnetworks.rubicon.DCPRubiconAdnetwork;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 
 public class DCPRubiconAdnetworkTest extends TestCase {

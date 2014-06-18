@@ -386,8 +386,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
                 && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
             String[] latlong = casInternalRequestParameters.latLong.split(",");
-            geo.setLat(Float.parseFloat(String.format("%.4f", Float.parseFloat(latlong[0]))));
-            geo.setLon(Float.parseFloat(String.format("%.4f", Float.parseFloat(latlong[1]))));
+            geo.setLat(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[0]))));
+            geo.setLon(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[1]))));
         }
         if (null != sasParams.getCountryCode()) {
             geo.setCountry(iabCountriesInterface.getIabCountry(sasParams.getCountryCode()));
