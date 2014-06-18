@@ -95,8 +95,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private String                         encryptedBid;
     private static List<String>            mimes                        = Arrays.asList("image/jpeg", "image/gif",
                                                                                 "image/png");
-    private static List<Integer>           fsBlockedAttributes          = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 13,
-                                                                                15, 16);
+    private static List<Integer>           fsBlockedAttributes          = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13,
+                                                                                14, 15, 16);
     private static List<Integer>           performanceBlockedAttributes = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
                                                                                 11, 12, 13, 14, 15, 16);
     private static final String            FAMILY_SAFE_RATING           = "1";
@@ -341,8 +341,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
                 && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
             String[] latlong = casInternalRequestParameters.latLong.split(",");
-            geo.setLat(Float.parseFloat(String.format("%.4f", Float.parseFloat(latlong[0]))));
-            geo.setLon(Float.parseFloat(String.format("%.4f", Float.parseFloat(latlong[1]))));
+            geo.setLat(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[0]))));
+            geo.setLon(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[1]))));
         }
         if (null != sasParams.getCountryCode()) {
             geo.setCountry(iabCountriesInterface.getIabCountry(sasParams.getCountryCode()));

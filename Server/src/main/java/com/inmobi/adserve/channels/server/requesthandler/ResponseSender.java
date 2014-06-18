@@ -374,8 +374,16 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 break;
         }
 
-        sendResponse(httpResponseStatus, getResponseBytes(sasParams.getDst(), defaultContent),
+        sendResponse(getResponseStatus(sasParams.getDst(), httpResponseStatus),
+                getResponseBytes(sasParams.getDst(), defaultContent),
                 new HashMap<String, String>(), serverChannel);
+    }
+
+    private HttpResponseStatus getResponseStatus(final int dstType, HttpResponseStatus httpResponseStatus) {
+        if (dstType == 6) {
+            return HttpResponseStatus.OK;
+        }
+        return httpResponseStatus;
     }
 
     private byte[] getResponseBytes(final int dstType, final String defaultResponse) {

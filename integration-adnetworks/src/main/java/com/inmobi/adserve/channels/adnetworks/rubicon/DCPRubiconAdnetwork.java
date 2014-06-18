@@ -63,13 +63,16 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	private static final String IAB_CATEGORY = "i.iab";
 	private static final String INMOBI_CATEGORY = "i.category";
 	private static final String RESPONSE_TEMPLATE = "<script>%s</script>";
+	private static final String BUNDLE_ID_TEMPLATE = "com.inmobi-exchange.%s";
+	private static final String DOMAIN_NAME = "app.domain";
 
 	private static final String DEFAULT_ZONE = "default";
 	private static final String SENSITIVITY_LOW = "low";
 	private static final String SENSITIVITY_HIGH = "high";
 	private static final String SITE_KEY_ADDL_PARAM = "site";
-	private static final String FS_RATING = "4+";
-	private static final String PERFORMANCE_RATING = "9+";
+	private static final String FS_RATING = "4%2B";
+	private static final String PERFORMANCE_RATING = "9%2B";
+	private static final String DOMAIN = "com.inmobi-exchange";
 
 
 	private final String userName;
@@ -177,7 +180,8 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		// if Dnt is on don't send the idfa
 		appendQueryParam(url, ZONE_ID, zoneId, false);
 		if (isApp) {
-			appendQueryParam(url, APP_BUNDLE, blindedSiteId, false);
+			appendQueryParam(url, APP_BUNDLE, String.format(BUNDLE_ID_TEMPLATE, blindedSiteId), false);
+			appendQueryParam(url, DOMAIN_NAME, DOMAIN, false);
 		}
 		appendQueryParam(url, UA,
 				getURLEncode(sasParams.getUserAgent(), format), false);
@@ -209,13 +213,13 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 			appendQueryParam(url, AD_SENSITIVE, SENSITIVITY_LOW, false);
 			if (isApp) {
 				appendQueryParam(url, APP_RATING,
-						getURLEncode(PERFORMANCE_RATING, format), false);
+						PERFORMANCE_RATING, false);
 			}
 		} else {
 			appendQueryParam(url, AD_SENSITIVE, SENSITIVITY_HIGH, false);
 			if (isApp) {
 				appendQueryParam(url, APP_RATING,
-						getURLEncode(FS_RATING, format), false);
+						FS_RATING, false);
 			}
 		}
 		if (casInternalRequestParameters.rtbBidFloor > 0) {
