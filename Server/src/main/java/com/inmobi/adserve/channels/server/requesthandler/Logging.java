@@ -410,14 +410,20 @@ public class Logging {
         for (int index = 0; rankList != null && index < rankList.size(); index++) {
             AdNetworkInterface adNetworkInterface = rankList.get(index).getAdNetworkInterface();
             ThirdPartyAdResponse adResponse = adNetworkInterface.getResponseStruct();
-            String adstatus = adResponse.adStatus;
+            String adStatus = adResponse.adStatus;
             String partnerName = adNetworkInterface.getName();
-            String extsiteKey = rankList.get(index).getChannelSegmentEntity().getExternalSiteKey();
+            String externalSiteKey = rankList.get(index).getChannelSegmentEntity().getExternalSiteKey();
             String advertiserId = rankList.get(index).getChannelSegmentEntity().getAdvertiserId();
             String requestUrl = adNetworkInterface.getRequestUrl();
             String response = adNetworkInterface.getHttpResponseContent();
-            if (!adstatus.equalsIgnoreCase("AD") || requestUrl.equals("") || response.equals("")) {
+            if (!adStatus.equalsIgnoreCase("AD") || requestUrl.equals("") || response.equals("")) {
                 continue;
+            }
+
+            if (enableDatabusLogging && decideToLog(partnerName, externalSiteKey)) {
+                //Actual Logging to stream
+                CasAdvertisementLog casAdvertisementLog = new CasAdvertisementLog(partnerName, requestUrl, response, adStatus, externalSiteKey, advertiserId);
+                sendToDatabus(casAdvertisementLog);
             }
 
             //File Logging
@@ -428,12 +434,6 @@ public class Logging {
                     .append(rankList.get(index).getChannelSegmentEntity().getExternalSiteKey());
             log.append(sep).append(requestUrl).append(sep).append(adResponse.adStatus);
             log.append(sep).append(response).append(sep).append(advertiserId);
-
-            if (enableDatabusLogging && decideToLog(partnerName, extsiteKey)) {
-                //Actual Logging to stream
-                CasAdvertisementLog casAdvertisementLog = new CasAdvertisementLog(partnerName, requestUrl, response, adstatus, extsiteKey, advertiserId);
-                sendToDatabus(casAdvertisementLog);
-            }
         }
 
         if (enableFileLogging && log.length() > 0) {
