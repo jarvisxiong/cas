@@ -49,7 +49,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected ThirdPartyAdResponse.ResponseStatus errorStatus             = ThirdPartyAdResponse.ResponseStatus.SUCCESS;
     
     protected boolean 							  isHTMLResponseSupported = true;
-    protected boolean 							  isNativeResponseSuported = false;
+    protected boolean 							  isNativeResponseSupported = false;
 
     protected SASRequestParameters                sasParams;
     protected CasInternalRequestParameters        casInternalRequestParameters;

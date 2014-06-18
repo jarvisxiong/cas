@@ -161,7 +161,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         this.repositoryHelper = repositoryHelper;
         this.templateWN = templateWinNotification;
         this.isHTMLResponseSupported = config.getBoolean(advertiserName + ".htmlSupported", true);
-        this.isNativeResponseSuported = config.getBoolean(advertiserName + ".nativeSupported", false);
+        this.isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", false);
     }
 
     @Override
@@ -325,7 +325,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             impression.setDisplaymanagerver(displayManagerVersion);
         }
         
-        if(isNativeResponseSuported && isNativeRequest()){
+        if(isNativeResponseSupported && isNativeRequest()){
         	impression.setExt(createNativeExtensionObject());
         }
         return impression;

@@ -37,7 +37,7 @@ public class NativeAdTemplateRepository extends
             NativeAdTemplateEntity.Builder builder = NativeAdTemplateEntity.newBuilder();
             builder.setSiteId(siteId);
             builder.setNativeAdId(nativeAdId);
-            builder.setBinary_template(encodedTemplate);
+            builder.setBinaryTemplate(encodedTemplate);
             
             NativeAdTemplateEntity entity = builder.build();
             

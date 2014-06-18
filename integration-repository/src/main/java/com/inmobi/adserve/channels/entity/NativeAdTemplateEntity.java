@@ -12,13 +12,13 @@ public class NativeAdTemplateEntity implements IdentifiableEntity<String>{
 	 */
 	private static final long serialVersionUID = -648051414378424341L;
 	private String      siteId;
-    private long      nativeAdId;
-    private String      binary_template;
+    private long        nativeAdId;
+    private String      binaryTemplate;
 
 	private NativeAdTemplateEntity(Builder builder){
 		this.siteId = builder.siteId;
 		this.nativeAdId=builder.nativeAdId;
-		this.binary_template=builder.binary_template;
+		this.binaryTemplate=builder.binaryTemplate;
 	}
 	
 	@Override
@@ -48,8 +48,8 @@ public class NativeAdTemplateEntity implements IdentifiableEntity<String>{
 	@Setter
 	public static class Builder {
 	    private String      siteId;
-	    private long      nativeAdId;
-	    private String      binary_template;
+	    private long        nativeAdId;
+	    private String      binaryTemplate;
 	    
 	    public NativeAdTemplateEntity build() {
 	        return new NativeAdTemplateEntity(this);
