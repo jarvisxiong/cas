@@ -48,7 +48,8 @@ public class ThriftRequestMaker {
 
         AdPoolRequest adPoolRequest = createAdPoolRequest();
         System.out.println("Request is : " + adPoolRequest);
-        sendBackFillGet(adPoolRequest);
+       // sendBackFillGet(adPoolRequest);
+        sendUMPPost(adPoolRequest);
 
     }
 
