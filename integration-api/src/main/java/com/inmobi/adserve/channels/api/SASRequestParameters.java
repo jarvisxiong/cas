@@ -8,6 +8,7 @@ import lombok.Data;
 
 import com.inmobi.adserve.adpool.EncryptionKeys;
 import com.inmobi.adserve.adpool.NetworkType;
+import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 
 
 @Data
@@ -74,6 +75,10 @@ public class SASRequestParameters {
 
     private EncryptionKeys      encryptionKey;
     private boolean             isKeepAlive;
+    
+    //UAC enrichment data
+    private WapSiteUACEntity    wapSiteUACEntity;
+   //private 
 
     public SASRequestParameters() {
         // Do Nothing.

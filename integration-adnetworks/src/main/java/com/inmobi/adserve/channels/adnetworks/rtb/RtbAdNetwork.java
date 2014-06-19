@@ -8,12 +8,14 @@ import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.*;
 import com.inmobi.casthrift.rtb.*;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -21,6 +23,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
 import lombok.Getter;
 import lombok.Setter;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
@@ -32,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+
 import java.awt.*;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -425,7 +429,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (null != sasParams.getCategories()) {
             app.setCat(iabCategoriesInterface.getIABCategories(sasParams.getCategories()));
         }
-        Map<String, String> appExtensions = new HashMap<String, String>();
         String appRating;
         if (!SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
             // Family safe
@@ -434,8 +437,25 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         else {
             appRating = PERFORMANCE_RATING;
         }
-        appExtensions.put(RATING_KEY, appRating);
-        app.setExt(appExtensions);
+        
+        // set App Ext fields
+        final AppExt ext = new AppExt();
+        ext.setFs(appRating);
+        final WapSiteUACEntity entity = sasParams.getWapSiteUACEntity();
+        if(entity != null) {
+        	final AppStore store = new AppStore();
+        	if(entity.getContentRating() != null && !entity.getContentRating().isEmpty()) {
+        		store.setCr(entity.getContentRating());
+        	}
+        	if(entity.getAppType() != null && !entity.getAppType().isEmpty()) {
+        		store.setPc(entity.getAppType());
+        	}
+        	if(entity.getCategories() != null && !entity.getCategories().isEmpty()) {
+        		store.setSc(entity.getCategories());
+        	}
+        	ext.setSd(store);
+        }
+        app.setExt(ext);
         return app;
     }
 

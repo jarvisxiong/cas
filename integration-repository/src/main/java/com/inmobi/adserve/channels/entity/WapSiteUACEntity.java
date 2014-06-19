@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.entity;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import lombok.Data;
 import lombok.Setter;
@@ -18,6 +19,7 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
 	private final long siteTypeId;
 	private final String contentRating;
 	private final String appType;
+	private final List<String> categories;
 	private final Timestamp uacModifiedOn;
 
 	public WapSiteUACEntity(final Builder builder) {
@@ -25,6 +27,7 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
 		siteTypeId = builder.siteTypeId;
 		contentRating = builder.contentRating;
 		appType = builder.appType;
+		categories = builder.categories;
 		uacModifiedOn = builder.uacModifiedOn;
 	}
 
@@ -38,6 +41,7 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
 		private long siteTypeId;
 		private String contentRating;
 		private String appType;
+		private List<String> categories;
 		private Timestamp uacModifiedOn;
 
 		public WapSiteUACEntity build() {
