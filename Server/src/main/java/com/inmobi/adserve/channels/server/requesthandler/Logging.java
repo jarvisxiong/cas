@@ -68,6 +68,20 @@ public class Logging {
             final SASRequestParameters sasParams, String terminationReason, final long totalTime) throws JSONException,
             TException {
         InspectorStats.incrementStatCount(InspectorStrings.latency, totalTime);
+
+        if (null != sasParams) {
+            DemandSourceType dst = getDst(sasParams.getDst());
+            InspectorStats.incrementStatCount(dst + "-" +InspectorStrings.latency, totalTime);
+            if (null != sasParams.getAllParametersJson() && (rankList == null || rankList.isEmpty())) {
+                InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.nomatchsegmentcount);
+                InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.nomatchsegmentlatency, totalTime);
+                InspectorStats.incrementStatCount(InspectorStrings.nomatchsegmentcount);
+                InspectorStats.incrementStatCount(InspectorStrings.nomatchsegmentlatency, totalTime);
+            }
+        }
+
+
+
         boolean isTerminated = false;
         if (null != terminationReason) {
             isTerminated = true;
@@ -203,6 +217,10 @@ public class Logging {
             LOG.debug("ADRR is : {}", adRR);
         }
         // Logging real time stats for graphite
+        if (null != sasParams) {
+            DemandSourceType dst = getDst(sasParams.getDst());
+            MetricsManager.updateLatency(dst.name(), totalTime);
+        }
         String osName = "";
         try {
             if (null != sasParams && null != advertiserId && null != impression && null != impression.getAd()) {
@@ -405,29 +423,9 @@ public class Logging {
             Integer count = Integer.parseInt(sampledAdvertiserLogNos.get(partnerName + extsiteKey).split("_")[1]);
 
             if (System.currentTimeMillis() - time < 3600000) {
-                if (count < totalCount) {
-                    requestUrl = adNetworkInterface.getRequestUrl();
-                    response = adNetworkInterface.getHttpResponseContent();
-                    if (requestUrl.equals("") || response.equals("")) {
-                        continue;
-                    }
-                    if (index > 0 && partnerName.length() > 0 && log.length() > 0) {
-                        log.append("\n");
-                    }
-                    log.append(partnerName).append(sep)
-                            .append(rankList.get(index).getChannelSegmentEntity().getExternalSiteKey());
-                    log.append(sep).append(requestUrl).append(sep).append(adResponse.adStatus);
-                    log.append(sep).append(response).append(sep).append(advertiserId);
-                    count++;
-                    sampledAdvertiserLogNos.put(partnerName + extsiteKey, time + "_" + count);
+                if (count >= totalCount) {
+                    continue;
                 }
-            }
-            else {
-                LOG.debug("creating new sampledadvertiser logs");
-                count = 0;
-                sampledAdvertiserLogNos.put(partnerName + extsiteKey, System.currentTimeMillis() + "_" + 0);
-                time = Long.parseLong(sampledAdvertiserLogNos.get(partnerName + extsiteKey).split("_")[0]);
-                count = Integer.parseInt(sampledAdvertiserLogNos.get(partnerName + extsiteKey).split("_")[1]);
                 requestUrl = adNetworkInterface.getRequestUrl();
                 response = adNetworkInterface.getHttpResponseContent();
                 if (requestUrl.equals("") || response.equals("")) {
@@ -443,10 +441,31 @@ public class Logging {
                 count++;
                 sampledAdvertiserLogNos.put(partnerName + extsiteKey, time + "_" + count);
             }
-            if (enableDatabusLogging) {
+            else {
+                LOG.debug("creating new sampledadvertiser logs");
+                count = 0;
+                sampledAdvertiserLogNos.put(partnerName + extsiteKey, System.currentTimeMillis() + "_" + 0);
+                time = Long.parseLong(sampledAdvertiserLogNos.get(partnerName + extsiteKey).split("_")[0]);
+                count = Integer.parseInt(sampledAdvertiserLogNos.get(partnerName + extsiteKey).split("_")[1]);
+                requestUrl = adNetworkInterface.getRequestUrl();
+                response = adNetworkInterface.getHttpResponseContent();
                 if (count >= totalCount) {
                     continue;
                 }
+                if (requestUrl.equals("") || response.equals("")) {
+                    continue;
+                }
+                if (index > 0 && partnerName.length() > 0 && log.length() > 0) {
+                    log.append("\n");
+                }
+                log.append(partnerName).append(sep)
+                        .append(rankList.get(index).getChannelSegmentEntity().getExternalSiteKey());
+                log.append(sep).append(requestUrl).append(sep).append(adResponse.adStatus);
+                log.append(sep).append(response).append(sep).append(advertiserId);
+                count++;
+                sampledAdvertiserLogNos.put(partnerName + extsiteKey, time + "_" + count);
+            }
+            if (enableDatabusLogging) {
                 CasAdvertisementLog casAdvertisementLog = new CasAdvertisementLog(partnerName, requestUrl, response, adstatus, extsiteKey, advertiserId);
                 Message msg = null;
                 try {
@@ -458,6 +477,7 @@ public class Logging {
                 }
                 if (null != msg) {
                     dataBusPublisher.publish(sampledAdvertisementLogKey, msg);
+                    LOG.debug("sampledAdvertiser log pushed to stream");
                 }
             }
         }

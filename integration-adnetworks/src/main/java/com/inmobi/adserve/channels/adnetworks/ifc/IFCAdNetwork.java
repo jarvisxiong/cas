@@ -38,7 +38,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final Logger LOG         = LoggerFactory.getLogger(IFCAdNetwork.class);
 
     private String              requestId;
-    private String              deviceOs;                                                 // Mandatory Param
+    private String              deviceOsId;                                                 // Mandatory Param
     private String              deviceOSVersion;                                          // Mandatory Param
     private String              handset;                                                  // Mandatory Param
     private String              carrier;                                                  // Mandatory Param
@@ -84,7 +84,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         if (null != jsonObject) {
             try {
                 requestId = stringifyParam(jsonObject, "tid", true);
-                deviceOs = stringifyParam(jsonObject, "deviceOs", false);
+                deviceOsId = stringifyParam(jsonObject, "deviceOsId", false);
                 deviceOSVersion = stringifyParam(jsonObject, "deviceOSVersion", false);
                 city = stringifyParam(jsonObject, "city", false);
                 state = stringifyParam(jsonObject, "state", false);
@@ -130,7 +130,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         }
         else {
             requestId = sasParams.getTid();
-            deviceOs = sasParams.getOsId() + "";
+            deviceOsId = String.valueOf(sasParams.getOsId());
             if (null != sasParams.getCity()) {
                 city = sasParams.getCity().toString();
             }
@@ -142,8 +142,8 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             siteAllowBanner = sasParams.getAllowBannerAds();
             adcode = sasParams.getAdcode();
             adGroupID = externalSiteId;
-            handset = sasParams.getHandsetInternalId() + "";
-            carrier = sasParams.getCarrierId() + "";
+            handset = String.valueOf(sasParams.getHandsetInternalId());
+            carrier = String.valueOf(sasParams.getCarrierId());
             deviceOSVersion = sasParams.getOsMajorVersion();
 
             if (sasParams.getSdkVersion() != null
@@ -163,7 +163,10 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         else if (!isEmpty(sasParams.getGender())
                 && (sasParams.getGender().equalsIgnoreCase("f") || sasParams.getGender().equalsIgnoreCase("female"))) {
             gender = "female";
-        }
+        } else{
+		gender = sasParams.getGender();
+	} 
+
         if (null != sasParams.getSiteId()) {
             siteID = sasParams.getSiteId();
         }
@@ -271,7 +274,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("sdkVersion", sasParams.getSdkVersion());
         jsonObject.addProperty("requestId", requestId);
-        jsonObject.addProperty("deviceOs", deviceOs);
+        jsonObject.addProperty("deviceOsId", deviceOsId);
         jsonObject.addProperty("deviceOSVersion", deviceOSVersion);
         jsonObject.addProperty("handset", handset);
         jsonObject.addProperty("carrier", carrier);
