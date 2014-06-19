@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.inmobi.casthrift.rtb.Bid;
 import com.inmobi.casthrift.rtb.BidResponse;
 import com.inmobi.casthrift.rtb.NativeResponse;
@@ -25,8 +26,10 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 	
 	private final static Logger            LOG                          = LoggerFactory.getLogger(NativeTemplateFormatterImpl.class);
 
-	private final Gson gson = new Gson();
-
+	private static GsonBuilder gb = new GsonBuilder();
+	static{
+		gb.disableHtmlEscaping();
+	}
 	
 	//TODO: remove it. Just added for tango for MVP.
 	private String START = "{",
@@ -43,7 +46,7 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 		     IMG = "\"image_xhdpi\":{",
 		    	IMG_W = "\"w\":$IMG_WIDTH,",
 		    	IMG_H = "\"h\":$IMG_HEIGHT,",
-		    	IMG_URL = "\"url\":\"$IMAGE_URL\""+
+		    	IMG_URL = "\"url\":\"$IMG_URL\""+
 		    	 "},",
 		     STAR_RATING = "\"star_rating\":\"$RATING\",",
 		     PLAYER_NUM = "\"players_num\":\"\",",
@@ -53,7 +56,7 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 	
 	
 	
-	private String contextCode = "\n\n<script type=\"text/javascript\" src=\"mraid.js\"></script>\n"
+	private String contextCode = "\n<script type=\"text/javascript\" src=\"mraid.js\"></script>\n"
 			+ "<div style=\"display:none; position:absolute;\" id=\"$NAMESPACEclickTarget\">"
 			+ "</div>\n<script type=\"text/javascript\">\n"
 			+ "(function() {"
@@ -95,14 +98,10 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 	@Override
 	public String getFormatterValue(String template, BidResponse response,Map<String, String> params) throws Exception {
 		
-		
-		
-		
 		Bid bid = response.getSeatbid().get(0).getBid().get(0);
 		String adm = bid.getAdm();
 		
-		Gson gson = new Gson();
-		NativeResponse natResponse = gson.fromJson(adm, NativeResponse.class);
+		NativeResponse natResponse = gb.create().fromJson(adm, NativeResponse.class);
 		
 		validateResponse(natResponse);
 		
@@ -185,7 +184,7 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
         	bcu.append(constructBeaconUrl(purl));
         }
         
-        cc.replaceAll("\\$BEACON_URL", bcu.toString());
+        cc = cc.replaceAll("\\$BEACON_URL", bcu.toString());
         
         StringBuilder ct = new StringBuilder();
         
@@ -199,11 +198,11 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
         if(clickUrls.size()>0){
         	ct.append("\"").append(clickUrls.get(i)).append("\"");
         }
-        cc.replaceAll("\\$CLICK_TRACKER", ct.toString());
+        cc = cc.replaceAll("\\$CLICK_TRACKER", ct.toString());
 
         
         String landingPageUrl = natResponse.getActionlink();
-        cc.replaceAll("\\$LANDING_PAGE", landingPageUrl);
+        cc = cc.replaceAll("\\$LANDING_PAGE", landingPageUrl);
         
 		
 		return cc;
@@ -278,6 +277,8 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 	
 	
 	public static void main(String args[]) throws Exception{
+		
+//		System.out.println("\"$LANDING_PAGE\"".replaceFirst("\\$LANDING_PAGE", "land"));
 //		
 //		NativeResponse natResponse = new NativeResponse();
 //		
@@ -333,7 +334,8 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 				+ " \"clickurl\": [ \"http://click.action1\", \"http://click.action2\" ], "
 				+ "\"callout\": 0,"
 				+ " \"data\": [ { \"seq\": 1, \"value\": \"3.9\", \"label\": 0 }],"
-				+ "\"image\":{\"imageurl\": \"http://im-age.png\",w:350,h:980}}");
+				+ "\"image\":{\"imageurl\": \"http://im-age.png\",w:350,h:980}"
+				+ "}");
 		bList.add(b);
 		sb.setBid(bList);
 		
@@ -360,10 +362,10 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 	    public String nativeAd(String pubContent, String contextCode,String namespace) {
 	        pubContent = base64(pubContent);
 	        NativeAd nativeAd = new NativeAd(pubContent,
-	                contextCode,
-	                namespace
-	                );
-	        return gson.toJson(nativeAd);
+							                contextCode,
+							                namespace);
+	        
+	       return gb.create().toJson(nativeAd);
 	    }
 	    
 	    public String base64(String input) {

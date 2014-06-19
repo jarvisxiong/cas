@@ -73,13 +73,6 @@
 		<dependency>
 		  <groupId>com.inmobi.adtemplate</groupId>
 		  <artifactId>adtemplate-idl</artifactId>
-		  <version>2.0.3</version>
-		  <classifier>thrift-0</classifier>
-		  <type>4.jar</type>
-		</dependency>
-		<dependency>
-		  <groupId>com.inmobi.adtemplate</groupId>
-		  <artifactId>adtemplate-idl</artifactId>
 		  <version>2.0.2</version>
 		</dependency>
 	</dependencies>
