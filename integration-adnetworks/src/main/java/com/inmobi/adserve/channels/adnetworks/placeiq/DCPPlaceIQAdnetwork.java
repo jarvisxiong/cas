@@ -65,8 +65,6 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String         IOS           = "iOS";
     private static final String         auIdFormat    = "%s/%s/%s/%s";
     private static final String         XMLFORMAT     = "xml";
-    //private static final String         DISPLAY_TYPE = "display";
-
     private final String                partnerId;
     private final String                requestFormat;
     private final String                responseFormat;
@@ -222,21 +220,16 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
                 appendQueryParam(url, ANDROIDIDSHA1, casInternalRequestParameters.uidIDUS1, false);
             }
         }
-        /*if (isInterstitial()) {
-            // display type 1 for interstitial
-            appendQueryParam(url, DISPLAY_TYPE, 1, false);
-        }*/
+       
 
         if (isApp) {
-            appendQueryParam(url, APPID, sasParams.getSiteIncId() + "", false);
-            
+            appendQueryParam(url, APPID, sasParams.getSiteIncId() + "", false);     
             if (isInterstitial()){
             appendQueryParam(url, ADTYPE, getURLEncode(APPTYPE_INT, format), false);
             }
             else{
                 appendQueryParam(url, ADTYPE, getURLEncode(APPTYPE_BANNER, format), false);
             }
-                
         }
         else {
             appendQueryParam(url, SITEID, sasParams.getSiteIncId() + "", false);
