@@ -771,8 +771,13 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     
     private void nativeAdBuilding(){
     	
+    	App app = bidRequest.getApp();
+    	
     	Map<String, String> params = new HashMap<String, String>();
     	params.put("beaconUrl",beaconUrl);
+    	if(app!=null){
+    		params.put("appId",app.getId());
+    	}
     	try {
     		responseContent = nativeTemplateFormatter.getFormatterValue(null, bidResponse, params);
 		} catch (Exception e) {

@@ -105,7 +105,7 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 		
 		validateResponse(natResponse);
 		
-		String pubContent = preparePubContent(response,natResponse);
+		String pubContent = preparePubContent(response,natResponse,params);
 		String namespace = getNamespace();
 	    String contextCode = prepareContextCode(response,params,natResponse).replaceAll("\\$NAMESPACE", namespace);
 		
@@ -217,12 +217,13 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
     }
 	
 	
-	private String preparePubContent(BidResponse response,NativeResponse natResponse) throws TException{
+	private String preparePubContent(BidResponse response,NativeResponse natResponse,Map<String, String> params) throws TException{
 		Bid bid = response.getSeatbid().get(0).getBid().get(0);
+		String appId = params.containsKey("appId")?params.get("appId"):"";
 		
 		StringBuilder pubContent = new StringBuilder();
 		pubContent.append(START);//STARTING JSON
-		pubContent.append(UID);
+		pubContent.append(UID.replaceAll("\\$UID", appId));
 		String title = natResponse.getTitle();
 		if(StringUtils.isEmpty(title)){
 			//throw exception.
@@ -350,29 +351,30 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 		NativeTemplateFormatterImpl impl = new NativeTemplateFormatterImpl();
 		System.out.println(impl.getFormatterValue(null, response, map));
 		
+		
 	}
 	
-	 @Data
-	    private static class NativeAd {
-	        private final String pubContent;
-	        private final String contextCode;
-	        private final String namespace;
-	    }
+	@Data
+    private static class NativeAd {
+        private final String pubContent;
+        private final String contextCode;
+        private final String namespace;
+    }
 
-	    public String nativeAd(String pubContent, String contextCode,String namespace) {
-	        pubContent = base64(pubContent);
-	        NativeAd nativeAd = new NativeAd(pubContent,
-							                contextCode,
-							                namespace);
-	        
-	       return gb.create().toJson(nativeAd);
-	    }
-	    
-	    public String base64(String input) {
-	        // The escaping is not url safe, the input is decoded as base64 utf-8 string
-	        Base64 base64 = new Base64();
-	        return base64.encodeAsString(input.getBytes(Charsets.UTF_8));
-	    }
+    public String nativeAd(String pubContent, String contextCode,String namespace) {
+        pubContent = base64(pubContent);
+        NativeAd nativeAd = new NativeAd(pubContent,
+						                contextCode,
+						                namespace);
+        
+       return gb.create().toJson(nativeAd);
+    }
+    
+    public String base64(String input) {
+        // The escaping is not url safe, the input is decoded as base64 utf-8 string
+        Base64 base64 = new Base64();
+        return base64.encodeAsString(input.getBytes(Charsets.UTF_8));
+    }
 
 
 	
