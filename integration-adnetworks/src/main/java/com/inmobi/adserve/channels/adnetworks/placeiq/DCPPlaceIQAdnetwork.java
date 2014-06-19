@@ -7,9 +7,11 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -56,12 +58,14 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String         COUNTRY       = "CO";
     // private static final String SECRET = "SK";
     private static final String         ADTYPE        = "AT";
-    private static final String         APPTYPE       = "STG,RMG,MRD";
+    private static final String         APPTYPE_BANNER="STG,RMG,MRD";
+    private static final String         APPTYPE_INT   = "STG,RMG,MRD,MRI";
     private static final String         WAPTYPE       = "STG,STW,RMG,MRD";
     private static final String         ANDROID       = "Android";
     private static final String         IOS           = "iOS";
     private static final String         auIdFormat    = "%s/%s/%s/%s";
     private static final String         XMLFORMAT     = "xml";
+    //private static final String         DISPLAY_TYPE = "display";
 
     private final String                partnerId;
     private final String                requestFormat;
@@ -218,11 +222,21 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
                 appendQueryParam(url, ANDROIDIDSHA1, casInternalRequestParameters.uidIDUS1, false);
             }
         }
+        /*if (isInterstitial()) {
+            // display type 1 for interstitial
+            appendQueryParam(url, DISPLAY_TYPE, 1, false);
+        }*/
 
         if (isApp) {
             appendQueryParam(url, APPID, sasParams.getSiteIncId() + "", false);
-            appendQueryParam(url, ADTYPE, getURLEncode(APPTYPE, format), false);
-
+            
+            if (isInterstitial()){
+            appendQueryParam(url, ADTYPE, getURLEncode(APPTYPE_INT, format), false);
+            }
+            else{
+                appendQueryParam(url, ADTYPE, getURLEncode(APPTYPE_BANNER, format), false);
+            }
+                
         }
         else {
             appendQueryParam(url, SITEID, sasParams.getSiteIncId() + "", false);
@@ -232,7 +246,16 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 
         return new URI(url.toString());
     }
-
+    private boolean isInterstitial() {
+        Short slot = sasParams.getSlot();
+        if (10 == slot // 300X250
+                || 14 == slot // 320X480
+                || 16 == slot // 768X1024
+                || 17 == slot)/* 800x1280 */ {
+            return true;
+        }
+        return false;
+    }
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {}", response);
