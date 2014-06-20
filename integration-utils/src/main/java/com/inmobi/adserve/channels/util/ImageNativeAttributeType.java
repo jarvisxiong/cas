@@ -8,7 +8,7 @@ public class ImageNativeAttributeType implements NativeAttributeType<Image> {
 	@Override
 	public Image getAttributes() {
 		Image image = new Image();
-		image.setAspectratio(1.9);
+		image.setAspectratio(1.91);
 		image.setMaxwidth(1200);
 		image.setMinwidth(600);
 		
