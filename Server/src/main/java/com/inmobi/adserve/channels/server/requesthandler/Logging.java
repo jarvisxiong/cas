@@ -40,7 +40,7 @@ public class Logging {
     private static String                                  umpAdsLogKey;
     private static boolean                                 enableFileLogging;
     private static boolean                                 enableDatabusLogging;
-    private final static ConcurrentHashMap<String, String> sampledAdvertiserLogNos = new ConcurrentHashMap<String, String>(
+    public final static ConcurrentHashMap<String, String> sampledAdvertiserLogNos = new ConcurrentHashMap<String, String>(
                                                                                            2000);
     @AdvertiserIdNameMap
     @Inject
@@ -392,6 +392,11 @@ public class Logging {
         }
     }
 
+    /**
+     *
+     * @param rankList
+     * @param config
+     */
     public static void sampledAdvertiserLogging(final List<ChannelSegment> rankList, final Configuration config) {
         LOG.debug("came inside sampledAdvertiser log");
         Logger sampledAdvertiserLogger = LoggerFactory.getLogger(config.getString("sampledadvertiser"));
@@ -404,87 +409,82 @@ public class Logging {
 
         for (int index = 0; rankList != null && index < rankList.size(); index++) {
             AdNetworkInterface adNetworkInterface = rankList.get(index).getAdNetworkInterface();
-
             ThirdPartyAdResponse adResponse = adNetworkInterface.getResponseStruct();
-            String adstatus = adResponse.adStatus;
-            if (!adstatus.equalsIgnoreCase("AD")) {
+            String adStatus = adResponse.adStatus;
+            String partnerName = adNetworkInterface.getName();
+            String externalSiteKey = rankList.get(index).getChannelSegmentEntity().getExternalSiteKey();
+            String advertiserId = rankList.get(index).getChannelSegmentEntity().getAdvertiserId();
+            String requestUrl = adNetworkInterface.getRequestUrl();
+            String response = adNetworkInterface.getHttpResponseContent();
+            if (!adStatus.equalsIgnoreCase("AD") || requestUrl.equals("") || response.equals("")) {
                 continue;
             }
-            String partnerName = adNetworkInterface.getName();
-            String extsiteKey = rankList.get(index).getChannelSegmentEntity().getExternalSiteKey();
-            String advertiserId = rankList.get(index).getChannelSegmentEntity().getAdvertiserId();
-            String requestUrl = "";
-            String response = "";
-            if (sampledAdvertiserLogNos.get(partnerName + extsiteKey) == null) {
-                String value = System.currentTimeMillis() + "_" + 0;
-                sampledAdvertiserLogNos.put(partnerName + extsiteKey, value);
-            }
-            Long time = Long.parseLong(sampledAdvertiserLogNos.get(partnerName + extsiteKey).split("_")[0]);
-            Integer count = Integer.parseInt(sampledAdvertiserLogNos.get(partnerName + extsiteKey).split("_")[1]);
 
-            if (System.currentTimeMillis() - time < 3600000) {
-                if (count >= totalCount) {
-                    continue;
-                }
-                requestUrl = adNetworkInterface.getRequestUrl();
-                response = adNetworkInterface.getHttpResponseContent();
-                if (requestUrl.equals("") || response.equals("")) {
-                    continue;
-                }
-                if (index > 0 && partnerName.length() > 0 && log.length() > 0) {
-                    log.append("\n");
-                }
-                log.append(partnerName).append(sep)
-                        .append(rankList.get(index).getChannelSegmentEntity().getExternalSiteKey());
-                log.append(sep).append(requestUrl).append(sep).append(adResponse.adStatus);
-                log.append(sep).append(response).append(sep).append(advertiserId);
-                count++;
-                sampledAdvertiserLogNos.put(partnerName + extsiteKey, time + "_" + count);
+            if (enableDatabusLogging && decideToLog(partnerName, externalSiteKey)) {
+                //Actual Logging to stream
+                CasAdvertisementLog casAdvertisementLog = new CasAdvertisementLog(partnerName, requestUrl, response, adStatus, externalSiteKey, advertiserId);
+                sendToDatabus(casAdvertisementLog, sampledAdvertisementLogKey);
             }
-            else {
-                LOG.debug("creating new sampledadvertiser logs");
-                count = 0;
-                sampledAdvertiserLogNos.put(partnerName + extsiteKey, System.currentTimeMillis() + "_" + 0);
-                time = Long.parseLong(sampledAdvertiserLogNos.get(partnerName + extsiteKey).split("_")[0]);
-                count = Integer.parseInt(sampledAdvertiserLogNos.get(partnerName + extsiteKey).split("_")[1]);
-                requestUrl = adNetworkInterface.getRequestUrl();
-                response = adNetworkInterface.getHttpResponseContent();
-                if (count >= totalCount) {
-                    continue;
-                }
-                if (requestUrl.equals("") || response.equals("")) {
-                    continue;
-                }
-                if (index > 0 && partnerName.length() > 0 && log.length() > 0) {
-                    log.append("\n");
-                }
-                log.append(partnerName).append(sep)
-                        .append(rankList.get(index).getChannelSegmentEntity().getExternalSiteKey());
-                log.append(sep).append(requestUrl).append(sep).append(adResponse.adStatus);
-                log.append(sep).append(response).append(sep).append(advertiserId);
-                count++;
-                sampledAdvertiserLogNos.put(partnerName + extsiteKey, time + "_" + count);
+
+            //File Logging
+            if (index > 0 && partnerName.length() > 0 && log.length() > 0) {
+                log.append("\n");
             }
-            if (enableDatabusLogging) {
-                CasAdvertisementLog casAdvertisementLog = new CasAdvertisementLog(partnerName, requestUrl, response, adstatus, extsiteKey, advertiserId);
-                Message msg = null;
-                try {
-                    TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
-                    msg = new Message(tSerializer.serialize(casAdvertisementLog));
-                }
-                catch (TException e) {
-                    LOG.debug("Error while creating sampledAdvertiser logs for databus ");
-                }
-                if (null != msg) {
-                    dataBusPublisher.publish(sampledAdvertisementLogKey, msg);
-                    LOG.debug("sampledAdvertiser log pushed to stream");
-                }
-            }
+            log.append(partnerName).append(sep)
+                    .append(rankList.get(index).getChannelSegmentEntity().getExternalSiteKey());
+            log.append(sep).append(requestUrl).append(sep).append(adStatus);
+            log.append(sep).append(response).append(sep).append(advertiserId);
         }
+
+        //Actual File Logging
         if (enableFileLogging && log.length() > 0) {
             sampledAdvertiserLogger.debug(log.toString());
             LOG.debug("done with sampledAdvertiser logging");
         }
+    }
+
+    /**
+     *
+     * @param casAdvertisementLog
+     */
+    private static void sendToDatabus(CasAdvertisementLog casAdvertisementLog, String sampledAdvertisementLogKey) {
+        Message msg = null;
+        try {
+            TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
+            msg = new Message(tSerializer.serialize(casAdvertisementLog));
+        }
+        catch (TException e) {
+            LOG.debug("Error while creating sampledAdvertiser logs for databus ");
+        }
+        if (null != msg) {
+            dataBusPublisher.publish(sampledAdvertisementLogKey, msg);
+            LOG.debug("sampledAdvertiser log pushed to stream");
+        }
+    }
+
+    /**
+     *
+     * @param partnerName
+     * @param externalSiteId
+     * @return true if logging required otherwise false
+     */
+    private static boolean decideToLog(String partnerName, String externalSiteId) {
+        long currentTime = System.currentTimeMillis();
+        if (null == sampledAdvertiserLogNos.get(partnerName + externalSiteId)) {
+            sampledAdvertiserLogNos.put(partnerName + externalSiteId, currentTime + "_" + 0);
+        }
+        Long time = Long.parseLong(sampledAdvertiserLogNos.get(partnerName + externalSiteId).split("_")[0]);
+        if (currentTime - time >= 3600000) {
+            sampledAdvertiserLogNos.put(partnerName + externalSiteId, currentTime + "_" + 0);
+            time = Long.parseLong(sampledAdvertiserLogNos.get(partnerName + externalSiteId).split("_")[0]);
+        }
+        Integer count = Integer.parseInt(sampledAdvertiserLogNos.get(partnerName + externalSiteId).split("_")[1]);
+        if (count >= totalCount) {
+            return false;
+        }
+        count++;
+        sampledAdvertiserLogNos.put(partnerName + externalSiteId, time + "_" + count);
+        return true;
     }
 
     public static ContentRating getContentRating(final SASRequestParameters sasParams) {
