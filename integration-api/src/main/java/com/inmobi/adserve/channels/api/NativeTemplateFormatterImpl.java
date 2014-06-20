@@ -51,7 +51,7 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 		     STAR_RATING = "\"star_rating\":\"$RATING\",",
 		     PLAYER_NUM = "\"players_num\":\"\",",
 		     IMP_ID = "\"imp_id\":\"$IMPID\",",
-		     CTA_INSTALL = "\"cta_install\":\"Install\"",
+		     CTA_INSTALL = "\"cta_install\":\"$CTA_INSTALL\"",
 		     END = "}";
 	
 	
@@ -269,7 +269,7 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 		.append(STAR_RATING.replaceAll("\\$RATING", RATING))
 		.append(PLAYER_NUM)
 		.append(IMP_ID.replaceAll("\\$IMPID", impId))
-		.append(CTA_INSTALL.replaceAll("\\$CTA_INSALL", cta_install))
+		.append(CTA_INSTALL.replaceAll("\\$CTA_INSTALL", cta_install))
 		.append(END);
 
 		return pubContent.toString();
