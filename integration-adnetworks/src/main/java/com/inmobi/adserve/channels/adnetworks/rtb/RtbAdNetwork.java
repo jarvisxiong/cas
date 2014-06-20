@@ -168,9 +168,12 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     protected boolean configureParameters() {
 
         LOG.debug("inside configureParameters of RTB");
-        if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
-                || StringUtils.isBlank(externalSiteId)) {
-            LOG.debug("mandate parameters missing for dummy so exiting adapter");
+        if (StringUtils.isBlank(sasParams.getRemoteHostIp())
+        		|| StringUtils.isBlank(sasParams.getUserAgent())
+                || StringUtils.isBlank(externalSiteId)
+                || (!isNativeResponseSupported && isNativeRequest())
+                || (!isHTMLResponseSupported && !isNativeRequest())) {
+            LOG.debug("mandate parameters missing or request format is not compaitable to partner supported response for dummy so exiting adapter");
             return false;
         }
 
