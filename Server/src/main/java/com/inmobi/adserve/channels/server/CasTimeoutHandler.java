@@ -9,7 +9,6 @@ import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.util.concurrent.ScheduledFuture;
 
 import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import com.google.inject.Inject;
@@ -31,7 +30,6 @@ public class CasTimeoutHandler extends ChannelDuplexHandler {
 
 	@Inject
 	private static Map<String, Servlet> pathToServletMap;
-	private static ScheduledExecutorService scheduledExecutorService;
 
 	/**
 	 * convert milliseconds into nanoseconds
