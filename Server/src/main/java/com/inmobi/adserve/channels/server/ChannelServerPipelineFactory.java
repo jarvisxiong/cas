@@ -26,12 +26,11 @@ public class ChannelServerPipelineFactory extends ChannelInitializer<SocketChann
 	private final ServerConfig serverConfig;
 	private final LoggingHandler loggingHandler;
 	private final RequestParserHandler requestParserHandler;
-	private final CasExceptionHandler casExceptionHandler;
 
 	@Inject
 	ChannelServerPipelineFactory(final ServerConfig serverConfig, final NettyRequestScopeSeedHandler nettyRequestScopeSeedHandler,
 			final CasConfigUtil servletHandler, final ConnectionLimitHandler incomingConnectionLimitHandler, final LoggingHandler loggingHandler,
-			final RequestParserHandler requestParserHandler, final CasExceptionHandler casExceptionHandler) {
+			final RequestParserHandler requestParserHandler) {
 
 		this.serverConfig = serverConfig;
 		this.nettyRequestScopeSeedHandler = nettyRequestScopeSeedHandler;
@@ -40,7 +39,6 @@ public class ChannelServerPipelineFactory extends ChannelInitializer<SocketChann
 		this.servletHandler = servletHandler;
 		this.loggingHandler = loggingHandler;
 		this.requestParserHandler = requestParserHandler;
-		this.casExceptionHandler = casExceptionHandler;
 	}
 
 	@Override
