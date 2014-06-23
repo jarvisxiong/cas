@@ -48,14 +48,17 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String ADSPACE_HEIGHT = "h";
     private static final String IPADDRESS = "ip";
     private static final String USER_AGENT = "ua";
-    private static final String IOS_ID = "ouid";
+    private static final String IOS_OPEN_UDID = "ouid";
     private static final String ANDROID_ID = "anid";
+    private static final String IDFA = "ida";
     private static final String DEVICE_OS = "os";
     private static final String LAT = "lat";
     private static final String LONG = "lon";
     private static final String COUNTRY = "co";
     private static final String USER_GENDER = "GENDER";
     private static final String USER_AGE = "AGE";
+    
+	private boolean isApp;
 
     public DCPAdsMogoAdnetwork(final Configuration config,
             final Bootstrap clientBootstrap,
@@ -93,6 +96,12 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
             LOG.debug("mandatory parameters missing for AdsMogo so exiting adapter");
             return false;
         }
+        isApp = (StringUtils.isBlank(sasParams.getSource()) || WAP
+				.equalsIgnoreCase(sasParams.getSource())) ? false : true;
+		if (isApp && StringUtils.isEmpty(getUid())) {
+			LOG.debug("mandatory parameter udid is missing for APP traffic in rubicon so exiting adapter");
+			return false;
+		}
         return true;
     }
 
@@ -134,11 +143,12 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
 
         if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
             if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
-                appendQueryParam(url, IOS_ID,
+                appendQueryParam(url, IDFA,
                         casInternalRequestParameters.uidIFA, false);
 
-            } else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
-                appendQueryParam(url, IOS_ID, casInternalRequestParameters.uid,
+            }
+            if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
+                appendQueryParam(url, IOS_OPEN_UDID, casInternalRequestParameters.uid,
                         false);
             }
         }
@@ -237,5 +247,22 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public String getId() {
         return (config.getString("adsmogo.advertiserId"));
+    }
+    
+    @Override
+    protected String getUid() {
+    	if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
+            return casInternalRequestParameters.uidIFA;
+        }
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
+            return casInternalRequestParameters.uidMd5;
+        }        
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIDUS1)) {
+            return casInternalRequestParameters.uidIDUS1;
+        }
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.uid)) {
+            return casInternalRequestParameters.uid;
+        }
+        return null;
     }
 }

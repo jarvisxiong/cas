@@ -113,6 +113,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
                         .append(getURLEncode(String.format(latlongFormat, latitude, longitude), format));
             }
             url.append("&callbackurl=").append(getURLEncode(clickUrl, format));
+            url.append("&realSiteId=").append((entity.getAdgroupIncId()+sasParams.getSiteIncId()));
 
             LOG.debug("WapStart url is {}", url);
 
