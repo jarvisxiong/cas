@@ -22,7 +22,6 @@ import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
-
 /**
  * @author abhishek.parwal
  * 
@@ -30,61 +29,66 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Sharable
 @Singleton
 public class CasExceptionHandler extends ChannelInboundHandlerAdapter {
-    private static final Logger            LOG = LoggerFactory.getLogger(CasExceptionHandler.class);
-    private final Provider<ResponseSender> responseSenderProvider;
-    private final Provider<Marker>         traceMarkerProvider;
+	private static final Logger LOG = LoggerFactory.getLogger(CasExceptionHandler.class);
+	private final Provider<ResponseSender> responseSenderProvider;
+	private final Provider<Marker> traceMarkerProvider;
+	private Marker traceMarker;
+	private ResponseSender responseSender;
 
-    @Inject
-    public CasExceptionHandler(final Provider<Marker> traceMarkerProvider,
-            final Provider<ResponseSender> responseSenderProvider) {
-        this.traceMarkerProvider = traceMarkerProvider;
-        this.responseSenderProvider = responseSenderProvider;
-    }
+	@Inject
+	public CasExceptionHandler(final Provider<Marker> traceMarkerProvider, final Provider<ResponseSender> responseSenderProvider) {
+		this.traceMarkerProvider = traceMarkerProvider;
+		this.responseSenderProvider = responseSenderProvider;
+	}
 
-    /**
-     * Invoked when an exception occurs whenever channel throws closedchannelexception increment the totalterminate
-     * means channel is closed by party who requested for the ad
-     */
-    @Override
-    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
-        MDC.put("requestId", String.format("0x%08x", ctx.channel().hashCode()));
+	@Override
+	public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
+		traceMarker = traceMarkerProvider.get();
+		responseSender = responseSenderProvider.get();
+		super.channelRead(ctx, msg);
+	}
 
-        Marker traceMarker = traceMarkerProvider.get();
-        ResponseSender responseSender = responseSenderProvider.get();
+	/**
+	 * Invoked when an exception occurs whenever channel throws
+	 * closedchannelexception increment the totalterminate means channel is
+	 * closed by party who requested for the ad
+	 */
+	@Override
+	public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
+		MDC.put("requestId", String.format("0x%08x", ctx.channel().hashCode()));
 
-        if (cause instanceof ReadTimeoutException) {
+		if (cause instanceof ReadTimeoutException) {
 
-            LOG.debug(traceMarker, "Channel is open in channelIdle handler");
-            if (responseSender.getRankList() != null) {
-                for (ChannelSegment channelSegment : responseSender.getRankList()) {
-                    if (channelSegment.getAdNetworkInterface().getAdStatus().equals("AD")) {
-                        LOG.debug(traceMarker, "Got Ad from {} Top Rank was {}", channelSegment.getAdNetworkInterface()
-                                .getName(), responseSender.getRankList().get(0).getAdNetworkInterface().getName());
-                        responseSender.sendAdResponse(channelSegment.getAdNetworkInterface(), ctx.channel());
-                        return;
-                    }
-                }
-            }
-            responseSender.sendNoAdResponse(ctx.channel());
-            // increment the totalTimeout. It means server
-            // could not write the response with in 800 ms
-            LOG.debug(traceMarker, "inside channel idle event handler for Request channel ID: {}", ctx.channel());
-            InspectorStats.incrementStatCount(InspectorStrings.totalTimeout);
-            LOG.debug(traceMarker, "server timeout");
+			LOG.debug(traceMarker, "Channel is open in channelIdle handler");
+			if (responseSender.getRankList() != null) {
+				for (ChannelSegment channelSegment : responseSender.getRankList()) {
+					if (channelSegment.getAdNetworkInterface().getAdStatus().equals("AD")) {
+						LOG.debug(traceMarker, "Got Ad from {} Top Rank was {}", channelSegment.getAdNetworkInterface().getName(), responseSender.getRankList()
+								.get(0).getAdNetworkInterface().getName());
+						responseSender.sendAdResponse(channelSegment.getAdNetworkInterface(), ctx.channel());
+						return;
+					}
+				}
+			}
+			responseSender.sendNoAdResponse(ctx.channel());
+			// increment the totalTimeout. It means server
+			// could not write the response with in 800 ms
+			LOG.debug(traceMarker, "inside channel idle event handler for Request channel ID: {}", ctx.channel());
+			InspectorStats.incrementStatCount(InspectorStrings.totalTimeout);
+			LOG.debug(traceMarker, "server timeout");
 
-        }
-        else {
+		} else {
 
-            String exceptionString = cause.getClass().getSimpleName();
-            InspectorStats.incrementStatCount(InspectorStrings.channelException, exceptionString);
-            InspectorStats.incrementStatCount(InspectorStrings.channelException, InspectorStrings.count);
-            if (cause instanceof ClosedChannelException || cause instanceof IOException) {
-                InspectorStats.incrementStatCount(InspectorStrings.totalTerminate);
-                LOG.debug(traceMarker, "Channel is terminated {}", ctx.channel());
-            }
-            LOG.info(traceMarker, "Getting netty error in HttpRequestHandler: {}", cause);
-            responseSender.sendNoAdResponse(ctx.channel());
-        }
+			String exceptionString = cause.getClass().getSimpleName();
+			InspectorStats.incrementStatCount(InspectorStrings.channelException, exceptionString);
+			InspectorStats.incrementStatCount(InspectorStrings.channelException, InspectorStrings.count);
+			if (cause instanceof ClosedChannelException || cause instanceof IOException) {
+				InspectorStats.incrementStatCount(InspectorStrings.totalTerminate);
+				LOG.debug(traceMarker, "Channel is terminated {}", ctx.channel());
+			}
+			LOG.info(traceMarker, "Getting netty error in HttpRequestHandler: {}", cause);
+			responseSender.sendNoAdResponse(ctx.channel());
+		}
 
-    }
+	}
 }
