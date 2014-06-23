@@ -445,15 +445,15 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if(entity != null) {
         	final AppStore store = new AppStore();
         	if(entity.getContentRating() != null && !entity.getContentRating().isEmpty()) {
-        		store.setCr(entity.getContentRating());
+        		store.setRating(entity.getContentRating());
         	}
         	if(entity.getAppType() != null && !entity.getAppType().isEmpty()) {
-        		store.setPc(entity.getAppType());
+        		store.setCat(entity.getAppType());
         	}
         	if(entity.getCategories() != null && !entity.getCategories().isEmpty()) {
-        		store.setSc(entity.getCategories());
+        		store.setSeccat(entity.getCategories());
         	}
-        	ext.setSd(store);
+        	ext.setStore(store);
         }
         app.setExt(ext);
         return app;
