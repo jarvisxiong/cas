@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.slf4j.Marker;
 
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
@@ -30,22 +29,13 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 public class CasExceptionHandler extends ChannelInboundHandlerAdapter {
 	private static final Logger LOG = LoggerFactory.getLogger(CasExceptionHandler.class);
-	private final Provider<ResponseSender> responseSenderProvider;
-	private final Provider<Marker> traceMarkerProvider;
-	private Marker traceMarker;
-	private ResponseSender responseSender;
+	private final Marker traceMarker;
+	private final ResponseSender responseSender;
 
 	@Inject
-	public CasExceptionHandler(final Provider<Marker> traceMarkerProvider, final Provider<ResponseSender> responseSenderProvider) {
-		this.traceMarkerProvider = traceMarkerProvider;
-		this.responseSenderProvider = responseSenderProvider;
-	}
-
-	@Override
-	public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
-		traceMarker = traceMarkerProvider.get();
-		responseSender = responseSenderProvider.get();
-		super.channelRead(ctx, msg);
+	public CasExceptionHandler(final Marker traceMarker, final ResponseSender responseSender) {
+		this.traceMarker = traceMarker;
+		this.responseSender = responseSender;
 	}
 
 	/**

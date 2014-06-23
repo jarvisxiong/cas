@@ -57,9 +57,8 @@ public class ChannelServerPipelineFactory extends ChannelInitializer<SocketChann
 		pipeline.addLast("requestIdHandler", requestIdHandler);
 		pipeline.addLast("nettyRequestScopeSeedHandler", nettyRequestScopeSeedHandler);
 
-		pipeline.addLast("casWriteTimeoutHandler",
+		pipeline.addLast("casTimeoutHandler",
 				new CasTimeoutHandler(serverConfig.getServerTimeoutInMillisForRTB(), serverConfig.getServerTimeoutInMillisForDCP()));
 		pipeline.addLast("requestParserHandler", requestParserHandler);
-		pipeline.addLast("casExceptionHandler", casExceptionHandler);
 	}
 }

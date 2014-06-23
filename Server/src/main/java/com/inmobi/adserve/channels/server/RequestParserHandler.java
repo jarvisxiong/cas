@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
+import com.google.inject.Injector;
 import com.google.inject.Provider;
 import com.inmobi.adserve.adpool.AdPoolRequest;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -49,18 +50,18 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
 	private final Provider<Servlet> servletProvider;
 	private final URLCodec urlCodec = new URLCodec();
 	private final Provider<HttpRequestHandler> httpRequestHandlerProvider;
-	private final CasExceptionHandler casExceptionHandler;
+
+	private final Injector injector;
 
 	@Inject
 	RequestParserHandler(final RequestParser requestParser, final ThriftRequestParser thriftRequestParser, final Provider<Marker> traceMarkerProvider,
-			final Provider<Servlet> servletProvider, final Provider<HttpRequestHandler> httpRequestHandlerProvider,
-			final CasExceptionHandler casExceptionHandler) {
+			final Provider<Servlet> servletProvider, final Provider<HttpRequestHandler> httpRequestHandlerProvider, final Injector injector) {
 		this.requestParser = requestParser;
 		this.thriftRequestParser = thriftRequestParser;
 		this.traceMarkerProvider = traceMarkerProvider;
 		this.servletProvider = servletProvider;
 		this.httpRequestHandlerProvider = httpRequestHandlerProvider;
-		this.casExceptionHandler = casExceptionHandler;
+		this.injector = injector;
 	}
 
 	@Override
@@ -150,7 +151,14 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
 			if (channelHandlerMap.containsKey("httpRequestHandler")) {
 				pipeline.remove("httpRequestHandler");
 			}
-			pipeline.addBefore("casExceptionHandler", "httpRequestHandler", httpRequestHandlerProvider.get());
+			pipeline.addLast("httpRequestHandler", httpRequestHandlerProvider.get());
+
+			if (channelHandlerMap.containsKey("casExceptionHandler")) {
+				pipeline.remove("casExceptionHandler");
+			}
+
+			pipeline.addLast("casExceptionHandler", injector.getInstance(CasExceptionHandler.class));
+
 		}
 	}
 }
