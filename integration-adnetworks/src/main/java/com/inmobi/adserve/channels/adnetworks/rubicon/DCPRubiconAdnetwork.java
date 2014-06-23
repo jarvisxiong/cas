@@ -73,6 +73,9 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	private static final String FS_RATING = "4%2B";
 	private static final String PERFORMANCE_RATING = "9%2B";
 	private static final String DOMAIN = "com.inmobi-exchange";
+	private static final String IDFA = "idfa";
+	private static final String OPEN_UDID = "open-udid";
+	private static final String UDID = "udid";
 
 
 	private final String userName;
@@ -249,17 +252,17 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 			if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
 				appendQueryParam(url, MD5_DEVICE_ID,
 						casInternalRequestParameters.uidMd5, false);
-				appendQueryParam(url, DEVICE_ID_TYPE, 4, false);
+				appendQueryParam(url, DEVICE_ID_TYPE, UDID, false);
 			} else if (StringUtils
 					.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
 				appendQueryParam(url, SHA1_DEVICE_ID,
 						casInternalRequestParameters.uidIDUS1, false);
-				appendQueryParam(url, DEVICE_ID_TYPE, 4, false);
+				appendQueryParam(url, DEVICE_ID_TYPE, UDID, false);
 
 			} else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
 				appendQueryParam(url, MD5_DEVICE_ID,
 						casInternalRequestParameters.uid, false);
-				appendQueryParam(url, DEVICE_ID_TYPE, 2, false);
+				appendQueryParam(url, DEVICE_ID_TYPE, OPEN_UDID, false);
 			}
 
 		} else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
@@ -267,21 +270,11 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 					&& "1".equals(casInternalRequestParameters.uidADT)) {
 				appendQueryParam(url, DEVICE_ID,
 						casInternalRequestParameters.uidIFA, false);
-				appendQueryParam(url, DEVICE_ID_TYPE, 1, false);
-			} else if (StringUtils
-					.isNotBlank(casInternalRequestParameters.uidSO1)) {
-				appendQueryParam(url, SHA1_DEVICE_ID,
-						casInternalRequestParameters.uidSO1, false);
-				appendQueryParam(url, DEVICE_ID_TYPE, 3, false);
-			} else if (StringUtils
-					.isNotBlank(casInternalRequestParameters.uidO1)) {
-				appendQueryParam(url, SHA1_DEVICE_ID,
-						casInternalRequestParameters.uidO1, false);
-				appendQueryParam(url, DEVICE_ID_TYPE, 3, false);
+				appendQueryParam(url, DEVICE_ID_TYPE, IDFA, false);
 			} else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
 				appendQueryParam(url, MD5_DEVICE_ID,
 						casInternalRequestParameters.uid, false);
-				appendQueryParam(url, DEVICE_ID_TYPE, 2, false);
+				appendQueryParam(url, DEVICE_ID_TYPE, OPEN_UDID, false);
 			}
 
 		}

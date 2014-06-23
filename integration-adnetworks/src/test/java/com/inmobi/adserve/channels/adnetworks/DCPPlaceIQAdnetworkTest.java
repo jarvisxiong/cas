@@ -275,6 +275,36 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
             assertEquals(expectedUrl, actualUrl);
         }
     }
+    
+    @Test
+    public void testDCPPlaceiqRequestUriWithInterstitial() throws Exception {
+        SASRequestParameters sasParams = new SASRequestParameters();
+        CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
+        sasParams.setRemoteHostIp("206.29.182.240");
+        sasParams.setUserAgent("Mozilla");
+        sasParams.setSource("APP");
+        casInternalRequestParameters.latLong = "37.4429,-122.1514";
+        sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
+        List<Long> category = new ArrayList<Long>();
+        category.add(1l);
+        sasParams.setCategories(category);
+        casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
+        sasParams.setSlot(Short.valueOf("14"));
+        sasParams.setSiteIncId(6575868);
+        sasParams.setOsId(HandSetOS.Android.getValue());
+        String externalKey = "PlaceIQ_test_7";
+        SlotSizeMapping.init();
+        ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
+                placeiqAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 0));
+        if (dcpPlaceIQAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
+            String actualUrl = dcpPlaceIQAdNetwork.getRequestUri().toString();
+            String expectedUrl = "http://test.ads.placeiq.com/2/ad?RT=ss&ST=xml&PT=IMB&AU=PlaceIQ_test_7%2Fuc%2F6456fc%2F0&IP=206.29.182.240&UA=Mozilla&DO=Android&LT=37.4429&LG=-122.1514&SZ=320x480&AM=202cb962ac59075b964b07152d234b70&AP=6575868&AT=STG%2CRMG%2CMRD%2CMRI";
+            assertEquals(expectedUrl, actualUrl);
+        }
+    }
 
     @Test
     public void testDCPPlaceiqRequestUriWithSlot() throws Exception {
