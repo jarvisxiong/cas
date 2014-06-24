@@ -3,11 +3,17 @@ package com.inmobi.adserve.channels.server;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.util.concurrent.ScheduledFuture;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.google.inject.Inject;
+import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.servlet.ServletRtbd;
 
 /**
  * @author abhishek.parwal
@@ -15,117 +21,105 @@ import java.util.concurrent.TimeUnit;
  */
 public class CasTimeoutHandler extends ChannelDuplexHandler {
 
-    private final long                  timeoutMillis;
-    private volatile boolean            flag = false;
-    private volatile long               lastReadTime;
+	private volatile long timeoutInNanos;
+	private final long timeoutInNanosForRTB;
+	private final long timeoutInNanosForCAS;
+	private volatile long lastReadTime;
 
-    private volatile ScheduledFuture<?> timeout;
+	private volatile ScheduledFuture<?> timeout;
 
-    /**
-     * @param timeoutMillis
-     */
-    public CasTimeoutHandler(final int timeoutMillis) {
-        this.timeoutMillis = timeoutMillis;
-    }
+	@Inject
+	private static Map<String, Servlet> pathToServletMap;
 
-    @Override
-    public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
-        flag = true;
-        lastReadTime = System.currentTimeMillis();
-        super.channelRead(ctx, msg);
-    }
+	/**
+	 * convert milliseconds into nanoseconds
+	 */
+	public CasTimeoutHandler(final int timeoutMillisForRTB, final int timeoutMillisForCAS) {
+		this.timeoutInNanosForRTB = TimeUnit.MILLISECONDS.toNanos(timeoutMillisForRTB);
+		this.timeoutInNanosForCAS = TimeUnit.MILLISECONDS.toNanos(timeoutMillisForCAS);
+	}
 
-    @Override
-    public void handlerAdded(final ChannelHandlerContext ctx) throws Exception {
-        if (ctx.channel().isActive() && ctx.channel().isRegistered()) {
-            // channelActvie() event has been fired already, which means this.channelActive() will
-            // not be invoked. We have to initialize here instead.
-            initialize(ctx);
-        }
-        else {
-            // channelActive() event has not been fired yet. this.channelActive() will be invoked
-            // and initialization will occur there.
-        }
-    }
+	@Override
+	public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
 
-    @Override
-    public void channelRegistered(final ChannelHandlerContext ctx) throws Exception {
-        // Initialize early if channel is active already.
-        if (ctx.channel().isActive()) {
-            initialize(ctx);
-        }
-        super.channelRegistered(ctx);
-    }
+		// if rtbd we are going with timeout of 190ms
+		// else if dcp we are going with timeout of 600 ms
 
-    private void initialize(final ChannelHandlerContext ctx) {
+		HttpRequest httpRequest = (HttpRequest) msg;
 
-        lastReadTime = System.currentTimeMillis();
-        timeout = ctx.executor().schedule(new ReadTimeoutTask(ctx), timeoutMillis, TimeUnit.MILLISECONDS);
-    }
+		QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httpRequest.getUri());
+		String path = queryStringDecoder.path();
 
-    @Override
-    public void write(final ChannelHandlerContext ctx, final Object msg, final ChannelPromise promise) throws Exception {
-        flag = false;
-        super.write(ctx, msg, promise);
-    }
+		Servlet servlet = pathToServletMap.get(path);
 
-    @Override
-    public void handlerRemoved(final ChannelHandlerContext ctx) throws Exception {
-        destroy();
-    }
+		if (servlet instanceof ServletRtbd) {
+			timeoutInNanos = timeoutInNanosForRTB;
+		} else {
+			timeoutInNanos = timeoutInNanosForCAS;
+		}
 
-    @Override
-    public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
-        destroy();
-        super.channelInactive(ctx);
-    }
+		initialize(ctx);
 
-    private void destroy() {
-        if (timeout != null) {
-            timeout.cancel(false);
-            timeout = null;
-        }
-    }
+		super.channelRead(ctx, msg);
+	}
 
-    private void readTimedOut(final ChannelHandlerContext ctx) {
-        flag = false;
-        ctx.fireExceptionCaught(ReadTimeoutException.INSTANCE);
-    }
+	private void initialize(final ChannelHandlerContext ctx) {
+		lastReadTime = System.nanoTime();
+		timeout = ctx.executor().schedule(new ReadTimeoutTask(ctx), timeoutInNanos, TimeUnit.NANOSECONDS);
+	}
 
-    private final class ReadTimeoutTask implements Runnable {
+	@Override
+	public void write(final ChannelHandlerContext ctx, final Object msg, final ChannelPromise promise) throws Exception {
+		if (!ctx.channel().isOpen()) {
+			return;
+		}
+		destroy();
+		super.write(ctx, msg, promise);
+	}
 
-        private final ChannelHandlerContext ctx;
+	private void destroy() {
+		if (timeout != null) {
+			timeout.cancel(true);
+			timeout = null;
+		}
+	}
 
-        ReadTimeoutTask(final ChannelHandlerContext ctx) {
-            this.ctx = ctx;
-        }
+	private void readTimedOut(final ChannelHandlerContext ctx) {
+		ctx.fireExceptionCaught(ReadTimeoutException.INSTANCE);
+	}
 
-        @Override
-        public void run() {
-            if (!ctx.channel().isOpen()) {
-                return;
-            }
+	private final class ReadTimeoutTask implements Runnable {
 
-            long currentTime = System.currentTimeMillis();
-            long nextDelay = timeoutMillis - (currentTime - lastReadTime);
-            if (nextDelay <= 0) {
-                // Read timed out - set a new timeout and notify the callback.
-                timeout = ctx.executor().schedule(this, timeoutMillis, TimeUnit.MILLISECONDS);
-                try {
-                    // Don't send unnecessary timeout
-                    if (flag) {
-                        readTimedOut(ctx);
-                    }
-                }
-                catch (Throwable t) {
-                    ctx.fireExceptionCaught(t);
-                }
-            }
-            else {
-                // Read occurred before the timeout - set a new timeout with shorter delay.
-                timeout = ctx.executor().schedule(this, nextDelay, TimeUnit.MILLISECONDS);
-            }
-        }
+		private final ChannelHandlerContext ctx;
 
-    }
+		ReadTimeoutTask(final ChannelHandlerContext ctx) {
+			this.ctx = ctx;
+		}
+
+		@Override
+		public void run() {
+			if (!ctx.channel().isOpen()) {
+				return;
+			}
+
+			long currentTime = System.nanoTime();
+
+			// if rtbd we are going with timeout of 190ms
+			// else if dcp we are going with timeout of 600 ms
+			long nextDelay = timeoutInNanos - (currentTime - lastReadTime);
+
+			if (nextDelay <= 0) {
+
+				try {
+					readTimedOut(ctx);
+				} catch (Throwable t) {
+					ctx.fireExceptionCaught(t);
+				}
+			} else {
+				// Read occurred before the timeout - set a new timeout with
+				// shorter delay.
+				timeout = ctx.executor().schedule(this, nextDelay, TimeUnit.NANOSECONDS);
+			}
+		}
+	}
 }
