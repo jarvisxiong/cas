@@ -138,9 +138,10 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 			throwException("Missing action text");
 		}
 		
-		if(response.getPixelurlSize()<1){
-			throwException("Missing pixelurl");
-		}
+		//Removing because partner may not like to track it's advertisement.
+		//		if(response.getPixelurlSize()<1){
+		//			throwException("Missing pixelurl");
+		//		}
 		
 		if(response.getClickurlSize()<1){
 			throwException("missing clickurl");

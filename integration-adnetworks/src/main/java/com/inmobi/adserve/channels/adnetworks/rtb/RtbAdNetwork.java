@@ -171,8 +171,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp())
         		|| StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)
-                || (!isNativeResponseSupported && isNativeRequest())
-                || (!isHTMLResponseSupported && !isNativeRequest())) {
+                || !isRequestFormatSupported()) {
             LOG.debug("mandate parameters missing or request format is not compaitable to partner supported response for dummy so exiting adapter");
             return false;
         }
@@ -224,6 +223,17 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         // Serializing the bidRequest Object
         return serializeBidRequest();
+    }
+    
+    
+    private boolean isRequestFormatSupported(){
+    	if(isNativeRequest()){
+    		return isNativeResponseSupported;
+    	}else if(!isNativeRequest()){
+    		return isHTMLResponseSupported;
+    	}
+    	
+    	return false;
     }
 
     private boolean createBidRequestObject(final List<Impression> impresssionlist, final Site site, final App app,
