@@ -66,7 +66,6 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
 			LOG.info(traceMarker, "stack trace is {}", exception);
 		} finally {
 			requestParameterHolder.getHttpRequest().release();
-			ctx.fireChannelRead(msg);
 		}
 
 	}
