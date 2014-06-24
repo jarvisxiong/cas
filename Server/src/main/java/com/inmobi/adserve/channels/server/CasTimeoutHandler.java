@@ -21,7 +21,7 @@ import com.inmobi.adserve.channels.server.servlet.ServletRtbd;
  */
 public class CasTimeoutHandler extends ChannelDuplexHandler {
 
-	private volatile long timeoutInMillis;
+	private volatile long timeoutInNanos;
 	private final long timeoutInNanosForRTB;
 	private final long timeoutInNanosForCAS;
 	private volatile long lastReadTime;
@@ -35,8 +35,8 @@ public class CasTimeoutHandler extends ChannelDuplexHandler {
 	 * convert milliseconds into nanoseconds
 	 */
 	public CasTimeoutHandler(final int timeoutMillisForRTB, final int timeoutMillisForCAS) {
-		this.timeoutInNanosForRTB = timeoutMillisForRTB;
-		this.timeoutInNanosForCAS = timeoutMillisForCAS;
+		this.timeoutInNanosForRTB = TimeUnit.MILLISECONDS.toNanos(timeoutMillisForRTB);
+		this.timeoutInNanosForCAS = TimeUnit.MILLISECONDS.toNanos(timeoutMillisForCAS);
 	}
 
 	@Override
@@ -53,9 +53,9 @@ public class CasTimeoutHandler extends ChannelDuplexHandler {
 		Servlet servlet = pathToServletMap.get(path);
 
 		if (servlet instanceof ServletRtbd) {
-			timeoutInMillis = timeoutInNanosForRTB;
+			timeoutInNanos = timeoutInNanosForRTB;
 		} else {
-			timeoutInMillis = timeoutInNanosForCAS;
+			timeoutInNanos = timeoutInNanosForCAS;
 		}
 
 		initialize(ctx);
@@ -64,8 +64,8 @@ public class CasTimeoutHandler extends ChannelDuplexHandler {
 	}
 
 	private void initialize(final ChannelHandlerContext ctx) {
-		lastReadTime = System.currentTimeMillis();
-		timeout = ctx.executor().schedule(new ReadTimeoutTask(ctx), timeoutInMillis, TimeUnit.MILLISECONDS);
+		lastReadTime = System.nanoTime();
+		timeout = ctx.executor().schedule(new ReadTimeoutTask(ctx), timeoutInNanos, TimeUnit.NANOSECONDS);
 	}
 
 	@Override
@@ -102,11 +102,11 @@ public class CasTimeoutHandler extends ChannelDuplexHandler {
 				return;
 			}
 
-			long currentTime = System.currentTimeMillis();
+			long currentTime = System.nanoTime();
 
 			// if rtbd we are going with timeout of 190ms
 			// else if dcp we are going with timeout of 600 ms
-			long nextDelay = timeoutInMillis - (currentTime - lastReadTime);
+			long nextDelay = timeoutInNanos - (currentTime - lastReadTime);
 
 			if (nextDelay <= 0) {
 
@@ -118,7 +118,7 @@ public class CasTimeoutHandler extends ChannelDuplexHandler {
 			} else {
 				// Read occurred before the timeout - set a new timeout with
 				// shorter delay.
-				timeout = ctx.executor().schedule(this, nextDelay, TimeUnit.MILLISECONDS);
+				timeout = ctx.executor().schedule(this, nextDelay, TimeUnit.NANOSECONDS);
 			}
 		}
 	}
