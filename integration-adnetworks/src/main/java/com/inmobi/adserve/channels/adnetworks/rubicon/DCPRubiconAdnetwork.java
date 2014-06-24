@@ -248,8 +248,15 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	private void appendDeviceIds(StringBuilder url) {
 		// Device id type 1 (IDFA), 2 (OpenUDID), 3 (Apple UDID), 4 (Android
 		// device ID)
-		boolean isUdid=false;
-		if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
+		
+		
+		if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
+				&& "1".equals(casInternalRequestParameters.uidADT)) {
+			appendQueryParam(url, DEVICE_ID,
+					casInternalRequestParameters.uidIFA, false);
+			appendQueryParam(url, DEVICE_ID_TYPE, IDFA, false);
+		}else{
+			boolean isUdid=false;
 			if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
 				appendQueryParam(url, MD5_DEVICE_ID,
 						casInternalRequestParameters.uidMd5, false);
@@ -268,19 +275,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 				appendQueryParam(url, DEVICE_ID_TYPE, OPEN_UDID, false);
 			}
 
-		} else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
-			if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
-					&& "1".equals(casInternalRequestParameters.uidADT)) {
-				appendQueryParam(url, DEVICE_ID,
-						casInternalRequestParameters.uidIFA, false);
-				appendQueryParam(url, DEVICE_ID_TYPE, IDFA, false);
-			} else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
-				appendQueryParam(url, MD5_DEVICE_ID,
-						casInternalRequestParameters.uid, false);
-				appendQueryParam(url, DEVICE_ID_TYPE, OPEN_UDID, false);
-			}
-
-		}
+		} 
 	}
 
 	@Override
