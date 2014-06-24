@@ -22,21 +22,18 @@ public class ChannelServerPipelineFactory extends ChannelInitializer<SocketChann
 	private final NettyRequestScopeSeedHandler nettyRequestScopeSeedHandler;
 	@Getter
 	private final ConnectionLimitHandler incomingConnectionLimitHandler;
-	private final CasConfigUtil servletHandler;
 	private final ServerConfig serverConfig;
 	private final LoggingHandler loggingHandler;
 	private final RequestParserHandler requestParserHandler;
 
 	@Inject
 	ChannelServerPipelineFactory(final ServerConfig serverConfig, final NettyRequestScopeSeedHandler nettyRequestScopeSeedHandler,
-			final CasConfigUtil servletHandler, final ConnectionLimitHandler incomingConnectionLimitHandler, final LoggingHandler loggingHandler,
-			final RequestParserHandler requestParserHandler) {
+			final ConnectionLimitHandler incomingConnectionLimitHandler, final LoggingHandler loggingHandler, final RequestParserHandler requestParserHandler) {
 
 		this.serverConfig = serverConfig;
 		this.nettyRequestScopeSeedHandler = nettyRequestScopeSeedHandler;
 		this.requestIdHandler = new RequestIdHandler();
 		this.incomingConnectionLimitHandler = incomingConnectionLimitHandler;
-		this.servletHandler = servletHandler;
 		this.loggingHandler = loggingHandler;
 		this.requestParserHandler = requestParserHandler;
 	}
