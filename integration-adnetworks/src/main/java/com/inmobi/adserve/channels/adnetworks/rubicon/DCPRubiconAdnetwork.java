@@ -248,18 +248,21 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	private void appendDeviceIds(StringBuilder url) {
 		// Device id type 1 (IDFA), 2 (OpenUDID), 3 (Apple UDID), 4 (Android
 		// device ID)
+		boolean isUdid=false;
 		if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
 			if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
 				appendQueryParam(url, MD5_DEVICE_ID,
 						casInternalRequestParameters.uidMd5, false);
-				appendQueryParam(url, DEVICE_ID_TYPE, UDID, false);
-			} else if (StringUtils
+				isUdid=true;
+			}if (StringUtils
 					.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
 				appendQueryParam(url, SHA1_DEVICE_ID,
-						casInternalRequestParameters.uidIDUS1, false);
+					casInternalRequestParameters.uidIDUS1, false);
+				isUdid=true;
+			} 
+			if(isUdid){
 				appendQueryParam(url, DEVICE_ID_TYPE, UDID, false);
-
-			} else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
+			}else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
 				appendQueryParam(url, MD5_DEVICE_ID,
 						casInternalRequestParameters.uid, false);
 				appendQueryParam(url, DEVICE_ID_TYPE, OPEN_UDID, false);
