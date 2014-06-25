@@ -41,8 +41,8 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 			 CLICK_URL = "\"click_url\":\"$ACTION_LINK\",",
 			 APP_URL = "\"app_url\":\"\",",
 			 ICON = "\"icon_xhdpi\":{",
-			    ICON_W=	 "\"w\":300,",
-				ICON_H = "\"h\":300,",
+			    ICON_W=	 "\"w\":$ICON_WIDTH,",
+				ICON_H = "\"h\":$ICON_HEIGHT,",
 				ICON_URL = "\"url\":\"$ICON_URL\""
 				+ "},",
 		     IMG = "\"image_xhdpi\":{",
@@ -166,6 +166,7 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 		
 		
 		String cc = contextCode;
+		String impId = response.getSeatbid().get(0).getBid().get(0).getImpid();
 		
 		StringBuilder bcu = new StringBuilder();
 		String nUrl = null;
@@ -187,7 +188,7 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
         	bcu.append(constructBeaconUrl(purl));
         }
         
-        cc = cc.replaceAll("\\$BEACON_URL", bcu.toString());
+        cc = cc.replaceAll("\\$BEACON_URL", quoteReplacement(bcu.toString()));
         
         StringBuilder ct = new StringBuilder();
         
@@ -201,11 +202,11 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
         if(clickUrls.size()>0){
         	ct.append("\"").append(clickUrls.get(i)).append("\"");
         }
-        cc = cc.replaceAll("\\$CLICK_TRACKER", ct.toString());
+        cc = cc.replaceAll("\\$CLICK_TRACKER", quoteReplacement(ct.toString().replaceAll("\\$IMP_ID", quoteReplacement(impId))));
 
         
         String landingPageUrl = natResponse.getActionlink();
-        cc = cc.replaceAll("\\$LANDING_PAGE", landingPageUrl);
+        cc = cc.replaceAll("\\$LANDING_PAGE", quoteReplacement(landingPageUrl));
         
 		
 		return cc;
@@ -249,18 +250,18 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 		}
 		
 		pubContent
-		.append(CLICK_URL.replaceAll("\\$ACTION_LINK", actionLink))
+		.append(CLICK_URL.replaceAll("\\$ACTION_LINK", quoteReplacement(actionLink)))
 		.append(APP_URL)
 		//ICON
 		.append(ICON)
-			.append(ICON_W)
-			.append(ICON_H)
-			.append(ICON_URL.replaceAll("\\$ICON_URL", iconUrl))
+			.append(ICON_W.replaceAll("\\$ICON_WIDTH", String.valueOf(imgwidth)))
+			.append(ICON_H.replaceAll("\\$ICON_HEIGHT", String.valueOf(imgHeight)))
+			.append(ICON_URL.replaceAll("\\$ICON_URL", quoteReplacement(iconUrl)))
 		//IMG	
 		.append(IMG)
 			.append(IMG_W.replaceAll("\\$IMG_WIDTH", String.valueOf(imgwidth)))
 			.append(IMG_H.replaceAll("\\$IMG_HEIGHT", String.valueOf(imgHeight)))
-			.append(IMG_URL.replaceAll("\\$IMG_URL", imgUrl))
+			.append(IMG_URL.replaceAll("\\$IMG_URL", quoteReplacement(imgUrl)))
 			
 		.append(STAR_RATING.replaceAll("\\$RATING", quoteReplacement(RATING)))
 		.append(PLAYER_NUM)
