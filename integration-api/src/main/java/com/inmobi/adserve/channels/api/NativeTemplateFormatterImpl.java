@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.regex.Matcher;
 
 import lombok.Data;
 
@@ -25,6 +26,7 @@ import com.inmobi.casthrift.rtb.SeatBid;
 public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 	
 	private final static Logger            LOG                          = LoggerFactory.getLogger(NativeTemplateFormatterImpl.class);
+	
 
 	private static GsonBuilder gb = new GsonBuilder();
 	static{
@@ -224,21 +226,14 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 		
 		StringBuilder pubContent = new StringBuilder();
 		pubContent.append(START);//STARTING JSON
-		pubContent.append(UID.replaceAll("\\$UID", appId));
+		pubContent.append(UID.replaceAll("\\$UID", quoteReplacement(appId)));
 		String title = natResponse.getTitle();
-		if(StringUtils.isEmpty(title)){
-			//throw exception.
-		}
 		
-		pubContent.append(TITLE.replaceAll("\\$TITLE", title));
+		pubContent.append(TITLE.replaceAll("\\$TITLE", quoteReplacement(title)));
 		
 		String description = natResponse.getDescription();
 		
-		if(StringUtils.isEmpty(description)){
-			//throw exception
-		}
-		
-		pubContent.append(SUBTITLE.replaceAll("\\$DESCRIPTION", description));
+		pubContent.append(SUBTITLE.replaceAll("\\$DESCRIPTION", quoteReplacement(description)));
 		
 		String actionLink = natResponse.getActionlink();
 		String cta_install = natResponse.getActiontext();
@@ -267,14 +262,23 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 			.append(IMG_H.replaceAll("\\$IMG_HEIGHT", String.valueOf(imgHeight)))
 			.append(IMG_URL.replaceAll("\\$IMG_URL", imgUrl))
 			
-		.append(STAR_RATING.replaceAll("\\$RATING", RATING))
+		.append(STAR_RATING.replaceAll("\\$RATING", quoteReplacement(RATING)))
 		.append(PLAYER_NUM)
-		.append(IMP_ID.replaceAll("\\$IMPID", impId))
-		.append(CTA_INSTALL.replaceAll("\\$CTA_INSTALL", cta_install))
+		.append(IMP_ID.replaceAll("\\$IMPID", quoteReplacement(impId)))
+		.append(CTA_INSTALL.replaceAll("\\$CTA_INSTALL", quoteReplacement(cta_install)))
 		.append(END);
 
 		return pubContent.toString();
 		
+	}
+	
+	/**
+	 * It's for replacing "\\ or $ in replacement string so that they should not be treated specially.
+	 * @param s
+	 * @return
+	 */
+	private String quoteReplacement(String s){
+		return Matcher.quoteReplacement(s);
 	}
 	
 	
