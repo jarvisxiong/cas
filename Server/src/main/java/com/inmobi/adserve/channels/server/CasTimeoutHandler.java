@@ -14,6 +14,8 @@ import java.util.concurrent.TimeUnit;
 import com.google.inject.Inject;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.servlet.ServletRtbd;
+import com.inmobi.adserve.channels.util.MetricsManager;
+import com.inmobi.casthrift.DemandSourceType;
 
 /**
  * @author abhishek.parwal
@@ -27,6 +29,7 @@ public class CasTimeoutHandler extends ChannelDuplexHandler {
 	private volatile long lastReadTime;
 
 	private volatile ScheduledFuture<?> timeout;
+	private volatile int dst;
 
 	@Inject
 	private static Map<String, Servlet> pathToServletMap;
@@ -54,8 +57,10 @@ public class CasTimeoutHandler extends ChannelDuplexHandler {
 
 		if (servlet instanceof ServletRtbd) {
 			timeoutInNanos = timeoutInNanosForRTB;
+			dst = 6;
 		} else {
 			timeoutInNanos = timeoutInNanosForCAS;
+			dst = 2;
 		}
 
 		initialize(ctx);
@@ -106,7 +111,12 @@ public class CasTimeoutHandler extends ChannelDuplexHandler {
 
 			// if rtbd we are going with timeout of 190ms
 			// else if dcp we are going with timeout of 600 ms
-			long nextDelay = timeoutInNanos - (currentTime - lastReadTime);
+			long latency = currentTime - lastReadTime;
+			long nextDelay = timeoutInNanos - (latency);
+
+			DemandSourceType demandSourceType = DemandSourceType.findByValue(dst);
+
+			MetricsManager.updateTimerLatency(demandSourceType.name(), TimeUnit.NANOSECONDS.toMillis(latency));
 
 			if (nextDelay <= 0) {
 
