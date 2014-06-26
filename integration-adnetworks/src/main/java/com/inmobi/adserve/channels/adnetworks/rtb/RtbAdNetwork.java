@@ -14,6 +14,7 @@ import com.inmobi.casthrift.rtb.*;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -21,6 +22,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
 import lombok.Getter;
 import lombok.Setter;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
@@ -32,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+
 import java.awt.*;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -120,7 +123,16 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                                                                                 "CNY","JPY","EUR","KRW","RUB"));
     @Inject
     private static AsyncHttpClientProvider asyncHttpClientProvider;
-
+    
+    @Inject
+    private static NativeTemplateAttributeFinder nativeTemplateAttributeFinder;
+    
+    @Inject
+    private static NativeTemplateFormatter nativeTemplateFormatter;
+    
+    
+    private static final String nativeString = "native";
+    
     @Override
     protected AsyncHttpClient getAsyncHttpClient() {
         return asyncHttpClientProvider.getRtbAsyncHttpClient();
@@ -148,15 +160,19 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         this.tmax = tmax;
         this.repositoryHelper = repositoryHelper;
         this.templateWN = templateWinNotification;
+        this.isHTMLResponseSupported = config.getBoolean(advertiserName + ".htmlSupported", true);
+        this.isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", false);
     }
 
     @Override
     protected boolean configureParameters() {
 
         LOG.debug("inside configureParameters of RTB");
-        if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
-                || StringUtils.isBlank(externalSiteId)) {
-            LOG.debug("mandate parameters missing for dummy so exiting adapter");
+        if (StringUtils.isBlank(sasParams.getRemoteHostIp())
+        		|| StringUtils.isBlank(sasParams.getUserAgent())
+                || StringUtils.isBlank(externalSiteId)
+                || !isRequestFormatSupported()) {
+            LOG.debug("mandate parameters missing or request format is not compaitable to partner supported response for dummy so exiting adapter");
             return false;
         }
 
@@ -207,6 +223,17 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         // Serializing the bidRequest Object
         return serializeBidRequest();
+    }
+    
+    
+    private boolean isRequestFormatSupported(){
+    	if(isNativeRequest()){
+    		return isNativeResponseSupported;
+    	}else if(!isNativeRequest()){
+    		return isHTMLResponseSupported;
+    	}
+    	
+    	return false;
     }
 
     private boolean createBidRequestObject(final List<Impression> impresssionlist, final Site site, final App app,
@@ -264,6 +291,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
         try {
             bidRequestJson = serializer.toString(bidRequest);
+            if(isNativeRequest()){
+            	bidRequestJson = bidRequestJson.replaceFirst("nativeObject", "native");
+            }
             LOG.info("RTB request json is : {}", bidRequestJson);
         }
         catch (TException e) {
@@ -285,7 +315,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             LOG.info("Impression id can not be null in sasparam");
             return null;
         }
-        impression.setBanner(banner);
+        
+        if(!isNativeRequest()){
+        	impression.setBanner(banner);
+        }
         impression.setBidfloorcur(USD);
         // Set interstitial or not
         if (null != sasParams.getRqAdType() && "int".equalsIgnoreCase(sasParams.getRqAdType())) {
@@ -304,9 +337,34 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (null != displayManagerVersion) {
             impression.setDisplaymanagerver(displayManagerVersion);
         }
+        
+        if(isNativeResponseSupported && isNativeRequest()){
+        	impression.setExt(createNativeExtensionObject());
+        }
         return impression;
     }
-
+    
+    
+    private ImpressionExtensions createNativeExtensionObject(){
+    	Native nat = new Native();
+    	nat.setMandatory(nativeTemplateAttributeFinder.findAttribute(new MandatoryNativeAttributeType()));
+    	nat.setImage(nativeTemplateAttributeFinder.findAttribute(new ImageNativeAttributeType()));
+    	
+    	//TODO: for native currently there is no way to identify MRAID traffic/container supported by publisher.
+//    	if(!StringUtils.isEmpty(sasParams.getSdkVersion())){
+//    	   nat.api.add(3);
+//    	}
+    	nat.setBattr(nativeTemplateAttributeFinder.findAttribute(new BAttrNativeType()));
+    	nat.setSuggested(nativeTemplateAttributeFinder.findAttribute(new SuggestedNativeAttributeType()));
+    	nat.setBtype(nativeTemplateAttributeFinder.findAttribute(new BTypeNativeAttributeType()));
+    	
+    	ImpressionExtensions iext = new ImpressionExtensions();
+    	iext.setNativeObject(nat);
+    	
+    	return iext;
+    }
+    
+   
     private Banner createBannerObject() {
         Banner banner = new Banner();
         banner.setId(casInternalRequestParameters.impressionId);
@@ -634,65 +692,115 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 return;
             }
             adStatus = "AD";
-            VelocityContext velocityContext = new VelocityContext();
-            SeatBid seatBid = bidResponse.getSeatbid().get(0);
-            Bid bid = seatBid.getBid().get(0);
-            String admContent = bid.getAdm();
+            if(isNativeRequest()){
+            	nativeAdBuilding();
+            }else{
+            	nonNativeAdBuilding();
+            }
 
-            int admSize = admContent.length();
-            if (!templateWN) {
-                String winUrl = this.beaconUrl + "?b=${WIN_BID}";
-                admContent = admContent.replace(RTBCallbackMacros.AUCTION_WIN_URL, winUrl);
-            }
-            int admAfterMacroSize = admContent.length();
-
-            if ("wap".equalsIgnoreCase(sasParams.getSource())) {
-                velocityContext.put(VelocityTemplateFieldConstants.PartnerHtmlCode, admContent);
-            }
-            else {
-                velocityContext.put(VelocityTemplateFieldConstants.PartnerHtmlCode, mraid + admContent);
-                if (StringUtils.isNotBlank(sasParams.getImaiBaseUrl())) {
-                    velocityContext.put(VelocityTemplateFieldConstants.IMAIBaseUrl, sasParams.getImaiBaseUrl());
-                }
-            }
-            // Checking whether to send win notification
-            LOG.debug("isWinRequired is {} and winfromconfig is {}", wnRequired, callbackUrl);
-            if (wnRequired) {
-                // setCallbackContent();
-                // Win notification is required
-                String nUrl = null;
-                try {
-                    nUrl = bidResponse.seatbid.get(0).getBid().get(0).getNurl();
-                }
-                catch (Exception e) {
-                    LOG.debug("Exception while parsing response {}", e);
-                }
-                LOG.debug("nurl is {}", nUrl);
-                if (!StringUtils.isEmpty(callbackUrl)) {
-                    LOG.debug("inside wn from config");
-                    velocityContext.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, callbackUrl);
-                }
-                else if (!StringUtils.isEmpty(nUrl)) {
-                    LOG.debug("inside wn from nurl");
-                    velocityContext.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, nUrl);
-                }
-
-            }
-            if (templateWN || (admAfterMacroSize ==  admSize)) {
-                velocityContext.put(VelocityTemplateFieldConstants.IMBeaconUrl, this.beaconUrl);
-            }
-            try {
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.RTB_HTML, velocityContext, sasParams,
-                        null);
-            }
-            catch (Exception e) {
-                adStatus = "NO_AD";
-                LOG.info("Some exception is caught while filling the velocity template for partner{} {}",
-                        advertiserName, e);
-            }
         }
         LOG.debug("response length is {}", responseContent.length());
     }
+    
+    
+    private void nonNativeAdBuilding(){
+    	
+        VelocityContext velocityContext = new VelocityContext();
+        
+        String admContent = getADMContent();
+
+        int admSize = admContent.length();
+        if (!templateWN) {
+            String winUrl = this.beaconUrl + "?b=${WIN_BID}";
+            admContent = admContent.replace(RTBCallbackMacros.AUCTION_WIN_URL, winUrl);
+        }
+        int admAfterMacroSize = admContent.length();
+
+        if ("wap".equalsIgnoreCase(sasParams.getSource())) {
+            velocityContext.put(VelocityTemplateFieldConstants.PartnerHtmlCode, admContent);
+        }
+        else {
+            velocityContext.put(VelocityTemplateFieldConstants.PartnerHtmlCode, mraid + admContent);
+            if (StringUtils.isNotBlank(sasParams.getImaiBaseUrl())) {
+                velocityContext.put(VelocityTemplateFieldConstants.IMAIBaseUrl, sasParams.getImaiBaseUrl());
+            }
+        }
+        // Checking whether to send win notification
+        LOG.debug("isWinRequired is {} and winfromconfig is {}", wnRequired, callbackUrl);
+        createWin(velocityContext);
+        
+        if (templateWN || (admAfterMacroSize ==  admSize)) {
+            velocityContext.put(VelocityTemplateFieldConstants.IMBeaconUrl, this.beaconUrl);
+        }
+        try {
+            responseContent = Formatter.getResponseFromTemplate(TemplateType.RTB_HTML, velocityContext, sasParams,
+                    null);
+        }
+        catch (Exception e) {
+            adStatus = "NO_AD";
+            LOG.info("Some exception is caught while filling the velocity template for partner{} {}",
+                    advertiserName, e);
+        }
+    	
+    }
+    
+    private String getADMContent(){
+    	
+    	  SeatBid seatBid = bidResponse.getSeatbid().get(0);
+          Bid bid = seatBid.getBid().get(0);
+          String admContent = bid.getAdm();
+          return admContent;
+    	
+    }
+    
+    private void createWin(VelocityContext velocityContext){
+    	if (wnRequired) {
+            // setCallbackContent();
+            // Win notification is required
+            String nUrl = null;
+            try {
+                nUrl = bidResponse.seatbid.get(0).getBid().get(0).getNurl();
+            }
+            catch (Exception e) {
+                LOG.debug("Exception while parsing response {}", e);
+            }
+            LOG.debug("nurl is {}", nUrl);
+            if (!StringUtils.isEmpty(callbackUrl)) {
+                LOG.debug("inside wn from config");
+                velocityContext.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, callbackUrl);
+            }
+            else if (!StringUtils.isEmpty(nUrl)) {
+                LOG.debug("inside wn from nurl");
+                velocityContext.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, nUrl);
+            }
+
+        }
+    }
+    
+    @Override
+    protected boolean isNativeRequest(){
+    	return nativeString.equals(sasParams.getRFormat());
+    }
+    
+    private void nativeAdBuilding(){
+    	
+    	App app = bidRequest.getApp();
+    	
+    	Map<String, String> params = new HashMap<String, String>();
+    	params.put("beaconUrl",beaconUrl);
+    	if(app!=null){
+    		params.put("appId",app.getId());
+    	}
+    	try {
+    		responseContent = nativeTemplateFormatter.getFormatterValue(null, bidResponse, params);
+		} catch (Exception e) {
+			 adStatus = "NO_AD";
+	         LOG.error("Some exception is caught while filling the native template for partner{} {}",
+	                    advertiserName, e);
+		}
+    	
+    }
+    
 
     public boolean deserializeResponse(final String response) {
         Gson gson = new Gson();

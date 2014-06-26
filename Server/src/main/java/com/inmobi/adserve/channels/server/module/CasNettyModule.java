@@ -13,6 +13,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
+import com.inmobi.adserve.channels.api.NativeTemplateFormatter;
+import com.inmobi.adserve.channels.api.NativeTemplateFormatterImpl;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.server.CasTimeoutHandler;
@@ -20,10 +22,12 @@ import com.inmobi.adserve.channels.server.ChannelServerPipelineFactory;
 import com.inmobi.adserve.channels.server.ChannelStatServerPipelineFactory;
 import com.inmobi.adserve.channels.server.ConnectionLimitHandler;
 import com.inmobi.adserve.channels.server.netty.CasNettyServer;
+import com.inmobi.adserve.channels.util.NativeTemplateAttributeFinder;
 import com.inmobi.adserve.channels.util.annotations.ServerChannelInitializer;
 import com.inmobi.adserve.channels.util.annotations.ServerConfiguration;
 import com.inmobi.adserve.channels.util.annotations.StatServerChannelInitializer;
 import com.inmobi.adserve.channels.util.annotations.WorkerExecutorService;
+
 
 /**
  * @author abhishek.parwal
@@ -49,8 +53,10 @@ public class CasNettyModule extends AbstractModule {
 		bind(channelInitializerType).annotatedWith(ServerChannelInitializer.class).to(ChannelServerPipelineFactory.class).asEagerSingleton();
 		bind(channelInitializerType).annotatedWith(StatServerChannelInitializer.class).to(ChannelStatServerPipelineFactory.class).asEagerSingleton();
 
-		bind(CasNettyServer.class).asEagerSingleton();
-		bind(AsyncHttpClientProvider.class).asEagerSingleton();
+        bind(CasNettyServer.class).asEagerSingleton();
+        bind(AsyncHttpClientProvider.class).asEagerSingleton();
+        bind(NativeTemplateAttributeFinder.class).asEagerSingleton();
+        bind(NativeTemplateFormatter.class).to(NativeTemplateFormatterImpl.class).asEagerSingleton();
 
 		// thread pool to be used in AsyncHttpClient
 		bind(ExecutorService.class).annotatedWith(WorkerExecutorService.class).toInstance(Executors.newCachedThreadPool());

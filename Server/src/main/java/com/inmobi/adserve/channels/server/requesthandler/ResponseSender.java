@@ -73,7 +73,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
 			+ " body {margin: 0; overflow: hidden; background-color: transparent}" + " </style></head><body class=\"nofill\"><!-- NO FILL -->"
 			+ "<script type=\"text/javascript\" charset=\"utf-8\">"
 			+ "parent.postMessage('{\"topic\":\"nfr\",\"container\" : \"%s\"}', '*');</script></body></html>";
-	private static Set<String> SUPPORTED_RESPONSE_FORMATS = Sets.newHashSet("html", "xhtml", "axml", "imai");
+	private static Set<String> SUPPORTED_RESPONSE_FORMATS = Sets.newHashSet("html", "xhtml", "axml", "imai","native");
 
 	private long totalTime;
 	private List<ChannelSegment> rankList;
@@ -381,7 +381,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
 			break;
 		}
 
-		sendResponse(getResponseStatus(sasParams.getDst(), httpResponseStatus), getResponseBytes(sasParams.getDst(), defaultContent),
+		sendResponse(getResponseStatus(sasParams.getDst(), httpResponseStatus),
+				getResponseBytes(sasParams.getDst(), defaultContent),
 				new HashMap<String, String>(), serverChannel);
 	}
 
@@ -559,7 +560,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
 			return ResponseFormat.HTML;
 		} else if ("axml".equalsIgnoreCase(responseFormat)) {
 			return ResponseFormat.XHTML;
-		}
+		}else if("native".equalsIgnoreCase(responseFormat)){
+			return ResponseFormat.NATIVE;
+        }
 		return ResponseFormat.getValue(responseFormat);
 	}
 
