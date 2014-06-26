@@ -144,12 +144,12 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 		//		if(response.getPixelurlSize()<1){
 		//			throwException("Missing pixelurl");
 		//		}
+		/** Removing it because as per API its optional and Anand has confirmed that it's not a mandatory field.**/
+		//		if(response.getClickurlSize()<1){
+		//			throwException("missing clickurl");
+		//		}
 		
-		if(response.getClickurlSize()<1){
-			throwException("missing clickurl");
-		}
-		
-		if(!response.isSetImage()){
+		if(response.getImage() ==null){
 			throwException("Missing Image");
 		}else if(StringUtils.isEmpty(response.getImage().getImageurl())){
 			throwException("Missing image url");
@@ -184,8 +184,10 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
         }
         
         List<String> pixelurls = natResponse.getPixelurl();
-        for(String purl:pixelurls){
-        	bcu.append(constructBeaconUrl(purl));
+        if(pixelurls!=null){
+	        for(String purl:pixelurls){
+	        	bcu.append(constructBeaconUrl(purl));
+	        }
         }
         
         cc = cc.replaceAll("\\$BEACON_URL", quoteReplacement(bcu.toString()));
@@ -193,15 +195,19 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
         StringBuilder ct = new StringBuilder();
         
         List<String> clickUrls = natResponse.getClickurl();
-        int i=0;
-        for(;i<clickUrls.size()-1;){
-        	ct.append("\"").append(clickUrls.get(i)).append("\"").append(",");
-        	i++;
+        if(clickUrls!=null){
+	        int i=0;
+	        for(;i<clickUrls.size()-1;){
+	        	ct.append("\"").append(clickUrls.get(i)).append("\"").append(",");
+	        	i++;
+	        }
+	        
+	        if(clickUrls.size()>0){
+	        	ct.append("\"").append(clickUrls.get(i)).append("\"");
+	        }
         }
         
-        if(clickUrls.size()>0){
-        	ct.append("\"").append(clickUrls.get(i)).append("\"");
-        }
+        
         cc = cc.replaceAll("\\$CLICK_TRACKER", quoteReplacement(ct.toString().replaceAll("\\$IMP_ID", quoteReplacement(impId))));
 
         
@@ -331,18 +337,19 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 		b.setImpid("DDSSBFGH8765");
 		b.setId("wxyabc876");
 //		b.setAdm("{\"version\":\"1.0\",\"iconurl\":\"www.inmobi.com\",\"title\":\"Hello World\",\"description\":\"I am a description\",\"actiontext\":\"Action text\",\"actionlink\":\"actionlink.inmobi.com\",\"callout\":0,\"data\":[{\"label\":0,\"value\":\"3.5\",\"seq\":0}]}");
-		b.setAdm("{\"version\": \"1.0\","
-				+ "\"iconurl\": \"http://icon.png\","
-				+ "\"title\": \"Hello World\", "
-				+ "\"description\": \"This is a beautiful experience\", "
-				+ "\"actiontext\": \"Buy Now\", "
-				+ "\"actionlink\": \"http://buynow.action\","
-				+ " \"pixelurl\": [ \"http://rendered.action1\", \"http://rendered.action2\" ],"
-				+ " \"clickurl\": [ \"http://click.action1\", \"http://click.action2\" ], "
-				+ "\"callout\": 0,"
-				+ " \"data\": [ { \"seq\": 1, \"value\": \"3.9\", \"label\": 0 }],"
-				+ "\"image\":{\"imageurl\": \"http://im-age.png\",w:350,h:980}"
-				+ "}");
+//		b.setAdm("{\"version\": \"1.0\","
+//				+ "\"iconurl\": \"http://icon.png\","
+//				+ "\"title\": \"Hello World\", "
+//				+ "\"description\": \"This is a beautiful experience\", "
+//				+ "\"actiontext\": \"Buy Now\", "
+//				+ "\"actionlink\": \"http://buynow.action\","
+//				+ " \"pixelurl\": [ \"http://rendered.action1\", \"http://rendered.action2\" ],"
+//				+ " \"clickurl\": [ \"http://click.action1\", \"http://click.action2\" ], "
+//				+ "\"callout\": 0,"
+//				+ " \"data\": [ { \"seq\": 1, \"value\": \"3.9\", \"label\": 0 }],"
+//				+ "\"image\":{\"imageurl\": \"http://im-age.png\",w:350,h:980}"
+//				+ "}");
+		b.setAdm("{\"clickurl\":[\"http://adtrack.king.com/modules/adTracking/adClicked.jsp?type=ad&androidId=$O1&st1=inmobi&st2=petrescuesaga&st3=us&st5=interstitial&st4=Native&st6=$IMP_ID&linkId=2302Native\" ],\"actionlink\":\"http://a.applovin.com/redirect?clcode=3!7283.1403763299!1eBApfg9DiRku4p9jpReauuqOeDX-MhPszWW7djk1vGz5f1NPyE5J0xF26F77hRCtqIWevzdO9qMVHThJepSDBhaoHvJkxmHFBqf3igP5UMydnbemHzmqZ4BdIssykwYUHh5MBm5EIpqj397e3JP6HpnA8SIJg-dvPX_zfGFw7fD3VxtjdAtjsMbkiUPNgaa0cat1D8Y1qf30_vuKczSFRHVZH_kM8hIo9AtN2ZPAExzK4GVtLv0ftRnw_ka1jFttupmqsS_RF-XxmbQJZTlQa-zTlq90uTYamOtOqs5c5PqcsZGp9uXYOYxkxKitq18V9TYNI4W0-ONmr8ziMcBqg**\",\"actiontext\":\"Visit Us\",\"description\":\"AppLovin, Your customers aren't targets, or personas, they're people.\",\"iconurl\":\"http://applovin-assets.s3.amazonaws.com/applovin_logo_80x80.png\",\"image\":{\"h\":\"627\",\"imageurl\":\"http://applovin-assets.s3.amazonaws.com/applovin_logo_1200x627.jpg\",\"w\":\"1200\"},\"title\":\"AppLovin\"}");
 		bList.add(b);
 		sb.setBid(bList);
 		
