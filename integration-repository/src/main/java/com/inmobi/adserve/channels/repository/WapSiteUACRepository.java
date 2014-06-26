@@ -56,8 +56,11 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
 			final List<String> catList = new ArrayList<>();
 			if (categories != null && !categories.isEmpty()) {
 				for (String cat : categories.split(",")) {
-					if (cat != null && !cat.isEmpty()) {
-						catList.add(cat.trim());
+					if (cat != null) {
+						cat = cat.trim();
+						if (!cat.isEmpty() && !"ALL".equalsIgnoreCase(cat)) {
+							catList.add(cat);
+						}
 					}
 				}
 				builder.setCategories(catList);
