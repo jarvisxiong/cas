@@ -272,13 +272,8 @@
 			<dependency>
 				<groupId>com.inmobi.commons</groupId>
 				<artifactId>casthrift</artifactId>
-				<version>1.25</version>
-			</dependency>
-			<dependency>
-				<groupId>com.inmobi.commons</groupId>
-				<artifactId>rtb</artifactId>
 				<version>1.26</version>
-			 </dependency>
+			</dependency>
 			<dependency>
 				<groupId>org.codehaus.jackson</groupId>
 				<artifactId>jackson-jaxrs</artifactId>

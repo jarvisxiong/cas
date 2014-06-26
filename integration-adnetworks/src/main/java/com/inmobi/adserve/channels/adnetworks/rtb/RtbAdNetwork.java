@@ -795,7 +795,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     		responseContent = nativeTemplateFormatter.getFormatterValue(null, bidResponse, params);
 		} catch (Exception e) {
 			 adStatus = "NO_AD";
-	         LOG.info("Some exception is caught while filling the native template for partner{} {}",
+	         LOG.error("Some exception is caught while filling the native template for partner{} {}",
 	                    advertiserName, e);
 		}
     	
