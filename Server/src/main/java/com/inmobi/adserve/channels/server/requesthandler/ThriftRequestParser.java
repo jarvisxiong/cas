@@ -4,7 +4,6 @@ import com.google.inject.Singleton;
 import com.inmobi.adserve.adpool.*;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.types.InventoryType;
 
@@ -76,7 +75,9 @@ public class ThriftRequestParser {
 			if (isApp) {
 				params.setWapSiteUACEntity(CasConfigUtil.repositoryHelper.queryWapSiteUACRepository(tObject.site.siteId));
 			}
-            params.setSiteType(tObject.site.isSetContentRating() ? tObject.site.contentRating.toString() : "FAMILY_SAFE");
+			params.setSiteEcpmEntity(CasConfigUtil.repositoryHelper.querySiteEcpmRepository(tObject.site.siteId,
+					tObject.geo.countryId, (int) tObject.device.osId));
+			params.setSiteType(tObject.site.isSetContentRating() ? tObject.site.contentRating.toString() : "FAMILY_SAFE");
             params.setCategories(convertIntToLong(tObject.site.siteTaxonomies));
             double ecpmFloor = Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor);
             params.setSiteFloor(ecpmFloor);
@@ -138,6 +139,8 @@ public class ThriftRequestParser {
         if (tObject.isSetCarrier()) {
             params.setCarrierId(new Long(tObject.carrier.carrierId).intValue());
             params.setNetworkType(tObject.carrier.networkType);
+            
+            
         }
 
         LOG.debug("Successfully parsed tObject, SAS params are : {}", params.toString());
@@ -253,6 +256,9 @@ public class ThriftRequestParser {
                     break;
                 case WC:
                     parameter.uidWC = uidValue;
+                    break;
+                case GPID:
+                    parameter.gpid = uidValue;
                     break;
                 default:
                     break;

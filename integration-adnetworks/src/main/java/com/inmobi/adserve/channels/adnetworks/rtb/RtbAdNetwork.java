@@ -510,16 +510,26 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         // Setting Extension for idfa
         if (!StringUtils.isEmpty(casInternalRequestParameters.uidIFA)) {
-            Map<String, String> deviceExtensions = device.getExt();
-            if (null == deviceExtensions) {
-                deviceExtensions = new HashMap<String, String>();
-            }
+        	final  Map<String, String> deviceExtensions = getDeviceExt(device);
             deviceExtensions.put("idfa", casInternalRequestParameters.uidIFA);
             deviceExtensions.put("idfasha1", getHashedValue(casInternalRequestParameters.uidIFA, "SHA-1"));
             deviceExtensions.put("idfamd5", getHashedValue(casInternalRequestParameters.uidIFA, "MD5"));
-            device.setExt(deviceExtensions);
         }
+        
+        if (!StringUtils.isEmpty(casInternalRequestParameters.gpid)) {
+        	final  Map<String, String> deviceExtensions = getDeviceExt(device);
+       	 	deviceExtensions.put("gpid", casInternalRequestParameters.gpid);
+       	}
         return device;
+    }
+    
+    private  Map<String, String> getDeviceExt(final Device device) {
+    	 Map<String, String> deviceExtensions = device.getExt();
+         if (null == deviceExtensions) {
+             deviceExtensions = new HashMap<String, String>();
+             device.setExt(deviceExtensions);
+         }
+         return deviceExtensions;
     }
 
     @Override
