@@ -63,6 +63,7 @@ public class ChannelServer {
     private static CurrencyConversionRepository     currencyConversionRepository;
     private static WapSiteUACRepository             wapSiteUACRepository;
     private static CreativeRepository               creativeRepository;
+    private static NativeAdTemplateRepository		nativeAdTemplateRepository;
     private static final String                     configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
     public static byte                              dataCenterIdCode;
     public static short                             hostIdCode;
@@ -124,6 +125,7 @@ public class ChannelServer {
             currencyConversionRepository = new CurrencyConversionRepository();
             wapSiteUACRepository = new WapSiteUACRepository();
             creativeRepository = new CreativeRepository();
+            nativeAdTemplateRepository = new NativeAdTemplateRepository();
 
             RepositoryHelper.Builder repoHelperBuilder = RepositoryHelper.newBuilder();
             repoHelperBuilder.setChannelRepository(channelRepository);
@@ -139,6 +141,8 @@ public class ChannelServer {
             repoHelperBuilder.setCurrencyConversionRepository(currencyConversionRepository);
             repoHelperBuilder.setWapSiteUACRepository(wapSiteUACRepository);
             repoHelperBuilder.setCreativeRepository(creativeRepository);
+            repoHelperBuilder.setNativeAdTemplateRepository(nativeAdTemplateRepository);
+            
             RepositoryHelper repositoryHelper = repoHelperBuilder.build();
 
             instantiateRepository(logger, configurationLoader);
@@ -257,7 +261,10 @@ public class ChannelServer {
             initialContext.bind("java:comp/env/jdbc", ds);
 
             ChannelSegmentMatchingCache.init(logger);
+            
+            
             // Reusing the repository from phoenix adserving framework.
+            
             creativeRepository.init(logger,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.CREATIVE_REPOSITORY),
                     ChannelServerStringLiterals.CREATIVE_REPOSITORY);
@@ -299,6 +306,10 @@ public class ChannelServer {
             siteEcpmRepository.init(logger,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY),
                     ChannelServerStringLiterals.SITE_ECPM_REPOSITORY);
+//            nativeAdTemplateRepository.init(logger,
+//                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY),
+//                    ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY);
+            
             logger.error("* * * * Instantiating repository completed * * * *");
             config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)
                     .subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY);

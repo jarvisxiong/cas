@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.server.handler;
 
 import com.google.inject.Key;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.scope.NettyRequestScope;
 import com.inmobi.adserve.channels.server.api.Servlet;
@@ -30,13 +31,16 @@ public class NettyRequestScopeSeedHandler extends ChannelInboundHandlerAdapter {
     private final NettyRequestScope    scope;
     private final Map<String, Servlet> pathToServletMap;
     private final ServletInvalid       invalidServlet;
+    private final Provider<Marker> traceMarkerProvider;
+
 
     @Inject
     public NettyRequestScopeSeedHandler(final NettyRequestScope scope, final Map<String, Servlet> pathToServletMap,
-            final ServletInvalid invalidServlet) {
+            final ServletInvalid invalidServlet, final Provider<Marker> traceMarkerProvider) {
         this.scope = scope;
         this.pathToServletMap = pathToServletMap;
         this.invalidServlet = invalidServlet;
+        this.traceMarkerProvider = traceMarkerProvider;
     }
 
     @Override
@@ -47,7 +51,7 @@ public class NettyRequestScopeSeedHandler extends ChannelInboundHandlerAdapter {
         scope.enter();
         try {
             scope.seed(Key.get(Marker.class), traceMarker);
-            scope.seed(Key.get(ResponseSender.class), new ResponseSender());
+            scope.seed(Key.get(ResponseSender.class), new ResponseSender(traceMarkerProvider));
 
             QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httpRequest.getUri());
             String path = queryStringDecoder.path();

@@ -41,7 +41,7 @@ public class RepositoryHelper {
     private final WapSiteUACRepository             wapSiteUACRepository;
     private final CreativeRepository               creativeRepository;
     private final RepositoryStatsProvider          repositoryStatsProvider;
-    // private static final Logger                    LOG = LoggerFactory.getLogger(RepositoryHelper.class);
+    private final NativeAdTemplateRepository	   nativeAdTemplateRepository;
 
     public RepositoryHelper(final Builder builder) {
         this.channelRepository = builder.channelRepository;
@@ -57,8 +57,10 @@ public class RepositoryHelper {
         this.currencyConversionRepository = builder.currencyConversionRepository;
         this.wapSiteUACRepository = builder.wapSiteUACRepository;
         this.creativeRepository = builder.creativeRepository;
+        this.nativeAdTemplateRepository = builder.nativeAdTemplateRepository;
         this.repositoryStatsProvider = new RepositoryStatsProvider();
         this.repositoryStatsProvider
+        .addRepositoryToStats(this.nativeAdTemplateRepository)
                 .addRepositoryToStats(this.channelRepository)
                     .addRepositoryToStats(this.channelAdGroupRepository)
                     .addRepositoryToStats(this.channelFeedbackRepository)
@@ -71,6 +73,7 @@ public class RepositoryHelper {
                     .addRepositoryToStats(this.currencyConversionRepository)
                     .addRepositoryToStats(this.wapSiteUACRepository)
                     .addRepositoryToStats(this.creativeRepository);
+                   // .addRepositoryToStats(this.nativeAdTemplateRepository);
 
     }
 
@@ -93,6 +96,7 @@ public class RepositoryHelper {
         private CurrencyConversionRepository     currencyConversionRepository;
         private WapSiteUACRepository             wapSiteUACRepository;
         private CreativeRepository               creativeRepository;
+        private NativeAdTemplateRepository       nativeAdTemplateRepository;
 
         public RepositoryHelper build() {
             Preconditions.checkNotNull(channelRepository);
@@ -108,6 +112,7 @@ public class RepositoryHelper {
             Preconditions.checkNotNull(currencyConversionRepository);
             Preconditions.checkNotNull(wapSiteUACRepository);
             Preconditions.checkNotNull(creativeRepository);
+            Preconditions.checkNotNull(nativeAdTemplateRepository);
             return new RepositoryHelper(this);
         }
     }
@@ -229,4 +234,12 @@ public class RepositoryHelper {
         return null;
     }
 
+   /* public NativeAdTemplateEntity queryNativeAdTemplateRepository(final String siteId) {
+        try {
+            return nativeAdTemplateRepository.query(siteId);
+        }
+        catch (RepositoryException ignored) {
+        }
+        return null;
+    }*/
 }

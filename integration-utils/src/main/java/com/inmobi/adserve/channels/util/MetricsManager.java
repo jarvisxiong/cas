@@ -78,6 +78,15 @@ public class MetricsManager {
         RealTimeStats realTimeStats = dstRealTimeStats.get(dst);
         realTimeStats.getLatency().update(latency);
     }
+    
+	public static void updateTimerLatency(final String dst, final long latency) {
+		if (null == dstRealTimeStats.get(dst)) {
+			RealTimeStats realTimeStats = new RealTimeStats(dst);
+			dstRealTimeStats.put(dst, realTimeStats);
+		}
+		RealTimeStats realTimeStats = dstRealTimeStats.get(dst);
+		realTimeStats.getTimerLatency().update(latency);
+	}
 
     public static void updateStats(Long countryId, String countryName, int osId, String osName, String advertiserName,
             boolean fills, boolean requests, boolean serverImpressions, double bids, long latency, double chargedBids) {

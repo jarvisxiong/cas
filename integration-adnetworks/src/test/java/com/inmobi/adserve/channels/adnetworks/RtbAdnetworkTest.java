@@ -66,6 +66,8 @@ public class RtbAdnetworkTest extends TestCase {
         expect(mockConfig.getBoolean(advertiserName + ".isWnRequired")).andReturn(true).anyTimes();
         expect(mockConfig.getBoolean(advertiserName + ".isWinFromClient")).andReturn(true).anyTimes();
         expect(mockConfig.getBoolean(advertiserName + ".siteBlinded")).andReturn(true).anyTimes();
+        expect(mockConfig.getBoolean(advertiserName + ".htmlSupported",true)).andReturn(true).anyTimes();
+        expect(mockConfig.getBoolean(advertiserName + ".nativeSupported",false)).andReturn(false).anyTimes();
         replay(mockConfig);
     }
 
