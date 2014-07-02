@@ -10,6 +10,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
 import com.inmobi.adserve.channels.entity.CreativeEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.PricingEngineEntity;
 import com.inmobi.adserve.channels.entity.PublisherFilterEntity;
 import com.inmobi.adserve.channels.entity.SegmentAdGroupFeedbackEntity;
@@ -234,12 +235,12 @@ public class RepositoryHelper {
         return null;
     }
 
-   /* public NativeAdTemplateEntity queryNativeAdTemplateRepository(final String siteId) {
+   public NativeAdTemplateEntity queryNativeAdTemplateRepository(final String siteId) {
         try {
             return nativeAdTemplateRepository.query(siteId);
         }
         catch (RepositoryException ignored) {
         }
         return null;
-    }*/
+    }
 }
