@@ -8,6 +8,7 @@ import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.*;
 import com.inmobi.casthrift.rtb.*;
@@ -483,7 +484,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (null != sasParams.getCategories()) {
             app.setCat(iabCategoriesInterface.getIABCategories(sasParams.getCategories()));
         }
-        Map<String, String> appExtensions = new HashMap<String, String>();
         String appRating;
         if (!SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
             // Family safe
@@ -492,8 +492,25 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         else {
             appRating = PERFORMANCE_RATING;
         }
-        appExtensions.put(RATING_KEY, appRating);
-        app.setExt(appExtensions);
+        
+        // set App Ext fields
+        final AppExt ext = new AppExt();
+        ext.setFs(appRating);
+        final WapSiteUACEntity entity = sasParams.getWapSiteUACEntity();
+        if(entity != null) {
+        	final AppStore store = new AppStore();
+        	if(!StringUtils.isEmpty(entity.getContentRating())) {
+        		store.setRating(entity.getContentRating());
+        	}
+        	if(!StringUtils.isEmpty(entity.getAppType())) {
+        		store.setCat(entity.getAppType());
+        	}
+        	if(entity.getCategories() != null && !entity.getCategories().isEmpty()) {
+        		store.setSeccat(entity.getCategories());
+        	}
+        	ext.setStore(store);
+        }
+        app.setExt(ext);
         return app;
     }
 
@@ -548,16 +565,26 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         // Setting Extension for idfa
         if (!StringUtils.isEmpty(casInternalRequestParameters.uidIFA)) {
-            Map<String, String> deviceExtensions = device.getExt();
-            if (null == deviceExtensions) {
-                deviceExtensions = new HashMap<String, String>();
-            }
+        	final  Map<String, String> deviceExtensions = getDeviceExt(device);
             deviceExtensions.put("idfa", casInternalRequestParameters.uidIFA);
             deviceExtensions.put("idfasha1", getHashedValue(casInternalRequestParameters.uidIFA, "SHA-1"));
             deviceExtensions.put("idfamd5", getHashedValue(casInternalRequestParameters.uidIFA, "MD5"));
-            device.setExt(deviceExtensions);
         }
+        
+        if (!StringUtils.isEmpty(casInternalRequestParameters.gpid)) {
+        	final  Map<String, String> deviceExtensions = getDeviceExt(device);
+       	 	deviceExtensions.put("gpid", casInternalRequestParameters.gpid);
+       	}
         return device;
+    }
+    
+    private  Map<String, String> getDeviceExt(final Device device) {
+    	 Map<String, String> deviceExtensions = device.getExt();
+         if (null == deviceExtensions) {
+             deviceExtensions = new HashMap<String, String>();
+             device.setExt(deviceExtensions);
+         }
+         return deviceExtensions;
     }
 
     @Override

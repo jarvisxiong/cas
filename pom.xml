@@ -40,7 +40,7 @@
 			<dependency>
 				<groupId>com.inmobi.commons</groupId>
 				<artifactId>datatypes-java-0.8</artifactId>
-				<version>1.5.4</version>
+				<version>1.5.12</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
@@ -272,7 +272,7 @@
 			<dependency>
 				<groupId>com.inmobi.commons</groupId>
 				<artifactId>casthrift</artifactId>
-				<version>1.26</version>
+				<version>1.27</version>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.jackson</groupId>
