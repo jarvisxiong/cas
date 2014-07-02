@@ -118,7 +118,7 @@ public class ServletGetSegment implements Servlet {
             }
             else if (repoName != null
                     && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY)) {
-                entity = CasConfigUtil.repositoryHelper.queryCurrencyConversionRepository(id.split("_")[0]);
+                entity = CasConfigUtil.repositoryHelper.queryCurrencyConversionRepository(id);
             }
             else if (repoName != null
                     && repoName.equalsIgnoreCase(ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY)) {

@@ -444,10 +444,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         final WapSiteUACEntity entity = sasParams.getWapSiteUACEntity();
         if(entity != null) {
         	final AppStore store = new AppStore();
-        	if(entity.getContentRating() != null && !entity.getContentRating().isEmpty()) {
+        	if(!StringUtils.isEmpty(entity.getContentRating())) {
         		store.setRating(entity.getContentRating());
         	}
-        	if(entity.getAppType() != null && !entity.getAppType().isEmpty()) {
+        	if(!StringUtils.isEmpty(entity.getAppType())) {
         		store.setCat(entity.getAppType());
         	}
         	if(entity.getCategories() != null && !entity.getCategories().isEmpty()) {
