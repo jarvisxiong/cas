@@ -1,47 +1,10 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
-import io.netty.util.CharsetUtil;
-
-import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.inject.Inject;
-
-import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.json.JSONException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
-import com.inmobi.adserve.adpool.AdInfo;
-import com.inmobi.adserve.adpool.AdPoolResponse;
-import com.inmobi.adserve.adpool.AuctionType;
-import com.inmobi.adserve.adpool.Creative;
-import com.inmobi.adserve.adpool.EncryptionKeys;
-import com.inmobi.adserve.channels.api.AdNetworkInterface;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.google.inject.Provider;
+import com.inmobi.adserve.adpool.*;
+import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
@@ -56,6 +19,24 @@ import com.inmobi.commons.security.util.exception.InvalidMessageException;
 import com.inmobi.types.AdIdChain;
 import com.inmobi.types.GUID;
 import com.inmobi.types.PricingModel;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.handler.codec.http.*;
+import io.netty.util.CharsetUtil;
+import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
+import javax.inject.Inject;
+import java.awt.*;
+import java.util.*;
+import java.util.List;
 
 public class ResponseSender extends HttpRequestHandlerBase {
 
@@ -89,8 +70,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
 	private String terminationReason;
 
 	private final long initialTime;
+    private Marker  traceMarker;
 
-	public String getTerminationReason() {
+    public String getTerminationReason() {
 		return terminationReason;
 	}
 
@@ -127,7 +109,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
 	}
 
 	@Inject
-	public ResponseSender() {
+	public ResponseSender(final Provider<Marker> traceMarkerProvider) {
 		this.initialTime = System.currentTimeMillis();
 		this.totalTime = 0;
 		this.rankList = null;
@@ -138,7 +120,10 @@ public class ResponseSender extends HttpRequestHandlerBase {
 		this.selectedAdIndex = 0;
 		this.requestCleaned = false;
 		this.auctionEngine = new AuctionEngine();
-	}
+        if (null != traceMarkerProvider) {
+            this.traceMarker = traceMarkerProvider.get();
+        }
+    }
 
 	@Override
 	public void sendAdResponse(final AdNetworkInterface selectedAdNetwork, final Channel serverChannel) {
@@ -525,7 +510,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
 			} else if (null != getAdResponse()) {
 				adResponseChannelSegment = getRankList().get(getSelectedAdIndex());
 			}
-			Logging.rrLogging(adResponseChannelSegment, list, sasParams, terminationReason, totalTime);
+			Logging.rrLogging(traceMarker, adResponseChannelSegment, list, sasParams, terminationReason, totalTime);
 			Logging.advertiserLogging(list, CasConfigUtil.getLoggerConfig());
 			Logging.sampledAdvertiserLogging(list, CasConfigUtil.getLoggerConfig());
 			Logging.creativeLogging(list, sasParams);
