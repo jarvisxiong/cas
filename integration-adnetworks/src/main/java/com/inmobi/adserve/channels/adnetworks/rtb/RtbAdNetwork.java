@@ -268,6 +268,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
             if (null != casInternalRequestParameters.blockedAdvertisers) {
                 casInternalRequestParameters.blockedAdvertisers.addAll(blockedAdvertisers);
+                bidRequest.setBadv(casInternalRequestParameters.blockedAdvertisers);
             }else {
               casInternalRequestParameters.blockedAdvertisers = blockedAdvertisers;
             }
