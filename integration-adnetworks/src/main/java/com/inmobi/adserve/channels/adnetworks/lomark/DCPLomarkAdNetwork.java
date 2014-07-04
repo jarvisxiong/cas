@@ -35,7 +35,7 @@ import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
 public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
-
+	
     private static final Logger          LOG         = LoggerFactory.getLogger(DCPLomarkAdNetwork.class);
 
     private transient String             key;
@@ -331,7 +331,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
         // first sort asc as per the paramter names
         Map<String, String> sortedParams = new TreeMap<String, String>(params);
         Set<Entry<String, String>> entrys = sortedParams.entrySet();
-        // after sorting，organize all paramters with key=value"format
+        // after sorting organize all paramters with key=value"format
         StringBuilder basestring = new StringBuilder();
         for (Entry<String, String> param : entrys) {
             basestring.append(param.getKey()).append('=').append(param.getValue());

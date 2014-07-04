@@ -4,7 +4,9 @@ import com.google.inject.Singleton;
 import com.inmobi.adserve.adpool.*;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.types.InventoryType;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,10 +70,18 @@ public class ThriftRequestParser {
         // Fill param from Site Object
         if (tObject.isSetSite()) {
             params.setSiteId(tObject.site.siteId);
-            params.setSource(tObject.site.isSetInventoryType() && tObject.site.inventoryType == InventoryType.APP ? "APP"
-                    : "WAP");
-            params.setSiteType(tObject.site.isSetContentRating() ? tObject.site.contentRating.toString()
-                    : "FAMILY_SAFE");
+            final boolean isApp = tObject.site.isSetInventoryType() && tObject.site.inventoryType == InventoryType.APP;
+            params.setSource(isApp ? "APP" : "WAP");
+			if (isApp) {
+				if (CasConfigUtil.repositoryHelper != null) {
+					params.setWapSiteUACEntity(CasConfigUtil.repositoryHelper.queryWapSiteUACRepository(tObject.site.siteId));
+				}
+			}
+			if (CasConfigUtil.repositoryHelper != null) {
+				params.setSiteEcpmEntity(CasConfigUtil.repositoryHelper.querySiteEcpmRepository(tObject.site.siteId,
+						tObject.geo.countryId, (int) tObject.device.osId));
+			}
+			params.setSiteType(tObject.site.isSetContentRating() ? tObject.site.contentRating.toString() : "FAMILY_SAFE");
             params.setCategories(convertIntToLong(tObject.site.siteTaxonomies));
             double ecpmFloor = Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor);
             params.setSiteFloor(ecpmFloor);
@@ -152,6 +162,8 @@ public class ThriftRequestParser {
         if (tObject.isSetCarrier()) {
             params.setCarrierId(new Long(tObject.carrier.carrierId).intValue());
             params.setNetworkType(tObject.carrier.networkType);
+            
+            
         }
 
         LOG.debug("Successfully parsed tObject, SAS params are : {}", params.toString());
@@ -267,6 +279,9 @@ public class ThriftRequestParser {
                     break;
                 case WC:
                     parameter.uidWC = uidValue;
+                    break;
+                case GPID:
+                    parameter.gpid = uidValue;
                     break;
                 default:
                     break;

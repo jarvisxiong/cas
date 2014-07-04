@@ -17,6 +17,7 @@ public class CasInternalRequestParameters {
 
     public String       impressionId;
     // Control enrichment params
+    public String       gpid;
     public String       uid;               // udid
     public String       uidO1;
     public String       uidMd5;            // UM5
