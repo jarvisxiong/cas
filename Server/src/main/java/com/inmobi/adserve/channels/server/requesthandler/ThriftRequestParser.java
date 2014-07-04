@@ -73,10 +73,14 @@ public class ThriftRequestParser {
             final boolean isApp = tObject.site.isSetInventoryType() && tObject.site.inventoryType == InventoryType.APP;
             params.setSource(isApp ? "APP" : "WAP");
 			if (isApp) {
-				params.setWapSiteUACEntity(CasConfigUtil.repositoryHelper.queryWapSiteUACRepository(tObject.site.siteId));
+				if (CasConfigUtil.repositoryHelper != null) {
+					params.setWapSiteUACEntity(CasConfigUtil.repositoryHelper.queryWapSiteUACRepository(tObject.site.siteId));
+				}
 			}
-			params.setSiteEcpmEntity(CasConfigUtil.repositoryHelper.querySiteEcpmRepository(tObject.site.siteId,
-					tObject.geo.countryId, (int) tObject.device.osId));
+			if (CasConfigUtil.repositoryHelper != null) {
+				params.setSiteEcpmEntity(CasConfigUtil.repositoryHelper.querySiteEcpmRepository(tObject.site.siteId,
+						tObject.geo.countryId, (int) tObject.device.osId));
+			}
 			params.setSiteType(tObject.site.isSetContentRating() ? tObject.site.contentRating.toString() : "FAMILY_SAFE");
             params.setCategories(convertIntToLong(tObject.site.siteTaxonomies));
             double ecpmFloor = Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor);
