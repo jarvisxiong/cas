@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.adnetworks.rtb;
 
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.api.*;
@@ -118,6 +119,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private final RepositoryHelper         repositoryHelper;
     private String                         bidderCurrency               = "USD";
     private static final String            USD                          = "USD";
+    private static final List<String> blockedAdvertisers = Lists.newArrayList("king.com", "supercell.net");
     
     @Getter
     static List<String>                    currenciesSupported          = new ArrayList<String>(Arrays.asList("USD",
@@ -265,7 +267,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             }
 
             if (null != casInternalRequestParameters.blockedAdvertisers) {
+                casInternalRequestParameters.blockedAdvertisers.addAll(blockedAdvertisers);
                 bidRequest.setBadv(casInternalRequestParameters.blockedAdvertisers);
+            }else {
+              casInternalRequestParameters.blockedAdvertisers = blockedAdvertisers;
             }
         }
         else {
