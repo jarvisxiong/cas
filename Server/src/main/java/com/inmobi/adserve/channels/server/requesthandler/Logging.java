@@ -19,6 +19,7 @@ import org.apache.thrift.protocol.TBinaryProtocol;
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
 
 import javax.inject.Inject;
 import java.net.InetAddress;
@@ -64,7 +65,7 @@ public class Logging {
     }
 
     // Writing rrlogs
-    public static void rrLogging(final ChannelSegment channelSegment, final List<ChannelSegment> rankList,
+    public static void rrLogging(Marker traceMarker, final ChannelSegment channelSegment, final List<ChannelSegment> rankList,
             final SASRequestParameters sasParams, String terminationReason, final long totalTime) throws JSONException,
             TException {
         InspectorStats.incrementStatCount(InspectorStrings.latency, totalTime);
@@ -214,7 +215,7 @@ public class Logging {
             TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
             Message msg = new Message(tSerializer.serialize(adRR));
             dataBusPublisher.publish(rrLogKey, msg);
-            LOG.debug("ADRR is : {}", adRR);
+            LOG.debug(traceMarker, "ADRR is : {}", adRR);
         }
         // Logging real time stats for graphite
         if (null != sasParams) {
@@ -303,17 +304,19 @@ public class Logging {
             InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.latency, adResponse.latency);
             InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.connectionLatency,
                     adNetwork.getConnectionLatency());
-            if ("AD".equals(adResponse.adStatus)) {
-                InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalFills);
-            }
-            else if ("NO_AD".equals(adResponse.adStatus)) {
-                InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalNoFills);
-            }
-            else if ("TIME_OUT".equals(adResponse.adStatus)) {
-                InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalTimeout);
-            }
-            else {
-                InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalTerminate);
+            switch (adResponse.adStatus) {
+                case "AD":
+                    InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalFills);
+                    break;
+                case "NO_AD":
+                    InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalNoFills);
+                    break;
+                case "TIME_OUT":
+                    InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalTimeout);
+                    break;
+                default:
+                    InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalTerminate);
+                    break;
             }
         }
         return channels;
