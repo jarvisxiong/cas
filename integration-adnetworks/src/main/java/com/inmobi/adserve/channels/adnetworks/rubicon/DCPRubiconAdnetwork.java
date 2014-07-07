@@ -100,6 +100,8 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		slotIdMap.put((short) 19, 50);
 		slotIdMap.put((short) 21, 45);
 		slotIdMap.put((short) 23, 46);
+		slotIdMap.put((short) 29, 14);
+		slotIdMap.put((short) 32, 101);
 	}
 
 	/**
