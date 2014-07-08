@@ -165,7 +165,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         this.templateWN = templateWinNotification;
         this.isHTMLResponseSupported = config.getBoolean(advertiserName + ".htmlSupported", true);
         this.isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", false);
-        this.blockedAdvertisers = Arrays.asList(config.getStringArray("blockedAdvertisers"));
+        this.blockedAdvertisers = new ArrayList<String>(Arrays.asList(
+            config.getStringArray("blockedAdvertisers")));
     }
 
     @Override
@@ -268,11 +269,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             }
 
             if (null != casInternalRequestParameters.blockedAdvertisers) {
-                casInternalRequestParameters.blockedAdvertisers.addAll(blockedAdvertisers);
-            }else {
-              casInternalRequestParameters.blockedAdvertisers = blockedAdvertisers;
+                blockedAdvertisers.addAll(casInternalRequestParameters.blockedAdvertisers);
             }
-            bidRequest.setBadv(casInternalRequestParameters.blockedAdvertisers);
+            bidRequest.setBadv(blockedAdvertisers);
         }
         else {
             LOG.debug("casInternalRequestParameters is null, so not setting blocked advertisers and categories");
