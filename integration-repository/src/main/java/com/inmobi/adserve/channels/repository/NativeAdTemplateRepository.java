@@ -28,11 +28,14 @@ public class NativeAdTemplateRepository extends
             String encodedTemplate = row.getString("binary_template");
             
             byte[] binaryTemplate = Base64.decodeBase64(encodedTemplate);
+            
+            logger.debug("SiteId  = "+siteId+" : nativeAdId = "+nativeAdId+" : template = "+new String(binaryTemplate));
+            
+            
             TDeserializer deserializer = new TDeserializer();
             com.inmobi.adtemplate.platform.AdTemplate adTemplate = new com.inmobi.adtemplate.platform.AdTemplate();
             deserializer.deserialize(adTemplate, binaryTemplate);
             
-//            adTemplate.getDemandConstraints()
 
             NativeAdTemplateEntity.Builder builder = NativeAdTemplateEntity.newBuilder();
             builder.setSiteId(siteId);

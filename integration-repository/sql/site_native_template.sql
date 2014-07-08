@@ -1,8 +1,8 @@
 CREATE OR REPLACE FUNCTION site_native_template(last_update timestamp without time zone)
-RETURNS SETOF site_native_template_type AS
+RETURNS SETOF site_native_template_type_05102013 AS
 $BODY$
 DECLARE
-    row1    site_native_template_type%ROWTYPE;
+    row1    site_native_template_type_05102013%ROWTYPE;
 BEGIN
     FOR row1 IN
 	 select site_id, native_ad_id, binary_template

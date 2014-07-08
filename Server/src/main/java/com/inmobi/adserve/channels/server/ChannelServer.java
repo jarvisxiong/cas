@@ -306,9 +306,9 @@ public class ChannelServer {
             siteEcpmRepository.init(logger,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY),
                     ChannelServerStringLiterals.SITE_ECPM_REPOSITORY);
-//            nativeAdTemplateRepository.init(logger,
-//                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY),
-//                    ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY);
+            nativeAdTemplateRepository.init(logger,
+                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY),
+                    ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY);
             
             logger.error("* * * * Instantiating repository completed * * * *");
             config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)
