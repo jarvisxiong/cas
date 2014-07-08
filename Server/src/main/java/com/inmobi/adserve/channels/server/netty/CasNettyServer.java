@@ -6,8 +6,10 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.util.concurrent.DefaultThreadFactory;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.Executors;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -36,7 +38,8 @@ public class CasNettyServer {
             final ChannelStatServerPipelineFactory statServerChannelInitializer) {
 
         this.bossGroup = new NioEventLoopGroup();
-        this.workerGroup = new NioEventLoopGroup();
+        
+        this.workerGroup = new NioEventLoopGroup(0, new DefaultThreadFactory("Inbound netty threads"));
         this.serverBootstrap = new ServerBootstrap();
         this.statServerBootstrap = new ServerBootstrap();
         this.serverChannelInitializer = serverChannelInitializer;
