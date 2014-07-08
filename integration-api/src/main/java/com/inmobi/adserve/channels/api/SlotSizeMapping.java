@@ -34,6 +34,8 @@ public class SlotSizeMapping {
         slotMap.put(30l, new Dimension(250, 125));
         slotMap.put(31l, new Dimension(320, 568));
         slotMap.put(32l, new Dimension(480, 320));
+        slotMap.put(33l, new Dimension(1024,768 ));
+        slotMap.put(34l, new Dimension(1280, 800));
         slotMap.put(35l, new Dimension(320, 30));
         slotMap.put(36l, new Dimension(320, 26));
         slotMap.put(0l, new Dimension(0, 0));
