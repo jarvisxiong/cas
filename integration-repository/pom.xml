@@ -16,6 +16,10 @@
 			<artifactId>util</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.inmobi.channels</groupId>
+			<artifactId>template</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 		</dependency>
