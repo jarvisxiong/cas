@@ -93,13 +93,15 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		slotIdMap.put((short) 11, 2);
 		slotIdMap.put((short) 12, 1);
 		slotIdMap.put((short) 13, 8);
-		slotIdMap.put((short) 14, 84);
+		slotIdMap.put((short) 14, 67);
 		slotIdMap.put((short) 15, 43);
 		slotIdMap.put((short) 16, 102);
 		slotIdMap.put((short) 18, 9);
 		slotIdMap.put((short) 19, 50);
 		slotIdMap.put((short) 21, 45);
 		slotIdMap.put((short) 23, 46);
+		slotIdMap.put((short) 29, 14);
+		slotIdMap.put((short) 32, 101);
 	}
 
 	/**
@@ -394,7 +396,9 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		if (10 == slot // 300X250
 				|| 14 == slot // 320X480
 				|| 16 == slot // 768X1024
-				|| 17 == slot)/* 800x1280 */ {
+				|| 17 == slot /* 800x1280 */
+				|| 33 == slot //1024x768
+				|| 34 == slot) /* 1280x800 */ {
 			return true;
 		}
 		return false;
