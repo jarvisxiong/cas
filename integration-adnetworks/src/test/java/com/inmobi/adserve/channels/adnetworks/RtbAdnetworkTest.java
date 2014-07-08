@@ -236,7 +236,7 @@ public class RtbAdnetworkTest extends TestCase {
 
     //Expected Blocked Advertisers
     ArrayList<String> expectedBlockedAdvertisers = Lists.newArrayList("king.com", "supercell.net", "paps.com", "fhs.com", "china.supercell.com", "supercell.com");
-    assertTrue(casInternalRequestParameters.blockedAdvertisers.containsAll(expectedBlockedAdvertisers));
+    assertNull(casInternalRequestParameters.blockedAdvertisers);
     assertEquals(6, rtbAdNetwork.getBidRequest().getBadv().size());
     assertTrue(rtbAdNetwork.getBidRequest().getBadv().containsAll(expectedBlockedAdvertisers));
   }
@@ -258,8 +258,7 @@ public class RtbAdnetworkTest extends TestCase {
 
     //Expected Blocked Advertisers
     ArrayList<String> expectedBlockedAdvertisers = Lists.newArrayList("abcd.com", "king.com", "supercell.net", "paps.com", "fhs.com", "china.supercell.com", "supercell.com");
-    assertEquals(7, casInternalRequestParameters.blockedAdvertisers.size());
-    assertTrue(casInternalRequestParameters.blockedAdvertisers.containsAll(expectedBlockedAdvertisers));
+    assertEquals(1, casInternalRequestParameters.blockedAdvertisers.size());
     assertEquals(7, rtbAdNetwork.getBidRequest().getBadv().size());
     assertTrue(rtbAdNetwork.getBidRequest().getBadv().containsAll(expectedBlockedAdvertisers));
   }
