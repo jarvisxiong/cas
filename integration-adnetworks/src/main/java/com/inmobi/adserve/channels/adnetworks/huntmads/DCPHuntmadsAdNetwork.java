@@ -27,18 +27,16 @@ import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DCPHuntmadsAdNetwork.class);
+    private static final Logger LOG        = LoggerFactory.getLogger(DCPHuntmadsAdNetwork.class);
 
     private transient String    latitude;
     private transient String    longitude;
     private int                 width;
     private int                 height;
-    private boolean             isweb;
     private boolean             isapp;
-    private static final String IDFA        = "idfa";
-    private static final String ANDROID_ID  = "androidid";
-    private static final String SITEID      = "pubsiteid";
-    
+    private static final String IDFA       = "idfa";
+    private static final String ANDROID_ID = "androidid";
+    private static final String SITEID     = "pubsiteid";
 
     /**
      * @param config
@@ -59,7 +57,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
         host = config.getString("huntmads.host");
-        
+
         // blocking opera traffic
         if (sasParams.getUserAgent().toUpperCase().contains("OPERA")) {
             LOG.debug("Opera user agent found. So exiting the adapter");
@@ -76,15 +74,10 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
-        
-        isapp = (StringUtils.isBlank(sasParams.getSource()) || "WAP"
-                .equalsIgnoreCase(sasParams.getSource())) ? false : true;
-        
-        isweb = (StringUtils.isBlank(sasParams.getSource()) || "WAP".equalsIgnoreCase(sasParams.getSource())) ? true
-                : false;
-        
-        
-       
+
+        isapp = (StringUtils.isBlank(sasParams.getSource()) || "WAP".equalsIgnoreCase(sasParams.getSource())) ? false
+                : true;
+
         LOG.info("Configure parameters inside huntmads returned true");
         return true;
     }
@@ -128,15 +121,10 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             if (casInternalRequestParameters.zipCode != null) {
                 url.append("&zip=").append(casInternalRequestParameters.zipCode);
             }
-            if (isweb)
-            {
-                url.append("&isweb=yes");
-            }
-            else {
-                url.append("&isweb=no");
-            }
+
             if (isapp) {
                 url.append("&isapp=yes");
+                url.append("&isweb=no");
                 if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
 
                     appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.uidIDUS1, false);
@@ -150,6 +138,8 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             else {
                 url.append("&isapp=no");
+                url.append("&isweb=yes");
+
             }
 
             appendQueryParam(url, SITEID, blindedSiteId, false);
@@ -158,8 +148,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
                 url.append("&country=").append(sasParams.getCountryCode().toUpperCase());
             }
 
-           
-             if (width != 0 && height != 0) {
+            if (width != 0 && height != 0) {
                 url.append("&min_size_x=").append((int) (width * .9));
                 url.append("&min_size_y=").append((int) (height * .9));
                 url.append("&size_x=").append(width);
