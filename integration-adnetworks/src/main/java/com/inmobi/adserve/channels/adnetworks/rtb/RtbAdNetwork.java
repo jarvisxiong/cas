@@ -119,7 +119,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private final RepositoryHelper         repositoryHelper;
     private String                         bidderCurrency               = "USD";
     private static final String            USD                          = "USD";
-    private static final List<String> blockedAdvertisers = Lists.newArrayList("king.com", "supercell.net");
+    private List<String> blockedAdvertisers;
     
     @Getter
     static List<String>                    currenciesSupported          = new ArrayList<String>(Arrays.asList("USD",
@@ -165,6 +165,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         this.templateWN = templateWinNotification;
         this.isHTMLResponseSupported = config.getBoolean(advertiserName + ".htmlSupported", true);
         this.isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", false);
+        this.blockedAdvertisers = new ArrayList<String>(Arrays.asList(
+            config.getStringArray("blockedAdvertisers")));
     }
 
     @Override
@@ -267,11 +269,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             }
 
             if (null != casInternalRequestParameters.blockedAdvertisers) {
-                casInternalRequestParameters.blockedAdvertisers.addAll(blockedAdvertisers);
-            }else {
-              casInternalRequestParameters.blockedAdvertisers = blockedAdvertisers;
+                blockedAdvertisers.addAll(casInternalRequestParameters.blockedAdvertisers);
             }
-            bidRequest.setBadv(casInternalRequestParameters.blockedAdvertisers);
+            bidRequest.setBadv(blockedAdvertisers);
         }
         else {
             LOG.debug("casInternalRequestParameters is null, so not setting blocked advertisers and categories");
