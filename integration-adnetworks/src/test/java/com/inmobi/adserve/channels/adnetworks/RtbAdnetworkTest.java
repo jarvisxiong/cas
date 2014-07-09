@@ -70,7 +70,7 @@ public class RtbAdnetworkTest extends TestCase {
         expect(mockConfig.getBoolean(advertiserName + ".siteBlinded")).andReturn(true).anyTimes();
         expect(mockConfig.getBoolean(advertiserName + ".htmlSupported",true)).andReturn(true).anyTimes();
         expect(mockConfig.getBoolean(advertiserName + ".nativeSupported",false)).andReturn(false).anyTimes();
-        expect(mockConfig.getStringArray("blockedAdvertisers")).andReturn(new String[]{"king.com","supercell.net", "paps.com", "fhs.com", "china.supercell.com", "supercell.com"}).anyTimes();
+        expect(mockConfig.getStringArray("rtb.blockedAdvertisers")).andReturn(new String[]{"king.com","supercell.net", "paps.com", "fhs.com", "china.supercell.com", "supercell.com"}).anyTimes();
         replay(mockConfig);
     }
 

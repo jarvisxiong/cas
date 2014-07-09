@@ -119,11 +119,14 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private final RepositoryHelper         repositoryHelper;
     private String                         bidderCurrency               = "USD";
     private static final String            USD                          = "USD";
-    private List<String> blockedAdvertisers;
+    private List<String> blockedAdvertisers = Lists.newArrayList(); ;
     
     @Getter
     static List<String>                    currenciesSupported          = new ArrayList<String>(Arrays.asList("USD",
                                                                                 "CNY","JPY","EUR","KRW","RUB"));
+    @Getter
+    static List<String>                    blockedAdvertiserList        = new ArrayList<String>(Arrays.asList("king.com", "supercell.net", "paps.com", "fhs.com", "china.supercell.com", "supercell.com"));
+    
     @Inject
     private static AsyncHttpClientProvider asyncHttpClientProvider;
     
@@ -165,8 +168,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         this.templateWN = templateWinNotification;
         this.isHTMLResponseSupported = config.getBoolean(advertiserName + ".htmlSupported", true);
         this.isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", false);
-        this.blockedAdvertisers = new ArrayList<String>(Arrays.asList(
-            config.getStringArray("blockedAdvertisers")));
+        this.blockedAdvertisers.addAll(blockedAdvertiserList);
+        
     }
 
     @Override
