@@ -819,7 +819,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     	App app = bidRequest.getApp();
     	
     	Map<String, String> params = new HashMap<String, String>();
-    	params.put("beaconUrl",beaconUrl);
+    	String winUrl = this.beaconUrl + "?b=${WIN_BID}";
+    	params.put("beaconUrl",winUrl);
     	if(app!=null){
     		params.put("appId",app.getId());
     	}
