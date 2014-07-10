@@ -182,7 +182,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	public URI getRequestUri() throws Exception {
 		StringBuilder url = new StringBuilder(host);
 		// TODO p_block_keys,app.category
-		// if Dnt is on don't send the idfa
+		
 		appendQueryParam(url, ZONE_ID, zoneId, false);
 		if (isApp) {
 			appendQueryParam(url, APP_BUNDLE, String.format(BUNDLE_ID_TEMPLATE, blindedSiteId), false);
@@ -397,6 +397,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 				|| 14 == slot // 320X480
 				|| 16 == slot // 768X1024
 				|| 17 == slot /* 800x1280 */
+				|| 32 == slot //480x320
 				|| 33 == slot //1024x768
 				|| 34 == slot) /* 1280x800 */ {
 			return true;
