@@ -398,18 +398,6 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		return categoryZoneId;
 	}
 
-	private boolean isInterstitial() {
-		Short slot = sasParams.getSlot();
-		if (10 == slot // 300X250
-				|| 14 == slot // 320X480
-				|| 16 == slot // 768X1024
-				|| 17 == slot /* 800x1280 */
-				|| 32 == slot //480x320
-				|| 33 == slot //1024x768
-				|| 34 == slot) /* 1280x800 */ {
-			return true;
-		}
-		return false;
-	}
+	
 
 }
