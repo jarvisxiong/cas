@@ -253,7 +253,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		
 		
 		if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
-				&& "1".equals(casInternalRequestParameters.uidADT)) {
+				&& "0".equals(casInternalRequestParameters.uidADT)) {
 			appendQueryParam(url, DEVICE_ID,
 					casInternalRequestParameters.uidIFA, false);
 			appendQueryParam(url, DEVICE_ID_TYPE, IDFA, false);
