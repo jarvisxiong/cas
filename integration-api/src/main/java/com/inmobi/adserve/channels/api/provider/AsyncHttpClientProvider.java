@@ -8,11 +8,19 @@ import java.util.concurrent.Executors;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.apache.http.client.HttpClient;
+import org.jboss.netty.bootstrap.ClientBootstrap;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Inject;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.util.annotations.WorkerExecutorService;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
+import com.ning.http.client.AsyncHttpProvider;
+import com.ning.http.client.extra.ThrottleRequestFilter;
+import com.ning.http.client.providers.netty.NettyAsyncHttpProvider;
+import com.ning.http.client.providers.netty.NettyAsyncHttpProviderConfig;
 
 
 /**
@@ -33,24 +41,36 @@ public class AsyncHttpClientProvider {
         this.executorService = executorService;
     }
 
-    @PostConstruct
-    public void setup() {
-        AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder()
-                .setRequestTimeoutInMs(serverConfig.getDcpRequestTimeoutInMillis())
-                .setConnectionTimeoutInMs(serverConfig.getDcpRequestTimeoutInMillis())
-                .setMaximumConnectionsTotal(serverConfig.getMaxDcpOutGoingConnections())
-                .setAllowPoolingConnection(true).setExecutorService(Executors.newCachedThreadPool(new DefaultThreadFactory("DCPClientThreads"))).build();
+	@PostConstruct
+	public void setup() {
+		AsyncHttpClientConfig.Builder cfRtbd = new AsyncHttpClientConfig.Builder()
+		.setRequestTimeoutInMs(
+				serverConfig.getRtbRequestTimeoutInMillis())
+		.setConnectionTimeoutInMs(
+				serverConfig.getRtbRequestTimeoutInMillis())
+		.setMaximumConnectionsTotal(
+				serverConfig.getMaxRtbOutGoingConnections())
+		.setFollowRedirects(false)
+		.setMaxRequestRetry(0)
+		.setAllowPoolingConnection(true)
+		.setExecutorService(Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("outbound-rtbd-client-%d").build()));
+		rtbAsyncHttpClient = new AsyncHttpClient(cfRtbd.build());
 
-        dcpAsyncHttpClient = new AsyncHttpClient(asyncHttpClientConfig);
+		AsyncHttpClientConfig.Builder cfDcp = new AsyncHttpClientConfig.Builder()
+				.setRequestTimeoutInMs(
+						serverConfig.getDcpRequestTimeoutInMillis())
+				.setConnectionTimeoutInMs(
+						serverConfig.getDcpRequestTimeoutInMillis())
+				.setMaximumConnectionsTotal(
+						serverConfig.getMaxDcpOutGoingConnections())
+				.setFollowRedirects(false)
+				.setMaxRequestRetry(0)
+				.setAllowPoolingConnection(true)
+				.setExecutorService(Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("outbound-dcpbackfill-client-%d").build()));
+		dcpAsyncHttpClient = new AsyncHttpClient(cfDcp.build());
 
-        asyncHttpClientConfig = new AsyncHttpClientConfig.Builder()
-                .setRequestTimeoutInMs(serverConfig.getRtbRequestTimeoutInMillis())
-                .setConnectionTimeoutInMs(serverConfig.getRtbRequestTimeoutInMillis())
-                .setMaximumConnectionsTotal(serverConfig.getMaxRtbOutGoingConnections())
-                .setAllowPoolingConnection(true).setExecutorService(Executors.newCachedThreadPool(new DefaultThreadFactory("RTBClientThreads"))).build();
-
-        rtbAsyncHttpClient = new AsyncHttpClient(asyncHttpClientConfig);
-    }
+		
+	}
 
     /**
      * @return the dcpAsyncHttpClient
