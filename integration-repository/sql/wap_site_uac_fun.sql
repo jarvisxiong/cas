@@ -14,7 +14,8 @@ BEGIN
     		uac_mod_on from wap_site_uac
     		where content_rating != '' or app_type !='' or categories != ''
     		or content_rating is not null or app_type is not null or categories is not null
-    		and uac_mod_on >=last_updated
+    		or coppa_enabled != false
+    		and modified_on >=last_updated
  LOOP
         RETURN NEXT row1;
     END LOOP;
