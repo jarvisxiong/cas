@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Charsets;
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.inmobi.casthrift.rtb.Bid;
 import com.inmobi.casthrift.rtb.BidResponse;
@@ -29,9 +28,9 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 	
 
 	private static GsonBuilder gb = new GsonBuilder();
-	static{
-		gb.disableHtmlEscaping();
-	}
+//	static{
+//		gb.disableHtmlEscaping();
+//	}
 	
 	//TODO: remove it. Just added for tango for MVP.
 	private String START = "{",
@@ -219,7 +218,7 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 	}
 	
 	private String constructBeaconUrl(String url){
-		return "<img src="+url+" style=\"display:none;\" />";
+		return "<img src=\""+url+"\" style=\"display:none;\" />";
 	}
 	
 	private String getNamespace() {

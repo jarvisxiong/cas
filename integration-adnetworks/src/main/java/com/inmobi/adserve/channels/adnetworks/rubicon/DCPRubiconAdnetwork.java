@@ -77,6 +77,8 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	private static final String OPEN_UDID = "open-udid";
 	private static final String UDID = "udid";
 
+        private static final double MIN_ECPM = 0.1;
+        private static final double ECPM_PERCENTAGE = 0.8;
 
 	private final String userName;
 	private final String password;
@@ -227,10 +229,15 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 						FS_RATING, false);
 			}
 		}
-		if (casInternalRequestParameters.rtbBidFloor > 0) {
-			appendQueryParam(url, FLOOR_PRICE,
-					casInternalRequestParameters.rtbBidFloor, false);
-		}
+
+		if (sasParams.getSiteEcpmEntity() != null && sasParams.getSiteEcpmEntity().getNetworkEcpm() > 0) {
+			appendQueryParam(url, FLOOR_PRICE, ECPM_PERCENTAGE * sasParams.getSiteEcpmEntity().getNetworkEcpm(), false);
+		}else if (casInternalRequestParameters.rtbBidFloor > 0){
+                  appendQueryParam(url, FLOOR_PRICE, casInternalRequestParameters.rtbBidFloor, false);
+                }else {
+                  appendQueryParam(url, FLOOR_PRICE, MIN_ECPM, false);
+                }
+
 		if (isInterstitial()) {
 			// display type 1 for interstitial
 			appendQueryParam(url, DISPLAY_TYPE, 1, false);
