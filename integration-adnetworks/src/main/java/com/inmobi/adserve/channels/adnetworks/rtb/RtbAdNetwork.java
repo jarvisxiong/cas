@@ -615,7 +615,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         byte[] body = content.toString().getBytes(CharsetUtil.UTF_8);
 
-        Request ningRequest = new RequestBuilder().setUrl(uriCallBack.toASCIIString()).setMethod("POST")
+        Request ningRequest = new RequestBuilder().setUrl(uriCallBack.toASCIIString())
                 .setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE)
                 .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length)).setBody(body)
                 .setHeader(HttpHeaders.Names.HOST, uriCallBack.getHost()).build();
@@ -686,7 +686,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             httpRequestMethod = "POST";
         }
 
-        return new RequestBuilder(httpRequestMethod).setUrl(uri.toString())
+        return new RequestBuilder(httpRequestMethod).setURI(uri)
                 .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json").setBody(body)
                 .setHeader(X_OPENRTB_VERSION, rtbVer).setHeader(HttpHeaders.Names.HOST, uri.getHost()).build();
     }

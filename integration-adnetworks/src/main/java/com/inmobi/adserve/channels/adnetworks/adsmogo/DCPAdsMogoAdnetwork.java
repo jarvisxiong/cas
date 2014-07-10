@@ -202,7 +202,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
         }
 
         return new RequestBuilder()
-                .setUrl(uri.toString())
+                .setURI(uri)
                 .setHeader(HttpHeaders.Names.USER_AGENT,
                         sasParams.getUserAgent())
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")

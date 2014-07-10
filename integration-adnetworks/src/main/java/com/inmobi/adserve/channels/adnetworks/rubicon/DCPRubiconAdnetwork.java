@@ -297,7 +297,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		String authStr = userName + ":" + password;
 		String authEncoded = new String(Base64.encodeBase64(authStr.getBytes()));
 		return new RequestBuilder()
-		.setUrl(uri.toString())
+		.setURI(uri)
 		.setHeader(HttpHeaders.Names.USER_AGENT,
 				sasParams.getUserAgent())
 				.setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
