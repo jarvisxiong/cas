@@ -48,14 +48,20 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String ADSPACE_HEIGHT = "h";
     private static final String IPADDRESS = "ip";
     private static final String USER_AGENT = "ua";
-    private static final String IOS_ID = "ouid";
+    private static final String IOS_OPEN_UDID = "ouid";
     private static final String ANDROID_ID = "anid";
+    private static final String IDFA = "ida";
+    private static final String IOS_ID = "ouid";
     private static final String DEVICE_OS = "os";
     private static final String LAT = "lat";
     private static final String LONG = "lon";
     private static final String COUNTRY = "co";
     private static final String USER_GENDER = "GENDER";
     private static final String USER_AGE = "AGE";
+    private static final String INTERSTITIAL = "interstitial";
+    private static final String BANNER = "banner";
+    
+	private boolean isApp;
 
     public DCPAdsMogoAdnetwork(final Configuration config,
             final Bootstrap clientBootstrap,
@@ -93,6 +99,12 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
             LOG.debug("mandatory parameters missing for AdsMogo so exiting adapter");
             return false;
         }
+        isApp = (StringUtils.isBlank(sasParams.getSource()) || WAP
+				.equalsIgnoreCase(sasParams.getSource())) ? false : true;
+		if (isApp && StringUtils.isEmpty(getUid())) {
+			LOG.debug("mandatory parameter udid is missing for APP traffic in AdsMogo so exiting adapter");
+			return false;
+		}
         return true;
     }
 
@@ -106,7 +118,10 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
         StringBuilder url = new StringBuilder(host);
         appendQueryParam(url, APPID, externalSiteId, false);
         appendQueryParam(url, IPADDRESS, sasParams.getRemoteHostIp(), false);
-        appendQueryParam(url, ADSPACE_TYPE, getAdType(), false);
+        if(isInterstitial())
+        	appendQueryParam(url, ADSPACE_TYPE, INTERSTITIAL, false);
+        else
+        	appendQueryParam(url, ADSPACE_TYPE, BANNER, false);
 
         appendQueryParam(url, USER_AGENT,
                 getURLEncode(sasParams.getUserAgent(), format), false);
@@ -134,11 +149,12 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
 
         if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
             if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
-                appendQueryParam(url, IOS_ID,
+                appendQueryParam(url, IDFA,
                         casInternalRequestParameters.uidIFA, false);
 
-            } else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
-                appendQueryParam(url, IOS_ID, casInternalRequestParameters.uid,
+            }
+            if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
+                appendQueryParam(url, IOS_OPEN_UDID, casInternalRequestParameters.uid,
                         false);
             }
             else if (StringUtils
@@ -186,16 +202,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
     
     }
 
-    private String getAdType() {
-        Short slot = sasParams.getSlot();
-        if (10 == slot // 300X250
-                || 14 == slot // 320X480
-                || 16 == slot) /* 768X1024 */{
-            return "interstitial";
-        }
-        return "banner";
-    }
-
+   
     @Override
     public Request getNingRequest() throws Exception {
 
@@ -205,7 +212,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
         }
 
         return new RequestBuilder()
-                .setURI(uri)
+                .setUrl(uri.toString())
                 .setHeader(HttpHeaders.Names.USER_AGENT,
                         sasParams.getUserAgent())
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
@@ -246,5 +253,22 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public String getId() {
         return (config.getString("adsmogo.advertiserId"));
+    }
+    
+    @Override
+    protected String getUid() {
+    	if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
+            return casInternalRequestParameters.uidIFA;
+        }
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
+            return casInternalRequestParameters.uidMd5;
+        }        
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIDUS1)) {
+            return casInternalRequestParameters.uidIDUS1;
+        }
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.uid)) {
+            return casInternalRequestParameters.uid;
+        }
+        return null;
     }
 }

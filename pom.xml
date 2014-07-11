@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.inmobi.channels</groupId>
 	<artifactId>cas</artifactId>
-	<version>3.120-SNAPSHOT</version>
+	<version>3.141-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<url>https://github.corp.inmobi.com/channel-adserve</url>
 	<parent>
@@ -40,7 +40,7 @@
 			<dependency>
 				<groupId>com.inmobi.commons</groupId>
 				<artifactId>datatypes-java-0.8</artifactId>
-				<version>1.5.4</version>
+				<version>1.5.12</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
@@ -110,7 +110,7 @@
 			<dependency>
 				<groupId>com.ning</groupId>
 				<artifactId>async-http-client</artifactId>
-				<version>1.8.5</version>
+				<version>1.7.9</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.maven</groupId>
@@ -272,7 +272,7 @@
 			<dependency>
 				<groupId>com.inmobi.commons</groupId>
 				<artifactId>casthrift</artifactId>
-				<version>1.25</version>
+				<version>1.27</version>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.jackson</groupId>
@@ -344,6 +344,7 @@
 				<artifactId>security</artifactId>
 				<version>1.0.3</version>
 			</dependency>
+			
 		</dependencies>
 	</dependencyManagement>
 

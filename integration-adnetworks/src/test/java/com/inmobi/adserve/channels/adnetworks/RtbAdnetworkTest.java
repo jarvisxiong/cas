@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.adnetworks;
 
+import com.google.common.collect.Lists;
+
 import com.inmobi.adserve.channels.adnetworks.rtb.ImpressionCallbackHelper;
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -66,6 +68,9 @@ public class RtbAdnetworkTest extends TestCase {
         expect(mockConfig.getBoolean(advertiserName + ".isWnRequired")).andReturn(true).anyTimes();
         expect(mockConfig.getBoolean(advertiserName + ".isWinFromClient")).andReturn(true).anyTimes();
         expect(mockConfig.getBoolean(advertiserName + ".siteBlinded")).andReturn(true).anyTimes();
+        expect(mockConfig.getBoolean(advertiserName + ".htmlSupported",true)).andReturn(true).anyTimes();
+        expect(mockConfig.getBoolean(advertiserName + ".nativeSupported",false)).andReturn(false).anyTimes();
+        expect(mockConfig.getStringArray("rtb.blockedAdvertisers")).andReturn(new String[]{"king.com","supercell.net", "paps.com", "fhs.com", "china.supercell.com", "supercell.com"}).anyTimes();
         replay(mockConfig);
     }
 
@@ -213,6 +218,50 @@ public class RtbAdnetworkTest extends TestCase {
                 rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl),
                 false);
     }
+
+  @Test
+  public void testShouldHaveFixedBlockedAdvertisers() {
+    String externalSiteKey = "f6wqjq1r5v";
+    ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId,
+                                                                                                         null, null, null, 0, null, null, true, true, externalSiteKey, null, null, null, 0, true, null, null, 0,
+                                                                                                         null, false, false, false, false, false, false, false, false, false, false, null,
+                                                                                                         new ArrayList<Integer>(), 0.0d, null, null, 32));
+    CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+    sasParams.setRemoteHostIp("206.29.182.240");
+    sasParams.setSource("wap");
+    sasParams.setUserAgent(
+        "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+    casInternalRequestParameters.impressionId = "4f8d98e2-4bbd-40bc-8795-22da170700f9";
+    rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
+
+    //Expected Blocked Advertisers
+    ArrayList<String> expectedBlockedAdvertisers = Lists.newArrayList("king.com", "supercell.net", "paps.com", "fhs.com", "china.supercell.com", "supercell.com");
+    assertNull(casInternalRequestParameters.blockedAdvertisers);
+    assertEquals(6, rtbAdNetwork.getBidRequest().getBadv().size());
+    assertTrue(rtbAdNetwork.getBidRequest().getBadv().containsAll(expectedBlockedAdvertisers));
+  }
+
+  @Test
+  public void testShouldAddFixedBlockedAdvertisersForExistingBlockedList() {
+    String externalSiteKey = "f6wqjq1r5v";
+    ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId,
+                                                                                                         null, null, null, 0, null, null, true, true, externalSiteKey, null, null, null, 0, true, null, null, 0,
+                                                                                                         null, false, false, false, false, false, false, false, false, false, false, null,
+                                                                                                         new ArrayList<Integer>(), 0.0d, null, null, 32));
+    CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+    casInternalRequestParameters.blockedAdvertisers = Lists.newArrayList("abcd.com");
+    sasParams.setRemoteHostIp("206.29.182.240");
+    sasParams.setSource("wap");
+    sasParams.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+    casInternalRequestParameters.impressionId = "4f8d98e2-4bbd-40bc-8795-22da170700f9";
+    rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
+
+    //Expected Blocked Advertisers
+    ArrayList<String> expectedBlockedAdvertisers = Lists.newArrayList("abcd.com", "king.com", "supercell.net", "paps.com", "fhs.com", "china.supercell.com", "supercell.com");
+    assertEquals(1, casInternalRequestParameters.blockedAdvertisers.size());
+    assertEquals(7, rtbAdNetwork.getBidRequest().getBadv().size());
+    assertTrue(rtbAdNetwork.getBidRequest().getBadv().containsAll(expectedBlockedAdvertisers));
+  }
 
     @Test
     public void testConfigureParametersWithAllsasparams() {

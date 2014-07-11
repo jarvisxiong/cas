@@ -28,6 +28,17 @@ public class SlotSizeMapping {
         slotMap.put(23l, new Dimension(480, 60));
         slotMap.put(24l, new Dimension(320, 53));
         slotMap.put(26l, new Dimension(300, 30));
+        slotMap.put(27l, new Dimension(500, 130));
+        slotMap.put(28l, new Dimension(292, 60));
+        slotMap.put(29l, new Dimension(250, 250));
+        slotMap.put(30l, new Dimension(250, 125));
+        slotMap.put(31l, new Dimension(320, 568));
+        slotMap.put(32l, new Dimension(480, 320));
+        slotMap.put(33l, new Dimension(1024,768 ));
+        slotMap.put(34l, new Dimension(1280, 800));
+        slotMap.put(35l, new Dimension(320, 30));
+        slotMap.put(36l, new Dimension(320, 26));
+        slotMap.put(0l, new Dimension(0, 0));
     }
 
     public static Dimension getDimension(Long slot) {

@@ -151,7 +151,11 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 				osId = 0;
 			}
 			url.append("&os=").append(HandSetOS.values()[osId].toString());
-			url.append("&instl=").append(getAdType());
+			if(isInterstitial()) {
+				url.append("&instl=1");
+			} else {
+				url.append("&instl=0");
+			}
 			url.append("&pt=").append(sourceType);
 
 			ArrayList<Long> bCat = new ArrayList<Long>();
@@ -289,15 +293,5 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 		}
 	}
 
-	private int getAdType() {
-		Short slot = sasParams.getSlot();
-		if (10 == slot // 300X250
-				|| 14 == slot // 320X480
-				|| 16 == slot) /* 768X1024 */{
-			// interstitial
-			return 1;
-		}
-		// banner
-		return 0;
-	}
+	
 }
