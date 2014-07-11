@@ -23,6 +23,8 @@ public final class App extends AbstractContext{
 	private String rating;
 	private int rating_count;
 	private int downloads;
+	private List<String> pixelUrls;
+	private List<String> clickUrls;
 	
 	
 	private App(Builder builder){
@@ -35,6 +37,7 @@ public final class App extends AbstractContext{
 		this.rating_count = builder.rating_count;
 		this.downloads = builder.downloads;
 		this.openingLandingUrl = builder.openingLandingUrl;
+		this.pixelUrls = builder.pixelUrls;
 		
 		setValues(params);
 	}
@@ -67,7 +70,8 @@ public final class App extends AbstractContext{
 		@Setter private String rating;
 		@Setter private int rating_count;
 		@Setter private int downloads;
-		
+		@Setter private List<String> pixelUrls;
+		@Setter private List<String> clickUrls;
 		public Context build(){
 			return new App(this);
 		}

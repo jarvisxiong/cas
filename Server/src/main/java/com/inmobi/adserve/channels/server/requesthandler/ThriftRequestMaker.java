@@ -63,8 +63,8 @@ public class ThriftRequestMaker {
 
         AdPoolRequest adPoolRequest = createAdPoolRequest();
         System.out.println("Request is : " + adPoolRequest);
-       // sendBackFillGet(adPoolRequest);
-        sendUMPPost(adPoolRequest);
+        sendBackFillGet(adPoolRequest);
+       // sendUMPPost(adPoolRequest);
 
     }
 
@@ -120,7 +120,7 @@ public class ThriftRequestMaker {
         adPoolRequest.setSegmentId(0);
         adPoolRequest.setDevice(device);
         adPoolRequest.setCarrier(carrier);
-
+        
         IntegrationDetails integrationDetails = new IntegrationDetails();
         integrationDetails.setIntegrationType(IntegrationType.ANDROID_SDK);
         integrationDetails.setIntegrationVersion(370);

@@ -7,6 +7,7 @@ import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.repository.*;
 import com.inmobi.adserve.channels.server.api.ConnectionType;
 import com.inmobi.adserve.channels.server.module.CasNettyModule;
+import com.inmobi.adserve.channels.server.module.NativeModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
@@ -15,10 +16,13 @@ import com.inmobi.casthrift.DataCenter;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import com.inmobi.messaging.publisher.MessagePublisherFactory;
 import com.inmobi.phoenix.exception.InitializationException;
+import com.inmobi.template.module.TemplateModule;
 import com.netflix.governator.guice.LifecycleInjector;
 import com.netflix.governator.lifecycle.LifecycleManager;
+
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Slf4JLoggerFactory;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbcp2.*;
 import org.apache.commons.pool2.impl.GenericObjectPool;
@@ -34,6 +38,7 @@ import javax.mail.internet.MimeMessage;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -168,7 +173,7 @@ public class ChannelServer {
                     .builder()
                     .withModules(
                             Modules.combine(new CasNettyModule(configurationLoader.getServerConfiguration()),
-                                    new ServerModule(configurationLoader, repositoryHelper)))
+                                    new ServerModule(configurationLoader, repositoryHelper),new NativeModule(), new TemplateModule()))
                     .usingBasePackages("com.inmobi.adserve.channels.server.netty",
                             "com.inmobi.adserve.channels.api.provider").build().createInjector();
 

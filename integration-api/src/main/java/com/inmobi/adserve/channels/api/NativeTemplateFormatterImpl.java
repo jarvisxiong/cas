@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Charsets;
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.inmobi.casthrift.rtb.Bid;
 import com.inmobi.casthrift.rtb.BidResponse;
@@ -163,6 +162,7 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 	}
 	
 	private String prepareContextCode(BidResponse response, Map<String, String> params,NativeResponse natResponse){
+		
 		
 		
 		String cc = contextCode;

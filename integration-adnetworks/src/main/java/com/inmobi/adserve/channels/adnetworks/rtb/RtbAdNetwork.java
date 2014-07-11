@@ -7,7 +7,15 @@ import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.attribute.BAttrNativeType;
+import com.inmobi.adserve.channels.api.attribute.BTypeNativeAttributeType;
+import com.inmobi.adserve.channels.api.attribute.ImageNativeAttributeType;
+import com.inmobi.adserve.channels.api.attribute.MandatoryNativeAttributeType;
+import com.inmobi.adserve.channels.api.attribute.SuggestedNativeAttributeType;
+import com.inmobi.adserve.channels.api.natives.NativeBuilder;
+import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
+import com.inmobi.adserve.channels.api.template.NativeTemplateAttributeFinder;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
@@ -132,6 +140,12 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     
     @Inject
     private static NativeTemplateFormatter nativeTemplateFormatter;
+    
+    @Inject
+    private static NativeBuilderFactory    nativeBuilderfactory;
+    
+    @Inject
+    private static NativeResponseMaker     nativeResponseMaker;
     
     
     private static final String nativeString = "native";
@@ -352,10 +366,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     
     
     private ImpressionExtensions createNativeExtensionObject(){
-    	Native nat = new Native();
-    	nat.setMandatory(nativeTemplateAttributeFinder.findAttribute(new MandatoryNativeAttributeType()));
-    	nat.setImage(nativeTemplateAttributeFinder.findAttribute(new ImageNativeAttributeType()));
-    	
+//    	Native nat = new Native();
+//    	nat.setMandatory(nativeTemplateAttributeFinder.findAttribute(new MandatoryNativeAttributeType()));
+//    	nat.setImage(nativeTemplateAttributeFinder.findAttribute(new ImageNativeAttributeType()));
+    	NativeBuilder nb = nativeBuilderfactory.create(repositoryHelper.queryNativeAdTemplateRepository(sasParams.getSiteId()));
+    	Native nat = nb.build();
     	//TODO: for native currently there is no way to identify MRAID traffic/container supported by publisher.
 //    	if(!StringUtils.isEmpty(sasParams.getSdkVersion())){
 //    	   nat.api.add(3);
@@ -824,7 +839,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     		params.put("appId",app.getId());
     	}
     	try {
-    		responseContent = nativeTemplateFormatter.getFormatterValue(null, bidResponse, params);
+//    		responseContent = nativeTemplateFormatter.getFormatterValue(null, bidResponse, params);
+    		params.put("siteId", this.sasParams.getSiteId());
+    		responseContent = nativeResponseMaker.makeResponse(bidResponse, params);
 		} catch (Exception e) {
 			 adStatus = "NO_AD";
 	         LOG.error("Some exception is caught while filling the native template for partner{} {}",

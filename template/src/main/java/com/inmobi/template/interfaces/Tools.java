@@ -1,5 +1,7 @@
 package com.inmobi.template.interfaces;
 
+import java.util.List;
+
 
 public abstract class Tools {
 	
@@ -17,5 +19,18 @@ public abstract class Tools {
     
 
     public abstract String nativeAd(Context context, String pubContent) ;
+    
+    public boolean newAsyncMode(Boolean abTestingMode, List<String> list, String value) {
+      return true;
+    }
+    
+    public Object boltObject(){
+
+    	
+    	
+    	
+    	return null;
+    }
+    
 
 }

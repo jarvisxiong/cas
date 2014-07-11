@@ -1,0 +1,191 @@
+package com.inmobi.adserve.channels.api;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
+
+import lombok.Data;
+
+import org.apache.commons.codec.Charsets;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.exception.ParseErrorException;
+import org.apache.velocity.exception.ResourceNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+import com.google.common.io.Files;
+import com.google.gson.Gson;
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.inmobi.casthrift.rtb.BidResponse;
+import com.inmobi.template.context.App;
+import com.inmobi.template.formatter.TemplateDecorator;
+import com.inmobi.template.formatter.TemplateParser;
+import com.inmobi.template.gson.GsonManager;
+import com.inmobi.template.module.TemplateModule;
+
+public class NativeResponseMaker {
+	
+	private final static Logger            LOG                          = LoggerFactory.getLogger(NativeResponseMaker.class);
+	
+	@Inject
+	private TemplateParser templateParser;
+	
+	@Inject
+	private GsonManager gsonManager;
+	
+	@Inject
+	private TemplateDecorator templateDecorator;
+	
+	private static final String errorStr = "%s can't be null."; 
+	
+	private Gson gson = null;
+	
+	
+	public NativeResponseMaker() {
+		gson = gsonManager.createGson();
+		
+	}
+	
+//	private String getFileContent(String fileName){
+//		File file = new File(fileName);
+//		String fileContent = null;
+//	    try {
+//	    	fileContent = Files.toString(file, Charsets.UTF_8);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		
+//	    return fileContent;
+//	}
+	
+	public String makeResponse(BidResponse response,Map<String, String> params) throws ResourceNotFoundException, ParseErrorException, Exception{
+		 Preconditions.checkNotNull(response, errorStr,"BidResponse");
+		 Preconditions.checkNotNull(params, errorStr,"params");
+		 Preconditions.checkNotNull(params.containsKey("siteId"), errorStr,"siteId");
+		 String siteId = params.get("siteId");
+		 
+		 App app = gson.fromJson(response.getSeatbid().get(0).getBid().get(0).getAdm(), App.class);
+		 
+		 VelocityContext vc = getVelocityContext(app,response,params);
+		 String namespace = getNamespace();
+		 vc.put("NAMESPACE", namespace);
+		 
+		 String pubContent = templateParser.format(app, siteId);
+		 String contextCode = templateDecorator.getContextCode(vc);
+		 
+		 LOG.debug("Making response for siteId : "+siteId);
+		 
+		return nativeAd(pubContent, contextCode, namespace);
+	}
+	
+	private VelocityContext getVelocityContext(App app,BidResponse response,Map<String, String> params){
+		VelocityContext context = new VelocityContext();
+		
+		String impId = response.getSeatbid().get(0).getBid().get(0).getImpid();
+		
+		context.put("IMP_ID", impId);
+		context.put("LANDING_PAGE",app.getOpeningLandingUrl());
+		context.put("BEACON_URL", getBeaconUrl(response,params,app));
+		context.put("CLICK_TRACKER", getClickUrl(response,params,app));
+		
+		return context;
+	}
+	
+	private String constructBeaconUrl(String url){
+		return "<img src=\""+url+"\" style=\"display:none;\" />";
+	}
+	
+	private String getBeaconUrl(BidResponse response,Map<String, String> params,App app){
+		
+		StringBuilder bcu = new StringBuilder();
+		String nUrl = null;
+        try {
+            nUrl = response.seatbid.get(0).getBid().get(0).getNurl();
+            bcu.append(constructBeaconUrl(nUrl));
+        }
+        catch (Exception e) {
+            LOG.debug("Exception while parsing response {}", e);
+        }
+        
+        String beaconUrl = params.get("beaconUrl");
+        if(!StringUtils.isEmpty(beaconUrl)){
+        	bcu.append(constructBeaconUrl(beaconUrl));
+        }
+        
+        List<String> pixelurls = app.getPixelUrls();
+        if(pixelurls!=null){
+	        for(String purl:pixelurls){
+	        	bcu.append(constructBeaconUrl(purl));
+	        }
+        }
+        
+        return bcu.toString();
+	}
+	
+	
+	private String getClickUrl(BidResponse response,Map<String, String> params,App app){
+		
+		StringBuilder ct = new StringBuilder();
+        
+        List<String> clickUrls = app.getClickUrls();
+        if(clickUrls!=null){
+	        int i=0;
+	        for(;i<clickUrls.size()-1;){
+	        	ct.append("\"").append(clickUrls.get(i)).append("\"").append(",");
+	        	i++;
+	        }
+	        
+	        if(clickUrls.size()>0){
+	        	ct.append("\"").append(clickUrls.get(i)).append("\"");
+	        }
+        }
+        
+		return ct.toString();
+	}
+	
+	
+	@Data
+    private static class NativeAd {
+        private final String pubContent;
+        private final String contextCode;
+        private final String namespace;
+    }
+
+    public String nativeAd(String pubContent, String contextCode,String namespace) {
+        pubContent = base64(pubContent);
+        NativeAd nativeAd = new NativeAd(pubContent,
+						                contextCode,
+						                namespace);
+        
+       return gson.toJson(nativeAd);
+    }
+    
+    public String base64(String input) {
+        // The escaping is not url safe, the input is decoded as base64 utf-8 string
+        Base64 base64 = new Base64();
+        return base64.encodeAsString(input.getBytes(Charsets.UTF_8));
+    }
+	
+	private String getNamespace() {
+        return "im_" + (Math.abs(ThreadLocalRandom.current().nextInt(10000))+10000) + "_";
+    }
+	
+	
+	public static void main(String args[]){
+		
+		
+		Injector injector = Guice.createInjector(new TemplateModule());
+		
+		
+	}
+	
+	
+
+}

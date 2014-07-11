@@ -2,7 +2,11 @@ package com.inmobi.template.deserializer;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
+import com.google.common.collect.Lists;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -26,7 +30,11 @@ public class AppDeserializer implements JsonDeserializer<Context> {
 		//String 	   actionText  = jsonObj.get("actiontext").getAsString();
 		String 	   actionLink  = jsonObj.get("actionlink").getAsString();
 		//String 	   cta_install  = jsonObj.get("actiontext").getAsString();
-		String     id    = jsonObj.get("uid").getAsString();
+		JsonElement  idElement   = jsonObj.get("uid");
+		String id ="";
+		if(idElement!=null){
+			id = idElement.getAsString();
+		}
 		
 		JsonElement imgElement = jsonObj.get("image");
 		Screenshot imgs[] = new Screenshot[]{ context.deserialize(imgElement, Screenshot.class)};
@@ -37,12 +45,15 @@ public class AppDeserializer implements JsonDeserializer<Context> {
 		JsonElement	   iconElement = jsonObj.get("icon");
 		Icon     icons[] = new Icon[]{context.deserialize(iconElement, Icon.class)};
 		
+		
 		App.Builder app = App.newBuilder();
 		app.setDesc(desc);
 		app.setTitle(title);
 		app.setOpeningLandingUrl(actionLink);
 		app.setIcons(Arrays.asList(icons));
 		app.setId(id);
+		app.setPixelUrls(getUrls(jsonObj.get("pixelurl")));
+		app.setClickUrls(getUrls(jsonObj.get("clickurl")));
 		
 		app.setScreenshots(Arrays.asList(imgs));
 		
@@ -52,6 +63,24 @@ public class AppDeserializer implements JsonDeserializer<Context> {
 		
 		
 		return app.build();
+	}
+	
+	
+	private List<String> getUrls(JsonElement jsonElement){
+		List<String> urlList = null;
+		if(jsonElement!=null){
+			JsonArray array = jsonElement.getAsJsonArray();
+			
+			if(array!=null){
+				urlList = Lists.newArrayList();
+				Iterator<JsonElement> itr = array.iterator();
+				while(itr.hasNext()){
+					String url = itr.next().getAsString();
+					urlList.add(url);
+				}
+			}
+		}
+		return urlList;
 	}
 
 }

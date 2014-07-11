@@ -74,7 +74,7 @@ public class ThriftRequestParser {
             params.setSource(isApp ? "APP" : "WAP");
 			if (isApp) {
 				if (CasConfigUtil.repositoryHelper != null) {
-					params.setWapSiteUACEntity(CasConfigUtil.repositoryHelper.queryWapSiteUACRepository(tObject.site.siteId));
+					//params.setWapSiteUACEntity(CasConfigUtil.repositoryHelper.queryWapSiteUACRepository(tObject.site.siteId));
 				}
 			}
 			if (CasConfigUtil.repositoryHelper != null) {

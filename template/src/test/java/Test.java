@@ -54,9 +54,10 @@ private static App getSampleApp(Injector injector){
 	public static void main(String args[]) throws ResourceNotFoundException, ParseErrorException, Exception{
 //		TemplateManager.addToTemplateCache(new NativeTemplate());
 		Injector injector = Guice.createInjector(new TemplateModule());
-		TemplateManager.addToTemplateCache("native_tango.vm",getContent());
+		TemplateManager.getInstance().addToTemplateCache("native_tango",getContent());
+		TemplateManager.getInstance().addToTemplateCache("native_tango1",getContent());
 		TemplateParser parser = injector.getInstance(TemplateParser.class);
-		parser.format(getSampleApp(injector),"native_tango.vm");
+		parser.format(getSampleApp(injector),"native_tango1");
 	}
 	
 }

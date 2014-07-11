@@ -16,7 +16,7 @@ public class TemplateModule extends AbstractModule {
 		bind(Tools.class).to(ToolsImpl.class).asEagerSingleton();
 		bind(TemplateParser.class).asEagerSingleton();
 		bind(MathTool.class).asEagerSingleton();
-		bind(TemplateManager.class).asEagerSingleton();
+		//bind(TemplateManager.class).asEagerSingleton();
 		bind(GsonManager.class).asEagerSingleton();
 		
 	}

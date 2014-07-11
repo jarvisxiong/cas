@@ -1,10 +1,12 @@
 package com.inmobi.adserve.channels.repository;
 
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.thrift.TDeserializer;
 
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
-import com.inmobi.adserve.channels.util.NativeTemplateAttributeFinder;
 import com.inmobi.phoenix.batteries.data.AbstractStatsMaintainingDBRepository;
 import com.inmobi.phoenix.batteries.data.DBEntity;
 import com.inmobi.phoenix.batteries.data.EntityError;
@@ -20,6 +22,7 @@ public class NativeAdTemplateRepository extends
 		AbstractStatsMaintainingDBRepository<NativeAdTemplateEntity, String> implements RepositoryManager {
 	
 	
+	
 	@Override
 	public DBEntity<NativeAdTemplateEntity, String> buildObjectFromRow(
 			ResultSetRow resultSetRow) throws RepositoryException {
@@ -28,6 +31,7 @@ public class NativeAdTemplateRepository extends
             String siteId = row.getString("site_id");
             long nativeAdId = row.getLong("native_ad_id");
             String encodedTemplate = row.getString("binary_template");
+            
             
             byte[] binaryTemplate = Base64.decodeBase64(encodedTemplate);
             
@@ -41,13 +45,30 @@ public class NativeAdTemplateRepository extends
             builder.setSiteId(siteId);
             builder.setNativeAdId(nativeAdId);
             
+            List<String> keys = adTemplate.getDemandConstraints().getJsonPath();
+            if(keys ==null){
+            	throw new Exception("No mandatory field found.");
+            }
+            
+            Iterator<String> itr = keys.iterator();
+            while(itr.hasNext()){
+            	String key = itr.next();
+            	if(NativeConstrains.isImageKey(key)){
+            		builder.setImageKey(key);
+            	}else if(NativeConstrains.isMandatoryKey(key)){
+            		builder.setMandatoryKey(key);
+            	}
+            }
+            
             NativeAdTemplateEntity templateEntity = builder.build();
             
-            TemplateManager.addToTemplateCache(templateEntity.getKey(), adTemplate.getDetails().getContent());
+            if(templateEntity.getMandatoryKey()!=null){
+            	TemplateManager.getInstance().addToTemplateCache(templateEntity.getSiteId(), adTemplate.getDetails().getContent());
+            }else{
+            	logger.warn("SiteId["+siteId+"]["+nativeAdId+"] doesn't have valid mandatory field thus not adding to Template Cache.");
+            }
             
-            logger.debug("SiteId  = "+siteId+" : nativeAdId = "+nativeAdId+" : template = "+adTemplate.getDetails().getContent());
-            
-            
+            logger.debug("Adding site id  "+siteId+" and nativeId "+nativeAdId+" to NativeAdTemplateRespository");
             return new DBEntity<NativeAdTemplateEntity, String>(templateEntity, null);
         }
         catch (Exception e) {
@@ -60,7 +81,7 @@ public class NativeAdTemplateRepository extends
 
 	@Override
 	public boolean isObjectToBeDeleted(NativeAdTemplateEntity entity) {
-		  if (entity.getId() == null || entity.getNativeAdId() <1) {
+		  if (entity.getId() == null || entity.getMandatoryKey() == null) {
 	            return true;
 	        }
 		  return false;
