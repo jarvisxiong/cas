@@ -141,6 +141,15 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
                 appendQueryParam(url, IOS_ID, casInternalRequestParameters.uid,
                         false);
             }
+            else if (StringUtils
+                    .isNotBlank(casInternalRequestParameters.uidIDUS1)) {
+                appendQueryParam(url, IOS_ID,
+                        casInternalRequestParameters.uidIDUS1, false);
+            }
+            else if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
+                appendQueryParam(url, IOS_ID,
+                        casInternalRequestParameters.uidMd5, false);
+            }
         }
 
         if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
@@ -150,10 +159,9 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
             } else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
                 appendQueryParam(url, ANDROID_ID,
                         casInternalRequestParameters.uid, false);
-            } else if (StringUtils
-                    .isNotBlank(casInternalRequestParameters.uidIDUS1)) {
-                appendQueryParam(url, ANDROID_ID,
-                        casInternalRequestParameters.uidIDUS1, false);
+            } 
+            else if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
+                appendQueryParam(url, ANDROID_ID, getURLEncode(casInternalRequestParameters.uidO1, format), false);
             }
         }
         String gen = sasParams.getGender();
@@ -175,6 +183,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
         authSignature = getHashedValue(query.toString(), "MD5");
 
         return requestUrl;
+    
     }
 
     private String getAdType() {

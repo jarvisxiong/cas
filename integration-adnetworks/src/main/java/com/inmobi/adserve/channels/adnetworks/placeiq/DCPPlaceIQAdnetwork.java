@@ -46,6 +46,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String         SIZE          = "SZ";
     private static final String         ANDROIDMD5    = "AM";
     private static final String         ANDROIDIDSHA1 = "AH";
+    private static final String         IOSSHA1       =  "DS";
     private static final String         IDFA          = "IA";
     private static final String         UA            = "UA";
     private static final String         CLIENT_IP     = "IP";
@@ -145,8 +146,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             os = ANDROID;
             isApp = true;
             if ((StringUtils.isEmpty(casInternalRequestParameters.uidMd5)
-                    && StringUtils.isEmpty(casInternalRequestParameters.uid) && StringUtils
-                        .isEmpty(casInternalRequestParameters.uidIDUS1))) {
+                    && StringUtils.isEmpty(casInternalRequestParameters.uid) )) {
                 LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
                 return false;
             }
@@ -154,7 +154,8 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
         else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) { // iPhone
             os = IOS;
             isApp = true;
-            if (StringUtils.isEmpty(casInternalRequestParameters.uidIFA)) {
+            if (StringUtils.isEmpty(casInternalRequestParameters.uidIFA) && StringUtils
+                    .isEmpty(casInternalRequestParameters.uidIDUS1)) {
                 LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
                 return false;
             }
@@ -210,6 +211,9 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
                 appendQueryParam(url, IDFA, casInternalRequestParameters.uidIFA, false);
 
             }
+            if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
+                appendQueryParam(url, IOSSHA1, casInternalRequestParameters.uidIDUS1, false);
+            }
         }
         if (os.equalsIgnoreCase(ANDROID)) {
             if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
@@ -218,9 +222,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
                 appendQueryParam(url, ANDROIDMD5, casInternalRequestParameters.uid, false);
             }
-            if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
-                appendQueryParam(url, ANDROIDIDSHA1, casInternalRequestParameters.uidIDUS1, false);
-            }
+            
         }
         /*if (isInterstitial()) {
             // display type 1 for interstitial

@@ -41,9 +41,10 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String LOCATION        = "loc";
     private static final String POSTAL_CODE     = "pcode";
     private static final String IDFA            = "idfa";
-    private static final String ANDROID_ID_SHA1 = "md5udid";
-    private static final String ANDROID_ID_MD5  = "sha1udid";
+    private static final String ANDROID_ID_SHA1 = "sha1udid";
+    private static final String ANDROID_ID_MD5  = "md5udid";
     private static final String ODIN1           = "sha1mac";
+    private static final String OPENUDID_SHA1   = "openudid";
     private static final String ST           	= "st";
     private static final String TRAFFIC_TYPE    = "mobile_web";
     // private static final String CLICKURL = "pubclick";
@@ -139,10 +140,11 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
                 else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
                     appendQueryParam(url, ANDROID_ID_MD5, getURLEncode(casInternalRequestParameters.uid, format), false);
                 }
-                if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
-                    appendQueryParam(url, ANDROID_ID_SHA1, getURLEncode(casInternalRequestParameters.uidIDUS1, format),
+                if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
+                    appendQueryParam(url, ANDROID_ID_SHA1, getURLEncode(casInternalRequestParameters.uidO1, format),
                             false);
                 }
+                
 
             }
             if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
@@ -154,6 +156,10 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
                 }
                 if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
                     appendQueryParam(url, IDFA, getURLEncode(casInternalRequestParameters.uidIFA, format), false);
+                }
+                if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
+                    appendQueryParam(url, OPENUDID_SHA1, getURLEncode(casInternalRequestParameters.uidIDUS1, format),
+                            false);
                 }
             }
 

@@ -86,7 +86,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 				longitude = latlong[1];
 			}
 		}
-		sourceType = (StringUtils.isBlank(sasParams.getSource()) || "WAP"
+		sourceType = (StringUtils.isBlank(sasParams.getSource()) || WAP
 				.equalsIgnoreCase(sasParams.getSource())) ? WEB : APP;
 
 		LOG.info("Configure parameters inside xad returned true");
@@ -227,17 +227,20 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 				deviceIdType = IDFA_PLAIN;
 				return;
 			}
+			if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
+                deviceId = casInternalRequestParameters.uidIDUS1;
+                deviceIdType = UUID_SHA1;
+                return;
+            }
+			
+			
 		} else if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
 			if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
 				deviceId = casInternalRequestParameters.uidMd5;
 				deviceIdType = ANDROID_ID_MD5;
 				return;
 			}
-			if (StringUtils.isNotBlank(casInternalRequestParameters.uidSO1)) {
-				deviceId = casInternalRequestParameters.uidSO1;
-				deviceIdType = ANDROID_ID_SHA1;
-				return;
-			}
+			
 			if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
 				deviceId = casInternalRequestParameters.uidO1;
 				deviceIdType = ANDROID_ID_SHA1;
