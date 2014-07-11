@@ -1,7 +1,5 @@
 package com.inmobi.adserve.channels.api;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -18,52 +16,38 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
-import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.inmobi.casthrift.rtb.BidResponse;
 import com.inmobi.template.context.App;
+import com.inmobi.template.exception.TemplateException;
 import com.inmobi.template.formatter.TemplateDecorator;
 import com.inmobi.template.formatter.TemplateParser;
-import com.inmobi.template.gson.GsonManager;
+import com.inmobi.template.interfaces.TemplateConfiguration;
 import com.inmobi.template.module.TemplateModule;
 
 public class NativeResponseMaker {
 	
 	private final static Logger            LOG                          = LoggerFactory.getLogger(NativeResponseMaker.class);
 	
-	@Inject
 	private TemplateParser templateParser;
 	
-	@Inject
-	private GsonManager gsonManager;
-	
-	@Inject
 	private TemplateDecorator templateDecorator;
 	
 	private static final String errorStr = "%s can't be null."; 
 	
 	private Gson gson = null;
 	
-	
-	public NativeResponseMaker() {
-		gson = gsonManager.createGson();
-		
+	@Inject
+	public NativeResponseMaker(TemplateParser parser, TemplateConfiguration tc) throws TemplateException {
+		gson = tc.getGsonManager().createGson();
+		templateParser = parser;
+		templateDecorator = tc.getTemplateDecorator(); 
+		//templateDecorator.addContextFile("/contextCode.vm");
 	}
 	
-//	private String getFileContent(String fileName){
-//		File file = new File(fileName);
-//		String fileContent = null;
-//	    try {
-//	    	fileContent = Files.toString(file, Charsets.UTF_8);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		
-//	    return fileContent;
-//	}
 	
 	public String makeResponse(BidResponse response,Map<String, String> params) throws ResourceNotFoundException, ParseErrorException, Exception{
 		 Preconditions.checkNotNull(response, errorStr,"BidResponse");

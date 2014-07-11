@@ -1,7 +1,5 @@
 package com.inmobi.template.formatter;
 
-import java.io.IOException;
-
 import org.apache.velocity.Template;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;

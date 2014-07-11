@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.repository.NativeConstrains;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.casthrift.rtb.Native;
 
 public class NativeBuilderImpl implements NativeBuilder{

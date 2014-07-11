@@ -15,20 +15,25 @@ import com.inmobi.template.context.App;
 import com.inmobi.template.exception.TemplateException;
 import com.inmobi.template.gson.GsonManager;
 import com.inmobi.template.interfaces.Context;
+import com.inmobi.template.interfaces.TemplateConfiguration;
 import com.inmobi.template.interfaces.Tools;
 
 public class TemplateParser {
 	
 	private final static Logger            LOG                          = LoggerFactory.getLogger(TemplateParser.class);
 	
-	@Inject
 	private Tools tools;
 	
-	@Inject
 	private  MathTool mTool;
 	
-	@Inject
 	private GsonManager gsonManager;
+	
+	@Inject
+	public TemplateParser(TemplateConfiguration config){
+		this.tools = config.getTool();
+		this.mTool = config.getMathTool();
+		this.gsonManager = config.getGsonManager();
+	}
 	
 	private VelocityContext getVelocityContext(){
 		VelocityContext velocityContext = new VelocityContext();

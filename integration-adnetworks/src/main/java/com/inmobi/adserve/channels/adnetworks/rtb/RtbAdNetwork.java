@@ -137,9 +137,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     
     @Inject
     private static NativeTemplateAttributeFinder nativeTemplateAttributeFinder;
-    
-    @Inject
-    private static NativeTemplateFormatter nativeTemplateFormatter;
+//    
+//    @Inject
+//    private static NativeTemplateFormatter nativeTemplateFormatter;
     
     @Inject
     private static NativeBuilderFactory    nativeBuilderfactory;
@@ -839,7 +839,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     		params.put("appId",app.getId());
     	}
     	try {
-//    		responseContent = nativeTemplateFormatter.getFormatterValue(null, bidResponse, params);
     		params.put("siteId", this.sasParams.getSiteId());
     		responseContent = nativeResponseMaker.makeResponse(bidResponse, params);
 		} catch (Exception e) {

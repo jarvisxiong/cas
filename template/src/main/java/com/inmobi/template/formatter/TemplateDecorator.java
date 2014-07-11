@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import sun.misc.IOUtils;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import com.inmobi.template.context.CreativeContext;
 import com.inmobi.template.exception.TemplateException;
 
@@ -18,20 +19,20 @@ public class TemplateDecorator {
 	
 	private final static Logger            LOG                          = LoggerFactory.getLogger(TemplateDecorator.class);
 	
-	private final String contextCodeFile = "contextCode.vm";
-	
+	private String contextCodeFile;
 	
 	@Inject
-	public TemplateDecorator() throws TemplateException{
-		String cc = getFileContent("/"+contextCodeFile);
+	public TemplateDecorator() {}
+	
+	@Inject
+	public void addContextFile(@Named("ContextCodeFile") String contextCodeVm) throws TemplateException{
+		this.contextCodeFile = contextCodeVm;
+		String cc = getFileContent(contextCodeFile);
 		TemplateManager.getInstance().addToTemplateCache(contextCodeFile, cc);
-		
 	}
 	
 	private String getFileContent(String fileName) throws TemplateException{
-		
 		try{
-		
 			InputStream is = TemplateDecorator.class.getResourceAsStream(fileName);
 			byte[] b = IOUtils.readFully(is, -1, true);
 			return new String(b);

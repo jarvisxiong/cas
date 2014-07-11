@@ -276,9 +276,9 @@ public class ChannelServer {
             currencyConversionRepository.init(logger,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY),
                     ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY);
-//            wapSiteUACRepository.init(logger,
-//                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY),
-//                    ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY);
+            wapSiteUACRepository.init(logger,
+                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY),
+                    ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY);
             channelAdGroupRepository.init(logger,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY),
                     ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY);
