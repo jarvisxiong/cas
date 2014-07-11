@@ -28,7 +28,24 @@
 		<dependency>
 			<groupId>org.sonatype.maven.plugin</groupId>
 			<artifactId>emma-maven-plugin</artifactId>
+			<exclusions>
+			   <exclusion>
+					<groupId>org.codehaus.plexus</groupId>
+					<artifactId>plexus-velocity</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
+		<!-- <dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-velocity</artifactId>
+			<version>1.1.2</version>
+			<exclusions>
+			   <exclusion>
+					<groupId>org.codehaus.plexus</groupId>
+					<artifactId>plexus-velocity</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency> -->
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-all</artifactId>

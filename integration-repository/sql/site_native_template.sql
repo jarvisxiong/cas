@@ -7,7 +7,7 @@ BEGIN
     FOR row1 IN
 	 select site_id, native_ad_id, binary_template
 	 from site_native_ad_settings,ad_template
-	 WHERE site_native_ad_settings.native_ad_id = ad_template.id
+	 WHERE site_native_ad_settings.native_ad_id = ad_template.id and site_native_ad_settings.type = 'native_content_template'
 LOOP
         RETURN NEXT row1;
     END LOOP;
