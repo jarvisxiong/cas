@@ -127,11 +127,14 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private final RepositoryHelper         repositoryHelper;
     private String                         bidderCurrency               = "USD";
     private static final String            USD                          = "USD";
-    private static final List<String> blockedAdvertisers = Lists.newArrayList("king.com", "supercell.net");
+    private List<String> blockedAdvertisers = Lists.newArrayList(); ;
     
     @Getter
     static List<String>                    currenciesSupported          = new ArrayList<String>(Arrays.asList("USD",
                                                                                 "CNY","JPY","EUR","KRW","RUB"));
+    @Getter
+    static List<String>                    blockedAdvertiserList        = new ArrayList<String>(Arrays.asList("king.com", "supercell.net", "paps.com", "fhs.com", "china.supercell.com", "supercell.com"));
+    
     @Inject
     private static AsyncHttpClientProvider asyncHttpClientProvider;
     
@@ -179,6 +182,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         this.templateWN = templateWinNotification;
         this.isHTMLResponseSupported = config.getBoolean(advertiserName + ".htmlSupported", true);
         this.isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", false);
+        this.blockedAdvertisers.addAll(blockedAdvertiserList);
+        
     }
 
     @Override
@@ -281,11 +286,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             }
 
             if (null != casInternalRequestParameters.blockedAdvertisers) {
-                casInternalRequestParameters.blockedAdvertisers.addAll(blockedAdvertisers);
-            }else {
-              casInternalRequestParameters.blockedAdvertisers = blockedAdvertisers;
+                blockedAdvertisers.addAll(casInternalRequestParameters.blockedAdvertisers);
             }
-            bidRequest.setBadv(casInternalRequestParameters.blockedAdvertisers);
+            bidRequest.setBadv(blockedAdvertisers);
         }
         else {
             LOG.debug("casInternalRequestParameters is null, so not setting blocked advertisers and categories");
@@ -627,7 +630,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         byte[] body = content.toString().getBytes(CharsetUtil.UTF_8);
 
-        Request ningRequest = new RequestBuilder().setUrl(uriCallBack.toASCIIString())
+        Request ningRequest = new RequestBuilder().setUrl(uriCallBack.toASCIIString()).setMethod("POST")
                 .setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE)
                 .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length)).setBody(body)
                 .setHeader(HttpHeaders.Names.HOST, uriCallBack.getHost()).build();
@@ -698,7 +701,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             httpRequestMethod = "POST";
         }
 
-        return new RequestBuilder(httpRequestMethod).setURI(uri)
+        return new RequestBuilder(httpRequestMethod).setUrl(uri.toString())
                 .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json").setBody(body)
                 .setHeader(X_OPENRTB_VERSION, rtbVer).setHeader(HttpHeaders.Names.HOST, uri.getHost()).build();
     }
@@ -834,7 +837,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     	App app = bidRequest.getApp();
     	
     	Map<String, String> params = new HashMap<String, String>();
-    	params.put("beaconUrl",beaconUrl);
+    	String winUrl = this.beaconUrl + "?b=${WIN_BID}";
+    	params.put("beaconUrl",winUrl);
     	if(app!=null){
     		params.put("appId",app.getId());
     	}

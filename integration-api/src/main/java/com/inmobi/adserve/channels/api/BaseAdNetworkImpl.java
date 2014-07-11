@@ -269,7 +269,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             uri = new URIBuilder(uri).setPort(80).build();
         }
 
-        return new RequestBuilder().setURI(uri).setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+        return new RequestBuilder().setUrl(uri.toString()).setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
                 .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
@@ -751,5 +751,19 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     public String getAdMarkUp()  {
       return null;
     }
+    
+    protected boolean isInterstitial() {
+		Short slot = sasParams.getSlot();
+		if (10 == slot // 300X250
+				|| 14 == slot // 320X480
+				|| 16 == slot // 768X1024
+				|| 17 == slot /* 800x1280 */
+				|| 32 == slot //480x320
+				|| 33 == slot //1024x768
+				|| 34 == slot) /* 1280x800 */ {
+			return true;
+		}
+		return false;
+	}
 
 }

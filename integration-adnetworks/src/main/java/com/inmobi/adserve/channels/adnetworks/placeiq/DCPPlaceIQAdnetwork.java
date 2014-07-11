@@ -239,16 +239,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 
         return new URI(url.toString());
     }
-    private boolean isInterstitial() {
-        Short slot = sasParams.getSlot();
-        if (10 == slot // 300X250
-                || 14 == slot // 320X480
-                || 16 == slot // 768X1024
-                || 17 == slot)/* 800x1280 */ {
-            return true;
-        }
-        return false;
-    }
+    
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {}", response);

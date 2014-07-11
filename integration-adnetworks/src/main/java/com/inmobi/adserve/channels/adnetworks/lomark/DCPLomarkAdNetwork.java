@@ -166,9 +166,16 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
 
             url.append("&AppId=").append(externalSiteId);
             requestMap.put("AppId", externalSiteId);
-            int adSpaceId = getAdType();
-            url.append("&AdSpaceType=").append(adSpaceId); // ("1 Banner 2 interstitial");
-            requestMap.put("AdSpaceType", String.valueOf(adSpaceId));
+            
+         // ("1 Banner 2 interstitial");
+            if(isInterstitial()){
+            	url.append("&AdSpaceType=2");
+            	requestMap.put("AdSpaceType", "2");
+            }
+            else{
+            	url.append("&AdSpaceType=1");
+            	requestMap.put("AdSpaceType", "1");
+            }
             // map operator
             Integer carrierId = getCarrierId();
             url.append("&Operator=").append(carrierId);// .append("1:China Mobile,2:China Unicom,3:China Telecom,4:other");
@@ -349,16 +356,6 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
         }
         return sign.toString();
 
-    }
-
-    private int getAdType() {
-        Short slot = sasParams.getSlot();
-        if (10 == slot // 300X250
-                || 14 == slot // 320X480
-                || 16 == slot) /* 768X1024 */{
-            return 2;
-        }
-        return 1;
     }
 
     private Integer getCarrierId() {

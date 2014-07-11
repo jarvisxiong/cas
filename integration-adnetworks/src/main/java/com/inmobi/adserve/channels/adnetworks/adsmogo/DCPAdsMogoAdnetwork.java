@@ -57,6 +57,8 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String COUNTRY = "co";
     private static final String USER_GENDER = "GENDER";
     private static final String USER_AGE = "AGE";
+    private static final String INTERSTITIAL = "interstitial";
+    private static final String BANNER = "banner";
     
 	private boolean isApp;
 
@@ -115,7 +117,10 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
         StringBuilder url = new StringBuilder(host);
         appendQueryParam(url, APPID, externalSiteId, false);
         appendQueryParam(url, IPADDRESS, sasParams.getRemoteHostIp(), false);
-        appendQueryParam(url, ADSPACE_TYPE, getAdType(), false);
+        if(isInterstitial())
+        	appendQueryParam(url, ADSPACE_TYPE, INTERSTITIAL, false);
+        else
+        	appendQueryParam(url, ADSPACE_TYPE, BANNER, false);
 
         appendQueryParam(url, USER_AGENT,
                 getURLEncode(sasParams.getUserAgent(), format), false);
@@ -187,16 +192,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
         return requestUrl;
     }
 
-    private String getAdType() {
-        Short slot = sasParams.getSlot();
-        if (10 == slot // 300X250
-                || 14 == slot // 320X480
-                || 16 == slot) /* 768X1024 */{
-            return "interstitial";
-        }
-        return "banner";
-    }
-
+   
     @Override
     public Request getNingRequest() throws Exception {
 
@@ -206,7 +202,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
         }
 
         return new RequestBuilder()
-                .setURI(uri)
+                .setUrl(uri.toString())
                 .setHeader(HttpHeaders.Names.USER_AGENT,
                         sasParams.getUserAgent())
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")

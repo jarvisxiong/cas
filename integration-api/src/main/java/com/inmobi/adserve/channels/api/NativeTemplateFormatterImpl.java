@@ -28,9 +28,9 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 	
 
 	private static GsonBuilder gb = new GsonBuilder();
-	static{
-		gb.disableHtmlEscaping();
-	}
+//	static{
+//		gb.disableHtmlEscaping();
+//	}
 	
 	//TODO: remove it. Just added for tango for MVP.
 	private String START = "{",
@@ -219,7 +219,7 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 	}
 	
 	private String constructBeaconUrl(String url){
-		return "<img src="+url+" style=\"display:none;\" />";
+		return "<img src=\""+url+"\" style=\"display:none;\" />";
 	}
 	
 	private String getNamespace() {
