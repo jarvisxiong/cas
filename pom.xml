@@ -109,11 +109,6 @@
 				<version>0.9.9-RC1</version>
 			</dependency>
 			<dependency>
-				<groupId>org.apache.velocity</groupId>
-				<artifactId>velocity</artifactId>
-				<version>1.7</version>
-			</dependency>
-			<dependency>
 				<groupId>com.ning</groupId>
 				<artifactId>async-http-client</artifactId>
 				<version>1.7.9</version>
