@@ -49,6 +49,11 @@
 				<version>${commons.pool.version}</version>
 			</dependency>
 			<dependency>
+                        <groupId>org.apache.velocity</groupId>
+                        <artifactId>velocity</artifactId>
+			<version>1.7</version>
+                	</dependency>
+			<dependency>
 				<groupId>com.google.inject.extensions</groupId>
 				<artifactId>guice-assistedinject</artifactId>
 				<version>${guice-assistedinject.version}</version>

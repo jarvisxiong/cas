@@ -173,7 +173,7 @@ public class ChannelServer {
                     .builder()
                     .withModules(
                             Modules.combine(new CasNettyModule(configurationLoader.getServerConfiguration()),
-                                    new ServerModule(configurationLoader, repositoryHelper),new NativeModule(), new TemplateModule()))
+                                    new ServerModule(configurationLoader, repositoryHelper)))
                     .usingBasePackages("com.inmobi.adserve.channels.server.netty",
                             "com.inmobi.adserve.channels.api.provider").build().createInjector();
 
