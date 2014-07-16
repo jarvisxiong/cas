@@ -12,7 +12,6 @@ import sun.misc.IOUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import com.inmobi.template.context.CreativeContext;
 import com.inmobi.template.exception.TemplateException;
 
 public class TemplateDecorator {
@@ -59,13 +58,5 @@ public class TemplateDecorator {
 		}
 	}
 	
-	
-	
-	public static void main(String args[]) throws TemplateException{
-		
-		CreativeContext cc = new CreativeContext();
-		TemplateDecorator td = new TemplateDecorator();
-		
-	}
 
 }

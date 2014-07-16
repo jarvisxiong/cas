@@ -9,11 +9,18 @@ import com.inmobi.casthrift.rtb.Image;
 
 public class NativeConstrains {
 	
-	private static enum Mandatory{
-		ICON(0,"icon"),
-		MEDIA(1,"Media"),
-		HEADLINE(2,"Headline"),
-		DESCRIPTION(3,"Description");
+	public static final int Icon = 0;
+	public static final int Media = 1;
+	public static final int Headline = 2;
+	public static final int Description = 3;
+	
+	
+	public enum Mandatory{
+		
+		ICON(Icon,"icon"),
+		MEDIA(Media,"Media"),
+		HEADLINE(Headline,"Headline"),
+		DESCRIPTION(Description,"Description");
 		
 		private final int index;
 		private String name;
@@ -22,11 +29,11 @@ public class NativeConstrains {
 			this.name= name;
 		}
 		
-		private String getName(){
-			return this.name();
+		public String getName(){
+			return this.name;
 		}
 		
-		private int getIndex(){
+		public int getIndex(){
 			return this.index;
 		}
 	}

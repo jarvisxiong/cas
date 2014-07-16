@@ -17,6 +17,7 @@ import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.api.template.NativeTemplateAttributeFinder;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.*;
@@ -362,7 +363,12 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         
         if(isNativeResponseSupported && isNativeRequest()){
-        	impression.setExt(createNativeExtensionObject());
+        	ImpressionExtensions impExt = createNativeExtensionObject();
+        	
+        	if(impExt ==null){
+        		return null;
+        	}
+        	impression.setExt(impExt);
         }
         return impression;
     }
@@ -372,7 +378,12 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 //    	Native nat = new Native();
 //    	nat.setMandatory(nativeTemplateAttributeFinder.findAttribute(new MandatoryNativeAttributeType()));
 //    	nat.setImage(nativeTemplateAttributeFinder.findAttribute(new ImageNativeAttributeType()));
-    	NativeBuilder nb = nativeBuilderfactory.create(repositoryHelper.queryNativeAdTemplateRepository(sasParams.getSiteId()));
+    	NativeAdTemplateEntity templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getSiteId());
+    	if(templateEntity == null){
+    		LOG.info(String.format("This site id %s doesn't have native template :",sasParams.getSiteId()));
+    		return null;
+    	}
+    	NativeBuilder nb = nativeBuilderfactory.create(templateEntity);
     	Native nat = nb.build();
     	//TODO: for native currently there is no way to identify MRAID traffic/container supported by publisher.
 //    	if(!StringUtils.isEmpty(sasParams.getSdkVersion())){
@@ -844,7 +855,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     	}
     	try {
     		params.put("siteId", this.sasParams.getSiteId());
-    		responseContent = nativeResponseMaker.makeResponse(bidResponse, params);
+    		responseContent = nativeResponseMaker.makeResponse(bidResponse, params, repositoryHelper.queryNativeAdTemplateRepository(sasParams.getSiteId()));
 		} catch (Exception e) {
 			 adStatus = "NO_AD";
 	         LOG.error("Some exception is caught while filling the native template for partner{} {}",

@@ -57,6 +57,8 @@ public class TemplateManager {
 	}
 	
 	public  Template getTemplate(String templateName) {
+		
+		LOG.debug(String.format("GET Template for site : %s", templateName));
 		return velocityEngine.getTemplate(templateName);
 	}
 

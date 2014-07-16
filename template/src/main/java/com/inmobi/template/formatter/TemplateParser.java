@@ -48,7 +48,7 @@ public class TemplateParser {
 	}
 	
 	public String format(Context context,String templateName) throws TemplateException{
-		
+		LOG.debug(String.format("Formating Template for site : %s", templateName));
 	    //velocityContext.put("config", UnifiedFormatterConfiguration.getInstance());
 	    //velocityContext.put("ad", adContext);
 	   // List<CreativeContext> creativeContextList = adContext.getCreativeList();
