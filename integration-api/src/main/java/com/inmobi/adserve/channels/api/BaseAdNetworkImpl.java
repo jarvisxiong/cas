@@ -469,7 +469,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     protected String getCategories(final char seperator, final boolean isAllRequired) {
-        return getCategories(seperator, true, false);
+        return getCategories(seperator, isAllRequired, false);
     }
 
     protected String getCategories(final char seperator, final boolean isAllRequired, final boolean isIABCategory) {
