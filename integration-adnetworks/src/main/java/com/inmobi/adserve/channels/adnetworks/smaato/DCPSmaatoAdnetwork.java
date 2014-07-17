@@ -154,7 +154,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
             appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.uidMd5, false);
         }
         else if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
-            appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.uidIDUS1, false);
+            appendQueryParam(url, OPEN_UDID, casInternalRequestParameters.uidIDUS1, false);
         }
         if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
             appendQueryParam(url, OPEN_UDID, casInternalRequestParameters.uid, false);
