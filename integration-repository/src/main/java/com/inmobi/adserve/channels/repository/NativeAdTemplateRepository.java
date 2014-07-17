@@ -64,11 +64,12 @@ public class NativeAdTemplateRepository extends
             
             if(templateEntity.getMandatoryKey()!=null){
             	TemplateManager.getInstance().addToTemplateCache(templateEntity.getSiteId(), adTemplate.getDetails().getContent());
+            	 logger.debug("Adding site id  "+siteId+" and nativeId "+nativeAdId+" to NativeAdTemplateRespository");
             }else{
             	logger.warn("SiteId["+siteId+"]["+nativeAdId+"] doesn't have valid mandatory field thus not adding to Template Cache.");
             }
             
-            logger.debug("Adding site id  "+siteId+" and nativeId "+nativeAdId+" to NativeAdTemplateRespository");
+           
             return new DBEntity<NativeAdTemplateEntity, String>(templateEntity, null);
         }
         catch (Exception e) {

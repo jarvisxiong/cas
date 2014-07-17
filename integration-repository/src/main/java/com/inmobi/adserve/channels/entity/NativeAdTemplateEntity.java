@@ -26,7 +26,7 @@ public final class NativeAdTemplateEntity implements IdentifiableEntity<String>{
 	
 	@Override
 	public String getJSON() {
-		return null;
+		return String.format("{\"siteId\":\"%s\",\"nativeAdId\":%s,\"mandatoryKey\":\"%s\",\"imageKey\":\"%s\"}", siteId,nativeAdId,mandatoryKey,imageKey);
 	}
 
 	@Override
