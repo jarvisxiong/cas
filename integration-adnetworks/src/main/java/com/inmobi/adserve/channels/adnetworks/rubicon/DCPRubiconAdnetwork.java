@@ -7,6 +7,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
@@ -65,6 +66,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	private static final String RESPONSE_TEMPLATE = "<script>%s</script>";
 	private static final String BUNDLE_ID_TEMPLATE = "com.inmobi-exchange.%s";
 	private static final String DOMAIN_NAME = "app.domain";
+	private static final String APPSTORE_CATEGORY = "app.category";
 
 	private static final String DEFAULT_ZONE = "default";
 	private static final String SENSITIVITY_LOW = "low";
@@ -186,6 +188,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		// TODO p_block_keys,app.category
 		
 		appendQueryParam(url, ZONE_ID, zoneId, false);
+		
 		if (isApp) {
 			appendQueryParam(url, APP_BUNDLE, String.format(BUNDLE_ID_TEMPLATE, blindedSiteId), false);
 			appendQueryParam(url, DOMAIN_NAME, DOMAIN, false);
@@ -216,17 +219,27 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		} else {
 			appendQueryParam(url, CONNECTION_TYPE, 0, false);
 		}
+		String contentRating=null;
+		if(sasParams.getWapSiteUACEntity()!=null){
+			List<String> appstoreCategories = sasParams.getWapSiteUACEntity().getCategories();
+			if(appstoreCategories !=null && appstoreCategories.size() > 0){
+				appendQueryParam(url, APPSTORE_CATEGORY, getURLEncode(StringUtils.join(appstoreCategories, ','),format), false);
+			}
+			contentRating = sasParams.getWapSiteUACEntity().getContentRating();
+		}
 		if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
 			appendQueryParam(url, AD_SENSITIVE, SENSITIVITY_LOW, false);
 			if (isApp) {
+				String rating = (contentRating == null)?PERFORMANCE_RATING:contentRating;
 				appendQueryParam(url, APP_RATING,
-						PERFORMANCE_RATING, false);
+						rating, false);
 			}
 		} else {
 			appendQueryParam(url, AD_SENSITIVE, SENSITIVITY_HIGH, false);
 			if (isApp) {
+				String rating = (contentRating == null)?FS_RATING:contentRating;
 				appendQueryParam(url, APP_RATING,
-						FS_RATING, false);
+						rating, false);
 			}
 		}
 
@@ -242,7 +255,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 			// display type 1 for interstitial
 			appendQueryParam(url, DISPLAY_TYPE, 1, false);
 		}
-
+		
 		appendQueryParam(url, INMOBI_CATEGORY,
 				getURLEncode(getCategories(',', false, false), format), false);
 		appendQueryParam(url, IAB_CATEGORY,
