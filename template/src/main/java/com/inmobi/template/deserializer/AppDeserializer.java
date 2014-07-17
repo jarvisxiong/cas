@@ -42,8 +42,18 @@ public class AppDeserializer implements JsonDeserializer<Context> {
 		JsonElement dataElement = jsonObj.get("data");
 		DataMap dataMap = context.deserialize(dataElement, DataMap.class);
 		
-		JsonElement	   iconElement = jsonObj.get("icon");
-		Icon     icons[] = new Icon[]{context.deserialize(iconElement, Icon.class)};
+		JsonElement	   iconElement = jsonObj.get("iconurl");
+		Icon     icons[] = null;
+		if(iconElement!=null){
+			String iconurl = iconElement.getAsString();
+			Icon.Builder icon = Icon.newBuilder();
+			icon.setH(300);
+			icon.setW(300);
+			icon.setUrl(iconurl);
+			icons = new Icon[]{(Icon)icon.build()};
+			
+		}
+		//Icon     icons[] = new Icon[]{context.deserialize(iconElement, Icon.class)};
 		
 		
 		App.Builder app = App.newBuilder();

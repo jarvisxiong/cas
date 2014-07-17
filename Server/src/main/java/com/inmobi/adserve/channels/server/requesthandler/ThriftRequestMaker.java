@@ -79,6 +79,7 @@ public class ThriftRequestMaker {
         //tango siteid
         //site.setSiteId("69d6ab27d03f407f9f6fa9c5fad77afd");
         site.setSiteId("99fafeaec0f4441cb7366d20de3335e2");
+        //site.setSiteId("495362deeca64c52bd14e2108d34b4c2");
         site.setPublisherId("sitepub");
         site.setContentRating(ContentRating.PERFORMANCE);
         site.setInventoryType(InventoryType.APP);

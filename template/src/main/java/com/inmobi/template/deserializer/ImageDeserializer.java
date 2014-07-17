@@ -23,7 +23,8 @@ public class ImageDeserializer implements JsonDeserializer<Context> {
 		Screenshot.Builder b = Screenshot.newBuilder();
 		b.setH(h);
 		b.setW(w);
-		b.setAr("3");
+		double ar = h/w;
+		b.setAr(String.valueOf(ar));
 		b.setUrl(url);
 		
 //		Screenshot screenShot = new Screenshot();

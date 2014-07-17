@@ -94,7 +94,7 @@ public class NativeResponseMaker {
 					 break;
 				case NativeConstrains.Media:
 					if(app.getScreenshots().size()<1){
-						throwException(String.format(errorStr, "Icon"));
+						throwException(String.format(errorStr, "Image"));
 					}
 					 break;
 				case NativeConstrains.Headline:
@@ -114,8 +114,7 @@ public class NativeResponseMaker {
 		Image image = NativeConstrains.getImage(templateEntity.getImageKey());
 		if(image!=null){
 			Screenshot screenShot = app.getScreenshots().get(0);
-			if(Double.parseDouble(screenShot.getAr()) != image.getAspectratio() || 
-					(screenShot.getW()>=image.getMinwidth() && screenShot.getW() <=image.getMaxwidth())){
+			if((screenShot.getW()>=image.getMinwidth() && screenShot.getW() <=image.getMaxwidth())){
 				throwException("Not a valid image attributes : "+screenShot);
 			}
 		}
