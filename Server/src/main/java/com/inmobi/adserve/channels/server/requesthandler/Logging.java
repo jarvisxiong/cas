@@ -79,6 +79,9 @@ public class Logging {
                 InspectorStats.incrementStatCount(InspectorStrings.nomatchsegmentcount);
                 InspectorStats.incrementStatCount(InspectorStrings.nomatchsegmentlatency, totalTime);
             }
+            if (sasParams.getRFormat().equalsIgnoreCase("native")) {
+                InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NATIVE_REQUESTS);
+            }
         }
 
 
