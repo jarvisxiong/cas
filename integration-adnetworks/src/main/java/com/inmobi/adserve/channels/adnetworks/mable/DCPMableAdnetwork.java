@@ -154,7 +154,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
         }
 
         String requestParams = getRequestParams();
-        Request ningRequest = new RequestBuilder("POST").setURI(uri)
+        Request ningRequest = new RequestBuilder("POST").setUrl(uri.toString())
                 .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
@@ -204,7 +204,6 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
                 && StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
             uidType = ifaFormat;
             return casInternalRequestParameters.uidIFA;
-
         }
         if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
             uidType = udidFormat;
@@ -225,6 +224,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIDUS1)) {
             uidType = udidFormat;
             return casInternalRequestParameters.uidIDUS1;
+        
         }
         return null;
     }
