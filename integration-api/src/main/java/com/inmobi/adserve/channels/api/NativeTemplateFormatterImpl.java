@@ -172,7 +172,9 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 		String nUrl = null;
         try {
             nUrl = response.seatbid.get(0).getBid().get(0).getNurl();
-            bcu.append(constructBeaconUrl(nUrl));
+            if(nUrl!=null){
+            	bcu.append(constructBeaconUrl(nUrl));
+            }
         }
         catch (Exception e) {
             LOG.debug("Exception while parsing response {}", e);
@@ -219,7 +221,7 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 	}
 	
 	private String constructBeaconUrl(String url){
-		return "<img src=\""+url+"\" style=\"display:none;\" />";
+		return "<img src=\\\""+url+"\\\" style=\\\"display:none;\\\" />";
 	}
 	
 	private String getNamespace() {

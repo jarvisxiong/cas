@@ -492,6 +492,14 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (null != sasParams.getCategories()) {
             site.setCat(iabCategoriesInterface.getIABCategories(sasParams.getCategories()));
         }
+        String category = null;
+        if (sasParams.getWapSiteUACEntity() != null &&
+            sasParams.getWapSiteUACEntity().getCategories() != null &&
+            sasParams.getWapSiteUACEntity().getCategories().size() > 0) {
+          site.setName(sasParams.getWapSiteUACEntity().getCategories().get(0));
+        }else if ((category = getCategories(',', false)) != null) {
+          site.setName(category);
+        }
         Map<String, String> siteExtensions = new HashMap<String, String>();
         String siteRating;
         if (!SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
@@ -517,6 +525,14 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         if (null != sasParams.getCategories()) {
             app.setCat(iabCategoriesInterface.getIABCategories(sasParams.getCategories()));
+        }
+        String category = null;
+        if (sasParams.getWapSiteUACEntity() != null &&
+            sasParams.getWapSiteUACEntity().getCategories() != null &&
+            sasParams.getWapSiteUACEntity().getCategories().size() > 0) {
+          app.setName(sasParams.getWapSiteUACEntity().getCategories().get(0));
+        }else if ((category = getCategories(',', false)) != null) {
+          app.setName(category);
         }
         String appRating;
         if (!SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
