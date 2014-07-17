@@ -873,9 +873,13 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     		params.put("siteId", this.sasParams.getSiteId());
     		responseContent = nativeResponseMaker.makeResponse(bidResponse, params, repositoryHelper.queryNativeAdTemplateRepository(sasParams.getSiteId()));
 		} catch (Exception e) {
+			
+			if(LOG.isDebugEnabled()){
+				e.printStackTrace();
+			}
 			 adStatus = "NO_AD";
-	         LOG.error("Some exception is caught while filling the native template for partner{} {}",
-	                    advertiserName, e);
+	         LOG.error("Some exception is caught while filling the native template for partner {} {} {} ",
+	                    advertiserName,e.getMessage(), e);
 		}
     	
     }
