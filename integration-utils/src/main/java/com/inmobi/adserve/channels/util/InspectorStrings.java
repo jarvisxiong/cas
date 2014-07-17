@@ -4,6 +4,7 @@ public class InspectorStrings {
 
     public static final String totalRequests                             = "TotalRequests";
     public static final String ruleEngineRequests                        = "RuleEngineRequests";
+    public static final String NATIVE_REQUESTS                           = "NativeRequests";
     public static final String totalInvocations                          = "TotalInvocations";
     public static final String successfulConfigure                       = "SuccessfulConfigure";
     public static final String totalNoFills                              = "TotalNoFills";
