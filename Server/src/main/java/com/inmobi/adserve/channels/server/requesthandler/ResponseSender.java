@@ -492,6 +492,12 @@ public class ResponseSender extends HttpRequestHandlerBase {
 	}
 
 	public void writeLogs() {
+        if (null == sasParams) {
+            InspectorStats.incrementStatCount(InspectorStrings.NON_AD_REQUESTS);
+            LOG.debug("Not logging anything, either sasParam is null or this is not an ad request");
+            LOG.debug("done with logging");
+            return;
+        }
 		List<ChannelSegment> list = new ArrayList<ChannelSegment>();
 		if (null != getRankList()) {
 			list.addAll(getRankList());
