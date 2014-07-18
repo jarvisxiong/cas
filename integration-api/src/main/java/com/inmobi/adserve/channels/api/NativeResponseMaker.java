@@ -114,7 +114,7 @@ public class NativeResponseMaker {
 		Image image = NativeConstrains.getImage(templateEntity.getImageKey());
 		if(image!=null){
 			Screenshot screenShot = app.getScreenshots().get(0);
-			if((screenShot.getW()>=image.getMinwidth() && screenShot.getW() <=image.getMaxwidth())){
+			if((screenShot.getW()>image.getMinwidth() && screenShot.getW() <image.getMaxwidth())){
 				throwException("Not a valid image attributes : "+screenShot);
 			}
 		}
