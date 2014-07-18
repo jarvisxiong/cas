@@ -88,12 +88,12 @@ public class NativeResponseMaker {
 			Integer integer =  iterator.next();
 			switch(integer){
 				case NativeConstrains.Icon:
-					 if(app.getIcons().size()<1||StringUtils.isEmpty(app.getIcons().get(0).getUrl())){
+					 if(app.getIcons()==null || app.getIcons().size()<1||StringUtils.isEmpty(app.getIcons().get(0).getUrl())){
 						 throwException(String.format(errorStr, "Icon"));
 					 }
 					 break;
 				case NativeConstrains.Media:
-					if(app.getScreenshots().size()<1){
+					if(app.getScreenshots()==null ||app.getScreenshots().size()<1){
 						throwException(String.format(errorStr, "Image"));
 					}
 					 break;
