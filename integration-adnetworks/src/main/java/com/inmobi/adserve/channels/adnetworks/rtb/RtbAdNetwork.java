@@ -878,8 +878,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 				e.printStackTrace();
 			}
 			 adStatus = "NO_AD";
-	         LOG.error("Some exception is caught while filling the native template for partner {} {} {} ",
-	                    advertiserName,e.getMessage(), e);
+	         LOG.error("Some exception is caught while filling the native template for partner "+e.getLocalizedMessage(),
+	                    advertiserName, e);
 		}
     	
     }

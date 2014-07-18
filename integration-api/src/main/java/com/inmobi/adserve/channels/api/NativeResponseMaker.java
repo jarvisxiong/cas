@@ -54,7 +54,7 @@ public class NativeResponseMaker {
 	}
 	
 	
-	public String makeResponse(BidResponse response,Map<String, String> params,NativeAdTemplateEntity templateEntity) throws ResourceNotFoundException, ParseErrorException, Exception{
+	public String makeResponse(BidResponse response,Map<String, String> params,NativeAdTemplateEntity templateEntity) throws Exception{
 		 Preconditions.checkNotNull(response, errorStr,"BidResponse");
 		 Preconditions.checkNotNull(params, errorStr,"params");
 		 Preconditions.checkNotNull(params.containsKey("siteId"), errorStr,"siteId");

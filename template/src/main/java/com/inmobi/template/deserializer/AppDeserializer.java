@@ -23,12 +23,20 @@ public class AppDeserializer implements JsonDeserializer<Context> {
 	@Override
 	public Context deserialize(JsonElement json, Type typeOf,JsonDeserializationContext context) throws JsonParseException {
 		JsonObject jsonObj = json.getAsJsonObject();
-		String     title = jsonObj.get("title").getAsString();
+		String     title = null;
+        if(jsonObj.get("title")!=null){		
+        	title = jsonObj.get("title").getAsString();
+        }
 		//String     version = jsonObj.get("version").getAsString();
-		
-		String 	   desc  = jsonObj.get("description").getAsString();
+        String 	   desc = null;
+        if(jsonObj.get("description")!=null){
+        	 desc  = jsonObj.get("description").getAsString();
+        }
 		//String 	   actionText  = jsonObj.get("actiontext").getAsString();
-		String 	   actionLink  = jsonObj.get("actionlink").getAsString();
+        String 	   actionLink = null;
+        if(jsonObj.get("actionlink")!=null){
+        	actionLink  = jsonObj.get("actionlink").getAsString();
+        }
 		//String 	   cta_install  = jsonObj.get("actiontext").getAsString();
 		JsonElement  idElement   = jsonObj.get("uid");
 		String id ="";
@@ -37,10 +45,16 @@ public class AppDeserializer implements JsonDeserializer<Context> {
 		}
 		
 		JsonElement imgElement = jsonObj.get("image");
-		Screenshot imgs[] = new Screenshot[]{ context.deserialize(imgElement, Screenshot.class)};
+		Screenshot imgs[] = null;
+		if(imgElement!=null){
+			 imgs = new Screenshot[]{ context.deserialize(imgElement, Screenshot.class)};
+		}
 		
 		JsonElement dataElement = jsonObj.get("data");
-		DataMap dataMap = context.deserialize(dataElement, DataMap.class);
+		DataMap dataMap = null;
+		if(dataElement!=null){
+			dataMap = context.deserialize(dataElement, DataMap.class);
+		}
 		
 		JsonElement	   iconElement = jsonObj.get("iconurl");
 		Icon     icons[] = null;
@@ -60,16 +74,21 @@ public class AppDeserializer implements JsonDeserializer<Context> {
 		app.setDesc(desc);
 		app.setTitle(title);
 		app.setOpeningLandingUrl(actionLink);
-		app.setIcons(Arrays.asList(icons));
+		if(icons!=null){
+			app.setIcons(Arrays.asList(icons));
+		}
 		app.setId(id);
 		app.setPixelUrls(getUrls(jsonObj.get("pixelurl")));
 		app.setClickUrls(getUrls(jsonObj.get("clickurl")));
+		if(imgs!=null){
+			app.setScreenshots(Arrays.asList(imgs));
+		}
 		
-		app.setScreenshots(Arrays.asList(imgs));
-		
-		app.setDownloads(dataMap.getDownloads());
-		app.setRating(dataMap.getRating());
-		app.setRating_count(dataMap.getRating_count());
+		if(dataMap!=null){
+			app.setDownloads(dataMap.getDownloads());
+			app.setRating(dataMap.getRating());
+			app.setRating_count(dataMap.getRating_count());
+		}
 		
 		
 		return app.build();
