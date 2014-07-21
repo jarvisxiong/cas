@@ -16,6 +16,8 @@ public final class Screenshot extends AbstractContext{
 	
 	 private int 	 w;
 	 private int 	 h;
+	 private int 	 width;
+	 private int 	 height;
 	 private String  ar;
 	 private String  url;
 	
@@ -24,6 +26,8 @@ public final class Screenshot extends AbstractContext{
 	private Screenshot(Builder builder){
 		this.w=builder.w;
 		this.h= builder.h;
+		this.width = this.w;
+		this.height = this.h;
 		this.url=builder.url;
 		this.ar=builder.ar;
 		setValues(params);
@@ -33,6 +37,8 @@ public final class Screenshot extends AbstractContext{
 	public void setValues(Map<String, Object> params) {
 		params.put("w", w);
 		params.put("h", h);
+		params.put("width", w);
+		params.put("height", h);
 		params.put("ar", ar);
 		params.put("url", url);
 	}

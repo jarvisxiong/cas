@@ -44,15 +44,28 @@ public final class App extends AbstractContext{
 
 	@Override
 	public void setValues(Map<String, Object> params) {
+		
+		
+		
 		params.put(KeyConstants.APP_DESC, this.desc);
 		params.put(KeyConstants.APP_ICONS, this.icons);
 		params.put(KeyConstants.APP_SCREENSHOTS, this.screenshots);
 		params.put(KeyConstants.APP_ID	, this.id);
 		params.put(KeyConstants.APP_TITLE, this.title);
+		
 		params.put(KeyConstants.APP_RATING, this.rating);
 		params.put(KeyConstants.APP_RATING_COUNT, this.rating_count);
 		params.put(KeyConstants.APP_DOWNLOADS, this.downloads);
+		
+		
+		params.put(KeyConstants.APP_HEADLINE, new CreativeBean("text", this.title));
+		params.put(KeyConstants.APP_CREATIVE_DESC, new CreativeBean("text", this.desc));
+		params.put(KeyConstants.APP_CREATIVE_ICONS, new CreativeBean("icon", this.icons));
+		params.put(KeyConstants.APP_CREATIVE_RATING, this.rating);
+		
 	}
+	
+	
 	
 	public static Builder newBuilder(){
 		return new Builder();

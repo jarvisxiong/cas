@@ -13,12 +13,16 @@ import com.inmobi.template.interfaces.Context;
 public class Icon extends AbstractContext{
 	
 	private int 	w;
+	private int 	width;
+	private int 	height;
 	private int 	h;
 	private String  url;
 	
 	private Icon(Builder builder){
 		this.w = builder.w;
 		this.h = builder.h;
+		this.height = builder.h;
+		this.width = builder.w;
 		this.url = builder.url;
 		setValues(params);
 	}

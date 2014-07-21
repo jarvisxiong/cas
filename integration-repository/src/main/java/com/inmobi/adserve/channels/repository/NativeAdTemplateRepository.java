@@ -44,6 +44,7 @@ public class NativeAdTemplateRepository extends
             NativeAdTemplateEntity.Builder builder = NativeAdTemplateEntity.newBuilder();
             builder.setSiteId(siteId);
             builder.setNativeAdId(nativeAdId);
+           
             
             List<String> keys = adTemplate.getDemandConstraints().getJsonPath();
             if(keys ==null){
@@ -61,6 +62,10 @@ public class NativeAdTemplateRepository extends
             }
             
             NativeAdTemplateEntity templateEntity = builder.build();
+            
+            if(siteId.equals("b5e2e6ea4a4b42a799ceca322b2fd004")){
+            	System.out.println(adTemplate.getDetails().getContent());
+            }
             
             if(templateEntity.getMandatoryKey()!=null){
             	TemplateManager.getInstance().addToTemplateCache(templateEntity.getSiteId(), adTemplate.getDetails().getContent());

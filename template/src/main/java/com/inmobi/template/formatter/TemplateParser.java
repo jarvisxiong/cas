@@ -59,6 +59,7 @@ public class TemplateParser {
 		try{
 			VelocityContext velocityContext = getVelocityContext();
 		    velocityContext.put("first", context);
+		    velocityContext.put("same_ar_screenshots", context.get("app.screenshots"));
 		      
 	         Template template = TemplateManager.getInstance().getTemplate(templateName);
 		     StringWriter writer = new StringWriter();
