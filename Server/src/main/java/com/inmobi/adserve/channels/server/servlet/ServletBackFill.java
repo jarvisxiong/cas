@@ -77,7 +77,7 @@ public class ServletBackFill implements Servlet {
             return;
         }
         if (nativeSites.contains(sasParams.getSiteId())) {
-            InspectorStats.incrementStatCount(sasParams.getSiteId() + InspectorStrings.SITE_LEVEL_REQUEST);
+            InspectorStats.incrementStatCount(InspectorStrings.SITE_LEVEL_REQUEST + "-" + sasParams.getSiteId());
         }
 
         // Setting isResponseOnlyFromDCP from config
