@@ -54,7 +54,7 @@ public class NativeResponseMaker {
 	}
 	
 	
-	public String makeResponse(BidResponse response,Map<String, String> params,NativeAdTemplateEntity templateEntity) throws ResourceNotFoundException, ParseErrorException, Exception{
+	public String makeResponse(BidResponse response,Map<String, String> params,NativeAdTemplateEntity templateEntity) throws Exception{
 		 Preconditions.checkNotNull(response, errorStr,"BidResponse");
 		 Preconditions.checkNotNull(params, errorStr,"params");
 		 Preconditions.checkNotNull(params.containsKey("siteId"), errorStr,"siteId");
@@ -88,12 +88,12 @@ public class NativeResponseMaker {
 			Integer integer =  iterator.next();
 			switch(integer){
 				case NativeConstrains.Icon:
-					 if(app.getIcons().size()<1||StringUtils.isEmpty(app.getIcons().get(0).getUrl())){
+					 if(app.getIcons()==null || app.getIcons().size()<1||StringUtils.isEmpty(app.getIcons().get(0).getUrl())){
 						 throwException(String.format(errorStr, "Icon"));
 					 }
 					 break;
 				case NativeConstrains.Media:
-					if(app.getScreenshots().size()<1){
+					if(app.getScreenshots()==null ||app.getScreenshots().size()<1){
 						throwException(String.format(errorStr, "Image"));
 					}
 					 break;
@@ -115,7 +115,7 @@ public class NativeResponseMaker {
 		if(image!=null){
 			Screenshot screenShot = app.getScreenshots().get(0);
 			if(!(screenShot.getW()>=image.getMinwidth() && screenShot.getW() <=image.getMaxwidth())){
-				throwException("Not a valid image attributes : "+screenShot);
+				throwException(String.format("Expected image contraints are %s. But got image attributes : %s ",image,screenShot));
 			}
 		}
 		
