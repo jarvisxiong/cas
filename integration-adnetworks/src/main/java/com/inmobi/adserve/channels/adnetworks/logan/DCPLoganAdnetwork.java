@@ -109,6 +109,9 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
             else if (casInternalRequestParameters.uidMd5 != null) {
                 udid = casInternalRequestParameters.uidMd5;
             }
+            else if (casInternalRequestParameters.uidIDUS1 != null) {
+                 udid =  casInternalRequestParameters.uidIDUS1;
+            }
             else if (!StringUtils.isBlank(casInternalRequestParameters.uid)) {
                 udid = casInternalRequestParameters.uid;
             }

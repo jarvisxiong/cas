@@ -204,7 +204,6 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
                 && StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
             uidType = ifaFormat;
             return casInternalRequestParameters.uidIFA;
-
         }
         if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
             uidType = udidFormat;
@@ -225,6 +224,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIDUS1)) {
             uidType = udidFormat;
             return casInternalRequestParameters.uidIDUS1;
+        
         }
         return null;
     }

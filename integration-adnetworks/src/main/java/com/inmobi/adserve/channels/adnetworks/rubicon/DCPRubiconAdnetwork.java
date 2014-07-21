@@ -65,6 +65,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	private static final String RESPONSE_TEMPLATE = "<script>%s</script>";
 	private static final String BUNDLE_ID_TEMPLATE = "com.inmobi-exchange.%s";
 	private static final String DOMAIN_NAME = "app.domain";
+	private static final String BLOCKLIST_PARAM = "p_block_keys";
 
 	private static final String DEFAULT_ZONE = "default";
 	private static final String SENSITIVITY_LOW = "low";
@@ -76,6 +77,10 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	private static final String IDFA = "idfa";
 	private static final String OPEN_UDID = "open-udid";
 	private static final String UDID = "udid";
+
+        // The following BLOCKLIST_IDs have been registered with Rubicon.
+        private static final String RUBICON_FS_BLOCKLIST_ID = "InMobiFS";
+        private static final String RUBICON_PERF_BLOCKLIST_ID = "InMobiPERF";
 
         private static final double MIN_ECPM = 0.1;
         private static final double ECPM_PERCENTAGE = 0.8;
@@ -218,12 +223,14 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		}
 		if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
 			appendQueryParam(url, AD_SENSITIVE, SENSITIVITY_LOW, false);
-			if (isApp) {
+                        appendQueryParam(url, BLOCKLIST_PARAM, RUBICON_PERF_BLOCKLIST_ID, false);
+                  if (isApp) {
 				appendQueryParam(url, APP_RATING,
 						PERFORMANCE_RATING, false);
 			}
 		} else {
 			appendQueryParam(url, AD_SENSITIVE, SENSITIVITY_HIGH, false);
+                        appendQueryParam(url, BLOCKLIST_PARAM, RUBICON_FS_BLOCKLIST_ID, false);
 			if (isApp) {
 				appendQueryParam(url, APP_RATING,
 						FS_RATING, false);
@@ -258,8 +265,13 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		// Device id type 1 (IDFA), 2 (OpenUDID), 3 (Apple UDID), 4 (Android
 		// device ID)
 		
-		
-		if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
+		if (!StringUtils.isEmpty(sasParams.getSdkVersion()) &&
+                StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
+                && "0".equals(casInternalRequestParameters.uidADT)) {
+            appendQueryParam(url, DEVICE_ID,
+                    casInternalRequestParameters.uidIFA, false);
+            appendQueryParam(url, DEVICE_ID_TYPE, IDFA, false);
+        } else if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
 				&& "1".equals(casInternalRequestParameters.uidADT)) {
 			appendQueryParam(url, DEVICE_ID,
 					casInternalRequestParameters.uidIFA, false);
@@ -269,6 +281,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 			if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
 				appendQueryParam(url, MD5_DEVICE_ID,
 						casInternalRequestParameters.uidMd5, false);
+
 				isUdid=true;
 			}if (StringUtils
 					.isNotBlank(casInternalRequestParameters.uidIDUS1)) {

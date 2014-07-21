@@ -167,17 +167,17 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
 					} else if (casInternalRequestParameters.uidMd5 != null) {
 						url.append("&uis=u&ui=").append(
 								casInternalRequestParameters.uidMd5);
-					} else if (!StringUtils
+					}else if (casInternalRequestParameters.uidIDUS1 != null) {
+                        url.append("&uis=ds&ui=").append(
+                                casInternalRequestParameters.uidIDUS1);
+                    }else if (!StringUtils
 							.isBlank(casInternalRequestParameters.uid)
 							&& !casInternalRequestParameters.uid.equals("null")) {
 						url.append("&uis=v&ui=").append(
 								casInternalRequestParameters.uid);
 					}
 				} else if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
-					if (casInternalRequestParameters.uidIDUS1 != null) {
-						url.append("&uis=ds&ui=").append(
-								casInternalRequestParameters.uidIDUS1);
-					} else if (casInternalRequestParameters.uidMd5 != null) {
+					  if (casInternalRequestParameters.uidMd5 != null) {
 						url.append("&uis=dm&ui=").append(
 								casInternalRequestParameters.uidMd5);
 					} else if (!StringUtils
