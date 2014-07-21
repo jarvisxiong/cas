@@ -16,7 +16,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -34,7 +33,11 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
     private transient String    longitude;
     private int                 width;
     private int                 height;
-    private boolean             isweb;
+    private boolean             isapp;
+    private static final String IDFA        = "idfa";
+    private static final String ANDROID_ID  = "androidid";
+    private static final String SITEID      = "pubsiteid";
+    
 
     /**
      * @param config
@@ -72,9 +75,11 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
-   isweb = (StringUtils.isBlank(sasParams.getSource()) || "WAP".equalsIgnoreCase(sasParams.getSource())) ? true
-                : false;
         
+        isapp = (StringUtils.isBlank(sasParams.getSource()) || "WAP"
+                .equalsIgnoreCase(sasParams.getSource())) ? false : true;
+        
+       
         LOG.info("Configure parameters inside huntmads returned true");
         return true;
     }
@@ -107,36 +112,47 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             if (casInternalRequestParameters.uidO1 != null) {
                 url.append("&udidtype=odin1&udid=").append(casInternalRequestParameters.uidO1);
             }
-            else if (casInternalRequestParameters.uidIFA != null) {
-                url.append("&udidtype=ifa&udid=").append(casInternalRequestParameters.uidIFA);
-            }
-            else if (casInternalRequestParameters.uidMd5 != null) {
-                url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.uidMd5);
-            }
             else if (!StringUtils.isBlank(casInternalRequestParameters.uid)
                     && !casInternalRequestParameters.uid.equals("null")) {
                 url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.uid);
             }
+            else if (casInternalRequestParameters.uidMd5 != null) {
+                url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.uidMd5);
+            }
+            
 
             if (casInternalRequestParameters.zipCode != null) {
                 url.append("&zip=").append(casInternalRequestParameters.zipCode);
             }
-            if (isweb)
-            {
+            
+            if (isapp) {
+                url.append("&isapp=yes");
+                url.append("&isweb=no");
+                if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
+
+                    appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.uidMd5, false);
+                }
+                if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
+                        && "1".equals(casInternalRequestParameters.uidADT)) {
+
+                    appendQueryParam(url, IDFA, casInternalRequestParameters.uidIFA, false);
+                }
+
+            }
+            else {
+                url.append("&isapp=no");
                 url.append("&isweb=yes");
+                
             }
-            else
-            {
-              url.append("&isweb=no");    
-            }
+
+            appendQueryParam(url, SITEID, blindedSiteId, false);
+
             if (sasParams.getCountryCode() != null) {
                 url.append("&country=").append(sasParams.getCountryCode().toUpperCase());
             }
 
            
-            
-            
-            if (width != 0 && height != 0) {
+             if (width != 0 && height != 0) {
                 url.append("&min_size_x=").append((int) (width * .9));
                 url.append("&min_size_y=").append((int) (height * .9));
                 url.append("&size_x=").append(width);

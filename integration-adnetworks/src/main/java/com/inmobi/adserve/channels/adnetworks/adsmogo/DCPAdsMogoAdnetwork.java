@@ -51,6 +51,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String IOS_OPEN_UDID = "ouid";
     private static final String ANDROID_ID = "anid";
     private static final String IDFA = "ida";
+    private static final String IOS_ID = "ouid";
     private static final String DEVICE_OS = "os";
     private static final String LAT = "lat";
     private static final String LONG = "lon";
@@ -156,6 +157,15 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
                 appendQueryParam(url, IOS_OPEN_UDID, casInternalRequestParameters.uid,
                         false);
             }
+            else if (StringUtils
+                    .isNotBlank(casInternalRequestParameters.uidIDUS1)) {
+                appendQueryParam(url, IOS_ID,
+                        casInternalRequestParameters.uidIDUS1, false);
+            }
+            else if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
+                appendQueryParam(url, IOS_ID,
+                        casInternalRequestParameters.uidMd5, false);
+            }
         }
 
         if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
@@ -165,10 +175,9 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
             } else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
                 appendQueryParam(url, ANDROID_ID,
                         casInternalRequestParameters.uid, false);
-            } else if (StringUtils
-                    .isNotBlank(casInternalRequestParameters.uidIDUS1)) {
-                appendQueryParam(url, ANDROID_ID,
-                        casInternalRequestParameters.uidIDUS1, false);
+            } 
+            else if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
+                appendQueryParam(url, ANDROID_ID, getURLEncode(casInternalRequestParameters.uidO1, format), false);
             }
         }
         String gen = sasParams.getGender();
@@ -190,6 +199,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
         authSignature = getHashedValue(query.toString(), "MD5");
 
         return requestUrl;
+    
     }
 
    
@@ -202,7 +212,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
         }
 
         return new RequestBuilder()
-                .setURI(uri)
+                .setUrl(uri.toString())
                 .setHeader(HttpHeaders.Names.USER_AGENT,
                         sasParams.getUserAgent())
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")

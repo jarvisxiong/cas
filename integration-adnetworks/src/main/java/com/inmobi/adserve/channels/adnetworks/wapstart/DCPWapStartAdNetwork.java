@@ -132,7 +132,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
         if (uri.getPort() == -1) {
             uri = new URIBuilder(uri).setPort(80).build();
         }
-        return new RequestBuilder().setURI(uri).setHeader("x-display-metrics", String.format("%sx%s", width, height))
+        return new RequestBuilder().setUrl(uri.toString()).setHeader("x-display-metrics", String.format("%sx%s", width, height))
                 .setHeader("xplus1-user-agent", sasParams.getUserAgent())
                 .setHeader("x-plus1-remote-addr", sasParams.getRemoteHostIp())
                 .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())

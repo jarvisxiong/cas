@@ -79,6 +79,9 @@ public class Logging {
                 InspectorStats.incrementStatCount(InspectorStrings.nomatchsegmentcount);
                 InspectorStats.incrementStatCount(InspectorStrings.nomatchsegmentlatency, totalTime);
             }
+            if (null != sasParams.getRFormat() && sasParams.getRFormat().equalsIgnoreCase("native")) {
+                InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NATIVE_REQUESTS);
+            }
         }
 
 
@@ -180,6 +183,7 @@ public class Logging {
             if (null != sasParams.getGender()) {
                 user.setGender(getGender(sasParams));
             }
+            user.setUids(sasParams.getTUidParams());
         }
         short adRequested = 1;
         Request request = new Request(adRequested, adsServed, sasParams == null ? null : sasParams.getSiteId(),
