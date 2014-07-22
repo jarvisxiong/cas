@@ -4,6 +4,7 @@ import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
+import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -258,6 +259,15 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 		sasParams.setSiteIncId(6575868);
 		sasParams.setOsId(HandSetOS.Android.getValue());
 		String externalKey = "38132";
+		List<String> categoryList = new ArrayList<String>();
+		categoryList.add("Games");
+		categoryList.add("Business");
+		
+		WapSiteUACEntity.Builder builder = new WapSiteUACEntity.Builder();
+		builder.setCategories(categoryList);
+		builder.setContentRating("4+");
+		WapSiteUACEntity uacEntity = builder.build();
+		sasParams.setWapSiteUACEntity(uacEntity);
 		SlotSizeMapping.init();
 		ChannelSegmentEntity entity = new ChannelSegmentEntity(
 				AdNetworksTest.getChannelSegmentEntityBuilder(rubiconAdvId,
@@ -271,11 +281,11 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 		dcpRubiconAdNetwork.configureParameters(sasParams,casInternalRequestParameters, entity, null, null);
 
 		String actualUrl = dcpRubiconAdNetwork.getRequestUri().toString();
-		String expectedUrl = "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.00000000-0000-0000-0000-0000006456fc&app.domain=com.inmobi-exchange&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&p_block_keys=InMobiFS&app.rating=4%2B&rp_floor=0.1&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpid_type=open-udid&kw=38132";
+		String expectedUrl = "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.00000000-0000-0000-0000-0000006456fc&app.domain=com.inmobi-exchange&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&app.category=Games%2CBusiness&i.aq_sensitivity=high&p_block_keys=InMobiFS%2Cblk6575868&app.rating=4+&rp_floor=0.1&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpid_type=open-udid&kw=38132";
                 assertEquals(expectedUrl, actualUrl);
 
                 sasParams.setSiteType("performance");
-                String expectedUrl_for_perftype = "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.00000000-0000-0000-0000-0000006456fc&app.domain=com.inmobi-exchange&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=low&p_block_keys=InMobiPERF&app.rating=9%2B&rp_floor=0.1&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpid_type=open-udid&kw=38132";
+                String expectedUrl_for_perftype = "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.00000000-0000-0000-0000-0000006456fc&app.domain=com.inmobi-exchange&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&app.category=Games%2CBusiness&i.aq_sensitivity=low&p_block_keys=InMobiPERF%2Cblk6575868&app.rating=4+&rp_floor=0.1&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpid_type=open-udid&kw=38132";
                 dcpRubiconAdNetwork.configureParameters(sasParams,casInternalRequestParameters, entity, null, null);
                 String actualUrl_for_perftype = dcpRubiconAdNetwork.getRequestUri().toString();
 
@@ -320,7 +330,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 		dcpRubiconAdNetwork.configureParameters(sasParams,casInternalRequestParameters, entity, null, null);
 
 		String actualUrl = dcpRubiconAdNetwork.getRequestUri().toString();
-		String expectedUrl = "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.00000000-0000-0000-0000-0000006456fc&app.domain=com.inmobi-exchange&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&p_block_keys=InMobiFS&app.rating=4%2B&rp_floor=0.4&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpidsha1=1234202cb962ac59075b964b07152d234b705432&device.dpid_type=udid&kw=38132";
+		String expectedUrl = "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.00000000-0000-0000-0000-0000006456fc&app.domain=com.inmobi-exchange&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&p_block_keys=InMobiFS%2Cblk6575868&app.rating=4+&rp_floor=0.4&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpidsha1=1234202cb962ac59075b964b07152d234b705432&device.dpid_type=udid&kw=38132";
 
 		assertEquals(expectedUrl, actualUrl);
 
@@ -329,14 +339,14 @@ public class DCPRubiconAdnetworkTest extends TestCase {
                 casInternalRequestParameters.rtbBidFloor = 0.68;
                 dcpRubiconAdNetwork.configureParameters(sasParams,casInternalRequestParameters, entity, null, null);
                 String actualUrl2 = dcpRubiconAdNetwork.getRequestUri().toString();
-                String expectedUrl2 = "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.00000000-0000-0000-0000-0000006456fc&app.domain=com.inmobi-exchange&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&p_block_keys=InMobiFS&app.rating=4%2B&rp_floor=0.68&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpidsha1=1234202cb962ac59075b964b07152d234b705432&device.dpid_type=udid&kw=38132";
+                String expectedUrl2 = "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.00000000-0000-0000-0000-0000006456fc&app.domain=com.inmobi-exchange&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&p_block_keys=InMobiFS%2Cblk6575868&app.rating=4+&rp_floor=0.68&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpidsha1=1234202cb962ac59075b964b07152d234b705432&device.dpid_type=udid&kw=38132";
                 assertEquals(expectedUrl2, actualUrl2);
 
                 // Fallback to default minimum ecpm of $0.1 value.
                 casInternalRequestParameters.rtbBidFloor = 0.0;
                 dcpRubiconAdNetwork.configureParameters(sasParams,casInternalRequestParameters, entity, null, null);
                 String actualUrl3 = dcpRubiconAdNetwork.getRequestUri().toString();
-                String expectedUrl3 = "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.00000000-0000-0000-0000-0000006456fc&app.domain=com.inmobi-exchange&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&p_block_keys=InMobiFS&app.rating=4%2B&rp_floor=0.1&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpidsha1=1234202cb962ac59075b964b07152d234b705432&device.dpid_type=udid&kw=38132";
+                String expectedUrl3 = "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.00000000-0000-0000-0000-0000006456fc&app.domain=com.inmobi-exchange&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&p_block_keys=InMobiFS%2Cblk6575868&app.rating=4+&rp_floor=0.1&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpidsha1=1234202cb962ac59075b964b07152d234b705432&device.dpid_type=udid&kw=38132";
                 assertEquals(expectedUrl3, actualUrl3);
 
 		dcpRubiconAdNetwork.getNingRequest();
@@ -378,28 +388,10 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 								0.0d, null, null, 0));
 
 		dcpRubiconAdNetwork.configureParameters(sasParams,casInternalRequestParameters, entity, null, null);
-
 		String actualUrl = dcpRubiconAdNetwork.getRequestUri().toString();
-		String expectedUrl = "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.00000000-0000-0000-0000-0000006456fc&app.domain=com.inmobi-exchange&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&app.rating=4%2B&rp_floor=0.4&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpidsha1=1234202cb962ac59075b964b07152d234b705432&device.dpid_type=udid&kw=38132";
-
+		String expectedUrl = "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.00000000-0000-0000-0000-0000006456fc&app.domain=com.inmobi-exchange&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&p_block_keys=InMobiFS%2Cblk6575868&app.rating=4+&rp_floor=0.4&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpidsha1=1234202cb962ac59075b964b07152d234b705432&device.dpid_type=udid&kw=38132";
 		assertEquals(expectedUrl, actualUrl);
-
-                // Fallback to casInternalParams RTB Floor.
-                sasParams.setSiteEcpmEntity(null);
-                casInternalRequestParameters.rtbBidFloor = 0.68;
-                dcpRubiconAdNetwork.configureParameters(sasParams,casInternalRequestParameters, entity, null, null);
-                String actualUrl2 = dcpRubiconAdNetwork.getRequestUri().toString();
-                String expectedUrl2 = "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.00000000-0000-0000-0000-0000006456fc&app.domain=com.inmobi-exchange&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&app.rating=4%2B&rp_floor=0.68&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpidsha1=1234202cb962ac59075b964b07152d234b705432&device.dpid_type=udid&kw=38132";
-                assertEquals(expectedUrl2, actualUrl2);
-
-                // Fallback to default minimum ecpm of $0.1 value.
-                casInternalRequestParameters.rtbBidFloor = 0.0;
-                dcpRubiconAdNetwork.configureParameters(sasParams,casInternalRequestParameters, entity, null, null);
-                String actualUrl3 = dcpRubiconAdNetwork.getRequestUri().toString();
-                String expectedUrl3 = "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.00000000-0000-0000-0000-0000006456fc&app.domain=com.inmobi-exchange&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&app.rating=4%2B&rp_floor=0.1&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpidsha1=1234202cb962ac59075b964b07152d234b705432&device.dpid_type=udid&kw=38132";
-                assertEquals(expectedUrl3, actualUrl3);
-
-		dcpRubiconAdNetwork.getNingRequest();
+        dcpRubiconAdNetwork.getNingRequest();
 	}
 
 	@Test
@@ -435,7 +427,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 		dcpRubiconAdNetwork.configureParameters(sasParams,
 				casInternalRequestParameters, entity, null, null);
 		String actualUrl = dcpRubiconAdNetwork.getRequestUri().toString();
-		String expectedUrl = "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.00000000-0000-0000-0000-0000006456fc&app.domain=com.inmobi-exchange&ua=Mozilla&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&p_block_keys=InMobiFS&app.rating=4%2B&rp_floor=0.1&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpid_type=open-udid&kw=38132";
+		String expectedUrl = "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.00000000-0000-0000-0000-0000006456fc&app.domain=com.inmobi-exchange&ua=Mozilla&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&p_block_keys=InMobiFS%2Cblk6575868&app.rating=4+&rp_floor=0.1&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpid_type=open-udid&kw=38132";
 		assertEquals(expectedUrl, actualUrl);
 
 	}

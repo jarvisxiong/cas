@@ -73,8 +73,8 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	private static final String SENSITIVITY_LOW = "low";
 	private static final String SENSITIVITY_HIGH = "high";
 	private static final String SITE_KEY_ADDL_PARAM = "site";
-	private static final String FS_RATING = "4%2B";
-	private static final String PERFORMANCE_RATING = "9%2B";
+	private static final String FS_RATING = "4+";
+	private static final String PERFORMANCE_RATING = "9+";
 	private static final String DOMAIN = "com.inmobi-exchange";
 	private static final String IDFA = "idfa";
 	private static final String OPEN_UDID = "open-udid";
