@@ -94,12 +94,17 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
             if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
                 url.append("&enctype=raw&idfa=").append(casInternalRequestParameters.uidIFA);
             }
+            
             if (StringUtils.isNotEmpty(casInternalRequestParameters.uidO1)) {
                 url.append("&enctype=sha1&udid=").append(casInternalRequestParameters.uidO1);
             }
             else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
                 url.append("&enctype=md5&udid=").append(casInternalRequestParameters.uidMd5);
             }
+            else if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
+                appendQueryParam(url,"&enctype=sha1&udid=", casInternalRequestParameters.uidIDUS1, false);
+            }
+            
 
             if (width != 0 && height != 0) {
                 url.append("&w=").append(width);

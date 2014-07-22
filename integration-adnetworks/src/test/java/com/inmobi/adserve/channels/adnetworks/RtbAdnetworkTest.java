@@ -12,6 +12,7 @@ import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.casthrift.rtb.Bid;
 import com.inmobi.casthrift.rtb.BidResponse;
@@ -218,6 +219,60 @@ public class RtbAdnetworkTest extends TestCase {
                 rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl),
                 false);
     }
+
+  @Test
+  public void testShouldTestCategorySetForSiteNameOrAppName() {
+    String externalSiteKey = "f6wqjq1r5v";
+    ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId,
+                                                                                                         null, null, null, 0, null, null, true, true, externalSiteKey, null, null, null, 0, true, null, null, 0,
+                                                                                                         null, false, false, false, false, false, false, false, false, false, false, null,
+                                                                                                         new ArrayList<Integer>(), 0.0d, null, null, 32));
+    CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+    sasParams.setRemoteHostIp("206.29.182.240");
+    sasParams.setSiteId("some_site_id");
+    sasParams.setSource("wap");
+    WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
+    builder.setCategories(Lists.newArrayList("Games", "Music"));
+    sasParams.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+    sasParams.setUserAgent(
+        "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+    casInternalRequestParameters.impressionId = "4f8d98e2-4bbd-40bc-8795-22da170700f9";
+    rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
+
+    //First UAC Entity Category should be present as Site Name.
+    assertEquals("Games", rtbAdNetwork.getBidRequest().getSite().getName());
+
+    //For App, First UAC Entity Category should be present as App Name.
+    sasParams.setSource("app");
+    rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
+    assertEquals("Games", rtbAdNetwork.getBidRequest().getApp().getName());
+
+    //If WapSiteUACEntity is null, then it should fallback to InMobi categories.
+    sasParams.setSource("app");
+    sasParams.setWapSiteUACEntity(null);
+    sasParams.setCategories(Lists.newArrayList(15L, 12L, 11L));
+    rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
+    // 15 mean board games. Refer to CategoryList
+    assertEquals("Board", rtbAdNetwork.getBidRequest().getApp().getName());
+
+    //If WapSiteUACEntity is null, then it should fallback to InMobi categories.
+    sasParams.setSource("wap");
+    sasParams.setWapSiteUACEntity(null);
+    sasParams.setCategories(Lists.newArrayList(11L, 12L, 15L));
+    rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
+    // 11 mean Games. Refer to CategoryList
+    assertEquals("Games", rtbAdNetwork.getBidRequest().getSite().getName());
+
+    //If WapSiteUACEntity and InMobi categories are null.
+    sasParams.setSource("wap");
+    sasParams.setWapSiteUACEntity(null);
+    ArrayList<Long> list = new ArrayList<Long>();
+    sasParams.setCategories(list);
+    rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
+
+    assertEquals("miscellenous", rtbAdNetwork.getBidRequest().getSite().getName());
+  }
+
 
   @Test
   public void testShouldHaveFixedBlockedAdvertisers() {
