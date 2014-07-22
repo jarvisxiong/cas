@@ -83,12 +83,12 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	// The following BLOCKLIST_IDs have been registered with Rubicon.
 	private static final String RUBICON_FS_BLOCKLIST_ID = "InMobiFS";
 	private static final String RUBICON_PERF_BLOCKLIST_ID = "InMobiPERF";
-	
+
 	private static final double MIN_ECPM = 0.1;
 	private static final double ECPM_PERCENTAGE = 0.8;
 
 	private static final String BLOCKLIST_FORMAT="%s,blk%s";
-	
+
 	private final String userName;
 	private final String password;
 
@@ -336,15 +336,15 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		String authStr = userName + ":" + password;
 		String authEncoded = new String(Base64.encodeBase64(authStr.getBytes()));
 		return new RequestBuilder()
-				.setUrl(uri.toString())
-				.setHeader(HttpHeaders.Names.USER_AGENT,
-						sasParams.getUserAgent())
+		.setUrl(uri.toString())
+		.setHeader(HttpHeaders.Names.USER_AGENT,
+				sasParams.getUserAgent())
 				.setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
 				.setHeader(HttpHeaders.Names.ACCEPT_ENCODING,
 						HttpHeaders.Values.BYTES)
-				.setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-				.setHeader("Authorization", "Basic " + authEncoded)
-				.setHeader(HttpHeaders.Names.HOST, uri.getHost()).build();
+						.setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
+						.setHeader("Authorization", "Basic " + authEncoded)
+						.setHeader(HttpHeaders.Names.HOST, uri.getHost()).build();
 
 	}
 
@@ -378,22 +378,22 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 					}
 					String htmlContent = ad.has("script") ? ad
 							.getString("script") : null;
-					if (StringUtils.isBlank(htmlContent)) {
-						adStatus = "NO_AD";
-						statusCode = 204;
-						responseContent = "";
-						return;
-					}
-					context.put(VelocityTemplateFieldConstants.PartnerHtmlCode,
-							String.format(RESPONSE_TEMPLATE, htmlContent));
-					TemplateType templateType = TemplateType.HTML;
-					if (!isApp) {
-						templateType = TemplateType.WAP_HTML_JS_AD_TAG;
-					}
+							if (StringUtils.isBlank(htmlContent)) {
+								adStatus = "NO_AD";
+								statusCode = 204;
+								responseContent = "";
+								return;
+							}
+							context.put(VelocityTemplateFieldConstants.PartnerHtmlCode,
+									String.format(RESPONSE_TEMPLATE, htmlContent));
+							TemplateType templateType = TemplateType.HTML;
+							if (!isApp) {
+								templateType = TemplateType.WAP_HTML_JS_AD_TAG;
+							}
 
-					responseContent = Formatter.getResponseFromTemplate(
-							templateType, context, sasParams, beaconUrl);
-					adStatus = "AD";
+							responseContent = Formatter.getResponseFromTemplate(
+									templateType, context, sasParams, beaconUrl);
+							adStatus = "AD";
 				} else {
 					adStatus = "NO_AD";
 					return;
