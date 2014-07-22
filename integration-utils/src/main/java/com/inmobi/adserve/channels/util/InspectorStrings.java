@@ -5,6 +5,7 @@ public class InspectorStrings {
     public static final String totalRequests                             = "TotalRequests";
     public static final String ruleEngineRequests                        = "RuleEngineRequests";
     public static final String NATIVE_REQUESTS                           = "NativeRequests";
+    public static final String NON_AD_REQUESTS                           = "NonAdRequests";
     public static final String totalInvocations                          = "TotalInvocations";
     public static final String successfulConfigure                       = "SuccessfulConfigure";
     public static final String totalNoFills                              = "TotalNoFills";
@@ -82,5 +83,5 @@ public class InspectorStrings {
     public static final String droppedInRtbCurrencyNotSupportedFilter    = "DroppedInRtbCurrencyNotSupportedFilter";
     public static final String ADAPTER_MISMATCH                          = "AdapterMismatch";
     public static final String DROPPED_IN_INVALID_DETAILS_FILTER         = "DroppedInInvalidDetailsFilter";
-
+    public static final String SITE_LEVEL_REQUEST                        = "SiteLevelRequest";
 }
