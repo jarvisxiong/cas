@@ -20,6 +20,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
 import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -87,7 +88,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	private static final double MIN_ECPM = 0.1;
 	private static final double ECPM_PERCENTAGE = 0.8;
 
-	private static final String BLOCKLIST_FORMAT="%s,blk%s";
+	private static final String SITE_BLOCKLIST_FORMAT="blk%s";
 
 	private final String userName;
 	private final String password;
@@ -192,10 +193,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	@Override
 	public URI getRequestUri() throws Exception {
 		StringBuilder url = new StringBuilder(host);
-		// TODO p_block_keys,app.category
-
 		appendQueryParam(url, ZONE_ID, zoneId, false);
-
 		if (isApp) {
 			appendQueryParam(url, APP_BUNDLE,
 					String.format(BUNDLE_ID_TEMPLATE, blindedSiteId), false);
@@ -210,7 +208,6 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 			appendQueryParam(url, DEVICE_OS,
 					HandSetOS.values()[sasParamsOsId - 1].toString(), false);
 		}
-
 		if (StringUtils.isNotBlank(sasParams.getOsMajorVersion())) {
 			appendQueryParam(url, OS_VERSION, sasParams.getOsMajorVersion(),
 					false);
@@ -227,38 +224,29 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		} else {
 			appendQueryParam(url, CONNECTION_TYPE, 0, false);
 		}
-		String contentRating = null;
-		if (sasParams.getWapSiteUACEntity() != null) {
-			List<String> appstoreCategories = sasParams.getWapSiteUACEntity()
-					.getCategories();
-			if (appstoreCategories != null && appstoreCategories.size() > 0) {
-				appendQueryParam(
-						url,
-						APPSTORE_CATEGORY,
-						getURLEncode(StringUtils.join(appstoreCategories, ','),
-								format), false);
-			}
-			contentRating = sasParams.getWapSiteUACEntity().getContentRating();
-		}
+		String uacContentRating = getUACContentRating(url);
+		List<String> blockedList = Lists.newArrayList();
+		blockedList.add(String.format(SITE_BLOCKLIST_FORMAT, sasParams.getSiteIncId()));
 		if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
 			appendQueryParam(url, AD_SENSITIVE, SENSITIVITY_LOW, false);
-			appendQueryParam(url, BLOCKLIST_PARAM,
-					getURLEncode(String.format(BLOCKLIST_FORMAT,RUBICON_PERF_BLOCKLIST_ID,sasParams.getSiteIncId()),format), false);
+			blockedList.add(RUBICON_PERF_BLOCKLIST_ID);
 			if (isApp) {
-				String rating = (contentRating == null) ? PERFORMANCE_RATING
-						: contentRating;
+				String rating = (uacContentRating == null) ? PERFORMANCE_RATING
+						: uacContentRating;
 				appendQueryParam(url, APP_RATING, rating, false);
 			}
 		} else {
 			appendQueryParam(url, AD_SENSITIVE, SENSITIVITY_HIGH, false);
-			appendQueryParam(url, BLOCKLIST_PARAM,
-					getURLEncode(String.format(BLOCKLIST_FORMAT,RUBICON_FS_BLOCKLIST_ID,sasParams.getSiteIncId()),format), false);
+			blockedList.add(RUBICON_FS_BLOCKLIST_ID);
 			if (isApp) {
-				String rating = (contentRating == null) ? FS_RATING
-						: contentRating;
+				String rating = (uacContentRating == null) ? FS_RATING
+						: uacContentRating;
 				appendQueryParam(url, APP_RATING, rating, false);
 			}
 		}
+
+		appendQueryParam(url, BLOCKLIST_PARAM,
+				getURLEncode(StringUtils.join(blockedList, ','),format), false);
 
 		if (sasParams.getSiteEcpmEntity() != null
 				&& sasParams.getSiteEcpmEntity().getNetworkEcpm() > 0) {
@@ -270,12 +258,10 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		} else {
 			appendQueryParam(url, FLOOR_PRICE, MIN_ECPM, false);
 		}
-
 		if (isInterstitial()) {
 			// display type 1 for interstitial
 			appendQueryParam(url, DISPLAY_TYPE, 1, false);
 		}
-
 		appendQueryParam(url, INMOBI_CATEGORY,
 				getURLEncode(getCategories(',', false, false), format), false);
 		appendQueryParam(url, IAB_CATEGORY,
@@ -287,44 +273,6 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		return new URI(url.toString());
 	}
 
-	private void appendDeviceIds(StringBuilder url) {
-		// Device id type 1 (IDFA), 2 (OpenUDID), 3 (Apple UDID), 4 (Android
-		// device ID)
-
-		if (!StringUtils.isEmpty(sasParams.getSdkVersion())
-				&& StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
-				&& "0".equals(casInternalRequestParameters.uidADT)) {
-			appendQueryParam(url, DEVICE_ID,
-					casInternalRequestParameters.uidIFA, false);
-			appendQueryParam(url, DEVICE_ID_TYPE, IDFA, false);
-		} else if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
-				&& "1".equals(casInternalRequestParameters.uidADT)) {
-			appendQueryParam(url, DEVICE_ID,
-					casInternalRequestParameters.uidIFA, false);
-			appendQueryParam(url, DEVICE_ID_TYPE, IDFA, false);
-		} else {
-			boolean isUdid = false;
-			if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
-				appendQueryParam(url, MD5_DEVICE_ID,
-						casInternalRequestParameters.uidMd5, false);
-
-				isUdid = true;
-			}
-			if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
-				appendQueryParam(url, SHA1_DEVICE_ID,
-						casInternalRequestParameters.uidIDUS1, false);
-				isUdid = true;
-			}
-			if (isUdid) {
-				appendQueryParam(url, DEVICE_ID_TYPE, UDID, false);
-			} else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
-				appendQueryParam(url, MD5_DEVICE_ID,
-						casInternalRequestParameters.uid, false);
-				appendQueryParam(url, DEVICE_ID_TYPE, OPEN_UDID, false);
-			}
-
-		}
-	}
 
 	@Override
 	public Request getNingRequest() throws Exception {
@@ -437,5 +385,62 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		}
 		return categoryZoneId;
 	}
+
+	private String getUACContentRating(StringBuilder url) {
+		String contentRating = null;
+		if (sasParams.getWapSiteUACEntity() != null) {
+			List<String> appstoreCategories = sasParams.getWapSiteUACEntity()
+					.getCategories();
+			if (appstoreCategories != null && appstoreCategories.size() > 0) {
+				appendQueryParam(
+						url,
+						APPSTORE_CATEGORY,
+						getURLEncode(StringUtils.join(appstoreCategories, ','),
+								format), false);
+			}
+			contentRating = sasParams.getWapSiteUACEntity().getContentRating();
+		}
+		return contentRating;
+	}
+
+	private void appendDeviceIds(StringBuilder url) {
+		// Device id type 1 (IDFA), 2 (OpenUDID), 3 (Apple UDID), 4 (Android
+		// device ID)
+
+		if (!StringUtils.isEmpty(sasParams.getSdkVersion())
+				&& StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
+				&& "0".equals(casInternalRequestParameters.uidADT)) {
+			appendQueryParam(url, DEVICE_ID,
+					casInternalRequestParameters.uidIFA, false);
+			appendQueryParam(url, DEVICE_ID_TYPE, IDFA, false);
+		} else if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
+				&& "1".equals(casInternalRequestParameters.uidADT)) {
+			appendQueryParam(url, DEVICE_ID,
+					casInternalRequestParameters.uidIFA, false);
+			appendQueryParam(url, DEVICE_ID_TYPE, IDFA, false);
+		} else {
+			boolean isUdid = false;
+			if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
+				appendQueryParam(url, MD5_DEVICE_ID,
+						casInternalRequestParameters.uidMd5, false);
+
+				isUdid = true;
+			}
+			if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
+				appendQueryParam(url, SHA1_DEVICE_ID,
+						casInternalRequestParameters.uidIDUS1, false);
+				isUdid = true;
+			}
+			if (isUdid) {
+				appendQueryParam(url, DEVICE_ID_TYPE, UDID, false);
+			} else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
+				appendQueryParam(url, MD5_DEVICE_ID,
+						casInternalRequestParameters.uid, false);
+				appendQueryParam(url, DEVICE_ID_TYPE, OPEN_UDID, false);
+			}
+
+		}
+	}
+
 
 }
