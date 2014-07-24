@@ -3,6 +3,8 @@ package com.inmobi.adserve.channels.repository;
 import java.util.Iterator;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.thrift.TDeserializer;
 
@@ -18,6 +20,7 @@ import com.inmobi.phoenix.data.RepositoryQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
 import com.inmobi.template.formatter.TemplateManager;
 
+@Slf4j
 public class NativeAdTemplateRepository extends
 		AbstractStatsMaintainingDBRepository<NativeAdTemplateEntity, String> implements RepositoryManager {
 	
@@ -62,11 +65,6 @@ public class NativeAdTemplateRepository extends
             }
             
             NativeAdTemplateEntity templateEntity = builder.build();
-            
-            if(siteId.equals("b5e2e6ea4a4b42a799ceca322b2fd004")){
-            	System.out.println(adTemplate.getDetails().getContent());
-            }
-            
             if(templateEntity.getMandatoryKey()!=null){
             	TemplateManager.getInstance().addToTemplateCache(templateEntity.getSiteId(), adTemplate.getDetails().getContent());
             	 logger.debug("Adding site id  "+siteId+" and nativeId "+nativeAdId+" to NativeAdTemplateRespository");

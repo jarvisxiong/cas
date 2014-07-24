@@ -75,7 +75,6 @@ public class NativeResponseMaker {
 		 String contextCode = templateDecorator.getContextCode(vc);
 		 
 		 LOG.debug("Making response for siteId : "+siteId);
-		 
 		return nativeAd(pubContent, contextCode, namespace);
 	}
 	
@@ -202,11 +201,8 @@ public class NativeResponseMaker {
 
     public String nativeAd(String pubContent, String contextCode,String namespace) {
         pubContent = base64(pubContent);
-        NativeAd nativeAd = new NativeAd(pubContent,
-						                contextCode,
-						                namespace);
-        
-       return gson.toJson(nativeAd);
+        NativeAd nativeAd = new NativeAd(pubContent, contextCode, namespace);
+        return gson.toJson(nativeAd);
     }
     
     public String base64(String input) {

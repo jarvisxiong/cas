@@ -29,7 +29,8 @@ public class ToolsImpl extends Tools {
 	}
 	
 	 public String nativeAd(Context creativeContext, String pubContent) {
-	        return gson.toJson(pubContent);
+		 return pubContent;
+	        //return gson.toJson(pubContent);
 	}
 
 }

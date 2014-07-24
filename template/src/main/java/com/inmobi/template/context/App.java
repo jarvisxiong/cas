@@ -58,9 +58,13 @@ public final class App extends AbstractContext{
 		params.put(KeyConstants.APP_DOWNLOADS, this.downloads);
 		
 		
-		params.put(KeyConstants.APP_HEADLINE, new CreativeBean("text", this.title));
-		params.put(KeyConstants.APP_CREATIVE_DESC, new CreativeBean("text", this.desc));
-		params.put(KeyConstants.APP_CREATIVE_ICONS, new CreativeBean("icon", this.icons));
+		// params.put(KeyConstants.APP_HEADLINE, new CreativeBean("text", this.title));
+		params.put(KeyConstants.APP_HEADLINE, this.title);
+		// params.put(KeyConstants.APP_CREATIVE_DESC, new CreativeBean("text", this.desc));
+		params.put(KeyConstants.APP_CREATIVE_DESC,  this.desc);
+		params.put(KeyConstants.ICON, this.icons);
+		params.put(KeyConstants.APP_CREATIVE_ICONS, this.icons);
+		params.put(KeyConstants.APP_CREATIVE,this);
 		params.put(KeyConstants.APP_CREATIVE_RATING, this.rating);
 		
 	}
