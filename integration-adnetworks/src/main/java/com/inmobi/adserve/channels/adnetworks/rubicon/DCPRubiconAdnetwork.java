@@ -426,6 +426,11 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 
 				isUdid = true;
 			}
+			String gpid = getGPID();
+			if(null != gpid){
+				appendQueryParam(url, DEVICE_ID,gpid, false);
+				isUdid = true;
+			}
 			if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
 				appendQueryParam(url, SHA1_DEVICE_ID,
 						casInternalRequestParameters.uidIDUS1, false);
