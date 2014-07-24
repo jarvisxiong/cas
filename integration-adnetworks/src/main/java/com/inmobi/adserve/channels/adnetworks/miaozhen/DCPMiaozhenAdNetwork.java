@@ -20,14 +20,14 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.net.URI;
 import java.util.Date;
 
 public class DCPMiaozhenAdNetwork extends AbstractDCPAdNetworkImpl {
 
-    private static final String APP = "m_app";
     private static final Logger LOG = LoggerFactory.getLogger(DCPRubiconAdnetwork.class);
+    private static final String APP = "m_app";
     private static final String OPEN_UDID = "m0";
     private static final String ANDROID_ID = "m1";
     private static final String IDFA = "m5";
@@ -50,7 +50,7 @@ public class DCPMiaozhenAdNetwork extends AbstractDCPAdNetworkImpl {
     private int width;
     private int height;
     private int networkType;
-    private boolean isApp;
+    private boolean isValidOS;
 
     public DCPMiaozhenAdNetwork(final Configuration config,
                                 final Bootstrap clientBootstrap,
@@ -61,9 +61,37 @@ public class DCPMiaozhenAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public boolean configureParameters() {
-        if (StringUtils.isBlank(sasParams.getRemoteHostIp())
-            || StringUtils.isBlank(sasParams.getUserAgent())
-            || StringUtils.isBlank(externalSiteId)) {
+        // Checking if the mandatory parameters are available.
+        // openUDID and IDFA check.
+        if (isIOS()) {
+            if (StringUtils.isBlank(casInternalRequestParameters.uidIDUS1)
+                && StringUtils.isBlank(casInternalRequestParameters.uidIFA)) {
+                LOG.debug("mandatory parameters missing for miaozhen so exiting adapter");
+                return false;
+            }
+        }
+
+        // Android ID check.
+        if (isAndroid()) {
+            if (StringUtils.isBlank(casInternalRequestParameters.uidMd5)
+            && StringUtils.isBlank(casInternalRequestParameters.uid)
+            && StringUtils.isBlank(casInternalRequestParameters.uidO1)) {
+                LOG.debug("mandatory parameters missing for miaozhen so exiting adapter");
+                return false;
+            }
+        }
+
+        // Operating system check.
+        int sasParamsOsId = sasParams.getOsId();
+        isValidOS = (sasParamsOsId >= HandSetOS.Others.getValue()
+            && sasParamsOsId <= HandSetOS.Windows_RT.getValue()); // Check if the OS ID is valid.
+        if (!isValidOS) {
+            LOG.debug("mandatory parameters missing for miaozhen so exiting adapter");
+            return false;
+        }
+
+        // IP check.
+        if(StringUtils.isBlank(sasParams.getRemoteHostIp())) {
             LOG.debug("mandatory parameters missing for miaozhen so exiting adapter");
             return false;
         }
@@ -71,8 +99,7 @@ public class DCPMiaozhenAdNetwork extends AbstractDCPAdNetworkImpl {
         // Get latitude & longitude.
         host = config.getString("miaozhen.host");
         if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
-            && StringUtils.countMatches(
-            casInternalRequestParameters.latLong, ",") > 0) {
+            && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
             String[] latlong = casInternalRequestParameters.latLong.split(",");
             latitude = latlong[0];
             longitude = latlong[1];
@@ -90,14 +117,11 @@ public class DCPMiaozhenAdNetwork extends AbstractDCPAdNetworkImpl {
             Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
-        } else {
-            LOG.debug("mandatory parameters missing for miaozhen so exiting adapter");
-            return false;
         }
 
         // Get local time stamp.
         Date current = new Date();
-        localTime = current.getTime() + "";
+        localTime = String.valueOf(current.getTime());
 
         // Find the network type.
         if (NetworkType.WIFI == sasParams.getNetworkType()) {
@@ -106,10 +130,7 @@ public class DCPMiaozhenAdNetwork extends AbstractDCPAdNetworkImpl {
             networkType = 2;
         }
 
-        // Set isApp.
-        isApp = (!(StringUtils.isBlank(sasParams.getSource())
-            || WAP.equalsIgnoreCase(sasParams.getSource())));
-
+        // Configuration successful.
         LOG.info("Configure parameters inside Miaozhen returned true");
         return true;
     }
@@ -123,7 +144,7 @@ public class DCPMiaozhenAdNetwork extends AbstractDCPAdNetworkImpl {
     public URI getRequestUri() throws Exception {
         StringBuilder url = new StringBuilder(host);
 
-        if(isApp) {
+        if(isApp()) {
             appendQueryParam(url, APP, String.format(BUNDLE_ID_TEMPLATE, blindedSiteId), false);
         }
 
@@ -135,15 +156,14 @@ public class DCPMiaozhenAdNetwork extends AbstractDCPAdNetworkImpl {
         appendQueryParam(url, NETWORK_TYPE, networkType, false);
 
         Integer sasParamsOsId = sasParams.getOsId();
-        if (sasParamsOsId > 0 && sasParamsOsId < 21) {
-            appendQueryParam(url, DEVICE_OS, HandSetOS.values()[sasParamsOsId
-                - 1].toString(), false);
+        if (isValidOS) {
+            appendQueryParam(url, DEVICE_OS, HandSetOS.values()[sasParamsOsId - 1].toString(), false);
         }
         if (StringUtils.isNotBlank(sasParams.getOsMajorVersion())) {
             appendQueryParam(url, OS_VERSION, sasParams.getOsMajorVersion(), false);
         }
 
-        if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
+        if (isAndroid()) {
             if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
                 appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.uidMd5, false);
             } else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
@@ -153,7 +173,7 @@ public class DCPMiaozhenAdNetwork extends AbstractDCPAdNetworkImpl {
             }
         }
 
-        if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
+        if (isIOS()) {
             if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
                 appendQueryParam(url, OPEN_UDID, casInternalRequestParameters.uidIDUS1, false);
             }
@@ -180,14 +200,7 @@ public class DCPMiaozhenAdNetwork extends AbstractDCPAdNetworkImpl {
                               final HttpResponseStatus status) {
         LOG.debug("Miaozhen response is {}", response);
 
-        if (null == response || status.code() != 200
-            || response.trim().isEmpty()) {
-            statusCode = status.code();
-            if (200 == statusCode) {
-                statusCode = 500;
-            }
-            responseContent = "";
-        } else {
+        if (isValidResponse(response, status)){
             statusCode = status.code();
             VelocityContext context = new VelocityContext();
             try {
@@ -258,8 +271,7 @@ public class DCPMiaozhenAdNetwork extends AbstractDCPAdNetworkImpl {
                             height);
                     }
 
-                    responseContent =
-                        Formatter.getResponseFromTemplate(TemplateType.IMAGE, context, sasParams, beaconUrl);
+                    responseContent = Formatter.getResponseFromTemplate(TemplateType.IMAGE, context, sasParams, beaconUrl);
                     adStatus = "AD";
                 } else {
                     adStatus = "NO_AD";

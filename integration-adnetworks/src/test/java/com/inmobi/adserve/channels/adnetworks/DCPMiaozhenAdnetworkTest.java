@@ -17,7 +17,7 @@ import org.testng.annotations.Test;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.UUID;
 
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
@@ -63,109 +63,140 @@ public class DCPMiaozhenAdnetworkTest extends TestCase {
     public void testDCPMiaozhenConfigureParameters() throws JSONException {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setSlot(Short.valueOf("11"));
-        sasParams.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+
+        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] {50l, 51l}));
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
-        casInternalRequestParameters.uid = "23e2ewq445545";
-        sasParams.setOsId(SASRequestParameters.HandSetOS.iOS.getValue());
+        casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
         casInternalRequestParameters.uidIFA = "23e2ewq445545";
         casInternalRequestParameters.uidADT = "0";
-        String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
-        sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-        String externalKey = "f6wqjq1r5v";
-        ChannelSegmentEntity entity =
-            new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                miaozhenAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-                null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
-        assertEquals(true, dcpMiaozhenAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+        casInternalRequestParameters.uidIDUS1 = "202cb962ac59075b964b07152d234b70";
+
+        sasParams.setRemoteHostIp("206.29.182.240");
+        sasParams.setUserAgent("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)");
+        sasParams.setSource("APP");
+        sasParams.setOsId(SASRequestParameters.HandSetOS.iOS.getValue());
+        sasParams.setSlot((short) 10);
+
+        ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
+            miaozhenAdvId, "adgroupid", null, null, 0, null, null, true, true, null, null, null, null, 0, true, null,
+            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+            new ArrayList<Integer>(), 0.0d, null, null, 0));
+
+        assertTrue(dcpMiaozhenAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null));
     }
 
     @Test
     public void testDCPMiaozhenConfigureParametersBlankIP() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        sasParams.setRemoteHostIp(null);
-        sasParams.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+
+        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] {50l, 51l}));
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
-        String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
-        sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-        String externalKey = "f6wqjq1r5v";
-        ChannelSegmentEntity entity =
-            new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                miaozhenAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-                null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
-        assertEquals(false, dcpMiaozhenAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+        casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
+        casInternalRequestParameters.uidIFA = "23e2ewq445545";
+        casInternalRequestParameters.uidADT = "0";
+        casInternalRequestParameters.uidIDUS1 = "202cb962ac59075b964b07152d234b70";
+
+        sasParams.setRemoteHostIp(null); // Blank IP.
+        sasParams.setUserAgent("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)");
+        sasParams.setSource("APP");
+        sasParams.setOsId(SASRequestParameters.HandSetOS.iOS.getValue());
+        sasParams.setSlot((short) 10);
+
+        ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
+            miaozhenAdvId, "adgroupid", null, null, 0, null, null, true, true, null, null, null, null, 0, true, null,
+            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+            new ArrayList<Integer>(), 0.0d, null, null, 0));
+
+        assertFalse(dcpMiaozhenAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null));
     }
 
     @Test
     public void testDCPMiaozhenConfigureParametersBlankUA() {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setUserAgent(" ");
+
+        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] {50l, 51l}));
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
-        String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
-        sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-        String externalKey = "f6wqjq1r5v";
-        ChannelSegmentEntity entity =
-            new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                miaozhenAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-                null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
-        assertEquals(false, dcpMiaozhenAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+        casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
+        casInternalRequestParameters.uidIFA = "23e2ewq445545";
+        casInternalRequestParameters.uidADT = "0";
+        casInternalRequestParameters.uidIDUS1 = "202cb962ac59075b964b07152d234b70";
+
+        sasParams.setRemoteHostIp("206.29.182.240");
+        sasParams.setUserAgent(""); // Blank UA.
+        sasParams.setSource("APP");
+        sasParams.setOsId(SASRequestParameters.HandSetOS.iOS.getValue());
+        sasParams.setSlot((short) 10);
+
+        ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
+            miaozhenAdvId, "adgroupid", null, null, 0, null, null, true, true, null, null, null, null, 0, true, null,
+            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+            new ArrayList<Integer>(), 0.0d, null, null, 0));
+
+        assertTrue(dcpMiaozhenAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null));
     }
 
     @Test
     public void testDCPMiaozhenRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+
         casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] {50l, 51l}));
-        sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setUserAgent("Mozilla");
-        sasParams.setSource("APP");
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
-        sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-        List<Long> category = new ArrayList<Long>();
-        category.add(3l);
-        sasParams.setCategories(category);
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot(Short.valueOf("15"));
-        sasParams.setOsId(SASRequestParameters.HandSetOS.iOS.getValue());
         casInternalRequestParameters.uidIFA = "23e2ewq445545";
         casInternalRequestParameters.uidADT = "0";
-        String externalKey = "4246";
-        SlotSizeMapping.init();
-        ChannelSegmentEntity entity =
-            new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                miaozhenAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
-                null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 0));
-        if (dcpMiaozhenAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
-            String actualUrl = dcpMiaozhenAdNetwork.getRequestUri().toString();
+        casInternalRequestParameters.uidIDUS1 = "202cb962ac59075b964b07152d234b70";
 
-            // Compare the expected URL with actual URL after eliminating its last parameter.
-            String expectedUrl = "http://s.x.cn.miaozhen.com/bx?v=0&m_ua=Mozilla&m_ip=206.29.182.240&m_adw=320&m_adh=50&m_pos=37.4429%2C-122.1514&m_net=2&m_os=iOS&m5=23e2ewq445545&m_int=0&l=0344343";
-            assertEquals(expectedUrl, actualUrl.substring(0, actualUrl.lastIndexOf('&')));
-        }
+        sasParams.setRemoteHostIp("206.29.182.240");
+        sasParams.setUserAgent("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)");
+        sasParams.setSource("APP");
+        sasParams.setOsId(SASRequestParameters.HandSetOS.iOS.getValue());
+        sasParams.setSlot((short) 10);
+        sasParams.setSiteIncId(12314321432L);
+
+        String externalKey = "4246";
+
+        ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
+            miaozhenAdvId, "adgroupid", null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+            new ArrayList<Integer>(), 0.0d, null, null, 0));
+
+        String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
+            + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1"
+            + "/9cddca11?beacon=true";
+
+        dcpMiaozhenAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl);
+
+        String blindedSiteId = (new UUID(1234L, 12314321432L)).toString();
+        String actualUrl = dcpMiaozhenAdNetwork.getRequestUri().toString();
+
+        // Compare the expected URL with actual URL after eliminating its last parameter.
+        String expectedUrl = "http://s.x.cn.miaozhen.com/bx?v=0&m_app=com.inmobi-exchange.00000000-0000-0000-0000-0002ddfda218&m_ua=Mozilla%2F5.0+%28compatible%3B+MSIE+9.0%3B+Windows+NT+6.1%3B+Trident%2F5.0%29&m_ip=206.29.182.240&m_adw=300&m_adh=250&m_pos=37.4429%2C-122.1514&m_net=2&m_os=iOS&m0=202cb962ac59075b964b07152d234b70&m5=23e2ewq445545&m_int=1&l=4246";
+        actualUrl = actualUrl.substring(0, actualUrl.lastIndexOf('&'));
+
+        assertEquals(expectedUrl, actualUrl);
     }
 
     @Test
     public void testDCPMiaozhenParseResponse() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+
         casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] {50l, 51l}));
+        casInternalRequestParameters.latLong = "37.4429,-122.1514";
+        casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
+        casInternalRequestParameters.uidIFA = "23e2ewq445545";
+        casInternalRequestParameters.uidADT = "0";
+        casInternalRequestParameters.uidIDUS1 = "202cb962ac59075b964b07152d234b70";
+
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)");
         sasParams.setSource("APP");
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
-        casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        sasParams.setSlot(Short.valueOf("15"));
         sasParams.setOsId(SASRequestParameters.HandSetOS.iOS.getValue());
-        casInternalRequestParameters.uidIFA = "23e2ewq445545";
-        casInternalRequestParameters.uidADT = "0";
+        sasParams.setSlot((short) 10);
+
         String externalKey = "4246";
 
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
@@ -204,6 +235,7 @@ public class DCPMiaozhenAdnetworkTest extends TestCase {
         // Check URI and Response.
         String testURI = dcpMiaozhenAdNetwork.getRequestUri().toString();
         String testResponse = dcpMiaozhenAdNetwork.getHttpResponseContent();
+        int i = 1;
     }
 
     @Test
