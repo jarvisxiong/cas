@@ -13,8 +13,9 @@ public interface KeyConstants {
 	public String APP_ID = "app.id";
 	
 	public String APP_CREATIVE = "imNative.creative";
-	public String APP_HEADLINE = "imNative.creative.headline.text";
-	public String APP_CREATIVE_DESC = "imNative.creative.description.text";
+	public String IMNATIVE_CREATIVE_HEADLINE = "imNative.creative.headline.text";
+	public String IMNATIVE_CREATIVE_DESC = "imNative.creative.description.text";
+	public String IMNATIVE_IMAGE = "imNative.creative.image";
 	
 	public String APP_CREATIVE_ICONS= "imNative.creative.icon";
 

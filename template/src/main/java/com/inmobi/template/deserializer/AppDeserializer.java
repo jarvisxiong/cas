@@ -21,7 +21,7 @@ import com.inmobi.template.interfaces.Context;
 public class AppDeserializer implements JsonDeserializer<Context> {
 
 	@Override
-	public Context deserialize(JsonElement json, Type typeOf,JsonDeserializationContext context) throws JsonParseException {
+	public Context deserialize(JsonElement json, Type typeOf, JsonDeserializationContext context) throws JsonParseException {
 		JsonObject jsonObj = json.getAsJsonObject();
 		String     title = null;
         if(jsonObj.get("title")!=null){		
