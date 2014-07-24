@@ -800,4 +800,10 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
           return true;
       }
   }
+
+  protected String getGPID(){
+    return (StringUtils.isNotBlank(casInternalRequestParameters.gpid) &&
+        "1".equals(casInternalRequestParameters.uidADT))
+               ? casInternalRequestParameters.gpid:null;
+  }
 }
