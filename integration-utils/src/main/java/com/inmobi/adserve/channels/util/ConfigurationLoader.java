@@ -1,7 +1,12 @@
 package com.inmobi.adserve.channels.util;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
+
 import lombok.Getter;
 
+import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -45,18 +50,17 @@ public class ConfigurationLoader {
 
         try {
             if (configFile.startsWith("/")) {
-                configuration = new PropertiesConfiguration(configFile);
+                configuration = new CasBaseConfiguration(new PropertiesConfiguration(configFile));
             }
             else {
-                configuration = new PropertiesConfiguration(ConfigurationLoader.class.getClassLoader().getResource(
-                        configFile));
+                configuration = new CasBaseConfiguration(new PropertiesConfiguration(ConfigurationLoader.class.getClassLoader().getResource(configFile)));
             }
         }
         catch (ConfigurationException e) {
             LOG.error("error loading config {}", e);
             throw new RuntimeException(e);
         }
-
+        
         cacheConfiguration = configuration.subset("Cache");
         repoConfiguration = configuration.subset("Cache.ChannelAdGroupRepository");
         feedBackConfiguration = configuration.subset("Cache.ChannelFeedbackRepository");
@@ -69,6 +73,7 @@ public class ConfigurationLoader {
         loggerConfiguration = configuration.subset("logger");
         log4jConfiguration = configuration.subset("log4j");
         rtbConfiguration = configuration.subset("rtb");
+
 
     }
 
