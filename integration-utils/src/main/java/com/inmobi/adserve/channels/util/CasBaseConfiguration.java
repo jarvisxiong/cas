@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Properties;
 
 import lombok.Delegate;
 
@@ -15,6 +16,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConversionException;
 import org.apache.commons.configuration.PropertyConverter;
 import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.NotImplementedException;
 
 import com.google.common.collect.Maps;
 
@@ -99,6 +101,8 @@ public class CasBaseConfiguration implements Configuration {
 		void clearProperty(String key);
 		
 		void clear();
+		
+		Properties getProperties(String key);
 	}
 
 	private Map<String, Object> map = Maps.newHashMap();
@@ -572,4 +576,8 @@ public class CasBaseConfiguration implements Configuration {
 		return new CasSubsetConfiguration(this, prefix, ".");
 	}
 
+	@Override
+	public Properties getProperties(String key) {
+		throw new NotImplementedException();
+	}
 }
