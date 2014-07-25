@@ -13,9 +13,10 @@ BEGIN
     			app_type,              
     			categories,              
     			coppa_enabled,          
-    			modified_on from wap_site_uac
-    			where content_rating != '' or app_type !='' or categories != ''
-    			or content_rating is not null or app_type is not null or categories is not null
+    			modified_on from wap_site_uac where
+    			   (content_rating is not null and content_rating != '')  
+    			or (app_type is not null and app_type !='')  
+    			or (categories is not null and categories != '')
     			or coppa_enabled != false
     			and modified_on >=last_updated
  LOOP
