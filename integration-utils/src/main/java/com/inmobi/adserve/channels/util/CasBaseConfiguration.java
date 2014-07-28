@@ -62,9 +62,4 @@ public class CasBaseConfiguration extends PropertiesConfiguration {
 			map.clear();
 		}
 	}
-	
-	@Override
-	public Properties getProperties(String key) {
-		throw new NotImplementedException();
-	}
 }
