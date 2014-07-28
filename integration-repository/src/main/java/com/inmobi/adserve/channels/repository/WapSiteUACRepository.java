@@ -35,17 +35,19 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
 	public DBEntity<WapSiteUACEntity, String> buildObjectFromRow(final ResultSetRow resultSetRow) throws RepositoryException {
 		final NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
 		final String id = row.getString("id");
-		final Timestamp modifiedOn = row.getTimestamp("uac_mod_on");
+		final Timestamp modifiedOn = row.getTimestamp("modified_on");
 
 		try {
 			final long siteTypeId = row.getLong("site_type_id");
 			final String contentRating = row.getString("content_rating");
 			final String appType = row.getString("app_type");
 			final String categories = row.getString("categories");
+			final boolean isCoppaEnabled = row.getBoolean("coppa_enabled");
 			final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
 			builder.setId(id);
-			builder.setUacModifiedOn(modifiedOn);
+			builder.setModifiedOn(modifiedOn);
 			builder.setSiteTypeId(siteTypeId);
+			builder.setCoppaEnabled(isCoppaEnabled);
 			if (siteTypeId == ANDROID_SITE_TYPE && contentRating != null && !contentRating.trim().isEmpty()) {
 				builder.setContentRating(CONTENT_RATING_MAP.get(contentRating));
 			} else {

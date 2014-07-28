@@ -20,7 +20,8 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
 	private final String contentRating;
 	private final String appType;
 	private final List<String> categories;
-	private final Timestamp uacModifiedOn;
+	private final boolean isCoppaEnabled;
+	private final Timestamp modifiedOn;
 
 	public WapSiteUACEntity(final Builder builder) {
 		id = builder.id;
@@ -28,7 +29,8 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
 		contentRating = builder.contentRating;
 		appType = builder.appType;
 		categories = builder.categories;
-		uacModifiedOn = builder.uacModifiedOn;
+		isCoppaEnabled = builder.isCoppaEnabled;
+		modifiedOn = builder.modifiedOn;
 	}
 
 	public static Builder newBuilder() {
@@ -42,7 +44,8 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
 		private String contentRating;
 		private String appType;
 		private List<String> categories;
-		private Timestamp uacModifiedOn;
+		private Timestamp modifiedOn;
+		private boolean isCoppaEnabled;
 
 		public WapSiteUACEntity build() {
 			return new WapSiteUACEntity(this);
