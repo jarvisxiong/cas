@@ -9,7 +9,8 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import com.google.common.collect.Maps;
 
 /**
- * This class was created because original getProperity in parent method has a synchronized block in it, which was causing performance bottlenecks at high cpu utilization. In this implementation we store all the values in our local map and the gets via the local map
+ * This class was created because original getProperity in parent method has a synchronized block in it, which was causing performance bottlenecks at high cpu utilization. 
+ * In this implementation we store all the values in our local map and the gets happen via the local map
  * @author rajashekhar.c
  *
  */
