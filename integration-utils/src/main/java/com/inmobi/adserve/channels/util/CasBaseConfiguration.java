@@ -1,45 +1,60 @@
 package com.inmobi.adserve.channels.util;
 
+import java.net.URL;
 import java.util.Map;
-import java.util.Properties;
 
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.lang.NotImplementedException;
 
 import com.google.common.collect.Maps;
 
 /**
- * 
+ * This class was created because original getProperity in parent method has a synchronized block in it, which was causing performance bottlenecks at high cpu utilization. In this implementation we store all the values in our local map and the gets via the local map
  * @author rajashekhar.c
  *
  */
 public class CasBaseConfiguration extends PropertiesConfiguration {
 
-	private Configuration configuration;
 	
-	private Object lock = new Object();
+	private Object lock;
 
-	private Map<String, Object> map = Maps.newHashMap();
+	private Map<String, Object> map;
 
-	public CasBaseConfiguration(Configuration configuration) {
-		this.configuration = configuration;
+	private boolean isInitialized = false; 
+	
+	public CasBaseConfiguration(String configFile) throws ConfigurationException {
+		super(configFile);
+	}
+
+	public CasBaseConfiguration(URL resource) throws ConfigurationException {
+		super(resource);
+	}
+	
+	private void initializeIfNotInitialized(){
+		if(isInitialized){
+			return;
+		}else{
+			isInitialized = true;
+			map = Maps.newHashMap();
+			lock = new Object();
+		}
 	}
 
 	@Override
 	public void setProperty(String key, Object value) {
 		synchronized (lock) {
 			map.put(key, value);
-			configuration.setProperty(key, value);
+			this.setProperty(key, value);
 		}
 	}
 
 	@Override
 	public Object getProperty(String key) {
+		initializeIfNotInitialized();
 		if (map.get(key) == null) {
 			synchronized (lock) {
 				if (map.get(key) == null) {
-					map.put(key, configuration.getProperty(key));
+					map.put(key, super.getProperty(key));
 				}
 			}
 		}
@@ -50,7 +65,7 @@ public class CasBaseConfiguration extends PropertiesConfiguration {
 	@Override
 	public void clearProperty(String key) {
 		synchronized (lock) {
-			configuration.clearProperty(key);
+			this.clearProperty(key);
 			map.remove(key);
 		}
 	}
@@ -58,7 +73,7 @@ public class CasBaseConfiguration extends PropertiesConfiguration {
 	@Override
 	public void clear(){
 		synchronized (lock) {
-			configuration.clear();
+			this.clear();
 			map.clear();
 		}
 	}

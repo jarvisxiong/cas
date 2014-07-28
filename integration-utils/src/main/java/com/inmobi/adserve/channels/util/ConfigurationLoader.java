@@ -50,10 +50,10 @@ public class ConfigurationLoader {
 
         try {
             if (configFile.startsWith("/")) {
-                configuration = new CasBaseConfiguration(new PropertiesConfiguration(configFile));
+                configuration = new CasBaseConfiguration(configFile);
             }
             else {
-                configuration = new CasBaseConfiguration(new PropertiesConfiguration(ConfigurationLoader.class.getClassLoader().getResource(configFile)));
+                configuration = new CasBaseConfiguration(ConfigurationLoader.class.getClassLoader().getResource(configFile));
             }
         }
         catch (ConfigurationException e) {
