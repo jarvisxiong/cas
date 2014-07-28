@@ -15,11 +15,7 @@ public class ToolsImpl extends Tools {
 
   @Override
   public Object jpath(final Context context, final String key) {
-    final Object val = context.get(key);
-    if (val != null) {
-      return val;
-    }
-    return "";
+    return context.get(key);
   }
 
   @Override

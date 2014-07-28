@@ -6,27 +6,31 @@ import java.util.List;
 public abstract class Tools {
 
 
-  public abstract Object jpath(Context context, String key);
+  public abstract Object jpath(final Context context, final String key);
 
-  public abstract String jpathStr(Context context, String key);
+  public abstract String jpathStr(final Context context, final String key);
 
 
-  public boolean isNonNull(Object value) {
+  public boolean isNonNull(final Object value) {
     return value != null;
   }
 
-  public abstract String jsonEncode(Object json);
+  // public boolean isNotEmpty(Object value) {
+  // return isNonNull(value) && value.
+  // }
+
+  public abstract String jsonEncode(final Object json);
 
 
-  public abstract String nativeAd(Context context, String pubContent);
+  public abstract String nativeAd(final Context context, final String pubContent);
 
-  public boolean newAsyncMode(Boolean abTestingMode, List<String> list, String value) {
+  public boolean newAsyncMode(final Boolean abTestingMode, final List<String> list,
+      final String value) {
     return true;
   }
 
   public Object boltObject() {
     return null;
   }
-
 
 }

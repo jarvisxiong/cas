@@ -9,8 +9,6 @@ import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.attribute.BAttrNativeType;
 import com.inmobi.adserve.channels.api.attribute.BTypeNativeAttributeType;
-import com.inmobi.adserve.channels.api.attribute.ImageNativeAttributeType;
-import com.inmobi.adserve.channels.api.attribute.MandatoryNativeAttributeType;
 import com.inmobi.adserve.channels.api.attribute.SuggestedNativeAttributeType;
 import com.inmobi.adserve.channels.api.natives.NativeBuilder;
 import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
@@ -99,7 +97,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     public static ImpressionCallbackHelper impressionCallbackHelper;
     private final IABCategoriesInterface   iabCategoriesInterface;
     private final IABCountriesInterface    iabCountriesInterface;
-    private final IABCitiesInterface       iabCitiesInterface;
+    // private final IABCitiesInterface       iabCitiesInterface;
     private final boolean                  siteBlinded;
     private final String                   advertiserName;
     private double                         secondBidPriceInUsd          = 0;
@@ -175,7 +173,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         this.urlBase = urlBase;
         this.setRtbPartner(true);
         this.iabCategoriesInterface = new IABCategoriesMap();
-        this.iabCitiesInterface = new IABCitiesMap();
+        // this.iabCitiesInterface = new IABCitiesMap();
         this.iabCountriesInterface = new IABCountriesMap();
         this.advertiserName = advertiserName;
         this.tmax = tmax;
@@ -878,6 +876,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 				e.printStackTrace();
 			}
 			 adStatus = "NO_AD";
+			 responseContent = "";
 	         LOG.error("Some exception is caught while filling the native template for partner "+e.getLocalizedMessage(),
 	                    advertiserName, e);
 		}
