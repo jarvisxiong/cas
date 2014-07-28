@@ -17,11 +17,10 @@ import com.google.common.collect.Maps;
 public class CasBaseConfiguration extends PropertiesConfiguration {
 
 	
-	private Object lock;
+	final static private Object lock = new Object();
 
-	private Map<String, Object> map;
+	final static private Map<String, Object> map  = Maps.newHashMap();
 
-	private boolean isInitialized = false; 
 	
 	public CasBaseConfiguration(String configFile) throws ConfigurationException {
 		super(configFile);
@@ -31,27 +30,16 @@ public class CasBaseConfiguration extends PropertiesConfiguration {
 		super(resource);
 	}
 	
-	private void initializeIfNotInitialized(){
-		if(isInitialized){
-			return;
-		}else{
-			isInitialized = true;
-			map = Maps.newHashMap();
-			lock = new Object();
-		}
-	}
-
 	@Override
 	public void setProperty(String key, Object value) {
 		synchronized (lock) {
 			map.put(key, value);
-			this.setProperty(key, value);
+			super.setProperty(key, value);
 		}
 	}
 
 	@Override
 	public Object getProperty(String key) {
-		initializeIfNotInitialized();
 		if (map.get(key) == null) {
 			synchronized (lock) {
 				if (map.get(key) == null) {
@@ -66,7 +54,7 @@ public class CasBaseConfiguration extends PropertiesConfiguration {
 	@Override
 	public void clearProperty(String key) {
 		synchronized (lock) {
-			this.clearProperty(key);
+			super.clearProperty(key);
 			map.remove(key);
 		}
 	}
@@ -74,7 +62,7 @@ public class CasBaseConfiguration extends PropertiesConfiguration {
 	@Override
 	public void clear(){
 		synchronized (lock) {
-			this.clear();
+			super.clear();
 			map.clear();
 		}
 	}
