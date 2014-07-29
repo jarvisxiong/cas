@@ -16,23 +16,18 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
   private static final long serialVersionUID = 1L;
 
   private final String id;
-  /**
-   * Type of site (Android, IOS etc.)
-   */
+  // Type of site (Android, IOS etc.)
   private final long siteTypeId;
-  /**
-   * Content Rating of the App
-   */
+  // Content Rating of the App
   private final String contentRating;
-  /**
-   * Primary category of the App
-   */
+  // Primary category of the App
   private final String appType;
-  /**
-   * List of secondary categories
-   */
+  // List of secondary categories
   private final List<String> categories;
-  private final Timestamp uacModifiedOn;
+  // Coppa enabled flag
+  private final boolean isCoppaEnabled;
+  // last modified time of this table
+  private final Timestamp modifiedOn;
 
   public WapSiteUACEntity(final Builder builder) {
     id = builder.id;
@@ -40,7 +35,8 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
     contentRating = builder.contentRating;
     appType = builder.appType;
     categories = builder.categories;
-    uacModifiedOn = builder.uacModifiedOn;
+    isCoppaEnabled = builder.isCoppaEnabled;
+    modifiedOn = builder.modifiedOn;
   }
 
   public static Builder newBuilder() {
@@ -54,7 +50,8 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
     private String contentRating;
     private String appType;
     private List<String> categories;
-    private Timestamp uacModifiedOn;
+    private Timestamp modifiedOn;
+    private boolean isCoppaEnabled;
 
     public WapSiteUACEntity build() {
       return new WapSiteUACEntity(this);

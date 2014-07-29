@@ -1,18 +1,10 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-
+import com.inmobi.adserve.adpool.*;
+import com.inmobi.phoenix.batteries.util.WilburyUUID;
+import com.inmobi.types.ContentRating;
+import com.inmobi.types.InventoryType;
+import com.inmobi.types.LocationSource;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.net.URLCodec;
 import org.apache.http.HttpResponse;
@@ -23,24 +15,16 @@ import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TBinaryProtocol;
-
 import sun.net.www.protocol.http.HttpURLConnection;
 
-import com.inmobi.adserve.adpool.AdPoolRequest;
-import com.inmobi.adserve.adpool.AdPoolResponse;
-import com.inmobi.adserve.adpool.Carrier;
-import com.inmobi.adserve.adpool.Device;
-import com.inmobi.adserve.adpool.Geo;
-import com.inmobi.adserve.adpool.IntegrationDetails;
-import com.inmobi.adserve.adpool.IntegrationType;
-import com.inmobi.adserve.adpool.RequestedAdType;
-import com.inmobi.adserve.adpool.ResponseFormat;
-import com.inmobi.adserve.adpool.Site;
-import com.inmobi.adserve.adpool.SupplyCapability;
-import com.inmobi.phoenix.batteries.util.WilburyUUID;
-import com.inmobi.types.ContentRating;
-import com.inmobi.types.InventoryType;
-import com.inmobi.types.LocationSource;
+import java.io.*;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ThriftRequestMaker {
     private static final URLCodec urlCodec = new URLCodec();
@@ -75,11 +59,12 @@ public class ThriftRequestMaker {
         site.setSiteUrl("siteurl");
         site.setCpcFloor(0.03);
         site.setEcpmFloor(.3);
-//        site.setSiteId("4028cb1334ef46a9013578fe1c1f18fc");
+        site.setSiteId("55b798bd8f1c4de5b89823fbacf419bc");
         //tango siteid
         //site.setSiteId("69d6ab27d03f407f9f6fa9c5fad77afd");
-       // site.setSiteId("99fafeaec0f4441cb7366d20de3335e2");
+        // site.setSiteId("99fafeaec0f4441cb7366d20de3335e2");
         site.setSiteId("b5e2e6ea4a4b42a799ceca322b2fd004");
+
         site.setPublisherId("sitepub");
         site.setContentRating(ContentRating.PERFORMANCE);
         site.setInventoryType(InventoryType.APP);
