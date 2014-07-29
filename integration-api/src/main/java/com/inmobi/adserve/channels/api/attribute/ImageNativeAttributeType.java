@@ -1,4 +1,4 @@
-package com.inmobi.adserve.channels.util;
+package com.inmobi.adserve.channels.api.attribute;
 
 import com.inmobi.casthrift.rtb.Image;
 

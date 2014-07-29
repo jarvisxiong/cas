@@ -28,6 +28,12 @@
 		<dependency>
 			<groupId>org.sonatype.maven.plugin</groupId>
 			<artifactId>emma-maven-plugin</artifactId>
+			<exclusions>
+			   <exclusion>
+					<groupId>org.codehaus.plexus</groupId>
+					<artifactId>plexus-velocity</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>io.netty</groupId>
