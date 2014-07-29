@@ -1,4 +1,7 @@
-package com.inmobi.adserve.channels.util;
+package com.inmobi.adserve.channels.api.template;
+
+import com.inmobi.adserve.channels.api.attribute.NativeAttributeType;
+
 
 public class NativeTemplateAttributeFinder {
 	

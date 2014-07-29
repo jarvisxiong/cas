@@ -1,30 +1,32 @@
 package com.inmobi.adserve.channels.entity;
 
+import lombok.Getter;
 import lombok.Setter;
 
-import com.inmobi.adserve.channels.entity.ChannelEntity.Builder;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 
-public class NativeAdTemplateEntity implements IdentifiableEntity<String>{
+@Getter
+public final class NativeAdTemplateEntity implements IdentifiableEntity<String>{
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -648051414378424341L;
-	private String      siteId;
-    private long        nativeAdId;
-    private String      binaryTemplate;
+	private String        siteId;
+    private long          nativeAdId;
+    private String	      mandatoryKey;
+    private String        imageKey;
 
 	private NativeAdTemplateEntity(Builder builder){
 		this.siteId = builder.siteId;
 		this.nativeAdId=builder.nativeAdId;
-		this.binaryTemplate=builder.binaryTemplate;
+		this.imageKey = builder.imageKey;
+		this.mandatoryKey = builder.mandatoryKey;
 	}
 	
 	@Override
 	public String getJSON() {
-		// TODO Auto-generated method stub
-		return null;
+		return String.format("{\"siteId\":\"%s\",\"nativeAdId\":%s,\"mandatoryKey\":\"%s\",\"imageKey\":\"%s\"}", siteId,nativeAdId,mandatoryKey,imageKey);
 	}
 
 	@Override
@@ -32,24 +34,18 @@ public class NativeAdTemplateEntity implements IdentifiableEntity<String>{
 		return this.siteId;
 	}
 	
-	public String getSiteId() {
-		return this.siteId;
-	}
-	
-	public long getNativeTemplateId() {
-		return this.nativeAdId;
-	}
-	
 	
 	public static Builder newBuilder() {
         return new Builder();
     }
 	
+	
 	@Setter
 	public static class Builder {
 	    private String      siteId;
 	    private long        nativeAdId;
-	    private String      binaryTemplate;
+	    private String	    mandatoryKey;
+	    private String      imageKey;
 	    
 	    public NativeAdTemplateEntity build() {
 	        return new NativeAdTemplateEntity(this);
