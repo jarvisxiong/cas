@@ -74,7 +74,7 @@ public class NativeResponseMaker {
 		 String pubContent = templateParser.format(app, siteId);
 		 String contextCode = templateDecorator.getContextCode(vc);
 		 
-		 LOG.debug("Making response for siteId : "+siteId);
+		 LOG.debug("Making response for siteId : {} ", siteId);
 		return nativeAd(pubContent, contextCode, namespace);
 	}
 	
@@ -135,6 +135,7 @@ public class NativeResponseMaker {
 	}
 	
 	private String constructBeaconUrl(String url){
+	  //TODO: use String.format
 		return "<img src=\\\""+url+"\\\" style=\\\"display:none;\\\" />";
 	}
 	
@@ -171,6 +172,7 @@ public class NativeResponseMaker {
 		throw new Exception(message);
 	}
 	
+	//TODO: Check and re-factor
 	private String getClickUrl(BidResponse response,Map<String, String> params,App app){
 		
 		StringBuilder ct = new StringBuilder();

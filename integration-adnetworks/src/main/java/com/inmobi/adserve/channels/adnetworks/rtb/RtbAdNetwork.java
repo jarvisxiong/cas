@@ -97,7 +97,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     public static ImpressionCallbackHelper impressionCallbackHelper;
     private final IABCategoriesInterface   iabCategoriesInterface;
     private final IABCountriesInterface    iabCountriesInterface;
-    // private final IABCitiesInterface       iabCitiesInterface;
     private final boolean                  siteBlinded;
     private final String                   advertiserName;
     private double                         secondBidPriceInUsd          = 0;
@@ -139,9 +138,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     
     @Inject
     private static NativeTemplateAttributeFinder nativeTemplateAttributeFinder;
-//    
-//    @Inject
-//    private static NativeTemplateFormatter nativeTemplateFormatter;
     
     @Inject
     private static NativeBuilderFactory    nativeBuilderfactory;
@@ -173,7 +169,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         this.urlBase = urlBase;
         this.setRtbPartner(true);
         this.iabCategoriesInterface = new IABCategoriesMap();
-        // this.iabCitiesInterface = new IABCitiesMap();
         this.iabCountriesInterface = new IABCountriesMap();
         this.advertiserName = advertiserName;
         this.tmax = tmax;
