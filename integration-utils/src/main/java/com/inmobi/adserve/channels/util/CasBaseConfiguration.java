@@ -1,14 +1,13 @@
 package com.inmobi.adserve.channels.util;
 
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.NotImplementedException;
-
-import com.google.common.collect.Maps;
 
 /**
  * This class was created because original getProperity in parent method has a
@@ -23,38 +22,40 @@ public class CasBaseConfiguration extends PropertiesConfiguration {
 
 	final static private Object lock = new Object();
 
-	final static private Map<String, Object> map = Maps.newHashMap();
+	final private Map<String, Object> map;
 
 	public CasBaseConfiguration(String configFile) throws ConfigurationException {
 		super(configFile);
+		map = new HashMap<>();
 		cloneMap();
 	}
 
 	public CasBaseConfiguration(URL resource) throws ConfigurationException {
 		super(resource);
+		map = new HashMap<>();
 		cloneMap();
 	}
 
 	@Override
 	public void setProperty(String key, Object value) {
 		synchronized (lock) {
-			map.put(key, value);
 			super.setProperty(key, value);
+			map.put(key, value);
 		}
 	}
 
 	@Override
 	public Object getProperty(String key) {
-		if (map.get(key) == null) {
+		if (map == null) {
 			return super.getProperty(key);
 		}
 		return map.get(key);
 	}
 
 	private void cloneMap() {
-		Iterator keys = getKeys();
+		Iterator<String> keys = getKeys();
 		while (keys.hasNext()) {
-			String key = (String) keys.next();
+			String key =  keys.next();
 			Object value = super.getProperty(key);
 			map.put(key, value);
 		}
