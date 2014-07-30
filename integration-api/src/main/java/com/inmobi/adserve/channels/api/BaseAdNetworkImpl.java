@@ -766,10 +766,44 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 		return false;
 	}
 
-    protected String getGPID(){
-        return (StringUtils.isNotBlank(casInternalRequestParameters.gpid) && "1".equals(casInternalRequestParameters.uidADT))
-                ? casInternalRequestParameters.gpid:null;
-    }
+  public boolean isIOS() {
+    return sasParams.getOsId() == SASRequestParameters.HandSetOS.iOS.getValue();
+  }
 
+  public boolean isAndroid() {
+    return sasParams.getOsId() == SASRequestParameters.HandSetOS.Android.getValue();
+  }
 
+  public boolean isApp(){
+      if(StringUtils.isBlank(sasParams.getSource())) {
+          return false;
+      }
+      else if (WAP.equalsIgnoreCase(sasParams.getSource())) {
+          return false;
+      }
+      else {
+          return true;
+      }
+  }
+
+  // Response is empty or null or status code other than 200.
+  public boolean isValidResponse(final String response, final HttpResponseStatus status) {
+      if(null == response || response.trim().isEmpty() || status.code() != 200) {
+          statusCode = status.code();
+          if (200 == statusCode) {
+              statusCode = 500;
+          }
+          responseContent = "";
+          return false;
+      }
+      else {
+          return true;
+      }
+  }
+
+  protected String getGPID(){
+    return (StringUtils.isNotBlank(casInternalRequestParameters.gpid) &&
+        "1".equals(casInternalRequestParameters.uidADT))
+               ? casInternalRequestParameters.gpid:null;
+  }
 }

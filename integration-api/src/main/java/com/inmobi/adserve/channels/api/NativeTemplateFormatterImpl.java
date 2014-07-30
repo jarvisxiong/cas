@@ -164,6 +164,7 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 	private String prepareContextCode(BidResponse response, Map<String, String> params,NativeResponse natResponse){
 		
 		
+		
 		String cc = contextCode;
 		String impId = response.getSeatbid().get(0).getBid().get(0).getImpid();
 		
@@ -261,8 +262,8 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 		.append(APP_URL)
 		//ICON
 		.append(ICON)
-			.append(ICON_W.replaceAll("\\$ICON_WIDTH", String.valueOf(imgwidth)))
-			.append(ICON_H.replaceAll("\\$ICON_HEIGHT", String.valueOf(imgHeight)))
+			.append(ICON_W.replaceAll("\\$ICON_WIDTH", String.valueOf(300)))
+			.append(ICON_H.replaceAll("\\$ICON_HEIGHT", String.valueOf(300)))
 			.append(ICON_URL.replaceAll("\\$ICON_URL", quoteReplacement(iconUrl)))
 		//IMG	
 		.append(IMG)
@@ -350,7 +351,16 @@ public class NativeTemplateFormatterImpl implements NativeTemplateFormatter {
 //				+ " \"data\": [ { \"seq\": 1, \"value\": \"3.9\", \"label\": 0 }],"
 //				+ "\"image\":{\"imageurl\": \"http://im-age.png\",w:350,h:980}"
 //				+ "}");
-		b.setAdm("{\"clickurl\":[\"http://adtrack.king.com/modules/adTracking/adClicked.jsp?type=ad&androidId=$O1&st1=inmobi&st2=petrescuesaga&st3=us&st5=interstitial&st4=Native&st6=$IMP_ID&linkId=2302Native\" ],\"actionlink\":\"http://a.applovin.com/redirect?clcode=3!7283.1403763299!1eBApfg9DiRku4p9jpReauuqOeDX-MhPszWW7djk1vGz5f1NPyE5J0xF26F77hRCtqIWevzdO9qMVHThJepSDBhaoHvJkxmHFBqf3igP5UMydnbemHzmqZ4BdIssykwYUHh5MBm5EIpqj397e3JP6HpnA8SIJg-dvPX_zfGFw7fD3VxtjdAtjsMbkiUPNgaa0cat1D8Y1qf30_vuKczSFRHVZH_kM8hIo9AtN2ZPAExzK4GVtLv0ftRnw_ka1jFttupmqsS_RF-XxmbQJZTlQa-zTlq90uTYamOtOqs5c5PqcsZGp9uXYOYxkxKitq18V9TYNI4W0-ONmr8ziMcBqg**\",\"actiontext\":\"Visit Us\",\"description\":\"AppLovin, Your customers aren't targets, or personas, they're people.\",\"iconurl\":\"http://applovin-assets.s3.amazonaws.com/applovin_logo_80x80.png\",\"image\":{\"h\":\"627\",\"imageurl\":\"http://applovin-assets.s3.amazonaws.com/applovin_logo_1200x627.jpg\",\"w\":\"1200\"},\"title\":\"AppLovin\"}");
+		//b.setAdm("{\"clickurl\":[\"http://adtrack.king.com/modules/adTracking/adClicked.jsp?type=ad&androidId=$O1&st1=inmobi&st2=petrescuesaga&st3=us&st5=interstitial&st4=Native&st6=$IMP_ID&linkId=2302Native\" ],\"actionlink\":\"http://a.applovin.com/redirect?clcode=3!7283.1403763299!1eBApfg9DiRku4p9jpReauuqOeDX-MhPszWW7djk1vGz5f1NPyE5J0xF26F77hRCtqIWevzdO9qMVHThJepSDBhaoHvJkxmHFBqf3igP5UMydnbemHzmqZ4BdIssykwYUHh5MBm5EIpqj397e3JP6HpnA8SIJg-dvPX_zfGFw7fD3VxtjdAtjsMbkiUPNgaa0cat1D8Y1qf30_vuKczSFRHVZH_kM8hIo9AtN2ZPAExzK4GVtLv0ftRnw_ka1jFttupmqsS_RF-XxmbQJZTlQa-zTlq90uTYamOtOqs5c5PqcsZGp9uXYOYxkxKitq18V9TYNI4W0-ONmr8ziMcBqg**\",\"actiontext\":\"Visit Us\",\"description\":\"AppLovin, Your customers aren't targets, or personas, they're people.\",\"iconurl\":\"http://applovin-assets.s3.amazonaws.com/applovin_logo_80x80.png\",\"image\":{\"h\":\"627\",\"imageurl\":\"http://applovin-assets.s3.amazonaws.com/applovin_logo_1200x627.jpg\",\"w\":\"1200\"},\"title\":\"AppLovin\"}");
+		b.setAdm("{\"clickurl\":[\"http://adtrack.king.com/modules/adTracking/adClicked.jsp?type=ad&androidId=$O1&st1=inmobi&st2=petrescuesaga&st3=us&st5=interstitial&st4=Native&st6=$IMP_ID&linkId=2302Native\" ],"
+				+ "\"actionlink\":\"http://a.applovin.com/redirect?clcode=3!7283.1403763299!1eBApfg9DiRku4p9jpReauuqOeDX-MhPszWW7djk1vGz5f1NPyE5J0xF26F77hRCtqIWevzdO9qMVHThJepSDBhaoHvJkxmHFBqf3igP5UMydnbemHzmqZ4BdIssykwYUHh5MBm5EIpqj397e3JP6HpnA8SIJg-dvPX_zfGFw7fD3VxtjdAtjsMbkiUPNgaa0cat1D8Y1qf30_vuKczSFRHVZH_kM8hIo9AtN2ZPAExzK4GVtLv0ftRnw_ka1jFttupmqsS_RF-XxmbQJZTlQa-zTlq90uTYamOtOqs5c5PqcsZGp9uXYOYxkxKitq18V9TYNI4W0-ONmr8ziMcBqg**\","
+				+ "\"actiontext\":\"Visit Us\","
+				+ "\"description\":\"AppLovin, Your customers aren't targets, or personas, they're people.\","
+				+ "\"iconurl\":\"http://applovin-assets.s3.amazonaws.com/applovin_logo_80x80.png\","
+				+ "\"image\":{\"h\":\"627\","
+				+ "\"imageurl\":\"http://applovin-assets.s3.amazonaws.com/applovin_logo_1200x627.jpg\","
+				+ "\"w\":\"1200\"},"
+				+ "\"title\":\"AppLovin\"}");
 		bList.add(b);
 		sb.setBid(bList);
 		

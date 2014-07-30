@@ -7,13 +7,17 @@
 	<parent>
 		<groupId>com.inmobi.channels</groupId>
 		<artifactId>cas</artifactId>
-		<version>3.147-SNAPSHOT</version>
+		<version>3.150-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.inmobi.channels</groupId>
 			<artifactId>util</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.inmobi.channels</groupId>
+			<artifactId>template</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>

@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.inmobi.channels</groupId>
 		<artifactId>cas</artifactId>
-		<version>3.147-SNAPSHOT</version>
+		<version>3.150-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
@@ -28,6 +28,12 @@
 		<dependency>
 			<groupId>org.sonatype.maven.plugin</groupId>
 			<artifactId>emma-maven-plugin</artifactId>
+			<exclusions>
+			   <exclusion>
+					<groupId>org.codehaus.plexus</groupId>
+					<artifactId>plexus-velocity</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>io.netty</groupId>

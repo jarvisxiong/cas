@@ -73,8 +73,8 @@ public class RepositoryHelper {
                     .addRepositoryToStats(this.siteEcpmRepository)
                     .addRepositoryToStats(this.currencyConversionRepository)
                     .addRepositoryToStats(this.wapSiteUACRepository)
-                    .addRepositoryToStats(this.creativeRepository);
-                   // .addRepositoryToStats(this.nativeAdTemplateRepository);
+                    .addRepositoryToStats(this.creativeRepository)
+                    .addRepositoryToStats(this.nativeAdTemplateRepository);
 
     }
 

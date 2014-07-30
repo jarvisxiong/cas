@@ -1,0 +1,23 @@
+$logger.logParameters(1, 0)
+
+#if ($creative.requireMraidJs)
+<script type="text/javascript" src="mraid.js"></script>
+#end
+<div style="display:none; position:absolute;" id="${creative.ns}clickTarget"></div>
+<script type="text/javascript">
+#set($newAsyncFlow = $tool.newAsyncMode($config.abTestingMode, $config.testAdGroupList, $creative.adGroupGuid))
+#set($boltObject = $tool.boltObject($creative, $newAsyncFlow))
+#if($newAsyncFlow && $creative.isLatencyOptimised() && $tool.isIAT($creative.landingUrl))
+    $config.fortyoneJs
+    $config.iatJs new window.inmobi.iat('$creative.ns', '$tool.getCurl($boltObject)');
+#end
+$config.boltJs new window.inmobi.Bolt($tool.boltJson($boltObject));
+$config.oldTapJs new window.inmobi.OldTap("$creative.ns", function() {
+  window['${creative.ns}openLandingPage']();
+  window['${creative.ns}clickCallback']();
+});
+#if ($creative.metricsEnabled)
+$config.metricJs new window.inmobi.csi.Metrics("$tool.javascript($creative.beaconUrl)",
+"$creative.ns");
+#end
+</script>
