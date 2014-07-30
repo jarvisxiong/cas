@@ -7,8 +7,15 @@ import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.attribute.BAttrNativeType;
+import com.inmobi.adserve.channels.api.attribute.BTypeNativeAttributeType;
+import com.inmobi.adserve.channels.api.attribute.SuggestedNativeAttributeType;
+import com.inmobi.adserve.channels.api.natives.NativeBuilder;
+import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
+import com.inmobi.adserve.channels.api.template.NativeTemplateAttributeFinder;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.*;
@@ -90,7 +97,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     public static ImpressionCallbackHelper impressionCallbackHelper;
     private final IABCategoriesInterface   iabCategoriesInterface;
     private final IABCountriesInterface    iabCountriesInterface;
-    private final IABCitiesInterface       iabCitiesInterface;
     private final boolean                  siteBlinded;
     private final String                   advertiserName;
     private double                         secondBidPriceInUsd          = 0;
@@ -134,7 +140,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private static NativeTemplateAttributeFinder nativeTemplateAttributeFinder;
     
     @Inject
-    private static NativeTemplateFormatter nativeTemplateFormatter;
+    private static NativeBuilderFactory    nativeBuilderfactory;
+    
+    @Inject
+    private static NativeResponseMaker     nativeResponseMaker;
     
     
     private static final String nativeString = "native";
@@ -160,7 +169,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         this.urlBase = urlBase;
         this.setRtbPartner(true);
         this.iabCategoriesInterface = new IABCategoriesMap();
-        this.iabCitiesInterface = new IABCitiesMap();
         this.iabCountriesInterface = new IABCountriesMap();
         this.advertiserName = advertiserName;
         this.tmax = tmax;
@@ -348,17 +356,28 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         
         if(isNativeResponseSupported && isNativeRequest()){
-        	impression.setExt(createNativeExtensionObject());
+        	ImpressionExtensions impExt = createNativeExtensionObject();
+        	
+        	if(impExt ==null){
+        		return null;
+        	}
+        	impression.setExt(impExt);
         }
         return impression;
     }
     
     
     private ImpressionExtensions createNativeExtensionObject(){
-    	Native nat = new Native();
-    	nat.setMandatory(nativeTemplateAttributeFinder.findAttribute(new MandatoryNativeAttributeType()));
-    	nat.setImage(nativeTemplateAttributeFinder.findAttribute(new ImageNativeAttributeType()));
-    	
+//    	Native nat = new Native();
+//    	nat.setMandatory(nativeTemplateAttributeFinder.findAttribute(new MandatoryNativeAttributeType()));
+//    	nat.setImage(nativeTemplateAttributeFinder.findAttribute(new ImageNativeAttributeType()));
+    	NativeAdTemplateEntity templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getSiteId());
+    	if(templateEntity == null){
+    		LOG.info(String.format("This site id %s doesn't have native template :",sasParams.getSiteId()));
+    		return null;
+    	}
+    	NativeBuilder nb = nativeBuilderfactory.create(templateEntity);
+    	Native nat = nb.build();
     	//TODO: for native currently there is no way to identify MRAID traffic/container supported by publisher.
 //    	if(!StringUtils.isEmpty(sasParams.getSdkVersion())){
 //    	   nat.api.add(3);
@@ -842,10 +861,16 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     		params.put("appId",app.getId());
     	}
     	try {
-    		responseContent = nativeTemplateFormatter.getFormatterValue(null, bidResponse, params);
+    		params.put("siteId", this.sasParams.getSiteId());
+    		responseContent = nativeResponseMaker.makeResponse(bidResponse, params, repositoryHelper.queryNativeAdTemplateRepository(sasParams.getSiteId()));
 		} catch (Exception e) {
+			
+			if(LOG.isDebugEnabled()){
+				e.printStackTrace();
+			}
 			 adStatus = "NO_AD";
-	         LOG.error("Some exception is caught while filling the native template for partner{} {}",
+			 responseContent = "";
+	         LOG.error("Some exception is caught while filling the native template for partner "+e.getLocalizedMessage(),
 	                    advertiserName, e);
 		}
     	

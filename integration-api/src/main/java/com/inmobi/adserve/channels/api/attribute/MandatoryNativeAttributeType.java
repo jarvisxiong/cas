@@ -1,4 +1,4 @@
-package com.inmobi.adserve.channels.util;
+package com.inmobi.adserve.channels.api.attribute;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,4 +25,6 @@ public class MandatoryNativeAttributeType implements NativeAttributeType<List<In
 		return attrs;
 	}
 
+
+	
 }

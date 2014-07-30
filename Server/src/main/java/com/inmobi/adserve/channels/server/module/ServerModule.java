@@ -3,6 +3,7 @@ package com.inmobi.adserve.channels.server.module;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
@@ -24,6 +25,8 @@ import com.inmobi.adserve.channels.util.JaxbHelper;
 import com.inmobi.adserve.channels.util.annotations.LoggerConfiguration;
 import com.inmobi.adserve.channels.util.annotations.RtbConfiguration;
 import com.inmobi.adserve.channels.util.annotations.ServerConfiguration;
+import com.inmobi.template.module.TemplateModule;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.hadoop.thirdparty.guava.common.collect.Maps;
 import org.reflections.Reflections;
@@ -31,6 +34,7 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.Path;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -77,7 +81,8 @@ public class ServerModule extends AbstractModule {
         requestStaticInjection(AuctionEngine.class);
         requestStaticInjection(ResponseSender.class);
 
-
+        install(new NativeModule());
+        install(new TemplateModule());
         install(new AdapterConfigModule(adapterConfiguration, ChannelServer.dataCentreName));
         install(new ChannelSegmentFilterModule());
         install(new ScopeModule());

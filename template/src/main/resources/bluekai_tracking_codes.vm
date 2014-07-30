@@ -1,0 +1,5 @@
+#if ($creative.appendBluekaiUrl && $tool.sdkGreaterOrEquals($creative.sdkVersion, "350"))
+#set($blueKaiParam = "id=$creative.normalizedUserId")
+<iframe $tool.attr("src", $tool.html($tool.addUrlParams($config.bluekaiUrl, $blueKaiParam))) width="1" height="0" seamless="seamless" style="display:none;">
+</iframe>
+#end

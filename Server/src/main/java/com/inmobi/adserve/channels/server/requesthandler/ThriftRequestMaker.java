@@ -62,7 +62,9 @@ public class ThriftRequestMaker {
         site.setSiteId("55b798bd8f1c4de5b89823fbacf419bc");
         //tango siteid
         //site.setSiteId("69d6ab27d03f407f9f6fa9c5fad77afd");
-//        site.setSiteId("b79bb8cbab6e479bbd1c14b2dd448f7e");
+        // site.setSiteId("99fafeaec0f4441cb7366d20de3335e2");
+        site.setSiteId("b5e2e6ea4a4b42a799ceca322b2fd004");
+
         site.setPublisherId("sitepub");
         site.setContentRating(ContentRating.PERFORMANCE);
         site.setInventoryType(InventoryType.APP);
@@ -104,7 +106,7 @@ public class ThriftRequestMaker {
         adPoolRequest.setSegmentId(0);
         adPoolRequest.setDevice(device);
         adPoolRequest.setCarrier(carrier);
-
+        
         IntegrationDetails integrationDetails = new IntegrationDetails();
         integrationDetails.setIntegrationType(IntegrationType.ANDROID_SDK);
         integrationDetails.setIntegrationVersion(370);
