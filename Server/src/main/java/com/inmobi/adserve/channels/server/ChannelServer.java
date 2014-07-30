@@ -1,33 +1,15 @@
 package com.inmobi.adserve.channels.server;
 
-import com.google.inject.Injector;
-import com.google.inject.util.Modules;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.repository.*;
-import com.inmobi.adserve.channels.server.api.ConnectionType;
-import com.inmobi.adserve.channels.server.module.CasNettyModule;
-import com.inmobi.adserve.channels.server.module.NativeModule;
-import com.inmobi.adserve.channels.server.module.ServerModule;
-import com.inmobi.adserve.channels.server.requesthandler.Logging;
-import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import com.inmobi.adserve.channels.util.MetricsManager;
-import com.inmobi.casthrift.DataCenter;
-import com.inmobi.messaging.publisher.AbstractMessagePublisher;
-import com.inmobi.messaging.publisher.MessagePublisherFactory;
-import com.inmobi.phoenix.exception.InitializationException;
-import com.inmobi.template.module.TemplateModule;
-import com.netflix.governator.guice.LifecycleInjector;
-import com.netflix.governator.lifecycle.LifecycleManager;
-
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Slf4JLoggerFactory;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.dbcp2.*;
-import org.apache.commons.pool2.impl.GenericObjectPool;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.List;
+import java.util.Properties;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -39,13 +21,48 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.List;
-import java.util.Properties;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.dbcp2.ConnectionFactory;
+import org.apache.commons.dbcp2.DriverManagerConnectionFactory;
+import org.apache.commons.dbcp2.PoolableConnection;
+import org.apache.commons.dbcp2.PoolableConnectionFactory;
+import org.apache.commons.dbcp2.PoolingDataSource;
+import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
+import com.google.inject.Injector;
+import com.google.inject.util.Modules;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
+import com.inmobi.adserve.channels.repository.ChannelFeedbackRepository;
+import com.inmobi.adserve.channels.repository.ChannelRepository;
+import com.inmobi.adserve.channels.repository.ChannelSegmentFeedbackRepository;
+import com.inmobi.adserve.channels.repository.ChannelSegmentMatchingCache;
+import com.inmobi.adserve.channels.repository.CreativeRepository;
+import com.inmobi.adserve.channels.repository.CurrencyConversionRepository;
+import com.inmobi.adserve.channels.repository.NativeAdTemplateRepository;
+import com.inmobi.adserve.channels.repository.PricingEngineRepository;
+import com.inmobi.adserve.channels.repository.PublisherFilterRepository;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.repository.SiteCitrusLeafFeedbackRepository;
+import com.inmobi.adserve.channels.repository.SiteEcpmRepository;
+import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
+import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
+import com.inmobi.adserve.channels.repository.WapSiteUACRepository;
+import com.inmobi.adserve.channels.server.api.ConnectionType;
+import com.inmobi.adserve.channels.server.module.CasNettyModule;
+import com.inmobi.adserve.channels.server.module.ServerModule;
+import com.inmobi.adserve.channels.server.requesthandler.Logging;
+import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import com.inmobi.adserve.channels.util.MetricsManager;
+import com.inmobi.casthrift.DataCenter;
+import com.inmobi.messaging.publisher.AbstractMessagePublisher;
+import com.inmobi.messaging.publisher.MessagePublisherFactory;
+import com.inmobi.phoenix.exception.InitializationException;
+import com.netflix.governator.guice.LifecycleInjector;
+import com.netflix.governator.lifecycle.LifecycleManager;
 
 
 /*
@@ -394,6 +411,7 @@ public class ChannelServer {
     }
 
     // send Mail if channel server crashes
+    @SuppressWarnings("unchecked")
     private static void sendMail(final String errorMessage, final String stackTrace) {
         Properties properties = System.getProperties();
         properties.setProperty("mail.smtp.host", CasConfigUtil.getServerConfig().getString("smtpServer"));
