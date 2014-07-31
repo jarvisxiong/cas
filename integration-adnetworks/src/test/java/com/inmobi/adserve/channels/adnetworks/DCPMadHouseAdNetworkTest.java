@@ -199,7 +199,7 @@ public class DCPMadHouseAdNetworkTest extends TestCase{
         String blindedSiteId = (new UUID(1000000009L, 1000000007L)).toString();
         String actualUrl = dcpMadhouseAdNetwork.getRequestUri().toString();
 
-        // Compare the expected URL with actual URL after eliminating its last parameter.
+        // Compare the expected URL with actual URL.
         String expectedUrl = "http://beta.api.main-servers.com/napi/90002830?adtype=5&os=iOS&oid=202cb962ac59075b964b07152d234b70&idfa=23e2ewq445545&width=300&height=250&lat=37.4429&lon=-122.1514&ip=206.29.182.240&ua=Mozilla%252F5.0%2B%2528compatible%253B%2BMSIE%2B9.0%253B%2BWindows%2BNT%2B6.1%253B%2BTrident%252F5.0%2529&pcat&pid=madhouseadv1";
         assertEquals(expectedUrl, actualUrl);
     }
