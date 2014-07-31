@@ -226,9 +226,8 @@ public class DCPMadHouseAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         URIBuilder builder = new URIBuilder();
-        builder.setScheme("http");
         builder.setHost(host);
-        builder.setPath("/napi/" + PUBLISHER_ID);
+        builder.setScheme("http");
 
         // Add the parameters.
         // Ad Type.

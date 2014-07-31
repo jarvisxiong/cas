@@ -15,6 +15,7 @@ import org.testng.annotations.Test;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import static org.easymock.EasyMock.expect;
@@ -27,7 +28,7 @@ public class DCPMadHouseAdNetworkTest extends TestCase{
         private final String loggerConf = "/tmp/channel-server.properties";
 
         private DCPMadHouseAdNetwork dcpMadhouseAdNetwork;
-        private final String madhouseHost = "http://s.x.cn.madhouse.com/bx?v=0";
+        private final String madhouseHost = "beta.api.main-servers.com/napi/90002830";
         private final String madhouseStatus = "on";
         private final String madhouseAdvId = "madhouseadv1";
 
@@ -75,6 +76,13 @@ public class DCPMadHouseAdNetworkTest extends TestCase{
             sasParams.setOsId(SASRequestParameters.HandSetOS.iOS.getValue());
             sasParams.setSlot((short) 10);
 
+            // Set Categories.
+            List categories = new ArrayList();
+            categories.add(1L);
+            categories.add(2L);
+            categories.add(3L);
+            sasParams.setCategories(categories);
+
             ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
                 madhouseAdvId, "adgroupid", null, null, 0, null, null, true, true, null, null, null, null, 0, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
@@ -101,6 +109,13 @@ public class DCPMadHouseAdNetworkTest extends TestCase{
         sasParams.setOsId(SASRequestParameters.HandSetOS.iOS.getValue());
         sasParams.setSlot((short) 10);
 
+        // Set Categories.
+        List categories = new ArrayList();
+        categories.add(1L);
+        categories.add(2L);
+        categories.add(3L);
+        sasParams.setCategories(categories);
+
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
             madhouseAdvId, "adgroupid", null, null, 0, null, null, true, true, null, null, null, null, 0, true, null,
             null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
@@ -126,6 +141,13 @@ public class DCPMadHouseAdNetworkTest extends TestCase{
         sasParams.setSource("APP");
         sasParams.setOsId(SASRequestParameters.HandSetOS.iOS.getValue());
         sasParams.setSlot((short) 10);
+
+        // Set Categories.
+        List categories = new ArrayList();
+        categories.add(1L);
+        categories.add(2L);
+        categories.add(3L);
+        sasParams.setCategories(categories);
 
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
             madhouseAdvId, "adgroupid", null, null, 0, null, null, true, true, null, null, null, null, 0, true, null,
@@ -154,6 +176,13 @@ public class DCPMadHouseAdNetworkTest extends TestCase{
         sasParams.setSlot((short) 10);
         sasParams.setSiteIncId(1000000007L);
 
+        // Set Categories.
+        List categories = new ArrayList();
+        categories.add(1L);
+        categories.add(2L);
+        categories.add(3L);
+        sasParams.setCategories(categories);
+
         String externalKey = "4246";
 
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
@@ -171,9 +200,7 @@ public class DCPMadHouseAdNetworkTest extends TestCase{
         String actualUrl = dcpMadhouseAdNetwork.getRequestUri().toString();
 
         // Compare the expected URL with actual URL after eliminating its last parameter.
-        String expectedUrl = "http://s.x.cn.madhouse.com/bx?v=0&m_app=com.inmobi-exchange.00000000-0000-0000-0000-00003b9aca07&m_ua=Mozilla%2F5.0+%28compatible%3B+MSIE+9.0%3B+Windows+NT+6.1%3B+Trident%2F5.0%29&m_ip=206.29.182.240&m_adw=300&m_adh=250&m_pos=37.4429%2C-122.1514&m_net=2&m_os=iOS&m0=202cb962ac59075b964b07152d234b70&m5=23e2ewq445545&m_int=1&l=4246";
-        actualUrl = actualUrl.substring(0, actualUrl.lastIndexOf('&'));
-
+        String expectedUrl = "http://beta.api.main-servers.com/napi/90002830?adtype=5&os=iOS&oid=202cb962ac59075b964b07152d234b70&idfa=23e2ewq445545&width=300&height=250&lat=37.4429&lon=-122.1514&ip=206.29.182.240&ua=Mozilla%252F5.0%2B%2528compatible%253B%2BMSIE%2B9.0%253B%2BWindows%2BNT%2B6.1%253B%2BTrident%252F5.0%2529&pcat&pid=madhouseadv1";
         assertEquals(expectedUrl, actualUrl);
     }
 }
