@@ -13,6 +13,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,7 +130,9 @@ public class NativeResponseMaker {
 		
 		context.put("IMP_ID", impId);
 		context.put("LANDING_PAGE",app.getOpeningLandingUrl());
-		context.put("BEACON_URL", getBeaconUrl(response,params,app));
+		context.put("OLD_LANDING_PAGE",app.getOpeningLandingUrl());
+		context.put("TRACKING_CODE", getTrackingCode(response,params,app));
+		context.put("BEACON_URL", params.get("beaconUrl"));
 		context.put("CLICK_TRACKER", getClickUrl(response,params,app));
 		
 		return context;
@@ -139,7 +143,7 @@ public class NativeResponseMaker {
 		return "<img src=\\\""+url+"\\\" style=\\\"display:none;\\\" />";
 	}
 	
-	private String getBeaconUrl(BidResponse response,Map<String, String> params,App app){
+	private String getTrackingCode(BidResponse response,Map<String, String> params,App app){
 		
 		StringBuilder bcu = new StringBuilder();
 		String nUrl = null;
@@ -153,9 +157,9 @@ public class NativeResponseMaker {
             LOG.debug("Exception while parsing response {}", e);
         }
         
-        String beaconUrl = params.get("beaconUrl");
-        if(!StringUtils.isEmpty(beaconUrl)){
-        	bcu.append(constructBeaconUrl(beaconUrl));
+        String winUrl = params.get("winUrl");
+        if(!StringUtils.isEmpty(winUrl)){
+        	bcu.append(constructBeaconUrl(winUrl));
         }
         
         List<String> pixelurls = app.getPixelUrls();
@@ -201,10 +205,15 @@ public class NativeResponseMaker {
         private final String namespace;
     }
 
-    public String nativeAd(String pubContent, String contextCode,String namespace) {
+    public String nativeAd(String pubContent, String contextCode,String namespace) throws JSONException {
         pubContent = base64(pubContent);
-        NativeAd nativeAd = new NativeAd(pubContent, contextCode, namespace);
-        return gson.toJson(nativeAd);
+        // NativeAd nativeAd = new NativeAd(pubContent, contextCode, namespace);
+        StringBuilder json = new StringBuilder();
+        json.append("{ \"pubContent\": \"").append(pubContent).append("\", \"contextCode\": \"").append(contextCode).append("\", \"namespace\": \"")
+        .append(namespace).append("\"}");
+        String test = json.toString();
+        return json.toString();
+        // return gson.toJson(nativeAd);
     }
     
     public String base64(String input) {

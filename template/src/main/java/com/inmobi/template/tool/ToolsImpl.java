@@ -15,7 +15,15 @@ public class ToolsImpl extends Tools {
 
   @Override
   public Object jpath(final Context context, final String key) {
+<<<<<<< Updated upstream
     return context.get(key);
+=======
+    final Object val = context.get(key);
+    if (val != null) {
+      return val;
+    }
+    return "";
+>>>>>>> Stashed changes
   }
 
   @Override
@@ -34,4 +42,8 @@ public class ToolsImpl extends Tools {
     // return gson.toJson(pubContent);
   }
 
+<<<<<<< Updated upstream
 }
+=======
+}
+>>>>>>> Stashed changes
