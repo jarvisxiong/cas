@@ -60,7 +60,9 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
 
   @Override
   public String getJSON() {
-    return null;
+    return String.format(
+        "{\"siteId\":\"%s\",\"siteTypeId\":%s,\"contentRating\":\"%s\",\"isCoppaEnabled\":%s,\"appType\":\"%s\"}", id,
+        siteTypeId, contentRating, isCoppaEnabled, appType);
   }
 
   @Override
