@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION site_native_template_fun(last_update timestamp without time zone)
+CREATE OR REPLACE FUNCTION site_native_template_fun(last_updated timestamp without time zone)
 RETURNS SETOF site_native_template_type AS
 $BODY$
 DECLARE
