@@ -38,7 +38,7 @@ public final class App extends AbstractContext{
 		this.downloads = builder.downloads;
 		this.openingLandingUrl = builder.openingLandingUrl;
 		this.pixelUrls = builder.pixelUrls;
-		
+		this.clickUrls = builder.clickUrls;
 		setValues(params);
 	}
 

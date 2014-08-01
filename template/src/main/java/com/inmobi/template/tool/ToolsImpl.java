@@ -9,7 +9,6 @@ public class ToolsImpl extends Tools {
   Gson gson = new Gson();
 
   public ToolsImpl() {
-
   }
 
 
@@ -31,7 +30,6 @@ public class ToolsImpl extends Tools {
   @Override
   public String nativeAd(final Context creativeContext, final String pubContent) {
     return pubContent;
-    // return gson.toJson(pubContent);
   }
 
 }
