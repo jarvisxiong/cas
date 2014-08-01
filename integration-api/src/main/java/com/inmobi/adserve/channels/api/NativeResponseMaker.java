@@ -11,10 +11,7 @@ import org.apache.commons.codec.Charsets;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.exception.ParseErrorException;
-import org.apache.velocity.exception.ResourceNotFoundException;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,9 +135,8 @@ public class NativeResponseMaker {
 		return context;
 	}
 	
-	private String constructBeaconUrl(String url){
-	  //TODO: use String.format
-		return "<img src=\\\""+url+"\\\" style=\\\"display:none;\\\" />";
+	private static String constructBeaconUrl(String url){
+	  return String.format("<img src=\"%s\" style=\"display:none;\" />", url);
 	}
 	
 	private String getTrackingCode(BidResponse response,Map<String, String> params,App app){
@@ -176,24 +172,19 @@ public class NativeResponseMaker {
 		throw new Exception(message);
 	}
 	
-	//TODO: Check and re-factor
 	private String getClickUrl(BidResponse response,Map<String, String> params,App app){
-		
 		StringBuilder ct = new StringBuilder();
-        
         List<String> clickUrls = app.getClickUrls();
-        if(clickUrls!=null){
+        if( clickUrls != null ) {
 	        int i=0;
-	        for(;i<clickUrls.size()-1;){
+	        for( ; i<clickUrls.size()-1; i++){
 	        	ct.append("\"").append(clickUrls.get(i)).append("\"").append(",");
-	        	i++;
 	        }
 	        
-	        if(clickUrls.size()>0){
+	        if(clickUrls.size() > 0){
 	        	ct.append("\"").append(clickUrls.get(i)).append("\"");
 	        }
         }
-        
 		return ct.toString();
 	}
 	
@@ -207,13 +198,8 @@ public class NativeResponseMaker {
 
     public String nativeAd(String pubContent, String contextCode,String namespace) throws JSONException {
         pubContent = base64(pubContent);
-        // NativeAd nativeAd = new NativeAd(pubContent, contextCode, namespace);
-        StringBuilder json = new StringBuilder();
-        json.append("{ \"pubContent\": \"").append(pubContent).append("\", \"contextCode\": \"").append(contextCode).append("\", \"namespace\": \"")
-        .append(namespace).append("\"}");
-        String test = json.toString();
-        return json.toString();
-        // return gson.toJson(nativeAd);
+        NativeAd nativeAd = new NativeAd(pubContent, contextCode, namespace);
+        return gson.toJson(nativeAd);
     }
     
     public String base64(String input) {
