@@ -856,8 +856,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     	
     	Map<String, String> params = new HashMap<String, String>();
     	String winUrl = this.beaconUrl + "?b=${WIN_BID}";
-    	params.put("beaconUrl",this.beaconUrl);
-    	params.put("winUrl",winUrl);
+    	params.put("beaconUrl", this.beaconUrl);
+    	params.put("winUrl",  winUrl);
+    	params.put("impressionId", this.impressionId);
     	if(app!=null){
     		params.put("appId",app.getId());
     	}

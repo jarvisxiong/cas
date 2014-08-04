@@ -21,8 +21,8 @@ import com.inmobi.template.interfaces.Context;
 public class AppDeserializer implements JsonDeserializer<Context> {
 
   @Override
-  public Context deserialize(final JsonElement json, final Type typeOf,
-      final JsonDeserializationContext context) throws JsonParseException {
+  public Context deserialize(final JsonElement json, final Type typeOf, final JsonDeserializationContext context)
+      throws JsonParseException {
     final JsonObject jsonObj = json.getAsJsonObject();
     String title = null;
     if (jsonObj.get("title") != null) {
@@ -33,12 +33,11 @@ public class AppDeserializer implements JsonDeserializer<Context> {
     if (jsonObj.get("description") != null) {
       desc = jsonObj.get("description").getAsString();
     }
-    // String actionText = jsonObj.get("actiontext").getAsString();
+    final String actionText = jsonObj.get("actiontext").getAsString();
     String actionLink = null;
     if (jsonObj.get("actionlink") != null) {
       actionLink = jsonObj.get("actionlink").getAsString();
     }
-    // String cta_install = jsonObj.get("actiontext").getAsString();
     final JsonElement idElement = jsonObj.get("uid");
     String id = "";
     if (idElement != null) {
@@ -68,13 +67,12 @@ public class AppDeserializer implements JsonDeserializer<Context> {
       icons = new Icon[] {(Icon) icon.build()};
 
     }
-    // Icon icons[] = new Icon[]{context.deserialize(iconElement, Icon.class)};
-
 
     final App.Builder app = App.newBuilder();
     app.setDesc(desc);
     app.setTitle(title);
     app.setOpeningLandingUrl(actionLink);
+    app.setActionText(actionText);
     if (icons != null) {
       app.setIcons(Arrays.asList(icons));
     }
@@ -90,8 +88,6 @@ public class AppDeserializer implements JsonDeserializer<Context> {
       app.setRating(dataMap.getRating());
       app.setRating_count(dataMap.getRating_count());
     }
-
-
     return app.build();
   }
 
