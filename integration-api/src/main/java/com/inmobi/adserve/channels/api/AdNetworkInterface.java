@@ -1,10 +1,11 @@
 package com.inmobi.adserve.channels.api;
 
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.casthrift.CreativeType;
 
 
 public interface AdNetworkInterface {
@@ -29,6 +30,8 @@ public interface AdNetworkInterface {
 
     // Returns whether to log creative or not
     String getAdMarkUp();
+    
+    CreativeType getCreativeType();
 
     // Returns whether to log creative or not
     boolean isLogCreative();
