@@ -270,7 +270,6 @@ public class Logging {
                 creativeLog.setAdm(adNetworkInterface.getAdMarkUp());
                 creativeLog.setCreativeAttributes(adNetworkInterface.getAttribute());
                 creativeLog.setAdvertiserDomains(adNetworkInterface.getADomain());
-                creativeLog.setCreativeType(adNetworkInterface.getCreativeType());
                 creativeLog.setTime_stamp(new Date().getTime());
                 LOG.info("Creative msg is {}", creativeLog);
                 Message msg = null;
@@ -432,7 +431,6 @@ public class Logging {
             if (enableDatabusLogging && decideToLog(partnerName, externalSiteKey)) {
                 //Actual Logging to stream
                 CasAdvertisementLog casAdvertisementLog = new CasAdvertisementLog(partnerName, requestUrl, response, adStatus, externalSiteKey, advertiserId);
-                casAdvertisementLog.setCreativeType(adNetworkInterface.getCreativeType());
                 sendToDatabus(casAdvertisementLog, sampledAdvertisementLogKey);
             }
 
