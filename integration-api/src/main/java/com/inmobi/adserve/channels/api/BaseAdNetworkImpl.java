@@ -5,13 +5,16 @@ import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.scope.NettyRequestScope;
 import com.inmobi.adserve.channels.util.*;
+import com.inmobi.casthrift.CreativeType;
 import com.ning.http.client.*;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONObject;
@@ -21,6 +24,7 @@ import org.slf4j.MDC;
 import org.slf4j.Marker;
 
 import javax.inject.Inject;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -666,6 +670,15 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     
     protected boolean isNativeRequest(){
     	return false;
+    }
+    
+    @Override
+    public CreativeType getCreativeType(){
+    	if(isNativeRequest()){
+    		return CreativeType.NATIVE;
+    	}else{
+    		return CreativeType.RICH_MEDIA;
+    	}
     }
 
     protected String getHashedValue(final String message, final String hashingType) {

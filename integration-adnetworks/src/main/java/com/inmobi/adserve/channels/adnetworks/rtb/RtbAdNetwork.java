@@ -894,6 +894,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             setBidPriceInUsd(calculatePriceInUSD(getBidPriceInLocal(), bidderCurrency));
             responseSeatId = bidResponse.getSeatbid().get(0).getSeat();
             Bid bid =  bidResponse.getSeatbid().get(0).getBid().get(0);
+            adm = bid.getAdm();
             responseImpressionId = bid.getImpid();
             creativeId = bid.getCrid();
             sampleImageUrl = bid.getIurl();
