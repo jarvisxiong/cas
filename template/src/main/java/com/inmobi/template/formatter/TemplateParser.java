@@ -50,13 +50,6 @@ public class TemplateParser {
 
   public String format(final Context context, final String templateName) throws TemplateException {
     LOG.debug("Formating Template for site : {}", templateName);
-    // velocityContext.put("config", UnifiedFormatterConfiguration.getInstance());
-    // velocityContext.put("ad", adContext);
-    // List<CreativeContext> creativeContextList = adContext.getCreativeList();
-    // if (!creativeContextList.isEmpty()) {
-    // velocityContext.put("first", new ContextImpl());
-    // ContextImpl c = new ContextImpl();
-    // c.setApp(getSampleApp());
     try {
       final VelocityContext velocityContext = getVelocityContext();
       velocityContext.put("first", context);
