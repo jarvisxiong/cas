@@ -3,6 +3,8 @@ package com.inmobi.adserve.channels.repository;
 import java.sql.Timestamp;
 import java.util.Collection;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.inmobi.adserve.channels.entity.CreativeEntity;
 import com.inmobi.adserve.channels.query.CreativeQuery;
 import com.inmobi.adserve.channels.types.CreativeExposure;
@@ -44,7 +46,7 @@ public class CreativeRepository extends AbstractStatsMaintainingDBRepository<Cre
     builder.setAdvertiserId(advertiserId);
     builder.setCreativeId(creativeId);
     CreativeExposure exposure = CreativeExposure.SELF_SERVE;
-    if (exposureLevel != null) {
+    if (!StringUtils.isEmpty(exposureLevel)) {
       exposure =
           "SELF-SERVE".equals(exposureLevel) ? CreativeExposure.SELF_SERVE : CreativeExposure.valueOf(exposureLevel);
     }
