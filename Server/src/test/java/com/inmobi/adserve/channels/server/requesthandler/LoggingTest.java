@@ -6,9 +6,12 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilterApplierTest;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import com.inmobi.casthrift.CreativeType;
 import com.inmobi.messaging.Message;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
+
 import junit.framework.TestCase;
+
 import org.apache.commons.configuration.Configuration;
 import org.easymock.EasyMock;
 import org.testng.annotations.Test;
@@ -67,6 +70,7 @@ public class LoggingTest extends TestCase {
         ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
         thirdPartyAdResponse.adStatus = "AD";
         expect(mockAdnetworkInterface.getResponseStruct()).andReturn(thirdPartyAdResponse).anyTimes();
+        expect(mockAdnetworkInterface.getCreativeType()).andReturn(CreativeType.BANNER).anyTimes();
         expect(mockAdnetworkInterface.getName()).andReturn("DummyAdNetwork1").anyTimes();
         expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
         expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("DummyResponsecontent").anyTimes();
@@ -163,6 +167,7 @@ public class LoggingTest extends TestCase {
         expect(mockAdnetworkInterface.getName()).andReturn("DummyAdNetwork2").anyTimes();
         expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
         expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("response").anyTimes();
+        expect(mockAdnetworkInterface.getCreativeType()).andReturn(CreativeType.BANNER).anyTimes();
         expect(mockAdnetworkInterface.isRtbPartner()).andReturn(false).anyTimes();
         replay(mockAdnetworkInterface);
         ChannelSegment channelSegment = new ChannelSegment(channelSegmentEntity, null, null, null, null,

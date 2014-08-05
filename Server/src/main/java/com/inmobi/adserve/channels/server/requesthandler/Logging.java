@@ -255,6 +255,9 @@ public class Logging {
             AdNetworkInterface adNetworkInterface = channelSegment.getAdNetworkInterface();
             if (adNetworkInterface.isRtbPartner() && adNetworkInterface.isLogCreative()) {
                 String response = adNetworkInterface.getHttpResponseContent();
+                if(adNetworkInterface.getCreativeType() == CreativeType.NATIVE){
+                	response = adNetworkInterface.getAdMarkUp();
+                }
                 String requestUrl = adNetworkInterface.getRequestUrl();
                 ThirdPartyAdResponse adResponse = adNetworkInterface.getResponseStruct();
                 String partnerName = adNetworkInterface.getName();
@@ -267,7 +270,6 @@ public class Logging {
                 creativeLog.setCountryId(sasRequestParameters.getCountryId().intValue());
                 creativeLog.setCreativeId(adNetworkInterface.getCreativeId());
                 creativeLog.setImageUrl(adNetworkInterface.getIUrl());
-                creativeLog.setAdm(adNetworkInterface.getAdMarkUp());
                 creativeLog.setCreativeAttributes(adNetworkInterface.getAttribute());
                 creativeLog.setAdvertiserDomains(adNetworkInterface.getADomain());
                 creativeLog.setCreativeType(adNetworkInterface.getCreativeType());
@@ -425,6 +427,10 @@ public class Logging {
             String advertiserId = rankList.get(index).getChannelSegmentEntity().getAdvertiserId();
             String requestUrl = adNetworkInterface.getRequestUrl();
             String response = adNetworkInterface.getHttpResponseContent();
+            if(adNetworkInterface.getCreativeType() == CreativeType.NATIVE){
+            	response = adNetworkInterface.getAdMarkUp();
+            }
+            
             if (!adStatus.equalsIgnoreCase("AD") || requestUrl.equals("") || response.equals("")) {
                 continue;
             }

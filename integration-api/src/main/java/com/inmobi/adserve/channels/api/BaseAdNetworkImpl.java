@@ -677,7 +677,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     	if(isNativeRequest()){
     		return CreativeType.NATIVE;
     	}else{
-    		return CreativeType.RICH_MEDIA;
+    		return CreativeType.BANNER;
     	}
     }
 
@@ -757,7 +757,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     @Override
     public void setLogCreative(boolean logCreative) {
-        //
+    	 //
     }
 
     @Override
