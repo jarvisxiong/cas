@@ -29,6 +29,7 @@ new window.inmobi.Bolt({
 "lps":"$OLD_LANDING_PAGE",
 "ct":[$CLICK_TRACKER],
 "bcu":"$BEACON_URL",
+"tc":"$TRACKING_CODE",
 "ws":false,
 "ns":"$NAMESPACE"});
 (function() {var b=window,c='handleClick',d='handleTouchEnd',f='handleTouchStart';b.inmobi=b.inmobi||{};var g=b.inmobi;function h(a,e){return function(l){e.call(a,l)}}function k(a,e){this.b=e;this.a=this.c=!1;b[a+c]=h(this,this.click);b[a+f]=h(this,this.start);b[a+d]=h(this,this.end)}k.prototype.click=function(){this.c||this.b()};k.prototype.start=function(a){this.a=this.c=!0;a&&a.preventDefault()};k.prototype.end=function(){this.a&&(this.a=!1,this.b())};g.OldTap=k;})(); new window.inmobi.OldTap("$NAMESPACE", function() {  window['${NAMESPACE}openLandingPage']();  window['${NAMESPACE}clickCallback']();});</script>
