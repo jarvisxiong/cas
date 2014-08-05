@@ -45,7 +45,8 @@ public class CreativeRepository extends
         String imageUrl = row.getString("sample_url");
         builder.setAdvertiserId(advertiserId);
         builder.setCreativeId(creativeId);
-        builder.setExposureLevel(CreativeExposure.valueOf(exposureLevel));
+        final CreativeExposure exposure = "SELF-SERVE".equals(exposureLevel) ? CreativeExposure.SELF_SERVE : CreativeExposure.valueOf(exposureLevel);
+        builder.setExposureLevel(exposure);
         builder.setImageUrl(imageUrl);
         CreativeEntity entity = builder.build();
 
