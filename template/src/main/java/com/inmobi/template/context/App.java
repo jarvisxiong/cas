@@ -36,13 +36,13 @@ public final class App extends AbstractContext {
     screenshots = builder.screenshots;
     id = builder.id;
     rating = builder.rating;
-    actionText = builder.actionText;
     rating_count = builder.rating_count;
     downloads = builder.downloads;
     openingLandingUrl = builder.openingLandingUrl;
     pixelUrls = builder.pixelUrls;
     clickUrls = builder.clickUrls;
     adImpressionId = builder.adImpressionId;
+    actionText = builder.actionText;
     setValues(params);
   }
 
@@ -63,7 +63,7 @@ public final class App extends AbstractContext {
     // params.put(KeyConstants.IMNATIVE_CREATIVE_DESC, new CreativeBean("text", this.desc));
     params.put(KeyConstants.IMNATIVE_CREATIVE_DESC, desc);
     params.put(KeyConstants.IMNATIVE_IMAGE, screenshots);
-    params.put(KeyConstants.IMNATIVE_ACTION_TEXT, actionText);
+    params.put(KeyConstants.IMNATIVE_ACTION, new CreativeBean("text", actionText));
     params.put(KeyConstants.ICON, icons);
     params.put(KeyConstants.APP_CREATIVE_ICONS, icons);
     params.put(KeyConstants.APP_CREATIVE, this);
