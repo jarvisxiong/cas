@@ -64,6 +64,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 				"/opt/mkhoj/conf/cas/logger.xml");
 		expect(mockConfig.getString("log4jLoggerConf")).andReturn(
 				"/opt/mkhoj/conf/cas/channel-server.properties");
+        expect(mockConfig.getDouble("rubicon.eCPMPercentage")).andReturn(0.8);
 		replay(mockConfig);
 	}
 
