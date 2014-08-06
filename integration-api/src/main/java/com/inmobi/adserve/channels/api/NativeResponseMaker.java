@@ -128,7 +128,7 @@ public class NativeResponseMaker {
   }
 
   private static String constructBeaconUrl(final String url) {
-    return String.format("<img src=\"%s\" style=\"display:none;\" />", url);
+    return String.format("<img src=\\\"%s\\\" style=\\\"display:none;\\\" />", url);
   }
 
   private String getTrackingCode(final BidResponse response, final Map<String, String> params, final App app) {
