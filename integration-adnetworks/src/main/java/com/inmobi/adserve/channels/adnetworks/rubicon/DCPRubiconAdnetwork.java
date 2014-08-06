@@ -86,12 +86,12 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	private static final String RUBICON_PERF_BLOCKLIST_ID = "InMobiPERF";
 
 	private static final double MIN_ECPM = 0.1;
-	private static final double ECPM_PERCENTAGE = 0.8;
 
 	private static final String SITE_BLOCKLIST_FORMAT="blk%s";
 
 	private final String userName;
 	private final String password;
+    private final double ECPM_PERCENTAGE;
 
 	private boolean isApp;
 
@@ -129,7 +129,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		super(config, clientBootstrap, baseRequestHandler, serverChannel);
 		userName = config.getString("rubicon.username");
 		password = config.getString("rubicon.password");
-
+        ECPM_PERCENTAGE = config.getDouble("rubicon.eCPMPercentage");
 	}
 
 	@Override
