@@ -60,84 +60,96 @@ public class DCPMadHouseAdNetwork extends AbstractDCPAdNetworkImpl {
     private int height;
     private boolean isValidOS;
 
-    // Category mapping.
-    private static Map<Integer, String> categoryMap;
+    // OS mapping.
+    private static Map<Integer, Integer> osMap;
     static {
-        categoryMap = new HashMap<Integer, String>();
-        categoryMap.put(1, "5");
-        categoryMap.put(2, "18");
-        categoryMap.put(3, "11");
-        categoryMap.put(4, "12");
-        categoryMap.put(5, "18");
-        categoryMap.put(6, "13");
-        categoryMap.put(7, "7");
-        categoryMap.put(8, "10");
-        categoryMap.put(9, "2");
-        categoryMap.put(10, "9");
-        categoryMap.put(11, "16");
-        categoryMap.put(12, "24");
-        categoryMap.put(13, "16");
-        categoryMap.put(14, "16");
-        categoryMap.put(15, "16");
-        categoryMap.put(16, "16");
-        categoryMap.put(17, "16");
-        categoryMap.put(18, "16");
-        categoryMap.put(19, "7");
-        categoryMap.put(20, "15");
-        categoryMap.put(21, "15");
-        categoryMap.put(22, "22");
-        categoryMap.put(23, "16");
-        categoryMap.put(24, "26");
-        categoryMap.put(25, "10");
-        categoryMap.put(26, "5");
-        categoryMap.put(27, "16");
-        categoryMap.put(28, "27");
-        categoryMap.put(29, "29");
-        categoryMap.put(30, "13");
-        categoryMap.put(31, "6");
-        categoryMap.put(32, "15");
-        categoryMap.put(33, "14");
-        categoryMap.put(34, "21");
-        categoryMap.put(35, "22");
-        categoryMap.put(36, "1");
-        categoryMap.put(37, "14");
-        categoryMap.put(38, "8");
-        categoryMap.put(39, "15");
-        categoryMap.put(40, "11");
-        categoryMap.put(41, "1");
-        categoryMap.put(42, "5");
-        categoryMap.put(43, "9");
-        categoryMap.put(44, "15");
-        categoryMap.put(45, "10");
-        categoryMap.put(46, "10");
-        categoryMap.put(47, "15");
-        categoryMap.put(48, "6");
-        categoryMap.put(49, "3");
-        categoryMap.put(50, "15");
-        categoryMap.put(51, "1");
-        categoryMap.put(52, "15");
-        categoryMap.put(53, "10");
-        categoryMap.put(54, "20");
-        categoryMap.put(55, "25");
-        categoryMap.put(56, "15");
-        categoryMap.put(57, "15");
-        categoryMap.put(58, "11");
-        categoryMap.put(59, "20");
-        categoryMap.put(60, "7");
-        categoryMap.put(61, "16");
-        categoryMap.put(62, "15");
-        categoryMap.put(63, "8");
-        categoryMap.put(64, "15");
-        categoryMap.put(65, "15");
-        categoryMap.put(66, "19");
-        categoryMap.put(67, "15");
-        categoryMap.put(68, "13");
-        categoryMap.put(69, "5");
-        categoryMap.put(70, "16");
-        categoryMap.put(71, "5");
-        categoryMap.put(72, "8");
-        categoryMap.put(73, "5");
-        categoryMap.put(74, "17");
+        osMap = new HashMap<Integer, Integer>();
+        osMap.put(3, 0);
+        osMap.put(5, 1);
+        osMap.put(9, 2);
+        osMap.put(13, 3);
+        osMap.put(8, 5);
+        osMap.put(1, 4);
+    }
+
+    // Category mapping.
+    private static Map<Long, String> categoryMap;
+    static {
+        categoryMap = new HashMap<Long, String>();
+        categoryMap.put(1L, "5");
+        categoryMap.put(2L, "18");
+        categoryMap.put(3L, "11");
+        categoryMap.put(4L, "12");
+        categoryMap.put(5L, "18");
+        categoryMap.put(6L, "13");
+        categoryMap.put(7L, "7");
+        categoryMap.put(8L, "10");
+        categoryMap.put(9L, "2");
+        categoryMap.put(10L, "9");
+        categoryMap.put(11L, "16");
+        categoryMap.put(12L, "24");
+        categoryMap.put(13L, "16");
+        categoryMap.put(14L, "16");
+        categoryMap.put(15L, "16");
+        categoryMap.put(16L, "16");
+        categoryMap.put(17L, "16");
+        categoryMap.put(18L, "16");
+        categoryMap.put(19L, "7");
+        categoryMap.put(20L, "15");
+        categoryMap.put(21L, "15");
+        categoryMap.put(22L, "22");
+        categoryMap.put(23L, "16");
+        categoryMap.put(24L, "26");
+        categoryMap.put(25L, "10");
+        categoryMap.put(26L, "5");
+        categoryMap.put(27L, "16");
+        categoryMap.put(28L, "27");
+        categoryMap.put(29L, "29");
+        categoryMap.put(30L, "13");
+        categoryMap.put(31L, "6");
+        categoryMap.put(32L, "15");
+        categoryMap.put(33L, "14");
+        categoryMap.put(34L, "21");
+        categoryMap.put(35L, "22");
+        categoryMap.put(36L, "1");
+        categoryMap.put(37L, "14");
+        categoryMap.put(38L, "8");
+        categoryMap.put(39L, "15");
+        categoryMap.put(40L, "11");
+        categoryMap.put(41L, "1");
+        categoryMap.put(42L, "5");
+        categoryMap.put(43L, "9");
+        categoryMap.put(44L, "15");
+        categoryMap.put(45L, "10");
+        categoryMap.put(46L, "10");
+        categoryMap.put(47L, "15");
+        categoryMap.put(48L, "6");
+        categoryMap.put(49L, "3");
+        categoryMap.put(50L, "15");
+        categoryMap.put(51L, "1");
+        categoryMap.put(52L, "15");
+        categoryMap.put(53L, "10");
+        categoryMap.put(54L, "20");
+        categoryMap.put(55L, "25");
+        categoryMap.put(56L, "15");
+        categoryMap.put(57L, "15");
+        categoryMap.put(58L, "11");
+        categoryMap.put(59L, "20");
+        categoryMap.put(60L, "7");
+        categoryMap.put(61L, "16");
+        categoryMap.put(62L, "15");
+        categoryMap.put(63L, "8");
+        categoryMap.put(64L, "15");
+        categoryMap.put(65L, "15");
+        categoryMap.put(66L, "19");
+        categoryMap.put(67L, "15");
+        categoryMap.put(68L, "13");
+        categoryMap.put(69L, "5");
+        categoryMap.put(70L, "16");
+        categoryMap.put(71L, "5");
+        categoryMap.put(72L, "8");
+        categoryMap.put(73L, "5");
+        categoryMap.put(74L, "17");
     }
     //
 
@@ -241,7 +253,7 @@ public class DCPMadHouseAdNetwork extends AbstractDCPAdNetworkImpl {
         // OS.
         Integer sasParamsOsId = sasParams.getOsId();
         if (isValidOS) {
-            builder.setParameter(DEVICE_OS, HandSetOS.values()[sasParamsOsId - 1].toString());
+            builder.setParameter(DEVICE_OS, osMap.get(sasParamsOsId).toString());
         }
 
         // OS Version.

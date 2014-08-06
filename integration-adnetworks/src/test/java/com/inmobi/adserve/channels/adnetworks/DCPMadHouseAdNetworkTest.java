@@ -7,6 +7,7 @@ import com.inmobi.adserve.channels.adnetworks.madhouse.DCPMadHouseAdNetwork;
 import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 import org.json.JSONException;
@@ -30,7 +31,7 @@ public class DCPMadHouseAdNetworkTest extends TestCase{
         private DCPMadHouseAdNetwork dcpMadhouseAdNetwork;
         private final String madhouseHost = "beta.api.main-servers.com/napi/90002830";
         private final String madhouseStatus = "on";
-        private final String madhouseAdvId = "madhouseadv1";
+        private final String madhouseAdvId = "c2f394befcff3f03";
 
         public void prepareMockConfig() {
             mockConfig = createMock(Configuration.class);
@@ -170,7 +171,7 @@ public class DCPMadHouseAdNetworkTest extends TestCase{
         casInternalRequestParameters.uidIDUS1 = "202cb962ac59075b964b07152d234b70";
 
         sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setUserAgent("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)");
+        sasParams.setUserAgent("Mozilla/5.0 (Linux; U; Android 4.1.2; nl-nl; GT-I9300 Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
         sasParams.setSource("APP");
         sasParams.setOsId(SASRequestParameters.HandSetOS.iOS.getValue());
         sasParams.setSlot((short) 10);
@@ -200,7 +201,64 @@ public class DCPMadHouseAdNetworkTest extends TestCase{
         String actualUrl = dcpMadhouseAdNetwork.getRequestUri().toString();
 
         // Compare the expected URL with actual URL.
-        String expectedUrl = "http://beta.api.main-servers.com/napi/90002830?adtype=5&os=iOS&oid=202cb962ac59075b964b07152d234b70&idfa=23e2ewq445545&width=300&height=250&lat=37.4429&lon=-122.1514&ip=206.29.182.240&ua=Mozilla%252F5.0%2B%2528compatible%253B%2BMSIE%2B9.0%253B%2BWindows%2BNT%2B6.1%253B%2BTrident%252F5.0%2529&pcat&pid=madhouseadv1";
+        String expectedUrl = "http://beta.api.main-servers.com/napi/90002830?adtype=5&os=1&oid=202cb962ac59075b964b07152d234b70&idfa=23e2ewq445545&width=300&height=250&lat=37.4429&lon=-122.1514&ip=206.29.182.240&ua=Mozilla%252F5.0%2B%2528Linux%253B%2BU%253B%2BAndroid%2B4.1.2%253B%2Bnl-nl%253B%2BGT-I9300%2BBuild%252FJZO54K%2529%2BAppleWebKit%252F534.30%2B%2528KHTML%252C%2Blike%2BGecko%2529%2BVersion%252F4.0%2BMobile%2BSafari%252F534.30&pcat=5&pid=c2f394befcff3f03";
         assertEquals(expectedUrl, actualUrl);
+    }
+
+    @Test
+    public void testDCPMadHouseParseResponse() throws Exception {
+        SASRequestParameters sasParams = new SASRequestParameters();
+        CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+
+        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] {50l, 51l}));
+        casInternalRequestParameters.latLong = "37.4429,-122.1514";
+        casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
+        casInternalRequestParameters.uidIFA = "23e2ewq445545";
+        casInternalRequestParameters.uidADT = "0";
+        casInternalRequestParameters.uidIDUS1 = "202cb962ac59075b964b07152d234b70";
+
+        sasParams.setRemoteHostIp("206.29.182.240");
+        sasParams.setUserAgent("Mozilla/5.0 (Linux; U; Android 4.1.2; nl-nl; GT-I9300 Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
+        sasParams.setSource("APP");
+        sasParams.setOsId(SASRequestParameters.HandSetOS.iOS.getValue());
+        sasParams.setSlot((short) 10);
+        sasParams.setSiteIncId(1000000007L);
+
+        // Set Categories.
+        List categories = new ArrayList();
+        categories.add(1L);
+        categories.add(2L);
+        categories.add(3L);
+        sasParams.setCategories(categories);
+
+        String externalKey = "4246";
+
+        ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
+            madhouseAdvId, "adgroupid", null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+            null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+            new ArrayList<Integer>(), 0.0d, null, null, 0));
+
+        String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
+            + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1"
+            + "/9cddca11?beacon=true";
+
+        // Response to be parsed.
+        String response = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+            + "<smartmad>\n"
+            + " <adcode>\n"
+            + "  <adspaceid>90002830</adspaceid>\n"
+            + "  <returncode>405</returncode>\n"
+            + "  <adhtml><![CDATA[<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"initial-scale= user-scalable=no\" /><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><title>SMAdUnit</title></head><body style=\"margin:0px auto; padding:0; overflow:hidden; background-color:transparent;\"><p>\n"
+            + "</p>\n"
+            + "</body></html>]]></adhtml>\n"
+            + " </adcode>\n"
+            + "</smartmad>";
+
+        dcpMadhouseAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl);
+        dcpMadhouseAdNetwork.parseResponse(response, HttpResponseStatus.OK);
+
+        // Check URI and Response.
+        String testURI = dcpMadhouseAdNetwork.getRequestUri().toString();
+        String testResponse = dcpMadhouseAdNetwork.getHttpResponseContent();
     }
 }
