@@ -80,6 +80,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	private static final String IDFA = "idfa";
 	private static final String OPEN_UDID = "open-udid";
 	private static final String UDID = "udid";
+	private static final String ACCEPT_APIS = "accept.apis";
 
 	// The following BLOCKLIST_IDs have been registered with Rubicon.
 	private static final String RUBICON_FS_BLOCKLIST_ID = "InMobiFS";
@@ -245,6 +246,16 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 			}
 		}
 
+		if(StringUtils.isNotBlank(sasParams.getSdkVersion())){
+			int version = Integer.parseInt(sasParams.getSdkVersion().substring(1));
+			//5 for MRAID-2 and 3 for MRAID-1
+			if(version >= 400){
+				appendQueryParam(url, ACCEPT_APIS, 5, false);
+			}else{
+				appendQueryParam(url, ACCEPT_APIS, 3, false);
+			}
+
+		}
 		appendQueryParam(url, BLOCKLIST_PARAM,
 				getURLEncode(StringUtils.join(blockedList, ','),format), false);
 
