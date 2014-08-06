@@ -196,7 +196,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		appendQueryParam(url, ZONE_ID, zoneId, false);
 		if (isApp) {
 			appendQueryParam(url, APP_BUNDLE,
-					String.format(BUNDLE_ID_TEMPLATE, blindedSiteId), false);
+					String.format(BUNDLE_ID_TEMPLATE, sasParams.getSiteIncId()), false);
 			appendQueryParam(url, DOMAIN_NAME, DOMAIN, false);
 		}
 		appendQueryParam(url, UA,

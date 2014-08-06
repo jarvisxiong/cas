@@ -487,9 +487,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         String category = null;
         if (sasParams.getWapSiteUACEntity() != null &&
-            sasParams.getWapSiteUACEntity().getCategories() != null &&
-            sasParams.getWapSiteUACEntity().getCategories().size() > 0) {
-          site.setName(sasParams.getWapSiteUACEntity().getCategories().get(0));
+            StringUtils.isNotEmpty(sasParams.getWapSiteUACEntity().getAppType())) {
+          site.setName(sasParams.getWapSiteUACEntity().getAppType());
         }else if ((category = getCategories(',', false)) != null) {
           site.setName(category);
         }
@@ -520,10 +519,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             app.setCat(iabCategoriesInterface.getIABCategories(sasParams.getCategories()));
         }
         String category = null;
-        if (sasParams.getWapSiteUACEntity() != null &&
-            sasParams.getWapSiteUACEntity().getCategories() != null &&
-            sasParams.getWapSiteUACEntity().getCategories().size() > 0) {
-          app.setName(sasParams.getWapSiteUACEntity().getCategories().get(0));
+      if (sasParams.getWapSiteUACEntity() != null &&
+          StringUtils.isNotEmpty(sasParams.getWapSiteUACEntity().getAppType())) {
+          app.setName(sasParams.getWapSiteUACEntity().getAppType());
         }else if ((category = getCategories(',', false)) != null) {
           app.setName(category);
         }
@@ -858,7 +856,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     	
     	Map<String, String> params = new HashMap<String, String>();
     	String winUrl = this.beaconUrl + "?b=${WIN_BID}";
-    	params.put("beaconUrl",winUrl);
+    	params.put("beaconUrl", this.beaconUrl);
+    	params.put("winUrl",  winUrl);
+    	params.put("impressionId", this.impressionId);
     	if(app!=null){
     		params.put("appId",app.getId());
     	}

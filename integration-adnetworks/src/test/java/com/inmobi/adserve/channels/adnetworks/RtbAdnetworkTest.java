@@ -232,7 +232,7 @@ public class RtbAdnetworkTest extends TestCase {
     sasParams.setSiteId("some_site_id");
     sasParams.setSource("wap");
     WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
-    builder.setCategories(Lists.newArrayList("Games", "Music"));
+    builder.setAppType("Games");
     sasParams.setWapSiteUACEntity(new WapSiteUACEntity(builder));
     sasParams.setUserAgent(
         "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -254,6 +254,15 @@ public class RtbAdnetworkTest extends TestCase {
     rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
     // 15 mean board games. Refer to CategoryList
     assertEquals("Board", rtbAdNetwork.getBidRequest().getApp().getName());
+
+    //If WapSiteUACEntity is not null, then it should set primary category name from uac.
+    sasParams.setSource("app");
+    builder = WapSiteUACEntity.newBuilder();
+    builder.setAppType("Social");
+    sasParams.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+    rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
+    // Setting primary category name from uac.
+    assertEquals("Social", rtbAdNetwork.getBidRequest().getApp().getName());
 
     //If WapSiteUACEntity is null, then it should fallback to InMobi categories.
     sasParams.setSource("wap");
