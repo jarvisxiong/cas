@@ -343,6 +343,7 @@ public class DCPMadHouseAdNetwork extends AbstractDCPAdNetworkImpl {
 
                 statusCode = status.code();
                 responseContent = Formatter.getResponseFromTemplate(Formatter.TemplateType.HTML, context, sasParams, beaconUrl);
+
                 adStatus = "AD";
             } catch (Exception exception) {
                 adStatus = "NO_AD";
