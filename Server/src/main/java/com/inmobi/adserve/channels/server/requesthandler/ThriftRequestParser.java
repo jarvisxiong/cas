@@ -285,6 +285,9 @@ public class ThriftRequestParser {
                 case WC:
                     parameter.uidWC = uidValue;
                     break;
+                case GAID:
+                    parameter.gaId = uidValue;
+                    break;
                 default:
                     break;
             }
