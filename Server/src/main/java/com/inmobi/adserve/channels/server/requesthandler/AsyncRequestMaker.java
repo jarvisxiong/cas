@@ -202,7 +202,7 @@ public class AsyncRequestMaker {
         String uuidIntKey = (WilburyUUID.setIntKey(WilburyUUID.getUUID().toString(), (int) adId)).toString();
         String uuidMachineKey = (WilburyUUID.setMachineId(uuidIntKey, ChannelServer.hostIdCode)).toString();
         String uuidWithCyclicCounter = (WilburyUUID.setCyclicCounter(uuidMachineKey,
-                (byte) (counter.getAndIncrement() % 128))).toString();
+                (byte) (Math.abs(counter.getAndIncrement() % 128)))).toString();
         return (WilburyUUID.setDataCenterId(uuidWithCyclicCounter, ChannelServer.dataCenterIdCode)).toString();
     }
 
