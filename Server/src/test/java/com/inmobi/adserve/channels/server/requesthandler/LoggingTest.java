@@ -106,6 +106,7 @@ public class LoggingTest extends TestCase {
         expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
         expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("").anyTimes();
         expect(mockAdnetworkInterface.isRtbPartner()).andReturn(false).anyTimes();
+        expect(mockAdnetworkInterface.getCreativeType()).andReturn(CreativeType.BANNER).anyTimes();
         replay(mockAdnetworkInterface);
         ChannelSegment channelSegment = new ChannelSegment(channelSegmentEntity, null, null, null, null,
                 mockAdnetworkInterface, 0);
@@ -137,6 +138,7 @@ public class LoggingTest extends TestCase {
         expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
         expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("").anyTimes();
         expect(mockAdnetworkInterface.isRtbPartner()).andReturn(false).anyTimes();
+        expect(mockAdnetworkInterface.getCreativeType()).andReturn(CreativeType.BANNER).anyTimes();
         replay(mockAdnetworkInterface);
         ChannelSegment channelSegment = new ChannelSegment(channelSegmentEntity, null, null, null, null,
                 mockAdnetworkInterface, 0);
