@@ -58,7 +58,7 @@ public class ServerTest extends TestCase {
         }
         prepareConfig();
         CasConfigUtil.init(config, null);
-        responseSender = new ResponseSender();
+        responseSender = new ResponseSender(null);
 
         AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
         Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-advertisement", "null", mockConfig);

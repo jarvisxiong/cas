@@ -1,0 +1,35 @@
+<script type="text/javascript" src="mraid.js"></script>
+<div style="display:none; position:absolute;" id="${NAMESPACE}clickTarget"></div>
+<script type="text/javascript">
+(function() {
+var e=encodeURIComponent,f=window,h=document,k='appendChild',n='createElement',p='setAttribute',q='',r='&',s='0',t='2',u='=',v='?m=',w='Events',x='_blank',y='a',z='click',A='clickCallback',B='clickTarget',C='error',D='event',E='function',F='height',G='href',H='iatSendClick',I='iframe',J='img',K='impressionCallback',L='onclick',M='openLandingPage',N='recordEvent',O='seamless',P='src',Q='target',R='width';f.inmobi=f.inmobi||{};
+function S(a){
+this.g=a.lp;this.h=a.lps;this.c=a.ct;this.d=a.tc;this.e=a.bcu;this.a=a.ns;this.i=a.ws;a=this.a;var c=this;
+f[a+M]=function(){
+var a=S.b(c.g),b=f.mraid;'undefined'!==typeof b&&'undefined'!==typeof b.openExternal?b.openExternal(a):(a=S.b(c.h),b=h[n](y),b[p](Q,x),b[p](G,a),h.body[k](b),S.f(b))};
+f[a+A]=function(a){
+T(c,a)};f[a+K]=function(){U(c)};
+f[a+N]=function(a,b){V(c,a,b)}}f.inmobi.Bolt=S;
+S.f=function(a){
+if(typeof a.click==E)a.click.call(a);
+else if(a.fireEvent)a.fireEvent(L);
+else if(a.dispatchEvent){
+var c=h.createEvent(w);c.initEvent(z,!1,!0);a.dispatchEvent(c)}};
+S.b=function(a){
+return a.replace(/\\$TS/g,q+(new Date).getTime())};
+function W(a,c){
+var d=h.getElementById(a.a+B),b=h[n](I);b[p](P,c);b[p](O,O);b[p](F,s);b[p](R,t);d[k](b)}
+function T(a,c){
+var d=f[a.a+H];d&&d();for(var d=a.c.length,b=0;b<d;b++)W(a,S.b(a.c[b]));a.i&&(c=c||eval(D),'undefined'!==typeof c&&(d=void 0!=c.touches?c.touches[0]:c,f.external.notify(JSON.stringify({j:d.clientX,k:d.clientY}))))}function U(a){if(null!=a.d)try{var c=h.getElementById(a.a+B),d=a.d,b=h[n](I);b[p](O,O);b[p](F,s);b[p](R,t);c[k](b);var g=b.contentWindow;g&&g.document.write(d)}catch(m){}}
+function V(a,c,d){
+function b(c,d,g){if(!(0>=g)){
+var m=h.getElementById(a.a+B),l=h[n](J);l[p](P,c);l[p](F,s);l[p](R,t);void 0!=l.addEventListener&&l.addEventListener(C,function(){f.setTimeout(function(){3E5<d&&(d=3E5);b(c,2*d,g-1)},d*Math.random())},!1);m[k](l)}}var g=a.e,g=g+(v+c);if(d)for(var m in d)g+=r+e(m)+u+e(d[m]);b(g,1E3,5);18==c&&U(a);8==c&&T(a,null)};})();
+new window.inmobi.Bolt({
+"lp":"$LANDING_PAGE",
+"lps":"$OLD_LANDING_PAGE",
+"ct":[$CLICK_TRACKER],
+"bcu":"$BEACON_URL",
+"tc":"$TRACKING_CODE",
+"ws":false,
+"ns":"$NAMESPACE"});
+(function() {var b=window,c='handleClick',d='handleTouchEnd',f='handleTouchStart';b.inmobi=b.inmobi||{};var g=b.inmobi;function h(a,e){return function(l){e.call(a,l)}}function k(a,e){this.b=e;this.a=this.c=!1;b[a+c]=h(this,this.click);b[a+f]=h(this,this.start);b[a+d]=h(this,this.end)}k.prototype.click=function(){this.c||this.b()};k.prototype.start=function(a){this.a=this.c=!0;a&&a.preventDefault()};k.prototype.end=function(){this.a&&(this.a=!1,this.b())};g.OldTap=k;})(); new window.inmobi.OldTap("$NAMESPACE", function() {  window['${NAMESPACE}openLandingPage']();  window['${NAMESPACE}clickCallback']();});</script>

@@ -1,34 +1,19 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+import com.google.inject.Singleton;
+import com.inmobi.adserve.adpool.*;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.server.CasConfigUtil;
+import com.inmobi.types.InventoryType;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.Singleton;
-import com.inmobi.adserve.adpool.AdPoolRequest;
-import com.inmobi.adserve.adpool.DemandType;
-import com.inmobi.adserve.adpool.EncryptionKeys;
-import com.inmobi.adserve.adpool.IntegrationType;
-import com.inmobi.adserve.adpool.RequestedAdType;
-import com.inmobi.adserve.adpool.ResponseFormat;
-import com.inmobi.adserve.adpool.SupplyCapability;
-import com.inmobi.adserve.adpool.UidParams;
-import com.inmobi.adserve.adpool.UidType;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.types.Gender;
-import com.inmobi.types.InventoryType;
+import java.security.MessageDigest;
+import java.util.*;
+import java.util.Map.Entry;
 
 
 @Singleton
@@ -56,7 +41,8 @@ public class ThriftRequestParser {
         params.setAllowBannerAds(tObject.isSetSupplyCapabilities()
                 && tObject.supplyCapabilities.contains(SupplyCapability.BANNER));
         // TODO use segment id in cas as long
-        params.setSiteSegmentId((int) tObject.segmentId);
+        int segmentId = tObject.isSetSegmentId() ? (int) tObject.segmentId : 0;
+        params.setSiteSegmentId(segmentId);
         boolean isInterstitial = tObject.isSetRequestedAdType()
                 && (tObject.requestedAdType == RequestedAdType.INTERSTITIAL);
         params.setRqAdType(isInterstitial ? "int" : (tObject.isSetRequestedAdType() ? tObject.requestedAdType.name()
@@ -84,10 +70,18 @@ public class ThriftRequestParser {
         // Fill param from Site Object
         if (tObject.isSetSite()) {
             params.setSiteId(tObject.site.siteId);
-            params.setSource(tObject.site.isSetInventoryType() && tObject.site.inventoryType == InventoryType.APP ? "APP"
-                    : "WAP");
-            params.setSiteType(tObject.site.isSetContentRating() ? tObject.site.contentRating.toString()
-                    : "FAMILY_SAFE");
+            final boolean isApp = tObject.site.isSetInventoryType() && tObject.site.inventoryType == InventoryType.APP;
+            params.setSource(isApp ? "APP" : "WAP");
+			if (isApp) {
+				if (CasConfigUtil.repositoryHelper != null) {
+					params.setWapSiteUACEntity(CasConfigUtil.repositoryHelper.queryWapSiteUACRepository(tObject.site.siteId));
+				}
+			}
+			if (CasConfigUtil.repositoryHelper != null) {
+				params.setSiteEcpmEntity(CasConfigUtil.repositoryHelper.querySiteEcpmRepository(tObject.site.siteId,
+						tObject.geo.countryId, (int) tObject.device.osId));
+			}
+			params.setSiteType(tObject.site.isSetContentRating() ? tObject.site.contentRating.toString() : "FAMILY_SAFE");
             params.setCategories(convertIntToLong(tObject.site.siteTaxonomies));
             double ecpmFloor = Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor);
             params.setSiteFloor(ecpmFloor);
@@ -127,33 +121,32 @@ public class ThriftRequestParser {
             params.setState(null != states && states.iterator().hasNext() ? tObject.geo.getStateIds().iterator().next()
                     : null);
         }
-        
+
         // Fill Params from User Object
         if (tObject.isSetUser()) {
             // TODO Change age to integer in DCP
             int currentYear = (short) Calendar.getInstance().get(Calendar.YEAR);
             int yob = tObject.user.yearOfBirth;
-            //Condition to check whether user's age is less than 100
-            if ((yob>currentYear-100) && (yob<currentYear))
-            {
+
+            // Condition to check whether user's age is less than 100
+            if ((yob > currentYear - 100) && (yob < currentYear)) {
                 int age = currentYear - yob;
                 params.setAge((short) age);
             }
-            /*String gender = null != tObject.user.gender ? tObject.user.gender.name() : "Male";
-            params.setGender(gender.equalsIgnoreCase("Male") ? "M" : "F");*/
-            
-           if(tObject.user.gender != null)
-           {
-                switch(tObject.user.gender){
-                    case FEMALE: params.setGender("F");
+
+            if (tObject.user.gender != null) {
+                switch (tObject.user.gender) {
+                    case FEMALE:
+                        params.setGender("F");
                         break;
-                    case MALE: params.setGender("M");
+                    case MALE:
+                        params.setGender("M");
                         break;
                     default:
                         params.setGender(null);
                         break;
                 }
-                
+
             }
             else
                 params.setGender(null);
@@ -169,6 +162,8 @@ public class ThriftRequestParser {
         if (tObject.isSetCarrier()) {
             params.setCarrierId(new Long(tObject.carrier.carrierId).intValue());
             params.setNetworkType(tObject.carrier.networkType);
+            
+            
         }
 
         LOG.debug("Successfully parsed tObject, SAS params are : {}", params.toString());
@@ -285,8 +280,8 @@ public class ThriftRequestParser {
                 case WC:
                     parameter.uidWC = uidValue;
                     break;
-                case GAID:
-                    parameter.gaId = uidValue;
+                case GPID:
+                    parameter.gpid = uidValue;
                     break;
                 default:
                     break;

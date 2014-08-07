@@ -287,6 +287,7 @@ public class RequestParser {
             parameter.uidO1 = stringify(userIdMap, "O1");
             parameter.uidMd5 = stringify(userIdMap, "UM5");
             parameter.uidIFA = stringify(userIdMap, "IDA");
+            parameter.gpid = stringify(userIdMap, "GPID");
             parameter.uidSO1 = stringify(userIdMap, "SO1");
             parameter.uidIFV = stringify(userIdMap, "IDV");
             parameter.uidIDUS1 = stringify(userIdMap, "IDUS1");

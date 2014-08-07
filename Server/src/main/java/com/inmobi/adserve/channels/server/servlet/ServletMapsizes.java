@@ -29,8 +29,8 @@ public class ServletMapsizes implements Servlet {
             final Channel serverChannel) throws Exception {
         JSONObject mapsizes = new JSONObject();
         mapsizes.put("SampledAdvertiserLog", Logging.getSampledadvertiserlognos().size());
+        mapsizes.put("SampledAdvertiserMap", Logging.sampledAdvertiserLogNos);
         mapsizes.put("creativeCache", CreativeCache.creativeCache.size());
-
         if (null != incomingConnectionLimitHandler) {
             mapsizes.put("IncomingMaxConnections", incomingConnectionLimitHandler.getMaxConnectionsLimit());
             mapsizes.put("IncomingDroppedConnections", incomingConnectionLimitHandler.getDroppedConnections());

@@ -7,6 +7,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
@@ -19,6 +20,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
 import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -63,6 +65,10 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	private static final String IAB_CATEGORY = "i.iab";
 	private static final String INMOBI_CATEGORY = "i.category";
 	private static final String RESPONSE_TEMPLATE = "<script>%s</script>";
+	private static final String BUNDLE_ID_TEMPLATE = "com.inmobi-exchange.%s";
+	private static final String DOMAIN_NAME = "app.domain";
+	private static final String APPSTORE_CATEGORY = "app.category";
+	private static final String BLOCKLIST_PARAM = "p_block_keys";
 
 	private static final String DEFAULT_ZONE = "default";
 	private static final String SENSITIVITY_LOW = "low";
@@ -70,10 +76,23 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	private static final String SITE_KEY_ADDL_PARAM = "site";
 	private static final String FS_RATING = "4+";
 	private static final String PERFORMANCE_RATING = "9+";
+	private static final String DOMAIN = "com.inmobi-exchange";
+	private static final String IDFA = "idfa";
+	private static final String OPEN_UDID = "open-udid";
+	private static final String UDID = "udid";
+	private static final String ACCEPT_APIS = "accept.apis";
 
+	// The following BLOCKLIST_IDs have been registered with Rubicon.
+	private static final String RUBICON_FS_BLOCKLIST_ID = "InMobiFS";
+	private static final String RUBICON_PERF_BLOCKLIST_ID = "InMobiPERF";
+
+	private static final double MIN_ECPM = 0.1;
+
+	private static final String SITE_BLOCKLIST_FORMAT="blk%s";
 
 	private final String userName;
 	private final String password;
+    private final double ECPM_PERCENTAGE;
 
 	private boolean isApp;
 
@@ -87,13 +106,15 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		slotIdMap.put((short) 11, 2);
 		slotIdMap.put((short) 12, 1);
 		slotIdMap.put((short) 13, 8);
-		slotIdMap.put((short) 14, 84);
+		slotIdMap.put((short) 14, 67);
 		slotIdMap.put((short) 15, 43);
 		slotIdMap.put((short) 16, 102);
 		slotIdMap.put((short) 18, 9);
 		slotIdMap.put((short) 19, 50);
 		slotIdMap.put((short) 21, 45);
 		slotIdMap.put((short) 23, 46);
+		slotIdMap.put((short) 29, 14);
+		slotIdMap.put((short) 32, 101);
 	}
 
 	/**
@@ -109,7 +130,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		super(config, clientBootstrap, baseRequestHandler, serverChannel);
 		userName = config.getString("rubicon.username");
 		password = config.getString("rubicon.password");
-
+        ECPM_PERCENTAGE = config.getDouble("rubicon.eCPMPercentage");
 	}
 
 	@Override
@@ -173,11 +194,11 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	@Override
 	public URI getRequestUri() throws Exception {
 		StringBuilder url = new StringBuilder(host);
-		// TODO p_block_keys,app.category
-		// if Dnt is on don't send the idfa
 		appendQueryParam(url, ZONE_ID, zoneId, false);
 		if (isApp) {
-			appendQueryParam(url, APP_BUNDLE, blindedSiteId, false);
+			appendQueryParam(url, APP_BUNDLE,
+					String.format(BUNDLE_ID_TEMPLATE, sasParams.getSiteIncId()), false);
+			appendQueryParam(url, DOMAIN_NAME, DOMAIN, false);
 		}
 		appendQueryParam(url, UA,
 				getURLEncode(sasParams.getUserAgent(), format), false);
@@ -188,7 +209,6 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 			appendQueryParam(url, DEVICE_OS,
 					HandSetOS.values()[sasParamsOsId - 1].toString(), false);
 		}
-
 		if (StringUtils.isNotBlank(sasParams.getOsMajorVersion())) {
 			appendQueryParam(url, OS_VERSION, sasParams.getOsMajorVersion(),
 					false);
@@ -205,28 +225,54 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		} else {
 			appendQueryParam(url, CONNECTION_TYPE, 0, false);
 		}
+		String uacContentRating = getUACContentRating(url);
+		List<String> blockedList = Lists.newArrayList();
+		blockedList.add(String.format(SITE_BLOCKLIST_FORMAT, sasParams.getSiteIncId()));
 		if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
 			appendQueryParam(url, AD_SENSITIVE, SENSITIVITY_LOW, false);
+			blockedList.add(RUBICON_PERF_BLOCKLIST_ID);
 			if (isApp) {
-				appendQueryParam(url, APP_RATING,
-						getURLEncode(PERFORMANCE_RATING, format), false);
+				String rating = (uacContentRating == null) ? PERFORMANCE_RATING
+						: uacContentRating;
+				appendQueryParam(url, APP_RATING, rating, false);
 			}
 		} else {
 			appendQueryParam(url, AD_SENSITIVE, SENSITIVITY_HIGH, false);
+			blockedList.add(RUBICON_FS_BLOCKLIST_ID);
 			if (isApp) {
-				appendQueryParam(url, APP_RATING,
-						getURLEncode(FS_RATING, format), false);
+				String rating = (uacContentRating == null) ? FS_RATING
+						: uacContentRating;
+				appendQueryParam(url, APP_RATING, rating, false);
 			}
 		}
-		if (casInternalRequestParameters.rtbBidFloor > 0) {
+
+		if(StringUtils.isNotBlank(sasParams.getSdkVersion())){
+			int version = Integer.parseInt(sasParams.getSdkVersion().substring(1));
+			//5 for MRAID-2 and 3 for MRAID-1
+			if(version >= 400){
+				appendQueryParam(url, ACCEPT_APIS, 5, false);
+			}else{
+				appendQueryParam(url, ACCEPT_APIS, 3, false);
+			}
+
+		}
+		appendQueryParam(url, BLOCKLIST_PARAM,
+				getURLEncode(StringUtils.join(blockedList, ','),format), false);
+
+		if (sasParams.getSiteEcpmEntity() != null
+				&& sasParams.getSiteEcpmEntity().getNetworkEcpm() > 0) {
+			appendQueryParam(url, FLOOR_PRICE, ECPM_PERCENTAGE
+					* sasParams.getSiteEcpmEntity().getNetworkEcpm(), false);
+		} else if (casInternalRequestParameters.rtbBidFloor > 0) {
 			appendQueryParam(url, FLOOR_PRICE,
 					casInternalRequestParameters.rtbBidFloor, false);
+		} else {
+			appendQueryParam(url, FLOOR_PRICE, MIN_ECPM, false);
 		}
 		if (isInterstitial()) {
 			// display type 1 for interstitial
 			appendQueryParam(url, DISPLAY_TYPE, 1, false);
 		}
-
 		appendQueryParam(url, INMOBI_CATEGORY,
 				getURLEncode(getCategories(',', false, false), format), false);
 		appendQueryParam(url, IAB_CATEGORY,
@@ -238,50 +284,6 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		return new URI(url.toString());
 	}
 
-	private void appendDeviceIds(StringBuilder url) {
-		// Device id type 1 (IDFA), 2 (OpenUDID), 3 (Apple UDID), 4 (Android
-		// device ID)
-		if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
-			if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
-				appendQueryParam(url, MD5_DEVICE_ID,
-						casInternalRequestParameters.uidMd5, false);
-				appendQueryParam(url, DEVICE_ID_TYPE, 4, false);
-			} else if (StringUtils
-					.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
-				appendQueryParam(url, SHA1_DEVICE_ID,
-						casInternalRequestParameters.uidIDUS1, false);
-				appendQueryParam(url, DEVICE_ID_TYPE, 4, false);
-
-			} else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
-				appendQueryParam(url, MD5_DEVICE_ID,
-						casInternalRequestParameters.uid, false);
-				appendQueryParam(url, DEVICE_ID_TYPE, 2, false);
-			}
-
-		} else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
-			if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
-					&& "1".equals(casInternalRequestParameters.uidADT)) {
-				appendQueryParam(url, DEVICE_ID,
-						casInternalRequestParameters.uidIFA, false);
-				appendQueryParam(url, DEVICE_ID_TYPE, 1, false);
-			} else if (StringUtils
-					.isNotBlank(casInternalRequestParameters.uidSO1)) {
-				appendQueryParam(url, SHA1_DEVICE_ID,
-						casInternalRequestParameters.uidSO1, false);
-				appendQueryParam(url, DEVICE_ID_TYPE, 3, false);
-			} else if (StringUtils
-					.isNotBlank(casInternalRequestParameters.uidO1)) {
-				appendQueryParam(url, SHA1_DEVICE_ID,
-						casInternalRequestParameters.uidO1, false);
-				appendQueryParam(url, DEVICE_ID_TYPE, 3, false);
-			} else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
-				appendQueryParam(url, MD5_DEVICE_ID,
-						casInternalRequestParameters.uid, false);
-				appendQueryParam(url, DEVICE_ID_TYPE, 2, false);
-			}
-
-		}
-	}
 
 	@Override
 	public Request getNingRequest() throws Exception {
@@ -293,7 +295,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		String authStr = userName + ":" + password;
 		String authEncoded = new String(Base64.encodeBase64(authStr.getBytes()));
 		return new RequestBuilder()
-		.setURI(uri)
+		.setUrl(uri.toString())
 		.setHeader(HttpHeaders.Names.USER_AGENT,
 				sasParams.getUserAgent())
 				.setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
@@ -342,9 +344,9 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 								return;
 							}
 							context.put(VelocityTemplateFieldConstants.PartnerHtmlCode,
-									String.format(RESPONSE_TEMPLATE,htmlContent));
+									String.format(RESPONSE_TEMPLATE, htmlContent));
 							TemplateType templateType = TemplateType.HTML;
-							if(!isApp){
+							if (!isApp) {
 								templateType = TemplateType.WAP_HTML_JS_AD_TAG;
 							}
 
@@ -369,14 +371,15 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	}
 
 	public String getZoneId(JSONObject additionalParams) {
-		String categoryZoneId=null;
+		String categoryZoneId = null;
 		try {
 			if (sasParams.getCategories() != null) {
 				for (int index = 0; index < sasParams.getCategories().size(); index++) {
-					String categoryIdKey = sasParams.getCategories().get(index).toString();
-					if(additionalParams.has(categoryIdKey))
-					{
-						categoryZoneId = additionalParams.getString(categoryIdKey);
+					String categoryIdKey = sasParams.getCategories().get(index)
+							.toString();
+					if (additionalParams.has(categoryIdKey)) {
+						categoryZoneId = additionalParams
+								.getString(categoryIdKey);
 						LOG.debug("category Id is {}", categoryZoneId);
 					}
 					if (categoryZoneId != null) {
@@ -384,7 +387,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 					}
 				}
 			}
-			if(additionalParams.has(DEFAULT_ZONE)){
+			if (additionalParams.has(DEFAULT_ZONE)) {
 				categoryZoneId = additionalParams.getString(DEFAULT_ZONE);
 			}
 
@@ -394,15 +397,72 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		return categoryZoneId;
 	}
 
-	private boolean isInterstitial() {
-		Short slot = sasParams.getSlot();
-		if (10 == slot // 300X250
-				|| 14 == slot // 320X480
-				|| 16 == slot // 768X1024
-				|| 17 == slot)/* 800x1280 */ {
-			return true;
+	private String getUACContentRating(StringBuilder url) {
+		String contentRating = null;
+		if (sasParams.getWapSiteUACEntity() != null) {
+			List<String> appstoreCategories = sasParams.getWapSiteUACEntity()
+					.getCategories();
+			if (appstoreCategories != null && appstoreCategories.size() > 0) {
+				appendQueryParam(
+						url,
+						APPSTORE_CATEGORY,
+						getURLEncode(StringUtils.join(appstoreCategories, ','),
+								format), false);
+			}
+			contentRating = sasParams.getWapSiteUACEntity().getContentRating();
 		}
-		return false;
+		return contentRating;
 	}
+
+	private void appendDeviceIds(StringBuilder url) {
+		// Device id type 1 (IDFA), 2 (OpenUDID), 3 (Apple UDID), 4 (Android
+		// device ID)
+
+		if (!StringUtils.isEmpty(sasParams.getSdkVersion())
+				&& StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
+				&& "0".equals(casInternalRequestParameters.uidADT)) {
+			appendQueryParam(url, DEVICE_ID,
+					casInternalRequestParameters.uidIFA, false);
+			appendQueryParam(url, DEVICE_ID_TYPE, IDFA, false);
+		} else if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
+				&& "1".equals(casInternalRequestParameters.uidADT)) {
+			appendQueryParam(url, DEVICE_ID,
+					casInternalRequestParameters.uidIFA, false);
+			appendQueryParam(url, DEVICE_ID_TYPE, IDFA, false);
+		} else {
+			boolean isUdid = false;
+			if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
+				appendQueryParam(url, MD5_DEVICE_ID,
+						casInternalRequestParameters.uidMd5, false);
+
+				isUdid = true;
+			}
+			String gpid = getGPID();
+			if(null != gpid){
+				appendQueryParam(url, DEVICE_ID,gpid, false);
+				isUdid = true;
+			}
+			if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
+				appendQueryParam(url, SHA1_DEVICE_ID,
+						casInternalRequestParameters.uidIDUS1, false);
+				isUdid = true;
+			}
+			else if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
+				appendQueryParam(url, SHA1_DEVICE_ID,
+						casInternalRequestParameters.uidO1, false);
+				isUdid = true;
+			}
+
+			if (isUdid) {
+				appendQueryParam(url, DEVICE_ID_TYPE, UDID, false);
+			} else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
+				appendQueryParam(url, MD5_DEVICE_ID,
+						casInternalRequestParameters.uid, false);
+				appendQueryParam(url, DEVICE_ID_TYPE, OPEN_UDID, false);
+			}
+
+		}
+	}
+
 
 }

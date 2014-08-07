@@ -76,8 +76,11 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
     StringBuffer sb = new StringBuffer("<script type=\"text/javascript\">");
     sb.append("google_ad_client = \"").append(googleInMobiPubID).append("\";");
     sb.append("google_ad_slot = \"").append(externalSiteId).append("\";");
-    sb.append("google_ad_width = \"").append(width).append("\";");
-    sb.append("google_ad_height = \"").append(height).append("\";");
+    sb.append("google_ad_width = ").append(width).append(";");
+    sb.append("google_ad_height = ").append(height).append(";");
+    if (!isApp()) {
+      sb.append("google_page_url = \"").append(sasParams.getAppUrl()).append("\";");
+    }
     sb.append("</script>");
     sb.append(SCRIPT_END_PART);
 

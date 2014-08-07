@@ -106,7 +106,7 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
         appendQueryParam(url, PUBID, externalSiteId, false);
         appendQueryParam(url, UA, getURLEncode(sasParams.getUserAgent(), format), false);
         appendQueryParam(url, CLIENT_IP, sasParams.getRemoteHostIp(), false);
-        // TODO is [p(url for sites) required?
+        // TODO is [p(url for sites) required?]
         appendQueryParam(url, TRAFFICTYPE, type, false);
         appendQueryParam(url, MRAIDSUPPORT, mraidType, false);
         if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {

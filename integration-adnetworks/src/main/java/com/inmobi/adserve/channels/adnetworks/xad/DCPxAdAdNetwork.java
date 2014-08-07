@@ -86,7 +86,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 				longitude = latlong[1];
 			}
 		}
-		sourceType = (StringUtils.isBlank(sasParams.getSource()) || "WAP"
+		sourceType = (StringUtils.isBlank(sasParams.getSource()) || WAP
 				.equalsIgnoreCase(sasParams.getSource())) ? WEB : APP;
 
 		LOG.info("Configure parameters inside xad returned true");
@@ -151,7 +151,11 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 				osId = 0;
 			}
 			url.append("&os=").append(HandSetOS.values()[osId].toString());
-			url.append("&instl=").append(getAdType());
+			if(isInterstitial()) {
+				url.append("&instl=1");
+			} else {
+				url.append("&instl=0");
+			}
 			url.append("&pt=").append(sourceType);
 
 			ArrayList<Long> bCat = new ArrayList<Long>();
@@ -227,17 +231,20 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 				deviceIdType = IDFA_PLAIN;
 				return;
 			}
+			if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
+                deviceId = casInternalRequestParameters.uidIDUS1;
+                deviceIdType = UUID_SHA1;
+                return;
+            }
+			
+			
 		} else if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
 			if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
 				deviceId = casInternalRequestParameters.uidMd5;
 				deviceIdType = ANDROID_ID_MD5;
 				return;
 			}
-			if (StringUtils.isNotBlank(casInternalRequestParameters.uidSO1)) {
-				deviceId = casInternalRequestParameters.uidSO1;
-				deviceIdType = ANDROID_ID_SHA1;
-				return;
-			}
+			
 			if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
 				deviceId = casInternalRequestParameters.uidO1;
 				deviceIdType = ANDROID_ID_SHA1;
@@ -286,15 +293,5 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 		}
 	}
 
-	private int getAdType() {
-		Short slot = sasParams.getSlot();
-		if (10 == slot // 300X250
-				|| 14 == slot // 320X480
-				|| 16 == slot) /* 768X1024 */{
-			// interstitial
-			return 1;
-		}
-		// banner
-		return 0;
-	}
+	
 }

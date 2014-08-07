@@ -35,7 +35,7 @@ import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
 public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
-
+	
     private static final Logger          LOG         = LoggerFactory.getLogger(DCPLomarkAdNetwork.class);
 
     private transient String             key;
@@ -166,9 +166,16 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
 
             url.append("&AppId=").append(externalSiteId);
             requestMap.put("AppId", externalSiteId);
-            int adSpaceId = getAdType();
-            url.append("&AdSpaceType=").append(adSpaceId); // ("1 Banner 2 interstitial");
-            requestMap.put("AdSpaceType", String.valueOf(adSpaceId));
+            
+         // ("1 Banner 2 interstitial");
+            if(isInterstitial()){
+            	url.append("&AdSpaceType=2");
+            	requestMap.put("AdSpaceType", "2");
+            }
+            else{
+            	url.append("&AdSpaceType=1");
+            	requestMap.put("AdSpaceType", "1");
+            }
             // map operator
             Integer carrierId = getCarrierId();
             url.append("&Operator=").append(carrierId);// .append("1:China Mobile,2:China Unicom,3:China Telecom,4:other");
@@ -331,7 +338,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
         // first sort asc as per the paramter names
         Map<String, String> sortedParams = new TreeMap<String, String>(params);
         Set<Entry<String, String>> entrys = sortedParams.entrySet();
-        // after sorting，organize all paramters with key=value"format
+        // after sorting organize all paramters with key=value"format
         StringBuilder basestring = new StringBuilder();
         for (Entry<String, String> param : entrys) {
             basestring.append(param.getKey()).append('=').append(param.getValue());
@@ -349,16 +356,6 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
         }
         return sign.toString();
 
-    }
-
-    private int getAdType() {
-        Short slot = sasParams.getSlot();
-        if (10 == slot // 300X250
-                || 14 == slot // 320X480
-                || 16 == slot) /* 768X1024 */{
-            return 2;
-        }
-        return 1;
     }
 
     private Integer getCarrierId() {

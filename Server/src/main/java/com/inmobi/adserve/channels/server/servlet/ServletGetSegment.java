@@ -106,7 +106,11 @@ public class ServletGetSegment implements Servlet {
                         Integer.parseInt(id.split("_")[1]));
             }
             else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CITRUS_LEAF_FEEDBACK)) {
-                entity = CasConfigUtil.repositoryHelper.querySiteCitrusLeafFeedbackRepository(id);
+                if (id.split("_").length > 1) {
+                    entity = CasConfigUtil.repositoryHelper.querySiteCitrusLeafFeedbackRepository(id.split("_")[0], Integer.parseInt(id.split("_")[1]));
+                } else {
+                    entity = CasConfigUtil.repositoryHelper.querySiteCitrusLeafFeedbackRepository(id);
+                }
             }
             else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY)) {
                 entity = CasConfigUtil.repositoryHelper.querySiteEcpmRepository(id.split("_")[0],
@@ -114,7 +118,11 @@ public class ServletGetSegment implements Servlet {
             }
             else if (repoName != null
                     && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY)) {
-                entity = CasConfigUtil.repositoryHelper.queryCurrencyConversionRepository(id.split("_")[0]);
+                entity = CasConfigUtil.repositoryHelper.queryCurrencyConversionRepository(id);
+            }
+            else if (repoName != null
+                    && repoName.equalsIgnoreCase(ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY)) {
+                entity = CasConfigUtil.repositoryHelper.queryWapSiteUACRepository(id.split("_")[0]);
             }
             else if (repoName != null
                     && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CREATIVE_REPOSITORY)) {

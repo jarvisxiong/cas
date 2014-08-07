@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-
 public class ThriftRequestMaker {
     private static final URLCodec urlCodec = new URLCodec();
     static AtomicInteger atomicInteger = new AtomicInteger();
@@ -48,6 +47,7 @@ public class ThriftRequestMaker {
 
         AdPoolRequest adPoolRequest = createAdPoolRequest();
         System.out.println("Request is : " + adPoolRequest);
+       // sendBackFillGet(adPoolRequest);
         sendUMPPost(adPoolRequest);
 
     }
@@ -59,7 +59,12 @@ public class ThriftRequestMaker {
         site.setSiteUrl("siteurl");
         site.setCpcFloor(0.03);
         site.setEcpmFloor(.3);
-        site.setSiteId("4028cb1334ef46a9013578fe1c1f18fc");
+        site.setSiteId("55b798bd8f1c4de5b89823fbacf419bc");
+        //tango siteid
+        //site.setSiteId("69d6ab27d03f407f9f6fa9c5fad77afd");
+        // site.setSiteId("99fafeaec0f4441cb7366d20de3335e2");
+        site.setSiteId("b5e2e6ea4a4b42a799ceca322b2fd004");
+
         site.setPublisherId("sitepub");
         site.setContentRating(ContentRating.PERFORMANCE);
         site.setInventoryType(InventoryType.APP);
@@ -97,15 +102,17 @@ public class ThriftRequestMaker {
         AdPoolRequest adPoolRequest = new AdPoolRequest();
         adPoolRequest.setRequestId("requestId");
         adPoolRequest.setRemoteHostIp("10.14.118.13");
-        adPoolRequest.setSite(site); adPoolRequest.setDevice(device);
+        adPoolRequest.setSite(site);
+        adPoolRequest.setSegmentId(0);
+        adPoolRequest.setDevice(device);
         adPoolRequest.setCarrier(carrier);
-
+        
         IntegrationDetails integrationDetails = new IntegrationDetails();
         integrationDetails.setIntegrationType(IntegrationType.ANDROID_SDK);
         integrationDetails.setIntegrationVersion(370);
 
         adPoolRequest.setRequestedAdType(RequestedAdType.ADHESION);
-        adPoolRequest.setResponseFormat(ResponseFormat.XHTML); adPoolRequest.setGeo(geo);
+        adPoolRequest.setResponseFormat(ResponseFormat.NATIVE); adPoolRequest.setGeo(geo);
         adPoolRequest.setIpFileVersion(1234);
         adPoolRequest.setIntegrationDetails(integrationDetails);
         List<Short> list = new ArrayList<Short>();

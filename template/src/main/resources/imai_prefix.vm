@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta name="viewport" content="user-scalable=0, minimum-scale=1.0, maximum-scale=1.0"/>
+    <style type="text/css">
+        body {margin: 0; overflow: hidden;}
+    </style>
+</head>
+<body>
+#set ($mraidJs = "${creative.getImaiBaseUrl()}mraid.js")
+<script type="text/javascript" $tool.attr("src", $mraidJs)> </script>
+<div style="display:none; position:absolute;" id="${creative.ns}clickTarget"></div>
+#set ($isLandingPageIAT = $tool.isIAT($creative.landingUrl))
+#set ($skStore = $creative.useSkStore && $tool.isNotEmpty($creative.appId) && !$creative.isOpenExternalExperiment())
+#set ($httpLandingPage = $tool.setScheme($creative.landingUrl, "http"))
+#set ($finalLandingPagePresent = (!$creative.hiddenWebView && $skStore) || $tool.isNotEmpty($creative.finalLandingUrl))
+#set ($doAsync = $creative.hiddenWebView || $creative.asyncEnabled || $creative.deepLinkEnabled)
+#set ($openFLP = $creative.asyncEnabled && $finalLandingPagePresent)
+#set ($newasyncflow = $tool.newAsyncMode($config.abTestingMode, $config.testAdGroupList, $creative.adGroupGuid))
+#if ($tool.isNotEmpty($creative.clickServerUrl))
+<script type="text/javascript">
+	window['${creative.ns}replaceTimeStamp'] = function(url) {
+    		return url.replace(/\$TS/g, new Date().getTime());
+  	};
+	window['${creative.ns}handleClick'] = function() {
+		window['${creative.ns}clickCallback']();
+		window['${creative.ns}openLandingPage']();
+	};
+	window['${creative.ns}openLandingPage'] = function() {
+        #if ($doAsync)
+            #if ($skStore)
+                #set ($clickSuffix = "at=2&am=5")
+                $logger.logParameters(2, 5)
+                var landingUrl = '$creative.appId';
+                #if ($creative.deepLinkEnabled)
+                    var fallback = '$creative.appId';
+                #end
+                #set($openLpMethod='_im_imai.ios.openItunesProductView')
+            #else
+                #if ($creative.isTwoPieceRm())
+                    #set ($clickSuffix = "at=2&am=4")
+                    $logger.logParameters(2, 4)
+                    #set($openLpMethod='_im_imai.openEmbedded')
+                #else
+                    #set ($clickSuffix = "at=2&am=3")
+                    $logger.logParameters(2, 3)
+                    #set($openLpMethod='_im_imai.openExternal')
+                #end
+                #if ($openFLP)
+                    var landingUrl = '$tool.jsInline($creative.finalLandingUrl)';
+                #else
+                    #if ($isLandingPageIAT)
+                        var landingUrl = '$tool.jsInline($httpLandingPage)';
+                    #else
+                        var landingUrl = '$tool.jsInline($creative.landingUrl)';
+                    #end
+                    #if ($creative.deepLinkEnabled)
+                        var fallback = '$creative.gpmAppUrl';
+                    #end
+                #end
+            #end
+        #else
+            #if ($creative.isTwoPieceRm())
+                #set ($clickSuffix = "at=2&am=2")
+                $logger.logParameters(2, 2)
+                #set ($clickTemp = $tool.addUrlParams($creative.clickServerUrl, $clickSuffix))
+                var landingUrl = '$tool.jsInline($clickTemp)';
+                #set($openLpMethod='_im_imai.openEmbedded')
+            #else
+                #set ($clickSuffix = "at=2&am=1")
+                $logger.logParameters(2, 1)
+                #set ($clickTemp = $tool.addUrlParams($creative.clickServerUrl, $clickSuffix))
+                var landingUrl = '$tool.jsInline($clickTemp)';
+                #set($openLpMethod='_im_imai.openExternal')
+            #end
+        #end
+        var url = window['${creative.ns}replaceTimeStamp'](landingUrl);
+        #if ($creative.deepLinkEnabled)
+            var opened = false;
+            var errorHandler = function(val) {
+                if (!opened) {
+                    opened = true;
+                    window['${creative.ns}recordEvent'](103);
+                    $openLpMethod(fallback);
+                }
+            };
+            _im_imai.addEventListener('error', errorHandler);
+            var deepLink = '$tool.jsInline($creative.landingUrl)';
+            _im_imai.openExternal(deepLink);
+        #else
+            $openLpMethod(url);
+        #end
+    };
+    #set($clickTemp = $tool.addUrlParams($creative.clickServerUrl, $clickSuffix))
+    #if($isLandingPageIAT && $doAsync && $newasyncflow)
+        $config.fortyoneJs;
+        $config.iatJs new window.inmobi.iat('$creative.ns','$tool.jsInline($clickTemp)');
+    #end
+    window['${creative.ns}clickCallback'] = function() {
+		_im_imai.onUserInteraction();
+        #foreach( $cturl in $creative.clickTrackingUrlList )
+            _im_imai.pingInWebView(window['${creative.ns}replaceTimeStamp']('$tool.jsInline($cturl)'));
+        #end
+        #if ($doAsync)
+            var iatSendClick = window['${creative.ns}iatSendClick'];
+            if (iatSendClick) {
+                iatSendClick();
+            }
+            else{
+                _im_imai.pingInWebView('$tool.jsInline($clickTemp)');
+            }
+            #if ($openFLP)
+              #if ($isLandingPageIAT && !$newasyncflow)
+                   #set($iatSuffix = "${clickSuffix}&sa=1")
+                   #set($iatUrl = $tool.addUrlParams($httpLandingPage, $iatSuffix))
+                   _im_imai.pingInWebView(window['${creative.ns}replaceTimeStamp']('$tool.jsInline($iatUrl)'));
+              #elseif(!$isLandingPageIAT)
+              		_im_imai.pingInWebView(window['${creative.ns}replaceTimeStamp']('$tool.jsInline($creative.landingUrl)'));
+			  #end
+            #end
+        #end
+	};
+	window['${creative.ns}impressionCallback'] = function() {
+        #parse('templates/includes/impression_tracking.vm')
+    };
+	window['${creative.ns}start'] = 0;
+	window['${creative.ns}handleTouchStart'] = function(e) {
+        window['${creative.ns}start'] = 1;
+        if (e === undefined || e == null) {
+            return;
+        }
+        e.preventDefault();
+	};
+	window['${creative.ns}handleTouchEnd'] = function() {
+        if (window['${creative.ns}start'] == 1) {
+            window['${creative.ns}start'] = 0;
+            window['${creative.ns}handleClick']();
+        }
+	};
+#if ($creative.metricsEnabled)
+$config.metricJs
+var ${creative.ns}metrics = new window.inmobi.csi.Metrics("$tool.javascript($creative.beaconUrl)",
+        "$creative.ns");
+#end
+#parse ('templates/includes/creativeApi.vm')
+</script>
+#end

@@ -154,7 +154,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
             appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.uidMd5, false);
         }
         else if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
-            appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.uidIDUS1, false);
+            appendQueryParam(url, OPEN_UDID, casInternalRequestParameters.uidIDUS1, false);
         }
         if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
             appendQueryParam(url, OPEN_UDID, casInternalRequestParameters.uid, false);
@@ -198,7 +198,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
             uri = new URIBuilder(uri).setPort(80).build();
         }
 
-        return new RequestBuilder().setURI(uri).setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+        return new RequestBuilder().setUrl(uri.toString()).setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
                 .setHeader("x-mh-User-Agent", sasParams.getUserAgent())
