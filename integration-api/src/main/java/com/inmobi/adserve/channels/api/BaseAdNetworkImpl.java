@@ -228,7 +228,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                         }
                     }
 
-                    LOG.error("error while fetching response from: {} {}", getName(), t);
+                    LOG.debug("error while fetching response from: {} {}", getName(), t);
 
                     if (isRequestComplete) {
                         return;
