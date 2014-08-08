@@ -49,7 +49,7 @@ public class AsyncHttpClientProvider {
 		.setConnectionTimeoutInMs(
 				serverConfig.getRtbRequestTimeoutInMillis())
 		.setMaximumConnectionsTotal(
-				serverConfig.getMaxRtbOutGoingConnections())
+				serverConfig.getMaxRtbOutGoingConnections() * Runtime.getRuntime().availableProcessors())
 		.setFollowRedirects(false)
 		.setMaxRequestRetry(0)
 		.setAllowPoolingConnection(true)
@@ -62,7 +62,7 @@ public class AsyncHttpClientProvider {
 				.setConnectionTimeoutInMs(
 						serverConfig.getDcpRequestTimeoutInMillis())
 				.setMaximumConnectionsTotal(
-						serverConfig.getMaxDcpOutGoingConnections())
+						serverConfig.getMaxDcpOutGoingConnections() * Runtime.getRuntime().availableProcessors())
 				.setFollowRedirects(false)
 				.setMaxRequestRetry(0)
 				.setAllowPoolingConnection(true)
