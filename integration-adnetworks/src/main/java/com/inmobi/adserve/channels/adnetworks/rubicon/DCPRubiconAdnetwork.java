@@ -92,7 +92,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 
 	private final String userName;
 	private final String password;
-    private final double ECPM_PERCENTAGE;
+	private final double ECPM_PERCENTAGE;
 
 	private boolean isApp;
 
@@ -130,7 +130,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		super(config, clientBootstrap, baseRequestHandler, serverChannel);
 		userName = config.getString("rubicon.username");
 		password = config.getString("rubicon.password");
-        ECPM_PERCENTAGE = config.getDouble("rubicon.eCPMPercentage");
+		ECPM_PERCENTAGE = config.getDouble("rubicon.eCPMPercentage");
 	}
 
 	@Override
@@ -418,13 +418,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		// Device id type 1 (IDFA), 2 (OpenUDID), 3 (Apple UDID), 4 (Android
 		// device ID)
 
-		if (!StringUtils.isEmpty(sasParams.getSdkVersion())
-				&& StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
-				&& "0".equals(casInternalRequestParameters.uidADT)) {
-			appendQueryParam(url, DEVICE_ID,
-					casInternalRequestParameters.uidIFA, false);
-			appendQueryParam(url, DEVICE_ID_TYPE, IDFA, false);
-		} else if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
+		if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
 				&& "1".equals(casInternalRequestParameters.uidADT)) {
 			appendQueryParam(url, DEVICE_ID,
 					casInternalRequestParameters.uidIFA, false);
