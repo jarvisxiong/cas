@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.inmobi.adserve.channels.types.AdCreativeType;
 import lombok.Data;
 
 import com.inmobi.adserve.adpool.EncryptionKeys;
@@ -83,7 +82,6 @@ public class SASRequestParameters {
     private SiteEcpmEntity      siteEcpmEntity;
 
     private boolean             isBannerVideoSupported;
-    private AdCreativeType      adCreativeType;
 
     public SASRequestParameters() {
         // Do Nothing.

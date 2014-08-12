@@ -1,18 +1,25 @@
 package com.inmobi.adserve.channels.api;
 
-import com.google.inject.Key;
-import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.scope.NettyRequestScope;
-import com.inmobi.adserve.channels.types.AdCreativeType;
-import com.inmobi.adserve.channels.util.*;
-import com.ning.http.client.*;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.inject.Inject;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONObject;
@@ -21,13 +28,24 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.slf4j.Marker;
 
-import javax.inject.Inject;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.security.MessageDigest;
-import java.util.*;
+import com.google.inject.Key;
+import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.scope.NettyRequestScope;
+import com.inmobi.adserve.channels.types.AdCreativeType;
+import com.inmobi.adserve.channels.util.CategoryList;
+import com.inmobi.adserve.channels.util.DocumentBuilderHelper;
+import com.inmobi.adserve.channels.util.IABCategoriesInterface;
+import com.inmobi.adserve.channels.util.IABCategoriesMap;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.JaxbHelper;
+import com.inmobi.casthrift.ADCreativeType;
+import com.ning.http.client.AsyncCompletionHandler;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.Request;
+import com.ning.http.client.RequestBuilder;
+import com.ning.http.client.Response;
 
 
 // This abstract class have base functionality of TPAN adapters.
@@ -52,6 +70,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected boolean 							  isHTMLResponseSupported = true;
     protected boolean 							  isNativeResponseSupported = false;
     protected boolean                             isBannerVideoResponseSupported = false;
+    protected boolean                             isVideoResponse         = false;
 
     protected SASRequestParameters                sasParams;
     protected CasInternalRequestParameters        casInternalRequestParameters;
@@ -60,7 +79,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     private ThirdPartyAdResponse                  responseStruct;
     private boolean                               isRtbPartner            = false;
     protected ChannelSegmentEntity                entity;
-    protected AdCreativeType                      adCreativeType;
 
     protected String                              externalSiteId;
     protected String                              host;
@@ -227,7 +245,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                         }
                     }
 
-                    LOG.error("error while fetching response from: {} {}", getName(), t);
+                    LOG.debug("error while fetching response from: {} {}", getName(), t);
 
                     if (isRequestComplete) {
                         return;
@@ -389,7 +407,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         this.impressionId = param.getImpressionId();
         this.blindedSiteId = getBlindedSiteId(param.getSiteIncId(), entity.getAdgroupIncId());
         this.entity = entity;
-        this.adCreativeType = sasParams.getAdCreativeType();
         return configureParameters();
     }
 
@@ -671,6 +688,17 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected boolean isNativeRequest(){
     	return false;
     }
+    
+    @Override
+    public ADCreativeType getCreativeType() {
+        if (isNativeRequest()) {
+            return ADCreativeType.NATIVE;
+        } else if (isVideoResponse) {
+            return ADCreativeType.INTERSTITIAL_VIDEO;
+        } else {
+            return ADCreativeType.BANNER;
+        }
+    }
 
     protected String getHashedValue(final String message, final String hashingType) {
         try {
@@ -687,15 +715,10 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         return null;
     }
 
-    @Override
-    public AdCreativeType getAdCreativeType() {
-        return adCreativeType;
-    }
-
     protected StringBuilder appendQueryParam(final StringBuilder builder, final String paramName,
             final int paramValue, final boolean isFirstParam) {
         return builder.append(isFirstParam ? '?' : '&').append(paramName).append('=').append(paramValue);
-    }
+   }
     protected StringBuilder appendQueryParam(final StringBuilder builder, final String paramName,
             final String paramValue, final boolean isFirstParam) {
         return builder.append(isFirstParam ? '?' : '&').append(paramName).append('=').append(paramValue);

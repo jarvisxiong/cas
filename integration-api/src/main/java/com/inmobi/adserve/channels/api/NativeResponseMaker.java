@@ -56,6 +56,8 @@ public class NativeResponseMaker {
 
     final String siteId = params.get("siteId");
     final App app = gson.fromJson(response.getSeatbid().get(0).getBid().get(0).getAdm(), App.class);
+    
+    app.setAdImpressionId(params.get("impressionId"));
     validateResponse(app, templateEntity);
 
     final VelocityContext vc = getVelocityContext(app, response, params);
@@ -126,7 +128,7 @@ public class NativeResponseMaker {
   }
 
   private static String constructBeaconUrl(final String url) {
-    return String.format("<img src=\"%s\" style=\"display:none;\" />", url);
+    return String.format("<img src=\\\"%s\\\" style=\\\"display:none;\\\" />", url);
   }
 
   private String getTrackingCode(final BidResponse response, final Map<String, String> params, final App app) {

@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.entity;
 
 import com.inmobi.adserve.channels.types.AdCreativeType;
+import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 import lombok.Getter;
 import lombok.Setter;
@@ -179,13 +180,15 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
 
     /**
      *
-     * @returns the inc ID correspoding to adformat
+     * @returns the Inc ID correspoding to adformat.
      */
-    public long getIncId(AdCreativeType creativeType) {
+    public long getIncId(ADCreativeType creativeType) {
         long notFound = -1L;
+        int creativeFormatId = getCreativeFormatId(creativeType);
+
         try {
             for (int i = 0; i < getCreativeTypes().length; i++) {
-                if (getCreativeTypes()[i] == creativeType.getValue()) {
+                if (getCreativeTypes()[i] == creativeFormatId) {
                     return getIncIds()[i];
                 }
             }
@@ -195,11 +198,12 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
         return notFound;
     }
 
-    public String getAdId(AdCreativeType creativeType) {
+    public String getAdId(ADCreativeType creativeType) {
         String notFound = "";
+        int creativeFormatId = getCreativeFormatId(creativeType);
         try {
             for (int i = 0; i < getCreativeTypes().length; i++) {
-                if (getCreativeTypes()[i] == creativeType.getValue()) {
+                if (getCreativeTypes()[i] == creativeFormatId) {
                     return getAdIds()[i];
                 }
             }
@@ -208,4 +212,16 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
         }
         return notFound;
     }
+
+    // TODO: Verify that approriate Creative Format ID is seeded in table wap_channel_ad.
+    private int getCreativeFormatId(ADCreativeType creativeType){
+        if (creativeType == ADCreativeType.NATIVE) {
+            return AdCreativeType.META_JSON.getValue();
+        } else if (creativeType == ADCreativeType.INTERSTITIAL_VIDEO) {
+            return AdCreativeType.VIDEO.getValue();
+        } else {
+            return AdCreativeType.BANNER.getValue();
+        }
+    }
+
 }

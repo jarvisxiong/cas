@@ -518,7 +518,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private Site createSiteObject() {
         Site site = null;
         if (siteBlinded) {
-            site = new Site(getBlindedSiteId(sasParams.getSiteIncId(), entity.getIncId(AdCreativeType.TEXT)));
+            site = new Site(getBlindedSiteId(sasParams.getSiteIncId(), entity.getIncId(getCreativeType())));
         }
         else {
             site = new Site(sasParams.getSiteId());
@@ -803,7 +803,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             adStatus = "AD";
             if (isNativeRequest()) {
                 nativeAdBuilding();
-            } else if (getAdCreativeType() == AdCreativeType.VIDEO) {
+            } else if (isVideoResponse) {
                 bannerVideoAdBuilding();
             } else {
                 bannerAdBuilding();
@@ -865,16 +865,16 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         String vastContentJSEsc = StringEscapeUtils.escapeJavaScript(getADMContent());
         velocityContext.put(VelocityTemplateFieldConstants.VASTContentJSEsc, vastContentJSEsc);
 
-        // JS Escaped WinUrl for partner.
+        // JS escaped WinUrl for partner.
         String partnerWinUrl = getPartnerWinUrl();
         velocityContext.put(VelocityTemplateFieldConstants.PartnerBeaconUrl,
                             StringEscapeUtils.escapeJavaScript(partnerWinUrl));
 
-        // JS Escaped IMWinUrl
+        // JS escaped IMWinUrl
         String imWinUrl = this.beaconUrl + "?b=${WIN_BID}";
         velocityContext.put(VelocityTemplateFieldConstants.IMWinUrl, StringEscapeUtils.escapeJavaScript(imWinUrl));
 
-        // Add JS Escaped IM beacon and click URLs.
+        // JS escaped IM beacon and click URLs.
         velocityContext.put(VelocityTemplateFieldConstants.IMBeaconUrl, StringEscapeUtils.escapeJavaScript(this.beaconUrl));
         velocityContext.put(VelocityTemplateFieldConstants.IMClickUrl, StringEscapeUtils.escapeJavaScript(this.clickUrl));
 
@@ -934,8 +934,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     	Map<String, String> params = new HashMap<String, String>();
     	String winUrl = this.beaconUrl + "?b=${WIN_BID}";
-    	params.put("beaconUrl",this.beaconUrl);
-    	params.put("winUrl",winUrl);
+    	params.put("beaconUrl", this.beaconUrl);
+    	params.put("winUrl",  winUrl);
+    	params.put("impressionId", this.impressionId);
     	if(app!=null){
     		params.put("appId",app.getId());
     	}
@@ -972,6 +973,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             setBidPriceInUsd(calculatePriceInUSD(getBidPriceInLocal(), bidderCurrency));
             responseSeatId = bidResponse.getSeatbid().get(0).getSeat();
             Bid bid =  bidResponse.getSeatbid().get(0).getBid().get(0);
+            adm = bid.getAdm();
             responseImpressionId = bid.getImpid();
             creativeId = bid.getCrid();
             sampleImageUrl = bid.getIurl();
@@ -980,7 +982,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             responseAuctionId = bidResponse.getId();
 
             // Check bid response for video
-            if (sasParams.isBannerVideoSupported()) {
+            if (sasParams.isBannerVideoSupported() && isBannerVideoResponseSupported) {
                 checkBidResponseForBannerVideo(bid.getExt());
             }
 
@@ -994,15 +996,20 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     private void checkBidResponseForBannerVideo(BidExtensions ext) {
         if (ext != null && ext.getVideo() != null) {
-            // Set Ad Creative Type
-            this.adCreativeType = AdCreativeType.VIDEO;
+            // A video response is received. Set the flag.
+            isVideoResponse = true;
 
             if (this.casInternalRequestParameters.impressionIdLookup != null) {
-                String oldImpresionId = this.getImpressionId();
-                // Update the impression ids and beacon URLs for video ad.
-                this.impressionId = this.casInternalRequestParameters.impressionIdLookup.get(AdCreativeType.VIDEO.getValue());
-                this.beaconUrl = this.beaconUrl.replace(oldImpresionId, this.impressionId);
-                this.clickUrl = this.clickUrl.replace(oldImpresionId, this.impressionId);
+                String newImpressionId =
+                        this.casInternalRequestParameters.impressionIdLookup.get(AdCreativeType.VIDEO.getValue());
+
+                if (StringUtils.isNotEmpty(newImpressionId)) {
+                    String oldImpresionId = this.getImpressionId();
+                    // Update the impression id and beacon URLs for video ad.
+                    this.impressionId = newImpressionId;
+                    this.beaconUrl = this.beaconUrl.replace(oldImpresionId, newImpressionId);
+                    this.clickUrl = this.clickUrl.replace(oldImpresionId, newImpressionId);
+                }
             }
         }
     }

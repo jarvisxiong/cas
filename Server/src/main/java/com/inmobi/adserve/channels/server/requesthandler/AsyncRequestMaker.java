@@ -13,6 +13,7 @@ import com.inmobi.adserve.channels.server.SegmentFactory;
 import com.inmobi.adserve.channels.types.AdCreativeType;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
 import io.netty.channel.Channel;
 import org.apache.commons.configuration.Configuration;
@@ -29,7 +30,6 @@ public class AsyncRequestMaker {
     private static final AtomicInteger counter = new AtomicInteger();
 
     private final SegmentFactory segmentFactory;
-    private AdCreativeType defaultCreativeType = AdCreativeType.TEXT;
 
     @Inject
     public AsyncRequestMaker(final SegmentFactory segmentFactory) {
@@ -52,7 +52,8 @@ public class AsyncRequestMaker {
         boolean isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled", false);
         int rtbMaxTimeOut = rtbConfig.getInt("RTBreadtimeoutMillis", 200);
         LOG.debug("isRtbEnabled is {}  and rtbMaxTimeout is {}", isRtbEnabled, rtbMaxTimeOut);
-        sasParams.setAdCreativeType(defaultCreativeType);
+
+        ADCreativeType creativeType = isNativeRequest(sasParams) ? ADCreativeType.NATIVE : ADCreativeType.BANNER;
 
         for (ChannelSegment row : rows) {
             ChannelSegmentEntity channelSegmentEntity = row.getChannelSegmentEntity();
@@ -72,12 +73,12 @@ public class AsyncRequestMaker {
 
             String clickUrl = null;
             String beaconUrl = null;
-            sasParams.setImpressionId(getImpressionId(channelSegmentEntity.getIncId(defaultCreativeType)));
+            sasParams.setImpressionId(getImpressionId(channelSegmentEntity.getIncId(creativeType)));
             CasInternalRequestParameters casInternalRequestParameters = getCasInternalRequestParameters(sasParams,
                     casInternalRequestParameterGlobal, channelSegmentEntity);
 
             controlEnrichment(casInternalRequestParameters, channelSegmentEntity);
-            sasParams.setAdIncId(channelSegmentEntity.getIncId(defaultCreativeType));
+            sasParams.setAdIncId(channelSegmentEntity.getIncId(creativeType));
             LOG.debug("impression id is {}", sasParams.getImpressionId());
 
             if ((network.isClickUrlRequired() || network.isBeaconUrlRequired()) && null != sasParams.getImpressionId()) {
@@ -154,8 +155,8 @@ public class AsyncRequestMaker {
         }
         HashMap<Integer, String> impressionIdLookup = new HashMap<>(adIncIds.length);
         for (int i = 0; i < adCreativeTypes.length; i++) {
-            // Lookup will be needed only for non-default creative types.
-            if (defaultCreativeType.getValue() != adCreativeTypes[i]) {
+            // Presently, we need the lookup only for video.
+            if (adCreativeTypes[i] == AdCreativeType.VIDEO.getValue()) {
                 impressionIdLookup.put(adCreativeTypes[i], getImpressionId(adIncIds[i]));
             }
         }
@@ -223,7 +224,7 @@ public class AsyncRequestMaker {
         String uuidIntKey = (WilburyUUID.setIntKey(WilburyUUID.getUUID().toString(), (int) adId)).toString();
         String uuidMachineKey = (WilburyUUID.setMachineId(uuidIntKey, ChannelServer.hostIdCode)).toString();
         String uuidWithCyclicCounter = (WilburyUUID.setCyclicCounter(uuidMachineKey,
-                (byte) (counter.getAndIncrement() % 128))).toString();
+                (byte) (Math.abs(counter.getAndIncrement() % 128)))).toString();
         return (WilburyUUID.setDataCenterId(uuidWithCyclicCounter, ChannelServer.dataCenterIdCode)).toString();
     }
 
@@ -258,5 +259,9 @@ public class AsyncRequestMaker {
         builder.setDst(dst.toString());
         builder.setBudgetBucketId("101"); // Default Value
         return new ClickUrlMakerV6(builder);
+    }
+
+    private boolean isNativeRequest(SASRequestParameters sasParams){
+        return "native".equalsIgnoreCase(sasParams.getRFormat());
     }
 }

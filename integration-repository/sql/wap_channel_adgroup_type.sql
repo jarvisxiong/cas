@@ -1,7 +1,7 @@
 CREATE OR REPLACE TYPE wap_channel_adgroup_type_11082014 AS
 (
     adgroup_id               CHARACTER VARYING(128),
-    ad_ids                   CHARACTER VARYING(128) [],
+    ad_ids                   CHARACTER VARYING(128)[],
     channel_id               CHARACTER VARYING(128),
     advertiser_id            CHARACTER VARYING(128),
     external_site_key        CHARACTER VARYING(128),

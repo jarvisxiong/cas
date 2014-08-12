@@ -1,12 +1,12 @@
 package com.inmobi.adserve.channels.api;
 
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.adserve.channels.types.AdCreativeType;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-
 
 public interface AdNetworkInterface {
 
@@ -30,6 +30,8 @@ public interface AdNetworkInterface {
 
     // Returns whether to log creative or not
     String getAdMarkUp();
+    
+    ADCreativeType getCreativeType();
 
     // Returns whether to log creative or not
     boolean isLogCreative();
@@ -106,9 +108,6 @@ public interface AdNetworkInterface {
 
     // get Impression Id
     String getImpressionId();
-
-    // get AdCreativeType
-    AdCreativeType getAdCreativeType();
 
     // Returns true if request is completed.
     boolean isRequestCompleted();

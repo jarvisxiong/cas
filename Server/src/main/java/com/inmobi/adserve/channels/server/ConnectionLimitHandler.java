@@ -26,18 +26,20 @@ public class ConnectionLimitHandler extends ChannelDuplexHandler {
 
     private final ServerConfig  serverConfig;
 
+	private int maxConnections;
+
     @Inject
     public ConnectionLimitHandler(final ServerConfig serverConfig) {
         this.serverConfig = serverConfig;
+        maxConnections = getMaxConnectionsLimit() * Runtime.getRuntime().availableProcessors();
     }
 
     @Override
     public void channelRegistered(final ChannelHandlerContext ctx) throws Exception {
-        int maxConnections = getMaxConnectionsLimit();
         if (maxConnections > 0) {
             if (activeConnections.getAndIncrement() > maxConnections) {
                 ctx.channel().close();
-                LOG.info("Incoming MaxLimit of connections {} exceeded so closing channel", maxConnections);
+                LOG.error("Incoming MaxLimit of connections {} exceeded so closing channel", maxConnections);
                 droppedConnections.incrementAndGet();
             }
         }
