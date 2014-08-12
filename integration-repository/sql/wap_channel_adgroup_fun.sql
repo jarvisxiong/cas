@@ -24,7 +24,7 @@ BEGIN
                 wap_channel_adgroup.category_taxomony as category_taxomony,
                 wap_channel_adgroup.segment_flags as segment_flags,
                 wap_channel_adgroup.additional_params as additional_params,
-                adgroup_creatives.ad_inc_ids as ad_inc_ids,
+                wap_channel_adgroup.adgroup_inc_id as adgroup_inc_id,
                 dcp_segment_site_inclusion_exclusion.sie_json,
                 wap_channel_adgroup.impression_ceil as impression_ceil,
                 wap_channel_adgroup.manuf_model_targeting as manuf_model_targeting,

@@ -32,7 +32,6 @@ import com.google.inject.Key;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.scope.NettyRequestScope;
-import com.inmobi.adserve.channels.types.AdCreativeType;
 import com.inmobi.adserve.channels.util.CategoryList;
 import com.inmobi.adserve.channels.util.DocumentBuilderHelper;
 import com.inmobi.adserve.channels.util.IABCategoriesInterface;
@@ -70,7 +69,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected boolean 							  isHTMLResponseSupported = true;
     protected boolean 							  isNativeResponseSupported = false;
     protected boolean                             isBannerVideoResponseSupported = false;
-    protected boolean                             isVideoResponse         = false;
+    protected boolean                             isVideoResponseReceived = false;
 
     protected SASRequestParameters                sasParams;
     protected CasInternalRequestParameters        casInternalRequestParameters;
@@ -693,7 +692,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     public ADCreativeType getCreativeType() {
         if (isNativeRequest()) {
             return ADCreativeType.NATIVE;
-        } else if (isVideoResponse) {
+        } else if (isVideoResponseReceived) {
             return ADCreativeType.INTERSTITIAL_VIDEO;
         } else {
             return ADCreativeType.BANNER;

@@ -185,7 +185,6 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
     public long getIncId(ADCreativeType creativeType) {
         long notFound = -1L;
         int creativeFormatId = getCreativeFormatId(creativeType);
-
         try {
             for (int i = 0; i < getCreativeTypes().length; i++) {
                 if (getCreativeTypes()[i] == creativeFormatId) {
@@ -213,14 +212,13 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
         return notFound;
     }
 
-    // TODO: Verify that approriate Creative Format ID is seeded in table wap_channel_ad.
     private int getCreativeFormatId(ADCreativeType creativeType){
         if (creativeType == ADCreativeType.NATIVE) {
-            return AdCreativeType.META_JSON.getValue();
+            return AdCreativeType.META_JSON.getValue();     // NATIVE
         } else if (creativeType == ADCreativeType.INTERSTITIAL_VIDEO) {
-            return AdCreativeType.VIDEO.getValue();
+            return AdCreativeType.VIDEO.getValue();         // VIDEO
         } else {
-            return AdCreativeType.BANNER.getValue();
+            return AdCreativeType.TEXT.getValue();  // BANNER
         }
     }
 

@@ -240,7 +240,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
 		byte[] bytes = responseString.getBytes(Charsets.UTF_8);
 		sendResponse(status, bytes, responseHeaders, serverChannel);
-
 	}
 
 	// send response to the caller

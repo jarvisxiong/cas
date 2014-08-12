@@ -252,16 +252,16 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         // Serializing the bidRequest Object
         return serializeBidRequest();
     }
-    
-    
-    private boolean isRequestFormatSupported(){
-    	if(isNativeRequest()){
-    		return isNativeResponseSupported;
-    	}else if(!isNativeRequest()){
-    		return isHTMLResponseSupported;
-    	}
-    	
-    	return false;
+
+
+    private boolean isRequestFormatSupported() {
+        if (isNativeRequest()) {
+            return isNativeResponseSupported;
+        } else if (!isNativeRequest()) {
+            return isHTMLResponseSupported;
+        }
+
+        return false;
     }
 
     private boolean createBidRequestObject(final List<Impression> impresssionlist, final Site site, final App app,
@@ -433,7 +433,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
 
         // If this request supports Banner Video and this advertiser is configured to support video
-        if (sasParams.isBannerVideoSupported() && isBannerVideoResponseSupported) {
+        if (sasParams.isBannerVideoSupported() && isBannerVideoResponseSupported
+                && this.casInternalRequestParameters.impressionIdLookup != null) {
             // Set video specific attributes to the Banner object
             banner.setBattr(videoBlockedAttributes);
             banner.setBtype(videoBlockCreativeType);
@@ -803,7 +804,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             adStatus = "AD";
             if (isNativeRequest()) {
                 nativeAdBuilding();
-            } else if (isVideoResponse) {
+            } else if (isVideoResponseReceived) {
                 bannerVideoAdBuilding();
             } else {
                 bannerAdBuilding();
@@ -997,18 +998,16 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private void checkBidResponseForBannerVideo(BidExtensions ext) {
         if (ext != null && ext.getVideo() != null) {
             // A video response is received. Set the flag.
-            isVideoResponse = true;
+            isVideoResponseReceived = true;
 
+            // Update the impression id, beacon and click URLs to refer to the video ad.
             if (this.casInternalRequestParameters.impressionIdLookup != null) {
                 String newImpressionId =
                         this.casInternalRequestParameters.impressionIdLookup.get(AdCreativeType.VIDEO.getValue());
-
                 if (StringUtils.isNotEmpty(newImpressionId)) {
-                    String oldImpresionId = this.getImpressionId();
-                    // Update the impression id and beacon URLs for video ad.
+                    this.beaconUrl = this.beaconUrl.replace(this.getImpressionId(), newImpressionId);
+                    this.clickUrl = this.clickUrl.replace(this.getImpressionId(), newImpressionId);
                     this.impressionId = newImpressionId;
-                    this.beaconUrl = this.beaconUrl.replace(oldImpresionId, newImpressionId);
-                    this.clickUrl = this.clickUrl.replace(oldImpresionId, newImpressionId);
                 }
             }
         }

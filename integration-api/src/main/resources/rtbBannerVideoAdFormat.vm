@@ -1,4 +1,4 @@
-var _im_vastTag = "$<VASTContentJSEsc>",
+var _im_vastTag = "$VASTContentJSEsc",
 	_im_vastParser = new DOMParser().parseFromString(_im_vastTag,"text/xml"),
 	nodes, index, videoUrl;
 //Identify various MediaFiles
@@ -34,4 +34,4 @@ _Sprout.xvars = {
   "impression_trackers": "$IMBeaconUrl,$PartnerBeaconUrl"
 };
 
-_Sprout._inMobiAdTagTracking={st:new Date().getTime(),rr:0};_Sprout["YVdJd3nBsDF7K8dl"]={querystring:{__im_curl:"IMBeaconUrl",__im_sdk:"$SDK_VERSION_ID",click:"$IMClickUrl",adFormat:"interstitial",__im_recordEventFun:"$RECORD_EVENT_FUN",openLandingPage:"$OPEN_LP_FUN"}};var _sproutReadyEvt=document.createEvent("Event");_sproutReadyEvt.initEvent("sproutReady",true,true);window.dispatchEvent(_sproutReadyEvt);var _Sprout_load=function(){var e=document.getElementsByTagName("script"),e=e[e.length-1],t=document.createElement("script");t.async=!0;t.type="text/javascript";t.src="http://farm.sproutbuilder.com/load/YVdJd3nBsDF7K8dl.inmobi.html.review.js?__t="+(Date.now())+"";e.parentNode.insertBefore(t,e.nextSibling)};"0"===window["_Sprout"]["YVdJd3nBsDF7K8dl"]["querystring"]["__im_sdk"]||"complete"===document.readyState?_Sprout_load():window.addEventListener("load",_Sprout_load,!1)</script>
+_Sprout._inMobiAdTagTracking={st:new Date().getTime(),rr:0};_Sprout["YVdJd3nBsDF7K8dl"]={querystring:{__im_curl:"$IMBeaconUrl",__im_sdk:"$SDK_VERSION_ID",click:"$IMClickUrl",adFormat:"interstitial",__im_recordEventFun:"$RECORD_EVENT_FUN",openLandingPage:"$OPEN_LP_FUN"}};var _sproutReadyEvt=document.createEvent("Event");_sproutReadyEvt.initEvent("sproutReady",true,true);window.dispatchEvent(_sproutReadyEvt);var _Sprout_load=function(){var e=document.getElementsByTagName("script"),e=e[e.length-1],t=document.createElement("script");t.async=!0;t.type="text/javascript";t.src="http://farm.sproutbuilder.com/load/YVdJd3nBsDF7K8dl.inmobi.html.review.js?__t="+(Date.now())+"";e.parentNode.insertBefore(t,e.nextSibling)};"0"===window["_Sprout"]["YVdJd3nBsDF7K8dl"]["querystring"]["__im_sdk"]||"complete"===document.readyState?_Sprout_load():window.addEventListener("load",_Sprout_load,!1)</script>

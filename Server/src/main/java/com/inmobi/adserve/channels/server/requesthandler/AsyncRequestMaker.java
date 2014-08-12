@@ -143,24 +143,27 @@ public class AsyncRequestMaker {
         casInternalRequestParameters.siteAccountType = casInternalRequestParameterGlobal.siteAccountType;
 
         // If banner video is supported on this request, set a hash for video impressionId Lookup.
-        casInternalRequestParameters.impressionIdLookup = sasParams.isBannerVideoSupported() ?
-                prepareAdImpressionIdLookup(channelSegmentEntity.getCreativeTypes(), channelSegmentEntity.getIncIds()) : null;
+        casInternalRequestParameters.impressionIdLookup = prepareAdImpressionIdLookup(sasParams,
+                channelSegmentEntity.getCreativeTypes(), channelSegmentEntity.getIncIds());
 
         return casInternalRequestParameters;
     }
 
-    private HashMap<Integer, String> prepareAdImpressionIdLookup(Integer[] adCreativeTypes, Long[] adIncIds) {
-        if (adCreativeTypes == null || adIncIds == null) {
+    private HashMap<Integer, String> prepareAdImpressionIdLookup(SASRequestParameters sasParams, Integer[] adCreativeTypes, Long[] adIncIds) {
+
+        if (!sasParams.isBannerVideoSupported() || adCreativeTypes == null || adIncIds == null) {
             return null;
         }
+
         HashMap<Integer, String> impressionIdLookup = new HashMap<>(adIncIds.length);
         for (int i = 0; i < adCreativeTypes.length; i++) {
             // Presently, we need the lookup only for video.
             if (adCreativeTypes[i] == AdCreativeType.VIDEO.getValue()) {
                 impressionIdLookup.put(adCreativeTypes[i], getImpressionId(adIncIds[i]));
+                return impressionIdLookup;
             }
         }
-        return impressionIdLookup;
+        return null;
     }
 
     private void controlEnrichment(final CasInternalRequestParameters casInternalRequestParameters,
