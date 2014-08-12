@@ -100,10 +100,10 @@ public class DCPSmaatoAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                smaatoAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                smaatoAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                         "{\"spot\":54235,\"pubId\":\"inmobi_1\"," + "\"site\":1234}"), new ArrayList<Integer>(), 0.0d,
-                null, null, 32));
+                null, null, 32, new Integer[] {0}));
         assertEquals(true,
                 dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
@@ -120,9 +120,9 @@ public class DCPSmaatoAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                smaatoAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                smaatoAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
                 dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
@@ -138,9 +138,9 @@ public class DCPSmaatoAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                smaatoAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                smaatoAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
                 dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
@@ -165,10 +165,10 @@ public class DCPSmaatoAdnetworkTest extends TestCase {
         String externalKey = "6378ef4a7db50d955c90f7dffb05ee20";
         SlotSizeMapping.init();
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                smaatoAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                smaatoAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                         "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<Integer>(), 0.0d,
-                null, null, 0));
+                null, null, 0, new Integer[] {0}));
         if (dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
             String actualUrl = dcpSmaatoAdNetwork.getRequestUri().toString();
 
@@ -200,10 +200,10 @@ public class DCPSmaatoAdnetworkTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                smaatoAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                smaatoAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                         "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<Integer>(), 0.0d,
-                null, null, 0));
+                null, null, 0, new Integer[] {0}));
         if (dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpSmaatoAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://f101.smaato.com/oapi/reqAd.jsp?adspace=01212121&pub=923867039&device=Mozilla&devip=206.29.182.240&format=all&dimension=mma&dimensionstrict=true&openudid=202cb962ac59075b964b07152d234b70&gps=38.5%2C-122.1514&kws=Business%2CBooks+%26+Reference&width=320&height=50";
@@ -226,10 +226,10 @@ public class DCPSmaatoAdnetworkTest extends TestCase {
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
 
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                smaatoAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                smaatoAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                         "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<Integer>(), 0.0d,
-                null, null, 32));
+                null, null, 32, new Integer[] {0}));
         dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl);
         String response = "<?xml version=\"1.0\"?><response xmlns=\"http://soma.smaato.com/oapi/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://soma.smaato.com/oapi/ http://www.smaato.com/definitions/xsd/smaatoapi_v2.xsd\"><sessionid>CFF4454048445012E09748993D22E78C.ip-10-0-37-13</sessionid><status>success</status><user><id>900</id><ownid></ownid></user><ads><ad id=\"0\" type=\"IMG\"><log-id></log-id><valid start=\"0\" end=\"0\" max=\"1\"/><link>http://ec2-54-209-70-178.compute-1.amazonaws.com/oapi/getAd.jsp;jsessionid=CFF4454048445012E09748993D22E78C.ip-10-0-37-13</link><action target=\"http://ec2-54-209-70-178.compute-1.amazonaws.com/oapi/lp.jsp;jsessionid=CFF4454048445012E09748993D22E78C.ip-10-0-37-13\" acc=\"server\"/><beacons/></ad></ads></response>";
         dcpSmaatoAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -252,10 +252,10 @@ public class DCPSmaatoAdnetworkTest extends TestCase {
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
 
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                smaatoAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                smaatoAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                         "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<Integer>(), 0.0d,
-                null, null, 32));
+                null, null, 32, new Integer[] {0}));
         dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl);
         String response = "<?xml version=\"1.0\"?><response xmlns=\"http://soma.smaato.com/oapi/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://soma.smaato.com/oapi/ http://www.smaato.com/definitions/xsd/smaatoapi_v2.xsd\"><sessionid>DF1C3BAB96CD1E2AC2C69B8E3C990E1A.ip-10-0-40-106</sessionid><status>success</status><user><id>900</id><ownid></ownid></user><ads><ad id=\"0\" type=\"TXT\"><log-id></log-id><valid start=\"0\" end=\"0\" max=\"1\"/><link></link><action target=\"http://ec2-54-209-110-73.compute-1.amazonaws.com/oapi/lp.jsp;jsessionid=DF1C3BAB96CD1E2AC2C69B8E3C990E1A.ip-10-0-40-106\" acc=\"server\"/><adtext>Please visit smaato.com! </adtext><beacons><beacon>http://ec2-54-209-110-73.compute-1.amazonaws.com/oapi/getBeacon.jsp;jsessionid=DF1C3BAB96CD1E2AC2C69B8E3C990E1A.ip-10-0-40-106</beacon></beacons></ad></ads></response>";
         dcpSmaatoAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -299,10 +299,10 @@ public class DCPSmaatoAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                smaatoAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                smaatoAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                         "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<Integer>(), 0.0d,
-                null, null, 32));
+                null, null, 32, new Integer[] {0}));
         dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null);
         assertEquals("4f8d98e2-4bbd-40bc-8795-22da170700f9", dcpSmaatoAdNetwork.getImpressionId());
     }

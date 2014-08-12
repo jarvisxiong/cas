@@ -1,0 +1,37 @@
+var _im_vastTag = "$<VASTContentJSEsc>",
+	_im_vastParser = new DOMParser().parseFromString(_im_vastTag,"text/xml"),
+	nodes, index, videoUrl;
+//Identify various MediaFiles
+nodes = xmlDoc.getElementsByTagName("MediaFile");
+for(index =0; index < nodes.length; index++) {
+	var height = node.getAttribute("height"),
+		width = node.getAttribute("width"),
+		bitrate = node.getAttribute("bitrate"),
+		type = node.getAttribute("type"),
+		delivery = node.getAttribute("delivery"),
+		url = node.childNodes[0].nodeValue;
+	//TODO: Ignore the following MediaFiles:
+	// 1. Non-mp4 ones
+	// 2. Non "progressive" delivery
+	//TODO: Find the best video based on bitrate and width/height
+	//TODO: Hack; Using the very first MediaFile
+	videoUrl = url; 
+	break;
+}
+
+<script src="mraid.js"></script><div id="Sprout_YVdJd3nBsDF7K8dl_div" data-creativeId="YVdJd3nBsDF7K8dl"></div>
+<script type="text/javascript">
+var _Sprout = _Sprout || {};
+/* 3rd Party Impression Tracker: a tracking pixel URL for tracking 3rd party impressions */
+_Sprout.impressionTracker = "PUT_IMPRESSION_TRACKER_HERE";
+/* 3rd Party Click Tracker: A URL or Macro like %c for third party exit tracking */
+_Sprout.clickTracker = "PUT_CLICK_TRACKER_HERE";
+/* Publisher Label: What you want to call this line-item in Studio reports */
+_Sprout.publisherLabel = "PUT_PUBLISHER_LABEL_HERE";
+/* External variables: parameters for dynamic ads */
+_Sprout.xvars = {
+  "video_url" : videoUrl,
+  "impression_trackers": "$IMBeaconUrl,$PartnerBeaconUrl"
+};
+
+_Sprout._inMobiAdTagTracking={st:new Date().getTime(),rr:0};_Sprout["YVdJd3nBsDF7K8dl"]={querystring:{__im_curl:"IMBeaconUrl",__im_sdk:"$SDK_VERSION_ID",click:"$IMClickUrl",adFormat:"interstitial",__im_recordEventFun:"$RECORD_EVENT_FUN",openLandingPage:"$OPEN_LP_FUN"}};var _sproutReadyEvt=document.createEvent("Event");_sproutReadyEvt.initEvent("sproutReady",true,true);window.dispatchEvent(_sproutReadyEvt);var _Sprout_load=function(){var e=document.getElementsByTagName("script"),e=e[e.length-1],t=document.createElement("script");t.async=!0;t.type="text/javascript";t.src="http://farm.sproutbuilder.com/load/YVdJd3nBsDF7K8dl.inmobi.html.review.js?__t="+(Date.now())+"";e.parentNode.insertBefore(t,e.nextSibling)};"0"===window["_Sprout"]["YVdJd3nBsDF7K8dl"]["querystring"]["__im_sdk"]||"complete"===document.readyState?_Sprout_load():window.addEventListener("load",_Sprout_load,!1)</script>

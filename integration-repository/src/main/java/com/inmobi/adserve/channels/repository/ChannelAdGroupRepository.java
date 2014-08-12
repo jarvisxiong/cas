@@ -36,11 +36,11 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
         Timestamp modifyTime = row.getTimestamp("modified_on");
         try {
             String advertiserId = row.getString("advertiser_id");
-            String adId = row.getString("ad_id");
+            String[] adIds = (String[]) row.getArray("ad_ids");
             String channelId = row.getString("channel_id");
             String externalSiteKey = row.getString("external_site_key");
             String campaignId = row.getString("campaign_id");
-            long adIncId = row.getLong("ad_inc_id");
+            Long[] adIncIds = (Long[]) row.getArray("ad_inc_ids");
             long adgroupIncId = row.getLong("adgroup_inc_id");
             boolean status = row.getBoolean("status");
             String pricingModel = row.getString("pricing_model");
@@ -49,6 +49,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
             Integer[] siteRatings = (Integer[]) row.getArray("site_ratings");
             Long[] rcList = (Long[]) row.getArray("rc_list");
             Long[] slotIds = (Long[]) row.getArray("slot_ids");
+            Integer[] creativeTypes = (Integer[]) row.getArray("creative_types");
             Long[] tags = null;
             List<Integer> segmentFlags;
             if (null != row.getArray("segment_flags")) {
@@ -111,7 +112,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
             ChannelSegmentEntity.Builder builder = ChannelSegmentEntity.newBuilder();
             builder.setAdvertiserId(advertiserId);
             builder.setAdgroupId(adgroupId);
-            builder.setAdId(adId);
+            builder.setAdIds(adIds);
             builder.setChannelId(channelId);
             builder.setPlatformTargeting(platformTargeting);
             builder.setAdgroupIncId(adgroupIncId);
@@ -124,7 +125,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
             builder.setModified_on(modified_on);
             builder.setCampaignId(campaignId);
             builder.setSlotIds(slotIds);
-            builder.setIncId(adIncId);
+            builder.setIncIds(adIncIds);
             builder.setPricingModel(pricingModel.toUpperCase());
             builder.setSiteRatings(siteRatings);
             builder.setTargetingPlatform(targetingPlatform);
@@ -150,6 +151,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
             builder.setTod(tod);
             builder.setDst(dst);
             builder.setCampaignIncId(campaignIncId);
+            builder.setCreativeTypes(creativeTypes);
 
             ChannelSegmentEntity entity = builder.build();
 

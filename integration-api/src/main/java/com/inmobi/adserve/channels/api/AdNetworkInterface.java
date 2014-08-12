@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.api;
 
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.types.AdCreativeType;
 
 import java.net.URI;
 import java.util.List;
@@ -105,6 +106,9 @@ public interface AdNetworkInterface {
 
     // get Impression Id
     String getImpressionId();
+
+    // get AdCreativeType
+    AdCreativeType getAdCreativeType();
 
     // Returns true if request is completed.
     boolean isRequestCompleted();

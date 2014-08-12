@@ -950,7 +950,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         builder.setAdvertiserId(advertiserId);
         builder.setAdvertiserId(advertiserId);
         builder.setAdgroupId(adgroupId);
-        builder.setAdId(adId);
+        builder.setAdIds(new String[] {adId});
         builder.setChannelId(channelId);
         builder.setPlatformTargeting(platformTargeting);
         builder.setRcList(rcList);
@@ -963,7 +963,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         builder.setModified_on(modified_on);
         builder.setCampaignId(campaignId);
         builder.setSlotIds(slotIds);
-        builder.setIncId(incId);
+        builder.setIncIds(new Long[] {incId});
         builder.setAdgroupIncId(incId);
         builder.setPricingModel(pricingModel);
         builder.setSiteRatings(siteRatings);

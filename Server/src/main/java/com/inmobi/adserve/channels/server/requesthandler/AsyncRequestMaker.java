@@ -10,6 +10,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.SegmentFactory;
+import com.inmobi.adserve.channels.types.AdCreativeType;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
@@ -18,10 +19,7 @@ import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -31,6 +29,7 @@ public class AsyncRequestMaker {
     private static final AtomicInteger counter = new AtomicInteger();
 
     private final SegmentFactory segmentFactory;
+    private AdCreativeType defaultCreativeType = AdCreativeType.TEXT;
 
     @Inject
     public AsyncRequestMaker(final SegmentFactory segmentFactory) {
@@ -53,6 +52,7 @@ public class AsyncRequestMaker {
         boolean isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled", false);
         int rtbMaxTimeOut = rtbConfig.getInt("RTBreadtimeoutMillis", 200);
         LOG.debug("isRtbEnabled is {}  and rtbMaxTimeout is {}", isRtbEnabled, rtbMaxTimeOut);
+        sasParams.setAdCreativeType(defaultCreativeType);
 
         for (ChannelSegment row : rows) {
             ChannelSegmentEntity channelSegmentEntity = row.getChannelSegmentEntity();
@@ -72,11 +72,12 @@ public class AsyncRequestMaker {
 
             String clickUrl = null;
             String beaconUrl = null;
-            sasParams.setImpressionId(getImpressionId(channelSegmentEntity.getIncId()));
+            sasParams.setImpressionId(getImpressionId(channelSegmentEntity.getIncId(defaultCreativeType)));
             CasInternalRequestParameters casInternalRequestParameters = getCasInternalRequestParameters(sasParams,
-                    casInternalRequestParameterGlobal);
+                    casInternalRequestParameterGlobal, channelSegmentEntity);
+
             controlEnrichment(casInternalRequestParameters, channelSegmentEntity);
-            sasParams.setAdIncId(channelSegmentEntity.getIncId());
+            sasParams.setAdIncId(channelSegmentEntity.getIncId(defaultCreativeType));
             LOG.debug("impression id is {}", sasParams.getImpressionId());
 
             if ((network.isClickUrlRequired() || network.isBeaconUrlRequired()) && null != sasParams.getImpressionId()) {
@@ -114,7 +115,8 @@ public class AsyncRequestMaker {
     }
 
     private CasInternalRequestParameters getCasInternalRequestParameters(final SASRequestParameters sasParams,
-            final CasInternalRequestParameters casInternalRequestParameterGlobal) {
+            final CasInternalRequestParameters casInternalRequestParameterGlobal,
+            final ChannelSegmentEntity channelSegmentEntity) {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.impressionId = sasParams.getImpressionId();
         casInternalRequestParameters.blockedCategories = casInternalRequestParameterGlobal.blockedCategories;
@@ -138,7 +140,26 @@ public class AsyncRequestMaker {
         casInternalRequestParameters.appUrl = sasParams.getAppUrl();
         casInternalRequestParameters.traceEnabled = casInternalRequestParameterGlobal.traceEnabled;
         casInternalRequestParameters.siteAccountType = casInternalRequestParameterGlobal.siteAccountType;
+
+        // If banner video is supported on this request, set a hash for video impressionId Lookup.
+        casInternalRequestParameters.impressionIdLookup = sasParams.isBannerVideoSupported() ?
+                prepareAdImpressionIdLookup(channelSegmentEntity.getCreativeTypes(), channelSegmentEntity.getIncIds()) : null;
+
         return casInternalRequestParameters;
+    }
+
+    private HashMap<Integer, String> prepareAdImpressionIdLookup(Integer[] adCreativeTypes, Long[] adIncIds) {
+        if (adCreativeTypes == null || adIncIds == null) {
+            return null;
+        }
+        HashMap<Integer, String> impressionIdLookup = new HashMap<>(adIncIds.length);
+        for (int i = 0; i < adCreativeTypes.length; i++) {
+            // Lookup will be needed only for non-default creative types.
+            if (defaultCreativeType.getValue() != adCreativeTypes[i]) {
+                impressionIdLookup.put(adCreativeTypes[i], getImpressionId(adIncIds[i]));
+            }
+        }
+        return impressionIdLookup;
     }
 
     private void controlEnrichment(final CasInternalRequestParameters casInternalRequestParameters,

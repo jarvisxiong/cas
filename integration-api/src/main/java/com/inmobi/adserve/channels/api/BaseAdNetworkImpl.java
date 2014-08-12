@@ -4,6 +4,7 @@ import com.google.inject.Key;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.scope.NettyRequestScope;
+import com.inmobi.adserve.channels.types.AdCreativeType;
 import com.inmobi.adserve.channels.util.*;
 import com.ning.http.client.*;
 import io.netty.bootstrap.Bootstrap;
@@ -50,6 +51,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     
     protected boolean 							  isHTMLResponseSupported = true;
     protected boolean 							  isNativeResponseSupported = false;
+    protected boolean                             isBannerVideoResponseSupported = false;
 
     protected SASRequestParameters                sasParams;
     protected CasInternalRequestParameters        casInternalRequestParameters;
@@ -58,6 +60,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     private ThirdPartyAdResponse                  responseStruct;
     private boolean                               isRtbPartner            = false;
     protected ChannelSegmentEntity                entity;
+    protected AdCreativeType                      adCreativeType;
 
     protected String                              externalSiteId;
     protected String                              host;
@@ -386,6 +389,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         this.impressionId = param.getImpressionId();
         this.blindedSiteId = getBlindedSiteId(param.getSiteIncId(), entity.getAdgroupIncId());
         this.entity = entity;
+        this.adCreativeType = sasParams.getAdCreativeType();
         return configureParameters();
     }
 
@@ -683,10 +687,15 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         return null;
     }
 
+    @Override
+    public AdCreativeType getAdCreativeType() {
+        return adCreativeType;
+    }
+
     protected StringBuilder appendQueryParam(final StringBuilder builder, final String paramName,
             final int paramValue, final boolean isFirstParam) {
         return builder.append(isFirstParam ? '?' : '&').append(paramName).append('=').append(paramValue);
-   }
+    }
     protected StringBuilder appendQueryParam(final StringBuilder builder, final String paramName,
             final String paramValue, final boolean isFirstParam) {
         return builder.append(isFirstParam ? '?' : '&').append(paramName).append('=').append(paramValue);

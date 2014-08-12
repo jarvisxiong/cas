@@ -18,6 +18,7 @@ import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.types.AdCreativeType;
 import com.inmobi.adserve.channels.util.*;
 import com.inmobi.casthrift.rtb.*;
 import com.ning.http.client.AsyncHttpClient;
@@ -33,6 +34,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.thrift.TException;
@@ -104,12 +106,15 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private String                         bidRequestJson               = "";
     protected static final String          mraid                        = "<script src=\"mraid.js\" ></script>";
     private String                         encryptedBid;
-    private static List<String>            mimes                        = Arrays.asList("image/jpeg", "image/gif",
+    private static List<String>            image_mimes                  = Arrays.asList("image/jpeg", "image/gif",
                                                                                 "image/png");
     private static List<Integer>           fsBlockedAttributes          = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13,
                                                                                 14, 15, 16);
     private static List<Integer>           performanceBlockedAttributes = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
                                                                                 11, 12, 13, 14, 15, 16);
+    private static List<Integer>           videoBlockedAttributes       = Arrays.asList(7, 8, 9, 10, 14);
+    private static List<Integer>           videoBlockCreativeType       = Arrays.asList(4);  // iframe
+
     private static final String            FAMILY_SAFE_RATING           = "1";
     private static final String            PERFORMANCE_RATING           = "0";
     private static final String            RATING_KEY                   = "fs";
@@ -125,8 +130,14 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private final RepositoryHelper         repositoryHelper;
     private String                         bidderCurrency               = "USD";
     private static final String            USD                          = "USD";
-    private List<String> blockedAdvertisers = Lists.newArrayList(); ;
-    
+    private List<String> blockedAdvertisers = Lists.newArrayList();
+
+    private static final List<String>      VIDEO_MIMES                  = Arrays.asList("video/mp4");
+    private static final int               EXT_VIDEO_LINEARITY          = 1;   // only linear ads
+    private static final int               EXT_VIDEO_MINDURATION        = 15;  // in secs.
+    private static final int               EXT_VIDEO_MAXDURATION        = 30;  // in secs.
+    private static final List<String>      EXT_VIDEO_TYPE               = Arrays.asList("VAST 2.0", "VAST 3.0");
+
     @Getter
     static List<String>                    currenciesSupported          = new ArrayList<String>(Arrays.asList("USD",
                                                                                 "CNY","JPY","EUR","KRW","RUB"));
@@ -176,6 +187,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         this.templateWN = templateWinNotification;
         this.isHTMLResponseSupported = config.getBoolean(advertiserName + ".htmlSupported", true);
         this.isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", false);
+        this.isBannerVideoResponseSupported = config.getBoolean(advertiserName + ".bannerVideoSupported", false);
         this.blockedAdvertisers.addAll(blockedAdvertiserList);
         
     }
@@ -410,7 +422,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
 
         // mime types a static list
-        banner.setMimes(mimes);
+        banner.setMimes(image_mimes);
 
         // Setting battributes
         if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
@@ -419,7 +431,36 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         else {
             banner.setBattr(fsBlockedAttributes);
         }
+
+        // If this request supports Banner Video and this advertiser is configured to support video
+        if (sasParams.isBannerVideoSupported() && isBannerVideoResponseSupported) {
+            // Set video specific attributes to the Banner object
+            banner.setBattr(videoBlockedAttributes);
+            banner.setBtype(videoBlockCreativeType);
+            banner.setPos(1); // above the fold
+
+            List<String> allMimes = new ArrayList<String>(VIDEO_MIMES);
+            allMimes.addAll(image_mimes);
+            banner.setMimes(allMimes);
+
+            BannerExtensions ext = createBannerExtensionsObject();
+            banner.setExt(ext);
+        }
         return banner;
+    }
+
+    private BannerExtensions createBannerExtensionsObject() {
+        // Create Banner->ext->video Object
+        BannerExtVideo video = new BannerExtVideo();
+        video.setLinearity(EXT_VIDEO_LINEARITY);
+        video.setMinduration(EXT_VIDEO_MINDURATION);
+        video.setMaxduration(EXT_VIDEO_MAXDURATION);
+        video.setType(EXT_VIDEO_TYPE);
+
+        BannerExtensions bannerExtensions = new BannerExtensions();
+        bannerExtensions.setVideo(video);
+
+        return bannerExtensions;
     }
 
     private Geo createGeoObject() {
@@ -477,7 +518,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private Site createSiteObject() {
         Site site = null;
         if (siteBlinded) {
-            site = new Site(getBlindedSiteId(sasParams.getSiteIncId(), entity.getIncId()));
+            site = new Site(getBlindedSiteId(sasParams.getSiteIncId(), entity.getIncId(AdCreativeType.TEXT)));
         }
         else {
             site = new Site(sasParams.getSiteId());
@@ -760,10 +801,12 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 return;
             }
             adStatus = "AD";
-            if(isNativeRequest()){
-            	nativeAdBuilding();
-            }else{
-            	nonNativeAdBuilding();
+            if (isNativeRequest()) {
+                nativeAdBuilding();
+            } else if (getAdCreativeType() == AdCreativeType.VIDEO) {
+                bannerVideoAdBuilding();
+            } else {
+                bannerAdBuilding();
             }
 
         }
@@ -771,10 +814,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
     
     
-    private void nonNativeAdBuilding(){
+    private void bannerAdBuilding(){
     	
         VelocityContext velocityContext = new VelocityContext();
-        
+
         String admContent = getADMContent();
 
         int admSize = admContent.length();
@@ -795,7 +838,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         // Checking whether to send win notification
         LOG.debug("isWinRequired is {} and winfromconfig is {}", wnRequired, callbackUrl);
-        createWin(velocityContext);
+        String partnerWinUrl = getPartnerWinUrl();
+        if (StringUtils.isNotEmpty(partnerWinUrl)){
+            velocityContext.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, partnerWinUrl);
+        }
         
         if (templateWN || (admAfterMacroSize ==  admSize)) {
             velocityContext.put(VelocityTemplateFieldConstants.IMBeaconUrl, this.beaconUrl);
@@ -811,6 +857,37 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
     	
     }
+
+    private void bannerVideoAdBuilding()
+    {
+        VelocityContext velocityContext = new VelocityContext();
+
+        String vastContentJSEsc = StringEscapeUtils.escapeJavaScript(getADMContent());
+        velocityContext.put(VelocityTemplateFieldConstants.VASTContentJSEsc, vastContentJSEsc);
+
+        // JS Escaped WinUrl for partner.
+        String partnerWinUrl = getPartnerWinUrl();
+        velocityContext.put(VelocityTemplateFieldConstants.PartnerBeaconUrl,
+                            StringEscapeUtils.escapeJavaScript(partnerWinUrl));
+
+        // JS Escaped IMWinUrl
+        String imWinUrl = this.beaconUrl + "?b=${WIN_BID}";
+        velocityContext.put(VelocityTemplateFieldConstants.IMWinUrl, StringEscapeUtils.escapeJavaScript(imWinUrl));
+
+        // Add JS Escaped IM beacon and click URLs.
+        velocityContext.put(VelocityTemplateFieldConstants.IMBeaconUrl, StringEscapeUtils.escapeJavaScript(this.beaconUrl));
+        velocityContext.put(VelocityTemplateFieldConstants.IMClickUrl, StringEscapeUtils.escapeJavaScript(this.clickUrl));
+
+        try {
+            responseContent = Formatter.getResponseFromTemplate(TemplateType.RTB_BANNER_VIDEO, velocityContext, sasParams,
+                    null);
+        }
+        catch (Exception e) {
+            adStatus = "NO_AD";
+            LOG.info("Some exception is caught while filling the velocity template for partner{} {}",
+                    advertiserName, e);
+        }
+    }
     
     private String getADMContent(){
     	
@@ -821,7 +898,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     	
     }
     
-    private void createWin(VelocityContext velocityContext){
+    private String getPartnerWinUrl(){
+        String winUrl = "";
     	if (wnRequired) {
             // setCallbackContent();
             // Win notification is required
@@ -835,14 +913,14 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             LOG.debug("nurl is {}", nUrl);
             if (!StringUtils.isEmpty(callbackUrl)) {
                 LOG.debug("inside wn from config");
-                velocityContext.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, callbackUrl);
+                winUrl = callbackUrl;
             }
             else if (!StringUtils.isEmpty(nUrl)) {
                 LOG.debug("inside wn from nurl");
-                velocityContext.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, nUrl);
+                winUrl = nUrl;
             }
-
         }
+        return winUrl;
     }
     
     @Override
@@ -853,7 +931,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private void nativeAdBuilding(){
     	
     	App app = bidRequest.getApp();
-    	
+
     	Map<String, String> params = new HashMap<String, String>();
     	String winUrl = this.beaconUrl + "?b=${WIN_BID}";
     	params.put("beaconUrl",this.beaconUrl);
@@ -900,11 +978,32 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             advertiserDomains = bid.getAdomain();
             creativeAttributes = bid.getAttr();
             responseAuctionId = bidResponse.getId();
+
+            // Check bid response for video
+            if (sasParams.isBannerVideoSupported()) {
+                checkBidResponseForBannerVideo(bid.getExt());
+            }
+
             return true;
         }
         catch (NullPointerException e) {
             LOG.info("Could not parse the rtb response from partner: {}", this.getName());
             return false;
+        }
+    }
+
+    private void checkBidResponseForBannerVideo(BidExtensions ext) {
+        if (ext != null && ext.getVideo() != null) {
+            // Set Ad Creative Type
+            this.adCreativeType = AdCreativeType.VIDEO;
+
+            if (this.casInternalRequestParameters.impressionIdLookup != null) {
+                String oldImpresionId = this.getImpressionId();
+                // Update the impression ids and beacon URLs for video ad.
+                this.impressionId = this.casInternalRequestParameters.impressionIdLookup.get(AdCreativeType.VIDEO.getValue());
+                this.beaconUrl = this.beaconUrl.replace(oldImpresionId, this.impressionId);
+                this.clickUrl = this.clickUrl.replace(oldImpresionId, this.impressionId);
+            }
         }
     }
 

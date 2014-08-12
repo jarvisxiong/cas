@@ -27,6 +27,7 @@ public class Formatter {
         RICH,
         IMAGE,
         RTB_HTML,
+        RTB_BANNER_VIDEO,
         NEXAGE_JS_AD_TAG,
         WAP_HTML_JS_AD_TAG
     }
@@ -38,6 +39,7 @@ public class Formatter {
     private static Template       velocityTemplateRichTxt;
     private static Template       velocityTemplateImg;
     private static Template       velocityTemplateRtb;
+    private static Template       velocityTemplateRtbBannerVideo;
     private static Template       velocityTemplateJsAdTag;
     private static Template       velocityTemplateWapHtmlJsAdTag;
 
@@ -50,6 +52,7 @@ public class Formatter {
         velocityTemplateRichTxt = velocityEngine.getTemplate("richTxtFormat.vm");
         velocityTemplateImg = velocityEngine.getTemplate("ImageAdFormat.vm");
         velocityTemplateRtb = velocityEngine.getTemplate("rtbHtmlAdFormat.vm");
+        velocityTemplateRtbBannerVideo = velocityEngine.getTemplate("rtbBannerVideoAdFormat.vm");
         velocityTemplateJsAdTag = velocityEngine.getTemplate("nexageJsAdTag.vm");
         velocityTemplateWapHtmlJsAdTag = velocityEngine.getTemplate("wapHtmlAdFormat.vm");
     }
@@ -118,6 +121,9 @@ public class Formatter {
                 break;
             case RTB_HTML:
                 velocityTemplateRtb.merge(context, writer);
+                break;
+            case RTB_BANNER_VIDEO:
+                velocityTemplateRtbBannerVideo.merge(context, writer);
                 break;
             case NEXAGE_JS_AD_TAG:
                 velocityTemplateJsAdTag.merge(context, writer);

@@ -162,9 +162,9 @@ public class AdNetworksTest extends TestCase {
         String externalKey = "f6wqjq1r5v";
         casInternalRequestParameters.impressionId = "4f8d98e2-4bbd-40bc-8795-22da170700f9";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(ifdAdvertiserId, null,
-                null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
-                0.0d, null, null, 32));
+                0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(true,
                 ifdAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null));
     }
@@ -180,9 +180,9 @@ public class AdNetworksTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(atntAdvertiserId, null,
-                null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
-                0.0d, null, null, 32));
+                0.0d, null, null, 32, new Integer[]{0}));
         assertEquals(true,
                 atntAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null));
     }
@@ -199,9 +199,9 @@ public class AdNetworksTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null,
-                null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null, false,
+                null, 0, null, null, true, true, externalKey, null, null, null, new Long [] {0L}, true, null, null, 0, null, false,
                 false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-                null, null, 32));
+                null, null, 32, new Integer[] {0}));
         assertEquals(true,
                 dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
@@ -218,9 +218,9 @@ public class AdNetworksTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null,
-                null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null, false,
+                null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
                 false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-                null, null, 32));
+                null, null, 32, new Integer[] {0}));
         assertEquals(false,
                 dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
@@ -237,9 +237,9 @@ public class AdNetworksTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null,
-                null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null, false,
+                null, 0, null, null, true, true, externalKey, null, null, null, new Long [] {0L}, true, null, null, 0, null, false,
                 false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-                null, null, 32));
+                null, null, 32, new Integer[] {0}));
         assertEquals(false,
                 dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
@@ -256,9 +256,9 @@ public class AdNetworksTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null,
-                null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null, false,
+                null, 0, null, null, true, true, externalKey, null, null, null, new Long [] {0L}, true, null, null, 0, null, false,
                 false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-                null, null, 32));
+                null, null, 32, new Integer[] {0}));
         assertEquals(false,
                 dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
@@ -274,9 +274,9 @@ public class AdNetworksTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null,
-                null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null, false,
+                null, 0, null, null, true, true, externalKey, null, null, null, new Long [] {0L}, true, null, null, 0, null, false,
                 false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-                null, null, 32));
+                null, null, 32, new Integer[] {0}));
         assertEquals(false,
                 dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
@@ -295,9 +295,9 @@ public class AdNetworksTest extends TestCase {
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         String externalSiteKey = "10023";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(webmoblinkAdvId, null,
-                null, null, 0, null, null, true, true, externalSiteKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
-                0.0d, null, null, 32));
+                0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(true, webmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity,
                 null, beaconUrl));
     }
@@ -315,9 +315,9 @@ public class AdNetworksTest extends TestCase {
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         String externalSiteKey = "10023";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(webmoblinkAdvId, null,
-                null, null, 0, null, null, true, true, externalSiteKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
-                0.0d, null, null, 32));
+                0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false, webmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity,
                 null, beaconUrl));
     }
@@ -336,9 +336,9 @@ public class AdNetworksTest extends TestCase {
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         String externalSiteKey = null;
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(webmoblinkAdvId, null,
-                null, null, 0, null, null, true, true, externalSiteKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
-                0.0d, null, null, 32));
+                0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false, webmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity,
                 null, beaconUrl));
     }
@@ -355,9 +355,9 @@ public class AdNetworksTest extends TestCase {
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         String externalSiteKey = "10023";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(webmoblinkAdvId, null,
-                null, null, 0, null, null, true, true, externalSiteKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
-                0.0d, null, null, 32));
+                0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false, webmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity,
                 null, beaconUrl));
     }
@@ -376,9 +376,9 @@ public class AdNetworksTest extends TestCase {
                 + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1" + "/9cddca11?ds=1";
         String externalSiteKey = "10023";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(webmoblinkAdvId, null,
-                null, null, 0, null, null, true, true, externalSiteKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
-                0.0d, null, null, 32));
+                0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(true, webmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity,
                 null, beaconUrl));
     }
@@ -399,9 +399,9 @@ public class AdNetworksTest extends TestCase {
                 + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1" + "/9cddca11?ds=1";
         String externalSiteKey = "10023";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(webmoblinkAdvId, null,
-                null, null, 0, null, null, true, true, externalSiteKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
-                0.0d, null, null, 32));
+                0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(true, webmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity,
                 null, beaconUrl));
     }
@@ -417,9 +417,9 @@ public class AdNetworksTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(mcAdvertiserId, null,
-                null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
-                0.0d, null, null, 32));
+                0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(true, mobileCommerceAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity,
                 null, null));
     }
@@ -439,9 +439,9 @@ public class AdNetworksTest extends TestCase {
         String externalKey = "118398";
         sasParams.setSiteIncId(18);
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(openxAdvertiserId, null,
-                null, null, 0, null, null, true, true, externalKey, null, null, null, 32, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[]{32L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
-                0.0d, null, null, 32));
+                0.0d, null, null, 32, new Integer[] {0}));
         if (openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
             String actualUrl = openxAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://openx.com/get?auid=118398&cnt=us&ip=206.29.182.240&lat=37.4429&lon=-122.1514&lt=3&c.siteId=00000000-0000-0020-0000-000000000012&did.ia=dfjksahfdjksahdkaw2e23231&did=1234";
@@ -464,9 +464,9 @@ public class AdNetworksTest extends TestCase {
         String externalKey = "118398";
         sasParams.setSiteIncId(18);
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(openxAdvertiserId, null,
-                null, null, 0, null, null, true, true, externalKey, null, null, null, 32, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {32L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
-                0.0d, null, null, 32));
+                0.0d, null, null, 32, new Integer[] {0}));
         if (openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
             String actualUrl = openxAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://openx.com/get?auid=118398&cnt=us&ip=206.29.182.240&lat=37.4429&lon=-122.1514&lt=3&c.siteId=00000000-0000-0020-0000-000000000012&did.o1=dfjksahfdjksahdkaw2e23231&did=1234";
@@ -487,9 +487,9 @@ public class AdNetworksTest extends TestCase {
         String externalKey = "118398";
         sasParams.setSiteIncId(18);
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(openxAdvertiserId, null,
-                null, null, 0, null, null, true, true, externalKey, null, null, null, 32, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {32L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, new JSONObject(),
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
             String actualUrl = openxAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://openx.com/get?auid=118398&cnt=us&ip=206.29.182.240&lat=37.4429&lon=-122.1514&lt=3&c.siteId=00000000-0000-0020-0000-000000000012&did=1234";
@@ -510,9 +510,9 @@ public class AdNetworksTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(dbAdvertiserId, null,
-                null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, new JSONObject(),
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertTrue(drawBridgeAdNetwork
                 .configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
@@ -531,9 +531,9 @@ public class AdNetworksTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(dbAdvertiserId, null,
-                null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, new JSONObject(),
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertTrue(drawBridgeAdNetwork
                 .configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
@@ -552,9 +552,9 @@ public class AdNetworksTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(dbAdvertiserId, null,
-                null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                        "{\"filter_iPod\":\"1\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
+                        "{\"filter_iPod\":\"1\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertFalse(drawBridgeAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl,
                 null));
     }
@@ -573,9 +573,9 @@ public class AdNetworksTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(dbAdvertiserId, null,
-                null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                        "{\"filter_iPod\":\"1\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
+                        "{\"filter_iPod\":\"1\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertTrue(drawBridgeAdNetwork
                 .configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
@@ -594,9 +594,9 @@ public class AdNetworksTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(dbAdvertiserId, null,
-                null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                        "{\"filter_iPod\":\"2\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
+                        "{\"filter_iPod\":\"2\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertFalse(drawBridgeAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl,
                 null));
     }
@@ -617,9 +617,9 @@ public class AdNetworksTest extends TestCase {
         sasParams.setSiteIncId(121212);
         String externalKey = "191000";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(dbAdvertiserId, null,
-                null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, new JSONObject(),
-                new ArrayList<Integer>(), 0.0d, null, null, 454545));
+                new ArrayList<Integer>(), 0.0d, null, null, 454545, new Integer[]{0}));
         if (drawBridgeAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
             String actualUrl = drawBridgeAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://drawbridge.com/get?_pid=aabb&_psign=inmobi&_clip=206.29.182.240&_did=1234&_odin1=dac95d86b46afdce78e1b36c082fda03&_ua=Mozilla&_art=sb&_pubcat=miscellenous&_adw=320&_adh=50&_clickbeacon=&_aid=00000000-0006-ef91-0000-00000001d97c&_test=1&_impressionbeacon=&_app=0";
@@ -645,9 +645,9 @@ public class AdNetworksTest extends TestCase {
         String externalKey = "191000";
         Long[] segmentCategories = new Long[] { 13l, 15l };
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(dbAdvertiserId, null,
-                null, null, 0, null, segmentCategories, true, true, externalKey, null, null, null, 0, true, null, null,
+                null, null, 0, null, segmentCategories, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null,
                 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(),
-                new ArrayList<Integer>(), 0.0d, null, null, 454545));
+                new ArrayList<Integer>(), 0.0d, null, null, 454545, new Integer[]{0}));
         if (drawBridgeAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
             String actualUrl = drawBridgeAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://drawbridge.com/get?_pid=aabb&_psign=inmobi&_clip=206.29.182.240&_did=1234&_macsha1=dac95d86b46afdce78e1b36c082fda03&_ua=Mozilla&_art=sb&_pubcat=Education%2CEntertainment&_adw=320&_adh=50&_clickbeacon=&_aid=00000000-0006-ef91-0000-00000001d97c&_test=1&_impressionbeacon=&_app=0";
@@ -673,9 +673,9 @@ public class AdNetworksTest extends TestCase {
         String externalKey = "191000";
         Long[] segmentCategories = new Long[] { 1l };
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(dbAdvertiserId, null,
-                null, null, 0, null, segmentCategories, true, true, externalKey, null, null, null, 0, true, null, null,
+                null, null, 0, null, segmentCategories, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null,
                 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(),
-                new ArrayList<Integer>(), 0.0d, null, null, 454545));
+                new ArrayList<Integer>(), 0.0d, null, null, 454545, new Integer[] {0}));
         if (drawBridgeAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
             String actualUrl = drawBridgeAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://drawbridge.com/get?_pid=aabb&_psign=inmobi&_clip=206.29.182.240&_did=1234&_macsha1=dac95d86b46afdce78e1b36c082fda03&_ua=Mozilla&_art=sb&_pubcat=Education%2CEntertainment&_adw=320&_adh=50&_clickbeacon=&_aid=00000000-0006-ef91-0000-00000001d97c&_test=1&_impressionbeacon=&_app=0";
@@ -700,9 +700,9 @@ public class AdNetworksTest extends TestCase {
         String externalKey = "191000";
         Long[] segmentCategories = null;
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(dbAdvertiserId, null,
-                null, null, 0, null, segmentCategories, true, true, externalKey, null, null, null, 0, true, null, null,
+                null, null, 0, null, segmentCategories, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null,
                 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(),
-                new ArrayList<Integer>(), 0.0d, null, null, 454545));
+                new ArrayList<Integer>(), 0.0d, null, null, 454545, new Integer[] {0}));
         if (drawBridgeAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
             String actualUrl = drawBridgeAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://drawbridge.com/get?_pid=aabb&_psign=inmobi&_clip=206.29.182.240&_did=dac95d86b46afdce78e1b36c082fda03&_ua=Mozilla&_art=sb&_pubcat=miscellenous&_adw=320&_adh=50&_clickbeacon=&_aid=00000000-0006-ef91-0000-00000001d97c&_test=1&_impressionbeacon=&_app=0";
@@ -728,9 +728,9 @@ public class AdNetworksTest extends TestCase {
         sasParams.setSiteIncId(121212);
         String externalKey = "191000";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(dbAdvertiserId, null,
-                null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, new JSONObject(),
-                new ArrayList<Integer>(), 0.0d, null, null, 454545));
+                new ArrayList<Integer>(), 0.0d, null, null, 454545, new Integer[] {0}));
         if (drawBridgeAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
             String actualUrl = drawBridgeAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://drawbridge.com/get?_pid=aabb&_psign=inmobi&_clip=206.29.182.240&_ifa=dac95d86b46afdce78e1b36c082fda03&_optout=0&_did=1234&_ua=Mozilla&_art=sb&_pubcat=miscellenous&_adw=320&_adh=50&_clickbeacon=&_aid=00000000-0006-ef91-0000-00000001d97c&_test=1&_impressionbeacon=&_app=0";
@@ -751,9 +751,9 @@ public class AdNetworksTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(atntAdvertiserId, null,
-                null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
-                0.0d, null, null, 32));
+                0.0d, null, null, 32, new Integer[] {0}));
         atntAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null);
         String actualUrl = atntAdNetwork.getRequestUri().toString();
         String expectedUrlPrefix = "http://api\\.yp\\.com/display/v1/ad\\?apikey=f6wqjq1r5v&ip=206\\.29\\.182\\.240&useragent=Mozilla&loc=37\\.4429:-122\\.1514&listingcount=1&visitorid=";
@@ -777,9 +777,9 @@ public class AdNetworksTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null,
-                null, 0, null, null, true, true, externalKey, null, null, null, 32, true, null, null, 0, null, false,
+                null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {32L}, true, null, null, 0, null, false,
                 false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-                null, null, 32));
+                null, null, 32, new Integer[] {0}));
         if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpTapitAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://r.tapit.com/adrequest.php?format=json&ip=206.29.182.240&ua=Mozilla&zone=19100&lat=37.4429&long=-122.1514&enctype=raw&idfa=202cb962ac59075b964b07152d234b70&w=320.0&h=50.0&tpsid=00000000-0000-0020-0000-000000000012";
@@ -804,9 +804,9 @@ public class AdNetworksTest extends TestCase {
         String clurl = "http://c2.w.inmobi.com/c"
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null,
-                null, 0, null, null, true, true, externalKey, null, null, null, 32, true, null, null, 0, null, false,
+                null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {32L}, true, null, null, 0, null, false,
                 false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-                null, null, 32));
+                null, null, 32, new Integer[] {0}));
         if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpTapitAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://r.tapit.com/adrequest.php?format=json&ip=206.29.182.240&ua=Mozilla&zone=19100&enctype=sha1&udid=202cb962ac59075b964b07152d234b70&w=320.0&h=50.0&tpsid=00000000-0000-0020-0000-000000000012";
@@ -829,9 +829,9 @@ public class AdNetworksTest extends TestCase {
         String clurl = "http://c2.w.inmobi.com/c"
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null,
-                null, 0, null, null, true, true, externalKey, null, null, null, 32, true, null, null, 0, null, false,
+                null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {32L}, true, null, null, 0, null, false,
                 false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-                null, null, 32));
+                null, null, 32, new Integer[] {0}));
         if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpTapitAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://r.tapit.com/adrequest.php?format=json&ip=206.29.182.240&ua=Mozilla&zone=19100&lat=37.4429&long=-122.1514&enctype=md5&udid=202cb962ac59075b964b07152d234b70&tpsid=00000000-0000-0020-0000-000000000012";
@@ -856,9 +856,9 @@ public class AdNetworksTest extends TestCase {
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         String externalSiteKey = "10023";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(webmoblinkAdvId, null,
-                null, null, 0, null, null, true, true, externalSiteKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
-                0.0d, null, null, 32));
+                0.0d, null, null, 32, new Integer[] {0}));
         if (webmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl)) {
             String actualUrl = webmoblinkAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://www.webmoblink-api.mobi/API2/MobileAPI.aspx?pid=10023&mo=LIVE&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334&ip=206.29.182.240&format=IMG&result=html&cc=us&channels=1,3,10";
@@ -882,9 +882,9 @@ public class AdNetworksTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         String externalSiteKey = "10023";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(webmoblinkAdvId, null,
-                null, null, 0, null, null, true, true, externalSiteKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
-                0.0d, null, null, 32));
+                0.0d, null, null, 32, new Integer[] {0}));
         if (webmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl)) {
             String actualUrl = webmoblinkAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://www.webmoblink-api.mobi/API2/MobileAPI.aspx?pid=10023&mo=LIVE&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334&ip=206.29.182.240&format=IMG&result=html&cc=us&channels=1,3,10";
@@ -907,9 +907,9 @@ public class AdNetworksTest extends TestCase {
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         String externalSiteKey = "10023";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(webmoblinkAdvId, null,
-                null, null, 0, null, null, true, true, externalSiteKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
-                0.0d, null, null, 32));
+                0.0d, null, null, 32, new Integer[] {0}));
         if (webmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl)) {
             String actualUrl = webmoblinkAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://www.webmoblink-api.mobi/API2/MobileAPI.aspx?pid=10023&mo=LIVE&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334&ip=206.29.182.240&format=IMG&result=html&cc=us";
@@ -930,9 +930,9 @@ public class AdNetworksTest extends TestCase {
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(openxAdvertiserId, null,
-                null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
-                0.0d, null, null, 32));
+                0.0d, null, null, 32, new Integer[] {0}));
 
         openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
@@ -958,9 +958,9 @@ public class AdNetworksTest extends TestCase {
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(openxAdvertiserId, null,
-                null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
-                0.0d, null, null, 32));
+                0.0d, null, null, 32, new Integer[] {0}));
 
         openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
@@ -986,9 +986,9 @@ public class AdNetworksTest extends TestCase {
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(openxAdvertiserId, null,
-                null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
-                0.0d, null, null, 32));
+                0.0d, null, null, 32, new Integer[] {0}));
 
         openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
@@ -1016,9 +1016,9 @@ public class AdNetworksTest extends TestCase {
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(openxAdvertiserId, null,
-                null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
-                0.0d, null, null, 32));
+                0.0d, null, null, 32, new Integer[] {0}));
 
         openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
@@ -1044,9 +1044,9 @@ public class AdNetworksTest extends TestCase {
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(dbAdvertiserId, null,
-                null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, new JSONObject(),
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (drawBridgeAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl,
                 beaconUrl)) {
             String response = "<style type='text/css'>     body { margin:0;padding:0 } </style>  <p align='center'>     <a href='http://c.adsymptotic.com/c/c?p=CiBiMTEzNGIwODMxNGY4ZWQ5ZjI0MGUwODk1MTgyMTNhZhCqJhoFMTAyMTggAigBMP7%2BjsIHOOjL%0A2oMFQABaAGD%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BaAByJnNpZy5TfDJiNDQwZjkwZTBkYzUzZWJlMDUzMGVlMjc2NGY4%0ANTYxeAKAAY8EigEiU3wyYjQ0MGY5MGUwZGM1M2ViZTA1MzBlZTI3NjRmODU2MQ%3D%3D' target='_blank' onclick=\"document.getElementById('click').src='http://c2.w.inmobi.com/c.asm/4/t/2xsl/ftl/1/2m/ba/u/0/0/0/x/4f5f96fa-013a-1000-e2fa-7d3018aa0040/-1/1/74263297?ds=1'\"><img src='http://mf.adsymptotic.com/i/00/00/00/06/6452_mg_300x50_20120227_0001.jpg' border='0'/></a> </p> <img src='http://c.adsymptotic.com/c/i?p=CiBiMTEzNGIwODMxNGY4ZWQ5ZjI0MGUwODk1MTgyMTNhZhCqJhoFMTAyMTggAigBMP7%2BjsIHOOjL%0A2oMFQABaAGD%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BaAByJnNpZy5TfDJiNDQwZjkwZTBkYzUzZWJlMDUzMGVlMjc2NGY4%0ANTYxeAKAAY8EigEiU3wyYjQ0MGY5MGUwZGM1M2ViZTA1MzBlZTI3NjRmODU2MQ%3D%3D&_pid=10218' width='1' height='1'></img> <img src='http://c2.w.inmobi.com/c.asm/4/t/2xsl/ftl/1/2m/ba/u/0/0/0/x/4f5f96fa-013a-1000-e2fa-7d3018aa0040/-1/1/74263297?ds=1&event=beacon' width='1' height='1'></img> <img id=\"click\" width=\"1\" height=\"1\"></img>";
@@ -1072,9 +1072,9 @@ public class AdNetworksTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(dbAdvertiserId, null,
-                null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, new JSONObject(),
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (drawBridgeAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl,
                 beaconUrl)) {
             String response = "<style type='text/css'>     body { margin:0;padding:0 } </style>  <p align='center'>     <a href='http://c.adsymptotic.com/c/c?p=CiBiMTEzNGIwODMxNGY4ZWQ5ZjI0MGUwODk1MTgyMTNhZhCqJhoFMTAyMTggAigBMP7%2BjsIHOOjL%0A2oMFQABaAGD%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BaAByJnNpZy5TfDJiNDQwZjkwZTBkYzUzZWJlMDUzMGVlMjc2NGY4%0ANTYxeAKAAY8EigEiU3wyYjQ0MGY5MGUwZGM1M2ViZTA1MzBlZTI3NjRmODU2MQ%3D%3D' target='_blank' onclick=\"document.getElementById('click').src='http://c2.w.inmobi.com/c.asm/4/t/2xsl/ftl/1/2m/ba/u/0/0/0/x/4f5f96fa-013a-1000-e2fa-7d3018aa0040/-1/1/74263297?ds=1'\"><img src='http://mf.adsymptotic.com/i/00/00/00/06/6452_mg_300x50_20120227_0001.jpg' border='0'/></a> </p> <img src='http://c.adsymptotic.com/c/i?p=CiBiMTEzNGIwODMxNGY4ZWQ5ZjI0MGUwODk1MTgyMTNhZhCqJhoFMTAyMTggAigBMP7%2BjsIHOOjL%0A2oMFQABaAGD%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BaAByJnNpZy5TfDJiNDQwZjkwZTBkYzUzZWJlMDUzMGVlMjc2NGY4%0ANTYxeAKAAY8EigEiU3wyYjQ0MGY5MGUwZGM1M2ViZTA1MzBlZTI3NjRmODU2MQ%3D%3D&_pid=10218' width='1' height='1'></img> <img src='http://c2.w.inmobi.com/c.asm/4/t/2xsl/ftl/1/2m/ba/u/0/0/0/x/4f5f96fa-013a-1000-e2fa-7d3018aa0040/-1/1/74263297?ds=1&event=beacon' width='1' height='1'></img> <img id=\"click\" width=\"1\" height=\"1\"></img>";
@@ -1101,9 +1101,9 @@ public class AdNetworksTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(dbAdvertiserId, null,
-                null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, new JSONObject(),
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (drawBridgeAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl,
                 beaconUrl)) {
             String response = "<style type='text/css'>     body { margin:0;padding:0 } </style>  <p align='center'>     <a href='http://c.adsymptotic.com/c/c?p=CiBiMTEzNGIwODMxNGY4ZWQ5ZjI0MGUwODk1MTgyMTNhZhCqJhoFMTAyMTggAigBMP7%2BjsIHOOjL%0A2oMFQABaAGD%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BaAByJnNpZy5TfDJiNDQwZjkwZTBkYzUzZWJlMDUzMGVlMjc2NGY4%0ANTYxeAKAAY8EigEiU3wyYjQ0MGY5MGUwZGM1M2ViZTA1MzBlZTI3NjRmODU2MQ%3D%3D' target='_blank' onclick=\"document.getElementById('click').src='http://c2.w.inmobi.com/c.asm/4/t/2xsl/ftl/1/2m/ba/u/0/0/0/x/4f5f96fa-013a-1000-e2fa-7d3018aa0040/-1/1/74263297?ds=1'\"><img src='http://mf.adsymptotic.com/i/00/00/00/06/6452_mg_300x50_20120227_0001.jpg' border='0'/></a> </p> <img src='http://c.adsymptotic.com/c/i?p=CiBiMTEzNGIwODMxNGY4ZWQ5ZjI0MGUwODk1MTgyMTNhZhCqJhoFMTAyMTggAigBMP7%2BjsIHOOjL%0A2oMFQABaAGD%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BaAByJnNpZy5TfDJiNDQwZjkwZTBkYzUzZWJlMDUzMGVlMjc2NGY4%0ANTYxeAKAAY8EigEiU3wyYjQ0MGY5MGUwZGM1M2ViZTA1MzBlZTI3NjRmODU2MQ%3D%3D&_pid=10218' width='1' height='1'></img> <img src='http://c2.w.inmobi.com/c.asm/4/t/2xsl/ftl/1/2m/ba/u/0/0/0/x/4f5f96fa-013a-1000-e2fa-7d3018aa0040/-1/1/74263297?ds=1&event=beacon' width='1' height='1'></img> <img id=\"click\" width=\"1\" height=\"1\"></img>";
@@ -1127,9 +1127,9 @@ public class AdNetworksTest extends TestCase {
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null,
-                null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null, false,
+                null, 0, null, null, true, true, externalKey, null, null, null, new Long [] {0L}, true, null, null, 0, null, false,
                 false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-                null, null, 32));
+                null, null, 32, new Integer[] {0}));
         if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl)) {
             String response = "{\"type\":\"banner\",\"html\":\"<a href=\\\"http:\\/\\/c.tapit.com\\/advalidate.php?zone=6579&amp;cid=106800&amp;adtype=1&amp;w=320.0&amp;h=50.0&amp;xid=dd3b9df3694433f01389c222f8059f39&amp;ip=174.141.213.29&amp;udid=&amp;adnetwork=1&amp;ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&amp;tpsid=1659216000069348\\\" target=\\\"_blank\\\"><img src=\\\"http:\\/\\/i.tapit.com\\/adimage.php?zone=6579&amp;cid=106800&amp;adtype=1&amp;xid=dd3b9df3694433f01389c222f8059f39&amp;ip=174.141.213.29&amp;udid=&amp;ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&amp;adnetwork=1&amp;tpsid=1659216000069348&amp;w=320&amp;h=50\\\" width=\\\"320\\\" height=\\\"50\\\" alt=\\\"\\\"\\/><\\/a>\",\"adId\":\"106800\",\"adWidth\":\"320\",\"adHeight\":\"50\",\"cpc\":0.025,\"adtitle\":\"\",\"adtext\":\"\",\"clickurl\":\"http:\\/\\/c.tapit.com\\/advalidate.php?zone=6579&cid=106800&adtype=1&w=320.0&h=50.0&xid=dd3b9df3694433f01389c222f8059f39&ip=174.141.213.29&udid=&adnetwork=1&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&tpsid=1659216000069348\",\"imageurl\":\"http:\\/\\/i.tapit.com\\/adimage.php?zone=6579&cid=106800&adtype=1&xid=dd3b9df3694433f01389c222f8059f39&ip=174.141.213.29&udid=&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&adnetwork=1&tpsid=1659216000069348&w=320&h=50\",\"domain\":\"c.tapit.com\"}";
             dcpTapitAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -1152,9 +1152,9 @@ public class AdNetworksTest extends TestCase {
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null,
-                null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null, false,
+                null, 0, null, null, true, true, externalKey, null, null, null, new Long [] {0L}, true, null, null, 0, null, false,
                 false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-                null, null, 32));
+                null, null, 32, new Integer[] {0}));
         if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl)) {
             String response = "{\"type\":\"html\",\"html\":\"<a href=\\\"http:\\/\\/c.tapit.com\\/advalidate.php?zone=6579&amp;cid=106800&amp;adtype=1&amp;w=320.0&amp;h=50.0&amp;xid=dd3b9df3694433f01389c222f8059f39&amp;ip=174.141.213.29&amp;udid=&amp;adnetwork=1&amp;ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&amp;tpsid=1659216000069348\\\" target=\\\"_blank\\\"><img src=\\\"http:\\/\\/i.tapit.com\\/adimage.php?zone=6579&amp;cid=106800&amp;adtype=1&amp;xid=dd3b9df3694433f01389c222f8059f39&amp;ip=174.141.213.29&amp;udid=&amp;ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&amp;adnetwork=1&amp;tpsid=1659216000069348&amp;w=320&amp;h=50\\\" width=\\\"320\\\" height=\\\"50\\\" alt=\\\"\\\"\\/><\\/a>\",\"adId\":\"106800\",\"adWidth\":\"320\",\"adHeight\":\"50\",\"cpc\":0.025,\"adtitle\":\"\",\"adtext\":\"\",\"clickurl\":\"http:\\/\\/c.tapit.com\\/advalidate.php?zone=6579&cid=106800&adtype=1&w=320.0&h=50.0&xid=dd3b9df3694433f01389c222f8059f39&ip=174.141.213.29&udid=&adnetwork=1&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&tpsid=1659216000069348\",\"imageurl\":\"http:\\/\\/i.tapit.com\\/adimage.php?zone=6579&cid=106800&adtype=1&xid=dd3b9df3694433f01389c222f8059f39&ip=174.141.213.29&udid=&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&adnetwork=1&tpsid=1659216000069348&w=320&h=50\",\"domain\":\"c.tapit.com\"}";
             dcpTapitAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -1177,9 +1177,9 @@ public class AdNetworksTest extends TestCase {
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null,
-                null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null, false,
+                null, 0, null, null, true, true, externalKey, null, null, null, new Long [] {0L}, true, null, null, 0, null, false,
                 false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-                null, null, 32));
+                null, null, 32, new Integer[] {0}));
         if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl)) {
             String response = "{\"type\":\"html\",\"html\":\"<a href=\\\"http:\\/\\/c.tapit.com\\/advalidate.php?zone=6579&amp;cid=106800&amp;adtype=1&amp;w=320.0&amp;h=50.0&amp;xid=dd3b9df3694433f01389c222f8059f39&amp;ip=174.141.213.29&amp;udid=&amp;adnetwork=1&amp;ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&amp;tpsid=1659216000069348\\\" target=\\\"_blank\\\"><img src=\\\"http:\\/\\/i.tapit.com\\/adimage.php?zone=6579&amp;cid=106800&amp;adtype=1&amp;xid=dd3b9df3694433f01389c222f8059f39&amp;ip=174.141.213.29&amp;udid=&amp;ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&amp;adnetwork=1&amp;tpsid=1659216000069348&amp;w=320&amp;h=50\\\" width=\\\"320\\\" height=\\\"50\\\" alt=\\\"\\\"\\/><\\/a>\",\"adId\":\"106800\",\"adWidth\":\"320\",\"adHeight\":\"50\",\"cpc\":0.025,\"adtitle\":\"\",\"adtext\":\"\",\"clickurl\":\"http:\\/\\/c.tapit.com\\/advalidate.php?zone=6579&cid=106800&adtype=1&w=320.0&h=50.0&xid=dd3b9df3694433f01389c222f8059f39&ip=174.141.213.29&udid=&adnetwork=1&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&tpsid=1659216000069348\",\"imageurl\":\"http:\\/\\/i.tapit.com\\/adimage.php?zone=6579&cid=106800&adtype=1&xid=dd3b9df3694433f01389c222f8059f39&ip=174.141.213.29&udid=&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&adnetwork=1&tpsid=1659216000069348&w=320&h=50\",\"domain\":\"c.tapit.com\"}";
             dcpTapitAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -1204,9 +1204,9 @@ public class AdNetworksTest extends TestCase {
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null,
-                null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null, false,
+                null, 0, null, null, true, true, externalKey, null, null, null, new Long [] {0L}, true, null, null, 0, null, false,
                 false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-                null, null, 32));
+                null, null, 32, new Integer[] {0}));
         if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl)) {
             String response = "{\"type\":\"html\",\"html\":\"<a href=\\\"http:\\/\\/c.tapit.com\\/advalidate.php?zone=6579&amp;cid=106800&amp;adtype=1&amp;w=320.0&amp;h=50.0&amp;xid=dd3b9df3694433f01389c222f8059f39&amp;ip=174.141.213.29&amp;udid=&amp;adnetwork=1&amp;ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&amp;tpsid=1659216000069348\\\" target=\\\"_blank\\\"><img src=\\\"http:\\/\\/i.tapit.com\\/adimage.php?zone=6579&amp;cid=106800&amp;adtype=1&amp;xid=dd3b9df3694433f01389c222f8059f39&amp;ip=174.141.213.29&amp;udid=&amp;ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&amp;adnetwork=1&amp;tpsid=1659216000069348&amp;w=320&amp;h=50\\\" width=\\\"320\\\" height=\\\"50\\\" alt=\\\"\\\"\\/><\\/a>\",\"adId\":\"106800\",\"adWidth\":\"320\",\"adHeight\":\"50\",\"cpc\":0.025,\"adtitle\":\"\",\"adtext\":\"\",\"clickurl\":\"http:\\/\\/c.tapit.com\\/advalidate.php?zone=6579&cid=106800&adtype=1&w=320.0&h=50.0&xid=dd3b9df3694433f01389c222f8059f39&ip=174.141.213.29&udid=&adnetwork=1&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&tpsid=1659216000069348\",\"imageurl\":\"http:\\/\\/i.tapit.com\\/adimage.php?zone=6579&cid=106800&adtype=1&xid=dd3b9df3694433f01389c222f8059f39&ip=174.141.213.29&udid=&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&adnetwork=1&tpsid=1659216000069348&w=320&h=50\",\"domain\":\"c.tapit.com\"}";
             dcpTapitAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -1229,9 +1229,9 @@ public class AdNetworksTest extends TestCase {
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null,
-                null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null, false,
+                null, 0, null, null, true, true, externalKey, null, null, null, new Long [] {0L}, true, null, null, 0, null, false,
                 false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-                null, null, 32));
+                null, null, 32, new Integer[] {0}));
         if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl)) {
             String response = "{\"type\":\"text\",\"html\":\"<a href=\\\"http:\\/\\/c.tapit.com\\/advalidate.php?zone=6579&amp;cid=106800&amp;adtype=1&amp;w=320.0&amp;h=50.0&amp;xid=dd3b9df3694433f01389c222f8059f39&amp;ip=174.141.213.29&amp;udid=&amp;adnetwork=1&amp;ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&amp;tpsid=1659216000069348\\\" target=\\\"_blank\\\"><img src=\\\"http:\\/\\/i.tapit.com\\/adimage.php?zone=6579&amp;cid=106800&amp;adtype=1&amp;xid=dd3b9df3694433f01389c222f8059f39&amp;ip=174.141.213.29&amp;udid=&amp;ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&amp;adnetwork=1&amp;tpsid=1659216000069348&amp;w=320&amp;h=50\\\" width=\\\"320\\\" height=\\\"50\\\" alt=\\\"\\\"\\/><\\/a>\",\"adId\":\"106800\",\"adWidth\":\"320\",\"adHeight\":\"50\",\"cpc\":0.025,\"adtitle\":\"sample title\",\"adtext\":\"sample text\",\"clickurl\":\"http:\\/\\/c.tapit.com\\/advalidate.php?zone=6579&cid=106800&adtype=1&w=320.0&h=50.0&xid=dd3b9df3694433f01389c222f8059f39&ip=174.141.213.29&udid=&adnetwork=1&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&tpsid=1659216000069348\",\"imageurl\":\"\",\"domain\":\"c.tapit.com\"}";
             dcpTapitAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -1256,9 +1256,9 @@ public class AdNetworksTest extends TestCase {
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null,
-                null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null, false,
+                null, 0, null, null, true, true, externalKey, null, null, null, new Long [] {0L}, true, null, null, 0, null, false,
                 false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
-                null, null, 32));
+                null, null, 32, new Integer[] {0}));
         if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl)) {
             String response = "{\"type\":\"text\",\"html\":\"<a href=\\\"http:\\/\\/c.tapit.com\\/advalidate.php?zone=6579&amp;cid=106800&amp;adtype=1&amp;w=320.0&amp;h=50.0&amp;xid=dd3b9df3694433f01389c222f8059f39&amp;ip=174.141.213.29&amp;udid=&amp;adnetwork=1&amp;ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&amp;tpsid=1659216000069348\\\" target=\\\"_blank\\\"><img src=\\\"http:\\/\\/i.tapit.com\\/adimage.php?zone=6579&amp;cid=106800&amp;adtype=1&amp;xid=dd3b9df3694433f01389c222f8059f39&amp;ip=174.141.213.29&amp;udid=&amp;ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&amp;adnetwork=1&amp;tpsid=1659216000069348&amp;w=320&amp;h=50\\\" width=\\\"320\\\" height=\\\"50\\\" alt=\\\"\\\"\\/><\\/a>\",\"adId\":\"106800\",\"adWidth\":\"320\",\"adHeight\":\"50\",\"cpc\":0.025,\"adtitle\":\"sample title\",\"adtext\":\"sample text\",\"clickurl\":\"http:\\/\\/c.tapit.com\\/advalidate.php?zone=6579&cid=106800&adtype=1&w=320.0&h=50.0&xid=dd3b9df3694433f01389c222f8059f39&ip=174.141.213.29&udid=&adnetwork=1&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&tpsid=1659216000069348\",\"imageurl\":\"\",\"domain\":\"c.tapit.com\"}";
             dcpTapitAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -1280,9 +1280,9 @@ public class AdNetworksTest extends TestCase {
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(mcAdvertiserId, null,
-                null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
-                0.0d, null, null, 32));
+                0.0d, null, null, 32, new Integer[] {0}));
         mobileCommerceAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl,
                 beaconUrl);
         String response = "<div style=\"margin:0px; border:0px; padding:0px; height:50px; font:14px arial, helvetica, sans-serif; line-height:normal; overflow:hidden;\"><img src=\"?uid=191023&region=US&mocop=7sh\" width=\"1\" height=\"1\" border=\"0\"/><img src=\"2p1z/vul/1/2m/b5/u/0/0/0/x/2a2509a1-013a-1000-db68-7d00182800c0/-1/1/db7f29d5?ds=1&event=beacon\" width=\"1\" height=\"1\" border=\"0\"/><a href=\"http://meta.7search.com/click/click.aspx?x=9NrXsMK4ECOm5nshfzWk7g%3d%3d_NT0wtTT%2b22GVQ0rNWzcEelu9DY%2b7nX%2fSgltrlFKIpd97Z9zFiz1B8dRrqYmL6ixpEzruB6mGYEU%2b0qvI4Q0e2a09rNn3H1NmFs4czZiFZnWcH3r6zjeWilAKHB67Zy0tM7ZuHxqG5udibNFFxAJKtoqt4s2aRuRtWYcyAm2rNQ2418moGXUGbE9C1lO6%2bGXQ2AZv9LiPDx%2b1O2VUYtJHa1hj3UyIQ6M%2fO3YZ8plzv%2boy9RTWdwD0YbeKfbs6%2bfOV\" onclick=\"document.getElementById('click').src='2p1z/vul/1/2m/b5/u/0/0/0/x/2a2509a1-013a-1000-db68-7d00182800c0/-1/1/db7f29d5?ds=1'\" style=\"display:block; text-decoration:none;\"><p style=\"margin:0px; border-radius:5px 5px 0px 0px; padding:1px 5px 0px 5px; width:320px; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#000000; background-color:#FBD67C;\"><span style=\"font-size:10px;\">Ad: </span>Find Our Your Top Search Results Now! </p> <p style=\"margin:0px; border-radius:0px 0px 5px 5px; padding:1px 5px 1px 5px; width:320px; font-size: 12px; color:#000000; background-color:#FBD67C;\">Immediately Get Search Results on the Products, Resources & Service...<span style=\"font-size:10px;\">[http://fooffa.com]</span></p>     </a><img id=\"click\" width=\"1\" height=\"1\"></div>";
@@ -1306,9 +1306,9 @@ public class AdNetworksTest extends TestCase {
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(getChannelSegmentEntityBuilder(mcAdvertiserId, null,
-                null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null, null, 0, null,
+                null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                 false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
-                0.0d, null, null, 32));
+                0.0d, null, null, 32, new Integer[] {0}));
         mobileCommerceAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl,
                 beaconUrl);
         String response = "<div style=\"margin:0px; border:0px; padding:0px; height:50px; font:14px arial, helvetica, sans-serif; line-height:normal; overflow:hidden;\"><img src=\"?uid=191023&region=US&mocop=7sh\" width=\"1\" height=\"1\" border=\"0\"/><img src=\"2p1z/vul/1/2m/b5/u/0/0/0/x/2a2509a1-013a-1000-db68-7d00182800c0/-1/1/db7f29d5?ds=1&event=beacon\" width=\"1\" height=\"1\" border=\"0\"/><a href=\"http://meta.7search.com/click/click.aspx?x=9NrXsMK4ECOm5nshfzWk7g%3d%3d_NT0wtTT%2b22GVQ0rNWzcEelu9DY%2b7nX%2fSgltrlFKIpd97Z9zFiz1B8dRrqYmL6ixpEzruB6mGYEU%2b0qvI4Q0e2a09rNn3H1NmFs4czZiFZnWcH3r6zjeWilAKHB67Zy0tM7ZuHxqG5udibNFFxAJKtoqt4s2aRuRtWYcyAm2rNQ2418moGXUGbE9C1lO6%2bGXQ2AZv9LiPDx%2b1O2VUYtJHa1hj3UyIQ6M%2fO3YZ8plzv%2boy9RTWdwD0YbeKfbs6%2bfOV\" onclick=\"document.getElementById('click').src='2p1z/vul/1/2m/b5/u/0/0/0/x/2a2509a1-013a-1000-db68-7d00182800c0/-1/1/db7f29d5?ds=1'\" style=\"display:block; text-decoration:none;\"><p style=\"margin:0px; border-radius:5px 5px 0px 0px; padding:1px 5px 0px 5px; width:320px; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#000000; background-color:#FBD67C;\"><span style=\"font-size:10px;\">Ad: </span>Find Our Your Top Search Results Now! </p> <p style=\"margin:0px; border-radius:0px 0px 5px 5px; padding:1px 5px 1px 5px; width:320px; font-size: 12px; color:#000000; background-color:#FBD67C;\">Immediately Get Search Results on the Products, Resources & Service...<span style=\"font-size:10px;\">[http://fooffa.com]</span></p>     </a><img id=\"click\" width=\"1\" height=\"1\"></div>";
@@ -1320,21 +1320,21 @@ public class AdNetworksTest extends TestCase {
     }
 
     public static ChannelSegmentEntity.Builder getChannelSegmentEntityBuilder(final String advertiserId,
-            final String adgroupId, final String adId, final String channelId, final long platformTargeting,
+            final String adgroupId, final String[] adIds, final String channelId, final long platformTargeting,
             final Long[] rcList, final Long[] tags, final boolean status, final boolean isTestMode,
             final String externalSiteKey, final Timestamp modified_on, final String campaignId, final Long[] slotIds,
-            final long incId, final boolean allTags, final String pricingModel, final Integer[] siteRatings,
+            final Long[] incIds, final boolean allTags, final String pricingModel, final Integer[] siteRatings,
             final int targetingPlatform, final ArrayList<Integer> osIds, final boolean udIdRequired,
             final boolean zipCodeRequired, final boolean latlongRequired, final boolean richMediaOnly,
             final boolean appUrlEnabled, final boolean interstitialOnly, final boolean nonInterstitialOnly,
             final boolean stripUdId, final boolean stripZipCode, final boolean stripLatlong,
             final JSONObject additionalParams, final List<Integer> manufModelTargetingList, final double ecpmBoost,
-            final Timestamp eCPMBoostDate, final Long[] tod, final long adGroupIncId) {
+            final Timestamp eCPMBoostDate, final Long[] tod, final long adGroupIncId, final Integer[] creativeTypes) {
         ChannelSegmentEntity.Builder builder = ChannelSegmentEntity.newBuilder();
         builder.setAdvertiserId(advertiserId);
         builder.setAdvertiserId(advertiserId);
         builder.setAdgroupId(adgroupId);
-        builder.setAdId(adId);
+        builder.setAdIds(adIds);
         builder.setChannelId(channelId);
         builder.setPlatformTargeting(platformTargeting);
         builder.setRcList(rcList);
@@ -1347,8 +1347,8 @@ public class AdNetworksTest extends TestCase {
         builder.setModified_on(modified_on);
         builder.setCampaignId(campaignId);
         builder.setSlotIds(slotIds);
-        builder.setIncId(incId);
-        builder.setAdgroupIncId(incId);
+        builder.setIncIds(incIds);
+        builder.setAdgroupIncId(incIds[0]);
         builder.setPricingModel(pricingModel);
         builder.setSiteRatings(siteRatings);
         builder.setTargetingPlatform(targetingPlatform);
@@ -1369,6 +1369,7 @@ public class AdNetworksTest extends TestCase {
         builder.setEcpmBoostExpiryDate(eCPMBoostDate);
         builder.setTod(tod);
         builder.setAdgroupIncId(adGroupIncId);
+        builder.setCreativeTypes(creativeTypes);
         return builder;
     }
 

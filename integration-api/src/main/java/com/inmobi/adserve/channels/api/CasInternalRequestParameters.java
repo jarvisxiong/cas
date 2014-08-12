@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.api;
 
 import com.inmobi.adserve.channels.types.AccountType;
 
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -16,6 +17,8 @@ public class CasInternalRequestParameters {
     public boolean      traceEnabled;
 
     public String       impressionId;
+    public HashMap<Integer, String> impressionIdLookup;
+
     // Control enrichment params
     public String       gpid;
     public String       uid;               // udid
