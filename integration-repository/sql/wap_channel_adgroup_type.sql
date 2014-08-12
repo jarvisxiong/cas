@@ -33,4 +33,4 @@ CREATE OR REPLACE TYPE wap_channel_adgroup_type_11082014 AS
     campaign_inc_id          BIGINT,
     creative_types           INT[]
 );
-ALTER TYPE wap_channel_adgroup_type_05102013 OWNER TO postgres;
+ALTER TYPE wap_channel_adgroup_type_11082014 OWNER TO postgres;
