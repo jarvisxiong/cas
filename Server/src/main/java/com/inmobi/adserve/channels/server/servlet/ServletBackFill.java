@@ -85,7 +85,7 @@ public class ServletBackFill implements Servlet {
         LOG.debug("isResponseOnlyFromDcp from config is {}", isResponseOnlyFromDcp);
         sasParams.setResponseOnlyFromDcp(isResponseOnlyFromDcp);
 
-        // Setting isVideoRTBSupported based on the Request params.
+        // Setting isBannerVideoSupported based on the Request params.
         boolean isBannerVideoSupported = casUtils.isBannerVideoSupported(sasParams);
         LOG.debug("isBannerVideoSupported for this request is {}", isBannerVideoSupported);
         sasParams.setBannerVideoSupported(isBannerVideoSupported);

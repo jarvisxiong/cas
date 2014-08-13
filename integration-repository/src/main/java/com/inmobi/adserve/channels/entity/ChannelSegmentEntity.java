@@ -5,6 +5,7 @@ import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang.ArrayUtils;
 import org.json.JSONObject;
 
 import java.sql.Timestamp;
@@ -179,8 +180,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
     }
 
     /**
-     *
-     * @returns the Inc ID correspoding to adformat.
+     * Get the inc_id corresponding to an ad format in the ad_group.
      */
     public long getIncId(ADCreativeType creativeType) {
         long notFound = -1L;
@@ -197,6 +197,9 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
         return notFound;
     }
 
+    /**
+     * Get the AdId corresponding to an ad format in the ad_group.
+     */
     public String getAdId(ADCreativeType creativeType) {
         String notFound = "";
         int creativeFormatId = getCreativeFormatId(creativeType);
@@ -212,14 +215,30 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
         return notFound;
     }
 
-    private int getCreativeFormatId(ADCreativeType creativeType){
-        if (creativeType == ADCreativeType.NATIVE) {
+    /**
+     * Get the creative format id corresponding to an ad format in the ad group
+     */
+    private int getCreativeFormatId(ADCreativeType creativeType) {
+
+        // NOTE: The supplied creativeType will be validated against an ad of the respective format in the ad group.
+        // If not found, it will fall back to BANNER ad. This is done for backward compalibility.
+        if (creativeType == ADCreativeType.NATIVE && containsAdFormat(AdCreativeType.META_JSON)) {
             return AdCreativeType.META_JSON.getValue();     // NATIVE
-        } else if (creativeType == ADCreativeType.INTERSTITIAL_VIDEO) {
+        } else if (creativeType == ADCreativeType.INTERSTITIAL_VIDEO && containsAdFormat(AdCreativeType.VIDEO)) {
             return AdCreativeType.VIDEO.getValue();         // VIDEO
         } else {
             return AdCreativeType.TEXT.getValue();  // BANNER
         }
+    }
+
+    /**
+     * Check if this entity contains a native ad.
+     */
+    private boolean containsAdFormat(AdCreativeType adCreativeType) {
+        if (this.getCreativeTypes() == null) {
+            return false;
+        }
+        return ArrayUtils.contains(this.getCreativeTypes(), adCreativeType.getValue());
     }
 
 }

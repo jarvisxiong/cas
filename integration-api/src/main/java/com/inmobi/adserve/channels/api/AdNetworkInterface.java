@@ -2,7 +2,6 @@ package com.inmobi.adserve.channels.api;
 
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.casthrift.ADCreativeType;
-import com.inmobi.adserve.channels.types.AdCreativeType;
 
 import java.net.URI;
 import java.util.List;
