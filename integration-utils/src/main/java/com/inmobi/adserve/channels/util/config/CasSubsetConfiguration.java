@@ -20,6 +20,10 @@ public class CasSubsetConfiguration extends SubsetConfiguration{
 	 * {@inheritDoc} says --> Returns the interpolated value. Non String values are returned without change. 
 	 * It anyway doesn't validate non-string values, String values are anyway validated by the calling code, so this method is redundant and it was causing performance bottle-necks.
 	 * This was causing our threads to choke and it was taking 17% of our cpu time and is the reason for our threads running into monitor or blocked state.
+	 * 
+	 * Note: If one config value points to another config value, it is not supported. 
+	 * Currently this feature is not used by our code, this is not a must have feature
+	 * In future if anyone needs it, then this method needs to be udpated.
 	 */
     protected Object interpolate(Object value)
     {
