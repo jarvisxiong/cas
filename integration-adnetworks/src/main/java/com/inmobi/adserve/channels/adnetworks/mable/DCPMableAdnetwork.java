@@ -224,8 +224,17 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIDUS1)) {
             uidType = udidFormat;
             return casInternalRequestParameters.uidIDUS1;
-        
+        }
+        else {
+        String gpid = getGPID();
+        if (gpid != null) {
+        uidType = udidFormat;
+        return gpid;
         }
         return null;
+        }
     }
 }
+        
+    
+ 

@@ -127,6 +127,12 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
             appendQueryParam(url, SHA1UDID, casInternalRequestParameters.uidIDUS1, false);
         }
+        else {
+            String gpid = getGPID();
+            if (gpid != null) {
+            url.append("&o_andadvid=").append(gpid);
+            }
+          }
         appendQueryParam(url, VERSION, apiVersion, false);
         if (StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)) {
             appendQueryParam(url, LAT, latitude, false);
