@@ -1,12 +1,15 @@
-package com.inmobi.adserve.channels.util;
+package com.inmobi.adserve.channels.util.config;
 
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.PropertyConverter;
+import org.apache.commons.configuration.SubsetConfiguration;
 import org.apache.commons.lang.NotImplementedException;
 
 /**
@@ -73,4 +76,12 @@ public class CasBaseConfiguration extends PropertiesConfiguration {
 	public void clear() {
 		throw new NotImplementedException();
 	}
+	
+
+	
+	@Override
+    public Configuration subset(String prefix)
+    {
+        return new CasSubsetConfiguration(this, prefix, ".");
+    }
 }
