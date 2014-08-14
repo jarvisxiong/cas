@@ -86,12 +86,13 @@ public class ChannelServer {
     private static WapSiteUACRepository             wapSiteUACRepository;
     private static CreativeRepository               creativeRepository;
     private static NativeAdTemplateRepository		nativeAdTemplateRepository;
-    private static final String                     configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
+    private static String                           configFile;
     public static byte                              dataCenterIdCode;
     public static short                             hostIdCode;
     public static String                            dataCentreName;
 
     public static void main(final String[] args) throws Exception {
+        configFile=System.getProperty("configFile","/opt/mkhoj/conf/cas/channel-server.properties");
         try {
             ConfigurationLoader configurationLoader = ConfigurationLoader.getInstance(configFile);
 
