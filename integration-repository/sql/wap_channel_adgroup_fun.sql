@@ -6,7 +6,7 @@ DECLARE
 BEGIN
     FOR row1 IN
         SELECT  wap_channel_adgroup.adgroup_id,
-                adgroup_creatives.ad_ids,
+                adgroup_formats.ad_ids,
                 wap_channel_adgroup.channel_id,
                 wap_channel_adgroup.advertiser_id,
                 wap_channel_adgroup.external_site_key,
@@ -15,7 +15,7 @@ BEGIN
                 least (wap_channel_adgroup.modified_on, dcp_segment_site_inclusion_exclusion.modified_on) as modified_on,
                 wap_channel_adgroup.campaign_id,
                 wap_channel_adgroup.slot_ids,
-                adgroup_creatives.ad_inc_ids as ad_inc_ids,
+                adgroup_formats.ad_inc_ids as ad_inc_ids,
                 wap_channel_adgroup.all_targeting_tags as all_tags,
                 wap_channel_adgroup.pricing_model,
                 wap_channel_adgroup.targeting_platform as targeting_platform,
@@ -33,19 +33,18 @@ BEGIN
                 wap_channel_adgroup.tod as tod,
                 wap_channel_adgroup.dst as dst,
                 wap_channel_adgroup.campaign_inc_id,
-                adgroup_creatives.creative_types
-          FROM  wap_channel_adgroup, dcp_segment_site_inclusion_exclusion, wap_channel_ad,
+                adgroup_formats.ad_format_ids
+          FROM  wap_channel_adgroup, dcp_segment_site_inclusion_exclusion,
                   (SELECT ad_group_id,
-		              array_agg(id order by is_banner_ad asc) as ad_ids,
-		              array_agg(inc_id order by is_banner_ad asc) as ad_inc_ids,
-		              array_agg(is_banner_ad order by is_banner_ad asc) as creative_types
+                      array_agg(id order by is_banner_ad asc) as ad_ids,
+                      array_agg(inc_id order by is_banner_ad asc) as ad_inc_ids,
+                      array_agg(is_banner_ad order by is_banner_ad asc) as ad_format_ids
                    FROM wap_channel_ad
-                   GROUP BY ad_group_id) as adgroup_creatives
+                   GROUP BY ad_group_id) as adgroup_formats
          WHERE  wap_channel_adgroup.adgroup_id = dcp_segment_site_inclusion_exclusion.adgroup_guid(+)
-           AND  wap_channel_ad.ad_group_id = wap_channel_adgroup.adgroup_id
-           AND  adgroup_creatives.ad_group_id=wap_channel_adgroup.adgroup_id
-		   AND  (wap_channel_adgroup.modified_on >= last_updated
-		         OR dcp_segment_site_inclusion_exclusion.modified_on >= last_updated)
+           AND  adgroup_formats.ad_group_id = wap_channel_adgroup.adgroup_id
+           AND  (wap_channel_adgroup.modified_on >= last_updated
+                 OR dcp_segment_site_inclusion_exclusion.modified_on >= last_updated)
  LOOP
         RETURN NEXT row1;
     END LOOP;

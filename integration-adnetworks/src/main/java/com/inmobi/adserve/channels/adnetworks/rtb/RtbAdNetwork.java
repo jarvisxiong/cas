@@ -432,7 +432,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             banner.setBattr(fsBlockedAttributes);
         }
 
-        // If this request supports Banner Video and this advertiser is configured to support video
+        // This request supports in-Banner Video on interstitial slot and this partner supports video.
         if (sasParams.isBannerVideoSupported() && isBannerVideoResponseSupported
                 && this.casInternalRequestParameters.impressionIdLookup != null) {
             // Set video specific attributes to the Banner object
@@ -996,18 +996,30 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     private void checkBidResponseForBannerVideo(BidExtensions ext) {
-        if (ext != null && ext.getVideo() != null) {
+
+        if (ext != null && ext.getVideo() != null &&
+                EXT_VIDEO_TYPE.contains(ext.getVideo().getType())) {
             // A video response is received. Set the flag.
             isVideoResponseReceived = true;
+            LOG.debug("Received video response of type {}.", ext.getVideo().getType());
 
-            // Update the impression id, beacon and click URLs to refer to the video ad.
+            // Update the impression id for video ad.
             if (this.casInternalRequestParameters.impressionIdLookup != null) {
                 String newImpressionId =
                         this.casInternalRequestParameters.impressionIdLookup.get(AdCreativeType.VIDEO.getValue());
                 if (StringUtils.isNotEmpty(newImpressionId)) {
+
+                    // Update the response impression id so that this doesn't get filtered in AuctionImpressionIdFilter.
+                    if (this.impressionId.equalsIgnoreCase(responseImpressionId)) {
+                        responseImpressionId = newImpressionId;
+                    }
+
+                    // Update beacon and click URLs to refer to the video Ads.
                     this.beaconUrl = this.beaconUrl.replace(this.getImpressionId(), newImpressionId);
                     this.clickUrl = this.clickUrl.replace(this.getImpressionId(), newImpressionId);
                     this.impressionId = newImpressionId;
+
+                    LOG.debug("Replaced impression id to new value {}.", newImpressionId);
                 }
             }
         }

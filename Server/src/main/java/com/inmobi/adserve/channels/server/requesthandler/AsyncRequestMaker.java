@@ -53,7 +53,14 @@ public class AsyncRequestMaker {
         int rtbMaxTimeOut = rtbConfig.getInt("RTBreadtimeoutMillis", 200);
         LOG.debug("isRtbEnabled is {}  and rtbMaxTimeout is {}", isRtbEnabled, rtbMaxTimeOut);
 
+        /*
+         NOTE: For a request that qualifies the in-banner video criteria, at this point we don't know whether an
+         interstitial video response will be sent or Banner.
+         At this point, the creative type is set to Banner for video supported requests. If the request gets fullfiled
+         with a video ad, creative type will be reset accordingly.
+        */
         ADCreativeType creativeType = isNativeRequest(sasParams) ? ADCreativeType.NATIVE : ADCreativeType.BANNER;
+        LOG.debug("Creative type is : {}", creativeType);
 
         for (ChannelSegment row : rows) {
             ChannelSegmentEntity channelSegmentEntity = row.getChannelSegmentEntity();
@@ -71,14 +78,20 @@ public class AsyncRequestMaker {
                 continue;
             }
 
+            long incId = channelSegmentEntity.getIncId(creativeType);
+            if (incId == -1) {
+                LOG.debug("Could not find incId for adGroup {} and creativeType {}", channelSegmentEntity.getAdgroupId());
+                continue;
+            }
+
             String clickUrl = null;
             String beaconUrl = null;
-            sasParams.setImpressionId(getImpressionId(channelSegmentEntity.getIncId(creativeType)));
+            sasParams.setImpressionId(getImpressionId(incId));
             CasInternalRequestParameters casInternalRequestParameters = getCasInternalRequestParameters(sasParams,
                     casInternalRequestParameterGlobal, channelSegmentEntity);
 
             controlEnrichment(casInternalRequestParameters, channelSegmentEntity);
-            sasParams.setAdIncId(channelSegmentEntity.getIncId(creativeType));
+            sasParams.setAdIncId(incId);
             LOG.debug("impression id is {}", sasParams.getImpressionId());
 
             if ((network.isClickUrlRequired() || network.isBeaconUrlRequired()) && null != sasParams.getImpressionId()) {
@@ -152,6 +165,7 @@ public class AsyncRequestMaker {
     private HashMap<Integer, String> prepareAdImpressionIdLookup(SASRequestParameters sasParams, Integer[] adCreativeTypes, Long[] adIncIds) {
 
         if (!sasParams.isBannerVideoSupported() || adCreativeTypes == null || adIncIds == null) {
+            LOG.debug("In-banner video ad is not supported.");
             return null;
         }
 
@@ -160,9 +174,11 @@ public class AsyncRequestMaker {
             // Presently, we need the lookup only for video.
             if (adCreativeTypes[i] == AdCreativeType.VIDEO.getValue()) {
                 impressionIdLookup.put(adCreativeTypes[i], getImpressionId(adIncIds[i]));
+                LOG.debug("impression id for in-banner video ad is {}.", impressionIdLookup.get(adCreativeTypes[i]));
                 return impressionIdLookup;
             }
         }
+        LOG.debug("Inconsistent data in the database. Could not find a video ad for this ad group.");
         return null;
     }
 

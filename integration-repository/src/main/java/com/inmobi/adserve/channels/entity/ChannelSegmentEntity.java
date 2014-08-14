@@ -81,7 +81,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
         this.adgroupIncId = builder.adgroupIncId;
         this.allTags = builder.allTags;
         this.pricingModel = builder.pricingModel;
-        ArrayList<Integer> targetingPlatform = new ArrayList();
+        ArrayList<Integer> targetingPlatform = new ArrayList<>();
         if (builder.targetingPlatform == 1 || builder.targetingPlatform > 2) {
             targetingPlatform.add(1);
         }
@@ -194,6 +194,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
         } catch (ArrayIndexOutOfBoundsException e) {
             return notFound;
         }
+        // This would happen only with inconsistent data.
         return notFound;
     }
 
@@ -212,6 +213,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
         } catch (ArrayIndexOutOfBoundsException e) {
             return notFound;
         }
+        // This would happen only with inconsistent data.
         return notFound;
     }
 
@@ -219,26 +221,13 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
      * Get the creative format id corresponding to an ad format in the ad group
      */
     private int getCreativeFormatId(ADCreativeType creativeType) {
-
-        // NOTE: The supplied creativeType will be validated against an ad of the respective format in the ad group.
-        // If not found, it will fall back to BANNER ad. This is done for backward compalibility.
-        if (creativeType == ADCreativeType.NATIVE && containsAdFormat(AdCreativeType.META_JSON)) {
+        if (creativeType == ADCreativeType.NATIVE) {
             return AdCreativeType.META_JSON.getValue();     // NATIVE
-        } else if (creativeType == ADCreativeType.INTERSTITIAL_VIDEO && containsAdFormat(AdCreativeType.VIDEO)) {
+        } else if (creativeType == ADCreativeType.INTERSTITIAL_VIDEO) {
             return AdCreativeType.VIDEO.getValue();         // VIDEO
-        } else {
-            return AdCreativeType.TEXT.getValue();  // BANNER
-        }
+        } else if (creativeType == ADCreativeType.BANNER) {
+            return AdCreativeType.TEXT.getValue();          // BANNER
+        } else
+            return -1; // not found
     }
-
-    /**
-     * Check if this entity contains a native ad.
-     */
-    private boolean containsAdFormat(AdCreativeType adCreativeType) {
-        if (this.getCreativeTypes() == null) {
-            return false;
-        }
-        return ArrayUtils.contains(this.getCreativeTypes(), adCreativeType.getValue());
-    }
-
 }
