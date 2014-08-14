@@ -115,6 +115,13 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
             else if (!StringUtils.isBlank(casInternalRequestParameters.uid)) {
                 udid = casInternalRequestParameters.uid;
             }
+            else {
+                String gpid = getGPID();
+                if (gpid != null) {
+                    udid = gpid;
+                }
+            }
+
             if (udid != null) {
                 appendQueryParam(url, UDID, udid, false);
             }
