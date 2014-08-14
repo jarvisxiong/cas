@@ -134,10 +134,10 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
                if (!StringUtils.isBlank(casInternalRequestParameters.uid)) {
                url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.uid);
                }
-               if (casInternalRequestParameters.gpid != null) {
-               url.append("&androidaid=").append(casInternalRequestParameters.gpid);
-               url.append("&adtracking=").append(casInternalRequestParameters.uidADT);
-                
+                if (casInternalRequestParameters.gpid != null) {
+                    url.append("&androidaid=").append(casInternalRequestParameters.gpid);
+                    url.append("&adtracking=").append(casInternalRequestParameters.uidADT);
+
                 }
                 
                 }
