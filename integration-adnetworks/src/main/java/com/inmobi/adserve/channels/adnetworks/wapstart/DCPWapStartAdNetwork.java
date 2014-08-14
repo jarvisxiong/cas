@@ -40,6 +40,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
     private String                       longitude     = null;
     private int                          width;
     private int                          height;
+    private String                       adid = null;
     private static IABCountriesInterface iABCountries;
     private static final String          latlongFormat = "%s,%s";
 
@@ -93,25 +94,47 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
     public URI getRequestUri() throws Exception {
         try {
             StringBuilder url = new StringBuilder(host);
-            url.append("?version=2&encoding=1&area=viewBanner&ip=").append(sasParams.getRemoteHostIp());
+            url.append("?version=2&encoding=1&area=viewBanner&ip=&ua=").append(sasParams.getRemoteHostIp());
             url.append("&id=").append(externalSiteId);
             String bsiteId = StringUtils.replace(blindedSiteId, "-", "");
             url.append("&pageId=00000000").append(bsiteId);
             url.append("&kws=").append(getURLEncode(getCategories(';'), format));
-
-            // if (sasParams.getGender() != null) {
-            // url.append("&sex=").append(sasParams.getGender());
-            // }
-            if (sasParams.getAge() != null) {
-                url.append("&age=").append(sasParams.getAge());
+            if(sasParams.getNetworkType()!=null)
+                url.append("&ctype=").append(sasParams.getNetworkType().name());
+            if (sasParams.getGender() != null) {
+             url.append("&gender=").append(sasParams.getGender());
+             }
+             if (sasParams.getCountryCode() != null) {
+                url.append("&country=").append(iABCountries.getIabCountry(sasParams.getCountryCode()));
+             }
+             if (StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)) {
+                url.append("&lat=")
+                        .append(latitude);
             }
-            if (sasParams.getCountryCode() != null) {
-                url.append("&countryCode=").append(iABCountries.getIabCountry(sasParams.getCountryCode()));
+             if (StringUtils.isNotBlank(longitude) && StringUtils.isNotBlank(longitude)) {
+                 url.append("&lon=")
+                         .append(longitude);
+             }
+            
+            if (StringUtils.isNotEmpty(casInternalRequestParameters.uid)) {
+                url.append("&uid=").append(casInternalRequestParameters.uid);
             }
-            if (StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)) {
-                url.append("&location=")
-                        .append(getURLEncode(String.format(latlongFormat, latitude, longitude), format));
+            else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
+                url.append("&uid=").append(casInternalRequestParameters.uidMd5);
             }
+            else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidO1)) {
+                url.append("&uid=").append(casInternalRequestParameters.uidO1);
+            }
+            if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
+                url.append("&idfa=").append(casInternalRequestParameters.uidIFA);
+            }
+            else {
+                String gpid = getGPID();
+                if (gpid != null) {
+                    adid = gpid;
+                }
+            }
+            
             url.append("&callbackurl=").append(getURLEncode(clickUrl, format));
             url.append("&realSiteId=").append((entity.getAdgroupIncId()+sasParams.getSiteIncId()));
 
