@@ -119,14 +119,14 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		slotIdMap.put((short) 32, 101);
 
 		siteFloorMap = new HashMap<String, Double>();
-		siteFloorMap.put("1387380247996547_94",0.60d);
-		siteFloorMap.put("1387380247996547_0",0.15d);
-		siteFloorMap.put("1399614102253772_44",10d);
-		siteFloorMap.put("1399614102253772_0",5d);
-		siteFloorMap.put("1397202244813823_0",0.50d);
-		siteFloorMap.put("1399614063068988_44",7d);
-		siteFloorMap.put("1399614063068988_0",4.5d);
-		siteFloorMap.put("1397121033459365_0",0.25d);
+		siteFloorMap.put("1387380247996547_94",1.1d);
+		siteFloorMap.put("1387380247996547_0",0.27d);
+		siteFloorMap.put("1399614102253772_44",19d);
+		siteFloorMap.put("1399614102253772_0",13d);
+		siteFloorMap.put("1397202244813823_0",1d);
+		siteFloorMap.put("1399614063068988_44",13d);
+		siteFloorMap.put("1399614063068988_0",11.5d);
+		siteFloorMap.put("1397121033459365_0",0.4d);
 	}
 
 	/**
