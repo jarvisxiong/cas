@@ -67,8 +67,8 @@ import com.netflix.governator.lifecycle.LifecycleManager;
 
 /*
  * 
- * Run jar:- java -Dincoming.connections=100 -Ddcpoutbound.connections=50 -Drtboutbound.connections=50 -jar
- * cas-server.jar If these are not specified server will pick these values from channel-server.properties config file.
+ * Run jar:- java -Dincoming.connections=100 -Ddcpoutbound.connections=50 -Drtboutbound.connections=50 -DconfigFile=sampleConfigFile -jar
+ * cas-server.jar If these are not specified server will pick these values from channel-server.properties config file. If configFile is not specified, it takes the DEFAULTCONFIGFILE from location "/opt/mkhoj/conf/cas/channel-server.properties"
  */
 public class ChannelServer {
     private static Logger                           logger;
@@ -86,13 +86,14 @@ public class ChannelServer {
     private static WapSiteUACRepository             wapSiteUACRepository;
     private static CreativeRepository               creativeRepository;
     private static NativeAdTemplateRepository		nativeAdTemplateRepository;
+    private static final String                     DEFAULTCONFIGFILE="/opt/mkhoj/conf/cas/channel-server.properties";
     private static String                           configFile;
     public static byte                              dataCenterIdCode;
     public static short                             hostIdCode;
     public static String                            dataCentreName;
 
     public static void main(final String[] args) throws Exception {
-        configFile=System.getProperty("configFile","/opt/mkhoj/conf/cas/channel-server.properties");
+        configFile=System.getProperty("configFile",DEFAULTCONFIGFILE);
         try {
             ConfigurationLoader configurationLoader = ConfigurationLoader.getInstance(configFile);
 
