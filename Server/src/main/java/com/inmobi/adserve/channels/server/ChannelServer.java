@@ -93,7 +93,6 @@ public class ChannelServer {
 
     public static void main(final String[] args) throws Exception {
         configFile=System.getProperty("configFile","/opt/mkhoj/conf/cas/channel-server.properties");
-	System.out.println(configFile);
         try {
             ConfigurationLoader configurationLoader = ConfigurationLoader.getInstance(configFile);
 
