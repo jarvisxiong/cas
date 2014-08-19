@@ -154,7 +154,7 @@ public class AsyncRequestMaker {
             casInternalRequestParameters.uidSO1 = null;
             casInternalRequestParameters.uidADT = null;
         }
-        if (channelSegmentEntity.isStripLatlong()) {
+        if (channelSegmentEntity.isStripZipCode()) {
             casInternalRequestParameters.zipCode = null;
         }
         if (channelSegmentEntity.isStripLatlong()) {
