@@ -184,6 +184,10 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
      */
     public long getIncId(ADCreativeType creativeType) {
         long notFound = -1L;
+
+        if (getCreativeTypes() == null)
+            return notFound;
+
         int creativeFormatId = getCreativeFormatId(creativeType);
         try {
             for (int i = 0; i < getCreativeTypes().length; i++) {
@@ -203,6 +207,10 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
      */
     public String getAdId(ADCreativeType creativeType) {
         String notFound = "";
+
+        if (getCreativeTypes() == null)
+            return notFound;
+
         int creativeFormatId = getCreativeFormatId(creativeType);
         try {
             for (int i = 0; i < getCreativeTypes().length; i++) {
