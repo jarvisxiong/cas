@@ -13,8 +13,10 @@ public interface KeyConstants {
   public static final String APP_ID = "app.id";
 
   public static final String APP_CREATIVE = "imNative.creative";
-  public static final String IMNATIVE_CREATIVE_HEADLINE = "imNative.creative.headline.text";
-  public static final String IMNATIVE_CREATIVE_DESC = "imNative.creative.description.text";
+  public static final String IMNATIVE_CREATIVE_HEADLINE_TEXT = "imNative.creative.headline.text";
+  public static final String IMNATIVE_CREATIVE_DESC_TEXT = "imNative.creative.description.text";
+  public static final String IMNATIVE_CREATIVE_HEADLINE = "imNative.creative.headline";
+  public static final String IMNATIVE_CREATIVE_DESC = "imNative.creative.description";
   public static final String IMNATIVE_IMAGE = "imNative.creative.image";
   public static final String IMNATIVE_ACTION = "imNative.creative.action";
 
