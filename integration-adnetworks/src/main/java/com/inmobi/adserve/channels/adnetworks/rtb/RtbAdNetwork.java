@@ -136,7 +136,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private static final int               EXT_VIDEO_LINEARITY          = 1;   // only linear ads
     private static final int               EXT_VIDEO_MINDURATION        = 15;  // in secs.
     private static final int               EXT_VIDEO_MAXDURATION        = 30;  // in secs.
-    private static final List<String>      EXT_VIDEO_TYPE               = Arrays.asList("VAST 2.0", "VAST 3.0");
+    private static final List<String>      EXT_VIDEO_TYPE               = Arrays.asList("VAST 2.0", "VAST 3.0", "VAST 2.0 Wrapper", "VAST 3.0 Wrapper");
 
     @Getter
     static List<String>                    currenciesSupported          = new ArrayList<String>(Arrays.asList("USD",
