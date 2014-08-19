@@ -104,7 +104,12 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
             else if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
                 appendQueryParam(url,"&enctype=sha1&udid=", casInternalRequestParameters.uidIDUS1, false);
             }
-            
+            else {
+               String gpid = getGPID();
+               if (gpid != null) {
+               url.append("&enctype=raw&udid=").append(gpid);
+               }
+            }
 
             if (width != 0 && height != 0) {
                 url.append("&w=").append(width);

@@ -166,7 +166,12 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
                         casInternalRequestParameters.uid);
             }
         }
-
+		else {
+		    String gpid = getGPID();
+		    if (gpid != null) {
+		    finalUrl.append("&d(id12)=").append(getHashedValue(gpid, "MD5"));
+		    }
+		}
 		if (isGeo) {
 			finalUrl.append("&req(loc)=").append(
 					getURLEncode(casInternalRequestParameters.latLong, format));

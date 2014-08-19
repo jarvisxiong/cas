@@ -89,6 +89,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 	private static final double MIN_ECPM = 0.1;
 
 	private static final String SITE_BLOCKLIST_FORMAT="blk%s";
+	private static final String SITE_FLOOR_KEF_FORMAT="%s_%d";
 
 	private final String userName;
 	private final String password;
@@ -96,6 +97,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 
 	private boolean isApp;
 
+	private static Map<String, Double> siteFloorMap;
 	private static Map<Short, Integer> slotIdMap;
 	static {
 		slotIdMap = new HashMap<Short, Integer>();
@@ -115,6 +117,16 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		slotIdMap.put((short) 23, 46);
 		slotIdMap.put((short) 29, 14);
 		slotIdMap.put((short) 32, 101);
+
+		siteFloorMap = new HashMap<String, Double>();
+		siteFloorMap.put("1387380247996547_94",1.1d);
+		siteFloorMap.put("1387380247996547_0",0.27d);
+		siteFloorMap.put("1399614102253772_44",19d);
+		siteFloorMap.put("1399614102253772_0",13d);
+		siteFloorMap.put("1397202244813823_0",1d);
+		siteFloorMap.put("1399614063068988_44",13d);
+		siteFloorMap.put("1399614063068988_0",11.5d);
+		siteFloorMap.put("1397121033459365_0",0.4d);
 	}
 
 	/**
@@ -259,15 +271,24 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		appendQueryParam(url, BLOCKLIST_PARAM,
 				getURLEncode(StringUtils.join(blockedList, ','),format), false);
 
-		if (sasParams.getSiteEcpmEntity() != null
-				&& sasParams.getSiteEcpmEntity().getNetworkEcpm() > 0) {
-			appendQueryParam(url, FLOOR_PRICE, ECPM_PERCENTAGE
-					* sasParams.getSiteEcpmEntity().getNetworkEcpm(), false);
-		} else if (casInternalRequestParameters.rtbBidFloor > 0) {
-			appendQueryParam(url, FLOOR_PRICE,
-					casInternalRequestParameters.rtbBidFloor, false);
-		} else {
-			appendQueryParam(url, FLOOR_PRICE, MIN_ECPM, false);
+		Double siteSpecificFloorDefault = siteFloorMap.get(String.format(SITE_FLOOR_KEF_FORMAT, sasParams.getSiteIncId(),0));
+
+
+		if(siteSpecificFloorDefault == null){
+			if (sasParams.getSiteEcpmEntity() != null
+					&& sasParams.getSiteEcpmEntity().getNetworkEcpm() > 0) {
+				appendQueryParam(url, FLOOR_PRICE, ECPM_PERCENTAGE
+						* sasParams.getSiteEcpmEntity().getNetworkEcpm(), false);
+			} else if (casInternalRequestParameters.rtbBidFloor > 0) {
+				appendQueryParam(url, FLOOR_PRICE,
+						casInternalRequestParameters.rtbBidFloor, false);
+			} else {
+				appendQueryParam(url, FLOOR_PRICE, MIN_ECPM, false);
+			}
+		}else{
+			Double siteSpecificFloorPerCountry = siteFloorMap.get(String.format(SITE_FLOOR_KEF_FORMAT, sasParams.getSiteIncId(),sasParams.getCountryId()));
+			double floor = (siteSpecificFloorPerCountry == null) ? siteSpecificFloorDefault : siteSpecificFloorPerCountry;
+			appendQueryParam(url, FLOOR_PRICE, floor, false);
 		}
 		if (isInterstitial()) {
 			// display type 1 for interstitial

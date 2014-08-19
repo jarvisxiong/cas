@@ -153,6 +153,8 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
         sasParams.setSlot((short) 15);
+        sasParams.setSource("APP");
+        sasParams.setOsId(5);
         sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "1324";
         SlotSizeMapping.init();
@@ -163,7 +165,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
                 new ArrayList<Integer>(), 0.0d, null, null, 32,new Integer[] {0} ));
         if (dcpHuntmadsAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpHuntmadsAdNetwork.getRequestUri().toString();
-            String expectedUrl = "http://ads.huntmad.com/ad?ip=206.29.182.240&track=1&timeout=500&rmtype=none&key=6&type=3&over_18=0&zone=1324&ua=Mozilla&test=1&lat=37.4429&long=-122.1514&udidtype=custom&udid=202cb962ac59075b964b07152d234b70&isapp=no&isweb=yes&pubsiteid=00000000-0000-0020-0000-000000000000&min_size_x=288&min_size_y=45&size_x=320&size_y=50&keywords=Food+%26+Drink%2CAdventure%2CWord";
+            String expectedUrl = "http://ads.huntmad.com/ad?ip=206.29.182.240&track=1&timeout=500&rmtype=none&key=6&type=3&over_18=0&zone=1324&ua=Mozilla&test=1&lat=37.4429&long=-122.1514&isapp=yes&isweb=no&udidtype=custom&udid=202cb962ac59075b964b07152d234b70&pubsiteid=00000000-0000-0020-0000-000000000000&min_size_x=288&min_size_y=45&size_x=320&size_y=50&keywords=Food+%26+Drink%2CAdventure%2CWord";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -190,7 +192,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
                 new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (dcpHuntmadsAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpHuntmadsAdNetwork.getRequestUri().toString();
-            String expectedUrl = "http://ads.huntmad.com/ad?ip=206.29.182.240&track=1&timeout=500&rmtype=none&key=6&type=3&over_18=0&zone=1324&ua=Mozilla&test=1&lat=37.4429&long=-122.1514&udidtype=custom&udid=202cb962ac59075b964b07152d234b70&isapp=no&isweb=yes&pubsiteid=00000000-0000-0020-0000-000000000000&country=US&min_size_x=421&min_size_y=54&size_x=468&size_y=60&format=468x60&keywords=Food+%26+Drink%2CAdventure%2CWord";
+            String expectedUrl = "http://ads.huntmad.com/ad?ip=206.29.182.240&track=1&timeout=500&rmtype=none&key=6&type=3&over_18=0&zone=1324&ua=Mozilla&test=1&lat=37.4429&long=-122.1514&isapp=no&isweb=yes&udidtype=custom&udid=202cb962ac59075b964b07152d234b70&pubsiteid=00000000-0000-0020-0000-000000000000&country=US&min_size_x=421&min_size_y=54&size_x=468&size_y=60&format=468x60&keywords=Food+%26+Drink%2CAdventure%2CWord";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -208,6 +210,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         casInternalRequestParameters.uidIFA="12q12q12q12q12q12q12q12q12q12q12q";
         casInternalRequestParameters.uidADT="1";
         sasParams.setSource("APP");
+        sasParams.setOsId(3);
         sasParams.setSlot((short) 15);
         sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         String externalKey = "1324";
@@ -220,7 +223,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
                 new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (dcpHuntmadsAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpHuntmadsAdNetwork.getRequestUri().toString();
-            String expectedUrl = "http://ads.huntmad.com/ad?ip=206.29.182.240&track=1&timeout=500&rmtype=none&key=6&type=3&over_18=0&zone=1324&ua=Mozilla&test=1&udidtype=custom&udid=202cb962ac59075b964b07152d234b70&isapp=yes&isweb=no&androidid=111a222b333c444d555e666f777&idfa=12q12q12q12q12q12q12q12q12q12q12q&pubsiteid=00000000-0000-0020-0000-000000000000&min_size_x=288&min_size_y=45&size_x=320&size_y=50&keywords=Food+%26+Drink%2CAdventure%2CWord";
+            String expectedUrl = "http://ads.huntmad.com/ad?ip=206.29.182.240&track=1&timeout=500&rmtype=none&key=6&type=3&over_18=0&zone=1324&ua=Mozilla&test=1&isapp=yes&isweb=no&androidid=111a222b333c444d555e666f777&udidtype=custom&udid=202cb962ac59075b964b07152d234b70&udidtype=custom&udid=202cb962ac59075b964b07152d234b70&pubsiteid=00000000-0000-0020-0000-000000000000&min_size_x=288&min_size_y=45&size_x=320&size_y=50&keywords=Food+%26+Drink%2CAdventure%2CWord";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -235,6 +238,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
         sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
+        sasParams.setOsId(5);
         String externalKey = "1324";
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c"
@@ -246,7 +250,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
                 new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (dcpHuntmadsAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpHuntmadsAdNetwork.getRequestUri().toString();
-            String expectedUrl = "http://ads.huntmad.com/ad?ip=206.29.182.240&track=1&timeout=500&rmtype=none&key=6&type=3&over_18=0&zone=1324&ua=Mozilla&test=1&lat=37.4429&long=-122.1514&udidtype=custom&udid=202cb962ac59075b964b07152d234b70&isapp=no&isweb=yes&pubsiteid=00000000-0000-0020-0000-000000000000&keywords=Food+%26+Drink%2CAdventure%2CWord";
+            String expectedUrl = "http://ads.huntmad.com/ad?ip=206.29.182.240&track=1&timeout=500&rmtype=none&key=6&type=3&over_18=0&zone=1324&ua=Mozilla&test=1&lat=37.4429&long=-122.1514&isapp=no&isweb=yes&udidtype=custom&udid=202cb962ac59075b964b07152d234b70&pubsiteid=00000000-0000-0020-0000-000000000000&keywords=Food+%26+Drink%2CAdventure%2CWord";
             assertEquals(expectedUrl, actualUrl);
         }
     }
