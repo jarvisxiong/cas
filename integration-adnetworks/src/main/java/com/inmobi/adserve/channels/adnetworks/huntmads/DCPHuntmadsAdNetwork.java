@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
@@ -109,41 +110,62 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
                 url.append("&long=").append(longitude);
             }
 
-            if (casInternalRequestParameters.uidO1 != null) {
-                url.append("&udidtype=odin1&udid=").append(casInternalRequestParameters.uidO1);
-            }
-            else if (!StringUtils.isBlank(casInternalRequestParameters.uid)
-                    && !casInternalRequestParameters.uid.equals("null")) {
-                url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.uid);
-            }
-            else if (casInternalRequestParameters.uidMd5 != null) {
-                url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.uidMd5);
-            }
-            
-
-            if (casInternalRequestParameters.zipCode != null) {
+           if (casInternalRequestParameters.zipCode != null) {
                 url.append("&zip=").append(casInternalRequestParameters.zipCode);
             }
             
             if (isapp) {
                 url.append("&isapp=yes");
                 url.append("&isweb=no");
-                if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
-
-                    appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.uidMd5, false);
-                }
-                if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
-                        && "1".equals(casInternalRequestParameters.uidADT)) {
-
-                    appendQueryParam(url, IDFA, casInternalRequestParameters.uidIFA, false);
-                }
-
             }
             else {
                 url.append("&isapp=no");
                 url.append("&isweb=yes");
                 
             }
+            if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
+                if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
+                
+               appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.uidMd5, false);
+               }
+               else if (casInternalRequestParameters.uidO1 != null) {
+               appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.uidO1, false);
+               }
+               if (!StringUtils.isBlank(casInternalRequestParameters.uid)) {
+               url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.uid);
+               }
+                if (casInternalRequestParameters.gpid != null) {
+                    url.append("&androidaid=").append(casInternalRequestParameters.gpid);
+                    url.append("&adtracking=").append(casInternalRequestParameters.uidADT);
+
+                }
+                
+                }
+               if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
+                
+               if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
+               && "1".equals(casInternalRequestParameters.uidADT)) {
+                
+                appendQueryParam(url, IDFA, casInternalRequestParameters.uidIFA, false);
+                }
+                if (casInternalRequestParameters.uidSO1 != null) {
+                url.append("&udidtype=odin1&udid=").append(casInternalRequestParameters.uidSO1);
+                }
+                else if (casInternalRequestParameters.uidMd5 != null) {
+                url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.uidMd5);
+                }
+                       
+                else if (!StringUtils.isBlank(casInternalRequestParameters.uid)) {
+                url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.uid);
+                }
+                               
+                }
+                else{
+                String uid = getUid();
+                if(!StringUtils.isBlank(uid)){
+                url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.uid);
+                }
+                }
 
             appendQueryParam(url, SITEID, blindedSiteId, false);
 

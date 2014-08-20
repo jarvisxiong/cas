@@ -186,7 +186,13 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
 						url.append("&uis=v&ui=").append(
 								casInternalRequestParameters.uid);
 					}
-				}
+                    else {
+                        String gpid = getGPID();
+                        if (gpid != null) {
+                            url.append("&g=").append(gpid);
+                        }
+                    }
+                }
 			}
 
 			if (casInternalRequestParameters.zipCode != null) {
