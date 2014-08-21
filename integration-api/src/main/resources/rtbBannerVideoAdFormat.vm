@@ -1,25 +1,65 @@
-var _im_vastTag = "$VASTContentJSEsc",
-	_im_vastParser = new DOMParser().parseFromString(_im_vastTag,"text/xml"),
-	nodes, index, videoUrl;
-//Identify various MediaFiles
-nodes = xmlDoc.getElementsByTagName("MediaFile");
-for(index =0; index < nodes.length; index++) {
-	var height = node.getAttribute("height"),
-		width = node.getAttribute("width"),
-		bitrate = node.getAttribute("bitrate"),
-		type = node.getAttribute("type"),
-		delivery = node.getAttribute("delivery"),
-		url = node.childNodes[0].nodeValue;
-	//TODO: Ignore the following MediaFiles:
-	// 1. Non-mp4 ones
-	// 2. Non "progressive" delivery
-	//TODO: Find the best video based on bitrate and width/height
-	//TODO: Hack; Using the very first MediaFile
-	videoUrl = url; 
-	break;
-}
-
-<script src="mraid.js"></script><div id="Sprout_YVdJd3nBsDF7K8dl_div" data-creativeId="YVdJd3nBsDF7K8dl"></div>
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta name="viewport" content="user-scalable=0, minimum-scale=1.0, maximum-scale=1.0"/>
+    <style type="text/css">
+        body {margin: 0; overflow: hidden;}
+    </style>
+</head>
+<body>
+<script type="text/javascript" src="${IMAIBaseUrl}"> </script>
+<div style="display:none; position:absolute;" id="${Namespace}clickTarget"></div>
+<script type="text/javascript">
+	window['${Namespace}replaceTimeStamp'] = function(url) {
+    		return url.replace(/\$TS/g, new Date().getTime());
+  	};
+    window['${Namespace}clickCallback'] = function() {
+		_im_imai.onUserInteraction();
+        _im_imai.pingInWebView(window['${Namespace}replaceTimeStamp']('${IMClickUrl}'));
+    };
+	window['${Namespace}impressionCallback'] = function() {
+    };
+    window['${Namespace}recordEvent'] = function(id, params) {
+        var firePixel = function(source, retryTime, times) {
+            if (times <= 0) {
+                return;
+            }
+            var clickTarget = document.getElementById('${Namespace}clickTarget');
+            var img = document.createElement('img');
+            img.setAttribute('src', source);
+            img.setAttribute('height', '0');
+            img.setAttribute('width', '2');
+            if (img['addEventListener'] != undefined) {
+                img.addEventListener('error', function() {
+                    window.setTimeout(function() {
+                        if (retryTime > 300000) {
+                            retryTime = 300000;
+                        }
+                        firePixel(source, retryTime * 2, times - 1);
+                    }, retryTime + Math.random());
+                }, false);
+            }
+            clickTarget.appendChild(img);
+        };
+        var beacon = "${IMBeaconUrl}";
+        beacon += "?m=" + id;
+        if (params) {
+            for (var key in params) {
+                beacon += "&" + encodeURIComponent(key) + "=" + encodeURIComponent(params[key]);
+            }
+        }
+        firePixel(beacon, 1000, 5);
+        if (id == 18) {
+            window['${Namespace}impressionCallback']();
+        }
+        if (id == 8) {
+            window['${Namespace}clickCallback'](event);
+        }
+    };
+</script>
+### START: Sprout template for VAST ##
+<div id="Sprout_o5Gae2vAtnXjSzTy_div" data-creativeId="o5Gae2vAtnXjSzTy"></div>
 <script type="text/javascript">
 var _Sprout = _Sprout || {};
 /* 3rd Party Impression Tracker: a tracking pixel URL for tracking 3rd party impressions */
@@ -30,8 +70,10 @@ _Sprout.clickTracker = "PUT_CLICK_TRACKER_HERE";
 _Sprout.publisherLabel = "PUT_PUBLISHER_LABEL_HERE";
 /* External variables: parameters for dynamic ads */
 _Sprout.xvars = {
-  "video_url" : videoUrl,
-  "impression_trackers": "$IMBeaconUrl,$PartnerBeaconUrl"
+	"impressionBeacons" : ["${IMWinUrl}"#if($PartnerBeaconUrl),"${PartnerBeaconUrl}"#end]
 };
-
-_Sprout._inMobiAdTagTracking={st:new Date().getTime(),rr:0};_Sprout["YVdJd3nBsDF7K8dl"]={querystring:{__im_curl:"$IMBeaconUrl",__im_sdk:"$SDK_VERSION_ID",click:"$IMClickUrl",adFormat:"interstitial",__im_recordEventFun:"$RECORD_EVENT_FUN",openLandingPage:"$OPEN_LP_FUN"}};var _sproutReadyEvt=document.createEvent("Event");_sproutReadyEvt.initEvent("sproutReady",true,true);window.dispatchEvent(_sproutReadyEvt);var _Sprout_load=function(){var e=document.getElementsByTagName("script"),e=e[e.length-1],t=document.createElement("script");t.async=!0;t.type="text/javascript";t.src="http://farm.sproutbuilder.com/load/YVdJd3nBsDF7K8dl.inmobi.html.review.js?__t="+(Date.now())+"";e.parentNode.insertBefore(t,e.nextSibling)};"0"===window["_Sprout"]["YVdJd3nBsDF7K8dl"]["querystring"]["__im_sdk"]||"complete"===document.readyState?_Sprout_load():window.addEventListener("load",_Sprout_load,!1)</script>
+(function(){function n(c){for(var d,e,a=0;a<l.length;a++)d=l[a].replace(p,c),e=new Image,e.src=d;c={action:"vast_error",label:c};d={spid:"hw-9d7k3pjAaiLi2yJHr",src:"handwritten"};for(var b in c)c.hasOwnProperty(b)&&(d[b]=c[b]);m&&"function"===typeof m&&m(99,d)}function r(c){var d=c.getElementsByTagName("Tracking")||[];c=c.getElementsByTagName("ClickTracking")||[];var e,a,b;for(b=0;b<d.length;b++)e=d[b].getAttribute("event")||"",a=d[b].childNodes[0].nodeValue||"",e&&a&&(f[e]?f[e].push(a):f[e]=[a]);for(b=0;b<c.length;b++)f.clickTracking?f.clickTracking.push(c[b].childNodes[0].nodeValue):f.clickTracking=[c[b].childNodes[0].nodeValue]}var m=window.im_982_recordEvent,f={},l=[],p="ERRORCODE";(function(){var c,d,e,a;if(/^https?.*/.test("$VASTContentJSEsc")){var b="$VASTContentJSEsc";d=0;var g;e=!1;a=0;for(var h="";3>d;){g=new XMLHttpRequest;try{g.open("GET",b,!1),g.send()}catch(m){}if(g=g.responseText){g=(new DOMParser).parseFromString(g,"text/xml");b=g.getElementsByTagName("parsererror");if(0<b.length){a=100;break}b=g.getElementsByTagName("Error");if(0<b.length)for(var k=0;k<b.length;k++)l.push(b[k].childNodes[0].nodeValue);b=g.getElementsByTagName("VASTAdTagURI");if(0<b.length)b=b[0].childNodes[0].nodeValue,r(g),d++;else{b=g.getElementsByTagName("InLine");0<b.length?(e=!0,h=g):a=303;break}}else a=900}3===d&&!e&&(a=302);d=h;if(!e){n(a);_Sprout.xvars.videoUrl="";return}}else if(d=(new DOMParser).parseFromString("$VASTContentJSEsc","text/xml"),e=d.getElementsByTagName("parsererror"),0<e.length){n(100);_Sprout.xvars.videoUrl="";return}h=d.getElementsByTagName("Error");e=d.getElementsByTagName("MediaFile");if(0<h.length)for(a=0;a<h.length;a++)l.push(h[a].childNodes[0].nodeValue);for(var s,p=16/9,q=0;q<e.length;q++)a=e[q],h=a.getAttribute("delivery"),g=a.getAttribute("bitrate"),b=a.getAttribute("width")||0,k=a.getAttribute("height")||0,s=a.getAttribute("type"),"progressive"===h&&("video/mp4"===s&&(b/k).toFixed(2)===p.toFixed(2))&&(c?1024-g<1024-c.getAttribute("bitrate")&&(c=a):c=a);c?c=c.childNodes[0].nodeValue:(n(403),c="");_Sprout.xvars.videoUrl=c;if(""!==c){c=d.getElementsByTagName("Linear");e=d.getElementsByTagName("ClickThrough");for(a=0;a<c.length&&null===c[a].getAttribute("skipoffset");a++);r(d);f.clickThrough=e[0].childNodes[0].nodeValue;_Sprout.xvars.play=f.start||"";_Sprout.xvars.q1=f.firstQuartile||"";_Sprout.xvars.q2=f.midpoint||"";_Sprout.xvars.q3=f.thirdQuartile||"";_Sprout.xvars.complete=f.complete||"";_Sprout.xvars.muted=f.mute||"";_Sprout.xvars.unmuted=f.unmute||"";_Sprout.xvars.paused=f.pause||"";_Sprout.xvars.resumed=f.resume||"";_Sprout.xvars.clickTracking=f.clickTracking||"";_Sprout.xvars.CTA=f.clickThrough||""}})()})();
+_Sprout._inMobiAdTagTracking={st:new Date().getTime(),rr:0};_Sprout["o5Gae2vAtnXjSzTy"]={querystring:{__im_curl:"${IMBeaconUrl}",__im_sdk:"${IMSDKVersion}",click:"${IMClickUrl}",adFormat:"interstitial",__im_recordEventFun:"${Namespace}recordEvent",__geo_lat:"$GEO_LAT",__geo_lng:"$GEO_LNG",__geo_cc:"$GEO_CC",__geo_zip:"$GEO_ZIP",__js_esc_geo_city:"$JS_ESC_GEO_CITY",openLandingPage:"$OPEN_LP_FUN"}};var _sproutReadyEvt=document.createEvent("Event");_sproutReadyEvt.initEvent("sproutReady",true,true);window.dispatchEvent(_sproutReadyEvt);var _Sprout_load=function(){var e=document.getElementsByTagName("script"),e=e[e.length-1],t=document.createElement("script");t.async=!0;t.type="text/javascript";t.src="http://edgy.sproutbuilder.com/load/o5Gae2vAtnXjSzTy.inmobi.html.js";e.parentNode.insertBefore(t,e.nextSibling)};"0"===window["_Sprout"]["o5Gae2vAtnXjSzTy"]["querystring"]["__im_sdk"]||"complete"===document.readyState?_Sprout_load():window.addEventListener("load",_Sprout_load,!1)</script>
+### END: Sprout template for VAST ##
+</body>
+</html>

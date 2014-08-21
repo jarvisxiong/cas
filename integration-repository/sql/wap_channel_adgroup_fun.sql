@@ -35,10 +35,10 @@ BEGIN
                 wap_channel_adgroup.campaign_inc_id,
                 adgroup_formats.ad_format_ids
           FROM  wap_channel_adgroup, dcp_segment_site_inclusion_exclusion,
-                  (SELECT ad_group_id,
-                      array_agg(id order by is_banner_ad asc) as ad_ids,
-                      array_agg(inc_id order by is_banner_ad asc) as ad_inc_ids,
-                      array_agg(is_banner_ad order by is_banner_ad asc) as ad_format_ids
+                (SELECT ad_group_id,
+                        array_agg(id order by is_banner_ad asc) as ad_ids,
+                        array_agg(inc_id order by is_banner_ad asc) as ad_inc_ids,
+                        array_agg(is_banner_ad order by is_banner_ad asc) as ad_format_ids
                    FROM wap_channel_ad
                    GROUP BY ad_group_id) as adgroup_formats
          WHERE  wap_channel_adgroup.adgroup_id = dcp_segment_site_inclusion_exclusion.adgroup_guid(+)

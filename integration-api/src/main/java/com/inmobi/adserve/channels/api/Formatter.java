@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 public class Formatter {
@@ -164,5 +165,9 @@ public class Formatter {
             return "template_320_50";
         }
         return null;
+    }
+
+    public static String getNamespace() {
+        return "im_" + (Math.abs(ThreadLocalRandom.current().nextInt(10000)) + 10000) + "_";
     }
 }

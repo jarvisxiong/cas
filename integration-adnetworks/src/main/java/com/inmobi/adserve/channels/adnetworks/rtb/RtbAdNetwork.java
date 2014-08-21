@@ -36,6 +36,7 @@ import lombok.Setter;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.validator.UrlValidator;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
@@ -43,10 +44,17 @@ import org.apache.thrift.protocol.TSimpleJSONProtocol;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import javax.inject.Inject;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import java.awt.*;
+import java.io.IOException;
+import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -868,8 +876,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         // JS escaped WinUrl for partner.
         String partnerWinUrl = getPartnerWinUrl();
-        velocityContext.put(VelocityTemplateFieldConstants.PartnerBeaconUrl,
-                            StringEscapeUtils.escapeJavaScript(partnerWinUrl));
+        if (StringUtils.isNotEmpty(partnerWinUrl)) {
+            velocityContext.put(VelocityTemplateFieldConstants.PartnerBeaconUrl,
+                    StringEscapeUtils.escapeJavaScript(partnerWinUrl));
+        }
 
         // JS escaped IMWinUrl
         String imWinUrl = this.beaconUrl + "?b=${WIN_BID}";
@@ -878,6 +888,15 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         // JS escaped IM beacon and click URLs.
         velocityContext.put(VelocityTemplateFieldConstants.IMBeaconUrl, StringEscapeUtils.escapeJavaScript(this.beaconUrl));
         velocityContext.put(VelocityTemplateFieldConstants.IMClickUrl, StringEscapeUtils.escapeJavaScript(this.clickUrl));
+
+        // SDK version
+        velocityContext.put(VelocityTemplateFieldConstants.IMSDKVersion, sasParams.getSdkVersion());
+
+        // Namespace
+        velocityContext.put(VelocityTemplateFieldConstants.Namespace, Formatter.getNamespace());
+
+        // IMAIBaseUrl
+        velocityContext.put(VelocityTemplateFieldConstants.IMAIBaseUrl, sasParams.getImaiBaseUrl());
 
         try {
             responseContent = Formatter.getResponseFromTemplate(TemplateType.RTB_BANNER_VIDEO, velocityContext, sasParams,
@@ -984,7 +1003,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
             // Check bid response for video
             if (sasParams.isBannerVideoSupported() && isBannerVideoResponseSupported) {
-                checkBidResponseForBannerVideo(bid.getExt());
+                return checkBidResponseForBannerVideo(bid.getExt());
             }
 
             return true;
@@ -995,13 +1014,45 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
     }
 
-    private void checkBidResponseForBannerVideo(BidExtensions ext) {
+    /**
+     * Checks if the RTB response is for video and contains a valid VAST response.
+     * @return
+     *      false - When a video response is received and it is NOT valid.
+     *      true  - 1) When the response does not contain video (banner response)
+     *              2) It contains video response which is a valid VAST.
+     */
+    private boolean checkBidResponseForBannerVideo(BidExtensions ext) {
 
-        if (ext != null && ext.getVideo() != null &&
-                EXT_VIDEO_TYPE.contains(ext.getVideo().getType())) {
-            // A video response is received. Set the flag.
-            isVideoResponseReceived = true;
+        if (ext != null && ext.getVideo() != null) {
             LOG.debug("Received video response of type {}.", ext.getVideo().getType());
+
+            // Validate the adm content for a valid VAST.
+            if (!isValidURL(adm) && !isValidXMLFormat(adm)) {
+                LOG.info("Invalid VAST response adm - {}", adm);
+                return false;
+            }
+
+            // Validate VAST type.
+            if (!EXT_VIDEO_TYPE.contains(ext.getVideo().getType())) {
+                LOG.info("Unsupported VAST type - {}", ext.getVideo().getType());
+                return false;
+            }
+
+            // Validate video duration.
+            if (ext.getVideo().duration < EXT_VIDEO_MINDURATION
+                    || ext.getVideo().duration > EXT_VIDEO_MAXDURATION) {
+                LOG.info("VAST response video duration {} should be within {} and {}.", ext.getVideo().getDuration(), EXT_VIDEO_MINDURATION, EXT_VIDEO_MAXDURATION);
+                return false;
+            }
+
+            // Validate Linearity
+            if (ext.getVideo().linearity != EXT_VIDEO_LINEARITY) {
+                LOG.info("Linearity {} is not supported for the VAST response.", ext.getVideo().linearity);
+                return false;
+            }
+
+            // A valid video response is received. Set the flag.
+            isVideoResponseReceived = true;
 
             // Update the impression id for video ad.
             if (this.casInternalRequestParameters.impressionIdLookup != null) {
@@ -1022,6 +1073,29 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                     LOG.debug("Replaced impression id to new value {}.", newImpressionId);
                 }
             }
+        }
+        return true;
+    }
+
+    private boolean isValidURL(String url) {
+        UrlValidator urlValidator = new UrlValidator();
+        return urlValidator.isValid(url);
+    }
+
+    private boolean isValidXMLFormat(String xmlString) {
+        if (StringUtils.isEmpty(xmlString)) {
+            return false;
+        }
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        InputSource source = new InputSource(new StringReader(xmlString));
+        try {
+            DocumentBuilder db = factory.newDocumentBuilder();
+            db.setErrorHandler(null);
+            db.parse(source);
+            return true;
+        } catch (SAXException | ParserConfigurationException | IOException e) {
+            LOG.debug("VAST response is NOT a valid XML - {}", e.getMessage());
+            return false;
         }
     }
 

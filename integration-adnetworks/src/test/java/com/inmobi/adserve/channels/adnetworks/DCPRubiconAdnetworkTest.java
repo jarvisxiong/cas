@@ -430,11 +430,11 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 		ChannelSegmentEntity entity = new ChannelSegmentEntity(
 				AdNetworksTest.getChannelSegmentEntityBuilder(rubiconAdvId,
 						null, null, null, 0, null, null, true, true,
-						externalKey, null, null, null, 0, true, null, null, 0,
+						externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
 						null, false, false, false, false, false, false, false,
 						false, false, false, new JSONObject(
 								"{\"3\":\"160212\",\"site\":\"38132\"}"), new ArrayList<Integer>(),
-								0.0d, null, null, 0));
+								0.0d, null, null, 0, new Integer[] {0}));
 
 		dcpRubiconAdNetwork.configureParameters(sasParams,casInternalRequestParameters, entity, null, null);
 		String actualUrl = dcpRubiconAdNetwork.getRequestUri().toString();

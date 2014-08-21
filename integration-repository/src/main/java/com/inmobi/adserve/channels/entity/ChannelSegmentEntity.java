@@ -5,7 +5,6 @@ import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang.ArrayUtils;
 import org.json.JSONObject;
 
 import java.sql.Timestamp;
