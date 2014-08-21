@@ -105,11 +105,12 @@ public class ChannelSegmentFilterModule extends AbstractModule {
                 filter.setOrder(FilterOrder.FIRST);
             }
             else if (filter instanceof AdGroupTotalCountFilter) {
-                filter.setOrder(FilterOrder.LAST);
-            }
-            else if (filter instanceof AdGroupPartnerCountFilter) {
                 filter.setOrder(FilterOrder.SECOND_LAST);
             }
+            else if (filter instanceof AdGroupPartnerCountFilter) {
+                filter.setOrder(FilterOrder.LAST);
+            }
+
             else {
                 filter.setOrder(FilterOrder.DEFAULT);
             }
