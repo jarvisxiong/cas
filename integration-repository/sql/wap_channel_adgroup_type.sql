@@ -21,7 +21,7 @@ CREATE OR REPLACE TYPE wap_channel_adgroup_type_05102013 AS
     os_version_targeting     CHARACTER VARYING(1024),
     category_taxomony        INTEGER[],
     segment_flags            INTEGER[],
-    additional_params        CHARACTER VARYING(300),
+    additional_params        CHARACTER VARYING(1000),
     adgroup_inc_id           BIGINT,
     sie_json                 VARCHAR,
     impression_ceil          BIGINT,
