@@ -18,7 +18,7 @@ import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.types.AdCreativeType;
+import com.inmobi.adserve.channels.types.AdFormatType;
 import com.inmobi.adserve.channels.util.*;
 import com.inmobi.casthrift.rtb.*;
 import com.ning.http.client.AsyncHttpClient;
@@ -34,8 +34,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.httpclient.URIException;
 import org.apache.commons.validator.UrlValidator;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.thrift.TException;
@@ -827,7 +829,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     	
         VelocityContext velocityContext = new VelocityContext();
 
-        String admContent = getADMContent();
+        String admContent = getAdMarkUp();
 
         int admSize = admContent.length();
         if (!templateWN) {
@@ -867,11 +869,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     	
     }
 
-    private void bannerVideoAdBuilding()
-    {
+    private void bannerVideoAdBuilding() {
         VelocityContext velocityContext = new VelocityContext();
 
-        String vastContentJSEsc = StringEscapeUtils.escapeJavaScript(getADMContent());
+        String vastContentJSEsc = StringEscapeUtils.escapeJavaScript(getAdMarkUp());
         velocityContext.put(VelocityTemplateFieldConstants.VASTContentJSEsc, vastContentJSEsc);
 
         // JS escaped WinUrl for partner.
@@ -901,26 +902,16 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         try {
             responseContent = Formatter.getResponseFromTemplate(TemplateType.RTB_BANNER_VIDEO, velocityContext, sasParams,
                     null);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             adStatus = "NO_AD";
             LOG.info("Some exception is caught while filling the velocity template for partner{} {}",
                     advertiserName, e);
         }
     }
-    
-    private String getADMContent(){
-    	
-    	  SeatBid seatBid = bidResponse.getSeatbid().get(0);
-          Bid bid = seatBid.getBid().get(0);
-          String admContent = bid.getAdm();
-          return admContent;
-    	
-    }
-    
+
     private String getPartnerWinUrl(){
         String winUrl = "";
-    	if (wnRequired) {
+        if (wnRequired) {
             // setCallbackContent();
             // Win notification is required
             String nUrl = null;
@@ -1019,26 +1010,26 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
      * @return
      *      false - When a video response is received and it is NOT valid.
      *      true  - 1) When the response does not contain video (banner response)
-     *              2) It contains video response which is a valid VAST.
+     *              2) It contains video response which is a valid XML/URL.
      */
     private boolean checkBidResponseForBannerVideo(BidExtensions ext) {
 
         if (ext != null && ext.getVideo() != null) {
             LOG.debug("Received video response of type {}.", ext.getVideo().getType());
 
-            // Validate the adm content for a valid VAST.
+            // Validate the adm content for a valid URL/XML.
             if (!isValidURL(adm) && !isValidXMLFormat(adm)) {
                 LOG.info("Invalid VAST response adm - {}", adm);
                 return false;
             }
 
-            // Validate VAST type.
+            // Validate supported VAST type.
             if (!EXT_VIDEO_TYPE.contains(ext.getVideo().getType())) {
                 LOG.info("Unsupported VAST type - {}", ext.getVideo().getType());
                 return false;
             }
 
-            // Validate video duration.
+            // Validate supported video duration.
             if (ext.getVideo().duration < EXT_VIDEO_MINDURATION
                     || ext.getVideo().duration > EXT_VIDEO_MAXDURATION) {
                 LOG.info("VAST response video duration {} should be within {} and {}.", ext.getVideo().getDuration(), EXT_VIDEO_MINDURATION, EXT_VIDEO_MAXDURATION);
@@ -1057,7 +1048,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             // Update the impression id for video ad.
             if (this.casInternalRequestParameters.impressionIdLookup != null) {
                 String newImpressionId =
-                        this.casInternalRequestParameters.impressionIdLookup.get(AdCreativeType.VIDEO.getValue());
+                        this.casInternalRequestParameters.impressionIdLookup.get(AdFormatType.VIDEO.getValue());
                 if (StringUtils.isNotEmpty(newImpressionId)) {
 
                     // Update the response impression id so that this doesn't get filtered in AuctionImpressionIdFilter.
@@ -1077,21 +1068,35 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         return true;
     }
 
-    private boolean isValidURL(String url) {
+    private boolean isValidURL(final String url) {
         UrlValidator urlValidator = new UrlValidator();
         return urlValidator.isValid(url);
     }
 
-    private boolean isValidXMLFormat(String xmlString) {
-        if (StringUtils.isEmpty(xmlString)) {
+    private boolean isValidXMLFormat(final String urlEncodedXmlStr) {
+        if (StringUtils.isEmpty(urlEncodedXmlStr)) {
             return false;
         }
+
+        // The XML content is expected to be in URL encoded format, so decoding
+        String xmlStr;
+        try {
+            xmlStr = URIUtil.decode(urlEncodedXmlStr);
+        } catch (URIException e) {
+            LOG.info("VAST XML response is NOT properly URL encode. {}", e.getMessage());
+            return false;
+        }
+
+        // Validate the XML by parsing it.
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        InputSource source = new InputSource(new StringReader(xmlString));
+        InputSource source = new InputSource(new StringReader(xmlStr));
         try {
             DocumentBuilder db = factory.newDocumentBuilder();
             db.setErrorHandler(null);
             db.parse(source);
+
+            // Intially adm was URL encoded XML string. Replace it with URL decoded value.
+            this.adm = xmlStr;
             return true;
         } catch (SAXException | ParserConfigurationException | IOException e) {
             LOG.debug("VAST response is NOT a valid XML - {}", e.getMessage());

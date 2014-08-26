@@ -151,7 +151,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
             builder.setTod(tod);
             builder.setDst(dst);
             builder.setCampaignIncId(campaignIncId);
-            builder.setCreativeTypes(creativeTypes);
+            builder.setAdFormatIds(creativeTypes);
 
             ChannelSegmentEntity entity = builder.build();
 

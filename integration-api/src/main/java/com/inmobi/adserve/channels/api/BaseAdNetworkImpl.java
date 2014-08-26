@@ -68,8 +68,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     
     protected boolean 							  isHTMLResponseSupported = true;
     protected boolean 							  isNativeResponseSupported = false;
-    protected boolean                             isBannerVideoResponseSupported = false;
-    protected boolean                             isVideoResponseReceived = false;
+    protected boolean 							  isBannerVideoResponseSupported = false;
+    protected boolean 							  isVideoResponseReceived = false;
 
     protected SASRequestParameters                sasParams;
     protected CasInternalRequestParameters        casInternalRequestParameters;

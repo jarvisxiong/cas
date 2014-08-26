@@ -203,7 +203,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
 		AdInfo rtbdAd = new AdInfo();
 		AdIdChain adIdChain = new AdIdChain();
 		ChannelSegmentEntity channelSegmentEntity = this.auctionEngine.getRtbResponse().getChannelSegmentEntity();
-        ADCreativeType responseCreativeType =  this.auctionEngine.getRtbResponse().getAdNetworkInterface().getCreativeType();
+		ADCreativeType responseCreativeType =  this.auctionEngine.getRtbResponse().getAdNetworkInterface().getCreativeType();
 		adIdChain.setAdgroup_guid(channelSegmentEntity.getAdgroupId());
 		adIdChain.setAd_guid(channelSegmentEntity.getAdId(responseCreativeType));
 		adIdChain.setAdvertiser_guid(channelSegmentEntity.getAdvertiserId());

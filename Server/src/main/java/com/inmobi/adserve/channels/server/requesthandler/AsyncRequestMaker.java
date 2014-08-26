@@ -10,7 +10,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.SegmentFactory;
-import com.inmobi.adserve.channels.types.AdCreativeType;
+import com.inmobi.adserve.channels.types.AdFormatType;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.casthrift.ADCreativeType;
@@ -57,7 +57,7 @@ public class AsyncRequestMaker {
          NOTE: For a request that qualifies the in-banner video criteria, at this point we don't know whether an
          interstitial video response will be sent or Banner.
          At this point, the creative type is set to Banner for video supported requests. If the request gets fullfiled
-         with a video ad, creative type will be reset accordingly.
+         with a video ad, creative type will be chosen accordingly.
         */
         ADCreativeType creativeType = isNativeRequest(sasParams) ? ADCreativeType.NATIVE : ADCreativeType.BANNER;
         LOG.debug("Creative type is : {}", creativeType);
@@ -157,24 +157,26 @@ public class AsyncRequestMaker {
 
         // If banner video is supported on this request, set a hash for video impressionId Lookup.
         casInternalRequestParameters.impressionIdLookup = prepareAdImpressionIdLookup(sasParams,
-                channelSegmentEntity.getCreativeTypes(), channelSegmentEntity.getIncIds());
+                channelSegmentEntity.getAdFormatIds(), channelSegmentEntity.getIncIds());
 
         return casInternalRequestParameters;
     }
 
-    private HashMap<Integer, String> prepareAdImpressionIdLookup(SASRequestParameters sasParams, Integer[] adCreativeTypes, Long[] adIncIds) {
+    private HashMap<Integer, String> prepareAdImpressionIdLookup(final SASRequestParameters sasParams,
+                                                                 final Integer[] adFormatIds, final Long[] adIncIds) {
 
-        if (!sasParams.isBannerVideoSupported() || adCreativeTypes == null || adIncIds == null) {
+        if (!sasParams.isBannerVideoSupported() || adFormatIds == null || adIncIds == null) {
             LOG.debug("In-banner video ad is not supported.");
             return null;
         }
 
         HashMap<Integer, String> impressionIdLookup = new HashMap<>(adIncIds.length);
-        for (int i = 0; i < adCreativeTypes.length; i++) {
+        for (int i = 0; i < adFormatIds.length; i++) {
             // Presently, we need the lookup only for video.
-            if (adCreativeTypes[i] == AdCreativeType.VIDEO.getValue()) {
-                impressionIdLookup.put(adCreativeTypes[i], getImpressionId(adIncIds[i]));
-                LOG.debug("impression id for in-banner video ad is {}.", impressionIdLookup.get(adCreativeTypes[i]));
+            // Put entry for video ad format only in the lookup and skip rest.
+            if (adFormatIds[i] == AdFormatType.VIDEO.getValue()) {
+                impressionIdLookup.put(adFormatIds[i], getImpressionId(adIncIds[i]));
+                LOG.debug("impression id for in-banner video ad is {}.", impressionIdLookup.get(adFormatIds[i]));
                 return impressionIdLookup;
             }
         }
@@ -280,7 +282,7 @@ public class AsyncRequestMaker {
         return new ClickUrlMakerV6(builder);
     }
 
-    private boolean isNativeRequest(SASRequestParameters sasParams){
+    private boolean isNativeRequest(final SASRequestParameters sasParams){
         return "native".equalsIgnoreCase(sasParams.getRFormat());
     }
 }

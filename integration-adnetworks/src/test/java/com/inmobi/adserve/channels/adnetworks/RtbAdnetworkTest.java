@@ -14,6 +14,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.types.AdFormatType;
 import com.inmobi.casthrift.rtb.Bid;
 import com.inmobi.casthrift.rtb.BidResponse;
 import com.inmobi.casthrift.rtb.SeatBid;
@@ -23,6 +24,7 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TSimpleJSONProtocol;
@@ -35,6 +37,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Executors;
 
@@ -71,7 +74,7 @@ public class RtbAdnetworkTest extends TestCase {
         expect(mockConfig.getBoolean(advertiserName + ".siteBlinded")).andReturn(true).anyTimes();
         expect(mockConfig.getBoolean(advertiserName + ".htmlSupported",true)).andReturn(true).anyTimes();
         expect(mockConfig.getBoolean(advertiserName + ".nativeSupported",false)).andReturn(false).anyTimes();
-        expect(mockConfig.getBoolean(advertiserName + ".bannerVideoSupported",false)).andReturn(false).once();
+        expect(mockConfig.getBoolean(advertiserName + ".bannerVideoSupported",false)).andReturn(true).once();
         expect(mockConfig.getStringArray("rtb.blockedAdvertisers")).andReturn(new String[]{"king.com","supercell.net", "paps.com", "fhs.com", "china.supercell.com", "supercell.com"}).anyTimes();
         replay(mockConfig);
     }
@@ -462,5 +465,48 @@ public class RtbAdnetworkTest extends TestCase {
         rtbAdNetwork.setSecondBidPrice(0.23);
         String afterMacros = rtbAdNetwork.replaceRTBMacros(responseAdm.toString());
         assertEquals(afterMacros, rtbAdNetwork.responseContent);
+    }
+
+    @Test
+    public void testParseResponseWithVideo() throws TException {
+
+        String oldImpressionId = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+        String newImpressionId = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee";
+        StringBuilder str = new StringBuilder();
+        str.append("{\"id\":\"fc30d281-0147-1000-d51b-000402530000\",\"seatbid\":[{\"bid\":[{\"id\":\"ab73dd4868a0bbadf8fd7527d95136b4\",\"impid\":\"fc30d283-0147-1000-fd85-000534960000\",\"price\":2.0759854316711426,\"adid\":\"1335571993285\",\"nurl\":\"http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}\",\"adm\":\"http://demo.tremorvideo.com/proddev/vast/vast2RegularLinear.xml\",\"adomain\":[\"mkhoj.com\"],\"iurl\":\"http://www.inmobi.com\",\"cid\":\"cid\",\"crid\":\"crid\",\"attr\":[1],\"ext\":{\"video\":{\"linearity\":1,\"duration\":30,\"type\":\"VAST 2.0\"}}}],\"seat\":\"f55c9d46d7704f8789015a64153a7015\"}],\"bidid\":\"fc30d281-0147-1000-d51b-000402530000\",\"cur\":\"USD\"}");
+
+        String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/" + oldImpressionId + "/-1/1/9cddca11?ds=1";
+        String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/" + oldImpressionId + "/-1/0/9cddca11?ds=1";
+        String externalSiteKey = "f6wqjq1r5v";
+        ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId,
+                null, null, null, 0, null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+
+        sasParams.setSlot((short) 14);
+        sasParams.setBannerVideoSupported(true);
+        sasParams.setImpressionId(oldImpressionId);
+
+        // Set the  video specifc impression Id lookup hash.
+        HashMap<Integer, String> impressionIdLookup = new HashMap<>();
+        impressionIdLookup.put(AdFormatType.VIDEO.getValue(), newImpressionId);
+        casInternalRequestParameters.impressionIdLookup = impressionIdLookup;
+
+        rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
+        boolean deserializeStatus = rtbAdNetwork.deserializeResponse(str.toString());
+
+        assertEquals(true, deserializeStatus);
+
+        // Verify that impression id is replaced correctly.
+        assertEquals(newImpressionId, rtbAdNetwork.getImpressionId());
+
+        rtbAdNetwork.parseResponse(str.toString(), HttpResponseStatus.OK);
+
+        // Verify that new impression id is used in the generate response.
+        // 5 times = 1 impression url + 2 beacon url + 2 click url
+        assertEquals(5, StringUtils.countMatches(rtbAdNetwork.responseContent, newImpressionId));
+
+        // Old impression id should not be used.
+        assertEquals(0, StringUtils.countMatches(rtbAdNetwork.responseContent, oldImpressionId));
     }
 }

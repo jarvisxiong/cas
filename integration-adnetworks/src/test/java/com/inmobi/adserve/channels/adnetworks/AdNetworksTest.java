@@ -1329,7 +1329,7 @@ public class AdNetworksTest extends TestCase {
             final boolean appUrlEnabled, final boolean interstitialOnly, final boolean nonInterstitialOnly,
             final boolean stripUdId, final boolean stripZipCode, final boolean stripLatlong,
             final JSONObject additionalParams, final List<Integer> manufModelTargetingList, final double ecpmBoost,
-            final Timestamp eCPMBoostDate, final Long[] tod, final long adGroupIncId, final Integer[] creativeTypes) {
+            final Timestamp eCPMBoostDate, final Long[] tod, final long adGroupIncId, final Integer[] AdFormatIds) {
         ChannelSegmentEntity.Builder builder = ChannelSegmentEntity.newBuilder();
         builder.setAdvertiserId(advertiserId);
         builder.setAdvertiserId(advertiserId);
@@ -1369,7 +1369,7 @@ public class AdNetworksTest extends TestCase {
         builder.setEcpmBoostExpiryDate(eCPMBoostDate);
         builder.setTod(tod);
         builder.setAdgroupIncId(adGroupIncId);
-        builder.setCreativeTypes(creativeTypes);
+        builder.setAdFormatIds(AdFormatIds);
         return builder;
     }
 

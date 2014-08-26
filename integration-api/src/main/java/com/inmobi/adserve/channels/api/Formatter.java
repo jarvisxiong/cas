@@ -63,7 +63,7 @@ public class Formatter {
 		if (StringUtils.isNotBlank(beaconUrl)) {
 			context.put(VelocityTemplateFieldConstants.IMBeaconUrl, beaconUrl);
 		}
-		
+
 		if (isRequestFromSdk(sasParams)) {
 				context.put(VelocityTemplateFieldConstants.SDK, true);
 				context.put(VelocityTemplateFieldConstants.SDK360Onwards, requestFromSDK360Onwards(sasParams));
@@ -72,7 +72,7 @@ public class Formatter {
 						sasParams.getImaiBaseUrl());
 			}
 		}
-		
+
 	}
 
     /**
