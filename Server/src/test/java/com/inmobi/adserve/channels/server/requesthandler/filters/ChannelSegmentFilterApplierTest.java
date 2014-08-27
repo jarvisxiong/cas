@@ -299,12 +299,9 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
 
         SASRequestParameters sasParams = new SASRequestParameters();
         sasParams.setSiteId("siteid");
-        TypeLiteral<List<AdvertiserLevelFilter>> listType = new TypeLiteral<List<AdvertiserLevelFilter>>() {
-        };
 
-        List<AdvertiserLevelFilter> advertiserLevelFilters = injector.getInstance(Key.get(listType));
 
-        for (AdvertiserLevelFilter advertiserLevelFilter : advertiserLevelFilters) {
+        for (AdvertiserLevelFilter advertiserLevelFilter : dcpAndRtbdAdvertiserLevelFilters) {
             advertiserLevelFilter.filter(advertiserMatchedSegmentDetails, sasParams);
         }
         List<ChannelSegment> channelSegmentList = getChannelSegments(advertiserMatchedSegmentDetails);
@@ -466,11 +463,6 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         sasParams.setDst(2);
         sasParams.setSiteId("siteid");
 
-        TypeLiteral<List<AdGroupLevelFilter>> listType = new TypeLiteral<List<AdGroupLevelFilter>>() {
-        };
-
-        List<AdGroupLevelFilter> adGroupLevelFilters = injector.getInstance(Key.get(listType));
-
         CasContext casContext = new CasContext();
         int sumOfSiteImpressions = 0;
         for (ChannelSegment channelSegment : channelSegments) {
@@ -478,7 +470,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         }
         casContext.setSumOfSiteImpressions(sumOfSiteImpressions);
 
-        for (AdGroupLevelFilter adGroupLevelFilter : adGroupLevelFilters) {
+        for (AdGroupLevelFilter adGroupLevelFilter : dcpAndRtbAdGroupLevelFilters) {
             adGroupLevelFilter.filter(channelSegments, sasParams, casContext);
         }
 

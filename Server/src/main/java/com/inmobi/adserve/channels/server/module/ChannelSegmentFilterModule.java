@@ -30,7 +30,9 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.Ad
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AbstractAdvertiserLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AdvertiserLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserDetailsInvalidFilter;
+import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserDroppedInRtbBalanceFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserExcludedFilter;
+import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserFailedInAccountSegmentFilter;
 
 
 /**
@@ -103,27 +105,8 @@ public class ChannelSegmentFilterModule extends AbstractModule {
     @Provides
     List<AdvertiserLevelFilter> provideIxAdvertiserLevelFilters(final Injector injector) {
         List<AdvertiserLevelFilter> advertiserLevelFilterList = Lists.newArrayList();
-
-        Set<Class<? extends AdvertiserLevelFilter>> classes = reflections.getSubTypesOf(AdvertiserLevelFilter.class);
-        classes.addAll(reflections.getSubTypesOf(AbstractAdvertiserLevelFilter.class));
-
-        for (Class<? extends AdvertiserLevelFilter> class1 : classes) {
-            AdvertiserLevelFilter filter = injector.getInstance(class1);
-            if (filter instanceof AdvertiserDetailsInvalidFilter) {
-                filter.setOrder(FilterOrder.FIRST);
-            }
-            else if (filter instanceof AdvertiserExcludedFilter) {
-                filter.setOrder(FilterOrder.SECOND);
-            }
-            else {
-                filter.setOrder(FilterOrder.DEFAULT);
-            }
-
-            advertiserLevelFilterList.add(filter);
-        }
-
-        Collections.sort(advertiserLevelFilterList, FILTER_COMPARATOR);
-
+        advertiserLevelFilterList.add(injector.getInstance(AdvertiserDroppedInRtbBalanceFilter.class));
+        advertiserLevelFilterList.add(injector.getInstance(AdvertiserFailedInAccountSegmentFilter.class));
         return advertiserLevelFilterList;
     }
 
