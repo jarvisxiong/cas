@@ -462,4 +462,44 @@ public class RtbAdnetworkTest extends TestCase {
         String afterMacros = rtbAdNetwork.replaceRTBMacros(responseAdm.toString());
         assertEquals(afterMacros, rtbAdNetwork.responseContent);
     }
+
+    @Test
+    public void testConfigureParametersTransparency() {
+        Long[] catLong = new Long[2];
+        catLong[0] = (long) 1;
+        catLong[1] = (long) 2;
+
+        SASRequestParameters sasParams = new SASRequestParameters();
+        sasParams.setSiteId("4028cba631b705570131d1bd19f201b2"); // Transparency to be included for this site ID.
+        sasParams.setSource("app"); // App object.
+        sasParams.setOsId(3); // Android OS.
+        sasParams.setSlot((short)1);
+        sasParams.setCategories(Arrays.asList(catLong));
+        sasParams.setLocSrc("wifi");
+        sasParams.setGender("Male");
+        sasParams.setAge((short)26);
+        sasParams.setRemoteHostIp("206.29.182.240");
+        sasParams
+            .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+
+        CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        casInternalRequestParameters.uid = "1234";
+        casInternalRequestParameters.latLong = "37.4429,-122.1514";
+        casInternalRequestParameters.impressionId = ("4f8d98e2-4bbd-40bc-8795-22da170700f9");
+        casInternalRequestParameters.auctionId = ("4f8d98e2-4bbd-40bc-8795-22da170700f9");
+
+        String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
+        String externalSiteKey = "f6wqjq1r5v";
+        String beaconUrl = "";
+
+        ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId,
+            null, null, null, 0, null, null, true, true, externalSiteKey, null, null, null, 0, true, null, null, 0,
+            null, false, false, false, false, false, false, false, false, false, false, null,
+            new ArrayList<Integer>(), 0.0d, null, null, 32));
+        rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
+        String ActualBundle = rtbAdNetwork.getBidRequest().app.bundle.toString();
+
+        // Compare the bundle value.
+        assertEquals(ActualBundle, "com.dreamstep.wBESTLOVEPOEMS");
+    }
 }
