@@ -32,7 +32,6 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.Adve
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserDetailsInvalidFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserDroppedInRtbBalanceFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserExcludedFilter;
-import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserFailedInAccountSegmentFilter;
 
 
 /**
@@ -106,7 +105,6 @@ public class ChannelSegmentFilterModule extends AbstractModule {
     List<AdvertiserLevelFilter> provideIxAdvertiserLevelFilters(final Injector injector) {
         List<AdvertiserLevelFilter> advertiserLevelFilterList = Lists.newArrayList();
         advertiserLevelFilterList.add(injector.getInstance(AdvertiserDroppedInRtbBalanceFilter.class));
-        advertiserLevelFilterList.add(injector.getInstance(AdvertiserFailedInAccountSegmentFilter.class));
         return advertiserLevelFilterList;
     }
 
@@ -147,31 +145,6 @@ public class ChannelSegmentFilterModule extends AbstractModule {
     @Singleton
     @Provides
     List<AdGroupLevelFilter> provideIXAdGroupLevelFilters(final Injector injector) {
-        List<AdGroupLevelFilter> adGroupLevelFilterList = Lists.newArrayList();
-
-        Set<Class<? extends AdGroupLevelFilter>> classes = reflections.getSubTypesOf(AdGroupLevelFilter.class);
-        classes.addAll(reflections.getSubTypesOf(AbstractAdGroupLevelFilter.class));
-
-        for (Class<? extends AdGroupLevelFilter> class1 : classes) {
-            AdGroupLevelFilter filter = injector.getInstance(class1);
-            if (filter instanceof AdGroupSupplyDemandClassificationFilter) {
-                filter.setOrder(FilterOrder.FIRST);
-            }
-            else if (filter instanceof AdGroupTotalCountFilter) {
-                filter.setOrder(FilterOrder.LAST);
-            }
-            else if (filter instanceof AdGroupPartnerCountFilter) {
-                filter.setOrder(FilterOrder.SECOND_LAST);
-            }
-            else {
-                filter.setOrder(FilterOrder.DEFAULT);
-            }
-
-            adGroupLevelFilterList.add(filter);
-        }
-
-        Collections.sort(adGroupLevelFilterList, FILTER_COMPARATOR);
-
-        return adGroupLevelFilterList;
+        return Lists.newArrayList();
     }
 }
