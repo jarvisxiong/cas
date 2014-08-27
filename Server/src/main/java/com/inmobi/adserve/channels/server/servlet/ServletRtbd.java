@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import java.util.List;
+
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.QueryStringDecoder;
 
@@ -17,6 +19,12 @@ import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
 import com.inmobi.adserve.channels.server.requesthandler.RequestFilters;
 import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilterApplier;
+import com.inmobi.adserve.channels.server.requesthandler.filters.DcpAndRtbAdGroupLevelFilters;
+import com.inmobi.adserve.channels.server.requesthandler.filters.DcpAndRtbdAdvertiserLevelFilters;
+import com.inmobi.adserve.channels.server.requesthandler.filters.IXAdGroupLevelFilters;
+import com.inmobi.adserve.channels.server.requesthandler.filters.IxAdvertiserLevelFilters;
+import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AdGroupLevelFilter;
+import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AdvertiserLevelFilter;
 import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -24,14 +32,15 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 
 @Singleton
 @Path("/rtbdFill")
-public class ServletRtbd extends ServletBackFill {
+public class ServletRtbd extends BaseServlet {
     private static final Logger               LOG = LoggerFactory.getLogger(ServletRtbd.class);
 
     @Inject
     public ServletRtbd(final Provider<Marker> traceMarkerProvider, final MatchSegments matchSegments,
             final RequestFilters requestFilters, final ChannelSegmentFilterApplier channelSegmentFilterApplier,
-            final CasUtils casUtils, final AsyncRequestMaker asyncRequestMaker) {
-    	super(matchSegments, traceMarkerProvider, channelSegmentFilterApplier, casUtils, requestFilters, asyncRequestMaker);
+            final CasUtils casUtils, final AsyncRequestMaker asyncRequestMaker, @DcpAndRtbdAdvertiserLevelFilters final List<AdvertiserLevelFilter> advertiserLevelFilters,
+    		@DcpAndRtbAdGroupLevelFilters final List<AdGroupLevelFilter> adGroupLevelFilters) {
+    	super(matchSegments, traceMarkerProvider, channelSegmentFilterApplier, casUtils, requestFilters, asyncRequestMaker, advertiserLevelFilters, adGroupLevelFilters);
     }
 
     @Override
@@ -47,4 +56,9 @@ public class ServletRtbd extends ServletBackFill {
     public String getName() {
         return "rtbdFill";
     }
+    
+	@Override
+	protected Logger getLogger() {
+		return LOG;
+	}
 }

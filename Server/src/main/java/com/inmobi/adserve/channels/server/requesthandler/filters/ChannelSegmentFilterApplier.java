@@ -31,24 +31,20 @@ public class ChannelSegmentFilterApplier {
 
     private final Provider<Marker>            traceMarkerProvider;
 
-    private final List<AdvertiserLevelFilter> advertiserLevelFilters;
 
-    private final List<AdGroupLevelFilter>    adGroupLevelFilters;
 
     private final CasUtils                    casUtils;
 
     @Inject
     public ChannelSegmentFilterApplier(final Provider<Marker> traceMarkerProvider,
-            final List<AdvertiserLevelFilter> advertiserLevelFilters,
-            final List<AdGroupLevelFilter> adGroupLevelFilters, final CasUtils casUtils) {
+    		final CasUtils casUtils) {
         this.traceMarkerProvider = traceMarkerProvider;
-        this.advertiserLevelFilters = advertiserLevelFilters;
-        this.adGroupLevelFilters = adGroupLevelFilters;
         this.casUtils = casUtils;
     }
 
     public List<ChannelSegment> getChannelSegments(final List<AdvertiserMatchedSegmentDetail> matchedSegmentDetails,
-            final SASRequestParameters sasParams, final CasContext casContext) {
+            final SASRequestParameters sasParams, final CasContext casContext, final List<AdvertiserLevelFilter> advertiserLevelFilters,
+    		final List<AdGroupLevelFilter> adGroupLevelFilters) {
 
         Marker traceMarker = traceMarkerProvider.get();
 
