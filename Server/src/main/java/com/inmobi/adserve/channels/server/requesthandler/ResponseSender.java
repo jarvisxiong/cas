@@ -372,14 +372,14 @@ public class ResponseSender extends HttpRequestHandlerBase {
 	}
 
 	private HttpResponseStatus getResponseStatus(final int dstType, final HttpResponseStatus httpResponseStatus) {
-		if (dstType == 6) {
+		if (dstType == 6 || dstType == 8) {
 			return HttpResponseStatus.OK;
 		}
 		return httpResponseStatus;
 	}
 
 	private byte[] getResponseBytes(final int dstType, final String defaultResponse) {
-		if (dstType == 6) {
+		if (dstType == 6 || dstType == 8) {
 			AdPoolResponse rtbdResponse = new AdPoolResponse();
 			try {
 				TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
