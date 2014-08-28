@@ -498,8 +498,11 @@ public class RtbAdnetworkTest extends TestCase {
             new ArrayList<Integer>(), 0.0d, null, null, 32));
         rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
         String ActualBundle = rtbAdNetwork.getBidRequest().app.bundle.toString();
+        String appID = rtbAdNetwork.getBidRequest().app.getId();
 
         // Compare the bundle value.
+        // App ID should be same as bundle value.
         assertEquals(ActualBundle, "com.dreamstep.wBESTLOVEPOEMS");
+        assertEquals(ActualBundle, appID);
     }
 }
