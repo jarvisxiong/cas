@@ -280,8 +280,8 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
     }
 
     public Collection<ChannelSegmentEntity> getEntities(final long slotId, final long category, final long country,
-            final Integer targetingPlatform, final Integer siteRating, final Integer osId) {
-        return ChannelSegmentMatchingCache.getEntities(slotId, category, country, targetingPlatform, siteRating, osId);
+            final Integer targetingPlatform, final Integer siteRating, final Integer osId, Integer dst) {
+        return ChannelSegmentMatchingCache.getEntities(slotId, category, country, targetingPlatform, siteRating, osId, dst);
     }
 
 }
