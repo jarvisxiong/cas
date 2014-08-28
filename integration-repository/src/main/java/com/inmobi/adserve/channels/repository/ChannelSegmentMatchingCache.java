@@ -18,8 +18,8 @@ public class ChannelSegmentMatchingCache {
     }
 
     public static Collection<ChannelSegmentEntity> getEntities(long slotId, long category, long country,
-            Integer targetingPlatform, Integer siteRating, Integer osId) {
-        String key = getKey(slotId, category, country, targetingPlatform, siteRating, osId);
+            Integer targetingPlatform, Integer siteRating, Integer osId, Integer dst) {
+        String key = getKey(slotId, category, country, targetingPlatform, siteRating, osId, dst);
         Map<String, ChannelSegmentEntity> entities = entityHashMap.get(key);
         if (null == entities) {
             logger.debug("Lookup in repository for key: " + key + "returned empty array");
@@ -68,8 +68,9 @@ public class ChannelSegmentMatchingCache {
                 : entity.getRcList();
         List<Integer> allowedTargetingPlatform = entity.getTargetingPlatform();
         Integer[] allowedSiteRatings = entity.getSiteRatings();
-        List<Integer> allowedOsIds = entity.getOsIds() == null || entity.getOsIds().size() == 0 ? new ArrayList<Integer>(
-                Arrays.asList(new Integer[] { -1 })) : entity.getOsIds();
+        List<Integer> allowedOsIds = entity.getOsIds() == null || entity.getOsIds().size() == 0 ? new ArrayList<Integer>(Arrays.asList(new Integer[] { -1 })) : entity.getOsIds();
+        
+        Integer dst = entity.getDst();
 
         List<String> matchingKeys = new ArrayList<String>();
         for (Long slot : allowedSlots) {
@@ -78,7 +79,7 @@ public class ChannelSegmentMatchingCache {
                     for (Integer targetingPlatform : allowedTargetingPlatform) {
                         for (Integer siteRating : allowedSiteRatings) {
                             for (Integer osId : allowedOsIds) {
-                                String key = getKey(slot, category, country, targetingPlatform, siteRating, osId);
+                                String key = getKey(slot, category, country, targetingPlatform, siteRating, osId, dst);
                                 matchingKeys.add(key);
                             }
                         }
@@ -90,8 +91,8 @@ public class ChannelSegmentMatchingCache {
     }
 
     private static String getKey(long slotId, long category, long country, Integer targetingPlatform,
-            Integer siteRating, Integer osId) {
-        return slotId + "_" + category + "_" + country + "_" + targetingPlatform + "_" + siteRating + "_" + osId;
+            Integer siteRating, Integer osId, Integer dst) {
+        return slotId + "_" + category + "_" + country + "_" + targetingPlatform + "_" + siteRating + "_" + osId + "_" + dst;
     }
 
 }

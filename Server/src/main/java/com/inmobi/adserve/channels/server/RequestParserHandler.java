@@ -89,7 +89,7 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
 			} else if (servletName.equalsIgnoreCase("BackFill")) {
 				dst = 2;
 			} else if (servletName.equalsIgnoreCase("ixFill")) {
-				dst = 7;
+				dst = 8;
 			}
 			LOG.debug("Method is  {}", request.getMethod());
 			if (request.getMethod() == HttpMethod.POST && null != dst) {
