@@ -370,6 +370,8 @@ public class Logging {
                 return DemandSourceType.DCP;
             case 6:
                 return DemandSourceType.RTBD;
+            case 8:
+                return DemandSourceType.IX;
             default:
                 return DemandSourceType.DCP;
 

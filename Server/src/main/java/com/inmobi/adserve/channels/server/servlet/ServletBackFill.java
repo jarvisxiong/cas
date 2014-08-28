@@ -47,7 +47,7 @@ public class ServletBackFill extends BaseServlet {
             final Channel serverChannel) throws Exception {
         Marker traceMarker = traceMarkerProvider.get();
         LOG.debug(traceMarker, "Inside Servlet {}", this.getClass().getSimpleName());
-        InspectorStats.incrementStatCount(InspectorStrings.ruleEngineRequests);
+        InspectorStats.incrementStatCount(InspectorStrings.backFillRequests);
         super.handleRequest(hrh, queryStringDecoder, serverChannel);
     }
 

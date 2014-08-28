@@ -12,6 +12,7 @@ import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.auction.AuctionEngine;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.commons.security.api.InmobiSession;
 import com.inmobi.commons.security.impl.InmobiSecurityImpl;
 import com.inmobi.commons.security.util.exception.InmobiSecureException;
@@ -19,11 +20,13 @@ import com.inmobi.commons.security.util.exception.InvalidMessageException;
 import com.inmobi.types.AdIdChain;
 import com.inmobi.types.GUID;
 import com.inmobi.types.PricingModel;
+
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
+
 import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
@@ -34,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import javax.inject.Inject;
+
 import java.awt.*;
 import java.util.*;
 import java.util.List;
@@ -161,17 +165,20 @@ public class ResponseSender extends HttpRequestHandlerBase {
 			sendResponse(HttpResponseStatus.OK, finalReponse, adResponse.responseHeaders, serverChannel);
 			return;
 		}
-		if (6 != sasParams.getDst()) {
+		
+		if (sasParams.getDst() == DemandSourceType.DCP.getValue()) {
 			sendResponse(HttpResponseStatus.OK, finalReponse, adResponse.responseHeaders, serverChannel);
 		} else {
-			AdPoolResponse rtbdResponse = createThriftResponse(adResponse.response);
-			LOG.debug("RTB response json to RE is {}", rtbdResponse);
-			if (null == rtbdResponse || !SUPPORTED_RESPONSE_FORMATS.contains(sasParams.getRFormat())) {
+			String dstName = DemandSourceType.findByValue(sasParams.getDst()).name();
+			System.out.println(dstName);
+			AdPoolResponse rtbdOrIxResponse = createThriftResponse(adResponse.response);
+			LOG.debug("{} response json to RE is {}", dstName, rtbdOrIxResponse);
+			if (null == rtbdOrIxResponse || !SUPPORTED_RESPONSE_FORMATS.contains(sasParams.getRFormat())) {
 				sendNoAdResponse(serverChannel);
 			} else {
 				try {
 					TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
-					byte[] serializedResponse = serializer.serialize(rtbdResponse);
+					byte[] serializedResponse = serializer.serialize(rtbdOrIxResponse);
 					sendResponse(HttpResponseStatus.OK, serializedResponse, adResponse.responseHeaders, serverChannel);
 					InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
 				} catch (TException e) {
@@ -372,14 +379,14 @@ public class ResponseSender extends HttpRequestHandlerBase {
 	}
 
 	private HttpResponseStatus getResponseStatus(final int dstType, final HttpResponseStatus httpResponseStatus) {
-		if (dstType == 6 || dstType == 8) {
+		if (dstType == DemandSourceType.RTBD.getValue() || dstType == DemandSourceType.IX.getValue()) {
 			return HttpResponseStatus.OK;
 		}
 		return httpResponseStatus;
 	}
 
 	private byte[] getResponseBytes(final int dstType, final String defaultResponse) {
-		if (dstType == 6 || dstType == 8) {
+		if(dstType == DemandSourceType.RTBD.getValue() || dstType == DemandSourceType.IX.getValue()) {
 			AdPoolResponse rtbdResponse = new AdPoolResponse();
 			try {
 				TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());

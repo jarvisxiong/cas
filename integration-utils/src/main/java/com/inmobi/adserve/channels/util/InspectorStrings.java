@@ -4,6 +4,8 @@ public class InspectorStrings {
 
     public static final String totalRequests                             = "TotalRequests";
     public static final String ruleEngineRequests                        = "RuleEngineRequests";
+    public static final String backFillRequests                          = "BackFillRequests";
+    public static final String ixRequests                                = "IXRequests";
     public static final String NATIVE_REQUESTS                           = "NativeRequests";
     public static final String NON_AD_REQUESTS                           = "NonAdRequests";
     public static final String totalInvocations                          = "TotalInvocations";
@@ -11,6 +13,7 @@ public class InspectorStrings {
     public static final String totalNoFills                              = "TotalNoFills";
     public static final String totalFills                                = "TotalFills";
     public static final String ruleEngineFills                           = "RuleEngineFills";
+    public static final String ixFills                                   = "IXFills";
     public static final String latency                                   = "Latency";
     public static final String connectionLatency                         = "ConnectionLatency";
     public static final String count                                     = "Count";
