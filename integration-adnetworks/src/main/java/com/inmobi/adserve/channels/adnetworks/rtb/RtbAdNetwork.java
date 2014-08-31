@@ -1198,18 +1198,27 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         return urlValidator.isValid(url);
     }
 
-    private boolean isValidXMLFormat(final String urlEncodedXmlStr) {
-        if (StringUtils.isEmpty(urlEncodedXmlStr)) {
+    private boolean isValidXMLFormat(final String encodedXmlStr) {
+        if (StringUtils.isEmpty(encodedXmlStr)) {
             return false;
         }
 
-        // The XML content is expected to be in URL encoded format, so decoding
+        /* The XML content is expected to be in encoded format, which can be:
+         * 1) URLEncoded String
+         * 2) JSEscaped String
+         */
         String xmlStr;
-        try {
-            xmlStr = URIUtil.decode(urlEncodedXmlStr);
-        } catch (URIException e) {
-            LOG.info("VAST XML response is NOT properly URL encode. {}", e.getMessage());
-            return false;
+
+        // If the string doesn't contain any space, consider it to be in URL encoded format.
+        if (!encodedXmlStr.contains(" ")) {
+            try {
+                xmlStr = URIUtil.decode(encodedXmlStr);
+            } catch (URIException e) {
+                LOG.info("VAST XML response is NOT properly URL encode. {}", e.getMessage());
+                return false;
+            }
+        } else {
+            xmlStr = StringEscapeUtils.unescapeJavaScript(encodedXmlStr);
         }
 
         // Validate the XML by parsing it.
@@ -1220,7 +1229,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             db.setErrorHandler(null);
             db.parse(source);
 
-            // Intially adm was URL encoded XML string. Replace it with URL decoded value.
+            // Initially adm was URL encoded XML string. Replace it with decoded value.
             this.adm = xmlStr;
             return true;
         } catch (SAXException | ParserConfigurationException | IOException e) {
