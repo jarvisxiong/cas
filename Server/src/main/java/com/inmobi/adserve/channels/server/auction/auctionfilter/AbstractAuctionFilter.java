@@ -106,7 +106,7 @@ public abstract class AbstractAuctionFilter implements AuctionFilter {
     AuctionCreativeAttributeFilter.java     NO                YES
     AuctionCreativeIdFilter.java            YES               YES
     AuctionCreativeValidatorFilter.java     NO                YES
-    AuctionCurrencyFilter.java              YES               YES
+    AuctionCurrencyFilter.java              NO               YES
     AuctionIdFilter.java                    YES               YES
     AuctionImpressionIdFilter.java          YES               YES
     AuctionIUrlFilter.java                  NO                YES

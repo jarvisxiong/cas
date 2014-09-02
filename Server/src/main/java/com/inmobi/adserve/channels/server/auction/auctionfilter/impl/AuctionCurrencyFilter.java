@@ -19,7 +19,7 @@ public class AuctionCurrencyFilter extends AbstractAuctionFilter {
     protected AuctionCurrencyFilter(Provider<Marker> traceMarkerProvider,final ServerConfig serverConfiguration) {
         super(traceMarkerProvider, InspectorStrings.droppedInRtbCurrencyNotSupportedFilter, serverConfiguration);
         isApplicableRTBD = true;
-        isApplicableIX = true;
+        isApplicableIX = false;
     }
 
     @Override
