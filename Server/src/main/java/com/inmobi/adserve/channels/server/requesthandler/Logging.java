@@ -29,6 +29,7 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.MetricsManager;
 import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
 import com.inmobi.adtemplate.platform.CreativeType;
+import com.inmobi.casthrift.ix.*;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.Ad;
 import com.inmobi.casthrift.AdIdChain;

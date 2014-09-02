@@ -120,6 +120,13 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         this.serverChannel = serverChannel;
     }
 
+    //Overriding these methods in IXAdNetwork
+    public String returnBuyer(){return null;}
+
+    public String returnDealId(){return null;}
+
+    public double returnAdjustBid(){return 0;}
+
     @Override
     public void setName(final String adapterName) {
         this.adapterName = adapterName;
@@ -550,8 +557,11 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
      * @return
      */
     protected String getUid() {
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)  && "1".equals(casInternalRequestParameters.uidADT)) {
             return casInternalRequestParameters.uidIFA;
+        }
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.gpid) && "1".equals(casInternalRequestParameters.uidADT)) {
+            return casInternalRequestParameters.gpid;
         }
         if (StringUtils.isNotEmpty(casInternalRequestParameters.uidSO1)) {
             return casInternalRequestParameters.uidSO1;

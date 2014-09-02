@@ -6,5 +6,6 @@ package com.inmobi.adserve.channels.util;
  */
 public enum AdapterType {
     DCP,
-    RTB
+    RTB,
+    IX
 }

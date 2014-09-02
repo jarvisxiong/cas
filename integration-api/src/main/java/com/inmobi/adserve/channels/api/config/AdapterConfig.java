@@ -107,6 +107,9 @@ public class AdapterConfig implements CasConfig {
         if (isRtb()) {
             return AdapterType.RTB;
         }
+        else if(isIx()){
+            return AdapterType.IX;
+        }
         return AdapterType.DCP;
     }
 
@@ -119,6 +122,10 @@ public class AdapterConfig implements CasConfig {
 
     public boolean isRtb() {
         return adapterConfig.getBoolean("isRtb", false);
+    }
+
+    public boolean isIx(){
+        return adapterConfig.getBoolean("isIx",false);
     }
 
     public int getMaxSegmentSelectionCount() {
