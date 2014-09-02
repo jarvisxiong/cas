@@ -103,14 +103,10 @@ public class ChannelSegmentFilterApplier {
     private void printSegments(final List<AdvertiserMatchedSegmentDetail> matchedSegmentDetails) {
         Marker traceMarker = traceMarkerProvider.get();
 
-        if (LOG.isDebugEnabled()) {
-
+        if (LOG.isTraceEnabled()) {
             LOG.debug(traceMarker, "Remaining AdGroups are :");
-
             for (AdvertiserMatchedSegmentDetail advertiserMatchedSegmentDetail : matchedSegmentDetails) {
-
                 for (ChannelSegment channelSegment : advertiserMatchedSegmentDetail.getChannelSegmentList()) {
-
                     LOG.debug(traceMarker, "Advertiser is {} and AdGp is {}", channelSegment.getChannelEntity()
                             .getAccountId(), channelSegment.getChannelSegmentEntity().getAdgroupId());
                 }
