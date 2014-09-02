@@ -98,6 +98,8 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface1.getCurrency()).andReturn("USD").anyTimes();
         expect(adNetworkInterface1.getCreativeId()).andReturn("creativeId").anyTimes();
+        expect(adNetworkInterface1.getDst()).andReturn(6).anyTimes();
+
         adNetworkInterface1.setLogCreative(true);
         org.easymock.EasyMock.expectLastCall().anyTimes();
         expect(adNetworkInterface1.getADomain()).andReturn(aDomains).anyTimes();
@@ -115,6 +117,8 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface2.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface2.getCurrency()).andReturn("USD").anyTimes();
         expect(adNetworkInterface2.getCreativeId()).andReturn("creativeId").anyTimes();
+        expect(adNetworkInterface2.getDst()).andReturn(6).anyTimes();
+
         adNetworkInterface2.setLogCreative(true);
         org.easymock.EasyMock.expectLastCall().anyTimes();
         expect(adNetworkInterface2.getADomain()).andReturn(aDomains).anyTimes();
@@ -155,7 +159,10 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface1.getCurrency()).andReturn("USD").anyTimes();
         expect(adNetworkInterface1.getCreativeId()).andReturn("creativeId").anyTimes();
+        expect(adNetworkInterface1.getDst()).andReturn(6).anyTimes();
+
         adNetworkInterface1.setLogCreative(true);
+
         org.easymock.EasyMock.expectLastCall().anyTimes();
         expect(adNetworkInterface1.getADomain()).andReturn(aDomains).anyTimes();
         expect(adNetworkInterface1.getAttribute()).andReturn(cAttributes).anyTimes();
@@ -206,7 +213,9 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface1.getCurrency()).andReturn("USD").anyTimes();
         expect(adNetworkInterface1.getCreativeId()).andReturn("creativeId").anyTimes();
+        expect(adNetworkInterface1.getDst()).andReturn(6).anyTimes();
         adNetworkInterface1.setLogCreative(true);
+
         org.easymock.EasyMock.expectLastCall().anyTimes();
         expect(adNetworkInterface1.getADomain()).andReturn(aDomains).anyTimes();
         expect(adNetworkInterface1.getAttribute()).andReturn(cAttributes).anyTimes();
@@ -223,7 +232,9 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface2.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface2.getCurrency()).andReturn("USD").anyTimes();
         expect(adNetworkInterface2.getCreativeId()).andReturn("creativeId").anyTimes();
+        expect(adNetworkInterface2.getDst()).andReturn(6).anyTimes();
         adNetworkInterface2.setLogCreative(true);
+
         org.easymock.EasyMock.expectLastCall().anyTimes();
         expect(adNetworkInterface2.getADomain()).andReturn(aDomains).anyTimes();
         expect(adNetworkInterface2.getAttribute()).andReturn(cAttributes).anyTimes();
@@ -242,7 +253,9 @@ public class HttpRequestHandlerTest extends TestCase {
         adNetworkInterface3.setSecondBidPrice(EasyMock.isA(Double.class));
         adNetworkInterface3.setEncryptedBid(EasyMock.isA(String.class));
         expect(adNetworkInterface3.getCreativeId()).andReturn("creativeId").anyTimes();
+        expect(adNetworkInterface3.getDst()).andReturn(6).anyTimes();
         adNetworkInterface3.setLogCreative(true);
+
         org.easymock.EasyMock.expectLastCall().anyTimes();
         expect(adNetworkInterface3.getADomain()).andReturn(aDomains).anyTimes();
         expect(adNetworkInterface3.getAttribute()).andReturn(cAttributes).anyTimes();
@@ -283,7 +296,9 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface1.getCurrency()).andReturn("USD").anyTimes();
         expect(adNetworkInterface1.getCreativeId()).andReturn("creativeId").anyTimes();
+        expect(adNetworkInterface1.getDst()).andReturn(6).anyTimes();
         adNetworkInterface1.setLogCreative(true);
+
         org.easymock.EasyMock.expectLastCall().anyTimes();
         expect(adNetworkInterface1.getADomain()).andReturn(aDomains).anyTimes();
         expect(adNetworkInterface1.getAttribute()).andReturn(cAttributes).anyTimes();
@@ -303,7 +318,9 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface2.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface2.getCurrency()).andReturn("USD").anyTimes();
         expect(adNetworkInterface2.getCreativeId()).andReturn("creativeId").anyTimes();
+        expect(adNetworkInterface2.getDst()).andReturn(6).anyTimes();
         adNetworkInterface2.setLogCreative(true);
+
         org.easymock.EasyMock.expectLastCall().anyTimes();
         expect(adNetworkInterface2.getADomain()).andReturn(aDomains).anyTimes();
         expect(adNetworkInterface2.getAttribute()).andReturn(cAttributes).anyTimes();
@@ -320,7 +337,9 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface3.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface3.getCurrency()).andReturn("USD").anyTimes();
         expect(adNetworkInterface3.getCreativeId()).andReturn("creativeId").anyTimes();
+        expect(adNetworkInterface3.getDst()).andReturn(6).anyTimes();
         adNetworkInterface3.setLogCreative(true);
+
         org.easymock.EasyMock.expectLastCall().anyTimes();
         expect(adNetworkInterface3.getADomain()).andReturn(aDomains).anyTimes();
         expect(adNetworkInterface3.getAttribute()).andReturn(cAttributes).anyTimes();
@@ -360,7 +379,9 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface1.getCurrency()).andReturn("USD").anyTimes();
         expect(adNetworkInterface1.getCreativeId()).andReturn("creativeId").anyTimes();
+        expect(adNetworkInterface1.getDst()).andReturn(6).anyTimes();
         adNetworkInterface1.setLogCreative(true);
+
         org.easymock.EasyMock.expectLastCall().anyTimes();
         expect(adNetworkInterface1.getADomain()).andReturn(aDomains).anyTimes();
         expect(adNetworkInterface1.getAttribute()).andReturn(cAttributes).anyTimes();
@@ -380,7 +401,9 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface2.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface2.getCurrency()).andReturn("USD").anyTimes();
         expect(adNetworkInterface2.getCreativeId()).andReturn("creativeId").anyTimes();
+        expect(adNetworkInterface2.getDst()).andReturn(6).anyTimes();
         adNetworkInterface2.setLogCreative(true);
+
         org.easymock.EasyMock.expectLastCall().anyTimes();
         expect(adNetworkInterface2.getADomain()).andReturn(aDomains).anyTimes();
         expect(adNetworkInterface2.getAttribute()).andReturn(cAttributes).anyTimes();
@@ -397,7 +420,9 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface3.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface3.getCurrency()).andReturn("USD").anyTimes();
         expect(adNetworkInterface3.getCreativeId()).andReturn("creativeId").anyTimes();
+        expect(adNetworkInterface3.getDst()).andReturn(6).anyTimes();
         adNetworkInterface3.setLogCreative(true);
+
         org.easymock.EasyMock.expectLastCall().anyTimes();
         expect(adNetworkInterface3.getADomain()).andReturn(aDomains).anyTimes();
         expect(adNetworkInterface3.getAttribute()).andReturn(cAttributes).anyTimes();
@@ -436,7 +461,9 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface1.getCurrency()).andReturn("USD").anyTimes();
         expect(adNetworkInterface1.getCreativeId()).andReturn("creativeId").anyTimes();
+        expect(adNetworkInterface1.getDst()).andReturn(6).anyTimes();
         adNetworkInterface1.setLogCreative(true);
+
         org.easymock.EasyMock.expectLastCall().anyTimes();
         expect(adNetworkInterface1.getADomain()).andReturn(aDomains).anyTimes();
         expect(adNetworkInterface1.getAttribute()).andReturn(cAttributes).anyTimes();
@@ -453,7 +480,9 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface2.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface2.getCurrency()).andReturn("USD").anyTimes();
         expect(adNetworkInterface2.getCreativeId()).andReturn("creativeId").anyTimes();
+        expect(adNetworkInterface2.getDst()).andReturn(6).anyTimes();
         adNetworkInterface2.setLogCreative(true);
+
         org.easymock.EasyMock.expectLastCall().anyTimes();
         expect(adNetworkInterface2.getADomain()).andReturn(aDomains).anyTimes();
         expect(adNetworkInterface2.getAttribute()).andReturn(cAttributes).anyTimes();
@@ -470,7 +499,9 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface3.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface3.getCurrency()).andReturn("USD").anyTimes();
         expect(adNetworkInterface3.getCreativeId()).andReturn("creativeId").anyTimes();
+        expect(adNetworkInterface3.getDst()).andReturn(6).anyTimes();
         adNetworkInterface3.setLogCreative(true);
+
         org.easymock.EasyMock.expectLastCall().anyTimes();
         expect(adNetworkInterface3.getADomain()).andReturn(aDomains).anyTimes();
         expect(adNetworkInterface3.getAttribute()).andReturn(cAttributes).anyTimes();
@@ -510,7 +541,9 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface1.getCurrency()).andReturn("USD").anyTimes();
         expect(adNetworkInterface1.getCreativeId()).andReturn("creativeId").anyTimes();
+        expect(adNetworkInterface1.getDst()).andReturn(6).anyTimes();
         adNetworkInterface1.setLogCreative(true);
+
         org.easymock.EasyMock.expectLastCall().anyTimes();
         expect(adNetworkInterface1.getADomain()).andReturn(aDomains).anyTimes();
         expect(adNetworkInterface1.getAttribute()).andReturn(cAttributes).anyTimes();
@@ -528,7 +561,9 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface2.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface2.getCurrency()).andReturn("USD").anyTimes();
         expect(adNetworkInterface2.getCreativeId()).andReturn("creativeId").anyTimes();
+        expect(adNetworkInterface2.getDst()).andReturn(6).anyTimes();
         adNetworkInterface2.setLogCreative(true);
+
         org.easymock.EasyMock.expectLastCall().anyTimes();
         expect(adNetworkInterface2.getADomain()).andReturn(aDomains).anyTimes();
         expect(adNetworkInterface2.getAttribute()).andReturn(cAttributes).anyTimes();
@@ -546,7 +581,9 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface3.getSeatId()).andReturn("advId").anyTimes();
         expect(adNetworkInterface3.getCurrency()).andReturn("USD").anyTimes();
         expect(adNetworkInterface3.getCreativeId()).andReturn("creativeId").anyTimes();
+        expect(adNetworkInterface3.getDst()).andReturn(6).anyTimes();
         adNetworkInterface3.setLogCreative(true);
+
         org.easymock.EasyMock.expectLastCall().anyTimes();
         expect(adNetworkInterface3.getADomain()).andReturn(aDomains).anyTimes();
         expect(adNetworkInterface3.getAttribute()).andReturn(cAttributes).anyTimes();
@@ -597,7 +634,9 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.isRtbPartner()).andReturn(true).anyTimes();
         expect(adNetworkInterface1.isLogCreative()).andReturn(false).anyTimes();
         expect(adNetworkInterface1.getCreativeId()).andReturn("creativeId").anyTimes();
+        expect(adNetworkInterface1.getDst()).andReturn(6).anyTimes();
         adNetworkInterface1.setLogCreative(true);
+
         org.easymock.EasyMock.expectLastCall().anyTimes();
         expect(adNetworkInterface1.getADomain()).andReturn(aDomains).anyTimes();
         expect(adNetworkInterface1.getAttribute()).andReturn(cAttributes).anyTimes();

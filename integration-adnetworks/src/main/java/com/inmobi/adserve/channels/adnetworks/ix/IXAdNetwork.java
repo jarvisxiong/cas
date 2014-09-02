@@ -27,6 +27,7 @@ import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 
 
+import com.sun.tools.corba.se.idl.StringGen;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -140,6 +141,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private String                         dealId;
     private Double                         adjustbid;
     private String                         creativeId;
+    private Integer                        pmptier;
+    private Integer                        estimated;
+    private String                         aqid;
     private String                         sampleImageUrl;
     private List<String>                   advertiserDomains;
     private List<Integer>                  creativeAttributes;
@@ -993,7 +997,14 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             responseImpressionId = bid.getImpid();
             creativeId = bid.getCrid();
             responseAuctionId = bidResponse.getId();
+            pmptier = bid.getPmptier();
+            //estimated = bid.getEstimated(); //Not used currently
+            aqid = bid.getAqid();
             adjustbid = bid.getAdjustbid();
+            if(null == adjustbid)
+            {
+                LOG.debug("yahan aaya h :D :D");
+            }
             dealId = bid.getDealid();
             buyer = seatBid.getBuyer();
             return true;
@@ -1018,6 +1029,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     {
         return buyer;
     }
+
+    public Integer returnPmptier() { return pmptier; }
+
+    public String returnAqid() { return aqid; }
 
     private double calculatePriceInUSD(final double price, String currencyCode) {
         if (StringUtils.isEmpty(currencyCode)) {

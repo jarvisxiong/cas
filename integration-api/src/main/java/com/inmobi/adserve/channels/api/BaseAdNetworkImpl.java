@@ -127,6 +127,10 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     public double returnAdjustBid(){return 0;}
 
+    public Integer returnPmptier() { return 0; }
+
+    public String returnAqid() { return null; }
+
     @Override
     public void setName(final String adapterName) {
         this.adapterName = adapterName;
