@@ -129,6 +129,24 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
     }
 
+    // Used for testing purposes
+    @Inject
+    public ResponseSender(final Provider<Marker> traceMarkerProvider, SASRequestParameters sasParams, AuctionEngine auctionEngine) {
+        this.initialTime = System.currentTimeMillis();
+        this.totalTime = 0;
+        this.rankList = null;
+        this.adResponse = null;
+        this.responseSent = false;
+        this.sasParams = sasParams;
+        this.rankIndexToProcess = 0;
+        this.selectedAdIndex = 0;
+        this.requestCleaned = false;
+        this.auctionEngine = auctionEngine;
+        if (null != traceMarkerProvider) {
+            this.traceMarker = traceMarkerProvider.get();
+        }
+    }
+
 	@Override
 	public void sendAdResponse(final AdNetworkInterface selectedAdNetwork, final Channel serverChannel) {
 		adResponse = selectedAdNetwork.getResponseAd();
@@ -219,7 +237,38 @@ public class ResponseSender extends HttpRequestHandlerBase {
 		List<AdIdChain> adIdChains = new ArrayList<AdIdChain>();
 		adIdChains.add(adIdChain);
 		rtbdAd.setAdIds(adIdChains);
-		rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);
+
+        switch(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getDst()) {
+            case 8: // If IX,
+                String returnDealIdMethodName = "returnDealId";
+                String returnHighestBidMethodName = "returnHighestBid";
+
+                // Set IX specific parameters
+                if (this.auctionEngine.getRtbResponse().getAdNetworkInterface() instanceof IXAdNetwork) {
+                    IXAdNetwork ixAdNetwork = (IXAdNetwork) this.auctionEngine.getRtbResponse().getAdNetworkInterface();
+                    String dealId = ixAdNetwork.returnDealID();
+                    long highestBid = ixAdNetwork.returnHighestBid();
+
+                    // Checking whether a dealId was provided in the bid response
+                    if (null != dealId) {
+                        // If dealId is present, then auction type is set to PREFERRED_DEAL
+                        // and dealId is set
+                        rtbdAd.setDealId(dealId);
+                        rtbdAd.setHighestBid(highestBid);
+                        rtbdAd.setAuctionType(AuctionType.PREFERRED_DEAL);
+                    } else {
+                        // otherwise auction type is set to FIRST_PRICE
+                        rtbdAd.setAuctionType(AuctionType.FIRST_PRICE);
+                    }
+                }
+                // TODO: Buyer setting
+                break;
+
+            default:// For RTBD/DCP, auction type is set to SECOND_PRICE
+                rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);
+                break;
+        }
+
 		rtbdAd.setPricingModel(PricingModel.CPM);
 		long bid = (long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface().getBidPriceInUsd() * Math.pow(10, 6));
 		rtbdAd.setPrice(bid);
