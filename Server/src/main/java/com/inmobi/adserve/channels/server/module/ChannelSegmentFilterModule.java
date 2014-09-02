@@ -9,9 +9,9 @@ import com.inmobi.adserve.channels.server.constants.FilterOrder;
 import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AbstractAdGroupLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AdGroupLevelFilter;
+import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupMaxSegmentPerRequestFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupPartnerCountFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupSupplyDemandClassificationFilter;
-import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupTotalCountFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AbstractAdvertiserLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AdvertiserLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserDetailsInvalidFilter;
@@ -104,7 +104,7 @@ public class ChannelSegmentFilterModule extends AbstractModule {
             if (filter instanceof AdGroupSupplyDemandClassificationFilter) {
                 filter.setOrder(FilterOrder.FIRST);
             }
-            else if (filter instanceof AdGroupTotalCountFilter) {
+            else if (filter instanceof AdGroupMaxSegmentPerRequestFilter) {
                 filter.setOrder(FilterOrder.LAST);
             }
             else if (filter instanceof AdGroupPartnerCountFilter) {

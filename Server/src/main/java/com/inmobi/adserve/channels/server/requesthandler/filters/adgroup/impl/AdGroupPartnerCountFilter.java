@@ -70,13 +70,15 @@ public class AdGroupPartnerCountFilter implements AdGroupLevelFilter {
                 if (result) {
                     LOG.debug(traceMarker, "Failed in filter {}  , advertiser {}", this.getClass().getSimpleName(),
                             advertiserId);
-                    break;
+
+                    // We are interested in capturing stats for all the dropped segments, hence not breaking the loop on this condition.
+                    incrementStats(channelSegment);
                 }
                 else {
                     selectedSegmentListForAdvertiser.add(channelSegment);
                     LOG.debug(traceMarker, "Passed in filter {} ,  advertiser {}", this.getClass().getSimpleName(),
                             advertiserId);
-                    incrementStats(channelSegment);
+                    incrementTotalSelectedSegmentStats(channelSegment);
                 }
             }
         }
@@ -116,10 +118,14 @@ public class AdGroupPartnerCountFilter implements AdGroupLevelFilter {
         return segmentCountForAdvertiser >= adapterConfig.getMaxSegmentSelectionCount();
     }
 
+    private void incrementStats(final ChannelSegment channelSegment) {
+        channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_PARTNER_COUNT_FILTER);
+    }
+
     /**
      * @param channelSegment
      */
-    private void incrementStats(final ChannelSegment channelSegment) {
+    private void incrementTotalSelectedSegmentStats(final ChannelSegment channelSegment) {
         channelSegment.incrementInspectorStats(InspectorStrings.totalSelectedSegments);
     }
 

@@ -31,7 +31,7 @@ public class AdvertiserExcludedFilter extends AbstractAdvertiserLevelFilter {
 
     @Inject
     public AdvertiserExcludedFilter(final Provider<Marker> traceMarkerProvider, final RepositoryHelper repositoryHelper) {
-        super(traceMarkerProvider, InspectorStrings.droppedinAdvertiserInclusionFilter);
+        super(traceMarkerProvider, InspectorStrings.droppedinAdvertiserExclusionFilter);
         this.repositoryHelper = repositoryHelper;
     }
 

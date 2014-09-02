@@ -26,7 +26,7 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
  * 
  */
 @Singleton
-public class AdGroupTotalCountFilter implements AdGroupLevelFilter {
+public class AdGroupMaxSegmentPerRequestFilter implements AdGroupLevelFilter {
 
     private static final Logger       LOG = LoggerFactory.getLogger(AbstractAdGroupLevelFilter.class);
 
@@ -37,7 +37,7 @@ public class AdGroupTotalCountFilter implements AdGroupLevelFilter {
     private FilterOrder order;
 
     @Inject
-    AdGroupTotalCountFilter(final Provider<Marker> traceMarkerProvider, final ServerConfig serverConfig) {
+    AdGroupMaxSegmentPerRequestFilter(final Provider<Marker> traceMarkerProvider, final ServerConfig serverConfig) {
         this.traceMarkerProvider = traceMarkerProvider;
         this.serverConfig = serverConfig;
     }
