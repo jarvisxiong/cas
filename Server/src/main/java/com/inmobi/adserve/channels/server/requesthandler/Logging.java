@@ -150,7 +150,7 @@ public class Logging {
                     channelSegmentEntity.getExternalSiteKey());
             ContentRating contentRating = getContentRating(sasParams);
             PricingModel pricingModel = getPricingModel(channelSegmentEntity.getPricingModel());
-            adMeta = new AdMeta(contentRating, pricingModel, "BANNER");
+            adMeta = new AdMeta(contentRating, pricingModel, "BANNER"); // TODO: Check "BANNER" point
             ad = new Ad(adChain, adMeta);
             impression = new Impression(channelSegment.getAdNetworkInterface().getImpressionId(), ad);
             impression.setAdChain(createCasAdChain(channelSegment));
@@ -290,10 +290,12 @@ public class Logging {
                 CasAdvertisementLog creativeLog = new CasAdvertisementLog(partnerName, requestUrl, response,
                         adStatus, externalSiteKey, advertiserId);
                 creativeLog.setCountryId(sasRequestParameters.getCountryId().intValue());
-                creativeLog.setCreativeId(adNetworkInterface.getCreativeId());
+                if(adNetworkInterface.getDst() == 6) {
                 creativeLog.setImageUrl(adNetworkInterface.getIUrl());
                 creativeLog.setCreativeAttributes(adNetworkInterface.getAttribute());
                 creativeLog.setAdvertiserDomains(adNetworkInterface.getADomain());
+                }
+                creativeLog.setCreativeId(adNetworkInterface.getCreativeId());
                 creativeLog.setCreativeType(adNetworkInterface.getCreativeType());
                 creativeLog.setTime_stamp(new Date().getTime());
                 LOG.info("Creative msg is {}", creativeLog);
@@ -375,7 +377,6 @@ public class Logging {
                 return DemandSourceType.IX;
             default:
                 return DemandSourceType.DCP;
-
         }
     }
 
