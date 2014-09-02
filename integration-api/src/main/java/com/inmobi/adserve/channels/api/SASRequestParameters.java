@@ -1,15 +1,14 @@
 package com.inmobi.adserve.channels.api;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import lombok.Data;
-
 import com.inmobi.adserve.adpool.EncryptionKeys;
 import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
+import lombok.Data;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 @Data
@@ -66,7 +65,7 @@ public class SASRequestParameters {
     private int                 modelId;
     private Set<String>         uAdapters;
 
-    private int                 dst;                  // This will describe the type of request dcp or rtbd
+    private int                 dst;                  // This will describe the type of request dcp, rtbd or ix
     private Set<Integer>        accountSegment;
     private boolean             isResponseOnlyFromDcp;
     private int                 sst;                  // 0 for Network
