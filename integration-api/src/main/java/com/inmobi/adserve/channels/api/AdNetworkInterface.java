@@ -140,4 +140,6 @@ public interface AdNetworkInterface {
 
     void setName(final String adapterName);
 
+    // Get Demand Source Type
+    int getDst();
 }

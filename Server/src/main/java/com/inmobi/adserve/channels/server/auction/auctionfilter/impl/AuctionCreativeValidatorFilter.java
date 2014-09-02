@@ -25,6 +25,8 @@ public class AuctionCreativeValidatorFilter extends AbstractAuctionFilter {
                                              final ServerConfig serverConfiguration) {
         super(traceMarkerProvider, InspectorStrings.droppedInCreativeValidatorFilter, serverConfiguration);
         this.repositoryHelper = repositoryHelper;
+        isApplicableRTBD = true;
+        isApplicableIX = false;
     }
 
     @Override

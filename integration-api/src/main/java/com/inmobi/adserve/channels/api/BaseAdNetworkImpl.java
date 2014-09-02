@@ -843,4 +843,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         "1".equals(casInternalRequestParameters.uidADT))
                ? casInternalRequestParameters.gpid:null;
   }
+
+    @Override
+    public int getDst() {
+        return sasParams.getDst();
+    }
 }

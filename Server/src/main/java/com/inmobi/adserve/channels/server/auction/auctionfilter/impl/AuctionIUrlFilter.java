@@ -18,6 +18,8 @@ public class AuctionIUrlFilter extends AbstractAuctionFilter {
     @Inject
     protected AuctionIUrlFilter(Provider<Marker> traceMarkerProvider,final ServerConfig serverConfiguration) {
         super(traceMarkerProvider, InspectorStrings.droppedInSampleImageUrlMissingFilter, serverConfiguration);
+        isApplicableRTBD = true;
+        isApplicableIX = false;
     }
 
     @Override

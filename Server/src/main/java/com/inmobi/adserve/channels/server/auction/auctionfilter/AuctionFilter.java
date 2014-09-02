@@ -16,4 +16,6 @@ public interface AuctionFilter extends ChannelSegmentFilter {
 
     boolean isApplicable(final String advertiserId);
 
+    boolean isApplicable(final int dst);
+
 }

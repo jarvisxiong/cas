@@ -21,6 +21,8 @@ public abstract class AbstractAuctionFilter implements AuctionFilter {
     private final String              inspectorString;
     private FilterOrder order;
     private ServerConfig serverConfiguration;
+    protected Boolean isApplicableRTBD;      // Whether the filter is applicable to RTBD
+    protected Boolean isApplicableIX;        // Whether the filter is applicable to IX
 
 
     protected AbstractAuctionFilter(final Provider<Marker> traceMarkerProvider, final String inspectorString, final ServerConfig serverConfiguration) {
@@ -28,7 +30,6 @@ public abstract class AbstractAuctionFilter implements AuctionFilter {
         this.inspectorString = inspectorString;
         this.serverConfiguration = serverConfiguration;
     }
-
 
     @Override
     public void filter(List<ChannelSegment> channelSegments, CasInternalRequestParameters casInternalRequestParameters) {
@@ -39,6 +40,8 @@ public abstract class AbstractAuctionFilter implements AuctionFilter {
 
             boolean result = false;
 
+            // Check whether the auction filter is applicable to the particular channel entity and also whether it
+            // is applicable to the particular demand source type
             if (isApplicable(channelSegment.getChannelEntity().getAccountId())) {
                 result = failedInFilter(channelSegment, casInternalRequestParameters);
             }
@@ -85,4 +88,30 @@ public abstract class AbstractAuctionFilter implements AuctionFilter {
     public boolean isApplicable(final String advertiserId) {
         return !this.serverConfiguration.getExcludedAdvertisers(this.getClass().getSimpleName()).contains(advertiserId);
     }
+
+    @Override
+    public boolean isApplicable(final int dst) {
+        switch(dst){
+            case 6: return this.isApplicableRTBD;
+            case 8: return this.isApplicableIX;
+            default: return true;
+        }
+    }
+
+    /*
+    Auction Filters                         isApplicableIX    isApplicableRTBD
+
+    AuctionAdvertiserDomainFilter.java      NO                YES
+    AuctionBidFloorFilter.java              YES               YES
+    AuctionCreativeAttributeFilter.java     NO                YES
+    AuctionCreativeIdFilter.java            YES               YES
+    AuctionCreativeValidatorFilter.java     NO                YES
+    AuctionCurrencyFilter.java              YES               YES
+    AuctionIdFilter.java                    YES               YES
+    AuctionImpressionIdFilter.java          YES               YES
+    AuctionIUrlFilter.java                  NO                YES
+    AuctionLogCreative.java                 NO                YES
+    AuctionNoAdFilter.java                  YES               YES
+    AuctionSeatIdFilter.java                YES               YES
+    */
 }

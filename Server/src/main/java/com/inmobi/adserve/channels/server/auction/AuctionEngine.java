@@ -59,32 +59,61 @@ public class AuctionEngine implements AuctionEngineInterface {
             return rtbResponse == null ? null : rtbResponse.getAdNetworkInterface();
         }
         auctionComplete = true;
+        List<ChannelSegment> rtbList;
 
-        LOG.debug("Inside RTB auction engine");
+        if(rtbSegments.size() >= 1) {
+            if (rtbSegments.get(0).getAdNetworkInterface().getDst() == 6) {
+                LOG.debug("Inside RTB auction engine");
+            } else {
+                LOG.debug("Inside auction engine (Rubicon Response)");
+            }
+            // Apply filtration only when we have at least 1 channelSegment
+            rtbList = auctionFilterApplier.applyFilters(new ArrayList<>(rtbSegments), casInternalRequestParameters);
+        } else {
+            rtbList = new ArrayList<>();
+        }
 
-        List<ChannelSegment> rtbList = auctionFilterApplier.applyFilters(new ArrayList<>(rtbSegments), casInternalRequestParameters);
-
-        // Send null as auction response in case of 0 rtb responses.
+        // Send null as auction response in case of 0 rtb/ix responses.
         if (rtbList.size() == 0) {
-            LOG.debug("RTB segments are {}", rtbList.size());
+            LOG.debug("RTB/Rubicon segments are {}", rtbList.size());
             rtbResponse = null;
             LOG.debug("Returning from auction engine , winner is none");
             return null;
         }
         else if (rtbList.size() == 1) {
-            LOG.debug("RTB segments are {}", rtbList.size());
+            if (rtbSegments.get(0).getAdNetworkInterface().getDst() == 6) {
+                LOG.debug("RTB segments are {}", rtbList.size());
+            } else {
+                LOG.debug("Rubicon segments are {}", rtbList.size());
+            }
             rtbResponse = rtbList.get(0);
             // Take minimum of rtbFloor+0.01 and bid as secondBidprice if no of rtb
             // response are 1.
-            secondBidPrice = Math.min(casInternalRequestParameters.rtbBidFloor, rtbResponse
-                    .getAdNetworkInterface().getBidPriceInUsd());
+            if (6 == rtbResponse.getAdNetworkInterface().getDst()) {
+                // For RTBD
+                secondBidPrice = Math.min(casInternalRequestParameters.rtbBidFloor, rtbResponse
+                        .getAdNetworkInterface().getBidPriceInUsd());
+                LOG.debug("Completed auction, winner is {} and secondBidPrice is {}", rtbList.get(0)
+                        .getAdNetworkInterface().getName(), secondBidPrice);
+            } else {
+                // For IX,
+                // we run a first price auction, but the value is still stored in secondBidPrice
+                secondBidPrice = rtbResponse.getAdNetworkInterface().getBidPriceInUsd();
+                LOG.debug("Completed auction, winner is {} and firstBidPrice is {}", rtbList.get(0)
+                        .getAdNetworkInterface().getName(), secondBidPrice);
+            }
+
             // Set encrypted bid price.
             rtbResponse.getAdNetworkInterface().setEncryptedBid(getEncryptedBid(secondBidPrice));
             rtbResponse.getAdNetworkInterface().setSecondBidPrice(secondBidPrice);
-            LOG.debug("Completed auction, winner is {} and secondBidPrice is {}", rtbList.get(0)
-                    .getAdNetworkInterface().getName(), secondBidPrice);
+
             // Return as there is no need to iterate over the list.
             return rtbList.get(0).getAdNetworkInterface();
+        }
+
+        // Multiple IX bids from RP should not be currently possible
+        if (rtbSegments.get(0).getAdNetworkInterface().getDst() == 8) {
+            return null;
         }
 
         // Sort the list by their bid prices.
