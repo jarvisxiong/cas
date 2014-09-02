@@ -846,6 +846,54 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         LOG.debug("response length is {}", responseContent.length());
     }
 
+    @Override
+    public void processResponse() {
+        LOG.debug("Inside process Response for the rubicon, partner: {}", getName());
+        if (isRequestComplete) {
+            LOG.debug("Already cleaned up so returning from process response");
+            return;
+        }
+        // LOG.debug("Inside process Response for the partner: {}", getName());
+        getResponseAd();
+        isRequestComplete = true;
+        if (baseRequestHandler.getAuctionEngine().isAllRtbComplete()) {
+            LOG.debug("isAllIXComplete is true");
+            if (baseRequestHandler.getAuctionEngine().isAuctionComplete()) {
+                LOG.debug("ix cas auction has run already");
+                if (baseRequestHandler.getAuctionEngine().isRtbResponseNull()) {
+                    LOG.debug("ix cas auction has returned null");
+                    // Sending no ad response and cleaning up channel
+                    // (processDcpPartner is skipped because the selected adNetworkInterface
+                    // will always be the last entry and a No Ad Response will be sent)
+                    baseRequestHandler.sendNoAdResponse(serverChannel);
+                    baseRequestHandler.cleanUp();
+                    return;
+                }
+
+                LOG.debug("ix cas response is not null so sending rtb response");
+                return;
+            }
+            else {
+                AdNetworkInterface highestBid = baseRequestHandler.getAuctionEngine().runRtbSecondPriceAuctionEngine();
+                if (highestBid != null) {
+                    LOG.debug("Sending ix cas response of {}", highestBid.getName());
+                    baseRequestHandler.sendAdResponse(highestBid, serverChannel);
+                    // highestBid.impressionCallback();
+                    LOG.debug("sent ix cas response");
+                    return;
+                }
+                else {
+                    LOG.debug("ix cas auction has returned null");
+                    // Sending no ad response and cleaning up channel
+                    // processDcpList is skipped
+                    baseRequestHandler.sendNoAdResponse(serverChannel);
+                    baseRequestHandler.cleanUp();
+                }
+            }
+        }
+        LOG.debug("ix cas auction has not run so waiting....");
+    }
+
 
     private void nonNativeAdBuilding(){
 

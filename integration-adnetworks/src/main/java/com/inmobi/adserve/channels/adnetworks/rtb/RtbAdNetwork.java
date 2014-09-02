@@ -305,7 +305,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         		|| StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)
                 || !isRequestFormatSupported()) {
-            LOG.debug("mandate parameters missing or request format is not compaitable to partner supported response for dummy so exiting adapter");
+            LOG.debug("mandate parameters missing or request format is not compatible to partner supported response for dummy so exiting adapter");
             return false;
         }
 
@@ -365,7 +365,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         // Serializing the bidRequest Object
         return serializeBidRequest();
     }
-    
     
     private boolean isRequestFormatSupported(){
     	if(isNativeRequest()){
@@ -517,7 +516,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     	return iext;
     }
     
-   
     private Banner createBannerObject() {
         Banner banner = new Banner();
         banner.setId(casInternalRequestParameters.impressionId);
@@ -800,7 +798,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     public String replaceRTBMacros(String url) {
         url = url.replaceAll(RTBCallbackMacros.AUCTION_ID_INSENSITIVE, bidResponse.id);
         url = url.replaceAll(RTBCallbackMacros.AUCTION_CURRENCY_INSENSITIVE, bidderCurrency);
-        if (6 != sasParams.getDst()) {
+
+        // Condition changed from sasParams.getDst() != 6 to == 2 to avoid unnecessary IX RTBMacro Replacements
+        if (2 == sasParams.getDst()) {
             url = url.replaceAll(RTBCallbackMacros.AUCTION_PRICE_ENCRYPTED_INSENSITIVE, encryptedBid);
             url = url.replaceAll(RTBCallbackMacros.AUCTION_PRICE_INSENSITIVE,
                     Double.toString(secondBidPriceInLocal));
@@ -890,7 +890,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             }else{
             	nonNativeAdBuilding();
             }
-
         }
         LOG.debug("response length is {}", responseContent.length());
     }
