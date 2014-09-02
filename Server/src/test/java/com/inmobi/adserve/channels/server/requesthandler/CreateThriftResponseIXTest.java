@@ -60,8 +60,8 @@ public class CreateThriftResponseIXTest {
         expect(mockIXAdNetwork.getCurrency()).andReturn("USD").anyTimes();
         expect(mockIXAdNetwork.getBidPriceInLocal()).andReturn(expectedBidPrice).anyTimes();
         // IX specific parameters
-        expect(mockIXAdNetwork.returnDealID()).andReturn("dealId").anyTimes();
-        expect(mockIXAdNetwork.returnHighestBid()).andReturn(0.5f).anyTimes();
+        expect(mockIXAdNetwork.returnDealId()).andReturn("dealId").anyTimes();
+        expect(mockIXAdNetwork.returnAdjustBid()).andReturn(0.5).anyTimes();
 
         expect(mockSASRequestParameters.getSlot()).andReturn((short)0).anyTimes();
 

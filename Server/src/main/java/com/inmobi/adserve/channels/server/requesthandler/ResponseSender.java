@@ -4,6 +4,7 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.inject.Provider;
 import com.inmobi.adserve.adpool.*;
+import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
@@ -222,7 +223,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
 		}
 	}
 
-	private AdPoolResponse createThriftResponse(final String finalResponse) {
+	AdPoolResponse createThriftResponse(final String finalResponse) {
 		AdPoolResponse adPoolResponse = new AdPoolResponse();
 		AdInfo rtbdAd = new AdInfo();
 		AdIdChain adIdChain = new AdIdChain();
@@ -246,8 +247,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 // Set IX specific parameters
                 if (this.auctionEngine.getRtbResponse().getAdNetworkInterface() instanceof IXAdNetwork) {
                     IXAdNetwork ixAdNetwork = (IXAdNetwork) this.auctionEngine.getRtbResponse().getAdNetworkInterface();
-                    String dealId = ixAdNetwork.returnDealID();
-                    long highestBid = ixAdNetwork.returnHighestBid();
+                    String dealId = ixAdNetwork.returnDealId();
+                    long highestBid = (long)(ixAdNetwork.returnAdjustBid() * Math.pow(10, 6));
 
                     // Checking whether a dealId was provided in the bid response
                     if (null != dealId) {
