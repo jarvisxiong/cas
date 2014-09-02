@@ -55,7 +55,7 @@ import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 
 public class Logging {
     private static final Logger                            LOG                     = LoggerFactory
-                                                                                           .getLogger(AsyncRequestMaker.class);
+                                                                                           .getLogger(Logging.class);
 
     private static AbstractMessagePublisher                dataBusPublisher;
     private static String                                  rrLogKey;
@@ -63,7 +63,7 @@ public class Logging {
     private static String                                  umpAdsLogKey;
     private static boolean                                 enableFileLogging;
     private static boolean                                 enableDatabusLogging;
-    public final static ConcurrentHashMap<String, String> sampledAdvertiserLogNos = new ConcurrentHashMap<String, String>(
+    public final static ConcurrentHashMap<String, String>  sampledAdvertiserLogNos = new ConcurrentHashMap<String, String>(
                                                                                            2000);
     @AdvertiserIdNameMap
     @Inject
