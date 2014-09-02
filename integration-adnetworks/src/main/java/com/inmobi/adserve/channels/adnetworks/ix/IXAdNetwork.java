@@ -431,7 +431,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return proxyDemand;
     }
 
-    //todo impression object is tough
+
     private Impression createImpressionObject(final Banner banner, final String displayManager,
                                               final String displayManagerVersion,final ProxyDemand proxyDemand) {
         Impression impression = new Impression();
@@ -520,7 +520,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 ext.setRp__size_id(slotIdMap.get(sasParams.getSlot()));
             }
         }
-        //todo not setting alternate size id's
+
         banner.setExt(ext);
         return banner;
     }
@@ -644,7 +644,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         final AppExt ext= new AppExt();
 
-        //todo copied rp.site_id from Site object here. Verify
+
 
         JSONObject additionalParams= entity.getAdditionalParams();
         try {
@@ -732,7 +732,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         //  if (!StringUtils.isEmpty(casInternalRequestParameters.gpid)) {
 
         final DeviceExtensions ext= new DeviceExtensions();
-        //todo setting rp.xff is recommended in rubicon specs.
+
         ext.setRp__xff(sasParams.getRemoteHostIp());
         device.setExt(ext);
 
@@ -741,7 +741,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
 
 
-    //todo confirm from Ankur, have replaced adid by impid
+
 
     public String replaceIXMacros(String url) {
         url = url.replaceAll(RTBCallbackMacros.AUCTION_ID_INSENSITIVE, bidResponse.id);
@@ -787,7 +787,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             httpRequestMethod = "POST";
         }
 
-        String authStr = userName + ":" + password;//todo read from config
+        String authStr = userName + ":" + password;
         String authEncoded = new String(Base64.encodeBase64(authStr.getBytes()));
         LOG.debug("INSIDE GET NING REQUEST");
 
@@ -835,8 +835,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             adStatus = "AD";
             if(isNativeRequest()){
                 Integer removeThis=1;
-                //todo ye comment hata do
+
                 // nativeAdBuilding();
+                LOG.debug("we do not support native request");
             }else{
                 nonNativeAdBuilding();
             }
