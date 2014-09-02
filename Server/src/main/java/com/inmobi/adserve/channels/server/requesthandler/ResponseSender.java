@@ -235,40 +235,53 @@ public class ResponseSender extends HttpRequestHandlerBase {
 		adIdChain.setAd(channelSegmentEntity.getIncId());
 		adIdChain.setGroup(channelSegmentEntity.getAdgroupIncId());
 		adIdChain.setCampaign(channelSegmentEntity.getCampaignIncId());
-		List<AdIdChain> adIdChains = new ArrayList<AdIdChain>();
-		adIdChains.add(adIdChain);
-		rtbdAd.setAdIds(adIdChains);
+		
 
         switch(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getDst()) {
             case 8: // If IX,
-                String returnDealIdMethodName = "returnDealId";
-                String returnHighestBidMethodName = "returnHighestBid";
 
                 // Set IX specific parameters
                 if (this.auctionEngine.getRtbResponse().getAdNetworkInterface() instanceof IXAdNetwork) {
                     IXAdNetwork ixAdNetwork = (IXAdNetwork) this.auctionEngine.getRtbResponse().getAdNetworkInterface();
                     String dealId = ixAdNetwork.returnDealId();
                     long highestBid = (long)(ixAdNetwork.returnAdjustBid() * Math.pow(10, 6));
-
+		    int pmptier = ixAdNetwork.returnPmptier();
+                    // Advertiser GUID is set from the Buyer field in the BID thrift object in the case of IX
+                    adIdChain.setAdvertiser_guid(ixAdNetwork.returnBuyer());
+                    
                     // Checking whether a dealId was provided in the bid response
                     if (null != dealId) {
                         // If dealId is present, then auction type is set to PREFERRED_DEAL
                         // and dealId is set
                         rtbdAd.setDealId(dealId);
                         rtbdAd.setHighestBid(highestBid);
-                        rtbdAd.setAuctionType(AuctionType.PREFERRED_DEAL);
+                        if (pmptier == 3) {
+                            // If private marketplace tier is 3 then the deal is a private auction
+                            rtbdAd.setAuctionType(AuctionType.PRIVATE_AUCTION);
+                        } else if (ixAdNetwork.returnPmptier() == 4){
+                            // If private marketplace tier is 4 then the deal is a preferred deal
+                            rtbdAd.setAuctionType(AuctionType.PREFERRED_DEAL);
+                        } else {
+                            // When pmptier is 0 (default value), auction is an open auction
+                            // Other values are reserved for future use
+                            rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);
+                        }
                     } else {
                         // otherwise auction type is set to FIRST_PRICE
                         rtbdAd.setAuctionType(AuctionType.FIRST_PRICE);
                     }
                 }
-                // TODO: Buyer setting
                 break;
 
             default:// For RTBD/DCP, auction type is set to SECOND_PRICE
+                adIdChain.setAdvertiser_guid(channelSegmentEntity.getAdvertiserId());
                 rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);
                 break;
         }
+
+		List<AdIdChain> adIdChains = new ArrayList<AdIdChain>();
+		adIdChains.add(adIdChain);
+		rtbdAd.setAdIds(adIdChains);
 
 		rtbdAd.setPricingModel(PricingModel.CPM);
 		long bid = (long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface().getBidPriceInUsd() * Math.pow(10, 6));
