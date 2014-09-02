@@ -2,22 +2,14 @@ package com.inmobi.adserve.channels.adnetworks.ix;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
-import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.attribute.BAttrNativeType;
-import com.inmobi.adserve.channels.api.attribute.BTypeNativeAttributeType;
-import com.inmobi.adserve.channels.api.attribute.SuggestedNativeAttributeType;
-import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
-import com.inmobi.adserve.channels.api.natives.NativeBuilder;
 
-import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.api.template.NativeTemplateAttributeFinder;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
-import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.*;
@@ -462,7 +454,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             impression.setInstl(0);
         }
         if (casInternalRequestParameters != null) {
-            impression.setBidfloor(casInternalRequestParameters.rtbBidFloor);
+            impression.setBidfloor(casInternalRequestParameters.auctionBidFloor);
             LOG.debug("Bid floor is {}", impression.getBidfloor());
         }
 
@@ -860,11 +852,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         // LOG.debug("Inside process Response for the partner: {}", getName());
         getResponseAd();
         isRequestComplete = true;
-        if (baseRequestHandler.getAuctionEngine().isAllRtbComplete()) {
+        if (baseRequestHandler.getAuctionEngine().isAuctionAllComplete()) {
             LOG.debug("isAllIXComplete is true");
             if (baseRequestHandler.getAuctionEngine().isAuctionComplete()) {
                 LOG.debug("ix cas auction has run already");
-                if (baseRequestHandler.getAuctionEngine().isRtbResponseNull()) {
+                if (baseRequestHandler.getAuctionEngine().isAuctionResponseNull()) {
                     LOG.debug("ix cas auction has returned null");
                     // Sending no ad response and cleaning up channel
                     // (processDcpPartner is skipped because the selected adNetworkInterface
@@ -878,7 +870,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 return;
             }
             else {
-                AdNetworkInterface highestBid = baseRequestHandler.getAuctionEngine().runRtbSecondPriceAuctionEngine();
+                AdNetworkInterface highestBid = baseRequestHandler.getAuctionEngine().runAuctionEngine();
                 if (highestBid != null) {
                     LOG.debug("Sending ix cas response of {}", highestBid.getName());
                     baseRequestHandler.sendAdResponse(highestBid, serverChannel);

@@ -11,7 +11,7 @@ public class CasInternalRequestParameters {
     public List<Long>   blockedCategories;
     public List<String> blockedAdvertisers;
     public AccountType  siteAccountType; //Whether site account is managed or selfserve
-    public double       rtbBidFloor;
+    public double       auctionBidFloor;
     public String       auctionId;
     public boolean      traceEnabled;
 

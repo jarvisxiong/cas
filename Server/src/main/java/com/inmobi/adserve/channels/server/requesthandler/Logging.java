@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 
+import com.inmobi.types.DemandSource;
 import org.apache.commons.configuration.Configuration;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
@@ -290,7 +291,7 @@ public class Logging {
                 CasAdvertisementLog creativeLog = new CasAdvertisementLog(partnerName, requestUrl, response,
                         adStatus, externalSiteKey, advertiserId);
                 creativeLog.setCountryId(sasRequestParameters.getCountryId().intValue());
-                if(adNetworkInterface.getDst() == 6) {
+                if(adNetworkInterface.getDst() == DemandSourceType.RTB.getValue()) {
                 creativeLog.setImageUrl(adNetworkInterface.getIUrl());
                 creativeLog.setCreativeAttributes(adNetworkInterface.getAttribute());
                 creativeLog.setAdvertiserDomains(adNetworkInterface.getADomain());

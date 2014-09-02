@@ -23,7 +23,7 @@ public class AuctionBidFloorFilter extends AbstractAuctionFilter {
 
     @Override
     protected boolean failedInFilter(ChannelSegment rtbSegment, CasInternalRequestParameters casInternalRequestParameters) {
-        if (rtbSegment.getAdNetworkInterface().getBidPriceInUsd() < casInternalRequestParameters.rtbBidFloor) {
+        if (rtbSegment.getAdNetworkInterface().getBidPriceInUsd() < casInternalRequestParameters.auctionBidFloor) {
             return true;
         }
         return false;

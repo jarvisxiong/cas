@@ -2,14 +2,14 @@ package com.inmobi.adserve.channels.api;
 
 
 public interface AuctionEngineInterface {
-    boolean isAllRtbComplete();
+    boolean isAuctionAllComplete();
 
     double getSecondBidPrice();
 
-    AdNetworkInterface runRtbSecondPriceAuctionEngine();
+    AdNetworkInterface runAuctionEngine();
 
     boolean isAuctionComplete();
 
-    boolean isRtbResponseNull();
+    boolean isAuctionResponseNull();
 
 }

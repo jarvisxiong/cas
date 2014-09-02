@@ -48,7 +48,7 @@ public class CreateThriftResponseIXTest {
         ChannelSegment mockChannelSegment = createMock(ChannelSegment.class);
         SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
 
-        expect(mockAuctionEngine.getRtbResponse()).andReturn(mockChannelSegment).anyTimes();
+        expect(mockAuctionEngine.getAuctionResponse()).andReturn(mockChannelSegment).anyTimes();
 
         expect(mockChannelSegment.getChannelSegmentEntity()).andReturn(dummyChannelSegmentEntity).anyTimes();
         expect(mockChannelSegment.getAdNetworkInterface()).andReturn(mockIXAdNetwork).anyTimes();

@@ -102,7 +102,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
 	}
 
 	public ChannelSegment getRtbResponse() {
-		return auctionEngine.getRtbResponse();
+		return auctionEngine.getAuctionResponse();
 	}
 
 	public int getSelectedAdIndex() {
@@ -227,7 +227,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
 		AdPoolResponse adPoolResponse = new AdPoolResponse();
 		AdInfo rtbdAd = new AdInfo();
 		AdIdChain adIdChain = new AdIdChain();
-		ChannelSegmentEntity channelSegmentEntity = this.auctionEngine.getRtbResponse().getChannelSegmentEntity();
+		ChannelSegmentEntity channelSegmentEntity = this.auctionEngine.getAuctionResponse().getChannelSegmentEntity();
 		adIdChain.setAdgroup_guid(channelSegmentEntity.getAdgroupId());
 		adIdChain.setAd_guid(channelSegmentEntity.getAdId());
 		adIdChain.setAdvertiser_guid(channelSegmentEntity.getAdvertiserId());
@@ -237,12 +237,12 @@ public class ResponseSender extends HttpRequestHandlerBase {
 		adIdChain.setCampaign(channelSegmentEntity.getCampaignIncId());
 		
 
-        switch(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getDst()) {
+        switch(this.auctionEngine.getAuctionResponse().getAdNetworkInterface().getDst()) {
             case 8: // If IX,
 
                 // Set IX specific parameters
-                if (this.auctionEngine.getRtbResponse().getAdNetworkInterface() instanceof IXAdNetwork) {
-                    IXAdNetwork ixAdNetwork = (IXAdNetwork) this.auctionEngine.getRtbResponse().getAdNetworkInterface();
+                if (this.auctionEngine.getAuctionResponse().getAdNetworkInterface() instanceof IXAdNetwork) {
+                    IXAdNetwork ixAdNetwork = (IXAdNetwork) this.auctionEngine.getAuctionResponse().getAdNetworkInterface();
                     String dealId = ixAdNetwork.returnDealId();
                     long highestBid = (long)(ixAdNetwork.returnAdjustBid() * Math.pow(10, 6));
 		    int pmptier = ixAdNetwork.returnPmptier();
@@ -284,20 +284,20 @@ public class ResponseSender extends HttpRequestHandlerBase {
 		rtbdAd.setAdIds(adIdChains);
 
 		rtbdAd.setPricingModel(PricingModel.CPM);
-		long bid = (long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface().getBidPriceInUsd() * Math.pow(10, 6));
+		long bid = (long) (this.auctionEngine.getAuctionResponse().getAdNetworkInterface().getBidPriceInUsd() * Math.pow(10, 6));
 		rtbdAd.setPrice(bid);
 		rtbdAd.setBid(bid);
-		UUID uuid = UUID.fromString(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getImpressionId());
+		UUID uuid = UUID.fromString(this.auctionEngine.getAuctionResponse().getAdNetworkInterface().getImpressionId());
 		rtbdAd.setImpressionId(new GUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits()));
 		rtbdAd.setSlotServed(sasParams.getSlot());
 		Creative rtbdCreative = new Creative();
 		rtbdCreative.setValue(finalResponse);
 		rtbdAd.setCreative(rtbdCreative);
 		adPoolResponse.setAds(Arrays.asList(rtbdAd));
-		adPoolResponse.setMinChargedValue((long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface().getSecondBidPriceInUsd() * Math.pow(10, 6)));
-		if (!"USD".equalsIgnoreCase(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getCurrency())) {
-			rtbdAd.setOriginalCurrencyName(this.auctionEngine.getRtbResponse().getAdNetworkInterface().getCurrency());
-			rtbdAd.setBidInOriginalCurrency((long) (this.auctionEngine.getRtbResponse().getAdNetworkInterface().getBidPriceInLocal() * Math.pow(10, 6)));
+		adPoolResponse.setMinChargedValue((long) (this.auctionEngine.getAuctionResponse().getAdNetworkInterface().getSecondBidPriceInUsd() * Math.pow(10, 6)));
+		if (!"USD".equalsIgnoreCase(this.auctionEngine.getAuctionResponse().getAdNetworkInterface().getCurrency())) {
+			rtbdAd.setOriginalCurrencyName(this.auctionEngine.getAuctionResponse().getAdNetworkInterface().getCurrency());
+			rtbdAd.setBidInOriginalCurrency((long) (this.auctionEngine.getAuctionResponse().getAdNetworkInterface().getBidPriceInLocal() * Math.pow(10, 6)));
 		}
 		return adPoolResponse;
 	}
@@ -546,7 +546,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
 		}
 
 		// Closing RTB channels
-		List<ChannelSegment> rtbList = auctionEngine.getRtbSegments();
+		List<ChannelSegment> rtbList = auctionEngine.getUnfilteredChannelSegmentList();
 
 		for (int index = 0; rtbList != null && index < rtbList.size(); index++) {
 			LOG.debug("calling clean up for channel {}", rtbList.get(index).getAdNetworkInterface().getId());
@@ -572,8 +572,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
 		if (null != getRankList()) {
 			list.addAll(getRankList());
 		}
-		if (null != getAuctionEngine().getRtbSegments()) {
-			list.addAll(getAuctionEngine().getRtbSegments());
+		if (null != getAuctionEngine().getUnfilteredChannelSegmentList()) {
+			list.addAll(getAuctionEngine().getUnfilteredChannelSegmentList());
 		}
 		long totalTime = getTotalTime();
 		if (totalTime > 2000) {

@@ -130,7 +130,7 @@ public abstract class BaseServlet implements Servlet {
 
         double networkSiteEcpm = casUtils.getNetworkSiteEcpm(casContext, sasParams);
         double segmentFloor = casUtils.getRtbFloor(casContext, hrh.responseSender.sasParams);
-        enrichCasInternalRequestParameters(hrh, filteredSegments, casInternalRequestParametersGlobal.rtbBidFloor,
+        enrichCasInternalRequestParameters(hrh, filteredSegments, casInternalRequestParametersGlobal.auctionBidFloor,
                 sasParams.getSiteFloor(), sasParams.getSiteIncId(), networkSiteEcpm, segmentFloor);
         hrh.responseSender.casInternalRequestParameters = casInternalRequestParametersGlobal;
         hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternalRequestParametersGlobal;
@@ -155,21 +155,21 @@ public abstract class BaseServlet implements Servlet {
                 .makeAsyncRequests(dcpSegments, serverChannel, rtbSegments);
 
         hrh.responseSender.setRankList(tempRankList);
-        hrh.responseSender.getAuctionEngine().setRtbSegments(rtbSegments);
+        hrh.responseSender.getAuctionEngine().setUnfilteredChannelSegmentList(rtbSegments);
         LOG.debug(traceMarker, "Number of tpans whose request was successfully completed {}", hrh.responseSender
                 .getRankList().size());
         LOG.debug(traceMarker, "Number of rtb tpans whose request was successfully completed {}", hrh.responseSender
-                .getAuctionEngine().getRtbSegments().size());
+                .getAuctionEngine().getUnfilteredChannelSegmentList().size());
         // if none of the async request succeed, we return "NO_AD"
         if (hrh.responseSender.getRankList().isEmpty()
-                && hrh.responseSender.getAuctionEngine().getRtbSegments().isEmpty()) {
+                && hrh.responseSender.getAuctionEngine().getUnfilteredChannelSegmentList().isEmpty()) {
             LOG.debug(traceMarker, "No calls");
             hrh.responseSender.sendNoAdResponse(serverChannel);
             return;
         }
 
-        if (hrh.responseSender.getAuctionEngine().isAllRtbComplete()) {
-            AdNetworkInterface highestBid = hrh.responseSender.getAuctionEngine().runRtbSecondPriceAuctionEngine();
+        if (hrh.responseSender.getAuctionEngine().isAuctionAllComplete()) {
+            AdNetworkInterface highestBid = hrh.responseSender.getAuctionEngine().runAuctionEngine();
             if (null != highestBid) {
                 LOG.debug(traceMarker, "Sending rtb response of {}", highestBid.getName());
                 hrh.responseSender.sendAdResponse(highestBid, serverChannel);
@@ -191,7 +191,7 @@ public abstract class BaseServlet implements Servlet {
         casInternalRequestParametersGlobal.blockedCategories = getBlockedCategories(hrh);
         casInternalRequestParametersGlobal.blockedAdvertisers = getBlockedAdvertisers(hrh);
         double minimumRtbFloor = 0.05;
-        casInternalRequestParametersGlobal.rtbBidFloor = hrh.responseSender.getAuctionEngine().calculateRTBFloor(
+        casInternalRequestParametersGlobal.auctionBidFloor = hrh.responseSender.getAuctionEngine().calculateAuctionFloor(
                 hrh.responseSender.sasParams.getSiteFloor(), 0.0, segmentFloor, minimumRtbFloor, networkSiteEcpm);
         casInternalRequestParametersGlobal.auctionId = asyncRequestMaker.getImpressionId(siteIncId);
         LOG.debug("RTB floor from the pricing engine entity is {}", rtbdFloor);
@@ -203,7 +203,7 @@ public abstract class BaseServlet implements Servlet {
         LOG.debug("NetworkSiteEcpm is {}", networkSiteEcpm);
         LOG.debug("SegmentFloor is {}", segmentFloor);
         LOG.debug("Minimum rtb floor is {}", minimumRtbFloor);
-        LOG.debug("Final rtbFloor is {}", casInternalRequestParametersGlobal.rtbBidFloor);
+        LOG.debug("Final rtbFloor is {}", casInternalRequestParametersGlobal.auctionBidFloor);
         LOG.debug("Auction id generated is {}", casInternalRequestParametersGlobal.auctionId);
     }
 

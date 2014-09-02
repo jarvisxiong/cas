@@ -159,11 +159,11 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         LOG.debug("Inside process Response for the partner: {}", getName());
         getResponseAd();
         isRequestComplete = true;
-        if (baseRequestHandler.getAuctionEngine().isAllRtbComplete()) {
-            LOG.debug("isAllRtbComplete is true");
+        if (baseRequestHandler.getAuctionEngine().isAuctionAllComplete()) {
+            LOG.debug("isAuctionAllComplete is true");
             if (baseRequestHandler.getAuctionEngine().isAuctionComplete()) {
                 LOG.debug("Rtb auction has run already");
-                if (baseRequestHandler.getAuctionEngine().isRtbResponseNull()) {
+                if (baseRequestHandler.getAuctionEngine().isAuctionResponseNull()) {
                     LOG.debug("rtb auction has returned null so processing dcp list");
                     // Process dcp partner response.
                     baseRequestHandler.processDcpPartner(serverChannel, this);
@@ -173,7 +173,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 return;
             }
             else {
-                AdNetworkInterface highestBid = baseRequestHandler.getAuctionEngine().runRtbSecondPriceAuctionEngine();
+                AdNetworkInterface highestBid = baseRequestHandler.getAuctionEngine().runAuctionEngine();
                 if (highestBid != null) {
                     LOG.debug("Sending rtb response of {}", highestBid.getName());
                     baseRequestHandler.sendAdResponse(highestBid, serverChannel);

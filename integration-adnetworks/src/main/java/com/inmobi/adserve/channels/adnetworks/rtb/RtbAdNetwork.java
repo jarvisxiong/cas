@@ -469,7 +469,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             impression.setInstl(0);
         }
         if (casInternalRequestParameters != null) {
-            impression.setBidfloor(casInternalRequestParameters.rtbBidFloor);
+            impression.setBidfloor(casInternalRequestParameters.auctionBidFloor);
             LOG.debug("Bid floor is {}", impression.getBidfloor());
         }
         if (null != displayManager) {
