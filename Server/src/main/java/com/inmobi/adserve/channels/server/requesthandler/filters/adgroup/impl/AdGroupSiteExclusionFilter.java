@@ -28,7 +28,7 @@ public class AdGroupSiteExclusionFilter extends AbstractAdGroupLevelFilter {
      */
     @Inject
     protected AdGroupSiteExclusionFilter(final Provider<Marker> traceMarkerProvider) {
-        super(traceMarkerProvider, InspectorStrings.droppedinSiteInclusionFilter);
+        super(traceMarkerProvider, InspectorStrings.droppedinSiteExclusionFilter);
     }
 
     @Override

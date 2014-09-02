@@ -44,7 +44,7 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.Ad
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupPropertyViolationFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupSiteExclusionFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupSupplyDemandClassificationFilter;
-import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupTotalCountFilter;
+import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupMaxSegmentPerRequestFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AdvertiserLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserExcludedFilter;
 import com.inmobi.adserve.channels.server.utils.CasUtils;
@@ -502,7 +502,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         List<ChannelSegment> channelSegments = Lists.newArrayList(channelSegment1, channelSegment2, channelSegment3,
                 channelSegment4, channelSegment5, channelSegment6);
 
-        AdGroupTotalCountFilter adGroupTotalCountFilter = injector.getInstance(AdGroupTotalCountFilter.class);
+        AdGroupMaxSegmentPerRequestFilter adGroupTotalCountFilter = injector.getInstance(AdGroupMaxSegmentPerRequestFilter.class);
         adGroupTotalCountFilter.filter(channelSegments, sasParams, new CasContext());
 
         assertEquals(5, channelSegments.size());
