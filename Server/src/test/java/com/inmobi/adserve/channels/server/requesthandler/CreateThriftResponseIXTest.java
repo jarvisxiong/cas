@@ -11,6 +11,7 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentF
 import com.inmobi.types.AdIdChain;
 import com.inmobi.types.GUID;
 import com.inmobi.types.PricingModel;
+import org.easymock.classextension.EasyMock;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -42,13 +43,10 @@ public class CreateThriftResponseIXTest {
                         false, false, null, null, 0.0d, null, null, false, new HashSet<String>(), 0));
 
 
-        // Mock AuctionEngine and IXAdNetwork
-        AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
+        // Mock IXAdNetwork, ChannelSegment, SASRequestParameters
         IXAdNetwork mockIXAdNetwork = createMock(IXAdNetwork.class);
         ChannelSegment mockChannelSegment = createMock(ChannelSegment.class);
         SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
-
-        expect(mockAuctionEngine.getAuctionResponse()).andReturn(mockChannelSegment).anyTimes();
 
         expect(mockChannelSegment.getChannelSegmentEntity()).andReturn(dummyChannelSegmentEntity).anyTimes();
         expect(mockChannelSegment.getAdNetworkInterface()).andReturn(mockIXAdNetwork).anyTimes();
@@ -65,10 +63,14 @@ public class CreateThriftResponseIXTest {
 
         expect(mockSASRequestParameters.getSlot()).andReturn((short)0).anyTimes();
 
-        replay(mockAuctionEngine, mockChannelSegment, mockIXAdNetwork, mockSASRequestParameters);
 
         // Create responseSender (the class to be tested)
-        responseSender = new ResponseSender(null, mockSASRequestParameters, mockAuctionEngine);
+        // The object of the class to be tested is partially mocked
+        responseSender = EasyMock.createMockBuilder(ResponseSender.class).addMockedMethod("getRtbResponse").createMock();
+        expect(responseSender.getRtbResponse()).andReturn(mockChannelSegment).anyTimes();
+
+        replay(mockChannelSegment, mockIXAdNetwork, mockSASRequestParameters, responseSender);
+        responseSender.sasParams = mockSASRequestParameters;
     }
 
     @Test
@@ -87,7 +89,7 @@ public class CreateThriftResponseIXTest {
         Assert.assertEquals(adIdChain.ad, dummyChannelSegmentEntity.getIncId());
         Assert.assertEquals(adIdChain.group, dummyChannelSegmentEntity.getAdgroupIncId());
         Assert.assertEquals(adIdChain.campaign, dummyChannelSegmentEntity.getCampaignIncId());
-        // TODO: IX specific params (Deal id, highestBid)
+        // TODO: IX specific params (Deal id, adjustBid, buyer)
         Assert.assertEquals(ixAd.getPricingModel(), PricingModel.CPM);
         Assert.assertEquals(ixAd.getPrice(), ixAd.getBid());
         Assert.assertEquals(ixAd.getPrice(), (long)(expectedBidPrice * Math.pow(10, 6)));

@@ -130,25 +130,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
     }
 
-    // Used for testing purposes
-    @Inject
-    public ResponseSender(final Provider<Marker> traceMarkerProvider, SASRequestParameters sasParams, AuctionEngine auctionEngine) {
-        this.initialTime = System.currentTimeMillis();
-        this.totalTime = 0;
-        this.rankList = null;
-        this.adResponse = null;
-        this.responseSent = false;
-        this.sasParams = sasParams;
-        this.rankIndexToProcess = 0;
-        this.selectedAdIndex = 0;
-        this.requestCleaned = false;
-        this.auctionEngine = auctionEngine;
-        if (null != traceMarkerProvider) {
-            this.traceMarker = traceMarkerProvider.get();
-        }
-    }
-
-	@Override
+    @Override
 	public void sendAdResponse(final AdNetworkInterface selectedAdNetwork, final Channel serverChannel) {
 		adResponse = selectedAdNetwork.getResponseAd();
 		selectedAdIndex = getRankIndex(selectedAdNetwork);
