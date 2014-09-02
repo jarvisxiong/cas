@@ -223,7 +223,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
 		}
 	}
 
-	AdPoolResponse createThriftResponse(final String finalResponse) {
+	protected AdPoolResponse createThriftResponse(final String finalResponse) {
 		AdPoolResponse adPoolResponse = new AdPoolResponse();
 		AdInfo rtbdAd = new AdInfo();
 		AdIdChain adIdChain = new AdIdChain();
@@ -245,7 +245,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
                     IXAdNetwork ixAdNetwork = (IXAdNetwork) this.auctionEngine.getAuctionResponse().getAdNetworkInterface();
                     String dealId = ixAdNetwork.returnDealId();
                     long highestBid = (long)(ixAdNetwork.returnAdjustBid() * Math.pow(10, 6));
-		    int pmptier = ixAdNetwork.returnPmptier();
+		            int pmptier = ixAdNetwork.returnPmptier();
+
                     // Advertiser GUID is set from the Buyer field in the BID thrift object in the case of IX
                     adIdChain.setAdvertiser_guid(ixAdNetwork.returnBuyer());
                     
