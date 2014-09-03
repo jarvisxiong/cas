@@ -89,7 +89,8 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
     public URI getRequestUri() throws Exception {
         try {
             StringBuilder url = new StringBuilder(host);
-            url.append("?version=2&encoding=1&area=viewBanner&ip=&ua=").append(sasParams.getRemoteHostIp());
+            url.append("?version=2&encoding=1&area=viewBanner&ip=").append(sasParams.getRemoteHostIp()).append(
+            		"&ua=").append(getURLEncode(sasParams.getUserAgent(), format));
             url.append("&id=").append(externalSiteId);
             String bsiteId = StringUtils.replace(blindedSiteId, "-", "");
             url.append("&pageId=00000000").append(bsiteId);
