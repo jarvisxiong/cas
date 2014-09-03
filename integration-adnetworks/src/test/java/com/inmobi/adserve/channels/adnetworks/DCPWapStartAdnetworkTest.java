@@ -214,7 +214,7 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         
         dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null);
         String actualUrl = dcpWapstartAdNetwork.getRequestUri().toString();
-        String expectedUrl = "http://ro.plus1.wapstart.ru?version=2&encoding=1&area=viewBanner&ip=&ua=206.29.182.240&id=1324&pageId=0000000000000000000000200000000000005ac0&kws=Food+%26+Drink%3BAdventure%3BWord&ctype=WIFI&gender=F&country=CHN&lat=37.4429&lon=-122.1514&uid=202cb962ac59075b964b07152d234b70&callbackurl=http%3A%2F%2Fc2.w.inmobi.com%2Fc.asm%2F4%2Fb%2Fbx5%2Fyaz%2F2%2Fb%2Fa5%2Fm%2F0%2F0%2F0%2F202cb962ac59075b964b07152d234b70%2F4f8d98e2-4bbd-40bc-87e5-22da170600f9%2F-1%2F1%2F9cddca11%3Fds%3D1&realSiteId=23264";
+        String expectedUrl = "http://ro.plus1.wapstart.ru?version=2&encoding=1&area=viewBanner&ip=206.29.182.240&ua=Mozilla&id=1324&pageId=0000000000000000000000200000000000005ac0&kws=Food+%26+Drink%3BAdventure%3BWord&ctype=WIFI&gender=F&country=CHN&lat=37.4429&lon=-122.1514&uid=202cb962ac59075b964b07152d234b70&callbackurl=http%3A%2F%2Fc2.w.inmobi.com%2Fc.asm%2F4%2Fb%2Fbx5%2Fyaz%2F2%2Fb%2Fa5%2Fm%2F0%2F0%2F0%2F202cb962ac59075b964b07152d234b70%2F4f8d98e2-4bbd-40bc-87e5-22da170600f9%2F-1%2F1%2F9cddca11%3Fds%3D1&realSiteId=23264";
         assertEquals(expectedUrl, actualUrl);
         
     }
@@ -244,7 +244,7 @@ public class DCPWapStartAdnetworkTest extends TestCase {
                 new ArrayList<Integer>(), 0.0d, null, null, 32));
         dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null);
         String actualUrl = dcpWapstartAdNetwork.getRequestUri().toString();
-        String expectedUrl = "http://ro.plus1.wapstart.ru?version=2&encoding=1&area=viewBanner&ip=&ua=206.29.182.240&id=1324&pageId=0000000000000000000000200000000000005ac0&kws=Food+%26+Drink%3BAdventure%3BWord&ctype=WIFI&gender=F&country=CHN&lon=-122.1514&uid=202cb962ac59075b964b07152d234b70&callbackurl=http%3A%2F%2Fc2.w.inmobi.com%2Fc.asm%2F4%2Fb%2Fbx5%2Fyaz%2F2%2Fb%2Fa5%2Fm%2F0%2F0%2F0%2F202cb962ac59075b964b07152d234b70%2F4f8d98e2-4bbd-40bc-87e5-22da170600f9%2F-1%2F1%2F9cddca11%3Fds%3D1&realSiteId=23264";
+        String expectedUrl = "http://ro.plus1.wapstart.ru?version=2&encoding=1&area=viewBanner&ip=206.29.182.240&ua=Mozilla&id=1324&pageId=0000000000000000000000200000000000005ac0&kws=Food+%26+Drink%3BAdventure%3BWord&ctype=WIFI&gender=F&country=CHN&lon=-122.1514&uid=202cb962ac59075b964b07152d234b70&callbackurl=http%3A%2F%2Fc2.w.inmobi.com%2Fc.asm%2F4%2Fb%2Fbx5%2Fyaz%2F2%2Fb%2Fa5%2Fm%2F0%2F0%2F0%2F202cb962ac59075b964b07152d234b70%2F4f8d98e2-4bbd-40bc-87e5-22da170600f9%2F-1%2F1%2F9cddca11%3Fds%3D1&realSiteId=23264";
         assertEquals(expectedUrl, actualUrl);
         
     }
