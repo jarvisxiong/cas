@@ -291,7 +291,7 @@ public class Logging {
                 CasAdvertisementLog creativeLog = new CasAdvertisementLog(partnerName, requestUrl, response,
                         adStatus, externalSiteKey, advertiserId);
                 creativeLog.setCountryId(sasRequestParameters.getCountryId().intValue());
-                if(adNetworkInterface.getDst() == DemandSourceType.RTB.getValue()) {
+                if(adNetworkInterface.getDst() == DemandSourceType.RTBD.getValue()) {
                 creativeLog.setImageUrl(adNetworkInterface.getIUrl());
                 creativeLog.setCreativeAttributes(adNetworkInterface.getAttribute());
                 creativeLog.setAdvertiserDomains(adNetworkInterface.getADomain());

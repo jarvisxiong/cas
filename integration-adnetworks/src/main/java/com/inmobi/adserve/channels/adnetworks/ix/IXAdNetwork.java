@@ -19,7 +19,7 @@ import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 
 
-import com.sun.tools.corba.se.idl.StringGen;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -78,10 +78,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private String                         urlArg;
     @Getter
     @Setter
-    private String                         rtbMethod;
-    @Getter
-    @Setter
-    private String                         rtbVer;
+    private String ixMethod;
     @Getter
     @Setter
     private String                         callbackUrl;
@@ -102,7 +99,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private final int                      auctionType                  = 2;
     private int                            tmax                         = 200;
     private boolean                        templateWN                   = true;
-    private static final String            X_OPENRTB_VERSION            = "x-openrtb-version";
     private static final String            CONTENT_TYPE                 = "application/json";
     private static final String            DISPLAY_MANAGER_INMOBI_SDK   = "inmobi_sdk";
     private static final String            DISPLAY_MANAGER_INMOBI_JS    = "inmobi_js";
@@ -243,14 +239,14 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         super(baseRequestHandler, serverChannel);
         this.advertiserId = config.getString(advertiserName + ".advertiserId");
         this.urlArg = config.getString(advertiserName + ".urlArg");
-        this.rtbVer = config.getString(advertiserName + ".rtbVer", "2.0");
+        //this.rtbVer = config.getString(advertiserName + ".rtbVer", "2.0");
         this.callbackUrl = config.getString(advertiserName + ".wnUrlback");
-        this.rtbMethod = config.getString(advertiserName + ".rtbMethod");
+        this.ixMethod = config.getString(advertiserName + ".ixMethod");
         this.wnRequired = config.getBoolean(advertiserName + ".isWnRequired");
         this.siteBlinded = config.getBoolean(advertiserName + ".siteBlinded");
         this.clientBootstrap = clientBootstrap;
         this.urlBase = urlBase;
-        this.setRtbPartner(true);
+        this.setIxPartner(true);
         this.iabCategoriesInterface = new IABCategoriesMap();
         this.iabCountriesInterface = new IABCountriesMap();
         this.advertiserName = advertiserName;
@@ -263,9 +259,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         this.userName = config.getString(advertiserName + ".userName");
         this.password = config.getString(advertiserName + ".password");
         this.accountId = config.getInt(advertiserName + ".accountId");
-
-
-
     }
 
     @Override
@@ -423,7 +416,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     private ProxyDemand createProxyDemandObject() {
         ProxyDemand proxyDemand = new ProxyDemand();
-        proxyDemand.setMarketrate(0.5);//todo take market rate from UMP
+        proxyDemand.setMarketrate(sasParams.getMarketRate());
         return proxyDemand;
     }
 
@@ -776,7 +769,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         String httpRequestMethod;
-        if (rtbMethod.equalsIgnoreCase("get")) {
+        if (ixMethod.equalsIgnoreCase("get")) {
             httpRequestMethod = "GET";
         }
         else {
@@ -790,13 +783,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return new RequestBuilder(httpRequestMethod).setUrl(uri.toString())
                 .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json").setBody(body)
                 .setHeader("Authorization", "Basic " + authEncoded)
-                .setHeader(X_OPENRTB_VERSION, rtbVer).setHeader(HttpHeaders.Names.HOST, uri.getHost()).build();
+                .setHeader(HttpHeaders.Names.HOST, uri.getHost()).build();
     }
 
     @Override
     public URI getRequestUri() throws URISyntaxException {
         StringBuilder url = new StringBuilder();
-        if (rtbMethod.equalsIgnoreCase("get")) {
+        if (ixMethod.equalsIgnoreCase("get")) {
             url.append(urlBase).append('?').append(urlArg).append('=');
         }
         else {
@@ -840,54 +833,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         }
         LOG.debug("response length is {}", responseContent.length());
-    }
-
-    @Override
-    public void processResponse() {
-        LOG.debug("Inside process Response for the rubicon, partner: {}", getName());
-        if (isRequestComplete) {
-            LOG.debug("Already cleaned up so returning from process response");
-            return;
-        }
-        // LOG.debug("Inside process Response for the partner: {}", getName());
-        getResponseAd();
-        isRequestComplete = true;
-        if (baseRequestHandler.getAuctionEngine().areAllChannelSegmentRequestsComplete()) {
-            LOG.debug("isAllIXComplete is true");
-            if (baseRequestHandler.getAuctionEngine().isAuctionComplete()) {
-                LOG.debug("ix cas auction has run already");
-                if (baseRequestHandler.getAuctionEngine().isAuctionResponseNull()) {
-                    LOG.debug("ix cas auction has returned null");
-                    // Sending no ad response and cleaning up channel
-                    // (processDcpPartner is skipped because the selected adNetworkInterface
-                    // will always be the last entry and a No Ad Response will be sent)
-                    baseRequestHandler.sendNoAdResponse(serverChannel);
-                    baseRequestHandler.cleanUp();
-                    return;
-                }
-
-                LOG.debug("ix cas response is not null so sending rtb response");
-                return;
-            }
-            else {
-                AdNetworkInterface highestBid = baseRequestHandler.getAuctionEngine().runAuctionEngine();
-                if (highestBid != null) {
-                    LOG.debug("Sending ix cas response of {}", highestBid.getName());
-                    baseRequestHandler.sendAdResponse(highestBid, serverChannel);
-                    // highestBid.impressionCallback();
-                    LOG.debug("sent ix cas response");
-                    return;
-                }
-                else {
-                    LOG.debug("ix cas auction has returned null");
-                    // Sending no ad response and cleaning up channel
-                    // processDcpList is skipped
-                    baseRequestHandler.sendNoAdResponse(serverChannel);
-                    baseRequestHandler.cleanUp();
-                }
-            }
-        }
-        LOG.debug("ix cas auction has not run so waiting....");
     }
 
 
@@ -1007,23 +952,25 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
     }
 
-    public double returnAdjustBid()
-    {
-        return adjustbid;
-    }
+    @Override
+    public double returnAdjustBid() { return adjustbid; }
 
+    @Override
     public String returnDealId()
     {
         return dealId;
     }
 
+    @Override
     public String returnBuyer()
     {
         return buyer;
     }
 
+    @Override
     public Integer returnPmptier() { return pmptier; }
 
+    @Override
     public String returnAqid() { return aqid; }
 
     private double calculatePriceInUSD(final double price, String currencyCode) {

@@ -71,7 +71,8 @@ public class SASRequestParameters {
     private int                 sst;                  // 0 for Network
     private String              pubId;
     private String              osMajorVersion;
-    private NetworkType         networkType; 
+    private NetworkType         networkType;
+    private double              marketRate;
 
     private EncryptionKeys      encryptionKey;
     private boolean             isKeepAlive;

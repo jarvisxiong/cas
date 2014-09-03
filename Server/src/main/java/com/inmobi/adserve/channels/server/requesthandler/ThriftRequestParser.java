@@ -28,8 +28,10 @@ public class ThriftRequestParser {
         params.setDst(dst);
         params.setResponseOnlyFromDcp(2 == dst);
 
+
         // Fill params from AdPoolRequest Object
         params.setRemoteHostIp(tObject.remoteHostIp);
+        params.setMarketRate((double)tObject.guidanceBid);
         // TODO Iterate over the segments using all slots
         Short slotId = null != tObject.selectedSlots && !tObject.selectedSlots.isEmpty() ? tObject.selectedSlots.get(0)
                 : (short) 0;

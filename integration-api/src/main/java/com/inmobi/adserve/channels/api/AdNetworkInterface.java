@@ -61,6 +61,9 @@ public interface AdNetworkInterface {
     // Returns true for rtb partner, false otherwise.
     boolean isRtbPartner();
 
+    //Returns true for ix partner, false otherwise.
+    boolean isIxPartner();
+
     // Returns auction id sent in the rtb response
     String getAuctionId();
 

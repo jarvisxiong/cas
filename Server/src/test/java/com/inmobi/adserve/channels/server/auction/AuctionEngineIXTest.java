@@ -6,6 +6,7 @@ import com.google.inject.util.Modules;
 import com.inmobi.adserve.channels.adnetworks.rubicon.IXAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
@@ -18,6 +19,7 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentF
 import com.inmobi.adserve.channels.server.requesthandler.filters.TestScopeModule;
 import com.inmobi.adserve.channels.types.AccountType;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import com.inmobi.casthrift.DemandSourceType;
 import org.apache.commons.configuration.Configuration;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
@@ -162,6 +164,8 @@ public class AuctionEngineIXTest {
         String expectedRTBAdNetworkName = "A";
 
         AuctionEngine auctionEngine = new AuctionEngine();
+        auctionEngine.sasParams = new SASRequestParameters();
+        auctionEngine.sasParams.setDst(DemandSourceType.IX.getValue());
         List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
         rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1));
@@ -189,6 +193,8 @@ public class AuctionEngineIXTest {
         String expectedRTBAdNetworkName = "A";
 
         AuctionEngine auctionEngine = new AuctionEngine();
+        auctionEngine.sasParams = new SASRequestParameters();
+        auctionEngine.sasParams.setDst(DemandSourceType.IX.getValue());
         List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
         rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1));
@@ -217,6 +223,8 @@ public class AuctionEngineIXTest {
         String expectedAuctionEngineResponse = null;
 
         AuctionEngine auctionEngine = new AuctionEngine();
+        auctionEngine.sasParams = new SASRequestParameters();
+        auctionEngine.sasParams.setDst(DemandSourceType.IX.getValue());
         List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
         rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1));
@@ -248,6 +256,8 @@ public class AuctionEngineIXTest {
         String expectedAuctionEngineResponse = null;
 
         AuctionEngine auctionEngine = new AuctionEngine();
+        auctionEngine.sasParams = new SASRequestParameters();
+        auctionEngine.sasParams.setDst(DemandSourceType.IX.getValue());
         List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
         auctionEngine.setUnfilteredChannelSegmentList(rtbSegments);

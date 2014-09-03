@@ -25,8 +25,9 @@ import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
-import com.smaato.soma.oapi.Response;
 import com.smaato.soma.oapi.Response.Ads.Ad;
+
+import javax.xml.ws.Response;
 
 
 public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
@@ -223,7 +224,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
             statusCode = status.code();
             VelocityContext context = new VelocityContext();
             try {
-                Response smaatoResponse = jaxbHelper.unmarshal(response, Response.class);
+                com.smaato.soma.oapi.Response smaatoResponse = jaxbHelper.unmarshal(response, com.smaato.soma.oapi.Response.class);
 
                 if (!SUCCESS.equalsIgnoreCase(smaatoResponse.getStatus()) || smaatoResponse.getAds().getAd() == null) {
                     adStatus = "NO_AD";

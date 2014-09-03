@@ -6,6 +6,7 @@ import com.google.inject.util.Modules;
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
@@ -18,6 +19,7 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentF
 import com.inmobi.adserve.channels.server.requesthandler.filters.TestScopeModule;
 import com.inmobi.adserve.channels.types.AccountType;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import com.inmobi.casthrift.DemandSourceType;
 import org.apache.commons.configuration.Configuration;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
@@ -90,7 +92,7 @@ public class AuctionEngineTest {
     }
 
     private ChannelSegment setBidder(final String advId, final String channelId, final String externalSiteKey,
-            final String adNetworkName, final Double bidValue, final Long latencyValue) {
+                                     final String adNetworkName, final Double bidValue, final Long latencyValue) {
 
         Long[] rcList = null;
         Long[] tags = null;
@@ -201,12 +203,14 @@ public class AuctionEngineTest {
 
     @Test(dataProvider = "DataProviderWith3Bidders")
     public void testAuctionEngineWith3BiddersExample(final String useCaseName, final Double floorPrice,
-            final String rtbNameInput1, final Double bidInput1, final Long latencyInput1, final String rtbNameInput2,
-            final Double bidInput2, final Long latencyInput2, final String rtbNameInput3, final Double bidInput3,
-            final Long latencyInput3, final Double expectedSecondPriceValue, final String expectedRTBName,
-            final Double expectedWinnerBidValue) {
+                                                     final String rtbNameInput1, final Double bidInput1, final Long latencyInput1, final String rtbNameInput2,
+                                                     final Double bidInput2, final Long latencyInput2, final String rtbNameInput3, final Double bidInput3,
+                                                     final Long latencyInput3, final Double expectedSecondPriceValue, final String expectedRTBName,
+                                                     final Double expectedWinnerBidValue) {
 
         AuctionEngine auctionEngine = new AuctionEngine();
+        auctionEngine.sasParams = new SASRequestParameters();
+        auctionEngine.sasParams.setDst(DemandSourceType.RTBD.getValue());
         List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
         rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", rtbNameInput1, bidInput1, latencyInput1));
@@ -283,12 +287,15 @@ public class AuctionEngineTest {
 
     @Test(dataProvider = "DataProviderWith4Bidders")
     public void testAuctionEngineWith4BiddersExample(final String useCaseName, final Double floorPrice,
-            final String rtbNameInput1, final Double bidInput1, final Long latencyInput1, final String rtbNameInput2,
-            final Double bidInput2, final Long latencyInput2, final String rtbNameInput3, final Double bidInput3,
-            final Long latencyInput3, final String rtbNameInput4, final Double bidInput4, final Long latencyInput4,
-            final Double expectedSecondPriceValue, final String expectedRTBName, final Double expectedWinnerBidValue) {
+                                                     final String rtbNameInput1, final Double bidInput1, final Long latencyInput1, final String rtbNameInput2,
+                                                     final Double bidInput2, final Long latencyInput2, final String rtbNameInput3, final Double bidInput3,
+                                                     final Long latencyInput3, final String rtbNameInput4, final Double bidInput4, final Long latencyInput4,
+                                                     final Double expectedSecondPriceValue, final String expectedRTBName, final Double expectedWinnerBidValue) {
 
         AuctionEngine auctionEngine = new AuctionEngine();
+        auctionEngine.sasParams = new SASRequestParameters();
+        auctionEngine.sasParams.setDst(DemandSourceType.RTBD.getValue());
+
         List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
         rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", rtbNameInput1, bidInput1, latencyInput1));
@@ -319,6 +326,8 @@ public class AuctionEngineTest {
         String expectedRTBAdNetworkName = "A";
 
         AuctionEngine auctionEngine = new AuctionEngine();
+        auctionEngine.sasParams = new SASRequestParameters();
+        auctionEngine.sasParams.setDst(DemandSourceType.RTBD.getValue());
         List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
         rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1));
@@ -351,6 +360,8 @@ public class AuctionEngineTest {
         Double expectedAuctionEngineResponse = null;
 
         AuctionEngine auctionEngine = new AuctionEngine();
+        auctionEngine.sasParams = new SASRequestParameters();
+        auctionEngine.sasParams.setDst(DemandSourceType.RTBD.getValue());
         List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
         rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1));
@@ -385,6 +396,8 @@ public class AuctionEngineTest {
         String expectedRTBAdNetworkName = "A";
 
         AuctionEngine auctionEngine = new AuctionEngine();
+        auctionEngine.sasParams = new SASRequestParameters();
+        auctionEngine.sasParams.setDst(DemandSourceType.RTBD.getValue());
         List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
         rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1));
@@ -413,6 +426,8 @@ public class AuctionEngineTest {
         String expectedAuctionEngineResponse = null;
 
         AuctionEngine auctionEngine = new AuctionEngine();
+        auctionEngine.sasParams = new SASRequestParameters();
+        auctionEngine.sasParams.setDst(DemandSourceType.RTBD.getValue());
         List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
         rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1));

@@ -1,3 +1,4 @@
+/*
 package com.inmobi.adserve.channels.server.requesthandler;
 
 import com.inmobi.adserve.adpool.AdInfo;
@@ -104,4 +105,4 @@ public class CreateThriftResponseIXTest {
         Assert.assertEquals(adPoolResponse.getMinChargedValue(), (long)(expectedBidPrice * Math.pow(10, 6)));
     }
 
-}
+}*/
