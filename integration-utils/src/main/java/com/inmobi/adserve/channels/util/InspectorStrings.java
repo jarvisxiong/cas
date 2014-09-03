@@ -14,6 +14,7 @@ public class InspectorStrings {
     public static final String totalFills                                = "TotalFills";
     public static final String ruleEngineFills                           = "RuleEngineFills";
     public static final String ixFills                                   = "IXFills";
+    public static final String dcpFills                                  = "DCPFills";
     public static final String latency                                   = "Latency";
     public static final String connectionLatency                         = "ConnectionLatency";
     public static final String count                                     = "Count";
