@@ -247,7 +247,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                         } else {
                             // When pmptier is 0 (default value), auction is an open auction
                             // Other values are reserved for future use
-                            rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);
+                            rtbdAd.setAuctionType(AuctionType.FIRST_PRICE);
                         }
                     } else {
                         // otherwise auction type is set to FIRST_PRICE
