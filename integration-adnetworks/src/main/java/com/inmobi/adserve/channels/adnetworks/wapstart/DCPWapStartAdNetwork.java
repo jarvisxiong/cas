@@ -15,10 +15,6 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -42,7 +38,6 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
     private int                          height;
     private String                       adid = null;
     private static IABCountriesInterface iABCountries;
-    private static final String          latlongFormat = "%s,%s";
 
     static {
         iABCountries = new IABCountriesMap();
@@ -125,15 +120,17 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
             else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidO1)) {
                 url.append("&uid=").append(casInternalRequestParameters.uidO1);
             }
-            if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
+            if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)&& "1".equals(casInternalRequestParameters.uidADT)) {
                 url.append("&idfa=").append(casInternalRequestParameters.uidIFA);
             }
-            else {
+            
                 String gpid = getGPID();
                 if (gpid != null) {
                     adid = gpid;
+                    url.append("&adid=").append(adid);
+                    
                 }
-            }
+            
             
             url.append("&callbackurl=").append(getURLEncode(clickUrl, format));
             url.append("&realSiteId=").append((entity.getAdgroupIncId()+sasParams.getSiteIncId()));
