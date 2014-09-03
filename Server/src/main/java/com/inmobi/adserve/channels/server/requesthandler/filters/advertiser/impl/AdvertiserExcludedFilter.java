@@ -25,8 +25,6 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 public class AdvertiserExcludedFilter extends AbstractAdvertiserLevelFilter {
 
-    private static final Logger    LOG = LoggerFactory.getLogger(AdvertiserExcludedFilter.class);
-
     private final RepositoryHelper repositoryHelper;
 
     @Inject

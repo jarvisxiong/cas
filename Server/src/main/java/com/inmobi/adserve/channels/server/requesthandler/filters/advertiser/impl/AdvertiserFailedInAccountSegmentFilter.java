@@ -13,7 +13,6 @@ import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AbstractAdvertiserLevelFilter;
-import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
 
@@ -41,16 +40,14 @@ public class AdvertiserFailedInAccountSegmentFilter extends AbstractAdvertiserLe
 
         int accountSegment = channelSegment.getChannelEntity().getAccountSegment();
         String advertiserId = channelSegment.getChannelEntity().getAccountId();
+
+        LOG.debug("AccountId from ChannelEntity: {} ", channelSegment.getChannelEntity().getAccountId());
+        LOG.debug("AdvertiserId from ChannelFeedbackEntity: {}", channelSegment.getChannelFeedbackEntity().getAdvertiserId());
+        LOG.debug("AdvertiserId from ChannelSegmentEntity: {}", channelSegment.getChannelSegmentEntity().getAdvertiserId());
+
         String advertiserName = advertiserIdNameMap.get(advertiserId);
 
         return (advertiserName == null || (sasParams.getDst() == 6 && null != sasParams.getAccountSegment()
                 && !sasParams.getAccountSegment().isEmpty() && !sasParams.getAccountSegment().contains(accountSegment)));
-    }
-
-    @Override
-    protected void incrementStats(final ChannelSegment channelSegment) {
-        String advertiserId = channelSegment.getChannelEntity().getAccountId();
-        String advertiserName = advertiserIdNameMap.get(advertiserId);
-        InspectorStats.incrementStatCount(advertiserName, InspectorStrings.droppedInAccountSegmentFilter);
     }
 }

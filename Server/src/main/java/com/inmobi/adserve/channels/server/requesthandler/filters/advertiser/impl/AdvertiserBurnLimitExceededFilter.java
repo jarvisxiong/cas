@@ -22,8 +22,6 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 public class AdvertiserBurnLimitExceededFilter extends AbstractAdvertiserLevelFilter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AdvertiserBurnLimitExceededFilter.class);
-
     private final ServerConfig  serverConfiguration;
 
     @Inject
