@@ -2,7 +2,7 @@ package com.inmobi.adserve.channels.api;
 
 
 public interface AuctionEngineInterface {
-    boolean isAuctionAllComplete();
+    boolean areAllChannelSegmentRequestsComplete();
 
     double getSecondBidPrice();
 

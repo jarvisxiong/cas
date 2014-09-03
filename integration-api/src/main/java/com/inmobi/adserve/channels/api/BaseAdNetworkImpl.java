@@ -159,8 +159,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         LOG.debug("Inside process Response for the partner: {}", getName());
         getResponseAd();
         isRequestComplete = true;
-        if (baseRequestHandler.getAuctionEngine().isAuctionAllComplete()) {
-            LOG.debug("isAuctionAllComplete is true");
+        if (baseRequestHandler.getAuctionEngine().areAllChannelSegmentRequestsComplete()) {
+            LOG.debug("areAllChannelSegmentRequestsComplete is true");
             if (baseRequestHandler.getAuctionEngine().isAuctionComplete()) {
                 LOG.debug("Rtb auction has run already");
                 if (baseRequestHandler.getAuctionEngine().isAuctionResponseNull()) {

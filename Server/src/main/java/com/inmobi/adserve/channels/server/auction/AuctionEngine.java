@@ -176,7 +176,7 @@ public class AuctionEngine implements AuctionEngineInterface {
     }
 
     @Override
-    public boolean isAuctionAllComplete() {
+    public boolean areAllChannelSegmentRequestsComplete() {
         if (unfilteredChannelSegmentList == null) {
             return false;
         }

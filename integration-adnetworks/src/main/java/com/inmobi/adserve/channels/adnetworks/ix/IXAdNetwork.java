@@ -852,7 +852,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         // LOG.debug("Inside process Response for the partner: {}", getName());
         getResponseAd();
         isRequestComplete = true;
-        if (baseRequestHandler.getAuctionEngine().isAuctionAllComplete()) {
+        if (baseRequestHandler.getAuctionEngine().areAllChannelSegmentRequestsComplete()) {
             LOG.debug("isAllIXComplete is true");
             if (baseRequestHandler.getAuctionEngine().isAuctionComplete()) {
                 LOG.debug("ix cas auction has run already");

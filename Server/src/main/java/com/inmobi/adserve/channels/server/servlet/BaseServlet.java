@@ -168,7 +168,7 @@ public abstract class BaseServlet implements Servlet {
             return;
         }
 
-        if (hrh.responseSender.getAuctionEngine().isAuctionAllComplete()) {
+        if (hrh.responseSender.getAuctionEngine().areAllChannelSegmentRequestsComplete()) {
             AdNetworkInterface highestBid = hrh.responseSender.getAuctionEngine().runAuctionEngine();
             if (null != highestBid) {
                 LOG.debug(traceMarker, "Sending rtb response of {}", highestBid.getName());

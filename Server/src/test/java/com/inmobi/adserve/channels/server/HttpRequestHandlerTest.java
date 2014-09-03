@@ -522,7 +522,7 @@ public class HttpRequestHandlerTest extends TestCase {
         httpRequestHandler.getAuctionEngine().getUnfilteredChannelSegmentList().add(channelSegment1);
         httpRequestHandler.getAuctionEngine().getUnfilteredChannelSegmentList().add(channelSegment2);
         httpRequestHandler.getAuctionEngine().getUnfilteredChannelSegmentList().add(channelSegment3);
-        boolean result = httpRequestHandler.getAuctionEngine().isAuctionAllComplete();
+        boolean result = httpRequestHandler.getAuctionEngine().areAllChannelSegmentRequestsComplete();
         assertEquals(true, result);
     }
 
@@ -604,7 +604,7 @@ public class HttpRequestHandlerTest extends TestCase {
         httpRequestHandler.getAuctionEngine().getUnfilteredChannelSegmentList().add(channelSegment1);
         httpRequestHandler.getAuctionEngine().getUnfilteredChannelSegmentList().add(channelSegment2);
         httpRequestHandler.getAuctionEngine().getUnfilteredChannelSegmentList().add(channelSegment3);
-        boolean result = httpRequestHandler.getAuctionEngine().isAuctionAllComplete();
+        boolean result = httpRequestHandler.getAuctionEngine().areAllChannelSegmentRequestsComplete();
         assertEquals(false, result);
     }
 
