@@ -219,7 +219,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     if (!isRequestCompleted()) {
                         LOG.debug("Operation complete for channel partner: {}", getName());
                         LOG.debug("{} operation complete latency {}", getName(), latency);
-                        String responseStr = response.getResponseBody();
+                        String responseStr = response.getResponseBody("UTF-8");
                         HttpResponseStatus httpResponseStatus = HttpResponseStatus.valueOf(response.getStatusCode());
                         parseResponse(responseStr, httpResponseStatus);
                         processResponse();
