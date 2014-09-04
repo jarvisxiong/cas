@@ -256,7 +256,7 @@ public class Logging {
                     osName = HandSetOS.values()[sasParamsOsId - 1].toString();
                 }
                 MetricsManager.updateStats(sasParams.getCountryId(), sasParams.getCountryCode(), sasParams.getOsId(),
-                        osName, advertiserIdNameMap.get(advertiserId), false, false, isServerImpression, 0.0,
+                        osName, advertiserIdNameMap.get(advertiserId), true, isServerImpression, 0.0,
                         (long) 0.0, impression.getAd().getWinBid());
             }
         }

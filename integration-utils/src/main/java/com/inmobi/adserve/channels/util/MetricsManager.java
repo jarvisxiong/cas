@@ -15,6 +15,7 @@ public class MetricsManager {
 
     private static Map<Integer/* country */, ConcurrentHashMap<Integer/* os */, ConcurrentHashMap<String/* advertiserName */, RealTimeStats>>> realTimeCountryOsAdvertiserStats = new ConcurrentHashMap<Integer, ConcurrentHashMap<Integer, ConcurrentHashMap<String, RealTimeStats>>>();
     private static Map<Integer/* country */, ConcurrentHashMap<Integer/* os */, RealTimeStats>>                                                realTimeCountryOsStats           = new ConcurrentHashMap<Integer, ConcurrentHashMap<Integer, RealTimeStats>>();
+    private static Map<Integer/* dst */, ConcurrentHashMap<String/* dst */, RealTimeStats>>                                                   realTimeCountryDstStats           = new ConcurrentHashMap<Integer, ConcurrentHashMap<String, RealTimeStats>>();
     private static Map<Integer/* country */, RealTimeStats>                                                                                    realTimeCountryStats             = new ConcurrentHashMap<Integer, RealTimeStats>();
     private static Map<String, RealTimeStats> dstRealTimeStats = new HashMap<>();
 
@@ -79,17 +80,22 @@ public class MetricsManager {
         realTimeStats.getLatency().update(latency);
     }
     
-	public static void updateTimerLatency(final String dst, final long latency) {
-		if (null == dstRealTimeStats.get(dst)) {
-			RealTimeStats realTimeStats = new RealTimeStats(dst);
-			dstRealTimeStats.put(dst, realTimeStats);
-		}
-		RealTimeStats realTimeStats = dstRealTimeStats.get(dst);
-		realTimeStats.getTimerLatency().update(latency);
-	}
+    
+    public static void updateRequestStats(String dst, Long countryId, String countryName) {
+        if (null == realTimeCountryDstStats.get(countryId)) {
+            realTimeCountryDstStats.put(countryId.intValue(), new ConcurrentHashMap<String, RealTimeStats>());
+        }
+        
+        if (null == realTimeCountryDstStats.get(countryId.intValue()).get(dst)) {
+            RealTimeStats realTimeStats = new RealTimeStats(countryName, dst);
+            realTimeCountryDstStats.get(countryId.intValue()).put(dst, realTimeStats);
+        }
+        realTimeCountryDstStats.get(countryId.intValue()).get(dst).getRequests().inc();
+    }
+    
 
     public static void updateStats(Long countryId, String countryName, int osId, String osName, String advertiserName,
-            boolean fills, boolean requests, boolean serverImpressions, double bids, long latency, double chargedBids) {
+            boolean fills, boolean serverImpressions, double bids, long latency, double chargedBids) {
         RealTimeStats realTimeCountryOsAdvertiserStats = getRealTimeCountryOsAdvertiserStats(countryId.intValue(), countryName,
             osId, osName, advertiserName);
         RealTimeStats realTimeCountryOsStats = getRealTimeCountryOsStats(countryId.intValue(), countryName, osId, osName);
@@ -100,11 +106,7 @@ public class MetricsManager {
             realTimeCountryOsStats.getFills().inc();
             realTimeCountryStats.getFills().inc();
         }
-        if (requests) {
-            realTimeCountryOsAdvertiserStats.getRequests().inc();
-            realTimeCountryOsStats.getRequests().inc();
-            realTimeCountryStats.getRequests().inc();
-        }
+
         if (serverImpressions) {
             realTimeCountryOsAdvertiserStats.getServerImpressions().inc();
             realTimeCountryOsStats.getServerImpressions().inc();
