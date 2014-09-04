@@ -528,10 +528,8 @@ public class RtbAdnetworkTest extends TestCase {
         sasParams.setBannerVideoSupported(true);
         sasParams.setImpressionId(oldImpressionId);
 
-        // Set the  video specifc impression Id lookup hash.
-        HashMap<Integer, String> impressionIdLookup = new HashMap<>();
-        impressionIdLookup.put(AdFormatType.VIDEO.getValue(), newImpressionId);
-        casInternalRequestParameters.impressionIdLookup = impressionIdLookup;
+        // Set the  video specific impression Id.
+        casInternalRequestParameters.impressionIdForVideo = newImpressionId;
 
         rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
         boolean deserializeStatus = rtbAdNetwork.deserializeResponse(str.toString());

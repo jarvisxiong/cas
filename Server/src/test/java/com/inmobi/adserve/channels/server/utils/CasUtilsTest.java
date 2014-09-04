@@ -19,6 +19,7 @@ public class CasUtilsTest extends TestCase {
 
         SasParamsTestData[] testData = {
                 new SasParamsTestData("APP", "a370", (short) 14, 3, "4.0", true),
+                new SasParamsTestData("APP", "a369", (short) 14, 3, "4.0", false),
                 new SasParamsTestData("APP", "a370", (short) 14, 3, "4.4", true),
                 new SasParamsTestData("APP", "a440", (short) 32, 3, "4.4", true),
                 new SasParamsTestData("APP", "i370", (short) 14, 5, "6.0", true),

@@ -155,29 +155,27 @@ public class AsyncRequestMaker {
         casInternalRequestParameters.traceEnabled = casInternalRequestParameterGlobal.traceEnabled;
         casInternalRequestParameters.siteAccountType = casInternalRequestParameterGlobal.siteAccountType;
 
-        // If banner video is supported on this request, set a hash for video impressionId Lookup.
-        casInternalRequestParameters.impressionIdLookup = prepareAdImpressionIdLookup(sasParams,
+        // Set impressionIdForVideo if banner video is supported on this request.
+        casInternalRequestParameters.impressionIdForVideo = getImpressionIdForVideo(sasParams,
                 channelSegmentEntity.getAdFormatIds(), channelSegmentEntity.getIncIds());
 
         return casInternalRequestParameters;
     }
 
-    private HashMap<Integer, String> prepareAdImpressionIdLookup(final SASRequestParameters sasParams,
-                                                                 final Integer[] adFormatIds, final Long[] adIncIds) {
+    private String getImpressionIdForVideo(final SASRequestParameters sasParams,
+                                           final Integer[] adFormatIds, final Long[] adIncIds) {
 
         if (!sasParams.isBannerVideoSupported() || adFormatIds == null || adIncIds == null) {
             LOG.debug("In-banner video ad is not supported.");
             return null;
         }
 
-        HashMap<Integer, String> impressionIdLookup = new HashMap<>(adIncIds.length);
         for (int i = 0; i < adFormatIds.length; i++) {
-            // Presently, we need the lookup only for video.
-            // Put entry for video ad format only in the lookup and skip rest.
+            //  Get impression id for video ad format.
             if (adFormatIds[i] == AdFormatType.VIDEO.getValue()) {
-                impressionIdLookup.put(adFormatIds[i], getImpressionId(adIncIds[i]));
-                LOG.debug("impression id for in-banner video ad is {}.", impressionIdLookup.get(adFormatIds[i]));
-                return impressionIdLookup;
+                String impressionId = getImpressionId(adIncIds[i]);
+                LOG.debug("impression id for in-banner video ad is {}.", impressionId);
+                return impressionId;
             }
         }
         LOG.debug("Inconsistent data in the database. Could not find a video ad for this ad group.");

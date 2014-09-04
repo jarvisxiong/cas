@@ -156,22 +156,22 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                                                                                 "CNY","JPY","EUR","KRW","RUB"));
     @Getter
     static List<String>                    blockedAdvertiserList        = new ArrayList<String>(Arrays.asList("king.com", "supercell.net", "paps.com", "fhs.com", "china.supercell.com", "supercell.com"));
-    
+
     @Inject
     private static AsyncHttpClientProvider asyncHttpClientProvider;
-    
+
     @Inject
     private static NativeTemplateAttributeFinder nativeTemplateAttributeFinder;
-    
+
     @Inject
     private static NativeBuilderFactory    nativeBuilderfactory;
-    
+
     @Inject
     private static NativeResponseMaker     nativeResponseMaker;
-    
-    
+
+
     private static final String nativeString = "native";
-    
+
     @Override
     protected AsyncHttpClient getAsyncHttpClient() {
         return asyncHttpClientProvider.getRtbAsyncHttpClient();
@@ -392,11 +392,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private boolean isRequestFormatSupported() {
         if (isNativeRequest()) {
             return isNativeResponseSupported;
-        } else if (!isNativeRequest()) {
+        } else {
             return isHTMLResponseSupported;
         }
-
-        return false;
     }
 
     private boolean createBidRequestObject(final List<Impression> impresssionlist, final Site site, final App app,
@@ -568,8 +566,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
 
         // This request supports in-Banner Video on interstitial slot and this partner supports video.
-        if (sasParams.isBannerVideoSupported() && isBannerVideoResponseSupported
-                && this.casInternalRequestParameters.impressionIdLookup != null) {
+        if (sasParams.isBannerVideoSupported() && isBannerVideoResponseSupported) {
             // Set video specific attributes to the Banner object
             banner.setBattr(videoBlockedAttributes);
             banner.setBtype(videoBlockCreativeType);
@@ -1170,24 +1167,20 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             // A valid video response is received. Set the flag.
             isVideoResponseReceived = true;
 
-            // Update the impression id for video ad.
-            if (this.casInternalRequestParameters.impressionIdLookup != null) {
-                String newImpressionId =
-                        this.casInternalRequestParameters.impressionIdLookup.get(AdFormatType.VIDEO.getValue());
-                if (StringUtils.isNotEmpty(newImpressionId)) {
+            String newImpressionId = this.casInternalRequestParameters.impressionIdForVideo;
+            if (StringUtils.isNotEmpty(newImpressionId)) {
 
-                    // Update the response impression id so that this doesn't get filtered in AuctionImpressionIdFilter.
-                    if (this.impressionId.equalsIgnoreCase(responseImpressionId)) {
-                        responseImpressionId = newImpressionId;
-                    }
-
-                    // Update beacon and click URLs to refer to the video Ads.
-                    this.beaconUrl = this.beaconUrl.replace(this.getImpressionId(), newImpressionId);
-                    this.clickUrl = this.clickUrl.replace(this.getImpressionId(), newImpressionId);
-                    this.impressionId = newImpressionId;
-
-                    LOG.debug("Replaced impression id to new value {}.", newImpressionId);
+                // Update the response impression id so that this doesn't get filtered in AuctionImpressionIdFilter.
+                if (this.impressionId.equalsIgnoreCase(responseImpressionId)) {
+                    responseImpressionId = newImpressionId;
                 }
+
+                // Update beacon and click URLs to refer to the video Ads.
+                this.beaconUrl = this.beaconUrl.replace(this.getImpressionId(), newImpressionId);
+                this.clickUrl = this.clickUrl.replace(this.getImpressionId(), newImpressionId);
+                this.impressionId = newImpressionId;
+
+                LOG.debug("Replaced impression id to new value {}.", newImpressionId);
             }
         }
         return true;

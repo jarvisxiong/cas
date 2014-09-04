@@ -41,7 +41,7 @@ public class FormatterTest {
     public void testrequestFromSDK360Onwards() {
         SASRequestParameters sasParams = new SASRequestParameters();
         assertEquals(false, Formatter.requestFromSDK360Onwards(sasParams));
-        sasParams.setSdkVersion("i350");
+        sasParams.setSdkVersion("i359");
         assertEquals(false, Formatter.requestFromSDK360Onwards(sasParams));
         sasParams.setSdkVersion("a350");
         assertEquals(false, Formatter.requestFromSDK360Onwards(sasParams));

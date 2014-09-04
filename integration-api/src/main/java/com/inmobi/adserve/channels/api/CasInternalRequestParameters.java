@@ -17,7 +17,7 @@ public class CasInternalRequestParameters {
     public boolean      traceEnabled;
 
     public String       impressionId;
-    public HashMap<Integer, String> impressionIdLookup;
+    public String       impressionIdForVideo;
 
     // Control enrichment params
     public String       gpid;

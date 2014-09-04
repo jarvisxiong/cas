@@ -124,7 +124,7 @@ public class CasUtils {
         try {
             String os = sasParams.getSdkVersion();
             if ((os.startsWith("i") || os.startsWith("a"))
-                    && Integer.parseInt(sasParams.getSdkVersion().substring(1, 3)) > 36) {
+                    && Integer.parseInt(sasParams.getSdkVersion().substring(1)) >= 370) {
                 return true;
             }
         }
