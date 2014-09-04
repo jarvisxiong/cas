@@ -13,10 +13,11 @@ import java.util.concurrent.TimeUnit;
 
 public class MetricsManager {
 
-    private static Map<Integer/* country */, ConcurrentHashMap<Integer/* os */, ConcurrentHashMap<String/* advertiserName */, RealTimeStats>>> realTimeCountryOsAdvertiserStats = new ConcurrentHashMap<Integer, ConcurrentHashMap<Integer, ConcurrentHashMap<String, RealTimeStats>>>();
-    private static Map<Integer/* country */, ConcurrentHashMap<Integer/* os */, RealTimeStats>>                                                realTimeCountryOsStats           = new ConcurrentHashMap<Integer, ConcurrentHashMap<Integer, RealTimeStats>>();
-    private static Map<Integer/* dst */, ConcurrentHashMap<String/* dst */, RealTimeStats>>                                                   realTimeCountryDstStats           = new ConcurrentHashMap<Integer, ConcurrentHashMap<String, RealTimeStats>>();
-    private static Map<Integer/* country */, RealTimeStats>                                                                                    realTimeCountryStats             = new ConcurrentHashMap<Integer, RealTimeStats>();
+    private static Map<Integer/* country */, ConcurrentHashMap<Integer/* os */, ConcurrentHashMap<String/* advertiserName */, RealTimeStats>>> realTimeCountryOsAdvertiserStats  = new ConcurrentHashMap<Integer, ConcurrentHashMap<Integer, ConcurrentHashMap<String, RealTimeStats>>>();
+    private static Map<Integer/* country */, ConcurrentHashMap<Integer/* os */, RealTimeStats>>                                                realTimeCountryOsStats            = new ConcurrentHashMap<Integer, ConcurrentHashMap<Integer, RealTimeStats>>();
+    private static Map<Integer/* dst */, ConcurrentHashMap<String/* dst */, RealTimeStats>>                                                    realTimeCountryDstStats           = new ConcurrentHashMap<Integer, ConcurrentHashMap<String, RealTimeStats>>();
+    private static Map<Integer/* partner */, ConcurrentHashMap<String/* dst */, RealTimeStats>>                                                realTimeCountryPartnerStats       = new ConcurrentHashMap<Integer, ConcurrentHashMap<String, RealTimeStats>>();
+    private static Map<Integer/* country */, RealTimeStats>                                                                                    realTimeCountryStats              = new ConcurrentHashMap<Integer, RealTimeStats>();
     private static Map<String, RealTimeStats> dstRealTimeStats = new HashMap<>();
 
 
@@ -81,7 +82,7 @@ public class MetricsManager {
     }
     
     
-    public static void updateRequestStats(String dst, Long countryId, String countryName) {
+    public static void updateIncomingRequestsStats(String dst, Long countryId, String countryName) {
         if (null == realTimeCountryDstStats.get(countryId)) {
             realTimeCountryDstStats.put(countryId.intValue(), new ConcurrentHashMap<String, RealTimeStats>());
         }
@@ -90,8 +91,22 @@ public class MetricsManager {
             RealTimeStats realTimeStats = new RealTimeStats(countryName, dst);
             realTimeCountryDstStats.get(countryId.intValue()).put(dst, realTimeStats);
         }
-        realTimeCountryDstStats.get(countryId.intValue()).get(dst).getRequests().inc();
+        realTimeCountryDstStats.get(countryId.intValue()).get(dst).getIncomingRequests().inc();
     }
+    
+    public static void updatePartnerRequestStats(String partnerName, Long countryId, String countryName) {
+        if (null == realTimeCountryDstStats.get(countryId)) {
+            realTimeCountryDstStats.put(countryId.intValue(), new ConcurrentHashMap<String, RealTimeStats>());
+        }
+        
+        if (null == realTimeCountryDstStats.get(countryId.intValue()).get(partnerName)) {
+            RealTimeStats realTimeStats = new RealTimeStats(countryName, partnerName);
+            realTimeCountryDstStats.get(countryId.intValue()).put(partnerName, realTimeStats);
+        }
+        realTimeCountryDstStats.get(countryId.intValue()).get(partnerName).getPartnerRequests().inc();
+    }
+    
+    
     
 
     public static void updateStats(Long countryId, String countryName, int osId, String osName, String advertiserName,

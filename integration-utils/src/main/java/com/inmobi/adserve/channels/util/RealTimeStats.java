@@ -13,7 +13,9 @@ public class RealTimeStats {
     @Getter
     private Counter             fills;
     @Getter
-    private Counter             requests;
+    private Counter             incomingRequests;
+    @Getter
+    private Counter             partnerRequests;
     @Getter
     private Counter             serverImpressions;
     @Getter
@@ -40,13 +42,16 @@ public class RealTimeStats {
 
     private void initializeStats(String key) {
         String fillsKey = key + SEP + "fills";
-        String requestsKey = key + SEP + "requests";
+        String incomingRequests = key + SEP + "incomingRequests";
+        String parnterRequestsKey = key + SEP + "partnerRequests";
         String serverImpressionsKey = key + SEP + "serverImpressions";
         String bidsKey = key + SEP + "bids";
         String latencyKey = key + SEP + "latency";
         String chargedBidsKey = key + SEP + "chargedBids";
+        
         this.fills = Metrics.newCounter(MetricsManager.class, fillsKey);
-        this.requests = Metrics.newCounter(MetricsManager.class, requestsKey);
+        this.incomingRequests = Metrics.newCounter(MetricsManager.class, incomingRequests);
+        this.partnerRequests = Metrics.newCounter(MetricsManager.class, parnterRequestsKey);
         this.serverImpressions = Metrics.newCounter(MetricsManager.class, serverImpressionsKey);
         this.bids = Metrics.newHistogram(MetricsManager.class, bidsKey);
         this.latency = Metrics.newHistogram(MetricsManager.class, latencyKey);

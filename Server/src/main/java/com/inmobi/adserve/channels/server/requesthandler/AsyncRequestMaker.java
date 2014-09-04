@@ -12,8 +12,12 @@ import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.SegmentFactory;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.MetricsManager;
+import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
+
 import io.netty.channel.Channel;
+
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,6 +107,7 @@ public class AsyncRequestMaker {
                 row.setAdNetworkInterface(network);
                 if (network.isRtbPartner()) {
                     rtbSegments.add(row);
+                    MetricsManager.updatePartnerRequestStats(network.getName(), sasParams.getCountryId(), sasParams.getCountryCode());
                     LOG.debug("{} is a rtb partner so adding this network to rtb ranklist", network.getName());
                 }
                 else {
