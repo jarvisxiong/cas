@@ -15,10 +15,10 @@ public class MetricsManager {
 
     private static Map<Integer/* country */, ConcurrentHashMap<Integer/* os */, ConcurrentHashMap<String/* advertiserName */, RealTimeStats>>> realTimeCountryOsAdvertiserStats  = new ConcurrentHashMap<Integer, ConcurrentHashMap<Integer, ConcurrentHashMap<String, RealTimeStats>>>();
     private static Map<Integer/* country */, ConcurrentHashMap<Integer/* os */, RealTimeStats>>                                                realTimeCountryOsStats            = new ConcurrentHashMap<Integer, ConcurrentHashMap<Integer, RealTimeStats>>();
-    private static Map<Integer/* dst */, ConcurrentHashMap<String/* dst */, RealTimeStats>>                                                    realTimeCountryDstStats           = new ConcurrentHashMap<Integer, ConcurrentHashMap<String, RealTimeStats>>();
-    private static Map<Integer/* partner */, ConcurrentHashMap<String/* dst */, RealTimeStats>>                                                realTimeCountryPartnerStats       = new ConcurrentHashMap<Integer, ConcurrentHashMap<String, RealTimeStats>>();
+    private static Map<Integer/* dst */, ConcurrentHashMap<String/* dst */, RealTimeStatsForCountryDst>>                                       realTimeCountryDstStats           = new ConcurrentHashMap<Integer, ConcurrentHashMap<String, RealTimeStatsForCountryDst>>();
+    private static Map<Integer/* partner */, ConcurrentHashMap<String/* dst */, RealTimeStatsForPartnerRequests>>                              realTimeCountryPartnerStats       = new ConcurrentHashMap<Integer, ConcurrentHashMap<String, RealTimeStatsForPartnerRequests>>();
     private static Map<Integer/* country */, RealTimeStats>                                                                                    realTimeCountryStats              = new ConcurrentHashMap<Integer, RealTimeStats>();
-    private static Map<String, RealTimeStats> dstRealTimeStats = new HashMap<>();
+    private static Map<String, RealTimeStatsForDstLatency> dstRealTimeStats = new HashMap<>();
 
 
     public static void init(String graphiteServer, int graphitePort, int graphiteInterval) {
@@ -74,36 +74,36 @@ public class MetricsManager {
 
     public static void updateLatency(String dst, long latency) {
         if (null == dstRealTimeStats.get(dst)) {
-            RealTimeStats realTimeStats = new RealTimeStats(dst);
+        	RealTimeStatsForDstLatency realTimeStats = new RealTimeStatsForDstLatency(dst);
             dstRealTimeStats.put(dst, realTimeStats);
         }
-        RealTimeStats realTimeStats = dstRealTimeStats.get(dst);
+        RealTimeStatsForDstLatency realTimeStats = dstRealTimeStats.get(dst);
         realTimeStats.getLatency().update(latency);
     }
     
     
     public static void updateIncomingRequestsStats(String dst, Long countryId, String countryName) {
         if (null == realTimeCountryDstStats.get(countryId)) {
-            realTimeCountryDstStats.put(countryId.intValue(), new ConcurrentHashMap<String, RealTimeStats>());
+            realTimeCountryDstStats.put(countryId.intValue(), new ConcurrentHashMap<String, RealTimeStatsForCountryDst>());
         }
         
         if (null == realTimeCountryDstStats.get(countryId.intValue()).get(dst)) {
-            RealTimeStats realTimeStats = new RealTimeStats(countryName, dst);
+        	RealTimeStatsForCountryDst realTimeStats = new RealTimeStatsForCountryDst(countryName, dst);
             realTimeCountryDstStats.get(countryId.intValue()).put(dst, realTimeStats);
         }
         realTimeCountryDstStats.get(countryId.intValue()).get(dst).getIncomingRequests().inc();
     }
     
     public static void updatePartnerRequestStats(String partnerName, Long countryId, String countryName) {
-        if (null == realTimeCountryDstStats.get(countryId)) {
-            realTimeCountryDstStats.put(countryId.intValue(), new ConcurrentHashMap<String, RealTimeStats>());
+        if (null == realTimeCountryPartnerStats.get(countryId)) {
+        	realTimeCountryPartnerStats.put(countryId.intValue(), new ConcurrentHashMap<String, RealTimeStatsForPartnerRequests>());
         }
         
-        if (null == realTimeCountryDstStats.get(countryId.intValue()).get(partnerName)) {
-            RealTimeStats realTimeStats = new RealTimeStats(countryName, partnerName);
-            realTimeCountryDstStats.get(countryId.intValue()).put(partnerName, realTimeStats);
+        if (null == realTimeCountryPartnerStats.get(countryId.intValue()).get(partnerName)) {
+        	RealTimeStatsForPartnerRequests realTimeStats = new RealTimeStatsForPartnerRequests(countryName, partnerName);
+            realTimeCountryPartnerStats.get(countryId.intValue()).put(partnerName, realTimeStats);
         }
-        realTimeCountryDstStats.get(countryId.intValue()).get(partnerName).getPartnerRequests().inc();
+        realTimeCountryPartnerStats.get(countryId.intValue()).get(partnerName).getPartnerRequests().inc();
     }
     
     
@@ -132,11 +132,7 @@ public class MetricsManager {
             realTimeCountryOsStats.getBids().update((long) bids * 1000);
             realTimeCountryStats.getBids().update((long) bids * 1000);
         }
-        if (latency > 0) {
-            realTimeCountryOsAdvertiserStats.getLatency().update(latency);
-            realTimeCountryOsStats.getLatency().update(latency);
-            realTimeCountryStats.getLatency().update(latency);
-        }
+
         if (chargedBids > 0.0) {
             realTimeCountryOsAdvertiserStats.getChargedBids().update((long) chargedBids * 1000);
             realTimeCountryOsStats.getChargedBids().update((long) chargedBids * 1000);

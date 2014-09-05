@@ -111,6 +111,7 @@ public class AsyncRequestMaker {
                     LOG.debug("{} is a rtb partner so adding this network to rtb ranklist", network.getName());
                 }
                 else {
+                	MetricsManager.updatePartnerRequestStats(network.getName(), sasParams.getCountryId(), sasParams.getCountryCode());
                     segments.add(row);
                 }
             }
