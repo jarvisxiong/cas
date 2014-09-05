@@ -79,9 +79,9 @@ public class DCPPubmaticAdapterTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "33327";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                new JSONObject("{\"9\":\"1231\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new JSONObject("{\"9\":\"1231\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
                 true);
@@ -100,9 +100,9 @@ public class DCPPubmaticAdapterTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "33327";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                new JSONObject("{\"9\":\"1231\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new JSONObject("{\"9\":\"1231\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
                 false);
@@ -121,9 +121,9 @@ public class DCPPubmaticAdapterTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                new JSONObject("{\"9\":\"1231\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new JSONObject("{\"9\":\"1231\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
                 false);
@@ -141,9 +141,9 @@ public class DCPPubmaticAdapterTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "33327";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
                 false);
@@ -164,9 +164,9 @@ public class DCPPubmaticAdapterTest extends TestCase {
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                new JSONObject("{\"9\":\"1231\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new JSONObject("{\"9\":\"1231\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             dcpPubmaticAdnetwork.makeAsyncRequest();
             String actualUrl = dcpPubmaticAdnetwork.getRequestUrl();
@@ -192,8 +192,8 @@ public class DCPPubmaticAdapterTest extends TestCase {
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
                 pubmaticAdvId, null, null, null, 0, null, segmentCategories, true, true, externalKey, null, null, null,
-                0, true, null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                new JSONObject("{\"9\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
+                new Long[] {0L}, true, null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
+                new JSONObject("{\"9\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
         if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualParams = dcpPubmaticAdnetwork.getRequestParams();
             String expectedParams = "timezone=0&frameName=test&inIframe=1&adVisibility=0&adPosition=-1x-1&operId=201&pubId=2685&adId=36844&siteId=33327&loc=37.4429,-122.1514&udid=202cb962ac59075b964b07152d234b70&kadwidth=320&kadheight=48&pageURL=00000000-0000-0000-0000-000000000000&keywords=Education%2CEntertainment&kltstamp=";
@@ -220,8 +220,8 @@ public class DCPPubmaticAdapterTest extends TestCase {
                 + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11" + "?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
                 pubmaticAdvId, null, null, null, 0, null, segmentCategories, true, true, externalKey, null, null, null,
-                0, true, null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                new JSONObject("{\"9\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
+                new Long[] {0L}, true, null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
+                new JSONObject("{\"9\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
         if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualParams = dcpPubmaticAdnetwork.getRequestParams();
             String expectedParams = "timezone=0&frameName=test&inIframe=1&adVisibility=0&adPosition=-1x-1&operId=201&pubId=2685&adId=36844&siteId=33327&loc=37.4429,-122.1514&udid=202cb962ac59075b964b07152d234b70&kadwidth=320&kadheight=48&pageURL=00000000-0000-0000-0000-000000000000&keywords=Education%2CEntertainment&kltstamp=";
@@ -247,9 +247,9 @@ public class DCPPubmaticAdapterTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
                 + "-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                new JSONObject("{\"9\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
+                new JSONObject("{\"9\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
         if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualParams = dcpPubmaticAdnetwork.getRequestParams();
             String expectedParams = "timezone=0&frameName=test&inIframe=1&adVisibility=0&adPosition=-1x-1&operId=201&pubId=2685&adId=36844&siteId=33327&loc=37.4429,-122.1514&udid=202cb962ac59075b964b07152d234b70&kadwidth=320&kadheight=48&pageURL=00000000-0000-0000-0000-000000000000&keywords=miscellenous&kltstamp=";
@@ -276,9 +276,9 @@ public class DCPPubmaticAdapterTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
                 + "-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                new JSONObject("{\"9\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
+                new JSONObject("{\"9\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
         if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualParams = dcpPubmaticAdnetwork.getRequestParams();
             String expectedParams = "timezone=0&frameName=test&inIframe=1&adVisibility=0&adPosition=-1x-1&operId=201&pubId=2685&adId=36844&siteId=33327&loc=37.4429,-122.1514&country=USA&udid=202cb962ac59075b964b07152d234b70&kadwidth=320&kadheight=48&pageURL=00000000-0000-0000-0000-000000000000&keywords=miscellenous&kltstamp=";
@@ -300,9 +300,9 @@ public class DCPPubmaticAdapterTest extends TestCase {
         sasParams.setSource("android");
         String externalKey = "33327";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                new JSONObject("{\"9\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new JSONObject("{\"9\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
             String actualParams = dcpPubmaticAdnetwork.getRequestParams();
             String expectedParams = "timezone=0&frameName=test&inIframe=1&adVisibility=0&adPosition=-1x-1&operId=201&pubId=2685&adId=36844&siteId=33327&loc=,-122.1514&udid=202cb962ac59075b964b07152d234b70&kadwidth=320&kadheight=50&pageURL=00000000-0000-0000-0000-000000000000&keywords=miscellenous&kltstamp=";
@@ -324,9 +324,9 @@ public class DCPPubmaticAdapterTest extends TestCase {
         sasParams.setSource("wap");
         String externalKey = "33327";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                new JSONObject("{\"9\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0));
+                new JSONObject("{\"9\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
         if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
             String actualParams = dcpPubmaticAdnetwork.getRequestParams();
             String expectedParams = "timezone=0&frameName=test&inIframe=1&adVisibility=0&adPosition=-1x-1&operId=201&pubId=2685&adId=36844&siteId=33327&loc=37.4429,-122.1514&udid=202cb962ac59075b964b07152d234b70&kadwidth=320&kadheight=48&pageURL=00000000-0000-0000-0000-000000000000&keywords=miscellenous&kltstamp=";
@@ -348,9 +348,9 @@ public class DCPPubmaticAdapterTest extends TestCase {
         String clickUrl = "http://c2.w.inmobi.com/c"
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                new JSONObject("{\"4\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new JSONObject("{\"4\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
         String response = "{\"PubMatic_Bid\":{\"ecpm\":1.000000,\"creative_tag\":\"<a target=\\\"_blank\\\" href=\\\"http://pubmatic.com\\\">\n<div style=\\\"left: 0px; top: 0px; width: 320px;\nheight: 50px; background-color:#003366; color:#ffffff; text-align:center;\\\" >\n<h4> PubMatic 320x50 Test Ad </h4>\n</div>\n</a>\",\"tracking_url\":\"http://aktrack.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=201&pubId=2685&siteId=30713&adId=28652&adServerId=1238&kefact=1.000000&kaxefact=1.000000&kadNetFrequecy=0&kadwidth=300&kadheight=50&kadsizeid=30&kltstamp=1360156017&indirectAdId=47965&adServerOptimizerId=1&ranreq=0.15638034541708&kpbmtpfact=0.000000&mobflag=1&ismobileapp=1&pageURL=NOPAGEURLSPECIFIED\",\"click_tracking_url\":\"http://track.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=3&clickData=aHR0cDovL3RyYWNrLnB1Ym1hdGljLmNvbS9BZFNlcnZlci9BZERpc3BsYXlUcmFja2VyU2VydmxldD9vcGVySWQ9MyZwdWJJZD0yNjg1JnNpdGVJZD0zMDcxMyZhZElkPTI4NjUyJmthZHNpemVpZD0yMDYxNTg0MzAyMzgmaW5kaXJlY3RBZElkPTQ3OTY1JmFkU2VydmVySWQ9MTIzOCZtb2JmbGFnPTEmaXNtb2JpbGVhcHA9MSZQdWJjbGt1cmw9&url=\",\"autorefresh_time\":0,\"prefetch_data\":0}}";
@@ -374,9 +374,9 @@ public class DCPPubmaticAdapterTest extends TestCase {
                 + "-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                new JSONObject("{\"4\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new JSONObject("{\"4\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
         String response = "{\"PubMatic_Bid\":{\"ecpm\":1.000000,\"creative_tag\":\"<a target=\\\"_blank\\\" href=\\\"http://pubmatic.com\\\">\n<div style=\\\"left: 0px; top: 0px; width: 320px;\nheight: 50px; background-color:#003366; color:#ffffff; text-align:center;\\\" >\n<h4> PubMatic 320x50 Test Ad </h4>\n</div>\n</a>\",\"tracking_url\":\"http://aktrack.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=201&pubId=2685&siteId=30713&adId=28652&adServerId=1238&kefact=1.000000&kaxefact=1.000000&kadNetFrequecy=0&kadwidth=300&kadheight=50&kadsizeid=30&kltstamp=1360156017&indirectAdId=47965&adServerOptimizerId=1&ranreq=0.15638034541708&kpbmtpfact=0.000000&mobflag=1&ismobileapp=1&pageURL=NOPAGEURLSPECIFIED\",\"click_tracking_url\":\"http://track.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=3&clickData=aHR0cDovL3RyYWNrLnB1Ym1hdGljLmNvbS9BZFNlcnZlci9BZERpc3BsYXlUcmFja2VyU2VydmxldD9vcGVySWQ9MyZwdWJJZD0yNjg1JnNpdGVJZD0zMDcxMyZhZElkPTI4NjUyJmthZHNpemVpZD0yMDYxNTg0MzAyMzgmaW5kaXJlY3RBZElkPTQ3OTY1JmFkU2VydmVySWQ9MTIzOCZtb2JmbGFnPTEmaXNtb2JpbGVhcHA9MSZQdWJjbGt1cmw9&url=\",\"autorefresh_time\":0,\"prefetch_data\":0}}";
@@ -400,9 +400,9 @@ public class DCPPubmaticAdapterTest extends TestCase {
                 + "-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                new JSONObject("{\"4\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new JSONObject("{\"4\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
         String response = "{\"PubMatic_Bid\":{\"ecpm\":1.000000,\"creative_tag\":\"<a target=\\\"_blank\\\" href=\\\"http://pubmatic.com\\\">\n<div style=\\\"left: 0px; top: 0px; width: 320px;\nheight: 50px; background-color:#003366; color:#ffffff; text-align:center;\\\" >\n<h4> PubMatic 320x50 Test Ad </h4>\n</div>\n</a>\",\"tracking_url\":\"http://aktrack.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=201&pubId=2685&siteId=30713&adId=28652&adServerId=1238&kefact=1.000000&kaxefact=1.000000&kadNetFrequecy=0&kadwidth=300&kadheight=50&kadsizeid=30&kltstamp=1360156017&indirectAdId=47965&adServerOptimizerId=1&ranreq=0.15638034541708&kpbmtpfact=0.000000&mobflag=1&ismobileapp=1&pageURL=NOPAGEURLSPECIFIED\",\"click_tracking_url\":\"http://track.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=3&clickData=aHR0cDovL3RyYWNrLnB1Ym1hdGljLmNvbS9BZFNlcnZlci9BZERpc3BsYXlUcmFja2VyU2VydmxldD9vcGVySWQ9MyZwdWJJZD0yNjg1JnNpdGVJZD0zMDcxMyZhZElkPTI4NjUyJmthZHNpemVpZD0yMDYxNTg0MzAyMzgmaW5kaXJlY3RBZElkPTQ3OTY1JmFkU2VydmVySWQ9MTIzOCZtb2JmbGFnPTEmaXNtb2JpbGVhcHA9MSZQdWJjbGt1cmw9&url=\",\"autorefresh_time\":0,\"prefetch_data\":0}}";
@@ -428,9 +428,9 @@ public class DCPPubmaticAdapterTest extends TestCase {
                 + "-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                new JSONObject("{\"4\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new JSONObject("{\"4\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
         String response = "{\"PubMatic_Bid\":{\"ecpm\":1.000000,\"creative_tag\":\"<a target=\\\"_blank\\\" href=\\\"http://pubmatic.com\\\">\n<div style=\\\"left: 0px; top: 0px; width: 320px;\nheight: 50px; background-color:#003366; color:#ffffff; text-align:center;\\\" >\n<h4> PubMatic 320x50 Test Ad </h4>\n</div>\n</a>\",\"tracking_url\":\"http://aktrack.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=201&pubId=2685&siteId=30713&adId=28652&adServerId=1238&kefact=1.000000&kaxefact=1.000000&kadNetFrequecy=0&kadwidth=300&kadheight=50&kadsizeid=30&kltstamp=1360156017&indirectAdId=47965&adServerOptimizerId=1&ranreq=0.15638034541708&kpbmtpfact=0.000000&mobflag=1&ismobileapp=1&pageURL=NOPAGEURLSPECIFIED\",\"click_tracking_url\":\"http://track.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=3&clickData=aHR0cDovL3RyYWNrLnB1Ym1hdGljLmNvbS9BZFNlcnZlci9BZERpc3BsYXlUcmFja2VyU2VydmxldD9vcGVySWQ9MyZwdWJJZD0yNjg1JnNpdGVJZD0zMDcxMyZhZElkPTI4NjUyJmthZHNpemVpZD0yMDYxNTg0MzAyMzgmaW5kaXJlY3RBZElkPTQ3OTY1JmFkU2VydmVySWQ9MTIzOCZtb2JmbGFnPTEmaXNtb2JpbGVhcHA9MSZQdWJjbGt1cmw9&url=\",\"autorefresh_time\":0,\"prefetch_data\":0}}";
@@ -472,9 +472,9 @@ public class DCPPubmaticAdapterTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "33327";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                pubmaticAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null);
         assertEquals(dcpPubmaticAdnetwork.getImpressionId(), "4f8d98e2-4bbd-40bc-8795-22da170700f9");
     }

@@ -77,10 +77,10 @@ public class DCPxAdAdNetworkTest extends TestCase {
 		ChannelSegmentEntity entity = new ChannelSegmentEntity(
 				AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId, null,
 						null, null, 0, null, null, true, true, externalKey,
-						null, null, null, 0, true, null, null, 0, null, false,
+						null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
 						false, false, false, false, false, false, false, false,
 						false, null, new ArrayList<Integer>(), 0.0d, null,
-						null, 32));
+						null, 32, new Integer[] {0}));
 		assertTrue(dcpxAdAdnetwork.configureParameters(sasParams,
 				casInternalRequestParameters, entity, clurl, null));
 	}
@@ -100,10 +100,10 @@ public class DCPxAdAdNetworkTest extends TestCase {
 		ChannelSegmentEntity entity = new ChannelSegmentEntity(
 				AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId, null,
 						null, null, 0, null, null, true, true, externalKey,
-						null, null, null, 0, true, null, null, 0, null, false,
+						null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
 						false, false, false, false, false, false, false, false,
 						false, null, new ArrayList<Integer>(), 0.0d, null,
-						null, 32));
+						null, 32, new Integer[] {0}));
 		assertTrue(dcpxAdAdnetwork.configureParameters(sasParams,
 				casInternalRequestParameters, entity, clurl, null));
 	}
@@ -122,10 +122,10 @@ public class DCPxAdAdNetworkTest extends TestCase {
 		ChannelSegmentEntity entity = new ChannelSegmentEntity(
 				AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId, null,
 						null, null, 0, null, null, true, true, externalKey,
-						null, null, null, 0, true, null, null, 0, null, false,
+						null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
 						false, false, false, false, false, false, false, false,
 						false, null, new ArrayList<Integer>(), 0.0d, null,
-						null, 32));
+						null, 32, new Integer[] {0}));
 		assertEquals(dcpxAdAdnetwork.configureParameters(sasParams,
 				casInternalRequestParameters, entity, clurl, null), false);
 	}
@@ -144,10 +144,10 @@ public class DCPxAdAdNetworkTest extends TestCase {
 		ChannelSegmentEntity entity = new ChannelSegmentEntity(
 				AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId, null,
 						null, null, 0, null, null, true, true, externalKey,
-						null, null, null, 0, true, null, null, 0, null, false,
+						null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
 						false, false, false, false, false, false, false, false,
 						false, null, new ArrayList<Integer>(), 0.0d, null,
-						null, 32));
+						null, 32, new Integer[] {0}));
 		assertEquals(dcpxAdAdnetwork.configureParameters(sasParams,
 				casInternalRequestParameters, entity, clurl, null), false);
 	}
@@ -165,10 +165,10 @@ public class DCPxAdAdNetworkTest extends TestCase {
 		ChannelSegmentEntity entity = new ChannelSegmentEntity(
 				AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId, null,
 						null, null, 0, null, null, true, true, externalKey,
-						null, null, null, 0, true, null, null, 0, null, false,
+						null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
 						false, false, false, false, false, false, false, false,
 						false, null, new ArrayList<Integer>(), 0.0d, null,
-						null, 32));
+						null, 32, new Integer[] {0}));
 		assertEquals(dcpxAdAdnetwork.configureParameters(sasParams,
 				casInternalRequestParameters, entity, clurl, null), false);
 	}
@@ -194,10 +194,10 @@ public class DCPxAdAdNetworkTest extends TestCase {
 		ChannelSegmentEntity entity = new ChannelSegmentEntity(
 				AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId, null,
 						null, null, 0, null, segmentCategories, true, true,
-						externalKey, null, null, null, 0, false, null, null, 0,
+						externalKey, null, null, null, new Long[] {0L}, false, null, null, 0,
 						null, false, false, false, false, false, false, false,
 						false, false, false, null, new ArrayList<Integer>(),
-						0.0d, null, null, 0));
+						0.0d, null, null, 0, new Integer[] {0}));
 		if (dcpxAdAdnetwork.configureParameters(sasParams,
 				casInternalRequestParameters, entity, clurl, null)) {
 			String actualUrl = dcpxAdAdnetwork.getRequestUri().toString();
@@ -231,10 +231,10 @@ public class DCPxAdAdNetworkTest extends TestCase {
 		ChannelSegmentEntity entity = new ChannelSegmentEntity(
 				AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId, null,
 						null, null, 0, null, segmentCategories, true, true,
-						externalKey, null, null, null, 0, true, null, null, 0,
+						externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
 						null, false, false, false, false, false, false, false,
 						false, false, false, null, new ArrayList<Integer>(),
-						0.0d, null, null, 0));
+						0.0d, null, null, 0, new Integer[] {0}));
 		if (dcpxAdAdnetwork.configureParameters(sasParams,
 				casInternalRequestParameters, entity, clurl, null)) {
 			String actualUrl = dcpxAdAdnetwork.getRequestUri().toString();
@@ -267,10 +267,10 @@ public class DCPxAdAdNetworkTest extends TestCase {
 		ChannelSegmentEntity entity = new ChannelSegmentEntity(
 				AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId, null,
 						null, null, 0, null, segmentCategories, true, true,
-						externalKey, null, null, null, 0, false, null, null, 0,
+						externalKey, null, null, null, new Long[] {0L}, false, null, null, 0,
 						null, false, false, false, false, false, false, false,
 						false, false, false, null, new ArrayList<Integer>(),
-						0.0d, null, null, 0));
+						0.0d, null, null, 0, new Integer[] {0}));
 		if (dcpxAdAdnetwork.configureParameters(sasParams,
 				casInternalRequestParameters, entity, clurl, null)) {
 			String actualUrl = dcpxAdAdnetwork.getRequestUri().toString();
@@ -299,10 +299,10 @@ public class DCPxAdAdNetworkTest extends TestCase {
 		ChannelSegmentEntity entity = new ChannelSegmentEntity(
 				AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId, null,
 						null, null, 0, null, null, true, true, externalKey,
-						null, null, null, 0, true, null, null, 0, null, false,
+						null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
 						false, false, false, false, false, false, false, false,
 						false, null, new ArrayList<Integer>(), 0.0d, null,
-						null, 32));
+						null, 32, new Integer[] {0}));
 		assertTrue(dcpxAdAdnetwork.configureParameters(sasParams,
 				casInternalRequestParameters, entity, clurl, null));
 	}
@@ -328,10 +328,10 @@ public class DCPxAdAdNetworkTest extends TestCase {
 		ChannelSegmentEntity entity = new ChannelSegmentEntity(
 				AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId, null,
 						null, null, 0, null, null, true, true, externalKey,
-						null, null, null, 0, true, null, null, 0, null, false,
+						null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
 						false, false, false, false, false, false, false, false,
 						false, null, new ArrayList<Integer>(), 0.0d, null,
-						null, 0));
+						null, 0, new Integer[] {0}));
 		if (dcpxAdAdnetwork.configureParameters(sasParams,
 				casInternalRequestParameters, entity, clurl, null)) {
 			String actualUrl = dcpxAdAdnetwork.getRequestUri().toString();
@@ -359,10 +359,10 @@ public class DCPxAdAdNetworkTest extends TestCase {
 		ChannelSegmentEntity entity = new ChannelSegmentEntity(
 				AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId, null,
 						null, null, 0, null, null, true, true, externalKey,
-						null, null, null, 0, true, null, null, 0, null, false,
+						null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
 						false, false, false, false, false, false, false, false,
 						false, null, new ArrayList<Integer>(), 0.0d, null,
-						null, 32));
+						null, 32, new Integer[] {0}));
 		assertFalse(dcpxAdAdnetwork.configureParameters(sasParams,
 				casInternalRequestParameters, entity, clurl, null));
 	}
@@ -384,10 +384,10 @@ public class DCPxAdAdNetworkTest extends TestCase {
 		ChannelSegmentEntity entity = new ChannelSegmentEntity(
 				AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId, null,
 						null, null, 0, null, null, true, true, externalKey,
-						null, null, null, 0, true, null, null, 0, null, false,
+						null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
 						false, false, false, false, false, false, false, false,
 						false, null, new ArrayList<Integer>(), 0.0d, null,
-						null, 32));
+						null, 32, new Integer[] {0}));
 		if (dcpxAdAdnetwork.configureParameters(sasParams,
 				casInternalRequestParameters, entity, clickUrl, beaconUrl)) {
 			String response = "<meta charset=\"utf-8\"/> <meta name=\"viewport\" content=\"width=device-width; initial-scale=1.0; maximum-scale=1.0;\"/> <script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/zepto.min.js\"></script> <link rel=\"stylesheet\" media=\"all\" href=\"http://test.xad.com/rest/xadbanner/layout/sb15/_ui/css/main_short.css\"/><script type=\"text/javascript\" src= \"http://test.xad.com/rest/xadbanner/layout/validation/validation.js\"> </script> <div id=\"xad-banner-wrapper_outer\"><div id=\"xad-banner-wrapper\"> <a href=\"http://test.xad.com/wap/?l_id=L3rwAq7nP7&appid=Dummy221\" style=\"text-decoration:none\"><div id=\"bus-holder\"> <img src=\"http://test.xad.com/rest/xadbanner/layout/sb15/template/map_small.png\" id=\"bus-logo\" alt=\"Gs\"/> </div> <p id=\"xad-banner-description\"> <span class=\"descr descr-height\">Fashionable Eyewear for Men &amp; Women in San Anselmo. Stop by Our Store!... </span> <span class=\"location\"> <span id=\"bus\">Focus Opticians</span> </span> </p> </a> <div id=\"banner-action\"> <a class=\"call-it\" href=\"http://test.xad.com/wap/?l_id=L3rwAq7nP7&appid=Dummy221\">call</a> <sub>xAd</sub></div> </div> <img src=\"http://test.xad.com/rest/notify?t=imp&tid=0&k=X3vZEQ0smjqdLj0sRi49wdtRkUulP9SP&v=1.1&uid=null&l_id=L3rwAq7nP7%7E9AYDW0evP7-0%7E1%7E1%7E1%7E3%7ECA%7Eus%7E9AYDW0evP7%7E1%7E0%7E0%7E%7E0%7E1&type=banner\" width=\"0\" height=\"0\"/> </div> <script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/main.js\"></script><script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/textSizer.js\"></script><script type=\"text/javascript\">$(window).bind('orientationchange', resizeText);$(window).resize(resizeText)</script>";
@@ -415,10 +415,10 @@ public class DCPxAdAdNetworkTest extends TestCase {
 		ChannelSegmentEntity entity = new ChannelSegmentEntity(
 				AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId, null,
 						null, null, 0, null, null, true, true, externalKey,
-						null, null, null, 0, true, null, null, 0, null, false,
+						null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
 						false, false, false, false, false, false, false, false,
 						false, null, new ArrayList<Integer>(), 0.0d, null,
-						null, 32));
+						null, 32, new Integer[] {0}));
 		dcpxAdAdnetwork.configureParameters(sasParams,
 				casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
@@ -445,10 +445,10 @@ public class DCPxAdAdNetworkTest extends TestCase {
 		ChannelSegmentEntity entity = new ChannelSegmentEntity(
 				AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId, null,
 						null, null, 0, null, null, true, true, externalKey,
-						null, null, null, 0, true, null, null, 0, null, false,
+						null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
 						false, false, false, false, false, false, false, false,
 						false, null, new ArrayList<Integer>(), 0.0d, null,
-						null, 32));
+						null, 32, new Integer[] {0}));
 		dcpxAdAdnetwork.configureParameters(sasParams,
 				casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
@@ -477,10 +477,10 @@ public class DCPxAdAdNetworkTest extends TestCase {
 		ChannelSegmentEntity entity = new ChannelSegmentEntity(
 				AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId, null,
 						null, null, 0, null, null, true, true, externalKey,
-						null, null, null, 0, true, null, null, 0, null, false,
+						null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
 						false, false, false, false, false, false, false, false,
 						false, null, new ArrayList<Integer>(), 0.0d, null,
-						null, 32));
+						null, 32, new Integer[] {0}));
 		dcpxAdAdnetwork.configureParameters(sasParams,
 				casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
@@ -526,10 +526,10 @@ public class DCPxAdAdNetworkTest extends TestCase {
 		ChannelSegmentEntity entity = new ChannelSegmentEntity(
 				AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId, null,
 						null, null, 0, null, null, true, true, externalKey,
-						null, null, null, 0, true, null, null, 0, null, false,
+						null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
 						false, false, false, false, false, false, false, false,
 						false, null, new ArrayList<Integer>(), 0.0d, null,
-						null, 32));
+						null, 32, new Integer[] {0}));
 		dcpxAdAdnetwork.configureParameters(sasParams,
 				casInternalRequestParameters, entity, clurl, null);
 		assertEquals(dcpxAdAdnetwork.getImpressionId(),

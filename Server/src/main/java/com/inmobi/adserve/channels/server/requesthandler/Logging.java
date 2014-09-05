@@ -144,9 +144,9 @@ public class Logging {
             advertiserId = channelSegment.getChannelEntity().getAccountId();
             adsServed = 1;
             ChannelSegmentEntity channelSegmentEntity = channelSegment.getChannelSegmentEntity();
-            adChain = new AdIdChain(channelSegmentEntity.getAdId(), channelSegmentEntity.getAdgroupId(),
-                    channelSegmentEntity.getCampaignId(), channelSegmentEntity.getAdvertiserId(),
-                    channelSegmentEntity.getExternalSiteKey());
+            adChain = new AdIdChain(channelSegmentEntity.getAdId(channelSegment.getAdNetworkInterface().getCreativeType()),
+                    channelSegmentEntity.getAdgroupId(), channelSegmentEntity.getCampaignId(),
+                    channelSegmentEntity.getAdvertiserId(), channelSegmentEntity.getExternalSiteKey());
             ContentRating contentRating = getContentRating(sasParams);
             PricingModel pricingModel = getPricingModel(channelSegmentEntity.getPricingModel());
             adMeta = new AdMeta(contentRating, pricingModel, "BANNER");

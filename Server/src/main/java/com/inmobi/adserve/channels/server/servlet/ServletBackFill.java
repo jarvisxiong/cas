@@ -85,6 +85,11 @@ public class ServletBackFill implements Servlet {
         LOG.debug("isResponseOnlyFromDcp from config is {}", isResponseOnlyFromDcp);
         sasParams.setResponseOnlyFromDcp(isResponseOnlyFromDcp);
 
+        // Setting isBannerVideoSupported based on the Request params.
+        boolean isBannerVideoSupported = casUtils.isBannerVideoSupported(sasParams);
+        LOG.debug("isBannerVideoSupported for this request is {}", isBannerVideoSupported);
+        sasParams.setBannerVideoSupported(isBannerVideoSupported);
+
         // Set imai content if r-format is imai
         String imaiBaseUrl = null;
         if (hrh.responseSender.getResponseFormat() == ResponseFormat.IMAI) {

@@ -10,18 +10,17 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.SegmentFactory;
+import com.inmobi.adserve.channels.types.AdFormatType;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
 import io.netty.channel.Channel;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -54,6 +53,15 @@ public class AsyncRequestMaker {
         int rtbMaxTimeOut = rtbConfig.getInt("RTBreadtimeoutMillis", 200);
         LOG.debug("isRtbEnabled is {}  and rtbMaxTimeout is {}", isRtbEnabled, rtbMaxTimeOut);
 
+        /*
+         NOTE: For a request that qualifies the in-banner video criteria, at this point we don't know whether an
+         interstitial video response will be sent or Banner.
+         At this point, the creative type is set to Banner for video supported requests. If the request gets fullfiled
+         with a video ad, creative type will be chosen accordingly.
+        */
+        ADCreativeType creativeType = isNativeRequest(sasParams) ? ADCreativeType.NATIVE : ADCreativeType.BANNER;
+        LOG.debug("Creative type is : {}", creativeType);
+
         for (ChannelSegment row : rows) {
             ChannelSegmentEntity channelSegmentEntity = row.getChannelSegmentEntity();
             AdNetworkInterface network = segmentFactory.getChannel(channelSegmentEntity.getAdvertiserId(), row
@@ -70,13 +78,20 @@ public class AsyncRequestMaker {
                 continue;
             }
 
+            long incId = channelSegmentEntity.getIncId(creativeType);
+            if (incId == -1) {
+                LOG.debug("Could not find incId for adGroup {} and creativeType {}", channelSegmentEntity.getAdgroupId());
+                continue;
+            }
+
             String clickUrl = null;
             String beaconUrl = null;
-            sasParams.setImpressionId(getImpressionId(channelSegmentEntity.getIncId()));
+            sasParams.setImpressionId(getImpressionId(incId));
             CasInternalRequestParameters casInternalRequestParameters = getCasInternalRequestParameters(sasParams,
-                    casInternalRequestParameterGlobal);
+                    casInternalRequestParameterGlobal, channelSegmentEntity);
+
             controlEnrichment(casInternalRequestParameters, channelSegmentEntity);
-            sasParams.setAdIncId(channelSegmentEntity.getIncId());
+            sasParams.setAdIncId(incId);
             LOG.debug("impression id is {}", sasParams.getImpressionId());
 
             if ((network.isClickUrlRequired() || network.isBeaconUrlRequired()) && null != sasParams.getImpressionId()) {
@@ -114,7 +129,8 @@ public class AsyncRequestMaker {
     }
 
     private CasInternalRequestParameters getCasInternalRequestParameters(final SASRequestParameters sasParams,
-            final CasInternalRequestParameters casInternalRequestParameterGlobal) {
+            final CasInternalRequestParameters casInternalRequestParameterGlobal,
+            final ChannelSegmentEntity channelSegmentEntity) {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.impressionId = sasParams.getImpressionId();
         casInternalRequestParameters.blockedCategories = casInternalRequestParameterGlobal.blockedCategories;
@@ -138,7 +154,32 @@ public class AsyncRequestMaker {
         casInternalRequestParameters.appUrl = sasParams.getAppUrl();
         casInternalRequestParameters.traceEnabled = casInternalRequestParameterGlobal.traceEnabled;
         casInternalRequestParameters.siteAccountType = casInternalRequestParameterGlobal.siteAccountType;
+
+        // Set impressionIdForVideo if banner video is supported on this request.
+        casInternalRequestParameters.impressionIdForVideo = getImpressionIdForVideo(sasParams,
+                channelSegmentEntity.getAdFormatIds(), channelSegmentEntity.getIncIds());
+
         return casInternalRequestParameters;
+    }
+
+    private String getImpressionIdForVideo(final SASRequestParameters sasParams,
+                                           final Integer[] adFormatIds, final Long[] adIncIds) {
+
+        if (!sasParams.isBannerVideoSupported() || adFormatIds == null || adIncIds == null) {
+            LOG.debug("In-banner video ad is not supported.");
+            return null;
+        }
+
+        for (int i = 0; i < adFormatIds.length; i++) {
+            //  Get impression id for video ad format.
+            if (adFormatIds[i] == AdFormatType.VIDEO.getValue()) {
+                String impressionId = getImpressionId(adIncIds[i]);
+                LOG.debug("impression id for in-banner video ad is {}.", impressionId);
+                return impressionId;
+            }
+        }
+        LOG.debug("Inconsistent data in the database. Could not find a video ad for this ad group.");
+        return null;
     }
 
     private void controlEnrichment(final CasInternalRequestParameters casInternalRequestParameters,
@@ -237,5 +278,9 @@ public class AsyncRequestMaker {
         builder.setDst(dst.toString());
         builder.setBudgetBucketId("101"); // Default Value
         return new ClickUrlMakerV6(builder);
+    }
+
+    private boolean isNativeRequest(final SASRequestParameters sasParams){
+        return "native".equalsIgnoreCase(sasParams.getRFormat());
     }
 }

@@ -82,9 +82,9 @@ public class DCPMadNetAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                madnetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                madnetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(true,
                 dcpMadNetAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
@@ -101,9 +101,9 @@ public class DCPMadNetAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                madnetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                madnetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
                 dcpMadNetAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
@@ -119,9 +119,9 @@ public class DCPMadNetAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                madnetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                madnetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
                 dcpMadNetAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
@@ -147,9 +147,9 @@ public class DCPMadNetAdNetworkTest extends TestCase {
         String externalKey = "0344343";
         SlotSizeMapping.init();
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                madnetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                madnetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 0));
+                new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
         if (dcpMadNetAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
             String actualUrl = dcpMadNetAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://p.madnet.ru/ads2s?uuid=0&t=json&html=0&type=text%2Cimage&ip=206.29.182.240&nid=inmob&pid=00000000-0000-0000-0000-000000000000&w=320&h=50&ua=Mozilla&cat=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&apid=00000000-0000-0000-0000-000000000000&gps=37.4429%2C-122.1514&idfa=23e2ewq445545&idfatracking=0";
@@ -182,10 +182,10 @@ public class DCPMadNetAdNetworkTest extends TestCase {
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
                 + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1" + "/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                madnetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                madnetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                         "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<Integer>(), 0.0d,
-                null, null, 0));
+                null, null, 0, new Integer[] {0}));
         if (dcpMadNetAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpMadNetAdNetwork.getRequestUri().toString();
             System.out.println(actualUrl);
@@ -211,9 +211,9 @@ public class DCPMadNetAdNetworkTest extends TestCase {
                 + "/9cddca11?beacon=true";
 
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                madnetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                madnetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpMadNetAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl);
         String response = "{   \"response\" : {      \"ads\" : [        {          \"components\" : {            \"beacons\" : [               \"http://p.madnet.ru/beacon?ic=0gq-KIsrO1mKjtApKGJW63ktk6Jjc88Rl5lCjxfZ9rq5skcn8sX1mZbW6BV6l76XBs7RWxkmn0KSA2tQ26oTLjGBMoYadTyZvO3YDUIxCYKI733VqpyDnvQg.G.NGwYQIJhgZh2DDBYUD.wnfyG9u1ou4-JVXFOgNCvGDmqIzxqaWhdV1jsnR3JwVRsxKZAmoi1G5eKM.ERhEygh600goq.9nwPvd.3vjKxvPQRkuTplCUfOOZ5TyAwuIooAHtcjYVN.zX113m3SrHaMbn3mUpjybV-d-9.fWheCCa6LW0XjhMPIQkSvxDUE-luALdZhznOvTI5R6ajOJ9uhwqK4hR6Ke6fxK38qvL3EwC68pymPU9dn.2g9yqAOVSPyTuvOIyPOjB7g7qVlu3lI6K.zLejD-Se6AG3ieRhKWuUfS1Qz-enrQ8HJ1uKFseS.5CsXBSygFoijQHvyOl2oS.aGRKApmYZwwVUAM7SxDveLX22Sy9cKf.LoaHjLBEjOk5QFLK5HUsCTDbuaZpegex50axaBUR49T.rRBWWd-BoOyJQZhZI8vPdsfypOGzUSE7wfZLG3Q7OOCzv206VsjmWchfvHgIBC3uHIqbFfW59rzfNr.yIQrwCzPxKWkiVlEnnIyCEpZvQr9kTMSVJ7dh5BDZ6O6vLkwAesTLs4sgeSVSZUG0yX1s8AXGS07OSGmMcV-.jE-WYNJM7ueMGkEPkBtEOwr0mE.OyGqmd8xfcq8AHX96duF.44V2Fj8OObnHeN.Pn3wBsQk78tjVaNet86fY5Y8T9DAB6owtRZysC.5xhqbP2WE6lsxMLMs7Iwk2Cw6oD52vCa3JcWN8qHQL91Gxt1BFAq4NAPDGU0dxD2qXNdRlWjVj-arD8J8IuhtQ==&cachebuster=0902ee6d-4046-4ce4-8355-06179c0020b7\"            ],            \"click_url\" : \"http://p.madnet.ru/click/0gq-KJy4Axfv-49dEX2gvfrmufehG2HBHkT6pEipCx4LGwHlkYc47uvg5sDhXe9J50SgQDG.0tb.ZfCrfY6EpneAaVE8U8qB1H4wKKUcg2vgTxsJw8yIAd.BVlWw3HoWQWGD0sSdX5JXKUAxYkJ7c-Aeq4IijFKK6IaZ2vBIrUOh4pLhNPFGfmOeANXehbGHJnZgKgE8-TbqfA8qE4NWZovmQOnpS.fGIX7Bt4Qv9fGs8X0d6sKHGDLCMKNGXyym1DbCovczCrjeXE6JmKQQ8F7ZGQqHrxTyQPvkLm2KYO01yYbrkaQ0KOpYlj1UR4u3RHNCa6eHxa2nbh-mR1BLuiObft82L7KnEl2PzggygW6Knja-zfCATVv-Yzi0Ons6TMAFGF8pzQmUfYd-KUjIP0TuI1c8n9B4tOhDvVcxrIr9iDX58nndWc0y1BNhSvvqgomlofBQYY8-7IKYJNkrtOzwgnvw-cW8zB9QiLNWX8RTmKkAwyqGHg5dAgw2NgwgmZKMLA7JcCE0RkDmOzFtCWWri9.zjxaoq1.Qr7YbF7CDYmk1cGJaNsoqrre5T.fEsBILH0CAV2e1T93VPPvpdliBkWc56BaKxZ9CUZL75Z3v3siojbVqpGe-EoOVE6vHzdmJ9DxWdFrvyFSUSLHqziZoHzDKWUAW3pGNZJbFCNcB7BDqySoIj0.TekTr8yfTLnUuCEA.nh9MKCNMnprs232hxyXhwc5S9tHfOKPALQ-kvwPAQtuoq38nC-Kf8ZC8D69YMye5MCo4qJs2kKcUiDgJLhZigrX28yOM1is2cPc9dMVavBkCYp8hmZgLw9eHuu2Xad.KvMYaKRu9KO8jaKkFQ-auz3LjjjvuWJc7JTYUicp5iGtXuvefC3yzPg==/http%3A%2F%2Fwww.tcsbank.ru%2Fmobile%2Fcards%2F%3Futm_source%3Dmobile_madnet_cc%26utm_medium%3Dcpm%26utm_content%3D320x53_card_white2_300%26utm_campaign%3Dcreditcard%26wm%3Dmadvertise_old_mobile_cc%26sid%3D320x53_card_white2_300\",            \"image_url\" : \"http://media.madnet.ru/ffd07026052aaa2dc00ed006d72bb767.gif\"          },          \"height\" : \"50\",          \"id\" : \"ad2b6392-5aa8-456a-8a0a-df1d9b97095f\",          \"type\" : \"image\",          \"width\" : \"320\"        }      ],      \"status\" : \"OK\"   } }";
         dcpMadNetAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -240,9 +240,9 @@ public class DCPMadNetAdNetworkTest extends TestCase {
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
 
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                madnetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                madnetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpMadNetAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl);
         String response = "{   \"response\" : {      \"ads\" : [        {          \"components\" : {            \"beacons\" : [               \"http://p.madnet.ru/beacon?ic=0gq-KIsrO1mKjtApKGJW63ktk6Jjc88Rl5lCjxfZ9rq5skcn8sX1mZbW6BV6l76XBs7RWxkmn0KSA2tQ26oTLjGBMoYadTyZvO3YDUIxCYKI733VqpyDnvQg.G.NGwYQIJhgZh2DDBYUD.wnfyG9u1ou4-JVXFOgNCvGDmqIzxqaWhdV1jsnR3JwVRsxKZAmoi1G5eKM.ERhEygh600goq.9nwPvd.3vjKxvPQRkuTplCUfOOZ5TyAwuIooAHtcjYVN.zX113m3SrHaMbn3mUpjybV-d-9.fWheCCa6LW0XjhMPIQkSvxDUE-luALdZhznOvTI5R6ajOJ9uhwqK4hR6Ke6fxK38qvL3EwC68pymPU9dn.2g9yqAOVSPyTuvOIyPOjB7g7qVlu3lI6K.zLejD-Se6AG3ieRhKWuUfS1Qz-enrQ8HJ1uKFseS.5CsXBSygFoijQHvyOl2oS.aGRKApmYZwwVUAM7SxDveLX22Sy9cKf.LoaHjLBEjOk5QFLK5HUsCTDbuaZpegex50axaBUR49T.rRBWWd-BoOyJQZhZI8vPdsfypOGzUSE7wfZLG3Q7OOCzv206VsjmWchfvHgIBC3uHIqbFfW59rzfNr.yIQrwCzPxKWkiVlEnnIyCEpZvQr9kTMSVJ7dh5BDZ6O6vLkwAesTLs4sgeSVSZUG0yX1s8AXGS07OSGmMcV-.jE-WYNJM7ueMGkEPkBtEOwr0mE.OyGqmd8xfcq8AHX96duF.44V2Fj8OObnHeN.Pn3wBsQk78tjVaNet86fY5Y8T9DAB6owtRZysC.5xhqbP2WE6lsxMLMs7Iwk2Cw6oD52vCa3JcWN8qHQL91Gxt1BFAq4NAPDGU0dxD2qXNdRlWjVj-arD8J8IuhtQ==&cachebuster=0902ee6d-4046-4ce4-8355-06179c0020b7\"            ],            \"click_url\" : \"http://p.madnet.ru/click/0gq-KJy4Axfv-49dEX2gvfrmufehG2HBHkT6pEipCx4LGwHlkYc47uvg5sDhXe9J50SgQDG.0tb.ZfCrfY6EpneAaVE8U8qB1H4wKKUcg2vgTxsJw8yIAd.BVlWw3HoWQWGD0sSdX5JXKUAxYkJ7c-Aeq4IijFKK6IaZ2vBIrUOh4pLhNPFGfmOeANXehbGHJnZgKgE8-TbqfA8qE4NWZovmQOnpS.fGIX7Bt4Qv9fGs8X0d6sKHGDLCMKNGXyym1DbCovczCrjeXE6JmKQQ8F7ZGQqHrxTyQPvkLm2KYO01yYbrkaQ0KOpYlj1UR4u3RHNCa6eHxa2nbh-mR1BLuiObft82L7KnEl2PzggygW6Knja-zfCATVv-Yzi0Ons6TMAFGF8pzQmUfYd-KUjIP0TuI1c8n9B4tOhDvVcxrIr9iDX58nndWc0y1BNhSvvqgomlofBQYY8-7IKYJNkrtOzwgnvw-cW8zB9QiLNWX8RTmKkAwyqGHg5dAgw2NgwgmZKMLA7JcCE0RkDmOzFtCWWri9.zjxaoq1.Qr7YbF7CDYmk1cGJaNsoqrre5T.fEsBILH0CAV2e1T93VPPvpdliBkWc56BaKxZ9CUZL75Z3v3siojbVqpGe-EoOVE6vHzdmJ9DxWdFrvyFSUSLHqziZoHzDKWUAW3pGNZJbFCNcB7BDqySoIj0.TekTr8yfTLnUuCEA.nh9MKCNMnprs232hxyXhwc5S9tHfOKPALQ-kvwPAQtuoq38nC-Kf8ZC8D69YMye5MCo4qJs2kKcUiDgJLhZigrX28yOM1is2cPc9dMVavBkCYp8hmZgLw9eHuu2Xad.KvMYaKRu9KO8jaKkFQ-auz3LjjjvuWJc7JTYUicp5iGtXuvefC3yzPg==/http%3A%2F%2Fwww.tcsbank.ru%2Fmobile%2Fcards%2F%3Futm_source%3Dmobile_madnet_cc%26utm_medium%3Dcpm%26utm_content%3D320x53_card_white2_300%26utm_campaign%3Dcreditcard%26wm%3Dmadvertise_old_mobile_cc%26sid%3D320x53_card_white2_300\",            \"text_title\" : \"Welcome to MedNet\"          },          \"height\" : \"50\",          \"id\" : \"ad2b6392-5aa8-456a-8a0a-df1d9b97095f\",          \"type\" : \"text\",          \"width\" : \"320\"        }      ],      \"status\" : \"OK\"   } }";
         dcpMadNetAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -285,10 +285,10 @@ public class DCPMadNetAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                madnetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                madnetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                         "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<Integer>(), 0.0d,
-                null, null, 32));
+                null, null, 32, new Integer[] {0}));
         dcpMadNetAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null);
         assertEquals("4f8d98e2-4bbd-40bc-8795-22da170700f9", dcpMadNetAdNetwork.getImpressionId());
     }
