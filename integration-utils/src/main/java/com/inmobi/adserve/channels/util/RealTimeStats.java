@@ -13,15 +13,9 @@ public class RealTimeStats {
     @Getter
     private Counter             fills;
     @Getter
-    private Counter             requests;
-    @Getter
     private Counter             serverImpressions;
     @Getter
     private Histogram           bids;
-    @Getter
-    private Histogram           latency;
-	@Getter
-	private Histogram 			timerLatency;
     @Getter
     private Histogram           chargedBids;      // These are secondBidprices
 
@@ -42,18 +36,13 @@ public class RealTimeStats {
 
     private void initializeStats(String key) {
         String fillsKey = key + SEP + "fills";
-        String requestsKey = key + SEP + "requests";
         String serverImpressionsKey = key + SEP + "serverImpressions";
         String bidsKey = key + SEP + "bids";
-        String latencyKey = key + SEP + "latency";
-        String timerLatencyKey = key + SEP + "timerLatency";
         String chargedBidsKey = key + SEP + "chargedBids";
+        
         this.fills = Metrics.newCounter(MetricsManager.class, fillsKey);
-        this.requests = Metrics.newCounter(MetricsManager.class, requestsKey);
         this.serverImpressions = Metrics.newCounter(MetricsManager.class, serverImpressionsKey);
         this.bids = Metrics.newHistogram(MetricsManager.class, bidsKey);
-        this.latency = Metrics.newHistogram(MetricsManager.class, latencyKey);
-        this.timerLatency = Metrics.newHistogram(MetricsManager.class, timerLatencyKey);
         this.chargedBids = Metrics.newHistogram(MetricsManager.class, chargedBidsKey);
     }
 }

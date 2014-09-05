@@ -90,9 +90,9 @@ public class IFCAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                ifcAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                ifcAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(ifcAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", ""), true);
     }
 
@@ -121,9 +121,9 @@ public class IFCAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                ifcAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                ifcAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(ifcAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", ""), true);
     }
 
@@ -152,9 +152,9 @@ public class IFCAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                ifcAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                ifcAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(ifcAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", ""), false);
     }
 
@@ -194,9 +194,9 @@ public class IFCAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                ifcAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                ifcAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         ifcAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
         try {
             ifcAdNetwork.parseResponse("", HttpResponseStatus.OK);
@@ -233,9 +233,9 @@ public class IFCAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                ifcAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                ifcAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(ifcAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", ""), true);
     }
 }
