@@ -1,12 +1,11 @@
 package com.inmobi.adserve.channels.api;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
-
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.casthrift.ADCreativeType;
 
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
 
 public interface AdNetworkInterface {
 
