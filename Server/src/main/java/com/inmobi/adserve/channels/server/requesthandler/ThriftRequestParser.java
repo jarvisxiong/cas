@@ -31,7 +31,7 @@ public class ThriftRequestParser {
 
         // Fill params from AdPoolRequest Object
         params.setRemoteHostIp(tObject.remoteHostIp);
-        params.setMarketRate((double)tObject.guidanceBid);
+        params.setMarketRate(tObject.guidanceBid * 1.0/Math.pow(10,6));
         // TODO Iterate over the segments using all slots
         Short slotId = null != tObject.selectedSlots && !tObject.selectedSlots.isEmpty() ? tObject.selectedSlots.get(0)
                 : (short) 0;
@@ -74,12 +74,11 @@ public class ThriftRequestParser {
             params.setSiteId(tObject.site.siteId);
             final boolean isApp = tObject.site.isSetInventoryType() && tObject.site.inventoryType == InventoryType.APP;
             params.setSource(isApp ? "APP" : "WAP");
-			if (isApp) {
-				if (CasConfigUtil.repositoryHelper != null) {
-					params.setWapSiteUACEntity(CasConfigUtil.repositoryHelper.queryWapSiteUACRepository(tObject.site.siteId));
-				}
-			}
+
 			if (CasConfigUtil.repositoryHelper != null) {
+
+				params.setWapSiteUACEntity(CasConfigUtil.repositoryHelper.queryWapSiteUACRepository(tObject.site.siteId));
+
 				params.setSiteEcpmEntity(CasConfigUtil.repositoryHelper.querySiteEcpmRepository(tObject.site.siteId,
 						tObject.geo.countryId, (int) tObject.device.osId));
 			}
