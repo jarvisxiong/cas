@@ -44,7 +44,7 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.Ad
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupPropertyViolationFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupSiteExclusionFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupSupplyDemandClassificationFilter;
-import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupTotalCountFilter;
+import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupMaxSegmentPerRequestFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AdvertiserLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserExcludedFilter;
 import com.inmobi.adserve.channels.server.utils.CasUtils;
@@ -504,7 +504,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         List<ChannelSegment> channelSegments = Lists.newArrayList(channelSegment1, channelSegment2, channelSegment3,
                 channelSegment4, channelSegment5, channelSegment6);
 
-        AdGroupTotalCountFilter adGroupTotalCountFilter = injector.getInstance(AdGroupTotalCountFilter.class);
+        AdGroupMaxSegmentPerRequestFilter adGroupTotalCountFilter = injector.getInstance(AdGroupMaxSegmentPerRequestFilter.class);
         adGroupTotalCountFilter.filter(channelSegments, sasParams, new CasContext());
 
         assertEquals(5, channelSegments.size());
@@ -952,7 +952,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         builder.setAdvertiserId(advertiserId);
         builder.setAdvertiserId(advertiserId);
         builder.setAdgroupId(adgroupId);
-        builder.setAdId(adId);
+        builder.setAdIds(new String[] {adId});
         builder.setChannelId(channelId);
         builder.setPlatformTargeting(platformTargeting);
         builder.setRcList(rcList);
@@ -965,7 +965,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         builder.setModified_on(modified_on);
         builder.setCampaignId(campaignId);
         builder.setSlotIds(slotIds);
-        builder.setIncId(incId);
+        builder.setIncIds(new Long[] {incId});
         builder.setAdgroupIncId(incId);
         builder.setPricingModel(pricingModel);
         builder.setSiteRatings(siteRatings);

@@ -285,7 +285,7 @@ public class MatchSegments {
     }
 
     private void printSegments(final List<AdvertiserMatchedSegmentDetail> result, final Marker traceMarker) {
-        if (LOG.isDebugEnabled()) {
+        if (LOG.isDebugEnabled() || null != traceMarker) {
             for (AdvertiserMatchedSegmentDetail advertiserMatchedSegmentDetail : result) {
                 for (ChannelSegment channelSegment : advertiserMatchedSegmentDetail.getChannelSegmentList()) {
                     LOG.debug(traceMarker, "Advertiser :{} , AdGroup : {}", channelSegment.getChannelSegmentEntity()

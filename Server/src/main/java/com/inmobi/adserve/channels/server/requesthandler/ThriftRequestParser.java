@@ -204,6 +204,9 @@ public class ThriftRequestParser {
     }
 
     private Set<Integer> getAccountSegments(final Set<DemandType> demandTypes) {
+
+        LOG.debug("demandTypesAllowed value is: {}", demandTypes);
+
         if (null == demandTypes) {
             return Collections.emptySet();
         }

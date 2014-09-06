@@ -13,6 +13,7 @@ import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.auction.AuctionEngine;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.commons.security.api.InmobiSession;
 import com.inmobi.commons.security.impl.InmobiSecurityImpl;
@@ -209,12 +210,15 @@ public class ResponseSender extends HttpRequestHandlerBase {
 		AdPoolResponse adPoolResponse = new AdPoolResponse();
 		AdInfo rtbdAd = new AdInfo();
 		AdIdChain adIdChain = new AdIdChain();
+
 		ChannelSegmentEntity channelSegmentEntity = getRtbResponse().getChannelSegmentEntity();
+		ADCreativeType responseCreativeType =  getRtbResponse().getAdNetworkInterface().getCreativeType();
+
 		adIdChain.setAdgroup_guid(channelSegmentEntity.getAdgroupId());
-		adIdChain.setAd_guid(channelSegmentEntity.getAdId());
+		adIdChain.setAd_guid(channelSegmentEntity.getAdId(responseCreativeType));
 		adIdChain.setAdvertiser_guid(channelSegmentEntity.getAdvertiserId());
 		adIdChain.setCampaign_guid(channelSegmentEntity.getCampaignId());
-		adIdChain.setAd(channelSegmentEntity.getIncId());
+		adIdChain.setAd(channelSegmentEntity.getIncId(responseCreativeType));
 		adIdChain.setGroup(channelSegmentEntity.getAdgroupIncId());
 		adIdChain.setCampaign(channelSegmentEntity.getCampaignIncId());
 		
@@ -291,7 +295,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
 		byte[] bytes = responseString.getBytes(Charsets.UTF_8);
 		sendResponse(status, bytes, responseHeaders, serverChannel);
-
 	}
 
 	// send response to the caller

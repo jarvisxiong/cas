@@ -49,7 +49,8 @@ public class RequestFilters {
         }
 
         if (!hrh.responseSender.sasParams.getAllowBannerAds()) {
-            LOG.error("Request not being served because of banner not allowed");
+            LOG.error("Request not being served because of banner not allowed.");
+            InspectorStats.incrementStatCount(InspectorStrings.DROPPED_IN_BANNER_NOT_ALLOWED_FILTER, InspectorStrings.count);
             return true;
         }
 

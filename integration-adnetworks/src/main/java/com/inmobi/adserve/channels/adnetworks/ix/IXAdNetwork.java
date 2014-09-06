@@ -546,7 +546,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private Site createSiteObject() {
         Site site = null;
         if (siteBlinded) {
-            site = new Site(getBlindedSiteId(sasParams.getSiteIncId(), entity.getIncId()));
+            site = new Site(getBlindedSiteId(sasParams.getSiteIncId(), entity.getIncId(getCreativeType())));
         }
         else {
             site = new Site(sasParams.getSiteId());

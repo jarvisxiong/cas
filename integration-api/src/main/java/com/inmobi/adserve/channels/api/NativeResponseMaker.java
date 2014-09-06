@@ -3,7 +3,6 @@ package com.inmobi.adserve.channels.api;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 
 import lombok.Data;
 
@@ -61,7 +60,7 @@ public class NativeResponseMaker {
     validateResponse(app, templateEntity);
 
     final VelocityContext vc = getVelocityContext(app, response, params);
-    final String namespace = getNamespace();
+    final String namespace = Formatter.getNamespace();
     vc.put("NAMESPACE", namespace);
 
     final String pubContent = templateParser.format(app, siteId);
@@ -196,10 +195,6 @@ public class NativeResponseMaker {
     // The escaping is not url safe, the input is decoded as base64 utf-8 string
     final Base64 base64 = new Base64();
     return base64.encodeAsString(input.getBytes(Charsets.UTF_8));
-  }
-
-  private String getNamespace() {
-    return "im_" + (Math.abs(ThreadLocalRandom.current().nextInt(10000)) + 10000) + "_";
   }
 
 }

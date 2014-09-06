@@ -8,6 +8,7 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.server.auction.AuctionEngine;
 import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilterApplierTest;
+import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.types.AdIdChain;
 import com.inmobi.types.GUID;
 import com.inmobi.types.PricingModel;
@@ -57,6 +58,7 @@ public class CreateThriftResponseIXTest {
         expect(mockIXAdNetwork.getImpressionId()).andReturn(impressionID).anyTimes();
         expect(mockIXAdNetwork.getCurrency()).andReturn("USD").anyTimes();
         expect(mockIXAdNetwork.getBidPriceInLocal()).andReturn(expectedBidPrice).anyTimes();
+        expect(mockIXAdNetwork.getCreativeType()).andReturn(ADCreativeType.BANNER).anyTimes();
         // IX specific parameters
         expect(mockIXAdNetwork.returnDealId()).andReturn("dealId").anyTimes();
         expect(mockIXAdNetwork.returnAdjustBid()).andReturn(0.5).anyTimes();
@@ -83,10 +85,10 @@ public class CreateThriftResponseIXTest {
         AdIdChain adIdChain = ixAd.getAdIds().get(0);
 
         Assert.assertEquals(adIdChain.adgroup_guid, dummyChannelSegmentEntity.getAdgroupId());
-        Assert.assertEquals(adIdChain.ad_guid, dummyChannelSegmentEntity.getAdId());
+        Assert.assertEquals(adIdChain.ad_guid, dummyChannelSegmentEntity.getAdId(ADCreativeType.BANNER));
         Assert.assertEquals(adIdChain.advertiser_guid, dummyChannelSegmentEntity.getAdvertiserId());
         Assert.assertEquals(adIdChain.campaign_guid, dummyChannelSegmentEntity.getCampaignId());
-        Assert.assertEquals(adIdChain.ad, dummyChannelSegmentEntity.getIncId());
+        Assert.assertEquals(adIdChain.ad, dummyChannelSegmentEntity.getIncId(ADCreativeType.BANNER));
         Assert.assertEquals(adIdChain.group, dummyChannelSegmentEntity.getAdgroupIncId());
         Assert.assertEquals(adIdChain.campaign, dummyChannelSegmentEntity.getCampaignIncId());
         // TODO: IX specific params (Deal id, adjustBid, buyer)

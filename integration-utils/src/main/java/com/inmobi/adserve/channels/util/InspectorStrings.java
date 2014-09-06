@@ -43,6 +43,7 @@ public class InspectorStrings {
     public static final String nomatchsegmentlatency                     = "NoMatchSegmentLatency";
     public static final String nomatchsegmentcount                       = "NoMatchSegmentCount";
     public static final String droppedInImpressionFilter                 = "DroppedInImpressionFilter";
+    public static final String droppedInPropertyViolationFilter          = "DroppedInPropertyViolationFilter";
     public static final String droppedInburnFilter                       = "DroppedInBurnFilter";
     public static final String droppedInRequestCapFilter                 = "DroppedInRequestCapFilter";
     public static final String droppedInSegmentPerRequestFilter          = "DroppedInSegmentPerRequestFilter";
@@ -51,15 +52,14 @@ public class InspectorStrings {
     public static final String lowSdkVersion                             = "LowSdkVersion";
     public static final String serverImpression                          = "Impression";
     public static final String channelException                          = "ChannelException";
-    public static final String droppedInSiteInclusionExclusionFilter     = "DroppedInSiteInclExcl";
     public static final String droppedInUdidFilter                       = "DroppedInUdidFilter";
     public static final String droppedInLatLongFilter                    = "DroppedInLatLongFilter";
     public static final String droppedInZipcodeFilter                    = "DroppedInZipcodeFilter";
     public static final String droppedInRichMediaFilter                  = "DroppedInRichMediaFilter";
     public static final String droppedInOnlyInterstitialFilter           = "DroppedInOnlyInterstitialFilter";
     public static final String droppedInOnlyNonInterstitialFilter        = "DroppedInOnlyNonInterstitialFilter";
-    public static final String droppedinAdvertiserInclusionFilter        = "DroppedinAdvertiserInclusionFilter";
-    public static final String droppedinSiteInclusionFilter              = "DroppedinSiteInclusionFilter";
+    public static final String droppedinAdvertiserExclusionFilter        = "DroppedinAdvertiserExclusionFilter";
+    public static final String droppedinSiteExclusionFilter              = "DroppedinSiteExclusionFilter";
     public static final String droppedinHandsetTargetingFilter           = "DroppedinHandsetTargetingFilter";
     public static final String droppedinPricingEngineFilter              = "DroppedinPricingEngineFilter";
     public static final String droppedInTODFilter                        = "DroppedInTODFilter";
@@ -69,7 +69,6 @@ public class InspectorStrings {
     public static final String siteFeedbackFailedToLoadFromCitrusLeaf    = "SiteFeedbackFailedToLoadFromCitrusLeaf";
     public static final String siteFeedbackLatency                       = "SiteFeedbackLatency";
     public static final String missingCategory                           = "MissingCategory";
-    public final static String droppedInGuaranteedDelivery               = "DroppedInGuaranteedDelivery";
     public final static String droppedInRtbBalanceFilter                 = "DroppedInRtbBalanceFilter";
     public final static String droppedInRtbBidFloorFilter                = "DroppedInRtbBidFloorFilter";
     public final static String droppedInRtbAuctionIdMisMatchFilter       = "DroppedInRtbAuctionIdMisMatchFilter";
@@ -86,5 +85,8 @@ public class InspectorStrings {
     public static final String droppedInRtbCurrencyNotSupportedFilter    = "DroppedInRtbCurrencyNotSupportedFilter";
     public static final String ADAPTER_MISMATCH                          = "AdapterMismatch";
     public static final String DROPPED_IN_INVALID_DETAILS_FILTER         = "DroppedInInvalidDetailsFilter";
+    public static final String DROPPED_IN_BANNER_NOT_ALLOWED_FILTER      = "DroppedInBannerNotAllowedFilter";
+    public static final String DROPPED_IN_PARTNER_COUNT_FILTER           = "DroppedInPartnerCountFilter";
+    public static final String DROPPED_IN_DAILY_IMP_COUNT_FILTER         = "DroppedInDailyImpressionCountFilter";
     public static final String SITE_LEVEL_REQUEST                        = "SiteLevelRequest";
 }

@@ -1,17 +1,5 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import java.util.List;
-
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.QueryStringDecoder;
-
-import javax.inject.Inject;
-import javax.ws.rs.Path;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
@@ -26,6 +14,22 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.Adve
 import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.MetricsManager;
+import com.inmobi.casthrift.DemandSourceType;
+
+import java.util.List;
+
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
+
+import javax.inject.Inject;
+import javax.ws.rs.Path;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
+import java.util.*;
 
 
 @Singleton
@@ -48,6 +52,7 @@ public class ServletBackFill extends BaseServlet {
         Marker traceMarker = traceMarkerProvider.get();
         LOG.debug(traceMarker, "Inside Servlet {}", this.getClass().getSimpleName());
         InspectorStats.incrementStatCount(InspectorStrings.backFillRequests);
+
         super.handleRequest(hrh, queryStringDecoder, serverChannel);
     }
 

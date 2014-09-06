@@ -83,9 +83,9 @@ public class GenericAdapterTest extends TestCase {
         sasParams.setSlot(Short.valueOf("9"));
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                httpoolAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0,
+                httpoolAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L},
                 true, null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 genericAdapter.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl),
                 true);
@@ -102,9 +102,9 @@ public class GenericAdapterTest extends TestCase {
         sasParams.setSiteIncId(18);
         sasParams.setSlot(Short.valueOf("9"));
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                httpoolAdvertiserId, null, null, null, 0, null, null, true, true, null, null, null, null, 0, true,
+                httpoolAdvertiserId, null, null, null, 0, null, null, true, true, null, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(genericAdapter.configureParameters(sasParams, casInternalRequestParameters, entity, null, null),
                 false);
     }
@@ -120,9 +120,9 @@ public class GenericAdapterTest extends TestCase {
         sasParams.setSlot(Short.valueOf("9"));
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                httpoolAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0,
+                httpoolAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L},
                 true, null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (genericAdapter.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl)) {
             String actualUrl = genericAdapter.getRequestUri().toString();
             String expectedUrl = "http://a.mobile.toboads.com/get?did=1234&zid=118398&format=320x48&sdkid=api&sdkver=100&uip=206.29.182.240&ua=Mozilla&ormma=0&fh=1&test=0";

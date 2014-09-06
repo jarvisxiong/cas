@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import com.inmobi.adserve.channels.util.MetricsManager;
+import com.inmobi.casthrift.DemandSourceType;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.QueryStringDecoder;
 
@@ -70,6 +72,10 @@ public abstract class BaseServlet implements Servlet {
         Marker traceMarker = traceMarkerProvider.get();
         InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
         SASRequestParameters sasParams = hrh.responseSender.sasParams;
+
+        //TODO: Review/Debug this line for NullPointerException
+        MetricsManager.updateIncomingRequestsStats(DemandSourceType.findByValue(sasParams.getDst()).name(), sasParams.getCountryId(), sasParams.getCountryCode());
+
         hrh.responseSender.getAuctionEngine().sasParams = hrh.responseSender.sasParams;
         CasInternalRequestParameters casInternalRequestParametersGlobal = hrh.responseSender.casInternalRequestParameters;
 
@@ -88,6 +94,11 @@ public abstract class BaseServlet implements Servlet {
         boolean isResponseOnlyFromDcp = CasConfigUtil.getServerConfig().getBoolean("isResponseOnyFromDCP", false);
         LOG.debug("isResponseOnlyFromDcp from config is {}", isResponseOnlyFromDcp);
         sasParams.setResponseOnlyFromDcp(isResponseOnlyFromDcp);
+
+        // Setting isBannerVideoSupported based on the Request params.
+        boolean isBannerVideoSupported = casUtils.isBannerVideoSupported(sasParams);
+        LOG.debug("isBannerVideoSupported for this request is {}", isBannerVideoSupported);
+        sasParams.setBannerVideoSupported(isBannerVideoSupported);
 
         // Set imai content if r-format is imai
         String imaiBaseUrl = null;

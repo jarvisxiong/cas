@@ -81,6 +81,8 @@ public class SASRequestParameters {
     private WapSiteUACEntity    wapSiteUACEntity;
     private SiteEcpmEntity      siteEcpmEntity;
 
+    private boolean             isBannerVideoSupported;
+
     public SASRequestParameters() {
         // Do Nothing.
     }

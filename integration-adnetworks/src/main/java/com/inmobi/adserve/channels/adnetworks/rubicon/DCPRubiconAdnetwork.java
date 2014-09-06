@@ -174,10 +174,6 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 
 		isApp = (StringUtils.isBlank(sasParams.getSource()) || WAP
 				.equalsIgnoreCase(sasParams.getSource())) ? false : true;
-		if (isApp && StringUtils.isEmpty(getUid())) {
-			LOG.debug("mandatory parameter udid is missing for APP traffic in rubicon so exiting adapter");
-			return false;
-		}
 
 		JSONObject additionalParams = entity.getAdditionalParams();
 
