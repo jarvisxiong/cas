@@ -154,7 +154,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     @Override
-    public boolean isIxPartner() { return isIxPartner(); }
+    public boolean isIxPartner() { return isIxPartner; }
 
     public void setIxPartner(final boolean isIxPartner) { this.isIxPartner = isIxPartner; }
 

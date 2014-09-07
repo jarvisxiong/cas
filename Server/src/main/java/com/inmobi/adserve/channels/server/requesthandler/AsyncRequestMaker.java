@@ -119,10 +119,10 @@ public class AsyncRequestMaker {
                     beaconUrl)) {
                 InspectorStats.incrementStatCount(network.getName(), InspectorStrings.successfulConfigure);
                 row.setAdNetworkInterface(network);
-                if (network.isRtbPartner()) {
+                if (network.isRtbPartner() || network.isIxPartner()) {
                     rtbSegments.add(row);
                     MetricsManager.updatePartnerRequestStats(network.getName(), sasParams.getCountryId(), sasParams.getCountryCode());
-                    LOG.debug("{} is a rtb partner so adding this network to rtb ranklist", network.getName());
+                    LOG.debug("{} is a rtb/ix partner so adding this network to rtb ranklist", network.getName());
                 }
                 else {
                 	MetricsManager.updatePartnerRequestStats(network.getName(), sasParams.getCountryId(), sasParams.getCountryCode());

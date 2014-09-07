@@ -473,7 +473,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             impression = new Impression(casInternalRequestParameters.impressionId);
         }
         else {
-            LOG.info("Impression id can not be null in sasparam");
+            LOG.info("Impression id can not be null in casInternal Request Params");
             return null;
         }
         
@@ -691,7 +691,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             app.setCat(iabCategoriesInterface.getIABCategories(sasParams.getCategories()));
         }
         String category = null;
-      if (sasParams.getWapSiteUACEntity() != null &&
+        if (sasParams.getWapSiteUACEntity() != null &&
           StringUtils.isNotEmpty(sasParams.getWapSiteUACEntity().getAppType())) {
           app.setName(sasParams.getWapSiteUACEntity().getAppType());
         }else if ((category = getCategories(',', false)) != null) {
