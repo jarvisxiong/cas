@@ -35,7 +35,29 @@ public class DCPDmgAdnetwork extends AbstractDCPAdNetworkImpl {
     private String              adType;
     private int                 adTypeId;
     private int                 client = 0;
-
+    
+    private static final String EXT_SITE_KEY = "as";
+    private static final String IP_ADDR = "i";
+    private static final String AD_TYPE = "f";
+    private static final String DEVICE_ID ="uid";
+    private static final String TIME ="t";
+    private static final String ADTYPE_ID ="tp";
+    private static final String CATEGORIES="kw";
+    private static final String WIDTH="adw";
+    private static final String HEIGHT="adh";
+    private static final String IDFA="ifa";
+    private static final String UDID="udid";
+    private static final String ANDROIDID="androidid";
+    private static final String LATITUDE="lat";
+    private static final String LONGITUDE="long";
+    private static final String GENDER="ge";
+    private static final String AGE="age";
+    private static final String COUNTRY_CODE="co";
+    private static final String ZIP_CODE="zip";
+    private static final String BLOCKED_CATEGORY_PERF="nk";
+    private static final String BLOCKED_CATEGORY_FS="nk";
+    
+    
     /**
      * @param config
      * @param clientBootstrap
@@ -101,55 +123,68 @@ public class DCPDmgAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         try {
+        	
             String host = config.getString("dmg.host");
-            String adNetworkId = config.getString("dmg.adnetworkId");
             StringBuilder url = new StringBuilder(host);
-            url.append("?acc=").append(adNetworkId).append("&as=").append(blindedSiteId).append("&ua=")
-                    .append(getURLEncode(sasParams.getUserAgent(), format)).append("&i=")
-                    .append(sasParams.getRemoteHostIp()).append("&f=").append(adType).append("&uid=").append(getUid())
-                    .append("&t=").append(System.currentTimeMillis()).append("&tp=").append(adTypeId).append("&kw=")
-                    .append(getURLEncode(getCategories(',', true), format));
-            
+            appendQueryParam(url, EXT_SITE_KEY, externalSiteId, false);
+            appendQueryParam(url, UA, getURLEncode(sasParams.getUserAgent(), format), false);
+            appendQueryParam(url, IP_ADDR, (sasParams.getRemoteHostIp()),false);
+            appendQueryParam(url, AD_TYPE, adType, false);
+            appendQueryParam(url, DEVICE_ID,getUid(),false);
+            appendQueryParam(url, TIME,System.currentTimeMillis(),false);
+            appendQueryParam(url, ADTYPE_ID,adTypeId,false);
+            appendQueryParam(url, CATEGORIES,getURLEncode(getCategories(',',true),format),false);
             if (width != 0 && height != 0) {
-                url.append("&adw=").append(width).append("&adh=").append(height);
+                
+                appendQueryParam(url, WIDTH, width, false);
+                appendQueryParam(url, HEIGHT, height, false);
             }
+            
             if (client == 2) {
-                if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
-                    url.append("&ifa=").append(casInternalRequestParameters.uidIFA);
+            	if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
+                        && "1".equals(casInternalRequestParameters.uidADT)) {
+                    appendQueryParam(url, IDFA, casInternalRequestParameters.uidIFA, false);
                 }
-                if (StringUtils.isNotBlank(casInternalRequestParameters.uidSO1)) {
-                    url.append("&udid=").append(casInternalRequestParameters.uidMd5);
+            	//TODO correct this
+                if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
+                    appendQueryParam(url, UDID, casInternalRequestParameters.uidIDUS1, false);
+                }
+                else if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
+                    appendQueryParam(url, UDID, casInternalRequestParameters.uidMd5, false);
                 }
             }
             else if (client == 1) {
                 if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
-                    url.append("&androidid=").append(casInternalRequestParameters.uidMd5);
+                    appendQueryParam(url, ANDROIDID, casInternalRequestParameters.uidMd5, false);
                 }
+                else if(StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
+                        appendQueryParam(url, ANDROIDID, casInternalRequestParameters.uidMd5, false);
+                    }
             }
 
             if (!StringUtils.isEmpty(latitude)) {
-                url.append("&lat=").append(latitude);
+                appendQueryParam(url, LATITUDE,latitude, false);
             }
             if (!StringUtils.isEmpty(longitude)) {
-                url.append("&long=").append(longitude);
+                appendQueryParam(url, LONGITUDE, longitude, false);
             }
             if (sasParams.getGender() != null) {
-                url.append("&ge=").append(sasParams.getGender());
+                appendQueryParam(url, GENDER,sasParams.getGender(), false);
             }
             if (sasParams.getAge() != null) {
-                url.append("&age=").append(sasParams.getAge());
+            	appendQueryParam(url, AGE,sasParams.getAge(), false);
             }
             if (sasParams.getCountryCode() != null) {
-                url.append("&co=").append(sasParams.getCountryCode());
+            	appendQueryParam(url, COUNTRY_CODE,sasParams.getCountryCode(), false);
             }
             if (sasParams.getPostalCode() != null) {
-                url.append("&zip=").append(sasParams.getPostalCode());
+            	appendQueryParam(url, ZIP_CODE,sasParams.getPostalCode(), false);
             }
             if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
-                url.append("&nk=").append(getURLEncode(CategoryList.getBlockedCategoryForPerformance(), format));
+                appendQueryParam(url, BLOCKED_CATEGORY_PERF,getURLEncode(CategoryList.getBlockedCategoryForPerformance(), format), false);
             }
             else {
-                url.append("&nk=").append(getURLEncode(CategoryList.getBlockedCategoryForFamilySafe(), format));
+            	 appendQueryParam(url, BLOCKED_CATEGORY_FS,getURLEncode(CategoryList.getBlockedCategoryForPerformance(), format), false);
             }
 
             LOG.debug("dmg url is {}", url);

@@ -35,7 +35,7 @@ public class DCPDmgAdnetworkTest extends TestCase {
     private final Bootstrap    clientBootstrap   = null;
 
     private DCPDmgAdnetwork dcpDmgAdNetwork;
-    private final String       dmgHost        = "http://pulse-serving.amobee.com/upsteed/wap/adrequest";
+    private final String       dmgHost        = "http://ad.dmg-mobile.com/upsteed/wap/adrequest?acc=17067024";
     private final String       dmgStatus      = "on";
     private final String       dmgAdvId       = "dmgadv1";
     private final String       dmgTest        = "1";
@@ -162,7 +162,7 @@ public class DCPDmgAdnetworkTest extends TestCase {
         sasParams.setCategories(category);
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
         sasParams.setSlot(Short.valueOf("15"));
-        String externalKey = "0344343";
+        String externalKey = "49538";
         SlotSizeMapping.init();
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
                 dmgAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
@@ -172,7 +172,7 @@ public class DCPDmgAdnetworkTest extends TestCase {
         if (dcpDmgAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
             String actualUrl = dcpDmgAdNetwork.getRequestUri().toString();
             String t = actualUrl.substring(actualUrl.indexOf("&t=") + 3, actualUrl.indexOf("&tp="));
-            String expectedUrl = "http://pulse-serving.amobee.com/upsteed/wap/adrequest?acc=test&as=00000000-0000-0000-0000-000000000000&ua=Mozilla&i=206.29.182.240&f=MobileBanner&uid=202cb962ac59075b964b07152d234b70&t=<time>&tp=4&kw=Business&adw=320&adh=50&lat=37.4429&long=-122.1514&nk=Law%2CGovermentt+%26+Politics%2CImmigration%2CLegal+Issues%2CU.S.+Government+Resources%2CPolitics%2CCommentary%2CNews%2CInternational+News%2CNational+News%2CLocal+News%2CHedge+Fund%2CInvesting%2CDating%2CDivorce+Support%2CGay+Life%2CParanormal+Phenomena%2CHunting%2FShooting%2CPagan%2FWiccan%2CAtheism%2FAgnosticism%2CLatter-Day+Saints%2CNon-Standard+Content%2CUnmoderated+UGC%2CExtreme+Graphic%2FExplicit+Violence%2CPornography%2CProfane+Content%2CHate+Content%2CIncentivized%2CIllegal+Content%2CIllegal+Content%2CWarez%2CSpyware%2FMalware%2CCopyright+Infringement%2CAdult+Education%2CPregnancy%2CHealth+%26+Fitness%2CBrain+Tumor%2CCancer%2CCholesterol%2CChronic+Fatigue+Syndrome%2CChronic+Pain%2CDeafness%2CDepression%2CDermatology%2CA.D.D.%2CDiabetes%2CEpilepsy%2CGERD%2FAcid+Reflux%2CHeart+Disease%2CHerbs+for+Health%2CIBS%2FCrohn%27s+Disease%2CIncest%2FAbuse+Support%2CIncontinence%2CAIDS%2FHIV%2CInfertility%2CMen%27s+Health%2CPanic%2FAnxiety+Disorders%2CPhysical+Therapy%2CPsychology%2FPsychiatry%2CSenor+Health%2CSexuality%2CAllergies%2CSleep+Disorders%2CSmoking+Cessation%2CWeight+Loss%2CWomen%27s+Health%2CAlternative+Medicine%2CArthritis%2CAutism%2FPDD%2CBipolar+Disorder%2CCocktails%2FBeer%2CCigars";
+            String expectedUrl= "http://ad.dmg-mobile.com/upsteed/wap/adrequest?acc=17067024&as=49538&ua=Mozilla&i=206.29.182.240&f=MobileBanner&uid=202cb962ac59075b964b07152d234b70&t=<time>&tp=4&kw=Business&adw=320&adh=50&lat=37.4429&long=-122.1514&nk=Immigration%2CLegal+Issues%2CGay+Life%2CAtheism%2FAgnosticism%2CExtreme+Graphic%2FExplicit+Violence%2CPornography%2CProfane+Content%2CHate+Content%2CIllegal+Content%2CWarez%2CSpyware%2FMalware%2CCopyright+Infringement%2CAdult+Education%2CPregnancy%2CBrain+Tumor%2CCancer%2CCholesterol%2CChronic+Fatigue+Syndrome%2CChronic+Pain%2CDeafness%2CDepression%2CDermatology%2CA.D.D.%2CDiabetes%2CEpilepsy%2CGERD%2FAcid+Reflux%2CHeart+Disease%2CHerbs+for+Health%2CIBS%2FCrohn%27s+Disease%2CIncest%2FAbuse+Support%2CIncontinence%2CAIDS%2FHIV%2CInfertility%2CMen%27s+Health%2CPanic%2FAnxiety+Disorders%2CPhysical+Therapy%2CPsychology%2FPsychiatry%2CSenor+Health%2CSexuality%2CSleep+Disorders%2CWeight+Loss%2CWomen%27s+Health%2CAlternative+Medicine%2CAutism%2FPDD%2CBipolar+Disorder%2CCocktails%2FBeer";
             assertEquals(expectedUrl.replace("<time>", t), actualUrl);
         }
     }
@@ -207,7 +207,7 @@ public class DCPDmgAdnetworkTest extends TestCase {
         if (dcpDmgAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpDmgAdNetwork.getRequestUri().toString();
             String t = actualUrl.substring(actualUrl.indexOf("&t=") + 3, actualUrl.indexOf("&tp="));
-            String expectedUrl = "http://pulse-serving.amobee.com/upsteed/wap/adrequest?acc=test&as=00000000-0000-0000-0000-000000000000&ua=Mozilla&i=206.29.182.240&f=MobileBanner&uid=202cb962ac59075b964b07152d234b70&t=<time>&tp=4&kw=Business%2CBooks+%26+Reference&adw=320&adh=50&lat=38.5&long=-122.1514&nk=Law%2CGovermentt+%26+Politics%2CImmigration%2CLegal+Issues%2CU.S.+Government+Resources%2CPolitics%2CCommentary%2CNews%2CInternational+News%2CNational+News%2CLocal+News%2CHedge+Fund%2CInvesting%2CDating%2CDivorce+Support%2CGay+Life%2CParanormal+Phenomena%2CHunting%2FShooting%2CPagan%2FWiccan%2CAtheism%2FAgnosticism%2CLatter-Day+Saints%2CNon-Standard+Content%2CUnmoderated+UGC%2CExtreme+Graphic%2FExplicit+Violence%2CPornography%2CProfane+Content%2CHate+Content%2CIncentivized%2CIllegal+Content%2CIllegal+Content%2CWarez%2CSpyware%2FMalware%2CCopyright+Infringement%2CAdult+Education%2CPregnancy%2CHealth+%26+Fitness%2CBrain+Tumor%2CCancer%2CCholesterol%2CChronic+Fatigue+Syndrome%2CChronic+Pain%2CDeafness%2CDepression%2CDermatology%2CA.D.D.%2CDiabetes%2CEpilepsy%2CGERD%2FAcid+Reflux%2CHeart+Disease%2CHerbs+for+Health%2CIBS%2FCrohn%27s+Disease%2CIncest%2FAbuse+Support%2CIncontinence%2CAIDS%2FHIV%2CInfertility%2CMen%27s+Health%2CPanic%2FAnxiety+Disorders%2CPhysical+Therapy%2CPsychology%2FPsychiatry%2CSenor+Health%2CSexuality%2CAllergies%2CSleep+Disorders%2CSmoking+Cessation%2CWeight+Loss%2CWomen%27s+Health%2CAlternative+Medicine%2CArthritis%2CAutism%2FPDD%2CBipolar+Disorder%2CCocktails%2FBeer%2CCigars";
+            String expectedUrl = "http://ad.dmg-mobile.com/upsteed/wap/adrequest?acc=17067024&as=01212121&ua=Mozilla&i=206.29.182.240&f=MobileBanner&uid=202cb962ac59075b964b07152d234b70&t=<time>&tp=4&kw=Business%2CBooks+%26+Reference&adw=320&adh=50&lat=38.5&long=-122.1514&nk=Immigration%2CLegal+Issues%2CGay+Life%2CAtheism%2FAgnosticism%2CExtreme+Graphic%2FExplicit+Violence%2CPornography%2CProfane+Content%2CHate+Content%2CIllegal+Content%2CWarez%2CSpyware%2FMalware%2CCopyright+Infringement%2CAdult+Education%2CPregnancy%2CBrain+Tumor%2CCancer%2CCholesterol%2CChronic+Fatigue+Syndrome%2CChronic+Pain%2CDeafness%2CDepression%2CDermatology%2CA.D.D.%2CDiabetes%2CEpilepsy%2CGERD%2FAcid+Reflux%2CHeart+Disease%2CHerbs+for+Health%2CIBS%2FCrohn%27s+Disease%2CIncest%2FAbuse+Support%2CIncontinence%2CAIDS%2FHIV%2CInfertility%2CMen%27s+Health%2CPanic%2FAnxiety+Disorders%2CPhysical+Therapy%2CPsychology%2FPsychiatry%2CSenor+Health%2CSexuality%2CSleep+Disorders%2CWeight+Loss%2CWomen%27s+Health%2CAlternative+Medicine%2CAutism%2FPDD%2CBipolar+Disorder%2CCocktails%2FBeer";
             assertEquals(expectedUrl.replaceAll("<time>", t), actualUrl);
 
         }
