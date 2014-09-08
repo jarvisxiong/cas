@@ -241,7 +241,7 @@ public class RepositoryHelper {
         return null;
     }
     
-    public IXAccountMapEntity queryWapSiteUACRepository(final Long rpNetworkId) {
+    public IXAccountMapEntity queryIXAccountMapRepository(final Long rpNetworkId) {
       try {
           return ixAccountMapRepository.query(rpNetworkId);
       }
