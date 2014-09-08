@@ -334,12 +334,12 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
 		responseSent = true;
 
-        // dst != 0 is true only for servlets rtbdFill, backFill, ixFill
-        // This check has been added to prevent totalNoFills from being updated, when any servlet other than the ones
-        // mentioned above throws an exception in HttpRequestHandler.
-        if(0 != sasParams.getDst()) {
-            InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
-        }
+	        // dst != 0 is true only for servlets rtbdFill, backFill, ixFill
+	        // This check has been added to prevent totalNoFills from being updated, when any servlet other than the ones
+	        // mentioned above throws an exception in HttpRequestHandler.
+	        if(null != sasParams && 0 != sasParams.getDst()) {
+	            InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
+	        }
 
 		HttpResponseStatus httpResponseStatus;
 		String defaultContent;
