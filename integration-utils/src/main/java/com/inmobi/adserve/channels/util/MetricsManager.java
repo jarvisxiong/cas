@@ -83,6 +83,10 @@ public class MetricsManager {
     
     
     public static void updateIncomingRequestsStats(String dst, Long countryId, String countryName) {
+    	if(countryId == null){
+    		return;
+    	}
+    	
         if (null == realTimeCountryDstStats.get(countryId.intValue())) {
             realTimeCountryDstStats.put(countryId.intValue(), new ConcurrentHashMap<String, RealTimeStatsForCountryDst>());
         }
