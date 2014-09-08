@@ -276,7 +276,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
 		totalTime = System.currentTimeMillis() - initialTime;
 		LOG.debug("successfully sent response");
 
-        /// dst != 0 is true only for servlets rtbdFill, backFill, ixFill
+        // dst != 0 is true only for servlets rtbdFill, backFill, ixFill
 		if (null != sasParams && 0 != sasParams.getDst()) {
 			cleanUp();
 			LOG.debug("successfully called cleanUp()");
