@@ -54,11 +54,10 @@ public class DCPDmgAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String AGE="age";
     private static final String COUNTRY_CODE="co";
     private static final String ZIP_CODE="zip";
-    private static final String BLOCKED_CATEGORY_PERF="nk";
-    private static final String BLOCKED_CATEGORY_FS="nk";
+    private static final String NEGATIVE_KEYWORD="nk";
     
     
-    /**
+     /**
      * @param config
      * @param clientBootstrap
      * @param baseRequestHandler
@@ -181,10 +180,10 @@ public class DCPDmgAdnetwork extends AbstractDCPAdNetworkImpl {
             	appendQueryParam(url, ZIP_CODE,sasParams.getPostalCode(), false);
             }
             if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
-                appendQueryParam(url, BLOCKED_CATEGORY_PERF,getURLEncode(CategoryList.getBlockedCategoryForPerformance(), format), false);
+                appendQueryParam(url, NEGATIVE_KEYWORD,getURLEncode(CategoryList.getBlockedCategoryForPerformance(), format), false);
             }
             else {
-            	 appendQueryParam(url, BLOCKED_CATEGORY_FS,getURLEncode(CategoryList.getBlockedCategoryForPerformance(), format), false);
+            	 appendQueryParam(url, NEGATIVE_KEYWORD,getURLEncode(CategoryList.getBlockedCategoryForPerformance(), format), false);
             }
 
             LOG.debug("dmg url is {}", url);
