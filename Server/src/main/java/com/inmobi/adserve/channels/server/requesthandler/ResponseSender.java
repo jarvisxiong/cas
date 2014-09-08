@@ -12,6 +12,7 @@ import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.auction.AuctionEngine;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.commons.security.api.InmobiSession;
 import com.inmobi.commons.security.impl.InmobiSecurityImpl;
 import com.inmobi.commons.security.util.exception.InmobiSecureException;
@@ -202,11 +203,12 @@ public class ResponseSender extends HttpRequestHandlerBase {
 		AdInfo rtbdAd = new AdInfo();
 		AdIdChain adIdChain = new AdIdChain();
 		ChannelSegmentEntity channelSegmentEntity = this.auctionEngine.getRtbResponse().getChannelSegmentEntity();
+		ADCreativeType responseCreativeType =  this.auctionEngine.getRtbResponse().getAdNetworkInterface().getCreativeType();
 		adIdChain.setAdgroup_guid(channelSegmentEntity.getAdgroupId());
-		adIdChain.setAd_guid(channelSegmentEntity.getAdId());
+		adIdChain.setAd_guid(channelSegmentEntity.getAdId(responseCreativeType));
 		adIdChain.setAdvertiser_guid(channelSegmentEntity.getAdvertiserId());
 		adIdChain.setCampaign_guid(channelSegmentEntity.getCampaignId());
-		adIdChain.setAd(channelSegmentEntity.getIncId());
+		adIdChain.setAd(channelSegmentEntity.getIncId(responseCreativeType));
 		adIdChain.setGroup(channelSegmentEntity.getAdgroupIncId());
 		adIdChain.setCampaign(channelSegmentEntity.getCampaignIncId());
 		List<AdIdChain> adIdChains = new ArrayList<AdIdChain>();
@@ -238,7 +240,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
 		byte[] bytes = responseString.getBytes(Charsets.UTF_8);
 		sendResponse(status, bytes, responseHeaders, serverChannel);
-
 	}
 
 	// send response to the caller
@@ -274,7 +275,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
 		totalTime = System.currentTimeMillis() - initialTime;
 		LOG.debug("successfully sent response");
-		if (null != sasParams) {
+
+        	// dst != 0 is true only for servlets rtbdFill, backFill, ixFill
+		if (null != sasParams && 0 != sasParams.getDst()) {
 			cleanUp();
 			LOG.debug("successfully called cleanUp()");
 		}
@@ -331,7 +334,12 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
 		responseSent = true;
 
-		InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
+	        // dst != 0 is true only for servlets rtbdFill, backFill, ixFill
+	        // This check has been added to prevent totalNoFills from being updated, when any servlet other than the ones
+	        // mentioned above throws an exception in HttpRequestHandler.
+	        if(null != sasParams && 0 != sasParams.getDst()) {
+	            InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
+	        }
 
 		HttpResponseStatus httpResponseStatus;
 		String defaultContent;

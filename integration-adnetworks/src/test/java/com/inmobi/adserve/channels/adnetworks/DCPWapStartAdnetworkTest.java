@@ -18,6 +18,7 @@ import org.testng.annotations.Test;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.util.Modules;
+import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.adnetworks.wapstart.DCPWapStartAdNetwork;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -98,9 +99,9 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
                 true);
@@ -118,9 +119,9 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
                 false);
@@ -139,9 +140,9 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
                 false);
@@ -160,9 +161,9 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
                 false);
@@ -180,9 +181,9 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
                 false);
@@ -195,6 +196,9 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSiteIncId(23232);
+        sasParams.setCountryCode("CN");
+        sasParams.setNetworkType(NetworkType.WIFI);
+        sasParams.setGender("F");
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
@@ -204,13 +208,13 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         SlotSizeMapping.init();
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         
         dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null);
         String actualUrl = dcpWapstartAdNetwork.getRequestUri().toString();
-        String expectedUrl = "http://ro.plus1.wapstart.ru?version=2&encoding=1&area=viewBanner&ip=206.29.182.240&id=1324&pageId=0000000000000000000000200000000000005ac0&kws=Food+%26+Drink%3BAdventure%3BWord&location=37.4429%2C-122.1514&callbackurl=http%3A%2F%2Fc2.w.inmobi.com%2Fc.asm%2F4%2Fb%2Fbx5%2Fyaz%2F2%2Fb%2Fa5%2Fm%2F0%2F0%2F0%2F202cb962ac59075b964b07152d234b70%2F4f8d98e2-4bbd-40bc-87e5-22da170600f9%2F-1%2F1%2F9cddca11%3Fds%3D1&realSiteId=23264";
+        String expectedUrl = "http://ro.plus1.wapstart.ru?version=2&encoding=1&area=viewBanner&ip=206.29.182.240&ua=Mozilla&id=1324&pageId=0000000000000000000000200000000000005ac0&kws=Food+%26+Drink%3BAdventure%3BWord&ctype=WIFI&gender=F&country=CHN&lat=37.4429&lon=-122.1514&uid=202cb962ac59075b964b07152d234b70&callbackurl=http%3A%2F%2Fc2.w.inmobi.com%2Fc.asm%2F4%2Fb%2Fbx5%2Fyaz%2F2%2Fb%2Fa5%2Fm%2F0%2F0%2F0%2F202cb962ac59075b964b07152d234b70%2F4f8d98e2-4bbd-40bc-87e5-22da170600f9%2F-1%2F1%2F9cddca11%3Fds%3D1&realSiteId=23264";
         assertEquals(expectedUrl, actualUrl);
         
     }
@@ -222,6 +226,9 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSiteIncId(23232);
+        sasParams.setCountryCode("CN");
+        sasParams.setNetworkType(NetworkType.WIFI);
+        sasParams.setGender("F");
         casInternalRequestParameters.latLong = " ,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
@@ -232,12 +239,12 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
                 + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11" + "?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null);
         String actualUrl = dcpWapstartAdNetwork.getRequestUri().toString();
-        String expectedUrl = "http://ro.plus1.wapstart.ru?version=2&encoding=1&area=viewBanner&ip=206.29.182.240&id=1324&pageId=0000000000000000000000200000000000005ac0&kws=Food+%26+Drink%3BAdventure%3BWord&callbackurl=http%3A%2F%2Fc2.w.inmobi.com%2Fc.asm%2F4%2Fb%2Fbx5%2Fyaz%2F2%2Fb%2Fa5%2Fm%2F0%2F0%2F0%2F202cb962ac59075b964b07152d234b70%2F4f8d98e2-4bbd-40bc-87e5-22da170600f9%2F-1%2F1%2F9cddca11%3Fds%3D1&realSiteId=23264";
+        String expectedUrl = "http://ro.plus1.wapstart.ru?version=2&encoding=1&area=viewBanner&ip=206.29.182.240&ua=Mozilla&id=1324&pageId=0000000000000000000000200000000000005ac0&kws=Food+%26+Drink%3BAdventure%3BWord&ctype=WIFI&gender=F&country=CHN&lon=-122.1514&uid=202cb962ac59075b964b07152d234b70&callbackurl=http%3A%2F%2Fc2.w.inmobi.com%2Fc.asm%2F4%2Fb%2Fbx5%2Fyaz%2F2%2Fb%2Fa5%2Fm%2F0%2F0%2F0%2F202cb962ac59075b964b07152d234b70%2F4f8d98e2-4bbd-40bc-87e5-22da170600f9%2F-1%2F1%2F9cddca11%3Fds%3D1&realSiteId=23264";
         assertEquals(expectedUrl, actualUrl);
         
     }
@@ -254,14 +261,14 @@ public class DCPWapStartAdnetworkTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
                 + "-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl);
-        String response = "<div class=\"plus1-ad\"	 style=\"background-color: #ffffff; border: solid 1px #a4cef2; padding: 5px; margin: 0; font-family: Arial, Helvetica, sans-serif; position: relative\">	<div style=\"border-bottom: 1px solid #e9e9e9; height: 10px;\"	><img style=\"margin: 0; padding: 0; vertical-align: top; border: none; width: 103px; height: 10px\"		  alt=\"#\"		  src=\"http://ru-img.ro.plus1.wapstart.ru/static/reklame/1.png\"	/></div>	<p style=\"margin: 0; padding: 0;\">		<a href=\"http://ru-click.ro.plus1.wapstart.ru/index.php?area=redirector&amp;type=1&amp;rsId=www15_c6fbad24605d29c468d26d9e929fcad2b36e3708_05221258&amp;site=10022&amp;banner=39073&amp;usr=792507&amp;conHash=8b4a9b3e95420778978b9966bc36be07a6c0f393\"				   style=\"color: #0e3fcc; margin: 0; padding: 0; text-decoration: underline;\"		>�������������� ������������ ���������������� ���� ������������!</a>		<br />		<span style=\"color: #000000; line-height: 11px; margin: 0; padding: 4px 0 3px 0;\">			���� ������������ ������������! ������������ ��������������		</span>	</p>	<p style=\"margin: 0; padding: 4px 0\">		<a href=\"http://ru-click.ro.plus1.wapstart.ru/index.php?area=redirector&amp;type=1&amp;rsId=www15_c6fbad24605d29c468d26d9e929fcad2b36e3708_05221258&amp;site=10022&amp;banner=39073&amp;usr=792507&amp;conHash=8b4a9b3e95420778978b9966bc36be07a6c0f393\" 				><img style=\"border: none; max-width:100%\"			  src=\"http://ru-img.ro.plus1.wapstart.ru/banners/15/1384942336_528c8b0048e1c.gif\"			  alt=\"\"		/></a>	</p></div>	<img src=\"http://ru-cntr.ro.plus1.wapstart.ru/?area=counter&amp;clientSession=62108fd97bd60d313dce896f3a42e93a94b30d4b&amp;bannerId=39073&amp;site=10022\"		 alt=\"\"		 style=\"width: 1px; height: 1px; position: absolute; left: -10000px\"	/>";
+        String response = "<div class=\"plus1-ad\"	 style=\"background-color: #ffffff; border: solid 1px #a4cef2; padding: 5px; margin: 0; font-family: Arial, Helvetica, sans-serif; position: relative\">	<div style=\"border-bottom: 1px solid #e9e9e9; height: 10px;\"	><img style=\"margin: 0; padding: 0; vertical-align: top; border: none; width: 103px; height: 10px\"		  alt=\"#\"		  src=\"http://ru-img.ro.plus1.wapstart.ru/static/reklame/1.png\"	/></div>	<p style=\"margin: 0; padding: 0;\">		<a href=\"http://ru-click.ro.plus1.wapstart.ru/index.php?area=redirector&amp;type=1&amp;rsId=www15_c6fbad24605d29c468d26d9e929fcad2b36e3708_05221258&amp;site=10022&amp;banner=39073&amp;usr=792507&amp;conHash=8b4a9b3e95420778978b9966bc36be07a6c0f393\"				   style=\"color: #0e3fcc; margin: 0; padding: 0; text-decoration: underline;\"		>������������������������������������������ ������������������������������������ ������������������������������������������������ ������������ ������������������������������������!</a>		<br />		<span style=\"color: #000000; line-height: 11px; margin: 0; padding: 4px 0 3px 0;\">			������������ ������������������������������������ ������������������������������������! ������������������������������������ ������������������������������������������		</span>	</p>	<p style=\"margin: 0; padding: 4px 0\">		<a href=\"http://ru-click.ro.plus1.wapstart.ru/index.php?area=redirector&amp;type=1&amp;rsId=www15_c6fbad24605d29c468d26d9e929fcad2b36e3708_05221258&amp;site=10022&amp;banner=39073&amp;usr=792507&amp;conHash=8b4a9b3e95420778978b9966bc36be07a6c0f393\" 				><img style=\"border: none; max-width:100%\"			  src=\"http://ru-img.ro.plus1.wapstart.ru/banners/15/1384942336_528c8b0048e1c.gif\"			  alt=\"\"		/></a>	</p></div>	<img src=\"http://ru-cntr.ro.plus1.wapstart.ru/?area=counter&amp;clientSession=62108fd97bd60d313dce896f3a42e93a94b30d4b&amp;bannerId=39073&amp;site=10022\"		 alt=\"\"		 style=\"width: 1px; height: 1px; position: absolute; left: -10000px\"	/>";
         dcpWapstartAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpWapstartAdNetwork.getHttpResponseStatusCode(), 200);
-        String outputHttpResponseContent = "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><div class=\"plus1-ad\"	 style=\"background-color: #ffffff; border: solid 1px #a4cef2; padding: 5px; margin: 0; font-family: Arial, Helvetica, sans-serif; position: relative\">	<div style=\"border-bottom: 1px solid #e9e9e9; height: 10px;\"	><img style=\"margin: 0; padding: 0; vertical-align: top; border: none; width: 103px; height: 10px\"		  alt=\"#\"		  src=\"http://ru-img.ro.plus1.wapstart.ru/static/reklame/1.png\"	/></div>	<p style=\"margin: 0; padding: 0;\">		<a href=\"http://ru-click.ro.plus1.wapstart.ru/index.php?area=redirector&amp;type=1&amp;rsId=www15_c6fbad24605d29c468d26d9e929fcad2b36e3708_05221258&amp;site=10022&amp;banner=39073&amp;usr=792507&amp;conHash=8b4a9b3e95420778978b9966bc36be07a6c0f393\"				   style=\"color: #0e3fcc; margin: 0; padding: 0; text-decoration: underline;\"		>�������������� ������������ ���������������� ���� ������������!</a>		<br />		<span style=\"color: #000000; line-height: 11px; margin: 0; padding: 4px 0 3px 0;\">			���� ������������ ������������! ������������ ��������������		</span>	</p>	<p style=\"margin: 0; padding: 4px 0\">		<a href=\"http://ru-click.ro.plus1.wapstart.ru/index.php?area=redirector&amp;type=1&amp;rsId=www15_c6fbad24605d29c468d26d9e929fcad2b36e3708_05221258&amp;site=10022&amp;banner=39073&amp;usr=792507&amp;conHash=8b4a9b3e95420778978b9966bc36be07a6c0f393\" 				><img style=\"border: none; max-width:100%\"			  src=\"http://ru-img.ro.plus1.wapstart.ru/banners/15/1384942336_528c8b0048e1c.gif\"			  alt=\"\"		/></a>	</p></div>	<img src=\"http://ru-cntr.ro.plus1.wapstart.ru/?area=counter&amp;clientSession=62108fd97bd60d313dce896f3a42e93a94b30d4b&amp;bannerId=39073&amp;site=10022\"		 alt=\"\"		 style=\"width: 1px; height: 1px; position: absolute; left: -10000px\"	/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1' height=1 width=1 border=0 style=\"display:none;\"/></body></html>";
+        String outputHttpResponseContent = "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><div class=\"plus1-ad\"	 style=\"background-color: #ffffff; border: solid 1px #a4cef2; padding: 5px; margin: 0; font-family: Arial, Helvetica, sans-serif; position: relative\">	<div style=\"border-bottom: 1px solid #e9e9e9; height: 10px;\"	><img style=\"margin: 0; padding: 0; vertical-align: top; border: none; width: 103px; height: 10px\"		  alt=\"#\"		  src=\"http://ru-img.ro.plus1.wapstart.ru/static/reklame/1.png\"	/></div>	<p style=\"margin: 0; padding: 0;\">		<a href=\"http://ru-click.ro.plus1.wapstart.ru/index.php?area=redirector&amp;type=1&amp;rsId=www15_c6fbad24605d29c468d26d9e929fcad2b36e3708_05221258&amp;site=10022&amp;banner=39073&amp;usr=792507&amp;conHash=8b4a9b3e95420778978b9966bc36be07a6c0f393\"				   style=\"color: #0e3fcc; margin: 0; padding: 0; text-decoration: underline;\"		>������������������������������������������ ������������������������������������ ������������������������������������������������ ������������ ������������������������������������!</a>		<br />		<span style=\"color: #000000; line-height: 11px; margin: 0; padding: 4px 0 3px 0;\">			������������ ������������������������������������ ������������������������������������! ������������������������������������ ������������������������������������������		</span>	</p>	<p style=\"margin: 0; padding: 4px 0\">		<a href=\"http://ru-click.ro.plus1.wapstart.ru/index.php?area=redirector&amp;type=1&amp;rsId=www15_c6fbad24605d29c468d26d9e929fcad2b36e3708_05221258&amp;site=10022&amp;banner=39073&amp;usr=792507&amp;conHash=8b4a9b3e95420778978b9966bc36be07a6c0f393\" 				><img style=\"border: none; max-width:100%\"			  src=\"http://ru-img.ro.plus1.wapstart.ru/banners/15/1384942336_528c8b0048e1c.gif\"			  alt=\"\"		/></a>	</p></div>	<img src=\"http://ru-cntr.ro.plus1.wapstart.ru/?area=counter&amp;clientSession=62108fd97bd60d313dce896f3a42e93a94b30d4b&amp;bannerId=39073&amp;site=10022\"		 alt=\"\"		 style=\"width: 1px; height: 1px; position: absolute; left: -10000px\"	/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1' height=1 width=1 border=0 style=\"display:none;\"/></body></html>";
         assertEquals(outputHttpResponseContent, dcpWapstartAdNetwork.getHttpResponseContent());
 
     }
@@ -303,9 +310,9 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                wapstartAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null);
         assertEquals(dcpWapstartAdNetwork.getImpressionId(), "4f8d98e2-4bbd-40bc-8795-22da170700f9");
     }

@@ -80,9 +80,9 @@ public class MullahMediaAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                mullahMediaAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                mullahMediaAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(dcpMMAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, blurl),
                 true);
     }
@@ -100,9 +100,9 @@ public class MullahMediaAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                mullahMediaAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                mullahMediaAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(dcpMMAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, blurl),
                 false);
     }
@@ -120,9 +120,9 @@ public class MullahMediaAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                mullahMediaAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                mullahMediaAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(dcpMMAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, blurl),
                 false);
     }
@@ -138,9 +138,9 @@ public class MullahMediaAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                mullahMediaAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                mullahMediaAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(dcpMMAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, blurl),
                 false);
     }
@@ -166,8 +166,8 @@ public class MullahMediaAdNetworkTest extends TestCase {
         Long[] segmentCategories = new Long[] { 13l, 15l };
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
                 mullahMediaAdvId, null, null, null, 0, null, segmentCategories, true, true, externalKey, null, null,
-                null, 123456, true, null, null, 0, null, false, false, false, false, false, false, false, false, false,
-                false, null, new ArrayList<Integer>(), 0.0d, null, null, 123456));
+                null, new Long[] {123456L}, true, null, null, 0, null, false, false, false, false, false, false, false, false, false,
+                false, null, new ArrayList<Integer>(), 0.0d, null, null, 123456, new Integer[] {0}));
         if (dcpMMAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, blurl)) {
             String actualUrl = dcpMMAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://ads.160tracker.com/mobile_ad_api_indirect.php?user_agent=Mozilla&user_ip=206.29.182.240&request_from=indirect&response_format=json&type=web&unique_key=202cb962ac59075b964b07152d234b70&hash_scheme=md5&country=US&lat=37.4429&long=-122.1514&w=320.0&h=50.0&sid=00000000-0001-e240-0000-00000000ddd5&pid=1423&site_name=1324&cat=Adventure";
@@ -198,8 +198,8 @@ public class MullahMediaAdNetworkTest extends TestCase {
         Long[] segmentCategories = new Long[] { 1l };
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
                 mullahMediaAdvId, null, null, null, 0, null, segmentCategories, true, true, externalKey, null, null,
-                null, 123456, true, null, null, 0, null, false, false, false, false, false, false, false, false, false,
-                false, null, new ArrayList<Integer>(), 0.0d, null, null, 123456));
+                null, new Long[] {123456L}, true, null, null, 0, null, false, false, false, false, false, false, false, false, false,
+                false, null, new ArrayList<Integer>(), 0.0d, null, null, 123456, new Integer[] {0}));
         if (dcpMMAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, blurl)) {
             String actualUrl = dcpMMAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://ads.160tracker.com/mobile_ad_api_indirect.php?user_agent=Mozilla&user_ip=206.29.182.240&request_from=indirect&response_format=json&type=web&unique_key=202cb962ac59075b964b07152d234b70&hash_scheme=md5&country=US&lat=37.4429&long=-122.1514&w=320.0&h=50.0&sid=00000000-0001-e240-0000-00000000ddd5&pid=1423&site_name=1324&cat=Board";
@@ -228,8 +228,8 @@ public class MullahMediaAdNetworkTest extends TestCase {
         Long[] segmentCategories = null;
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
                 mullahMediaAdvId, null, null, null, 0, null, segmentCategories, true, true, externalKey, null, null,
-                null, 123456, true, null, null, 0, null, false, false, false, false, false, false, false, false, false,
-                false, null, new ArrayList<Integer>(), 0.0d, null, null, 123456));
+                null, new Long[] {123456L}, true, null, null, 0, null, false, false, false, false, false, false, false, false, false,
+                false, null, new ArrayList<Integer>(), 0.0d, null, null, 123456, new Integer[] {0}));
         if (dcpMMAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, blurl)) {
             String actualUrl = dcpMMAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://ads.160tracker.com/mobile_ad_api_indirect.php?user_agent=Mozilla&user_ip=206.29.182.240&request_from=indirect&response_format=json&type=web&unique_key=202cb962ac59075b964b07152d234b70&hash_scheme=md5&country=US&lat=37.4429&long=-122.1514&w=320.0&h=50.0&sid=00000000-0001-e240-0000-00000000ddd5&pid=1423&site_name=1324&cat=miscellenous";
@@ -257,9 +257,9 @@ public class MullahMediaAdNetworkTest extends TestCase {
                 + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11"
                 + "?ds=1&beacon=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                mullahMediaAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                mullahMediaAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (dcpMMAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, blurl)) {
             assertNull(dcpMMAdNetwork.getRequestUri());
         }
@@ -284,9 +284,9 @@ public class MullahMediaAdNetworkTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
                 + "-87e5-22da170600f9/-1/1/9cddca11?ds=1&beacon=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                mullahMediaAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 123456,
+                mullahMediaAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {123456L},
                 true, null, null, 123456, null, false, false, false, false, false, false, false, false, false, false,
-                null, new ArrayList<Integer>(), 0.0d, null, null, 123456));
+                null, new ArrayList<Integer>(), 0.0d, null, null, 123456, new Integer[] {0}));
         if (dcpMMAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, blurl)) {
             String actualUrl = dcpMMAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://ads.160tracker.com/mobile_ad_api_indirect.php?user_agent=Mozilla&user_ip=206.29.182.240&request_from=indirect&response_format=json&type=web&unique_key=202cb962ac59075b964b07152d234b70&hash_scheme=md5&country=US&lat=37.4429&long=-122.1514&carrier_id=537&sid=00000000-0001-e240-0000-00000000ddd5&pid=1423&site_name=1324&cat=miscellenous";
@@ -305,9 +305,9 @@ public class MullahMediaAdNetworkTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
                 + "-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                mullahMediaAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                mullahMediaAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpMMAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl);
 
         String response = "{\"img\":[\"http://www.mmnetwork.mobi/s.php?sig=a03a8024b8e0f5eccf240b164255de6a&adid=30014&caid=7&banner=320_50&cid=4305&advid=1651&e=dc&d=50331&f=m&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+T-Mobile+G2+Build%2FGRJ22%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&up=3493211533&cr=1vQtRSuXirEnkUbpJPLY&unique_key=&tl=4RYn3Dh0bzfK8Q8a6qM8kIW1342xs2C2P4tT602p&\"],\"landing\":[\"http://www.mmnetwork.mobi/c.php?sig=a03a8024b8e0f5eccf240b164255de6a&adid=30014&caid=7&cid=4305&advid=1651&e=dc&f=m&unique_key=&lat=&long=&zip=&banner=320_50&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+T-Mobile+G2+Build%2FGRJ22%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1\"],\"size\":[\"320_50\"]}";
@@ -361,9 +361,9 @@ public class MullahMediaAdNetworkTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
                 + "-87e5-22da170600f9/-1/1/9cddca11?ds=1&beacon=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                mullahMediaAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                mullahMediaAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpMMAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, blurl);
         assertEquals(dcpMMAdNetwork.getImpressionId(), "4f8d98e2-4bbd-40bc-8795-22da170700f9");
     }

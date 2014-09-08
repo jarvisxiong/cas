@@ -13,13 +13,16 @@ import com.inmobi.adserve.channels.server.requesthandler.beans.AdvertiserMatched
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
+
 import lombok.Getter;
+
 import org.apache.hadoop.thirdparty.guava.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import javax.inject.Singleton;
+
 import java.util.*;
 
 
@@ -166,7 +169,7 @@ public class MatchSegments {
             for (long countryId : countries) {
                 for (int os : osIds) {
                     Collection<ChannelSegmentEntity> filteredEntities = loadEntities(slotId, category, countryId,
-                            targetingPlatform, siteRating, os, traceMarker);
+                            targetingPlatform, siteRating, os, sasParams.getDst(), traceMarker);
                     LOG.debug(traceMarker, "Found {} adGroups", filteredEntities.size());
                     allFilteredEntities.addAll(filteredEntities);
                 }
@@ -191,11 +194,11 @@ public class MatchSegments {
 
     // Loads entities and updates cache if required.
     private Collection<ChannelSegmentEntity> loadEntities(final long slotId, final long category, final long country,
-            final Integer targetingPlatform, final Integer siteRating, final int osId, final Marker traceMarker) {
+            final Integer targetingPlatform, final Integer siteRating, final int osId, Integer dst, final Marker traceMarker) {
         LOG.debug(traceMarker,
                 "Loading adgroups for slot: {} category: {} country: {} targetingPlatform: {} siteRating: {} osId: {}",
-                slotId, category, country, targetingPlatform, siteRating, osId);
-        return channelAdGroupRepository.getEntities(slotId, category, country, targetingPlatform, siteRating, osId);
+                slotId, category, country, targetingPlatform, siteRating, osId, dst);
+        return channelAdGroupRepository.getEntities(slotId, category, country, targetingPlatform, siteRating, osId, dst);
     }
 
     private List<AdvertiserMatchedSegmentDetail> insertChannelSegmentToResultSet(
@@ -282,7 +285,7 @@ public class MatchSegments {
     }
 
     private void printSegments(final List<AdvertiserMatchedSegmentDetail> result, final Marker traceMarker) {
-        if (LOG.isDebugEnabled()) {
+        if (LOG.isDebugEnabled() || null != traceMarker) {
             for (AdvertiserMatchedSegmentDetail advertiserMatchedSegmentDetail : result) {
                 for (ChannelSegment channelSegment : advertiserMatchedSegmentDetail.getChannelSegmentList()) {
                     LOG.debug(traceMarker, "Advertiser :{} , AdGroup : {}", channelSegment.getChannelSegmentEntity()

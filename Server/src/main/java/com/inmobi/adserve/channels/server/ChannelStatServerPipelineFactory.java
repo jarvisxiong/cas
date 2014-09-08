@@ -44,8 +44,6 @@ public class ChannelStatServerPipelineFactory extends ChannelInitializer<SocketC
 																				// MB
 																				// data
 																				// size
-		pipeline.addLast("casWriteTimeoutHandler",
-				new CasTimeoutHandler(serverConfig.getServerTimeoutInMillisForRTB(), serverConfig.getServerTimeoutInMillisForDCP()));
 		pipeline.addLast("requestIdHandler", requestIdHandler);
 		pipeline.addLast("nettyRequestScopeSeedHandler", nettyRequestScopeSeedHandler);
 		pipeline.addLast("requestParserHandler", requestParserHandler);

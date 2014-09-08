@@ -66,9 +66,13 @@ public class ChannelSegment {
     }
 
     public void incrementInspectorStats(final String inspectorString) {
+        incrementInspectorStats(inspectorString, 1L);
+    }
+
+    public void incrementInspectorStats(final String inspectorString, long value) {
         String advertiserId = channelSegmentEntity.getAdvertiserId();
         if (advertiserIdNameMap.containsKey(advertiserId)) {
-            InspectorStats.incrementStatCount(advertiserIdNameMap.get(advertiserId), inspectorString);
+            InspectorStats.incrementStatCount(advertiserIdNameMap.get(advertiserId), inspectorString, value);
         }
     }
 

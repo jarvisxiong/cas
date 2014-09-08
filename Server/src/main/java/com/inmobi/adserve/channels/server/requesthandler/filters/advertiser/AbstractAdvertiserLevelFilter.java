@@ -41,6 +41,11 @@ public abstract class AbstractAdvertiserLevelFilter implements AdvertiserLevelFi
         for (Iterator<AdvertiserMatchedSegmentDetail> iterator = matchedSegmentDetails.iterator(); iterator.hasNext();) {
             AdvertiserMatchedSegmentDetail matchedSegmentDetail = iterator.next();
 
+            /*
+             * All the Advertiser Level filters (extending this abstract class) are on advertiser level properties.
+             * The filer is applied only on the first channelSegment in the ChannelSegmentList for an advertiser. Being a
+             * filter on advertiser level properties, the filtering result is expected to be same for all segments.
+             */
             ChannelSegment channelSegment = matchedSegmentDetail.getChannelSegmentList().get(0);
 
             boolean result = failedInFilter(channelSegment, sasParams);
@@ -51,7 +56,7 @@ public abstract class AbstractAdvertiserLevelFilter implements AdvertiserLevelFi
                 iterator.remove();
                 LOG.debug(traceMarker, "Failed in filter {}  , advertiser {}", this.getClass().getSimpleName(),
                         advertiserId);
-                incrementStats(channelSegment);
+                incrementStats(matchedSegmentDetail.getChannelSegmentList());
             }
             else {
                 LOG.debug(traceMarker, "Passed in filter {} ,  advertiser {}", this.getClass().getSimpleName(),
@@ -61,10 +66,10 @@ public abstract class AbstractAdvertiserLevelFilter implements AdvertiserLevelFi
     }
 
     /**
-     * @param channelSegment
+     * @param channelSegments
      */
-    protected void incrementStats(final ChannelSegment channelSegment) {
-        channelSegment.incrementInspectorStats(inspectorString);
+    protected void incrementStats(final List<ChannelSegment> channelSegments) {
+        channelSegments.get(0).incrementInspectorStats(inspectorString, channelSegments.size());
     }
 
     /**
