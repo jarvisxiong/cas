@@ -10,6 +10,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
 import com.inmobi.adserve.channels.entity.CreativeEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.PricingEngineEntity;
 import com.inmobi.adserve.channels.entity.PublisherFilterEntity;
@@ -40,6 +41,7 @@ public class RepositoryHelper {
     private final SiteEcpmRepository               siteEcpmRepository;
     private final CurrencyConversionRepository     currencyConversionRepository;
     private final WapSiteUACRepository             wapSiteUACRepository;
+    private final IXAccountMapRepository           ixAccountMapRepository;
     private final CreativeRepository               creativeRepository;
     private final RepositoryStatsProvider          repositoryStatsProvider;
     private final NativeAdTemplateRepository	   nativeAdTemplateRepository;
@@ -57,6 +59,7 @@ public class RepositoryHelper {
         this.siteEcpmRepository = builder.siteEcpmRepository;
         this.currencyConversionRepository = builder.currencyConversionRepository;
         this.wapSiteUACRepository = builder.wapSiteUACRepository;
+        this.ixAccountMapRepository = builder.ixAccountMapRepository;
         this.creativeRepository = builder.creativeRepository;
         this.nativeAdTemplateRepository = builder.nativeAdTemplateRepository;
         this.repositoryStatsProvider = new RepositoryStatsProvider();
@@ -73,6 +76,7 @@ public class RepositoryHelper {
                     .addRepositoryToStats(this.siteEcpmRepository)
                     .addRepositoryToStats(this.currencyConversionRepository)
                     .addRepositoryToStats(this.wapSiteUACRepository)
+                    .addRepositoryToStats(this.ixAccountMapRepository)
                     .addRepositoryToStats(this.creativeRepository)
                     .addRepositoryToStats(this.nativeAdTemplateRepository);
 
@@ -96,6 +100,7 @@ public class RepositoryHelper {
         private SiteEcpmRepository               siteEcpmRepository;
         private CurrencyConversionRepository     currencyConversionRepository;
         private WapSiteUACRepository             wapSiteUACRepository;
+        private IXAccountMapRepository           ixAccountMapRepository;
         private CreativeRepository               creativeRepository;
         private NativeAdTemplateRepository       nativeAdTemplateRepository;
 
@@ -112,6 +117,7 @@ public class RepositoryHelper {
             Preconditions.checkNotNull(siteEcpmRepository);
             Preconditions.checkNotNull(currencyConversionRepository);
             Preconditions.checkNotNull(wapSiteUACRepository);
+            Preconditions.checkNotNull(ixAccountMapRepository);
             Preconditions.checkNotNull(creativeRepository);
             Preconditions.checkNotNull(nativeAdTemplateRepository);
             return new RepositoryHelper(this);
@@ -234,6 +240,15 @@ public class RepositoryHelper {
         }
         return null;
     }
+    
+    public IXAccountMapEntity queryWapSiteUACRepository(final Long rpNetworkId) {
+      try {
+          return ixAccountMapRepository.query(rpNetworkId);
+      }
+      catch (RepositoryException ignored) {
+      }
+      return null;
+  }
 
    public NativeAdTemplateEntity queryNativeAdTemplateRepository(final String siteId) {
         try {
