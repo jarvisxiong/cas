@@ -224,7 +224,6 @@ public class ChannelServer {
             throws ClassNotFoundException {
         try {
             logger.debug("Starting to instantiate repository");
-            ChannelSegmentMatchingCache.init(logger);
             Configuration databaseConfig = config.getDatabaseConfiguration();
             System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.apache.naming.java.javaURLContextFactory");
             System.setProperty(Context.URL_PKG_PREFIXES, "org.apache.naming");
@@ -274,8 +273,8 @@ public class ChannelServer {
             initialContext.bind("java:comp/env/jdbc", ds);
 
             ChannelSegmentMatchingCache.init(logger);
-            
-            
+            ChannelSegmentAdvertiserCache.init(logger);
+
             // Reusing the repository from phoenix adserving framework.
             
             creativeRepository.init(logger,
