@@ -102,7 +102,9 @@ public class Logging {
             }
             if (null != sasParams.getRFormat() && sasParams.getRFormat().equalsIgnoreCase("native")) {
                 InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NATIVE_REQUESTS);
-                InspectorStats.incrementStatCount(dst + "-" + sasParams.getSiteId() + "-" + InspectorStrings.NATIVE_REQUESTS);
+                if(rankList == null || rankList.isEmpty()){
+                	InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NATIVE_REQUESTS + "-" + InspectorStrings.nomatchsegmentcount);
+                }
             }
         }
 
