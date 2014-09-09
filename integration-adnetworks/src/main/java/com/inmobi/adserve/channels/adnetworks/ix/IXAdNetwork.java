@@ -412,13 +412,19 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         CommonExtension impExt = new CommonExtension();
 
         JSONObject additionalParams= entity.getAdditionalParams();
-        String zoneId=getZoneId(additionalParams);
-        if(null != zoneId) {
-            RubiconExtension rp = new RubiconExtension();
-            rp.setZone_id(zoneId);
-            impExt.setRp(rp);
-        }
 
+        if (null != additionalParams) {
+            String zoneId = getZoneId(additionalParams);
+            if (null != zoneId) {
+                RubiconExtension rp = new RubiconExtension();
+                rp.setZone_id(zoneId);
+                impExt.setRp(rp);
+            }
+            else{
+                return null;
+                //zoneID not available so returning NULL
+            }
+        }
         impression.setExt(impExt);
 
         return impression;
@@ -514,6 +520,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteUrl())) {
                 site.setPage(wapSiteUACEntity.getSiteUrl());
             }
+            if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())){
+                site.setName(wapSiteUACEntity.getSiteName());
+            }
+
         }
         else {
             site.setId(getBlindedSiteId(sasParams.getSiteIncId(), entity.getIncId(getCreativeType())));
@@ -530,7 +540,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         List <String> blockedList= getBlockedList();
         site.setBlocklists(blockedList);
         final Publisher publisher = new Publisher();
-        publisher.setCat(iabCategoriesInterface.getIABCategories(sasParams.getCategories()));
+        if(null != sasParams.getCategories()){
+        publisher.setCat(iabCategoriesInterface.getIABCategories(sasParams.getCategories()));}
 
         final CommonExtension publisherExtensions = new CommonExtension();
         final RubiconExtension rpForPub = new RubiconExtension();
@@ -556,6 +567,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             ext.setRp(rpForSite);
         } catch (JSONException e) {
             LOG.debug("Site Id is not configured");
+            return null;
         }
 
         site.setExt(ext);
@@ -612,16 +624,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             {
                 app.setBundle(wapSiteUACEntity.getMarketId());
             }
-            //todo set name from repo
+            if(StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName()))
+            {
+                app.setName(wapSiteUACEntity.getSiteName());
+            }
         }
         else {
             app.setId(getBlindedSiteId(sasParams.getSiteIncId(), entity.getIncId(getCreativeType())));
-
-
-            if (null != sasParams.getCategories()) {
-                app.setCat(iabCategoriesInterface.getIABCategories(sasParams.getCategories()));
-            }
-
 
             String category = null;
             if (isWapSiteUACEntity &&
@@ -631,13 +640,18 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 app.setName(category);
             }
         }
+        //setting App categories to app store categories from repo
+        if (isWapSiteUACEntity){
+            app.setCat(wapSiteUACEntity.getCategories());
+        }
 
         List <String> blockedList= getBlockedList();
         app.setBlocklists(blockedList);
 
 
         final Publisher publisher = new Publisher();
-        publisher.setCat(iabCategoriesInterface.getIABCategories(sasParams.getCategories()));
+        if(null != sasParams.getCategories()){
+        publisher.setCat(iabCategoriesInterface.getIABCategories(sasParams.getCategories()));}
 
         final CommonExtension publisherExtensions = new CommonExtension();
         final RubiconExtension rpForPub = new RubiconExtension();
@@ -664,6 +678,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             ext.setRp(rpForApp);
         } catch (JSONException e) {
             LOG.debug("Site Id is not configured");
+            return null;
         }
 
         app.setExt(ext);

@@ -73,7 +73,6 @@ public abstract class BaseServlet implements Servlet {
         InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
         SASRequestParameters sasParams = hrh.responseSender.sasParams;
 
-        //TODO: Review/Debug this line for NullPointerException
         MetricsManager.updateIncomingRequestsStats(DemandSourceType.findByValue(sasParams.getDst()).name(), sasParams.getCountryId(), sasParams.getCountryCode());
 
         hrh.responseSender.getAuctionEngine().sasParams = hrh.responseSender.sasParams;

@@ -34,40 +34,64 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
     public DBEntity<WapSiteUACEntity, String> buildObjectFromRow(final ResultSetRow resultSetRow) throws RepositoryException {
         final NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
         final String id = row.getString("id");
-        final Timestamp modifiedOn = row.getTimestamp("modified_on");
-
+        final Timestamp modifiedOn;
+        if(null != row.getTimestamp("wsu_modified_on")) {
+            modifiedOn = row.getTimestamp("wsu_modified_on").after(row.getTimestamp("ws_modified_on")) ? row.getTimestamp("wsu_modified_on") : row.getTimestamp("ws_modified_on");
+        }
+        else{
+            modifiedOn = row.getTimestamp("ws_modified_on");
+        }
         try {
-
-            final long siteTypeId = row.getLong("site_type_id");
             final String pubId = row.getString("pub_id");
-
+            final String marketId = row.getString("market_id");
+            final long siteTypeId = row.getLong("site_type_id");
             final String contentRating = row.getString("content_rating");
             final String appType = row.getString("app_type");
             final String categories = row.getString("categories");
-
-            final boolean transparencyEnabled = row.getBoolean("is_transparency_enabled");
-            final boolean exchangeEnabled = row.getBoolean("is_exchange_enabled");
-
-            final Integer pubBlockArr[] = (Integer[])row.getArray("pub_block_list");
-
-            final Integer siteBlockArr[] = (Integer[])row.getArray("site_block_list");
-
-
             final boolean coppaEnabled = row.getBoolean("coppa_enabled");
-
-            final String marketId = row.getString("market_id");
-            final String siteUrl = row.getString("siteUrl");
+            final Integer exchange_settings = row.getInt("exchange_settings");
+            final boolean exchangeEnabled = row.getBoolean("is_exchange_enabled");
+            final Integer pubBlockArr[] = (Integer[])row.getArray("pub_block_list");
+            final Integer siteBlockArr[] = (Integer[])row.getArray("site_block_list");
+            final boolean siteTransparencyEnabled = row.getBoolean("is_site_transparent");
+            final String siteUrl = row.getString("site_url");
+            final String siteName = row.getString("site_name");
+            final String appTitle = row.getString("app_title");
+            boolean pubTransparencyEnabled = false;
+            if(exchange_settings==1){
+                pubTransparencyEnabled=true;
+            }
 
             final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
             builder.setId(id);
-            builder.setModifiedOn(modifiedOn);
-            builder.setSiteTypeId(siteTypeId);
-            builder.setCoppaEnabled(coppaEnabled);
-            builder.setExchangeEnabled(exchangeEnabled);
-            builder.setTransparencyEnabled(transparencyEnabled);
             builder.setPubId(pubId);
             builder.setMarketId(marketId);
-            builder.setSiteUrl(siteUrl);
+            builder.setSiteTypeId(siteTypeId);
+
+            if (siteTypeId == ANDROID_SITE_TYPE && contentRating != null && !contentRating.trim().isEmpty()) {
+                builder.setContentRating(CONTENT_RATING_MAP.get(contentRating));
+            } else {
+                builder.setContentRating(contentRating);
+            }
+
+            builder.setAppType(appType);
+
+            final List<String> catList = new ArrayList<>();
+            if (categories != null && !categories.isEmpty()) {
+                for (String cat : categories.split(",")) {
+                    if (cat != null) {
+                        cat = cat.trim();
+                        if (!cat.isEmpty() && !"ALL".equalsIgnoreCase(cat)) {
+                            catList.add(cat);
+                        }
+                    }
+                }
+                builder.setCategories(catList);
+            }
+
+            builder.setCoppaEnabled(coppaEnabled);
+            builder.setTransparencyEnabled(pubTransparencyEnabled && siteTransparencyEnabled);
+            builder.setExchangeEnabled(exchangeEnabled);
 
             if(null != siteBlockArr)
             {
@@ -82,26 +106,11 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
                 builder.setBlockList(new ArrayList<Integer>());
             }
 
-            if (siteTypeId == ANDROID_SITE_TYPE && contentRating != null && !contentRating.trim().isEmpty()) {
-                builder.setContentRating(CONTENT_RATING_MAP.get(contentRating));
-            } else {
-                builder.setContentRating(contentRating);
-            }
-            //
+            builder.setSiteUrl(siteUrl);
+            builder.setSiteName(siteName);
+            builder.setAppTitle(appTitle);
+            builder.setModifiedOn(modifiedOn);
 
-            builder.setAppType(appType);
-            final List<String> catList = new ArrayList<>();
-            if (categories != null && !categories.isEmpty()) {
-                for (String cat : categories.split(",")) {
-                    if (cat != null) {
-                        cat = cat.trim();
-                        if (!cat.isEmpty() && !"ALL".equalsIgnoreCase(cat)) {
-                            catList.add(cat);
-                        }
-                    }
-                }
-                builder.setCategories(catList);
-            }
             final WapSiteUACEntity entity = builder.build();
             if (logger.isDebugEnabled()) {
                 logger.debug("Found WapSiteUACEntity : " + entity);

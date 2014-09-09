@@ -522,7 +522,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 return getValueFromListAsString(iabCategoryMap.getIABCategories(sasParams.getCategories()), seperator);
 
             }
-            else {
+            else if(null != sasParams.getCategories()){
                 for (int index = 0; index < sasParams.getCategories().size(); index++) {
                     String category = CategoryList.getCategory(sasParams.getCategories().get(index).intValue());
                     appendCategories(sb, category, seperator);
