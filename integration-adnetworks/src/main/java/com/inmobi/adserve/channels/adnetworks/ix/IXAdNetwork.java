@@ -37,26 +37,16 @@ import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TSimpleJSONProtocol;
 import org.apache.velocity.VelocityContext;
-import org.reflections.scanners.ResourcesScanner;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
-import org.reflections.util.FilterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.reflections.Reflections;
 
 import javax.inject.Inject;
 
 import java.awt.*;
-import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.List;
-
-import java.lang.reflect.Field;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -146,6 +136,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final String RUBICON_FS_BLOCKLIST_ID = "InMobiFS";
     private WapSiteUACEntity wapSiteUACEntity;
     private boolean isWapSiteUACEntity = false;
+    private List<String> globalBlindFromConfig;
+    private List<Integer> globalBlind = Lists.newArrayList();
 
     private List<String> blockedAdvertisers = Lists.newArrayList(); ;
 
@@ -220,6 +212,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         this.userName = config.getString(advertiserName + ".userName");
         this.password = config.getString(advertiserName + ".password");
         this.accountId = config.getInt(advertiserName + ".accountId");
+        this.globalBlindFromConfig = config.getList(advertiserName + ".globalBlind");
     }
 
     @Override
@@ -504,10 +497,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         User user = new User();
 
         user.setId(getUid());
-        if (casInternalRequestParameters.uid != null) {
-            user.setId(casInternalRequestParameters.uid);
-            user.setBuyeruid(casInternalRequestParameters.uid);
-        }
 
         return user;
     }
@@ -571,7 +560,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         site.setExt(ext);
-
         return site;
     }
 
@@ -592,18 +580,23 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     {
 
         Transparency transparency = new Transparency();
-        if(isWapSiteUACEntity)
+        if(isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled())
         {
-
-            if(wapSiteUACEntity.isTransparencyEnabled())
-            {
                 transparency.setBlind(0);
-                transparency.setBlindbuyers(wapSiteUACEntity.getBlockList());
-            }
-            else
-            {
-                transparency.setBlind(1);
-            }
+                if(null != wapSiteUACEntity.getBlindList()) {
+                    transparency.setBlindbuyers(wapSiteUACEntity.getBlindList());
+                }
+                else if (globalBlindFromConfig.size() > 0 && !globalBlindFromConfig.get(0).isEmpty()) {
+                    globalBlind.clear();
+                    for (String s : globalBlindFromConfig) globalBlind.add(Integer.valueOf(s));
+
+                    transparency.setBlindbuyers(globalBlind);
+
+                }
+        }
+        else
+        {
+            transparency.setBlind(1);
         }
         return transparency;
     }
@@ -999,6 +992,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
     }
 
+    //This function not used, for future use
     @Override
     protected boolean isNativeRequest(){
         return nativeString.equals(sasParams.getRFormat());
