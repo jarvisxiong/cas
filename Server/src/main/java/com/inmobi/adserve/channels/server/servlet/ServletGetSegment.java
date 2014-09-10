@@ -9,8 +9,10 @@ import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.QueryStringDecoder;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.Path;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -123,6 +126,10 @@ public class ServletGetSegment implements Servlet {
             else if (repoName != null
                     && repoName.equalsIgnoreCase(ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY)) {
                 entity = CasConfigUtil.repositoryHelper.queryWapSiteUACRepository(id.split("_")[0]);
+            }
+            else if (repoName != null
+                && repoName.equalsIgnoreCase(ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY)) {
+                entity = CasConfigUtil.repositoryHelper.queryIXAccountMapRepository(Long.parseLong(id.split("_")[0]));
             }
             else if (repoName != null
                     && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CREATIVE_REPOSITORY)) {

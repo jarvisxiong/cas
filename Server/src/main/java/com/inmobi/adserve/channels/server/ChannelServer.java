@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.server;
 
+import com.inmobi.adserve.channels.repository.*;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Slf4JLoggerFactory;
 
@@ -35,22 +36,6 @@ import com.google.inject.Injector;
 import com.google.inject.util.Modules;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
-import com.inmobi.adserve.channels.repository.ChannelFeedbackRepository;
-import com.inmobi.adserve.channels.repository.ChannelRepository;
-import com.inmobi.adserve.channels.repository.ChannelSegmentFeedbackRepository;
-import com.inmobi.adserve.channels.repository.ChannelSegmentMatchingCache;
-import com.inmobi.adserve.channels.repository.CreativeRepository;
-import com.inmobi.adserve.channels.repository.CurrencyConversionRepository;
-import com.inmobi.adserve.channels.repository.NativeAdTemplateRepository;
-import com.inmobi.adserve.channels.repository.PricingEngineRepository;
-import com.inmobi.adserve.channels.repository.PublisherFilterRepository;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.repository.SiteCitrusLeafFeedbackRepository;
-import com.inmobi.adserve.channels.repository.SiteEcpmRepository;
-import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
-import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
-import com.inmobi.adserve.channels.repository.WapSiteUACRepository;
 import com.inmobi.adserve.channels.server.api.ConnectionType;
 import com.inmobi.adserve.channels.server.module.CasNettyModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
@@ -84,6 +69,7 @@ public class ChannelServer {
     private static SiteEcpmRepository               siteEcpmRepository;
     private static CurrencyConversionRepository     currencyConversionRepository;
     private static WapSiteUACRepository             wapSiteUACRepository;
+    private static IXAccountMapRepository           ixAccountMapRepository;
     private static CreativeRepository               creativeRepository;
     private static NativeAdTemplateRepository		nativeAdTemplateRepository;
     private static final String                     DEFAULT_CONFIG_FILE="/opt/mkhoj/conf/cas/channel-server.properties";
@@ -148,6 +134,7 @@ public class ChannelServer {
             siteEcpmRepository = new SiteEcpmRepository();
             currencyConversionRepository = new CurrencyConversionRepository();
             wapSiteUACRepository = new WapSiteUACRepository();
+            ixAccountMapRepository = new IXAccountMapRepository();
             creativeRepository = new CreativeRepository();
             nativeAdTemplateRepository = new NativeAdTemplateRepository();
 
@@ -164,6 +151,8 @@ public class ChannelServer {
             repoHelperBuilder.setSiteEcpmRepository(siteEcpmRepository);
             repoHelperBuilder.setCurrencyConversionRepository(currencyConversionRepository);
             repoHelperBuilder.setWapSiteUACRepository(wapSiteUACRepository);
+            repoHelperBuilder.setIxAccountMapRepository(ixAccountMapRepository);
+
             repoHelperBuilder.setCreativeRepository(creativeRepository);
             repoHelperBuilder.setNativeAdTemplateRepository(nativeAdTemplateRepository);
             
@@ -235,7 +224,6 @@ public class ChannelServer {
             throws ClassNotFoundException {
         try {
             logger.debug("Starting to instantiate repository");
-            ChannelSegmentMatchingCache.init(logger);
             Configuration databaseConfig = config.getDatabaseConfiguration();
             System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.apache.naming.java.javaURLContextFactory");
             System.setProperty(Context.URL_PKG_PREFIXES, "org.apache.naming");
@@ -285,8 +273,8 @@ public class ChannelServer {
             initialContext.bind("java:comp/env/jdbc", ds);
 
             ChannelSegmentMatchingCache.init(logger);
-            
-            
+            ChannelSegmentAdvertiserCache.init(logger);
+
             // Reusing the repository from phoenix adserving framework.
             
             creativeRepository.init(logger,
@@ -298,6 +286,9 @@ public class ChannelServer {
             wapSiteUACRepository.init(logger,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY),
                     ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY);
+            ixAccountMapRepository.init(logger,
+                  config.getCacheConfiguration().subset(ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY),
+                  ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY);
             channelAdGroupRepository.init(logger,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY),
                     ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY);
