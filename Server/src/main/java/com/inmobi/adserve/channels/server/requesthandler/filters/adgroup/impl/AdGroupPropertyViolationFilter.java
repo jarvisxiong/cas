@@ -26,7 +26,7 @@ public class AdGroupPropertyViolationFilter extends AbstractAdGroupLevelFilter {
      */
     @Inject
     protected AdGroupPropertyViolationFilter(final Provider<Marker> traceMarkerProvider) {
-        super(traceMarkerProvider, InspectorStrings.droppedInImpressionFilter);
+        super(traceMarkerProvider, InspectorStrings.droppedInPropertyViolationFilter);
     }
 
     @Override

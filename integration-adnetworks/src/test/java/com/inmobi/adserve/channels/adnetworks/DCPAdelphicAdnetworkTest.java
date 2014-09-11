@@ -81,10 +81,10 @@ public class DCPAdelphicAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                adelphicAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                adelphicAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
                 new JSONObject("{\"spot\":54235,\"pubId\":\"inmobi_1\"," + "\"site\":1234}"), new ArrayList<Integer>(),
-                0.0d, null, null, 32));
+                0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(true,
                 dcpAdelphicAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
@@ -101,9 +101,9 @@ public class DCPAdelphicAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                adelphicAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                adelphicAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
                 dcpAdelphicAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
@@ -120,9 +120,9 @@ public class DCPAdelphicAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                adelphicAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                adelphicAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
                 dcpAdelphicAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
@@ -138,9 +138,9 @@ public class DCPAdelphicAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                adelphicAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                adelphicAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
                 dcpAdelphicAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
     }
@@ -163,10 +163,10 @@ public class DCPAdelphicAdnetworkTest extends TestCase {
         String externalKey = "0344343";
         SlotSizeMapping.init();
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                adelphicAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                adelphicAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
                 new JSONObject("{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<Integer>(),
-                0.0d, null, null, 0));
+                0.0d, null, null, 0, new Integer[] {0}));
         if (dcpAdelphicAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
             String actualUrl = dcpAdelphicAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://ad.ipredictive.com/d/ads?pub=inmobi_1&site=0&spot=1_testkey&msi.name=00000000-0000-0000-0000-000000000000&msi.id=00000000-0000-0000-0000-000000000000&msi.type=a&version=1.0&ua=Mozilla&cliend_ip=206.29.182.240&ctype=banner&csize=320x50&lat=37.4429&lon=-122.1514&bcat=IAB25-5%2CIAB25-4%2CIAB25-7%2CIAB25-1%2CIAB25-3%2CIAB25-2%2CIAB9-9%2CIAB7-9%2CIAB7-8%2CIAB14-1%2CIAB14-2%2CIAB14-3%2CIAB5-2%2CIAB7-45%2CIAB7-44%2CIAB26%2CIAB8-5%2CIAB7-3%2CIAB25%2CIAB23-9%2CIAB7-2%2CIAB7-5%2CIAB23-2%2CIAB13-5%2CIAB7-10%2CIAB7-4%2CIAB13-7%2CIAB21%2CIAB7-6%2CIAB7-11%2CIAB7-12%2CIAB6-7%2CIAB7-13%2CIAB7-14%2CIAB7-16%2CIAB7-18%2CIAB7-19%2CIAB7%2CIAB10%2CIAB12%2CIAB7-21%2CIAB11%2CIAB7-20%2CIAB7-28%2CIAB7-29%2CIAB7-27%2CIAB7-24%2CIAB7-25%2CIAB7-22%2CIAB19-3%2CIAB17-18%2CIAB7-31%2CIAB7-30%2CIAB7-37%2CIAB11-1%2CIAB7-38%2CIAB11-2%2CIAB7-39%2CIAB7-34%2CIAB7-36%2CIAB23-10%2CIAB15-5%2CIAB12-1%2CIAB12-3%2CIAB26-3%2CIAB12-2%2CIAB26-4%2CIAB26-1%2CIAB26-2%2CIAB7-41%2CIAB7-40%2CIAB11-5%2CIAB11-4%2CIAB11-3&scat=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4";
@@ -197,10 +197,10 @@ public class DCPAdelphicAdnetworkTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                adelphicAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                adelphicAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
                 new JSONObject("{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<Integer>(),
-                0.0d, null, null, 0));
+                0.0d, null, null, 0, new Integer[] {0}));
         if (dcpAdelphicAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpAdelphicAdNetwork.getRequestUri().toString();
             System.out.println(actualUrl);
@@ -223,10 +223,10 @@ public class DCPAdelphicAdnetworkTest extends TestCase {
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
 
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                adelphicAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                adelphicAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
                 new JSONObject("{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<Integer>(),
-                0.0d, null, null, 32));
+                0.0d, null, null, 32, new Integer[] {0}));
         dcpAdelphicAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl);
         String response = "<div style='margin:0px; padding:0px;'><a target=\"_top\" href=\"http://ad.ipredictive.com/d/track/click?zid=inmobi_1_0_1_testkey&sid=bde34925-a0da-11e2-851d-f112587bd4c2&crid=424&adid=8&oid=55&cid=50&spid=322&pubid=58&ez_p=H4sIAAAAAAAAAKuuBQBDv6ajAgAAAA&rd=http%3A%2F%2Fapp.appsflyer.com%2Fid381840917%3Fpid%3Dadelphic_int%26c%3DAdelphic%26clickid%3Dbde34925-a0da-11e2-851d-f112587bd4c2%253A424%253A58%253A8%253A50%253A55%253Ainmobi_1_0_1_testkey\"><img src=\"http://ad.ipredictive.com/d/img/image?zid=inmobi_1_0_1_testkey&sid=bde34925-a0da-11e2-851d-f112587bd4c2&crid=424&adid=8&oid=55&cid=50&spid=322&pubid=58&ez_p=H4sIAAAAAAAAAKuuBQBDv6ajAgAAAA&rd=http%3A%2F%2Fd299n2tvhpuett.cloudfront.net%2Fimage%2Fadelphic%2Fadelphic5.png&rr=43207\" width=\"320\" height=\"50\"></img></a></div>";
         dcpAdelphicAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -251,10 +251,10 @@ public class DCPAdelphicAdnetworkTest extends TestCase {
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
 
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                adelphicAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                adelphicAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
                 new JSONObject("{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<Integer>(),
-                0.0d, null, null, 32));
+                0.0d, null, null, 32, new Integer[] {0}));
         dcpAdelphicAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl);
         String response = "<div style='margin:0px; padding:0px;'><a target=\"_top\" href=\"http://ad.ipredictive.com/d/track/click?zid=inmobi_1_0_1_testkey&sid=bde34925-a0da-11e2-851d-f112587bd4c2&crid=424&adid=8&oid=55&cid=50&spid=322&pubid=58&ez_p=H4sIAAAAAAAAAKuuBQBDv6ajAgAAAA&rd=http%3A%2F%2Fapp.appsflyer.com%2Fid381840917%3Fpid%3Dadelphic_int%26c%3DAdelphic%26clickid%3Dbde34925-a0da-11e2-851d-f112587bd4c2%253A424%253A58%253A8%253A50%253A55%253Ainmobi_1_0_1_testkey\"><img src=\"http://ad.ipredictive.com/d/img/image?zid=inmobi_1_0_1_testkey&sid=bde34925-a0da-11e2-851d-f112587bd4c2&crid=424&adid=8&oid=55&cid=50&spid=322&pubid=58&ez_p=H4sIAAAAAAAAAKuuBQBDv6ajAgAAAA&rd=http%3A%2F%2Fd299n2tvhpuett.cloudfront.net%2Fimage%2Fadelphic%2Fadelphic5.png&rr=43207\" width=\"320\" height=\"50\"></img></a></div>";
         dcpAdelphicAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -298,10 +298,10 @@ public class DCPAdelphicAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                adelphicAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                adelphicAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
                 new JSONObject("{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<Integer>(),
-                0.0d, null, null, 32));
+                0.0d, null, null, 32, new Integer[] {0}));
         dcpAdelphicAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null);
         assertEquals("4f8d98e2-4bbd-40bc-8795-22da170700f9", dcpAdelphicAdNetwork.getImpressionId());
     }

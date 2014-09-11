@@ -1,9 +1,7 @@
 package com.inmobi.adserve.channels.api;
 
 import static org.easymock.EasyMock.expect;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.fail;
+import static org.testng.Assert.*;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.velocity.VelocityContext;
@@ -43,7 +41,7 @@ public class FormatterTest {
     public void testrequestFromSDK360Onwards() {
         SASRequestParameters sasParams = new SASRequestParameters();
         assertEquals(false, Formatter.requestFromSDK360Onwards(sasParams));
-        sasParams.setSdkVersion("i350");
+        sasParams.setSdkVersion("i359");
         assertEquals(false, Formatter.requestFromSDK360Onwards(sasParams));
         sasParams.setSdkVersion("a350");
         assertEquals(false, Formatter.requestFromSDK360Onwards(sasParams));
@@ -136,5 +134,13 @@ public class FormatterTest {
                 assertNull(template);
                 break;
         }
+    }
+
+    @Test
+    public void testgetNamespace() {
+        String namespace = Formatter.getNamespace();
+
+        // Verify namespace
+        assertTrue(namespace.matches("im_1\\d{4}_"));
     }
 }

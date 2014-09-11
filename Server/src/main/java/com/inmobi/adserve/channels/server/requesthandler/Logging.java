@@ -102,7 +102,9 @@ public class Logging {
             }
             if (null != sasParams.getRFormat() && sasParams.getRFormat().equalsIgnoreCase("native")) {
                 InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NATIVE_REQUESTS);
-                InspectorStats.incrementStatCount(dst + "-" + sasParams.getSiteId() + "-" + InspectorStrings.NATIVE_REQUESTS);
+                if(rankList == null || rankList.isEmpty()){
+                	InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NATIVE_REQUESTS + "-" + InspectorStrings.nomatchsegmentcount);
+                }
             }
         }
 
@@ -144,9 +146,9 @@ public class Logging {
             advertiserId = channelSegment.getChannelEntity().getAccountId();
             adsServed = 1;
             ChannelSegmentEntity channelSegmentEntity = channelSegment.getChannelSegmentEntity();
-            adChain = new AdIdChain(channelSegmentEntity.getAdId(), channelSegmentEntity.getAdgroupId(),
-                    channelSegmentEntity.getCampaignId(), channelSegmentEntity.getAdvertiserId(),
-                    channelSegmentEntity.getExternalSiteKey());
+            adChain = new AdIdChain(channelSegmentEntity.getAdId(channelSegment.getAdNetworkInterface().getCreativeType()),
+                    channelSegmentEntity.getAdgroupId(), channelSegmentEntity.getCampaignId(),
+                    channelSegmentEntity.getAdvertiserId(), channelSegmentEntity.getExternalSiteKey());
             ContentRating contentRating = getContentRating(sasParams);
             PricingModel pricingModel = getPricingModel(channelSegmentEntity.getPricingModel());
             adMeta = new AdMeta(contentRating, pricingModel, "BANNER");
@@ -248,22 +250,9 @@ public class Logging {
             DemandSourceType dst = getDst(sasParams.getDst());
             MetricsManager.updateLatency(dst.name(), totalTime);
         }
-        String osName = "";
-        try {
-            if (null != sasParams && null != advertiserId && null != impression && null != impression.getAd()) {
-                Integer sasParamsOsId = sasParams.getOsId();
-                if (sasParamsOsId > 0 && sasParamsOsId < 21) {
-                    osName = HandSetOS.values()[sasParamsOsId - 1].toString();
-                }
-                MetricsManager.updateStats(sasParams.getCountryId(), sasParams.getCountryCode(), sasParams.getOsId(),
-                        osName, advertiserIdNameMap.get(advertiserId), false, false, isServerImpression, 0.0,
-                        (long) 0.0, impression.getAd().getWinBid());
-            }
-        }
-        catch (Exception e) {
-            LOG.info("error while writing to graphite in rrLog", e);
-        }
     }
+    
+    
 
     // Writing creatives
     public static void creativeLogging(final List<ChannelSegment> channelSegments, final SASRequestParameters sasRequestParameters) {

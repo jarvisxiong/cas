@@ -77,9 +77,9 @@ public class DCPAppierAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                appierAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                appierAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 dcpAppierAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
                 true);
@@ -97,9 +97,9 @@ public class DCPAppierAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                appierAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                appierAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 dcpAppierAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
                 false);
@@ -117,9 +117,9 @@ public class DCPAppierAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                appierAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                appierAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 dcpAppierAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
                 false);
@@ -136,9 +136,9 @@ public class DCPAppierAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                appierAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                appierAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 dcpAppierAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null),
                 false);
@@ -160,9 +160,9 @@ public class DCPAppierAdnetworkTest extends TestCase {
      * ; String blurl =
      * "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&beacon=1"
      * ; ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-     * appierAdvId, null, null, null, 0, null, segmentCategories, true, true, externalKey, null, null, null, 0, true,
+     * appierAdvId, null, null, null, 0, null, segmentCategories, true, true, externalKey, null, null, null, new Long[] {0L}, true,
      * null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null, new
-     * ArrayList<Integer>(), 0.0d, null, null, 0)); if (dcpAppierAdNetwork.configureParameters(sasParams,
+     * ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0})); if (dcpAppierAdNetwork.configureParameters(sasParams,
      * casInternalRequestParameters, entity, clurl, blurl)) { String expectedUrl =
      * "version=1&reqid=4f8d98e2-4bbd-40bc-8795-22da170700f9&segkey=test&clientip=206.29.182.240&bsiteid=00000000-0000-0000-0000-000000000000&sitetype=1&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.2.2%3B+es-us%3B+Movistar+Prime+Build%2FFRF91%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&categories=Board%2CAdventure&os=android&lat=37.4429&long=-122.1514&size=320x50&um5=202cb962ac59075b964b07152d234b70&siterating=Performance"
      * ; ChannelBuffer actualUrl = dcpAppierAdNetwork.getHttpRequest().getContent(); // .getRequestUri().toString();
@@ -181,8 +181,8 @@ public class DCPAppierAdnetworkTest extends TestCase {
      * "http://c2.w.inmobi.com/c" + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd" +
      * "-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1"; ChannelSegmentEntity entity = new
      * ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder( appierAdvId, null, null, null, 0, null, null,
-     * true, true, externalKey, null, null, null, 0, true, null, null, 0, null, false, false, false, false, false,
-     * false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d, null, null, 0)); if
+     * true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null, false, false, false, false, false,
+     * false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0})); if
      * (dcpAppierAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
      * 
      * ChannelBuffer actualUrl = dcpAppierAdNetwork.getHttpRequest().getContent(); // .getRequestUri().toString();
@@ -204,8 +204,8 @@ public class DCPAppierAdnetworkTest extends TestCase {
      * ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd" +
      * "-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1"; ChannelSegmentEntity entity = new
      * ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder( appierAdvId, null, null, null, 0, null, null,
-     * true, true, externalKey, null, null, null, 0, true, null, null, 0, null, false, false, false, false, false,
-     * false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d, null, null, 0)); if
+     * true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null, false, false, false, false, false,
+     * false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0})); if
      * (dcpAppierAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
      * ChannelBuffer actualUrl = dcpAppierAdNetwork.getHttpRequest().getContent(); // .getRequestUri().toString();
      * String expectedUrl =
@@ -226,9 +226,9 @@ public class DCPAppierAdnetworkTest extends TestCase {
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                appierAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                appierAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpAppierAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
         String response = "{\"click_landing\":\"http://inmobi-hk0.rtb.appier.net/click?reqid=4f8d98e2-4bbd-40bc-8795-22da170700f9&bidobjid=C4sWETu4SOmbi4yZEuhtqw&cid=hasoffer_test_20130411&crid=hasoffer_test_20130412_1&partner_id=inmobi_hk&bx=Cylxwnu_oqIxo4QxK4l1cmG12quso4QxK4lgC4u_CylP38JF3Hf121lR3H7Ru1x1wj7EJbiE34u_uqdxo0dxo0dxKrdxo0dWo0dxo4Rxo0dxKrGxo0dxo0dxo0dxo4lOeM&ui=CylNUYtyUmgfc8tW30I121uyo0lqwqfmoYSq7rfx7Pi12rwRwqdDorIy30uP7buDo4lO&bidder=inmobi-hk0.rtb.appier.net\",\"reqid\":\"4f8d98e2-4bbd-40bc-8795-22da170700f9\",\"type\":\"img\",\"banner_url\":\"http://placehold.it/320x50\",\"imp_beacon\":\"http://inmobi-hk0.rtb.appier.net/show?reqid=4f8d98e2-4bbd-40bc-8795-22da170700f9&bidobjid=C4sWETu4SOmbi4yZEuhtqw&impid=&cid=hasoffer_test_20130411&crid=hasoffer_test_20130412_1&partner_id=inmobi_hk&bx=Cylxwnu_oqIxo4QxK4lswmo121u1K4l1cmG12quso4QxeM&ui=CylNUYtyUmgfc8tW30I121uyo0lqwqfmoYSq7rfx7Pi12rwRwqdDorIy30uP7buDo4lO\"}";
         dcpAppierAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -250,9 +250,9 @@ public class DCPAppierAdnetworkTest extends TestCase {
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                appierAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                appierAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpAppierAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl);
         String response = "{\"click_landing\":\"http://inmobi-hk0.rtb.appier.net/click?reqid=4f8d98e2-4bbd-40bc-8795-22da170700f9&bidobjid=C4sWETu4SOmbi4yZEuhtqw&cid=hasoffer_test_20130411&crid=hasoffer_test_20130412_1&partner_id=inmobi_hk&bx=Cylxwnu_oqIxo4QxK4l1cmG12quso4QxK4lgC4u_CylP38JF3Hf121lR3H7Ru1x1wj7EJbiE34u_uqdxo0dxo0dxKrdxo0dWo0dxo4Rxo0dxKrGxo0dxo0dxo0dxo4lOeM&ui=CylNUYtyUmgfc8tW30I121uyo0lqwqfmoYSq7rfx7Pi12rwRwqdDorIy30uP7buDo4lO&bidder=inmobi-hk0.rtb.appier.net\",\"reqid\":\"4f8d98e2-4bbd-40bc-8795-22da170700f9\",\"type\":\"img\",\"banner_url\":\"http://placehold.it/320x50\",\"imp_beacon\":\"http://inmobi-hk0.rtb.appier.net/show?reqid=4f8d98e2-4bbd-40bc-8795-22da170700f9&bidobjid=C4sWETu4SOmbi4yZEuhtqw&impid=&cid=hasoffer_test_20130411&crid=hasoffer_test_20130412_1&partner_id=inmobi_hk&bx=Cylxwnu_oqIxo4QxK4lswmo121u1K4l1cmG12quso4QxeM&ui=CylNUYtyUmgfc8tW30I121uyo0lqwqfmoYSq7rfx7Pi12rwRwqdDorIy30uP7buDo4lO\"}";
         dcpAppierAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -276,9 +276,9 @@ public class DCPAppierAdnetworkTest extends TestCase {
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                appierAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                appierAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpAppierAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
         String response = "{\"click_landing\": \"http://inmobi-hk0.rtb.appier.net/click?reqid=4f8d98e2-4bbd-40bc-8795-22da170700f9&bidobjid=mgYR35C4S8OMOpyTwOV4SQ&cid=hasoffer_test_20130411&crid=hasoffer_test_20130412_1&partner_id=inmobi_hk&bx=Cylxwnu_oqIxo4QxK4l1cmG12quso4QxK4lgC4u_CylP38JF3Hf121lR3H7Ru1x1wj7EJbiE34u_uqdxo0dxo0dxKrdxo0dWo0dxo4Rxo0dxKrGxo0dxo0dxo0dxo4lOeM&ui=CylNUYtyUmgfc8tW30I121uyo0lqwqfmoYSq7rfx7Pi12rwRwqdDorIy30uP7buDo4lO&bidder=inmobi-hk0.rtb.appier.net\",\"reqid\": \"4f8d98e2-4bbd-40bc-8795-22da170700f9\",\"type\": \"txt\",\"text\": \"Best Shooting Game!\",\"imp_beacon\": \"http://inmobi-hk0.rtb.appier.net/show?reqid=4f8d98e2-4bbd-40bc-8795-22da170700f9&bidobjid=mgYR35C4S8OMOpyTwOV4SQ&impid=&cid=hasoffer_test_20130411&crid=hasoffer_test_20130412_1&partner_id=inmobi_hk&bx=Cylxwnu_oqIxo4QxK4lswmo121u1K4l1cmG12quso4QxeM&ui=CylNUYtyUmgfc8tW30I121uyo0lqwqfmoYSq7rfx7Pi12rwRwqdDorIy30uP7buDo4lO\"}";
@@ -302,9 +302,9 @@ public class DCPAppierAdnetworkTest extends TestCase {
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                appierAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                appierAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpAppierAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
 
         String response = "{\"click_landing\": \"http://inmobi-hk0.rtb.appier.net/click?reqid=4f8d98e2-4bbd-40bc-8795-22da170700f9&bidobjid=mgYR35C4S8OMOpyTwOV4SQ&cid=hasoffer_test_20130411&crid=hasoffer_test_20130412_1&partner_id=inmobi_hk&bx=Cylxwnu_oqIxo4QxK4l1cmG12quso4QxK4lgC4u_CylP38JF3Hf121lR3H7Ru1x1wj7EJbiE34u_uqdxo0dxo0dxKrdxo0dWo0dxo4Rxo0dxKrGxo0dxo0dxo0dxo4lOeM&ui=CylNUYtyUmgfc8tW30I121uyo0lqwqfmoYSq7rfx7Pi12rwRwqdDorIy30uP7buDo4lO&bidder=inmobi-hk0.rtb.appier.net\",\"reqid\": \"4f8d98e2-4bbd-40bc-8795-22da170700f9\",\"type\": \"txt\",\"text\": \"Best Shooting Game!\",\"imp_beacon\": \"http://inmobi-hk0.rtb.appier.net/show?reqid=4f8d98e2-4bbd-40bc-8795-22da170700f9&bidobjid=mgYR35C4S8OMOpyTwOV4SQ&impid=&cid=hasoffer_test_20130411&crid=hasoffer_test_20130412_1&partner_id=inmobi_hk&bx=Cylxwnu_oqIxo4QxK4lswmo121u1K4l1cmG12quso4QxeM&ui=CylNUYtyUmgfc8tW30I121uyo0lqwqfmoYSq7rfx7Pi12rwRwqdDorIy30uP7buDo4lO\"}";
@@ -339,9 +339,9 @@ public class DCPAppierAdnetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                appierAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true, null,
+                appierAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpAppierAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null);
         assertEquals(dcpAppierAdNetwork.getImpressionId(), "4f8d98e2-4bbd-40bc-8795-22da170700f9");
     }

@@ -24,8 +24,6 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 public class AdvertiserDetailsInvalidFilter extends AbstractAdvertiserLevelFilter {
 
-    private static final Logger              LOG = LoggerFactory.getLogger(AdvertiserBurnLimitExceededFilter.class);
-
     private final Map<String, AdapterConfig> advertiserIdConfigMap;
 
     @Inject

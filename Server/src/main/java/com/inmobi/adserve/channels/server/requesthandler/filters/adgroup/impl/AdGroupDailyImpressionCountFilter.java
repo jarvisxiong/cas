@@ -28,7 +28,7 @@ public class AdGroupDailyImpressionCountFilter extends AbstractAdGroupLevelFilte
      */
     @Inject
     protected AdGroupDailyImpressionCountFilter(final Provider<Marker> traceMarkerProvider) {
-        super(traceMarkerProvider, InspectorStrings.totalSelectedSegments);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_DAILY_IMP_COUNT_FILTER);
 
     }
 

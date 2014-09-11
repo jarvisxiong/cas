@@ -22,8 +22,12 @@ import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.types.AccountType;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.MetricsManager;
+import com.inmobi.casthrift.DemandSourceType;
+
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.QueryStringDecoder;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +35,7 @@ import org.slf4j.Marker;
 
 import javax.inject.Inject;
 import javax.ws.rs.Path;
+
 import java.util.*;
 
 
@@ -66,9 +71,11 @@ public class ServletBackFill implements Servlet {
         Marker traceMarker = traceMarkerProvider.get();
         InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
         SASRequestParameters sasParams = hrh.responseSender.sasParams;
+
+        MetricsManager.updateIncomingRequestsStats(DemandSourceType.findByValue(sasParams.getDst()).name(), sasParams.getCountryId(), sasParams.getCountryCode());
+
         hrh.responseSender.getAuctionEngine().sasParams = hrh.responseSender.sasParams;
         CasInternalRequestParameters casInternalRequestParametersGlobal = hrh.responseSender.casInternalRequestParameters;
-
         casInternalRequestParametersGlobal.traceEnabled = Boolean.valueOf(hrh.getHttpRequest().headers().get("x-mkhoj-tracer"));
 
         if (requestFilters.isDroppedInRequestFilters(hrh)) {
@@ -84,6 +91,11 @@ public class ServletBackFill implements Servlet {
         boolean isResponseOnlyFromDcp = CasConfigUtil.getServerConfig().getBoolean("isResponseOnyFromDCP", false);
         LOG.debug("isResponseOnlyFromDcp from config is {}", isResponseOnlyFromDcp);
         sasParams.setResponseOnlyFromDcp(isResponseOnlyFromDcp);
+
+        // Setting isBannerVideoSupported based on the Request params.
+        boolean isBannerVideoSupported = casUtils.isBannerVideoSupported(sasParams);
+        LOG.debug("isBannerVideoSupported for this request is {}", isBannerVideoSupported);
+        sasParams.setBannerVideoSupported(isBannerVideoSupported);
 
         // Set imai content if r-format is imai
         String imaiBaseUrl = null;
@@ -242,5 +254,5 @@ public class ServletBackFill implements Servlet {
         }
         return blockedAdvertisers;
     }
-
+    
 }
