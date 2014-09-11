@@ -1,5 +1,24 @@
 package com.inmobi.adserve.channels.repository;
 
+import com.aerospike.client.*;
+import com.aerospike.client.policy.ClientPolicy;
+import com.aerospike.client.policy.Policy;
+import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
+import com.inmobi.adserve.channels.entity.SegmentAdGroupFeedbackEntity;
+import com.inmobi.adserve.channels.entity.SiteFeedbackEntity;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.casthrift.AdGroupFeedback;
+import com.inmobi.casthrift.DataCenter;
+import com.inmobi.casthrift.Feedback;
+import com.inmobi.casthrift.SiteFeedback;
+import org.apache.commons.configuration.Configuration;
+import org.apache.thrift.TDeserializer;
+import org.apache.thrift.TException;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -10,35 +29,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import net.citrusleaf.CitrusleafClient;
-import net.citrusleaf.CitrusleafClient.ClResult;
-import net.citrusleaf.CitrusleafClient.ClResultCode;
+// Assumptions:
+// siteId is never null
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.thrift.TDeserializer;
-import org.apache.thrift.TException;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public class SiteAerospikeFeedbackRepository {
 
-import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
-import com.inmobi.adserve.channels.entity.SegmentAdGroupFeedbackEntity;
-import com.inmobi.adserve.channels.entity.SiteFeedbackEntity;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.casthrift.AdGroupFeedback;
-import com.inmobi.casthrift.DataCenter;
-import com.inmobi.casthrift.Feedback;
-import com.inmobi.casthrift.SiteFeedback;
-
-
-public class SiteCitrusLeafFeedbackRepository {
-
-    private CitrusleafClient                                          citrusleafClient;
+    private AerospikeClient                                           aerospikeClient;
+    private Policy                                                    policy;
     private String                                                    namespace;
     private String                                                    set;
     private DataCenter                                                colo;
-    // Cache to store segment feedback entities loaded form the citrus leaf.
+    // Cache to store segment feedback entities loaded from aerospike.
     private ConcurrentHashMap<String/* siteId */, SiteFeedbackEntity> siteSegmentFeedbackCache;
     private ConcurrentHashMap<String, Boolean>                        currentlyUpdatingSites;
     private int                                                       refreshTime;
@@ -47,60 +48,73 @@ public class SiteCitrusLeafFeedbackRepository {
     private int                                                       boostTimeFrame;
     private double                                                    defaultECPM;
     private static final Logger                                       LOG = LoggerFactory
-                                                                                  .getLogger(SiteCitrusLeafFeedbackRepository.class);
+                                                                                  .getLogger(SiteAerospikeFeedbackRepository.class);
 
     public void init(final Configuration config, final DataCenter colo) {
-        this.namespace = config.getString("namespace");
-        this.set = config.getString("set");
-        this.citrusleafClient = new CitrusleafClient(config.getString("host"), config.getInt("port"));
+        this.namespace         = config.getString("namespace");
+        this.set               = config.getString("set");
+        this.refreshTime       = config.getInt("refreshTime");
+        this.feedbackTimeFrame = config.getInt("feedbackTimeFrame", 15);
+        this.boostTimeFrame    = config.getInt("boostTimeFrame", 3);
+        this.defaultECPM       = config.getDouble("default.ecpm", 0.25);
+
         this.siteSegmentFeedbackCache = new ConcurrentHashMap<String, SiteFeedbackEntity>();
         this.currentlyUpdatingSites = new ConcurrentHashMap<String, Boolean>();
-        this.refreshTime = config.getInt("refreshTime");
-        this.feedbackTimeFrame = config.getInt("feedbackTimeFrame", 15);
-        this.boostTimeFrame = config.getInt("boostTimeFrame", 3);
-        this.defaultECPM = config.getDouble("default.ecpm", 0.25);
+
         this.colo = colo;
         this.executorService = Executors.newCachedThreadPool();
+
+        try {
+            ClientPolicy clientpolicy = new ClientPolicy();
+            clientpolicy.maxThreads = 125;    // QPS = ?
+            clientpolicy.timeout = 100;       // Timeout = ?
+            // Verify client policy
+            this.aerospikeClient = new AerospikeClient(clientpolicy, config.getString("host"), config.getInt("port"));
+        } catch (AerospikeException e) {
+            LOG.error("Exception while creating Aerospike client: {}", e.getMessage());
+        }
+
+        policy = new Policy();
     }
 
     /**
      * Method to get SegmentAdGroupFeedbackEntity for the request site and segment combination. Looks first in cache
      * with a configurable refresh time if hits within the refresh time , returns the hit entity otherwise makes a call
-     * to citrusleaf to load the fresh data while returning the stale entity for the current request.
-     * 
-     * @return : returns te entity matching for the site, segment and adgroup combination
+     * to aerospike to load the fresh data while returning the stale entity for the current request.
+     *
+     * @return : returns the entity matching for the site, segment and adgroup combination
      */
     public SegmentAdGroupFeedbackEntity query(final String siteId, final Integer segmentId) {
         SiteFeedbackEntity siteFeedbackEntity = siteSegmentFeedbackCache.get(siteId);
         if (siteFeedbackEntity != null) {
-            LOG.debug("got the siteFeedback entity from cache for query {} {}", siteId, segmentId);
+            LOG.debug("Got the siteFeedback entity from cache for query: siteId: {}, segmentId: {}", siteId, segmentId);
             if (System.currentTimeMillis() - siteFeedbackEntity.getLastUpdated() < refreshTime) {
-                LOG.debug("siteFeedback entity is fresh for query {} {}", siteId, segmentId);
+                LOG.debug("siteFeedback entity is fresh for query: siteId: {}, segmentId: {}", siteId, segmentId);
                 InspectorStats.incrementStatCount(InspectorStrings.siteFeedbackCacheHit);
                 return siteFeedbackEntity.getSegmentAdGroupFeedbackMap() == null ? null : siteFeedbackEntity
                         .getSegmentAdGroupFeedbackMap().get(segmentId);
             }
-            LOG.debug("siteFeedback entity is stale for query {}_{}", siteId, segmentId);
+            LOG.debug("siteFeedback entity is stale for query: siteId: {}, segmentId: {}", siteId, segmentId);
         }
         else {
             LOG.debug("siteFeedback not found for siteId: {}", siteId);
         }
-        LOG.debug("Returning default/old siteFeedback entity and Fetching new data from citrus leaf for siteId: {}",
+        LOG.debug("Returning default/old siteFeedback entity and fetching new data from aerospike for siteId: {}",
                 siteId);
         InspectorStats.incrementStatCount(InspectorStrings.siteFeedbackCacheMiss);
-        asynchronouslyFetchFeedbackFromCitrusLeaf(siteId);
+        asynchronouslyFetchFeedbackFromAerospike(siteId);
         siteFeedbackEntity = siteSegmentFeedbackCache.get(siteId);
         return siteFeedbackEntity == null ? null : (siteFeedbackEntity.getSegmentAdGroupFeedbackMap() == null ? null
                 : siteFeedbackEntity.getSegmentAdGroupFeedbackMap().get(segmentId));
     }
 
     /**
-     * Method that asynchronously fetches feedback from the citrusleaf and puts it into the cache
+     * Method that asynchronously fetches feedback from aerospike and puts it into the cache.
      */
-    private void asynchronouslyFetchFeedbackFromCitrusLeaf(final String siteId) {
+    private void asynchronouslyFetchFeedbackFromAerospike(final String siteId) {
         Boolean isSiteGettingUpdated = this.currentlyUpdatingSites.putIfAbsent(siteId, true);
         if (isSiteGettingUpdated == null) {
-            // forking new thread to fetch feedback from citrusleaf
+            // forking new thread to fetch feedback from zerospike
             CacheUpdater cacheUpdater = new CacheUpdater(siteId);
             Thread cacheUpdaterThread = new Thread(cacheUpdater);
             executorService.execute(cacheUpdaterThread);
@@ -111,8 +125,7 @@ public class SiteCitrusLeafFeedbackRepository {
     }
 
     /**
-     * Class that performs feedback fetch from citrusleaf and cache updating tasks asynchronously
-     * 
+     * Class that performs feedback fetch from aerospike and cache updating tasks asynchronously
      */
     class CacheUpdater implements Runnable {
         private final String siteId;
@@ -123,47 +136,54 @@ public class SiteCitrusLeafFeedbackRepository {
 
         @Override
         public void run() {
-            LOG.debug("getting feedback form the citrus leaf for query {}", siteId);
-            getFeedbackFromCitrusleaf(siteId);
+            LOG.debug("getting feedback form the aerospike for query {}", siteId);
+            getFeedbackFromAerospike(siteId);
         }
 
         /**
-         * Method which gets feedback form citrusleaf in case of a cache miss and updates the cache
+         * Method which gets feedback from aerospike in case of a cache miss and updates the cache
          */
-        void getFeedbackFromCitrusleaf(final String siteId) {
+        void getFeedbackFromAerospike(final String siteId) {
             // getting all data for the site
-            ClResult clResult = getFromCitrusLeaf(siteId);
-            if (!clResult.resultCode.equals(ClResultCode.OK)) {
-                LOG.debug("key not found in citrus leaf");
-                InspectorStats.incrementStatCount(InspectorStrings.siteFeedbackFailedToLoadFromCitrusLeaf);
+            Record record = getFromAerospike(siteId);
+            if (null == record) {
+                LOG.debug("Key not found in aerospike");
+                InspectorStats.incrementStatCount(InspectorStrings.siteFeedbackFailedToLoadFromAerospike);
                 return;
             }
-            LOG.debug("key found in citrus leaf");
-            updateCache(processResultFromCitrusLeaf(clResult));
+            LOG.debug("Key found in aerospike");
+            updateCache(processResultFromAerospike(record));
         }
 
         /**
-         * Method which makes a call to citrus leaf to load the complete site info
+         * Method which makes a call to aerospike to load the complete site info
          */
-        ClResult getFromCitrusLeaf(final String site) {
-            InspectorStats.incrementStatCount(InspectorStrings.siteFeedbackRequestsToCitrusLeaf);
+        Record getFromAerospike(final String site) {
+            InspectorStats.incrementStatCount(InspectorStrings.siteFeedbackRequestsToAerospike);
             long time = System.currentTimeMillis();
-            ClResult clResult = citrusleafClient.getAll(namespace, set, site, null);
+            Record record = null;
+
+            try {
+                final Key key = new Key(namespace, set, site);
+                record = aerospikeClient.get(policy, key);
+            } catch (AerospikeException e) {
+                LOG.error("Exception while retrieving record: {}", e.getMessage());
+            }
             time = System.currentTimeMillis() - time;
             InspectorStats.incrementStatCount(InspectorStrings.siteFeedbackLatency, time);
-            return clResult;
+            return record;
         }
 
         /**
          * Processes feedback , extract global and colo data to get the siteFeedbackEntity object
          * 
-         * @param clResult
+         * @param record
          *            : ClResult object containing the feedback
          */
-        SiteFeedbackEntity processResultFromCitrusLeaf(final ClResult clResult) {
-            if (clResult.results != null) {
+        SiteFeedbackEntity processResultFromAerospike(final Record record) {
+            if (null != record) {
                 Map<Integer, SegmentAdGroupFeedbackEntity> segmentAdGroupFeedbackEntityMap = new HashMap<Integer, SegmentAdGroupFeedbackEntity>();
-                for (Map.Entry<String, Object> binValuePair : clResult.results.entrySet()) {
+                for (Map.Entry<String, Object> binValuePair : record.bins.entrySet()) {
                     String bin = binValuePair.getKey();
                     if (bin.startsWith(DataCenter.ALL.toString())) {
                         String segmentId = bin.split("\u0001")[1];
@@ -181,7 +201,7 @@ public class SiteCitrusLeafFeedbackRepository {
                         SiteFeedback rctFeedback = new SiteFeedback();
                         try {
                             TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
-                            Object byteArray = clResult.results.get(bin);
+                            Object byteArray = record.getValue(bin);
                             if (byteArray == null) {
                                 throw new TException("No rct data");
                             }
@@ -196,7 +216,7 @@ public class SiteCitrusLeafFeedbackRepository {
                         SiteFeedback coloFeedback = new SiteFeedback();
                         try {
                             TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
-                            Object byteArray = clResult.results.get(bin);
+                            Object byteArray = record.getValue(bin);
                             if (byteArray == null) {
                                 throw new TException("No colo data");
                             }
@@ -221,13 +241,13 @@ public class SiteCitrusLeafFeedbackRepository {
                 builder.setSegmentAdGroupFeedbackMap(segmentAdGroupFeedbackEntityMap);
                 return builder.build();
             }
-            LOG.debug("No result set for this site in citrusleaf");
+            LOG.debug("No result set for this site in aerospike");
             return null;
         }
 
         /**
-         * Builds the siteFeedbackEntity object form the global and colo feedback objects(thrift genereated) fetched
-         * from citrus leaf
+         * Builds the siteFeedbackEntity object from the global and colo feedback objects(thrift generated) fetched
+         * from aerospike
          */
         SegmentAdGroupFeedbackEntity buildSiteFeedbackEntity(final SiteFeedback globalFeedback,
                 final SiteFeedback rctFeedback, final SiteFeedback coloFeedback) {

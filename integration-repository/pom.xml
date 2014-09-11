@@ -61,8 +61,8 @@
 			<artifactId>gson</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>net.citrusleaf</groupId>
-			<artifactId>citrusleaf-client</artifactId>
+            <groupId>com.aerospike</groupId>
+            <artifactId>aerospike-client</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.testng</groupId>

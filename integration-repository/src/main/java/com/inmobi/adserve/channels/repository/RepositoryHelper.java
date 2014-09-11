@@ -34,7 +34,7 @@ public class RepositoryHelper {
     private final ChannelSegmentFeedbackRepository channelSegmentFeedbackRepository;
     private final SiteMetaDataRepository           siteMetaDataRepository;
     private final SiteTaxonomyRepository           siteTaxonomyRepository;
-    private final SiteCitrusLeafFeedbackRepository siteCitrusLeafFeedbackRepository;
+    private final SiteAerospikeFeedbackRepository  siteAerospikeFeedbackRepository;
     private final PricingEngineRepository          pricingEngineRepository;
     private final PublisherFilterRepository        publisherFilterRepository;
     private final SiteEcpmRepository               siteEcpmRepository;
@@ -51,7 +51,7 @@ public class RepositoryHelper {
         this.channelSegmentFeedbackRepository = builder.channelSegmentFeedbackRepository;
         this.siteMetaDataRepository = builder.siteMetaDataRepository;
         this.siteTaxonomyRepository = builder.siteTaxonomyRepository;
-        this.siteCitrusLeafFeedbackRepository = builder.siteCitrusLeafFeedbackRepository;
+        this.siteAerospikeFeedbackRepository = builder.siteAerospikeFeedbackRepository;
         this.pricingEngineRepository = builder.pricingEngineRepository;
         this.publisherFilterRepository = builder.publisherFilterRepository;
         this.siteEcpmRepository = builder.siteEcpmRepository;
@@ -90,7 +90,7 @@ public class RepositoryHelper {
         private ChannelSegmentFeedbackRepository channelSegmentFeedbackRepository;
         private SiteMetaDataRepository           siteMetaDataRepository;
         private SiteTaxonomyRepository           siteTaxonomyRepository;
-        private SiteCitrusLeafFeedbackRepository siteCitrusLeafFeedbackRepository;
+        private SiteAerospikeFeedbackRepository  siteAerospikeFeedbackRepository;
         private PricingEngineRepository          pricingEngineRepository;
         private PublisherFilterRepository        publisherFilterRepository;
         private SiteEcpmRepository               siteEcpmRepository;
@@ -106,7 +106,7 @@ public class RepositoryHelper {
             Preconditions.checkNotNull(channelSegmentFeedbackRepository);
             Preconditions.checkNotNull(siteMetaDataRepository);
             Preconditions.checkNotNull(siteTaxonomyRepository);
-            Preconditions.checkNotNull(siteCitrusLeafFeedbackRepository);
+            Preconditions.checkNotNull(siteAerospikeFeedbackRepository);
             Preconditions.checkNotNull(pricingEngineRepository);
             Preconditions.checkNotNull(publisherFilterRepository);
             Preconditions.checkNotNull(siteEcpmRepository);
@@ -172,13 +172,13 @@ public class RepositoryHelper {
         return null;
     }
 
-    public SegmentAdGroupFeedbackEntity querySiteCitrusLeafFeedbackRepository(final String siteId,
+    public SegmentAdGroupFeedbackEntity querySiteAerospikeFeedbackRepository(final String siteId,
             final Integer segmentId) {
-        return siteCitrusLeafFeedbackRepository.query(siteId, segmentId);
+        return siteAerospikeFeedbackRepository.query(siteId, segmentId);
     }
 
-    public SiteFeedbackEntity querySiteCitrusLeafFeedbackRepository(final String siteId) {
-        return siteCitrusLeafFeedbackRepository.query(siteId);
+    public SiteFeedbackEntity querySiteAerospikeFeedbackRepository(final String siteId) {
+        return siteAerospikeFeedbackRepository.query(siteId);
     }
 
     public PricingEngineEntity queryPricingEngineRepository(final int country, final int os) {

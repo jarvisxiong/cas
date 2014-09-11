@@ -1,13 +1,5 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import java.util.Comparator;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import lombok.Getter;
-import lombok.Setter;
-
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
@@ -15,6 +7,12 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.inject.Inject;
+import java.util.Comparator;
+import java.util.Map;
 
 
 public class ChannelSegment {
@@ -27,7 +25,7 @@ public class ChannelSegment {
     @Getter
     private final ChannelSegmentFeedbackEntity     channelSegmentFeedbackEntity;
     @Getter
-    private final ChannelSegmentFeedbackEntity     channelSegmentCitrusLeafFeedbackEntity;
+    private final ChannelSegmentFeedbackEntity     channelSegmentAerospikeFeedbackEntity;
     @Getter
     @Setter
     private AdNetworkInterface                     adNetworkInterface;
@@ -54,13 +52,13 @@ public class ChannelSegment {
     public ChannelSegment(final ChannelSegmentEntity channelSegmentEntity, final ChannelEntity channelEntity,
             final ChannelFeedbackEntity channelFeedbackEntity,
             final ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity,
-            final ChannelSegmentFeedbackEntity channelSegmentCitrusLeafFeedbackEntity,
+            final ChannelSegmentFeedbackEntity channelSegmentAerospikeFeedbackEntity,
             final AdNetworkInterface adNetworkInterface, final double prioritisedECPM) {
         this.channelSegmentEntity = channelSegmentEntity;
         this.channelEntity = channelEntity;
         this.channelFeedbackEntity = channelFeedbackEntity;
         this.channelSegmentFeedbackEntity = channelSegmentFeedbackEntity;
-        this.channelSegmentCitrusLeafFeedbackEntity = channelSegmentCitrusLeafFeedbackEntity;
+        this.channelSegmentAerospikeFeedbackEntity = channelSegmentAerospikeFeedbackEntity;
         this.adNetworkInterface = adNetworkInterface;
         this.prioritisedECPM = prioritisedECPM;
     }
