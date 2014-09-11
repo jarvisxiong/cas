@@ -31,7 +31,7 @@ public class ThriftRequestParser {
 
         // Fill params from AdPoolRequest Object
         params.setRemoteHostIp(tObject.remoteHostIp);
-        params.setMarketRate(tObject.guidanceBid * 1.0/Math.pow(10,6));
+
         // TODO Iterate over the segments using all slots
         Short slotId = null != tObject.selectedSlots && !tObject.selectedSlots.isEmpty() ? tObject.selectedSlots.get(0)
                 : (short) 0;
@@ -86,6 +86,12 @@ public class ThriftRequestParser {
             params.setCategories(convertIntToLong(tObject.site.siteTaxonomies));
             double ecpmFloor = Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor);
             params.setSiteFloor(ecpmFloor);
+            if(tObject.isSetGuidanceBid() && (tObject.guidanceBid * 1.0 / Math.pow(10, 6)) > ecpmFloor) {
+                params.setMarketRate(tObject.guidanceBid * 1.0 / Math.pow(10, 6));
+            }
+            else{
+                params.setMarketRate(ecpmFloor);
+            }
             params.setSiteIncId(tObject.site.siteIncId);
             params.setAppUrl(tObject.site.siteUrl);
             params.setPubId(tObject.site.publisherId);
