@@ -18,8 +18,6 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
 
     private final String id;
     // Type of site (Android, IOS etc.)
-    private final String pubId;//todo for debugging purpose only, remove later
-
     private final String marketId;
     //Bundle Id of App
     private final long siteTypeId;
@@ -33,9 +31,9 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
     private final boolean isCoppaEnabled;
     // last modified time of this table
     private final boolean isTransparencyEnabled;
-    //flag to see if transparency is enabled
-    private final List<Integer> blockList;
-    //list of DSP's, to be blocked for a site
+    //flag to see if transparency is enabled, this will be true if transparency is enabled at both publisher and site level
+    private final List<Integer> blindList;
+    //list of DSP's, for which the site is blind. Picked from wap_site table if available, otherwise from wap_publisher table
     private final String siteUrl;
     //Site page, App store URL
     private final String siteName;
@@ -45,7 +43,6 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
 
     public WapSiteUACEntity(final Builder builder) {
         id = builder.id;
-        pubId = builder.pubId;
         marketId = builder.marketId;
         siteTypeId = builder.siteTypeId;
         contentRating = builder.contentRating;
@@ -53,7 +50,7 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
         categories = builder.categories;
         isCoppaEnabled = builder.isCoppaEnabled;
         isTransparencyEnabled = builder.isTransparencyEnabled;
-        blockList = builder.blockList;
+        blindList = builder.blindList;
         siteUrl = builder.siteUrl;
         siteName = builder.siteName;
         appTitle = builder.appTitle;
@@ -67,7 +64,6 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
     @Setter
     public static class Builder {
         private String id;
-        private String pubId;
         private String marketId;
         private long siteTypeId;
         private String contentRating;
@@ -76,7 +72,7 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
         private boolean isCoppaEnabled;
         private boolean isTransparencyEnabled;
         private boolean isExchangeEnabled;
-        private List<Integer> blockList;
+        private List<Integer> blindList;
         private String siteUrl;
         private String siteName;
         private String appTitle;
