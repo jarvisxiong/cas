@@ -1,6 +1,5 @@
 package com.inmobi.adserve.channels.repository;
 
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -14,7 +13,6 @@ import com.inmobi.phoenix.batteries.data.rdbmsrow.ResultSetRow;
 import com.inmobi.phoenix.data.RepositoryManager;
 import com.inmobi.phoenix.data.RepositoryQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
-import org.apache.log4j.Logger;
 
 public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<WapSiteUACEntity, String> implements
         RepositoryManager {
@@ -42,7 +40,6 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
             modifiedOn = row.getTimestamp("ws_modified_on");
         }
         try {
-            final String pubId = row.getString("pub_id");
             final String marketId = row.getString("market_id");
             final long siteTypeId = row.getLong("site_type_id");
             final String contentRating = row.getString("content_rating");
@@ -51,20 +48,19 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
             final boolean coppaEnabled = row.getBoolean("coppa_enabled");
             final Integer exchange_settings = row.getInt("exchange_settings");
             final boolean exchangeEnabled = row.getBoolean("is_exchange_enabled");
-            final Integer pubBlockArr[] = (Integer[])row.getArray("pub_block_list");
-            final Integer siteBlockArr[] = (Integer[])row.getArray("site_block_list");
+            final Integer pubBlindArr[] = (Integer[])row.getArray("pub_blind_list");
+            final Integer siteBlindArr[] = (Integer[])row.getArray("site_blind_list");
             final boolean siteTransparencyEnabled = row.getBoolean("is_site_transparent");
             final String siteUrl = row.getString("site_url");
             final String siteName = row.getString("site_name");
             final String appTitle = row.getString("app_title");
             boolean pubTransparencyEnabled = false;
-            if(exchange_settings==1){
+            if(exchange_settings==1){//exchange_settings=1 => Publisher is transparent and exchange enabled
                 pubTransparencyEnabled=true;
             }
 
             final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
             builder.setId(id);
-            builder.setPubId(pubId);
             builder.setMarketId(marketId);
             builder.setSiteTypeId(siteTypeId);
 
@@ -90,20 +86,17 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
             }
 
             builder.setCoppaEnabled(coppaEnabled);
+            //Both Publisher level and site level transparency has to be enabled for an ad request to be transparent
             builder.setTransparencyEnabled(pubTransparencyEnabled && siteTransparencyEnabled);
             builder.setExchangeEnabled(exchangeEnabled);
-
-            if(null != siteBlockArr)
+            //if Site Id is set, we take site level blindlist, otherwise publisher level blind list
+            if(null != siteBlindArr)
             {
-                builder.setBlockList(Arrays.asList(siteBlockArr));
+                builder.setBlindList(Arrays.asList(siteBlindArr));
             }
-            else if(null != pubBlockArr)
+            else if(null != pubBlindArr)
             {
-                builder.setBlockList(Arrays.asList(pubBlockArr));
-            }
-            else
-            {
-                builder.setBlockList(new ArrayList<Integer>());
+                builder.setBlindList(Arrays.asList(pubBlindArr));
             }
 
             builder.setSiteUrl(siteUrl);
