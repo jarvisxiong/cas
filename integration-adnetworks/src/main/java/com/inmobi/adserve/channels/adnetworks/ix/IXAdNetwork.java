@@ -278,6 +278,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         // Creating BidRequest Object using unique auction id per auction
         boolean flag = createBidRequestObject(impresssionlist, site, app, user, device, regs);
         if (!flag) {
+            LOG.debug("failed inside createBidRequest");
             return false;
         }
 
@@ -365,7 +366,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     private ProxyDemand createProxyDemandObject() {
         ProxyDemand proxyDemand = new ProxyDemand();
-        proxyDemand.setMarketrate(sasParams.getMarketRate());
+        proxyDemand.setMarketrate(Math.max(sasParams.getMarketRate(),casInternalRequestParameters.auctionBidFloor));
         return proxyDemand;
     }
 
@@ -414,6 +415,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 impExt.setRp(rp);
             }
             else{
+                LOG.debug("zone id not present, will say false");
                 return null;
                 //zoneID not available so returning NULL
             }
@@ -516,7 +518,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
         else {
             site.setId(getBlindedSiteId(sasParams.getSiteIncId(), entity.getIncId(getCreativeType())));
-
+            //todo change incId to guiID
             String category = null;
             if (isWapSiteUACEntity &&
                     StringUtils.isNotEmpty(wapSiteUACEntity.getAppType())) {
