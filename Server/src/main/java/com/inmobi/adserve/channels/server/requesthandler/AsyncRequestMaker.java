@@ -121,11 +121,9 @@ public class AsyncRequestMaker {
                 row.setAdNetworkInterface(network);
                 if (network.isRtbPartner()) {
                     rtbSegments.add(row);
-                    MetricsManager.updatePartnerRequestStats(network.getName(), sasParams.getCountryId(), sasParams.getCountryCode());
                     LOG.debug("{} is a rtb partner so adding this network to rtb ranklist", network.getName());
                 }
                 else {
-                	MetricsManager.updatePartnerRequestStats(network.getName(), sasParams.getCountryId(), sasParams.getCountryCode());
                     segments.add(row);
                 }
             }
