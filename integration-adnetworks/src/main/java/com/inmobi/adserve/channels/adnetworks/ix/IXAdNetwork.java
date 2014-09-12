@@ -281,6 +281,14 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             LOG.debug("failed inside createBidRequest");
             return false;
         }
+        if(isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled())
+        {
+            InspectorStats.incrementStatCount(InspectorStrings.IX_SENT_AS_TRANSPARENT);
+        }
+        else
+        {
+            InspectorStats.incrementStatCount(InspectorStrings.IX_SENT_AS_BLIND);
+        }
 
         // Serializing the bidRequest Object
         return serializeBidRequest();
@@ -685,6 +693,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     public List <String> getBlockedList()
     {
         List<String> blockedList = Lists.newArrayList();
+        LOG.debug("{}",sasParams.getSiteIncId());
         blockedList.add(String.format(SITE_BLOCKLIST_FORMAT, sasParams.getSiteIncId()));
         if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
 
