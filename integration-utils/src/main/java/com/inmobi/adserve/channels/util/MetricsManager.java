@@ -90,6 +90,15 @@ public class MetricsManager {
         realTimeStats.getMatchSegmentLatency().update(latency);
     }
     
+    public static void updateClientTimerLatency(String dst, long latency) {
+        if (null == dstRealTimeStats.get(dst)) {
+        	RealTimeStatsForDstLatency realTimeStats = new RealTimeStatsForDstLatency(dst);
+            dstRealTimeStats.put(dst, realTimeStats);
+        }
+        RealTimeStatsForDstLatency realTimeStats = dstRealTimeStats.get(dst);
+        realTimeStats.getMatchSegmentLatency().update(latency);
+    }
+    
     
     public static void updateIncomingRequestsStats(String dst, Long countryId, String countryName) {
     	if(countryId == null){
