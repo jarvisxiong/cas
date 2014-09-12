@@ -168,15 +168,24 @@ public class AuctionEngine implements AuctionEngineInterface {
     public boolean updateDSPAccountInfo(RepositoryHelper repositoryHelper, String buyer) {
         // Get Inmobi account id for the DSP on Rubicon side
         IXAccountMapEntity ixAccountMapEntity = repositoryHelper.queryIXAccountMapRepository(Long.parseLong(buyer));
+        if(null == ixAccountMapEntity) {
+            LOG.error("Invalid Rubicon DSP id: DSP id:{}", buyer);
+            return false;
+        }
         String accountId = ixAccountMapEntity.getInmobiAccountId();
 
         // Get collection of Channel Segment Entities for the particular Inmobi account id
         ChannelAdGroupRepository channelAdGroupRepository = repositoryHelper.getChannelAdGroupRepository();
+        if (null == channelAdGroupRepository) {
+            LOG.error("Channel AdGroup Repository is null.");
+            return false;
+        }
+
         Collection<ChannelSegmentEntity> adGroupMap = channelAdGroupRepository.getEntities(accountId);
 
         if(adGroupMap.isEmpty()) {
             // If collection is empty
-            LOG.error("Failed to get Channel Segment Entity collection for Rubicon DSP from ix_account_map: DSP id:{}, inmobi account id:{}", buyer, accountId);
+            LOG.error("Channel Segment Entity collection for Rubicon DSP is empty: DSP id:{}, inmobi account id:{}", buyer, accountId);
             return false;
         } else {
             // Else picking up the first channel segment entity and assuming that to be the correct entity
