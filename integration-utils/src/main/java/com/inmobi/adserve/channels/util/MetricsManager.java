@@ -96,7 +96,7 @@ public class MetricsManager {
             dstRealTimeStats.put(dst, realTimeStats);
         }
         RealTimeStatsForDstLatency realTimeStats = dstRealTimeStats.get(dst);
-        realTimeStats.getMatchSegmentLatency().update(latency);
+        realTimeStats.getClientTimerLatency().update(latency);
     }
     
     
