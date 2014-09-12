@@ -1,6 +1,8 @@
 package com.inmobi.adserve.channels.api;
 
 
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+
 public interface AuctionEngineInterface {
     boolean areAllChannelSegmentRequestsComplete();
 
@@ -12,4 +14,5 @@ public interface AuctionEngineInterface {
 
     boolean isAuctionResponseNull();
 
+    public boolean updateDSPAccountInfo(RepositoryHelper repositoryHelper, String buyer);
 }

@@ -9,8 +9,11 @@ import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.api.template.NativeTemplateAttributeFinder;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
+import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.*;
 import com.inmobi.casthrift.ix.*;
@@ -152,9 +155,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     @Inject
     private static NativeTemplateAttributeFinder nativeTemplateAttributeFinder;
-
-
-
 
     private static Map<Short, Integer> slotIdMap;
     static {
@@ -835,6 +835,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return URI.create(url.toString());
     }
 
+
+
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         adStatus = "NO_AD";
@@ -900,11 +902,18 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             else {
                 AdNetworkInterface highestBid = baseRequestHandler.getAuctionEngine().runAuctionEngine();
                 if (highestBid != null) {
-                    LOG.debug("Sending IX auction response of {}", highestBid.getName());
-                    baseRequestHandler.sendAdResponse(highestBid, serverChannel);
-                    // highestBid.impressionCallback();
-                    LOG.debug("Sent IX auction response");
-                    return;
+                    // Updating AdIdChain params for rubicon DSPs
+                    if (!baseRequestHandler.getAuctionEngine().updateDSPAccountInfo(repositoryHelper, buyer)) {
+                        baseRequestHandler.sendNoAdResponse(serverChannel);
+                        baseRequestHandler.cleanUp();
+                        return;
+                    } else {
+                        LOG.debug("Sending IX auction response of {}", highestBid.getName());
+                        baseRequestHandler.sendAdResponse(highestBid, serverChannel);
+                        // highestBid.impressionCallback();
+                        LOG.debug("Sent IX auction response");
+                        return;
+                    }
                 }
                 else {
                     LOG.debug("IX auction has returned null");
@@ -1016,7 +1025,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             responseSeatId = seatBid.getSeat();
             Bid bid =  seatBid.getBid().get(0);
             adm = bid.getAdm();
-            responseImpressionId = bid.getImpid();
+            responseImpressionId = bid.getImpid();  // For IX, this value is changed later (and that value depends on the ADCreativeType)
             creativeId = bid.getCrid();
             responseAuctionId = bidResponse.getId();
             pmptier = bid.getPmptier();
@@ -1113,6 +1122,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Override
     public String getRtbImpressionId() {
         return responseImpressionId;
+    }
+
+    public void setRtbImpressionId(String impressionId) {
+        responseImpressionId = impressionId;
     }
 
     @Override
