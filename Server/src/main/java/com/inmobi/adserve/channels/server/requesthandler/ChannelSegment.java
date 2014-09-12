@@ -19,7 +19,7 @@ import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
 
 public class ChannelSegment {
     @Getter
-    private final ChannelSegmentEntity             channelSegmentEntity;
+    private ChannelSegmentEntity                   channelSegmentEntity;
     @Getter
     private final ChannelEntity                    channelEntity;
     @Getter

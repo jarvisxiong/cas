@@ -1,17 +1,24 @@
 package com.inmobi.adserve.channels.server.auction;
 
+import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.AuctionEngineInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
+import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
+import com.inmobi.casthrift.ADCreativeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -154,6 +161,39 @@ public class AuctionEngine implements AuctionEngineInterface {
         LOG.debug("Completed auction, winner is {} and secondBidPrice is {}", filteredChannelSegmentList.get(lowestLatencyBid)
                 .getAdNetworkInterface().getName(), secondBidPrice);
         return filteredChannelSegmentList.get(lowestLatencyBid).getAdNetworkInterface();
+    }
+
+    @Override
+    // This function sets the parameters contained in the AdIdChain from the buyer field in the ix response
+    public boolean updateDSPAccountInfo(RepositoryHelper repositoryHelper, String buyer) {
+        // Get Inmobi account id for the DSP on Rubicon side
+        IXAccountMapEntity ixAccountMapEntity = repositoryHelper.queryIXAccountMapRepository(Long.parseLong(buyer));
+        String accountId = ixAccountMapEntity.getInmobiAccountId();
+
+        // Get collection of Channel Segment Entities for the particular Inmobi account id
+        ChannelAdGroupRepository channelAdGroupRepository = repositoryHelper.getChannelAdGroupRepository();
+        Collection<ChannelSegmentEntity> adGroupMap = channelAdGroupRepository.getEntities(accountId);
+
+        if(adGroupMap.isEmpty()) {
+            // If collection is empty
+            LOG.error("Failed to get Channel Segment Entity collection for Rubicon DSP from ix_account_map: DSP id:{}, inmobi account id:{}", buyer, accountId);
+            return false;
+        } else {
+            // Else picking up the first channel segment entity and assuming that to be the correct entity
+            ChannelSegmentEntity channelSegmentEntity = adGroupMap.iterator().next();
+
+            // Update AdIdChain params
+            auctionResponse.getChannelSegmentEntity().updateAdIdChainParams(channelSegmentEntity, ((IXAdNetwork)auctionResponse.getAdNetworkInterface()).returnBuyer());
+
+            // Get response creative type and get the incId for the respective response creative type
+            ADCreativeType responseCreativeType =  auctionResponse.getAdNetworkInterface().getCreativeType();
+            long incId = auctionResponse.getChannelSegmentEntity().getIncId(responseCreativeType);
+
+            // Generating new impression id
+            String newImpressionId = asyncRequestMaker.getImpressionId(incId);
+            ((IXAdNetwork)auctionResponse.getAdNetworkInterface()).setRtbImpressionId(newImpressionId);
+            return true;
+        }
     }
 
     private String getDSTName() {

@@ -19,9 +19,9 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
 
     private static final long        serialVersionUID = 1L;
 
-    private final String             advertiserId;
-    private final String             adgroupId;
-    private final String[]           adIds;
+    private String                   advertiserId;
+    private String                   adgroupId;
+    private String[]                 adIds;
     private final String             channelId;
     private final long               platformTargeting;
     private final Long[]             rcList;
@@ -30,10 +30,10 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
     private final boolean            isTestMode;
     private final String             externalSiteKey;
     private final Timestamp          modified_on;
-    private final String             campaignId;
+    private String                   campaignId;
     private final Long[]             slotIds;
-    private final Long[]             incIds;
-    private final long               adgroupIncId;
+    private Long[]                   incIds;
+    private long                     adgroupIncId;
     private final boolean            allTags;
     private final String             pricingModel;
     private final ArrayList<Integer> targetingPlatform;
@@ -59,7 +59,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
     private final Date               ecpmBoostExpiryDate;
     private final Long[]             tod;
     private final int                dst;                      // Classify rtbd and dcp ad groups
-    private final long               campaignIncId;
+    private long                     campaignIncId;
     private final Integer[]          AdFormatIds;
 
     public ChannelSegmentEntity(Builder builder) {
@@ -237,4 +237,17 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
         } else
             return -1; // not found
     }
+
+    public void updateAdIdChainParams(ChannelSegmentEntity entity, String buyer) {
+        this.adgroupId      = entity.getAdgroupId();
+        this.adIds          = entity.getAdIds();
+        this.campaignId     = entity.getCampaignId();
+        this.incIds         = entity.getIncIds();
+        this.adgroupIncId   = entity.getAdgroupIncId();
+        this.campaignIncId  = entity.getCampaignIncId();
+
+        // Advertiser GUID is set from the Buyer field in the BID thrift object
+        this.advertiserId   = buyer;
+    }
+
 }

@@ -221,7 +221,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
 		adIdChain.setAd(channelSegmentEntity.getIncId(responseCreativeType));
 		adIdChain.setGroup(channelSegmentEntity.getAdgroupIncId());
 		adIdChain.setCampaign(channelSegmentEntity.getCampaignIncId());
-		
+        adIdChain.setAdvertiser_guid(channelSegmentEntity.getAdvertiserId());
 
         switch(getRtbResponse().getAdNetworkInterface().getDst()) {
             case 8: // If IX,
@@ -233,9 +233,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
                     long highestBid = (long)(ixAdNetwork.returnAdjustBid() * Math.pow(10, 6));
 		            int pmptier = ixAdNetwork.returnPmptier();
 
-                    // Advertiser GUID is set from the Buyer field in the BID thrift object in the case of IX
-                    adIdChain.setAdvertiser_guid(ixAdNetwork.returnBuyer());
-                    
                     // Checking whether a dealId was provided in the bid response
                     if (null != dealId) {
                         // If dealId is present, then auction type is set to PREFERRED_DEAL
@@ -261,7 +258,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 break;
 
             default:// For RTBD/DCP, auction type is set to SECOND_PRICE
-                adIdChain.setAdvertiser_guid(channelSegmentEntity.getAdvertiserId());
                 rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);
                 break;
         }
