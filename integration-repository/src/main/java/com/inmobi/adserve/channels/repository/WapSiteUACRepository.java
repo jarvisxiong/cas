@@ -90,11 +90,11 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
             builder.setTransparencyEnabled(pubTransparencyEnabled && siteTransparencyEnabled);
             builder.setExchangeEnabled(exchangeEnabled);
             //if Site Id is set, we take site level blindlist, otherwise publisher level blind list
-            if(null != siteBlindArr)
+            if(null != siteBlindArr && siteBlindArr.length>0)
             {
                 builder.setBlindList(Arrays.asList(siteBlindArr));
             }
-            else if(null != pubBlindArr)
+            else if(null != pubBlindArr && pubBlindArr.length>0)
             {
                 builder.setBlindList(Arrays.asList(pubBlindArr));
             }
