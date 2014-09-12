@@ -89,4 +89,6 @@ public class InspectorStrings {
     public static final String DROPPED_IN_PARTNER_COUNT_FILTER           = "DroppedInPartnerCountFilter";
     public static final String DROPPED_IN_DAILY_IMP_COUNT_FILTER         = "DroppedInDailyImpressionCountFilter";
     public static final String SITE_LEVEL_REQUEST                        = "SiteLevelRequest";
+    public static final String IX_SENT_AS_TRANSPARENT                    = "IXSentAsTransparent";
+    public static final String IX_SENT_AS_BLIND                          = "IXSentAsBlind";
 }
