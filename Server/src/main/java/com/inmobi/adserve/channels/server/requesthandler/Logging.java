@@ -249,10 +249,6 @@ public class Logging {
         if (null != sasParams) {
             DemandSourceType dst = getDst(sasParams.getDst());
             MetricsManager.updateLatency(dst.name(), totalTime);
-            
-            if(rankList != null && rankList.size() > 0){
-            	MetricsManager.updateMatchSegmentLatency(dst.name(), totalTime);
-            }
         }
     }
     

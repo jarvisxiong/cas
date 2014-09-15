@@ -22,6 +22,7 @@ import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.MetricsManager;
 
 
 @Singleton
@@ -80,6 +81,9 @@ public class ServletChangeConfig implements Servlet {
                     updates.append(configKey).append("=")
                             .append(CasConfigUtil.getServerConfig().getString(configKey.replace("server.", "")))
                             .append("\n");
+                }
+                if (configKey.startsWith("resetTimers")) {
+                	MetricsManager.resetTimers();
                 }
             }
             hrh.responseSender.sendResponse(updates.toString(), serverChannel);
