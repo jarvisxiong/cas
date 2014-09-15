@@ -14,8 +14,6 @@ public class RealTimeStatsForDstLatency {
     @Getter
     private Histogram           latency;
     @Getter
-    private Histogram           matchSegmentLatency;
-    @Getter
     private Histogram           clientTimerLatency;
 
 
@@ -28,10 +26,12 @@ public class RealTimeStatsForDstLatency {
     	String latencyKey = key + SEP + "latency";        
         this.latency = Metrics.newHistogram(MetricsManager.class, latencyKey);
         
-        String matchSegmentLatencyKey = key + SEP + "matchSegmentLatency";        
-        this.matchSegmentLatency = Metrics.newHistogram(MetricsManager.class, matchSegmentLatencyKey);
-        
         String clientTimerLatencyKey = key + SEP + "clientTimerLatency";        
         this.clientTimerLatency = Metrics.newHistogram(MetricsManager.class, clientTimerLatencyKey);
+    }
+    
+    public void clearTimers(){
+    	latency.clear();
+    	clientTimerLatency.clear();
     }
 }
