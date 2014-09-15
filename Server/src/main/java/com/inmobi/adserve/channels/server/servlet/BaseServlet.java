@@ -73,8 +73,6 @@ public abstract class BaseServlet implements Servlet {
         InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
         SASRequestParameters sasParams = hrh.responseSender.sasParams;
 
-        MetricsManager.updateIncomingRequestsStats(DemandSourceType.findByValue(sasParams.getDst()).name(), sasParams.getCountryId(), sasParams.getCountryCode());
-
         hrh.responseSender.getAuctionEngine().sasParams = hrh.responseSender.sasParams;
         CasInternalRequestParameters casInternalRequestParametersGlobal = hrh.responseSender.casInternalRequestParameters;
 

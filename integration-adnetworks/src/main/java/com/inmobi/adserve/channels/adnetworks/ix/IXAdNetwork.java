@@ -726,7 +726,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         // Setting do not track
         if (null != casInternalRequestParameters.uidADT) {
             try {
-                device.setDnt(Integer.parseInt(casInternalRequestParameters.uidADT) == 0 ? 1 : 0);
                 device.setLmt(Integer.parseInt(casInternalRequestParameters.uidADT) == 0 ? 1 : 0);
             }
             catch (NumberFormatException e) {
