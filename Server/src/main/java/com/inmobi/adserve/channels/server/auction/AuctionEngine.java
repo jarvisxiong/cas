@@ -189,10 +189,11 @@ public class AuctionEngine implements AuctionEngineInterface {
             return false;
         } else {
             // Else picking up the first channel segment entity and assuming that to be the correct entity
-            ChannelSegmentEntity channelSegmentEntity = adGroupMap.iterator().next();
+            ChannelSegmentEntity dspChannelSegmentEntity = adGroupMap.iterator().next();
 
-            // Update AdIdChain params
-            auctionResponse.getChannelSegmentEntity().updateAdIdChainParams(channelSegmentEntity, ((IXAdNetwork)auctionResponse.getAdNetworkInterface()).returnBuyer());
+            // Create a new ChannelSegment with DSP information. So that, all the logging happens on DSP Id.
+            this.auctionResponse = new ChannelSegment(dspChannelSegmentEntity, null, null, null, null,
+                    auctionResponse.getAdNetworkInterface(), -1L);
 
             // Get response creative type and get the incId for the respective response creative type
             ADCreativeType responseCreativeType =  auctionResponse.getAdNetworkInterface().getCreativeType();
@@ -200,7 +201,7 @@ public class AuctionEngine implements AuctionEngineInterface {
 
             // Generating new impression id
             String newImpressionId = asyncRequestMaker.getImpressionId(incId);
-            ((IXAdNetwork)auctionResponse.getAdNetworkInterface()).setRtbImpressionId(newImpressionId);
+            ((IXAdNetwork)auctionResponse.getAdNetworkInterface()).setImpressionId(newImpressionId);
             return true;
         }
     }

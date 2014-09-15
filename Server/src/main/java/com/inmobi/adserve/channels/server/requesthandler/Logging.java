@@ -145,7 +145,7 @@ public class Logging {
             InspectorStats.incrementStatCount(channelSegment.getAdNetworkInterface().getName(),
                     InspectorStrings.serverImpression);
             isServerImpression = true;
-            advertiserId = channelSegment.getChannelEntity().getAccountId();
+            advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
             adsServed = 1;
             ChannelSegmentEntity channelSegmentEntity = channelSegment.getChannelSegmentEntity();
             adChain = new AdIdChain(channelSegmentEntity.getAdId(channelSegment.getAdNetworkInterface().getCreativeType()),
@@ -350,7 +350,7 @@ public class Logging {
 
     public static CasAdChain createCasAdChain(final ChannelSegment channelSegment) {
         CasAdChain casAdChain = new CasAdChain();
-        casAdChain.setAdvertiserId(channelSegment.getChannelEntity().getAccountId());
+        casAdChain.setAdvertiserId(channelSegment.getChannelSegmentEntity().getAdvertiserId());
         casAdChain.setCampaign_inc_id(channelSegment.getChannelSegmentEntity().getCampaignIncId());
         casAdChain.setAdgroup_inc_id(channelSegment.getChannelSegmentEntity().getAdgroupIncId());
         casAdChain.setExternalSiteKey(channelSegment.getChannelSegmentEntity().getExternalSiteKey());

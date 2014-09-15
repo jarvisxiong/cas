@@ -9,11 +9,8 @@ import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.api.template.NativeTemplateAttributeFinder;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
-import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
-import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.*;
 import com.inmobi.casthrift.ix.*;
@@ -1132,8 +1129,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return responseImpressionId;
     }
 
-    public void setRtbImpressionId(String impressionId) {
-        responseImpressionId = impressionId;
+    public void setImpressionId(String impressionId) {
+        this.impressionId = impressionId;
     }
 
     @Override

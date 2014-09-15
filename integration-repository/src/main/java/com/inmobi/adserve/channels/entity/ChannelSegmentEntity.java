@@ -237,17 +237,4 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
         } else
             return -1; // not found
     }
-
-    public void updateAdIdChainParams(ChannelSegmentEntity entity, String buyer) {
-        this.adgroupId      = entity.getAdgroupId();
-        this.adIds          = entity.getAdIds();
-        this.campaignId     = entity.getCampaignId();
-        this.incIds         = entity.getIncIds();
-        this.adgroupIncId   = entity.getAdgroupIncId();
-        this.campaignIncId  = entity.getCampaignIncId();
-
-        // Advertiser GUID is set from the Buyer field in the BID thrift object
-        this.advertiserId   = buyer;
-    }
-
 }
