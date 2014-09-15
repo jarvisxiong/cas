@@ -121,11 +121,9 @@ public class AsyncRequestMaker {
                 row.setAdNetworkInterface(network);
                 if (network.isRtbPartner() || network.isIxPartner()) {
                     rtbSegments.add(row);
-                    MetricsManager.updatePartnerRequestStats(network.getName(), sasParams.getCountryId(), sasParams.getCountryCode());
                     LOG.debug("{} is a rtb/ix partner so adding this network to rtb ranklist", network.getName());
                 }
                 else {
-                	MetricsManager.updatePartnerRequestStats(network.getName(), sasParams.getCountryId(), sasParams.getCountryCode());
                     segments.add(row);
                 }
             }
@@ -141,7 +139,7 @@ public class AsyncRequestMaker {
         casInternalRequestParameters.blockedCategories = casInternalRequestParameterGlobal.blockedCategories;
         casInternalRequestParameters.blockedAdvertisers = casInternalRequestParameterGlobal.blockedAdvertisers;
         casInternalRequestParameters.highestEcpm = casInternalRequestParameterGlobal.highestEcpm;
-        casInternalRequestParameters.auctionBidFloor = casInternalRequestParameterGlobal.auctionBidFloor;
+        casInternalRequestParameters.rtbBidFloor = casInternalRequestParameterGlobal.rtbBidFloor;
         casInternalRequestParameters.auctionId = casInternalRequestParameterGlobal.auctionId;
         casInternalRequestParameters.uid = casInternalRequestParameterGlobal.uid;
         casInternalRequestParameters.uidO1 = casInternalRequestParameterGlobal.uidO1;

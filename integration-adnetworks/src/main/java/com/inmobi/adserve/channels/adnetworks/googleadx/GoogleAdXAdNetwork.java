@@ -46,14 +46,13 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
   public boolean configureParameters() {
     googleInMobiPubID = config.getString("googleadx.googleAdXPublisherID");
 
-    if (sasParams.getSlot() != null
-        && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-      Dimension dim = SlotSizeMapping.getDimension((long) sasParams
-          .getSlot());
-      width = (int) Math.ceil(dim.getWidth());
-      height = (int) Math.ceil(dim.getHeight());
+    Short slot = sasParams.getSlot();
+    if(slot == null || slot == 9 || SlotSizeMapping.getDimension((long) slot ) == null) {
+        slot = 15;
     }
-
+    Dimension dim = SlotSizeMapping.getDimension((long)slot);
+    width = (int) Math.ceil(dim.getWidth());
+    height = (int) Math.ceil(dim.getHeight());
     LOG.debug("Configure parameters inside GoogleAdX returned true");
     return true;
   }
@@ -112,3 +111,4 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
     return null;
   }
 }
+

@@ -81,8 +81,30 @@ public class MetricsManager {
         realTimeStats.getLatency().update(latency);
     }
     
+    public static void updateMatchSegmentLatency(String dst, long latency) {
+        if (null == dstRealTimeStats.get(dst)) {
+        	RealTimeStatsForDstLatency realTimeStats = new RealTimeStatsForDstLatency(dst);
+            dstRealTimeStats.put(dst, realTimeStats);
+        }
+        RealTimeStatsForDstLatency realTimeStats = dstRealTimeStats.get(dst);
+        realTimeStats.getMatchSegmentLatency().update(latency);
+    }
+    
+    public static void updateClientTimerLatency(String dst, long latency) {
+        if (null == dstRealTimeStats.get(dst)) {
+        	RealTimeStatsForDstLatency realTimeStats = new RealTimeStatsForDstLatency(dst);
+            dstRealTimeStats.put(dst, realTimeStats);
+        }
+        RealTimeStatsForDstLatency realTimeStats = dstRealTimeStats.get(dst);
+        realTimeStats.getClientTimerLatency().update(latency);
+    }
+    
     
     public static void updateIncomingRequestsStats(String dst, Long countryId, String countryName) {
+    	if(countryId == null){
+    		return;
+    	}
+    	
         if (null == realTimeCountryDstStats.get(countryId.intValue())) {
             realTimeCountryDstStats.put(countryId.intValue(), new ConcurrentHashMap<String, RealTimeStatsForCountryDst>());
         }
