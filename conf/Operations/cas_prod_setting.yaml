@@ -1,0 +1,669 @@
+prod:
+   ua2:
+      db_host:
+         - dbadserve.vip.ua2.inmobi.com
+      db_port:
+         - 6543
+      database:
+         - wap_prod_adserve
+      citrusleaf_host:
+         - clf.ads.ua2.inmobi.com
+      citrusleaf_port:
+         - 3000
+      ifd_host:
+         - ads01.ifd.vip.ua2.inmobi.com 
+      ifd_status:
+         - "off"
+      ifc_host:
+         - "ifc1.vip.ua2.inmobi.com:8080"
+      ifc_status:
+         - 'on'
+      nexage_host:
+         - 'bos.ads.nexage.com'
+      mondemand_address:
+         - '10.3.0.167'
+      mondemand_port:
+         - '12555'
+      log_type :
+         - 'ERROR'
+      debug_log_type :
+         - 'ERROR'
+      graphite_host :
+         - 'mon04.ads.ua2.inmobi.com'
+      scribe_endpoint1:
+         - 'databus.vip.ua2.inmobi.com'
+      read_timeout:
+         - 500
+      server_timeout:
+         - 600
+      rtb_server_timeout:
+         - 180
+      t_segmentno:
+         - '-1'
+      in_bm_cnxn:
+         - '150'
+      in_vm_cnxn:
+         - '80'
+      out_bm_rtb_cnxn:
+         - '1200'
+      out_vm_rtb_cnxn:
+         - '400'
+      out_bm_dcp_cnxn:
+         - '1200'
+      out_vm_dcp_cnxn:
+         - '400'
+
+   uj1:
+      db_host:
+         - dbadserve.vip.uj1.inmobi.com
+      db_port:
+         - 6543 
+      database:
+         - wap_prod_adserve
+      citrusleaf_host:
+         - clf.ads.uj1.inmobi.com
+      citrusleaf_port:
+         - 3000
+      ifd_host:
+         - "ads01.ifd.vip.uj1.inmobi.com"
+      ifd_status:
+         - "on"
+      ifc_host:
+         - "ifc1.vip.uj1.inmobi.com:8080"
+      ifc_status:
+         - 'on'
+      nexage_host:
+         - 'sjc.ads.nexage.com'
+      mondemand_address:
+         - '192.168.96.64'
+      mondemand_port:
+         - '12555'
+      log_type :
+         - 'ERROR'
+      debug_log_type :
+         - 'ERROR'
+      graphite_host :
+         - 'mon02.ads.uj1.inmobi.com'
+      scribe_endpoint1:
+         - 'databus.vip.uj1.inmobi.com'
+      read_timeout:
+         - 500
+      server_timeout:
+         - 600
+      rtb_server_timeout:
+         - 180
+      t_segmentno:
+         - '-1'
+      out_bm_rtb_cnxn:
+         - '1200'
+      out_vm_rtb_cnxn:
+         - '400'
+      out_bm_dcp_cnxn:
+         - '1200'
+      out_vm_dcp_cnxn:
+         - '400'
+      in_bm_cnxn:
+         - '150'
+      in_vm_cnxn:
+         - '80'
+
+   uh1:
+      db_host:
+         - dbadserve.vip.uh1.inmobi.com
+      db_port:
+         - 6543 
+      database:
+         - wap_prod_adserve
+      citrusleaf_host:
+         - clf.ads.uh1.inmobi.com
+      citrusleaf_port:
+         - 3000
+      ifd_host:
+         - "ads01.ifd.vip.uh1.inmobi.com"
+      ifd_status:
+         - "on"
+      ifc_host:
+         - "ifc1.vip.uh1.inmobi.com:8080"
+      ifc_status:
+         - 'on'
+      nexage_host:
+         - 'bos.ads.nexage.com'
+      mondemand_address:
+         - '10.45.0.136'
+      mondemand_port:
+         - '12555'
+      log_type :
+         - 'ERROR'
+      debug_log_type :
+         - 'ERROR'
+      graphite_host :
+         - 'mon03.ads.uh1.inmobi.com'
+      scribe_endpoint1:
+         - 'databus.vip.uh1.inmobi.com'
+      read_timeout:
+         - 500
+      server_timeout:
+         - 600
+      rtb_server_timeout:
+         - 180
+      t_segmentno:
+         - '-1'
+      out_bm_rtb_cnxn:
+         - '1200'
+      out_vm_rtb_cnxn:
+         - '400'
+      out_bm_dcp_cnxn:
+         - '1200'
+      out_vm_dcp_cnxn:
+         - '400'
+      in_bm_cnxn:
+         - '150'
+      in_vm_cnxn:
+         - '80'
+
+   lhr1:
+      db_host:
+         - dbadserve.vip.lhr1.inmobi.com
+      db_port:
+         - 6543 
+      database:
+         - wap_prod_adserve
+      citrusleaf_host:
+         - clf.ads.lhr1.inmobi.com
+      citrusleaf_port:
+         - 3000
+      ifd_host:
+         - "ads01.ifd.vip.lhr1.inmobi.com"
+      ifd_status:
+         - "off"
+      ifc_host:
+         - "ifc1.vip.lhr1.inmobi.com:8080"
+      ifc_status:
+         - 'on'
+      nexage_host:
+         - 'bos.ads.nexage.com'
+      mondemand_address:
+         - '192.168.176.80'
+      mondemand_port:
+         - '12555'
+      log_type :
+         - 'ERROR'
+      debug_log_type :
+         - 'ERROR'
+      graphite_host :
+         - 'mon02.ads.lhr1.inmobi.com'
+      scribe_endpoint1:
+         - 'databus.vip.lhr1.inmobi.com'
+      read_timeout:
+         - 500
+      server_timeout:
+         - 600
+      rtb_server_timeout:
+         - 180
+      t_segmentno:
+         - '-1'
+      out_bm_rtb_cnxn:
+         - '1200'
+      out_vm_rtb_cnxn:
+         - '400'
+      out_bm_dcp_cnxn:
+         - '1200'
+      out_vm_dcp_cnxn:
+         - '400'
+      in_bm_cnxn:
+         - '150'
+      in_vm_cnxn:
+         - '80'
+
+   hkg1:
+      db_host:
+         - dbadserve.vip.hkg1.inmobi.com
+      db_port:
+         - 6543 
+      database:
+         - wap_prod_adserve
+      citrusleaf_host:
+         - clf.ads.hkg1.inmobi.com
+      citrusleaf_port:
+         - 3000
+      ifd_host:
+         - "ads01.ifd.vip.hkg1.inmobi.com"
+      ifd_status:
+         - "off"
+      ifc_host:
+         - "ifc1.vip.hkg1.inmobi.com:8080"
+      ifc_status:
+         - 'on'
+      nexage_host:
+         - 'sjc.ads.nexage.com'
+      mondemand_address:
+         - '192.168.192.72'
+      mondemand_port:
+         - '12555'
+      log_type :
+         - 'ERROR'
+      debug_log_type :
+         - 'ERROR'
+      graphite_host :
+         - 'mon02.ads.lhr1.inmobi.com'
+      scribe_endpoint1:
+         - 'databus.vip.hkg1.inmobi.com'
+      read_timeout:
+         - 500
+      server_timeout:
+         - 600
+      rtb_server_timeout:
+         - 180
+      t_segmentno:
+         - '-1'
+      out_bm_rtb_cnxn:
+         - '1200'
+      out_vm_rtb_cnxn:
+         - '400'
+      out_bm_dcp_cnxn:
+         - '1200'
+      out_vm_dcp_cnxn:
+         - '400'
+      in_bm_cnxn:
+         - '150'
+      in_vm_cnxn:
+         - '80'
+
+pilot:
+   ua2:
+      db_host:
+         - dbadserve.vip.ua2.inmobi.com
+      db_port:
+         - 6543
+      database:
+         - wap_prod_adserve
+      citrusleaf_host:
+         - clf.ads.ua2.inmobi.com
+      citrusleaf_port:
+         - 3000
+      ifd_host:
+         - ads01.ifd.vip.ua2.inmobi.com 
+      ifd_status:
+         - "off"
+      ifc_host:
+         - "ifc1.vip.ua2.inmobi.com:8080"
+      ifc_status:
+         - 'on'
+      nexage_host:
+         - 'bos.ads.nexage.com'
+      mondemand_address:
+         - '10.3.0.167'
+      mondemand_port:
+         - '12555'
+      log_type :
+         - 'DEBUG'
+      debug_log_type :
+         - 'INFO'
+      graphite_host :
+         - 'mon04.ads.ua2.inmobi.com'
+      scribe_endpoint1:
+         - 'databus.vip.ua2.inmobi.com'
+      read_timeout:
+         - 500
+      server_timeout:
+         - 600
+      rtb_server_timeout:
+         - 160
+      t_segmentno:
+         - '-1'
+      out_bm_rtb_cnxn:
+         - '1200'
+      out_vm_rtb_cnxn:
+         - '400'
+      out_bm_dcp_cnxn:
+         - '1200'
+      out_vm_dcp_cnxn:
+         - '400'
+      in_bm_cnxn:
+         - '150'
+      in_vm_cnxn:
+         - '80'
+   uj1:
+      db_host:
+         - dbadserve.vip.uj1.inmobi.com
+      db_port:
+         - 6543
+      database:
+         - wap_prod_adserve
+      citrusleaf_host:
+         - clf.ads.uj1.inmobi.com
+      citrusleaf_port:
+         - 3000
+      ifd_host:
+         - "ads01.ifd.vip.uj1.inmobi.com"
+      ifd_status:
+         - "on"
+      ifc_host:
+         - "ifc1.vip.uj1.inmobi.com:8080"
+      ifc_status:
+         - 'on'
+      nexage_host:
+         - 'sjc.ads.nexage.com'
+      mondemand_address:
+         - '192.168.96.64'
+      mondemand_port:
+         - '12555'
+      log_type :
+         - 'DEBUG'
+      debug_log_type :
+         - 'INFO'
+      graphite_host :
+         - 'mon02.ads.uj1.inmobi.com'
+      scribe_endpoint1:
+         - 'databus.vip.uj1.inmobi.com'
+      read_timeout:
+         - 500
+      server_timeout:
+         - 600
+      rtb_server_timeout:
+         - 160
+      t_segmentno:
+         - '-1'
+      out_bm_rtb_cnxn:
+         - '1200'
+      out_vm_rtb_cnxn:
+         - '400'
+      out_bm_dcp_cnxn:
+         - '1200'
+      out_vm_dcp_cnxn:
+         - '400'
+      in_bm_cnxn:
+         - '150'
+      in_vm_cnxn:
+         - '80'
+   uh1:
+      db_host:
+         - dbadserve.vip.uh1.inmobi.com
+      db_port:
+         - 6543
+      database:
+         - wap_prod_adserve
+      citrusleaf_host:
+         - clf.ads.uh1.inmobi.com
+      citrusleaf_port:
+         - 3000
+      ifd_host:
+         - "ads01.ifd.vip.uh1.inmobi.com"
+      ifd_status:
+         - "on"
+      ifc_host:
+         - "ifc1.vip.uh1.inmobi.com:8080"
+      ifc_status:
+         - 'on'
+      nexage_host:
+         - 'bos.ads.nexage.com'
+      mondemand_address:
+         - '10.45.0.136'
+      mondemand_port:
+         - '12555'
+      log_type :
+         - 'DEBUG'
+      debug_log_type :
+         - 'INFO'
+      graphite_host :
+         - 'mon03.ads.uh1.inmobi.com'
+      scribe_endpoint1:
+         - 'databus.vip.uh1.inmobi.com'
+      read_timeout:
+         - 500
+      server_timeout:
+         - 600
+      rtb_server_timeout:
+         - 160
+      t_segmentno:
+         - '-1'
+      out_bm_rtb_cnxn:
+         - '1200'
+      out_vm_rtb_cnxn:
+         - '400'
+      out_bm_dcp_cnxn:
+         - '1200'
+      out_vm_dcp_cnxn:
+         - '400'
+      in_bm_cnxn:
+         - '150'
+      in_vm_cnxn:
+         - '80'
+   lhr1:
+      db_host:
+         - dbadserve.vip.lhr1.inmobi.com
+      db_port:
+         - 6543 
+      database:
+         - wap_prod_adserve
+      citrusleaf_host:
+         - clf.ads.lhr1.inmobi.com
+      citrusleaf_port:
+         - 3000
+      ifd_host:
+         - "ads01.ifd.vip.lhr1.inmobi.com"
+      ifd_status:
+         - "off"
+      ifc_host:
+         - "ifc1.vip.lhr1.inmobi.com:8080"
+      ifc_status:
+         - 'on'
+      nexage_host:
+         - 'bos.ads.nexage.com'
+      mondemand_address:
+         - '192.168.176.80'
+      mondemand_port:
+         - '12555'
+      log_type :
+         - 'DEBUG'
+      debug_log_type :
+         - 'INFO'
+      graphite_host :
+         - 'mon02.ads.lhr1.inmobi.com'
+      scribe_endpoint1:
+         - 'databus.vip.lhr1.inmobi.com'
+      read_timeout:
+         - 500
+      server_timeout:
+         - 600
+      rtb_server_timeout:
+         - 160
+      t_segmentno:
+         - '-1'
+      out_bm_rtb_cnxn:
+         - '1200'
+      out_vm_rtb_cnxn:
+         - '400'
+      out_bm_dcp_cnxn:
+         - '1200'
+      out_vm_dcp_cnxn:
+         - '400'
+      in_bm_cnxn:
+         - '150'
+      in_vm_cnxn:
+         - '80'
+   hkg1:
+      db_host:
+         - dbadserve.vip.hkg1.inmobi.com
+      db_port:
+         - 6543 
+      database:
+         - wap_prod_adserve
+      citrusleaf_host:
+         - clf.ads.hkg1.inmobi.com
+      citrusleaf_port:
+         - 3000
+      ifd_host:
+         - "ads01.ifd.vip.hkg1.inmobi.com"
+      ifd_status:
+         - "off"
+      ifc_host:
+         - "ifc1.vip.hkg1.inmobi.com:8080"
+      ifc_status:
+         - 'on'
+      nexage_host:
+         - 'sjc.ads.nexage.com'
+      mondemand_address:
+         - '192.168.192.72'
+      mondemand_port:
+         - '12555'
+      log_type :
+         - 'DEBUG'
+      debug_log_type :
+         - 'INFO'
+      graphite_host :
+         - 'mon02.ads.lhr1.inmobi.com'
+      scribe_endpoint1:
+         - 'databus.vip.hkg1.inmobi.com'
+      read_timeout:
+         - 500
+      server_timeout:
+         - 600
+      rtb_server_timeout:
+         - 160
+      t_segmentno:
+         - '-1'
+      out_bm_rtb_cnxn:
+         - '1200'
+      out_vm_rtb_cnxn:
+         - '400'
+      out_bm_dcp_cnxn:
+         - '1200'
+      out_vm_dcp_cnxn:
+         - '400'
+      in_bm_cnxn:
+         - '150'
+      in_vm_cnxn:
+         - '80'
+nonprod:
+   lhr1:
+      db_host:
+         - web1012.ads.lhr1.inmobi.com
+      db_port:
+         - 5499
+      citrusleaf_host:
+         - clf.ads.lhr1.inmobi.com
+      citrusleaf_port:
+         - 3000
+      ifd_host:
+         - "web1012.ads.lhr1.inmobi.com"
+      ifd_status:
+         - "off"
+      ifc_host:
+         - "web1012.ads.lhr1.inmobi.com:8082"
+      ifc_status:
+         - 'on'
+      nexage_host:
+         - 'bos.non_prod'
+      mondemand_address:
+         - '192.168.176.80'
+      mondemand_port:
+         - '12555'
+      log_type :
+         - 'DEBUG'
+   corp:
+      db_host:
+         - db.corp.inmobi.com
+      db_port:
+         - 6543
+      database:
+         - wap_prod_adserve
+      citrusleaf_host:
+         - clf.corp.inmobi.com
+      citrusleaf_port:
+         - 3000
+      ifd_host:
+         - ads01.ifd.corp.inmobi.com
+      ifd_status:
+         - "off"
+      ifc_host:
+         - "ifc1.vip.corp.inmobi.com:8080"
+      ifc_status:
+         - 'on'
+      nexage_host:
+         - 'bos.ads.nexage.com'
+      mondemand_address:
+         - 'localhost'
+      mondemand_port:
+         - '12555'
+      log_type :
+         - 'DEBUG'
+      debug_log_type :
+         - 'INFO'
+      graphite_host :
+         - 'mon02.ads.lhr1.inmobi.com'
+      scribe_endpoint1:
+         - 'databus.vip.nonprod.inmobi.com'
+      read_timeout:
+         - 500
+      server_timeout:
+         - 600
+      rtb_server_timeout:
+         - 180
+      t_segmentno:
+         - '-1'
+      out_bm_rtb_cnxn:
+         - '1200'
+      out_vm_rtb_cnxn:
+         - '400'
+      out_bm_dcp_cnxn:
+         - '1200'
+      out_vm_dcp_cnxn:
+         - '400'
+      in_bm_cnxn:
+         - '150'
+      in_vm_cnxn:
+         - '80'
+   ev1:
+      db_host:
+         - dbadserve.vip.ua2.inmobi.com
+      db_port:
+         - 6543
+      database:
+         - wap_prod_adserve
+      citrusleaf_host:
+         - clf.ads.ua2.inmobi.com
+      citrusleaf_port:
+         - 3000
+      ifd_host:
+         - ads01.ifd.vip.ua2.inmobi.com 
+      ifd_status:
+         - "off"
+      ifc_host:
+         - "ifc1.vip.ua2.inmobi.com:8080"
+      ifc_status:
+         - 'on'
+      nexage_host:
+         - 'bos.ads.nexage.com'
+      mondemand_address:
+         - '10.3.0.167'
+      mondemand_port:
+         - '12555'
+      log_type :
+         - 'DEBUG'
+      debug_log_type :
+         - 'INFO'
+      graphite_host :
+         - 'mon04.ads.ua2.inmobi.com'
+      scribe_endpoint1:
+         - 'databus.vip.nnprod.inmobi.com'
+      read_timeout:
+         - 500
+      server_timeout:
+         - 600
+      rtb_server_timeout:
+         - 180
+      t_segmentno:
+         - '-1'
+      out_bm_rtb_cnxn:
+         - '1200'
+      out_vm_rtb_cnxn:
+         - '400'
+      out_bm_dcp_cnxn:
+         - '1200'
+      out_vm_dcp_cnxn:
+         - '400'
+      in_bm_cnxn:
+         - '150'
+      in_vm_cnxn:
+         - '80'

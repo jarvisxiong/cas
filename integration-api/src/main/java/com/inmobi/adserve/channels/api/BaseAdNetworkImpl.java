@@ -39,6 +39,7 @@ import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.JaxbHelper;
+import com.inmobi.adserve.channels.util.MetricsManager;
 import com.inmobi.casthrift.ADCreativeType;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
@@ -68,6 +69,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     
     protected boolean 							  isHTMLResponseSupported = true;
     protected boolean 							  isNativeResponseSupported = false;
+    protected boolean 							  isBannerVideoResponseSupported = false;
+    protected boolean 							  isVideoResponseReceived = false;
 
     protected SASRequestParameters                sasParams;
     protected CasInternalRequestParameters        casInternalRequestParameters;
@@ -219,7 +222,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     if (!isRequestCompleted()) {
                         LOG.debug("Operation complete for channel partner: {}", getName());
                         LOG.debug("{} operation complete latency {}", getName(), latency);
-                        String responseStr = response.getResponseBody();
+                        String responseStr = response.getResponseBody("UTF-8");
                         HttpResponseStatus httpResponseStatus = HttpResponseStatus.valueOf(response.getStatusCode());
                         parseResponse(responseStr, httpResponseStatus);
                         processResponse();
@@ -247,11 +250,20 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     if (isRequestComplete) {
                         return;
                     }
-
+                    
+                	String dst;
+                	if(isRtbPartner()){
+                		dst = "RTBD";
+                	}else{
+                		dst = "DCP";
+                	}
+                	MetricsManager.updateClientTimerLatency(dst, latency);
+                	
                     if (t instanceof java.net.ConnectException) {
                         LOG.debug("{} connection timeout latency {}", getName(), latency);
                         adStatus = "TIME_OUT";
                         InspectorStats.incrementStatCount(getName(), InspectorStrings.connectionTimeout);
+                        InspectorStats.incrementStatCount(InspectorStrings.connectionTimeout);
                         processResponse();
                         return;
                     }
@@ -687,12 +699,14 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
     
     @Override
-    public ADCreativeType getCreativeType(){
-    	if(isNativeRequest()){
-    		return ADCreativeType.NATIVE;
-    	}else{
-    		return ADCreativeType.BANNER;
-    	}
+    public ADCreativeType getCreativeType() {
+        if (isNativeRequest()) {
+            return ADCreativeType.NATIVE;
+        } else if (isVideoResponseReceived) {
+            return ADCreativeType.INTERSTITIAL_VIDEO;
+        } else {
+            return ADCreativeType.BANNER;
+        }
     }
 
     protected String getHashedValue(final String message, final String hashingType) {
@@ -771,7 +785,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     @Override
     public void setLogCreative(boolean logCreative) {
-    	 //
+        //
     }
 
     @Override

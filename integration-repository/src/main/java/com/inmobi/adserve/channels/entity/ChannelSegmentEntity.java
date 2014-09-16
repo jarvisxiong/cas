@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.entity;
 
+import com.inmobi.adserve.channels.types.AdFormatType;
+import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +21,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
 
     private final String             advertiserId;
     private final String             adgroupId;
-    private final String             adId;
+    private final String[]           adIds;
     private final String             channelId;
     private final long               platformTargeting;
     private final Long[]             rcList;
@@ -30,7 +32,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
     private final Timestamp          modified_on;
     private final String             campaignId;
     private final Long[]             slotIds;
-    private final long               incId;
+    private final Long[]             incIds;
     private final long               adgroupIncId;
     private final boolean            allTags;
     private final String             pricingModel;
@@ -58,11 +60,12 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
     private final Long[]             tod;
     private final int                dst;                      // Classify rtbd and dcp ad groups
     private final long               campaignIncId;
+    private final Integer[]          AdFormatIds;
 
     public ChannelSegmentEntity(Builder builder) {
         this.advertiserId = builder.advertiserId;
         this.adgroupId = builder.adgroupId;
-        this.adId = builder.adId;
+        this.adIds = builder.adIds;
         this.channelId = builder.channelId;
         this.platformTargeting = builder.platformTargeting;
         this.rcList = builder.rcList;
@@ -73,11 +76,11 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
         this.modified_on = builder.modified_on;
         this.campaignId = builder.campaignId;
         this.slotIds = builder.slotIds;
-        this.incId = builder.incId;
+        this.incIds = builder.incIds;
         this.adgroupIncId = builder.adgroupIncId;
         this.allTags = builder.allTags;
         this.pricingModel = builder.pricingModel;
-        ArrayList<Integer> targetingPlatform = new ArrayList();
+        ArrayList<Integer> targetingPlatform = new ArrayList<>();
         if (builder.targetingPlatform == 1 || builder.targetingPlatform > 2) {
             targetingPlatform.add(1);
         }
@@ -108,6 +111,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
         this.tod = builder.tod;
         this.dst = builder.dst;
         this.campaignIncId = builder.campaignIncId;
+        this.AdFormatIds = builder.AdFormatIds;
     }
 
     public static Builder newBuilder() {
@@ -118,7 +122,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
     public static class Builder {
         private String        advertiserId;
         private String        adgroupId;
-        private String        adId;
+        private String[]      adIds;
         private String        channelId;
         private long          platformTargeting;
         private Long[]        rcList;
@@ -129,7 +133,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
         private Timestamp     modified_on;
         private String        campaignId;
         private Long[]        slotIds;
-        private long          incId;
+        private Long[]        incIds;
         private long          adgroupIncId;
         private boolean       allTags;
         private String        pricingModel;
@@ -157,6 +161,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
         private Long[]        tod;
         private int           dst;
         private long          campaignIncId;
+        private Integer[]     AdFormatIds;
 
         public ChannelSegmentEntity build() {
             return new ChannelSegmentEntity(this);
@@ -173,4 +178,63 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
         return null; // To change body of implemented methods use File | Settings | File Templates.
     }
 
+    /**
+     * Get the inc_id corresponding to an ad format in the ad_group.
+     */
+    public long getIncId(final ADCreativeType creativeType) {
+        long notFound = -1L;
+
+        if (getAdFormatIds() == null)
+            return notFound;
+
+        int requestedAdFormatId = getAdFormatId(creativeType);
+        try {
+            for (int i = 0; i < getAdFormatIds().length; i++) {
+                if (getAdFormatIds()[i] == requestedAdFormatId) {
+                    return getIncIds()[i];
+                }
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return notFound;
+        }
+        // This would happen only with inconsistent data.
+        return notFound;
+    }
+
+    /**
+     * Get the AdId corresponding to an ad format in the ad_group.
+     */
+    public String getAdId(final ADCreativeType creativeType) {
+        String notFound = "";
+
+        if (getAdFormatIds() == null)
+            return notFound;
+
+        int requestedAdFormatId = getAdFormatId(creativeType);
+        try {
+            for (int i = 0; i < getAdFormatIds().length; i++) {
+                if (getAdFormatIds()[i] == requestedAdFormatId) {
+                    return getAdIds()[i];
+                }
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return notFound;
+        }
+        // This would happen only with inconsistent data.
+        return notFound;
+    }
+
+    /**
+     * Get Ad format id corresponding to a creative type in the ad group.
+     */
+    private int getAdFormatId(final ADCreativeType creativeType) {
+        if (creativeType == ADCreativeType.NATIVE) {
+            return AdFormatType.META_JSON.getValue();     // NATIVE
+        } else if (creativeType == ADCreativeType.INTERSTITIAL_VIDEO) {
+            return AdFormatType.VIDEO.getValue();         // VIDEO
+        } else if (creativeType == ADCreativeType.BANNER) {
+            return AdFormatType.TEXT.getValue();          // BANNER
+        } else
+            return -1; // not found
+    }
 }

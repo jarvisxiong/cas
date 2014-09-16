@@ -25,8 +25,6 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 public class AdvertiserDroppedInRtbBalanceFilter extends AbstractAdvertiserLevelFilter {
 
-    private static final Logger              LOG = LoggerFactory.getLogger(AdvertiserDroppedInRtbBalanceFilter.class);
-
     private final Map<String, AdapterConfig> advertiserIdConfigMap;
 
     private final ServerConfig        serverConfiguration;

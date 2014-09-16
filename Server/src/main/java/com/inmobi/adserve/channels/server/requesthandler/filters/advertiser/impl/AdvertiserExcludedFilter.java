@@ -25,13 +25,11 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 public class AdvertiserExcludedFilter extends AbstractAdvertiserLevelFilter {
 
-    private static final Logger    LOG = LoggerFactory.getLogger(AdvertiserExcludedFilter.class);
-
     private final RepositoryHelper repositoryHelper;
 
     @Inject
     public AdvertiserExcludedFilter(final Provider<Marker> traceMarkerProvider, final RepositoryHelper repositoryHelper) {
-        super(traceMarkerProvider, InspectorStrings.droppedinAdvertiserInclusionFilter);
+        super(traceMarkerProvider, InspectorStrings.droppedinAdvertiserExclusionFilter);
         this.repositoryHelper = repositoryHelper;
     }
 

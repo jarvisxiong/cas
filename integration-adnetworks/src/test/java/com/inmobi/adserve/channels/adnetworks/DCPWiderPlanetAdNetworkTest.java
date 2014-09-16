@@ -67,9 +67,9 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                widerPlanetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                widerPlanetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(dcpWiderPlanetAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity,
                 clurl, null), true);
     }
@@ -88,9 +88,9 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                widerPlanetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                widerPlanetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(dcpWiderPlanetAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity,
                 clurl, null), false);
     }
@@ -107,9 +107,9 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                widerPlanetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                widerPlanetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(dcpWiderPlanetAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity,
                 clurl, null), false);
     }
@@ -126,9 +126,9 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                widerPlanetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                widerPlanetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(dcpWiderPlanetAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity,
                 clurl, null), false);
     }
@@ -144,9 +144,9 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                widerPlanetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                widerPlanetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(dcpWiderPlanetAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity,
                 clurl, null), false);
     }
@@ -162,9 +162,9 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                widerPlanetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                widerPlanetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(dcpWiderPlanetAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity,
                 clurl, null), false);
     }
@@ -187,9 +187,9 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                widerPlanetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                widerPlanetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (dcpWiderPlanetAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpWiderPlanetAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://adtg.widerplanet.com/delivery/adw.php?zoneid=7211&useragent=Mozilla&uip=206.29.182.240&wuid=50ef30779da35e2ea3d3bdb384ed305a&location=37.4429%2C-122.1514&duid=202cb962ac59075b964b07152d234b70";
@@ -215,9 +215,9 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                widerPlanetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                widerPlanetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (dcpWiderPlanetAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpWiderPlanetAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://adtg.widerplanet.com/delivery/adw.php?zoneid=7211&useragent=Mozilla&uip=206.29.182.240&wuid=50ef30779da35e2ea3d3bdb384ed305a&location=37.4429%2C-122.1514&duid=202cb962ac59075b964b07152d234b70";
@@ -243,9 +243,9 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase {
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                widerPlanetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                widerPlanetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (dcpWiderPlanetAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
             String actualUrl = dcpWiderPlanetAdNetwork.getRequestUri().toString();
             String expectedUrl = "http://adtg.widerplanet.com/delivery/adw.php?zoneid=7211&useragent=Mozilla&uip=206.29.182.240&wuid=50ef30779da35e2ea3d3bdb384ed305a&duid=202cb962ac59075b964b07152d234b70";
@@ -267,9 +267,9 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase {
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                widerPlanetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                widerPlanetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpWiderPlanetAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl,
                 beaconUrl);
         String response = "{\"response\":\"ad\",\"imageUrl\":\"http://aitg.widerplanet.com/images/e815dc6f7def89ef6c814db04c99de6c.jpg\",\"imageWidth\":\"320\",\"imageHeight\":\"50\",\"landingUrl\":\"http://adtg.widerplanet.com/delivery/ck.php?oaparams=2__lid=7210__bannerid=24883__zoneid=7211__OXLCA=1__cb=224973e970__user_segment_id=0__context_segment_id=1__host=__domain=__category=__dlid=5b538eb890b86645481ab8f2e4ae5353136972180537__rv=8c__rvt=1__ctype=10__ft=0__oadest=http%3A%2F%2Fwww.inmobi.com&amp;qsc=1lghmpu&amp;wuid=50ef30779da35e2ea3d3bdb384ed305a&amp;uip=206.29.182.240\",\"beacon\":\"http://adtg.widerplanet.com/delivery/lg.php?lid=7210&bannerid=24883&campaignid=10470&zoneid=7211&OXLIA=1&cb=2faa3e2448&user_segment_id=0&context_segment_id=1&host=&domain=&category=&dlid=5b538eb890b86645481ab8f2e4ae5353136972180537&rv=8c&rvt=1&vk=%CB%CA%CF%CC%2B%8E%CFN%AD%2C%CF%2FJ%29%B6%D5I%2FJ-IM%CE%40%12%81%B3%00&ctype=10&sl=1&bc=32%B60%B7%B423%B7%D012%B1%B00%B623%B0%04%B2%0C%0D%81b%06+%86%91%01%90%01%00&ft=0&amp;qsc=1odkajr&amp;wuid=50ef30779da35e2ea3d3bdb384ed305a&amp;uip=206.29.182.240\",\"beacon_ext1\":\"http://sosa.semanticrep.com/rt/widerplanet.php?c=tg&ex=1370326605&or=N&rd=418d60dec8&pu=1369778400\",\"beacon_ext2\":\"http://adimg.wisenut.co.kr/tgates/?c=tg&ex=1369721805&or=N&rd=963fd53489&pu=1369778400\"}";
@@ -317,9 +317,9 @@ public class DCPWiderPlanetAdNetworkTest extends TestCase {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                widerPlanetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, 0, true,
+                widerPlanetAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                 null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32));
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpWiderPlanetAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null);
         assertEquals(dcpWiderPlanetAdNetwork.getImpressionId(), "4f8d98e2-4bbd-40bc-8795-22da170700f9");
     }

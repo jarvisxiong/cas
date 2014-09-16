@@ -21,8 +21,6 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 public class AdvertiserDailyRequestCapExceededFilter extends AbstractAdvertiserLevelFilter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AdvertiserDailyRequestCapExceededFilter.class);
-
     @Inject
     public AdvertiserDailyRequestCapExceededFilter(final Provider<Marker> traceMarkerProvider) {
         super(traceMarkerProvider, InspectorStrings.droppedInRequestCapFilter);

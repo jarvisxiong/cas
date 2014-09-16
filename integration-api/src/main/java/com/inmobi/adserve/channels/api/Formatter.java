@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 public class Formatter {
@@ -27,6 +28,7 @@ public class Formatter {
         RICH,
         IMAGE,
         RTB_HTML,
+        RTB_BANNER_VIDEO,
         NEXAGE_JS_AD_TAG,
         WAP_HTML_JS_AD_TAG
     }
@@ -38,6 +40,7 @@ public class Formatter {
     private static Template       velocityTemplateRichTxt;
     private static Template       velocityTemplateImg;
     private static Template       velocityTemplateRtb;
+    private static Template       velocityTemplateRtbBannerVideo;
     private static Template       velocityTemplateJsAdTag;
     private static Template       velocityTemplateWapHtmlJsAdTag;
 
@@ -50,6 +53,7 @@ public class Formatter {
         velocityTemplateRichTxt = velocityEngine.getTemplate("richTxtFormat.vm");
         velocityTemplateImg = velocityEngine.getTemplate("ImageAdFormat.vm");
         velocityTemplateRtb = velocityEngine.getTemplate("rtbHtmlAdFormat.vm");
+        velocityTemplateRtbBannerVideo = velocityEngine.getTemplate("rtbBannerVideoAdFormat.vm");
         velocityTemplateJsAdTag = velocityEngine.getTemplate("nexageJsAdTag.vm");
         velocityTemplateWapHtmlJsAdTag = velocityEngine.getTemplate("wapHtmlAdFormat.vm");
     }
@@ -59,7 +63,7 @@ public class Formatter {
 		if (StringUtils.isNotBlank(beaconUrl)) {
 			context.put(VelocityTemplateFieldConstants.IMBeaconUrl, beaconUrl);
 		}
-		
+
 		if (isRequestFromSdk(sasParams)) {
 				context.put(VelocityTemplateFieldConstants.SDK, true);
 				context.put(VelocityTemplateFieldConstants.SDK360Onwards, requestFromSDK360Onwards(sasParams));
@@ -68,7 +72,7 @@ public class Formatter {
 						sasParams.getImaiBaseUrl());
 			}
 		}
-		
+
 	}
 
     /**
@@ -85,7 +89,7 @@ public class Formatter {
         try {
             String os = sasParams.getSdkVersion();
             if ((os.startsWith("i") || os.startsWith("a"))
-                    && Integer.parseInt(sasParams.getSdkVersion().substring(1, 3)) > 35) {
+                    && Integer.parseInt(sasParams.getSdkVersion().substring(1)) >= 360) {
                 return true;
             }
         }
@@ -118,6 +122,9 @@ public class Formatter {
                 break;
             case RTB_HTML:
                 velocityTemplateRtb.merge(context, writer);
+                break;
+            case RTB_BANNER_VIDEO:
+                velocityTemplateRtbBannerVideo.merge(context, writer);
                 break;
             case NEXAGE_JS_AD_TAG:
                 velocityTemplateJsAdTag.merge(context, writer);
@@ -158,5 +165,9 @@ public class Formatter {
             return "template_320_50";
         }
         return null;
+    }
+
+    public static String getNamespace() {
+        return "im_" + (Math.abs(ThreadLocalRandom.current().nextInt(10000)) + 10000) + "_";
     }
 }
