@@ -193,7 +193,7 @@ public class ChannelServer {
                 }
             });
 
-            //System.out.close();
+            System.out.close();
             // If client bootstrap is not present throwing exception which will
             // set
             // lbStatus as NOT_OK.
