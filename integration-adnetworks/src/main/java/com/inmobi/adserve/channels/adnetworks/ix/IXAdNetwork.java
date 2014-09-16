@@ -640,7 +640,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final CommonExtension ext= new CommonExtension();
 
 
-
         JSONObject additionalParams= entity.getAdditionalParams();
         try {
             Integer siteId = Integer.parseInt(additionalParams.getString("site"));
