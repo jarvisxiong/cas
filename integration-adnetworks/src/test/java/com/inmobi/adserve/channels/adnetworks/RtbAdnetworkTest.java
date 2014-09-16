@@ -463,7 +463,7 @@ public class RtbAdnetworkTest extends TestCase {
         assertEquals(afterMacros, rtbAdNetwork.responseContent);
     }
 
-    @Test
+    /*@Test
     public void testConfigureParametersTransparency() {
         Long[] catLong = new Long[2];
         catLong[0] = (long) 1;
@@ -504,5 +504,5 @@ public class RtbAdnetworkTest extends TestCase {
         // App ID should be same as bundle value.
         assertEquals(ActualBundle, "com.dreamstep.wBESTLOVEPOEMS");
         assertEquals(ActualBundle, appID);
-    }
+    }*/
 }
