@@ -183,9 +183,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         this.blockedAdvertisers.addAll(blockedAdvertiserList);
 
         // Populate the listed site ID's.
+        siteIDMap = new HashMap<String, String>();
         // Uncomment the below code to enable transparency.
-        /*siteIDMap = new HashMap<String, String>();
-        siteIDMap.put("12a35ce4035c427cad0eed2e139d2554", "com.dreamstep.webWidget.wAppcreationguide");
+        /*siteIDMap.put("12a35ce4035c427cad0eed2e139d2554", "com.dreamstep.webWidget.wAppcreationguide");
         siteIDMap.put("4028cba631b705570131d1bd19f201b2", "com.dreamstep.wBESTLOVEPOEMS");
         //siteIDMap.put("4028cba631d63df1013206b983e80379");
         //siteIDMap.put("4028cba631d63df1013206bb1233037a");
