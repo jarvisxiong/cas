@@ -267,23 +267,25 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     if (isRequestComplete) {
                         return;
                     }
-
+                    
+                	String dst;
+                	if(isRtbPartner()){
+                		dst = "RTBD";
+                	}else{
+                		dst = "DCP";
+                	}
+                	MetricsManager.updateClientTimerLatency(dst, latency);
+                	
                     if (t instanceof java.net.ConnectException) {
                         LOG.debug("{} connection timeout latency {}", getName(), latency);
                         adStatus = "TIME_OUT";
                         InspectorStats.incrementStatCount(getName(), InspectorStrings.connectionTimeout);
+                        InspectorStats.incrementStatCount(InspectorStrings.connectionTimeout);
                         processResponse();
                         return;
                     }
 
                     if (t instanceof java.util.concurrent.TimeoutException) {
-                    	String dst;
-                    	if(isRtbPartner()){
-                    		dst = "RTBD";
-                    	}else{
-                    		dst = "DCP";
-                    	}
-                    	MetricsManager.updateClientTimerLatency(dst, latency);
                         LOG.debug("{} timeout latency {}", getName(), latency);
                         adStatus = "TIME_OUT";
                         processResponse();
