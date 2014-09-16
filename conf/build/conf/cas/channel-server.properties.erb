@@ -228,6 +228,14 @@ Cache.WapSiteUACRepository.refreshTime = 1200
 Cache.WapSiteUACRepository.isUpdatable = true
 Cache.WapSiteUACRepository.dataSourceName = jdbc
 
+Cache.Name = IXAccountMapRepository
+Cache.IXAccountMapRepository.Manager = com.inmobi.adserve.channels.repository.IXAccountMapRepository
+Cache.IXAccountMapRepository.query = select * from ix_account_map_fun('${last_update}') limit 1
+Cache.IXAccountMapRepository.initialDelay = 300
+Cache.IXAccountMapRepository.refreshTime = 12000
+Cache.IXAccountMapRepository.isUpdatable = true
+Cache.IXAccountMapRepository.dataSourceName = jdbc
+
 Cache.Name = ChannelAdGroupRepository
 Cache.ChannelAdGroupRepository.Manager = com.inmobi.adserve.channels.repository.ChannelAdGroupRepository
 Cache.ChannelAdGroupRepository.query = select * from wap_channel_adgroup_fun_11082014('${last_update}')
