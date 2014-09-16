@@ -19,6 +19,7 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentF
 import com.inmobi.adserve.channels.server.requesthandler.filters.TestScopeModule;
 import com.inmobi.adserve.channels.types.AccountType;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.casthrift.DemandSourceType;
 import org.apache.commons.configuration.Configuration;
 import org.easymock.Capture;
@@ -53,6 +54,9 @@ public class AuctionEngineTest {
     public void setUp() throws IOException {
         final ConfigurationLoader config = ConfigurationLoader.getInstance("channel-server.properties");
         CasConfigUtil.init(config, null);
+
+        ImpressionIdGenerator.init((short) 123, (byte)10);
+
         // this is done, to track the encryptedBid variable getting set inside the AuctionEngine.
         encryptedBid1 = new Capture<String>();
 

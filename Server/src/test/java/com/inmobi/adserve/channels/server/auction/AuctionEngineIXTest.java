@@ -3,7 +3,7 @@ package com.inmobi.adserve.channels.server.auction;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.util.Modules;
-import com.inmobi.adserve.channels.adnetworks.rubicon.IXAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
@@ -19,6 +19,7 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentF
 import com.inmobi.adserve.channels.server.requesthandler.filters.TestScopeModule;
 import com.inmobi.adserve.channels.types.AccountType;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.casthrift.DemandSourceType;
 import org.apache.commons.configuration.Configuration;
 import org.easymock.Capture;
@@ -52,6 +53,9 @@ public class AuctionEngineIXTest {
     public void setUp() throws IOException {
         final ConfigurationLoader config = ConfigurationLoader.getInstance("channel-server.properties");
         CasConfigUtil.init(config, null);
+
+        ImpressionIdGenerator.init((short) 123, (byte)10);
+
         // this is done, to track the encryptedBid variable getting set inside the AuctionEngine.
         encryptedBid1 = new Capture<String>();
 

@@ -3,11 +3,12 @@ package com.inmobi.adserve.channels.server.requesthandler;
 import com.inmobi.adserve.adpool.AdInfo;
 import com.inmobi.adserve.adpool.AdPoolResponse;
 import com.inmobi.adserve.adpool.Creative;
-import com.inmobi.adserve.channels.adnetworks.rubicon.IXAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.server.auction.AuctionEngine;
 import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilterApplierTest;
+import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.types.AdIdChain;
 import com.inmobi.types.GUID;
@@ -36,6 +37,9 @@ public class CreateThriftResponseIXTest {
         expectedBidPrice = 1.23;
         impressionID = "00000000-000e-9f94-0000-0000000210f7";
 
+        ImpressionIdGenerator.init((short) 123, (byte) 10);
+
+
         // Create dummy ChannelSegmentEntity
         dummyChannelSegmentEntity = new ChannelSegmentEntity(
                 ChannelSegmentFilterApplierTest.getChannelSegmentEntityBuilder("Advertiser A", "adgroupId", "adId", "channelId",
@@ -62,6 +66,7 @@ public class CreateThriftResponseIXTest {
         // IX specific parameters
         expect(mockIXAdNetwork.returnDealId()).andReturn("dealId").anyTimes();
         expect(mockIXAdNetwork.returnAdjustBid()).andReturn(0.5).anyTimes();
+        expect(mockIXAdNetwork.returnPmptier()).andReturn(3).anyTimes();
 
         expect(mockSASRequestParameters.getSlot()).andReturn((short)0).anyTimes();
 

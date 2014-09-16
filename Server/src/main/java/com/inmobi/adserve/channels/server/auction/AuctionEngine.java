@@ -1,31 +1,25 @@
 package com.inmobi.adserve.channels.server.auction;
 
-import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.AuctionEngineInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
-import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
+import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
-import com.inmobi.casthrift.ADCreativeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 
 /***
  * Auction Engine to run different types of auctions in rtbd and ix.
- * 
+ *
  * @author Devi Chand(devi.chand@inmobi.com)
  */
 public class AuctionEngine implements AuctionEngineInterface {
@@ -41,9 +35,6 @@ public class AuctionEngine implements AuctionEngineInterface {
     @AdvertiserIdNameMap
     @Inject
     private static Map<String, String>  advertiserIdNameMap;
-
-    @Inject
-    private static AsyncRequestMaker asyncRequestMaker;
 
     @Inject
     private static AuctionFilterApplier auctionFilterApplier;
@@ -99,7 +90,6 @@ public class AuctionEngine implements AuctionEngineInterface {
                 // For IX,
                 // we run a first price auction, but the value is still stored in secondBidPrice
                 secondBidPrice = auctionResponse.getAdNetworkInterface().getBidPriceInUsd();
-
             }
             LOG.debug("Completed auction, winner is {} and firstBidPrice is {}", filteredChannelSegmentList.get(0)
                     .getAdNetworkInterface().getName(), secondBidPrice);
@@ -164,46 +154,13 @@ public class AuctionEngine implements AuctionEngineInterface {
     }
 
     @Override
-    // This function sets the parameters contained in the AdIdChain from the buyer field in the ix response
-    public boolean updateDSPAccountInfo(RepositoryHelper repositoryHelper, String buyer) {
-        // Get Inmobi account id for the DSP on Rubicon side
-        IXAccountMapEntity ixAccountMapEntity = repositoryHelper.queryIXAccountMapRepository(Long.parseLong(buyer));
-        if(null == ixAccountMapEntity) {
-            LOG.error("Invalid Rubicon DSP id: DSP id:{}", buyer);
-            return false;
-        }
-        String accountId = ixAccountMapEntity.getInmobiAccountId();
-
-        // Get collection of Channel Segment Entities for the particular Inmobi account id
-        ChannelAdGroupRepository channelAdGroupRepository = repositoryHelper.getChannelAdGroupRepository();
-        if (null == channelAdGroupRepository) {
-            LOG.error("Channel AdGroup Repository is null.");
-            return false;
-        }
-
-        Collection<ChannelSegmentEntity> adGroupMap = channelAdGroupRepository.getEntities(accountId);
-
-        if(adGroupMap.isEmpty()) {
-            // If collection is empty
-            LOG.error("Channel Segment Entity collection for Rubicon DSP is empty: DSP id:{}, inmobi account id:{}", buyer, accountId);
-            return false;
-        } else {
-            // Else picking up the first channel segment entity and assuming that to be the correct entity
-            ChannelSegmentEntity dspChannelSegmentEntity = adGroupMap.iterator().next();
-
-            // Create a new ChannelSegment with DSP information. So that, all the logging happens on DSP Id.
-            this.auctionResponse = new ChannelSegment(dspChannelSegmentEntity, null, null, null, null,
+    /**
+     * Update auctionResponse with DSP ChannelSegmentEntity
+     * This is being done because we want all the logging to be done on the DSP details, not RP.
+     */
+    public void updateIXChannelSegment(ChannelSegmentEntity dspChannelSegmentEntity) {
+        this.auctionResponse = new ChannelSegment(dspChannelSegmentEntity, null, null, null, null,
                     auctionResponse.getAdNetworkInterface(), -1L);
-
-            // Get response creative type and get the incId for the respective response creative type
-            ADCreativeType responseCreativeType =  auctionResponse.getAdNetworkInterface().getCreativeType();
-            long incId = auctionResponse.getChannelSegmentEntity().getIncId(responseCreativeType);
-
-            // Generating new impression id
-            String newImpressionId = asyncRequestMaker.getImpressionId(incId);
-            ((IXAdNetwork)auctionResponse.getAdNetworkInterface()).setImpressionId(newImpressionId);
-            return true;
-        }
     }
 
     private String getDSTName() {
@@ -256,7 +213,7 @@ public class AuctionEngine implements AuctionEngineInterface {
 
     public String getEncryptedBid(final Double bid) {
         long winBid = (long) (bid * Math.pow(10, 6));
-        return asyncRequestMaker.getImpressionId(winBid);
+        return ImpressionIdGenerator.getInstance().getImpressionId(winBid);
     }
 
     public double calculateAuctionFloor(final double siteFloor, final double highestEcpm, final double segmentFloor,

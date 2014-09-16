@@ -60,6 +60,13 @@
 			<groupId>com.inmobi.commons</groupId>
 			<artifactId>casthrift</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>inmobi.phoenix.batteries</groupId>
+            <artifactId>data</artifactId>
+            <version>2.3.13</version>
+            <scope>compile</scope>
+            <optional>false</optional>
+        </dependency>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>

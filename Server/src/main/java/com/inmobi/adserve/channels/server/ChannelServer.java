@@ -1,16 +1,30 @@
 package com.inmobi.adserve.channels.server;
 
+import com.google.inject.Injector;
+import com.google.inject.util.Modules;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.repository.*;
+import com.inmobi.adserve.channels.server.api.ConnectionType;
+import com.inmobi.adserve.channels.server.module.CasNettyModule;
+import com.inmobi.adserve.channels.server.module.ServerModule;
+import com.inmobi.adserve.channels.server.requesthandler.Logging;
+import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import com.inmobi.adserve.channels.util.MetricsManager;
+import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
+import com.inmobi.casthrift.DataCenter;
+import com.inmobi.messaging.publisher.AbstractMessagePublisher;
+import com.inmobi.messaging.publisher.MessagePublisherFactory;
+import com.inmobi.phoenix.exception.InitializationException;
+import com.netflix.governator.guice.LifecycleInjector;
+import com.netflix.governator.lifecycle.LifecycleManager;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Slf4JLoggerFactory;
-
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.List;
-import java.util.Properties;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.dbcp2.*;
+import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -21,33 +35,13 @@ import javax.mail.internet.MimeMessage;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.dbcp2.ConnectionFactory;
-import org.apache.commons.dbcp2.DriverManagerConnectionFactory;
-import org.apache.commons.dbcp2.PoolableConnection;
-import org.apache.commons.dbcp2.PoolableConnectionFactory;
-import org.apache.commons.dbcp2.PoolingDataSource;
-import org.apache.commons.pool2.impl.GenericObjectPool;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
-import com.google.inject.Injector;
-import com.google.inject.util.Modules;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.server.api.ConnectionType;
-import com.inmobi.adserve.channels.server.module.CasNettyModule;
-import com.inmobi.adserve.channels.server.module.ServerModule;
-import com.inmobi.adserve.channels.server.requesthandler.Logging;
-import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import com.inmobi.adserve.channels.util.MetricsManager;
-import com.inmobi.casthrift.DataCenter;
-import com.inmobi.messaging.publisher.AbstractMessagePublisher;
-import com.inmobi.messaging.publisher.MessagePublisherFactory;
-import com.inmobi.phoenix.exception.InitializationException;
-import com.netflix.governator.guice.LifecycleInjector;
-import com.netflix.governator.lifecycle.LifecycleManager;
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.List;
+import java.util.Properties;
 
 
 /*
@@ -110,6 +104,9 @@ public class ChannelServer {
             // Initialising logging - Write to databus
             AbstractMessagePublisher dataBusPublisher = (AbstractMessagePublisher) MessagePublisherFactory
                     .create(configFile);
+
+            // Initialising ImpressionIdGenerator
+            ImpressionIdGenerator.init(ChannelServer.hostIdCode, ChannelServer.dataCenterIdCode);
 
             String rrLogKey = configurationLoader.getServerConfiguration().getString("rrLogKey");
             String advertisementLogKey = configurationLoader.getServerConfiguration().getString("adsLogKey");
