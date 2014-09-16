@@ -60,10 +60,10 @@
 			<groupId>com.inmobi.commons</groupId>
 			<artifactId>casthrift</artifactId>
 		</dependency>
-        <dependency>
+		<dependency>
             <groupId>inmobi.phoenix.batteries</groupId>
             <artifactId>util</artifactId>
-        </dependency>
+		</dependency>
         <dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>

@@ -128,7 +128,7 @@ public class ServletGetSegment implements Servlet {
                 entity = CasConfigUtil.repositoryHelper.queryWapSiteUACRepository(id.split("_")[0]);
             }
             else if (repoName != null
-                && repoName.equalsIgnoreCase(ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY)) {
+                    && repoName.equalsIgnoreCase(ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY)) {
                 entity = CasConfigUtil.repositoryHelper.queryIXAccountMapRepository(Long.parseLong(id.split("_")[0]));
             }
             else if (repoName != null
