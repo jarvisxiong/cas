@@ -92,4 +92,6 @@ public class InspectorStrings {
     public static final String SITE_LEVEL_REQUEST                        = "SiteLevelRequest";
     public static final String IX_SENT_AS_TRANSPARENT                    = "IXSentAsTransparent";
     public static final String IX_SENT_AS_BLIND                          = "IXSentAsBlind";
+    public static final String IX_ZONE_ID_NOT_PRESENT                    = "IXZoneIdNotPresent";
+    public static final String IX_SITE_ID_NOT_PRESENT                    = "IXSiteIdNotPresent";
 }
