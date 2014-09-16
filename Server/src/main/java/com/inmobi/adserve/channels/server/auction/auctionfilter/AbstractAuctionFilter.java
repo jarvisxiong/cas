@@ -93,9 +93,12 @@ public abstract class AbstractAuctionFilter implements AuctionFilter {
     @Override
     public boolean isApplicable(final DemandSourceType dst) {
         switch(dst){
-            case RTBD: return this.isApplicableRTBD;
-            case IX:   return this.isApplicableIX;
-            default:   return true;
+            case RTBD:
+                return this.isApplicableRTBD;
+            case IX:
+                return this.isApplicableIX;
+            default:
+                return true;
         }
     }
 

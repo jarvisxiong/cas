@@ -13,7 +13,6 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.api.template.NativeTemplateAttributeFinder;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
@@ -69,7 +68,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.awt.*;
+import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -193,10 +192,12 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final String nativeString = "native";
     private ChannelSegmentEntity dspChannelSegmentEntity;
 
+
     @Override
     protected AsyncHttpClient getAsyncHttpClient() {
         return asyncHttpClientProvider.getRtbAsyncHttpClient();
     }
+
 
     public IXAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
                        final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String urlBase,
@@ -226,6 +227,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         this.accountId = config.getInt(advertiserName + ".accountId");
         this.globalBlindFromConfig = config.getList(advertiserName + ".globalBlind");
     }
+
 
     @Override
     protected boolean configureParameters() {
@@ -317,6 +319,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return false;
     }
 
+
     private IXBidRequest createBidRequestObject(final List<Impression> impresssionlist, final Site site, final App app,
                                            final User user, final Device device,final Regs regs) {
         IXBidRequest tempBidRequest = new IXBidRequest(impresssionlist);
@@ -340,6 +343,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         tempBidRequest.setRegs(regs);
         return tempBidRequest;
     }
+
 
     private String serializeBidRequest() {
 
@@ -379,6 +383,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
         return regs;
     }
+
 
     private ProxyDemand createProxyDemandObject() {
         ProxyDemand proxyDemand = new ProxyDemand();
@@ -439,6 +444,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return impression;
     }
 
+
     public String getZoneId(JSONObject additionalParams) {
         String categoryZoneId = null;
         boolean isCategorySet = false;
@@ -490,6 +496,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return banner;
     }
 
+
     private Geo createGeoObject() {
         Geo geo = new Geo();
         if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
@@ -507,6 +514,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return geo;
     }
 
+
     private User createUserObject() {
         User user = new User();
 
@@ -514,6 +522,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         return user;
     }
+
 
     private Site createSiteObject() {
         Site site = new Site();
@@ -583,8 +592,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
 
-    private AdQuality createAdQuality()
-    {
+    private AdQuality createAdQuality() {
         AdQuality adQuality = new AdQuality();
         if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
             adQuality.setSensitivity("low");
@@ -594,8 +602,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return adQuality;
     }
 
-    private Transparency createTransparency()
-    {
+
+    private Transparency createTransparency() {
 
         Transparency transparency = new Transparency();
         if(isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled())
@@ -615,6 +623,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
         return transparency;
     }
+
 
     private App createAppObject() {
         App app = new App();
@@ -689,8 +698,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
 
-    public List <String> getBlockedList()
-    {
+    public List <String> getBlockedList() {
         List<String> blockedList = Lists.newArrayList();
         LOG.debug("{}",sasParams.getSiteIncId());
         blockedList.add(String.format(SITE_BLOCKLIST_FORMAT, sasParams.getSiteIncId()));
@@ -705,7 +713,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
         return blockedList;
     }
-
 
 
     private Device createDeviceObject(final Geo geo) {
@@ -794,6 +801,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return url;
     }
 
+
     @Override
     protected Request getNingRequest() throws Exception {
         byte[] body = bidRequestJson.getBytes(CharsetUtil.UTF_8);
@@ -820,6 +828,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 .setHeader(HttpHeaders.Names.HOST, uri.getHost()).build();
     }
 
+
     @Override
     public URI getRequestUri() throws URISyntaxException {
         StringBuilder url = new StringBuilder();
@@ -831,7 +840,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         LOG.debug("{} url is {}", getName(), url.toString());
         return URI.create(url.toString());
     }
-
 
 
     @Override
@@ -867,6 +875,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
         LOG.debug("response length is {}", responseContent.length());
     }
+
 
     public boolean updateDSPAccountInfo(String buyer) {
         LOG.debug("Inside updateDSPAccountInfo");
@@ -928,6 +937,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
     }
 
+
     @Override
     public void processResponse() {
         LOG.debug("Inside process Response for the partner: {}", getName());
@@ -977,7 +987,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
 
-
     private void nonNativeAdBuilding(){
 
         VelocityContext velocityContext = new VelocityContext();
@@ -1017,6 +1026,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     }
 
+
     private String getADMContent(){
 
         SeatBid seatBid = bidResponse.getSeatbid().get(0);
@@ -1025,6 +1035,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return admContent;
 
     }
+
 
     private void createWin(VelocityContext velocityContext){
         if (wnRequired) {
@@ -1050,11 +1061,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
     }
 
+
     //This function not used, for future use
     @Override
     protected boolean isNativeRequest(){
         return nativeString.equals(sasParams.getRFormat());
     }
+
 
     public boolean deserializeResponse(final String response) {
         Gson gson = new Gson();
@@ -1089,8 +1102,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
     }
 
+
     @Override
     public double returnAdjustBid() { return adjustbid; }
+
 
     @Override
     public String returnDealId()
@@ -1098,21 +1113,26 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return dealId;
     }
 
+
     @Override
     public Integer returnPmpTier() { return pmptier; }
 
+
     @Override
     public String returnAqid() { return aqid; }
+
 
     @Override
     public String getId() {
         return advertiserId;
     }
 
+
     @Override
     public String getName() {
         return this.advertiserName;
     }
+
 
     @Override
     public void setSecondBidPrice(final Double price) {
@@ -1125,84 +1145,101 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         LOG.debug("responseContent after replaceMacros is {}", getResponseAd().response);
     }
 
+
     @Override
     public String getAuctionId() {
         return responseAuctionId;
     }
+
 
     @Override
     public String getRtbImpressionId() {
         return responseImpressionId;
     }
 
+
     public void setImpressionId(String impressionId) {
         this.impressionId = impressionId;
     }
+
 
     @Override
     public String getSeatId() {
         return responseSeatId;
     }
 
+
     @Override
     public void setEncryptedBid(final String encryptedBid) {
         this.encryptedBid = encryptedBid;
     }
+
 
     @Override
     public double getSecondBidPriceInUsd() {
         return secondBidPriceInUsd;
     }
 
+
     @Override
     public double getSecondBidPriceInLocal() {
         return secondBidPriceInLocal;
     }
+
 
     @Override
     public double getBidPriceInUsd() {
         return bidPriceInUsd;
     }
 
+
     @Override
     public double getBidPriceInLocal() {
         return bidPriceInLocal;
     }
+
 
     @Override
     public String getCurrency() {
         return USD;
     }
 
+
     @Override
     public String getCreativeId() {
         return creativeId;
     }
+
 
     @Override
     public String getIUrl() {
         return sampleImageUrl;
     }
 
+
     @Override
     public List<Integer> getAttribute() {
         return  creativeAttributes;
     }
+
 
     @Override
     public List<String> getADomain() {
         return advertiserDomains;
     }
 
+
     @Override
     public boolean isLogCreative() {
         return logCreative;
     }
 
+
     @Override
     public void setLogCreative(boolean logCreative) {
         this.logCreative = logCreative;
     }
+
 
     @Override
     public String getAdMarkUp() {

@@ -304,8 +304,8 @@ public class ChannelServer {
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY),
                     ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY);
             ixAccountMapRepository.init(logger,
-                  config.getCacheConfiguration().subset(ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY),
-                  ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY);
+                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY),
+                    ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY);
             channelAdGroupRepository.init(logger,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY),
                     ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY);

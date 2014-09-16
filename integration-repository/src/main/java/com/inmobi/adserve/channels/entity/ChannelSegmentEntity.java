@@ -33,7 +33,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
     private final String             campaignId;
     private final Long[]             slotIds;
     private final Long[]             incIds;
-    private long                     adgroupIncId;
+    private final long               adgroupIncId;
     private final boolean            allTags;
     private final String             pricingModel;
     private final ArrayList<Integer> targetingPlatform;

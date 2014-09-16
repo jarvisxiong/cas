@@ -84,8 +84,8 @@ public class AuctionEngine implements AuctionEngineInterface {
             // response are 1.
             if (DemandSourceType.RTBD == auctionResponse.getAdNetworkInterface().getDst()) {
                 // For RTBD
-                secondBidPrice = Math.min(casInternalRequestParameters.auctionBidFloor, auctionResponse
-                        .getAdNetworkInterface().getBidPriceInUsd());
+                secondBidPrice = Math.min(casInternalRequestParameters.auctionBidFloor,
+                        auctionResponse.getAdNetworkInterface().getBidPriceInUsd());
             } else {
                 // For IX,
                 // we run a first price auction, but the value is still stored in secondBidPrice
@@ -99,7 +99,7 @@ public class AuctionEngine implements AuctionEngineInterface {
             auctionResponse.getAdNetworkInterface().setSecondBidPrice(secondBidPrice);
 
             // Return as there is no need to iterate over the list.
-            return filteredChannelSegmentList.get(0).getAdNetworkInterface();
+            return auctionResponse.getAdNetworkInterface();
         }
 
         // Multiple IX bids from RP should not be currently possible

@@ -102,8 +102,7 @@ public abstract class BaseServlet implements Servlet {
         if (hrh.responseSender.getResponseFormat() == ResponseFormat.IMAI) {
             if (hrh.responseSender.sasParams.getOsId() == 3) {
                 imaiBaseUrl = CasConfigUtil.getServerConfig().getString("androidBaseUrl");
-            }
-            else {
+            } else {
                 imaiBaseUrl = CasConfigUtil.getServerConfig().getString("iPhoneBaseUrl");
             }
         }
@@ -186,8 +185,7 @@ public abstract class BaseServlet implements Servlet {
             }
             // Resetting the rankIndexToProcess for already completed adapters.
             hrh.responseSender.processDcpList(serverChannel);
-            LOG.debug(traceMarker, "returned from send Response, ranklist size is {}", hrh.responseSender.getRankList()
-                    .size());
+            LOG.debug(traceMarker, "returned from send Response, ranklist size is {}",  hrh.responseSender.getRankList().size());
         }
     }
 
