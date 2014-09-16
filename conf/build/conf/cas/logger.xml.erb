@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+
+	<turboFilter class="com.inmobi.adserve.channels.server.logging.MarkerAndLevelFilter">
+		<Level><%= debug_log_type %></Level>
+		<ExcludedTurboFilteringLogs>advertiser,sampledadvertiser</ExcludedTurboFilteringLogs>
+	</turboFilter>
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<layout>
+			<pattern>%d %-5p [%X{requestId}] %c{36}: %m\n%ex</pattern>
+		</layout>
+	</appender>
+
+	<appender name="debugAppender"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>/opt/mkhoj/logs/cas/debug/debug.log</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>/opt/mkhoj/logs/cas/debug/debug.log.%d{yyyy-MM-dd-HH}
+			</FileNamePattern>
+		</rollingPolicy>
+
+		<encoder>
+			<Pattern>%d %-5p [%X{requestId}] %c{36}: %m\n%ex{6}</Pattern>
+			<immediateFlush>false</immediateFlush>
+		</encoder>
+	</appender>
+
+	<appender name="advertiserAppender"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>/opt/mkhoj/logs/cas/advertiser/advertiser.log</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>/opt/mkhoj/logs/cas/advertiser/advertiser.log.%d{yyyy-MM-dd-HH}
+			</FileNamePattern>
+		</rollingPolicy>
+
+		<encoder>
+			<Pattern>%d %-5p [%X{requestId}] %c{36}: %m\n%ex</Pattern>
+			<immediateFlush>false</immediateFlush>
+		</encoder>
+	</appender>
+
+	<appender name="sampledadvertiserAppender"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>/opt/mkhoj/logs/cas/sampledadvertiser/sampledadvertiser.log
+		</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>/opt/mkhoj/logs/cas/sampledadvertiser/sampledadvertiser.log.%d{yyyy-MM-dd-HH}
+			</FileNamePattern>
+		</rollingPolicy>
+
+		<encoder>
+			<Pattern>%d %-5p [%X{requestId}] %c{36}: %m\n%ex</Pattern>
+			<immediateFlush>false</immediateFlush>
+		</encoder>
+	</appender>
+
+	<appender name="repository" class="org.apache.log4j.DailyRollingFileAppender">
+		<File>/opt/mkhoj/logs/cas/repository/repository.log</File>
+		<DatePattern>'.'yyyy-MM-dd-HH</DatePattern>
+		<layout class="org.apache.log4j.PatternLayout">
+			<ConversionPattern>%d %-5p [%X{requestId}] %c{36}: %m\n%ex
+			</ConversionPattern>
+		</layout>
+	</appender>
+
+	<appender name="TRACELOG"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>/opt/mkhoj/logs/cas/trace/trace.log</File>
+		<encoder>
+			<pattern>%d %-5p [%X{requestId}] %c{36}: %m\n%ex</pattern>
+			<immediateFlush>true</immediateFlush>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>/opt/mkhoj/logs/cas/trace/trace.log.%d{yyyy-MM-dd-HH}
+			</FileNamePattern>
+		</rollingPolicy>
+		<filter class="com.inmobi.adserve.channels.server.logging.TraceFilter" />
+	</appender>
+
+	<root level="DEBUG">
+	</root>
+
+	<logger name="com.inmobi.adserve.channels" level="DEBUG">
+		<appender-ref ref="TRACELOG" />
+		<appender-ref ref="debugAppender" />
+	</logger>
+
+	<logger name="advertiser" level="<%= log_type %>" additivity="false">
+		<appender-ref ref="advertiserAppender" />
+	</logger>
+
+	<logger name="sampledadvertiser" level="DEBUG" additivity="false">
+		<appender-ref ref="sampledadvertiserAppender" />
+	</logger>
+
+</configuration>

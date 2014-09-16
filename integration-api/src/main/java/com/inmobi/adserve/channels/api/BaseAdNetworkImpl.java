@@ -39,6 +39,7 @@ import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.JaxbHelper;
+import com.inmobi.adserve.channels.util.MetricsManager;
 import com.inmobi.casthrift.ADCreativeType;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
@@ -249,11 +250,20 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     if (isRequestComplete) {
                         return;
                     }
-
+                    
+                	String dst;
+                	if(isRtbPartner()){
+                		dst = "RTBD";
+                	}else{
+                		dst = "DCP";
+                	}
+                	MetricsManager.updateClientTimerLatency(dst, latency);
+                	
                     if (t instanceof java.net.ConnectException) {
                         LOG.debug("{} connection timeout latency {}", getName(), latency);
                         adStatus = "TIME_OUT";
                         InspectorStats.incrementStatCount(getName(), InspectorStrings.connectionTimeout);
+                        InspectorStats.incrementStatCount(InspectorStrings.connectionTimeout);
                         processResponse();
                         return;
                     }
