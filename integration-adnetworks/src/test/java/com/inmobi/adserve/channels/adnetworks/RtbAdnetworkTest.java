@@ -1,7 +1,6 @@
 package com.inmobi.adserve.channels.adnetworks;
 
 import com.google.common.collect.Lists;
-
 import com.inmobi.adserve.channels.adnetworks.rtb.ImpressionCallbackHelper;
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -14,7 +13,6 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.types.AdFormatType;
 import com.inmobi.casthrift.rtb.Bid;
 import com.inmobi.casthrift.rtb.BidResponse;
 import com.inmobi.casthrift.rtb.SeatBid;
@@ -37,7 +35,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Executors;
 
@@ -507,11 +504,8 @@ public class RtbAdnetworkTest extends TestCase {
         // Compare the bundle value.
         // App ID should be same as bundle value.
         assertEquals(ActualBundle, "com.dreamstep.wBESTLOVEPOEMS");
-<<<<<<< HEAD
         assertEquals(ActualBundle, appID);
     }*/
-=======
-    }
 
 
     @Test
@@ -554,5 +548,4 @@ public class RtbAdnetworkTest extends TestCase {
         // Old impression id should not be used.
         assertEquals(0, StringUtils.countMatches(rtbAdNetwork.responseContent, oldImpressionId));
     }
->>>>>>> e1284222a0fd452a110b98d40b7397949a4a76c5
 }

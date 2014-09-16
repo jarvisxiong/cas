@@ -18,13 +18,11 @@ import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.types.AdFormatType;
 import com.inmobi.adserve.channels.util.*;
 import com.inmobi.casthrift.rtb.*;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -32,12 +30,11 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
 import lombok.Getter;
 import lombok.Setter;
-
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.httpclient.URIException;
 import org.apache.commons.validator.UrlValidator;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.thrift.TException;
@@ -53,7 +50,6 @@ import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import java.awt.*;
 import java.io.IOException;
 import java.io.StringReader;
@@ -143,12 +139,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private List<String> blockedAdvertisers = Lists.newArrayList();
 
     // Listed site ID's.
-<<<<<<< HEAD
     // To enable transparency for listed site ID's.
     private HashMap<String, String> siteIDMap;
-    
-=======
-    private HashMap<String, String>        siteIDMap;
 
     private static final List<String>      VIDEO_MIMES                  = Arrays.asList("video/mp4");
     private static final int               EXT_VIDEO_LINEARITY          = 1;   // only linear ads
@@ -156,7 +148,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private static final int               EXT_VIDEO_MAXDURATION        = 30;  // in secs.
     private static final List<String>      EXT_VIDEO_TYPE               = Arrays.asList("VAST 2.0", "VAST 3.0", "VAST 2.0 Wrapper", "VAST 3.0 Wrapper");
 
->>>>>>> e1284222a0fd452a110b98d40b7397949a4a76c5
     @Getter
     static List<String>                    currenciesSupported          = new ArrayList<String>(Arrays.asList("USD",
                                                                                 "CNY","JPY","EUR","KRW","RUB"));
