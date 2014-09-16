@@ -230,7 +230,7 @@ Cache.WapSiteUACRepository.dataSourceName = jdbc
 
 Cache.Name = IXAccountMapRepository
 Cache.IXAccountMapRepository.Manager = com.inmobi.adserve.channels.repository.IXAccountMapRepository
-Cache.IXAccountMapRepository.query = select * from ix_account_map_fun('${last_update}') limit 1
+Cache.IXAccountMapRepository.query = select * from ix_account_map_fun('${last_update}')
 Cache.IXAccountMapRepository.initialDelay = 300
 Cache.IXAccountMapRepository.refreshTime = 12000
 Cache.IXAccountMapRepository.isUpdatable = true
