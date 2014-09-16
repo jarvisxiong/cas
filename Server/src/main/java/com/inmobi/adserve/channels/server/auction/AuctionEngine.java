@@ -8,6 +8,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
+import com.inmobi.casthrift.DemandSourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,9 +48,8 @@ public class AuctionEngine implements AuctionEngineInterface {
      * rtb adapter for the segment BidFloor is maximum of lowestEcpm and siteFloor If only 2 rtb are selected, highest
      * bid will win and would be charged the secondHighest price If only 1 rtb is selected, it will be selected for
      * sending response and will be charged the highest of secondHighest price or 90% of bidFloor
-     */
-    /*
-        Runs a second price auction for RTBD and a first price auction for IX
+     *
+     *  Runs a second price auction for RTBD and a first price auction for IX.
      */
 
     @Override
@@ -63,14 +63,14 @@ public class AuctionEngine implements AuctionEngineInterface {
         List<ChannelSegment> filteredChannelSegmentList;
 
         if(unfilteredChannelSegmentList.size() >= 1) {
-            LOG.debug("Inside {} auction engine", getDSTName());
+            LOG.debug("Inside {} auction engine", DemandSourceType.findByValue(sasParams.getDst()).toString());
             // Apply filtration only when we have at least 1 channelSegment
             filteredChannelSegmentList = auctionFilterApplier.applyFilters(new ArrayList<>(unfilteredChannelSegmentList), casInternalRequestParameters);
         } else {
             filteredChannelSegmentList = new ArrayList<>();
         }
 
-        LOG.debug("No. of filtered {} segments are {}", getDSTName(), filteredChannelSegmentList.size());
+        LOG.debug("No. of filtered {} segments are {}", DemandSourceType.findByValue(sasParams.getDst()).toString(), filteredChannelSegmentList.size());
 
         // Send auction response as null in case of 0 rtb/ix responses.
         if (filteredChannelSegmentList.size() == 0) {
@@ -82,7 +82,7 @@ public class AuctionEngine implements AuctionEngineInterface {
             auctionResponse = filteredChannelSegmentList.get(0);
             // Take minimum of auctionFloor+0.01 and bid as secondBidprice if no. of auction
             // response are 1.
-            if (6 == auctionResponse.getAdNetworkInterface().getDst()) {
+            if (DemandSourceType.RTBD == auctionResponse.getAdNetworkInterface().getDst()) {
                 // For RTBD
                 secondBidPrice = Math.min(casInternalRequestParameters.auctionBidFloor, auctionResponse
                         .getAdNetworkInterface().getBidPriceInUsd());
@@ -103,10 +103,11 @@ public class AuctionEngine implements AuctionEngineInterface {
         }
 
         // Multiple IX bids from RP should not be currently possible
-        if (unfilteredChannelSegmentList.get(0).getAdNetworkInterface().getDst() == 8) {
+        if (unfilteredChannelSegmentList.get(0).getAdNetworkInterface().getDst() == DemandSourceType.IX) {
             return null;
         }
 
+        // TODO: Use pre-implemented sort
         // Sort the list by their bid prices.
         for (int i = 0; i < filteredChannelSegmentList.size(); i++) {
             for (int j = i + 1; j < filteredChannelSegmentList.size(); j++) {
@@ -163,11 +164,6 @@ public class AuctionEngine implements AuctionEngineInterface {
                     auctionResponse.getAdNetworkInterface(), -1L);
     }
 
-    private String getDSTName() {
-        return sasParams.getDst()==6?"RTBD":"IX";
-    }
-
-
     @Override
     public boolean isAuctionComplete() {
         return auctionComplete;
@@ -216,10 +212,20 @@ public class AuctionEngine implements AuctionEngineInterface {
         return ImpressionIdGenerator.getInstance().getImpressionId(winBid);
     }
 
+    /**
+     * Returns auctionFloor which is the maximum of siteFloor, highestEcpm, segmentFloor, countryFloor
+     * and networkSiteEcpm
+     *
+     * @param siteFloor
+     * @param highestEcpm
+     * @param segmentFloor
+     * @param countryFloor
+     * @param networkSiteEcpm
+     */
     public double calculateAuctionFloor(final double siteFloor, final double highestEcpm, final double segmentFloor,
                                         final double countryFloor, final double networkSiteEcpm) {
         double auctionFloor;
-        auctionFloor = Math.max(siteFloor, highestEcpm);
+        auctionFloor = Math.max(siteFloor,    highestEcpm);
         auctionFloor = Math.max(auctionFloor, segmentFloor);
         auctionFloor = Math.max(auctionFloor, countryFloor);
         auctionFloor = Math.max(auctionFloor, networkSiteEcpm);

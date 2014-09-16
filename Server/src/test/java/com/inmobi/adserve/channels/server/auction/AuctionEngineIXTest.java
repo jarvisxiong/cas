@@ -131,17 +131,7 @@ public class AuctionEngineIXTest {
         expect(mockAdnetworkInterface.getSeatId()).andReturn(advId).anyTimes();
         expect(mockAdnetworkInterface.getCurrency()).andReturn("USD").anyTimes();
         expect(mockAdnetworkInterface.getCreativeId()).andReturn("creativeId").anyTimes();
-        expect(mockAdnetworkInterface.getDst()).andReturn(8).anyTimes();
-
-        //mockAdnetworkInterface.setLogCreative(true);
-        //EasyMock.expectLastCall().anyTimes();
-        //List<String> adomains = new ArrayList<String>();
-        //adomains.add("a.com");
-        //expect(mockAdnetworkInterface.getADomain()).andReturn(adomains).anyTimes();
-        //List<Integer> cAttributes = new ArrayList<Integer>();
-        //cAttributes.add(1);
-        //expect(mockAdnetworkInterface.getAttribute()).andReturn(cAttributes).anyTimes();
-        //expect(mockAdnetworkInterface.getIUrl()).andReturn("iurl").anyTimes();
+        expect(mockAdnetworkInterface.getDst()).andReturn(DemandSourceType.IX).anyTimes();
 
         // this is done, to track the encryptedBid variable getting set inside the AuctionEngine.
         mockAdnetworkInterface.setEncryptedBid(EasyMock.capture(encryptedBid1));

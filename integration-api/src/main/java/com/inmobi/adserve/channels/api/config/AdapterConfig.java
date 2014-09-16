@@ -4,7 +4,6 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.google.inject.name.Named;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
-import com.inmobi.adserve.channels.util.AdapterType;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -98,19 +97,6 @@ public class AdapterConfig implements CasConfig {
         String hostName = getAdapterHost();
 
         return StringUtils.isNotBlank(hostName) && !"NA".equalsIgnoreCase(hostName);
-    }
-
-    /**
-     * @return the adapterType
-     */
-    public AdapterType getAdapterType() {
-        if (isRtb()) {
-            return AdapterType.RTB;
-        }
-        else if(isIx()){
-            return AdapterType.IX;
-        }
-        return AdapterType.DCP;
     }
 
     /*

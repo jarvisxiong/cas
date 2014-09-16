@@ -1,36 +1,13 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.inject.Inject;
-
-import com.inmobi.types.DemandSource;
-import org.apache.commons.configuration.Configuration;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.json.JSONException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.MetricsManager;
 import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
-import com.inmobi.adtemplate.platform.CreativeType;
-import com.inmobi.casthrift.ix.*;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.Ad;
 import com.inmobi.casthrift.AdIdChain;
@@ -52,6 +29,23 @@ import com.inmobi.casthrift.Request;
 import com.inmobi.casthrift.User;
 import com.inmobi.messaging.Message;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
+import org.apache.commons.configuration.Configuration;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
+import javax.inject.Inject;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class Logging {
@@ -94,7 +88,7 @@ public class Logging {
         InspectorStats.incrementStatCount(InspectorStrings.latency, totalTime);
 
         if (null != sasParams) {
-            DemandSourceType dst = getDst(sasParams.getDst());
+            DemandSourceType dst = DemandSourceType.findByValue(sasParams.getDst());
             InspectorStats.incrementStatCount(dst + "-" +InspectorStrings.latency, totalTime);
             if (null != sasParams.getAllParametersJson() && (rankList == null || rankList.isEmpty())) {
                 InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.nomatchsegmentcount);
@@ -229,7 +223,7 @@ public class Logging {
         }
 
         if (null != sasParams) {
-            request.setRequestDst(getDst(sasParams.getDst()));
+            request.setRequestDst(DemandSourceType.findByValue(sasParams.getDst()));
         }
 
         List<Impression> impressions = null;
@@ -249,7 +243,7 @@ public class Logging {
         }
         // Logging real time stats for graphite
         if (null != sasParams) {
-            DemandSourceType dst = getDst(sasParams.getDst());
+            DemandSourceType dst = DemandSourceType.findByValue(sasParams.getDst());
             MetricsManager.updateLatency(dst.name(), totalTime);
         }
     }
@@ -280,7 +274,7 @@ public class Logging {
                 CasAdvertisementLog creativeLog = new CasAdvertisementLog(partnerName, requestUrl, response,
                         adStatus, externalSiteKey, advertiserId);
                 creativeLog.setCountryId(sasRequestParameters.getCountryId().intValue());
-                if(adNetworkInterface.getDst() == DemandSourceType.RTBD.getValue()) {
+                if(adNetworkInterface.getDst() == DemandSourceType.RTBD) {
                 creativeLog.setImageUrl(adNetworkInterface.getIUrl());
                 creativeLog.setCreativeAttributes(adNetworkInterface.getAttribute());
                 creativeLog.setAdvertiserDomains(adNetworkInterface.getADomain());
@@ -350,24 +344,11 @@ public class Logging {
         casAdChain.setCampaign_inc_id(channelSegment.getChannelSegmentEntity().getCampaignIncId());
         casAdChain.setAdgroup_inc_id(channelSegment.getChannelSegmentEntity().getAdgroupIncId());
         casAdChain.setExternalSiteKey(channelSegment.getChannelSegmentEntity().getExternalSiteKey());
-        casAdChain.setDst(getDst(channelSegment.getChannelSegmentEntity().getDst()));
+        casAdChain.setDst(DemandSourceType.findByValue(channelSegment.getChannelSegmentEntity().getDst()));
         if (null != channelSegment.getAdNetworkInterface().getCreativeId()) {
             casAdChain.setCreativeId(channelSegment.getAdNetworkInterface().getCreativeId());
         }
         return casAdChain;
-    }
-
-    private static DemandSourceType getDst(final int dst) {
-        switch (dst) {
-            case 2:
-                return DemandSourceType.DCP;
-            case 6:
-                return DemandSourceType.RTBD;
-            case 8:
-                return DemandSourceType.IX;
-            default:
-                return DemandSourceType.DCP;
-        }
     }
 
     public static AdStatus getAdStatus(final String adStatus) {

@@ -24,6 +24,7 @@ import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.types.AccountType;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.casthrift.DemandSourceType;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import org.apache.commons.collections.CollectionUtils;
@@ -90,7 +91,7 @@ public abstract class BaseServlet implements Servlet {
         sasParams.setResponseOnlyFromDcp(isResponseOnlyFromDcp);
 
         // Setting isBannerVideoSupported based on the Request params. Only supported for RTBD request.
-        if (6 == sasParams.getDst()) {
+        if (DemandSourceType.RTBD == DemandSourceType.findByValue(sasParams.getDst())) {
             boolean isBannerVideoSupported = casUtils.isBannerVideoSupported(sasParams);
             LOG.debug("isBannerVideoSupported for this request is {}", isBannerVideoSupported);
             sasParams.setBannerVideoSupported(isBannerVideoSupported);

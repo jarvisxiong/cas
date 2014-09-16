@@ -4,7 +4,24 @@ import com.google.inject.Injector;
 import com.google.inject.util.Modules;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.repository.*;
+import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
+import com.inmobi.adserve.channels.repository.ChannelFeedbackRepository;
+import com.inmobi.adserve.channels.repository.ChannelRepository;
+import com.inmobi.adserve.channels.repository.ChannelSegmentAdvertiserCache;
+import com.inmobi.adserve.channels.repository.ChannelSegmentFeedbackRepository;
+import com.inmobi.adserve.channels.repository.ChannelSegmentMatchingCache;
+import com.inmobi.adserve.channels.repository.CreativeRepository;
+import com.inmobi.adserve.channels.repository.CurrencyConversionRepository;
+import com.inmobi.adserve.channels.repository.IXAccountMapRepository;
+import com.inmobi.adserve.channels.repository.NativeAdTemplateRepository;
+import com.inmobi.adserve.channels.repository.PricingEngineRepository;
+import com.inmobi.adserve.channels.repository.PublisherFilterRepository;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.repository.SiteCitrusLeafFeedbackRepository;
+import com.inmobi.adserve.channels.repository.SiteEcpmRepository;
+import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
+import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
+import com.inmobi.adserve.channels.repository.WapSiteUACRepository;
 import com.inmobi.adserve.channels.server.api.ConnectionType;
 import com.inmobi.adserve.channels.server.module.CasNettyModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
@@ -21,7 +38,11 @@ import com.netflix.governator.lifecycle.LifecycleManager;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Slf4JLoggerFactory;
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.dbcp2.*;
+import org.apache.commons.dbcp2.ConnectionFactory;
+import org.apache.commons.dbcp2.DriverManagerConnectionFactory;
+import org.apache.commons.dbcp2.PoolableConnection;
+import org.apache.commons.dbcp2.PoolableConnectionFactory;
+import org.apache.commons.dbcp2.PoolingDataSource;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -65,7 +86,7 @@ public class ChannelServer {
     private static WapSiteUACRepository             wapSiteUACRepository;
     private static IXAccountMapRepository           ixAccountMapRepository;
     private static CreativeRepository               creativeRepository;
-    private static NativeAdTemplateRepository		nativeAdTemplateRepository;
+    private static NativeAdTemplateRepository       nativeAdTemplateRepository;
     private static final String                     DEFAULT_CONFIG_FILE="/opt/mkhoj/conf/cas/channel-server.properties";
     private static String                           configFile;
     public static byte                              dataCenterIdCode;
@@ -81,7 +102,6 @@ public class ChannelServer {
                 System.out.println("Log folders are not available so exiting..");
                 return;
             }
-
             // Set the status code for load balancer status.
             ServerStatusInfo.statusCode = 200;
 
@@ -119,21 +139,21 @@ public class ChannelServer {
                             "mon02.ads.uj1.inmobi.com"),
                     configurationLoader.getServerConfiguration().getInt("graphiteServer.port", 2003),
                     configurationLoader.getServerConfiguration().getInt("graphiteServer.intervalInMinutes", 1));
-            channelAdGroupRepository = new ChannelAdGroupRepository();
-            channelRepository = new ChannelRepository();
-            channelFeedbackRepository = new ChannelFeedbackRepository();
+            channelAdGroupRepository         = new ChannelAdGroupRepository();
+            channelRepository                = new ChannelRepository();
+            channelFeedbackRepository        = new ChannelFeedbackRepository();
             channelSegmentFeedbackRepository = new ChannelSegmentFeedbackRepository();
-            siteMetaDataRepository = new SiteMetaDataRepository();
-            siteTaxonomyRepository = new SiteTaxonomyRepository();
+            siteMetaDataRepository           = new SiteMetaDataRepository();
+            siteTaxonomyRepository           = new SiteTaxonomyRepository();
             siteCitrusLeafFeedbackRepository = new SiteCitrusLeafFeedbackRepository();
-            pricingEngineRepository = new PricingEngineRepository();
-            publisherFilterRepository = new PublisherFilterRepository();
-            siteEcpmRepository = new SiteEcpmRepository();
-            currencyConversionRepository = new CurrencyConversionRepository();
-            wapSiteUACRepository = new WapSiteUACRepository();
-            ixAccountMapRepository = new IXAccountMapRepository();
-            creativeRepository = new CreativeRepository();
-            nativeAdTemplateRepository = new NativeAdTemplateRepository();
+            pricingEngineRepository          = new PricingEngineRepository();
+            publisherFilterRepository        = new PublisherFilterRepository();
+            siteEcpmRepository               = new SiteEcpmRepository();
+            currencyConversionRepository     = new CurrencyConversionRepository();
+            wapSiteUACRepository             = new WapSiteUACRepository();
+            ixAccountMapRepository           = new IXAccountMapRepository();
+            creativeRepository               = new CreativeRepository();
+            nativeAdTemplateRepository       = new NativeAdTemplateRepository();
 
             RepositoryHelper.Builder repoHelperBuilder = RepositoryHelper.newBuilder();
             repoHelperBuilder.setChannelRepository(channelRepository);
