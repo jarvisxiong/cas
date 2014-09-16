@@ -429,6 +429,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 impExt.setRp(rp);
             } else{
                 LOG.debug("zone id not present, will say false");
+                InspectorStats.incrementStatCount(InspectorStrings.IX_ZONE_ID_NOT_PRESENT);
                 return null;
                 //zoneID not available so returning NULL
             }
@@ -523,6 +524,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             rubiconSiteId = Integer.parseInt(additionalParams.getString("site"));
         } catch (JSONException e) {
             LOG.debug("Site Id is not configured");
+            InspectorStats.incrementStatCount(InspectorStrings.IX_SITE_ID_NOT_PRESENT);
             return null;
         }
 
@@ -537,7 +539,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         } else {
             site.setId(getBlindedSiteId(sasParams.getSiteIncId(), entity.getIncId(getCreativeType())));
-            //todo change incId to guiID
 
             if (isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType())) {
                 site.setName(wapSiteUACEntity.getAppType());
@@ -617,6 +618,15 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     private App createAppObject() {
         App app = new App();
+        JSONObject additionalParams= entity.getAdditionalParams();
+        Integer rubiconSiteId;
+        try {
+            rubiconSiteId = Integer.parseInt(additionalParams.getString("site"));
+        } catch (JSONException e) {
+            LOG.debug("Site Id is not configured");
+            InspectorStats.incrementStatCount(InspectorStrings.IX_SITE_ID_NOT_PRESENT);
+            return null;
+        }
 
         if(isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled()){
             app.setId(sasParams.getSiteId());
@@ -669,17 +679,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         final CommonExtension ext= new CommonExtension();
 
-
-        JSONObject additionalParams= entity.getAdditionalParams();
-        try {
-            Integer siteId = Integer.parseInt(additionalParams.getString("site"));
-            final RubiconExtension rpForApp = new RubiconExtension();
-            rpForApp.setSite_id(siteId);
-            ext.setRp(rpForApp);
-        } catch (JSONException e) {
-            LOG.debug("Site Id is not configured");
-            return null;
-        }
+        final RubiconExtension rpForApp = new RubiconExtension();
+        rpForApp.setSite_id(rubiconSiteId);
+        ext.setRp(rpForApp);
 
         app.setExt(ext);
 
@@ -856,7 +858,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             adStatus = "AD";
 
             if(isNativeRequest()){
-                // Todo add nativeAdBuilding();
+                // TODO add nativeAdBuilding();
                 LOG.debug("we do not support native request");
             } else {
                 nonNativeAdBuilding();
