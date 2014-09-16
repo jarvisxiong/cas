@@ -222,7 +222,7 @@ Cache.CurrencyConversionRepository.dataSourceName = jdbc
 
 Cache.Name = WapSiteUACRepository
 Cache.WapSiteUACRepository.Manager = com.inmobi.adserve.channels.repository.WapSiteUACRepository
-Cache.WapSiteUACRepository.query = select * from wap_site_uac_fun_coppa('${last_update}')
+Cache.WapSiteUACRepository.query = select * from wap_site_uac_fun_11092014('${last_update}')
 Cache.WapSiteUACRepository.initialDelay = 300
 Cache.WapSiteUACRepository.refreshTime = 1200
 Cache.WapSiteUACRepository.isUpdatable = true
@@ -1476,3 +1476,26 @@ adapter.dmg.status=on
 adapter.dmg.host=http://ad.dmg-mobile.com/upsteed/wap/adrequest?acc=17067024
 adapter.dmg.partnerSegmentNo=1
 adapter.dmg.class=com.inmobi.adserve.channels.adnetworks.dmg.DCPDmgAdnetwork
+
+adapter.ix.isIx=true
+adapter.ix.status=on
+adapter.ix.templateWinNotification=false
+adapter.ix.siteBlinded=false
+adapter.ix.rtbVer=2.0
+adapter.ix.advertiserId=1b1bdc749bd44a6c9037e513701ee815
+adapter.ix.urlArg=query
+adapter.ix.ixMethod=post
+adapter.ix.isWnRequired=true
+adapter.ix.host.uj1=NA
+adapter.ix.host.lhr1=NA
+adapter.ix.host.hkg1=NA
+adapter.ix.host.ua2=NA
+adapter.ix.host.uh1=NA
+adapter.ix.host.default=http://staged-by.rubiconproject.com/a/api/exchange.json
+adapter.ix.class=com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork
+adapter.ix.nativeSupported=false
+adapter.ix.htmlSupported=true
+adapter.ix.userName=test
+adapter.ix.password=api
+adapter.ix.accountId=11726
+adapter.ix.globalBlind=2865,2853,3158,3038,3107,3002,3320,3560,3600,3676
