@@ -128,6 +128,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private List<String> blockedAdvertisers = Lists.newArrayList(); ;
 
     // Listed site ID's.
+    // To enable transparency for listed site ID's.
     private HashMap<String, String> siteIDMap;
     
     @Getter
@@ -182,7 +183,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         this.blockedAdvertisers.addAll(blockedAdvertiserList);
 
         // Populate the listed site ID's.
-        siteIDMap = new HashMap<String, String>();
+        // Uncomment the below code to enable transparency.
+        /*siteIDMap = new HashMap<String, String>();
         siteIDMap.put("12a35ce4035c427cad0eed2e139d2554", "com.dreamstep.webWidget.wAppcreationguide");
         siteIDMap.put("4028cba631b705570131d1bd19f201b2", "com.dreamstep.wBESTLOVEPOEMS");
         //siteIDMap.put("4028cba631d63df1013206b983e80379");
@@ -294,7 +296,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         siteIDMap.put("cc939819623d44df991f450d609eba3a", "com.thechive");
         siteIDMap.put("d9bdade865d24e7597a1fc0c05e944ad", "com.thechive.chivespy");
         //siteIDMap.put("ec0249d3844447f58274f68d94d7617c");
-        siteIDMap.put("4028cbff3aab0518013ae1dbf41b0403", "id426026150");
+        siteIDMap.put("4028cbff3aab0518013ae1dbf41b0403", "id426026150");*/
     }
 
     @Override
