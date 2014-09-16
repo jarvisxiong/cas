@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.api;
 
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.casthrift.ADCreativeType;
+import com.inmobi.casthrift.DemandSourceType;
 
 import java.net.URI;
 import java.util.List;
@@ -143,5 +144,5 @@ public interface AdNetworkInterface {
     void setName(final String adapterName);
 
     // Get Demand Source Type
-    int getDst();
+    DemandSourceType getDst();
 }

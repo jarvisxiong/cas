@@ -2,10 +2,14 @@ package com.inmobi.adserve.channels.adnetworks.ix;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
-import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.api.template.NativeTemplateAttributeFinder;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
@@ -14,11 +18,33 @@ import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.util.*;
+import com.inmobi.adserve.channels.util.IABCategoriesInterface;
+import com.inmobi.adserve.channels.util.IABCategoriesMap;
+import com.inmobi.adserve.channels.util.IABCountriesInterface;
+import com.inmobi.adserve.channels.util.IABCountriesMap;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.casthrift.ADCreativeType;
-import com.inmobi.casthrift.ix.*;
+import com.inmobi.casthrift.ix.AdQuality;
+import com.inmobi.casthrift.ix.App;
+import com.inmobi.casthrift.ix.Banner;
+import com.inmobi.casthrift.ix.Bid;
+import com.inmobi.casthrift.ix.CommonExtension;
+import com.inmobi.casthrift.ix.Device;
+import com.inmobi.casthrift.ix.Geo;
+import com.inmobi.casthrift.ix.IXBidRequest;
+import com.inmobi.casthrift.ix.IXBidResponse;
+import com.inmobi.casthrift.ix.Impression;
+import com.inmobi.casthrift.ix.ProxyDemand;
+import com.inmobi.casthrift.ix.Publisher;
+import com.inmobi.casthrift.ix.Regs;
+import com.inmobi.casthrift.ix.RubiconExtension;
+import com.inmobi.casthrift.ix.SeatBid;
+import com.inmobi.casthrift.ix.Site;
 import com.inmobi.casthrift.ix.Transparency;
+import com.inmobi.casthrift.ix.User;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
@@ -46,8 +72,12 @@ import javax.inject.Inject;
 import java.awt.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -67,7 +97,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private String                         urlArg;
     @Getter
     @Setter
-    private String ixMethod;
+    private String                         ixMethod;
     @Getter
     @Setter
     private String                         callbackUrl;
@@ -768,9 +798,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
 
-
-
-
     public String replaceIXMacros(String url) {
         url = url.replaceAll(RTBCallbackMacros.AUCTION_ID_INSENSITIVE, bidResponse.id);
         url = url.replaceAll(RTBCallbackMacros.AUCTION_CURRENCY_INSENSITIVE, bidderCurrency);
@@ -1112,7 +1139,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
     @Override
-    public Integer returnPmptier() { return pmptier; }
+    public Integer returnPmpTier() { return pmptier; }
 
     @Override
     public String returnAqid() { return aqid; }

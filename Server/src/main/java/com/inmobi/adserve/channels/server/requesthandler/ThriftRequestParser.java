@@ -75,14 +75,14 @@ public class ThriftRequestParser {
             final boolean isApp = tObject.site.isSetInventoryType() && tObject.site.inventoryType == InventoryType.APP;
             params.setSource(isApp ? "APP" : "WAP");
 
-			if (CasConfigUtil.repositoryHelper != null) {
+            if (CasConfigUtil.repositoryHelper != null) {
 
-				params.setWapSiteUACEntity(CasConfigUtil.repositoryHelper.queryWapSiteUACRepository(tObject.site.siteId));
+                    params.setWapSiteUACEntity(CasConfigUtil.repositoryHelper.queryWapSiteUACRepository(tObject.site.siteId));
 
-				params.setSiteEcpmEntity(CasConfigUtil.repositoryHelper.querySiteEcpmRepository(tObject.site.siteId,
-						tObject.geo.countryId, (int) tObject.device.osId));
-			}
-			params.setSiteType(tObject.site.isSetContentRatingDeprecated() ? tObject.site.contentRatingDeprecated.toString() : "FAMILY_SAFE");
+                    params.setSiteEcpmEntity(CasConfigUtil.repositoryHelper.querySiteEcpmRepository(tObject.site.siteId,
+                                    tObject.geo.countryId, (int) tObject.device.osId));
+            }
+            params.setSiteType(tObject.site.isSetContentRatingDeprecated() ? tObject.site.contentRatingDeprecated.toString() : "FAMILY_SAFE");
             params.setCategories(convertIntToLong(tObject.site.siteTaxonomies));
             double ecpmFloor = Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor);
             params.setSiteFloor(ecpmFloor);

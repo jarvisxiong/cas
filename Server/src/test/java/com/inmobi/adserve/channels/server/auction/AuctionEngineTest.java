@@ -132,7 +132,7 @@ public class AuctionEngineTest {
         expect(mockAdnetworkInterface.getSeatId()).andReturn(advId).anyTimes();
         expect(mockAdnetworkInterface.getCurrency()).andReturn("USD").anyTimes();
         expect(mockAdnetworkInterface.getCreativeId()).andReturn("creativeId").anyTimes();
-        expect(mockAdnetworkInterface.getDst()).andReturn(6).anyTimes();
+        expect(mockAdnetworkInterface.getDst()).andReturn(DemandSourceType.RTBD).anyTimes();
 
         mockAdnetworkInterface.setLogCreative(true);
         EasyMock.expectLastCall().anyTimes();

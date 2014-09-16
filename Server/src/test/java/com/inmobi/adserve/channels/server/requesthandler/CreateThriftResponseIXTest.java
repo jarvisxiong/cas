@@ -10,6 +10,7 @@ import com.inmobi.adserve.channels.server.auction.AuctionEngine;
 import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilterApplierTest;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.casthrift.ADCreativeType;
+import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.types.AdIdChain;
 import com.inmobi.types.GUID;
 import com.inmobi.types.PricingModel;
@@ -25,6 +26,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
 
+// TODO: Needs fixing
 public class CreateThriftResponseIXTest {
     AuctionEngine                auctionEngine;
     ResponseSender               responseSender;
@@ -56,7 +58,7 @@ public class CreateThriftResponseIXTest {
         expect(mockChannelSegment.getChannelSegmentEntity()).andReturn(dummyChannelSegmentEntity).anyTimes();
         expect(mockChannelSegment.getAdNetworkInterface()).andReturn(mockIXAdNetwork).anyTimes();
 
-        expect(mockIXAdNetwork.getDst()).andReturn(8).anyTimes();
+        expect(mockIXAdNetwork.getDst()).andReturn(DemandSourceType.IX).anyTimes();
         expect(mockIXAdNetwork.getBidPriceInUsd()).andReturn(expectedBidPrice).anyTimes();
         expect(mockIXAdNetwork.getSecondBidPriceInUsd()).andReturn(expectedBidPrice).anyTimes();
         expect(mockIXAdNetwork.getImpressionId()).andReturn(impressionID).anyTimes();
@@ -66,7 +68,7 @@ public class CreateThriftResponseIXTest {
         // IX specific parameters
         expect(mockIXAdNetwork.returnDealId()).andReturn("dealId").anyTimes();
         expect(mockIXAdNetwork.returnAdjustBid()).andReturn(0.5).anyTimes();
-        expect(mockIXAdNetwork.returnPmptier()).andReturn(3).anyTimes();
+        expect(mockIXAdNetwork.returnPmpTier()).andReturn(3).anyTimes();
 
         expect(mockSASRequestParameters.getSlot()).andReturn((short)0).anyTimes();
 

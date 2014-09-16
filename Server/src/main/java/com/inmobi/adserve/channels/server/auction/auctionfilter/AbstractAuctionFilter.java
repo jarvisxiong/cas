@@ -5,6 +5,7 @@ import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.server.constants.FilterOrder;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
+import com.inmobi.casthrift.DemandSourceType;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,28 +91,28 @@ public abstract class AbstractAuctionFilter implements AuctionFilter {
     }
 
     @Override
-    public boolean isApplicable(final int dst) {
+    public boolean isApplicable(final DemandSourceType dst) {
         switch(dst){
-            case 6: return this.isApplicableRTBD;
-            case 8: return this.isApplicableIX;
-            default: return true;
+            case RTBD: return this.isApplicableRTBD;
+            case IX:   return this.isApplicableIX;
+            default:   return true;
         }
     }
 
     /*
-    Auction Filters                         isApplicableIX    isApplicableRTBD
-
-    AuctionAdvertiserDomainFilter.java      NO                YES
-    AuctionBidFloorFilter.java              YES               YES
-    AuctionCreativeAttributeFilter.java     NO                YES
-    AuctionCreativeIdFilter.java            YES               YES
-    AuctionCreativeValidatorFilter.java     NO                YES
-    AuctionCurrencyFilter.java              NO               YES
-    AuctionIdFilter.java                    YES               YES
-    AuctionImpressionIdFilter.java          YES               YES
-    AuctionIUrlFilter.java                  NO                YES
-    AuctionLogCreative.java                 NO                YES
-    AuctionNoAdFilter.java                  YES               YES
-    AuctionSeatIdFilter.java                YES               YES
-    */
+     * Auction Filters                         isApplicableIX    isApplicableRTBD
+     *
+     * AuctionAdvertiserDomainFilter.java      NO                YES
+     * AuctionBidFloorFilter.java              YES               YES
+     * AuctionCreativeAttributeFilter.java     NO                YES
+     * AuctionCreativeIdFilter.java            YES               YES
+     * AuctionCreativeValidatorFilter.java     NO                YES
+     * AuctionCurrencyFilter.java              NO                YES
+     * AuctionIdFilter.java                    YES               YES
+     * AuctionImpressionIdFilter.java          YES               YES
+     * AuctionIUrlFilter.java                  NO                YES
+     * AuctionLogCreative.java                 NO                YES
+     * AuctionNoAdFilter.java                  YES               YES
+     * AuctionSeatIdFilter.java                YES               YES
+     */
 }

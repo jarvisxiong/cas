@@ -3,9 +3,18 @@ package com.inmobi.adserve.channels.server.requesthandler;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.inject.Provider;
-import com.inmobi.adserve.adpool.*;
+import com.inmobi.adserve.adpool.AdInfo;
+import com.inmobi.adserve.adpool.AdPoolResponse;
+import com.inmobi.adserve.adpool.AuctionType;
+import com.inmobi.adserve.adpool.Creative;
+import com.inmobi.adserve.adpool.EncryptionKeys;
 import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
-import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
@@ -22,13 +31,15 @@ import com.inmobi.commons.security.util.exception.InvalidMessageException;
 import com.inmobi.types.AdIdChain;
 import com.inmobi.types.GUID;
 import com.inmobi.types.PricingModel;
-
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.handler.codec.http.*;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
 import io.netty.util.CharsetUtil;
-
 import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
@@ -39,10 +50,16 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import javax.inject.Inject;
-
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import static com.inmobi.casthrift.DemandSourceType.*;
 
 public class ResponseSender extends HttpRequestHandlerBase {
 
@@ -62,6 +79,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
 			+ "parent.postMessage('{\"topic\":\"nfr\",\"container\" : \"%s\"}', '*');</script></body></html>";
 	private static Set<String> SUPPORTED_RESPONSE_FORMATS = Sets.newHashSet("html", "xhtml", "axml", "imai","native");
 
+    private static final int PRIVATE_AUCTION = 3;
+    private static final int PREFERRED_DEAL  = 4;
+
 	private long totalTime;
 	private List<ChannelSegment> rankList;
 	private ThirdPartyAdResponse adResponse;
@@ -76,9 +96,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
 	private String terminationReason;
 
 	private final long initialTime;
-    private Marker  traceMarker;
+        private Marker  traceMarker;
 
-    public String getTerminationReason() {
+        public String getTerminationReason() {
 		return terminationReason;
 	}
 
@@ -132,7 +152,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     @Override
-	public void sendAdResponse(final AdNetworkInterface selectedAdNetwork, final Channel serverChannel) {
+    public void sendAdResponse(final AdNetworkInterface selectedAdNetwork, final Channel serverChannel) {
 
         /*
          * Updating rankList for the selected DSP ChannelSegment.
@@ -179,11 +199,10 @@ public class ResponseSender extends HttpRequestHandlerBase {
 			return;
 		}
 
-		if (sasParams.getDst() == DemandSourceType.DCP.getValue()) {
+		if (sasParams.getDst() == DCP.getValue()) {
 			sendResponse(HttpResponseStatus.OK, finalReponse, adResponse.responseHeaders, serverChannel);
 		} else {
-			String dstName = DemandSourceType.findByValue(sasParams.getDst()).name();
-			System.out.println(dstName);
+			String dstName = DemandSourceType.findByValue(sasParams.getDst()).toString();
 			AdPoolResponse rtbdOrIxResponse = createThriftResponse(adResponse.response);
 			LOG.debug("{} response json to RE is {}", dstName, rtbdOrIxResponse);
 			if (null == rtbdOrIxResponse || !SUPPORTED_RESPONSE_FORMATS.contains(sasParams.getRFormat())) {
@@ -232,46 +251,47 @@ public class ResponseSender extends HttpRequestHandlerBase {
 		adIdChain.setAd(channelSegmentEntity.getIncId(responseCreativeType));
 		adIdChain.setGroup(channelSegmentEntity.getAdgroupIncId());
 		adIdChain.setCampaign(channelSegmentEntity.getCampaignIncId());
-        adIdChain.setAdvertiser_guid(channelSegmentEntity.getAdvertiserId());
+                adIdChain.setAdvertiser_guid(channelSegmentEntity.getAdvertiserId());
 
-        switch(getRtbResponse().getAdNetworkInterface().getDst()) {
-            case 8: // If IX,
+                // TODO: Create method and write UT
+                switch(getRtbResponse().getAdNetworkInterface().getDst()) {
+                    case IX: // If IX,
 
-                // Set IX specific parameters
-                if (getRtbResponse().getAdNetworkInterface() instanceof IXAdNetwork) {
-                    IXAdNetwork ixAdNetwork = (IXAdNetwork) getRtbResponse().getAdNetworkInterface();
-                    String dealId = ixAdNetwork.returnDealId();
-                    long highestBid = (long)(ixAdNetwork.returnAdjustBid() * Math.pow(10, 6));
-		            int pmptier = ixAdNetwork.returnPmptier();
+                        // Set IX specific parameters
+                        if (getRtbResponse().getAdNetworkInterface() instanceof IXAdNetwork) {
+                            IXAdNetwork ixAdNetwork = (IXAdNetwork) getRtbResponse().getAdNetworkInterface();
+                            String dealId = ixAdNetwork.returnDealId();
+                            long highestBid = (long)(ixAdNetwork.returnAdjustBid() * Math.pow(10, 6));
+                            int pmpTier = ixAdNetwork.returnPmpTier();
 
-                    // Checking whether a dealId was provided in the bid response
-                    if (null != dealId) {
-                        // If dealId is present, then auction type is set to PREFERRED_DEAL
-                        // and dealId is set
-                        rtbdAd.setDealId(dealId);
-                        rtbdAd.setHighestBid(highestBid);
-                        if (pmptier == 3) {
-                            // If private marketplace tier is 3 then the deal is a private auction
-                            rtbdAd.setAuctionType(AuctionType.PRIVATE_AUCTION);
-                        } else if (ixAdNetwork.returnPmptier() == 4){
-                            // If private marketplace tier is 4 then the deal is a preferred deal
-                            rtbdAd.setAuctionType(AuctionType.PREFERRED_DEAL);
-                        } else {
-                            // When pmptier is 0 (default value), auction is an open auction
-                            // Other values are reserved for future use
-                            rtbdAd.setAuctionType(AuctionType.PREFERRED_DEAL);
+                            // Checking whether a dealId was provided in the bid response
+                            if (null != dealId) {
+                                // If dealId is present, then auction type is set to PREFERRED_DEAL
+                                // and dealId is set
+                                rtbdAd.setDealId(dealId);
+                                rtbdAd.setHighestBid(highestBid);
+                                if (PRIVATE_AUCTION == pmpTier) {
+                                    // If private marketplace tier is 3 then the deal is a private auction
+                                    rtbdAd.setAuctionType(AuctionType.PRIVATE_AUCTION);
+                                } else if (PREFERRED_DEAL == pmpTier){
+                                    // If private marketplace tier is 4 then the deal is a preferred deal
+                                    rtbdAd.setAuctionType(AuctionType.PREFERRED_DEAL);
+                                } else {
+                                    // When pmpTier is 0 (default value), auction is an open auction
+                                    // Other values are reserved for future use
+                                    rtbdAd.setAuctionType(AuctionType.PREFERRED_DEAL);
+                                }
+                            } else {
+                                // otherwise auction type is set to FIRST_PRICE
+                                rtbdAd.setAuctionType(AuctionType.FIRST_PRICE);
+                            }
                         }
-                    } else {
-                        // otherwise auction type is set to FIRST_PRICE
-                        rtbdAd.setAuctionType(AuctionType.FIRST_PRICE);
-                    }
-                }
-                break;
+                        break;
 
-            default:// For RTBD/DCP, auction type is set to SECOND_PRICE
-                rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);
-                break;
-        }
+                    default:// For RTBD/DCP, auction type is set to SECOND_PRICE
+                        rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);
+                        break;
+                }
 
 		List<AdIdChain> adIdChains = new ArrayList<AdIdChain>();
 		adIdChains.add(adIdChain);
@@ -442,14 +462,14 @@ public class ResponseSender extends HttpRequestHandlerBase {
 	}
 
 	private HttpResponseStatus getResponseStatus(final int dstType, final HttpResponseStatus httpResponseStatus) {
-		if (dstType == DemandSourceType.RTBD.getValue() || dstType == DemandSourceType.IX.getValue()) {
+		if (dstType == RTBD.getValue() || dstType == IX.getValue()) {
 			return HttpResponseStatus.OK;
 		}
 		return httpResponseStatus;
 	}
 
 	private byte[] getResponseBytes(final int dstType, final String defaultResponse) {
-		if(dstType == DemandSourceType.RTBD.getValue() || dstType == DemandSourceType.IX.getValue()) {
+		if(dstType == RTBD.getValue() || dstType == IX.getValue()) {
 			AdPoolResponse rtbdResponse = new AdPoolResponse();
 			try {
 				TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
@@ -562,12 +582,12 @@ public class ResponseSender extends HttpRequestHandlerBase {
 	}
 
 	public void writeLogs() {
-        if (null == sasParams) {
-            InspectorStats.incrementStatCount(InspectorStrings.NON_AD_REQUESTS);
-            LOG.debug("Not logging anything, either sasParam is null or this is not an ad request");
-            LOG.debug("done with logging");
-            return;
-        }
+                if (null == sasParams) {
+                    InspectorStats.incrementStatCount(InspectorStrings.NON_AD_REQUESTS);
+                    LOG.debug("Not logging anything, either sasParam is null or this is not an ad request");
+                    LOG.debug("done with logging");
+                    return;
+                }
 		List<ChannelSegment> list = new ArrayList<ChannelSegment>();
 		if (null != getRankList()) {
 			list.addAll(getRankList());

@@ -17,6 +17,7 @@ public class ImpressionIdGenerator {
     private byte dataCenterIdCode;
     private static ImpressionIdGenerator instance = null;
 
+
     public static ImpressionIdGenerator getInstance() {
         if(null == instance) {
             throw new IllegalArgumentException("Class is not initialized yet");
