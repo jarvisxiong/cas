@@ -1,19 +1,5 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import com.inmobi.adserve.channels.util.MetricsManager;
-import com.inmobi.casthrift.DemandSourceType;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.QueryStringDecoder;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
 import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -34,9 +20,20 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentF
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AdGroupLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AdvertiserLevelFilter;
 import com.inmobi.adserve.channels.server.utils.CasUtils;
+import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.types.AccountType;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 public abstract class BaseServlet implements Servlet {
@@ -203,7 +200,7 @@ public abstract class BaseServlet implements Servlet {
         double minimumRtbFloor = 0.05;
         casInternalRequestParametersGlobal.auctionBidFloor = hrh.responseSender.getAuctionEngine().calculateAuctionFloor(
                 hrh.responseSender.sasParams.getSiteFloor(), 0.0, segmentFloor, minimumRtbFloor, networkSiteEcpm);
-        casInternalRequestParametersGlobal.auctionId = asyncRequestMaker.getImpressionId(siteIncId);
+        casInternalRequestParametersGlobal.auctionId = ImpressionIdGenerator.getInstance().getImpressionId(siteIncId);
         LOG.debug("RTB floor from the pricing engine entity is {}", rtbdFloor);
         LOG.debug("RTB floor from the pricing engine entity is {}", segmentFloor);
         LOG.debug("Highest Ecpm is {}", casInternalRequestParametersGlobal.highestEcpm);

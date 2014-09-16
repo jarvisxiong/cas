@@ -6,21 +6,22 @@ import com.inmobi.adserve.channels.api.*;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.api.template.NativeTemplateAttributeFinder;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
+import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.*;
+import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
+import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.ix.*;
 import com.inmobi.casthrift.ix.Transparency;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
-
-
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -28,7 +29,6 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
 import lombok.Getter;
 import lombok.Setter;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -37,19 +37,17 @@ import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TSimpleJSONProtocol;
 import org.apache.velocity.VelocityContext;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-
 import java.awt.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.List;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 
 /**
@@ -115,7 +113,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private String                         responseSeatId;
     private String                         responseImpressionId;
     private String                         responseAuctionId;
-    private String                         buyer;
     private String                         dealId;
     private Double                         adjustbid;
     private String                         creativeId;
@@ -127,7 +124,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private List<Integer>                  creativeAttributes;
     private boolean                        logCreative                  = false;
     private String                         adm;
-    private final RepositoryHelper         repositoryHelper;
+    public final RepositoryHelper         repositoryHelper;
     private String                         bidderCurrency               = "USD";
     private static final String            USD                          = "USD";
     private static final String BLOCKLIST_PARAM = "p_block_keys";
@@ -139,7 +136,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private List<String> globalBlindFromConfig;
     private List<Integer> globalBlind = Lists.newArrayList();
 
-    private List<String> blockedAdvertisers = Lists.newArrayList(); ;
+    private List<String> blockedAdvertisers = Lists.newArrayList();
 
     @Getter
     static List<String>                    currenciesSupported          = new ArrayList<String>(Arrays.asList("USD",
@@ -177,6 +174,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
 
     private static final String nativeString = "native";
+    private ChannelSegmentEntity dspChannelSegmentEntity;
 
     @Override
     protected AsyncHttpClient getAsyncHttpClient() {
@@ -865,6 +863,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 return;
             }
             adStatus = "AD";
+
             if(isNativeRequest()){
                 Integer removeThis=1;
 
@@ -876,6 +875,66 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         }
         LOG.debug("response length is {}", responseContent.length());
+    }
+
+    public boolean updateDSPAccountInfo(String buyer) {
+        LOG.debug("Inside updateDSPAccountInfo");
+        // Get Inmobi account id for the DSP on Rubicon side
+        IXAccountMapEntity ixAccountMapEntity = repositoryHelper.queryIXAccountMapRepository(Long.parseLong(buyer));
+        if (null == ixAccountMapEntity) {
+            LOG.error("Invalid Rubicon DSP id: DSP id:{}", buyer);
+            return false;
+        }
+        String accountId = ixAccountMapEntity.getInmobiAccountId();
+
+        // Get collection of Channel Segment Entities for the particular Inmobi account id
+        ChannelAdGroupRepository channelAdGroupRepository = repositoryHelper.getChannelAdGroupRepository();
+        if (null == channelAdGroupRepository) {
+            LOG.error("Channel AdGroup Repository is null.");
+            return false;
+        }
+
+        Collection<ChannelSegmentEntity> adGroupMap = channelAdGroupRepository.getEntities(accountId);
+
+        if (adGroupMap.isEmpty()) {
+            // If collection is empty
+            LOG.error("Channel Segment Entity collection for Rubicon DSP is empty: DSP id:{}, inmobi account id:{}", buyer, accountId);
+            return false;
+        } else {
+            // Else picking up the first channel segment entity and assuming that to be the correct entity
+            this.dspChannelSegmentEntity = adGroupMap.iterator().next();
+
+            // Create a new ChannelSegment with DSP information. So that, all the logging happens on DSP Id.
+            //this.auctionResponse = new ChannelSegment(dspChannelSegmentEntity, null, null, null, null,
+               //     auctionResponse.getAdNetworkInterface(), -1L);
+
+            // Get response creative type and get the incId for the respective response creative type
+            ADCreativeType responseCreativeType = this.getCreativeType();
+            long incId = this.dspChannelSegmentEntity.getIncId(responseCreativeType);
+
+            String oldImpressionId = this.getImpressionId();
+            LOG.debug("Old impression id: {}", oldImpressionId);
+
+            // Generating new impression id
+            LOG.debug("Creating new impression id from incId: {}", incId);
+            String newImpressionId = ImpressionIdGenerator.getInstance().getImpressionId(incId);
+
+            if (StringUtils.isNotEmpty(newImpressionId)) {
+                // Update the response impression id so that this doesn't get filtered in AuctionImpressionIdFilter.
+                if (this.impressionId.equalsIgnoreCase(responseImpressionId)) {
+                    responseImpressionId = newImpressionId;
+                }
+
+                // Update beacon and click URLs to refer to the video Ads.
+                this.beaconUrl = this.beaconUrl.replace(this.getImpressionId(), newImpressionId);
+                this.clickUrl = this.clickUrl.replace(this.getImpressionId(), newImpressionId);
+                this.impressionId = newImpressionId;
+
+                LOG.debug("Replaced impression id to new value {}.", newImpressionId);
+            }
+
+            return true;
+        }
     }
 
     @Override
@@ -907,18 +966,14 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             else {
                 AdNetworkInterface highestBid = baseRequestHandler.getAuctionEngine().runAuctionEngine();
                 if (highestBid != null) {
-                    // Updating AdIdChain params for rubicon DSPs
-                    if (!baseRequestHandler.getAuctionEngine().updateDSPAccountInfo(repositoryHelper, buyer)) {
-                        baseRequestHandler.sendNoAdResponse(serverChannel);
-                        baseRequestHandler.cleanUp();
-                        return;
-                    } else {
-                        LOG.debug("Sending IX auction response of {}", highestBid.getName());
-                        baseRequestHandler.sendAdResponse(highestBid, serverChannel);
-                        // highestBid.impressionCallback();
-                        LOG.debug("Sent IX auction response");
-                        return;
-                    }
+                    // Update Response ChannelSegment
+                    baseRequestHandler.getAuctionEngine().updateIXChannelSegment(dspChannelSegmentEntity);
+
+                    LOG.debug("Sending IX auction response of {}", highestBid.getName());
+                    baseRequestHandler.sendAdResponse(highestBid, serverChannel);
+                    // highestBid.impressionCallback();
+                    LOG.debug("Sent IX auction response");
+                    return;
                 }
                 else {
                     LOG.debug("IX auction has returned null");
@@ -1038,8 +1093,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             aqid = bid.getAqid();
             adjustbid = bid.getAdjustbid();
             dealId = bid.getDealid();
-            buyer = seatBid.getBuyer();
-            return true;
+
+            return updateDSPAccountInfo(seatBid.getBuyer());
         }
         catch (NullPointerException e) {
             LOG.info("Could not parse the ix response from partner: {}", this.getName());
@@ -1054,12 +1109,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     public String returnDealId()
     {
         return dealId;
-    }
-
-    @Override
-    public String returnBuyer()
-    {
-        return buyer;
     }
 
     @Override
@@ -1112,7 +1161,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     public void setSecondBidPrice(final Double price) {
         this.secondBidPriceInUsd = price;
         this.secondBidPriceInLocal = calculatePriceInLocal(price);
-        LOG.debug("responseContent before replaceMacros is {}", responseContent);
+        LOG.debug("responseContent before replaceMacros is {}", this.responseContent);
         this.responseContent = replaceIXMacros(this.responseContent);
         ThirdPartyAdResponse adResponse = getResponseAd();
         adResponse.response = responseContent;

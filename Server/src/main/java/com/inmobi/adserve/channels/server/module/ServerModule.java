@@ -87,7 +87,6 @@ public class ServerModule extends AbstractModule {
         install(new ChannelSegmentFilterModule());
         install(new ScopeModule());
         install(new AuctionFilterModule());
-
     }
 
     @Singleton
