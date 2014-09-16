@@ -62,9 +62,9 @@
 		</dependency>
         <dependency>
             <groupId>inmobi.phoenix.batteries</groupId>
-            <artifactId>data</artifactId>
+            <artifactId>util</artifactId>
         </dependency>
-		<dependency>
+        <dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 		</dependency>
