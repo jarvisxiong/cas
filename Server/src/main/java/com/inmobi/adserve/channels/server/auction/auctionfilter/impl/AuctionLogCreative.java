@@ -24,6 +24,8 @@ public class AuctionLogCreative extends AbstractAuctionFilter {
         super(traceMarkerProvider, InspectorStrings.droppedInCreativeValidatorFilter, serverConfiguration);
         this.repositoryHelper = repositoryHelper;
         this.creativeCache = creativeCache;
+        isApplicableRTBD = true;
+        isApplicableIX = false;
     }
 
     @Override

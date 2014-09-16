@@ -8,29 +8,26 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.SegmentFactory;
+import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.types.AdFormatType;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.MetricsManager;
 import com.inmobi.casthrift.ADCreativeType;
-import com.inmobi.phoenix.batteries.util.WilburyUUID;
-
 import io.netty.channel.Channel;
-
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 
 @Singleton
 public class AsyncRequestMaker {
     private static final Logger  LOG = LoggerFactory.getLogger(AsyncRequestMaker.class);
-    private static final AtomicInteger counter = new AtomicInteger();
 
     private final SegmentFactory segmentFactory;
 
@@ -89,7 +86,7 @@ public class AsyncRequestMaker {
 
             String clickUrl = null;
             String beaconUrl = null;
-            sasParams.setImpressionId(getImpressionId(incId));
+            sasParams.setImpressionId(ImpressionIdGenerator.getInstance().getImpressionId(incId));
             CasInternalRequestParameters casInternalRequestParameters = getCasInternalRequestParameters(sasParams,
                     casInternalRequestParameterGlobal, channelSegmentEntity);
 
@@ -119,9 +116,9 @@ public class AsyncRequestMaker {
                     beaconUrl)) {
                 InspectorStats.incrementStatCount(network.getName(), InspectorStrings.successfulConfigure);
                 row.setAdNetworkInterface(network);
-                if (network.isRtbPartner()) {
+                if (network.isRtbPartner() || network.isIxPartner()) {
                     rtbSegments.add(row);
-                    LOG.debug("{} is a rtb partner so adding this network to rtb ranklist", network.getName());
+                    LOG.debug("{} is a rtb/ix partner so adding this network to rtb ranklist", network.getName());
                 }
                 else {
                     segments.add(row);
@@ -139,7 +136,7 @@ public class AsyncRequestMaker {
         casInternalRequestParameters.blockedCategories = casInternalRequestParameterGlobal.blockedCategories;
         casInternalRequestParameters.blockedAdvertisers = casInternalRequestParameterGlobal.blockedAdvertisers;
         casInternalRequestParameters.highestEcpm = casInternalRequestParameterGlobal.highestEcpm;
-        casInternalRequestParameters.rtbBidFloor = casInternalRequestParameterGlobal.rtbBidFloor;
+        casInternalRequestParameters.auctionBidFloor = casInternalRequestParameterGlobal.auctionBidFloor;
         casInternalRequestParameters.auctionId = casInternalRequestParameterGlobal.auctionId;
         casInternalRequestParameters.uid = casInternalRequestParameterGlobal.uid;
         casInternalRequestParameters.uidO1 = casInternalRequestParameterGlobal.uidO1;
@@ -176,7 +173,7 @@ public class AsyncRequestMaker {
         for (int i = 0; i < adFormatIds.length; i++) {
             //  Get impression id for video ad format.
             if (adFormatIds[i] == AdFormatType.VIDEO.getValue()) {
-                String impressionId = getImpressionId(adIncIds[i]);
+                String impressionId = ImpressionIdGenerator.getInstance().getImpressionId(adIncIds[i]);
                 LOG.debug("impression id for in-banner video ad is {}.", impressionId);
                 return impressionId;
             }
@@ -240,14 +237,6 @@ public class AsyncRequestMaker {
             }
         }
         return rankList;
-    }
-
-    public String getImpressionId(final long adId) {
-        String uuidIntKey = (WilburyUUID.setIntKey(WilburyUUID.getUUID().toString(), (int) adId)).toString();
-        String uuidMachineKey = (WilburyUUID.setMachineId(uuidIntKey, ChannelServer.hostIdCode)).toString();
-        String uuidWithCyclicCounter = (WilburyUUID.setCyclicCounter(uuidMachineKey,
-                (byte) (Math.abs(counter.getAndIncrement() % 128)))).toString();
-        return (WilburyUUID.setDataCenterId(uuidWithCyclicCounter, ChannelServer.dataCenterIdCode)).toString();
     }
 
     private static ClickUrlMakerV6 setClickParams(final boolean pricingModel, final Configuration config,

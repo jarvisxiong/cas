@@ -1,33 +1,5 @@
 package com.inmobi.adserve.channels.api;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.security.MessageDigest;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import javax.inject.Inject;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
-import org.slf4j.Marker;
-
 import com.google.inject.Key;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
@@ -41,11 +13,37 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.JaxbHelper;
 import com.inmobi.adserve.channels.util.MetricsManager;
 import com.inmobi.casthrift.ADCreativeType;
+import com.inmobi.casthrift.DemandSourceType;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+import org.slf4j.Marker;
+
+import javax.inject.Inject;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 
 // This abstract class have base functionality of TPAN adapters.
@@ -78,6 +76,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected String                              requestUrl              = "";
     private ThirdPartyAdResponse                  responseStruct;
     private boolean                               isRtbPartner            = false;
+    private boolean                               isIxPartner             = false;
     protected ChannelSegmentEntity                entity;
 
     protected String                              externalSiteId;
@@ -123,6 +122,17 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         this.serverChannel = serverChannel;
     }
 
+    //Overriding these methods in IXAdNetwork
+    public String returnBuyer(){return null;}
+
+    public String returnDealId(){return null;}
+
+    public double returnAdjustBid(){return 0;}
+
+    public Integer returnPmpTier() { return 0; }
+
+    public String returnAqid() { return null; }
+
     @Override
     public void setName(final String adapterName) {
         this.adapterName = adapterName;
@@ -142,6 +152,11 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         this.isRtbPartner = isRtbPartner;
     }
 
+    @Override
+    public boolean isIxPartner() { return isIxPartner; }
+
+    public void setIxPartner(final boolean isIxPartner) { this.isIxPartner = isIxPartner; }
+
     public void processResponse() {
         LOG.debug("Inside process Response for the partner: {}", getName());
         if (isRequestComplete) {
@@ -151,26 +166,26 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         LOG.debug("Inside process Response for the partner: {}", getName());
         getResponseAd();
         isRequestComplete = true;
-        if (baseRequestHandler.getAuctionEngine().isAllRtbComplete()) {
-            LOG.debug("isAllRtbComplete is true");
+        if (baseRequestHandler.getAuctionEngine().areAllChannelSegmentRequestsComplete()) {
+            LOG.debug("areAllChannelSegmentRequestsComplete is true");
             if (baseRequestHandler.getAuctionEngine().isAuctionComplete()) {
-                LOG.debug("Rtb auction has run already");
-                if (baseRequestHandler.getAuctionEngine().isRtbResponseNull()) {
-                    LOG.debug("rtb auction has returned null so processing dcp list");
+                LOG.debug("Auction has run already");
+                if (baseRequestHandler.getAuctionEngine().isAuctionResponseNull()) {
+                    LOG.debug("Auction has returned null so processing dcp list");
                     // Process dcp partner response.
                     baseRequestHandler.processDcpPartner(serverChannel, this);
                     return;
                 }
-                LOG.debug("rtb response is not null so sending rtb response");
+                LOG.debug("Auction response is not null so sending auction response");
                 return;
             }
             else {
-                AdNetworkInterface highestBid = baseRequestHandler.getAuctionEngine().runRtbSecondPriceAuctionEngine();
+                AdNetworkInterface highestBid = baseRequestHandler.getAuctionEngine().runAuctionEngine();
                 if (highestBid != null) {
-                    LOG.debug("Sending rtb response of {}", highestBid.getName());
+                    LOG.debug("Sending auction response of {}", highestBid.getName());
                     baseRequestHandler.sendAdResponse(highestBid, serverChannel);
                     // highestBid.impressionCallback();
-                    LOG.debug("sent rtb response");
+                    LOG.debug("sent auction response");
                     return;
                 }
                 else {
@@ -179,7 +194,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 }
             }
         }
-        LOG.debug("rtb auction has not run so waiting....");
+        LOG.debug("Auction has not run so waiting....");
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -515,7 +530,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 return getValueFromListAsString(iabCategoryMap.getIABCategories(sasParams.getCategories()), seperator);
 
             }
-            else {
+            else if(null != sasParams.getCategories()){
                 for (int index = 0; index < sasParams.getCategories().size(); index++) {
                     String category = CategoryList.getCategory(sasParams.getCategories().get(index).intValue());
                     appendCategories(sb, category, seperator);
@@ -562,8 +577,11 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
      * @return
      */
     protected String getUid() {
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)  && "1".equals(casInternalRequestParameters.uidADT)) {
             return casInternalRequestParameters.uidIFA;
+        }
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.gpid) && "1".equals(casInternalRequestParameters.uidADT)) {
+            return casInternalRequestParameters.gpid;
         }
         if (StringUtils.isNotEmpty(casInternalRequestParameters.uidSO1)) {
             return casInternalRequestParameters.uidSO1;
@@ -847,4 +865,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         "1".equals(casInternalRequestParameters.uidADT))
                ? casInternalRequestParameters.gpid:null;
   }
+
+    @Override
+    public DemandSourceType getDst() {
+        return DemandSourceType.findByValue(sasParams.getDst());
+    }
 }

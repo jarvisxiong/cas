@@ -66,7 +66,7 @@ public class ThriftRequestMaker {
         site.setSiteId("b5e2e6ea4a4b42a799ceca322b2fd004");
 
         site.setPublisherId("sitepub");
-        site.setContentRating(ContentRating.PERFORMANCE);
+        site.setContentRatingDeprecated(ContentRating.PERFORMANCE);
         site.setInventoryType(InventoryType.APP);
         Set<Integer> tags = new HashSet<Integer>();
         tags.add(10);

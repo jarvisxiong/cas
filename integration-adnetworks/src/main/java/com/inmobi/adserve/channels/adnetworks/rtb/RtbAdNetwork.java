@@ -327,7 +327,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         		|| StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)
                 || !isRequestFormatSupported()) {
-            LOG.debug("mandate parameters missing or request format is not compaitable to partner supported response for dummy so exiting adapter");
+            LOG.debug("mandate parameters missing or request format is not compatible to partner supported response for dummy so exiting adapter");
             return false;
         }
 
@@ -387,7 +387,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         // Serializing the bidRequest Object
         return serializeBidRequest();
     }
-
 
     private boolean isRequestFormatSupported() {
         if (isNativeRequest()) {
@@ -474,7 +473,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             impression = new Impression(casInternalRequestParameters.impressionId);
         }
         else {
-            LOG.info("Impression id can not be null in sasparam");
+            LOG.info("Impression id can not be null in casInternal Request Params");
             return null;
         }
         
@@ -490,7 +489,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             impression.setInstl(0);
         }
         if (casInternalRequestParameters != null) {
-            impression.setBidfloor(casInternalRequestParameters.rtbBidFloor);
+            impression.setBidfloor(casInternalRequestParameters.auctionBidFloor);
             LOG.debug("Bid floor is {}", impression.getBidfloor());
         }
         if (null != displayManager) {
@@ -537,7 +536,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     	return iext;
     }
     
-   
     private Banner createBannerObject() {
         Banner banner = new Banner();
         banner.setId(casInternalRequestParameters.impressionId);
@@ -693,7 +691,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             app.setCat(iabCategoriesInterface.getIABCategories(sasParams.getCategories()));
         }
         String category = null;
-      if (sasParams.getWapSiteUACEntity() != null &&
+        if (sasParams.getWapSiteUACEntity() != null &&
           StringUtils.isNotEmpty(sasParams.getWapSiteUACEntity().getAppType())) {
           app.setName(sasParams.getWapSiteUACEntity().getAppType());
         }else if ((category = getCategories(',', false)) != null) {
@@ -849,7 +847,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     public String replaceRTBMacros(String url) {
         url = url.replaceAll(RTBCallbackMacros.AUCTION_ID_INSENSITIVE, bidResponse.id);
         url = url.replaceAll(RTBCallbackMacros.AUCTION_CURRENCY_INSENSITIVE, bidderCurrency);
-        if (6 != sasParams.getDst()) {
+
+        // Condition changed from sasParams.getDst() != 6 to == 2 to avoid unnecessary IX RTBMacro Replacements
+        if (2 == sasParams.getDst()) {
             url = url.replaceAll(RTBCallbackMacros.AUCTION_PRICE_ENCRYPTED_INSENSITIVE, encryptedBid);
             url = url.replaceAll(RTBCallbackMacros.AUCTION_PRICE_INSENSITIVE,
                     Double.toString(secondBidPriceInLocal));
@@ -941,7 +941,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             } else {
                 bannerAdBuilding();
             }
-
         }
         LOG.debug("response length is {}", responseContent.length());
     }
