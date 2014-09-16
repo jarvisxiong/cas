@@ -161,7 +161,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
 		String finalReponse = adResponse.response;
 		if (sasParams.getSlot() != null && SlotSizeMapping.getDimension(Long.valueOf(sasParams.getSlot())) != null) {
 			LOG.debug("slot served is {}", sasParams.getSlot());
-			InspectorStats.incrementStatCount(InspectorStrings.totalFills);
 			if (getResponseFormat() == ResponseFormat.XHTML) {
 				Dimension dim = SlotSizeMapping.getDimension(Long.valueOf(sasParams.getSlot()));
 				String startElement = String.format(START_TAG, (int) dim.getWidth(), (int) dim.getHeight());
@@ -181,6 +180,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
 		if (sasParams.getDst() == DemandSourceType.DCP.getValue()) {
 			sendResponse(HttpResponseStatus.OK, finalReponse, adResponse.responseHeaders, serverChannel);
+			incrementStatsForFills(sasParams.getDst());
 		} else {
 			String dstName = DemandSourceType.findByValue(sasParams.getDst()).name();
 			System.out.println(dstName);
@@ -193,13 +193,25 @@ public class ResponseSender extends HttpRequestHandlerBase {
 					TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
 					byte[] serializedResponse = serializer.serialize(rtbdOrIxResponse);
 					sendResponse(HttpResponseStatus.OK, serializedResponse, adResponse.responseHeaders, serverChannel);
-					InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
+					incrementStatsForFills(sasParams.getDst());
 				} catch (TException e) {
 					LOG.error("Error in serializing the adPool response ", e);
 					sendNoAdResponse(serverChannel);
 				}
 			}
 		}
+	}
+	
+	private void incrementStatsForFills(int dst){
+		if(dst == DemandSourceType.DCP.getValue()){
+			InspectorStats.incrementStatCount(InspectorStrings.dcpFills);
+		}else if(dst == DemandSourceType.RTBD.getValue()){
+			InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
+		}else if(dst == DemandSourceType.IX.getValue()){
+			InspectorStats.incrementStatCount(InspectorStrings.ixFills); 
+		}
+		
+		InspectorStats.incrementStatCount(InspectorStrings.totalFills);
 	}
 
 	private boolean checkResponseSent() {
