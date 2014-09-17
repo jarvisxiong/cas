@@ -217,6 +217,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 // Creating Site object
                 site = createSiteObject();
             }
+            else {
+                // Creating App object
+                app = createAppObject();
+            }
         }
 
         // Creating Geo Object for device Object
