@@ -462,6 +462,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
             case JS_AD_CODE:
                 httpResponseStatus = HttpResponseStatus.OK;
                 defaultContent = String.format(NO_AD_JS_ADCODE, sasParams.getRqIframe());
+                break;
             default:
                 httpResponseStatus = HttpResponseStatus.OK;
                 defaultContent = NO_AD_HTML;

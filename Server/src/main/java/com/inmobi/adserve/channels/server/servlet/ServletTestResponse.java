@@ -18,12 +18,12 @@ import java.io.File;
 @Path("/testResponse")
 public class ServletTestResponse implements Servlet {
     private static final Logger LOG = LoggerFactory.getLogger(ServletStat.class);
+    private static final String fileName = "/opt/mkhoj/test/cas/testResponse.txt";
 
     @Override
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
                               final Channel serverChannel) throws Exception {
         LOG.debug("Inside testTResponse servlet");
-        String fileName = "/opt/mkhoj/test/cas/testResponse.txt";
         String testResponse = Files.toString(new File(fileName), Charsets.UTF_8);
         hrh.responseSender.sendResponse(testResponse, serverChannel);
     }

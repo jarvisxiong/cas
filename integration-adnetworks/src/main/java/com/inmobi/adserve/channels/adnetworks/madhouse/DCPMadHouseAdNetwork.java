@@ -335,11 +335,11 @@ public class DCPMadHouseAdNetwork extends AbstractDCPAdNetworkImpl {
                 context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, htmlContent.getTextContent());
                 //
 
-                // Other responses.
+                /* Other responses.
                 Node adSpaceID = document.getElementsByTagName("adspaceid").item(0);
                 Node returnCode = document.getElementsByTagName("returncode").item(0);
                 Node adType = document.getElementsByTagName("adtype").item(0);
-                //
+                */
 
                 statusCode = status.code();
                 responseContent = Formatter.getResponseFromTemplate(Formatter.TemplateType.HTML, context, sasParams, beaconUrl);

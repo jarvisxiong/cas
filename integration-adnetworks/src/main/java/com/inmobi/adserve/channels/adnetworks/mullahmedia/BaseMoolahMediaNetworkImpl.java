@@ -186,7 +186,8 @@ public abstract class BaseMoolahMediaNetworkImpl extends AbstractDCPAdNetworkImp
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
             Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             sb.append("&w=").append(dim.getWidth()).append("&h=").append(dim.getHeight());
-            if (sasParams.getSlot().equals(10)) // 300x250
+            Short compareSlotWith = 10;
+            if (sasParams.getSlot().equals(compareSlotWith))
             {
                 blindedSiteId += "-300x250";
             }

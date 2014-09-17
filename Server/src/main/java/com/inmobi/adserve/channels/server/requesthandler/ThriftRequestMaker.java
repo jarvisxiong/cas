@@ -170,9 +170,10 @@ public class ThriftRequestMaker {
         System.out.println("Response Code : " + response.getStatusLine().getStatusCode());
 
         InputStreamReader inputStreamReader = null;
+        BufferedReader rd = null;
         try {
             inputStreamReader = new InputStreamReader(response.getEntity().getContent());
-            BufferedReader rd = new BufferedReader(inputStreamReader);
+            rd = new BufferedReader(inputStreamReader);
 
             StringBuffer result = new StringBuffer();
             String line = "";
@@ -182,6 +183,11 @@ public class ThriftRequestMaker {
             System.out.println(result.toString());
         }
         finally {
+
+            if (rd != null){
+                rd.close();
+            }
+
             if (inputStreamReader != null) {
                 inputStreamReader.close();
             }

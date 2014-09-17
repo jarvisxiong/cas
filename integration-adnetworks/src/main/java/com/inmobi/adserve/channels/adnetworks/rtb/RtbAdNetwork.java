@@ -323,6 +323,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     protected boolean configureParameters() {
 
         LOG.debug("inside configureParameters of RTB");
+        if(null == casInternalRequestParameters || null == sasParams){
+            LOG.debug("casInternalRequestParams or sasParams cannot be null");
+            return false;
+        }
         if (StringUtils.isBlank(sasParams.getRemoteHostIp())
         		|| StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)
@@ -398,6 +402,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     private boolean createBidRequestObject(final List<Impression> impresssionlist, final Site site, final App app,
             final User user, final Device device) {
+        //nullcheck for casInternalRequestParams and sasParams done while configuring adapter
         bidRequest = new BidRequest(casInternalRequestParameters.auctionId, impresssionlist);
         bidRequest.setTmax(tmax);
         bidRequest.setAt(auctionType);
@@ -405,32 +410,30 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         List<String> seatList = new ArrayList<String>();
         seatList.add(advertiserId);
         bidRequest.setWseat(seatList);
-        if (casInternalRequestParameters != null) {
-            LOG.debug("blockedCategories are {}", casInternalRequestParameters.blockedCategories);
-            LOG.debug("blockedAdvertisers are {}", casInternalRequestParameters.blockedAdvertisers);
-            bidRequest.setBcat(new ArrayList<String>());
-            if (null != casInternalRequestParameters.blockedCategories) {
-                bidRequest.setBcat(iabCategoriesInterface
-                        .getIABCategories(casInternalRequestParameters.blockedCategories));
-            }
-            // Setting blocked categories
-            if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
-                bidRequest.getBcat().addAll(
-                        iabCategoriesInterface.getIABCategories(IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES));
-            }
-            else {
-                bidRequest.getBcat().addAll(
-                        iabCategoriesInterface.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES));
-            }
 
-            if (null != casInternalRequestParameters.blockedAdvertisers) {
-                blockedAdvertisers.addAll(casInternalRequestParameters.blockedAdvertisers);
-            }
-            bidRequest.setBadv(blockedAdvertisers);
+
+        bidRequest.setBcat(new ArrayList<String>());
+        if (null != casInternalRequestParameters.blockedCategories) {
+            bidRequest.setBcat(iabCategoriesInterface
+                    .getIABCategories(casInternalRequestParameters.blockedCategories));
+            LOG.debug("blockedCategories are {}", casInternalRequestParameters.blockedCategories);
+        }
+        // Setting blocked categories
+        if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
+            bidRequest.getBcat().addAll(
+                    iabCategoriesInterface.getIABCategories(IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES));
         }
         else {
-            LOG.debug("casInternalRequestParameters is null, so not setting blocked advertisers and categories");
+            bidRequest.getBcat().addAll(
+                    iabCategoriesInterface.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES));
         }
+
+        if (null != casInternalRequestParameters.blockedAdvertisers) {
+            blockedAdvertisers.addAll(casInternalRequestParameters.blockedAdvertisers);
+            LOG.debug("blockedAdvertisers are {}", casInternalRequestParameters.blockedAdvertisers);
+        }
+        bidRequest.setBadv(blockedAdvertisers);
+
 
         if (site != null) {
             bidRequest.setSite(site);
@@ -468,6 +471,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     private Impression createImpressionObject(final Banner banner, final String displayManager,
             final String displayManagerVersion) {
+        //nullcheck for casInternalRequestParams and sasParams done while configuring adapter
         Impression impression;
         if (null != casInternalRequestParameters.impressionId) {
             impression = new Impression(casInternalRequestParameters.impressionId);
@@ -488,10 +492,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         else {
             impression.setInstl(0);
         }
-        if (casInternalRequestParameters != null) {
-            impression.setBidfloor(casInternalRequestParameters.auctionBidFloor);
-            LOG.debug("Bid floor is {}", impression.getBidfloor());
-        }
+
+        impression.setBidfloor(casInternalRequestParameters.auctionBidFloor);
+        LOG.debug("Bid floor is {}", impression.getBidfloor());
+
         if (null != displayManager) {
             impression.setDisplaymanager(displayManager);
         }
@@ -502,7 +506,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if(isNativeResponseSupported && isNativeRequest()){
         	ImpressionExtensions impExt = createNativeExtensionObject();
         	
-        	if(impExt ==null){
+        	if(impExt == null){
         		return null;
         	}
         	impression.setExt(impExt);
@@ -622,7 +626,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private User createUserObject() {
         User user = new User();
         String gender = sasParams.getGender();
-        if ( StringUtils.isNotEmpty(gender));
+        if ( StringUtils.isNotEmpty(gender))
         {
             user.setGender(gender);  
         }
