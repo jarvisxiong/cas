@@ -15,11 +15,18 @@ public class InspectorStrings {
     public static final String ruleEngineFills                           = "RuleEngineFills";
     public static final String ixFills                                   = "IXFills";
     public static final String dcpFills                                  = "DCPFills";
+    public static final String count                                     = "Count";
+    
     public static final String latency                                   = "Latency";
     public static final String connectionLatency                         = "ConnectionLatency";
-    public static final String count                                     = "Count";
+    
     public static final String totalTimeout                              = "TotalTimeout";
     public static final String connectionTimeout                         = "ConnectionTimeout";
+    public static final String clientTimerLatency                        = "ClientTimerLatency";
+    public static final String timerLatency                              = "timerLatency";
+    public static final String timeoutException                          = "TimeoutException";
+    
+    
     public static final String totalTerminate                            = "TotalTerminate";
     public static final String successfulRequests                        = "success";
     public static final String jsonParsingError                          = "Terminated_JsonError";
