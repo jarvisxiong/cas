@@ -17,11 +17,13 @@ public class AuctionBidFloorFilter extends AbstractAuctionFilter {
     @Inject
     protected AuctionBidFloorFilter(Provider<Marker> traceMarkerProvider,final ServerConfig serverConfiguration) {
         super(traceMarkerProvider, InspectorStrings.droppedInRtbBidFloorFilter, serverConfiguration);
+        isApplicableRTBD = true;
+        isApplicableIX = true;
     }
 
     @Override
     protected boolean failedInFilter(ChannelSegment rtbSegment, CasInternalRequestParameters casInternalRequestParameters) {
-        if (rtbSegment.getAdNetworkInterface().getBidPriceInUsd() < casInternalRequestParameters.rtbBidFloor) {
+        if (rtbSegment.getAdNetworkInterface().getBidPriceInUsd() < casInternalRequestParameters.auctionBidFloor) {
             return true;
         }
         return false;

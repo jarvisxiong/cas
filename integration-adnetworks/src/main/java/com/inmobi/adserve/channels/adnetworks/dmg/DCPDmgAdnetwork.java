@@ -1,19 +1,15 @@
 package com.inmobi.adserve.channels.adnetworks.dmg;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
-
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -32,16 +28,11 @@ public class DCPDmgAdnetwork extends AbstractDCPAdNetworkImpl {
     private int                 height;
     private String              latitude;
     private String              longitude;
-    private String              adType;
-    private int                 adTypeId;
     private int                 client = 0;
-    
     private static final String EXT_SITE_KEY = "as";
     private static final String IP_ADDR = "i";
-    private static final String AD_TYPE = "f";
     private static final String DEVICE_ID ="uid";
     private static final String TIME ="t";
-    private static final String ADTYPE_ID ="tp";
     private static final String CATEGORIES="kw";
     private static final String WIDTH="adw";
     private static final String HEIGHT="adh";
@@ -88,17 +79,7 @@ public class DCPDmgAdnetwork extends AbstractDCPAdNetworkImpl {
             height = (int) Math.ceil(dim.getHeight());
 
             Integer slot = Integer.valueOf(sasParams.getSlot());
-            if (10 == slot // 300X250
-                    || 14 == slot // 320X480
-                    || 16 == slot) /* 768X1024 */{
-                adType = "FullScreen";
-                adTypeId = 3;
             }
-            else {
-                adType = "MobileBanner";
-                adTypeId = 4;
-            }
-        }
         else {
             LOG.debug("mandatory parameters missing for dmg so exiting adapter");
             return false;
@@ -128,13 +109,10 @@ public class DCPDmgAdnetwork extends AbstractDCPAdNetworkImpl {
             appendQueryParam(url, EXT_SITE_KEY, externalSiteId, false);
             appendQueryParam(url, UA, getURLEncode(sasParams.getUserAgent(), format), false);
             appendQueryParam(url, IP_ADDR, (sasParams.getRemoteHostIp()),false);
-            appendQueryParam(url, AD_TYPE, adType, false);
             appendQueryParam(url, DEVICE_ID,getUid(),false);
             appendQueryParam(url, TIME,System.currentTimeMillis(),false);
-            appendQueryParam(url, ADTYPE_ID,adTypeId,false);
             appendQueryParam(url, CATEGORIES,getURLEncode(getCategories(',',true),format),false);
             if (width != 0 && height != 0) {
-                
                 appendQueryParam(url, WIDTH, width, false);
                 appendQueryParam(url, HEIGHT, height, false);
             }

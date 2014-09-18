@@ -1,18 +1,17 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.zip.CRC32;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 public class CryptoHashGenerator {
-    private static final Logger LOG = LoggerFactory.getLogger(AsyncRequestMaker.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CryptoHashGenerator.class);
 
     private final ThreadSafeMac mac;
 

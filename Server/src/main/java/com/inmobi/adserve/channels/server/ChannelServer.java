@@ -38,10 +38,12 @@ import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.ChannelFeedbackRepository;
 import com.inmobi.adserve.channels.repository.ChannelRepository;
+import com.inmobi.adserve.channels.repository.ChannelSegmentAdvertiserCache;
 import com.inmobi.adserve.channels.repository.ChannelSegmentFeedbackRepository;
 import com.inmobi.adserve.channels.repository.ChannelSegmentMatchingCache;
 import com.inmobi.adserve.channels.repository.CreativeRepository;
 import com.inmobi.adserve.channels.repository.CurrencyConversionRepository;
+import com.inmobi.adserve.channels.repository.IXAccountMapRepository;
 import com.inmobi.adserve.channels.repository.NativeAdTemplateRepository;
 import com.inmobi.adserve.channels.repository.PricingEngineRepository;
 import com.inmobi.adserve.channels.repository.PublisherFilterRepository;
@@ -56,7 +58,8 @@ import com.inmobi.adserve.channels.server.module.CasNettyModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import com.inmobi.adserve.channels.util.MetricsManager;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.casthrift.DataCenter;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import com.inmobi.messaging.publisher.MessagePublisherFactory;
@@ -84,8 +87,9 @@ public class ChannelServer {
     private static SiteEcpmRepository               siteEcpmRepository;
     private static CurrencyConversionRepository     currencyConversionRepository;
     private static WapSiteUACRepository             wapSiteUACRepository;
+    private static IXAccountMapRepository           ixAccountMapRepository;
     private static CreativeRepository               creativeRepository;
-    private static NativeAdTemplateRepository		nativeAdTemplateRepository;
+    private static NativeAdTemplateRepository       nativeAdTemplateRepository;
     private static final String                     DEFAULT_CONFIG_FILE="/opt/mkhoj/conf/cas/channel-server.properties";
     private static String                           configFile;
     public static byte                              dataCenterIdCode;
@@ -101,7 +105,6 @@ public class ChannelServer {
                 System.out.println("Log folders are not available so exiting..");
                 return;
             }
-
             // Set the status code for load balancer status.
             ServerStatusInfo.statusCode = 200;
 
@@ -125,31 +128,35 @@ public class ChannelServer {
             AbstractMessagePublisher dataBusPublisher = (AbstractMessagePublisher) MessagePublisherFactory
                     .create(configFile);
 
+            // Initialising ImpressionIdGenerator
+            ImpressionIdGenerator.init(ChannelServer.hostIdCode, ChannelServer.dataCenterIdCode);
+
             String rrLogKey = configurationLoader.getServerConfiguration().getString("rrLogKey");
             String advertisementLogKey = configurationLoader.getServerConfiguration().getString("adsLogKey");
             String umpAdsLogKey = configurationLoader.getServerConfiguration().getString("umpAdsLogKey");
             Logging.init(dataBusPublisher, rrLogKey, advertisementLogKey, umpAdsLogKey, configurationLoader.getServerConfiguration());
 
             // Initializing graphite stats
-            MetricsManager.init(
+            InspectorStats.init(
                     configurationLoader.getServerConfiguration().getString("graphiteServer.host",
                             "mon02.ads.uj1.inmobi.com"),
                     configurationLoader.getServerConfiguration().getInt("graphiteServer.port", 2003),
                     configurationLoader.getServerConfiguration().getInt("graphiteServer.intervalInMinutes", 1));
-            channelAdGroupRepository = new ChannelAdGroupRepository();
-            channelRepository = new ChannelRepository();
-            channelFeedbackRepository = new ChannelFeedbackRepository();
+            channelAdGroupRepository         = new ChannelAdGroupRepository();
+            channelRepository                = new ChannelRepository();
+            channelFeedbackRepository        = new ChannelFeedbackRepository();
             channelSegmentFeedbackRepository = new ChannelSegmentFeedbackRepository();
-            siteMetaDataRepository = new SiteMetaDataRepository();
-            siteTaxonomyRepository = new SiteTaxonomyRepository();
+            siteMetaDataRepository           = new SiteMetaDataRepository();
+            siteTaxonomyRepository           = new SiteTaxonomyRepository();
             siteCitrusLeafFeedbackRepository = new SiteCitrusLeafFeedbackRepository();
-            pricingEngineRepository = new PricingEngineRepository();
-            publisherFilterRepository = new PublisherFilterRepository();
-            siteEcpmRepository = new SiteEcpmRepository();
-            currencyConversionRepository = new CurrencyConversionRepository();
-            wapSiteUACRepository = new WapSiteUACRepository();
-            creativeRepository = new CreativeRepository();
-            nativeAdTemplateRepository = new NativeAdTemplateRepository();
+            pricingEngineRepository          = new PricingEngineRepository();
+            publisherFilterRepository        = new PublisherFilterRepository();
+            siteEcpmRepository               = new SiteEcpmRepository();
+            currencyConversionRepository     = new CurrencyConversionRepository();
+            wapSiteUACRepository             = new WapSiteUACRepository();
+            ixAccountMapRepository           = new IXAccountMapRepository();
+            creativeRepository               = new CreativeRepository();
+            nativeAdTemplateRepository       = new NativeAdTemplateRepository();
 
             RepositoryHelper.Builder repoHelperBuilder = RepositoryHelper.newBuilder();
             repoHelperBuilder.setChannelRepository(channelRepository);
@@ -164,6 +171,8 @@ public class ChannelServer {
             repoHelperBuilder.setSiteEcpmRepository(siteEcpmRepository);
             repoHelperBuilder.setCurrencyConversionRepository(currencyConversionRepository);
             repoHelperBuilder.setWapSiteUACRepository(wapSiteUACRepository);
+            repoHelperBuilder.setIxAccountMapRepository(ixAccountMapRepository);
+
             repoHelperBuilder.setCreativeRepository(creativeRepository);
             repoHelperBuilder.setNativeAdTemplateRepository(nativeAdTemplateRepository);
             
@@ -207,7 +216,7 @@ public class ChannelServer {
                 }
             });
 
-            //System.out.close();
+            System.out.close();
             // If client bootstrap is not present throwing exception which will
             // set
             // lbStatus as NOT_OK.
@@ -235,7 +244,6 @@ public class ChannelServer {
             throws ClassNotFoundException {
         try {
             logger.debug("Starting to instantiate repository");
-            ChannelSegmentMatchingCache.init(logger);
             Configuration databaseConfig = config.getDatabaseConfiguration();
             System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.apache.naming.java.javaURLContextFactory");
             System.setProperty(Context.URL_PKG_PREFIXES, "org.apache.naming");
@@ -285,8 +293,8 @@ public class ChannelServer {
             initialContext.bind("java:comp/env/jdbc", ds);
 
             ChannelSegmentMatchingCache.init(logger);
-            
-            
+            ChannelSegmentAdvertiserCache.init(logger);
+
             // Reusing the repository from phoenix adserving framework.
             
             creativeRepository.init(logger,
@@ -298,6 +306,9 @@ public class ChannelServer {
             wapSiteUACRepository.init(logger,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY),
                     ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY);
+            ixAccountMapRepository.init(logger,
+                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY),
+                    ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY);
             channelAdGroupRepository.init(logger,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY),
                     ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY);

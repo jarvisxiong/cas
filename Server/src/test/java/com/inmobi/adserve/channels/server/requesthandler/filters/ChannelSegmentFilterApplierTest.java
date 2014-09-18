@@ -76,6 +76,8 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
     private ChannelSegment               channelSegment4;
     private ChannelSegment               channelSegment5;
     private ChannelSegment               channelSegment6;
+    private List<AdvertiserLevelFilter> dcpAndRtbdAdvertiserLevelFilters;
+    private List<AdGroupLevelFilter> 	dcpAndRtbAdGroupLevelFilters;
     private Set<String>                  emptySet;
     private Set<String>                  emptySet2;
     private RepositoryHelper             repositoryHelper;
@@ -234,6 +236,14 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
                 new CasNettyModule(configurationLoder.getServerConfiguration())).with(new TestScopeModule()));
 
         channelSegmentFilterApplier = injector.getInstance(ChannelSegmentFilterApplier.class);
+        
+    	TypeLiteral<List<AdvertiserLevelFilter>> advertiserLevelTypeLiteral = new TypeLiteral<List<AdvertiserLevelFilter>>(){};
+    	Key<List<AdvertiserLevelFilter>> dcpAndRtbdAdvertiserLevelFiltersKey = Key.get(advertiserLevelTypeLiteral, DcpAndRtbdAdvertiserLevelFilters.class);
+    	dcpAndRtbdAdvertiserLevelFilters = injector.getInstance(dcpAndRtbdAdvertiserLevelFiltersKey);
+
+    	TypeLiteral<List<AdGroupLevelFilter>> adGroupLevelTypeLiteral = new TypeLiteral<List<AdGroupLevelFilter>>(){};
+    	Key<List<AdGroupLevelFilter>> dcpAndRtbAdGroupLevelFiltersKey = Key.get(adGroupLevelTypeLiteral, DcpAndRtbAdGroupLevelFilters.class);
+    	dcpAndRtbAdGroupLevelFilters = injector.getInstance(dcpAndRtbAdGroupLevelFiltersKey);
 
     }
 
@@ -244,7 +254,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
                 channelSegment4, channelSegment6)));
 
         List<ChannelSegment> channelSegments = channelSegmentFilterApplier.getChannelSegments(
-                advertiserMatchedSegmentDetails, sasParams, new CasContext());
+                advertiserMatchedSegmentDetails, sasParams, new CasContext(), dcpAndRtbdAdvertiserLevelFilters, dcpAndRtbAdGroupLevelFilters);
 
         assertEquals(true, channelSegments.contains(channelSegment1));
         assertEquals(true, channelSegments.contains(channelSegment4));
@@ -258,7 +268,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
                 channelSegment4, channelSegment6)));
 
         List<ChannelSegment> channelSegments = channelSegmentFilterApplier.getChannelSegments(
-                advertiserMatchedSegmentDetails, sasParams, new CasContext());
+                advertiserMatchedSegmentDetails, sasParams, new CasContext(), dcpAndRtbdAdvertiserLevelFilters, dcpAndRtbAdGroupLevelFilters);
 
         assertEquals(true, channelSegments.contains(channelSegment1));
         assertEquals(true, channelSegments.contains(channelSegment4));
@@ -272,7 +282,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
                 channelSegment4, channelSegment6)));
 
         List<ChannelSegment> channelSegments = channelSegmentFilterApplier.getChannelSegments(
-                advertiserMatchedSegmentDetails, sasParams, new CasContext());
+                advertiserMatchedSegmentDetails, sasParams, new CasContext(), dcpAndRtbdAdvertiserLevelFilters, dcpAndRtbAdGroupLevelFilters);
         assertEquals(true, channelSegments.contains(channelSegment1));
         assertEquals(true, channelSegments.contains(channelSegment4));
         assertEquals(true, channelSegments.contains(channelSegment6));
@@ -289,12 +299,9 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
 
         SASRequestParameters sasParams = new SASRequestParameters();
         sasParams.setSiteId("siteid");
-        TypeLiteral<List<AdvertiserLevelFilter>> listType = new TypeLiteral<List<AdvertiserLevelFilter>>() {
-        };
 
-        List<AdvertiserLevelFilter> advertiserLevelFilters = injector.getInstance(Key.get(listType));
 
-        for (AdvertiserLevelFilter advertiserLevelFilter : advertiserLevelFilters) {
+        for (AdvertiserLevelFilter advertiserLevelFilter : dcpAndRtbdAdvertiserLevelFilters) {
             advertiserLevelFilter.filter(advertiserMatchedSegmentDetails, sasParams);
         }
         List<ChannelSegment> channelSegmentList = getChannelSegments(advertiserMatchedSegmentDetails);
@@ -456,11 +463,6 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         sasParams.setDst(2);
         sasParams.setSiteId("siteid");
 
-        TypeLiteral<List<AdGroupLevelFilter>> listType = new TypeLiteral<List<AdGroupLevelFilter>>() {
-        };
-
-        List<AdGroupLevelFilter> adGroupLevelFilters = injector.getInstance(Key.get(listType));
-
         CasContext casContext = new CasContext();
         int sumOfSiteImpressions = 0;
         for (ChannelSegment channelSegment : channelSegments) {
@@ -468,7 +470,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         }
         casContext.setSumOfSiteImpressions(sumOfSiteImpressions);
 
-        for (AdGroupLevelFilter adGroupLevelFilter : adGroupLevelFilters) {
+        for (AdGroupLevelFilter adGroupLevelFilter : dcpAndRtbAdGroupLevelFilters) {
             adGroupLevelFilter.filter(channelSegments, sasParams, casContext);
         }
 

@@ -16,6 +16,8 @@ public class AuctionNoAdFilter extends AbstractAuctionFilter {
     @Inject
     protected AuctionNoAdFilter(Provider<Marker> traceMarkerProvider,final ServerConfig serverConfiguration) {
         super(traceMarkerProvider, null, serverConfiguration);
+        isApplicableRTBD = true;
+        isApplicableIX = true;
     }
 
     @Override

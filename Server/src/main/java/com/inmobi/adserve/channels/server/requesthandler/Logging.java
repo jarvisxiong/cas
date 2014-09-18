@@ -21,14 +21,11 @@ import org.slf4j.Marker;
 
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.MetricsManager;
 import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
-import com.inmobi.adtemplate.platform.CreativeType;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.Ad;
 import com.inmobi.casthrift.AdIdChain;
@@ -54,7 +51,7 @@ import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 
 public class Logging {
     private static final Logger                            LOG                     = LoggerFactory
-                                                                                           .getLogger(AsyncRequestMaker.class);
+                                                                                           .getLogger(Logging.class);
 
     private static AbstractMessagePublisher                dataBusPublisher;
     private static String                                  rrLogKey;
@@ -62,7 +59,7 @@ public class Logging {
     private static String                                  umpAdsLogKey;
     private static boolean                                 enableFileLogging;
     private static boolean                                 enableDatabusLogging;
-    public final static ConcurrentHashMap<String, String> sampledAdvertiserLogNos = new ConcurrentHashMap<String, String>(
+    public final static ConcurrentHashMap<String, String>  sampledAdvertiserLogNos = new ConcurrentHashMap<String, String>(
                                                                                            2000);
     @AdvertiserIdNameMap
     @Inject
@@ -92,7 +89,7 @@ public class Logging {
         InspectorStats.incrementStatCount(InspectorStrings.latency, totalTime);
 
         if (null != sasParams) {
-            DemandSourceType dst = getDst(sasParams.getDst());
+            DemandSourceType dst = DemandSourceType.findByValue(sasParams.getDst());
             InspectorStats.incrementStatCount(dst + "-" +InspectorStrings.latency, totalTime);
             if (null != sasParams.getAllParametersJson() && (rankList == null || rankList.isEmpty())) {
                 InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.nomatchsegmentcount);
@@ -143,7 +140,7 @@ public class Logging {
             InspectorStats.incrementStatCount(channelSegment.getAdNetworkInterface().getName(),
                     InspectorStrings.serverImpression);
             isServerImpression = true;
-            advertiserId = channelSegment.getChannelEntity().getAccountId();
+            advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
             adsServed = 1;
             ChannelSegmentEntity channelSegmentEntity = channelSegment.getChannelSegmentEntity();
             adChain = new AdIdChain(channelSegmentEntity.getAdId(channelSegment.getAdNetworkInterface().getCreativeType()),
@@ -151,7 +148,7 @@ public class Logging {
                     channelSegmentEntity.getAdvertiserId(), channelSegmentEntity.getExternalSiteKey());
             ContentRating contentRating = getContentRating(sasParams);
             PricingModel pricingModel = getPricingModel(channelSegmentEntity.getPricingModel());
-            adMeta = new AdMeta(contentRating, pricingModel, "BANNER");
+            adMeta = new AdMeta(contentRating, pricingModel, "BANNER"); // TODO: Check "BANNER" point
             ad = new Ad(adChain, adMeta);
             impression = new Impression(channelSegment.getAdNetworkInterface().getImpressionId(), ad);
             impression.setAdChain(createCasAdChain(channelSegment));
@@ -227,7 +224,7 @@ public class Logging {
         }
 
         if (null != sasParams) {
-            request.setRequestDst(getDst(sasParams.getDst()));
+            request.setRequestDst(DemandSourceType.findByValue(sasParams.getDst()));
         }
 
         List<Impression> impressions = null;
@@ -247,8 +244,8 @@ public class Logging {
         }
         // Logging real time stats for graphite
         if (null != sasParams) {
-            DemandSourceType dst = getDst(sasParams.getDst());
-            MetricsManager.updateLatency(dst.name(), totalTime);
+            DemandSourceType dst = DemandSourceType.findByValue(sasParams.getDst());
+            InspectorStats.updateYammerTimerStats(dst.name(), InspectorStrings.timerLatency, totalTime);
         }
     }
     
@@ -278,10 +275,12 @@ public class Logging {
                 CasAdvertisementLog creativeLog = new CasAdvertisementLog(partnerName, requestUrl, response,
                         adStatus, externalSiteKey, advertiserId);
                 creativeLog.setCountryId(sasRequestParameters.getCountryId().intValue());
-                creativeLog.setCreativeId(adNetworkInterface.getCreativeId());
+                if(adNetworkInterface.getDst() == DemandSourceType.RTBD) {
                 creativeLog.setImageUrl(adNetworkInterface.getIUrl());
                 creativeLog.setCreativeAttributes(adNetworkInterface.getAttribute());
                 creativeLog.setAdvertiserDomains(adNetworkInterface.getADomain());
+                }
+                creativeLog.setCreativeId(adNetworkInterface.getCreativeId());
                 creativeLog.setCreativeType(adNetworkInterface.getCreativeType());
                 creativeLog.setTime_stamp(new Date().getTime());
                 LOG.info("Creative msg is {}", creativeLog);
@@ -342,27 +341,15 @@ public class Logging {
 
     public static CasAdChain createCasAdChain(final ChannelSegment channelSegment) {
         CasAdChain casAdChain = new CasAdChain();
-        casAdChain.setAdvertiserId(channelSegment.getChannelEntity().getAccountId());
+        casAdChain.setAdvertiserId(channelSegment.getChannelSegmentEntity().getAdvertiserId());
         casAdChain.setCampaign_inc_id(channelSegment.getChannelSegmentEntity().getCampaignIncId());
         casAdChain.setAdgroup_inc_id(channelSegment.getChannelSegmentEntity().getAdgroupIncId());
         casAdChain.setExternalSiteKey(channelSegment.getChannelSegmentEntity().getExternalSiteKey());
-        casAdChain.setDst(getDst(channelSegment.getChannelSegmentEntity().getDst()));
+        casAdChain.setDst(DemandSourceType.findByValue(channelSegment.getChannelSegmentEntity().getDst()));
         if (null != channelSegment.getAdNetworkInterface().getCreativeId()) {
             casAdChain.setCreativeId(channelSegment.getAdNetworkInterface().getCreativeId());
         }
         return casAdChain;
-    }
-
-    private static DemandSourceType getDst(final int dst) {
-        switch (dst) {
-            case 2:
-                return DemandSourceType.DCP;
-            case 6:
-                return DemandSourceType.RTBD;
-            default:
-                return DemandSourceType.DCP;
-
-        }
     }
 
     public static AdStatus getAdStatus(final String adStatus) {

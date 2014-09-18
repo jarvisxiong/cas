@@ -1,14 +1,5 @@
 package com.inmobi.adserve.channels.server.requesthandler.filters;
 
-import java.util.Collections;
-import java.util.List;
-
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
 import com.google.common.collect.Lists;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -19,6 +10,13 @@ import com.inmobi.adserve.channels.server.requesthandler.beans.AdvertiserMatched
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AdGroupLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AdvertiserLevelFilter;
 import com.inmobi.adserve.channels.server.utils.CasUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
+import javax.inject.Inject;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -30,25 +28,17 @@ public class ChannelSegmentFilterApplier {
     private static final Logger               LOG = LoggerFactory.getLogger(ChannelSegmentFilterApplier.class);
 
     private final Provider<Marker>            traceMarkerProvider;
-
-    private final List<AdvertiserLevelFilter> advertiserLevelFilters;
-
-    private final List<AdGroupLevelFilter>    adGroupLevelFilters;
-
     private final CasUtils                    casUtils;
 
     @Inject
-    public ChannelSegmentFilterApplier(final Provider<Marker> traceMarkerProvider,
-            final List<AdvertiserLevelFilter> advertiserLevelFilters,
-            final List<AdGroupLevelFilter> adGroupLevelFilters, final CasUtils casUtils) {
+    public ChannelSegmentFilterApplier(final Provider<Marker> traceMarkerProvider, final CasUtils casUtils) {
         this.traceMarkerProvider = traceMarkerProvider;
-        this.advertiserLevelFilters = advertiserLevelFilters;
-        this.adGroupLevelFilters = adGroupLevelFilters;
         this.casUtils = casUtils;
     }
 
     public List<ChannelSegment> getChannelSegments(final List<AdvertiserMatchedSegmentDetail> matchedSegmentDetails,
-            final SASRequestParameters sasParams, final CasContext casContext) {
+            final SASRequestParameters sasParams, final CasContext casContext, final List<AdvertiserLevelFilter> advertiserLevelFilters,
+            final List<AdGroupLevelFilter> adGroupLevelFilters) {
 
         Marker traceMarker = traceMarkerProvider.get();
 

@@ -40,6 +40,7 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.JaxbHelper;
 import com.inmobi.casthrift.ADCreativeType;
+import com.inmobi.casthrift.DemandSourceType;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
@@ -77,6 +78,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected String                              requestUrl              = "";
     private ThirdPartyAdResponse                  responseStruct;
     private boolean                               isRtbPartner            = false;
+    private boolean                               isIxPartner             = false;
     protected ChannelSegmentEntity                entity;
 
     protected String                              externalSiteId;
@@ -122,6 +124,17 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         this.serverChannel = serverChannel;
     }
 
+    //Overriding these methods in IXAdNetwork
+    public String returnBuyer(){return null;}
+
+    public String returnDealId(){return null;}
+
+    public double returnAdjustBid(){return 0;}
+
+    public Integer returnPmpTier() { return 0; }
+
+    public String returnAqid() { return null; }
+
     @Override
     public void setName(final String adapterName) {
         this.adapterName = adapterName;
@@ -141,6 +154,11 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         this.isRtbPartner = isRtbPartner;
     }
 
+    @Override
+    public boolean isIxPartner() { return isIxPartner; }
+
+    public void setIxPartner(final boolean isIxPartner) { this.isIxPartner = isIxPartner; }
+
     public void processResponse() {
         LOG.debug("Inside process Response for the partner: {}", getName());
         if (isRequestComplete) {
@@ -150,26 +168,26 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         LOG.debug("Inside process Response for the partner: {}", getName());
         getResponseAd();
         isRequestComplete = true;
-        if (baseRequestHandler.getAuctionEngine().isAllRtbComplete()) {
-            LOG.debug("isAllRtbComplete is true");
+        if (baseRequestHandler.getAuctionEngine().areAllChannelSegmentRequestsComplete()) {
+            LOG.debug("areAllChannelSegmentRequestsComplete is true");
             if (baseRequestHandler.getAuctionEngine().isAuctionComplete()) {
-                LOG.debug("Rtb auction has run already");
-                if (baseRequestHandler.getAuctionEngine().isRtbResponseNull()) {
-                    LOG.debug("rtb auction has returned null so processing dcp list");
+                LOG.debug("Auction has run already");
+                if (baseRequestHandler.getAuctionEngine().isAuctionResponseNull()) {
+                    LOG.debug("Auction has returned null so processing dcp list");
                     // Process dcp partner response.
                     baseRequestHandler.processDcpPartner(serverChannel, this);
                     return;
                 }
-                LOG.debug("rtb response is not null so sending rtb response");
+                LOG.debug("Auction response is not null so sending auction response");
                 return;
             }
             else {
-                AdNetworkInterface highestBid = baseRequestHandler.getAuctionEngine().runRtbSecondPriceAuctionEngine();
+                AdNetworkInterface highestBid = baseRequestHandler.getAuctionEngine().runAuctionEngine();
                 if (highestBid != null) {
-                    LOG.debug("Sending rtb response of {}", highestBid.getName());
+                    LOG.debug("Sending auction response of {}", highestBid.getName());
                     baseRequestHandler.sendAdResponse(highestBid, serverChannel);
                     // highestBid.impressionCallback();
-                    LOG.debug("sent rtb response");
+                    LOG.debug("sent auction response");
                     return;
                 }
                 else {
@@ -178,7 +196,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 }
             }
         }
-        LOG.debug("rtb auction has not run so waiting....");
+        LOG.debug("Auction has not run so waiting....");
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -249,11 +267,21 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     if (isRequestComplete) {
                         return;
                     }
-
+                    
+                	String dst;
+                	if(isRtbPartner()){
+                		dst = "RTBD";
+                	}else{
+                		dst = "DCP";
+                	}
+                	InspectorStats.updateYammerTimerStats(dst, InspectorStrings.clientTimerLatency, latency);
+                	
+                	
                     if (t instanceof java.net.ConnectException) {
                         LOG.debug("{} connection timeout latency {}", getName(), latency);
                         adStatus = "TIME_OUT";
                         InspectorStats.incrementStatCount(getName(), InspectorStrings.connectionTimeout);
+                        InspectorStats.incrementStatCount(InspectorStrings.connectionTimeout);
                         processResponse();
                         return;
                     }
@@ -262,6 +290,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                         LOG.debug("{} timeout latency {}", getName(), latency);
                         adStatus = "TIME_OUT";
                         processResponse();
+                        InspectorStats.incrementStatCount(InspectorStrings.timeoutException);
                         return;
                     }
 
@@ -505,7 +534,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 return getValueFromListAsString(iabCategoryMap.getIABCategories(sasParams.getCategories()), seperator);
 
             }
-            else {
+            else if(null != sasParams.getCategories()){
                 for (int index = 0; index < sasParams.getCategories().size(); index++) {
                     String category = CategoryList.getCategory(sasParams.getCategories().get(index).intValue());
                     appendCategories(sb, category, seperator);
@@ -552,8 +581,11 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
      * @return
      */
     protected String getUid() {
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)  && "1".equals(casInternalRequestParameters.uidADT)) {
             return casInternalRequestParameters.uidIFA;
+        }
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.gpid) && "1".equals(casInternalRequestParameters.uidADT)) {
+            return casInternalRequestParameters.gpid;
         }
         if (StringUtils.isNotEmpty(casInternalRequestParameters.uidSO1)) {
             return casInternalRequestParameters.uidSO1;
@@ -837,4 +869,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         "1".equals(casInternalRequestParameters.uidADT))
                ? casInternalRequestParameters.gpid:null;
   }
+
+    @Override
+    public DemandSourceType getDst() {
+        return DemandSourceType.findByValue(sasParams.getDst());
+    }
 }

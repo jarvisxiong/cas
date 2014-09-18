@@ -53,7 +53,7 @@ public class ThriftRequestParserTest extends TestCase {
 
     public void testParseRequestParameters() {
         Site site = new Site();
-        site.setContentRating(ContentRating.FAMILY_SAFE);
+        site.setContentRatingDeprecated(ContentRating.FAMILY_SAFE);
         site.setCpcFloor(1);
         site.setEcpmFloor(3.2);
         site.setInventoryType(InventoryType.APP);
@@ -63,7 +63,7 @@ public class ThriftRequestParserTest extends TestCase {
         site.setSiteUrl("siteUrl");
 
         Device device = new Device();
-        device.setDeviceType(DeviceType.SMARTPHONE);
+        device.setDeviceTypeDeprecated(DeviceType.SMARTPHONE);
         device.setUserAgent("UserAgent");
         device.setOsId(123);
         device.setModelId(234);
