@@ -264,10 +264,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
                     LOG.debug("error while fetching response from: {} {}", getName(), t);
 
-                    if (isRequestComplete) {
-                        return;
-                    }
-                    
                 	String dst;
                 	if(isRtbPartner()){
                 		dst = "RTBD";
@@ -291,6 +287,10 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                         adStatus = "TIME_OUT";
                         processResponse();
                         InspectorStats.incrementStatCount(InspectorStrings.timeoutException);
+                        return;
+                    }
+                    
+                    if (isRequestComplete) {
                         return;
                     }
 
