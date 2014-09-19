@@ -83,6 +83,13 @@ public class SiteAerospikeFeedbackRepository {
     }
 
     /**
+     * Close all client connections to aerospike server nodes.
+     */
+    public void cleanUp() {
+        aerospikeClient.close();
+    }
+
+    /**
      * Method to get SegmentAdGroupFeedbackEntity for the request site and segment combination. Looks first in cache
      * with a configurable refresh time if hits within the refresh time , returns the hit entity otherwise makes a call
      * to aerospike to load the fresh data while returning the stale entity for the current request.

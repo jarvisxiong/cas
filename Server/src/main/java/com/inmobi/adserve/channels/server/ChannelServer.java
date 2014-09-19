@@ -4,9 +4,6 @@ import com.google.inject.Injector;
 import com.google.inject.util.Modules;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
-<<<<<<< HEAD
-import com.inmobi.adserve.channels.repository.*;
-=======
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.ChannelFeedbackRepository;
 import com.inmobi.adserve.channels.repository.ChannelRepository;
@@ -20,12 +17,11 @@ import com.inmobi.adserve.channels.repository.NativeAdTemplateRepository;
 import com.inmobi.adserve.channels.repository.PricingEngineRepository;
 import com.inmobi.adserve.channels.repository.PublisherFilterRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.repository.SiteCitrusLeafFeedbackRepository;
+import com.inmobi.adserve.channels.repository.SiteAerospikeFeedbackRepository;
 import com.inmobi.adserve.channels.repository.SiteEcpmRepository;
 import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
 import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
 import com.inmobi.adserve.channels.repository.WapSiteUACRepository;
->>>>>>> 8538568c0f2f8673f0c6f0acbf90a47578852cad
 import com.inmobi.adserve.channels.server.api.ConnectionType;
 import com.inmobi.adserve.channels.server.module.CasNettyModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
@@ -42,7 +38,11 @@ import com.netflix.governator.lifecycle.LifecycleManager;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Slf4JLoggerFactory;
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.dbcp2.*;
+import org.apache.commons.dbcp2.ConnectionFactory;
+import org.apache.commons.dbcp2.DriverManagerConnectionFactory;
+import org.apache.commons.dbcp2.PoolableConnection;
+import org.apache.commons.dbcp2.PoolableConnectionFactory;
+import org.apache.commons.dbcp2.PoolingDataSource;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -143,30 +143,17 @@ public class ChannelServer {
             channelRepository                = new ChannelRepository();
             channelFeedbackRepository        = new ChannelFeedbackRepository();
             channelSegmentFeedbackRepository = new ChannelSegmentFeedbackRepository();
-<<<<<<< HEAD
-            siteMetaDataRepository = new SiteMetaDataRepository();
-            siteTaxonomyRepository = new SiteTaxonomyRepository();
-            siteAerospikeFeedbackRepository = new SiteAerospikeFeedbackRepository();
-            pricingEngineRepository = new PricingEngineRepository();
-            publisherFilterRepository = new PublisherFilterRepository();
-            siteEcpmRepository = new SiteEcpmRepository();
-            currencyConversionRepository = new CurrencyConversionRepository();
-            wapSiteUACRepository = new WapSiteUACRepository();
-            creativeRepository = new CreativeRepository();
-            nativeAdTemplateRepository = new NativeAdTemplateRepository();
-=======
             siteMetaDataRepository           = new SiteMetaDataRepository();
             siteTaxonomyRepository           = new SiteTaxonomyRepository();
-            siteCitrusLeafFeedbackRepository = new SiteCitrusLeafFeedbackRepository();
+            siteAerospikeFeedbackRepository  = new SiteAerospikeFeedbackRepository();
             pricingEngineRepository          = new PricingEngineRepository();
             publisherFilterRepository        = new PublisherFilterRepository();
             siteEcpmRepository               = new SiteEcpmRepository();
             currencyConversionRepository     = new CurrencyConversionRepository();
             wapSiteUACRepository             = new WapSiteUACRepository();
-            ixAccountMapRepository           = new IXAccountMapRepository();
             creativeRepository               = new CreativeRepository();
             nativeAdTemplateRepository       = new NativeAdTemplateRepository();
->>>>>>> 8538568c0f2f8673f0c6f0acbf90a47578852cad
+            ixAccountMapRepository           = new IXAccountMapRepository();
 
             RepositoryHelper.Builder repoHelperBuilder = RepositoryHelper.newBuilder();
             repoHelperBuilder.setChannelRepository(channelRepository);
@@ -240,6 +227,10 @@ public class ChannelServer {
                 logger.debug("{}", exception);
                 sendMail(exception.getMessage(), getMyStackTrace(exception));
             }
+        }
+        finally {
+            // Closing all connections to Aerospike DB
+            siteAerospikeFeedbackRepository.cleanUp();
         }
     }
 
