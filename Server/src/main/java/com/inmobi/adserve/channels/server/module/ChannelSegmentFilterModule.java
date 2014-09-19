@@ -1,5 +1,16 @@
 package com.inmobi.adserve.channels.server.module;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
+
 import com.google.common.collect.Lists;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
@@ -7,6 +18,10 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.constants.FilterOrder;
 import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilter;
+import com.inmobi.adserve.channels.server.requesthandler.filters.DcpAndRtbAdGroupLevelFilters;
+import com.inmobi.adserve.channels.server.requesthandler.filters.DcpAndRtbdAdvertiserLevelFilters;
+import com.inmobi.adserve.channels.server.requesthandler.filters.IXAdGroupLevelFilters;
+import com.inmobi.adserve.channels.server.requesthandler.filters.IxAdvertiserLevelFilters;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AbstractAdGroupLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AdGroupLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupMaxSegmentPerRequestFilter;
@@ -15,17 +30,8 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.Ad
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AbstractAdvertiserLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AdvertiserLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserDetailsInvalidFilter;
+import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserDroppedInRtbBalanceFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserExcludedFilter;
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
-import org.reflections.util.FilterBuilder;
-
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
 
 
 /**
@@ -62,10 +68,12 @@ public class ChannelSegmentFilterModule extends AbstractModule {
     protected void configure() {
 
     }
-
+    
+    
+    @DcpAndRtbdAdvertiserLevelFilters
     @Singleton
     @Provides
-    List<AdvertiserLevelFilter> provideAdvertiserLevelFilters(final Injector injector) {
+    List<AdvertiserLevelFilter> provideDcpAndRtbdAdvertiserLevelFilters(final Injector injector) {
         List<AdvertiserLevelFilter> advertiserLevelFilterList = Lists.newArrayList();
 
         Set<Class<? extends AdvertiserLevelFilter>> classes = reflections.getSubTypesOf(AdvertiserLevelFilter.class);
@@ -90,10 +98,20 @@ public class ChannelSegmentFilterModule extends AbstractModule {
 
         return advertiserLevelFilterList;
     }
-
+    
+    @IxAdvertiserLevelFilters
     @Singleton
     @Provides
-    List<AdGroupLevelFilter> provideAdGroupLevelFilters(final Injector injector) {
+    List<AdvertiserLevelFilter> provideIxAdvertiserLevelFilters(final Injector injector) {
+        List<AdvertiserLevelFilter> advertiserLevelFilterList = Lists.newArrayList();
+        advertiserLevelFilterList.add(injector.getInstance(AdvertiserDroppedInRtbBalanceFilter.class));
+        return advertiserLevelFilterList;
+    }
+
+    @DcpAndRtbAdGroupLevelFilters
+    @Singleton
+    @Provides
+    List<AdGroupLevelFilter> provideDcpAndRtbAdGroupLevelFilters(final Injector injector) {
         List<AdGroupLevelFilter> adGroupLevelFilterList = Lists.newArrayList();
 
         Set<Class<? extends AdGroupLevelFilter>> classes = reflections.getSubTypesOf(AdGroupLevelFilter.class);
@@ -120,5 +138,13 @@ public class ChannelSegmentFilterModule extends AbstractModule {
         Collections.sort(adGroupLevelFilterList, FILTER_COMPARATOR);
 
         return adGroupLevelFilterList;
+    }
+    
+    
+    @IXAdGroupLevelFilters
+    @Singleton
+    @Provides
+    List<AdGroupLevelFilter> provideIXAdGroupLevelFilters(final Injector injector) {
+        return Lists.newArrayList();
     }
 }

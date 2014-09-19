@@ -26,13 +26,6 @@ public class RequestFilters {
             return true;
         }
 
-        // Send noad if new-category is not present in the request
-        if (CasConfigUtil.random.nextInt(100) >= CasConfigUtil.percentRollout) {
-            LOG.debug("Request not being served because of limited percentage rollout");
-            InspectorStats.incrementStatCount(InspectorStrings.droppedRollout, InspectorStrings.count);
-            return true;
-        }
-
         if (null == hrh.responseSender.sasParams) {
             LOG.error("Terminating request as sasParam is null");
             hrh.setTerminationReason(CasConfigUtil.jsonParsingError);

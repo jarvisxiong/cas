@@ -196,7 +196,7 @@ public class MatchSegments {
     private Collection<ChannelSegmentEntity> loadEntities(final long slotId, final long category, final long country,
             final Integer targetingPlatform, final Integer siteRating, final int osId, Integer dst, final Marker traceMarker) {
         LOG.debug(traceMarker,
-                "Loading adgroups for slot: {} category: {} country: {} targetingPlatform: {} siteRating: {} osId: {}",
+                "Loading adgroups for slot: {} category: {} country: {} targetingPlatform: {} siteRating: {} osId: {} dst: {}",
                 slotId, category, country, targetingPlatform, siteRating, osId, dst);
         return channelAdGroupRepository.getEntities(slotId, category, country, targetingPlatform, siteRating, osId, dst);
     }

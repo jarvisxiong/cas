@@ -71,8 +71,7 @@ public class SiteAerospikeFeedbackRepository {
 
         try {
             ClientPolicy clientpolicy = new ClientPolicy();
-            clientpolicy.maxThreads = 125;    // QPS = ?
-            clientpolicy.timeout = 100;       // Timeout = ?
+            clientpolicy.maxThreads = 20;
             // Verify client policy
             this.aerospikeClient = new AerospikeClient(clientpolicy, config.getString("host"), config.getInt("port"));
         } catch (AerospikeException e) {

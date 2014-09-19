@@ -1,15 +1,17 @@
 package com.inmobi.adserve.channels.api;
 
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 
 public interface AuctionEngineInterface {
-    boolean isAllRtbComplete();
+    boolean areAllChannelSegmentRequestsComplete();
 
     double getSecondBidPrice();
 
-    AdNetworkInterface runRtbSecondPriceAuctionEngine();
+    AdNetworkInterface runAuctionEngine();
 
     boolean isAuctionComplete();
 
-    boolean isRtbResponseNull();
+    boolean isAuctionResponseNull();
 
+    public void updateIXChannelSegment(ChannelSegmentEntity dspChannelSegmentEntity);
 }

@@ -17,6 +17,8 @@ public class AuctionIdFilter extends AbstractAuctionFilter {
     @Inject
     protected AuctionIdFilter(Provider<Marker> traceMarkerProvider,final ServerConfig serverConfiguration) {
         super(traceMarkerProvider, InspectorStrings.droppedInRtbAuctionIdMisMatchFilter, serverConfiguration);
+        isApplicableRTBD = true;
+        isApplicableIX = true;
     }
 
     @Override

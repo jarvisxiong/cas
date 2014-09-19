@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.api;
 
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.casthrift.ADCreativeType;
+import com.inmobi.casthrift.DemandSourceType;
 
 import java.net.URI;
 import java.util.List;
@@ -59,6 +60,9 @@ public interface AdNetworkInterface {
 
     // Returns true for rtb partner, false otherwise.
     boolean isRtbPartner();
+
+    //Returns true for ix partner, false otherwise.
+    boolean isIxPartner();
 
     // Returns auction id sent in the rtb response
     String getAuctionId();
@@ -139,4 +143,6 @@ public interface AdNetworkInterface {
 
     void setName(final String adapterName);
 
+    // Get Demand Source Type
+    DemandSourceType getDst();
 }

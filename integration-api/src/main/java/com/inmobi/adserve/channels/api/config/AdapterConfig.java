@@ -4,7 +4,6 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.google.inject.name.Named;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
-import com.inmobi.adserve.channels.util.AdapterType;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -100,16 +99,6 @@ public class AdapterConfig implements CasConfig {
         return StringUtils.isNotBlank(hostName) && !"NA".equalsIgnoreCase(hostName);
     }
 
-    /**
-     * @return the adapterType
-     */
-    public AdapterType getAdapterType() {
-        if (isRtb()) {
-            return AdapterType.RTB;
-        }
-        return AdapterType.DCP;
-    }
-
     /*
      * @return the adNetworkInterfaceClass
      */
@@ -119,6 +108,10 @@ public class AdapterConfig implements CasConfig {
 
     public boolean isRtb() {
         return adapterConfig.getBoolean("isRtb", false);
+    }
+
+    public boolean isIx(){
+        return adapterConfig.getBoolean("isIx",false);
     }
 
     public int getMaxSegmentSelectionCount() {

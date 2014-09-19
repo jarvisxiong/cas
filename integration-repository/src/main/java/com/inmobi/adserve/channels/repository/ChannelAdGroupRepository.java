@@ -253,8 +253,13 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
         try {
             ChannelSegmentEntity oldEntity = query(entity.getId());
             if (oldEntity != null) {
+
+                // Cleanup from ChannelSegmentMatchingCache
                 matchingKeys = ChannelSegmentMatchingCache.generateMatchingKeys(oldEntity);
                 ChannelSegmentMatchingCache.cleanupEntityFromCache(oldEntity, matchingKeys);
+
+                // Cleanup from ChannelSegmentAdvertiserCache
+                ChannelSegmentAdvertiserCache.cleanupEntityFromCache(oldEntity);
             }
         }
         catch (RepositoryException e) {
@@ -263,6 +268,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
         if (entity.isStatus() && entity.getSiteRatings() != null && entity.getSlotIds() != null) {
             matchingKeys = ChannelSegmentMatchingCache.generateMatchingKeys(entity);
             ChannelSegmentMatchingCache.insertEntityToCache(entity, matchingKeys);
+            ChannelSegmentAdvertiserCache.insertEntityToCache(entity);
             return false;
         }
         else {
@@ -284,6 +290,16 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
     public Collection<ChannelSegmentEntity> getEntities(final long slotId, final long category, final long country,
             final Integer targetingPlatform, final Integer siteRating, final Integer osId, Integer dst) {
         return ChannelSegmentMatchingCache.getEntities(slotId, category, country, targetingPlatform, siteRating, osId, dst);
+    }
+
+    /**
+     * Gets all the matching segments of an advertiser.
+     *
+     * @param advertiserId
+     * @return Collection of ChannelSegmentEntity
+     */
+    public Collection<ChannelSegmentEntity> getEntities(final String advertiserId) {
+        return ChannelSegmentAdvertiserCache.getEntities(advertiserId);
     }
 
 }

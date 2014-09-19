@@ -16,8 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.Singleton;
-import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
+import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
 import com.inmobi.adserve.channels.util.InspectorStats;
@@ -80,6 +80,9 @@ public class ServletChangeConfig implements Servlet {
                     updates.append(configKey).append("=")
                             .append(CasConfigUtil.getServerConfig().getString(configKey.replace("server.", "")))
                             .append("\n");
+                }
+                if (configKey.startsWith("resetTimers")) {
+                	InspectorStats.resetTimers();
                 }
             }
             hrh.responseSender.sendResponse(updates.toString(), serverChannel);

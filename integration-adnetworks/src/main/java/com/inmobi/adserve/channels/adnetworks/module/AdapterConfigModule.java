@@ -15,6 +15,7 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
 import com.google.inject.util.Providers;
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.config.AdapterConfig;
 import com.inmobi.adserve.channels.api.config.AdapterConfigFactory;
@@ -40,6 +41,7 @@ public class AdapterConfigModule extends AbstractModule {
 
         requestStaticInjection(BaseAdNetworkImpl.class);
         requestStaticInjection(RtbAdNetwork.class);
+        requestStaticInjection(IXAdNetwork.class);
 
         install(new FactoryModuleBuilder().build(AdapterConfigFactory.class));
         bind(String.class).annotatedWith(Names.named("dcName")).toProvider(Providers.of(dcName));
