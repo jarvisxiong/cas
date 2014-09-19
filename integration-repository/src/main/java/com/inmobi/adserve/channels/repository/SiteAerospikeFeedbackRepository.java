@@ -126,7 +126,7 @@ public class SiteAerospikeFeedbackRepository {
     private void asynchronouslyFetchFeedbackFromAerospike(final String siteId) {
         Boolean isSiteGettingUpdated = this.currentlyUpdatingSites.putIfAbsent(siteId, true);
         if (isSiteGettingUpdated == null) {
-            // forking new thread to fetch feedback from zerospike
+            // forking new thread to fetch feedback from Aerospike
             CacheUpdater cacheUpdater = new CacheUpdater(siteId);
             Thread cacheUpdaterThread = new Thread(cacheUpdater);
             executorService.execute(cacheUpdaterThread);
