@@ -37,7 +37,7 @@ public class AdGroupSupplyDemandClassificationFilter extends AbstractAdGroupLeve
     @Inject
     protected AdGroupSupplyDemandClassificationFilter(final Provider<Marker> traceMarkerProvider,
             final RepositoryHelper repositoryHelper, final ServerConfig serverConfig, final Map<String, AdapterConfig> advertiserIdConfigMap) {
-        super(traceMarkerProvider, InspectorStrings.droppedInSupplyDemandClassificationFilter);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_SUPPLY_DEMAND_CLASSIFICATION_FILTER);
         this.repositoryHelper = repositoryHelper;
         this.serverConfig = serverConfig;
         this.advertiserIdConfigMap = advertiserIdConfigMap;
@@ -66,8 +66,7 @@ public class AdGroupSupplyDemandClassificationFilter extends AbstractAdGroupLeve
 
         if (pricingEngineEntity == null) {
             return !(PricingEngineEntity.DEFAULT_SUPPLY_DEMAND_MAPPING[supplyClass][demandClass] == 1);
-        }
-        else {
+        } else {
             return !(pricingEngineEntity.isSupplyAcceptsDemand(supplyClass, demandClass));
         }
 
@@ -87,8 +86,7 @@ public class AdGroupSupplyDemandClassificationFilter extends AbstractAdGroupLeve
 
         if (casContext.getSumOfSiteImpressions() == 0) {
             eCPMBoost = 0;
-        }
-        else {
+        } else {
             if (impressionsRendered == 0) {
                 impressionsRendered = 1;
             }
@@ -108,8 +106,7 @@ public class AdGroupSupplyDemandClassificationFilter extends AbstractAdGroupLeve
     private byte getDemandClass(final SiteEcpmEntity siteEcpmEntity, final double prioritisedECPM) {
         if (siteEcpmEntity == null) {
             return serverConfig.getDefaultDemandClass();
-        }
-        else {
+        } else {
             return getEcpmClass(prioritisedECPM, siteEcpmEntity.getNetworkEcpm());
         }
     }
@@ -120,8 +117,7 @@ public class AdGroupSupplyDemandClassificationFilter extends AbstractAdGroupLeve
         if (siteEcpmEntity == null) {
             LOG.debug(traceMarker, "SiteEcpmEntity is null, thus returning default class");
             return serverConfig.getDefaultSupplyClass();
-        }
-        else {
+        } else {
             LOG.debug(traceMarker, "SupplyClassFloors {} ", serverConfig.getSupplyClassFloors());
             LOG.debug(traceMarker, "Site ecpm is {} Network ecpm is {}", siteEcpmEntity.getEcpm(),
                     siteEcpmEntity.getNetworkEcpm());

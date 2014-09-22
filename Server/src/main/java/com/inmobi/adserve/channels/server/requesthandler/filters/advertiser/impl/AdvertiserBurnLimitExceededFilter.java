@@ -27,7 +27,7 @@ public class AdvertiserBurnLimitExceededFilter extends AbstractAdvertiserLevelFi
     @Inject
     public AdvertiserBurnLimitExceededFilter(final Provider<Marker> traceMarkerProvider,
             final ServerConfig serverConfiguration) {
-        super(traceMarkerProvider, InspectorStrings.droppedInburnFilter);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_BURN_FILTER);
         this.serverConfiguration = serverConfiguration;
     }
 
