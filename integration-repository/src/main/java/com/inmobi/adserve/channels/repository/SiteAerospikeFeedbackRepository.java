@@ -73,10 +73,10 @@ public class SiteAerospikeFeedbackRepository {
         this.executorService = Executors.newCachedThreadPool();
 
         try {
-            ClientPolicy clientpolicy = new ClientPolicy();
-            clientpolicy.maxThreads = 10;
+            ClientPolicy clientPolicy = new ClientPolicy();
+            clientPolicy.maxThreads = 10;
             
-            this.aerospikeClient = new AerospikeClient(clientpolicy, config.getString("host"), config.getInt("port"));
+            this.aerospikeClient = new AerospikeClient(clientPolicy, config.getString("host"), config.getInt("port"));
         } catch (AerospikeException e) {
             LOG.error("Exception while creating Aerospike client: {}", e.getMessage());
             throw new InitializationException("Could not instantiate Aerospike client");
