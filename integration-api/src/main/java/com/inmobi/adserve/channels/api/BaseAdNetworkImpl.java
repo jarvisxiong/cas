@@ -178,8 +178,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 }
                 LOG.debug("Auction response is not null so sending auction response");
                 return;
-            }
-            else {
+            } else {
                 AdNetworkInterface highestBid = baseRequestHandler.getAuctionEngine().runAuctionEngine();
                 if (highestBid != null) {
                     LOG.debug("Sending auction response of {}", highestBid.getName());
@@ -187,8 +186,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     // highestBid.impressionCallback();
                     LOG.debug("sent auction response");
                     return;
-                }
-                else {
+                } else {
                     LOG.debug("rtb auction has returned null so processing dcp list");
                     baseRequestHandler.processDcpList(serverChannel);
                 }
@@ -228,8 +226,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                         scope.enter();
                         try {
                             scope.seed(Key.get(Marker.class), NettyRequestScope.TRACE_MAKER);
-                        }
-                        finally {
+                        } finally {
                             scope.exit();
                         }
                     }
@@ -254,8 +251,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                         scope.enter();
                         try {
                             scope.seed(Key.get(Marker.class), NettyRequestScope.TRACE_MAKER);
-                        }
-                        finally {
+                        } finally {
                             scope.exit();
                         }
                     }
@@ -277,8 +273,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     if (t instanceof java.net.ConnectException) {
                         LOG.debug("{} connection timeout latency {}", getName(), latency);
                         adStatus = "TIME_OUT";
-                        InspectorStats.incrementStatCount(getName(), InspectorStrings.connectionTimeout);
-                        InspectorStats.incrementStatCount(InspectorStrings.connectionTimeout);
+                        InspectorStats.incrementStatCount(getName(), InspectorStrings.CONNECTION_TIMEOUT);
+                        InspectorStats.incrementStatCount(InspectorStrings.CONNECTION_TIMEOUT);
                         processResponse();
                         return;
                     }
@@ -295,8 +291,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     processResponse();
                 }
             });
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             LOG.debug("Exception in {} makeAsyncRequest : {}", getName(), e.getMessage());
         }
         LOG.debug("{} returning from make NingRequest", getName());
@@ -388,21 +383,17 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         responseStruct.responseHeaders = getResponseHeaders();
         if (statusCode >= 400) {
             responseStruct.responseStatus = ThirdPartyAdResponse.ResponseStatus.FAILURE_NETWORK_ERROR;
-        }
-        else if (statusCode >= 300) {
+        } else if (statusCode >= 300) {
             responseStruct.responseStatus = ThirdPartyAdResponse.ResponseStatus.FAILURE_REQUEST_ERROR;
-        }
-        else if (statusCode == 200) {
+        } else if (statusCode == 200) {
             if (StringUtils.isBlank(responseContent) || !adStatus.equalsIgnoreCase("AD")) {
                 adStatus = "NO_AD";
                 responseStruct.responseStatus = ThirdPartyAdResponse.ResponseStatus.FAILURE_NO_AD;
-            }
-            else {
+            } else {
                 responseStruct.responseStatus = ThirdPartyAdResponse.ResponseStatus.SUCCESS;
                 adStatus = "AD";
             }
-        }
-        else if (statusCode >= 204) {
+        } else if (statusCode >= 204) {
             responseStruct.responseStatus = ThirdPartyAdResponse.ResponseStatus.FAILURE_NO_AD;
         }
         responseStruct.latency = latency;
@@ -489,8 +480,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             responseContent = response;
             statusCode = status.code();
             adStatus = "AD";
@@ -529,8 +519,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             if (isIABCategory) {
                 return getValueFromListAsString(iabCategoryMap.getIABCategories(sasParams.getCategories()), seperator);
 
-            }
-            else if(null != sasParams.getCategories()){
+            } else if (null != sasParams.getCategories()){
                 for (int index = 0; index < sasParams.getCategories().size(); index++) {
                     String category = CategoryList.getCategory(sasParams.getCategories().get(index).intValue());
                     appendCategories(sb, category, seperator);
@@ -539,8 +528,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     }
                 }
             }
-        }
-        else {
+        } else {
             for (int index = 0; index < sasParams.getCategories().size(); index++) {
                 String category = null;
                 int cat = sasParams.getCategories().get(index).intValue();
@@ -668,14 +656,12 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     tobeEndoded = decoded;
                     decoded = URLDecoder.decode(tobeEndoded, format);
                 }
-            }
-            catch (UnsupportedEncodingException uee) {
+            } catch (UnsupportedEncodingException uee) {
                 LOG.debug("Error during decode in getURLEncode() for {} for string {}", getName(), param);
             }
             try {
                 encodedString = URLEncoder.encode(decoded.trim(), format);
-            }
-            catch (UnsupportedEncodingException e) {
+            } catch (UnsupportedEncodingException e) {
                 LOG.debug("Error during encode in getURLEncode() for {} for string {}", getName(), param);
             }
         }
@@ -736,8 +722,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
             }
             return sb.toString();
-        }
-        catch (java.security.NoSuchAlgorithmException e) {
+        } catch (java.security.NoSuchAlgorithmException e) {
         }
         return null;
     }
@@ -836,11 +821,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
   public boolean isApp(){
       if(StringUtils.isBlank(sasParams.getSource())) {
           return false;
-      }
-      else if (WAP.equalsIgnoreCase(sasParams.getSource())) {
+      } else if (WAP.equalsIgnoreCase(sasParams.getSource())) {
           return false;
-      }
-      else {
+      } else {
           return true;
       }
   }
@@ -854,8 +837,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
           }
           responseContent = "";
           return false;
-      }
-      else {
+      } else {
           return true;
       }
   }

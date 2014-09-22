@@ -14,6 +14,11 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 
 
 public class CasConfigUtil {
+/*
+    private CasConfigUtil(){
+        //dummy private constructor to avoid instantiation from other classes
+    }
+*/
     private static final Logger    LOG                      = LoggerFactory.getLogger(CasConfigUtil.class);
 
     // TODO: clear up all these responses, configs to separate module
@@ -50,7 +55,7 @@ public class CasConfigUtil {
         CasConfigUtil.repositoryHelper = repositoryHelper;
         percentRollout = CasConfigUtil.serverConfig.getInt("percentRollout", 100);
         allowedSiteTypes = CasConfigUtil.serverConfig.getList("allowedSiteTypes");
-        InspectorStats.setStats(InspectorStrings.percentRollout, percentRollout);
+        InspectorStats.setStats(InspectorStrings.PERCENT_ROLL_OUT, percentRollout);
     }
 
     public static Configuration getServerConfig() {

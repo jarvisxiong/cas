@@ -116,8 +116,7 @@ public abstract class BaseMoolahMediaNetworkImpl extends AbstractDCPAdNetworkImp
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             LOG.debug("beacon url inside mullah media is {}", beaconUrl);
             try {
                 statusCode = status.code();
@@ -129,20 +128,17 @@ public abstract class BaseMoolahMediaNetworkImpl extends AbstractDCPAdNetworkImp
                 context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.IMAGE, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            }
-            catch (JSONException exception) {
+            } catch (JSONException exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from mullah : {}", exception);
                 LOG.info("Response from mullah: {}", response);
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from mullah : {}", exception);
                 LOG.info("Response from mullah: {}", response);
                 try {
                     throw exception;
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     LOG.info("Error while rethrowing the exception : {}", e);
                 }
             }
@@ -204,8 +200,7 @@ public abstract class BaseMoolahMediaNetworkImpl extends AbstractDCPAdNetworkImp
     public URI getRequestUri() throws Exception {
         try {
             return (new URI(host + "?" + getRequestParameters()));
-        }
-        catch (URISyntaxException exception) {
+        } catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.info("{}", exception);
         }
@@ -222,8 +217,7 @@ public abstract class BaseMoolahMediaNetworkImpl extends AbstractDCPAdNetworkImp
                     return category;
                 }
             }
-        }
-        else if (sasParams.getCategories() != null) {
+        } else if (sasParams.getCategories() != null) {
             for (int index = 0; index < sasParams.getCategories().size(); index++) {
                 String category = CategoryList.getCategory(sasParams.getCategories().get(index).intValue());
                 LOG.debug("category is {}", category);
