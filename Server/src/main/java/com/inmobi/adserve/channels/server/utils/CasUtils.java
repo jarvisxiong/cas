@@ -99,8 +99,7 @@ public class CasUtils {
                     osVersion = osVersion.substring(0, osVersion.indexOf("."));
                 }
                 osMajorVersion = Integer.parseInt(osVersion);
-            }
-            catch (NumberFormatException e)
+            } catch (NumberFormatException e)
             {
                 LOG.debug("Exception while parsing osMajorVersion {}", e);
                 return false;
@@ -127,11 +126,9 @@ public class CasUtils {
                     && Integer.parseInt(sasParams.getSdkVersion().substring(1)) >= 370) {
                 return true;
             }
-        }
-        catch (StringIndexOutOfBoundsException e1) {
+        } catch (StringIndexOutOfBoundsException e1) {
             LOG.debug("Invalid sdkversion {}", e1);
-        }
-        catch (NumberFormatException e2) {
+        } catch (NumberFormatException e2) {
             LOG.debug("Invalid sdkversion {}", e2);
         }
         return false;
