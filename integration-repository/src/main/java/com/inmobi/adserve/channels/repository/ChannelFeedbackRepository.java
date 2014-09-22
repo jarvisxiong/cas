@@ -47,8 +47,7 @@ public class ChannelFeedbackRepository extends AbstractStatsMaintainingDBReposit
 
             ChannelFeedbackEntity entity = builder.build();
             return new DBEntity<ChannelFeedbackEntity, String>(entity, modifiedOn);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Error in resultset row", e);
             return new DBEntity<ChannelFeedbackEntity, String>(new EntityError<String>(advertiserId,
                     "ERROR_IN_EXTRACTING_CHANNEL"), modifiedOn);

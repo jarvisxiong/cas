@@ -184,8 +184,9 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
     public long getIncId(final ADCreativeType creativeType) {
         long notFound = -1L;
 
-        if (getAdFormatIds() == null)
+        if (null == getAdFormatIds()) {
             return notFound;
+        }
 
         int requestedAdFormatId = getAdFormatId(creativeType);
         try {
@@ -207,8 +208,9 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
     public String getAdId(final ADCreativeType creativeType) {
         String notFound = "";
 
-        if (getAdFormatIds() == null)
+        if (null == getAdFormatIds()) {
             return notFound;
+        }
 
         int requestedAdFormatId = getAdFormatId(creativeType);
         try {
@@ -234,7 +236,8 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
             return AdFormatType.VIDEO.getValue();         // VIDEO
         } else if (creativeType == ADCreativeType.BANNER) {
             return AdFormatType.TEXT.getValue();          // BANNER
-        } else
+        } else {
             return -1; // not found
+        }
     }
 }
