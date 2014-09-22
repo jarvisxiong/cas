@@ -192,9 +192,9 @@
 				<version>9.0-801.jdbc3</version>
 			</dependency>
 			<dependency>
-				<groupId>net.citrusleaf</groupId>
-				<artifactId>citrusleaf-client</artifactId>
-				<version>2.0.23</version>
+                		<groupId>com.aerospike</groupId>
+                		<artifactId>aerospike-client</artifactId>
+                		<version>3.0.27</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.guava</groupId>

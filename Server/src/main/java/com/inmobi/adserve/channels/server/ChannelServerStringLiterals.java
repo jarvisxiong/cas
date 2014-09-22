@@ -9,7 +9,7 @@ public class ChannelServerStringLiterals {
     public static final String SITE_TAXONOMY_REPOSITORY            = "SiteTaxonomyRepository";
     public static final String PRICING_ENGINE_REPOSITORY           = "PricingEngineRepository";
     public static final String PUBLISHER_FILTER_REPOSITORY         = "PublisherFilterRepository";
-    public static final String CITRUS_LEAF_FEEDBACK                = "citrusleaf";
+    public static final String AEROSPIKE_FEEDBACK                  = "aerospike";
     public static final String DATABASE                            = "database";
     public static final String QUERY                               = "query";
     public static final String DATA_CENTER_ID_KEY                  = "dc.id";

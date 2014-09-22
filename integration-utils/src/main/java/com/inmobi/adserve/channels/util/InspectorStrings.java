@@ -73,8 +73,8 @@ public class InspectorStrings {
     public static final String droppedInTODFilter                        = "DroppedInTODFilter";
     public static final String siteFeedbackCacheHit                      = "SiteFeedbackCacheHit";
     public static final String siteFeedbackCacheMiss                     = "SiteFeedbackCacheMiss";
-    public static final String siteFeedbackRequestsToCitrusLeaf          = "SiteFeedbackRequestsToCitrusLeaf";
-    public static final String siteFeedbackFailedToLoadFromCitrusLeaf    = "SiteFeedbackFailedToLoadFromCitrusLeaf";
+    public static final String siteFeedbackRequestsToAerospike           = "SiteFeedbackRequestsToAerospike";
+    public static final String siteFeedbackFailedToLoadFromAerospike     = "SiteFeedbackFailedToLoadFromAerospike";
     public static final String siteFeedbackLatency                       = "SiteFeedbackLatency";
     public static final String missingCategory                           = "MissingCategory";
     public final static String droppedInRtbBalanceFilter                 = "DroppedInRtbBalanceFilter";
