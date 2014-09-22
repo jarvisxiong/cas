@@ -32,7 +32,7 @@ public class AdGroupPricingEngineFilter extends AbstractAdGroupLevelFilter {
      */
     @Inject
     protected AdGroupPricingEngineFilter(final Provider<Marker> traceMarkerProvider) {
-        super(traceMarkerProvider, InspectorStrings.droppedinPricingEngineFilter);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_PRICING_ENGINE_FILTER);
     }
 
     @Override
@@ -62,22 +62,18 @@ public class AdGroupPricingEngineFilter extends AbstractAdGroupLevelFilter {
             int percentage;
             if (dcpFloor > 0.0) {
                 percentage = (int) ((ecpm / dcpFloor) * 100);
-            }
-            else {
+            } else {
                 percentage = 150;
             }
 
             // Allow percentage of times any segment
             if (percentage > 100) {
                 percentage = 100;
-            }
-            else if (percentage == 100) {
+            } else if (percentage == 100) {
                 percentage = 50;
-            }
-            else if (percentage >= 80) {
+            } else if (percentage >= 80) {
                 percentage = 10;
-            }
-            else {
+            } else {
                 percentage = 1;
             }
 
