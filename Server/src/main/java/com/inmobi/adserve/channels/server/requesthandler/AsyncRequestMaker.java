@@ -114,13 +114,12 @@ public class AsyncRequestMaker {
 
             if (network.configureParameters(sasParams, casInternalRequestParameters, channelSegmentEntity, clickUrl,
                     beaconUrl)) {
-                InspectorStats.incrementStatCount(network.getName(), InspectorStrings.successfulConfigure);
+                InspectorStats.incrementStatCount(network.getName(), InspectorStrings.SUCCESSFUL_CONFIGURE);
                 row.setAdNetworkInterface(network);
                 if (network.isRtbPartner() || network.isIxPartner()) {
                     rtbSegments.add(row);
                     LOG.debug("{} is a rtb/ix partner so adding this network to rtb ranklist", network.getName());
-                }
-                else {
+                } else {
                     segments.add(row);
                 }
             }
@@ -213,12 +212,11 @@ public class AsyncRequestMaker {
         while (itr.hasNext()) {
             ChannelSegment channelSegment = itr.next();
             InspectorStats.incrementStatCount(channelSegment.getAdNetworkInterface().getName(),
-                    InspectorStrings.totalInvocations);
+                    InspectorStrings.TOTAL_INVOCATIONS);
             if (channelSegment.getAdNetworkInterface().makeAsyncRequest()) {
                 LOG.debug("Successfully sent request to channel of  advertiser id {} and channel id {}", channelSegment
                         .getChannelSegmentEntity().getId(), channelSegment.getChannelSegmentEntity().getChannelId());
-            }
-            else {
+            } else {
                 itr.remove();
             }
         }
@@ -226,13 +224,12 @@ public class AsyncRequestMaker {
         while (rtbItr.hasNext()) {
             ChannelSegment channelSegment = rtbItr.next();
             InspectorStats.incrementStatCount(channelSegment.getAdNetworkInterface().getName(),
-                    InspectorStrings.totalInvocations);
+                    InspectorStrings.TOTAL_INVOCATIONS);
             if (channelSegment.getAdNetworkInterface().makeAsyncRequest()) {
                 LOG.debug("Successfully sent request to rtb channel of  advertiser id {} and channel id {}",
                         channelSegment.getChannelSegmentEntity().getId(), channelSegment.getChannelSegmentEntity()
                                 .getChannelId());
-            }
-            else {
+            } else {
                 rtbItr.remove();
             }
         }

@@ -49,8 +49,7 @@ public class ATNTAdNetwork extends AbstractDCPAdNetworkImpl {
         if (casInternalRequestParameters.latLong != null) {
             String[] latlong = casInternalRequestParameters.latLong.split(",");
             loc = latlong[0] + ":" + latlong[1];
-        }
-        else {
+        } else {
             loc = null;
         }
         LOG.debug("Configure Parameters in atnt retunred true");
@@ -95,8 +94,7 @@ public class ATNTAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             LOG.debug("url inside atnt is {}", finalUrl);
             return (new URI(finalUrl.toString()));
-        }
-        catch (URISyntaxException exception) {
+        } catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.info("Error Forming Url inside atnt {}", exception);
         }

@@ -77,8 +77,7 @@ public class AuctionEngine implements AuctionEngineInterface {
             auctionResponse = null;
             LOG.debug("Returning from auction engine , winner is none");
             return null;
-        }
-        else if (filteredChannelSegmentList.size() == 1) {
+        } else if (filteredChannelSegmentList.size() == 1) {
             auctionResponse = filteredChannelSegmentList.get(0);
             // Take minimum of auctionFloor+0.01 and bid as secondBidprice if no. of auction
             // response are 1.
@@ -128,8 +127,7 @@ public class AuctionEngine implements AuctionEngineInterface {
             if (filteredChannelSegmentList.get(i).getAdNetworkInterface().getBidPriceInUsd() < maxPrice) {
                 secondHighestBid = i;
                 break;
-            }
-            else if (filteredChannelSegmentList.get(i).getAdNetworkInterface().getLatency() < filteredChannelSegmentList.get(lowestLatencyBid)
+            } else if (filteredChannelSegmentList.get(i).getAdNetworkInterface().getLatency() < filteredChannelSegmentList.get(lowestLatencyBid)
                     .getAdNetworkInterface().getLatency()) {
                 lowestLatencyBid = i;
             }
