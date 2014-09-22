@@ -1,6 +1,9 @@
 package com.inmobi.adserve.channels.repository;
 
-import com.aerospike.client.*;
+import com.aerospike.client.AerospikeClient;
+import com.aerospike.client.AerospikeException;
+import com.aerospike.client.Key;
+import com.aerospike.client.Record;
 import com.aerospike.client.policy.ClientPolicy;
 import com.aerospike.client.policy.Policy;
 import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
@@ -72,7 +75,7 @@ public class SiteAerospikeFeedbackRepository {
         try {
             ClientPolicy clientpolicy = new ClientPolicy();
             clientpolicy.maxThreads = 10;
-            // Verify client policy
+            
             this.aerospikeClient = new AerospikeClient(clientpolicy, config.getString("host"), config.getInt("port"));
         } catch (AerospikeException e) {
             LOG.error("Exception while creating Aerospike client: {}", e.getMessage());
@@ -148,7 +151,7 @@ public class SiteAerospikeFeedbackRepository {
 
         @Override
         public void run() {
-            LOG.debug("getting feedback form the aerospike for query {}", siteId);
+            LOG.debug("Getting feedback from the aerospike for query {}", siteId);
             getFeedbackFromAerospike(siteId);
         }
 
