@@ -228,10 +228,6 @@ public class ChannelServer {
                 sendMail(exception.getMessage(), getMyStackTrace(exception));
             }
         }
-        finally {
-            // Closing all connections to Aerospike DB
-            siteAerospikeFeedbackRepository.cleanUp();
-        }
     }
 
     public static String getMyStackTrace(final Exception exception) {
