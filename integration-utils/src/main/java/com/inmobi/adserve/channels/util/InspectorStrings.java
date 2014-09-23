@@ -15,11 +15,18 @@ public class InspectorStrings {
     public static final String ruleEngineFills                           = "RuleEngineFills";
     public static final String ixFills                                   = "IXFills";
     public static final String dcpFills                                  = "DCPFills";
+    public static final String count                                     = "Count";
+    
     public static final String latency                                   = "Latency";
     public static final String connectionLatency                         = "ConnectionLatency";
-    public static final String count                                     = "Count";
+    
     public static final String totalTimeout                              = "TotalTimeout";
     public static final String connectionTimeout                         = "ConnectionTimeout";
+    public static final String clientTimerLatency                        = "ClientTimerLatency";
+    public static final String timerLatency                              = "timerLatency";
+    public static final String timeoutException                          = "TimeoutException";
+    
+    
     public static final String totalTerminate                            = "TotalTerminate";
     public static final String successfulRequests                        = "success";
     public static final String jsonParsingError                          = "Terminated_JsonError";
@@ -66,8 +73,8 @@ public class InspectorStrings {
     public static final String droppedInTODFilter                        = "DroppedInTODFilter";
     public static final String siteFeedbackCacheHit                      = "SiteFeedbackCacheHit";
     public static final String siteFeedbackCacheMiss                     = "SiteFeedbackCacheMiss";
-    public static final String siteFeedbackRequestsToCitrusLeaf          = "SiteFeedbackRequestsToCitrusLeaf";
-    public static final String siteFeedbackFailedToLoadFromCitrusLeaf    = "SiteFeedbackFailedToLoadFromCitrusLeaf";
+    public static final String siteFeedbackRequestsToAerospike           = "SiteFeedbackRequestsToAerospike";
+    public static final String siteFeedbackFailedToLoadFromAerospike     = "SiteFeedbackFailedToLoadFromAerospike";
     public static final String siteFeedbackLatency                       = "SiteFeedbackLatency";
     public static final String missingCategory                           = "MissingCategory";
     public final static String droppedInRtbBalanceFilter                 = "DroppedInRtbBalanceFilter";
@@ -89,7 +96,6 @@ public class InspectorStrings {
     public static final String DROPPED_IN_BANNER_NOT_ALLOWED_FILTER      = "DroppedInBannerNotAllowedFilter";
     public static final String DROPPED_IN_PARTNER_COUNT_FILTER           = "DroppedInPartnerCountFilter";
     public static final String DROPPED_IN_DAILY_IMP_COUNT_FILTER         = "DroppedInDailyImpressionCountFilter";
-    public static final String SITE_LEVEL_REQUEST                        = "SiteLevelRequest";
     public static final String IX_SENT_AS_TRANSPARENT                    = "IXSentAsTransparent";
     public static final String IX_SENT_AS_BLIND                          = "IXSentAsBlind";
     public static final String IX_ZONE_ID_NOT_PRESENT                    = "IXZoneIdNotPresent";

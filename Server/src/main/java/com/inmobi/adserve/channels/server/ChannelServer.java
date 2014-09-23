@@ -17,7 +17,7 @@ import com.inmobi.adserve.channels.repository.NativeAdTemplateRepository;
 import com.inmobi.adserve.channels.repository.PricingEngineRepository;
 import com.inmobi.adserve.channels.repository.PublisherFilterRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.repository.SiteCitrusLeafFeedbackRepository;
+import com.inmobi.adserve.channels.repository.SiteAerospikeFeedbackRepository;
 import com.inmobi.adserve.channels.repository.SiteEcpmRepository;
 import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
 import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
@@ -27,7 +27,7 @@ import com.inmobi.adserve.channels.server.module.CasNettyModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import com.inmobi.adserve.channels.util.MetricsManager;
+import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.casthrift.DataCenter;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
@@ -78,7 +78,7 @@ public class ChannelServer {
     private static ChannelSegmentFeedbackRepository channelSegmentFeedbackRepository;
     private static SiteMetaDataRepository           siteMetaDataRepository;
     private static SiteTaxonomyRepository           siteTaxonomyRepository;
-    private static SiteCitrusLeafFeedbackRepository siteCitrusLeafFeedbackRepository;
+    private static SiteAerospikeFeedbackRepository  siteAerospikeFeedbackRepository;
     private static PricingEngineRepository          pricingEngineRepository;
     private static PublisherFilterRepository        publisherFilterRepository;
     private static SiteEcpmRepository               siteEcpmRepository;
@@ -134,7 +134,7 @@ public class ChannelServer {
             Logging.init(dataBusPublisher, rrLogKey, advertisementLogKey, umpAdsLogKey, configurationLoader.getServerConfiguration());
 
             // Initializing graphite stats
-            MetricsManager.init(
+            InspectorStats.init(
                     configurationLoader.getServerConfiguration().getString("graphiteServer.host",
                             "mon02.ads.uj1.inmobi.com"),
                     configurationLoader.getServerConfiguration().getInt("graphiteServer.port", 2003),
@@ -145,15 +145,15 @@ public class ChannelServer {
             channelSegmentFeedbackRepository = new ChannelSegmentFeedbackRepository();
             siteMetaDataRepository           = new SiteMetaDataRepository();
             siteTaxonomyRepository           = new SiteTaxonomyRepository();
-            siteCitrusLeafFeedbackRepository = new SiteCitrusLeafFeedbackRepository();
+            siteAerospikeFeedbackRepository  = new SiteAerospikeFeedbackRepository();
             pricingEngineRepository          = new PricingEngineRepository();
             publisherFilterRepository        = new PublisherFilterRepository();
             siteEcpmRepository               = new SiteEcpmRepository();
             currencyConversionRepository     = new CurrencyConversionRepository();
             wapSiteUACRepository             = new WapSiteUACRepository();
-            ixAccountMapRepository           = new IXAccountMapRepository();
             creativeRepository               = new CreativeRepository();
             nativeAdTemplateRepository       = new NativeAdTemplateRepository();
+            ixAccountMapRepository           = new IXAccountMapRepository();
 
             RepositoryHelper.Builder repoHelperBuilder = RepositoryHelper.newBuilder();
             repoHelperBuilder.setChannelRepository(channelRepository);
@@ -162,7 +162,7 @@ public class ChannelServer {
             repoHelperBuilder.setChannelSegmentFeedbackRepository(channelSegmentFeedbackRepository);
             repoHelperBuilder.setSiteMetaDataRepository(siteMetaDataRepository);
             repoHelperBuilder.setSiteTaxonomyRepository(siteTaxonomyRepository);
-            repoHelperBuilder.setSiteCitrusLeafFeedbackRepository(siteCitrusLeafFeedbackRepository);
+            repoHelperBuilder.setSiteAerospikeFeedbackRepository(siteAerospikeFeedbackRepository);
             repoHelperBuilder.setPricingEngineRepository(pricingEngineRepository);
             repoHelperBuilder.setPublisherFilterRepository(publisherFilterRepository);
             repoHelperBuilder.setSiteEcpmRepository(siteEcpmRepository);
@@ -332,8 +332,8 @@ public class ChannelServer {
             publisherFilterRepository.init(logger,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.PUBLISHER_FILTER_REPOSITORY),
                     ChannelServerStringLiterals.PUBLISHER_FILTER_REPOSITORY);
-            siteCitrusLeafFeedbackRepository.init(
-                    config.getServerConfiguration().subset(ChannelServerStringLiterals.CITRUS_LEAF_FEEDBACK),
+            siteAerospikeFeedbackRepository.init(
+                    config.getServerConfiguration().subset(ChannelServerStringLiterals.AEROSPIKE_FEEDBACK),
                     getDataCenter());
             siteEcpmRepository.init(logger,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY),

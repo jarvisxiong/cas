@@ -77,7 +77,7 @@ public class AdGroupSupplyDemandClassificationFilter extends AbstractAdGroupLeve
         Marker traceMarker = traceMarkerProvider.get();
 
         ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = channelSegment
-                .getChannelSegmentCitrusLeafFeedbackEntity();
+                .getChannelSegmentAerospikeFeedbackEntity();
         double eCPM = channelSegmentFeedbackEntity.getECPM();
         int impressionsRendered = channelSegmentFeedbackEntity.getBeacons();
         LOG.debug(traceMarker, "Impressions Rendered {} for adGroup{}", impressionsRendered, channelSegment
