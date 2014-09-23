@@ -477,8 +477,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private Banner createBannerObject() {
         Banner banner = new Banner();
         banner.setId(casInternalRequestParameters.impressionId);
-        Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
-        if (null != sasParams.getSlot() && null != dim) {
+        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
+            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             banner.setW((int) dim.getWidth());
             banner.setH((int) dim.getHeight());
         }
