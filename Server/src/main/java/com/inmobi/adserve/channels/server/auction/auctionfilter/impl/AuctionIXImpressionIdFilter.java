@@ -33,9 +33,9 @@ public class AuctionIXImpressionIdFilter extends AbstractAuctionFilter {
         if (rtbSegment.getAdNetworkInterface() instanceof IXAdNetwork) {
             IXAdNetwork ixAdNetwork = (IXAdNetwork) rtbSegment.getAdNetworkInterface();
             int responseImpressionId = Integer.parseInt(ixAdNetwork.getRtbImpressionId());
-            if (ixAdNetwork.getResponseBidObjCount() > 1
-                    || responseImpressionId <= 0 || responseImpressionId > ixAdNetwork.getImpressionObjCount()) {
-                return true;
+            if (ixAdNetwork.getResponseBidObjCount() == 1
+                    && responseImpressionId >= 1 && responseImpressionId <= ixAdNetwork.getImpressionObjCount()) {
+                return false;
             }
         }
         return true;
