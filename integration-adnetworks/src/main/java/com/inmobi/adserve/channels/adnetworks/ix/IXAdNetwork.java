@@ -1084,13 +1084,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             bidResponse = gson.fromJson(response, IXBidResponse.class);
             LOG.debug("Done with parsing of bidresponse");
             if (null == bidResponse || null == bidResponse.getSeatbid() || bidResponse.getSeatbidSize() == 0) {
-                LOG.debug("BidResponse does not have seat bid object");
+                LOG.error("BidResponse does not have seat bid object");
                 return false;
             }
             //bidderCurrency is to USD by default
             SeatBid seatBid=bidResponse.getSeatbid().get(0);
             if(null == seatBid.getBid() || seatBid.getBidSize() == 0) {
-                LOG.debug("Seat bid object does not have bid object");
+                LOG.error("Seat bid object does not have bid object");
                 return false;
             }
             setBidPriceInLocal(seatBid.getBid().get(0).getPrice());
