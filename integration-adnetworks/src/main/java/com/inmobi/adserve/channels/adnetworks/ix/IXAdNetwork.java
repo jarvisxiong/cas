@@ -658,7 +658,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             if(StringUtils.isNotEmpty(wapSiteUACEntity.getSiteUrl())) {
                 app.setStoreurl(wapSiteUACEntity.getSiteUrl());
             }
-            if(StringUtils.isNotEmpty(wapSiteUACEntity.getMarketId())) {
+            if(StringUtils.isNotEmpty(wapSiteUACEntity.getBundleId())) {
                 app.setBundle(wapSiteUACEntity.getBundleId());
             }
             if(StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())) {
