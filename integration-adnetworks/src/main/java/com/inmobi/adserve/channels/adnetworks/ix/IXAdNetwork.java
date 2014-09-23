@@ -514,9 +514,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     private Geo createGeoObject() {
         Geo geo = new Geo();
-        if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
-                && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0
-                && (!isCoppaSet)) {
+        //If Coppa is not set, only then send latLong
+        if ((!isCoppaSet) && StringUtils.isNotBlank(casInternalRequestParameters.latLong)
+                && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
             String[] latlong = casInternalRequestParameters.latLong.split(",");
             geo.setLat(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[0]))));
             geo.setLon(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[1]))));
@@ -777,7 +777,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         // Setting Extension for ifa
-        if (!StringUtils.isEmpty(casInternalRequestParameters.uidIFA) && (!isCoppaSet)) {
+        //if Coppa is not set, only then set IFA
+        if (!isCoppaSet && !StringUtils.isEmpty(casInternalRequestParameters.uidIFA)) {
             device.setIfa(casInternalRequestParameters.uidIFA);
         }
 
@@ -894,7 +895,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         }
         LOG.debug("response length is {}", responseContent.length());
-        LOG.debug("response is {}",responseContent);
+        LOG.debug("response is {}", responseContent);
     }
 
 
