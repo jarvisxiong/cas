@@ -138,6 +138,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private String                         creativeId;
     private Integer                        pmptier;
     private String                         aqid;
+    private boolean                        isCoppaSet                   = false;
     private String                         sampleImageUrl;
     private List<String>                   advertiserDomains;
     private List<Integer>                  creativeAttributes;
@@ -258,7 +259,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 app = createAppObject();
             }
         }
-
+        //Creating Regs Object
+        Regs regs = createRegsObject();
         // Creating Geo Object for device Object
         Geo geo = createGeoObject();
         // Creating Banner object
@@ -267,8 +269,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         Device device = createDeviceObject(geo);
         // Creating User Object
         User user = createUserObject();
-        //Creating Regs Object
-        Regs regs = createRegsObject();
         // Creating Impression Object
         List<Impression> impresssionlist = new ArrayList<Impression>();
         String displayManager = null;
@@ -321,7 +321,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
 
     private IXBidRequest createBidRequestObject(final List<Impression> impresssionlist, final Site site, final App app,
-                                           final User user, final Device device,final Regs regs) {
+                                                final User user, final Device device,final Regs regs) {
         IXBidRequest tempBidRequest = new IXBidRequest(impresssionlist);
 
         tempBidRequest.setId(casInternalRequestParameters.auctionId);
@@ -377,6 +377,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if(isWapSiteUACEntity) {
             if (wapSiteUACEntity.isCoppaEnabled()) {
                 regs.setCoppa(1);
+                isCoppaSet = true;
             } else {
                 regs.setCoppa(0);
             }
@@ -500,7 +501,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private Geo createGeoObject() {
         Geo geo = new Geo();
         if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
-                && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
+                && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0
+                && (!isCoppaSet)) {
             String[] latlong = casInternalRequestParameters.latLong.split(",");
             geo.setLat(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[0]))));
             geo.setLon(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[1]))));
@@ -539,8 +541,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         if(isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled()) {
             site.setId(sasParams.getSiteId());
-            if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteUrl())) {
-                site.setPage(wapSiteUACEntity.getSiteUrl());
+            String tempSiteUrl = wapSiteUACEntity.getSiteUrl();
+            if (StringUtils.isNotEmpty(tempSiteUrl)) {
+                site.setPage(tempSiteUrl);
+                site.setDomain(tempSiteUrl);
             }
             if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())){
                 site.setName(wapSiteUACEntity.getSiteName());
@@ -608,16 +612,16 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         Transparency transparency = new Transparency();
         if(isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled())
         {
-                transparency.setBlind(0);
-                if(null != wapSiteUACEntity.getBlindList()) {
-                    transparency.setBlindbuyers(wapSiteUACEntity.getBlindList());
-                } else if (globalBlindFromConfig.size() > 0 && !globalBlindFromConfig.get(0).isEmpty()) {
-                    List<Integer> globalBlind = Lists.newArrayList();
-                    for (String s : globalBlindFromConfig){
-                        globalBlind.add(Integer.valueOf(s));
-                    }
-                    transparency.setBlindbuyers(globalBlind);
+            transparency.setBlind(0);
+            if(null != wapSiteUACEntity.getBlindList()) {
+                transparency.setBlindbuyers(wapSiteUACEntity.getBlindList());
+            } else if (globalBlindFromConfig.size() > 0 && !globalBlindFromConfig.get(0).isEmpty()) {
+                List<Integer> globalBlind = Lists.newArrayList();
+                for (String s : globalBlindFromConfig){
+                    globalBlind.add(Integer.valueOf(s));
                 }
+                transparency.setBlindbuyers(globalBlind);
+            }
         } else {
             transparency.setBlind(1);
         }
@@ -660,9 +664,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 }
             }
         }
-        //setting App categories to app store categories from repo
-        if (isWapSiteUACEntity){
-            app.setCat(wapSiteUACEntity.getCategories());
+        List <Long> tempSasCategories = sasParams.getCategories();
+
+        if(null != tempSasCategories){
+            app.setCat(iabCategoriesInterface.getIABCategories(tempSasCategories));
         }
 
         List <String> blockedList= getBlockedList();
@@ -670,8 +675,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
 
         final Publisher publisher = new Publisher();
-        if(null != sasParams.getCategories()){
-        publisher.setCat(iabCategoriesInterface.getIABCategories(sasParams.getCategories()));}
+        if(null != tempSasCategories) {
+            publisher.setCat(iabCategoriesInterface.getIABCategories(tempSasCategories));
+        }
 
         final CommonExtension publisherExtensions = new CommonExtension();
         final RubiconExtension rpForPub = new RubiconExtension();
@@ -757,7 +763,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         // Setting Extension for ifa
-        if (!StringUtils.isEmpty(casInternalRequestParameters.uidIFA)) {
+        if (!StringUtils.isEmpty(casInternalRequestParameters.uidIFA) && (!isCoppaSet)) {
             device.setIfa(casInternalRequestParameters.uidIFA);
         }
 
@@ -906,7 +912,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
             // Create a new ChannelSegment with DSP information. So that, all the logging happens on DSP Id.
             //this.auctionResponse = new ChannelSegment(dspChannelSegmentEntity, null, null, null, null,
-               //     auctionResponse.getAdNetworkInterface(), -1L);
+            //     auctionResponse.getAdNetworkInterface(), -1L);
 
             // Get response creative type and get the incId for the respective response creative type
             ADCreativeType responseCreativeType = this.getCreativeType();
