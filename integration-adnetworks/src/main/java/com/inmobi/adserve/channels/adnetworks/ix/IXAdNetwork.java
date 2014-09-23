@@ -1089,6 +1089,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             }
             //bidderCurrency is to USD by default
             SeatBid seatBid=bidResponse.getSeatbid().get(0);
+            if(null == seatBid.getBid() || seatBid.getBidSize() == 0) {
+                LOG.debug("Seat bid object does not have bid object");
+                return false;
+            }
             setBidPriceInLocal(seatBid.getBid().get(0).getPrice());
             setBidPriceInUsd(getBidPriceInLocal());
             responseSeatId = seatBid.getSeat();
