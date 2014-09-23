@@ -81,9 +81,6 @@ public abstract class BaseServlet implements Servlet {
             hrh.responseSender.sendNoAdResponse(serverChannel);
             return;
         }
-        if (nativeSites.contains(sasParams.getSiteId())) {
-            InspectorStats.incrementStatCount(InspectorStrings.SITE_LEVEL_REQUEST + "-" + sasParams.getSiteId());
-        }
 
         // Setting isResponseOnlyFromDCP from config
         boolean isResponseOnlyFromDcp = CasConfigUtil.getServerConfig().getBoolean("isResponseOnyFromDCP", false);
