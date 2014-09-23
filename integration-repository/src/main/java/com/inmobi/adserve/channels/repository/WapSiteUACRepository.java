@@ -57,7 +57,7 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
             final boolean siteTransparencyEnabled = row.getBoolean("is_site_transparent");
             final String siteUrl = row.getString("site_url");
             final String siteName = row.getString("site_name");
-            final String appTitle = row.getString("app_title");
+            final String appTitle = row.getString("title");
             boolean pubTransparencyEnabled = false;
             if(exchange_settings==1){//exchange_settings=1 => Publisher is transparent and exchange enabled
                 pubTransparencyEnabled=true;
