@@ -23,7 +23,7 @@ public class AuctionIXImpressionIdFilter extends AbstractAuctionFilter {
 
     @Inject
     protected AuctionIXImpressionIdFilter(Provider<Marker> traceMarkerProvider, final ServerConfig serverConfiguration) {
-        super(traceMarkerProvider, InspectorStrings.droppedInRtbImpressionIdMisMatchFilter, serverConfiguration);
+        super(traceMarkerProvider, InspectorStrings.droppedInAuctionIxImpressionIdFilter, serverConfiguration);
         isApplicableRTBD = false;
         isApplicableIX = true;
     }
@@ -32,11 +32,17 @@ public class AuctionIXImpressionIdFilter extends AbstractAuctionFilter {
     protected boolean failedInFilter(ChannelSegment rtbSegment, CasInternalRequestParameters casInternalRequestParameters) {
         if (rtbSegment.getAdNetworkInterface() instanceof IXAdNetwork) {
             IXAdNetwork ixAdNetwork = (IXAdNetwork) rtbSegment.getAdNetworkInterface();
-            int responseImpressionId = Integer.parseInt(ixAdNetwork.getRtbImpressionId());
-            if (ixAdNetwork.getResponseBidObjCount() == 1
-                    && responseImpressionId >= 1 && responseImpressionId <= ixAdNetwork.getImpressionObjCount()) {
+            try {
+                int responseImpressionId = Integer.parseInt(ixAdNetwork.getRtbImpressionId());
+                if (ixAdNetwork.getResponseBidObjCount() == 1
+                        && responseImpressionId >= 1 && responseImpressionId <= ixAdNetwork.getImpressionObjCount()) {
+                    return false;
+                }
+            }
+            catch (NumberFormatException e) {
                 return false;
             }
+
         }
         return true;
     }

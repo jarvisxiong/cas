@@ -408,10 +408,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         if (null != casInternalRequestParameters.impressionId) {
             /**
-             * We were originally passing the guid impression id in the RP response, but in order to conform to the
-             * rubicon spec, we are now passing a unique identifier whose value starts with 1, and increments up to n
-             * for n impressions).
-             * impression = new Impression(casInternalRequestParameters.impressionId);
+             * In order to conform to the rubicon spec, we are passing a unique integer identifier whose value
+             * starts with 1, and increments up to n for n impressions.
              */
             impression = new Impression("1");
         } else {
