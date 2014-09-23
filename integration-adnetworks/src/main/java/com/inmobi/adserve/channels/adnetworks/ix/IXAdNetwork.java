@@ -143,8 +143,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private List<Integer>                  creativeAttributes;
     private boolean                        logCreative                  = false;
     private String                         adm;
-    public final RepositoryHelper         repositoryHelper;
+    public final RepositoryHelper          repositoryHelper;
     private static final String            USD                          = "USD";
+    @Getter
+    private int                            impressionObjCount;
+    @Getter
+    private int                            responseBidObjCount;
+
     private static final String SITE_BLOCKLIST_FORMAT="blk%s";
     private static final String RUBICON_PERF_BLOCKLIST_ID = "InMobiPERF";
     private static final String RUBICON_FS_BLOCKLIST_ID = "InMobiFS";
@@ -237,7 +242,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)
                 || !isRequestFormatSupported()) {
-            LOG.debug("mandate parameters missing or request format is not compaitable to partner supported response for dummy so exiting adapter");
+            LOG.debug("mandate parameters missing or request format is not compatible to partner supported response for dummy so exiting adapter");
             return false;
         }
 
@@ -280,17 +285,20 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             displayManager = DISPLAY_MANAGER_INMOBI_JS;
         }
         ProxyDemand proxyDemand = createProxyDemandObject();
+
+        // Only 1 impression object is being generated.
         Impression impression = createImpressionObject(banner, displayManager, displayManagerVersion,proxyDemand);
         if (null == impression) {
             return false;
         }
         impresssionlist.add(impression);
+        this.impressionObjCount = impresssionlist.size();
 
         // Creating BidRequest Object using unique auction id per auction
         bidRequest = createBidRequestObject(impresssionlist, site, app, user, device, regs);
 
         if (null == bidRequest) {
-            LOG.debug("failed inside createBidRequest");
+            LOG.debug("Failed inside createBidRequest");
             return false;
         }
 
@@ -398,7 +406,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         Impression impression;
 
         if (null != casInternalRequestParameters.impressionId) {
-            impression = new Impression(casInternalRequestParameters.impressionId);
+            /**
+             * We were originally passing the guid impression id in the RP response, but in order to conform to the
+             * rubicon spec, we are now passing a unique identifier whose value starts with 1, and increments up to n
+             * for n impressions).
+             * impression = new Impression(casInternalRequestParameters.impressionId);
+             */
+            impression = new Impression("1");
         } else {
             LOG.info("Impression id can not be null in Cas Internal Request Params");
             return null;
@@ -905,8 +919,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             this.dspChannelSegmentEntity = adGroupMap.iterator().next();
 
             // Create a new ChannelSegment with DSP information. So that, all the logging happens on DSP Id.
-            //this.auctionResponse = new ChannelSegment(dspChannelSegmentEntity, null, null, null, null,
-               //     auctionResponse.getAdNetworkInterface(), -1L);
+            // this.auctionResponse = new ChannelSegment(dspChannelSegmentEntity, null, null, null, null,
+            //        auctionResponse.getAdNetworkInterface(), -1L);
 
             // Get response creative type and get the incId for the respective response creative type
             ADCreativeType responseCreativeType = this.getCreativeType();
@@ -920,11 +934,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             String newImpressionId = ImpressionIdGenerator.getInstance().getImpressionId(incId);
 
             if (StringUtils.isNotEmpty(newImpressionId)) {
-                // Update the response impression id so that this doesn't get filtered in AuctionImpressionIdFilter.
-                if (this.impressionId.equalsIgnoreCase(responseImpressionId)) {
-                    responseImpressionId = newImpressionId;
-                }
-
                 // Update beacon and click URLs to refer to the video Ads.
                 this.beaconUrl = this.beaconUrl.replace(this.getImpressionId(), newImpressionId);
                 this.clickUrl = this.clickUrl.replace(this.getImpressionId(), newImpressionId);
@@ -1083,9 +1092,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             setBidPriceInLocal(seatBid.getBid().get(0).getPrice());
             setBidPriceInUsd(getBidPriceInLocal());
             responseSeatId = seatBid.getSeat();
+            responseBidObjCount = seatBid.getBid().size();
             Bid bid =  seatBid.getBid().get(0);
             adm = bid.getAdm();
-            responseImpressionId = bid.getImpid();  // For IX, this value is changed later (and that value depends on the ADCreativeType)
+            responseImpressionId = bid.getImpid();
             creativeId = bid.getCrid();
             responseAuctionId = bidResponse.getId();
             pmptier = bid.getPmptier();
