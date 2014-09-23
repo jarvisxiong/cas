@@ -38,6 +38,7 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
     //Site page, App store URL
     private final String siteName;
     private final String appTitle;
+    private final String bundleId;
     private final Timestamp modifiedOn;
 
 
@@ -54,6 +55,7 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
         siteUrl = builder.siteUrl;
         siteName = builder.siteName;
         appTitle = builder.appTitle;
+        bundleId = builder.bundleId;
         modifiedOn = builder.modifiedOn;
     }
 
@@ -71,11 +73,11 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
         private List<String> categories;
         private boolean isCoppaEnabled;
         private boolean isTransparencyEnabled;
-        private boolean isExchangeEnabled;
         private List<Integer> blindList;
         private String siteUrl;
         private String siteName;
         private String appTitle;
+        private String bundleId;
         private Timestamp modifiedOn;
         public WapSiteUACEntity build() {
             return new WapSiteUACEntity(this);

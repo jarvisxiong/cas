@@ -647,7 +647,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 app.setStoreurl(wapSiteUACEntity.getSiteUrl());
             }
             if(StringUtils.isNotEmpty(wapSiteUACEntity.getMarketId())) {
-                app.setBundle(wapSiteUACEntity.getMarketId());
+                app.setBundle(wapSiteUACEntity.getBundleId());
             }
             if(StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())) {
                 app.setName(wapSiteUACEntity.getSiteName());
@@ -880,6 +880,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         }
         LOG.debug("response length is {}", responseContent.length());
+        LOG.debug("response is {}",responseContent);
     }
 
 

@@ -1,8 +1,8 @@
-CREATE OR REPLACE FUNCTION wap_site_uac_fun_08092014_transparencyFinal(last_updated timestamp without time zone)
-RETURNS SETOF wap_site_uac_type_08092014_transparencyFinal AS
+CREATE OR REPLACE FUNCTION wap_site_uac_fun_23092014(last_updated timestamp without time zone)
+RETURNS SETOF wap_site_uac_type_23092014 AS
 $BODY$
 DECLARE
-    row1    wap_site_uac_type_08092014_transparencyFinal%ROWTYPE;
+    row1    wap_site_uac_type_23092014%ROWTYPE;
 BEGIN
     FOR row1 IN
 
@@ -15,15 +15,16 @@ SELECT
     			wsu.app_type AS app_type,
     			wsu.categories AS categories,
     			wsu.coppa_enabled AS coppa_enabled,
-    			wp.exchange_settings AS exchange_settings,
-    			wp.pub_block_list AS pub_block_list,
-    			ws.site_block_list AS site_block_list,
+    			wp.exchange_setting AS exchange_settings,
+    			wp.pub_blind_list AS pub_blind_list,
+    			ws.site_blind_list AS site_blind_list,
     			ws.is_site_transparent AS is_site_transparent,
     			ws.site_url AS site_url,
     			ws.site_name AS site_name,
     			wsu.title AS title,
+    			wsu.bundle_id AS bundle_id,
     			wsu.modified_on AS wsu_modified_on,
-    			ws.modified_on  AS ws_modified_on
+    			ws.modified_on AS ws_modified_on
     			from wap_site AS ws LEFT OUTER JOIN wap_site_uac AS wsu ON (ws.id=wsu.id),wap_publisher wp
     		    where
     		    ( wsu.modified_on >= last_updated or ws.modified_on >= last_updated)
