@@ -63,7 +63,7 @@ public class ChannelSegmentFilterApplier {
 
         int sumOfSiteImpressions = 0;
         for (ChannelSegment channelSegment : channelSegmentList) {
-            sumOfSiteImpressions += channelSegment.getChannelSegmentCitrusLeafFeedbackEntity().getBeacons();
+            sumOfSiteImpressions += channelSegment.getChannelSegmentAerospikeFeedbackEntity().getBeacons();
         }
         casContext.setSumOfSiteImpressions(sumOfSiteImpressions);
         LOG.debug(traceMarker, "Sum of Site impressions:{}", sumOfSiteImpressions);

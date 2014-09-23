@@ -6,9 +6,9 @@ prod:
          - 6543
       database:
          - wap_prod_adserve
-      citrusleaf_host:
+      aerospike_host:
          - clf.ads.ua2.inmobi.com
-      citrusleaf_port:
+      aerospike_port:
          - 3000
       ifd_host:
          - ads01.ifd.vip.ua2.inmobi.com 
@@ -60,9 +60,9 @@ prod:
          - 6543 
       database:
          - wap_prod_adserve
-      citrusleaf_host:
+      aerospike_host:
          - clf.ads.uj1.inmobi.com
-      citrusleaf_port:
+      aerospike_port:
          - 3000
       ifd_host:
          - "ads01.ifd.vip.uj1.inmobi.com"
@@ -114,9 +114,9 @@ prod:
          - 6543 
       database:
          - wap_prod_adserve
-      citrusleaf_host:
+      aerospike_host:
          - clf.ads.uh1.inmobi.com
-      citrusleaf_port:
+      aerospike_port:
          - 3000
       ifd_host:
          - "ads01.ifd.vip.uh1.inmobi.com"
@@ -168,9 +168,9 @@ prod:
          - 6543 
       database:
          - wap_prod_adserve
-      citrusleaf_host:
+      aerospike_host:
          - clf.ads.lhr1.inmobi.com
-      citrusleaf_port:
+      aerospike_port:
          - 3000
       ifd_host:
          - "ads01.ifd.vip.lhr1.inmobi.com"
@@ -222,9 +222,9 @@ prod:
          - 6543 
       database:
          - wap_prod_adserve
-      citrusleaf_host:
+      aerospike_host:
          - clf.ads.hkg1.inmobi.com
-      citrusleaf_port:
+      aerospike_port:
          - 3000
       ifd_host:
          - "ads01.ifd.vip.hkg1.inmobi.com"
@@ -277,9 +277,9 @@ pilot:
          - 6543
       database:
          - wap_prod_adserve
-      citrusleaf_host:
+      aerospike_host:
          - clf.ads.ua2.inmobi.com
-      citrusleaf_port:
+      aerospike_port:
          - 3000
       ifd_host:
          - ads01.ifd.vip.ua2.inmobi.com 
@@ -330,9 +330,9 @@ pilot:
          - 6543
       database:
          - wap_prod_adserve
-      citrusleaf_host:
+      aerospike_host:
          - clf.ads.uj1.inmobi.com
-      citrusleaf_port:
+      aerospike_port:
          - 3000
       ifd_host:
          - "ads01.ifd.vip.uj1.inmobi.com"
@@ -383,9 +383,9 @@ pilot:
          - 6543
       database:
          - wap_prod_adserve
-      citrusleaf_host:
+      aerospike_host:
          - clf.ads.uh1.inmobi.com
-      citrusleaf_port:
+      aerospike_port:
          - 3000
       ifd_host:
          - "ads01.ifd.vip.uh1.inmobi.com"
@@ -436,9 +436,9 @@ pilot:
          - 6543 
       database:
          - wap_prod_adserve
-      citrusleaf_host:
+      aerospike_host:
          - clf.ads.lhr1.inmobi.com
-      citrusleaf_port:
+      aerospike_port:
          - 3000
       ifd_host:
          - "ads01.ifd.vip.lhr1.inmobi.com"
@@ -489,9 +489,9 @@ pilot:
          - 6543 
       database:
          - wap_prod_adserve
-      citrusleaf_host:
+      aerospike_host:
          - clf.ads.hkg1.inmobi.com
-      citrusleaf_port:
+      aerospike_port:
          - 3000
       ifd_host:
          - "ads01.ifd.vip.hkg1.inmobi.com"
@@ -541,9 +541,9 @@ nonprod:
          - web1012.ads.lhr1.inmobi.com
       db_port:
          - 5499
-      citrusleaf_host:
+      aerospike_host:
          - clf.ads.lhr1.inmobi.com
-      citrusleaf_port:
+      aerospike_port:
          - 3000
       ifd_host:
          - "web1012.ads.lhr1.inmobi.com"
@@ -568,9 +568,9 @@ nonprod:
          - 6543
       database:
          - wap_prod_adserve
-      citrusleaf_host:
+      aerospike_host:
          - clf.corp.inmobi.com
-      citrusleaf_port:
+      aerospike_port:
          - 3000
       ifd_host:
          - ads01.ifd.corp.inmobi.com
@@ -621,9 +621,9 @@ nonprod:
          - 6543
       database:
          - wap_prod_adserve
-      citrusleaf_host:
+      aerospike_host:
          - clf.ads.ua2.inmobi.com
-      citrusleaf_port:
+      aerospike_port:
          - 3000
       ifd_host:
          - ads01.ifd.vip.ua2.inmobi.com 

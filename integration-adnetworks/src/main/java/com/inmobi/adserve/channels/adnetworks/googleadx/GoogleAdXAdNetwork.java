@@ -44,6 +44,12 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
 
   @Override
   public boolean configureParameters() {
+
+    if ((sasParams.getUserAgent() != null && sasParams.getUserAgent().toLowerCase().contains("opera"))
+            || (sasParams.getDeviceType() != null && sasParams.getDeviceType().equals("FEATURE_PHONE"))) {
+      return false;
+    }
+
     googleInMobiPubID = config.getString("googleadx.googleAdXPublisherID");
 
     Short slot = sasParams.getSlot();
