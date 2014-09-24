@@ -29,12 +29,11 @@ public class ServletChangeRollout implements Servlet {
         try {
             List<String> rollout = (queryStringDecoder.parameters().get("percentRollout"));
             CasConfigUtil.percentRollout = Integer.parseInt(rollout.get(0));
-        }
-        catch (NumberFormatException ex) {
+        } catch (NumberFormatException ex) {
             LOG.info("invalid attempt to change rollout percentage {}", ex);
             hrh.responseSender.sendResponse("INVALIDPERCENT", serverChannel);
         }
-        InspectorStats.setWorkflowStats(InspectorStrings.percentRollout, Long.valueOf(CasConfigUtil.percentRollout));
+        InspectorStats.setWorkflowStats(InspectorStrings.PERCENT_ROLL_OUT, Long.valueOf(CasConfigUtil.percentRollout));
         LOG.debug("new roll out percentage is {}", CasConfigUtil.percentRollout);
         hrh.responseSender.sendResponse("OK", serverChannel);
     }

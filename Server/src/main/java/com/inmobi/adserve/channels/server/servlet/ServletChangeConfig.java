@@ -44,11 +44,10 @@ public class ServletChangeConfig implements Servlet {
         JSONObject jObject = null;
         try {
             jObject = requestParser.extractParams(params, "update");
-        }
-        catch (JSONException exeption) {
+        } catch (JSONException exeption) {
             LOG.debug("Encountered Json Error while creating json object inside servlet");
             hrh.setTerminationReason(CasConfigUtil.jsonParsingError);
-            InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
+            InspectorStats.incrementStatCount(InspectorStrings.JSON_PARSING_ERROR, InspectorStrings.COUNT);
             hrh.responseSender.sendResponse("Incorrect Json", serverChannel);
             return;
         }
@@ -87,8 +86,7 @@ public class ServletChangeConfig implements Servlet {
                 }
             }
             hrh.responseSender.sendResponse(updates.toString(), serverChannel);
-        }
-        catch (JSONException ex) {
+        } catch (JSONException ex) {
             LOG.debug("Encountered Json Error while creating json object inside HttpRequest Handler for config change");
             hrh.responseSender.setTerminationReason(CasConfigUtil.jsonParsingError);
         }
