@@ -20,8 +20,7 @@ public class ChannelServerHelper {
         byte dataCenterIdCode;
         try {
             dataCenterIdCode = Byte.parseByte(System.getProperty(dataCenterIdKey));
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             logger.info("NumberFormatException in getDataCenterId");
             dataCenterIdCode = 0;
         }
@@ -39,23 +38,19 @@ public class ChannelServerHelper {
             try {
                 addr = InetAddress.getLocalHost();
                 hostName = addr.getHostName();
-            }
-            catch (UnknownHostException e1) {
+            } catch (UnknownHostException e1) {
                 logger.info("UnknownHostException in getHostId");
             }
         }
         try {
             if (null != hostName) {
                 hostId = Short.parseShort(hostName.substring(3, 7));
-            }
-            else {
+            } else {
                 return hostId;
             }
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             logger.info("NumberFormatException in getHostId");
-        }
-        catch (StringIndexOutOfBoundsException e) {
+        } catch (StringIndexOutOfBoundsException e) {
             logger.info("StringIndexOutOfRangeException in getHostId");
         }
         if (logger.isDebugEnabled()) {
@@ -72,8 +67,7 @@ public class ChannelServerHelper {
         Integer maxConnections = null;
         try {
             maxConnections = Integer.parseInt(System.getProperty(connectionsKey));
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             logger.info("NumberFormatException " + connectionType.toString() + "maxConnections");
         }
         if (logger.isDebugEnabled()) {
