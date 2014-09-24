@@ -77,8 +77,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         JSONObject jsonObject = null;
         try {
             jsonObject = new JSONObject(sasParams.getAllParametersJson());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             //
         }
         if (null != jsonObject) {
@@ -93,21 +92,18 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
                 siteAllowBanner = getFlagParams(jsonObject, "site-allowBanner", false);
                 adcode = stringifyParam(jsonObject, "adcode", true);
                 adGroupID = externalSiteId;
-            }
-            catch (JSONException e) {
+            } catch (JSONException e) {
                 return false;
             }
             try {
                 handset = getHandsetString(jsonObject.getJSONArray("handset"));
-            }
-            catch (JSONException e) {
+            } catch (JSONException e) {
                 LOG.info("IFC Mandatory Parameter missing: handset");
                 return false;
             }
             try {
                 carrier = getCarrierString(jsonObject.getJSONArray("carrier"));
-            }
-            catch (JSONException e) {
+            } catch (JSONException e) {
                 LOG.info("IFC Mandatory Parameter missing: carrier");
                 return false;
             }
@@ -123,12 +119,10 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
                 /*if ((sdkVersion == null || sdkVersion.toLowerCase().equals("0")) && adcode.equalsIgnoreCase("non-js")) {
                     return false;
                 }*/
-            }
-            catch (JSONException e) {
+            } catch (JSONException e) {
                 LOG.info("Error while parsing 'sdk-version'");
             }
-        }
-        else {
+        } else {
             requestId = sasParams.getTid();
             deviceOsId = String.valueOf(sasParams.getOsId());
             if (null != sasParams.getCity()) {
@@ -146,9 +140,10 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             carrier = String.valueOf(sasParams.getCarrierId());
             deviceOSVersion = sasParams.getOsMajorVersion();
 
-            if (sasParams.getSdkVersion() != null
-                    && (sasParams.getSdkVersion().toLowerCase().startsWith("i30") || sasParams.getSdkVersion()
-                            .toLowerCase().startsWith("a30"))) {
+            String tempSdkVersion = sasParams.getSdkVersion();
+
+            if (tempSdkVersion != null && (tempSdkVersion.toLowerCase().startsWith("i30")
+                    || tempSdkVersion.toLowerCase().startsWith("a30"))) {
                 return false;
             }
         }
@@ -156,21 +151,22 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         if (!isEmpty(sasParams.getUserAgent())) {
             userAgent = getURLEncode(sasParams.getUserAgent(), format);
         }
-        if (!isEmpty(sasParams.getGender())
-                && (sasParams.getGender().equalsIgnoreCase("m") || sasParams.getGender().equalsIgnoreCase("male"))) {
+
+        String tempGender = sasParams.getGender();
+
+        if (!isEmpty(tempGender)
+                && ("m".equalsIgnoreCase(tempGender) || "male".equalsIgnoreCase(tempGender))) {
             gender = "male";
-        }
-        else if (!isEmpty(sasParams.getGender())
-                && (sasParams.getGender().equalsIgnoreCase("f") || sasParams.getGender().equalsIgnoreCase("female"))) {
+        } else if (!isEmpty(tempGender)
+                && ("f".equalsIgnoreCase(tempGender) || "female".equalsIgnoreCase(tempGender))) {
             gender = "female";
         } else{
-		gender = sasParams.getGender();
+		gender = tempGender;
 	} 
 
         if (null != sasParams.getSiteId()) {
             siteID = sasParams.getSiteId();
-        }
-        else {
+        } else {
             LOG.info("IFC Mandatory Parameter missing: SiteName");
             return false;
         }
@@ -178,8 +174,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             slotHeight = String.valueOf(dim.getHeight());
             slotWidth = String.valueOf(dim.getWidth());
-        }
-        else {
+        } else {
             LOG.info("IFC Mandatory Parameter missing: Slot");
             return false;
         }
@@ -210,13 +205,11 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             throws JSONException {
         try {
             return (String) jObject.get(field);
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             if (isMandatory) {
                 LOG.info("IFC Mandatory Parameter missing: {}", field);
                 throw new JSONException("IFC Mandatory Parameter missing:" + field);
-            }
-            else {
+            } else {
                 return null;
             }
 
@@ -258,8 +251,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             log.put("resp", adStatus);
             log.put("latency", getLatency());
             return log;
-        }
-        catch (JSONException exception) {
+        } catch (JSONException exception) {
             LOG.info("Error while constructing logline inside ifc adapter");
             return null;
         }
@@ -369,8 +361,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             responseContent = response;
             statusCode = status.code();
             adStatus = "AD";

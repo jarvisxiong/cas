@@ -64,8 +64,7 @@ public class IFDAdNetwork extends AbstractDCPAdNetworkImpl {
         try {
             String url = config.getString("ifd.host") + createIFDParams();
             return (new URI(url));
-        }
-        catch (URISyntaxException exception) {
+        } catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
         }
         return null;
@@ -91,15 +90,13 @@ public class IFDAdNetwork extends AbstractDCPAdNetworkImpl {
 
         try {
             paramMap.put("tid", sasParams.getTid());
-        }
-        catch (Exception exception) {
+        } catch (Exception exception) {
             throw new Exception("mandatory parameter tid value is missing");
         }
 
         try {
             paramMap.put("mk-ad-slot", sasParams.getSlot().toString());
-        }
-        catch (Exception exception) {
+        } catch (Exception exception) {
             throw new Exception("mandatory parameter mk-ad-slot value is missing");
         }
 
@@ -110,15 +107,13 @@ public class IFDAdNetwork extends AbstractDCPAdNetworkImpl {
 
         try {
             paramMap.put("rq-h-user-agent", sasParams.getUserAgent());
-        }
-        catch (Exception exception) {
+        } catch (Exception exception) {
             throw new Exception("mandatory parameter rq-h-user-agent value is missing");
         }
 
         try {
             paramMap.put("h-id", sasParams.getHandsetInternalId() + "");
-        }
-        catch (Exception exception) {
+        } catch (Exception exception) {
             throw new Exception("mandatory parameter handset value is either null or not formatted properly.");
         }
 
@@ -126,8 +121,7 @@ public class IFDAdNetwork extends AbstractDCPAdNetworkImpl {
             paramMap.put("cid", sasParams.getCarrierId() + "");
             paramMap.put("cnid", sasParams.getCountryCode());
             paramMap.put("cc", sasParams.getCountryId().toString());
-        }
-        catch (Exception exception) {
+        } catch (Exception exception) {
             throw new Exception("mandatory parameter carrier value is either null or not formatted properly.");
         }
 
@@ -136,8 +130,7 @@ public class IFDAdNetwork extends AbstractDCPAdNetworkImpl {
         String format = null;
         try {
             format = sasParams.getRFormat();
-        }
-        catch (Exception exception) {
+        } catch (Exception exception) {
             LOG.info("error in parsing format passed by network");
         }
         if (StringUtils.isEmpty(format)) {
@@ -147,15 +140,13 @@ public class IFDAdNetwork extends AbstractDCPAdNetworkImpl {
 
         try {
             paramMap.put("sdk-version", sasParams.getSdkVersion());
-        }
-        catch (Exception exception) {
+        } catch (Exception exception) {
             LOG.info("error in parsing sdk-version passed by network");
         }
 
         try {
             paramMap.put("u-latlong", sasParams.getLatLong());
-        }
-        catch (Exception exception) {
+        } catch (Exception exception) {
             LOG.info("error in parsing latlong passed by network");
         }
         normalizedParms = normalizeParameters(paramMap);
@@ -178,8 +169,7 @@ public class IFDAdNetwork extends AbstractDCPAdNetworkImpl {
             if (value != null) {
                 try {
                     parameters.add(URLEncoder.encode(key, "UTF-8") + '=' + URLEncoder.encode(value, "UTF-8"));
-                }
-                catch (UnsupportedEncodingException e) {
+                } catch (UnsupportedEncodingException e) {
                     throw new IllegalStateException(e);
                 }
             }
@@ -217,16 +207,14 @@ public class IFDAdNetwork extends AbstractDCPAdNetworkImpl {
                     if (statusCode != 200) {
                         return;
                     }
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     errorStatus = ThirdPartyAdResponse.ResponseStatus.INVALID_RESPONSE;
                     statusCode = 500;
                     LOG.debug("status code is 500 inside parseResponse");
                     return;
                 }
-            }
-            // blank line indicates end of header and start of body
-            else if (responseArray[index].trim().isEmpty()) {
+            } else if (responseArray[index].trim().isEmpty()) {
+                // blank line indicates end of header and start of body
                 LOG.debug("got a blank line to separate header and body");
                 break;
             }
