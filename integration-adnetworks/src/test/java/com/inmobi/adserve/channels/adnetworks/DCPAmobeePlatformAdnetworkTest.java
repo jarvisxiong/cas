@@ -18,7 +18,7 @@ import org.apache.commons.configuration.Configuration;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
-import com.inmobi.adserve.channels.adnetworks.dmg.DCPDmgAdnetwork;
+import com.inmobi.adserve.channels.adnetworks.amobeeplatform.DCPAmobeePlatformAdnetwork;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
@@ -27,13 +27,13 @@ import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 
 
-public class DCPDmgAdnetworkTest extends TestCase {
+public class DCPAmobeePlatformAdnetworkTest extends TestCase {
 	private Configuration      mockConfig        = null;
 	private final String       debug             = "debug";
 	private final String       loggerConf        = "/tmp/channel-server.properties";
 	private final Bootstrap    clientBootstrap   = null;
 
-	private DCPDmgAdnetwork dcpDmgAdNetwork;
+	private DCPAmobeePlatformAdnetwork dcpDmgAdNetwork;
 	private final String       dmgHost        = "http://ad.dmg-mobile.com/upsteed/wap/adrequest?acc=17067024";
 	private final String       dmgStatus      = "on";
 	private final String       dmgAdvId       = "dmgadv1";
@@ -65,7 +65,8 @@ public class DCPDmgAdnetworkTest extends TestCase {
 		prepareMockConfig();
 		SlotSizeMapping.init();
 		Formatter.init();
-		dcpDmgAdNetwork = new DCPDmgAdnetwork(mockConfig, clientBootstrap, base, serverChannel);
+		dcpDmgAdNetwork = new DCPAmobeePlatformAdnetwork(mockConfig, clientBootstrap, base, serverChannel);
+		dcpDmgAdNetwork.setName("dmg");
 	}
 
 	@Test
