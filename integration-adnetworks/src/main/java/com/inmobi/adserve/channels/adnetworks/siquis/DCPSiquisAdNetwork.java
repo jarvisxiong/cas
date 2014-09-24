@@ -79,8 +79,7 @@ public class DCPSiquisAdNetwork extends AbstractDCPAdNetworkImpl {
 
             LOG.debug("Siquis url is {}", url);
             return (new URI(url.toString()));
-        }
-        catch (URISyntaxException exception) {
+        } catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.error("{}", exception);
         }
@@ -97,8 +96,7 @@ public class DCPSiquisAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             try {
                 statusCode = status.code();
                 JSONArray adResponseArray = new JSONArray(response);
@@ -111,12 +109,10 @@ public class DCPSiquisAdNetwork extends AbstractDCPAdNetworkImpl {
                     String url = reformatClickUr(adResponse.get("clickurl").toString());
                     if (url != null) {
                         context.put(VelocityTemplateFieldConstants.PartnerClickUrl, url);
-                    }
-                    else {
+                    } else {
                         return;
                     }
-                }
-                else {
+                } else {
                     context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse.get("clickurl"));
                 }
                 context.put(VelocityTemplateFieldConstants.SmallFont, "1");
@@ -125,28 +121,24 @@ public class DCPSiquisAdNetwork extends AbstractDCPAdNetworkImpl {
                 if (StringUtils.isEmpty(vmTemplate)) {
                     responseContent = Formatter.getResponseFromTemplate(TemplateType.PLAIN, context, sasParams,
                             beaconUrl);
-                }
-                else {
+                } else {
                     context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
                     responseContent = Formatter.getResponseFromTemplate(TemplateType.RICH, context, sasParams,
                             beaconUrl);
                 }
                 adStatus = "AD";
                 LOG.debug("response length is {} responseContent is {}", responseContent.length(), responseContent);
-            }
-            catch (JSONException exception) {
+            } catch (JSONException exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from siquis : {}", exception);
                 LOG.info("Response from siquis: {}", response);
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from siquis : {}", exception);
                 LOG.info("Response from siquis: {}", response);
                 try {
                     throw exception;
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     LOG.info("Error while rethrowing the exception : {}", e);
                 }
             }
@@ -171,8 +163,7 @@ public class DCPSiquisAdNetwork extends AbstractDCPAdNetworkImpl {
                 formattedUrl.append(URLDecoder.decode(urlParams[i], utf8)).append('=')
                         .append(URLDecoder.decode(urlParams[i + 1], utf8)).append('&');
             }
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             LOG.info("Faild to reformat Siquis clickurl {}", clickUrl);
             return null;
         }

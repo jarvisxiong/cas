@@ -150,8 +150,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         }
         if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
             appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.uidMd5, false);
-        }
-        else if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
+        } else if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
             appendQueryParam(url, OPEN_UDID, casInternalRequestParameters.uidIDUS1, false);
         }
         if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
@@ -159,8 +158,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         }
         if (StringUtils.isNotBlank(casInternalRequestParameters.uidSO1)) {
             appendQueryParam(url, ODIN1, casInternalRequestParameters.uidSO1, false);
-        }
-        else if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
+        } else if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
             appendQueryParam(url, ODIN1, casInternalRequestParameters.uidO1, false);
         }
 
@@ -216,8 +214,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             statusCode = status.code();
             VelocityContext context = new VelocityContext();
             try {
@@ -240,28 +237,23 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
                 if (IMAGE_TYPE.equalsIgnoreCase(ad.getType()) && StringUtils.isNotBlank(ad.getLink())) {
                     context.put(VelocityTemplateFieldConstants.PartnerImgUrl, ad.getLink());
                     t = TemplateType.IMAGE;
-                }
-                else if (TEXT_TYPE.equalsIgnoreCase(ad.getType()) && StringUtils.isNotBlank(ad.getAdtext())) {
+                } else if (TEXT_TYPE.equalsIgnoreCase(ad.getType()) && StringUtils.isNotBlank(ad.getAdtext())) {
                     context.put(VelocityTemplateFieldConstants.AdText, ad.getAdtext());
                     String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                     if (StringUtils.isEmpty(vmTemplate)) {
                         t = TemplateType.PLAIN;
-                    }
-                    else {
+                    } else {
                         context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
                         t = TemplateType.RICH;
                     }
-                }
-                else {
+                } else {
                     adStatus = "NO_   AD";
                     return;
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
 
-            }
-
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from Smaato");
                 LOG.info("Response from Smaato {}", response);

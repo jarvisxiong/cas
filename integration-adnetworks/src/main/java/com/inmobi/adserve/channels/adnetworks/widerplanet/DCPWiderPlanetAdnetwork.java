@@ -77,8 +77,7 @@ public class DCPWiderPlanetAdnetwork extends AbstractDCPAdNetworkImpl {
             LOG.debug("WiderPlanet url is {}", url);
 
             return (new URI(url.toString()));
-        }
-        catch (URISyntaxException exception) {
+        } catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.error("{}", exception);
         }
@@ -95,8 +94,7 @@ public class DCPWiderPlanetAdnetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             try {
 
                 JSONObject adResponse = new JSONObject(response);
@@ -119,15 +117,13 @@ public class DCPWiderPlanetAdnetwork extends AbstractDCPAdNetworkImpl {
                     }
                     responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                     adStatus = "AD";
-                }
-                else {
+                } else {
                     statusCode = 500;
                     adStatus = "NO_AD";
                     responseContent = "";
                     return;
                 }
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from widerplanet : {}", exception);
                 LOG.info("Response from wider planet: {}", response);

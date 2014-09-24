@@ -97,14 +97,11 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
             
             if (StringUtils.isNotEmpty(casInternalRequestParameters.uidO1)) {
                 url.append("&enctype=sha1&udid=").append(casInternalRequestParameters.uidO1);
-            }
-            else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
+            } else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
                 url.append("&enctype=md5&udid=").append(casInternalRequestParameters.uidMd5);
-            }
-            else if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
+            } else if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
                 appendQueryParam(url,"&enctype=sha1&udid=", casInternalRequestParameters.uidIDUS1, false);
-            }
-            else {
+            } else {
                String gpid = getGPID();
                if (gpid != null) {
                url.append("&enctype=raw&udid=").append(gpid);
@@ -119,8 +116,7 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
 
             LOG.debug("Tapit url is {}", url);
             return (new URI(url.toString()));
-        }
-        catch (URISyntaxException exception) {
+        } catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.error("{}", exception);
         }
@@ -137,55 +133,48 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             LOG.debug("beacon url inside mullah media is {}", beaconUrl);
             try {
                 statusCode = status.code();
                 JSONObject adResponse = new JSONObject(response);
                 VelocityContext context = new VelocityContext();
                 TemplateType t;
-                if (adResponse.getString("type").equals("html")) {
+                if ("html".equals(adResponse.getString("type"))) {
                     context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, adResponse.getString("html"));
                     t = TemplateType.HTML;
-                }
-                else {
+                } else {
                     context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse.getString("clickurl"));
                     context.put(VelocityTemplateFieldConstants.Width, adResponse.getString("adWidth"));
                     context.put(VelocityTemplateFieldConstants.Height, adResponse.getString("adHeight"));
                     context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
-                    if (adResponse.getString("type").equals("text")) {
+                    if ("text".equals(adResponse.getString("type"))) {
                         context.put(VelocityTemplateFieldConstants.AdText, adResponse.getString("adtext"));
                         String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                         if (StringUtils.isEmpty(vmTemplate)) {
                             t = TemplateType.PLAIN;
-                        }
-                        else {
+                        } else {
                             context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
                             t = TemplateType.RICH;
                         }
-                    }
-                    else {
+                    } else {
                         context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getString("imageurl"));
                         t = TemplateType.IMAGE;
                     }
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            }
-            catch (JSONException exception) {
+            } catch (JSONException exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from tapit : {}", exception);
                 LOG.info("Response from tapit: {}", response);
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from tapit : {}", exception);
                 LOG.info("Response from tapit: {}", response);
                 try {
                     throw exception;
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     LOG.info("Error while rethrowing the exception : {}", e);
                 }
             }

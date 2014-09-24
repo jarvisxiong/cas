@@ -94,7 +94,7 @@ public class DrawBridgeAdNetwork extends AbstractDCPAdNetworkImpl {
         StringBuilder finalUrl = new StringBuilder();
         finalUrl.append(config.getString("drawbridge.host")).append(config.getString("drawbridge.partnerId"))
                 .append("&_psign=").append(config.getString("drawbridge.partnerSignature"));
-        if (!(StringUtils.isEmpty(sasParams.getRemoteHostIp()) || sasParams.getRemoteHostIp().equals("null"))) {
+        if (!(StringUtils.isEmpty(sasParams.getRemoteHostIp()) || "null".equals(sasParams.getRemoteHostIp()))) {
             finalUrl.append("&_clip=").append(sasParams.getRemoteHostIp());
         }
         if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
@@ -108,11 +108,9 @@ public class DrawBridgeAdNetwork extends AbstractDCPAdNetworkImpl {
         // Setting UDID preference IDUS1, UM5, UDID
         if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
             finalUrl.append("&_did=").append(casInternalRequestParameters.uidIDUS1);
-        }
-        else if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
+        } else if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
             finalUrl.append("&_did=").append(casInternalRequestParameters.uidMd5);
-        }
-        else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
+        } else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
             finalUrl.append("&_did=").append(casInternalRequestParameters.uid);
         }
 
@@ -123,33 +121,32 @@ public class DrawBridgeAdNetwork extends AbstractDCPAdNetworkImpl {
             finalUrl.append("&_macsha1=").append(casInternalRequestParameters.uidO1);
         }
 
-        if (!(StringUtils.isEmpty(sasParams.getUserAgent()) || sasParams.getUserAgent().equals("null"))) {
+        if (!(StringUtils.isEmpty(sasParams.getUserAgent()) || "null".equals(sasParams.getUserAgent()))) {
             finalUrl.append("&_ua=").append(getURLEncode(sasParams.getUserAgent(), format));
         }
-        if (!(StringUtils.isEmpty(geoCoordinate) || geoCoordinate.equals("null"))) {
+        if (!(StringUtils.isEmpty(geoCoordinate) || "null".equals(geoCoordinate))) {
             finalUrl.append("&_geo=").append(geoCoordinate);
         }
         finalUrl.append("&_art=sb");
 
-        if (!(StringUtils.isEmpty(sasParams.getGender()) || sasParams.getGender().equals("null"))) {
+        if (!(StringUtils.isEmpty(sasParams.getGender()) || "null".equals(sasParams.getGender()))) {
             finalUrl.append("&_dgen=").append(sasParams.getGender());
         }
         String temp = getYearofBirth();
-        if (!(StringUtils.isEmpty(temp) || temp.equals("null"))) {
+        if (!(StringUtils.isEmpty(temp) || "null".equals(temp))) {
             finalUrl.append("&_dyob=").append(temp);
         }
-        if (!(StringUtils.isEmpty(casInternalRequestParameters.zipCode) || casInternalRequestParameters.zipCode
-                .equals("null"))) {
+        if (!(StringUtils.isEmpty(casInternalRequestParameters.zipCode) || "null".equals(casInternalRequestParameters.zipCode))) {
             finalUrl.append("&_dzip=").append(casInternalRequestParameters.zipCode);
         }
         temp = getCategories(',');
-        if (!(StringUtils.isEmpty(temp) || temp.equals("null"))) {
+        if (!(StringUtils.isEmpty(temp) || "null".equals(temp))) {
             finalUrl.append("&_pubcat=").append(getURLEncode(temp, format));
         }
         if (null != dim) {
             finalUrl.append("&_adw=").append((int) dim.getWidth()).append("&_adh=").append((int) dim.getHeight());
         }
-        if (!(StringUtils.isEmpty(sasParams.getCountryCode()) || sasParams.getCountryCode().equals("null"))) {
+        if (!(StringUtils.isEmpty(sasParams.getCountryCode()) || "null".equals(sasParams.getCountryCode()))) {
             finalUrl.append("&_dco=").append(getCountry(sasParams.getCountryCode()));
         }
         finalUrl.append("&_clickbeacon=").append(getURLEncode(clickUrl, format));
@@ -161,8 +158,7 @@ public class DrawBridgeAdNetwork extends AbstractDCPAdNetworkImpl {
         LOG.debug("url inside drawbridge: {}", finalUrl);
         try {
             return (new URI(finalUrl.toString()));
-        }
-        catch (URISyntaxException exception) {
+        } catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.error("Error Forming Url inside drawbridge: {}", exception);
         }
@@ -182,8 +178,7 @@ public class DrawBridgeAdNetwork extends AbstractDCPAdNetworkImpl {
                 return (new Locale("en", country).getISO3Country());
             }
             return null;
-        }
-        catch (MissingResourceException exception) {
+        } catch (MissingResourceException exception) {
             LOG.info("3 letter name not found for country");
             return null;
         }
@@ -199,23 +194,20 @@ public class DrawBridgeAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             statusCode = status.code();
             VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
             context.remove(VelocityTemplateFieldConstants.IMBeaconUrl);
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, null);
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from drawbridge : {}", exception);
                 LOG.info("Response from drawbridge: {}", response);
                 try {
                     throw exception;
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     LOG.info("Error while rethrowing the exception : {}", e);
                 }
             }
@@ -234,12 +226,10 @@ public class DrawBridgeAdNetwork extends AbstractDCPAdNetworkImpl {
             md.update(param.getBytes());
             byte[] output = md.digest();
             return (bytesToHex(output));
-        }
-        catch (NoSuchAlgorithmException exception) {
+        } catch (NoSuchAlgorithmException exception) {
             LOG.info("error generating hash of uid {}", exception);
             return null;
-        }
-        catch (NullPointerException exception) {
+        } catch (NullPointerException exception) {
             LOG.info("error generating hash inside drawbridge {}", exception);
             return null;
         }

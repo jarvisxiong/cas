@@ -153,40 +153,30 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
 				url.append("&long=").append(longitude);
 			}
 
+            String casUidMd5 = casInternalRequestParameters.uidMd5;
+            String casUid    = casInternalRequestParameters.uid;
+
 			if (!"wap".equalsIgnoreCase(sasParams.getSource())) {
 				if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
 					if (casInternalRequestParameters.uidIFA != null) {
-						url.append("&uis=a&ui=").append(
-								casInternalRequestParameters.uidIFA);
+						url.append("&uis=a&ui=").append(casInternalRequestParameters.uidIFA);
 					} else if (casInternalRequestParameters.uidSO1 != null) {
-						url.append("&uis=us&ui=").append(
-								casInternalRequestParameters.uidSO1);
+						url.append("&uis=us&ui=").append(casInternalRequestParameters.uidSO1);
 					} else if (casInternalRequestParameters.uidO1 != null) {
-						url.append("&uis=us&ui=").append(
-								casInternalRequestParameters.uidO1);
-					} else if (casInternalRequestParameters.uidMd5 != null) {
-						url.append("&uis=u&ui=").append(
-								casInternalRequestParameters.uidMd5);
+						url.append("&uis=us&ui=").append(casInternalRequestParameters.uidO1);
+					} else if (casUidMd5 != null) {
+						url.append("&uis=u&ui=").append(casUidMd5);
 					}else if (casInternalRequestParameters.uidIDUS1 != null) {
-                        url.append("&uis=ds&ui=").append(
-                                casInternalRequestParameters.uidIDUS1);
-                    }else if (!StringUtils
-							.isBlank(casInternalRequestParameters.uid)
-							&& !casInternalRequestParameters.uid.equals("null")) {
-						url.append("&uis=v&ui=").append(
-								casInternalRequestParameters.uid);
+                        url.append("&uis=ds&ui=").append(casInternalRequestParameters.uidIDUS1);
+                    }else if (!StringUtils.isBlank(casUid) && !"null".equals(casUid)) {
+						url.append("&uis=v&ui=").append(casUid);
 					}
 				} else if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
-					  if (casInternalRequestParameters.uidMd5 != null) {
-						url.append("&uis=dm&ui=").append(
-								casInternalRequestParameters.uidMd5);
-					} else if (!StringUtils
-							.isBlank(casInternalRequestParameters.uid)
-							&& !casInternalRequestParameters.uid.equals("null")) {
-						url.append("&uis=v&ui=").append(
-								casInternalRequestParameters.uid);
-					}
-                    else {
+					  if (casUidMd5 != null) {
+						url.append("&uis=dm&ui=").append(casUidMd5);
+					} else if (!StringUtils.isBlank(casUid) && !"null".equals(casUid)) {
+						url.append("&uis=v&ui=").append(casUid);
+					} else {
                         String gpid = getGPID();
                         if (gpid != null) {
                             url.append("&g=").append(gpid);

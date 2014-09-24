@@ -62,8 +62,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
             Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
-        }
-        else {
+        } else {
             LOG.debug("mandate parameters missing for WapStart, so returning from adapter");
             return false;
         }
@@ -95,42 +94,38 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
             String bsiteId = StringUtils.replace(blindedSiteId, "-", "");
             url.append("&pageId=00000000").append(bsiteId);
             url.append("&kws=").append(getURLEncode(getCategories(';'), format));
-            if(sasParams.getNetworkType()!=null)
+            if(sasParams.getNetworkType()!=null) {
                 url.append("&ctype=").append(sasParams.getNetworkType().name());
+            }
             if (sasParams.getGender() != null) {
              url.append("&gender=").append(sasParams.getGender());
-             }
-             if (sasParams.getCountryCode() != null) {
-                url.append("&country=").append(iABCountries.getIabCountry(sasParams.getCountryCode()));
-             }
-             if (StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)) {
-                url.append("&lat=")
-                        .append(latitude);
             }
-             if (StringUtils.isNotBlank(longitude) && StringUtils.isNotBlank(longitude)) {
-                 url.append("&lon=")
-                         .append(longitude);
-             }
+            if (sasParams.getCountryCode() != null) {
+                url.append("&country=").append(iABCountries.getIabCountry(sasParams.getCountryCode()));
+            }
+            if (StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)) {
+                 url.append("&lat=").append(latitude);
+            }
+            if (StringUtils.isNotBlank(longitude) && StringUtils.isNotBlank(longitude)) {
+                 url.append("&lon=").append(longitude);
+            }
             
             if (StringUtils.isNotEmpty(casInternalRequestParameters.uid)) {
                 url.append("&uid=").append(casInternalRequestParameters.uid);
-            }
-            else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
+            } else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
                 url.append("&uid=").append(casInternalRequestParameters.uidMd5);
-            }
-            else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidO1)) {
+            } else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidO1)) {
                 url.append("&uid=").append(casInternalRequestParameters.uidO1);
             }
             if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)&& "1".equals(casInternalRequestParameters.uidADT)) {
                 url.append("&idfa=").append(casInternalRequestParameters.uidIFA);
             }
             
-                String gpid = getGPID();
-                if (gpid != null) {
-                    adid = gpid;
-                    url.append("&adid=").append(adid);
-                    
-                }
+            String gpid = getGPID();
+            if (gpid != null) {
+                adid = gpid;
+                url.append("&adid=").append(adid);
+            }
             
             
             url.append("&callbackurl=").append(getURLEncode(clickUrl, format));
@@ -139,8 +134,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
             LOG.debug("WapStart url is {}", url);
 
             return (new URI(url.toString()));
-        }
-        catch (URISyntaxException exception) {
+        } catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.info("{}", exception);
         }
@@ -173,8 +167,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
         	//TODO remove once the partner fix NO_AD
         	if(response.trim().length() < 50){
         		adStatus = "NO_AD";
@@ -187,8 +180,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from Wapstart : {}", exception);
                 LOG.info("Response from WapStart: {}", response);
