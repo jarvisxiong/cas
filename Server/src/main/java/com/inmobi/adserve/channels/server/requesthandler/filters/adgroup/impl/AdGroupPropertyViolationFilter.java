@@ -36,7 +36,7 @@ public class AdGroupPropertyViolationFilter extends AbstractAdGroupLevelFilter {
         ChannelSegmentEntity channelSegmentEntity = channelSegment.getChannelSegmentEntity();
 
         if (channelSegmentEntity.isUdIdRequired()
-                && ((StringUtils.isEmpty(sasParams.getUidParams()) || sasParams.getUidParams().equals("{}"))
+                && ((StringUtils.isEmpty(sasParams.getUidParams()) || "{}".equals(sasParams.getUidParams()))
                 && (null == sasParams.getTUidParams() || sasParams.getTUidParams().isEmpty()))) {
             channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_UDID_FILTER);
             return true;
@@ -53,13 +53,14 @@ public class AdGroupPropertyViolationFilter extends AbstractAdGroupLevelFilter {
             channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_RICH_MEDIA_FILTER);
             return true;
         }
-        if (channelSegmentEntity.isInterstitialOnly()
-                && (sasParams.getRqAdType() == null || !sasParams.getRqAdType().equals("int"))) {
+
+        String rqAdType = sasParams.getRqAdType();
+
+        if (channelSegmentEntity.isInterstitialOnly() && (rqAdType == null || !"int".equals(rqAdType))) {
             channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_ONLY_INTERSTITIAL_FILTER);
             return true;
         }
-        if (channelSegmentEntity.isNonInterstitialOnly() && sasParams.getRqAdType() != null
-                && sasParams.getRqAdType().equals("int")) {
+        if (channelSegmentEntity.isNonInterstitialOnly() && rqAdType != null && "int".equals(rqAdType)) {
             channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_ONLY_NON_INTERSTITIAL_FILTER);
             return true;
         }
