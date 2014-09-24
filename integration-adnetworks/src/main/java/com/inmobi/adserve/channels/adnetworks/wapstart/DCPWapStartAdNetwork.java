@@ -8,205 +8,277 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Calendar;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.velocity.VelocityContext;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.IABCountriesInterface;
-import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 
 
 public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
-    private static final Logger          LOG           = LoggerFactory.getLogger(DCPWapStartAdNetwork.class);
+	private static final Logger          LOG           = LoggerFactory.getLogger(DCPWapStartAdNetwork.class);
 
-    private String                       latitude      = null;
-    private String                       longitude     = null;
-    private int                          width;
-    private int                          height;
-    private String                       adid = null;
-    private static IABCountriesInterface iABCountries;
+	private String                       latitude      = null;
+	private String                       longitude     = null;
+	private int                          width;
+	private int                          height;
+	private String                       adid = null;
 
-    static {
-        iABCountries = new IABCountriesMap();
-    }
 
-    public DCPWapStartAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
-        super(config, clientBootstrap, baseRequestHandler, serverChannel);
+	public DCPWapStartAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+			final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+		super(config, clientBootstrap, baseRequestHandler, serverChannel);
 
-    }
+	}
 
-    @Override
-    public boolean configureParameters() {
-        if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
-                || StringUtils.isBlank(externalSiteId)) {
-            LOG.debug("mandatory parameters missing for wapstart so exiting adapter");
-            return false;
-        }
-        host = config.getString("wapstart.host");
+	@Override
+	public boolean configureParameters() {
+		if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
+				|| StringUtils.isBlank(externalSiteId)) {
+			LOG.debug("mandatory parameters missing for wapstart so exiting adapter");
+			return false;
+		}
+		host = config.getString("wapstart.host");
 
-        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
-            width = (int) Math.ceil(dim.getWidth());
-            height = (int) Math.ceil(dim.getHeight());
-        }
-        else {
-            LOG.debug("mandate parameters missing for WapStart, so returning from adapter");
-            return false;
-        }
+		if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
+			Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
+			width = (int) Math.ceil(dim.getWidth());
+			height = (int) Math.ceil(dim.getHeight());
+		}
+		else {
+			LOG.debug("mandate parameters missing for WapStart, so returning from adapter");
+			return false;
+		}
 
-        if (casInternalRequestParameters.latLong != null
-                && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
-            String[] latlong = casInternalRequestParameters.latLong.split(",");
-            latitude = latlong[0];
-            longitude = latlong[1];
+		if (casInternalRequestParameters.latLong != null
+				&& StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
+			String[] latlong = casInternalRequestParameters.latLong.split(",");
+			latitude = latlong[0];
+			longitude = latlong[1];
 
-        }
+		}
 
-        LOG.info("Configure parameters inside wapstart returned true");
-        return true;
-    }
+		LOG.info("Configure parameters inside wapstart returned true");
+		return true;
+	}
 
-    @Override
-    public String getName() {
-        return "wapstart";
-    }
+	@Override
+	public String getName() {
+		return "wapstart";
+	}
 
-    @Override
-    public URI getRequestUri() throws Exception {
-        try {
-            StringBuilder url = new StringBuilder(host);
-            url.append("?version=2&encoding=1&area=viewBanner&ip=").append(sasParams.getRemoteHostIp()).append(
-            		"&ua=").append(getURLEncode(sasParams.getUserAgent(), format));
-            url.append("&id=").append(externalSiteId);
-            String bsiteId = StringUtils.replace(blindedSiteId, "-", "");
-            url.append("&pageId=00000000").append(bsiteId);
-            url.append("&kws=").append(getURLEncode(getCategories(';'), format));
-            if(sasParams.getNetworkType()!=null)
-                url.append("&ctype=").append(sasParams.getNetworkType().name());
-            if (sasParams.getGender() != null) {
-             url.append("&gender=").append(sasParams.getGender());
-             }
-             if (sasParams.getCountryCode() != null) {
-                url.append("&country=").append(iABCountries.getIabCountry(sasParams.getCountryCode()));
-             }
-             if (StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)) {
-                url.append("&lat=")
-                        .append(latitude);
-            }
-             if (StringUtils.isNotBlank(longitude) && StringUtils.isNotBlank(longitude)) {
-                 url.append("&lon=")
-                         .append(longitude);
-             }
-            
-            if (StringUtils.isNotEmpty(casInternalRequestParameters.uid)) {
-                url.append("&uid=").append(casInternalRequestParameters.uid);
-            }
-            else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
-                url.append("&uid=").append(casInternalRequestParameters.uidMd5);
-            }
-            else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidO1)) {
-                url.append("&uid=").append(casInternalRequestParameters.uidO1);
-            }
-            if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)&& "1".equals(casInternalRequestParameters.uidADT)) {
-                url.append("&idfa=").append(casInternalRequestParameters.uidIFA);
-            }
-            
-                String gpid = getGPID();
-                if (gpid != null) {
-                    adid = gpid;
-                    url.append("&adid=").append(adid);
-                    
-                }
-            
-            
-            url.append("&callbackurl=").append(getURLEncode(clickUrl, format));
-            url.append("&realSiteId=").append((entity.getAdgroupIncId()+sasParams.getSiteIncId()));
+	@Override
+	public URI getRequestUri() throws Exception {
+		try {
+			StringBuilder url = new StringBuilder(String.format(host,externalSiteId));
+			return (new URI(url.toString()));
+		}
+		catch (URISyntaxException exception) {
+			errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
+			LOG.info("{}", exception);
+		}
+		return null;
+	}
 
-            LOG.debug("WapStart url is {}", url);
+	private String getRequestParams() {
+		User user= new User();
+		String gender = sasParams.getGender();
+		if(StringUtils.isNotBlank(gender)){
+			int gen = "F".equalsIgnoreCase(gender)? 2 : 1;
+			user.setGender(gen);
+		}
+		if (sasParams.getAge() != null) {
+			int age = sasParams.getAge();
+			int year = Calendar.getInstance().get(Calendar.YEAR);
+			int yob = year - age;
+			user.setYob(yob);
+		}
+		if(StringUtils.isNotBlank(casInternalRequestParameters.uid)){
+			user.setUid(casInternalRequestParameters.uid);
+		}
+		Geo geo = new Geo();
+		if (StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)) {
+			geo.setLat(latitude);
+			geo.setLon(longitude);
+		}
+		if(StringUtils.isNotBlank(sasParams.getCountryCode())){
+			geo.setCountry(sasParams.getCountryCode());
+		}
+		Device device= new Device();
+		device.setIp(sasParams.getRemoteHostIp());
+		device.setUa(sasParams.getUserAgent());
+		String gpid = getGPID();
+		if (gpid != null) {
+			adid = gpid;
+			device.setAdid(adid);
 
-            return (new URI(url.toString()));
-        }
-        catch (URISyntaxException exception) {
-            errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            LOG.info("{}", exception);
-        }
-        return null;
-    }
+		}
+		if(StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)){
+			device.setAndroid_id(casInternalRequestParameters.uidMd5);
+		}
+		else if(StringUtils.isNotBlank(casInternalRequestParameters.uidO1)){
+			device.setAndroid_id(casInternalRequestParameters.uidO1);
+		}
+		if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)&& "1".equals(casInternalRequestParameters.uidADT)) {
+			device.setIfa(casInternalRequestParameters.uidIFA);
+		}
+		device.setGeo(geo);
 
-    @Override
-    protected Request getNingRequest() throws Exception {
-        URI uri = getRequestUri();
-        if (uri.getPort() == -1) {
-            uri = new URIBuilder(uri).setPort(80).build();
-        }
-        return new RequestBuilder().setUrl(uri.toString()).setHeader("x-display-metrics", String.format("%sx%s", width, height))
-                .setHeader("xplus1-user-agent", sasParams.getUserAgent())
-                .setHeader("x-plus1-remote-addr", sasParams.getRemoteHostIp())
-                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us").setHeader(HttpHeaders.Names.REFERER, requestUrl)
-                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
-                .setHeader(HttpHeaders.Names.HOST, uri.getHost())
-                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp()).build();
-    }
+		Publisher publisher = new Publisher();
+		publisher.setName(blindedSiteId);
+		publisher.setId(sasParams.getSiteIncId());
 
-    @Override
-    public void parseResponse(final String response, final HttpResponseStatus status) {
-        LOG.debug("response is {} and response length is {}", response, response.length());
-        if (status.code() != 200 || StringUtils.isBlank(response)) {
-            statusCode = status.code();
-            if (200 == statusCode) {
-                statusCode = 500;
-            }
-            responseContent = "";
-            return;
-        }
-        else {
-        	//TODO remove once the partner fix NO_AD
-        	if(response.trim().length() < 50){
-        		adStatus = "NO_AD";
-        		statusCode = 500;
-        		return;
-        	}
-            statusCode = status.code();
-            VelocityContext context = new VelocityContext();
-            context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
+		Site site = new Site();
+		site.setId(Integer.parseInt(externalSiteId));
+		site.setPublisher(publisher);
+		site.setCtype(1);
 
-            try {
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
-            }
-            catch (Exception exception) {
-                adStatus = "NO_AD";
-                LOG.info("Error parsing response from Wapstart : {}", exception);
-                LOG.info("Response from WapStart: {}", response);
-                return;
-            }
-            adStatus = "AD";
-        }
-        LOG.debug("response length is {}", responseContent.length());
-    }
+		Banner banner = new Banner();
+		banner.setH(height);
+		banner.setW(width);
+		//5:MRAID 2
+		banner.setApi(5);
+		//Banner type 1: Text and Graphic
+		banner.setBtype(1);
+		Impression impression = new Impression();
+		Banner[] banners =  new Banner[1];
+		banners[0]=banner;
+		impression.setBanner(banners);
+		WapStartAdrequest adRequest = new WapStartAdrequest();
+		adRequest.setDevice(device);
+		adRequest.setImpression(impression);
+		adRequest.setSite(site);
+		adRequest.setUser(user);
 
-    @Override
-    public String getId() {
-        return (config.getString("wapstart.advertiserId"));
-    }
+		ObjectMapper mapper = new ObjectMapper();
 
-    @Override
-    public boolean isClickUrlRequired() {
-        return true;
-    }
+		try {
 
+			String requestBody = mapper.writeValueAsString(adRequest);
+			LOG.debug(requestBody);
+			return requestBody;
+		} catch (JsonProcessingException e) {
+			LOG.error(e.getMessage());
+		}
+		return null;
+
+	}
+
+	@Override
+	public Request getNingRequest() throws Exception {
+		URI uri = getRequestUri();
+		if (uri.getPort() == -1) {
+			uri = new URIBuilder(uri).setPort(80).build();
+		}
+
+		String requestParams = getRequestParams();
+		Request ningRequest = new RequestBuilder("POST").setUrl(uri.toString())
+				.setHeader("x-display-metrics", String.format("%sx%s", width, height))
+				.setHeader("xplus1-user-agent", sasParams.getUserAgent())
+				.setHeader("x-plus1-remote-addr", sasParams.getRemoteHostIp())
+				.setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+				.setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
+				.setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
+				.setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
+				.setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
+				.setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(requestParams).build();
+		LOG.debug("WapStart request: {}", ningRequest);
+		LOG.debug("WapStart request Body: {}", requestParams);
+		return ningRequest;
+	}
+
+
+
+	@Override
+	public void parseResponse(final String response, final HttpResponseStatus status) {
+		LOG.debug("response is {} and response length is {}", response, response.length());
+		if (status.code() != 200 || StringUtils.isBlank(response)) {
+			statusCode = status.code();
+			if (200 == statusCode) {
+				statusCode = 500;
+			}
+			responseContent = "";
+			return;
+		}
+		try {
+			JSONObject responseJson = new JSONObject(response).getJSONArray("seat").getJSONObject(0);
+			;
+			TemplateType t;
+			VelocityContext context = new VelocityContext();
+			String partnerClickUrl = null;
+			if(responseJson.has("clink")){
+				partnerClickUrl = responseJson.getString("clink");
+			}
+			else{
+				adStatus = "NO_AD";
+				statusCode = 500;
+				return;
+			}
+			context.put(VelocityTemplateFieldConstants.PartnerClickUrl, partnerClickUrl);
+			context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
+			context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, responseJson.getString("vlink"));
+			if(responseJson.has("graphic")){
+				JSONObject textGraphic = responseJson.getJSONObject("textgraphic");
+				String imageUrl = textGraphic.getString("name");
+				context.put(VelocityTemplateFieldConstants.PartnerImgUrl, imageUrl);
+				t = TemplateType.IMAGE;
+			}
+			else if(responseJson.has("text")){
+				JSONObject text = responseJson.getJSONObject("text");
+				context.put(VelocityTemplateFieldConstants.AdText, text.getString("title"));
+				if(text.has("content")){
+					context.put(VelocityTemplateFieldConstants.Description, text.getString("content"));
+				}
+				String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
+				if (StringUtils.isEmpty(vmTemplate)) {
+					t = TemplateType.PLAIN;
+				}
+				else {
+					context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
+					t = TemplateType.RICH;
+				}
+
+			}
+			else{
+				adStatus = "NO_AD";
+				statusCode = 500;
+				return;
+			}
+			responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
+			adStatus = "AD";
+			statusCode = 200;
+		} catch (Exception exception) {
+			adStatus = "NO_AD";
+			LOG.info("Error parsing response from Wapstart : {}", exception);
+			LOG.info("Response from WapStart: {}", response);
+			return;
+		}
+		LOG.debug("response length is {}", responseContent.length());
+	}
+
+	@Override
+	public String getId() {
+		return (config.getString("wapstart.advertiserId"));
+	}
+
+	@Override
+	public boolean isClickUrlRequired() {
+		return true;
+	}
 }
