@@ -91,8 +91,7 @@ public class MobileCommerceAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             LOG.debug("mobile commerce url is {}", url);
             return (new URI(url.toString()));
-        }
-        catch (URISyntaxException exception) {
+        } catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.error("{}", exception);
         }
@@ -117,8 +116,7 @@ public class MobileCommerceAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             try {
                 statusCode = status.code();
                 VelocityContext context = new VelocityContext();
@@ -126,11 +124,9 @@ public class MobileCommerceAdNetwork extends AbstractDCPAdNetworkImpl {
                 if ("html".equalsIgnoreCase(responseFormat)) {
                     context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
                     responseTemplate = TemplateType.HTML;
-                }
-                else if (response.startsWith("{")) {
+                } else if (response.startsWith("{")) {
                     responseTemplate = getAdTemplateFromJson(response, context);
-                }
-                else {
+                } else {
                     adStatus = "NO_AD";
                     responseContent = "";
                     return;
@@ -138,20 +134,17 @@ public class MobileCommerceAdNetwork extends AbstractDCPAdNetworkImpl {
                 responseContent = Formatter.getResponseFromTemplate(responseTemplate, context, sasParams, null);
                 adStatus = "AD";
 
-            }
-            catch (JSONException exception) {
+            } catch (JSONException exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from MobileCommerce : {}", exception);
                 LOG.info("Response from siquis: {}", response);
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from MobileCommerce : {}", exception);
                 LOG.info("Response from MobileCommerce: {}", response);
                 try {
                     throw exception;
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     LOG.info("Error while rethrowing the exception : {}", e);
                 }
             }
@@ -184,8 +177,7 @@ public class MobileCommerceAdNetwork extends AbstractDCPAdNetworkImpl {
         String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
         if (StringUtils.isEmpty(vmTemplate)) {
             responseTemplate = TemplateType.PLAIN;
-        }
-        else {
+        } else {
             context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
             responseTemplate = TemplateType.RICH;
         }
