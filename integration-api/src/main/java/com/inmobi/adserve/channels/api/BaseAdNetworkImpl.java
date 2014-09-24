@@ -568,22 +568,22 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)  && "1".equals(casInternalRequestParameters.uidADT)) {
             return casInternalRequestParameters.uidIFA;
         }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.gpid) && "1".equals(casInternalRequestParameters.uidADT)) {
+        else if (StringUtils.isNotEmpty(casInternalRequestParameters.gpid) && "1".equals(casInternalRequestParameters.uidADT)) {
             return casInternalRequestParameters.gpid;
         }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidSO1)) {
+        else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidSO1)) {
             return casInternalRequestParameters.uidSO1;
         }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
+        else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
             return casInternalRequestParameters.uidMd5;
         }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidO1)) {
+        else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidO1)) {
             return casInternalRequestParameters.uidO1;
         }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIDUS1)) {
+        else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIDUS1)) {
             return casInternalRequestParameters.uidIDUS1;
         }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uid)) {
+        else if (StringUtils.isNotEmpty(casInternalRequestParameters.uid)) {
             return casInternalRequestParameters.uid;
         }
         return null;

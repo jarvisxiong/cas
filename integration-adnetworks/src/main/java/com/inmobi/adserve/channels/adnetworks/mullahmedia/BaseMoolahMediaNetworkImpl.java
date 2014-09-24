@@ -108,6 +108,43 @@ public abstract class BaseMoolahMediaNetworkImpl extends AbstractDCPAdNetworkImp
 
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
+
+        if (!checkIfValidResponse(response, status)) {
+            return;
+        }
+
+        LOG.debug("beacon url inside mullah media is {}", beaconUrl);
+        try {
+            statusCode = status.code();
+            JSONObject adResponse = new JSONObject(response);
+            VelocityContext context = new VelocityContext();
+            context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse.getJSONArray("landing")
+                    .getString(0));
+            context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getJSONArray("img").getString(0));
+            context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
+            responseContent = Formatter.getResponseFromTemplate(TemplateType.IMAGE, context, sasParams, beaconUrl);
+            adStatus = "AD";
+        } catch (JSONException exception) {
+            adStatus = "NO_AD";
+            LOG.info("Error parsing response from mullah : {}", exception);
+            LOG.info("Response from mullah: {}", response);
+        } catch (Exception exception) {
+            adStatus = "NO_AD";
+            LOG.info("Error parsing response from mullah : {}", exception);
+            LOG.info("Response from mullah: {}", response);
+            try {
+                throw exception;
+            } catch (Exception e) {
+                LOG.info("Error while rethrowing the exception : {}", e);
+            }
+        }
+
+
+        LOG.debug("response length is {}", responseContent.length());
+    }
+
+    private boolean checkIfValidResponse(final String response, final HttpResponseStatus status) {
+
         if (StringUtils.isBlank(response) || status.code() != 200 || !response.startsWith("{")
                 || response.startsWith("{\"error")) {
             statusCode = status.code();
@@ -115,36 +152,9 @@ public abstract class BaseMoolahMediaNetworkImpl extends AbstractDCPAdNetworkImp
                 statusCode = 500;
             }
             responseContent = "";
-            return;
-        } else {
-            LOG.debug("beacon url inside mullah media is {}", beaconUrl);
-            try {
-                statusCode = status.code();
-                JSONObject adResponse = new JSONObject(response);
-                VelocityContext context = new VelocityContext();
-                context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse.getJSONArray("landing")
-                        .getString(0));
-                context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getJSONArray("img").getString(0));
-                context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.IMAGE, context, sasParams, beaconUrl);
-                adStatus = "AD";
-            } catch (JSONException exception) {
-                adStatus = "NO_AD";
-                LOG.info("Error parsing response from mullah : {}", exception);
-                LOG.info("Response from mullah: {}", response);
-            } catch (Exception exception) {
-                adStatus = "NO_AD";
-                LOG.info("Error parsing response from mullah : {}", exception);
-                LOG.info("Response from mullah: {}", response);
-                try {
-                    throw exception;
-                } catch (Exception e) {
-                    LOG.info("Error while rethrowing the exception : {}", e);
-                }
-            }
-
+            return false;
         }
-        LOG.debug("response length is {}", responseContent.length());
+        return true;
     }
 
     public String getRequestParameters() throws Exception {
@@ -183,7 +193,7 @@ public abstract class BaseMoolahMediaNetworkImpl extends AbstractDCPAdNetworkImp
             Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             sb.append("&w=").append(dim.getWidth()).append("&h=").append(dim.getHeight());
             Short compareSlotWith = 10;
-            if (sasParams.getSlot().equals(compareSlotWith))
+            if (sasParams.getSlot().equals(compareSlotWith)) // 300x250
             {
                 blindedSiteId += "-300x250";
             }
@@ -244,23 +254,23 @@ public abstract class BaseMoolahMediaNetworkImpl extends AbstractDCPAdNetworkImp
                 && StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
             return casInternalRequestParameters.uidIFA;
         }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
+        else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
             hashScheme = md5Hash;
             return casInternalRequestParameters.uidMd5;
         }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uid)) {
+        else if (StringUtils.isNotEmpty(casInternalRequestParameters.uid)) {
             hashScheme = md5Hash;
             return casInternalRequestParameters.uid;
         }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidO1)) {
+        else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidO1)) {
             hashScheme = sha1Hash;
             return casInternalRequestParameters.uidO1;
         }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidSO1)) {
+        else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidSO1)) {
             hashScheme = sha1Hash;
             return casInternalRequestParameters.uidSO1;
         }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIDUS1)) {
+        else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIDUS1)) {
             hashScheme = sha1Hash;
             return casInternalRequestParameters.uidIDUS1;
         }

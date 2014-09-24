@@ -49,7 +49,7 @@ public class CasExceptionHandler extends ChannelInboundHandlerAdapter {
 			LOG.debug(traceMarker, "Channel is open in channelIdle handler");
 			if (responseSender.getRankList() != null) {
 				for (ChannelSegment channelSegment : responseSender.getRankList()) {
-					if (channelSegment.getAdNetworkInterface().getAdStatus().equals("AD")) {
+					if ("AD".equals(channelSegment.getAdNetworkInterface().getAdStatus())) {
 						LOG.debug(traceMarker, "Got Ad from {} Top Rank was {}", channelSegment.getAdNetworkInterface().getName(), responseSender.getRankList()
 								.get(0).getAdNetworkInterface().getName());
 						responseSender.sendAdResponse(channelSegment.getAdNetworkInterface(), ctx.channel());
