@@ -79,8 +79,7 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
             Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
-        }
-        else {
+        } else {
             LOG.debug("mandate parameters missing for {} so returning from adapter", name);
             return false;
         }
@@ -95,8 +94,7 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
         if (sasParams.getOsId() == HandSetOS.Android.getValue()
                 || sasParams.getOsId() == HandSetOS.iOS.getValue()) {
             isApp = true;
-        }
-        else {
+        } else {
             isApp = false;
         }
 
@@ -118,8 +116,7 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
             appendQueryParam(url, ID, externalSiteId, false);
             if (isApp) {
                 appendQueryParam(url, APP_ID, blindedSiteId, false);
-            }
-            else{
+            } else{
             	appendQueryParam(url, ST, TRAFFIC_TYPE, false);
             }
             appendQueryParam(url, SIZE, String.format(sizeFormat, width, height), false);
@@ -136,8 +133,7 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
                 if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
                     appendQueryParam(url, ANDROID_ID_MD5, getURLEncode(casInternalRequestParameters.uidMd5, format),
                             false);
-                }
-                else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
+                } else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
                     appendQueryParam(url, ANDROID_ID_MD5, getURLEncode(casInternalRequestParameters.uid, format), false);
                 }
                 if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
@@ -150,8 +146,7 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
             if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
                 if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
                     appendQueryParam(url, ODIN1, getURLEncode(casInternalRequestParameters.uidO1, format), false);
-                }
-                else if (StringUtils.isNotBlank(casInternalRequestParameters.uidSO1)) {
+                } else if (StringUtils.isNotBlank(casInternalRequestParameters.uidSO1)) {
                     appendQueryParam(url, ODIN1, getURLEncode(casInternalRequestParameters.uidSO1, format), false);
                 }
                 if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
@@ -186,8 +181,7 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             statusCode = status.code();
             VelocityContext context = new VelocityContext();
             try {
@@ -204,8 +198,7 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
 
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from {} {}", name, exception);
                 LOG.info("Response from {} {}", name, response);

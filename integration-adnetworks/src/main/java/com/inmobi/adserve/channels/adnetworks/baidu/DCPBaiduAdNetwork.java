@@ -77,8 +77,7 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
             // Baidu wanted in that format
             height = (int) Math.ceil(dim.getWidth());
             width = (int) Math.ceil(dim.getHeight());
-        }
-        else {
+        } else {
             LOG.debug("mandate parameters missing for Baidu, so returning from adapter");
             return false;
         }
@@ -92,14 +91,11 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
 
         if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
             os = IOS;
-        }
-        else if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
+        } else if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
             os = ANDROID;
-        }
-        else if (sasParams.getOsId() == HandSetOS.Symbian_OS.getValue()) {
+        } else if (sasParams.getOsId() == HandSetOS.Symbian_OS.getValue()) {
             os = SYMBIAN;
-        }
-        else {
+        } else {
             os = WEB;
         }
         LOG.info("Configure parameters inside baidu returned true");
@@ -154,16 +150,14 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             statusCode = status.code();
             VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
 
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, null);
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from baidu : {}", exception);
                 LOG.info("Response from baidu: {}", response);

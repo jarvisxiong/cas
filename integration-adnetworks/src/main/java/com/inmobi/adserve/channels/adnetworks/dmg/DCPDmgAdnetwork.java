@@ -79,16 +79,13 @@ public class DCPDmgAdnetwork extends AbstractDCPAdNetworkImpl {
             height = (int) Math.ceil(dim.getHeight());
 
             Integer slot = Integer.valueOf(sasParams.getSlot());
-            }
-        else {
+        } else {
             LOG.debug("mandatory parameters missing for dmg so exiting adapter");
             return false;
         }
         if (sasParams.getOsId() == HandSetOS.Android.getValue()) { // android
             client = 1;
-
-        }
-        else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) { // iPhone
+        } else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) { // iPhone
             client = 2;
         }
         LOG.info("Configure parameters inside dmg returned true");
@@ -129,14 +126,12 @@ public class DCPDmgAdnetwork extends AbstractDCPAdNetworkImpl {
                 else if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
                     appendQueryParam(url, UDID, casInternalRequestParameters.uidMd5, false);
                 }
-            }
-            else if (client == 1) {
+            } else if (client == 1) {
                 if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
                     appendQueryParam(url, ANDROIDID, casInternalRequestParameters.uidMd5, false);
+                } else if(StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
+                    appendQueryParam(url, ANDROIDID, casInternalRequestParameters.uidMd5, false);
                 }
-                else if(StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
-                        appendQueryParam(url, ANDROIDID, casInternalRequestParameters.uidMd5, false);
-                    }
             }
 
             if (!StringUtils.isEmpty(latitude)) {
@@ -159,16 +154,14 @@ public class DCPDmgAdnetwork extends AbstractDCPAdNetworkImpl {
             }
             if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
                 appendQueryParam(url, NEGATIVE_KEYWORD,getURLEncode(CategoryList.getBlockedCategoryForPerformance(), format), false);
-            }
-            else {
+            } else {
             	 appendQueryParam(url, NEGATIVE_KEYWORD,getURLEncode(CategoryList.getBlockedCategoryForPerformance(), format), false);
             }
 
             LOG.debug("dmg url is {}", url);
 
             return (new URI(url.toString()));
-        }
-        catch (URISyntaxException exception) {
+        } catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.error("{}", exception);
         }
@@ -185,15 +178,13 @@ public class DCPDmgAdnetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 adStatus = "NO_AD";
                 LOG.error("Error parsing response from dmg : {}", exception);
                 LOG.error("Response from dmg: {}", response);

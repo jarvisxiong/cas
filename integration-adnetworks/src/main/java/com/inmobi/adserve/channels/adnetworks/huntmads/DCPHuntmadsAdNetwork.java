@@ -117,55 +117,49 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             if (isapp) {
                 url.append("&isapp=yes");
                 url.append("&isweb=no");
-            }
-            else {
+            } else {
                 url.append("&isapp=no");
                 url.append("&isweb=yes");
                 
             }
             if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
                 if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
-                
-               appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.uidMd5, false);
-               }
-               else if (casInternalRequestParameters.uidO1 != null) {
-               appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.uidO1, false);
-               }
-               if (!StringUtils.isBlank(casInternalRequestParameters.uid)) {
-               url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.uid);
-               }
+
+                    appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.uidMd5, false);
+                } else if (casInternalRequestParameters.uidO1 != null) {
+                    appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.uidO1, false);
+                }
+                if (!StringUtils.isBlank(casInternalRequestParameters.uid)) {
+                    url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.uid);
+                }
                 if (casInternalRequestParameters.gpid != null) {
                     url.append("&androidaid=").append(casInternalRequestParameters.gpid);
                     url.append("&adtracking=").append(casInternalRequestParameters.uidADT);
 
                 }
-                
-                }
-               if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
-                
-               if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
-               && "1".equals(casInternalRequestParameters.uidADT)) {
-                
-                appendQueryParam(url, IDFA, casInternalRequestParameters.uidIFA, false);
+
+            }
+            if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
+
+                if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
+                        && "1".equals(casInternalRequestParameters.uidADT)) {
+
+                    appendQueryParam(url, IDFA, casInternalRequestParameters.uidIFA, false);
                 }
                 if (casInternalRequestParameters.uidSO1 != null) {
-                url.append("&udidtype=odin1&udid=").append(casInternalRequestParameters.uidSO1);
+                    url.append("&udidtype=odin1&udid=").append(casInternalRequestParameters.uidSO1);
+                } else if (casInternalRequestParameters.uidMd5 != null) {
+                    url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.uidMd5);
+                } else if (!StringUtils.isBlank(casInternalRequestParameters.uid)) {
+                    url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.uid);
                 }
-                else if (casInternalRequestParameters.uidMd5 != null) {
-                url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.uidMd5);
-                }
-                       
-                else if (!StringUtils.isBlank(casInternalRequestParameters.uid)) {
-                url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.uid);
-                }
-                               
-                }
-                else{
+
+            } else {
                 String uid = getUid();
-                if(!StringUtils.isBlank(uid)){
-                url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.uid);
+                if (!StringUtils.isBlank(uid)) {
+                    url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.uid);
                 }
-                }
+            }
 
             appendQueryParam(url, SITEID, blindedSiteId, false);
 
@@ -174,7 +168,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             }
 
            
-             if (width != 0 && height != 0) {
+            if (width != 0 && height != 0) {
                 url.append("&min_size_x=").append((int) (width * .9));
                 url.append("&min_size_y=").append((int) (height * .9));
                 url.append("&size_x=").append(width);
@@ -188,8 +182,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             LOG.debug("Huntmads url is {}", url);
 
             return (new URI(url.toString()));
-        }
-        catch (URISyntaxException exception) {
+        } catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.error("{}", exception);
         }
@@ -208,8 +201,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             LOG.debug("beacon url inside huntmads is {}", beaconUrl);
 
             try {
@@ -223,8 +215,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
                 TemplateType t = TemplateType.HTML;
                 if (adResponse.has("content") && StringUtils.isNotBlank(adResponse.getString("content"))) {
                     context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, adResponse.getString("content"));
-                }
-                else {
+                } else {
                     context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse.getString("url"));
                     String partnerBeacon = adResponse.getString("track");
                     if (StringUtils.isNotBlank(partnerBeacon) && !"null".equalsIgnoreCase(partnerBeacon)) {
@@ -238,12 +229,10 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
                         if (!StringUtils.isEmpty(vmTemplate)) {
                             context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
                             t = TemplateType.RICH;
-                        }
-                        else {
+                        } else {
                             t = TemplateType.PLAIN;
                         }
-                    }
-                    else {
+                    } else {
                         context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getString("img"));
                         t = TemplateType.IMAGE;
                     }
@@ -251,20 +240,17 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
 
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            }
-            catch (JSONException exception) {
+            } catch (JSONException exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from huntmads : {}", exception);
                 LOG.info("Response from huntmads: {}", response);
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from huntmads : {}", exception);
                 LOG.info("Response from huntmads: {}", response);
                 try {
                     throw exception;
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     LOG.info("Error while rethrowing the exception : {}", e);
                 }
             }

@@ -63,8 +63,8 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
             Long slotSize = (long) sasParams.getSlot();
             // Httpool doesnt support 320x48 & 320x53. so mapping to 320x50
-            if (slotSize == 9l || slotSize == 24l) {
-                slotSize = 15l;
+            if (slotSize == 9L || slotSize == 24L) {
+                slotSize = 15L;
             }
             Dimension dim = SlotSizeMapping.getDimension(slotSize);
             acceptShop = dim.getWidth() > 299;
@@ -106,7 +106,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
             }
 
             String did = getUid();
-            if (StringUtils.isEmpty(did) || did.equals("null")) {
+            if (StringUtils.isEmpty(did) || "null".equals(did)) {
                 did = "nodeviceid-1234567890";
             }
             url.append("&did=").append(did);
@@ -119,13 +119,12 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             String gender = sasParams.getGender();
             if (StringUtils.isNotBlank(gender)) {
-                url.append("&dd_gnd=").append(gender.equalsIgnoreCase("f") ? 2 : 1);
+                url.append("&dd_gnd=").append("f".equalsIgnoreCase(gender) ? 2 : 1);
             }
             LOG.debug("httpool url is {}", url.toString());
 
             return (new URI(url.toString()));
-        }
-        catch (URISyntaxException exception) {
+        } catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.error("{}", exception);
         }
@@ -143,8 +142,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             LOG.debug("beacon url inside httpool is {}", beaconUrl);
 
             try {
@@ -163,8 +161,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
                 if ("tpt".equalsIgnoreCase(adType)) {
                     context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, adResponse.getString("content"));
                     t = TemplateType.HTML;
-                }
-                else {
+                } else {
                     String landingUrl = adResponse.getString("click_url") + "&url="
                             + adResponse.getString("redirect_url");
                     context.put(VelocityTemplateFieldConstants.PartnerClickUrl, landingUrl);
@@ -176,32 +173,27 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
                             LOG.info("No template found for the slot");
                             adStatus = "NO_AD";
                             return;
-                        }
-                        else {
+                        } else {
                             context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
                             t = TemplateType.RICH;
                         }
-                    }
-                    else {
+                    } else {
                         t = TemplateType.IMAGE;
                     }
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            }
-            catch (JSONException exception) {
+            } catch (JSONException exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from httpool : {}", exception);
                 LOG.info("Response from httpool: {}", response);
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from httpool : {}", exception);
                 LOG.info("Response from httpool: {}", response);
                 try {
                     throw exception;
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     LOG.info("Error while rethrowing the exception : {}", e);
                 }
             }
