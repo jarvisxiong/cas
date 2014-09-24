@@ -73,6 +73,7 @@ public class ServletGetSegment implements Servlet {
             String repoName = segment.getString("repo-name");
             String key = id + "_" + repoName;
             Object entity = null;
+
             if(repoName != null) {
                 if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_REPOSITORY)) {
                     entity = CasConfigUtil.repositoryHelper.queryChannelRepository(id);
@@ -92,11 +93,11 @@ public class ServletGetSegment implements Servlet {
                 } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.PUBLISHER_FILTER_REPOSITORY)) {
                     entity = CasConfigUtil.repositoryHelper.queryPublisherFilterRepository(id.split("_")[0],
                             Integer.parseInt(id.split("_")[1]));
-                } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CITRUS_LEAF_FEEDBACK)) {
+                } else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals.AEROSPIKE_FEEDBACK)) {
                     if (id.split("_").length > 1) {
-                        entity = CasConfigUtil.repositoryHelper.querySiteCitrusLeafFeedbackRepository(id.split("_")[0], Integer.parseInt(id.split("_")[1]));
+                        entity = CasConfigUtil.repositoryHelper.querySiteAerospikeFeedbackRepository(id.split("_")[0], Integer.parseInt(id.split("_")[1]));
                     } else {
-                        entity = CasConfigUtil.repositoryHelper.querySiteCitrusLeafFeedbackRepository(id);
+                        entity = CasConfigUtil.repositoryHelper.querySiteAerospikeFeedbackRepository(id);
                     }
                 } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY)) {
                     entity = CasConfigUtil.repositoryHelper.querySiteEcpmRepository(id.split("_")[0],
@@ -110,8 +111,8 @@ public class ServletGetSegment implements Servlet {
                 } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CREATIVE_REPOSITORY)) {
                     entity = CasConfigUtil.repositoryHelper.queryCreativeRepository(id.split("_")[0], id.split("_")[1]);
                 }
+                segmentInfo.put(key, entity);
             }
-            segmentInfo.put(key, entity);
         }
         Gson gson = new Gson();
         hrh.responseSender.sendResponse(gson.toJson(segmentInfo), serverChannel);

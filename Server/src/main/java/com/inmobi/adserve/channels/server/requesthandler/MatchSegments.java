@@ -37,7 +37,7 @@ public class MatchSegments {
     private final ChannelEntity                defaultChannelEntity;
     private final ChannelFeedbackEntity        defaultChannelFeedbackEntity;
     private final ChannelSegmentFeedbackEntity defaultChannelSegmentFeedbackEntity;
-    private final ChannelSegmentFeedbackEntity defaultChannelSegmentCitrusLeafFeedbackEntity;
+    private final ChannelSegmentFeedbackEntity defaultChannelSegmentAerospikeFeedbackEntity;
     private final Provider<Marker>             traceMarkerProvider;
 
     private final Map<String, String>          advertiserIdToNameMap;
@@ -75,7 +75,7 @@ public class MatchSegments {
         channelSegmentFeedbackEntityBuilder.setLastHourLatency(400);
         defaultChannelSegmentFeedbackEntity = channelSegmentFeedbackEntityBuilder.build();
 
-        this.defaultChannelSegmentCitrusLeafFeedbackEntity = this.defaultChannelSegmentFeedbackEntity;
+        this.defaultChannelSegmentAerospikeFeedbackEntity = this.defaultChannelSegmentFeedbackEntity;
     }
 
     // select channel segment based on specified rules
@@ -241,7 +241,7 @@ public class MatchSegments {
                 .queryChannelFeedbackRepository(channelSegmentEntity.getAdvertiserId());
         ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity = repositoryHelper
                 .queryChannelSegmentFeedbackRepository(channelSegmentEntity.getAdgroupId());
-        ChannelSegmentFeedbackEntity channelSegmentCitrusLeafFeedbackEntity = null;
+        ChannelSegmentFeedbackEntity channelSegmentAerospikeFeedbackEntity = null;
         if (channelEntity == null) {
             LOG.debug(traceMarker, "No channelEntity for found");
             channelEntity = defaultChannelEntity;
@@ -258,25 +258,25 @@ public class MatchSegments {
         }
 
         SegmentAdGroupFeedbackEntity segmentAdGroupFeedbackEntity = repositoryHelper
-                .querySiteCitrusLeafFeedbackRepository(sasParams.getSiteId(), sasParams.getSiteSegmentId());
+                .querySiteAerospikeFeedbackRepository(sasParams.getSiteId(), sasParams.getSiteSegmentId());
 
         if (segmentAdGroupFeedbackEntity != null) {
             if (segmentAdGroupFeedbackEntity.getAdGroupFeedbackMap() != null) {
-                channelSegmentCitrusLeafFeedbackEntity = segmentAdGroupFeedbackEntity.getAdGroupFeedbackMap().get(
+                channelSegmentAerospikeFeedbackEntity = segmentAdGroupFeedbackEntity.getAdGroupFeedbackMap().get(
                         channelSegmentEntity.getExternalSiteKey());
             }
         } else {
             LOG.debug(traceMarker, "No segmentAdGroupFeedbackEntity found");
         }
 
-        if (channelSegmentCitrusLeafFeedbackEntity == null) {
-            LOG.debug(traceMarker, "No channelSegmentCitrusLeafFeedbackEntity");
-            channelSegmentCitrusLeafFeedbackEntity = defaultChannelSegmentCitrusLeafFeedbackEntity;
+        if (channelSegmentAerospikeFeedbackEntity == null) {
+            LOG.debug(traceMarker, "No channelSegmentAerospikeFeedbackEntity");
+            channelSegmentAerospikeFeedbackEntity = defaultChannelSegmentAerospikeFeedbackEntity;
         }
 
-        double pEcpm = channelSegmentCitrusLeafFeedbackEntity.getECPM();
+        double pEcpm = channelSegmentAerospikeFeedbackEntity.getECPM();
         return new ChannelSegment(channelSegmentEntity, channelEntity, channelFeedbackEntity,
-                channelSegmentFeedbackEntity, channelSegmentCitrusLeafFeedbackEntity, null, pEcpm);
+                channelSegmentFeedbackEntity, channelSegmentAerospikeFeedbackEntity, null, pEcpm);
     }
 
     private void printSegments(final List<AdvertiserMatchedSegmentDetail> result, final Marker traceMarker) {

@@ -73,8 +73,6 @@ public class InspectorStrings {
     public static final String DROPPED_IN_TOD_FILTER                     = "DroppedInTODFilter";
     public static final String SITE_FEEDBACK_CACHE_HIT                   = "SiteFeedbackCacheHit";
     public static final String SITE_FEEDBACK_CACHE_MISS                  = "SiteFeedbackCacheMiss";
-    public static final String SITE_FEEDBACK_REQUESTS_TO_CITRUS_LEAF     = "SiteFeedbackRequestsToCitrusLeaf";
-    public static final String SITE_FEEDBACK_FAILED_TO_LOAD_FROM_CITRUS_LEAF = "SiteFeedbackFailedToLoadFromCitrusLeaf";
     public static final String SITE_FEEDBACK_LATENCY                     = "SiteFeedbackLatency";
     public static final String MISSING_CATEGORY                          = "MissingCategory";
     public final static String DROPPED_IN_RTB_BALANCE_FILTER             = "DroppedInRtbBalanceFilter";
@@ -87,6 +85,8 @@ public class InspectorStrings {
     public final static String DROPPED_IN_ADVERTISER_DOMAINS_MISSING_FILTER      = "DroppedInAdvertiserDomainsFilter";
     public final static String DROPPED_IN_CREATIVE_ATTRIBUTES_MISSING_FILTER = "DroppedInCreativeAttributesFilter";
     public final static String DROPPED_IN_CREATIVE_VALIDATOR_FILTER      = "DroppedInCreativeValidatorFilter";
+    public static final String siteFeedbackRequestsToAerospike           = "SiteFeedbackRequestsToAerospike";
+    public static final String siteFeedbackFailedToLoadFromAerospike     = "SiteFeedbackFailedToLoadFromAerospike";
     public final static String droppedInDstFilter                        = "DroppedInDstFilter";
     public final static String DROPPED_IN_ACCOUNT_SEGMENT_FILTER         = "DroppedInAccountSegmentFilter";
     public static final String DROPPED_IN_SUPPLY_DEMAND_CLASSIFICATION_FILTER = "DroppedInSupplyDemandClassificationFilter";

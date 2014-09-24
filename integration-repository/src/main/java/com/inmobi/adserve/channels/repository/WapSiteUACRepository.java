@@ -50,13 +50,12 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
             final String categories = row.getString("categories");
             final boolean coppaEnabled = row.getBoolean("coppa_enabled");
             final Integer exchange_settings = row.getInt("exchange_settings");
-            final boolean exchangeEnabled = row.getBoolean("is_exchange_enabled");
             final Integer pubBlindArr[] = (Integer[])row.getArray("pub_blind_list");
             final Integer siteBlindArr[] = (Integer[])row.getArray("site_blind_list");
             final boolean siteTransparencyEnabled = row.getBoolean("is_site_transparent");
             final String siteUrl = row.getString("site_url");
             final String siteName = row.getString("site_name");
-            final String appTitle = row.getString("app_title");
+            final String appTitle = row.getString("title");
             boolean pubTransparencyEnabled = false;
             if(exchange_settings==1){//exchange_settings=1 => Publisher is transparent and exchange enabled
                 pubTransparencyEnabled=true;
@@ -91,7 +90,6 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
             builder.setCoppaEnabled(coppaEnabled);
             //Both Publisher level and site level transparency has to be enabled for an ad request to be transparent
             builder.setTransparencyEnabled(pubTransparencyEnabled && siteTransparencyEnabled);
-            builder.setExchangeEnabled(exchangeEnabled);
             //if Site Id is set, we take site level blindlist, otherwise publisher level blind list
             if(null != siteBlindArr && siteBlindArr.length>0) {
                 builder.setBlindList(Arrays.asList(siteBlindArr));
