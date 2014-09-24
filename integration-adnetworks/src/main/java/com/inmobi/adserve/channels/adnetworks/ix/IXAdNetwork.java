@@ -154,6 +154,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final String SITE_BLOCKLIST_FORMAT="blk%s";
     private static final String RUBICON_PERF_BLOCKLIST_ID = "InMobiPERF";
     private static final String RUBICON_FS_BLOCKLIST_ID = "InMobiFS";
+    private static final String RESPONSE_TEMPLATE = "<script>%s</script>";
     private WapSiteUACEntity wapSiteUACEntity;
     private boolean isWapSiteUACEntity = false;
     private List<String> globalBlindFromConfig;
@@ -489,7 +490,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     private Banner createBannerObject() {
         Banner banner = new Banner();
-        banner.setId(casInternalRequestParameters.impressionId);
+        // Presently only one banner object per impression object is being sent
+        // When multiple banner objects will be supported,banner ids will begin at 1 and end at n for n banner objects
+        banner.setId("1");
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
             Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             banner.setW((int) dim.getWidth());
@@ -513,7 +516,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private Geo createGeoObject() {
         Geo geo = new Geo();
         //If Coppa is not set, only then send latLong
-        if ((!isCoppaSet) && StringUtils.isNotBlank(casInternalRequestParameters.latLong)
+        if (!isCoppaSet && StringUtils.isNotBlank(casInternalRequestParameters.latLong)
                 && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
             String[] latlong = casInternalRequestParameters.latLong.split(",");
             geo.setLat(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[0]))));
@@ -1015,6 +1018,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
         int admAfterMacroSize = admContent.length();
 
+        // RP responds with JS content so surrounding admContent with <script> as being done in Rubicon DCP response.
+        admContent = String.format(RESPONSE_TEMPLATE, admContent);
         if ("wap".equalsIgnoreCase(sasParams.getSource())) {
             velocityContext.put(VelocityTemplateFieldConstants.PartnerHtmlCode, admContent);
         } else {
