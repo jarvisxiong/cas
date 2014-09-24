@@ -25,7 +25,7 @@ public class ChannelSegment {
     @Getter
     private final ChannelSegmentFeedbackEntity     channelSegmentFeedbackEntity;
     @Getter
-    private final ChannelSegmentFeedbackEntity     channelSegmentCitrusLeafFeedbackEntity;
+    private final ChannelSegmentFeedbackEntity     channelSegmentAerospikeFeedbackEntity;
     @Getter
     @Setter
     private AdNetworkInterface                     adNetworkInterface;
@@ -52,13 +52,13 @@ public class ChannelSegment {
     public ChannelSegment(final ChannelSegmentEntity channelSegmentEntity, final ChannelEntity channelEntity,
             final ChannelFeedbackEntity channelFeedbackEntity,
             final ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity,
-            final ChannelSegmentFeedbackEntity channelSegmentCitrusLeafFeedbackEntity,
+            final ChannelSegmentFeedbackEntity channelSegmentAerospikeFeedbackEntity,
             final AdNetworkInterface adNetworkInterface, final double prioritisedECPM) {
         this.channelSegmentEntity = channelSegmentEntity;
         this.channelEntity = channelEntity;
         this.channelFeedbackEntity = channelFeedbackEntity;
         this.channelSegmentFeedbackEntity = channelSegmentFeedbackEntity;
-        this.channelSegmentCitrusLeafFeedbackEntity = channelSegmentCitrusLeafFeedbackEntity;
+        this.channelSegmentAerospikeFeedbackEntity = channelSegmentAerospikeFeedbackEntity;
         this.adNetworkInterface = adNetworkInterface;
         this.prioritisedECPM = prioritisedECPM;
     }

@@ -71,7 +71,6 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
         private List<String> categories;
         private boolean isCoppaEnabled;
         private boolean isTransparencyEnabled;
-        private boolean isExchangeEnabled;
         private List<Integer> blindList;
         private String siteUrl;
         private String siteName;

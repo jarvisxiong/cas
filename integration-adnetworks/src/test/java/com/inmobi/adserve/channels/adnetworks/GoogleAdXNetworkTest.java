@@ -77,6 +77,25 @@ public class GoogleAdXNetworkTest extends TestCase {
         null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
         "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
     assertTrue(googleAdXNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null));
+
+
+    // If we know the request is from FeaturePhones Or Opera then return false
+    sasParams.setDeviceType("FEATURE_PHONE");
+    entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
+          googleAdXPublisherID, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
+          null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                  "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+
+    assertFalse(googleAdXNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null));
+
+      // If we know the request is from FeaturePhones Or Opera then return false
+      sasParams.setUserAgent("Opera/9.80 (J2ME/MIDP; Opera Mini/9.80 (S60; SymbOS; Opera Mobi/23.348; U; en) Presto/2.5.25 Version/10.54");
+      entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
+              googleAdXPublisherID, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
+              null, 0, null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                      "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+
+      assertFalse(googleAdXNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null));
   }
 
   @Test
