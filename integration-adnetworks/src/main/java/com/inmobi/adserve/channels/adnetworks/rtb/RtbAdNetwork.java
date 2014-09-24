@@ -339,6 +339,14 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             } else {
                 // Creating App object
                 app = createAppObject();
+
+                // Set bundle if the site ID is present.
+                if (siteIDMap.get(sasParams.getSiteId()) != null) {
+                    if (isAndroid() || isIOS()) {
+                        app.bundle = siteIDMap.get(sasParams.getSiteId());
+                        app.id = app.bundle;
+                    }
+                }
             }
         }
 
