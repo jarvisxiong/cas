@@ -39,8 +39,7 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
         final Timestamp modifiedOn;
         if(null != row.getTimestamp("wsu_modified_on")) {
             modifiedOn = row.getTimestamp("wsu_modified_on").after(row.getTimestamp("ws_modified_on")) ? row.getTimestamp("wsu_modified_on") : row.getTimestamp("ws_modified_on");
-        }
-        else{
+        } else{
             modifiedOn = row.getTimestamp("ws_modified_on");
         }
         try {
@@ -94,12 +93,9 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
             builder.setTransparencyEnabled(pubTransparencyEnabled && siteTransparencyEnabled);
             builder.setExchangeEnabled(exchangeEnabled);
             //if Site Id is set, we take site level blindlist, otherwise publisher level blind list
-            if(null != siteBlindArr && siteBlindArr.length>0)
-            {
+            if(null != siteBlindArr && siteBlindArr.length>0) {
                 builder.setBlindList(Arrays.asList(siteBlindArr));
-            }
-            else if(null != pubBlindArr && pubBlindArr.length>0)
-            {
+            } else if(null != pubBlindArr && pubBlindArr.length>0) {
                 builder.setBlindList(Arrays.asList(pubBlindArr));
             }
 

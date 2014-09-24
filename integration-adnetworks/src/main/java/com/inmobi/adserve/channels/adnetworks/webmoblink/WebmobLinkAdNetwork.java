@@ -33,25 +33,25 @@ public class WebmobLinkAdNetwork extends AbstractDCPAdNetworkImpl {
     private String                 channels;
     private static Map<Long, Long> channelList = new HashMap<Long, Long>();
     static {
-        channelList.put(10l, 1l);
-        channelList.put(19l, 3l);
-        channelList.put(32l, 3l);
-        channelList.put(4l, 3l);
-        channelList.put(30l, 3l);
-        channelList.put(28l, 3l);
-        channelList.put(13l, 10l);
-        channelList.put(31l, 10l);
-        channelList.put(14l, 11l);
-        channelList.put(22l, 14l);
-        channelList.put(18l, 14l);
-        channelList.put(21l, 14l);
-        channelList.put(17l, 14l);
-        channelList.put(15l, 16l);
-        channelList.put(7l, 20l);
-        channelList.put(23l, 20l);
-        channelList.put(24l, 20l);
-        channelList.put(27l, 20l);
-        channelList.put(11l, 23l);
+        channelList.put(10L, 1L);
+        channelList.put(19L, 3L);
+        channelList.put(32L, 3L);
+        channelList.put(4L, 3L);
+        channelList.put(30L, 3L);
+        channelList.put(28L, 3L);
+        channelList.put(13L, 10L);
+        channelList.put(31L, 10L);
+        channelList.put(14L, 11L);
+        channelList.put(22L, 14L);
+        channelList.put(18L, 14L);
+        channelList.put(21L, 14L);
+        channelList.put(17L, 14L);
+        channelList.put(15L, 16L);
+        channelList.put(7L, 20L);
+        channelList.put(23L, 20L);
+        channelList.put(24L, 20L);
+        channelList.put(27L, 20L);
+        channelList.put(11L, 23L);
     }
 
     public WebmobLinkAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
@@ -128,8 +128,7 @@ public class WebmobLinkAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             LOG.debug("Webmoblink uri - {}", url);
             return (new URI(url.toString()));
-        }
-        catch (URISyntaxException exception) {
+        } catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.error("{}", exception);
         }

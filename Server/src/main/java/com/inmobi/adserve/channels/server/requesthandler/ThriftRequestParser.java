@@ -87,10 +87,10 @@ public class ThriftRequestParser {
             double ecpmFloor = Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor);
             params.setSiteFloor(ecpmFloor);
             double computedBidGuidance = tObject.guidanceBid * 1.0 / Math.pow(10, 6);
+
             if(tObject.isSetGuidanceBid() && computedBidGuidance > ecpmFloor) {
                 params.setMarketRate(computedBidGuidance);
-            }
-            else{
+            } else{
                 params.setMarketRate(ecpmFloor);
             }
             params.setSiteIncId(tObject.site.siteIncId);
@@ -155,9 +155,9 @@ public class ThriftRequestParser {
                         break;
                 }
 
-            }
-            else
+            } else {
                 params.setGender(null);
+            }
         }
 
         // Fill params from UIDParams Object
@@ -309,8 +309,7 @@ public class ThriftRequestParser {
                 sb.append(Integer.toHexString((anArray & 0xFF) | 0x100).substring(1, 3));
             }
             return sb.toString();
-        }
-        catch (java.security.NoSuchAlgorithmException ignored) {
+        } catch (java.security.NoSuchAlgorithmException ignored) {
         }
         return null;
     }
@@ -325,8 +324,7 @@ public class ThriftRequestParser {
     public String getSdkVersion(final IntegrationType integrationType, final int version) {
         if (integrationType == IntegrationType.ANDROID_SDK) {
             return "a" + version;
-        }
-        else if (integrationType == IntegrationType.IOS_SDK) {
+        } else if (integrationType == IntegrationType.IOS_SDK) {
             return "i" + version;
         }
         return null;
