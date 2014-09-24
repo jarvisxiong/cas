@@ -50,11 +50,10 @@ public class ServletGetSegment implements Servlet {
         JSONObject jObject;
         try {
             jObject = requestParser.extractParams(params, "segments");
-        }
-        catch (JSONException exeption) {
+        } catch (JSONException exeption) {
             LOG.debug("Encountered Json Error while creating json object inside servlet");
             hrh.setTerminationReason(CasConfigUtil.jsonParsingError);
-            InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
+            InspectorStats.incrementStatCount(InspectorStrings.JSON_PARSING_ERROR, InspectorStrings.COUNT);
             hrh.responseSender.sendResponse("Incorrect Json", serverChannel);
             return;
         }
@@ -74,66 +73,43 @@ public class ServletGetSegment implements Servlet {
             String repoName = segment.getString("repo-name");
             String key = id + "_" + repoName;
             Object entity = null;
-
-            if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_REPOSITORY)) {
-                entity = CasConfigUtil.repositoryHelper.queryChannelRepository(id);
-            }
-            else if (repoName != null
-                    && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY)) {
-                entity = CasConfigUtil.repositoryHelper.queryChannelAdGroupRepository(id);
-            }
-            else if (repoName != null
-                    && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY)) {
-                entity = CasConfigUtil.repositoryHelper.queryChannelFeedbackRepository(id);
-            }
-            else if (repoName != null
-                    && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY)) {
-                entity = CasConfigUtil.repositoryHelper.queryChannelSegmentFeedbackRepository(id);
-            }
-            else if (repoName != null
-                    && repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)) {
-                entity = CasConfigUtil.repositoryHelper.querySiteMetaDetaRepository(id);
-            }
-            else if (repoName != null
-                    && repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY)) {
-                entity = CasConfigUtil.repositoryHelper.querySiteTaxonomyRepository(id);
-            }
-            else if (repoName != null
-                    && repoName.equalsIgnoreCase(ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY)) {
-                entity = CasConfigUtil.repositoryHelper.queryPricingEngineRepository(
-                        Integer.parseInt(id.split("_")[0]), Integer.parseInt(id.split("_")[1]));
-            }
-            else if (repoName != null
-                    && repoName.equalsIgnoreCase(ChannelServerStringLiterals.PUBLISHER_FILTER_REPOSITORY)) {
-                entity = CasConfigUtil.repositoryHelper.queryPublisherFilterRepository(id.split("_")[0],
-                        Integer.parseInt(id.split("_")[1]));
-            }
-            else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CITRUS_LEAF_FEEDBACK)) {
-                if (id.split("_").length > 1) {
-                    entity = CasConfigUtil.repositoryHelper.querySiteCitrusLeafFeedbackRepository(id.split("_")[0], Integer.parseInt(id.split("_")[1]));
-                } else {
-                    entity = CasConfigUtil.repositoryHelper.querySiteCitrusLeafFeedbackRepository(id);
+            if(repoName != null) {
+                if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_REPOSITORY)) {
+                    entity = CasConfigUtil.repositoryHelper.queryChannelRepository(id);
+                } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY)) {
+                    entity = CasConfigUtil.repositoryHelper.queryChannelAdGroupRepository(id);
+                } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY)) {
+                    entity = CasConfigUtil.repositoryHelper.queryChannelFeedbackRepository(id);
+                } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY)) {
+                    entity = CasConfigUtil.repositoryHelper.queryChannelSegmentFeedbackRepository(id);
+                } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)) {
+                    entity = CasConfigUtil.repositoryHelper.querySiteMetaDetaRepository(id);
+                } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY)) {
+                    entity = CasConfigUtil.repositoryHelper.querySiteTaxonomyRepository(id);
+                } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY)) {
+                    entity = CasConfigUtil.repositoryHelper.queryPricingEngineRepository(
+                            Integer.parseInt(id.split("_")[0]), Integer.parseInt(id.split("_")[1]));
+                } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.PUBLISHER_FILTER_REPOSITORY)) {
+                    entity = CasConfigUtil.repositoryHelper.queryPublisherFilterRepository(id.split("_")[0],
+                            Integer.parseInt(id.split("_")[1]));
+                } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CITRUS_LEAF_FEEDBACK)) {
+                    if (id.split("_").length > 1) {
+                        entity = CasConfigUtil.repositoryHelper.querySiteCitrusLeafFeedbackRepository(id.split("_")[0], Integer.parseInt(id.split("_")[1]));
+                    } else {
+                        entity = CasConfigUtil.repositoryHelper.querySiteCitrusLeafFeedbackRepository(id);
+                    }
+                } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY)) {
+                    entity = CasConfigUtil.repositoryHelper.querySiteEcpmRepository(id.split("_")[0],
+                            Integer.parseInt(id.split("_")[1]), Integer.parseInt(id.split("_")[2]));
+                } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY)) {
+                    entity = CasConfigUtil.repositoryHelper.queryCurrencyConversionRepository(id);
+                } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY)) {
+                    entity = CasConfigUtil.repositoryHelper.queryWapSiteUACRepository(id.split("_")[0]);
+                } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY)) {
+                    entity = CasConfigUtil.repositoryHelper.queryIXAccountMapRepository(Long.parseLong(id.split("_")[0]));
+                } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CREATIVE_REPOSITORY)) {
+                    entity = CasConfigUtil.repositoryHelper.queryCreativeRepository(id.split("_")[0], id.split("_")[1]);
                 }
-            }
-            else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY)) {
-                entity = CasConfigUtil.repositoryHelper.querySiteEcpmRepository(id.split("_")[0],
-                        Integer.parseInt(id.split("_")[1]), Integer.parseInt(id.split("_")[2]));
-            }
-            else if (repoName != null
-                    && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY)) {
-                entity = CasConfigUtil.repositoryHelper.queryCurrencyConversionRepository(id);
-            }
-            else if (repoName != null
-                    && repoName.equalsIgnoreCase(ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY)) {
-                entity = CasConfigUtil.repositoryHelper.queryWapSiteUACRepository(id.split("_")[0]);
-            }
-            else if (repoName != null
-                    && repoName.equalsIgnoreCase(ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY)) {
-                entity = CasConfigUtil.repositoryHelper.queryIXAccountMapRepository(Long.parseLong(id.split("_")[0]));
-            }
-            else if (repoName != null
-                    && repoName.equalsIgnoreCase(ChannelServerStringLiterals.CREATIVE_REPOSITORY)) {
-                entity = CasConfigUtil.repositoryHelper.queryCreativeRepository(id.split("_")[0], id.split("_")[1]);
             }
             segmentInfo.put(key, entity);
         }

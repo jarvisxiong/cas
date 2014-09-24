@@ -36,7 +36,7 @@ public class ServletLbStatus implements Servlet {
         LOG.debug("asked for load balancer status");
         InspectorStats.incrementStatCount("LbStatus", InspectorStrings.totalRequests);
         if (ServerStatusInfo.statusCode != 404) {
-            InspectorStats.incrementStatCount("LbStatus", InspectorStrings.successfulRequests);
+            InspectorStats.incrementStatCount("LbStatus", InspectorStrings.SUCCESSFUL_REQUESTS);
             hrh.responseSender.sendResponse("OK", serverChannel);
             return;
         }

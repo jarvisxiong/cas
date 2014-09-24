@@ -44,7 +44,7 @@ public class ServletRtbd extends BaseServlet {
             final Channel serverChannel) throws Exception {
         Marker traceMarker = traceMarkerProvider.get();
         LOG.debug(traceMarker, "Inside RTBD servlet");
-        InspectorStats.incrementStatCount(InspectorStrings.ruleEngineRequests);
+        InspectorStats.incrementStatCount(InspectorStrings.RULE_ENGINE_REQUESTS);
         super.handleRequest(hrh, queryStringDecoder, serverChannel);
     }
 

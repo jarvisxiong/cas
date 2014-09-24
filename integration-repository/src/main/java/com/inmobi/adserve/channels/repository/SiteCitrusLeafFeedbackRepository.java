@@ -76,18 +76,17 @@ public class SiteCitrusLeafFeedbackRepository {
             LOG.debug("got the siteFeedback entity from cache for query {} {}", siteId, segmentId);
             if (System.currentTimeMillis() - siteFeedbackEntity.getLastUpdated() < refreshTime) {
                 LOG.debug("siteFeedback entity is fresh for query {} {}", siteId, segmentId);
-                InspectorStats.incrementStatCount(InspectorStrings.siteFeedbackCacheHit);
+                InspectorStats.incrementStatCount(InspectorStrings.SITE_FEEDBACK_CACHE_HIT);
                 return siteFeedbackEntity.getSegmentAdGroupFeedbackMap() == null ? null : siteFeedbackEntity
                         .getSegmentAdGroupFeedbackMap().get(segmentId);
             }
             LOG.debug("siteFeedback entity is stale for query {}_{}", siteId, segmentId);
-        }
-        else {
+        } else {
             LOG.debug("siteFeedback not found for siteId: {}", siteId);
         }
         LOG.debug("Returning default/old siteFeedback entity and Fetching new data from citrus leaf for siteId: {}",
                 siteId);
-        InspectorStats.incrementStatCount(InspectorStrings.siteFeedbackCacheMiss);
+        InspectorStats.incrementStatCount(InspectorStrings.SITE_FEEDBACK_CACHE_MISS);
         asynchronouslyFetchFeedbackFromCitrusLeaf(siteId);
         siteFeedbackEntity = siteSegmentFeedbackCache.get(siteId);
         return siteFeedbackEntity == null ? null : (siteFeedbackEntity.getSegmentAdGroupFeedbackMap() == null ? null
@@ -104,8 +103,7 @@ public class SiteCitrusLeafFeedbackRepository {
             CacheUpdater cacheUpdater = new CacheUpdater(siteId);
             Thread cacheUpdaterThread = new Thread(cacheUpdater);
             executorService.execute(cacheUpdaterThread);
-        }
-        else {
+        } else {
             LOG.debug("Not fetching feedback as site is already updating");
         }
     }
@@ -135,7 +133,7 @@ public class SiteCitrusLeafFeedbackRepository {
             ClResult clResult = getFromCitrusLeaf(siteId);
             if (!clResult.resultCode.equals(ClResultCode.OK)) {
                 LOG.debug("key not found in citrus leaf");
-                InspectorStats.incrementStatCount(InspectorStrings.siteFeedbackFailedToLoadFromCitrusLeaf);
+                InspectorStats.incrementStatCount(InspectorStrings.SITE_FEEDBACK_FAILED_TO_LOAD_FROM_CITRUS_LEAF);
                 return;
             }
             LOG.debug("key found in citrus leaf");
@@ -146,11 +144,11 @@ public class SiteCitrusLeafFeedbackRepository {
          * Method which makes a call to citrus leaf to load the complete site info
          */
         ClResult getFromCitrusLeaf(final String site) {
-            InspectorStats.incrementStatCount(InspectorStrings.siteFeedbackRequestsToCitrusLeaf);
+            InspectorStats.incrementStatCount(InspectorStrings.SITE_FEEDBACK_REQUESTS_TO_CITRUS_LEAF);
             long time = System.currentTimeMillis();
             ClResult clResult = citrusleafClient.getAll(namespace, set, site, null);
             time = System.currentTimeMillis() - time;
-            InspectorStats.incrementStatCount(InspectorStrings.siteFeedbackLatency, time);
+            InspectorStats.incrementStatCount(InspectorStrings.SITE_FEEDBACK_LATENCY, time);
             return clResult;
         }
 
@@ -171,8 +169,7 @@ public class SiteCitrusLeafFeedbackRepository {
                         try {
                             TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
                             tDeserializer.deserialize(globalFeedback, (byte[]) binValuePair.getValue());
-                        }
-                        catch (TException exception) {
+                        } catch (TException exception) {
                             LOG.debug("Error in deserializing thrift for global feedback for segment {} {}", segmentId,
                                     exception);
                             globalFeedback = null;
@@ -186,8 +183,7 @@ public class SiteCitrusLeafFeedbackRepository {
                                 throw new TException("No rct data");
                             }
                             tDeserializer.deserialize(rctFeedback, (byte[]) byteArray);
-                        }
-                        catch (TException exception) {
+                        } catch (TException exception) {
                             LOG.debug("Error in deserializing thrift for rct feedback for segment {} {}", segmentId,
                                     exception);
                             rctFeedback = null;
@@ -201,8 +197,7 @@ public class SiteCitrusLeafFeedbackRepository {
                                 throw new TException("No colo data");
                             }
                             tDeserializer.deserialize(coloFeedback, (byte[]) byteArray);
-                        }
-                        catch (TException exception) {
+                        } catch (TException exception) {
                             LOG.debug("Error in deserializing thrift for local feedback for segment {} {}", segmentId,
                                     exception);
                             coloFeedback = null;
@@ -257,9 +252,7 @@ public class SiteCitrusLeafFeedbackRepository {
                                 .getExternalSiteKey());
                         builder.setBeacons(builder.getBeacons() + rctBuilder.getBeacons());
                         adGroupFeedbackBuilderMap.put(adGroupFeedback.getExternalSiteKey(), builder);
-                    }
-                    // else adding feedback entity with rct data
-                    else {
+                    } else { // else adding feedback entity with rct data
                         adGroupFeedbackBuilderMap.put(adGroupFeedback.getExternalSiteKey(), rctBuilder);
                     }
                 }
@@ -278,9 +271,7 @@ public class SiteCitrusLeafFeedbackRepository {
                         builder.setFillRatio(coloBuilder.getFillRatio());
                         builder.setLastHourLatency(coloBuilder.getLastHourLatency());
                         adGroupFeedbackBuilderMap.put(adGroupFeedback.getExternalSiteKey(), builder);
-                    }
-                    // else adding feedback entity with colo local data
-                    else {
+                    } else {// else adding feedback entity with colo local data
                         adGroupFeedbackBuilderMap.put(adGroupFeedback.getExternalSiteKey(), coloBuilder);
                     }
                 }
@@ -293,11 +284,9 @@ public class SiteCitrusLeafFeedbackRepository {
             Integer segmentId;
             if (globalFeedback != null) {
                 segmentId = globalFeedback.getInventorySegmentId();
-            }
-            else if (rctFeedback != null) {
+            } else if (rctFeedback != null) {
                 segmentId = rctFeedback.getInventorySegmentId();
-            }
-            else {
+            } else {
                 segmentId = coloFeedback.getInventorySegmentId();
             }
             return new SegmentAdGroupFeedbackEntity(segmentId, adGroupFeedbackMap);
