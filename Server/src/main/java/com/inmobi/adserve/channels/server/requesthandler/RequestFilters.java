@@ -18,10 +18,9 @@ public class RequestFilters {
         if (null != hrh.getTerminationReason()) {
             LOG.debug("Request not being served because of the termination reason {}", hrh.getTerminationReason());
             if (CasConfigUtil.jsonParsingError.equalsIgnoreCase(hrh.getTerminationReason())) {
-                InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
-            }
-            else {
-                InspectorStats.incrementStatCount(InspectorStrings.thriftParsingError, InspectorStrings.count);
+                InspectorStats.incrementStatCount(InspectorStrings.JSON_PARSING_ERROR, InspectorStrings.COUNT);
+            } else {
+                InspectorStats.incrementStatCount(InspectorStrings.THRIFT_PARSING_ERROR, InspectorStrings.COUNT);
             }
             return true;
         }
@@ -29,7 +28,7 @@ public class RequestFilters {
         if (null == hrh.responseSender.sasParams) {
             LOG.error("Terminating request as sasParam is null");
             hrh.setTerminationReason(CasConfigUtil.jsonParsingError);
-            InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
+            InspectorStats.incrementStatCount(InspectorStrings.JSON_PARSING_ERROR, InspectorStrings.COUNT);
             return true;
         }
 
@@ -37,20 +36,20 @@ public class RequestFilters {
             LOG.error("Category field is not present in the request so sending noad");
             hrh.responseSender.sasParams.setCategories(new ArrayList<Long>());
             hrh.setTerminationReason(CasConfigUtil.MISSING_CATEGORY);
-            InspectorStats.incrementStatCount(InspectorStrings.missingCategory, InspectorStrings.count);
+            InspectorStats.incrementStatCount(InspectorStrings.MISSING_CATEGORY, InspectorStrings.COUNT);
             return true;
         }
 
         if (null == hrh.responseSender.sasParams.getSiteId()) {
             LOG.error("Terminating request as site id was missing");
             hrh.setTerminationReason(CasConfigUtil.missingSiteId);
-            InspectorStats.incrementStatCount(InspectorStrings.missingSiteId, InspectorStrings.count);
+            InspectorStats.incrementStatCount(InspectorStrings.MISSING_SITE_ID, InspectorStrings.COUNT);
             return true;
         }
 
         if (!hrh.responseSender.sasParams.getAllowBannerAds()) {
             LOG.error("Request not being served because of banner not allowed.");
-            InspectorStats.incrementStatCount(InspectorStrings.DROPPED_IN_BANNER_NOT_ALLOWED_FILTER, InspectorStrings.count);
+            InspectorStats.incrementStatCount(InspectorStrings.DROPPED_IN_BANNER_NOT_ALLOWED_FILTER, InspectorStrings.COUNT);
             return true;
         }
 
@@ -58,28 +57,26 @@ public class RequestFilters {
                 && !CasConfigUtil.allowedSiteTypes.contains(hrh.responseSender.sasParams.getSiteType())) {
             LOG.error("Terminating request as incompatible content type");
             hrh.setTerminationReason(CasConfigUtil.incompatibleSiteType);
-            InspectorStats.incrementStatCount(InspectorStrings.incompatibleSiteType, InspectorStrings.count);
+            InspectorStats.incrementStatCount(InspectorStrings.INCOMPATIBLE_SITE_TYPE, InspectorStrings.COUNT);
             return true;
         }
+        String tempSdkVersion = hrh.responseSender.sasParams.getSdkVersion();
 
-        if (hrh.responseSender.sasParams.getSdkVersion() != null) {
+        if (null != tempSdkVersion) {
             try {
-                if ((hrh.responseSender.sasParams.getSdkVersion().substring(0, 1).equalsIgnoreCase("i") || hrh.responseSender.sasParams
-                        .getSdkVersion().substring(0, 1).equalsIgnoreCase("a"))
-                        && Integer.parseInt(hrh.responseSender.sasParams.getSdkVersion().substring(1, 2)) < 3) {
+                if (("i".equalsIgnoreCase(tempSdkVersion.substring(0, 1))
+                        || "a".equalsIgnoreCase(tempSdkVersion.substring(0, 1)))
+                        && Integer.parseInt(tempSdkVersion.substring(1, 2)) < 3) {
                     LOG.error("Terminating request as sdkVersion is less than 3");
                     hrh.setTerminationReason(CasConfigUtil.lowSdkVersion);
-                    InspectorStats.incrementStatCount(InspectorStrings.lowSdkVersion, InspectorStrings.count);
+                    InspectorStats.incrementStatCount(InspectorStrings.LOW_SDK_VERSION, InspectorStrings.COUNT);
                     return true;
+                } else {
+                    LOG.debug("sdk-version : {}", tempSdkVersion);
                 }
-                else {
-                    LOG.debug("sdk-version : {}", hrh.responseSender.sasParams.getSdkVersion());
-                }
-            }
-            catch (StringIndexOutOfBoundsException exception) {
+            } catch (StringIndexOutOfBoundsException exception) {
                 LOG.error("Invalid sdk-version " + exception.getMessage());
-            }
-            catch (NumberFormatException exception) {
+            } catch (NumberFormatException exception) {
                 LOG.error("Invalid sdk-version " + exception.getMessage());
             }
 

@@ -35,8 +35,7 @@ public class PricingEngineRepository extends
         Collection<PricingEngineEntity> pricingEngineEntityResultSet = query(pricingEngineIdQuery);
         if (pricingEngineEntityResultSet == null || pricingEngineEntityResultSet.size() == 0) {
             return null;
-        }
-        else if (pricingEngineEntityResultSet.size() >= 1) {
+        } else if (pricingEngineEntityResultSet.size() >= 1) {
             return (PricingEngineEntity) pricingEngineEntityResultSet.toArray()[0];
         }
         return null;
@@ -56,8 +55,7 @@ public class PricingEngineRepository extends
         builder.setDcpFloor(row.getDouble("dcp_floor"));
         try {
             builder.setSupplyToDemandMap(getSupplyToDemandMap(row.getString("supply_demand_json")));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return new DBEntity<PricingEngineEntity, PricingEngineQuery>(new EntityError<PricingEngineQuery>(
                     new PricingEngineQuery(countryId, osId), JSON_ERROR), modifyTime);
         }

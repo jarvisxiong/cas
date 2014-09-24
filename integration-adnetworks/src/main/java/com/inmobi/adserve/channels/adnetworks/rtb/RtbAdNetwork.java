@@ -98,7 +98,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Setter
     BidResponse                            bidResponse;
     private final boolean                  wnRequired;
-    private final int                      auctionType                  = 2;
+    private static final int               auctionType                  = 2;
     private int                            tmax                         = 200;
     private boolean                        templateWN                   = true;
     private static final String            X_OPENRTB_VERSION            = "x-openrtb-version";
@@ -114,7 +114,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private double                         secondBidPriceInUsd          = 0;
     private double                         secondBidPriceInLocal        = 0;
     private String                         bidRequestJson               = "";
-    protected static final String          mraid                        = "<script src=\"mraid.js\" ></script>";
+    protected static final String          MRAID                        = "<script src=\"mraid.js\" ></script>";
     private String                         encryptedBid;
     private static List<String>            image_mimes                  = Arrays.asList("image/jpeg", "image/gif",
                                                                                 "image/png");
@@ -128,6 +128,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private static final String            FAMILY_SAFE_RATING           = "1";
     private static final String            PERFORMANCE_RATING           = "0";
     private static final String            RATING_KEY                   = "fs";
+    private static final String            NO_AD                        = "NO_AD";
     private String                         responseSeatId;
     private String                         responseImpressionId;
     private String                         responseAuctionId;
@@ -170,7 +171,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private static NativeResponseMaker     nativeResponseMaker;
 
 
-    private static final String nativeString = "native";
+    private static final String NATIVE_STRING = "native";
 
     @Override
     protected AsyncHttpClient getAsyncHttpClient() {
@@ -323,15 +324,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     protected boolean configureParameters() {
 
         LOG.debug("inside configureParameters of RTB");
-        if(null == casInternalRequestParameters || null == sasParams){
-            LOG.debug("casInternalRequestParams or sasParams cannot be null");
-            return false;
-        }
-        if (StringUtils.isBlank(sasParams.getRemoteHostIp())
-        		|| StringUtils.isBlank(sasParams.getUserAgent())
-                || StringUtils.isBlank(externalSiteId)
-                || !isRequestFormatSupported()) {
-            LOG.debug("mandate parameters missing or request format is not compatible to partner supported response for dummy so exiting adapter");
+
+        if (!checkIfBasicParamsAvailable()) {
             return false;
         }
 
@@ -339,21 +333,12 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         App app = null;
         Site site = null;
         if (null != sasParams.getSource() && null != sasParams.getSiteId()) {
-            if (sasParams.getSource().equalsIgnoreCase("WAP")) {
+            if ("WAP".equalsIgnoreCase(sasParams.getSource())) {
                 // Creating Site object
                 site = createSiteObject();
-            }
-            else {
+            } else {
                 // Creating App object
                 app = createAppObject();
-
-                // Set bundle if the site ID is present.
-                if (siteIDMap.get(sasParams.getSiteId()) != null) {
-                    if (isAndroid() || isIOS()) {
-                        app.bundle = siteIDMap.get(sasParams.getSiteId());
-                        app.id = app.bundle;
-                    }
-                }
             }
         }
 
@@ -372,8 +357,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (null != sasParams.getSdkVersion()) {
             displayManager = DISPLAY_MANAGER_INMOBI_SDK;
             displayManagerVersion = sasParams.getSdkVersion();
-        }
-        else if (null != sasParams.getAdcode() && "JS".equalsIgnoreCase(sasParams.getAdcode())) {
+        } else if (null != sasParams.getAdcode() && "JS".equalsIgnoreCase(sasParams.getAdcode())) {
             displayManager = DISPLAY_MANAGER_INMOBI_JS;
         }
         Impression impression = createImpressionObject(banner, displayManager, displayManagerVersion);
@@ -390,6 +374,22 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         // Serializing the bidRequest Object
         return serializeBidRequest();
+    }
+
+    private boolean checkIfBasicParamsAvailable() {
+
+        if (null == casInternalRequestParameters || null == sasParams){
+            LOG.debug("casInternalRequestParams or sasParams cannot be null");
+            return false;
+        }
+        if (StringUtils.isBlank(sasParams.getRemoteHostIp())
+                || StringUtils.isBlank(sasParams.getUserAgent())
+                || StringUtils.isBlank(externalSiteId)
+                || !isRequestFormatSupported()) {
+            LOG.debug("mandate parameters missing or request format is not compatible to partner supported response for dummy so exiting adapter");
+            return false;
+        }
+        return true;
     }
 
     private boolean isRequestFormatSupported() {
@@ -422,8 +422,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
             bidRequest.getBcat().addAll(
                     iabCategoriesInterface.getIABCategories(IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES));
-        }
-        else {
+        } else {
             bidRequest.getBcat().addAll(
                     iabCategoriesInterface.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES));
         }
@@ -437,11 +436,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         if (site != null) {
             bidRequest.setSite(site);
-        }
-        else if (app != null) {
+        } else if (app != null) {
             bidRequest.setApp(app);
-        }
-        else {
+        } else {
             LOG.debug("App and Site both object can not be null so returning");
             return false;
         }
@@ -459,10 +456,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             	bidRequestJson = bidRequestJson.replaceFirst("nativeObject", "native");
             }
             LOG.info("RTB request json is : {}", bidRequestJson);
-        }
-        catch (TException e) {
+        } catch (TException e) {
             LOG.debug("Could not create json from bidrequest for partner {}", advertiserName);
             LOG.info("Configure parameters inside rtb returned false {}", advertiserName);
+            //todo add trace
             return false;
         }
         LOG.info("Configure parameters inside rtb returned true");
@@ -475,8 +472,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         Impression impression;
         if (null != casInternalRequestParameters.impressionId) {
             impression = new Impression(casInternalRequestParameters.impressionId);
-        }
-        else {
+        } else {
             LOG.info("Impression id can not be null in casInternal Request Params");
             return null;
         }
@@ -488,8 +484,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         // Set interstitial or not
         if (null != sasParams.getRqAdType() && "int".equalsIgnoreCase(sasParams.getRqAdType())) {
             impression.setInstl(1);
-        }
-        else {
+        } else {
             impression.setInstl(0);
         }
 
@@ -506,7 +501,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if(isNativeResponseSupported && isNativeRequest()){
         	ImpressionExtensions impExt = createNativeExtensionObject();
         	
-        	if(impExt == null){
+        	if (impExt == null) {
         		return null;
         	}
         	impression.setExt(impExt);
@@ -562,8 +557,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         // Setting battributes
         if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
             banner.setBattr(performanceBlockedAttributes);
-        }
-        else {
+        } else {
             banner.setBattr(fsBlockedAttributes);
         }
 
@@ -616,8 +610,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         // Setting type of geo data
         if ("DERIVED_LAT_LON".equalsIgnoreCase(sasParams.getLocSrc())) {
             geo.setType(1);
-        }
-        else if ("LATLON".equalsIgnoreCase(sasParams.getLocSrc())) {
+        } else if ("LATLON".equalsIgnoreCase(sasParams.getLocSrc())) {
             geo.setType(2);
         }
         return geo;
@@ -626,8 +619,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private User createUserObject() {
         User user = new User();
         String gender = sasParams.getGender();
-        if ( StringUtils.isNotEmpty(gender))
-        {
+        if ( StringUtils.isNotEmpty(gender)) {
             user.setGender(gender);  
         }
         
@@ -643,8 +635,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 int yob = year - age;
                 user.setYob(yob);
             }
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             LOG.debug("Exception : {}", e);
         }
         return user;
@@ -654,8 +645,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         Site site = null;
         if (siteBlinded) {
             site = new Site(getBlindedSiteId(sasParams.getSiteIncId(), entity.getIncId(getCreativeType())));
-        }
-        else {
+        } else {
             site = new Site(sasParams.getSiteId());
         }
         if (null != sasParams.getCategories()) {
@@ -665,7 +655,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (sasParams.getWapSiteUACEntity() != null &&
             StringUtils.isNotEmpty(sasParams.getWapSiteUACEntity().getAppType())) {
           site.setName(sasParams.getWapSiteUACEntity().getAppType());
-        }else if ((category = getCategories(',', false)) != null) {
+        } else if ((category = getCategories(',', false)) != null) {
           site.setName(category);
         }
         Map<String, String> siteExtensions = new HashMap<String, String>();
@@ -673,8 +663,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (!SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
             // Family safe
             siteRating = FAMILY_SAFE_RATING;
-        }
-        else {
+        } else {
             siteRating = PERFORMANCE_RATING;
         }
         siteExtensions.put(RATING_KEY, siteRating);
@@ -687,48 +676,55 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         App app = null;
         if (siteBlinded) {
             app = new App(getBlindedSiteId(sasParams.getSiteIncId(), entity.getAdgroupIncId()));
-        }
-        else {
+        } else {
             app = new App(sasParams.getSiteId());
         }
         if (null != sasParams.getCategories()) {
             app.setCat(iabCategoriesInterface.getIABCategories(sasParams.getCategories()));
         }
         String category = null;
-        if (sasParams.getWapSiteUACEntity() != null &&
-          StringUtils.isNotEmpty(sasParams.getWapSiteUACEntity().getAppType())) {
-          app.setName(sasParams.getWapSiteUACEntity().getAppType());
-        }else if ((category = getCategories(',', false)) != null) {
-          app.setName(category);
+        final WapSiteUACEntity entity = sasParams.getWapSiteUACEntity();
+
+        if (entity != null && StringUtils.isNotEmpty(entity.getAppType())) {
+            app.setName(entity.getAppType());
+        } else if ((category = getCategories(',', false)) != null) {
+            app.setName(category);
         }
+
+        // set App Ext fields
+        final AppExt ext = createAppExt(entity);
+
+        app.setExt(ext);
+        return app;
+    }
+
+    private AppExt createAppExt(final WapSiteUACEntity entity) {
+        AppExt ext = new AppExt();
+
         String appRating;
         if (!SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
             // Family safe
             appRating = FAMILY_SAFE_RATING;
-        }
-        else {
+        } else {
             appRating = PERFORMANCE_RATING;
         }
-        
-        // set App Ext fields
-        final AppExt ext = new AppExt();
+
         ext.setFs(appRating);
-        final WapSiteUACEntity entity = sasParams.getWapSiteUACEntity();
+
         if(entity != null) {
-        	final AppStore store = new AppStore();
-        	if(!StringUtils.isEmpty(entity.getContentRating())) {
-        		store.setRating(entity.getContentRating());
-        	}
-        	if(!StringUtils.isEmpty(entity.getAppType())) {
-        		store.setCat(entity.getAppType());
-        	}
-        	if(entity.getCategories() != null && !entity.getCategories().isEmpty()) {
-        		store.setSeccat(entity.getCategories());
-        	}
-        	ext.setStore(store);
+            final AppStore store = new AppStore();
+            if(!StringUtils.isEmpty(entity.getContentRating())) {
+                store.setRating(entity.getContentRating());
+            }
+            if(!StringUtils.isEmpty(entity.getAppType())) {
+                store.setCat(entity.getAppType());
+            }
+            if(entity.getCategories() != null && !entity.getCategories().isEmpty()) {
+                store.setSeccat(entity.getCategories());
+            }
+            ext.setStore(store);
         }
-        app.setExt(ext);
-        return app;
+        return ext;
     }
 
     private Device createDeviceObject(final Geo geo) {
@@ -747,16 +743,15 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         if(NetworkType.WIFI == sasParams.getNetworkType()){
             device.setConnectiontype(2);
-        }
-        else{
+        } else{
             device.setConnectiontype(0);
         }
+
         // Setting do not track
         if (null != casInternalRequestParameters.uidADT) {
             try {
                 device.setDnt(Integer.parseInt(casInternalRequestParameters.uidADT) == 0 ? 1 : 0);
-            }
-            catch (NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 LOG.debug("Exception while parsing uidADT to integer {}", e);
             }
         }
@@ -764,8 +759,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (null != casInternalRequestParameters.uidSO1) {
             device.setDidsha1(casInternalRequestParameters.uidSO1);
             device.setDpidsha1(casInternalRequestParameters.uidSO1);
-        }
-        else if (null != casInternalRequestParameters.uidO1) {
+        } else if (null != casInternalRequestParameters.uidO1) {
             device.setDidsha1(casInternalRequestParameters.uidO1);
             device.setDpidsha1(casInternalRequestParameters.uidO1);
         }
@@ -774,8 +768,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (null != casInternalRequestParameters.uidMd5) {
             device.setDidmd5(casInternalRequestParameters.uidMd5);
             device.setDpidmd5(casInternalRequestParameters.uidMd5);
-        }
-        else if (null != casInternalRequestParameters.uid) {
+        } else if (null != casInternalRequestParameters.uid) {
             device.setDidmd5(casInternalRequestParameters.uid);
             device.setDpidmd5(casInternalRequestParameters.uid);
         }
@@ -794,13 +787,15 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
        	}
         return device;
     }
-    
+
     private  Map<String, String> getDeviceExt(final Device device) {
     	 Map<String, String> deviceExtensions = device.getExt();
+
          if (null == deviceExtensions) {
              deviceExtensions = new HashMap<String, String>();
              device.setExt(deviceExtensions);
          }
+
          return deviceExtensions;
     }
 
@@ -811,8 +806,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         LOG.debug("Callback url is : {}", callbackUrl);
         try {
             uriCallBack = new URI(callbackUrl);
-        }
-        catch (URISyntaxException e) {
+        } catch (URISyntaxException e) {
             LOG.debug("error in creating uri for callback");
         }
 
@@ -832,8 +826,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         boolean callbackResult = impressionCallbackHelper.writeResponse(uriCallBack, ningRequest, getAsyncHttpClient());
         if (callbackResult) {
             LOG.debug("Callback is sent successfully");
-        }
-        else {
+        } else {
             LOG.debug("Could not send the callback");
         }
     }
@@ -890,10 +883,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
 
         String httpRequestMethod;
-        if (rtbMethod.equalsIgnoreCase("get")) {
+        if ("get".equalsIgnoreCase(rtbMethod)) {
             httpRequestMethod = "GET";
-        }
-        else {
+        } else {
             httpRequestMethod = "POST";
         }
 
@@ -905,10 +897,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Override
     public URI getRequestUri() throws URISyntaxException {
         StringBuilder url = new StringBuilder();
-        if (rtbMethod.equalsIgnoreCase("get")) {
+        if ("get".equalsIgnoreCase(rtbMethod)) {
             url.append(urlBase).append('?').append(urlArg).append('=');
-        }
-        else {
+        } else {
             url.append(urlBase);
         }
         LOG.debug("{} url is {}", getName(), url.toString());
@@ -917,7 +908,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
-        adStatus = "NO_AD";
+        adStatus = NO_AD;
         LOG.debug("response is {}", response);
         if (status.code() != 200 || StringUtils.isBlank(response)) {
             statusCode = status.code();
@@ -926,12 +917,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             statusCode = status.code();
             boolean parsedResponse = deserializeResponse(response);
             if (!parsedResponse) {
-                adStatus = "NO_AD";
+                adStatus = NO_AD;
                 responseContent = "";
                 statusCode = 500;
                 LOG.info("Error in parsing rtb response");
@@ -965,9 +955,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         if ("wap".equalsIgnoreCase(sasParams.getSource())) {
             velocityContext.put(VelocityTemplateFieldConstants.PartnerHtmlCode, admContent);
-        }
-        else {
-            velocityContext.put(VelocityTemplateFieldConstants.PartnerHtmlCode, mraid + admContent);
+        } else {
+            velocityContext.put(VelocityTemplateFieldConstants.PartnerHtmlCode, MRAID + admContent);
             if (StringUtils.isNotBlank(sasParams.getImaiBaseUrl())) {
                 velocityContext.put(VelocityTemplateFieldConstants.IMAIBaseUrl, sasParams.getImaiBaseUrl());
             }
@@ -985,9 +974,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         try {
             responseContent = Formatter.getResponseFromTemplate(TemplateType.RTB_HTML, velocityContext, sasParams,
                     null);
-        }
-        catch (Exception e) {
-            adStatus = "NO_AD";
+        } catch (Exception e) {
+            adStatus = NO_AD;
             LOG.info("Some exception is caught while filling the velocity template for partner{} {}",
                     advertiserName, e);
         }
@@ -1028,7 +1016,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             responseContent = Formatter.getResponseFromTemplate(TemplateType.RTB_BANNER_VIDEO, velocityContext, sasParams,
                     null);
         } catch (Exception e) {
-            adStatus = "NO_AD";
+            adStatus = NO_AD;
             LOG.info("Some exception is caught while filling the velocity template for partner{} {}",
                     advertiserName, e);
         }
@@ -1042,16 +1030,14 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             String nUrl = null;
             try {
                 nUrl = bidResponse.seatbid.get(0).getBid().get(0).getNurl();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 LOG.debug("Exception while parsing response {}", e);
             }
             LOG.debug("nurl is {}", nUrl);
             if (!StringUtils.isEmpty(callbackUrl)) {
                 LOG.debug("inside wn from config");
                 winUrl = callbackUrl;
-            }
-            else if (!StringUtils.isEmpty(nUrl)) {
+            } else if (!StringUtils.isEmpty(nUrl)) {
                 LOG.debug("inside wn from nurl");
                 winUrl = nUrl;
             }
@@ -1061,7 +1047,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     
     @Override
     protected boolean isNativeRequest(){
-    	return nativeString.equals(sasParams.getRFormat());
+    	return NATIVE_STRING.equals(sasParams.getRFormat());
     }
     
     private void nativeAdBuilding(){
@@ -1084,7 +1070,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 			if(LOG.isDebugEnabled()){
 				e.printStackTrace();
 			}
-			 adStatus = "NO_AD";
+			 adStatus = NO_AD;
 			 responseContent = "";
 	         LOG.error("Some exception is caught while filling the native template for partner "+e.getLocalizedMessage(),
 	                    advertiserName, e);
@@ -1123,8 +1109,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             }
 
             return true;
-        }
-        catch (NullPointerException e) {
+        } catch (NullPointerException e) {
+            //todo add trace
             LOG.info("Could not parse the rtb response from partner: {}", this.getName());
             return false;
         }
@@ -1142,28 +1128,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (ext != null && ext.getVideo() != null) {
             LOG.debug("Received video response of type {}.", ext.getVideo().getType());
 
-            // Validate the adm content for a valid URL/XML.
-            if (!isValidURL(adm) && !isValidXMLFormat(adm)) {
-                LOG.info("Invalid VAST response adm - {}", adm);
-                return false;
-            }
-
-            // Validate supported VAST type.
-            if (!EXT_VIDEO_TYPE.contains(ext.getVideo().getType())) {
-                LOG.info("Unsupported VAST type - {}", ext.getVideo().getType());
-                return false;
-            }
-
-            // Validate supported video duration.
-            if (ext.getVideo().duration < EXT_VIDEO_MINDURATION
-                    || ext.getVideo().duration > EXT_VIDEO_MAXDURATION) {
-                LOG.info("VAST response video duration {} should be within {} and {}.", ext.getVideo().getDuration(), EXT_VIDEO_MINDURATION, EXT_VIDEO_MAXDURATION);
-                return false;
-            }
-
-            // Validate Linearity
-            if (ext.getVideo().linearity != EXT_VIDEO_LINEARITY) {
-                LOG.info("Linearity {} is not supported for the VAST response.", ext.getVideo().linearity);
+            if(!checkRequiredParametersInVideoResponse(ext)) {
                 return false;
             }
 
@@ -1188,6 +1153,40 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         return true;
     }
+
+    private boolean checkRequiredParametersInVideoResponse(BidExtensions ext) {
+        // Validate the adm content for a valid URL/XML.
+        if (!isValidURL(adm) && !isValidXMLFormat(adm)) {
+            LOG.info("Invalid VAST response adm - {}", adm);
+            //todo add trace
+            return false;
+        }
+
+        // Validate supported VAST type.
+        if (!EXT_VIDEO_TYPE.contains(ext.getVideo().getType())) {
+            LOG.info("Unsupported VAST type - {}", ext.getVideo().getType());
+            //todo add trace
+            return false;
+        }
+
+        // Validate supported video duration.
+        if (ext.getVideo().duration < EXT_VIDEO_MINDURATION
+                || ext.getVideo().duration > EXT_VIDEO_MAXDURATION) {
+            LOG.info("VAST response video duration {} should be within {} and {}.", ext.getVideo().getDuration(), EXT_VIDEO_MINDURATION, EXT_VIDEO_MAXDURATION);
+            //todo add trace
+            return false;
+        }
+
+        // Validate Linearity
+        if (ext.getVideo().linearity != EXT_VIDEO_LINEARITY) {
+            LOG.info("Linearity {} is not supported for the VAST response.", ext.getVideo().linearity);
+            //todo add trace
+            return false;
+        }
+        return true;
+    }
+
+
 
     private boolean isValidURL(final String url) {
         UrlValidator urlValidator = new UrlValidator();
@@ -1240,8 +1239,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         if (USD.equalsIgnoreCase(currencyCode)) {
             return price;
-        }
-        else {
+        } else {
             CurrencyConversionEntity currencyConversionEntity = repositoryHelper
                     .queryCurrencyConversionRepository(currencyCode);
             if (null != currencyConversionEntity && null != currencyConversionEntity.getConversionRate()

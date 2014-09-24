@@ -34,25 +34,26 @@ public class PublisherFilterEntity implements IdentifiableEntity<PublisherFilter
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         PublisherFilterEntity other = (PublisherFilterEntity) obj;
-        if (ruleType == null) {
-            if (other.ruleType != null)
-                return false;
-        }
-        else if (!ruleType.equals(other.ruleType))
+        if (ruleType == null && other.ruleType != null){
             return false;
-        if (siteId == null) {
-            if (other.siteId != null)
-                return false;
-        }
-        else if (!siteId.equals(other.siteId))
+        } else if (!ruleType.equals(other.ruleType)) {
             return false;
+        }
+        if (siteId == null && other.siteId != null){
+            return false;
+        } else if (!siteId.equals(other.siteId)) {
+            return false;
+        }
         return true;
     }
 

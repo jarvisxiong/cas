@@ -190,7 +190,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
             }
         } else {
             LOG.info("invalid slot, so not returning response, even though we got an ad");
-            InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
+            InspectorStats.incrementStatCount(InspectorStrings.TOTAL_NO_FILLS);
             if (getResponseFormat() == ResponseFormat.XHTML) {
                 finalReponse = NO_AD_XHTML;
             }
@@ -223,14 +223,14 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
     private void incrementStatsForFills(int dst) {
         if (dst == DemandSourceType.DCP.getValue()) {
-            InspectorStats.incrementStatCount(InspectorStrings.dcpFills);
+            InspectorStats.incrementStatCount(InspectorStrings.DCP_FILLS);
         } else if (dst == DemandSourceType.RTBD.getValue()) {
-            InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
+            InspectorStats.incrementStatCount(InspectorStrings.RULE_ENGINE_FILLS);
         } else if (dst == DemandSourceType.IX.getValue()) {
-            InspectorStats.incrementStatCount(InspectorStrings.ixFills);
+            InspectorStats.incrementStatCount(InspectorStrings.IX_FILLS);
         }
 
-        InspectorStats.incrementStatCount(InspectorStrings.totalFills);
+        InspectorStats.incrementStatCount(InspectorStrings.TOTAL_FILLS);
     }
 
     private boolean checkResponseSent() {
@@ -432,7 +432,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         // This check has been added to prevent totalNoFills from being updated, when any servlet other than the ones
         // mentioned above throws an exception in HttpRequestHandler.
         if (null != sasParams && 0 != sasParams.getDst()) {
-            InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
+            InspectorStats.incrementStatCount(InspectorStrings.TOTAL_NO_FILLS);
         }
 
         HttpResponseStatus httpResponseStatus;

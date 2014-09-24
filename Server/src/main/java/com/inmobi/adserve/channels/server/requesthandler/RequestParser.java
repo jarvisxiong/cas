@@ -80,14 +80,12 @@ public class RequestParser {
         params.setCountryCode(parseArray(jObject, "carrier", 2));
         try {
             params.setCity(Integer.parseInt(parseArray(jObject, "carrier", 3)));
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             LOG.debug(traceMarker, "City not found in request");
         }
         try {
             params.setState(Integer.parseInt(parseArray(jObject, "carrier", 4)));
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             LOG.debug(traceMarker, "State not found in request");
         }
         String slot = stringify(jObject, "slot-served");
@@ -134,16 +132,14 @@ public class RequestParser {
             if (siteInfo != null && siteInfo.length() > 0) {
                 params.setSiteIncId(siteInfo.getLong(0));
             }
-        }
-        catch (JSONException exception) {
+        } catch (JSONException exception) {
             LOG.debug(traceMarker, "site object not found in request");
             params.setSiteIncId(0);
         }
         try {
             JSONArray jsonArray = jObject.getJSONArray("handset");
             params.setHandsetInternalId(Long.parseLong(jsonArray.get(0).toString()));
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             LOG.debug(traceMarker, "Handset array not found");
         }
         params.setOsId(jObject.optInt("os-id", -1));
@@ -162,8 +158,7 @@ public class RequestParser {
             if (null != fieldValueObject) {
                 fieldValue = fieldValueObject.toString();
             }
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             return null;
         }
         LOG.debug(traceMarker, "Retrived from json {} = {}", field, fieldValue);
@@ -182,8 +177,7 @@ public class RequestParser {
             else {
                 return (jArray.getString(index));
             }
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             return null;
         }
     }
@@ -198,8 +192,7 @@ public class RequestParser {
                 category[index] = categories.getLong(index);
             }
             return Arrays.asList(category);
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             LOG.debug(traceMarker, "error while reading category array {}", e);
             return null;
         }
@@ -215,8 +208,7 @@ public class RequestParser {
                 accountSegments.add(segments.getInt(index));
             }
             return accountSegments;
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             LOG.debug(traceMarker, "error while reading account segments array {}", e);
             return new HashSet<Integer>();
         }
@@ -253,15 +245,12 @@ public class RequestParser {
                     Collections.addAll(advertiserSet, advertiserList);
                     parameter.setUAdapters(advertiserSet);
                 }
-            }
-            catch (UnsupportedEncodingException e) {
+            } catch (UnsupportedEncodingException e) {
                 LOG.debug(traceMarker, "Error in encoding u params {}", e);
             }
-        }
-        catch (JSONException exception) {
+        } catch (JSONException exception) {
             LOG.debug(traceMarker, "json exception in parsing u params {}", exception);
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             LOG.debug(traceMarker, "number format exception in u params {}", e);
         }
         return parameter;
@@ -294,8 +283,7 @@ public class RequestParser {
             parameter.uidADT = stringify(userIdMap, "u-id-adt");
             parameter.uuidFromUidCookie = stringify(userIdMap, "imuc__5");
             parameter.uidWC = stringify(userIdMap, "WC");
-        }
-        catch (JSONException exception) {
+        } catch (JSONException exception) {
             LOG.debug(traceMarker, "Error in extracting userid params");
         }
     }
@@ -309,8 +297,7 @@ public class RequestParser {
                 sb.append(Integer.toHexString((anArray & 0xFF) | 0x100).substring(1, 3));
             }
             return sb.toString();
-        }
-        catch (java.security.NoSuchAlgorithmException ignored) {
+        } catch (java.security.NoSuchAlgorithmException ignored) {
         }
         return null;
     }

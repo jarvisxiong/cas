@@ -127,8 +127,7 @@ public class RepositoryHelper {
     public ChannelEntity queryChannelRepository(final String channelId) {
         try {
             return channelRepository.query(channelId);
-        }
-        catch (RepositoryException ignored) {
+        } catch (RepositoryException ignored) {
         }
         return null;
     }
@@ -136,8 +135,7 @@ public class RepositoryHelper {
     public ChannelSegmentEntity queryChannelAdGroupRepository(final String adGroupId) {
         try {
             return channelAdGroupRepository.query(adGroupId);
-        }
-        catch (RepositoryException ignored) {
+        } catch (RepositoryException ignored) {
         }
         return null;
     }
@@ -145,8 +143,7 @@ public class RepositoryHelper {
     public ChannelSegmentFeedbackEntity queryChannelSegmentFeedbackRepository(final String adGroupId) {
         try {
             return channelSegmentFeedbackRepository.query(adGroupId);
-        }
-        catch (RepositoryException ignored) {
+        } catch (RepositoryException ignored) {
         }
         return null;
     }
@@ -154,8 +151,7 @@ public class RepositoryHelper {
     public ChannelFeedbackEntity queryChannelFeedbackRepository(final String advertiserId) {
         try {
             return channelFeedbackRepository.query(advertiserId);
-        }
-        catch (RepositoryException ignored) {
+        } catch (RepositoryException ignored) {
         }
         return null;
     }
@@ -163,8 +159,7 @@ public class RepositoryHelper {
     public SiteTaxonomyEntity querySiteTaxonomyRepository(final String id) {
         try {
             return siteTaxonomyRepository.query(id);
-        }
-        catch (RepositoryException ignored) {
+        } catch (RepositoryException ignored) {
         }
         return null;
     }
@@ -172,8 +167,7 @@ public class RepositoryHelper {
     public SiteMetaDataEntity querySiteMetaDetaRepository(final String siteId) {
         try {
             return siteMetaDataRepository.query(siteId);
-        }
-        catch (RepositoryException ignored) {
+        } catch (RepositoryException ignored) {
         }
         return null;
     }
@@ -190,8 +184,7 @@ public class RepositoryHelper {
     public PricingEngineEntity queryPricingEngineRepository(final int country, final int os) {
         try {
             return pricingEngineRepository.query(new PricingEngineQuery(country, os));
-        }
-        catch (RepositoryException ignored) {
+        } catch (RepositoryException ignored) {
         }
         return null;
     }
@@ -199,8 +192,7 @@ public class RepositoryHelper {
     public CreativeEntity queryCreativeRepository(final String advertiserId, final String creativeId) {
         try {
             return creativeRepository.query(new CreativeQuery(advertiserId, creativeId));
-        }
-        catch (RepositoryException ignored) {
+        } catch (RepositoryException ignored) {
         }
         return null;
     }
@@ -208,8 +200,7 @@ public class RepositoryHelper {
     public PublisherFilterEntity queryPublisherFilterRepository(final String siteId, final Integer ruleType) {
         try {
             return publisherFilterRepository.query(new PublisherFilterQuery(siteId, ruleType));
-        }
-        catch (RepositoryException ignored) {
+        } catch (RepositoryException ignored) {
         }
         return null;
     }
@@ -217,8 +208,7 @@ public class RepositoryHelper {
     public SiteEcpmEntity querySiteEcpmRepository(final String siteId, final Integer countryId, final Integer osId) {
         try {
             return siteEcpmRepository.query(new SiteEcpmQuery(siteId, countryId, osId));
-        }
-        catch (RepositoryException ignored) {
+        } catch (RepositoryException ignored) {
         }
         return null;
     }
@@ -226,8 +216,7 @@ public class RepositoryHelper {
     public CurrencyConversionEntity queryCurrencyConversionRepository(final String countryId) {
         try {
             return currencyConversionRepository.query(countryId);
-        }
-        catch (RepositoryException ignored) {
+        } catch (RepositoryException ignored) {
         }
         return null;
     }
@@ -235,8 +224,7 @@ public class RepositoryHelper {
     public WapSiteUACEntity queryWapSiteUACRepository(final String id) {
         try {
             return wapSiteUACRepository.query(id);
-        }
-        catch (RepositoryException ignored) {
+        } catch (RepositoryException ignored) {
         }
         return null;
     }
@@ -244,8 +232,7 @@ public class RepositoryHelper {
     public IXAccountMapEntity queryIXAccountMapRepository(final Long rpNetworkId) {
       try {
           return ixAccountMapRepository.query(rpNetworkId);
-      }
-      catch (RepositoryException ignored) {
+      } catch (RepositoryException ignored) {
       }
       return null;
   }
@@ -253,8 +240,7 @@ public class RepositoryHelper {
    public NativeAdTemplateEntity queryNativeAdTemplateRepository(final String siteId) {
         try {
             return nativeAdTemplateRepository.query(siteId);
-        }
-        catch (RepositoryException ignored) {
+        } catch (RepositoryException ignored) {
         }
         return null;
     }

@@ -25,8 +25,7 @@ public class PublisherFilterRepository extends
         Collection<PublisherFilterEntity> publisherFilterEntityResultSet = query(publisherFilterQuery);
         if (publisherFilterEntityResultSet == null || publisherFilterEntityResultSet.size() == 0) {
             return null;
-        }
-        else if (publisherFilterEntityResultSet.size() >= 1) {
+        } else if (publisherFilterEntityResultSet.size() >= 1) {
             return (PublisherFilterEntity) publisherFilterEntityResultSet.toArray()[0];
         }
         return null;
@@ -52,11 +51,9 @@ public class PublisherFilterRepository extends
                 i++;
             }
             publisherFilterEntity.setBlockedCategories(blockedCategories);
-        }
-        else if (publisherFilterEntity.getRuleType() == 6) {
+        } else if (publisherFilterEntity.getRuleType() == 6) {
             publisherFilterEntity.setBlockedAdvertisers(tempArray);
-        }
-        else {
+        } else {
             publisherFilterEntity = new PublisherFilterEntity();
         }
         if (logger.isDebugEnabled()) {
