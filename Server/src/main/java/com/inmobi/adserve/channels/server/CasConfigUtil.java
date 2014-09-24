@@ -55,7 +55,8 @@ public class CasConfigUtil {
         CasConfigUtil.repositoryHelper = repositoryHelper;
         percentRollout = CasConfigUtil.serverConfig.getInt("percentRollout", 100);
         allowedSiteTypes = CasConfigUtil.serverConfig.getList("allowedSiteTypes");
-        InspectorStats.setStats(InspectorStrings.PERCENT_ROLL_OUT, percentRollout);
+
+        InspectorStats.incrementStatCount(InspectorStrings.PERCENT_ROLL_OUT, percentRollout);
     }
 
     public static Configuration getServerConfig() {

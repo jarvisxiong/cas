@@ -30,6 +30,9 @@ public class InspectorStrings {
     public static final String THRIFT_PARSING_ERROR                      = "Terminated_ThriftError";
     public static final String PROCESSING_ERROR                          = "Terminated_ServerError";
     public static final String MISSING_SITE_ID                           = "Terminated_NoSite";
+    public static final String clientTimerLatency                        = "ClientTimerLatency";
+    public static final String timerLatency                              = "timerLatency";
+    public static final String timeoutException                          = "TimeoutException";
     public static final String isUpdating                                = "IsUpdating";
     public static final String successfulUpdates                         = "SuccessfulUpdates";
     public static final String unSuccessfulUpdates                       = "UnsuccessfulUpdates";
@@ -93,7 +96,6 @@ public class InspectorStrings {
     public static final String DROPPED_IN_BANNER_NOT_ALLOWED_FILTER      = "DroppedInBannerNotAllowedFilter";
     public static final String DROPPED_IN_PARTNER_COUNT_FILTER           = "DroppedInPartnerCountFilter";
     public static final String DROPPED_IN_DAILY_IMP_COUNT_FILTER         = "DroppedInDailyImpressionCountFilter";
-    public static final String SITE_LEVEL_REQUEST                        = "SiteLevelRequest";
     public static final String IX_SENT_AS_TRANSPARENT                    = "IXSentAsTransparent";
     public static final String IX_SENT_AS_BLIND                          = "IXSentAsBlind";
     public static final String IX_ZONE_ID_NOT_PRESENT                    = "IXZoneIdNotPresent";

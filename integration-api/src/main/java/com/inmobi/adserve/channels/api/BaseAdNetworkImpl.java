@@ -1,5 +1,33 @@
 package com.inmobi.adserve.channels.api;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.inject.Inject;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+import org.slf4j.Marker;
+
 import com.google.inject.Key;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
@@ -11,7 +39,6 @@ import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.JaxbHelper;
-import com.inmobi.adserve.channels.util.MetricsManager;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
 import com.ning.http.client.AsyncCompletionHandler;
@@ -19,31 +46,6 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
-import org.slf4j.Marker;
-
-import javax.inject.Inject;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.security.MessageDigest;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 
 // This abstract class have base functionality of TPAN adapters.
@@ -268,7 +270,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 	}else{
                 		dst = "DCP";
                 	}
-                	MetricsManager.updateClientTimerLatency(dst, latency);
+                	InspectorStats.updateYammerTimerStats(dst, InspectorStrings.clientTimerLatency, latency);
+                	
                 	
                     if (t instanceof java.net.ConnectException) {
                         LOG.debug("{} connection timeout latency {}", getName(), latency);
@@ -283,6 +286,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                         LOG.debug("{} timeout latency {}", getName(), latency);
                         adStatus = "TIME_OUT";
                         processResponse();
+                        InspectorStats.incrementStatCount(InspectorStrings.timeoutException);
                         return;
                     }
 
