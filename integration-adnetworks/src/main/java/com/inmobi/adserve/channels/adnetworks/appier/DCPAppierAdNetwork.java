@@ -68,11 +68,11 @@ public class DCPAppierAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public boolean configureParameters() {
-        if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
-                || StringUtils.isBlank(externalSiteId)) {
-            LOG.debug("mandatory parameters missing for appier so exiting adapter");
+
+        if (!checkIfBasicParamsAvailable()) {
             return false;
         }
+
         host = config.getString("appier.host");
         if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
                 && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
@@ -88,13 +88,26 @@ public class DCPAppierAdNetwork extends AbstractDCPAdNetworkImpl {
 
         if (sasParams.getOsId() == HandSetOS.Android.getValue()) { // android
             os = "android";
-        }
-        else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) { // iPhone
+        } else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) { // iPhone
             os = "ios";
         }
         sourceType = (StringUtils.isBlank(sasParams.getSource()) || "WAP".equalsIgnoreCase(sasParams.getSource())) ? "1"
                 : "0";
         LOG.info("Configure parameters inside Appier returned true");
+        return true;
+    }
+
+    private boolean checkIfBasicParamsAvailable() {
+
+        if (null == casInternalRequestParameters || null == sasParams){
+            LOG.debug("casInternalRequestParams or sasParams cannot be null");
+            return false;
+        }
+        if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
+                || StringUtils.isBlank(externalSiteId)) {
+            LOG.debug("mandatory parameters missing for appier so exiting adapter");
+            return false;
+        }
         return true;
     }
 
@@ -176,8 +189,7 @@ public class DCPAppierAdNetwork extends AbstractDCPAdNetworkImpl {
         }
         if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
             appendQueryParam(url, SITE_RATING, PERFORMANCE, false);
-        }
-        else {
+        } else {
             appendQueryParam(url, SITE_RATING, FAMILY_SAFE, false);
         }
 
@@ -196,13 +208,11 @@ public class DCPAppierAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else if (statusCode == 204) {
+        } else if (statusCode == 204) {
             statusCode = 500;
             adStatus = "NO_AD";
             return;
-        }
-        else {
+        } else {
             try {
                 JSONObject adResponse = new JSONObject(response);
                 statusCode = status.code();
@@ -221,19 +231,16 @@ public class DCPAppierAdNetwork extends AbstractDCPAdNetworkImpl {
                     if (!StringUtils.isEmpty(vmTemplate)) {
                         context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
                         t = TemplateType.RICH;
-                    }
-                    else {
+                    } else {
                         t = TemplateType.PLAIN;
                     }
-                }
-                else {
+                } else {
                     context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getString("banner_url"));
                     t = TemplateType.IMAGE;
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 adStatus = "NO_AD";
                 LOG.error("Error parsing response from Appier : {}", exception);
                 LOG.error("Response from Appier: {}", response);

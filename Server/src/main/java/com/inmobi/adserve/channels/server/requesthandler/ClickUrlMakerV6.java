@@ -98,44 +98,37 @@ public class ClickUrlMakerV6 {
         budgetBucketId = builder.budgetBucketId;
         if (StringUtils.isEmpty(builder.gender)) {
             gender = "u";
-        }
-        else {
+        } else {
             gender = builder.gender;
         }
         if (builder.age < 0) {
             age = 0;
-        }
-        else {
+        } else {
             age = builder.age;
         }
         if (null == builder.isBillableDemog) {
             isBillableDemog = true;
-        }
-        else {
+        } else {
             isBillableDemog = builder.isBillableDemog;
         }
         if (null == builder.tierInfo) {
             tierInfo = "-1";
-        }
-        else {
+        } else {
             tierInfo = builder.tierInfo;
         }
         if (StringUtils.isEmpty(builder.latlonval)) {
             latlonval = "x";
-        }
-        else {
+        } else {
             latlonval = builder.latlonval;
         }
         if (null == builder.creativeId) {
             creativeId = "0";
-        }
-        else {
+        } else {
             creativeId = builder.creativeId;
         }
         if (null == builder.dst) {
             dst = "1";
-        }
-        else {
+        } else {
             dst = builder.dst;
         }
         isTestRequest = builder.isTestRequest;
@@ -187,8 +180,7 @@ public class ClickUrlMakerV6 {
         // 2nd URL component: CPC/CPM information
         if (isCPC) {
             adUrlSuffix.append(URLMARKERCPC);
-        }
-        else {
+        } else {
             adUrlSuffix.append(URLMARKERCPM);
         }
         // 3rd URL component: site inc id
@@ -223,8 +215,7 @@ public class ClickUrlMakerV6 {
         String billable;
         if (isBillableDemog) {
             billable = "1";
-        }
-        else {
+        } else {
             billable = "0";
         }
         adUrlSuffix.append(appendSeparator(billable));
@@ -232,8 +223,7 @@ public class ClickUrlMakerV6 {
         if (null == udIdVal || udIdVal.isEmpty()) {
             LOG.debug("udIdVal is null or empty so using default value");
             adUrlSuffix.append(appendSeparator(DEFAULT_UDID_VALUE));
-        }
-        else {
+        } else {
             adUrlSuffix.append(appendSeparator(getEncodedJson(udIdVal)));
         }
         // 13th impression id
@@ -245,15 +235,13 @@ public class ClickUrlMakerV6 {
         // 14th imsdk, 0 for web and -1 for other ad formats)
         if (!StringUtils.isEmpty(imSdk)) {
             adUrlSuffix.append(appendSeparator(imSdk));
-        }
-        else {
+        } else {
             adUrlSuffix.append(appendSeparator(DEFAULTIMSDK));
         }
         // 15th segmentId
         if (null != segmentId) {
             adUrlSuffix.append(appendSeparator(getIdBase36(segmentId)));
-        }
-        else {
+        } else {
             adUrlSuffix.append(appendSeparator(Integer.toString(0)));
         }
 
@@ -270,8 +258,7 @@ public class ClickUrlMakerV6 {
         if (isTestRequest) {
             adUrlSuffix.append(appendSeparator(IS_TEST));
             beaconUrlSuffix.append(appendSeparator(IS_TEST));
-        }
-        else {
+        } else {
             adUrlSuffix.append(appendSeparator(IS_NOT_TEST));
             beaconUrlSuffix.append(appendSeparator(IS_NOT_TEST));
         }
@@ -288,8 +275,7 @@ public class ClickUrlMakerV6 {
         if (isRtbSite) {
             adUrlSuffix.append(appendSeparator(RTB_SUPPLY));
             beaconUrlSuffix.append(appendSeparator(RTB_SUPPLY));
-        }
-        else {
+        } else {
             adUrlSuffix.append(appendSeparator(NON_RTB_SUPPLY));
             beaconUrlSuffix.append(appendSeparator(NON_RTB_SUPPLY));
         }
@@ -308,8 +294,7 @@ public class ClickUrlMakerV6 {
             adUrlSuffix.append(appendSeparator(ClickUrlMakerV6.clickURLHashingSecretKeyTestModeVersionBase36));
             beaconUrlSuffix.append(appendSeparator(ClickUrlMakerV6.clickURLHashingSecretKeyTestModeVersionBase36));
             cryptoHashGenerator = new CryptoHashGenerator(testCryptoSecretKey);
-        }
-        else {
+        } else {
             adUrlSuffix.append(appendSeparator(ClickUrlMakerV6.clickURLHashingSecretKeyVersionBase36));
             beaconUrlSuffix.append(appendSeparator(ClickUrlMakerV6.clickURLHashingSecretKeyVersionBase36));
             cryptoHashGenerator = new CryptoHashGenerator(cryptoSecretKey);

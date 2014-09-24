@@ -66,8 +66,7 @@ public class DCPAdelphicAdNetwork extends AbstractDCPAdNetworkImpl {
             Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
-        }
-        else {
+        } else {
             LOG.debug("mandate parameters missing for Adelphic, so returning from adapter");
             return false;
         }
@@ -89,8 +88,7 @@ public class DCPAdelphicAdNetwork extends AbstractDCPAdNetworkImpl {
             spotId = additionalParams.getString("spot");
             publisherId = additionalParams.getString("pubId");
             siteId = additionalParams.getString("site");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             LOG.error("Spot Id/Site/pubId is not configured for the segment:{}", entity.getExternalSiteKey());
             return false;
         }
@@ -146,8 +144,7 @@ public class DCPAdelphicAdNetwork extends AbstractDCPAdNetworkImpl {
 
             if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
                 bCat.add(IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES);
-            }
-            else {
+            } else {
                 bCat.add(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES);
             }
             url.append("&bcat=").append(
@@ -156,8 +153,7 @@ public class DCPAdelphicAdNetwork extends AbstractDCPAdNetworkImpl {
             LOG.debug("Adelphic url is {}", url);
 
             return (new URI(url.toString()));
-        }
-        catch (URISyntaxException exception) {
+        } catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.error("{}", exception);
         }
@@ -174,15 +170,13 @@ public class DCPAdelphicAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from Adelphic : {}", exception);
                 LOG.info("Response from Adelphic: {}", response);

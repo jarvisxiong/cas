@@ -51,24 +51,26 @@ public class CreativeEntity implements IdentifiableEntity<CreativeQuery> {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        CreativeEntity other = (CreativeEntity) obj;
-        if (advertiserId == null) {
-            if (other.advertiserId != null)
-                return false;
-        } else if (!advertiserId.equals(other.advertiserId))
-            return false;
-        if (creativeId == null) {
-            if (other.creativeId != null)
-                return false;
         }
-        else if (!creativeId.equals(other.creativeId))
+        if (obj == null) {
             return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        CreativeEntity other = (CreativeEntity) obj;
+        if (null == advertiserId && null != other.advertiserId) {
+                return false;
+        } else if (!advertiserId.equals(other.advertiserId)) {
+            return false;
+        }
+        if (null == creativeId && null != other.creativeId) {
+                return false;
+        } else if (!creativeId.equals(other.creativeId)) {
+            return false;
+        }
         return true;
     }
 

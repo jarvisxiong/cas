@@ -96,8 +96,7 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
             }
             LOG.debug("{} url is {}", name, url);
             return (new URI(url.toString()));
-        }
-        catch (URISyntaxException exception) {
+        } catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.error("{}", exception);
         }
@@ -114,8 +113,7 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             try {
                 JSONObject adResponse = new JSONObject(response);
 
@@ -133,24 +131,21 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
                 if (adResponse.has("beacon_url")) {
                     context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, adResponse.getString("beacon_url"));
                 }
-                if (adResponse.getString("creative_type").equalsIgnoreCase("image")) {
+                if ("image".equalsIgnoreCase(adResponse.getString("creative_type"))) {
                     context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse.getString("click_url"));
                     context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
                     context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getString("creative_url"));
-                }
-                else if (adResponse.getString("creative_type").equalsIgnoreCase("3rdparty")) {
+                } else if ("3rdparty".equalsIgnoreCase(adResponse.getString("creative_type"))) {
                     context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, adResponse.getString("creative_url"));
                     t = TemplateType.HTML;
-                }
-                else {
+                } else {
                     adStatus = "NO_AD";
                     responseContent = "";
                     return;
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 adStatus = "NO_AD";
                 LOG.error("Error parsing response {} from {}  {}", response, name, exception);
             }

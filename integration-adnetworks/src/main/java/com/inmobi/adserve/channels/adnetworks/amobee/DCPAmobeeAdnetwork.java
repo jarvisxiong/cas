@@ -72,21 +72,18 @@ public class DCPAmobeeAdnetwork extends AbstractDCPAdNetworkImpl {
                     || 16 == slot) /* 768X1024 */{
                 adType = "FullScreen";
                 adTypeId = 3;
-            }
-            else {
+            } else {
                 adType = "MobileBanner";
                 adTypeId = 4;
             }
-        }
-        else {
+        } else {
             LOG.debug("mandatory parameters missing for amobee so exiting adapter");
             return false;
         }
         if (sasParams.getOsId() == HandSetOS.Android.getValue()) { // android
             client = 1;
 
-        }
-        else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) { // iPhone
+        } else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) { // iPhone
             client = 2;
         }
         LOG.info("Configure parameters inside amobee returned true");
@@ -120,8 +117,7 @@ public class DCPAmobeeAdnetwork extends AbstractDCPAdNetworkImpl {
                 if (StringUtils.isNotBlank(casInternalRequestParameters.uidSO1)) {
                     url.append("&udid=").append(casInternalRequestParameters.uidMd5);
                 }
-            }
-            else if (client == 1) {
+            } else if (client == 1) {
                 if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
                     url.append("&androidid=").append(casInternalRequestParameters.uidMd5);
                 }
@@ -147,8 +143,7 @@ public class DCPAmobeeAdnetwork extends AbstractDCPAdNetworkImpl {
             }
             if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
                 url.append("&nk=").append(getURLEncode(CategoryList.getBlockedCategoryForPerformance(), format));
-            }
-            else {
+            } else {
                 url.append("&nk=").append(getURLEncode(CategoryList.getBlockedCategoryForFamilySafe(), format));
             }
 
@@ -173,15 +168,13 @@ public class DCPAmobeeAdnetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 adStatus = "NO_AD";
                 LOG.error("Error parsing response from Adelphic : {}", exception);
                 LOG.error("Response from Adelphic: {}", response);

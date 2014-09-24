@@ -118,11 +118,11 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
         StringBuilder url = new StringBuilder(host);
         appendQueryParam(url, APPID, externalSiteId, false);
         appendQueryParam(url, IPADDRESS, sasParams.getRemoteHostIp(), false);
-        if(isInterstitial())
-        	appendQueryParam(url, ADSPACE_TYPE, INTERSTITIAL, false);
-        else
-        	appendQueryParam(url, ADSPACE_TYPE, BANNER, false);
-
+        if(isInterstitial()) {
+            appendQueryParam(url, ADSPACE_TYPE, INTERSTITIAL, false);
+        } else {
+            appendQueryParam(url, ADSPACE_TYPE, BANNER, false);
+        }
         appendQueryParam(url, USER_AGENT,
                 getURLEncode(sasParams.getUserAgent(), format), false);
         if (StringUtils.isNotEmpty(os)) {
@@ -156,13 +156,11 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
             if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
                 appendQueryParam(url, IOS_OPEN_UDID, casInternalRequestParameters.uid,
                         false);
-            }
-            else if (StringUtils
+            } else if (StringUtils
                     .isNotBlank(casInternalRequestParameters.uidIDUS1)) {
                 appendQueryParam(url, IOS_ID,
                         casInternalRequestParameters.uidIDUS1, false);
-            }
-            else if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
+            } else if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
                 appendQueryParam(url, IOS_ID,
                         casInternalRequestParameters.uidMd5, false);
             }
@@ -175,8 +173,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
             } else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
                 appendQueryParam(url, ANDROID_ID,
                         casInternalRequestParameters.uid, false);
-            } 
-            else if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
+            } else if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
                 appendQueryParam(url, ANDROID_ID, getURLEncode(casInternalRequestParameters.uidO1, format), false);
             }
         }
