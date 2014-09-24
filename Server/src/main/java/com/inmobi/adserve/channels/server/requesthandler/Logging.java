@@ -86,21 +86,21 @@ public class Logging {
     public static void rrLogging(Marker traceMarker, final ChannelSegment channelSegment, final List<ChannelSegment> rankList,
             final SASRequestParameters sasParams, String terminationReason, final long totalTime) throws JSONException,
             TException {
-        InspectorStats.incrementStatCount(InspectorStrings.latency, totalTime);
+        InspectorStats.incrementStatCount(InspectorStrings.LATENCY, totalTime);
 
         if (null != sasParams) {
             DemandSourceType dst = DemandSourceType.findByValue(sasParams.getDst());
-            InspectorStats.incrementStatCount(dst + "-" +InspectorStrings.latency, totalTime);
+            InspectorStats.incrementStatCount(dst + "-" +InspectorStrings.LATENCY, totalTime);
             if (null != sasParams.getAllParametersJson() && (rankList == null || rankList.isEmpty())) {
-                InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.nomatchsegmentcount);
-                InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.nomatchsegmentlatency, totalTime);
-                InspectorStats.incrementStatCount(InspectorStrings.nomatchsegmentcount);
-                InspectorStats.incrementStatCount(InspectorStrings.nomatchsegmentlatency, totalTime);
+                InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NO_MATCH_SEGMENT_COUNT);
+                InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NO_MATCH_SEGMENT_LATENCY, totalTime);
+                InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_COUNT);
+                InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_LATENCY, totalTime);
             }
             if (null != sasParams.getRFormat() && sasParams.getRFormat().equalsIgnoreCase("native")) {
                 InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NATIVE_REQUESTS);
                 if(rankList == null || rankList.isEmpty()){
-                	InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NATIVE_REQUESTS + "-" + InspectorStrings.nomatchsegmentcount);
+                	InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NATIVE_REQUESTS + "-" + InspectorStrings.NO_MATCH_SEGMENT_COUNT);
                 }
             }
         }
@@ -138,7 +138,7 @@ public class Logging {
         String advertiserId = null;
         if (channelSegment != null) {
             InspectorStats.incrementStatCount(channelSegment.getAdNetworkInterface().getName(),
-                    InspectorStrings.serverImpression);
+                    InspectorStrings.SERVER_IMPRESSION);
             isServerImpression = true;
             advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
             adsServed = 1;
@@ -318,21 +318,21 @@ public class Logging {
             AdNetworkInterface adNetwork = channelSegment.getAdNetworkInterface();
             ThirdPartyAdResponse adResponse = adNetwork.getResponseStruct();
             InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalRequests);
-            InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.latency, adResponse.latency);
-            InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.connectionLatency,
+            InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.LATENCY, adResponse.latency);
+            InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.CONNECTION_LATENCY,
                     adNetwork.getConnectionLatency());
             switch (adResponse.adStatus) {
                 case "AD":
-                    InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalFills);
+                    InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_FILLS);
                     break;
                 case "NO_AD":
-                    InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalNoFills);
+                    InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_NO_FILLS);
                     break;
                 case "TIME_OUT":
-                    InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalTimeout);
+                    InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_TIMEOUT);
                     break;
                 default:
-                    InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalTerminate);
+                    InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_TERMINATE);
                     break;
             }
         }
