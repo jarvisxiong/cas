@@ -114,20 +114,17 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
         }
         if (StringUtils.isNotBlank(casInternalRequestParameters.uidSO1)) {
             appendQueryParam(url, SHA1UDID, casInternalRequestParameters.uidSO1, false);
-        }
-        else if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
+        } else if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
             appendQueryParam(url, SHA1UDID, casInternalRequestParameters.uidO1, false);
         }
         if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
             appendQueryParam(url, MD5UDID, casInternalRequestParameters.uidMd5, false);
-        }
-        else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
+        } else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
             appendQueryParam(url, MD5UDID, casInternalRequestParameters.uid, false);
         }
         if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
             appendQueryParam(url, SHA1UDID, casInternalRequestParameters.uidIDUS1, false);
-        }
-        else {
+        } else {
             String gpid = getGPID();
             if (gpid != null) {
                 url.append("&o_andadvid=").append(gpid);
@@ -168,8 +165,7 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             statusCode = status.code();
             VelocityContext context = new VelocityContext();
             try {
@@ -185,8 +181,7 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
 
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from Mobfox");
                 LOG.info("Response from Mobfox {}", response);

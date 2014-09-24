@@ -143,8 +143,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
 		if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
 			finalUrl.append("&d(id2)=").append(
 					casInternalRequestParameters.uidO1);
-		}
-		else if  (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
+		} else if  (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
             finalUrl.append("&d(id2)=").append(
                     casInternalRequestParameters.uidIDUS1);
         }
@@ -156,8 +155,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
 				finalUrl.append("&u(id)=").append(
 						casInternalRequestParameters.uidMd5);
 			}
-		}
-		else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
+		} else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
             if (isApp) {
                 finalUrl.append("&d(id12)=").append(
                         casInternalRequestParameters.uid);
@@ -165,8 +163,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
                 finalUrl.append("&u(id)=").append(
                         casInternalRequestParameters.uid);
             }
-        }
-		else {
+        } else {
 		    String gpid = getGPID();
 		    if (gpid != null) {
 		    finalUrl.append("&d(id12)=").append(getHashedValue(gpid, "MD5"));

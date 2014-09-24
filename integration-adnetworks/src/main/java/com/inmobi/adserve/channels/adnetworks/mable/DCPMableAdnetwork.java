@@ -64,8 +64,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
             Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
-        }
-        else {
+        } else {
             LOG.debug("mandate parameters missing for Mable, so returning from adapter");
             return false;
         }
@@ -124,8 +123,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
                 request.put("zip", sasParams.getPostalCode());
             }
 
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             LOG.info("Error while forming request object");
         }
         LOG.debug("Mable request {}", request);
@@ -138,8 +136,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
             String host = config.getString("mable.host");
             StringBuilder url = new StringBuilder(host);
             return (new URI(url.toString()));
-        }
-        catch (URISyntaxException exception) {
+        } catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.error("{}", exception);
         }
@@ -176,15 +173,13 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 adStatus = "NO_AD";
                 LOG.error("Error parsing response from Mable : {}", exception);
                 LOG.error("Response from Mable: {}", response);
@@ -224,8 +219,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIDUS1)) {
             uidType = udidFormat;
             return casInternalRequestParameters.uidIDUS1;
-        }
-        else {
+        } else {
             String gpid = getGPID();
             if (gpid != null) {
                 uidType = udidFormat;

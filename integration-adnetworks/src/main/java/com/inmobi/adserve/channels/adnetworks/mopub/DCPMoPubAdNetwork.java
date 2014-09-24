@@ -78,8 +78,7 @@ public class DCPMoPubAdNetwork extends AbstractDCPAdNetworkImpl {
             LOG.debug("MoPub url is {}", url);
 
             return (new URI(url.toString()));
-        }
-        catch (URISyntaxException exception) {
+        } catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.error("{}", exception);
         }
@@ -96,8 +95,7 @@ public class DCPMoPubAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             responseContent = String.format(responseTemplate, response, beaconUrl);
             adStatus = "AD";
         }

@@ -102,20 +102,15 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
             String udid = null;
             if (casInternalRequestParameters.uidO1 != null) {
                 udid = casInternalRequestParameters.uidO1;
-            }
-            else if (casInternalRequestParameters.uidIFA != null) {
+            } else if (casInternalRequestParameters.uidIFA != null) {
                 udid = casInternalRequestParameters.uidIFA;
-            }
-            else if (casInternalRequestParameters.uidMd5 != null) {
+            } else if (casInternalRequestParameters.uidMd5 != null) {
                 udid = casInternalRequestParameters.uidMd5;
-            }
-            else if (casInternalRequestParameters.uidIDUS1 != null) {
+            } else if (casInternalRequestParameters.uidIDUS1 != null) {
                  udid =  casInternalRequestParameters.uidIDUS1;
-            }
-            else if (!StringUtils.isBlank(casInternalRequestParameters.uid)) {
+            } else if (!StringUtils.isBlank(casInternalRequestParameters.uid)) {
                 udid = casInternalRequestParameters.uid;
-            }
-            else {
+            } else {
                 String gpid = getGPID();
                 if (gpid != null) {
                     udid = gpid;
@@ -139,8 +134,7 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
             }
             LOG.debug("logan url is {}", url);
             return (new URI(url.toString()));
-        }
-        catch (URISyntaxException exception) {
+        } catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.info("{}", exception);
         }
@@ -158,16 +152,14 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             LOG.debug("beacon url inside logan is {}", beaconUrl);
 
             try {
                 JSONArray jArray = null;
                 if (response.endsWith(";")) {
                     jArray = new JSONArray(response.substring(0, response.length() - 1));
-                }
-                else {
+                } else {
                     jArray = new JSONArray(response);
                 }
                 JSONObject adResponse = jArray.getJSONObject(0);
@@ -190,29 +182,24 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
                         if (!StringUtils.isEmpty(vmTemplate)) {
                             context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
                             t = TemplateType.RICH;
-                        }
-                        else {
+                        } else {
                             t = TemplateType.PLAIN;
                         }
-                    }
-                    else {
+                    } else {
                         context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getString("img"));
                         t = TemplateType.IMAGE;
                     }
-                }
-                else {
+                } else {
                     context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, adResponse.getString("content"));
                     t = TemplateType.HTML;
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            }
-            catch (JSONException exception) {
+            } catch (JSONException exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from logan : {}", exception);
                 LOG.info("Response from logan: {}", response);
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from logan : {}", exception);
                 LOG.info("Response from logan: {}", response);

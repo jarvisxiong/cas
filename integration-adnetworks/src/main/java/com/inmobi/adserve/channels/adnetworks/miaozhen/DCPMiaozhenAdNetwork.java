@@ -205,7 +205,7 @@ public class DCPMiaozhenAdNetwork extends AbstractDCPAdNetworkImpl {
             VelocityContext context = new VelocityContext();
             try {
                 JSONObject ad = new JSONObject(response);
-                if (ad.getString("type").equalsIgnoreCase("I")) {
+                if ("I".equalsIgnoreCase(ad.getString("type"))) {
 
                     // Image URL.
                     if (ad.has("src")) {

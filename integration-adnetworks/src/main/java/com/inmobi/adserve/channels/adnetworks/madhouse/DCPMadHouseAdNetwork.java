@@ -221,8 +221,7 @@ public class DCPMadHouseAdNetwork extends AbstractDCPAdNetworkImpl {
             Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
-        }
-        else {
+        } else {
             LOG.debug("mandatory parameters missing for madhouse so exiting adapter");
             return false;
         }
@@ -245,8 +244,7 @@ public class DCPMadHouseAdNetwork extends AbstractDCPAdNetworkImpl {
         // Ad Type.
         if(isInterstitial()) {
             builder.setParameter(AD_TYPE, "5"); // Interstitial.
-        }
-        else {
+        } else {
             builder.setParameter(AD_TYPE, "2"); // Banner.
         }
 

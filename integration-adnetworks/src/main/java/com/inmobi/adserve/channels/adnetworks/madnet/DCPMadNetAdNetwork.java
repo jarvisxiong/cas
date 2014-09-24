@@ -88,8 +88,7 @@ public class DCPMadNetAdNetwork extends AbstractDCPAdNetworkImpl {
 
             if (WAP.equalsIgnoreCase(sasParams.getSource())) {
                 url.append("&sid=");
-            }
-            else {
+            } else {
                 url.append("&apid=");
             }
             url.append(blindedSiteId);
@@ -129,8 +128,7 @@ public class DCPMadNetAdNetwork extends AbstractDCPAdNetworkImpl {
 
             LOG.debug("MadNet url is {}", url);
             return (new URI(url.toString()));
-        }
-        catch (URISyntaxException exception) {
+        } catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.error("{}", exception);
         }
@@ -147,8 +145,7 @@ public class DCPMadNetAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             statusCode = status.code();
             VelocityContext context = new VelocityContext();
             TemplateType t = TemplateType.IMAGE;
@@ -163,12 +160,10 @@ public class DCPMadNetAdNetwork extends AbstractDCPAdNetworkImpl {
                     if (!StringUtils.isEmpty(vmTemplate)) {
                         context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
                         t = TemplateType.RICH;
-                    }
-                    else {
+                    } else {
                         t = TemplateType.PLAIN;
                     }
-                }
-                else {
+                } else {
                     adResponse = adResponse.getJSONObject("components");
                     context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getString("image_url"));
                 }
@@ -186,20 +181,17 @@ public class DCPMadNetAdNetwork extends AbstractDCPAdNetworkImpl {
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            }
-            catch (JSONException exception) {
+            } catch (JSONException exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from MadNet : {}", exception);
                 LOG.info("Response from MadNet: {}", response);
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from MadNet : {}", exception);
                 LOG.info("Response from MadNet: {}", response);
                 try {
                     throw exception;
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     LOG.info("Error while rethrowing the exception : {}", e);
                 }
             }
