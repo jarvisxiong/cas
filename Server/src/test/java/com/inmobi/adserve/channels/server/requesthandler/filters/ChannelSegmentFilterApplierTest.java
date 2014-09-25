@@ -466,7 +466,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         CasContext casContext = new CasContext();
         int sumOfSiteImpressions = 0;
         for (ChannelSegment channelSegment : channelSegments) {
-            sumOfSiteImpressions += channelSegment.getChannelSegmentCitrusLeafFeedbackEntity().getBeacons();
+            sumOfSiteImpressions += channelSegment.getChannelSegmentAerospikeFeedbackEntity().getBeacons();
         }
         casContext.setSumOfSiteImpressions(sumOfSiteImpressions);
 

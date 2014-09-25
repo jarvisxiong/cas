@@ -73,7 +73,7 @@ public class MatchSegmentsTest extends TestCase {
         expect(repositoryHelper.querySiteTaxonomyRepository("2")).andReturn(s2).anyTimes();
         expect(repositoryHelper.querySiteTaxonomyRepository("3")).andReturn(s3).anyTimes();
         expect(repositoryHelper.querySiteTaxonomyRepository("4")).andReturn(s4).anyTimes();
-        expect(repositoryHelper.querySiteCitrusLeafFeedbackRepository("1", 2)).andReturn(null).anyTimes();
+        expect(repositoryHelper.querySiteAerospikeFeedbackRepository("1", 2)).andReturn(null).anyTimes();
         expect(repositoryHelper.getChannelAdGroupRepository()).andReturn(createMock(ChannelAdGroupRepository.class))
                 .anyTimes();
         replay(repositoryHelper);

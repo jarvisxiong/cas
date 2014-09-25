@@ -3,10 +3,14 @@ package com.inmobi.adserve.channels.adnetworks.rtb;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.inmobi.adserve.adpool.NetworkType;
-import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.NativeResponseMaker;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.attribute.BAttrNativeType;
 import com.inmobi.adserve.channels.api.attribute.BTypeNativeAttributeType;
 import com.inmobi.adserve.channels.api.attribute.SuggestedNativeAttributeType;
@@ -18,13 +22,31 @@ import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.types.AdFormatType;
-import com.inmobi.adserve.channels.util.*;
-import com.inmobi.casthrift.rtb.*;
+import com.inmobi.adserve.channels.util.IABCategoriesInterface;
+import com.inmobi.adserve.channels.util.IABCategoriesMap;
+import com.inmobi.adserve.channels.util.IABCountriesInterface;
+import com.inmobi.adserve.channels.util.IABCountriesMap;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.casthrift.rtb.App;
+import com.inmobi.casthrift.rtb.AppExt;
+import com.inmobi.casthrift.rtb.AppStore;
+import com.inmobi.casthrift.rtb.Banner;
+import com.inmobi.casthrift.rtb.BannerExtVideo;
+import com.inmobi.casthrift.rtb.BannerExtensions;
+import com.inmobi.casthrift.rtb.Bid;
+import com.inmobi.casthrift.rtb.BidExtensions;
+import com.inmobi.casthrift.rtb.BidRequest;
+import com.inmobi.casthrift.rtb.BidResponse;
+import com.inmobi.casthrift.rtb.Device;
+import com.inmobi.casthrift.rtb.Geo;
+import com.inmobi.casthrift.rtb.Impression;
+import com.inmobi.casthrift.rtb.ImpressionExtensions;
+import com.inmobi.casthrift.rtb.Native;
+import com.inmobi.casthrift.rtb.Site;
+import com.inmobi.casthrift.rtb.User;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -32,12 +54,11 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
 import lombok.Getter;
 import lombok.Setter;
-
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.httpclient.URIException;
 import org.apache.commons.validator.UrlValidator;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.thrift.TException;
@@ -53,15 +74,18 @@ import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
-import java.awt.*;
+import java.awt.Dimension;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 /**
  * Generic RTB adapter.
@@ -142,9 +166,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private static final String            USD                          = "USD";
     private List<String> blockedAdvertisers = Lists.newArrayList();
 
-    // Listed site ID's.
-    private HashMap<String, String>        siteIDMap;
-
     private static final List<String>      VIDEO_MIMES                  = Arrays.asList("video/mp4");
     private static final int               EXT_VIDEO_LINEARITY          = 1;   // only linear ads
     private static final int               EXT_VIDEO_MINDURATION        = 15;  // in secs.
@@ -202,121 +223,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         this.isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", false);
         this.isBannerVideoResponseSupported = config.getBoolean(advertiserName + ".bannerVideoSupported", false);
         this.blockedAdvertisers.addAll(blockedAdvertiserList);
-
-        // Populate the listed site ID's.
-        siteIDMap = new HashMap<String, String>();
-        siteIDMap.put("12a35ce4035c427cad0eed2e139d2554", "com.dreamstep.webWidget.wAppcreationguide");
-        siteIDMap.put("4028cba631b705570131d1bd19f201b2", "com.dreamstep.wBESTLOVEPOEMS");
-        //siteIDMap.put("4028cba631d63df1013206b983e80379");
-        //siteIDMap.put("4028cba631d63df1013206bb1233037a");
-        siteIDMap.put("ccf54cfa1aca468ab0b07f535c4e7998", "com.eFlashFrench");
-        siteIDMap.put("47fe7b8914b74f29a1ace8235a34c290", "com.eFlashJapanese");
-        siteIDMap.put("f229aacbcd914ffb8c3a76df90428561", "com.eFlashHindi");
-        siteIDMap.put("f0cea5d18ff8485e8a3e5524250b432f", "com.playsightwords");
-        siteIDMap.put("c7cb7c97a3bb4af48c60c65456583de4", "id388415793");
-        siteIDMap.put("0872a2e5844b4c61b7490798fa84d479", "com.eFlashItalian");
-        siteIDMap.put("6e2cb45551ea44fc9ea4e7f4e1748efc", "com.eFlashGerman");
-        siteIDMap.put("1b46212b8c71442793b930e1c736b4f3", "com.eFlashPotuguese");
-        siteIDMap.put("85f6432130b84b0fa21e44ded012a479", "com.eFlashManderin");
-        siteIDMap.put("f51b1d04f4784f6f85689d0637c856a0", "id398463258");
-        siteIDMap.put("6d1cc217f5a84462a8eaf48a1f6d214e", "com.eFlashRussian");
-        siteIDMap.put("4028cbff3a6eaf57013aa016df4b04f8", "id378668742");
-        siteIDMap.put("4028cbff386b43c501387745667401fb", "id485327896");
-        //siteIDMap.put("932c00ee0f584cbb9225bbc6dd1e3142");
-        siteIDMap.put("4028cbff38e2d7c00138fa3aa7f601ad", "id398463450");
-        siteIDMap.put("4028cbff3977a43c01397d350e760081", "id421829637");
-        siteIDMap.put("4028cbff388ff27c013894aa1499008f", "id409571265");
-        siteIDMap.put("4028cbff3b93b240013b93d6909f000b", "com.eFlashEnglish");
-        siteIDMap.put("4028cbff39009b2401396e8951c50934", "id447065810");
-        siteIDMap.put("92a74f99307e45958e11b4f7633505f7", "com.eFlashSpanish");
-        siteIDMap.put("4028cbff388ff27c013894a5abc5008d", "id393319814");
-        siteIDMap.put("4028cbff39009b2401396e86baf20933", "id503851561");
-        siteIDMap.put("4028cbff39009b2401394a5b98d0061f", "id482972824");
-        siteIDMap.put("4028cbff3a6eaf57013aa021712104fb", "id576235357");
-        siteIDMap.put("4028cbff3a6eaf57013aa021c89904fc", "id576235350");
-        siteIDMap.put("8ceb2ea5a8e34140a0be174f10b38828", "id395684206");
-        siteIDMap.put("eb66de17c72a4830a71d1d0a5c3e386f", "id690570027");
-        siteIDMap.put("4028cbff3b93b240013bb6ae205802b3", "air.com.eflashApps.numberKids");
-        //siteIDMap.put("120fcc7828cd480ea910055cae0e4b65");
-        siteIDMap.put("1355f6537db84d1b957facfbcbb88a54", "com.gamecircus.CoinDozerSeasons");
-        siteIDMap.put("2459cbe7919d48389b2519fb5c299645", "id434800417");
-        //siteIDMap.put("355406320fd64b5d88c80fd9ef57677f");
-        siteIDMap.put("4028cb1334ef46a90135ab0c09bc20f1", "com.gamecircus.CoinDozerWorld");
-        siteIDMap.put("4028cb1334ef46a90135ab2416fb20f3", "com.gamecircus.CoinDozerHalloween");
-        siteIDMap.put("4028cb1334ef46a90135ab3c9d1920f6", "com.gamecircus.CookieDozerThanksgiving");
-        siteIDMap.put("4028cb1334ef46a90135ab4a6e0920f7", "com.leftover.CoinDozer");
-        siteIDMap.put("4028cb1334ef46a90135ab4f5e5620f8", "com.leftover.CookieDozer");
-        siteIDMap.put("4028cb1334ef46a90135ab53f5d220fa", "com.gamecircus.HorseFrenzy");
-        siteIDMap.put("4028cb1334ef46a90135ab58378620fc", "com.gamecircus.CoinDozerSeasons");
-        siteIDMap.put("4028cb1334ef46a90135ab5a86f220fd", "com.gamecircus.PrizeClawSeasons");
-        siteIDMap.put("4028cb1334ef46a90135ac65e4802105", "id413381762");
-        siteIDMap.put("4028cb1334ef46a90135ac6a674f2106", "id446647072");
-        siteIDMap.put("4028cb1334ef46a90135ac6b6fac2107", "id458642688");
-        siteIDMap.put("4028cb1334ef46a90135ac6c78652108", "id429974502");
-        siteIDMap.put("4028cb1334ef46a90135ac6dacaa2109", "id426330570");
-        siteIDMap.put("4028cb1334ef46a90135ac6e74e8210a", "id413594876");
-        siteIDMap.put("4028cb1334ef46a90135ac6f5cab210b", "id454233285");
-        siteIDMap.put("4028cb1334ef46a90135ac727958210c", "id461797782");
-        siteIDMap.put("4028cba630724cd9013195be870a11e2", "id434800417");
-        siteIDMap.put("4028cba631d63df1013234285d8a05a9", "id405589767");
-        siteIDMap.put("4028cba6323d864901324085740f0056", "id372836496");
-        siteIDMap.put("4028cba6323d864901324086dff90057", "id377624008");
-        siteIDMap.put("4028cba6323d864901324088054a0059", "id395317832");
-        siteIDMap.put("4028cba6323d864901324089be60005a", "id396254497");
-        siteIDMap.put("4028cba6323d86490132408bea64005c", "id412840230");
-        siteIDMap.put("4028cba634ef45cb0135595873cf0fd7", "id404098945");
-        siteIDMap.put("4028cba634ef45cb01355959c9680fd9", "id404225671");
-        siteIDMap.put("4028cba634ef45cb0135595b32b50fda", "id418202202");
-        siteIDMap.put("4028cba634ef45cb0135a709d5ad1ea0", "com.gamecircus.PrizeClaw");
-        siteIDMap.put("4028cbff369b93f601369d0947360049", "com.gamecircus.Paplinko");
-        siteIDMap.put("4028cbff379738bf013815d800721c85", "com.gamecircus.FrogToss");
-        siteIDMap.put("4028cbff388ff27c01389139309a0044", "id543697247");
-        //siteIDMap.put("4028cbff38989ad10138d9fbd23b0999");
-        //siteIDMap.put("4028cbff38989ad10138d9fe8e53099a");
-        //siteIDMap.put("4028cbff3a4e5dd7013a565d4ca700c5");
-        //siteIDMap.put("4028cbff3b77ce76013b8bcb340b024c");
-        siteIDMap.put("43e45b3522a74d77bca8529d095b3a72", "id413381762");
-        siteIDMap.put("4730c69fb33c4c7bad663ccf3f746840", "com.gamecircus.PrizeClaw");
-        siteIDMap.put("4a2d500433f84df8a6035a017786d947", "id543697247");
-        siteIDMap.put("5764ea07a2454a45a04593f2f797c346", "id418202202");
-        //siteIDMap.put("67d36349e65a4632af61ac9419a089a2");
-        //siteIDMap.put("9e9c80d07c624006965abd083fd33c96");
-        //siteIDMap.put("a7529f899c264fdbb8f80636cb66e7f2");
-        siteIDMap.put("abe652bf19d14cadb0e0194ca3507d9d", "id633827057");
-        siteIDMap.put("aea22a1702c64e0b9f9523783e5e4ea0", "com.gamecircus.prizeclawtwo");
-        //siteIDMap.put("b23afd140f794a379a68f392615f705e");
-        //siteIDMap.put("bb6fda961c944f209e597d1bd690ee51");
-        siteIDMap.put("c64124a8995f46cbab8a54470d09aa62", "id405589767");
-        siteIDMap.put("c99bc248032741cbb1327837a2924ac8", "com.leftover.CoinDozer");
-        siteIDMap.put("d0d79f350d2f49e2bd8ca8bcbb0b1486", "id372836496");
-        siteIDMap.put("d6d4ffd1ee6e4622afa171a98fd79c7a", "com.gamecircus.Paplinko");
-        siteIDMap.put("e75f00b1179a47fd9925ff2a2951c833", "com.gamecircus.moviez");
-        siteIDMap.put("0bba65a565284137aa242ba794cfff0f", "com.jsdev.instasize");
-        siteIDMap.put("29f89f15877b453dbe6a5c51f42e2f0a", "com.jsdev.instasize");
-        siteIDMap.put("55b798bd8f1c4de5b89823fbacf419bc", "com.jsdev.instasize");
-        siteIDMap.put("7219db61cf1545d6b2242415a930270b", "id576649830");
-        siteIDMap.put("975c065b9cc546cd84ad9b7d4ae55add", "id576649830");
-        siteIDMap.put("db5ea326eed44033bab28ae7f16397d2", "com.jsdev.instasize");
-        siteIDMap.put("035987e8e0c54642b54199522d5fc5ce", "com.thechive");
-        siteIDMap.put("158c43a7711147b0a2536414244bcfd5", "id448999087");
-        //siteIDMap.put("1b3f5f9f598543c59cc422e31402b98e");
-        siteIDMap.put("2d35c447943e4d89856b84ebe94a3a8f", "id694895878");
-        siteIDMap.put("4028cbff367d7022013688fbf4f8017a", "com.thechive");
-        siteIDMap.put("4028cbff367d7022013688fdd08e017b", "id448999087");
-        //siteIDMap.put("4028cbff367d7022013689001d22017d");
-        siteIDMap.put("4028cbff3aab0518013abcf722bc014e", "id448999087");
-        siteIDMap.put("4028cbff3af511e5013b057dfefe01b4", "id448999087");
-        //siteIDMap.put("4028cbff3af511e5013b0581217401b5");
-        //siteIDMap.put("6bfb9439132742f0bc8b6660095f8593");
-        siteIDMap.put("6e7f8bd647cd4f08834c248dafc4d0ac", "id656863406");
-        siteIDMap.put("7086962c13694b63b5914431927c1d7f", "id448999087");
-        siteIDMap.put("99d95f977ab1466eb94dee22d9f769c1", "id694895878");
-        siteIDMap.put("c4e1fefa09bd497c9f8c060a1a814281", "com.thechive");
-        siteIDMap.put("c5be3529183b45eb93c79f25ec40ef01", "com.theberry");
-        siteIDMap.put("cc939819623d44df991f450d609eba3a", "com.thechive");
-        siteIDMap.put("d9bdade865d24e7597a1fc0c05e944ad", "com.thechive.chivespy");
-        //siteIDMap.put("ec0249d3844447f58274f68d94d7617c");
-        siteIDMap.put("4028cbff3aab0518013ae1dbf41b0403", "id426026150");
     }
 
     @Override
@@ -342,14 +248,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             else {
                 // Creating App object
                 app = createAppObject();
-
-                // Set bundle if the site ID is present.
-                if (siteIDMap.get(sasParams.getSiteId()) != null) {
-                    if (isAndroid() || isIOS()) {
-                        app.bundle = siteIDMap.get(sasParams.getSiteId());
-                        app.id = app.bundle;
-                    }
-                }
             }
         }
 

@@ -49,6 +49,7 @@ public class SASRequestParameters {
     private String              rqIframe;
     private String              rFormat;
 
+    private String deviceType;
     private int                 osId;
     private Short               rqMkAdcount;
     private String              tid;

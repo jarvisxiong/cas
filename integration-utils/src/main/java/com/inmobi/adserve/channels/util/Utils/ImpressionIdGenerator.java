@@ -42,6 +42,7 @@ public class ImpressionIdGenerator {
         this.dataCenterIdCode = dataCenterIdCode;
     }
 
+
     public String getImpressionId(final long adId) {
         String uuidIntKey = (WilburyUUID.setIntKey(WilburyUUID.getUUID().toString(), (int) adId)).toString();
         String uuidMachineKey = (WilburyUUID.setMachineId(uuidIntKey, hostIdCode)).toString();
