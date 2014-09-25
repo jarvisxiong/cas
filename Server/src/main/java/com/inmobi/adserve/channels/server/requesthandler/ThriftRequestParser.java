@@ -1,21 +1,36 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.inject.Singleton;
-import com.inmobi.adserve.adpool.*;
+import com.inmobi.adserve.adpool.AdPoolRequest;
+import com.inmobi.adserve.adpool.DemandType;
+import com.inmobi.adserve.adpool.EncryptionKeys;
+import com.inmobi.adserve.adpool.IntegrationType;
+import com.inmobi.adserve.adpool.RequestedAdType;
+import com.inmobi.adserve.adpool.ResponseFormat;
+import com.inmobi.adserve.adpool.SupplyCapability;
+import com.inmobi.adserve.adpool.UidParams;
+import com.inmobi.adserve.adpool.UidType;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.types.InventoryType;
-
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.security.MessageDigest;
-import java.util.*;
-import java.util.Map.Entry;
 
 
 @Singleton
@@ -66,7 +81,6 @@ public class ThriftRequestParser {
             }
             params.setSdkVersion(getSdkVersion(tObject.integrationDetails.integrationType,
                     tObject.integrationDetails.integrationVersion));
-            // TODO Wait for the final contract from Devashish
             params.setAdcode(getAdCode(tObject.integrationDetails.integrationType));
         }
 
