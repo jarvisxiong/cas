@@ -63,8 +63,8 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
         }
 
         // Check App ID.
-        // i.e. Check BlindedSiteID.
-        if(StringUtils.isBlank(blindedSiteId)) {
+        // i.e. Check externalSiteId.
+        if(StringUtils.isBlank(externalSiteId)) {
             LOG.debug("Mandatory parameters missing for Marimedia so exiting adapter");
             return false;
         }
@@ -108,8 +108,8 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
         }
 
         // Set App ID.
-        if(StringUtils.isNotBlank(blindedSiteId)) {
-            appendQueryParam(url, APP_ID, getURLEncode(blindedSiteId, format), false);
+        if(StringUtils.isNotBlank(externalSiteId)) {
+            appendQueryParam(url, APP_ID, getURLEncode(externalSiteId, format), false);
         }
 
         // Set IP.
@@ -193,35 +193,36 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
             try {
                 JSONObject ad = new JSONObject(response);
 
-                // Banner Ad.
-                if (ad.getString("adType").equalsIgnoreCase("banner")) {
-                    // Image URL.
-                    if (ad.has("imageUrl")) {
+                // Banner or Interstitial.
+                if (ad.getString("adType").equalsIgnoreCase("banner") || ad.getString("adType").equalsIgnoreCase("html")) {
+                    if(ad.getString("adType").equalsIgnoreCase("banner")) {
                         String imageUrl = ad.getString("imageUrl");
                         context.put(VelocityTemplateFieldConstants.PartnerImgUrl, imageUrl);
                     }
-                }
-                // Interstitial Ad.
-                else if (ad.getString("adType").equalsIgnoreCase("html")) {
-                    if (ad.has("htmlUrl")) {
+                    else {
                         String htmlUrl = ad.getString("htmlUrl");
                         context.put(VelocityTemplateFieldConstants.PartnerImgUrl, htmlUrl);
                     }
                 }
+                else {
+                    // Other format.
+                    adStatus = "NO_AD";
+                    LOG.info("Error parsing response from Marimedia");
+                    LOG.info("Response from Marimedia {}", response);
+                    return;
+                }
 
                 // Ad URL.
-                if (ad.has("adUrl")) {
-                    String adUrl = ad.getString("adUrl");
-                    context.put(VelocityTemplateFieldConstants.AdUrl, adUrl);
-                }
+                String adUrl = ad.getString("adUrl");
+                context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adUrl);
 
                 // Impression URL.
-                if (ad.has("impUrl")) {
-                    String impressionUrl = ad.getString("impUrl");
-                    context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, impressionUrl);
-                }
+                String impressionUrl = ad.getString("impUrl");
+                context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, impressionUrl);
 
-                responseContent = Formatter.getResponseFromTemplate(Formatter.TemplateType.HTML, context, sasParams, beaconUrl);
+                context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
+
+                responseContent = Formatter.getResponseFromTemplate(Formatter.TemplateType.IMAGE, context, sasParams, beaconUrl);
                 adStatus = "AD";
             } catch (Exception exception) {
                 adStatus = "NO_AD";
@@ -239,5 +240,10 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public String getId() {
         return (config.getString("marimedia.advertiserId"));
+    }
+
+    @Override
+    public boolean isClickUrlRequired() {
+        return true;
     }
 }

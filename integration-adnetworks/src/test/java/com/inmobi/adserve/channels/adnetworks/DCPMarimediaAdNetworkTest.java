@@ -14,7 +14,6 @@ import org.testng.annotations.Test;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.UUID;
 
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
@@ -73,12 +72,10 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
         sasParams.setSource("APP");
         sasParams.setOsId(SASRequestParameters.HandSetOS.iOS.getValue());
         sasParams.setSlot((short) 21);
-
-        // Set blinded site ID.
-        sasParams.setSiteId((new UUID(1000000009L, 1000000007L)).toString());
+        String externalKey = "1234";
 
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                marimediaAdvId, "adgroupid", null, null, 0, null, null, true, true, null, null, null, null, new Long[] {1L}, true, null,
+                marimediaAdvId, "adgroupid", null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {1L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
                 new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
 
@@ -102,12 +99,10 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
         sasParams.setSource("APP");
         sasParams.setOsId(SASRequestParameters.HandSetOS.iOS.getValue());
         sasParams.setSlot((short) 21);
-
-        // Set blinded site ID.
-        sasParams.setSiteId((new UUID(1000000009L, 1000000007L)).toString());
+        String externalKey = "1234";
 
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                marimediaAdvId, "adgroupid", null, null, 0, null, null, true, true, null, null, null, null, new Long[] {1L}, true, null,
+                marimediaAdvId, "adgroupid", null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {1L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
                 new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
 
@@ -119,7 +114,7 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
 
         // Compare the expected URL with actual URL.
         String actualUrl = dcpMarimediaAdNetwork.getRequestUri().toString();
-        String expectedUrl = "http://ad.taptica.com/aff_ad?rt=0&u=Mozilla%2F5.0+%28compatible%3B+MSIE+9.0%3B+Windows+NT+6.1%3B+Trident%2F5.0%29&a=00000000-0000-0000-0000-000000000000&i=206.29.182.240&t=2&r=480x75&lat=37.4429&lon=-122.1514&tt_udid=202cb962ac59075b964b07152d234b70&tt_idfa=23e2ewq445545";
+        String expectedUrl = "http://ad.taptica.com/aff_ad?rt=0&u=Mozilla%2F5.0+%28compatible%3B+MSIE+9.0%3B+Windows+NT+6.1%3B+Trident%2F5.0%29&a=1234&i=206.29.182.240&t=2&r=480x75&lat=37.4429&lon=-122.1514&tt_udid=202cb962ac59075b964b07152d234b70&tt_idfa=23e2ewq445545";
         assertEquals(expectedUrl, actualUrl);
     }
 
@@ -140,12 +135,10 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
         sasParams.setSource("APP");
         sasParams.setOsId(SASRequestParameters.HandSetOS.iOS.getValue());
         sasParams.setSlot((short) 21);
-
-        // Set blinded site ID.
-        sasParams.setSiteId((new UUID(1000000009L, 1000000007L)).toString());
+        String externalKey = "1234";
 
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                marimediaAdvId, "adgroupid", null, null, 0, null, null, true, true, null, null, null, null, new Long[] {1L}, true, null,
+                marimediaAdvId, "adgroupid", null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {1L}, true, null,
                 null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
                 new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
 
@@ -160,7 +153,7 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
         assertEquals(dcpMarimediaAdNetwork.getHttpResponseStatusCode(), 200);
 
         String actualResponse = dcpMarimediaAdNetwork.responseContent;
-        String expectedResponse = "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body>$PartnerHtmlCode<img src='http://ad.taptica.com/aff_i?tt_cid=3b327792f36441b49f34501f1acc3109&el=GbtixRMFpAr%2boJEVHfprXTgVAQ3Ld8jjq6x3iEWyaxyyAB9XQaJ2hY1C%2bRbXbyCqSUxUNfry7uYwwqJoGMRB4DXDBgQXPm3cW0TjdSjP3GwU4L4c80snbxBqkCNTlGzYfeDOTGlIBc72p%2bKawW1NjSO6o5imY%2fv08FTGqOkRkhtpsdYOVHKXY6dYrgs57S2lAlmQgY62z3717Io%2f82fSHB4vgiY9rovVowp65VpiBKbt3a6VLqOpERRikOpS6NDRe4qtJFdK326mBMsVETyPW1Egv4eZAnn1baZ5OLwYf9UTWP3x1OsgHBD9YV5V2hA%2btjAExs9A%2brj%2b5Tk2lGAGFpK%2bM%2bd3ttbG%2f%2brE2WlbRVHfE3EtatWKJ0g2kh8p2uccF7N5FsRn9PvvRTwgM0pgmw9h5xjcFcG9PfLRrmZ6QXCq5hytHd4B3y7WU1pQUmjtQO8YHaj0wTdZ2NJJtyfuIL78qSwgTqfYiAkg7%2bMDVjs%3d' height=1 width=1 border=0 style=\"display:none;\"/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>";
+        String expectedResponse = "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><a href='http://tracking.taptica.com/aff_ic?tt_cid=3b327792f36441b49f34501f1acc3109&el=GbtixRMFpAr%2boJEVHfprXTgVAQ3Ld8jjq6x3iEWyaxyyAB9XQaJ2hY1C%2bRbXbyCqSUxUNfry7uYwwqJoGMRB4DXDBgQXPm3cW0TjdSjP3GwU4L4c80snbxBqkCNTlGzYfeDOTGlIBc72p%2bKawW1NjSO6o5imY%2fv08FTGqOkRkhtpsdYOVHKXY6dYrgs57S2lAlmQgY62z3717Io%2f82fSHB4vgiY9rovVowp65VpiBKbt3a6VLqOpERRikOpS6NDRe4qtJFdK326mBMsVETyPW1Egv4eZAnn1baZ5OLwYf9TWP3x1OsgHBD9YV5V2hA%2btjAExs9A%2brj%2b5Tk2lGAGFpK%2bM%2bd3ttbG%2f%2brE2WlbRVHfE3EtatWKJ0g2kh8p2uccF7N5FsRn9PvvRTwgM0pgmw9h5xjcFcG9PfLRrmZ6QXCq5hytHd4B3y7WU1pQUmjtQO8YHaj0wTdZ2NJJtyfuIL78qSwgTqfYiAkg7%2bMDVjs%3d' onclick=\"document.getElementById('click').src='$IMClickUrl';\" target=\"_blank\" style=\"text-decoration: none\"><img src='http://media.go2speed.org/brand/files/taptica/4278/Bingo_2tixanimated_Banner_320x50.gif'  /></a><img src='http://ad.taptica.com/aff_i?tt_cid=3b327792f36441b49f34501f1acc3109&el=GbtixRMFpAr%2boJEVHfprXTgVAQ3Ld8jjq6x3iEWyaxyyAB9XQaJ2hY1C%2bRbXbyCqSUxUNfry7uYwwqJoGMRB4DXDBgQXPm3cW0TjdSjP3GwU4L4c80snbxBqkCNTlGzYfeDOTGlIBc72p%2bKawW1NjSO6o5imY%2fv08FTGqOkRkhtpsdYOVHKXY6dYrgs57S2lAlmQgY62z3717Io%2f82fSHB4vgiY9rovVowp65VpiBKbt3a6VLqOpERRikOpS6NDRe4qtJFdK326mBMsVETyPW1Egv4eZAnn1baZ5OLwYf9UTWP3x1OsgHBD9YV5V2hA%2btjAExs9A%2brj%2b5Tk2lGAGFpK%2bM%2bd3ttbG%2f%2brE2WlbRVHfE3EtatWKJ0g2kh8p2uccF7N5FsRn9PvvRTwgM0pgmw9h5xjcFcG9PfLRrmZ6QXCq5hytHd4B3y7WU1pQUmjtQO8YHaj0wTdZ2NJJtyfuIL78qSwgTqfYiAkg7%2bMDVjs%3d' height=1 width=1 border=0 style=\"display:none;\"/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/><img id=\"click\" width=\"1\" height=\"1\" style=\"display:none;\"/></body></html>";
 
         assertEquals(actualResponse, expectedResponse);
     }
