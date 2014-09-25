@@ -4,6 +4,7 @@ import com.google.inject.Singleton;
 import com.inmobi.adserve.adpool.*;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.types.InventoryType;
 
@@ -35,6 +36,16 @@ public class ThriftRequestParser {
         // TODO Iterate over the segments using all slots
         Short slotId = null != tObject.selectedSlots && !tObject.selectedSlots.isEmpty() ? tObject.selectedSlots.get(0)
                 : (short) 0;
+        //Checking slotId from IX_SLOT_ID_MAP, and setting slot if it's present as a key in the map
+        if(8 == dst && null != tObject.selectedSlots) {
+            for(short tempSlot : tObject.selectedSlots) {
+                if(SlotSizeMapping.IXMapHasSlot(tempSlot)) {
+                    slotId = tempSlot;
+                    break;
+                }
+            }
+        }
+
         params.setSlot(slotId);
         params.setRqMkSlot(tObject.selectedSlots);
         params.setRFormat(getResponseFormat(tObject.responseFormat));
