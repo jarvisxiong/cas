@@ -1,4 +1,4 @@
-package com.inmobi.adserve.channels.server.requesthandler;
+package com.inmobi.adserve.channels.util.Utils;
 
 import com.google.gson.Gson;
 import lombok.Getter;

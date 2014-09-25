@@ -82,6 +82,7 @@ public class InspectorStrings {
     public final static String droppedInRtbAuctionIdMisMatchFilter       = "DroppedInRtbAuctionIdMisMatchFilter";
     public final static String droppedInRtbSeatidMisMatchFilter          = "DroppedInRtbSeatidMisMatchFilter";
     public final static String droppedInRtbImpressionIdMisMatchFilter    = "DroppedInRtbImpressionIdMisMatchFilter";
+    public final static String droppedInAuctionIxImpressionIdFilter      = "DroppedInAuctionIxImpressionIdFilter";
     public final static String droppedInCreativeIdMissingFilter          = "DroppedInCreativeIdMissingFilter";
     public final static String droppedInSampleImageUrlMissingFilter      = "DroppedInSampleImageUrlMissingFilter";
     public final static String droppedInAdvertiserDomainsMissingFilter   = "DroppedInAdvertiserDomainsFilter";

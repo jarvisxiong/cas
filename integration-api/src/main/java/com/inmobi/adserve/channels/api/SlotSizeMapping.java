@@ -1,11 +1,13 @@
 package com.inmobi.adserve.channels.api;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.util.HashMap;
+import java.util.Map;
 
 
 public class SlotSizeMapping {
     public static final HashMap<Long, Dimension> slotMap = new HashMap<Long, Dimension>();
+    private static final Map<Short, Integer> IX_SLOT_ID_MAP = new HashMap<Short, Integer>();
 
     public static void init() {
         slotMap.put(1l, new Dimension(120, 20));
@@ -34,14 +36,42 @@ public class SlotSizeMapping {
         slotMap.put(30l, new Dimension(250, 125));
         slotMap.put(31l, new Dimension(320, 568));
         slotMap.put(32l, new Dimension(480, 320));
-        slotMap.put(33l, new Dimension(1024,768 ));
+        slotMap.put(33l, new Dimension(1024, 768 ));
         slotMap.put(34l, new Dimension(1280, 800));
         slotMap.put(35l, new Dimension(320, 30));
         slotMap.put(36l, new Dimension(320, 26));
         slotMap.put(0l, new Dimension(0, 0));
+
+        //Adding IX_SLOT_ID_MAP, which is a map from InMobi slot id's to Rubicon slot id's
+
+        IX_SLOT_ID_MAP.put((short) 4, 44);
+        // Mapping 320x48 to 320x50
+        IX_SLOT_ID_MAP.put((short) 9, 43);
+        IX_SLOT_ID_MAP.put((short) 10, 15);
+        IX_SLOT_ID_MAP.put((short) 11, 2);
+        IX_SLOT_ID_MAP.put((short) 12, 1);
+        IX_SLOT_ID_MAP.put((short) 13, 8);
+        IX_SLOT_ID_MAP.put((short) 14, 67);
+        IX_SLOT_ID_MAP.put((short) 15, 43);
+        IX_SLOT_ID_MAP.put((short) 16, 102);
+        IX_SLOT_ID_MAP.put((short) 18, 9);
+        IX_SLOT_ID_MAP.put((short) 19, 50);
+        IX_SLOT_ID_MAP.put((short) 21, 45);
+        IX_SLOT_ID_MAP.put((short) 23, 46);
+        IX_SLOT_ID_MAP.put((short) 29, 14);
+        IX_SLOT_ID_MAP.put((short) 32, 101);
+        IX_SLOT_ID_MAP.put((short) 33, 53);
     }
 
     public static Dimension getDimension(Long slot) {
         return (slotMap.get(slot));
+    }
+
+    public static boolean isIXSupportedSlot(short inmobiSlot) {
+        return IX_SLOT_ID_MAP.containsKey(inmobiSlot);
+    }
+
+    public static Integer getIXMappedSlotId(short inmobiSlot) {
+        return IX_SLOT_ID_MAP.get(inmobiSlot);
     }
 }

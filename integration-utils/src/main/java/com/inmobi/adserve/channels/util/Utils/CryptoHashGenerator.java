@@ -1,4 +1,4 @@
-package com.inmobi.adserve.channels.server.requesthandler;
+package com.inmobi.adserve.channels.util.Utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

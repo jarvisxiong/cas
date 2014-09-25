@@ -1,4 +1,4 @@
-    CREATE OR REPLACE TYPE wap_site_uac_type_11092014 AS
+    CREATE OR REPLACE TYPE wap_site_uac_type_23092014 AS
     (
         id                      character varying(255),
         pub_id                  character varying(255),
@@ -15,7 +15,8 @@
         site_url                text,
         site_name               text,
         title                   text,
+        bundle_id               text,
         wsu_modified_on         TIMESTAMP WITHOUT TIME ZONE,
         ws_modified_on          TIMESTAMP WITHOUT TIME ZONE
     );
-    ALTER TYPE wap_site_uac_type_11092014 OWNER TO postgres;
+    ALTER TYPE wap_site_uac_type_23092014 OWNER TO postgres;

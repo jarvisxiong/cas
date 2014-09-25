@@ -1,8 +1,8 @@
-CREATE OR REPLACE FUNCTION wap_site_uac_fun_11092014(last_updated timestamp without time zone)
-RETURNS SETOF wap_site_uac_type_11092014 AS
+CREATE OR REPLACE FUNCTION wap_site_uac_fun_23092014(last_updated timestamp without time zone)
+RETURNS SETOF wap_site_uac_type_23092014 AS
 $BODY$
 DECLARE
-    row1    wap_site_uac_type_11092014%ROWTYPE;
+    row1    wap_site_uac_type_23092014%ROWTYPE;
 BEGIN
     FOR row1 IN
 
@@ -22,6 +22,7 @@ SELECT
     			ws.site_url AS site_url,
     			ws.site_name AS site_name,
     			wsu.title AS title,
+    			wsu.bundle_id AS bundle_id,
     			wsu.modified_on AS wsu_modified_on,
     			ws.modified_on AS ws_modified_on
     			from wap_site AS ws LEFT OUTER JOIN wap_site_uac AS wsu ON (ws.id=wsu.id),wap_publisher wp

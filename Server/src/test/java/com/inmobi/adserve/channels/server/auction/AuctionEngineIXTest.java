@@ -126,13 +126,15 @@ public class AuctionEngineIXTest {
         expect(mockAdnetworkInterface.getBidPriceInUsd()).andReturn(bidValue).anyTimes();
         expect(mockAdnetworkInterface.isRtbPartner()).andReturn(true).anyTimes();
         expect(mockAdnetworkInterface.getAuctionId()).andReturn("auctionId").anyTimes();
-        expect(mockAdnetworkInterface.getRtbImpressionId()).andReturn("impressionId").anyTimes();
+        expect(mockAdnetworkInterface.getRtbImpressionId()).andReturn("1").anyTimes();
         expect(mockAdnetworkInterface.getImpressionId()).andReturn("impressionId").anyTimes();
         expect(mockAdnetworkInterface.getSeatId()).andReturn(advId).anyTimes();
         expect(mockAdnetworkInterface.getCurrency()).andReturn("USD").anyTimes();
         expect(mockAdnetworkInterface.getCreativeId()).andReturn("creativeId").anyTimes();
         expect(mockAdnetworkInterface.getDst()).andReturn(DemandSourceType.IX).anyTimes();
-
+        expect(((IXAdNetwork)mockAdnetworkInterface).getResponseBidObjCount()).andReturn(1).anyTimes();
+        expect(((IXAdNetwork)mockAdnetworkInterface).getImpressionObjCount()).andReturn(1).anyTimes();
+        // responseBidObjCount
         // this is done, to track the encryptedBid variable getting set inside the AuctionEngine.
         mockAdnetworkInterface.setEncryptedBid(EasyMock.capture(encryptedBid1));
         EasyMock.expectLastCall().anyTimes();
