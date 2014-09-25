@@ -166,30 +166,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     @Inject
     private static NativeTemplateAttributeFinder nativeTemplateAttributeFinder;
-
-    private static Map<Short, Integer> slotIdMap;
-    static {
-        slotIdMap = new HashMap<Short, Integer>();
-        slotIdMap.put((short) 4, 44);
-        // Mapping 320x48 to 320x50
-        slotIdMap.put((short) 9, 43);
-        slotIdMap.put((short) 10, 15);
-        slotIdMap.put((short) 11, 2);
-        slotIdMap.put((short) 12, 1);
-        slotIdMap.put((short) 13, 8);
-        slotIdMap.put((short) 14, 67);
-        slotIdMap.put((short) 15, 43);
-        slotIdMap.put((short) 16, 102);
-        slotIdMap.put((short) 18, 9);
-        slotIdMap.put((short) 19, 50);
-        slotIdMap.put((short) 21, 45);
-        slotIdMap.put((short) 23, 46);
-        slotIdMap.put((short) 29, 14);
-        slotIdMap.put((short) 32, 101);
-
-    }
-
-
     private static final String nativeString = "native";
     private ChannelSegmentEntity dspChannelSegmentEntity;
 
@@ -486,9 +462,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         final CommonExtension ext= new CommonExtension();
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            if (slotIdMap.containsKey(sasParams.getSlot())) {
+            if (SlotSizeMapping.IXMapHasSlot(sasParams.getSlot())) {
                 final RubiconExtension rp = new RubiconExtension();
-                rp.setSize_id(slotIdMap.get(sasParams.getSlot()));
+                rp.setSize_id(SlotSizeMapping.IXMapGetRubiconSlot(sasParams.getSlot()));
                 ext.setRp(rp);
             }
         }
