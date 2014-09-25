@@ -83,7 +83,7 @@ public class IABCategoriesMap implements IABCategoriesInterface {
         categoriesToIABMapping.put(65l, new String[] { "IAB19" });
         categoriesToIABMapping.put(66l, new String[] { "IAB19" });
         categoriesToIABMapping.put(67l, new String[] { "IAB22" });
-        categoriesToIABMapping.put(68l, new String[] { "IAB14-6" });
+        categoriesToIABMapping.put(68l, new String[] { "IAB14" });
         categoriesToIABMapping.put(69l, new String[] { "IAB3-4", "IAB19" });
         categoriesToIABMapping.put(70l, new String[] { "IAB17" });
         categoriesToIABMapping.put(71l, new String[] { "IAB19" });
@@ -91,8 +91,8 @@ public class IABCategoriesMap implements IABCategoriesInterface {
         categoriesToIABMapping.put(73l, new String[] { "IAB1-6", "IAB17" });
         categoriesToIABMapping.put(74l, new String[] { "IAB15-10" });
         categoriesToIABMapping.put(FAMILY_SAFE_BLOCK_CATEGORIES, new String[] { "IAB11", "IAB11-1", "IAB11-2",
-            "IAB11-3", "IAB11-4", "IAB11-5", "IAB12", "IAB12-1", "IAB12-2", "IAB12-3", "IAB13-5", "IAB13-7", "IAB14-1",
-            "IAB14-2", "IAB14-3", "IAB15-5", "IAB17-18", "IAB23-10", "IAB23-2", "IAB23-9", "IAB25", "IAB25-1",
+            "IAB11-3", "IAB11-4", "IAB11-5", "IAB12", "IAB12-1", "IAB12-2", "IAB12-3", "IAB13-5", "IAB13-7","IAB14",
+            "IAB15-5", "IAB17-18", "IAB23-10", "IAB23-2", "IAB23-9", "IAB25", "IAB25-1",
             "IAB25-2", "IAB25-3", "IAB25-4", "IAB25-5", "IAB25-7", "IAB26", "IAB26-1", "IAB26-2", "IAB26-3", "IAB26-4",
             "IAB5-2", "IAB6-7", "IAB7", "IAB7-10", "IAB7-11", "IAB7-12", "IAB7-13", "IAB7-14", "IAB7-16", "IAB7-18",
             "IAB7-19", "IAB7-2", "IAB7-20", "IAB7-21", "IAB7-22", "IAB7-24", "IAB7-25", "IAB7-27", "IAB7-28",
