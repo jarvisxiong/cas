@@ -26,6 +26,7 @@ import com.inmobi.adserve.channels.util.IABCategoriesInterface;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
+import com.inmobi.adserve.channels.util.Utils.ClickUrlMakerV6;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.casthrift.rtb.App;
 import com.inmobi.casthrift.rtb.AppExt;
@@ -1073,8 +1074,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 }
 
                 // Update beacon and click URLs to refer to the video Ads.
-                this.beaconUrl = this.beaconUrl.replace(this.getImpressionId(), newImpressionId);
-                this.clickUrl = this.clickUrl.replace(this.getImpressionId(), newImpressionId);
+                this.beaconUrl = ClickUrlMakerV6.ClickUrlsRegenerator.regenerateBeaconUrl(this.beaconUrl, this.getImpressionId(), newImpressionId);
+                this.clickUrl  = ClickUrlMakerV6.ClickUrlsRegenerator.regenerateClickUrl(this.clickUrl, this.getImpressionId(), newImpressionId);
                 this.impressionId = newImpressionId;
 
                 LOG.debug("Replaced impression id to new value {}.", newImpressionId);

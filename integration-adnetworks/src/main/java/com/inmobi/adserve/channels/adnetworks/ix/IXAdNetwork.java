@@ -23,6 +23,7 @@ import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.Utils.ClickUrlMakerV6;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.casthrift.ADCreativeType;
@@ -943,9 +944,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             String newImpressionId = ImpressionIdGenerator.getInstance().getImpressionId(incId);
 
             if (StringUtils.isNotEmpty(newImpressionId)) {
-                // Update beacon and click URLs to refer to the video Ads.
-                this.beaconUrl = this.beaconUrl.replace(this.getImpressionId(), newImpressionId);
-                this.clickUrl = this.clickUrl.replace(this.getImpressionId(), newImpressionId);
+                // Update beacon and click URLs
+                this.beaconUrl = ClickUrlMakerV6.ClickUrlsRegenerator.regenerateBeaconUrl(this.beaconUrl, this.getImpressionId(), newImpressionId);
+                this.clickUrl  = ClickUrlMakerV6.ClickUrlsRegenerator.regenerateClickUrl(this.clickUrl, this.getImpressionId(), newImpressionId);
                 this.impressionId = newImpressionId;
 
                 LOG.debug("Replaced impression id to new value {}.", newImpressionId);
