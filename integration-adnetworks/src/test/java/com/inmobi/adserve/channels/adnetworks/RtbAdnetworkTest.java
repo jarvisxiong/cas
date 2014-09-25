@@ -13,7 +13,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.util.Utils.ClickUrlMakerV6;
+import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
 import com.inmobi.casthrift.rtb.Bid;
 import com.inmobi.casthrift.rtb.BidResponse;
 import com.inmobi.casthrift.rtb.SeatBid;
@@ -488,9 +488,9 @@ public class RtbAdnetworkTest extends TestCase {
         // Set the  video specific impression Id.
         casInternalRequestParameters.impressionIdForVideo = newImpressionId;
 
-        ClickUrlMakerV6.ClickUrlsRegenerator.init(
+        ClickUrlsRegenerator.init(
                 "clickmaker.key.1.value", "clickmaker.key.2.value", "clickmaker.beaconURLPrefix",
-                "clickmaker.beaconURLPrefix", "clickmaker.clickURLPrefix", true, false,
+                "clickmaker.beaconURLPrefix", "clickmaker.clickURLPrefix", false,
                 true, true
         );
 

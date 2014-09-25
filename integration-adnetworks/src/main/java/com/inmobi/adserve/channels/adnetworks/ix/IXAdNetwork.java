@@ -23,7 +23,7 @@ import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.Utils.ClickUrlMakerV6;
+import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.casthrift.ADCreativeType;
@@ -75,9 +75,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -921,8 +919,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
             if (StringUtils.isNotEmpty(newImpressionId)) {
                 // Update beacon and click URLs
-                this.beaconUrl = ClickUrlMakerV6.ClickUrlsRegenerator.regenerateBeaconUrl(this.beaconUrl, this.getImpressionId(), newImpressionId);
-                this.clickUrl  = ClickUrlMakerV6.ClickUrlsRegenerator.regenerateClickUrl(this.clickUrl, this.getImpressionId(), newImpressionId);
+                this.beaconUrl = ClickUrlsRegenerator.regenerateBeaconUrl(sasParams.isRichMedia(), this.beaconUrl, this.getImpressionId(), newImpressionId);
+                this.clickUrl  = ClickUrlsRegenerator.regenerateClickUrl(this.clickUrl, this.getImpressionId(), newImpressionId);
                 this.impressionId = newImpressionId;
 
                 LOG.debug("Replaced impression id to new value {}.", newImpressionId);

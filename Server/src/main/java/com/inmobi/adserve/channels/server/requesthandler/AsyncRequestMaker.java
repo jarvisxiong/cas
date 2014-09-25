@@ -242,17 +242,6 @@ public class AsyncRequestMaker {
 
     private static ClickUrlMakerV6 setClickParams(final boolean pricingModel, final Configuration config,
             final SASRequestParameters sasParams, final Integer dst) {
-
-        String cryptoSecretKey        =  config.getString("clickmaker.key.1.value");
-        String testCryptoSecretKey    =  config.getString("clickmaker.key.2.value");
-        String rmBeaconURLPrefix      =  config.getString("clickmaker.beaconURLPrefix");
-        String imageBeaconURLPrefix   =  config.getString("clickmaker.beaconURLPrefix");
-        String clickURLPrefix         =  config.getString("clickmaker.clickURLPrefix");
-        Boolean isRmAd                =  sasParams.isRichMedia();
-        Boolean testMode              =  false;
-        Boolean imageBeaconFlag       =  true;
-        Boolean isBeaconEnabledOnSite =  true;
-
         ClickUrlMakerV6.Builder builder = ClickUrlMakerV6.newBuilder();
         builder.setImpressionId(sasParams.getImpressionId());
         builder.setAge(null != sasParams.getAge() ? sasParams.getAge().intValue() : 0);
@@ -267,27 +256,20 @@ public class AsyncRequestMaker {
         builder.setIsBillableDemog(false);
         builder.setSiteIncId(sasParams.getSiteIncId());
         builder.setUdIdVal(sasParams.getTUidParams());
-        builder.setCryptoSecretKey(cryptoSecretKey);
-        builder.setTestCryptoSecretKey(testCryptoSecretKey);
-        builder.setImageBeaconFlag(imageBeaconFlag);
-        builder.setBeaconEnabledOnSite(isBeaconEnabledOnSite);
-        builder.setTestMode(testMode);
-        builder.setRmAd(isRmAd);
-        builder.setRmBeaconURLPrefix(rmBeaconURLPrefix);
-        builder.setClickURLPrefix(clickURLPrefix);
-        builder.setImageBeaconURLPrefix(imageBeaconURLPrefix);
+        builder.setCryptoSecretKey(config.getString("clickmaker.key.1.value"));
+        builder.setTestCryptoSecretKey(config.getString("clickmaker.key.2.value"));
+        builder.setImageBeaconFlag(true);// true/false
+        builder.setBeaconEnabledOnSite(true);// do not know
+        builder.setTestMode(false);
+        builder.setRmAd(sasParams.isRichMedia());
+        builder.setRmBeaconURLPrefix(config.getString("clickmaker.beaconURLPrefix"));
+        builder.setClickURLPrefix(config.getString("clickmaker.clickURLPrefix"));
+        builder.setImageBeaconURLPrefix(config.getString("clickmaker.beaconURLPrefix"));
         builder.setTestRequest(false);
         builder.setLatlonval(sasParams.getLatLong());
         builder.setRtbSite(sasParams.getSst() != 0);// TODO:- Change this according to thrift enums
         builder.setDst(dst.toString());
         builder.setBudgetBucketId("101"); // Default Value
-
-        ClickUrlMakerV6.ClickUrlsRegenerator.init(
-                cryptoSecretKey, testCryptoSecretKey, rmBeaconURLPrefix,
-                imageBeaconURLPrefix, clickURLPrefix, isRmAd, testMode,
-                imageBeaconFlag, isBeaconEnabledOnSite
-                );
-
         return new ClickUrlMakerV6(builder);
     }
 
