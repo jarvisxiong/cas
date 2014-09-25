@@ -6,6 +6,7 @@ import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
+import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.types.InventoryType;
 
 import org.apache.commons.lang.StringUtils;
@@ -23,7 +24,7 @@ public class ThriftRequestParser {
     private static final Logger LOG = LoggerFactory.getLogger(ThriftRequestParser.class);
 
     public void parseRequestParameters(final AdPoolRequest tObject, final SASRequestParameters params,
-            final CasInternalRequestParameters casInternalRequestParameters, final int dst) {
+                                       final CasInternalRequestParameters casInternalRequestParameters, final int dst) {
         LOG.debug("Inside parameter parser : ThriftParser");
         params.setAllParametersJson(tObject.toString());
         params.setDst(dst);
@@ -33,18 +34,7 @@ public class ThriftRequestParser {
         // Fill params from AdPoolRequest Object
         params.setRemoteHostIp(tObject.remoteHostIp);
 
-        // TODO Iterate over the segments using all slots
-        Short slotId = null != tObject.selectedSlots && !tObject.selectedSlots.isEmpty() ? tObject.selectedSlots.get(0)
-                : (short) 0;
-        //Checking slotId from IX_SLOT_ID_MAP, and setting slot if it's present as a key in the map
-        if(8 == dst && null != tObject.selectedSlots) {
-            for(short tempSlot : tObject.selectedSlots) {
-                if(SlotSizeMapping.IXMapHasSlot(tempSlot)) {
-                    slotId = tempSlot;
-                    break;
-                }
-            }
-        }
+        Short slotId = getSlotId(tObject.selectedSlots, dst);
 
         params.setSlot(slotId);
         params.setRqMkSlot(tObject.selectedSlots);
@@ -88,10 +78,10 @@ public class ThriftRequestParser {
 
             if (CasConfigUtil.repositoryHelper != null) {
 
-                    params.setWapSiteUACEntity(CasConfigUtil.repositoryHelper.queryWapSiteUACRepository(tObject.site.siteId));
+                params.setWapSiteUACEntity(CasConfigUtil.repositoryHelper.queryWapSiteUACRepository(tObject.site.siteId));
 
-                    params.setSiteEcpmEntity(CasConfigUtil.repositoryHelper.querySiteEcpmRepository(tObject.site.siteId,
-                                    tObject.geo.countryId, (int) tObject.device.osId));
+                params.setSiteEcpmEntity(CasConfigUtil.repositoryHelper.querySiteEcpmRepository(tObject.site.siteId,
+                        tObject.geo.countryId, (int) tObject.device.osId));
             }
             params.setSiteType(tObject.site.isSetContentRatingDeprecated() ? tObject.site.contentRatingDeprecated.toString() : "FAMILY_SAFE");
             params.setCategories(convertIntToLong(tObject.site.siteTaxonomies));
@@ -184,11 +174,27 @@ public class ThriftRequestParser {
         if (tObject.isSetCarrier()) {
             params.setCarrierId(new Long(tObject.carrier.carrierId).intValue());
             params.setNetworkType(tObject.carrier.networkType);
-            
-            
+
+
         }
 
         LOG.debug("Successfully parsed tObject, SAS params are : {}", params.toString());
+    }
+
+    private Short getSlotId(List<Short> selectedSlots,Integer dst) {
+        // TODO Iterate over the segments using all slots
+        Short slotId = null != selectedSlots && !selectedSlots.isEmpty() ? selectedSlots.get(0)
+                : (short) 0;
+        //Checking slotId from IX_SLOT_ID_MAP, and setting slot if it's present as a key in the map
+        if (DemandSourceType.IX.getValue() == dst && null != selectedSlots) {
+            for (short tempSlot : selectedSlots) {
+                if (SlotSizeMapping.IXMapHasSlot(tempSlot)) {
+                    slotId = tempSlot;
+                    break;
+                }
+            }
+        }
+        return slotId;
     }
 
     private String getResponseFormat(final ResponseFormat rqFormat) {
