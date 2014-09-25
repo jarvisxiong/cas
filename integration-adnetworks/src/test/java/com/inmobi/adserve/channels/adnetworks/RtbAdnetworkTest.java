@@ -74,6 +74,10 @@ public class RtbAdnetworkTest extends TestCase {
         expect(mockConfig.getBoolean(advertiserName + ".nativeSupported",false)).andReturn(false).anyTimes();
         expect(mockConfig.getBoolean(advertiserName + ".bannerVideoSupported",false)).andReturn(true).once();
         expect(mockConfig.getStringArray("rtb.blockedAdvertisers")).andReturn(new String[]{"king.com","supercell.net", "paps.com", "fhs.com", "china.supercell.com", "supercell.com"}).anyTimes();
+        expect(mockConfig.getString("key.1.value")).andReturn("clickmaker.key.1.value").anyTimes();
+        expect(mockConfig.getString("key.2.value")).andReturn("clickmaker.key.2.value").anyTimes();
+        expect(mockConfig.getString("beaconURLPrefix")).andReturn("clickmaker.beaconURLPrefix").anyTimes();
+        expect(mockConfig.getString("clickURLPrefix")).andReturn("clickmaker.clickURLPrefix").anyTimes();
         replay(mockConfig);
     }
 
@@ -488,11 +492,7 @@ public class RtbAdnetworkTest extends TestCase {
         // Set the  video specific impression Id.
         casInternalRequestParameters.impressionIdForVideo = newImpressionId;
 
-        ClickUrlsRegenerator.init(
-                "clickmaker.key.1.value", "clickmaker.key.2.value", "clickmaker.beaconURLPrefix",
-                "clickmaker.beaconURLPrefix", "clickmaker.clickURLPrefix", false,
-                true, true
-        );
+        ClickUrlsRegenerator.init(mockConfig);
 
         rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
         boolean deserializeStatus = rtbAdNetwork.deserializeResponse(str.toString());

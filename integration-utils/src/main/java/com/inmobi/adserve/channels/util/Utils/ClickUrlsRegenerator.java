@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.util.Utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.commons.configuration.Configuration;
 
 /** This class helps in regenerating new click and beacon urls.
  *  Regeneration is needed in IX because the impression id is modified after the RP response.
@@ -16,9 +17,19 @@ public class ClickUrlsRegenerator {
     private static Boolean             isBeaconEnabledOnSite;
 
 
-    public static void init(String cryptoSecretKey, String testCryptoSecretKey, String rmBeaconURLPrefix,
-                            String imageBeaconURLPrefix, String clickURLPrefix, Boolean testMode,
-                            Boolean imageBeaconFlag, Boolean isBeaconEnabledOnSite) {
+    public static void init(final Configuration configuration) {
+        /**
+         *  Assumptions: 
+         */
+
+        String cryptoSecretKey        =  configuration.getString("key.1.value");
+        String testCryptoSecretKey    =  configuration.getString("key.2.value");
+        String rmBeaconURLPrefix      =  configuration.getString("beaconURLPrefix");
+        String imageBeaconURLPrefix   =  configuration.getString("beaconURLPrefix");
+        String clickURLPrefix         =  configuration.getString("clickURLPrefix");
+        Boolean testMode              =  false;
+        Boolean imageBeaconFlag       =  true;
+        Boolean isBeaconEnabledOnSite =  true;
 
         ClickUrlsRegenerator.rmBeaconURLPrefix     = rmBeaconURLPrefix;
         ClickUrlsRegenerator.imageBeaconURLPrefix  = imageBeaconURLPrefix;

@@ -129,21 +129,8 @@ public class ChannelServer {
             // Initialising ImpressionIdGenerator
             ImpressionIdGenerator.init(ChannelServer.hostIdCode, ChannelServer.dataCenterIdCode);
 
-            String cryptoSecretKey        =  configurationLoader.getServerConfiguration().getString("clickmaker.key.1.value");
-            String testCryptoSecretKey    =  configurationLoader.getServerConfiguration().getString("clickmaker.key.2.value");
-            String rmBeaconURLPrefix      =  configurationLoader.getServerConfiguration().getString("clickmaker.beaconURLPrefix");
-            String imageBeaconURLPrefix   =  configurationLoader.getServerConfiguration().getString("clickmaker.beaconURLPrefix");
-            String clickURLPrefix         =  configurationLoader.getServerConfiguration().getString("clickmaker.clickURLPrefix");
-            Boolean testMode              =  false;
-            Boolean imageBeaconFlag       =  true;
-            Boolean isBeaconEnabledOnSite =  true;
-
             // Initialising ClickUrlsRegenerator
-            ClickUrlsRegenerator.init(
-                    cryptoSecretKey, testCryptoSecretKey, rmBeaconURLPrefix,
-                    imageBeaconURLPrefix, clickURLPrefix, testMode,
-                    imageBeaconFlag, isBeaconEnabledOnSite
-            );
+            ClickUrlsRegenerator.init(configurationLoader.getServerConfiguration().subset("clickmaker"));
 
             String rrLogKey = configurationLoader.getServerConfiguration().getString("rrLogKey");
             String advertisementLogKey = configurationLoader.getServerConfiguration().getString("adsLogKey");
