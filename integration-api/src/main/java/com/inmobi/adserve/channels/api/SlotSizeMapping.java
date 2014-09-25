@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class SlotSizeMapping {
     public static final HashMap<Long, Dimension> slotMap = new HashMap<Long, Dimension>();
-    private static Map<Short, Integer> IX_SLOT_ID_MAP = new HashMap<Short, Integer>();
+    private static final Map<Short, Integer> IX_SLOT_ID_MAP = new HashMap<Short, Integer>();
 
     public static void init() {
         slotMap.put(1l, new Dimension(120, 20));
@@ -67,11 +67,11 @@ public class SlotSizeMapping {
         return (slotMap.get(slot));
     }
 
-    public static boolean IXMapHasSlot(short inmobiSlot) {
+    public static boolean isIXSupportedSlot(short inmobiSlot) {
         return IX_SLOT_ID_MAP.containsKey(inmobiSlot);
     }
 
-    public static Integer IXMapGetRubiconSlot(short inmobiSlot) {
+    public static Integer getIXMappedSlotId(short inmobiSlot) {
         return IX_SLOT_ID_MAP.get(inmobiSlot);
     }
 }

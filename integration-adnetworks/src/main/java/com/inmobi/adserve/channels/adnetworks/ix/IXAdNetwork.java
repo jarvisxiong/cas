@@ -476,9 +476,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         final CommonExtension ext= new CommonExtension();
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            if (SlotSizeMapping.IXMapHasSlot(sasParams.getSlot())) {
+            if (SlotSizeMapping.isIXSupportedSlot(sasParams.getSlot())) {
                 final RubiconExtension rp = new RubiconExtension();
-                rp.setSize_id(SlotSizeMapping.IXMapGetRubiconSlot(sasParams.getSlot()));
+                rp.setSize_id(SlotSizeMapping.getIXMappedSlotId(sasParams.getSlot()));
                 ext.setRp(rp);
             }
         }
@@ -919,7 +919,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
             if (StringUtils.isNotEmpty(newImpressionId)) {
                 // Update beacon and click URLs
-                this.beaconUrl = ClickUrlsRegenerator.regenerateBeaconUrl(sasParams.isRichMedia(), this.beaconUrl, this.getImpressionId(), newImpressionId);
+                this.beaconUrl = ClickUrlsRegenerator.regenerateBeaconUrl(this.beaconUrl, this.getImpressionId(), newImpressionId, sasParams.isRichMedia());
                 this.clickUrl  = ClickUrlsRegenerator.regenerateClickUrl(this.clickUrl, this.getImpressionId(), newImpressionId);
                 this.impressionId = newImpressionId;
 

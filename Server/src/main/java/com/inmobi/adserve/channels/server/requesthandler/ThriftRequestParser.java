@@ -181,14 +181,14 @@ public class ThriftRequestParser {
         LOG.debug("Successfully parsed tObject, SAS params are : {}", params.toString());
     }
 
-    private Short getSlotId(List<Short> selectedSlots,Integer dst) {
+    private Short getSlotId(List<Short> selectedSlots, int dst) {
         // TODO Iterate over the segments using all slots
-        Short slotId = null != selectedSlots && !selectedSlots.isEmpty() ? selectedSlots.get(0)
-                : (short) 0;
-        //Checking slotId from IX_SLOT_ID_MAP, and setting slot if it's present as a key in the map
+        Short slotId = (null != selectedSlots && !selectedSlots.isEmpty()) ? selectedSlots.get(0) : (short) 0;
+
+        // From the list of slots received in ad pool request, pick the first IX supported slot.
         if (DemandSourceType.IX.getValue() == dst && null != selectedSlots) {
             for (short tempSlot : selectedSlots) {
-                if (SlotSizeMapping.IXMapHasSlot(tempSlot)) {
+                if (SlotSizeMapping.isIXSupportedSlot(tempSlot)) {
                     slotId = tempSlot;
                     break;
                 }

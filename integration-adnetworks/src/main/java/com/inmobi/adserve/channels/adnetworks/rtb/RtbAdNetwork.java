@@ -1074,7 +1074,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 }
 
                 // Update beacon and click URLs to refer to the video Ads.
-                this.beaconUrl = ClickUrlsRegenerator.regenerateBeaconUrl(sasParams.isRichMedia(), this.beaconUrl, this.getImpressionId(), newImpressionId);
+                this.beaconUrl = ClickUrlsRegenerator.regenerateBeaconUrl(this.beaconUrl, this.getImpressionId(), newImpressionId, sasParams.isRichMedia());
                 this.clickUrl  = ClickUrlsRegenerator.regenerateClickUrl(this.clickUrl, this.getImpressionId(), newImpressionId);
                 this.impressionId = newImpressionId;
 
