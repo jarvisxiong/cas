@@ -8,44 +8,39 @@ import org.apache.commons.configuration.Configuration;
  *  Regeneration is needed in IX because the impression id is modified after the RP response.
  */
 public class ClickUrlsRegenerator {
+
     private static final Logger LOG = LoggerFactory.getLogger(ClickUrlsRegenerator.class);
     private static CryptoHashGenerator cryptoHashGenerator;
     private static String              rmBeaconURLPrefix;
     private static String              imageBeaconURLPrefix;
     private static String              clickURLPrefix;
-    private static Boolean             imageBeaconFlag;
-    private static Boolean             isBeaconEnabledOnSite;
 
 
     public static void init(final Configuration configuration) {
-        /**
-         *  Assumptions: 
-         */
 
         String cryptoSecretKey        =  configuration.getString("key.1.value");
-        String testCryptoSecretKey    =  configuration.getString("key.2.value");
         String rmBeaconURLPrefix      =  configuration.getString("beaconURLPrefix");
         String imageBeaconURLPrefix   =  configuration.getString("beaconURLPrefix");
         String clickURLPrefix         =  configuration.getString("clickURLPrefix");
-        Boolean testMode              =  false;
-        Boolean imageBeaconFlag       =  true;
-        Boolean isBeaconEnabledOnSite =  true;
 
-        ClickUrlsRegenerator.rmBeaconURLPrefix     = rmBeaconURLPrefix;
-        ClickUrlsRegenerator.imageBeaconURLPrefix  = imageBeaconURLPrefix;
-        ClickUrlsRegenerator.clickURLPrefix        = clickURLPrefix;
-        ClickUrlsRegenerator.imageBeaconFlag       = imageBeaconFlag;
-        ClickUrlsRegenerator.isBeaconEnabledOnSite = isBeaconEnabledOnSite;
+        ClickUrlsRegenerator.rmBeaconURLPrefix = rmBeaconURLPrefix;
+        ClickUrlsRegenerator.imageBeaconURLPrefix = imageBeaconURLPrefix;
+        ClickUrlsRegenerator.clickURLPrefix = clickURLPrefix;
 
-        if(testMode)
-            cryptoHashGenerator = new CryptoHashGenerator(cryptoSecretKey);
-        else
-            cryptoHashGenerator = new CryptoHashGenerator(testCryptoSecretKey);
+        /*
+         * ClickURLMakerV6 always uses the non-testMode key for hash generation.
+         * The same key that is being used in ClickURLMakerV6 is being used here.
+         */
+        cryptoHashGenerator = new CryptoHashGenerator(cryptoSecretKey);
     }
 
 
     public static String regenerateClickUrl(String clickUrl, String oldImpressionId, String newImpressionId) {
         LOG.debug("Old Click Url: {}", clickUrl);
+
+        if (clickUrl == null) {
+            return null;
+        }
 
         // Removing trailing "/" + hash
         clickUrl = clickUrl.substring(0, clickUrl.lastIndexOf('/'));
@@ -53,22 +48,20 @@ public class ClickUrlsRegenerator {
         // Replacing old impression id with new impression id
         clickUrl = clickUrl.replace(oldImpressionId, newImpressionId);
 
-        // Same logic (after the 25th field) as createClickUrls method in ClickUrlMakerV6
-        if (null != clickURLPrefix) {
-            // Appending new "/" + hash to clickUrl
-            clickUrl = clickUrl + '/' + cryptoHashGenerator.generateHash(clickUrl.substring(clickURLPrefix.length()));
-        } else {
-            LOG.debug("clickURLPrefix is null, therefore cannot regenerate ClickURl");
-            return null;
-        }
+        // Regenerate hash and new URL.
+        clickUrl = clickUrl + '/' + cryptoHashGenerator.generateHash(clickUrl.substring(clickURLPrefix.length()));
 
         LOG.debug("New Click Url: {}", clickUrl);
         return clickUrl;
     }
 
 
-    public static String regenerateBeaconUrl(Boolean isRmAd, String beaconUrl, String oldImpressionId, String newImpressionId) {
+    public static String regenerateBeaconUrl(String beaconUrl, String oldImpressionId, String newImpressionId, Boolean isRmAd) {
         LOG.debug("Old Beacon Url: {}", beaconUrl);
+
+        if (beaconUrl == null) {
+            return null;
+        }
 
         // Removing trailing "/" + hash
         beaconUrl = beaconUrl.substring(0, beaconUrl.lastIndexOf('/'));
@@ -78,26 +71,12 @@ public class ClickUrlsRegenerator {
 
         // Same logic (after the 25th field) as createClickUrls method in ClickUrlMakerV6
         if (isRmAd) {
-            if (null != rmBeaconURLPrefix) {
-                // Appending new "/" + hash to beaconURL
-                beaconUrl = beaconUrl + '/' + cryptoHashGenerator.generateHash(beaconUrl.substring(rmBeaconURLPrefix.length()));
-            }
-            else {
-                LOG.debug("rmBeaconURLPrefix is null, therefore cannot regenerate BeaconURl");
-                return null;
-            }
-        }
-        else if (imageBeaconFlag || isBeaconEnabledOnSite){
-            if (null != imageBeaconURLPrefix) {
-                // Appending new "/" + hash to beaconURL
-                beaconUrl = beaconUrl + '/' + cryptoHashGenerator.generateHash(beaconUrl.substring(imageBeaconURLPrefix.length()));
-            } else {
-                LOG.debug("imageBeaconURLPrefix is null, therefore cannot regenerate BeaconURl");
-                return null;
-            }
+            // Appending new "/" + hash to beaconURL
+            beaconUrl = beaconUrl + '/' + cryptoHashGenerator.generateHash(beaconUrl.substring(rmBeaconURLPrefix.length()));
         }
         else {
-            return null;
+            // Appending new "/" + hash to beaconURL
+            beaconUrl = beaconUrl + '/' + cryptoHashGenerator.generateHash(beaconUrl.substring(imageBeaconURLPrefix.length()));
         }
 
         LOG.debug("New Beacon Url: {}", beaconUrl);

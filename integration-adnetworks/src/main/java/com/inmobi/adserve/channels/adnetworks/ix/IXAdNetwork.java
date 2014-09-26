@@ -72,10 +72,12 @@ import javax.inject.Inject;
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -476,9 +478,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         final CommonExtension ext= new CommonExtension();
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            if (SlotSizeMapping.IXMapHasSlot(sasParams.getSlot())) {
+            if (SlotSizeMapping.isIXSupportedSlot(sasParams.getSlot())) {
                 final RubiconExtension rp = new RubiconExtension();
-                rp.setSize_id(SlotSizeMapping.IXMapGetRubiconSlot(sasParams.getSlot()));
+                rp.setSize_id(SlotSizeMapping.getIXMappedSlotId(sasParams.getSlot()));
                 ext.setRp(rp);
             }
         }
@@ -541,7 +543,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             }
 
         } else {
-            site.setId(getBlindedSiteId(sasParams.getSiteIncId(), entity.getIncId(getCreativeType())));
+            site.setId(getBlindedSiteId(sasParams.getSiteIncId()));
 
             if (isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType())) {
                 site.setName(wapSiteUACEntity.getAppType());
@@ -919,7 +921,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
             if (StringUtils.isNotEmpty(newImpressionId)) {
                 // Update beacon and click URLs
-                this.beaconUrl = ClickUrlsRegenerator.regenerateBeaconUrl(sasParams.isRichMedia(), this.beaconUrl, this.getImpressionId(), newImpressionId);
+                this.beaconUrl = ClickUrlsRegenerator.regenerateBeaconUrl(this.beaconUrl, this.getImpressionId(), newImpressionId, sasParams.isRichMedia());
                 this.clickUrl  = ClickUrlsRegenerator.regenerateClickUrl(this.clickUrl, this.getImpressionId(), newImpressionId);
                 this.impressionId = newImpressionId;
 
@@ -1056,6 +1058,16 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
     }
 
+    /**
+     * Generates blinded site uuid from siteIncId.
+     * For a given site Id, the generated blinded SiteId will always be same.
+     *
+     * NOTE: RTB uses a different logic where the blinded SiteId is a function of siteIncId+AdGroupIncId.
+     */
+    private String getBlindedSiteId(long siteIncId) {
+        byte[] byteArr = ByteBuffer.allocate(8).putLong(siteIncId).array();
+        return UUID.nameUUIDFromBytes(byteArr).toString();
+    }
 
     //This function not used, for future use
     @Override
