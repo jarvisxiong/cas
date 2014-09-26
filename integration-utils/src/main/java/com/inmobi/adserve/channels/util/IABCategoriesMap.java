@@ -83,7 +83,7 @@ public class IABCategoriesMap implements IABCategoriesInterface {
         categoriesToIABMapping.put(65l, new String[] { "IAB19" });
         categoriesToIABMapping.put(66l, new String[] { "IAB19" });
         categoriesToIABMapping.put(67l, new String[] { "IAB22" });
-        categoriesToIABMapping.put(68l, new String[] { "IAB14" });
+        categoriesToIABMapping.put(68l, new String[] { "IAB14-6" });
         categoriesToIABMapping.put(69l, new String[] { "IAB3-4", "IAB19" });
         categoriesToIABMapping.put(70l, new String[] { "IAB17" });
         categoriesToIABMapping.put(71l, new String[] { "IAB19" });
