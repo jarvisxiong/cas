@@ -160,8 +160,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
          * NOTE: In case of No Ad, the logging will happen on RP parameters only.
          */
         if (selectedAdNetwork instanceof IXAdNetwork) {
-            List<ChannelSegment> dspRankList = Arrays.asList(this.getAuctionEngine().getAuctionResponse());
-            this.setRankList(dspRankList);
+            getAuctionEngine().setUnfilteredChannelSegmentList(Arrays.asList(this.getAuctionEngine().getAuctionResponse()));
         }
 
         adResponse = selectedAdNetwork.getResponseAd();
