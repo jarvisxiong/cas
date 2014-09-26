@@ -46,7 +46,7 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
   public boolean configureParameters() {
 
     if ((sasParams.getUserAgent() != null && sasParams.getUserAgent().toLowerCase().contains("opera"))
-            || (sasParams.getDeviceType() != null && sasParams.getDeviceType().equals("FEATURE_PHONE"))) {
+            || (sasParams.getDeviceType() != null && "FEATURE_PHONE".equals(sasParams.getDeviceType()))) {
       return false;
     }
 

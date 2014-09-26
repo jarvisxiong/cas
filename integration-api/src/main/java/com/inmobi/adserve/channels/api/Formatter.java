@@ -140,28 +140,28 @@ public class Formatter {
         if (slot == null) {
             return null;
         }
-        if (slot.equals("1") || slot.equals("1.0")) {
+        if ("1".equals(slot) || "1.0".equals(slot)) {
             return "template_120_20";
         }
-        if (slot.equals("2") || slot.equals("2.0")) {
+        if ("2".equals(slot) || "2.0".equals(slot)) {
             return "template_168_28";
         }
-        if (slot.equals("3") || slot.equals("3.0")) {
+        if ("3".equals(slot) || "3.0".equals(slot)) {
             return "template_216_36";
         }
-        if (slot.equals("4") || slot.equals("4.0")) {
+        if ("4".equals(slot) || "4.0".equals(slot)) {
             return "template_300_50";
         }
-        if (slot.equals("9") || slot.equals("9.0")) {
+        if ("9".equals(slot) || "9.0".equals(slot)) {
             return "template_320_48";
         }
-        if (slot.equals("11") || slot.equals("11.0")) {
+        if ("11".equals(slot) || "11.0".equals(slot)) {
             return "template_728_90";
         }
-        if (slot.equals("12") || slot.equals("12.0")) {
+        if ("12".equals(slot) || "12.0".equals(slot)) {
             return "template_468_60";
         }
-        if (slot.equals("15") || slot.equals("15.0")) {
+        if ("15".equals(slot) || "15.0".equals(slot)) {
             return "template_320_50";
         }
         return null;

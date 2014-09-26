@@ -390,7 +390,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         } else if (statusCode >= 300) {
             responseStruct.responseStatus = ThirdPartyAdResponse.ResponseStatus.FAILURE_REQUEST_ERROR;
         } else if (statusCode == 200) {
-            if (StringUtils.isBlank(responseContent) || !adStatus.equalsIgnoreCase("AD")) {
+            if (StringUtils.isBlank(responseContent) || !"AD".equalsIgnoreCase(adStatus)) {
                 adStatus = "NO_AD";
                 responseStruct.responseStatus = ThirdPartyAdResponse.ResponseStatus.FAILURE_NO_AD;
             } else {

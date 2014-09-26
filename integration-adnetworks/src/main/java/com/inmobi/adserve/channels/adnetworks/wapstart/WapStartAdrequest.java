@@ -85,6 +85,7 @@ class Banner{
 	private int btype;
 }
 
+
 @Data
 @JsonInclude(Include.NON_NULL)
 class Impression{

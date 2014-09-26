@@ -97,7 +97,7 @@ public class AsyncRequestMaker {
             if ((network.isClickUrlRequired() || network.isBeaconUrlRequired()) && null != sasParams.getImpressionId()) {
                 boolean isCpc = false;
                 if (null != channelSegmentEntity.getPricingModel()
-                        && channelSegmentEntity.getPricingModel().equalsIgnoreCase("cpc")) {
+                        && "cpc".equalsIgnoreCase(channelSegmentEntity.getPricingModel())) {
                     isCpc = true;
                 }
                 ClickUrlMakerV6 clickUrlMakerV6 = setClickParams(isCpc, config, sasParams,

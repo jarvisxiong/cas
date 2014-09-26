@@ -209,7 +209,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
 		// discarding parameters that have null values
 		for (int i = 1; i < urlParams.length; i++) {
 			String[] paramValue = urlParams[i].split("=");
-			if ((paramValue.length == 2) && !(paramValue[1].equals("null"))
+			if ((paramValue.length == 2) && !("null".equals(paramValue[1]))
 					&& !(StringUtils.isEmpty(paramValue[1]))) {
 				finalUrl.append("&").append(paramValue[0]).append("=")
 						.append(paramValue[1]);

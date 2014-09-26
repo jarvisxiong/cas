@@ -97,7 +97,7 @@ public class Logging {
                 InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_COUNT);
                 InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_LATENCY, totalTime);
             }
-            if (null != sasParams.getRFormat() && sasParams.getRFormat().equalsIgnoreCase("native")) {
+            if (null != sasParams.getRFormat() && "native".equalsIgnoreCase(sasParams.getRFormat())) {
                 InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NATIVE_REQUESTS);
                 if(rankList == null || rankList.isEmpty()){
                 	InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NATIVE_REQUESTS + "-" + InspectorStrings.NO_MATCH_SEGMENT_COUNT);
@@ -382,11 +382,11 @@ public class Logging {
             log.append(sep).append(adResponse.adStatus);
             String response = "";
             String requestUrl = "";
-            if (adResponse.adStatus.equalsIgnoreCase("AD")) {
+            if ("AD".equalsIgnoreCase(adResponse.adStatus)) {
                 response = adNetworkInterface.getHttpResponseContent();
                 log.append(sep).append(response);
             }
-            if (!adNetworkInterface.getRequestUrl().equals("")) {
+            if (!"".equals(adNetworkInterface.getRequestUrl())) {
                 requestUrl = adNetworkInterface.getRequestUrl();
                 log.append(sep).append(requestUrl);
             }
@@ -428,7 +428,7 @@ public class Logging {
             	response = adNetworkInterface.getAdMarkUp();
             }
             
-            if (!adStatus.equalsIgnoreCase("AD") || requestUrl.equals("") || response.equals("")) {
+            if (!"AD".equalsIgnoreCase(adStatus) || "".equals(requestUrl) || "".equals(response)) {
                 continue;
             }
 
@@ -501,17 +501,20 @@ public class Logging {
     }
 
     public static ContentRating getContentRating(final SASRequestParameters sasParams) {
+        String sasSiteType;
         if (sasParams == null || null == sasParams.getSiteType()) {
             return null;
         }
-        else if (sasParams.getSiteType().equalsIgnoreCase("performance")) {
-            return ContentRating.PERFORMANCE;
-        }
-        else if (sasParams.getSiteType().equalsIgnoreCase("FAMILY_SAFE")) {
-            return ContentRating.FAMILY_SAFE;
-        }
-        else if (sasParams.getSiteType().equalsIgnoreCase("MATURE")) {
-            return ContentRating.MATURE;
+        else {
+            sasSiteType = sasParams.getSiteType();
+
+            if ("performance".equalsIgnoreCase(sasSiteType)) {
+                return ContentRating.PERFORMANCE;
+            } else if ("FAMILY_SAFE".equalsIgnoreCase(sasSiteType)) {
+                return ContentRating.FAMILY_SAFE;
+            } else if ("MATURE".equalsIgnoreCase(sasSiteType)) {
+                return ContentRating.MATURE;
+            }
         }
         return null;
     }
@@ -520,17 +523,17 @@ public class Logging {
         if (pricingModel == null) {
             return null;
         }
-        else if (pricingModel.equalsIgnoreCase("cpc")) {
+        else if ("cpc".equalsIgnoreCase(pricingModel)) {
             return PricingModel.CPC;
         }
-        else if (pricingModel.equalsIgnoreCase("cpm")) {
+        else if ("cpm".equalsIgnoreCase(pricingModel)) {
             return PricingModel.CPM;
         }
         return null;
     }
 
     public static InventoryType getInventoryType(final SASRequestParameters sasParams) {
-        if (null != sasParams && sasParams.getSdkVersion() != null && sasParams.getSdkVersion().equalsIgnoreCase("0")) {
+        if (null != sasParams && sasParams.getSdkVersion() != null && "0".equalsIgnoreCase(sasParams.getSdkVersion())) {
             return InventoryType.BROWSER;
         }
         return InventoryType.APP;
@@ -540,7 +543,7 @@ public class Logging {
         if (sasParams == null) {
             return null;
         }
-        else if (sasParams.getGender().equalsIgnoreCase("m")) {
+        else if ("m".equalsIgnoreCase(sasParams.getGender())) {
             return Gender.MALE;
         }
         return Gender.FEMALE;

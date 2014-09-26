@@ -145,7 +145,7 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
 				JSONObject adResponse = new JSONObject(response);
 				VelocityContext context = new VelocityContext();
 				TemplateType t;
-				if (adResponse.getString("type").equals("html")) {
+				if ("html".equals(adResponse.getString("type"))) {
 					context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, adResponse.getString("html"));
 					t = TemplateType.HTML;
 				}
@@ -154,7 +154,7 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
 					context.put(VelocityTemplateFieldConstants.Width, adResponse.getString("adWidth"));
 					context.put(VelocityTemplateFieldConstants.Height, adResponse.getString("adHeight"));
 					context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
-					if (adResponse.getString("type").equals("text")) {
+					if ("text".equals(adResponse.getString("type"))) {
 						context.put(VelocityTemplateFieldConstants.AdText, adResponse.getString("adtext"));
 						String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
 						if (StringUtils.isEmpty(vmTemplate)) {

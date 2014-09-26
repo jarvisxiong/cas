@@ -78,7 +78,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         try {
             jsonObject = new JSONObject(sasParams.getAllParametersJson());
         } catch (Exception e) {
-            //
+            LOG.debug("cannot get AllParametersJson from sasParams, {}", e);
         }
         if (null != jsonObject) {
             try {
@@ -93,6 +93,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
                 adcode = stringifyParam(jsonObject, "adcode", true);
                 adGroupID = externalSiteId;
             } catch (JSONException e) {
+                LOG.info("cannot configure parameters in IFCAdNetwork, {}", e);
                 return false;
             }
             try {
@@ -120,7 +121,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
                     return false;
                 }*/
             } catch (JSONException e) {
-                LOG.info("Error while parsing 'sdk-version'");
+                LOG.info("Error while parsing 'sdk-version', {}", e);
             }
         } else {
             requestId = sasParams.getTid();
@@ -207,7 +208,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             return (String) jObject.get(field);
         } catch (JSONException e) {
             if (isMandatory) {
-                LOG.info("IFC Mandatory Parameter missing: {}", field);
+                LOG.info("IFC Mandatory Parameter missing: {} , and exception thrown {}", field, e);
                 throw new JSONException("IFC Mandatory Parameter missing:" + field);
             } else {
                 return null;
