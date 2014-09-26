@@ -100,15 +100,15 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         emptySet = new HashSet<String>();
         emptySet2 = new HashSet<String>();
 
-        advertiserId1 = "4028cb1e35aedd980135e6cae0720942";
-        advertiserId2 = "4028cb1e37361021013750f93b4d03c1";
-        advertiserId3 = "4028cb9734cad8a30134d6a7f264031f";
+        advertiserId1 = "4028cb1e38411ed20138515af2b6025a";
+        advertiserId2 = "4028cbe0373b25ce0137c0eb0c091e83";
+        advertiserId3 = "72cd0cbf-a1eb-4905-b6d5-de28acb72dc8";
 
         ChannelEntity.Builder cE1Builder = ChannelEntity.newBuilder();
         cE1Builder.setAccountId(advertiserId1);
         cE1Builder.setPriority(1);
         cE1Builder.setImpressionCeil(90);
-        cE1Builder.setName("atnt");
+        cE1Builder.setName("tapit");
         cE1Builder.setRequestCap(100);
         cE1Builder.setSiteInclusion(false);
         cE1Builder.setSitesIE(emptySet);
@@ -118,7 +118,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         cE2Builder.setAccountId(advertiserId2);
         cE2Builder.setPriority(1);
         cE2Builder.setImpressionCeil(90);
-        cE2Builder.setName("mobilecommerce");
+        cE2Builder.setName("openx");
         cE2Builder.setRequestCap(100);
         cE2Builder.setSiteInclusion(false);
         cE2Builder.setSitesIE(emptySet);
@@ -128,7 +128,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         cE3Builder.setAccountId(advertiserId3);
         cE3Builder.setPriority(5);
         cE3Builder.setImpressionCeil(90);
-        cE3Builder.setName("ifd");
+        cE3Builder.setName("nexage");
         cE3Builder.setRequestCap(100);
         cE3Builder.setSiteInclusion(false);
         cE3Builder.setSitesIE(emptySet);
@@ -466,7 +466,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         CasContext casContext = new CasContext();
         int sumOfSiteImpressions = 0;
         for (ChannelSegment channelSegment : channelSegments) {
-            sumOfSiteImpressions += channelSegment.getChannelSegmentCitrusLeafFeedbackEntity().getBeacons();
+            sumOfSiteImpressions += channelSegment.getChannelSegmentAerospikeFeedbackEntity().getBeacons();
         }
         casContext.setSumOfSiteImpressions(sumOfSiteImpressions);
 

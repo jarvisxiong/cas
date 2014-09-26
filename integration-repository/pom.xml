@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>com.inmobi.channels</groupId>
 		<artifactId>cas</artifactId>
-		<version>3.191-SNAPSHOT</version>
+		<version>3.197-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
@@ -61,8 +61,8 @@
 			<artifactId>gson</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>net.citrusleaf</groupId>
-			<artifactId>citrusleaf-client</artifactId>
+            		<groupId>com.aerospike</groupId>
+        		<artifactId>aerospike-client</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.testng</groupId>

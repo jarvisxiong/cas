@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.inmobi.channels</groupId>
 	<artifactId>cas</artifactId>
-	<version>3.191-SNAPSHOT</version>
+	<version>3.197-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<url>https://github.corp.inmobi.com/channel-adserve</url>
 	<parent>
@@ -192,9 +192,9 @@
 				<version>9.0-801.jdbc3</version>
 			</dependency>
 			<dependency>
-				<groupId>net.citrusleaf</groupId>
-				<artifactId>citrusleaf-client</artifactId>
-				<version>2.0.23</version>
+                		<groupId>com.aerospike</groupId>
+                		<artifactId>aerospike-client</artifactId>
+                		<version>3.0.27</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.guava</groupId>
@@ -406,6 +406,11 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
 			</plugin>
 		</plugins>
 	</build>

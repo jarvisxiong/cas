@@ -73,8 +73,8 @@ public class InspectorStrings {
     public static final String droppedInTODFilter                        = "DroppedInTODFilter";
     public static final String siteFeedbackCacheHit                      = "SiteFeedbackCacheHit";
     public static final String siteFeedbackCacheMiss                     = "SiteFeedbackCacheMiss";
-    public static final String siteFeedbackRequestsToCitrusLeaf          = "SiteFeedbackRequestsToCitrusLeaf";
-    public static final String siteFeedbackFailedToLoadFromCitrusLeaf    = "SiteFeedbackFailedToLoadFromCitrusLeaf";
+    public static final String siteFeedbackRequestsToAerospike           = "SiteFeedbackRequestsToAerospike";
+    public static final String siteFeedbackFailedToLoadFromAerospike     = "SiteFeedbackFailedToLoadFromAerospike";
     public static final String siteFeedbackLatency                       = "SiteFeedbackLatency";
     public static final String missingCategory                           = "MissingCategory";
     public final static String droppedInRtbBalanceFilter                 = "DroppedInRtbBalanceFilter";
@@ -82,6 +82,7 @@ public class InspectorStrings {
     public final static String droppedInRtbAuctionIdMisMatchFilter       = "DroppedInRtbAuctionIdMisMatchFilter";
     public final static String droppedInRtbSeatidMisMatchFilter          = "DroppedInRtbSeatidMisMatchFilter";
     public final static String droppedInRtbImpressionIdMisMatchFilter    = "DroppedInRtbImpressionIdMisMatchFilter";
+    public final static String droppedInAuctionIxImpressionIdFilter      = "DroppedInAuctionIxImpressionIdFilter";
     public final static String droppedInCreativeIdMissingFilter          = "DroppedInCreativeIdMissingFilter";
     public final static String droppedInSampleImageUrlMissingFilter      = "DroppedInSampleImageUrlMissingFilter";
     public final static String droppedInAdvertiserDomainsMissingFilter   = "DroppedInAdvertiserDomainsFilter";
