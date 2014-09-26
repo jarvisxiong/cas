@@ -57,6 +57,7 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
             final String siteUrl = row.getString("site_url");
             final String siteName = row.getString("site_name");
             final String appTitle = row.getString("title");
+            final String bundleId = row.getString("bundle_id");
             boolean pubTransparencyEnabled = false;
             if(exchange_settings==1){//exchange_settings=1 => Publisher is transparent and exchange enabled
                 pubTransparencyEnabled=true;
@@ -104,6 +105,7 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
             builder.setSiteUrl(siteUrl);
             builder.setSiteName(siteName);
             builder.setAppTitle(appTitle);
+            builder.setBundleId(bundleId);
             builder.setModifiedOn(modifiedOn);
 
             final WapSiteUACEntity entity = builder.build();

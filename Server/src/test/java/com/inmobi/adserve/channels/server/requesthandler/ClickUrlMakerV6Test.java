@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import com.inmobi.adserve.channels.util.Utils.ClickUrlMakerV6;
 import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 import org.testng.annotations.Test;
