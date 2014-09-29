@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.adnetworks.marimedia;
 
 // Created by Dhanasekaran K P on 23/9/14.
 
+import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.adnetworks.rubicon.DCPRubiconAdnetwork;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -35,14 +36,25 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final String AD_TYPE = "t";
 
     private static final String ANDROID_ID = "tt_android_id";
+    private static final String ANDROID_ID_SHA1 = "tt_android_id_sha1";
+    private static final String ANDROID_ID_MD5 = "tt_android_id_md5";
+    private static final String ANDROID_ADVERTISING_ID = "tt_advertising_id";
+
     private static final String IDFA = "tt_idfa";
     private static final String UDID = "tt_udid";
+    private static final String UDID_MD5 = "tt_udid_md5";
+
     private static final String LATITUDE = "lat";
     private static final String LONGITUDE = "lon";
+    private static final String NETWORK_TYPE = "nt";
+
+    private static final String GENDER = "gender";
+    private static final String AGE = "age";
 
     private int width;
     private int height;
     private String resolution;
+    private String networkType;
 
     public DCPMarimediaAdNetwork(final Configuration config,
                                 final Bootstrap clientBootstrap,
@@ -92,6 +104,13 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
         // Check Ad type.
         // Will be set in getRequestUri().
         // No video format supported, either "Interstitial" or "Banner".
+
+        // Find the network type.
+        if (NetworkType.WIFI == sasParams.getNetworkType()) {
+            networkType = "wifi";
+        } else {
+            networkType = "carrier";
+        }
 
         // Configuration successful.
         LOG.info("Configure parameters inside Marimedia returned true");
@@ -144,10 +163,16 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
         if (isAndroid()) {
             if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
                 appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.uidMd5, false);
+                appendQueryParam(url, ANDROID_ID_MD5, casInternalRequestParameters.uidMd5, false);
             } else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
                 appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.uid, false);
             } else if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
                 appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.uidO1, false);
+                appendQueryParam(url, ANDROID_ID_SHA1, casInternalRequestParameters.uidO1, false);
+            }
+
+            if (StringUtils.isNotBlank(casInternalRequestParameters.gpid)) {
+                appendQueryParam(url, ANDROID_ADVERTISING_ID, casInternalRequestParameters.gpid, false);
             }
         }
 
@@ -159,6 +184,22 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
             if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
                 appendQueryParam(url, IDFA, casInternalRequestParameters.uidIFA, false);
             }
+            if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
+                appendQueryParam(url, UDID_MD5, casInternalRequestParameters.uidMd5, false);
+            }
+        }
+
+        // Set Network Type.
+        appendQueryParam(url, NETWORK_TYPE, networkType, false);
+
+        // Set Age.
+        if(StringUtils.isNotBlank(sasParams.getAge().toString())) {
+            appendQueryParam(url, AGE, getURLEncode(sasParams.getAge().toString(), format), false);
+        }
+
+        // Set Gender.
+        if(StringUtils.isNotBlank(sasParams.getGender())) {
+            appendQueryParam(url, GENDER, getURLEncode(sasParams.getGender(), format), false);
         }
 
         LOG.debug("Marimedia url is {}", url);
@@ -217,8 +258,10 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
                 context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adUrl);
 
                 // Impression URL.
-                String impressionUrl = ad.getString("impUrl");
-                context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, impressionUrl);
+                if(ad.has("impUrl")) {
+                    String impressionUrl = ad.getString("impUrl");
+                    context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, impressionUrl);
+                }
 
                 context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
 
