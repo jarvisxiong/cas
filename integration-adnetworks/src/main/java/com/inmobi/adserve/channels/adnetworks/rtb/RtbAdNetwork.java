@@ -309,12 +309,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         seatList.add(advertiserId);
         bidRequest.setWseat(seatList);
         if (casInternalRequestParameters != null) {
-            LOG.debug("blockedCategories are {}", casInternalRequestParameters.blockedCategories);
+            LOG.debug("blockedIabCategories are {}", casInternalRequestParameters.blockedIabCategories);
             LOG.debug("blockedAdvertisers are {}", casInternalRequestParameters.blockedAdvertisers);
             bidRequest.setBcat(new ArrayList<String>());
-            if (null != casInternalRequestParameters.blockedCategories) {
-                bidRequest.setBcat(iabCategoriesInterface
-                        .getIABCategories(casInternalRequestParameters.blockedCategories));
+            if (null != casInternalRequestParameters.blockedIabCategories) {
+                bidRequest.setBcat(casInternalRequestParameters.blockedIabCategories);
             }
             // Setting blocked categories
             if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {

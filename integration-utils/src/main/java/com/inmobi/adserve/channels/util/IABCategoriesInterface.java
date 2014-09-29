@@ -12,7 +12,7 @@ public interface IABCategoriesInterface {
 
     /**
      * Maps new inmobi categories to IAB categories.
-     * 
+     *
      * @param List
      *            of new inmobi categories.
      * @return List of IAB Categories code.

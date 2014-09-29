@@ -214,13 +214,13 @@ Cache.PricingEngineRepository.refreshTime = 1200
 Cache.PricingEngineRepository.isUpdatable = true
 Cache.PricingEngineRepository.dataSourceName = jdbc
 
-Cache.Name = PublisherFilterRepository
-Cache.PublisherFilterRepository.Manager = com.inmobi.adserve.channels.repository.PublisherFilterRepository
-Cache.PublisherFilterRepository.query = select * from publisher_filter_repo_fun('${last_update}')
-Cache.PublisherFilterRepository.initialDelay = 300
-Cache.PublisherFilterRepository.refreshTime = 1200
-Cache.PublisherFilterRepository.isUpdatable = true
-Cache.PublisherFilterRepository.dataSourceName = jdbc
+Cache.Name = SiteFilterRepository
+Cache.SiteFilterRepository.Manager = com.inmobi.adserve.channels.repository.SiteFilterRepository
+Cache.SiteFilterRepository.query = select * from site_filter_repo_fun('${last_update}')
+Cache.SiteFilterRepository.initialDelay = 300
+Cache.SiteFilterRepository.refreshTime = 1200
+Cache.SiteFilterRepository.isUpdatable = true
+Cache.SiteFilterRepository.dataSourceName = jdbc
 
 Cache.Name = SiteEcpmRepository
 Cache.SiteEcpmRepository.Manager = com.inmobi.adserve.channels.repository.SiteEcpmRepository
@@ -1228,6 +1228,22 @@ adapter.admobixrtb.host.ua2=NA
 adapter.admobixrtb.host.uh1=http://us-east.rtb-dsp.com/bid_request/92709/
 adapter.admobixrtb.host.default=NA
 adapter.admobixrtb.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
+
+adapter.cacaflyrtb.isRtb=true
+adapter.cacaflyrtb.status=on
+adapter.cacaflyrtb.siteBlinded=true
+adapter.cacaflyrtb.rtbVer=2.0
+adapter.cacaflyrtb.advertiserId=6435edf6c25244e18d2f5f709972fae6
+adapter.cacaflyrtb.urlArg=query
+adapter.cacaflyrtb.rtbMethod=post
+adapter.cacaflyrtb.isWnRequired=true
+adapter.cacaflyrtb.host.uj1=NA
+adapter.cacaflyrtb.host.lhr1=NA
+adapter.cacaflyrtb.host.hkg1=http://rtb-inmobi.tenmax.io/bid
+adapter.cacaflyrtb.host.ua2=NA
+adapter.cacaflyrtb.host.uh1=NA
+adapter.cacaflyrtb.host.default=NA
+adapter.cacaflyrtb.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
 
 adapter.ix.isIx=true
 adapter.ix.status=on
