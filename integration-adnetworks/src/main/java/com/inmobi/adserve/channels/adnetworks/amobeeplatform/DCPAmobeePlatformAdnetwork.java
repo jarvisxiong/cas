@@ -67,7 +67,7 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
 	public boolean configureParameters() {
 		if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
 				|| StringUtils.isBlank(externalSiteId)) {
-			LOG.debug("mandatory parameters missing for dmg so exiting adapter");
+			LOG.debug("mandatory parameters missing for {} so exiting adapter",name);
 			return false;
 		}
 
@@ -83,7 +83,7 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
 			height = (int) Math.ceil(dim.getHeight());
 		}
 		else {
-			LOG.debug("mandatory parameters missing for dmg so exiting adapter");
+			LOG.debug("mandatory parameters missing for {}so exiting adapter",name);
 			return false;
 		}
 		if (sasParams.getOsId() == HandSetOS.Android.getValue()) { // android
@@ -93,13 +93,13 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
 		else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) { // iPhone
 			client = 2;
 		}
-		LOG.info("Configure parameters inside dmg returned true");
+		LOG.info("Configure parameters inside {} returned true",name);
 		return true;
 	}
 
 	@Override
 	public String getName() {
-		return "dmg";
+		return name;
 	}
 
 	@Override
@@ -129,7 +129,6 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
 						&& "1".equals(casInternalRequestParameters.uidADT)) {
 					appendQueryParam(url, IDFA, casInternalRequestParameters.uidIFA, false);
 				}
-				//TODO correct this
 				if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
 					appendQueryParam(url, UDID, casInternalRequestParameters.uidIDUS1, false);
 				}
@@ -171,7 +170,7 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
 				appendQueryParam(url, NEGATIVE_KEYWORD,getURLEncode(CategoryList.getBlockedCategoryForPerformance(), format), false);
 			}
 
-			LOG.debug("dmg url is {}", url);
+			LOG.debug("{} url is {}",name, url);
 
 			return (new URI(url.toString()));
 		}
@@ -202,8 +201,8 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
 			}
 			catch (Exception exception) {
 				adStatus = "NO_AD";
-				LOG.error("Error parsing response from dmg : {}", exception);
-				LOG.error("Response from dmg: {}", response);
+				LOG.error("Error parsing response from {} : {}",name, exception);
+				LOG.error("Response from {}: {}",name, response);
 			}
 		}
 		LOG.debug("response length is {}", responseContent.length());

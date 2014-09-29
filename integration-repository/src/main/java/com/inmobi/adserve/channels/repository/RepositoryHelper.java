@@ -13,17 +13,17 @@ import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.PricingEngineEntity;
-import com.inmobi.adserve.channels.entity.PublisherFilterEntity;
 import com.inmobi.adserve.channels.entity.SegmentAdGroupFeedbackEntity;
 import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
 import com.inmobi.adserve.channels.entity.SiteFeedbackEntity;
+import com.inmobi.adserve.channels.entity.SiteFilterEntity;
 import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.query.CreativeQuery;
 import com.inmobi.adserve.channels.query.PricingEngineQuery;
-import com.inmobi.adserve.channels.query.PublisherFilterQuery;
 import com.inmobi.adserve.channels.query.SiteEcpmQuery;
+import com.inmobi.adserve.channels.query.SiteFilterQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
 
 
@@ -37,7 +37,7 @@ public class RepositoryHelper {
     private final SiteTaxonomyRepository           siteTaxonomyRepository;
     private final SiteAerospikeFeedbackRepository  siteAerospikeFeedbackRepository;
     private final PricingEngineRepository          pricingEngineRepository;
-    private final PublisherFilterRepository        publisherFilterRepository;
+    private final SiteFilterRepository             siteFilterRepository;
     private final SiteEcpmRepository               siteEcpmRepository;
     private final CurrencyConversionRepository     currencyConversionRepository;
     private final WapSiteUACRepository             wapSiteUACRepository;
@@ -55,7 +55,7 @@ public class RepositoryHelper {
         this.siteTaxonomyRepository = builder.siteTaxonomyRepository;
         this.siteAerospikeFeedbackRepository = builder.siteAerospikeFeedbackRepository;
         this.pricingEngineRepository = builder.pricingEngineRepository;
-        this.publisherFilterRepository = builder.publisherFilterRepository;
+        this.siteFilterRepository = builder.siteFilterRepository;
         this.siteEcpmRepository = builder.siteEcpmRepository;
         this.currencyConversionRepository = builder.currencyConversionRepository;
         this.wapSiteUACRepository = builder.wapSiteUACRepository;
@@ -72,7 +72,7 @@ public class RepositoryHelper {
                     .addRepositoryToStats(this.siteMetaDataRepository)
                     .addRepositoryToStats(this.siteTaxonomyRepository)
                     .addRepositoryToStats(this.pricingEngineRepository)
-                    .addRepositoryToStats(this.publisherFilterRepository)
+                    .addRepositoryToStats(this.siteFilterRepository)
                     .addRepositoryToStats(this.siteEcpmRepository)
                     .addRepositoryToStats(this.currencyConversionRepository)
                     .addRepositoryToStats(this.wapSiteUACRepository)
@@ -96,7 +96,7 @@ public class RepositoryHelper {
         private SiteTaxonomyRepository           siteTaxonomyRepository;
         private SiteAerospikeFeedbackRepository  siteAerospikeFeedbackRepository;
         private PricingEngineRepository          pricingEngineRepository;
-        private PublisherFilterRepository        publisherFilterRepository;
+        private SiteFilterRepository             siteFilterRepository;
         private SiteEcpmRepository               siteEcpmRepository;
         private CurrencyConversionRepository     currencyConversionRepository;
         private WapSiteUACRepository             wapSiteUACRepository;
@@ -113,7 +113,7 @@ public class RepositoryHelper {
             Preconditions.checkNotNull(siteTaxonomyRepository);
             Preconditions.checkNotNull(siteAerospikeFeedbackRepository);
             Preconditions.checkNotNull(pricingEngineRepository);
-            Preconditions.checkNotNull(publisherFilterRepository);
+            Preconditions.checkNotNull(siteFilterRepository);
             Preconditions.checkNotNull(siteEcpmRepository);
             Preconditions.checkNotNull(currencyConversionRepository);
             Preconditions.checkNotNull(wapSiteUACRepository);
@@ -205,9 +205,9 @@ public class RepositoryHelper {
         return null;
     }
 
-    public PublisherFilterEntity queryPublisherFilterRepository(final String siteId, final Integer ruleType) {
+    public SiteFilterEntity querySiteFilterRepository(final String siteId, final Integer ruleType) {
         try {
-            return publisherFilterRepository.query(new PublisherFilterQuery(siteId, ruleType));
+            return siteFilterRepository.query(new SiteFilterQuery(siteId, ruleType));
         }
         catch (RepositoryException ignored) {
         }

@@ -15,10 +15,10 @@ import com.inmobi.adserve.channels.repository.CurrencyConversionRepository;
 import com.inmobi.adserve.channels.repository.IXAccountMapRepository;
 import com.inmobi.adserve.channels.repository.NativeAdTemplateRepository;
 import com.inmobi.adserve.channels.repository.PricingEngineRepository;
-import com.inmobi.adserve.channels.repository.PublisherFilterRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.repository.SiteAerospikeFeedbackRepository;
 import com.inmobi.adserve.channels.repository.SiteEcpmRepository;
+import com.inmobi.adserve.channels.repository.SiteFilterRepository;
 import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
 import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
 import com.inmobi.adserve.channels.repository.WapSiteUACRepository;
@@ -81,7 +81,7 @@ public class ChannelServer {
     private static SiteTaxonomyRepository           siteTaxonomyRepository;
     private static SiteAerospikeFeedbackRepository  siteAerospikeFeedbackRepository;
     private static PricingEngineRepository          pricingEngineRepository;
-    private static PublisherFilterRepository        publisherFilterRepository;
+    private static SiteFilterRepository             siteFilterRepository;
     private static SiteEcpmRepository               siteEcpmRepository;
     private static CurrencyConversionRepository     currencyConversionRepository;
     private static WapSiteUACRepository             wapSiteUACRepository;
@@ -151,7 +151,7 @@ public class ChannelServer {
             siteTaxonomyRepository           = new SiteTaxonomyRepository();
             siteAerospikeFeedbackRepository  = new SiteAerospikeFeedbackRepository();
             pricingEngineRepository          = new PricingEngineRepository();
-            publisherFilterRepository        = new PublisherFilterRepository();
+            siteFilterRepository             = new SiteFilterRepository();
             siteEcpmRepository               = new SiteEcpmRepository();
             currencyConversionRepository     = new CurrencyConversionRepository();
             wapSiteUACRepository             = new WapSiteUACRepository();
@@ -168,7 +168,7 @@ public class ChannelServer {
             repoHelperBuilder.setSiteTaxonomyRepository(siteTaxonomyRepository);
             repoHelperBuilder.setSiteAerospikeFeedbackRepository(siteAerospikeFeedbackRepository);
             repoHelperBuilder.setPricingEngineRepository(pricingEngineRepository);
-            repoHelperBuilder.setPublisherFilterRepository(publisherFilterRepository);
+            repoHelperBuilder.setSiteFilterRepository(siteFilterRepository);
             repoHelperBuilder.setSiteEcpmRepository(siteEcpmRepository);
             repoHelperBuilder.setCurrencyConversionRepository(currencyConversionRepository);
             repoHelperBuilder.setWapSiteUACRepository(wapSiteUACRepository);
@@ -333,9 +333,9 @@ public class ChannelServer {
             pricingEngineRepository.init(logger,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY),
                     ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY);
-            publisherFilterRepository.init(logger,
-                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.PUBLISHER_FILTER_REPOSITORY),
-                    ChannelServerStringLiterals.PUBLISHER_FILTER_REPOSITORY);
+            siteFilterRepository.init(logger,
+                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_FILTER_REPOSITORY),
+                    ChannelServerStringLiterals.SITE_FILTER_REPOSITORY);
             siteAerospikeFeedbackRepository.init(
                     config.getServerConfiguration().subset(ChannelServerStringLiterals.AEROSPIKE_FEEDBACK),
                     getDataCenter());
