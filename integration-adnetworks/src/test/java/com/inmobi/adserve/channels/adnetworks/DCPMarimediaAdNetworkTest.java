@@ -13,7 +13,6 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
@@ -60,7 +59,7 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
 
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]{50l, 51l}));
+        //casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]{50l, 51l}));
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
         casInternalRequestParameters.uidIFA = "23e2ewq445545";
@@ -87,7 +86,7 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
 
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]{50l, 51l}));
+        //casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]{50l, 51l}));
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
         casInternalRequestParameters.uidIFA = "23e2ewq445545";
@@ -123,7 +122,7 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
 
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]{50l, 51l}));
+        //casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]{50l, 51l}));
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
         casInternalRequestParameters.uidIFA = "23e2ewq445545";
@@ -163,7 +162,7 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
 
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]{50l, 51l}));
+        //casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]{50l, 51l}));
         casInternalRequestParameters.latLong = "37.4429,-122.1514";
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
         casInternalRequestParameters.uidIFA = "23e2ewq445545";

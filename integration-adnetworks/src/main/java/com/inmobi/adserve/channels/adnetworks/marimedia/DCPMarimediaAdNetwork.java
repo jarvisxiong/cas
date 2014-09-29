@@ -236,14 +236,12 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
 
                 // Banner or Interstitial.
                 if (ad.getString("adType").equalsIgnoreCase("banner")) {
-                    //     if(ad.getString("adType").equalsIgnoreCase("banner")) {
                     String imageUrl = ad.getString("imageUrl");
                     context.put(VelocityTemplateFieldConstants.PartnerImgUrl, imageUrl);
                 }
                 else if( ad.getString("adType").equalsIgnoreCase("html")) {
                     String htmlUrl = ad.getString("htmlUrl");
                     context.put(VelocityTemplateFieldConstants.PartnerImgUrl, htmlUrl);
-
                 }
                 else {
                     // Other format.
