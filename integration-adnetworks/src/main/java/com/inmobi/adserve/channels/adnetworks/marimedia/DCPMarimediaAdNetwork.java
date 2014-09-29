@@ -193,13 +193,17 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
         appendQueryParam(url, NETWORK_TYPE, networkType, false);
 
         // Set Age.
-        if(StringUtils.isNotBlank(sasParams.getAge().toString())) {
-            appendQueryParam(url, AGE, getURLEncode(sasParams.getAge().toString(), format), false);
+        if(null != sasParams.getAge()) {
+            if (StringUtils.isNotBlank(sasParams.getAge().toString())) {
+                appendQueryParam(url, AGE, getURLEncode(sasParams.getAge().toString(), format), false);
+            }
         }
 
         // Set Gender.
-        if(StringUtils.isNotBlank(sasParams.getGender())) {
-            appendQueryParam(url, GENDER, getURLEncode(sasParams.getGender(), format), false);
+        if(null != sasParams.getGender()) {
+            if (StringUtils.isNotBlank(sasParams.getGender())) {
+                appendQueryParam(url, GENDER, getURLEncode(sasParams.getGender(), format), false);
+            }
         }
 
         LOG.debug("Marimedia url is {}", url);
@@ -247,6 +251,7 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
                 }
                 else {
                     // Other format.
+                    // adType is "video" or "empty".
                     adStatus = "NO_AD";
                     LOG.info("Error parsing response from Marimedia");
                     LOG.info("Response from Marimedia {}", response);
