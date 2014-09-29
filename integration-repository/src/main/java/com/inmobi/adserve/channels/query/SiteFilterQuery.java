@@ -13,6 +13,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SiteFilterQuery implements RepositoryQuery {
 
-    private String siteId;
+    private String  siteId;
     private Integer ruleType;
 }

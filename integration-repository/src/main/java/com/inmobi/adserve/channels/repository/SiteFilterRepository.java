@@ -27,7 +27,7 @@ public class SiteFilterRepository extends
         Collection<SiteFilterEntity> SiteFilterEntityResultSet = query(SiteFilterQuery);
         if (SiteFilterEntityResultSet == null || SiteFilterEntityResultSet.size() == 0) {
             return null;
-        } else if (SiteFilterEntityResultSet.size() >= 1) {
+        } else if (SiteFilterEntityResultSet.size() >= 1) { // TODO: Is this condition needed?
             return (SiteFilterEntity) SiteFilterEntityResultSet.toArray()[0];
         }
         return null;
@@ -45,7 +45,7 @@ public class SiteFilterRepository extends
         String[] tempArray = (String[]) row.getArray("filter_data");
 
         if (SiteFilterEntity.getRuleType() == 4) {
-            SiteFilterEntity.setBlockedCategories(tempArray);
+            SiteFilterEntity.setBlockedIabCategories(tempArray);
         } else if (SiteFilterEntity.getRuleType() == 6) {
             SiteFilterEntity.setBlockedAdvertisers(tempArray);
         } else {

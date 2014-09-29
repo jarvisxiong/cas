@@ -191,7 +191,7 @@ public abstract class BaseServlet implements Servlet {
             final long siteIncId, final double networkSiteEcpm, final double segmentFloor) {
         CasInternalRequestParameters casInternalRequestParametersGlobal = hrh.responseSender.casInternalRequestParameters;
         casInternalRequestParametersGlobal.highestEcpm = getHighestEcpm(filteredSegments);
-        casInternalRequestParametersGlobal.blockedIabCategories = getBlockedCategories(hrh);
+        casInternalRequestParametersGlobal.blockedIabCategories = getBlockedIabCategories(hrh);
         casInternalRequestParametersGlobal.blockedAdvertisers = getBlockedAdvertisers(hrh);
         double minimumRtbFloor = 0.05;
         casInternalRequestParametersGlobal.auctionBidFloor = hrh.responseSender.getAuctionEngine().calculateAuctionFloor(
@@ -221,13 +221,13 @@ public abstract class BaseServlet implements Servlet {
         return highestEcpm;
     }
 
-    private List<String>  getBlockedCategories(final HttpRequestHandler hrh) {
+    private List<String> getBlockedIabCategories(final HttpRequestHandler hrh) {
         List<String> blockedCategories = null;
         if (null != hrh.responseSender.sasParams.getSiteId()) {
             SiteFilterEntity siteFilterEntity = CasConfigUtil.repositoryHelper
                     .querySiteFilterRepository(hrh.responseSender.sasParams.getSiteId(), 4);
-            if (null != siteFilterEntity && siteFilterEntity.getBlockedCategories() != null) {
-                blockedCategories = Arrays.asList(siteFilterEntity.getBlockedCategories());
+            if (null != siteFilterEntity && siteFilterEntity.getBlockedIabCategories() != null) {
+                blockedCategories = Arrays.asList(siteFilterEntity.getBlockedIabCategories());
             }
         }
         return blockedCategories;

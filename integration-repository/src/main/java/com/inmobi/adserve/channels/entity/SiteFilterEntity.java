@@ -16,7 +16,7 @@ public class SiteFilterEntity implements IdentifiableEntity<SiteFilterQuery> {
 
     private String            siteId;
     private String            pubId;
-    private String[]          blockedCategories;
+    private String[]          blockedIabCategories;
     private String[]          blockedAdvertisers;
     private Integer           ruleType;
     private boolean           isExpired;
