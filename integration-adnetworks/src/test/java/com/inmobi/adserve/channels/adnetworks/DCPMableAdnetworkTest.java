@@ -149,7 +149,7 @@ public class DCPMableAdnetworkTest extends TestCase {
     public void testDCPMableRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
+        casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSource("APP");
@@ -182,7 +182,7 @@ public class DCPMableAdnetworkTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSource("WAP");
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
+        casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
         casInternalRequestParameters.latLong = "38.5,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
@@ -214,7 +214,7 @@ public class DCPMableAdnetworkTest extends TestCase {
     public void testDCPMableParseAd() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
+        casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSlot(Short.valueOf("15"));
@@ -241,7 +241,7 @@ public class DCPMableAdnetworkTest extends TestCase {
     public void testDCPMableParseAppAd() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
+        casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSlot(Short.valueOf("15"));

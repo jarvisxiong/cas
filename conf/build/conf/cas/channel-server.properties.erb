@@ -214,13 +214,13 @@ Cache.PricingEngineRepository.refreshTime = 1200
 Cache.PricingEngineRepository.isUpdatable = true
 Cache.PricingEngineRepository.dataSourceName = jdbc
 
-Cache.Name = PublisherFilterRepository
-Cache.PublisherFilterRepository.Manager = com.inmobi.adserve.channels.repository.PublisherFilterRepository
-Cache.PublisherFilterRepository.query = select * from publisher_filter_repo_fun('${last_update}')
-Cache.PublisherFilterRepository.initialDelay = 300
-Cache.PublisherFilterRepository.refreshTime = 1200
-Cache.PublisherFilterRepository.isUpdatable = true
-Cache.PublisherFilterRepository.dataSourceName = jdbc
+Cache.Name = SiteFilterRepository
+Cache.SiteFilterRepository.Manager = com.inmobi.adserve.channels.repository.SiteFilterRepository
+Cache.SiteFilterRepository.query = select * from site_filter_repo_fun('${last_update}')
+Cache.SiteFilterRepository.initialDelay = 300
+Cache.SiteFilterRepository.refreshTime = 1200
+Cache.SiteFilterRepository.isUpdatable = true
+Cache.SiteFilterRepository.dataSourceName = jdbc
 
 Cache.Name = SiteEcpmRepository
 Cache.SiteEcpmRepository.Manager = com.inmobi.adserve.channels.repository.SiteEcpmRepository

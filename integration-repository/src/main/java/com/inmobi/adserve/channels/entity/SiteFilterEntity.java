@@ -1,6 +1,6 @@
 package com.inmobi.adserve.channels.entity;
 
-import com.inmobi.adserve.channels.query.PublisherFilterQuery;
+import com.inmobi.adserve.channels.query.SiteFilterQuery;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 import lombok.Data;
 import lombok.ToString;
@@ -10,13 +10,13 @@ import java.sql.Timestamp;
 
 @Data
 @ToString
-public class PublisherFilterEntity implements IdentifiableEntity<PublisherFilterQuery> {
+public class SiteFilterEntity implements IdentifiableEntity<SiteFilterQuery> {
 
-    private static final long serialVersionUID = 6433325928036900792L;
+    private static final long serialVersionUID = -3778683319364509021L;
 
     private String            siteId;
     private String            pubId;
-    private Long[]            blockedCategories;
+    private String[]          blockedCategories;
     private String[]          blockedAdvertisers;
     private Integer           ruleType;
     private boolean           isExpired;
@@ -28,8 +28,8 @@ public class PublisherFilterEntity implements IdentifiableEntity<PublisherFilter
     }
 
     @Override
-    public PublisherFilterQuery getId() {
-        return new PublisherFilterQuery(this.getSiteId(), this.getRuleType());
+    public SiteFilterQuery getId() {
+        return new SiteFilterQuery(this.getSiteId(), this.getRuleType());
     }
 
     @Override
@@ -40,7 +40,7 @@ public class PublisherFilterEntity implements IdentifiableEntity<PublisherFilter
             return false;
         if (getClass() != obj.getClass())
             return false;
-        PublisherFilterEntity other = (PublisherFilterEntity) obj;
+        SiteFilterEntity other = (SiteFilterEntity) obj;
         if (ruleType == null) {
             if (other.ruleType != null)
                 return false;

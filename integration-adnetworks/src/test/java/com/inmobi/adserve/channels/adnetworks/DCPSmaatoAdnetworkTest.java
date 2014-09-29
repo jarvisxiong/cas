@@ -149,7 +149,7 @@ public class DCPSmaatoAdnetworkTest extends TestCase {
     public void testDCPSmaatoRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
+        casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
         sasParams.setRemoteHostIp("178.190.64.146");
         sasParams
                 .setUserAgent("Mozilla/5.0 (iPod; CPU iPhone OS 6_1_5 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Mobile/10B400");
@@ -184,7 +184,7 @@ public class DCPSmaatoAdnetworkTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSource("WAP");
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
+        casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
         casInternalRequestParameters.latLong = "38.5,-122.1514";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
@@ -216,7 +216,7 @@ public class DCPSmaatoAdnetworkTest extends TestCase {
     public void testDCPSmaatoParseAdImage() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
+        casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSlot(Short.valueOf("15"));
@@ -242,7 +242,7 @@ public class DCPSmaatoAdnetworkTest extends TestCase {
     public void testDCPSmaatoParseAdText() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[] { 50l, 51l }));
+        casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSlot(Short.valueOf("15"));

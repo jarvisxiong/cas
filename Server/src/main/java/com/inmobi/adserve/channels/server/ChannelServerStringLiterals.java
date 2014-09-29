@@ -8,7 +8,7 @@ public class ChannelServerStringLiterals {
     public static final String SITE_METADATA_REPOSITORY            = "SiteMetaDataRepository";
     public static final String SITE_TAXONOMY_REPOSITORY            = "SiteTaxonomyRepository";
     public static final String PRICING_ENGINE_REPOSITORY           = "PricingEngineRepository";
-    public static final String PUBLISHER_FILTER_REPOSITORY         = "PublisherFilterRepository";
+    public static final String SITE_FILTER_REPOSITORY              = "SiteFilterRepository";
     public static final String AEROSPIKE_FEEDBACK                  = "aerospike";
     public static final String DATABASE                            = "database";
     public static final String QUERY                               = "query";

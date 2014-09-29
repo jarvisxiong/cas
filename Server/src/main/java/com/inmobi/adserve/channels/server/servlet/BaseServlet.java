@@ -4,7 +4,7 @@ import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.entity.PublisherFilterEntity;
+import com.inmobi.adserve.channels.entity.SiteFilterEntity;
 import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
@@ -191,7 +191,7 @@ public abstract class BaseServlet implements Servlet {
             final long siteIncId, final double networkSiteEcpm, final double segmentFloor) {
         CasInternalRequestParameters casInternalRequestParametersGlobal = hrh.responseSender.casInternalRequestParameters;
         casInternalRequestParametersGlobal.highestEcpm = getHighestEcpm(filteredSegments);
-        casInternalRequestParametersGlobal.blockedCategories = getBlockedCategories(hrh);
+        casInternalRequestParametersGlobal.blockedIabCategories = getBlockedCategories(hrh);
         casInternalRequestParametersGlobal.blockedAdvertisers = getBlockedAdvertisers(hrh);
         double minimumRtbFloor = 0.05;
         casInternalRequestParametersGlobal.auctionBidFloor = hrh.responseSender.getAuctionEngine().calculateAuctionFloor(
@@ -200,7 +200,7 @@ public abstract class BaseServlet implements Servlet {
         LOG.debug("RTB floor from the pricing engine entity is {}", rtbdFloor);
         LOG.debug("RTB floor from the pricing engine entity is {}", segmentFloor);
         LOG.debug("Highest Ecpm is {}", casInternalRequestParametersGlobal.highestEcpm);
-        LOG.debug("BlockedCategories are {}", casInternalRequestParametersGlobal.blockedCategories);
+        LOG.debug("BlockedCategories are {}", casInternalRequestParametersGlobal.blockedIabCategories);
         LOG.debug("BlockedAdvertisers are {}", casInternalRequestParametersGlobal.blockedAdvertisers);
         LOG.debug("Site floor is {}", siteFloor);
         LOG.debug("NetworkSiteEcpm is {}", networkSiteEcpm);
@@ -221,13 +221,13 @@ public abstract class BaseServlet implements Servlet {
         return highestEcpm;
     }
 
-    private List<Long> getBlockedCategories(final HttpRequestHandler hrh) {
-        List<Long> blockedCategories = null;
+    private List<String>  getBlockedCategories(final HttpRequestHandler hrh) {
+        List<String> blockedCategories = null;
         if (null != hrh.responseSender.sasParams.getSiteId()) {
-            PublisherFilterEntity publisherFilterEntity = CasConfigUtil.repositoryHelper
-                    .queryPublisherFilterRepository(hrh.responseSender.sasParams.getSiteId(), 4);
-            if (null != publisherFilterEntity && publisherFilterEntity.getBlockedCategories() != null) {
-                blockedCategories = Arrays.asList(publisherFilterEntity.getBlockedCategories());
+            SiteFilterEntity siteFilterEntity = CasConfigUtil.repositoryHelper
+                    .querySiteFilterRepository(hrh.responseSender.sasParams.getSiteId(), 4);
+            if (null != siteFilterEntity && siteFilterEntity.getBlockedCategories() != null) {
+                blockedCategories = Arrays.asList(siteFilterEntity.getBlockedCategories());
             }
         }
         return blockedCategories;
@@ -236,10 +236,10 @@ public abstract class BaseServlet implements Servlet {
     private List<String> getBlockedAdvertisers(final HttpRequestHandler hrh) {
         List<String> blockedAdvertisers = null;
         if (null != hrh.responseSender.sasParams.getSiteId()) {
-            PublisherFilterEntity publisherFilterEntity = CasConfigUtil.repositoryHelper
-                    .queryPublisherFilterRepository(hrh.responseSender.sasParams.getSiteId(), 6);
-            if (null != publisherFilterEntity && publisherFilterEntity.getBlockedAdvertisers() != null) {
-                blockedAdvertisers = Arrays.asList(publisherFilterEntity.getBlockedAdvertisers());
+            SiteFilterEntity siteFilterEntity = CasConfigUtil.repositoryHelper
+                    .querySiteFilterRepository(hrh.responseSender.sasParams.getSiteId(), 6);
+            if (null != siteFilterEntity && siteFilterEntity.getBlockedAdvertisers() != null) {
+                blockedAdvertisers = Arrays.asList(siteFilterEntity.getBlockedAdvertisers());
             }
         }
         return blockedAdvertisers;

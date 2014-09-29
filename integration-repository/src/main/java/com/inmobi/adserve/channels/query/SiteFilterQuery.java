@@ -5,13 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-
+/**
+ * Created by yasir.imteyaz on 27/09/14.
+ */
 @EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
-public class PublisherFilterQuery implements RepositoryQuery {
+public class SiteFilterQuery implements RepositoryQuery {
 
-    private String  siteId;
+    private String siteId;
     private Integer ruleType;
-
 }
