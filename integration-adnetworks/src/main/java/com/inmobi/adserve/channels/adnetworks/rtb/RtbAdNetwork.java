@@ -311,19 +311,21 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (casInternalRequestParameters != null) {
             LOG.debug("blockedIabCategories are {}", casInternalRequestParameters.blockedIabCategories);
             LOG.debug("blockedAdvertisers are {}", casInternalRequestParameters.blockedAdvertisers);
-            bidRequest.setBcat(new ArrayList<String>());
+
+            List<String> bCatList = new ArrayList<String>();
             if (null != casInternalRequestParameters.blockedIabCategories) {
-                bidRequest.setBcat(casInternalRequestParameters.blockedIabCategories);
+                bCatList.addAll(casInternalRequestParameters.blockedIabCategories);
             }
             // Setting blocked categories
             if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
-                bidRequest.getBcat().addAll(
+                bCatList.addAll(
                         iabCategoriesInterface.getIABCategories(IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES));
             }
             else {
-                bidRequest.getBcat().addAll(
+                bCatList.addAll(
                         iabCategoriesInterface.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES));
             }
+            bidRequest.setBcat(bCatList);
 
             if (null != casInternalRequestParameters.blockedAdvertisers) {
                 blockedAdvertisers.addAll(casInternalRequestParameters.blockedAdvertisers);
