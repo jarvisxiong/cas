@@ -250,8 +250,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 	public void testDCPrubiconRequestUri() throws Exception {
 		SASRequestParameters sasParams = new SASRequestParameters();
 		CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-		casInternalRequestParameters.blockedCategories = new ArrayList<Long>(
-				Arrays.asList(new Long[] { 50l, 51l }));
+		casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
 		sasParams.setRemoteHostIp("206.29.182.240");
 		sasParams.setUserAgent(URLEncoder.encode("Mozilla/5.0 (iPhone; CPU iPhone OS 7_0_5 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Mobile/11B601", "UTF-8"));
 		sasParams.setSource("APP");
@@ -303,8 +302,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 	public void testDCPrubiconRequestUriWithMultipleUdid() throws Exception {
 		SASRequestParameters sasParams = new SASRequestParameters();
 		CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-		casInternalRequestParameters.blockedCategories = new ArrayList<Long>(
-				Arrays.asList(new Long[] { 50l, 51l }));
+		casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
 		sasParams.setRemoteHostIp("206.29.182.240");
 		sasParams.setUserAgent(URLEncoder.encode("Mozilla/5.0 (iPhone; CPU iPhone OS 7_0_5 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Mobile/11B601", "UTF-8"));
 		sasParams.setSource("APP");
@@ -363,8 +361,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 	public void testDCPrubiconRequestUriWithUAC() throws Exception {
 		SASRequestParameters sasParams = new SASRequestParameters();
 		CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-		casInternalRequestParameters.blockedCategories = new ArrayList<Long>(
-				Arrays.asList(new Long[] { 50l, 51l }));
+		casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
 		sasParams.setRemoteHostIp("206.29.182.240");
 		sasParams.setUserAgent(URLEncoder.encode("Mozilla/5.0 (iPhone; CPU iPhone OS 7_0_5 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Mobile/11B601", "UTF-8"));
 		sasParams.setSource("APP");
@@ -405,8 +402,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 	public void testDCPrubiconRequestUriWithSiteSpecificFloor() throws Exception {
 		SASRequestParameters sasParams = new SASRequestParameters();
 		CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-		casInternalRequestParameters.blockedCategories = new ArrayList<Long>(
-				Arrays.asList(new Long[] { 50l, 51l }));
+		casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
 		sasParams.setRemoteHostIp("206.29.182.240");
 		sasParams.setUserAgent(URLEncoder.encode("Mozilla/5.0 (iPhone; CPU iPhone OS 7_0_5 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Mobile/11B601", "UTF-8"));
 		sasParams.setSource("APP");
@@ -455,8 +451,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 	public void testDCPrubiconRequestUriWithSpecificSlot() throws Exception {
 		SASRequestParameters sasParams = new SASRequestParameters();
 		CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-		casInternalRequestParameters.blockedCategories = new ArrayList<Long>(
-				Arrays.asList(new Long[] { 50l, 51l }));
+		casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
 		sasParams.setRemoteHostIp("206.29.182.240");
 		sasParams.setUserAgent("Mozilla");
 		sasParams.setSource("APP");
@@ -494,8 +489,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 	public void testDCPrubiconParseAdWap() throws Exception {
 		SASRequestParameters sasParams = new SASRequestParameters();
 		CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-		casInternalRequestParameters.blockedCategories = new ArrayList<Long>(
-				Arrays.asList(new Long[] { 50l, 51l }));
+		casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
 		sasParams.setRemoteHostIp("206.29.182.240");
 		sasParams.setUserAgent("Mozilla");
 		sasParams.setSlot(Short.valueOf("15"));
@@ -556,8 +550,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 	public void testDCPrubiconParseAdApp() throws Exception {
 		SASRequestParameters sasParams = new SASRequestParameters();
 		CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-		casInternalRequestParameters.blockedCategories = new ArrayList<Long>(
-				Arrays.asList(new Long[] { 50l, 51l }));
+		casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
 		sasParams.setRemoteHostIp("206.29.182.240");
 		sasParams.setUserAgent("Mozilla");
 		sasParams.setSlot(Short.valueOf("15"));
