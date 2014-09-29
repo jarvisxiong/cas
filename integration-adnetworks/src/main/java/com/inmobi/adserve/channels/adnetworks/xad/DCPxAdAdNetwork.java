@@ -165,9 +165,9 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 			}
 
 			if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
-                iabBCatagories.addAll(iabCategoryMap.getIABCategories(IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES));
+				iabBCatagories.addAll(iabCategoryMap.getIABCategories(IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES));
 			} else {
-                iabBCatagories.addAll(iabCategoryMap.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES));
+				iabBCatagories.addAll(iabCategoryMap.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES));
 			}
 			for (String bCategory : iabBCatagories) {
 				url.append("&bcat=").append(bCategory);

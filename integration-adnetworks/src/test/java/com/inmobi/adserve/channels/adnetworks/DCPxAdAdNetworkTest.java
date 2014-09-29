@@ -220,8 +220,8 @@ public class DCPxAdAdNetworkTest extends TestCase {
 		siteCategories.add(13l);
 		casInternalRequestParameters.latLong = "37.4429,-122.1514";
 		sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-        casInternalRequestParameters.uidIFA = "202cb962ac59075b964b07152d234b70";
-        casInternalRequestParameters.blockedIabCategories = Arrays.asList("IAB10", "IAB21", "IAB12");
+		casInternalRequestParameters.uidIFA = "202cb962ac59075b964b07152d234b70";
+		casInternalRequestParameters.blockedIabCategories = Arrays.asList("IAB10", "IAB21", "IAB12");
 		sasParams.setSlot(Short.valueOf("9"));
 		sasParams.setOsId(5);
 		sasParams.setSiteId("12345");
