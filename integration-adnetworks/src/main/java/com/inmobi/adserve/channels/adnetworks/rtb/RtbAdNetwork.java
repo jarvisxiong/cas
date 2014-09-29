@@ -311,7 +311,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (casInternalRequestParameters != null) {
             LOG.debug("blockedIabCategories are {}", casInternalRequestParameters.blockedIabCategories);
             LOG.debug("blockedAdvertisers are {}", casInternalRequestParameters.blockedAdvertisers);
-            bidRequest.setBcat(new ArrayList<String>());
 
             List<String> bCatList = new ArrayList<String>();
             if (null != casInternalRequestParameters.blockedIabCategories) {
