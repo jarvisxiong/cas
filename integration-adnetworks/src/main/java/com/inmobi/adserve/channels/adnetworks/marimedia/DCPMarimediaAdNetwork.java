@@ -57,9 +57,9 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
     private String networkType;
 
     public DCPMarimediaAdNetwork(final Configuration config,
-                                final Bootstrap clientBootstrap,
-                                final HttpRequestHandlerBase baseRequestHandler,
-                                final Channel serverChannel) {
+                                 final Bootstrap clientBootstrap,
+                                 final HttpRequestHandlerBase baseRequestHandler,
+                                 final Channel serverChannel) {
         super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
@@ -194,16 +194,12 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
 
         // Set Age.
         if(null != sasParams.getAge()) {
-            if (StringUtils.isNotBlank(sasParams.getAge().toString())) {
-                appendQueryParam(url, AGE, getURLEncode(sasParams.getAge().toString(), format), false);
-            }
+            appendQueryParam(url, AGE, getURLEncode(sasParams.getAge().toString(), format), false);
         }
 
         // Set Gender.
         if(null != sasParams.getGender()) {
-            if (StringUtils.isNotBlank(sasParams.getGender())) {
-                appendQueryParam(url, GENDER, getURLEncode(sasParams.getGender(), format), false);
-            }
+            appendQueryParam(url, GENDER, getURLEncode(sasParams.getGender(), format), false);
         }
 
         LOG.debug("Marimedia url is {}", url);
@@ -239,15 +235,15 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
                 JSONObject ad = new JSONObject(response);
 
                 // Banner or Interstitial.
-                if (ad.getString("adType").equalsIgnoreCase("banner") || ad.getString("adType").equalsIgnoreCase("html")) {
-                    if(ad.getString("adType").equalsIgnoreCase("banner")) {
-                        String imageUrl = ad.getString("imageUrl");
-                        context.put(VelocityTemplateFieldConstants.PartnerImgUrl, imageUrl);
-                    }
-                    else {
-                        String htmlUrl = ad.getString("htmlUrl");
-                        context.put(VelocityTemplateFieldConstants.PartnerImgUrl, htmlUrl);
-                    }
+                if (ad.getString("adType").equalsIgnoreCase("banner")) {
+                    //     if(ad.getString("adType").equalsIgnoreCase("banner")) {
+                    String imageUrl = ad.getString("imageUrl");
+                    context.put(VelocityTemplateFieldConstants.PartnerImgUrl, imageUrl);
+                }
+                else if( ad.getString("adType").equalsIgnoreCase("html")) {
+                    String htmlUrl = ad.getString("htmlUrl");
+                    context.put(VelocityTemplateFieldConstants.PartnerImgUrl, htmlUrl);
+
                 }
                 else {
                     // Other format.
