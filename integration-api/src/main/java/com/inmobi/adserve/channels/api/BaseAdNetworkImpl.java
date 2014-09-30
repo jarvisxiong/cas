@@ -29,6 +29,7 @@ import org.slf4j.MDC;
 import org.slf4j.Marker;
 
 import com.google.inject.Key;
+import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.scope.NettyRequestScope;
@@ -80,6 +81,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     private boolean                               isRtbPartner            = false;
     private boolean                               isIxPartner             = false;
     protected ChannelSegmentEntity                entity;
+    protected final Marker                        traceMarker; 
 
     protected String                              externalSiteId;
     protected String                              host;
@@ -118,10 +120,14 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     @Inject
     private static NettyRequestScope              scope;
-
+    
+    @Inject
+    private Provider<Marker>                      traceMarkerProvider;
+    
     public BaseAdNetworkImpl(final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         this.baseRequestHandler = baseRequestHandler;
         this.serverChannel = serverChannel;
+        this.traceMarker = traceMarkerProvider.get();
     }
 
     //Overriding these methods in IXAdNetwork

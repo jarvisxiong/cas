@@ -59,7 +59,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
     @Override
     public boolean configureParameters() {
         if (isMandateParamAbsent()) {
-            LOG.debug("mandate parameters missing for", advertiserName, "so returning from adapter");
+            LOG.debug(traceMarker, "mandate parameters missing for", advertiserName, "so returning from adapter");
             return false;
         }
         return true;
@@ -108,13 +108,13 @@ public class GenericAdapter extends BaseAdNetworkImpl {
         else {
             finalUrl = host;
         }
-        LOG.debug("url inside{} : {}", advertiserName, finalUrl);
+        LOG.debug(traceMarker, "url inside{} : {}", advertiserName, finalUrl);
         try {
             return (new URI(finalUrl));
         }
         catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            LOG.info("Error Forming Url inside {} {}", advertiserName, exception);
+            LOG.info(traceMarker, "Error Forming Url inside {} {}", advertiserName, exception);
         }
         return null;
     }
@@ -144,7 +144,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
 
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
-        LOG.debug("response is {} and response length is {}", response, response.length());
+        LOG.debug(traceMarker, "response is {} and response length is {}", response, response.length());
         if (responseFormat.equals(MacrosAndStrings.JSON)) {
             if (status.code() != 200 || StringUtils.isBlank(response)) {
                 statusCode = status.code();
@@ -175,7 +175,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
                     }
                 }
                 catch (Exception e) {
-                    LOG.debug("Exception in converting json object from response {}", e);
+                    LOG.debug(traceMarker, "Exception in converting json object from response {}", e);
                 }
             }
         }
@@ -203,7 +203,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
             statusCode = 500;
             responseContent = "";
         }
-        LOG.debug("response length is {}", responseContent.length());
+        LOG.debug(traceMarker, "response length is {}", responseContent.length());
     }
 
     public String expandMacro(final String macro) {
