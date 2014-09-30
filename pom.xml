@@ -192,9 +192,9 @@
 				<version>9.0-801.jdbc3</version>
 			</dependency>
 			<dependency>
-                		<groupId>com.aerospike</groupId>
-                		<artifactId>aerospike-client</artifactId>
-                		<version>3.0.27</version>
+				<groupId>com.aerospike</groupId>
+				<artifactId>aerospike-client</artifactId>
+				<version>3.0.27</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.guava</groupId>
