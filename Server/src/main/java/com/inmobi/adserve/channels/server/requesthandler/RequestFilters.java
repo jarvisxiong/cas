@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.server.requesthandler;
 
 import java.util.ArrayList;
 
+import com.inmobi.casthrift.DemandSourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,6 +85,13 @@ public class RequestFilters {
             }
 
         }
+
+        if (DemandSourceType.IX.getValue() == hrh.responseSender.sasParams.getDst()
+                && -1 == hrh.responseSender.sasParams.getSlot()) {
+            LOG.error("Request for ix dropped since no slot in the list RqMkSlot has a mapping to Rubicon's slots");
+            return true;
+        }
+
         return false;
     }
 }
