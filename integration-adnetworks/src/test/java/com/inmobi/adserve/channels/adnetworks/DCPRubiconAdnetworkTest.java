@@ -486,6 +486,47 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 	}
 
 	@Test
+	public void testDCPrubiconRequestUriWithGPID() throws Exception {
+		SASRequestParameters sasParams = new SASRequestParameters();
+		CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+		casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
+		sasParams.setRemoteHostIp("206.29.182.240");
+		sasParams.setUserAgent("Mozilla");
+		sasParams.setSource("APP");
+		casInternalRequestParameters.latLong = "37.4429,-122.1514";
+		sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
+		List<Long> category = new ArrayList<Long>();
+		category.add(3l);
+		sasParams.setCategories(category);
+
+		casInternalRequestParameters.gpid = "202cb962ac59075b964b07152d234b70";
+		casInternalRequestParameters.uidADT = "1";
+
+		sasParams.setSlot(Short.valueOf("9"));
+		sasParams.setSiteIncId(6575868);
+		sasParams.setSource("APP");
+		sasParams.setOsId(HandSetOS.Android.getValue());
+		sasParams.setSdkVersion("a360");
+		String externalKey = "38132";
+		SlotSizeMapping.init();
+		ChannelSegmentEntity entity = new ChannelSegmentEntity(
+				AdNetworksTest.getChannelSegmentEntityBuilder(rubiconAdvId,
+						null, null, null, 0, null, null, true, true,
+						externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+						null, false, false, false, false, false, false, false,
+						false, false, false, new JSONObject(
+								"{\"3\":\"160212\",\"site\":\"38132\"}"), new ArrayList<Integer>(),
+								0.0d, null, null, 0, new Integer[]{0}));
+		dcpRubiconAdNetwork.configureParameters(sasParams,
+				casInternalRequestParameters, entity, null, null);
+		String actualUrl = dcpRubiconAdNetwork.getRequestUri().toString();
+		String expectedUrl = "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.6575868&app.domain=com.inmobi-exchange&ua=Mozilla&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&app.rating=4+&accept.apis=3&p_block_keys=blk6575868%2CInMobiFS&rp_floor=0.1&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpid=202cb962ac59075b964b07152d234b70&device.dpid_type=gaid&kw=38132";
+		assertEquals(expectedUrl, actualUrl);
+
+	}
+
+
+	@Test
 	public void testDCPrubiconParseAdWap() throws Exception {
 		SASRequestParameters sasParams = new SASRequestParameters();
 		CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
