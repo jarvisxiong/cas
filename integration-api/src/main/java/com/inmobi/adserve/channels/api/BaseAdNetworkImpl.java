@@ -81,7 +81,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     private boolean                               isRtbPartner            = false;
     private boolean                               isIxPartner             = false;
     protected ChannelSegmentEntity                entity;
-    protected final Marker                        traceMarker; 
+    protected Marker                              traceMarker; 
 
     protected String                              externalSiteId;
     protected String                              host;
@@ -127,7 +127,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     public BaseAdNetworkImpl(final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         this.baseRequestHandler = baseRequestHandler;
         this.serverChannel = serverChannel;
-        this.traceMarker = traceMarkerProvider.get();
+    if (traceMarkerProvider != null) {
+      this.traceMarker = traceMarkerProvider.get();
+    }
     }
 
     //Overriding these methods in IXAdNetwork
