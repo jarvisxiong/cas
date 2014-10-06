@@ -844,7 +844,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         adStatus = "NO_AD";
-        LOG.debug(traceMarker, "response is {}", response);
+        LOG.info(traceMarker, "response is {}", response);
         if (status.code() != 200 || StringUtils.isBlank(response)) {
             statusCode = status.code();
             if (200 == statusCode) {
@@ -1103,9 +1103,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             aqid = bid.getAqid();
             adjustbid = bid.getAdjustbid();
             dealId = bid.getDealid();
-
-            return updateDSPAccountInfo(seatBid.getBuyer());
-        } catch (NullPointerException e) {
+            boolean result = updateDSPAccountInfo(seatBid.getBuyer());
+            if (!result) {
+                InspectorStats.incrementStatCount(this.getName(), InspectorStrings.INVALID_DSP_ID);
+            }
+            return result;
+        }
+        catch (NullPointerException e) {
             LOG.info(traceMarker, "Could not parse the ix response from partner: {}, exception raised {}", this.getName(), e);
             return false;
         }
