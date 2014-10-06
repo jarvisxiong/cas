@@ -158,19 +158,19 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 			}
 			url.append("&pt=").append(sourceType);
 
-			ArrayList<Long> bCat = new ArrayList<Long>();
+			ArrayList<String> bCat = new ArrayList<String>();
 
-			if (casInternalRequestParameters.blockedCategories != null) {
-				bCat.addAll(casInternalRequestParameters.blockedCategories);
+			if (casInternalRequestParameters.blockedIabCategories != null) {
+				bCat.addAll(casInternalRequestParameters.blockedIabCategories);
 			}
 
-			if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams
-					.getSiteType())) {
-				bCat.add(IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES);
+			if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
+				bCat.addAll(IAB_CATEGORY_MAP.getIABCategories(IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES));
 			} else {
-				bCat.add(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES);
+				bCat.addAll(IAB_CATEGORY_MAP.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES));
 			}
-			for (String bCategory : IAB_CATEGORY_MAP.getIABCategories(bCat)) {
+
+			for (String bCategory : bCat) {
 				url.append("&bcat=").append(bCategory);
 			}
 			LOG.debug("xAd url is {}", url);

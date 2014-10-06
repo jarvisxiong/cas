@@ -234,7 +234,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Override
     protected boolean configureParameters() {
 
-        LOG.debug("inside configureParameters of RTB");
+        LOG.debug(traceMarker, "inside configureParameters of RTB");
 
         if (!checkIfBasicParamsAvailable()) {
             return false;
@@ -290,14 +290,14 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private boolean checkIfBasicParamsAvailable() {
 
         if (null == casInternalRequestParameters || null == sasParams){
-            LOG.debug("casInternalRequestParams or sasParams cannot be null");
+            LOG.debug(traceMarker, "casInternalRequestParams or sasParams cannot be null");
             return false;
         }
         if (StringUtils.isBlank(sasParams.getRemoteHostIp())
                 || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)
                 || !isRequestFormatSupported()) {
-            LOG.debug("mandate parameters missing or request format is not compatible to partner supported response for dummy so exiting adapter");
+            LOG.debug(traceMarker, "mandate parameters missing or request format is not compatible to partner supported response for dummy so exiting adapter");
             return false;
         }
         return true;
@@ -317,30 +317,28 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         bidRequest = new BidRequest(casInternalRequestParameters.auctionId, impresssionlist);
         bidRequest.setTmax(tmax);
         bidRequest.setAt(AUCTION_TYPE);
-        bidRequest.setCur(Collections.<String> emptyList());
+        bidRequest.setCur(Collections.<String>emptyList());
         List<String> seatList = new ArrayList<String>();
         seatList.add(advertiserId);
         bidRequest.setWseat(seatList);
-
-
-        bidRequest.setBcat(new ArrayList<String>());
-        if (null != casInternalRequestParameters.blockedCategories) {
-            bidRequest.setBcat(iabCategoriesInterface
-                    .getIABCategories(casInternalRequestParameters.blockedCategories));
-            LOG.debug("blockedCategories are {}", casInternalRequestParameters.blockedCategories);
+        List<String> bCatList = new ArrayList<String>();
+        if (null != casInternalRequestParameters.blockedIabCategories) {
+            bCatList.addAll(casInternalRequestParameters.blockedIabCategories);
+            LOG.debug(traceMarker, "blockedCategories are {}", casInternalRequestParameters.blockedIabCategories);
         }
         // Setting blocked categories
         if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
-            bidRequest.getBcat().addAll(
+            bCatList.addAll(
                     iabCategoriesInterface.getIABCategories(IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES));
         } else {
-            bidRequest.getBcat().addAll(
+            bCatList.addAll(
                     iabCategoriesInterface.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES));
         }
+        bidRequest.setBcat(bCatList);
 
         if (null != casInternalRequestParameters.blockedAdvertisers) {
             blockedAdvertisers.addAll(casInternalRequestParameters.blockedAdvertisers);
-            LOG.debug("blockedAdvertisers are {}", casInternalRequestParameters.blockedAdvertisers);
+            LOG.debug(traceMarker, "blockedAdvertisers are {}", casInternalRequestParameters.blockedAdvertisers);
         }
         bidRequest.setBadv(blockedAdvertisers);
 
@@ -350,7 +348,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         } else if (app != null) {
             bidRequest.setApp(app);
         } else {
-            LOG.debug("App and Site both object can not be null so returning");
+            LOG.debug(traceMarker, "App and Site both object can not be null so returning");
             return false;
         }
 
@@ -366,14 +364,14 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             if(isNativeRequest()){
             	bidRequestJson = bidRequestJson.replaceFirst("nativeObject", "native");
             }
-            LOG.info("RTB request json is : {}", bidRequestJson);
-        } catch (TException e) {
-            LOG.debug("Could not create json from bidrequest for partner {}", advertiserName);
-            LOG.info("Configure parameters inside rtb returned false {}, exception raised {}", advertiserName, e);
-            //todo add trace
+            LOG.info(traceMarker, "RTB request json is : {}", bidRequestJson);
+        }
+        catch (TException e) {
+            LOG.debug(traceMarker, "Could not create json from bidrequest for partner {}", advertiserName);
+            LOG.info(traceMarker, "Configure parameters inside rtb returned false {}, exception raised {}", advertiserName, e);
             return false;
         }
-        LOG.info("Configure parameters inside rtb returned true");
+        LOG.info(traceMarker, "Configure parameters inside rtb returned true");
         return true;
     }
 
@@ -384,7 +382,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (null != casInternalRequestParameters.impressionId) {
             impression = new Impression(casInternalRequestParameters.impressionId);
         } else {
-            LOG.info("Impression id can not be null in casInternal Request Params");
+            LOG.info(traceMarker, "Impression id can not be null in casInternal Request Params");
             return null;
         }
         
@@ -400,7 +398,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
 
         impression.setBidfloor(casInternalRequestParameters.auctionBidFloor);
-        LOG.debug("Bid floor is {}", impression.getBidfloor());
+        LOG.debug(traceMarker, "Bid floor is {}", impression.getBidfloor());
 
         if (null != displayManager) {
             impression.setDisplaymanager(displayManager);
@@ -427,7 +425,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 //    	nat.setImage(nativeTemplateAttributeFinder.findAttribute(new ImageNativeAttributeType()));
     	NativeAdTemplateEntity templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getSiteId());
     	if(templateEntity == null){
-    		LOG.info(String.format("This site id %s doesn't have native template :",sasParams.getSiteId()));
+    		LOG.info(traceMarker, String.format("This site id %s doesn't have native template :",sasParams.getSiteId()));
     		return null;
     	}
     	NativeBuilder nb = nativeBuilderfactory.create(templateEntity);
@@ -547,7 +545,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 user.setYob(yob);
             }
         } catch (NumberFormatException e) {
-            LOG.debug("Exception : {}", e);
+            LOG.debug(traceMarker, "Exception : {}", e);
         }
         return user;
     }
@@ -663,7 +661,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             try {
                 device.setDnt(Integer.parseInt(casInternalRequestParameters.uidADT) == 0 ? 1 : 0);
             } catch (NumberFormatException e) {
-                LOG.debug("Exception while parsing uidADT to integer {}", e);
+                LOG.debug(traceMarker, "Exception while parsing uidADT to integer {}", e);
             }
         }
         // Setting platform id sha1 hashed
@@ -714,11 +712,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     public void impressionCallback() {
         URI uriCallBack = null;
         this.callbackUrl = replaceRTBMacros(this.callbackUrl);
-        LOG.debug("Callback url is : {}", callbackUrl);
+        LOG.debug(traceMarker, "Callback url is : {}", callbackUrl);
         try {
             uriCallBack = new URI(callbackUrl);
         } catch (URISyntaxException e) {
-            LOG.debug("error in creating uri for callback, exception raised {}", e);
+            LOG.debug(traceMarker, "error in creating uri for callback");
         }
 
         StringBuilder content = new StringBuilder();
@@ -736,9 +734,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         boolean callbackResult = impressionCallbackHelper.writeResponse(uriCallBack, ningRequest, getAsyncHttpClient());
         if (callbackResult) {
-            LOG.debug("Callback is sent successfully");
+            LOG.debug(traceMarker, "Callback is sent successfully");
         } else {
-            LOG.debug("Could not send the callback");
+            LOG.debug(traceMarker, "Could not send the callback");
         }
     }
 
@@ -774,13 +772,13 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                     .get(0).getSeat());
         }
         if (null == bidRequest) {
-            LOG.info("bidrequest is null");
+            LOG.info(traceMarker, "bidrequest is null");
             return url;
         }
         url = url.replaceAll(RTBCallbackMacros.AUCTION_IMP_ID_INSENSITIVE, bidRequest.getImp().get(0)
                 .getId());
 
-        LOG.debug("String after replaceMacros is {}", url);
+        LOG.debug(traceMarker, "String after replaceMacros is {}", url);
         return url;
     }
 
@@ -813,14 +811,14 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         } else {
             url.append(urlBase);
         }
-        LOG.debug("{} url is {}", getName(), url.toString());
+        LOG.debug(traceMarker, "{} url is {}", getName(), url.toString());
         return URI.create(url.toString());
     }
 
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         adStatus = NO_AD;
-        LOG.debug("response is {}", response);
+        LOG.debug(traceMarker, "response is {}", response);
         if (status.code() != 200 || StringUtils.isBlank(response)) {
             statusCode = status.code();
             if (200 == statusCode) {
@@ -835,7 +833,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 adStatus = NO_AD;
                 responseContent = "";
                 statusCode = 500;
-                LOG.info("Error in parsing rtb response");
+                LOG.info(traceMarker, "Error in parsing rtb response");
                 return;
             }
             adStatus = "AD";
@@ -847,7 +845,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 bannerAdBuilding();
             }
         }
-        LOG.debug("response length is {}", responseContent.length());
+        LOG.debug(traceMarker, "response length is {}", responseContent.length());
     }
     
     
@@ -873,7 +871,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             }
         }
         // Checking whether to send win notification
-        LOG.debug("isWinRequired is {} and winfromconfig is {}", wnRequired, callbackUrl);
+        LOG.debug(traceMarker, "isWinRequired is {} and winfromconfig is {}", wnRequired, callbackUrl);
         String partnerWinUrl = getPartnerWinUrl();
         if (StringUtils.isNotEmpty(partnerWinUrl)){
             velocityContext.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, partnerWinUrl);
@@ -887,7 +885,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                     null);
         } catch (Exception e) {
             adStatus = NO_AD;
-            LOG.info("Some exception is caught while filling the velocity template for partner{} {}",
+            LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner{} {}",
                     advertiserName, e);
         }
     	
@@ -928,7 +926,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                     null);
         } catch (Exception e) {
             adStatus = NO_AD;
-            LOG.info("Some exception is caught while filling the velocity template for partner{} {}",
+            LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner{} {}",
                     advertiserName, e);
         }
     }
@@ -942,14 +940,15 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             try {
                 nUrl = bidResponse.seatbid.get(0).getBid().get(0).getNurl();
             } catch (Exception e) {
-                LOG.debug("Exception while parsing response {}", e);
+                LOG.debug(traceMarker, "Exception while parsing response {}", e);
             }
-            LOG.debug("nurl is {}", nUrl);
+            LOG.debug(traceMarker, "nurl is {}", nUrl);
             if (!StringUtils.isEmpty(callbackUrl)) {
-                LOG.debug("inside wn from config");
+                LOG.debug(traceMarker, "inside wn from config");
                 winUrl = callbackUrl;
-            } else if (!StringUtils.isEmpty(nUrl)) {
-                LOG.debug("inside wn from nurl");
+            }
+            else if (!StringUtils.isEmpty(nUrl)) {
+                LOG.debug(traceMarker, "inside wn from nurl");
                 winUrl = nUrl;
             }
         }
@@ -994,9 +993,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         Gson gson = new Gson();
         try {
             bidResponse = gson.fromJson(response, BidResponse.class);
-            LOG.debug("Done with parsing of bidresponse");
+            LOG.debug(traceMarker, "Done with parsing of bidresponse");
             if (null == bidResponse || null == bidResponse.getSeatbid() || bidResponse.getSeatbidSize() == 0) {
-                LOG.debug("BidResponse does not have seat bid object");
+                LOG.debug(traceMarker, "BidResponse does not have seat bid object");
                 return false;
             }
             if (!StringUtils.isEmpty(bidResponse.getCur())) {
@@ -1020,9 +1019,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             }
 
             return true;
-        } catch (NullPointerException e) {
-            //todo add trace
-            LOG.info("Could not parse the rtb response from partner: {}, exception thrown {}", this.getName(), e);
+        }
+        catch (NullPointerException e) {
+            LOG.info(traceMarker, "Could not parse the rtb response from partner: {}, exception thrown {}", this.getName(), e);
             return false;
         }
     }
@@ -1037,7 +1036,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private boolean checkBidResponseForBannerVideo(BidExtensions ext) {
 
         if (ext != null && ext.getVideo() != null) {
-            LOG.debug("Received video response of type {}.", ext.getVideo().getType());
+            LOG.debug(traceMarker, "Received video response of type {}.", ext.getVideo().getType());
 
             if(!checkRequiredParametersInVideoResponse(ext)) {
                 return false;
@@ -1059,7 +1058,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 this.clickUrl  = ClickUrlsRegenerator.regenerateClickUrl(this.clickUrl, this.getImpressionId(), newImpressionId);
                 this.impressionId = newImpressionId;
 
-                LOG.debug("Replaced impression id to new value {}.", newImpressionId);
+                LOG.debug(traceMarker, "Replaced impression id to new value {}.", newImpressionId);
             }
         }
         return true;
@@ -1068,30 +1067,26 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private boolean checkRequiredParametersInVideoResponse(BidExtensions ext) {
         // Validate the adm content for a valid URL/XML.
         if (!isValidURL(adm) && !isValidXMLFormat(adm)) {
-            LOG.info("Invalid VAST response adm - {}", adm);
-            //todo add trace
+            LOG.info(traceMarker, "Invalid VAST response adm - {}", adm);
             return false;
         }
 
         // Validate supported VAST type.
         if (!EXT_VIDEO_TYPE.contains(ext.getVideo().getType())) {
-            LOG.info("Unsupported VAST type - {}", ext.getVideo().getType());
-            //todo add trace
+            LOG.info(traceMarker, "Unsupported VAST type - {}", ext.getVideo().getType());
             return false;
         }
 
         // Validate supported video duration.
         if (ext.getVideo().duration < EXT_VIDEO_MINDURATION
                 || ext.getVideo().duration > EXT_VIDEO_MAXDURATION) {
-            LOG.info("VAST response video duration {} should be within {} and {}.", ext.getVideo().getDuration(), EXT_VIDEO_MINDURATION, EXT_VIDEO_MAXDURATION);
-            //todo add trace
+            LOG.info(traceMarker, "VAST response video duration {} should be within {} and {}.", ext.getVideo().getDuration(), EXT_VIDEO_MINDURATION, EXT_VIDEO_MAXDURATION);
             return false;
         }
 
         // Validate Linearity
         if (ext.getVideo().linearity != EXT_VIDEO_LINEARITY) {
-            LOG.info("Linearity {} is not supported for the VAST response.", ext.getVideo().linearity);
-            //todo add trace
+            LOG.info(traceMarker, "Linearity {} is not supported for the VAST response.", ext.getVideo().linearity);
             return false;
         }
         return true;
@@ -1120,7 +1115,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             try {
                 xmlStr = URIUtil.decode(encodedXmlStr);
             } catch (URIException e) {
-                LOG.info("VAST XML response is NOT properly URL encode. {}", e);
+                LOG.info(traceMarker, "VAST XML response is NOT properly URL encode. {}", e);
                 return false;
             }
         } else {
@@ -1139,7 +1134,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             this.adm = xmlStr;
             return true;
         } catch (SAXException | ParserConfigurationException | IOException e) {
-            LOG.debug("VAST response is NOT a valid XML - {}", e);
+            LOG.debug(traceMarker, "VAST response is NOT a valid XML - {}", e);
             return false;
         }
     }
@@ -1187,11 +1182,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     public void setSecondBidPrice(final Double price) {
         this.secondBidPriceInUsd = price;
         this.secondBidPriceInLocal = calculatePriceInLocal(price);
-        LOG.debug("responseContent before replaceMacros is {}", responseContent);
+        LOG.debug(traceMarker, "responseContent before replaceMacros is {}", responseContent);
         this.responseContent = replaceRTBMacros(this.responseContent);
         ThirdPartyAdResponse adResponse = getResponseAd();
         adResponse.response = responseContent;
-        LOG.debug("responseContent after replaceMacros is {}", getResponseAd().response);
+        LOG.debug(traceMarker, "responseContent after replaceMacros is {}", getResponseAd().response);
     }
 
     @Override

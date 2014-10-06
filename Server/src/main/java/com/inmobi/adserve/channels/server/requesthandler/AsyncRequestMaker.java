@@ -133,7 +133,7 @@ public class AsyncRequestMaker {
             final ChannelSegmentEntity channelSegmentEntity) {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.impressionId = sasParams.getImpressionId();
-        casInternalRequestParameters.blockedCategories = casInternalRequestParameterGlobal.blockedCategories;
+        casInternalRequestParameters.blockedIabCategories = casInternalRequestParameterGlobal.blockedIabCategories;
         casInternalRequestParameters.blockedAdvertisers = casInternalRequestParameterGlobal.blockedAdvertisers;
         casInternalRequestParameters.highestEcpm = casInternalRequestParameterGlobal.highestEcpm;
         casInternalRequestParameters.auctionBidFloor = casInternalRequestParameterGlobal.auctionBidFloor;

@@ -90,10 +90,10 @@ public class ServletGetSegment implements Servlet {
                 } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY)) {
                     entity = CasConfigUtil.repositoryHelper.queryPricingEngineRepository(
                             Integer.parseInt(id.split("_")[0]), Integer.parseInt(id.split("_")[1]));
-                } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.PUBLISHER_FILTER_REPOSITORY)) {
-                    entity = CasConfigUtil.repositoryHelper.queryPublisherFilterRepository(id.split("_")[0],
+                } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_FILTER_REPOSITORY)) {
+                    entity = CasConfigUtil.repositoryHelper.querySiteFilterRepository(id.split("_")[0],
                             Integer.parseInt(id.split("_")[1]));
-                } else if (repoName != null && repoName.equalsIgnoreCase(ChannelServerStringLiterals.AEROSPIKE_FEEDBACK)) {
+                } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.AEROSPIKE_FEEDBACK)) {
                     if (id.split("_").length > 1) {
                         entity = CasConfigUtil.repositoryHelper.querySiteAerospikeFeedbackRepository(id.split("_")[0], Integer.parseInt(id.split("_")[1]));
                     } else {

@@ -9,7 +9,7 @@ import java.util.List;
 public class CasInternalRequestParameters {
     // Rtb Params
     public double       highestEcpm;
-    public List<Long>   blockedCategories;
+    public List<String> blockedIabCategories;
     public List<String> blockedAdvertisers;
     public AccountType  siteAccountType; //Whether site account is managed or selfserve
     public double       auctionBidFloor;

@@ -23,9 +23,9 @@ public class ClickUrlsRegenerator {
         String imageBeaconURLPrefix   =  configuration.getString("beaconURLPrefix");
         String clickURLPrefix         =  configuration.getString("clickURLPrefix");
 
-        ClickUrlsRegenerator.rmBeaconURLPrefix = rmBeaconURLPrefix;
+        ClickUrlsRegenerator.rmBeaconURLPrefix    = rmBeaconURLPrefix;
         ClickUrlsRegenerator.imageBeaconURLPrefix = imageBeaconURLPrefix;
-        ClickUrlsRegenerator.clickURLPrefix = clickURLPrefix;
+        ClickUrlsRegenerator.clickURLPrefix       = clickURLPrefix;
 
         /*
          * ClickURLMakerV6 always uses the non-testMode key for hash generation.
@@ -48,7 +48,7 @@ public class ClickUrlsRegenerator {
         // Replacing old impression id with new impression id
         clickUrl = clickUrl.replace(oldImpressionId, newImpressionId);
 
-        // Regenerate hash and new URL.
+        // Appending new "/" + hash to clickURL
         clickUrl = clickUrl + '/' + cryptoHashGenerator.generateHash(clickUrl.substring(clickURLPrefix.length()));
 
         LOG.debug("New Click Url: {}", clickUrl);

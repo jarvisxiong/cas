@@ -197,14 +197,19 @@ public class ThriftRequestParser {
 
     private Short getSlotId(List<Short> selectedSlots, int dst) {
         // TODO Iterate over the segments using all slots
-        Short slotId = (null != selectedSlots && !selectedSlots.isEmpty()) ? selectedSlots.get(0) : (short) 0;
+        Short slotId;
 
-        // From the list of slots received in ad pool request, pick the first IX supported slot.
-        if (DemandSourceType.IX.getValue() == dst && null != selectedSlots) {
-            for (short tempSlot : selectedSlots) {
-                if (SlotSizeMapping.isIXSupportedSlot(tempSlot)) {
-                    slotId = tempSlot;
-                    break;
+        if (DemandSourceType.IX.getValue() != dst) {
+            slotId = (null != selectedSlots && !selectedSlots.isEmpty()) ? selectedSlots.get(0) : (short) 0;
+        } else { /* From the list of slots received in ad pool request, pick the first IX supported slot. If no slot
+        is IX supported set the slotId = -1, this will be dropped in RequestFilters */
+            slotId = -1;
+            if (null != selectedSlots) {
+                for (short tempSlot : selectedSlots) {
+                    if (SlotSizeMapping.isIXSupportedSlot(tempSlot)) {
+                        slotId = tempSlot;
+                        break;
+                    }
                 }
             }
         }
