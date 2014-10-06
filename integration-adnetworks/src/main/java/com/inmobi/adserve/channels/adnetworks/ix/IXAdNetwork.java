@@ -1083,7 +1083,12 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             adjustbid = bid.getAdjustbid();
             dealId = bid.getDealid();
 
-            return updateDSPAccountInfo(seatBid.getBuyer());
+            boolean result = updateDSPAccountInfo(seatBid.getBuyer());
+            if (!result) {
+                InspectorStats.incrementStatCount(InspectorStrings.INVALID_DSP_ID);
+            }
+
+            return result;
         }
         catch (NullPointerException e) {
             LOG.info(traceMarker, "Could not parse the ix response from partner: {}", this.getName());
