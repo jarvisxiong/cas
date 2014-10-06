@@ -24,7 +24,6 @@ import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.ning.http.client.Request;
 
 
 public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
@@ -49,8 +48,8 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String TRAFFIC_TYPE    = "mobile_web";
     // private static final String CLICKURL = "pubclick";
 
-    private static final String sizeFormat      = "%dx%d";
-    private static final String latlongFormat   = "%s,%s";
+    private static final String SIZE_FORMAT     = "%dx%d";
+    private static final String LAT_LONG_FORMAT = "%s,%s";
     
     private String              name;
     private boolean             isApp;
@@ -119,11 +118,11 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
             } else{
             	appendQueryParam(url, ST, TRAFFIC_TYPE, false);
             }
-            appendQueryParam(url, SIZE, String.format(sizeFormat, width, height), false);
+            appendQueryParam(url, SIZE, String.format(SIZE_FORMAT, width, height), false);
 
             if (StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)) {
                 appendQueryParam(url, LOCATION,
-                        getURLEncode(String.format(latlongFormat, latitude, longitude), format), false);
+                        getURLEncode(String.format(LAT_LONG_FORMAT, latitude, longitude), format), false);
             }
             if (null != sasParams.getPostalCode()) {
                 appendQueryParam(url, POSTAL_CODE, sasParams.getPostalCode().toString(), false);
@@ -162,8 +161,7 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
             LOG.debug("{} url is {}", name, url);
 
             return (new URI(url.toString()));
-        }
-        catch (URISyntaxException exception) {
+        } catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.error("{}", exception);
         }
@@ -194,7 +192,7 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
                     return;
                 }
                 JSONObject adsJson = responseArray.getJSONObject(0);
-                context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, adsJson.getString("content"));
+                context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, adsJson.getString("content"));
 
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";

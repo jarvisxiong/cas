@@ -33,9 +33,9 @@ public class PricingEngineRepository extends
     @Override
     public PricingEngineEntity queryUniqueResult(final RepositoryQuery pricingEngineIdQuery) throws RepositoryException {
         Collection<PricingEngineEntity> pricingEngineEntityResultSet = query(pricingEngineIdQuery);
-        if (pricingEngineEntityResultSet == null || pricingEngineEntityResultSet.size() == 0) {
+        if (pricingEngineEntityResultSet == null || pricingEngineEntityResultSet.isEmpty()) {
             return null;
-        } else if (pricingEngineEntityResultSet.size() >= 1) {
+        } else if (!pricingEngineEntityResultSet.isEmpty()) {
             return (PricingEngineEntity) pricingEngineEntityResultSet.toArray()[0];
         }
         return null;

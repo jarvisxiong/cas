@@ -503,7 +503,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
         String adCode = sasParams.getAdcode();
         String rqIframe = sasParams.getRqIframe();
-        return adCode != null && rqIframe != null && adCode.equalsIgnoreCase("JS");
+        return adCode != null && rqIframe != null && "JS".equalsIgnoreCase(adCode);
     }
 
     @Override
@@ -624,8 +624,10 @@ public class ResponseSender extends HttpRequestHandlerBase {
             Logging.sampledAdvertiserLogging(list, CasConfigUtil.getLoggerConfig());
             Logging.creativeLogging(list, sasParams);
         } catch (JSONException exception) {
+            LOG.debug("Exception raised in ResponseSender {}", exception);
             LOG.debug(ChannelServer.getMyStackTrace(exception));
         } catch (TException exception) {
+            LOG.debug("Exception raised in ResponseSender {}", exception);
             LOG.debug(ChannelServer.getMyStackTrace(exception));
         }
         LOG.debug("done with logging");

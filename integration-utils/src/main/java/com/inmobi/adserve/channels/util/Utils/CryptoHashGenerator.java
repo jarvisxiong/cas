@@ -1,4 +1,4 @@
-package com.inmobi.adserve.channels.server.requesthandler;
+package com.inmobi.adserve.channels.util.Utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,8 +32,10 @@ public class CryptoHashGenerator {
                 mac.init(sk);
                 return mac;
             } catch (NoSuchAlgorithmException e) {
+                LOG.debug("Exception raised in CryptoHashGenerator {}", e);
                 return null;
             } catch (InvalidKeyException e) {
+                LOG.debug("Exception raised CryptoHashGenerator {}", e);
                 return null;
             }
         }

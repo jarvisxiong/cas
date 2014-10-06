@@ -61,14 +61,14 @@ public class Formatter {
     static void updateVelocityContext(final VelocityContext context, final SASRequestParameters sasParams,
  final String beaconUrl) {
 		if (StringUtils.isNotBlank(beaconUrl)) {
-			context.put(VelocityTemplateFieldConstants.IMBeaconUrl, beaconUrl);
+			context.put(VelocityTemplateFieldConstants.IM_BEACON_URL, beaconUrl);
 		}
 
 		if (isRequestFromSdk(sasParams)) {
 				context.put(VelocityTemplateFieldConstants.SDK, true);
-				context.put(VelocityTemplateFieldConstants.SDK360Onwards, requestFromSDK360Onwards(sasParams));
+				context.put(VelocityTemplateFieldConstants.SDK360_ONWARDS, requestFromSDK360Onwards(sasParams));
 			if (StringUtils.isNotBlank(sasParams.getImaiBaseUrl())) {
-				context.put(VelocityTemplateFieldConstants.IMAIBaseUrl,
+				context.put(VelocityTemplateFieldConstants.IMAI_BASE_URL,
 						sasParams.getImaiBaseUrl());
 			}
 		}
@@ -92,11 +92,9 @@ public class Formatter {
                     && Integer.parseInt(sasParams.getSdkVersion().substring(1)) >= 360) {
                 return true;
             }
-        }
-        catch (StringIndexOutOfBoundsException e2) {
+        } catch (StringIndexOutOfBoundsException e2) {
             LOG.debug("Invalid sdkversion {}", e2);
-        }
-        catch (NumberFormatException e3) {
+        } catch (NumberFormatException e3) {
             LOG.debug("Invalid sdkversion {}", e3);
         }
         return false;
@@ -131,6 +129,8 @@ public class Formatter {
                 break;
             case WAP_HTML_JS_AD_TAG:
                 velocityTemplateWapHtmlJsAdTag.merge(context, writer);
+                break;
+            default:
                 break;
         }
         return writer.toString();

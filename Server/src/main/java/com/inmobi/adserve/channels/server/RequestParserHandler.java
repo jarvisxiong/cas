@@ -101,7 +101,7 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
 					tDeserializer.deserialize(adPoolRequest, adPoolRequestBytes);
 					thriftRequestParser.parseRequestParameters(adPoolRequest, sasParams, casInternalRequestParameters, dst);
 				} catch (TException ex) {
-					terminationReason = CasConfigUtil.thriftParsingError;
+					terminationReason = CasConfigUtil.THRIFT_PARSING_ERROR;
 					LOG.debug(traceMarker, "Error in de serializing thrift ", ex);
 					InspectorStats.incrementStatCount(InspectorStrings.THRIFT_PARSING_ERROR, InspectorStrings.COUNT);
 				}
@@ -110,7 +110,7 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
 				try {
 					jsonObject = requestParser.extractParams(params);
 				} catch (JSONException exception) {
-					terminationReason = CasConfigUtil.jsonParsingError;
+					terminationReason = CasConfigUtil.JSON_PARSING_ERROR;
 					jsonObject = new JSONObject();
 					LOG.debug("Encountered Json Error while creating json object inside ", exception);
 					InspectorStats.incrementStatCount(InspectorStrings.JSON_PARSING_ERROR, InspectorStrings.COUNT);
@@ -138,7 +138,7 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
 						tDeserializer.deserialize(adPoolRequest, decodedContent);
 						thriftRequestParser.parseRequestParameters(adPoolRequest, sasParams, casInternalRequestParameters, dst);
 					} catch (TException ex) {
-						terminationReason = CasConfigUtil.thriftParsingError;
+						terminationReason = CasConfigUtil.THRIFT_PARSING_ERROR;
 						LOG.debug(traceMarker, "Error in de serializing thrift ", ex);
 						InspectorStats.incrementStatCount(InspectorStrings.THRIFT_PARSING_ERROR, InspectorStrings.COUNT);
 					}

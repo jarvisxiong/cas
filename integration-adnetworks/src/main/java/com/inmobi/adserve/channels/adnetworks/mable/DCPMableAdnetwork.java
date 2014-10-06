@@ -39,11 +39,11 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
     private String              longitude;
     private final String        authKey;
     private String              uidType      = null;
-    private static final String sizeFormat   = "%dx%d";
-    private static final String udidFormat   = "UDID";
-    private static final String odinFormat   = "ODIN1";
-    private static final String sodin1Format = "SODIN1";
-    private static final String ifaFormat    = "IFA";
+    private static final String SIZE_FORMAT  = "%dx%d";
+    private static final String UDID_FORMAT  = "UDID";
+    private static final String ODIN_FORMAT  = "ODIN1";
+    private static final String SODIN1_FORMAT = "SODIN1";
+    private static final String IFA_FORMAT = "IFA";
 
     public DCPMableAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
@@ -102,7 +102,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
                 request.put("device_id", uid);
                 request.put("did_format", uidType);
             }
-            request.put("slot_size", String.format(sizeFormat, width, height));
+            request.put("slot_size", String.format(SIZE_FORMAT, width, height));
             if (!StringUtils.isEmpty(latitude)) {
                 request.put("lat", latitude);
             }
@@ -124,7 +124,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
             }
 
         } catch (JSONException e) {
-            LOG.info("Error while forming request object");
+            LOG.info("Error while forming request object, exception raised {}", e);
         }
         LOG.debug("Mable request {}", request);
         return request.toString();
@@ -175,7 +175,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
             return;
         } else {
             VelocityContext context = new VelocityContext();
-            context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
+            context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response.trim());
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
@@ -197,32 +197,32 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
     protected String getUid() {
         if (sasParams.getOsId() == HandSetOS.iOS.getValue()
                 && StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
-            uidType = ifaFormat;
+            uidType = IFA_FORMAT;
             return casInternalRequestParameters.uidIFA;
         }
         if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
-            uidType = udidFormat;
+            uidType = UDID_FORMAT;
             return casInternalRequestParameters.uidMd5;
         }
         if (StringUtils.isNotEmpty(casInternalRequestParameters.uid)) {
-            uidType = udidFormat;
+            uidType = UDID_FORMAT;
             return casInternalRequestParameters.uid;
         }
         if (StringUtils.isNotEmpty(casInternalRequestParameters.uidO1)) {
-            uidType = odinFormat;
+            uidType = ODIN_FORMAT;
             return casInternalRequestParameters.uidO1;
         }
         if (StringUtils.isNotEmpty(casInternalRequestParameters.uidSO1)) {
-            uidType = sodin1Format;
+            uidType = SODIN1_FORMAT;
             return casInternalRequestParameters.uidSO1;
         }
         if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIDUS1)) {
-            uidType = udidFormat;
+            uidType = UDID_FORMAT;
             return casInternalRequestParameters.uidIDUS1;
         } else {
             String gpid = getGPID();
             if (gpid != null) {
-                uidType = udidFormat;
+                uidType = UDID_FORMAT;
                 return gpid;
             }
             return null;

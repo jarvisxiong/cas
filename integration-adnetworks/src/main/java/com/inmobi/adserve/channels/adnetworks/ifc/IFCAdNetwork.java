@@ -56,7 +56,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
 
     HttpRequest                 httpRequest;
 
-    private static final String suppySource = "DCP";
+    private static final String SUPPY_SOURCE = "DCP";
     private final String        ifcURL;
 
     private String              adGroupID;
@@ -99,13 +99,13 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             try {
                 handset = getHandsetString(jsonObject.getJSONArray("handset"));
             } catch (JSONException e) {
-                LOG.info("IFC Mandatory Parameter missing: handset");
+                LOG.info("IFC Mandatory Parameter missing: handset, exception raised {}", e);
                 return false;
             }
             try {
                 carrier = getCarrierString(jsonObject.getJSONArray("carrier"));
             } catch (JSONException e) {
-                LOG.info("IFC Mandatory Parameter missing: carrier");
+                LOG.info("IFC Mandatory Parameter missing: carrier, exception raised {}", e);
                 return false;
             }
 
@@ -192,10 +192,9 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         Boolean booleanVal = null;
         try {
             booleanVal = jsonObject.getBoolean(field);
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             if (isMandatory) {
-                LOG.info("IFC Mandatory Parameter missing: {}", field);
+                LOG.info("IFC Mandatory Parameter missing: {} , raised exception {}", field, e);
                 throw new JSONException("IFC Mandatory Parameter missing:" + field);
             }
         }
@@ -253,7 +252,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             log.put("latency", getLatency());
             return log;
         } catch (JSONException exception) {
-            LOG.info("Error while constructing logline inside ifc adapter");
+            LOG.info("Error while constructing logline inside ifc adapter, exception raised {}", exception);
             return null;
         }
     }
@@ -298,7 +297,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         jsonObject.addProperty("siteAllowBanner", siteAllowBanner);
         jsonObject.addProperty("adCode", adcode);
         jsonObject.addProperty("imaiBaseUrl", sasParams.getImaiBaseUrl());
-        jsonObject.addProperty("supplySource", suppySource);
+        jsonObject.addProperty("supplySource", SUPPY_SOURCE);
         jsonObject.addProperty("blindedSiteId", blindedSiteId);
         jsonObject.addProperty("uidIFA", casInternalRequestParameters.uidIFA);
         jsonObject.addProperty("uidSO1", casInternalRequestParameters.uidSO1);

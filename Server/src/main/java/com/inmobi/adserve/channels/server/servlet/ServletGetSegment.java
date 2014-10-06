@@ -50,9 +50,9 @@ public class ServletGetSegment implements Servlet {
         JSONObject jObject;
         try {
             jObject = requestParser.extractParams(params, "segments");
-        } catch (JSONException exeption) {
-            LOG.debug("Encountered Json Error while creating json object inside servlet");
-            hrh.setTerminationReason(CasConfigUtil.jsonParsingError);
+        } catch (JSONException exception) {
+            LOG.debug("Encountered Json Error while creating json object inside servlet, exception raised {}", exception);
+            hrh.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
             InspectorStats.incrementStatCount(InspectorStrings.JSON_PARSING_ERROR, InspectorStrings.COUNT);
             hrh.responseSender.sendResponse("Incorrect Json", serverChannel);
             return;

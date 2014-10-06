@@ -155,26 +155,26 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
                 statusCode = status.code();
                 TemplateType t;
                 VelocityContext context = new VelocityContext();
-                context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
-                context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, adResponse.getString("impression_url"));
+                context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
+                context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, adResponse.getString("impression_url"));
                 String adType = adResponse.getString("ad_type");
                 if ("tpt".equalsIgnoreCase(adType)) {
-                    context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, adResponse.getString("content"));
+                    context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, adResponse.getString("content"));
                     t = TemplateType.HTML;
                 } else {
                     String landingUrl = adResponse.getString("click_url") + "&url="
                             + adResponse.getString("redirect_url");
-                    context.put(VelocityTemplateFieldConstants.PartnerClickUrl, landingUrl);
-                    context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getString("image_url"));
+                    context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, landingUrl);
+                    context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, adResponse.getString("image_url"));
                     if ("shop".equalsIgnoreCase(adType)) {
-                        context.put(VelocityTemplateFieldConstants.AdText, adResponse.getString("content"));
+                        context.put(VelocityTemplateFieldConstants.AD_TEXT, adResponse.getString("content"));
                         String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                         if (StringUtils.isEmpty(vmTemplate)) {
                             LOG.info("No template found for the slot");
                             adStatus = "NO_AD";
                             return;
                         } else {
-                            context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
+                            context.put(VelocityTemplateFieldConstants.TEMPLATE, vmTemplate);
                             t = TemplateType.RICH;
                         }
                     } else {

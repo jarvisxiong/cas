@@ -15,10 +15,10 @@ import com.google.common.base.Preconditions;
 
 public class TemplateManager {
 	
-	private final  Logger            LOG                          = LoggerFactory.getLogger(TemplateManager.class);
+	private static final  Logger LOG                                 = LoggerFactory.getLogger(TemplateManager.class);
 	
 	private  final StringResourceRepository stringResourceRepository = new StringResourceRepositoryImpl();
-	private  final String STRING_REPO_NAME = "rtb-service-template-test-internal-repo";
+	private  static final String STRING_REPO_NAME = "rtb-service-template-test-internal-repo";
 	private  final VelocityEngine velocityEngine = new VelocityEngine();
 	
 	private  final String errorStr = "%s can't be null."; 

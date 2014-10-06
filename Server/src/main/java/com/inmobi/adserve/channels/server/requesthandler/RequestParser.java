@@ -133,14 +133,14 @@ public class RequestParser {
                 params.setSiteIncId(siteInfo.getLong(0));
             }
         } catch (JSONException exception) {
-            LOG.debug(traceMarker, "site object not found in request");
+            LOG.debug(traceMarker, "site object not found in request, {}", exception);
             params.setSiteIncId(0);
         }
         try {
             JSONArray jsonArray = jObject.getJSONArray("handset");
             params.setHandsetInternalId(Long.parseLong(jsonArray.get(0).toString()));
         } catch (JSONException e) {
-            LOG.debug(traceMarker, "Handset array not found");
+            LOG.debug(traceMarker, "Handset array not found, {}", e);
         }
         params.setOsId(jObject.optInt("os-id", -1));
         params.setRichMedia(jObject.optBoolean("rich-media", false));
@@ -151,7 +151,6 @@ public class RequestParser {
 
     public String stringify(final JSONObject jObject, final String field) {
         Marker traceMarker = traceMarkerProvider.get();
-
         String fieldValue = "";
         try {
             Object fieldValueObject = jObject.get(field);
@@ -159,6 +158,7 @@ public class RequestParser {
                 fieldValue = fieldValueObject.toString();
             }
         } catch (JSONException e) {
+            LOG.debug(traceMarker, "exception {} while Stringifying {} from JSON", e, field);
             return null;
         }
         LOG.debug(traceMarker, "Retrived from json {} = {}", field, fieldValue);
@@ -166,6 +166,7 @@ public class RequestParser {
     }
 
     public String parseArray(final JSONObject jObject, final String param, final int index) {
+        Marker traceMarker = traceMarkerProvider.get();
         if (null == jObject) {
             return null;
         }
@@ -173,18 +174,17 @@ public class RequestParser {
             JSONArray jArray = jObject.getJSONArray(param);
             if (null == jArray) {
                 return null;
-            }
-            else {
+            } else {
                 return (jArray.getString(index));
             }
         } catch (JSONException e) {
+            LOG.debug(traceMarker, "exception {} while parsing field at index {} from {}", e, index, jObject);
             return null;
         }
     }
 
     public List<Long> getCategory(final JSONObject jObject, final String oldORnew) {
         Marker traceMarker = traceMarkerProvider.get();
-
         try {
             JSONArray categories = jObject.getJSONArray(oldORnew);
             Long[] category = new Long[categories.length()];
@@ -200,7 +200,6 @@ public class RequestParser {
 
     public Set<Integer> getAcoountSegments(final JSONObject jObject) {
         Marker traceMarker = traceMarkerProvider.get();
-
         try {
             JSONArray segments = jObject.optJSONArray("segments");
             HashSet<Integer> accountSegments = new HashSet<Integer>();
@@ -217,7 +216,6 @@ public class RequestParser {
     // Get user specific params
     public SASRequestParameters getUserParams(final SASRequestParameters parameter, final JSONObject jObject) {
         Marker traceMarker = traceMarkerProvider.get();
-
         LOG.debug(traceMarker, "inside parsing user params");
         String utf8 = "UTF-8";
         try {
@@ -225,6 +223,8 @@ public class RequestParser {
             parameter.setAge(Short.valueOf(stringify(userMap, "u-age")));
             parameter.setGender(stringify(userMap, "u-gender"));
             parameter.setPostalCode(Integer.parseInt(stringify(userMap, "u-postalcode")));
+            System.out.println("Postal code is " + parameter.getPostalCode());
+            LOG.debug(traceMarker, "Postal code is {}", parameter.getPostalCode());
             try {
                 if (null != parameter.getAge()) {
                     parameter.setAge(Short.valueOf(URLEncoder.encode(String.valueOf(parameter.getAge()), utf8)));
@@ -259,7 +259,6 @@ public class RequestParser {
     // Get user id params
     public void setUserIdParams(final CasInternalRequestParameters parameter, final JSONObject jObject) {
         Marker traceMarker = traceMarkerProvider.get();
-
         if (null == jObject) {
             return;
         }
@@ -284,7 +283,7 @@ public class RequestParser {
             parameter.uuidFromUidCookie = stringify(userIdMap, "imuc__5");
             parameter.uidWC = stringify(userIdMap, "WC");
         } catch (JSONException exception) {
-            LOG.debug(traceMarker, "Error in extracting userid params");
+            LOG.debug(traceMarker, "Error in extracting userid params, {}", exception);
         }
     }
 

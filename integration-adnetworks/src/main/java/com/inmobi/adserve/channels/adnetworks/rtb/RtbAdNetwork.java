@@ -1,35 +1,32 @@
 package com.inmobi.adserve.channels.adnetworks.rtb;
 
-import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import com.inmobi.adserve.adpool.NetworkType;
-import com.inmobi.adserve.channels.api.*;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.attribute.BAttrNativeType;
-import com.inmobi.adserve.channels.api.attribute.BTypeNativeAttributeType;
-import com.inmobi.adserve.channels.api.attribute.SuggestedNativeAttributeType;
-import com.inmobi.adserve.channels.api.natives.NativeBuilder;
-import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
-import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
-import com.inmobi.adserve.channels.api.template.NativeTemplateAttributeFinder;
-import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
-import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
-import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.util.*;
-import com.inmobi.casthrift.rtb.*;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.Request;
-import com.ning.http.client.RequestBuilder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
+
+import java.awt.Dimension;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import lombok.Getter;
 import lombok.Setter;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
@@ -46,18 +43,54 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import javax.inject.Inject;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.awt.*;
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.*;
-import java.util.List;
-
+import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import com.inmobi.adserve.adpool.NetworkType;
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.NativeResponseMaker;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.api.attribute.BAttrNativeType;
+import com.inmobi.adserve.channels.api.attribute.BTypeNativeAttributeType;
+import com.inmobi.adserve.channels.api.attribute.SuggestedNativeAttributeType;
+import com.inmobi.adserve.channels.api.natives.NativeBuilder;
+import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
+import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
+import com.inmobi.adserve.channels.api.template.NativeTemplateAttributeFinder;
+import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
+import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.util.IABCategoriesInterface;
+import com.inmobi.adserve.channels.util.IABCategoriesMap;
+import com.inmobi.adserve.channels.util.IABCountriesInterface;
+import com.inmobi.adserve.channels.util.IABCountriesMap;
+import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.casthrift.rtb.App;
+import com.inmobi.casthrift.rtb.AppExt;
+import com.inmobi.casthrift.rtb.AppStore;
+import com.inmobi.casthrift.rtb.Banner;
+import com.inmobi.casthrift.rtb.BannerExtVideo;
+import com.inmobi.casthrift.rtb.BannerExtensions;
+import com.inmobi.casthrift.rtb.Bid;
+import com.inmobi.casthrift.rtb.BidExtensions;
+import com.inmobi.casthrift.rtb.BidRequest;
+import com.inmobi.casthrift.rtb.BidResponse;
+import com.inmobi.casthrift.rtb.Device;
+import com.inmobi.casthrift.rtb.Geo;
+import com.inmobi.casthrift.rtb.Impression;
+import com.inmobi.casthrift.rtb.ImpressionExtensions;
+import com.inmobi.casthrift.rtb.Native;
+import com.inmobi.casthrift.rtb.Site;
+import com.inmobi.casthrift.rtb.User;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.Request;
+import com.ning.http.client.RequestBuilder;
 
 /**
  * Generic RTB adapter.
@@ -94,7 +127,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Setter
     BidResponse                            bidResponse;
     private final boolean                  wnRequired;
-    private static final int               auctionType                  = 2;
+    private static final int               AUCTION_TYPE                 = 2;
     private int                            tmax                         = 200;
     private boolean                        templateWN                   = true;
     private static final String            X_OPENRTB_VERSION            = "x-openrtb-version";
@@ -283,7 +316,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         //nullcheck for casInternalRequestParams and sasParams done while configuring adapter
         bidRequest = new BidRequest(casInternalRequestParameters.auctionId, impresssionlist);
         bidRequest.setTmax(tmax);
-        bidRequest.setAt(auctionType);
+        bidRequest.setAt(AUCTION_TYPE);
         bidRequest.setCur(Collections.<String> emptyList());
         List<String> seatList = new ArrayList<String>();
         seatList.add(advertiserId);
@@ -336,7 +369,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             LOG.info("RTB request json is : {}", bidRequestJson);
         } catch (TException e) {
             LOG.debug("Could not create json from bidrequest for partner {}", advertiserName);
-            LOG.info("Configure parameters inside rtb returned false {}", advertiserName);
+            LOG.info("Configure parameters inside rtb returned false {}, exception raised {}", advertiserName, e);
             //todo add trace
             return false;
         }
@@ -685,7 +718,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         try {
             uriCallBack = new URI(callbackUrl);
         } catch (URISyntaxException e) {
-            LOG.debug("error in creating uri for callback");
+            LOG.debug("error in creating uri for callback, exception raised {}", e);
         }
 
         StringBuilder content = new StringBuilder();
@@ -832,22 +865,22 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         int admAfterMacroSize = admContent.length();
 
         if ("wap".equalsIgnoreCase(sasParams.getSource())) {
-            velocityContext.put(VelocityTemplateFieldConstants.PartnerHtmlCode, admContent);
+            velocityContext.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, admContent);
         } else {
-            velocityContext.put(VelocityTemplateFieldConstants.PartnerHtmlCode, MRAID + admContent);
+            velocityContext.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, MRAID + admContent);
             if (StringUtils.isNotBlank(sasParams.getImaiBaseUrl())) {
-                velocityContext.put(VelocityTemplateFieldConstants.IMAIBaseUrl, sasParams.getImaiBaseUrl());
+                velocityContext.put(VelocityTemplateFieldConstants.IMAI_BASE_URL, sasParams.getImaiBaseUrl());
             }
         }
         // Checking whether to send win notification
         LOG.debug("isWinRequired is {} and winfromconfig is {}", wnRequired, callbackUrl);
         String partnerWinUrl = getPartnerWinUrl();
         if (StringUtils.isNotEmpty(partnerWinUrl)){
-            velocityContext.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, partnerWinUrl);
+            velocityContext.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, partnerWinUrl);
         }
         
         if (templateWN || (admAfterMacroSize ==  admSize)) {
-            velocityContext.put(VelocityTemplateFieldConstants.IMBeaconUrl, this.beaconUrl);
+            velocityContext.put(VelocityTemplateFieldConstants.IM_BEACON_URL, this.beaconUrl);
         }
         try {
             responseContent = Formatter.getResponseFromTemplate(TemplateType.RTB_HTML, velocityContext, sasParams,
@@ -864,31 +897,31 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         VelocityContext velocityContext = new VelocityContext();
 
         String vastContentJSEsc = StringEscapeUtils.escapeJavaScript(getAdMarkUp());
-        velocityContext.put(VelocityTemplateFieldConstants.VASTContentJSEsc, vastContentJSEsc);
+        velocityContext.put(VelocityTemplateFieldConstants.VAST_CONTENT_JS_ESC, vastContentJSEsc);
 
         // JS escaped WinUrl for partner.
         String partnerWinUrl = getPartnerWinUrl();
         if (StringUtils.isNotEmpty(partnerWinUrl)) {
-            velocityContext.put(VelocityTemplateFieldConstants.PartnerBeaconUrl,
+            velocityContext.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL,
                     StringEscapeUtils.escapeJavaScript(partnerWinUrl));
         }
 
         // JS escaped IMWinUrl
         String imWinUrl = this.beaconUrl + "?b=${WIN_BID}";
-        velocityContext.put(VelocityTemplateFieldConstants.IMWinUrl, StringEscapeUtils.escapeJavaScript(imWinUrl));
+        velocityContext.put(VelocityTemplateFieldConstants.IM_WIN_URL, StringEscapeUtils.escapeJavaScript(imWinUrl));
 
         // JS escaped IM beacon and click URLs.
-        velocityContext.put(VelocityTemplateFieldConstants.IMBeaconUrl, StringEscapeUtils.escapeJavaScript(this.beaconUrl));
-        velocityContext.put(VelocityTemplateFieldConstants.IMClickUrl, StringEscapeUtils.escapeJavaScript(this.clickUrl));
+        velocityContext.put(VelocityTemplateFieldConstants.IM_BEACON_URL, StringEscapeUtils.escapeJavaScript(this.beaconUrl));
+        velocityContext.put(VelocityTemplateFieldConstants.IM_CLICK_URL, StringEscapeUtils.escapeJavaScript(this.clickUrl));
 
         // SDK version
-        velocityContext.put(VelocityTemplateFieldConstants.IMSDKVersion, sasParams.getSdkVersion());
+        velocityContext.put(VelocityTemplateFieldConstants.IMSDK_VERSION, sasParams.getSdkVersion());
 
         // Namespace
-        velocityContext.put(VelocityTemplateFieldConstants.Namespace, Formatter.getNamespace());
+        velocityContext.put(VelocityTemplateFieldConstants.NAMESPACE, Formatter.getNamespace());
 
         // IMAIBaseUrl
-        velocityContext.put(VelocityTemplateFieldConstants.IMAIBaseUrl, sasParams.getImaiBaseUrl());
+        velocityContext.put(VelocityTemplateFieldConstants.IMAI_BASE_URL, sasParams.getImaiBaseUrl());
 
         try {
             responseContent = Formatter.getResponseFromTemplate(TemplateType.RTB_BANNER_VIDEO, velocityContext, sasParams,
@@ -989,7 +1022,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             return true;
         } catch (NullPointerException e) {
             //todo add trace
-            LOG.info("Could not parse the rtb response from partner: {}", this.getName());
+            LOG.info("Could not parse the rtb response from partner: {}, exception thrown {}", this.getName(), e);
             return false;
         }
     }
@@ -1022,8 +1055,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 }
 
                 // Update beacon and click URLs to refer to the video Ads.
-                this.beaconUrl = this.beaconUrl.replace(this.getImpressionId(), newImpressionId);
-                this.clickUrl = this.clickUrl.replace(this.getImpressionId(), newImpressionId);
+                this.beaconUrl = ClickUrlsRegenerator.regenerateBeaconUrl(this.beaconUrl, this.getImpressionId(), newImpressionId, sasParams.isRichMedia());
+                this.clickUrl  = ClickUrlsRegenerator.regenerateClickUrl(this.clickUrl, this.getImpressionId(), newImpressionId);
                 this.impressionId = newImpressionId;
 
                 LOG.debug("Replaced impression id to new value {}.", newImpressionId);
@@ -1087,7 +1120,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             try {
                 xmlStr = URIUtil.decode(encodedXmlStr);
             } catch (URIException e) {
-                LOG.info("VAST XML response is NOT properly URL encode. {}", e.getMessage());
+                LOG.info("VAST XML response is NOT properly URL encode. {}", e);
                 return false;
             }
         } else {
@@ -1106,7 +1139,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             this.adm = xmlStr;
             return true;
         } catch (SAXException | ParserConfigurationException | IOException e) {
-            LOG.debug("VAST response is NOT a valid XML - {}", e.getMessage());
+            LOG.debug("VAST response is NOT a valid XML - {}", e);
             return false;
         }
     }

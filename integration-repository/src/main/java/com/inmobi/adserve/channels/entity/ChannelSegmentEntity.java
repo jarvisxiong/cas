@@ -6,6 +6,8 @@ import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 import lombok.Getter;
 import lombok.Setter;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ import java.util.Set;
 public class ChannelSegmentEntity implements IdentifiableEntity<String> {
 
     private static final long        serialVersionUID = 1L;
+    private final static Logger LOG = LoggerFactory.getLogger(ChannelSegmentEntity.class);
 
     private final String             advertiserId;
     private final String             adgroupId;
@@ -196,6 +199,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
                 }
             }
         } catch (ArrayIndexOutOfBoundsException e) {
+            LOG.debug("Exception raised in ChannelSegmentEntity {}", e);
             return notFound;
         }
         // This would happen only with inconsistent data.
@@ -220,6 +224,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
                 }
             }
         } catch (ArrayIndexOutOfBoundsException e) {
+            LOG.debug("Exception raised in ChannelSegmentEntity {}", e);
             return notFound;
         }
         // This would happen only with inconsistent data.

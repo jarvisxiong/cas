@@ -110,8 +110,7 @@ public class Logging {
         boolean isTerminated = false;
         if (null != terminationReason) {
             isTerminated = true;
-        }
-        else {
+        } else {
             terminationReason = "NO";
         }
         short adsServed = 0;
@@ -123,9 +122,8 @@ public class Logging {
                 LOG.info("host cant be empty, abandoning rr logging");
                 return;
             }
-        }
-        catch (UnknownHostException ex) {
-            LOG.info("could not resolve host inside rr logging, so abandoning response");
+        } catch (UnknownHostException ex) {
+            LOG.info("could not resolve host inside rr logging so abandoning response, raised exception {}", ex);
             return;
         }
         InventoryType inventory = getInventoryType(sasParams);
@@ -169,7 +167,7 @@ public class Logging {
             slotServed = sasParams.getSlot();
             countryId = sasParams.getCountryId();
             carrierId = sasParams.getCarrierId();
-            if (null != sasParams.getRqMkSlot() && sasParams.getRqMkSlot().size() > 0) {
+            if (null != sasParams.getRqMkSlot() && (!sasParams.getRqMkSlot().isEmpty())) {
                 requestSlot = sasParams.getRqMkSlot().get(0);
             }
             state = sasParams.getState();
@@ -288,9 +286,8 @@ public class Logging {
                 try {
                     TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
                     msg = new Message(tSerializer.serialize(creativeLog));
-                }
-                catch (TException e) {
-                    LOG.debug("Error while creating creative logs for databus ");
+                } catch (TException e) {
+                    LOG.debug("Error while creating creative logs for databus, raised exception {}", e);
                 }
                 if (null != msg) {
                     dataBusPublisher.publish(umpAdsLogKey, msg);
@@ -317,7 +314,7 @@ public class Logging {
             // Incrementing inspectors
             AdNetworkInterface adNetwork = channelSegment.getAdNetworkInterface();
             ThirdPartyAdResponse adResponse = adNetwork.getResponseStruct();
-            InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalRequests);
+            InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_REQUESTS);
             InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.LATENCY, adResponse.latency);
             InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.CONNECTION_LATENCY,
                     adNetwork.getConnectionLatency());
@@ -355,11 +352,9 @@ public class Logging {
     public static AdStatus getAdStatus(final String adStatus) {
         if ("AD".equalsIgnoreCase(adStatus)) {
             return AdStatus.AD;
-        }
-        else if ("NO_AD".equals(adStatus)) {
+        } else if ("NO_AD".equals(adStatus)) {
             return AdStatus.NO_AD;
-        }
-        else if ("TIME_OUT".equals(adStatus)) {
+        } else if ("TIME_OUT".equals(adStatus)) {
             return AdStatus.TIME_OUT;
         }
         return AdStatus.DROPPED;
@@ -465,9 +460,8 @@ public class Logging {
         try {
             TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
             msg = new Message(tSerializer.serialize(casAdvertisementLog));
-        }
-        catch (TException e) {
-            LOG.debug("Error while creating sampledAdvertiser logs for databus ");
+        } catch (TException e) {
+            LOG.debug("Error while creating sampledAdvertiser logs for databus, raised exception {}", e);
         }
         if (null != msg) {
             dataBusPublisher.publish(sampledAdvertisementLogKey, msg);
@@ -504,8 +498,7 @@ public class Logging {
         String sasSiteType;
         if (sasParams == null || null == sasParams.getSiteType()) {
             return null;
-        }
-        else {
+        } else {
             sasSiteType = sasParams.getSiteType();
 
             if ("performance".equalsIgnoreCase(sasSiteType)) {
@@ -522,11 +515,9 @@ public class Logging {
     public static PricingModel getPricingModel(final String pricingModel) {
         if (pricingModel == null) {
             return null;
-        }
-        else if ("cpc".equalsIgnoreCase(pricingModel)) {
+        } else if ("cpc".equalsIgnoreCase(pricingModel)) {
             return PricingModel.CPC;
-        }
-        else if ("cpm".equalsIgnoreCase(pricingModel)) {
+        } else if ("cpm".equalsIgnoreCase(pricingModel)) {
             return PricingModel.CPM;
         }
         return null;
@@ -542,8 +533,7 @@ public class Logging {
     public static Gender getGender(final SASRequestParameters sasParams) {
         if (sasParams == null) {
             return null;
-        }
-        else if ("m".equalsIgnoreCase(sasParams.getGender())) {
+        } else if ("m".equalsIgnoreCase(sasParams.getGender())) {
             return Gender.MALE;
         }
         return Gender.FEMALE;

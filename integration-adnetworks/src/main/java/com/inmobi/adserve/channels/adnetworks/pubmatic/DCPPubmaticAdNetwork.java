@@ -78,7 +78,7 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
                 adId = additionalParams.getString((sasParams.getSlot()).toString());
 
             } catch (Exception e) {
-                LOG.error("AdId is not configured for the segment:{}", entity.getExternalSiteKey());
+                LOG.error("AdId is not configured for the segment:{}, exception raised {}", entity.getExternalSiteKey(), e);
                 return false;
             }
         } else {
@@ -201,16 +201,15 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
                 LOG.info("Response from pubmatic: {}", response);
                 try {
                     throw ex;
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     LOG.info("Error while rethrowing the exception : {}", e);
                     return;
                 }
             }
 
             VelocityContext context = new VelocityContext();
-            context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, partnerBeacon);
-            context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, htmlCode);
+            context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, partnerBeacon);
+            context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, htmlCode);
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";

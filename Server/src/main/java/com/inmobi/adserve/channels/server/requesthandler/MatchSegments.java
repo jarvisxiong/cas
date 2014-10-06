@@ -176,7 +176,7 @@ public class MatchSegments {
         List<AdvertiserMatchedSegmentDetail> result = insertChannelSegmentToResultSet(allFilteredEntities, sasParams,
                 traceMarker);
 
-        if (result.size() == 0) {
+        if (result.isEmpty()) {
             LOG.debug(
                     traceMarker,
                     "No matching records for the request - slot: {} categories: {} country: {} targetingPlatform: {} siteRating: {} osId: {}",

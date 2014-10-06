@@ -1,4 +1,4 @@
-package com.inmobi.adserve.channels.server.requesthandler;
+package com.inmobi.adserve.channels.util.Utils;
 
 import com.google.gson.Gson;
 import lombok.Getter;
@@ -34,10 +34,10 @@ public class ClickUrlMakerV6 {
     private static final String       IS_NOT_TEST                                   = "0";
     private static final String       RTB_SUPPLY                                    = "rtb";
     private static final String       NON_RTB_SUPPLY                                = "nw";
-    private static final Long         clickURLHashingSecretKeyVersion               = (long) 1;
-    private static final String       clickURLHashingSecretKeyVersionBase36         = getIdBase36(clickURLHashingSecretKeyVersion);
-    private static final Long         clickURLHashingSecretKeyTestModeVersion       = (long) 2;
-    private static final String       clickURLHashingSecretKeyTestModeVersionBase36 = getIdBase36(clickURLHashingSecretKeyTestModeVersion);
+    private static final Long         CLICK_URL_HASHING_SECRET_KEY_VERSION          = (long) 1;
+    private static final String       CLICK_URL_HASHING_SECRET_KEY_VERSION_BASE_36  = getIdBase36(CLICK_URL_HASHING_SECRET_KEY_VERSION);
+    private static final Long         CLICK_URL_HASHING_SECRET_KEY_TEST_MODE_VERSION = (long) 2;
+    private static final String       CLICK_URL_HASHING_SECRET_KEY_TEST_MODE_VERSION_BASE_36 = getIdBase36(CLICK_URL_HASHING_SECRET_KEY_TEST_MODE_VERSION);
     @Getter
     private String                    beaconUrl;
     @Getter
@@ -291,12 +291,12 @@ public class ClickUrlMakerV6 {
         // 24th and 25th URL Component: hash key version and url hash
         CryptoHashGenerator cryptoHashGenerator;
         if (testMode) {
-            adUrlSuffix.append(appendSeparator(ClickUrlMakerV6.clickURLHashingSecretKeyTestModeVersionBase36));
-            beaconUrlSuffix.append(appendSeparator(ClickUrlMakerV6.clickURLHashingSecretKeyTestModeVersionBase36));
+            adUrlSuffix.append(appendSeparator(ClickUrlMakerV6.CLICK_URL_HASHING_SECRET_KEY_TEST_MODE_VERSION_BASE_36));
+            beaconUrlSuffix.append(appendSeparator(ClickUrlMakerV6.CLICK_URL_HASHING_SECRET_KEY_TEST_MODE_VERSION_BASE_36));
             cryptoHashGenerator = new CryptoHashGenerator(testCryptoSecretKey);
         } else {
-            adUrlSuffix.append(appendSeparator(ClickUrlMakerV6.clickURLHashingSecretKeyVersionBase36));
-            beaconUrlSuffix.append(appendSeparator(ClickUrlMakerV6.clickURLHashingSecretKeyVersionBase36));
+            adUrlSuffix.append(appendSeparator(ClickUrlMakerV6.CLICK_URL_HASHING_SECRET_KEY_VERSION_BASE_36));
+            beaconUrlSuffix.append(appendSeparator(ClickUrlMakerV6.CLICK_URL_HASHING_SECRET_KEY_VERSION_BASE_36));
             cryptoHashGenerator = new CryptoHashGenerator(cryptoSecretKey);
         }
         adUrlSuffix.append(appendSeparator(cryptoHashGenerator.generateHash(adUrlSuffix.toString())));

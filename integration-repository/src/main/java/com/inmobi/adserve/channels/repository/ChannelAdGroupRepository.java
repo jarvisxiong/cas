@@ -167,7 +167,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
             try {
                 return new JSONObject(additionalParams);
             } catch (JSONException e) {
-                logger.info("Error in parsing additional params json");
+                logger.info("Error in parsing additional params json, exception raised {}", e);
             }
         }
         return new JSONObject();
@@ -185,7 +185,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
                 }
             }
         } catch (JSONException e) {
-            // Do Nothing
+
         }
         return osIds;
     }

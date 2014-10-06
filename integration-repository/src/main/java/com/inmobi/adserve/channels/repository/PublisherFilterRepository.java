@@ -23,9 +23,9 @@ public class PublisherFilterRepository extends
     @Override
     public PublisherFilterEntity queryUniqueResult(RepositoryQuery publisherFilterQuery) throws RepositoryException {
         Collection<PublisherFilterEntity> publisherFilterEntityResultSet = query(publisherFilterQuery);
-        if (publisherFilterEntityResultSet == null || publisherFilterEntityResultSet.size() == 0) {
+        if (publisherFilterEntityResultSet == null || publisherFilterEntityResultSet.isEmpty()) {
             return null;
-        } else if (publisherFilterEntityResultSet.size() >= 1) {
+        } else if (!publisherFilterEntityResultSet.isEmpty()) {
             return (PublisherFilterEntity) publisherFilterEntityResultSet.toArray()[0];
         }
         return null;

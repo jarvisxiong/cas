@@ -272,31 +272,31 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
                 }
 
                 VelocityContext context = new VelocityContext();
-                context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
-                context.put(VelocityTemplateFieldConstants.PartnerClickUrl, partnerClickUrl);
+                context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
+                context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, partnerClickUrl);
 
                 if (StringUtils.isNotBlank(imageUrl)) {
-                    context.put(VelocityTemplateFieldConstants.PartnerImgUrl, imageUrl);
+                    context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, imageUrl);
                 }
                 if (StringUtils.isNotBlank(partnerClickBeacon)) {
-                    context.put(VelocityTemplateFieldConstants.PartnerClickBeacon, partnerClickBeacon);
+                    context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_BEACON, partnerClickBeacon);
                 }
                 if (StringUtils.isNotBlank(partnerImpressionBeacon)) {
-                    context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, partnerImpressionBeacon);
+                    context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, partnerImpressionBeacon);
                 }
 
                 TemplateType type;
                 if (creativeType == 2) {
-                    context.put(VelocityTemplateFieldConstants.AdText,
+                    context.put(VelocityTemplateFieldConstants.AD_TEXT,
                             displayInfo.getJSONObject("title").getString("text"));
-                    context.put(VelocityTemplateFieldConstants.Description, displayInfo.getString("subtitle"));
+                    context.put(VelocityTemplateFieldConstants.DESCRIPTION, displayInfo.getString("subtitle"));
                     String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                     if (StringUtils.isEmpty(vmTemplate)) {
                         LOG.info("No template found for the slot");
                         adStatus = NO_AD;
                         return;
                     } else {
-                        context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
+                        context.put(VelocityTemplateFieldConstants.TEMPLATE, vmTemplate);
                         type = TemplateType.RICH;
                     }
                 } else {
@@ -323,9 +323,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
         return true;
     }
 
-    private String getSignature(final HashMap<String, String> params, final String secret) throws IOException
-
-    {
+    private String getSignature(final HashMap<String, String> params, final String secret) throws IOException {
         // first sort asc as per the paramter names
         Map<String, String> sortedParams = new TreeMap<String, String>(params);
         Set<Entry<String, String>> entrys = sortedParams.entrySet();
@@ -358,7 +356,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
                 return 4;
             }
         } catch (Exception e) {
-            LOG.info("Cannot map carrier Id for Lomark");
+            LOG.info("Cannot map carrier Id for Lomark, exception raised {}", e);
         }
         return 4;
     }

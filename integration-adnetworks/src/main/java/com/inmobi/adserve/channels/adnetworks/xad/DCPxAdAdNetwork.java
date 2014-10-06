@@ -43,7 +43,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 	private static final String APP = "app";
 	private static final String WEB = "web";
 
-	private static final IABCategoriesInterface iabCategoryMap = new IABCategoriesMap();
+	private static final IABCategoriesInterface IAB_CATEGORY_MAP = new IABCategoriesMap();
 
 	public DCPxAdAdNetwork(final Configuration config,
 			final Bootstrap clientBootstrap,
@@ -170,7 +170,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 			} else {
 				bCat.add(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES);
 			}
-			for (String bCategory : iabCategoryMap.getIABCategories(bCat)) {
+			for (String bCategory : IAB_CATEGORY_MAP.getIABCategories(bCat)) {
 				url.append("&bcat=").append(bCategory);
 			}
 			LOG.debug("xAd url is {}", url);
@@ -199,7 +199,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 		} else {
 			statusCode = status.code();
 			VelocityContext context = new VelocityContext();
-			context.put(VelocityTemplateFieldConstants.PartnerHtmlCode,
+			context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE,
 					response.trim());
 			try {
 				responseContent = Formatter.getResponseFromTemplate(

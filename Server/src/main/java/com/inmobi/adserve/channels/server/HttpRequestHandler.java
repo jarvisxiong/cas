@@ -58,7 +58,7 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
 
 			servlet.handleRequest(this, new QueryStringDecoder(httpRequest.getUri()), ctx.channel());
 		} catch (Exception exception) {
-			responseSender.setTerminationReason(CasConfigUtil.processingError);
+			responseSender.setTerminationReason(CasConfigUtil.PROCESSING_ERROR);
 			InspectorStats.incrementStatCount(InspectorStrings.PROCESSING_ERROR, InspectorStrings.COUNT);
 			responseSender.sendNoAdResponse(ctx.channel());
 			String exceptionClass = exception.getClass().getSimpleName();

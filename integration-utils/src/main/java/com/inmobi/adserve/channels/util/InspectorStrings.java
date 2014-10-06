@@ -6,7 +6,7 @@ public class InspectorStrings {
         //dummy private constructor to avoid instantiation from other classes
     }
 
-    public static final String totalRequests                             = "TotalRequests";
+    public static final String TOTAL_REQUESTS                            = "TotalRequests";
     public static final String RULE_ENGINE_REQUESTS                      = "RuleEngineRequests";
     public static final String BACK_FILL_REQUESTS                        = "BackFillRequests";
     public static final String IX_REQUESTS                               = "IXRequests";
@@ -33,21 +33,8 @@ public class InspectorStrings {
     public static final String clientTimerLatency                        = "ClientTimerLatency";
     public static final String timerLatency                              = "timerLatency";
     public static final String timeoutException                          = "TimeoutException";
-    public static final String isUpdating                                = "IsUpdating";
-    public static final String successfulUpdates                         = "SuccessfulUpdates";
-    public static final String unSuccessfulUpdates                       = "UnsuccessfulUpdates";
-    public static final String entityCurrentlyLoaded                     = "EntityCurrentlyLoaded";
-    public static final String repoSource                                = "RepoSource";
-    public static final String refreshInterval                           = "RefreshInterval";
-    public static final String query                                     = "Query";
-    public static final String updateLatency                             = "UpdateLatency";
-    public static final String lastSuccessfulUpdate                      = "LastSuccessfulUpdate";
-    public static final String lastUnsuccessfulUpdate                    = "LastUnsuccessfulUpdate";
-    public static final String entityFailedtoLoad                        = "EntityFailedToLoad";
     public static final String INCOMPATIBLE_SITE_TYPE                    = "Termninated_IncompatibleSite";
-    public static final String droppedRollout                            = "DroppedRollout";
     public static final String PERCENT_ROLL_OUT                          = "PercentRollout";
-    public static final String channelClosed                             = "channelClosed";
     public static final String NO_MATCH_SEGMENT_LATENCY                  = "NoMatchSegmentLatency";
     public static final String NO_MATCH_SEGMENT_COUNT                    = "NoMatchSegmentCount";
     public static final String DROPPED_IN_IMPRESSION_FILTER              = "DroppedInImpressionFilter";
@@ -87,11 +74,10 @@ public class InspectorStrings {
     public final static String DROPPED_IN_CREATIVE_VALIDATOR_FILTER      = "DroppedInCreativeValidatorFilter";
     public static final String siteFeedbackRequestsToAerospike           = "SiteFeedbackRequestsToAerospike";
     public static final String siteFeedbackFailedToLoadFromAerospike     = "SiteFeedbackFailedToLoadFromAerospike";
-    public final static String droppedInDstFilter                        = "DroppedInDstFilter";
+    public final static String droppedInAuctionIxImpressionIdFilter      = "DroppedInAuctionIxImpressionIdFilter";
     public final static String DROPPED_IN_ACCOUNT_SEGMENT_FILTER         = "DroppedInAccountSegmentFilter";
     public static final String DROPPED_IN_SUPPLY_DEMAND_CLASSIFICATION_FILTER = "DroppedInSupplyDemandClassificationFilter";
     public static final String DROPPED_IN_RTB_CURRENCY_NOT_SUPPORTED_FILTER = "DroppedInRtbCurrencyNotSupportedFilter";
-    public static final String ADAPTER_MISMATCH                          = "AdapterMismatch";
     public static final String DROPPED_IN_INVALID_DETAILS_FILTER         = "DroppedInInvalidDetailsFilter";
     public static final String DROPPED_IN_BANNER_NOT_ALLOWED_FILTER      = "DroppedInBannerNotAllowedFilter";
     public static final String DROPPED_IN_PARTNER_COUNT_FILTER           = "DroppedInPartnerCountFilter";

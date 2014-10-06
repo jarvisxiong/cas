@@ -62,9 +62,9 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String         IMAGE_TYPE       = "IMG";
     private static final String         TEXT_TYPE        = "TXT";
 
-    private static final String         responseFormat   = "all";
-    private static final String         strictField      = "true";
-    private static final String         latLongFormat    = "%s,%s";
+    private static final String         RESPONSE_FORMAT  = "all";
+    private static final String         STRICT_FIELD     = "true";
+    private static final String         LAT_LONG_FORMAT  = "%s,%s";
     private final String                publisherId;
 
     private static Map<Integer, String> slotIdMap;
@@ -138,10 +138,10 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         appendQueryParam(url, PUBID, publisherId, false);
         appendQueryParam(url, UA, getURLEncode(sasParams.getUserAgent(), format), false);
         appendQueryParam(url, CLIENT_IP, sasParams.getRemoteHostIp(), false);
-        appendQueryParam(url, FORMAT, responseFormat, false);
+        appendQueryParam(url, FORMAT, RESPONSE_FORMAT, false);
         // appendQueryParam(url, FORMAT_STRICT, strictField, false);
         appendQueryParam(url, DIMENSION, dimension, false);
-        appendQueryParam(url, DIMENSION_STRICT, strictField, false);
+        appendQueryParam(url, DIMENSION_STRICT, STRICT_FIELD, false);
 
         // TODO map the udids
         if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
@@ -163,7 +163,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         }
 
         if (StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)) {
-            appendQueryParam(url, LATLONG, getURLEncode(String.format(latLongFormat, latitude, longitude), format),
+            appendQueryParam(url, LATLONG, getURLEncode(String.format(LAT_LONG_FORMAT, latitude, longitude), format),
                     false);
         }
         if (StringUtils.isNotBlank(sasParams.getGender())) {
@@ -230,20 +230,20 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
                 Ad ad = smaatoResponse.getAds().getAd();
 
                 TemplateType t = null;
-                context.put(VelocityTemplateFieldConstants.PartnerClickUrl, ad.getAction().getTarget());
-                context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
+                context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, ad.getAction().getTarget());
+                context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
 
-                context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, ad.getBeacons().getBeacon());
+                context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, ad.getBeacons().getBeacon());
                 if (IMAGE_TYPE.equalsIgnoreCase(ad.getType()) && StringUtils.isNotBlank(ad.getLink())) {
-                    context.put(VelocityTemplateFieldConstants.PartnerImgUrl, ad.getLink());
+                    context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, ad.getLink());
                     t = TemplateType.IMAGE;
                 } else if (TEXT_TYPE.equalsIgnoreCase(ad.getType()) && StringUtils.isNotBlank(ad.getAdtext())) {
-                    context.put(VelocityTemplateFieldConstants.AdText, ad.getAdtext());
+                    context.put(VelocityTemplateFieldConstants.AD_TEXT, ad.getAdtext());
                     String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                     if (StringUtils.isEmpty(vmTemplate)) {
                         t = TemplateType.PLAIN;
                     } else {
-                        context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
+                        context.put(VelocityTemplateFieldConstants.TEMPLATE, vmTemplate);
                         t = TemplateType.RICH;
                     }
                 } else {
@@ -255,7 +255,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
 
             } catch (Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from Smaato");
+                LOG.info("Error parsing response from Smaato, exception raised {}", exception);
                 LOG.info("Response from Smaato {}", response);
             }
         }

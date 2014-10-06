@@ -64,8 +64,8 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
 					.getAdditionalParams().getString(TRUE_LAT_LONG_ONLY));
 		} catch (JSONException e) {
 			sendTrueLatLongOnly = false;
-			LOG.info("trueLatLong is not configured for the segment:{} {}",
-					entity.getExternalSiteKey(), this.getName());
+			LOG.info("trueLatLong is not configured for the segment:{} {}, exception raised {}",
+					entity.getExternalSiteKey(), this.getName(), e);
 		}
 
 		if (sendTrueLatLongOnly) {
@@ -220,8 +220,8 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
 		} else {
 			statusCode = status.code();
 			VelocityContext context = new VelocityContext();
-			context.put(VelocityTemplateFieldConstants.IMBeaconUrl, beaconUrl);
-			context.put(VelocityTemplateFieldConstants.PartnerHtmlCode,
+			context.put(VelocityTemplateFieldConstants.IM_BEACON_URL, beaconUrl);
+			context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE,
 					response.trim());
 			try {
 				responseContent = Formatter.getResponseFromTemplate(

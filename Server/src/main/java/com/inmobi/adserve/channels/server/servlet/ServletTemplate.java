@@ -37,13 +37,13 @@ public class ServletTemplate implements Servlet {
         Map<String, List<String>> params = queryStringDecoder.parameters();
         List<String> siteIdList = params.get("siteId");
         String message = "Invalid siteId";
-        if(siteIdList!=null && siteIdList.size()>0){
+        if (siteIdList != null && (!siteIdList.isEmpty())) {
         	 String siteId = siteIdList.get(0);
         	NativeAdTemplateRepository templateRepository = CasConfigUtil.repositoryHelper.getNativeAdTemplateRepository();
         	NativeAdTemplateEntity  entity = templateRepository.query(siteId);
-        	if(entity!=null){
+        	if (entity!=null) {
         		message = entity.getJSON();
-        	}else{
+        	} else {
         		message = "No template found for site Id "+siteId;
         	}
         	 

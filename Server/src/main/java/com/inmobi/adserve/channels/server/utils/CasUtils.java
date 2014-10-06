@@ -91,16 +91,14 @@ public class CasUtils {
         }
 
         String osVersion = sasParams.getOsMajorVersion();
-        if (StringUtils.isNotEmpty(osVersion))
-        {
+        if (StringUtils.isNotEmpty(osVersion)) {
             int osMajorVersion;
             try {
                 if (osVersion.contains(".")){
                     osVersion = osVersion.substring(0, osVersion.indexOf("."));
                 }
                 osMajorVersion = Integer.parseInt(osVersion);
-            } catch (NumberFormatException e)
-            {
+            } catch (NumberFormatException e) {
                 LOG.debug("Exception while parsing osMajorVersion {}", e);
                 return false;
             }

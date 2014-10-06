@@ -162,13 +162,13 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
 
                 if (responseFormat.equalsIgnoreCase(TemplateType.HTML.name())) {
                     t = TemplateType.HTML;
-                    context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response);
+                    context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response);
                 } else {
                     t = TemplateType.IMAGE;
                     JSONObject adResponse = new JSONObject(response).getJSONObject("adresponse").getJSONObject("imp");
-                    context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse.getString("clickurl"));
-                    context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getString("imgurl"));
-                    context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
+                    context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, adResponse.getString("clickurl"));
+                    context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, adResponse.getString("imgurl"));
+                    context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";

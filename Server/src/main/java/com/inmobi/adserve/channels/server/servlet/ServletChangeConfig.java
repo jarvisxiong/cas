@@ -44,15 +44,15 @@ public class ServletChangeConfig implements Servlet {
         try {
             jObject = requestParser.extractParams(params, "update");
         } catch (JSONException exeption) {
-            LOG.debug("Encountered Json Error while creating json object inside servlet");
-            hrh.setTerminationReason(CasConfigUtil.jsonParsingError);
+            LOG.debug("Encountered Json Error while creating json object inside servlet, {}", exeption);
+            hrh.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
             InspectorStats.incrementStatCount(InspectorStrings.JSON_PARSING_ERROR, InspectorStrings.COUNT);
             hrh.responseSender.sendResponse("Incorrect Json", serverChannel);
             return;
         }
         if (jObject == null) {
             LOG.debug("jobject is null so returning");
-            hrh.setTerminationReason(CasConfigUtil.jsonParsingError);
+            hrh.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
             hrh.responseSender.sendResponse("Incorrect Json", serverChannel);
             return;
         }
@@ -86,8 +86,8 @@ public class ServletChangeConfig implements Servlet {
             }
             hrh.responseSender.sendResponse(updates.toString(), serverChannel);
         } catch (JSONException ex) {
-            LOG.debug("Encountered Json Error while creating json object inside HttpRequest Handler for config change");
-            hrh.responseSender.setTerminationReason(CasConfigUtil.jsonParsingError);
+            LOG.debug("Encountered Json Error while creating json object inside HttpRequest Handler for config change, exception raised {}", ex);
+            hrh.responseSender.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
         }
     }
 

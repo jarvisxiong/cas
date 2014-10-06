@@ -214,26 +214,26 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
 
                 TemplateType t = TemplateType.HTML;
                 if (adResponse.has("content") && StringUtils.isNotBlank(adResponse.getString("content"))) {
-                    context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, adResponse.getString("content"));
+                    context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, adResponse.getString("content"));
                 } else {
-                    context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse.getString("url"));
+                    context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, adResponse.getString("url"));
                     String partnerBeacon = adResponse.getString("track");
                     if (StringUtils.isNotBlank(partnerBeacon) && !"null".equalsIgnoreCase(partnerBeacon)) {
-                        context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, adResponse.getString("track"));
+                        context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, adResponse.getString("track"));
                     }
-                    context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
+                    context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
 
                     if (textAd && StringUtils.isNotBlank(adResponse.getString("text"))) {
-                        context.put(VelocityTemplateFieldConstants.AdText, adResponse.getString("text"));
+                        context.put(VelocityTemplateFieldConstants.AD_TEXT, adResponse.getString("text"));
                         String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                         if (!StringUtils.isEmpty(vmTemplate)) {
-                            context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
+                            context.put(VelocityTemplateFieldConstants.TEMPLATE, vmTemplate);
                             t = TemplateType.RICH;
                         } else {
                             t = TemplateType.PLAIN;
                         }
                     } else {
-                        context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getString("img"));
+                        context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, adResponse.getString("img"));
                         t = TemplateType.IMAGE;
                     }
                 }

@@ -26,15 +26,15 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
 
     private static final Logger LOG                = LoggerFactory.getLogger(DCPAjillionAdnetwork.class);
 
-    private final String        FORMAT             = "format";
-    private final String        KEYWORD            = "keyword";
-    private final String        PUBID              = "pubid";
-    private final String        CLIENT_IP          = "clientip";
-    private final String        CLIENT_UA          = "clientua";
-    private final String        AGE                = "age";
-    private final String        IS_BEACON_RQD      = "use_beacon";
-    private final String        slotFormat         = "%s.slot_%s_%s";
-    private final String        beaconRequiredFlag = "1";
+    private static final String        FORMAT             = "format";
+    private static final String        KEYWORD            = "keyword";
+    private static final String        PUBID              = "pubid";
+    private static final String        CLIENT_IP          = "clientip";
+    private static final String        CLIENT_UA          = "clientua";
+    private static final String        AGE                = "age";
+    private static final String        IS_BEACON_RQD      = "use_beacon";
+    private static final String        slotFormat         = "%s.slot_%s_%s";
+    private static final String        beaconRequiredFlag = "1";
     private String              placementId        = null;
     private String              name;
 
@@ -129,14 +129,14 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
 
                 TemplateType t = TemplateType.IMAGE;
                 if (adResponse.has("beacon_url")) {
-                    context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, adResponse.getString("beacon_url"));
+                    context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, adResponse.getString("beacon_url"));
                 }
                 if ("image".equalsIgnoreCase(adResponse.getString("creative_type"))) {
-                    context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse.getString("click_url"));
-                    context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
-                    context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getString("creative_url"));
+                    context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, adResponse.getString("click_url"));
+                    context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
+                    context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, adResponse.getString("creative_url"));
                 } else if ("3rdparty".equalsIgnoreCase(adResponse.getString("creative_type"))) {
-                    context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, adResponse.getString("creative_url"));
+                    context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, adResponse.getString("creative_url"));
                     t = TemplateType.HTML;
                 } else {
                     adStatus = "NO_AD";

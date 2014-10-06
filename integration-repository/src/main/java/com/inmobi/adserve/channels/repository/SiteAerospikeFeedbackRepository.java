@@ -44,7 +44,7 @@ public class SiteAerospikeFeedbackRepository {
     private String                                                    set;
     private DataCenter                                                colo;
     // Cache to store segment feedback entities loaded from aerospike.
-    private ConcurrentHashMap<String/* siteId */, SiteFeedbackEntity> siteSegmentFeedbackCache;
+    private Map<String/* siteId */, SiteFeedbackEntity> siteSegmentFeedbackCache;
     private ConcurrentHashMap<String, Boolean>                        currentlyUpdatingSites;
     private int                                                       refreshTime;
     private ExecutorService                                           executorService;
@@ -78,7 +78,7 @@ public class SiteAerospikeFeedbackRepository {
             
             this.aerospikeClient = new AerospikeClient(clientPolicy, config.getString("host"), config.getInt("port"));
         } catch (AerospikeException e) {
-            LOG.error("Exception while creating Aerospike client: {}", e.getMessage());
+            LOG.error("Exception while creating Aerospike client: {}", e);
             throw new InitializationException("Could not instantiate Aerospike client");
         }
 
@@ -103,8 +103,7 @@ public class SiteAerospikeFeedbackRepository {
                         .getSegmentAdGroupFeedbackMap().get(segmentId);
             }
             LOG.debug("siteFeedback entity is stale for query: siteId: {}, segmentId: {}", siteId, segmentId);
-        }
-        else {
+        } else {
             LOG.debug("siteFeedback not found for siteId: {}", siteId);
         }
         LOG.debug("Returning default/old siteFeedback entity and fetching new data from aerospike for siteId: {}",
@@ -174,7 +173,7 @@ public class SiteAerospikeFeedbackRepository {
                 final Key key = new Key(namespace, set, site);
                 record = aerospikeClient.get(policy, key);
             } catch (AerospikeException e) {
-                LOG.error("Exception while retrieving record: {}", e.getMessage());
+                LOG.error("Exception while retrieving record: {}", e);
                 record = null;
             }
             time = System.currentTimeMillis() - time;

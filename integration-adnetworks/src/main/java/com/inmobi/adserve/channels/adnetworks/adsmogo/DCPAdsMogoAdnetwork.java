@@ -231,7 +231,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
             return;
         } else {
             VelocityContext context = new VelocityContext();
-            context.put(VelocityTemplateFieldConstants.PartnerHtmlCode,
+            context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE,
                     response.trim());
             try {
                 responseContent = Formatter.getResponseFromTemplate(

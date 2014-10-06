@@ -87,8 +87,8 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
 			// segment table
 			pos = entity.getAdditionalParams().getString(POS);
 		} catch (JSONException e) {
-			LOG.info("pos is not configured for the segment:{} {}",
-					entity.getExternalSiteKey(), this.getName());
+			LOG.info("pos is not configured for the segment:{} {}, exception raised {}",
+					entity.getExternalSiteKey(), this.getName(), e);
 			return false;
 		}
 
@@ -97,6 +97,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
 					.getString(JS_AD_TAG));
 		} catch (JSONException e) {
 			jsAdTag = false;
+            LOG.debug("exception raised while retrieving JS_AD_TAG from additional Params {}", e);
 		}
 
 		isApp = (StringUtils.isBlank(sasParams.getSource()) || "WAP"
@@ -240,7 +241,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
 		} else {
 			statusCode = status.code();
 			VelocityContext context = new VelocityContext();
-			context.put(VelocityTemplateFieldConstants.PartnerHtmlCode,
+			context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE,
 					response.trim());
 			try {
 				responseContent = Formatter.getResponseFromTemplate(

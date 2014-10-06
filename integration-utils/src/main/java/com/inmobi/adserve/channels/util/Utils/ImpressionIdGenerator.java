@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ImpressionIdGenerator {
     private static final Logger LOG = LoggerFactory.getLogger(ImpressionIdGenerator.class);
-    private static final AtomicInteger counter = new AtomicInteger();
+    private static final AtomicInteger COUNTER = new AtomicInteger();
     private short hostIdCode;
     private byte dataCenterIdCode;
     private static ImpressionIdGenerator instance = null;
@@ -42,11 +42,12 @@ public class ImpressionIdGenerator {
         this.dataCenterIdCode = dataCenterIdCode;
     }
 
+
     public String getImpressionId(final long adId) {
         String uuidIntKey = (WilburyUUID.setIntKey(WilburyUUID.getUUID().toString(), (int) adId)).toString();
         String uuidMachineKey = (WilburyUUID.setMachineId(uuidIntKey, hostIdCode)).toString();
         String uuidWithCyclicCounter = (WilburyUUID.setCyclicCounter(uuidMachineKey,
-                (byte) (Math.abs(counter.getAndIncrement() % 128)))).toString();
+                (byte) (Math.abs(COUNTER.getAndIncrement() % 128)))).toString();
         return (WilburyUUID.setDataCenterId(uuidWithCyclicCounter, dataCenterIdCode)).toString();
     }
 }

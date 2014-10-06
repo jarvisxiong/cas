@@ -34,7 +34,7 @@ public class ServletLbStatus implements Servlet {
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
             final Channel serverChannel) throws Exception {
         LOG.debug("asked for load balancer status");
-        InspectorStats.incrementStatCount("LbStatus", InspectorStrings.totalRequests);
+        InspectorStats.incrementStatCount("LbStatus", InspectorStrings.TOTAL_REQUESTS);
         if (ServerStatusInfo.statusCode != 404) {
             InspectorStats.incrementStatCount("LbStatus", InspectorStrings.SUCCESSFUL_REQUESTS);
             hrh.responseSender.sendResponse("OK", serverChannel);

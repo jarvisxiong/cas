@@ -9,6 +9,7 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.SegmentFactory;
+import com.inmobi.adserve.channels.util.Utils.ClickUrlMakerV6;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.types.AdFormatType;
 import com.inmobi.adserve.channels.util.InspectorStats;
@@ -109,7 +110,7 @@ public class AsyncRequestMaker {
                 LOG.debug("beacon url : {}", beaconUrl);
             }
 
-            LOG.debug("Sending request to Channel of advsertiserId {}", channelSegmentEntity.getAdvertiserId());
+            LOG.debug("Sending request to Channel of advertiserId {}", channelSegmentEntity.getAdvertiserId());
             LOG.debug("external site key is {}", channelSegmentEntity.getExternalSiteKey());
 
             if (network.configureParameters(sasParams, casInternalRequestParameters, channelSegmentEntity, clickUrl,

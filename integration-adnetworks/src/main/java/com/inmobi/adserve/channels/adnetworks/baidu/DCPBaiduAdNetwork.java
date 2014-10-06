@@ -153,7 +153,7 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
         } else {
             statusCode = status.code();
             VelocityContext context = new VelocityContext();
-            context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
+            context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response.trim());
 
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, null);

@@ -9,8 +9,7 @@ public class CasSubsetConfiguration extends SubsetConfiguration{
 		super(parent, prefix);
 	}
 	
-    public CasSubsetConfiguration(Configuration parent, String prefix, String delimiter)
-    {
+    public CasSubsetConfiguration(Configuration parent, String prefix, String delimiter) {
     	super(parent, prefix, delimiter);
     }
     
@@ -25,8 +24,7 @@ public class CasSubsetConfiguration extends SubsetConfiguration{
 	 * Currently this feature is not used by our code, this is not a must have feature
 	 * In future if anyone needs it, then this method needs to be udpated.
 	 */
-    protected Object interpolate(Object value)
-    {
+    protected Object interpolate(Object value) {
         return value;
     }
 }

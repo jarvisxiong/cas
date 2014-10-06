@@ -53,10 +53,10 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String   B_SITE_ID    = "s_subid";
     private static final String   REQUEST_TYPE = "rt";
 
-    private static final String   type         = "live";
-    private static final String   mraidType    = "1";
-    private static final String   apiVersion   = "2.0";
-    private static final String   requestType  = "api";
+    private static final String   TYPE         = "live";
+    private static final String   MRAID_TYPE   = "1";
+    private static final String   API_VERSION  = "2.0";
+    private static final String   REQUEST_TYPE_VALUE = "api";
 
     /**
      * @param config
@@ -102,13 +102,13 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         StringBuilder url = new StringBuilder(host);
-        appendQueryParam(url, REQUEST_TYPE, requestType, true);
+        appendQueryParam(url, REQUEST_TYPE, REQUEST_TYPE_VALUE, true);
         appendQueryParam(url, PUBID, externalSiteId, false);
         appendQueryParam(url, UA, getURLEncode(sasParams.getUserAgent(), format), false);
         appendQueryParam(url, CLIENT_IP, sasParams.getRemoteHostIp(), false);
         // TODO is [p(url for sites) required?]
-        appendQueryParam(url, TRAFFICTYPE, type, false);
-        appendQueryParam(url, MRAIDSUPPORT, mraidType, false);
+        appendQueryParam(url, TRAFFICTYPE, TYPE, false);
+        appendQueryParam(url, MRAIDSUPPORT, MRAID_TYPE, false);
         if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
             appendQueryParam(url, IFA, casInternalRequestParameters.uidIFA, false);
         }
@@ -130,7 +130,7 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
                 url.append("&o_andadvid=").append(gpid);
             }
         }
-        appendQueryParam(url, VERSION, apiVersion, false);
+        appendQueryParam(url, VERSION, API_VERSION, false);
         if (StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)) {
             appendQueryParam(url, LAT, latitude, false);
             appendQueryParam(url, LONG, longitude, false);
@@ -177,13 +177,13 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
                     responseContent = "";
                     return;
                 }
-                context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, htmlContent);
+                context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, htmlContent);
 
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
             } catch (Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from Mobfox");
+                LOG.info("Error parsing response from Mobfox, Exception raised {}", exception);
                 LOG.info("Response from Mobfox {}", response);
             }
         }

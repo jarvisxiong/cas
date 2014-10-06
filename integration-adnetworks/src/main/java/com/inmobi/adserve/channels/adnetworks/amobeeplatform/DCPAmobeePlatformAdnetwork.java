@@ -67,7 +67,7 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
 	public boolean configureParameters() {
 		if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
 				|| StringUtils.isBlank(externalSiteId)) {
-			LOG.debug("mandatory parameters missing for dmg so exiting adapter");
+			LOG.debug("mandatory parameters missing for {} so exiting adapter",name);
 			return false;
 		}
 
@@ -81,25 +81,23 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
 			Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
 			width = (int) Math.ceil(dim.getWidth());
 			height = (int) Math.ceil(dim.getHeight());
-		}
-		else {
-			LOG.debug("mandatory parameters missing for dmg so exiting adapter");
+		} else {
+			LOG.debug("mandatory parameters missing for {}so exiting adapter",name);
 			return false;
 		}
 		if (sasParams.getOsId() == HandSetOS.Android.getValue()) { // android
 			client = 1;
 
-		}
-		else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) { // iPhone
+		} else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) { // iPhone
 			client = 2;
 		}
-		LOG.info("Configure parameters inside dmg returned true");
+		LOG.info("Configure parameters inside {} returned true",name);
 		return true;
 	}
 
 	@Override
 	public String getName() {
-		return "dmg";
+		return name;
 	}
 
 	@Override
@@ -129,11 +127,9 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
 						&& "1".equals(casInternalRequestParameters.uidADT)) {
 					appendQueryParam(url, IDFA, casInternalRequestParameters.uidIFA, false);
 				}
-				//TODO correct this
 				if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
 					appendQueryParam(url, UDID, casInternalRequestParameters.uidIDUS1, false);
-				}
-				else if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
+				} else if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
 					appendQueryParam(url, UDID, casInternalRequestParameters.uidMd5, false);
 				}
 			}
@@ -166,16 +162,14 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
 			}
 			if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
 				appendQueryParam(url, NEGATIVE_KEYWORD,getURLEncode(CategoryList.getBlockedCategoryForPerformance(), format), false);
-			}
-			else {
+			} else {
 				appendQueryParam(url, NEGATIVE_KEYWORD,getURLEncode(CategoryList.getBlockedCategoryForPerformance(), format), false);
 			}
 
-			LOG.debug("dmg url is {}", url);
+			LOG.debug("{} url is {}",name, url);
 
 			return (new URI(url.toString()));
-		}
-		catch (URISyntaxException exception) {
+		} catch (URISyntaxException exception) {
 			errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
 			LOG.error("{}", exception);
 		}
@@ -192,18 +186,16 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
 			}
 			responseContent = "";
 			return;
-		}
-		else {
+		} else {
 			VelocityContext context = new VelocityContext();
-			context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
+			context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response.trim());
 			try {
 				responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
 				adStatus = "AD";
-			}
-			catch (Exception exception) {
+			} catch (Exception exception) {
 				adStatus = "NO_AD";
-				LOG.error("Error parsing response from dmg : {}", exception);
-				LOG.error("Response from dmg: {}", response);
+				LOG.error("Error parsing response from {} : {}",name, exception);
+				LOG.error("Response from {}: {}",name, response);
 			}
 		}
 		LOG.debug("response length is {}", responseContent.length());

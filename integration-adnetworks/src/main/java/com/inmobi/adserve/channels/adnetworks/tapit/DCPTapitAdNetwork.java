@@ -98,11 +98,9 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
 
 			if (StringUtils.isNotEmpty(casInternalRequestParameters.uidO1)) {
 				url.append("&enctype=sha1&udid=").append(casInternalRequestParameters.uidO1);
-			}
-			else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
+			} else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
 				url.append("&enctype=md5&udid=").append(casInternalRequestParameters.uidMd5);
-			}
-			else if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
+			} else if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
 				appendQueryParam(url,"&enctype=sha1&udid=", casInternalRequestParameters.uidIDUS1, false);
 			}
 			String gpid = getGPID();
@@ -119,8 +117,7 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
 
 			LOG.debug("Tapit url is {}", url);
 			return (new URI(url.toString()));
-		}
-		catch (URISyntaxException exception) {
+		} catch (URISyntaxException exception) {
 			errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
 			LOG.error("{}", exception);
 		}
@@ -137,8 +134,7 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
 			}
 			responseContent = "";
 			return;
-		}
-		else {
+		} else {
 			LOG.debug("beacon url inside mullah media is {}", beaconUrl);
 			try {
 				statusCode = status.code();
@@ -146,46 +142,40 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
 				VelocityContext context = new VelocityContext();
 				TemplateType t;
 				if ("html".equals(adResponse.getString("type"))) {
-					context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, adResponse.getString("html"));
+					context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, adResponse.getString("html"));
 					t = TemplateType.HTML;
-				}
-				else {
-					context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse.getString("clickurl"));
-					context.put(VelocityTemplateFieldConstants.Width, adResponse.getString("adWidth"));
-					context.put(VelocityTemplateFieldConstants.Height, adResponse.getString("adHeight"));
-					context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
+				} else {
+					context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, adResponse.getString("clickurl"));
+					context.put(VelocityTemplateFieldConstants.WIDTH, adResponse.getString("adWidth"));
+					context.put(VelocityTemplateFieldConstants.HEIGHT, adResponse.getString("adHeight"));
+					context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
 					if ("text".equals(adResponse.getString("type"))) {
-						context.put(VelocityTemplateFieldConstants.AdText, adResponse.getString("adtext"));
+						context.put(VelocityTemplateFieldConstants.AD_TEXT, adResponse.getString("adtext"));
 						String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
 						if (StringUtils.isEmpty(vmTemplate)) {
 							t = TemplateType.PLAIN;
-						}
-						else {
-							context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
+						} else {
+							context.put(VelocityTemplateFieldConstants.TEMPLATE, vmTemplate);
 							t = TemplateType.RICH;
 						}
-					}
-					else {
-						context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getString("imageurl"));
+					} else {
+						context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, adResponse.getString("imageurl"));
 						t = TemplateType.IMAGE;
 					}
 				}
 				responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
 				adStatus = "AD";
-			}
-			catch (JSONException exception) {
+			} catch (JSONException exception) {
 				adStatus = "NO_AD";
 				LOG.info("Error parsing response from tapit : {}", exception);
 				LOG.info("Response from tapit: {}", response);
-			}
-			catch (Exception exception) {
+			} catch (Exception exception) {
 				adStatus = "NO_AD";
 				LOG.info("Error parsing response from tapit : {}", exception);
 				LOG.info("Response from tapit: {}", response);
 				try {
 					throw exception;
-				}
-				catch (Exception e) {
+				} catch (Exception e) {
 					LOG.info("Error while rethrowing the exception : {}", e);
 				}
 			}

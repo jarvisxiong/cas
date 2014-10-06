@@ -7,11 +7,12 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class ChannelServerHelper {
     private final Logger logger;
-
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(ChannelServerHelper.class);
     public ChannelServerHelper(final Logger serverLogger) {
         logger = serverLogger;
     }
@@ -39,6 +40,8 @@ public class ChannelServerHelper {
                 addr = InetAddress.getLocalHost();
                 hostName = addr.getHostName();
             } catch (UnknownHostException e1) {
+                //todo both logs here, check
+                LOG.info("UnknownHostException in getHostId, exception raised {}", e1);
                 logger.info("UnknownHostException in getHostId");
             }
         }
@@ -49,9 +52,9 @@ public class ChannelServerHelper {
                 return hostId;
             }
         } catch (NumberFormatException e) {
-            logger.info("NumberFormatException in getHostId");
+            LOG.info("NumberFormatException in getHostId, exception raised {}", e);
         } catch (StringIndexOutOfBoundsException e) {
-            logger.info("StringIndexOutOfRangeException in getHostId");
+            LOG.info("StringIndexOutOfRangeException in getHostId, exception raised {}", e);
         }
         if (logger.isDebugEnabled()) {
             logger.debug("hostid is " + hostId);
