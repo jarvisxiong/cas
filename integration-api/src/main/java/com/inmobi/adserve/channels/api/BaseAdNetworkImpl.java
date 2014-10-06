@@ -96,7 +96,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected final Channel                       serverChannel;
     protected static String                       SITE_RATING_PERFORMANCE = "PERFORMANCE";
     protected static final String                 WAP                     = "WAP";
-    private static final IABCategoriesInterface   iabCategoryMap          = new IABCategoriesMap();
+    private static final IABCategoriesInterface   IAB_CATEGORY_MAP        = new IABCategoriesMap();
 
     protected static final String                 UA                      = "ua";
     protected static final String                 IP                      = "ip";
@@ -296,7 +296,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 }
             });
         } catch (Exception e) {
-            LOG.debug("Exception in {} makeAsyncRequest : {}", getName(), e.getMessage());
+            LOG.debug("Exception in {} makeAsyncRequest : {}", getName(), e);
         }
         LOG.debug("{} returning from make NingRequest", getName());
         return true;
@@ -521,7 +521,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         }
         if (allTags) {
             if (isIABCategory) {
-                return getValueFromListAsString(iabCategoryMap.getIABCategories(sasParams.getCategories()), seperator);
+                return getValueFromListAsString(IAB_CATEGORY_MAP.getIABCategories(sasParams.getCategories()), seperator);
 
             } else if (null != sasParams.getCategories()){
                 for (int index = 0; index < sasParams.getCategories().size(); index++) {
@@ -539,7 +539,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 for (int i = 0; i < segmentCategories.length; i++) {
                     if (cat == segmentCategories[i]) {
                         if (isIABCategory) {
-                            return getValueFromListAsString(iabCategoryMap.getIABCategories(segmentCategories[i]),
+                            return getValueFromListAsString(IAB_CATEGORY_MAP.getIABCategories(segmentCategories[i]),
                                     seperator);
 
                         }
@@ -571,23 +571,17 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected String getUid() {
         if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)  && "1".equals(casInternalRequestParameters.uidADT)) {
             return casInternalRequestParameters.uidIFA;
-        }
-        else if (StringUtils.isNotEmpty(casInternalRequestParameters.gpid) && "1".equals(casInternalRequestParameters.uidADT)) {
+        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.gpid) && "1".equals(casInternalRequestParameters.uidADT)) {
             return casInternalRequestParameters.gpid;
-        }
-        else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidSO1)) {
+        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidSO1)) {
             return casInternalRequestParameters.uidSO1;
-        }
-        else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
+        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
             return casInternalRequestParameters.uidMd5;
-        }
-        else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidO1)) {
+        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidO1)) {
             return casInternalRequestParameters.uidO1;
-        }
-        else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIDUS1)) {
+        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIDUS1)) {
             return casInternalRequestParameters.uidIDUS1;
-        }
-        else if (StringUtils.isNotEmpty(casInternalRequestParameters.uid)) {
+        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.uid)) {
             return casInternalRequestParameters.uid;
         }
         return null;
@@ -661,12 +655,12 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     decoded = URLDecoder.decode(tobeEndoded, format);
                 }
             } catch (UnsupportedEncodingException uee) {
-                LOG.debug("Error during decode in getURLEncode() for {} for string {}", getName(), param);
+                LOG.debug("Error during decode in getURLEncode() for {} for string {}, exception raised {}", getName(), param, uee);
             }
             try {
                 encodedString = URLEncoder.encode(decoded.trim(), format);
             } catch (UnsupportedEncodingException e) {
-                LOG.debug("Error during encode in getURLEncode() for {} for string {}", getName(), param);
+                LOG.debug("Error during encode in getURLEncode() for {} for string {}, exception raised {}", getName(), param, e);
             }
         }
         return encodedString;
@@ -677,7 +671,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     protected String getValueFromListAsString(final List<String> list, final char seperatar) {
-        if (list.size() == 0) {
+        if (list.isEmpty()) {
             return "";
         }
         StringBuilder s = new StringBuilder(list.get(0));
@@ -727,6 +721,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             }
             return sb.toString();
         } catch (java.security.NoSuchAlgorithmException e) {
+            LOG.debug("exception raised in BaseAdNetwork {}", e);
         }
         return null;
     }
@@ -825,10 +820,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
   public boolean isApp(){
       if(StringUtils.isBlank(sasParams.getSource())) {
           return false;
-      } else if (WAP.equalsIgnoreCase(sasParams.getSource())) {
-          return false;
       } else {
-          return true;
+          return !WAP.equalsIgnoreCase(sasParams.getSource());
       }
   }
 

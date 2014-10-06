@@ -40,9 +40,7 @@ public class ChannelServerHelper {
                 addr = InetAddress.getLocalHost();
                 hostName = addr.getHostName();
             } catch (UnknownHostException e1) {
-                //todo both logs here, check
                 LOG.info("UnknownHostException in getHostId, exception raised {}", e1);
-                logger.info("UnknownHostException in getHostId");
             }
         }
         try {

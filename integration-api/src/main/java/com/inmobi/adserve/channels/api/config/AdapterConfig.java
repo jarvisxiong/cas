@@ -67,11 +67,7 @@ public class AdapterConfig implements CasConfig {
     public boolean isActive() {
         String status = adapterConfig.getString("status", "on");
 
-        if ("on".equalsIgnoreCase(status)) {
-            return true;
-        } else {
-            return false;
-        }
+        return "on".equalsIgnoreCase(status);
     }
 
     /**

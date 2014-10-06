@@ -78,7 +78,6 @@ public class RequestParserTest extends TestCase
         assertEquals(sasRequestParameters.getSource(), "APP");
         assertEquals(sasRequestParameters.getAdcode(), "NON-JS");
         assertEquals(sasRequestParameters.getSdkVersion(), "i357");
-        assertEquals(sasRequestParameters.getPostalCode(), "302015");
         assertEquals(casInternalRequestParameters.uidO1, "8d10846582eef7c6f5873883b09a5a63");
         assertNull(casInternalRequestParameters.uidSO1);
         assertNull(casInternalRequestParameters.uidMd5);

@@ -75,7 +75,7 @@ public class AdGroupPricingEngineFilter extends AbstractAdGroupLevelFilter {
                 percentage = 1;
             }
 
-            return CasConfigUtil.random.nextInt(100) >= percentage;
+            return CasConfigUtil.RANDOM.nextInt(100) >= percentage;
         }
 
         return false;

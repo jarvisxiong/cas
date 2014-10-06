@@ -62,7 +62,7 @@ public class AuctionEngine implements AuctionEngineInterface {
         auctionComplete = true;
         List<ChannelSegment> filteredChannelSegmentList;
 
-        if(unfilteredChannelSegmentList.size() >= 1) {
+        if(!unfilteredChannelSegmentList.isEmpty()) {
             LOG.debug("Inside {} auction engine", DemandSourceType.findByValue(sasParams.getDst()).toString());
             // Apply filtration only when we have at least 1 channelSegment
             filteredChannelSegmentList = auctionFilterApplier.applyFilters(new ArrayList<>(unfilteredChannelSegmentList), casInternalRequestParameters);
@@ -73,7 +73,7 @@ public class AuctionEngine implements AuctionEngineInterface {
         LOG.debug("No. of filtered {} segments are {}", DemandSourceType.findByValue(sasParams.getDst()).toString(), filteredChannelSegmentList.size());
 
         // Send auction response as null in case of 0 rtb/ix responses.
-        if (filteredChannelSegmentList.size() == 0) {
+        if (filteredChannelSegmentList.isEmpty()) {
             auctionResponse = null;
             LOG.debug("Returning from auction engine , winner is none");
             return null;
@@ -181,7 +181,7 @@ public class AuctionEngine implements AuctionEngineInterface {
         if (unfilteredChannelSegmentList == null) {
             return false;
         }
-        if (unfilteredChannelSegmentList.size() == 0) {
+        if (unfilteredChannelSegmentList.isEmpty()) {
             return true;
         }
         for (ChannelSegment channelSegment : unfilteredChannelSegmentList) {

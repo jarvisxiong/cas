@@ -223,8 +223,6 @@ public class RequestParser {
             parameter.setAge(Short.valueOf(stringify(userMap, "u-age")));
             parameter.setGender(stringify(userMap, "u-gender"));
             parameter.setPostalCode(Integer.parseInt(stringify(userMap, "u-postalcode")));
-            System.out.println("Postal code is " + parameter.getPostalCode());
-            LOG.debug(traceMarker, "Postal code is {}", parameter.getPostalCode());
             try {
                 if (null != parameter.getAge()) {
                     parameter.setAge(Short.valueOf(URLEncoder.encode(String.valueOf(parameter.getAge()), utf8)));
