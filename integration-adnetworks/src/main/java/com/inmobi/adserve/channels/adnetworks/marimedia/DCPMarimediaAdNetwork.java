@@ -237,11 +237,11 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
                 // Banner or Interstitial.
                 if (ad.getString("adType").equalsIgnoreCase("banner")) {
                     String imageUrl = ad.getString("imageUrl");
-                    context.put(VelocityTemplateFieldConstants.PartnerImgUrl, imageUrl);
+                    context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, imageUrl);
                 }
                 else if( ad.getString("adType").equalsIgnoreCase("html")) {
                     String htmlUrl = ad.getString("htmlUrl");
-                    context.put(VelocityTemplateFieldConstants.PartnerImgUrl, htmlUrl);
+                    context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, htmlUrl);
                 }
                 else {
                     // Other format.
@@ -254,15 +254,15 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
 
                 // Ad URL.
                 String adUrl = ad.getString("adUrl");
-                context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adUrl);
+                context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, adUrl);
 
                 // Impression URL.
                 if(ad.has("impUrl")) {
                     String impressionUrl = ad.getString("impUrl");
-                    context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, impressionUrl);
+                    context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, impressionUrl);
                 }
 
-                context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
+                context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
 
                 responseContent = Formatter.getResponseFromTemplate(Formatter.TemplateType.IMAGE, context, sasParams, beaconUrl);
                 adStatus = "AD";

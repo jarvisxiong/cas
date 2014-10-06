@@ -278,7 +278,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 	}else{
                 		dst = "DCP";
                 	}
-                	InspectorStats.updateYammerTimerStats(dst, InspectorStrings.clientTimerLatency, latency);
+                	InspectorStats.updateYammerTimerStats(dst, InspectorStrings.CLIENT_TIMER_LATENCY, latency);
                 	
                 	
                     if (t instanceof java.net.ConnectException) {

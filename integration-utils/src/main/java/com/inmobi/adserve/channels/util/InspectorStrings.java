@@ -30,7 +30,7 @@ public class InspectorStrings {
     public static final String THRIFT_PARSING_ERROR                      = "Terminated_ThriftError";
     public static final String PROCESSING_ERROR                          = "Terminated_ServerError";
     public static final String MISSING_SITE_ID                           = "Terminated_NoSite";
-    public static final String clientTimerLatency                        = "ClientTimerLatency";
+    public static final String CLIENT_TIMER_LATENCY                      = "ClientTimerLatency";
     public static final String timerLatency                              = "timerLatency";
     public static final String timeoutException                          = "TimeoutException";
     public static final String INCOMPATIBLE_SITE_TYPE                    = "Termninated_IncompatibleSite";
