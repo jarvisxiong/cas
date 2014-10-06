@@ -1085,7 +1085,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
             boolean result = updateDSPAccountInfo(seatBid.getBuyer());
             if (!result) {
-                InspectorStats.incrementStatCount(InspectorStrings.INVALID_DSP_ID);
+                InspectorStats.incrementStatCount(this.getName(), InspectorStrings.INVALID_DSP_ID);
             }
 
             return result;
