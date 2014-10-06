@@ -102,5 +102,4 @@ public class InspectorStrings {
     public static final String IX_ZONE_ID_NOT_PRESENT                    = "IXZoneIdNotPresent";
     public static final String IX_SITE_ID_NOT_PRESENT                    = "IXSiteIdNotPresent";
     public static final String INVALID_DSP_ID                            = "InvalidDspId";
-
 }

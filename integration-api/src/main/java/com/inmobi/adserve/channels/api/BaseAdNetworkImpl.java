@@ -277,8 +277,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 	if (isRtbPartner()){
                 		dst = "RTBD";
                 	} else if (isIxPartner()) {
-                        dst = "IX";
-                    } else {
+                		dst = "IX";
+                	} else {
                 		dst = "DCP";
                 	}
                 	InspectorStats.updateYammerTimerStats(dst, InspectorStrings.clientTimerLatency, latency);
