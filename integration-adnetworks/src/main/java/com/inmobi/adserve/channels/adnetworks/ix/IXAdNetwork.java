@@ -821,7 +821,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         adStatus = "NO_AD";
-        LOG.debug(traceMarker, "response is {}", response);
+        LOG.info(traceMarker, "response is {}", response);
         if (status.code() != 200 || StringUtils.isBlank(response)) {
             statusCode = status.code();
             if (200 == statusCode) {
