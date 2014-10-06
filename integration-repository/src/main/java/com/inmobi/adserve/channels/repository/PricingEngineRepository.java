@@ -35,10 +35,8 @@ public class PricingEngineRepository extends
         Collection<PricingEngineEntity> pricingEngineEntityResultSet = query(pricingEngineIdQuery);
         if (pricingEngineEntityResultSet == null || pricingEngineEntityResultSet.isEmpty()) {
             return null;
-        } else if (!pricingEngineEntityResultSet.isEmpty()) {
-            return (PricingEngineEntity) pricingEngineEntityResultSet.toArray()[0];
         }
-        return null;
+        return (PricingEngineEntity) pricingEngineEntityResultSet.toArray()[0];
     }
 
     @Override
