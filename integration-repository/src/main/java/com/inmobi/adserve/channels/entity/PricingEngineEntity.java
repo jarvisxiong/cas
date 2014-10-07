@@ -78,13 +78,17 @@ public class PricingEngineEntity implements IdentifiableEntity<PricingEngineQuer
             return false;
         }
         PricingEngineEntity other = (PricingEngineEntity) obj;
-        if (countryId == null && other.countryId != null) {
+        if (null == countryId) {
+            if (null != other.countryId) {
                 return false;
+            }
         } else if (!countryId.equals(other.countryId)) {
             return false;
         }
-        if (osId == null && other.osId != null){
+        if (osId == null) {
+            if (other.osId != null) {
                 return false;
+            }
         } else if (!osId.equals(other.osId)) {
             return false;
         }

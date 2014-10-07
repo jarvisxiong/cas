@@ -86,7 +86,7 @@ import java.util.UUID;
  */
 public class IXAdNetwork extends BaseAdNetworkImpl {
 
-    private final static Logger            LOG                          = LoggerFactory.getLogger(IXAdNetwork.class);
+    private static final Logger            LOG                          = LoggerFactory.getLogger(IXAdNetwork.class);
 
     @Getter
     @Setter

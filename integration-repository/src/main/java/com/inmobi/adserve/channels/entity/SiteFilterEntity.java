@@ -45,13 +45,17 @@ public class SiteFilterEntity implements IdentifiableEntity<SiteFilterQuery> {
         }
         SiteFilterEntity other = (SiteFilterEntity) obj;
 
-        if (ruleType == null && other.ruleType != null){
-            return false;
+        if (null == ruleType) {
+            if (null != other.ruleType) {
+                return false;
+            }
         } else if (!ruleType.equals(other.ruleType)) {
             return false;
         }
-        if (siteId == null && other.siteId != null){
-            return false;
+        if (null == siteId) {
+            if (null != other.siteId) {
+                return false;
+            }
         } else if (!siteId.equals(other.siteId)) {
             return false;
         }

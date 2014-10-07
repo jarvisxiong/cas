@@ -61,13 +61,17 @@ public class CreativeEntity implements IdentifiableEntity<CreativeQuery> {
             return false;
         }
         CreativeEntity other = (CreativeEntity) obj;
-        if (null == advertiserId && null != other.advertiserId) {
+        if (null == advertiserId) {
+            if (null != other.advertiserId) {
                 return false;
+            }
         } else if (!advertiserId.equals(other.advertiserId)) {
             return false;
         }
-        if (null == creativeId && null != other.creativeId) {
+        if (null == creativeId) {
+            if (null != other.creativeId) {
                 return false;
+            }
         } else if (!creativeId.equals(other.creativeId)) {
             return false;
         }

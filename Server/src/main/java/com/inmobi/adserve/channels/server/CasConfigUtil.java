@@ -40,7 +40,6 @@ public class CasConfigUtil {
     private static Configuration   databaseConfig;
 
     public static RepositoryHelper repositoryHelper;
-    public static int              percentRollout;
     public static List<String>     allowedSiteTypes;
     public static int              rollCount                = 0;
     public static final Random     RANDOM                   = new Random();
@@ -53,10 +52,9 @@ public class CasConfigUtil {
         CasConfigUtil.log4jConfig = config.getLog4jConfiguration();
         CasConfigUtil.databaseConfig = config.getDatabaseConfiguration();
         CasConfigUtil.repositoryHelper = repositoryHelper;
-        percentRollout = CasConfigUtil.serverConfig.getInt("percentRollout", 100);
         allowedSiteTypes = CasConfigUtil.serverConfig.getList("allowedSiteTypes");
 
-        InspectorStats.incrementStatCount(InspectorStrings.PERCENT_ROLL_OUT, percentRollout);
+        InspectorStats.incrementStatCount(InspectorStrings.PERCENT_ROLL_OUT, CasConfigUtil.serverConfig.getInt("percentRollout", 100));
     }
 
     public static Configuration getServerConfig() {

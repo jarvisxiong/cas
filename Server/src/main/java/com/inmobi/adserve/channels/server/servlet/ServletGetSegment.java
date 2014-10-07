@@ -74,7 +74,7 @@ public class ServletGetSegment implements Servlet {
             String key = id + "_" + repoName;
             Object entity = null;
 
-            if(repoName != null) {
+            if (repoName != null) {
                 if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_REPOSITORY)) {
                     entity = CasConfigUtil.repositoryHelper.queryChannelRepository(id);
                 } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY)) {
@@ -111,8 +111,8 @@ public class ServletGetSegment implements Servlet {
                 } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CREATIVE_REPOSITORY)) {
                     entity = CasConfigUtil.repositoryHelper.queryCreativeRepository(id.split("_")[0], id.split("_")[1]);
                 }
-                segmentInfo.put(key, entity);
             }
+            segmentInfo.put(key, entity);
         }
         Gson gson = new Gson();
         hrh.responseSender.sendResponse(gson.toJson(segmentInfo), serverChannel);
