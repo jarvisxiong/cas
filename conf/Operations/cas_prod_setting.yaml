@@ -245,7 +245,7 @@ prod:
       debug_log_type :
          - 'ERROR'
       graphite_host :
-         - 'mon02.ads.lhr1.inmobi.com'
+         - 'mon01.ads.hkg1.inmobi.com'
       scribe_endpoint1:
          - 'databus.vip.hkg1.inmobi.com'
       read_timeout:
