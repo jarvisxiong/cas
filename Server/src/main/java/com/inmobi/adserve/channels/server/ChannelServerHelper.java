@@ -11,23 +11,20 @@ import org.slf4j.LoggerFactory;
 
 
 public class ChannelServerHelper {
-    private final Logger logger;
+
     private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(ChannelServerHelper.class);
-    public ChannelServerHelper(final Logger serverLogger) {
-        logger = serverLogger;
-    }
 
     public byte getDataCenterId(final String dataCenterIdKey) {
         byte dataCenterIdCode;
         try {
             dataCenterIdCode = Byte.parseByte(System.getProperty(dataCenterIdKey));
         } catch (NumberFormatException e) {
-            logger.info("NumberFormatException in getDataCenterId");
+            LOG.info("NumberFormatException in getDataCenterId");
             dataCenterIdCode = 0;
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("dataCenterId is " + dataCenterIdCode);
-        }
+
+        LOG.debug("dataCenterId is {}", dataCenterIdCode);
+
         return dataCenterIdCode;
     }
 
@@ -54,9 +51,9 @@ public class ChannelServerHelper {
         } catch (StringIndexOutOfBoundsException e) {
             LOG.info("StringIndexOutOfRangeException in getHostId, exception raised {}", e);
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("hostid is " + hostId);
-        }
+
+        LOG.debug("hostid is {}", hostId);
+
         return hostId;
     }
 
@@ -69,11 +66,11 @@ public class ChannelServerHelper {
         try {
             maxConnections = Integer.parseInt(System.getProperty(connectionsKey));
         } catch (NumberFormatException e) {
-            logger.info("NumberFormatException " + connectionType.toString() + "maxConnections");
+            LOG.info("NumberFormatException {} maxConnections", connectionType.toString());
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Max limit for " +  connectionType.toString() + " connections is " + maxConnections);
-        }
+
+        LOG.debug("Max limit for {}, connections is {}", connectionType.toString(), maxConnections);
+
         return maxConnections;
     }
 }

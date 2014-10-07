@@ -28,7 +28,7 @@ public class ServletChangeRollout implements Servlet {
             final Channel serverChannel) throws Exception {
         Integer percentRollout;
         try {
-            List<String> rollout = (queryStringDecoder.parameters().get("percentRollout"));
+            List<String> rollout = queryStringDecoder.parameters().get("percentRollout");
             percentRollout = Integer.parseInt(rollout.get(0));
         } catch (NumberFormatException ex) {
             LOG.info("invalid attempt to change rollout percentage {}", ex);
