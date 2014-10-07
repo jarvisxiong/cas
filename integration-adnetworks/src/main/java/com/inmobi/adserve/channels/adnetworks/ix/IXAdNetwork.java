@@ -11,7 +11,6 @@ import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
-import com.inmobi.adserve.channels.api.template.NativeTemplateAttributeFinder;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
@@ -115,10 +114,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private final String                   password;
     private final Integer                  accountId;
     private final boolean                  wnRequired;
-    private final int                      auctionType                  = 2;
     private int                            tmax                         = 200;
     private boolean                        templateWN                   = true;
-    private static final String            CONTENT_TYPE                 = "application/json";
     private static final String            DISPLAY_MANAGER_INMOBI_SDK   = "inmobi_sdk";
     private static final String            DISPLAY_MANAGER_INMOBI_JS    = "inmobi_js";
     private final String                   advertiserId;
@@ -171,8 +168,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Inject
     private static AsyncHttpClientProvider asyncHttpClientProvider;
 
-    @Inject
-    private static NativeTemplateAttributeFinder nativeTemplateAttributeFinder;
     private static final String nativeString = "native";
     private ChannelSegmentEntity dspChannelSegmentEntity;
 
@@ -186,7 +181,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     public IXAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
                        final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String urlBase,
                        final String advertiserName, final int tmax, final RepositoryHelper repositoryHelper, final boolean templateWinNotification) {
-
         super(baseRequestHandler, serverChannel);
         this.advertiserId = config.getString(advertiserName + ".advertiserId");
         this.urlArg = config.getString(advertiserName + ".urlArg");
@@ -216,12 +210,12 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Override
     protected boolean configureParameters() {
 
-        LOG.debug("inside configureParameters of IX");
+        LOG.debug(traceMarker, "inside configureParameters of IX");
         if (StringUtils.isBlank(sasParams.getRemoteHostIp())
                 || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)
                 || !isRequestFormatSupported()) {
-            LOG.debug("mandate parameters missing or request format is not compatible to partner supported response for dummy so exiting adapter");
+            LOG.debug(traceMarker, "mandate parameters missing or request format is not compatible to partner supported response for dummy so exiting adapter");
             return false;
         }
 
@@ -276,7 +270,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         bidRequest = createBidRequestObject(impresssionlist, site, app, user, device, regs);
 
         if (null == bidRequest) {
-            LOG.debug("Failed inside createBidRequest");
+            LOG.debug(traceMarker, "Failed inside createBidRequest");
             return false;
         }
 
@@ -313,14 +307,14 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         tempBidRequest.setId(casInternalRequestParameters.auctionId);
         tempBidRequest.setTmax(tmax);
 
-        LOG.debug("INSIDE CREATE BID REQUEST OBJECT");
+        LOG.debug(traceMarker, "INSIDE CREATE BID REQUEST OBJECT");
 
         if (site != null) {
             tempBidRequest.setSite(site);
         } else if (app != null) {
             tempBidRequest.setApp(app);
         } else {
-            LOG.debug("App and Site both object can not be null so returning");
+            LOG.debug(traceMarker, "App and Site both object can not be null so returning");
             return null;
         }
 
@@ -332,27 +326,21 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
 
     private String serializeBidRequest() {
-
         TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
-
         String tempBidRequestJson;
-
         try {
-
             tempBidRequestJson = serializer.toString(bidRequest);
             if(isNativeRequest()){
                 tempBidRequestJson = tempBidRequestJson.replaceFirst("nativeObject", "native");
             }
-
-            LOG.info("IX request json is : {}", tempBidRequestJson);
+            LOG.info(traceMarker, "IX request json is : {}", tempBidRequestJson);
         }
         catch (TException e) {
-            LOG.debug("Could not create json from bidrequest for partner {}", advertiserName);
-            LOG.info("Configure parameters inside IX returned false {}", advertiserName);
+            LOG.debug(traceMarker, "Could not create json from bidrequest for partner {}", advertiserName);
+            LOG.info(traceMarker, "Configure parameters inside IX returned false {}", advertiserName);
             return null;
         }
-        LOG.info("return true");
-
+        LOG.info(traceMarker, "return true");
         return tempBidRequestJson;
     }
 
@@ -381,9 +369,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     private Impression createImpressionObject(final Banner banner, final String displayManager,
                                               final String displayManagerVersion, final ProxyDemand proxyDemand) {
-
         Impression impression;
-
         if (null != casInternalRequestParameters.impressionId) {
             /**
              * In order to conform to the rubicon spec, we are passing a unique integer identifier whose value
@@ -391,10 +377,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
              */
             impression = new Impression("1");
         } else {
-            LOG.info("Impression id can not be null in Cas Internal Request Params");
+            LOG.info(traceMarker, "Impression id can not be null in Cas Internal Request Params");
             return null;
         }
-
         if(!isNativeRequest()){
             impression.setBanner(banner);
         }
@@ -406,17 +391,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         } else {
             impression.setInstl(0);
         }
-
         impression.setBidfloor(casInternalRequestParameters.auctionBidFloor);
-
-        LOG.debug("Bid floor is {}", impression.getBidfloor());
-
-
-
+        LOG.debug(traceMarker, "Bid floor is {}", impression.getBidfloor());
         CommonExtension impExt = new CommonExtension();
-
         JSONObject additionalParams= entity.getAdditionalParams();
-
         if (null != additionalParams) {
             String zoneId = getZoneId(additionalParams);
             if (null != zoneId) {
@@ -424,14 +402,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 rp.setZone_id(zoneId);
                 impExt.setRp(rp);
             } else{
-                LOG.debug("zone id not present, will say false");
+                LOG.debug(traceMarker, "zone id not present, will say false");
                 InspectorStats.incrementStatCount(InspectorStrings.IX_ZONE_ID_NOT_PRESENT);
                 return null;
                 //zoneID not available so returning NULL
             }
         }
         impression.setExt(impExt);
-
         return impression;
     }
 
@@ -446,7 +423,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                     String categoryIdKey = sasParams.getCategories().get(index).toString();
                     if (additionalParams.has(categoryIdKey)) {
                         categoryZoneId = additionalParams.getString(categoryIdKey);
-                        LOG.debug("category Id is {}", categoryZoneId);
+                        LOG.debug(traceMarker, "category Id is {}", categoryZoneId);
                     }
                     if (categoryZoneId != null) {
                         isCategorySet = true;
@@ -526,7 +503,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         try {
             rubiconSiteId = Integer.parseInt(additionalParams.getString("site"));
         } catch (JSONException e) {
-            LOG.debug("Site Id is not configured");
+            LOG.debug(traceMarker, "Site Id is not configured");
             InspectorStats.incrementStatCount(InspectorStrings.IX_SITE_ID_NOT_PRESENT);
             return null;
         }
@@ -628,7 +605,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         try {
             rubiconSiteId = Integer.parseInt(additionalParams.getString("site"));
         } catch (JSONException e) {
-            LOG.debug("Site Id is not configured");
+            LOG.debug(traceMarker, "Site Id is not configured");
             InspectorStats.incrementStatCount(InspectorStrings.IX_SITE_ID_NOT_PRESENT);
             return null;
         }
@@ -698,7 +675,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     public List <String> getBlockedList() {
         List<String> blockedList = Lists.newArrayList();
-        LOG.debug("{}",sasParams.getSiteIncId());
+        LOG.debug(traceMarker, "{}",sasParams.getSiteIncId());
         blockedList.add(String.format(SITE_BLOCKLIST_FORMAT, sasParams.getSiteIncId()));
         if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
 
@@ -733,7 +710,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 device.setLmt(Integer.parseInt(casInternalRequestParameters.uidADT) == 0 ? 1 : 0);
             }
             catch (NumberFormatException e) {
-                LOG.debug("Exception while parsing uidADT to integer {}", e);
+                LOG.debug(traceMarker, "Exception while parsing uidADT to integer {}", e);
             }
         }
         // Setting platform id sha1 hashed
@@ -790,13 +767,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                     .get(0).getSeat());
         }
         if (null == bidRequest) {
-            LOG.info("bidrequest is null");
+            LOG.info(traceMarker, "bidrequest is null");
             return url;
         }
         url = url.replaceAll(RTBCallbackMacros.AUCTION_IMP_ID_INSENSITIVE, bidRequest.getImp().get(0)
                 .getId());
 
-        LOG.debug("String after replaceMacros is {}", url);
+        LOG.debug(traceMarker, "String after replaceMacros is {}", url);
         return url;
     }
 
@@ -819,7 +796,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         String authStr = userName + ":" + password;
         String authEncoded = new String(Base64.encodeBase64(authStr.getBytes()));
-        LOG.debug("INSIDE GET NING REQUEST");
+        LOG.debug(traceMarker, "INSIDE GET NING REQUEST");
 
         return new RequestBuilder(httpRequestMethod).setUrl(uri.toString())
                 .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json").setBody(body)
@@ -836,7 +813,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         } else {
             url.append(urlBase);
         }
-        LOG.debug("{} url is {}", getName(), url.toString());
+        LOG.debug(traceMarker, "{} url is {}", getName(), url.toString());
         return URI.create(url.toString());
     }
 
@@ -844,7 +821,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         adStatus = "NO_AD";
-        LOG.debug("response is {}", response);
+        LOG.info(traceMarker, "response is {}", response);
         if (status.code() != 200 || StringUtils.isBlank(response)) {
             statusCode = status.code();
             if (200 == statusCode) {
@@ -859,26 +836,26 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 adStatus = "NO_AD";
                 responseContent = "";
                 statusCode = 500;
-                LOG.info("Error in parsing ix response");
+                LOG.info(traceMarker, "Error in parsing ix response");
                 return;
             }
             adStatus = "AD";
 
             if(isNativeRequest()){
                 // TODO add nativeAdBuilding();
-                LOG.debug("we do not support native request");
+                LOG.debug(traceMarker, "we do not support native request");
             } else {
                 nonNativeAdBuilding();
             }
 
         }
-        LOG.debug("response length is {}", responseContent.length());
-        LOG.debug("response is {}", responseContent);
+        LOG.debug(traceMarker, "response length is {}", responseContent.length());
+        LOG.debug(traceMarker, "response is {}", responseContent);
     }
 
 
     public boolean updateDSPAccountInfo(String buyer) {
-        LOG.debug("Inside updateDSPAccountInfo");
+        LOG.debug(traceMarker, "Inside updateDSPAccountInfo");
         // Get Inmobi account id for the DSP on Rubicon side
         IXAccountMapEntity ixAccountMapEntity = repositoryHelper.queryIXAccountMapRepository(Long.parseLong(buyer));
         if (null == ixAccountMapEntity) {
@@ -913,10 +890,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             long incId = this.dspChannelSegmentEntity.getIncId(responseCreativeType);
 
             String oldImpressionId = this.getImpressionId();
-            LOG.debug("Old impression id: {}", oldImpressionId);
+            LOG.debug(traceMarker, "Old impression id: {}", oldImpressionId);
 
             // Generating new impression id
-            LOG.debug("Creating new impression id from incId: {}", incId);
+            LOG.debug(traceMarker, "Creating new impression id from incId: {}", incId);
             String newImpressionId = ImpressionIdGenerator.getInstance().getImpressionId(incId);
 
             if (StringUtils.isNotEmpty(newImpressionId)) {
@@ -925,7 +902,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 this.clickUrl  = ClickUrlsRegenerator.regenerateClickUrl(this.clickUrl, this.getImpressionId(), newImpressionId);
                 this.impressionId = newImpressionId;
 
-                LOG.debug("Replaced impression id to new value {}.", newImpressionId);
+                LOG.debug(traceMarker, "Replaced impression id to new value {}.", newImpressionId);
             }
 
             return true;
@@ -935,20 +912,20 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     @Override
     public void processResponse() {
-        LOG.debug("Inside process Response for the partner: {}", getName());
+        LOG.debug(traceMarker, "Inside process Response for the partner: {}", getName());
         if (isRequestComplete) {
-            LOG.debug("Already cleaned up so returning from process response");
+            LOG.debug(traceMarker, "Already cleaned up so returning from process response");
             return;
         }
-        LOG.debug("Inside process Response for the partner: {}", getName());
+        LOG.debug(traceMarker, "Inside process Response for the partner: {}", getName());
         getResponseAd();
         isRequestComplete = true;
         if (baseRequestHandler.getAuctionEngine().areAllChannelSegmentRequestsComplete()) {
-            LOG.debug("areAllChannelSegmentRequestsComplete is true");
+            LOG.debug(traceMarker, "areAllChannelSegmentRequestsComplete is true");
             if (baseRequestHandler.getAuctionEngine().isAuctionComplete()) {
-                LOG.debug("IX Auction has run already");
+                LOG.debug(traceMarker, "IX Auction has run already");
                 if (baseRequestHandler.getAuctionEngine().isAuctionResponseNull()) {
-                    LOG.debug("IX Auction has returned null");
+                    LOG.debug(traceMarker, "IX Auction has returned null");
                     // Sending no ad response and cleaning up channel
                     // (processDcpPartner is skipped because the selected adNetworkInterface
                     // will always be the last entry and a No Ad Response will be sent)
@@ -956,7 +933,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                     baseRequestHandler.cleanUp();
                     return;
                 }
-                LOG.debug("IX Auction response is not null so sending auction response");
+                LOG.debug(traceMarker, "IX Auction response is not null so sending auction response");
                 return;
             } else {
                 AdNetworkInterface highestBid = baseRequestHandler.getAuctionEngine().runAuctionEngine();
@@ -964,13 +941,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                     // Update Response ChannelSegment
                     baseRequestHandler.getAuctionEngine().updateIXChannelSegment(dspChannelSegmentEntity);
 
-                    LOG.debug("Sending IX auction response of {}", highestBid.getName());
+                    LOG.debug(traceMarker, "Sending IX auction response of {}", highestBid.getName());
                     baseRequestHandler.sendAdResponse(highestBid, serverChannel);
                     // highestBid.impressionCallback();
-                    LOG.debug("Sent IX auction response");
+                    LOG.debug(traceMarker, "Sent IX auction response");
                     return;
                 } else {
-                    LOG.debug("IX auction has returned null");
+                    LOG.debug(traceMarker, "IX auction has returned null");
                     // Sending no ad response and cleaning up channel
                     // processDcpList is skipped
                     baseRequestHandler.sendNoAdResponse(serverChannel);
@@ -978,7 +955,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 }
             }
         }
-        LOG.debug("IX Auction has not run so waiting....");
+        LOG.debug(traceMarker, "IX Auction has not run so waiting....");
     }
 
 
@@ -1006,7 +983,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             }
         }
         // Checking whether to send win notification
-        LOG.debug("isWinRequired is {} and winfromconfig is {}", wnRequired, callbackUrl);
+        LOG.debug(traceMarker, "isWinRequired is {} and winfromconfig is {}", wnRequired, callbackUrl);
         createWin(velocityContext);
 
         if (templateWN || (admAfterMacroSize ==  admSize)) {
@@ -1017,7 +994,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                     null);
         } catch (Exception e) {
             adStatus = "NO_AD";
-            LOG.info("Some exception is caught while filling the velocity template for partner{} {}",
+            LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner{} {}",
                     advertiserName, e);
         }
 
@@ -1043,15 +1020,15 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 nUrl = bidResponse.seatbid.get(0).getBid().get(0).getNurl();
             }
             catch (Exception e) {
-                LOG.debug("Exception while parsing response {}", e);
+                LOG.debug(traceMarker, "Exception while parsing response {}", e);
             }
-            LOG.debug("nurl is {}", nUrl);
+            LOG.debug(traceMarker, "nurl is {}", nUrl);
             if (!StringUtils.isEmpty(callbackUrl)) {
-                LOG.debug("inside wn from config");
+                LOG.debug(traceMarker, "inside wn from config");
                 velocityContext.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, callbackUrl);
             }
             else if (!StringUtils.isEmpty(nUrl)) {
-                LOG.debug("inside wn from nurl");
+                LOG.debug(traceMarker, "inside wn from nurl");
                 velocityContext.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, nUrl);
             }
 
@@ -1080,7 +1057,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         Gson gson = new Gson();
         try {
             bidResponse = gson.fromJson(response, IXBidResponse.class);
-            LOG.debug("Done with parsing of bidresponse");
+            LOG.debug(traceMarker, "Done with parsing of bidresponse");
             if (null == bidResponse || null == bidResponse.getSeatbid() || bidResponse.getSeatbidSize() == 0) {
                 LOG.error("BidResponse does not have seat bid object");
                 return false;
@@ -1106,10 +1083,15 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             adjustbid = bid.getAdjustbid();
             dealId = bid.getDealid();
 
-            return updateDSPAccountInfo(seatBid.getBuyer());
+            boolean result = updateDSPAccountInfo(seatBid.getBuyer());
+            if (!result) {
+                InspectorStats.incrementStatCount(this.getName(), InspectorStrings.INVALID_DSP_ID);
+            }
+
+            return result;
         }
         catch (NullPointerException e) {
-            LOG.info("Could not parse the ix response from partner: {}", this.getName());
+            LOG.info(traceMarker, "Could not parse the ix response from partner: {}", this.getName());
             return false;
         }
     }
@@ -1150,11 +1132,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     public void setSecondBidPrice(final Double price) {
         this.secondBidPriceInUsd = price;
         this.secondBidPriceInLocal = price;
-        LOG.debug("responseContent before replaceMacros is {}", this.responseContent);
+        LOG.debug(traceMarker, "responseContent before replaceMacros is {}", this.responseContent);
         this.responseContent = replaceIXMacros(this.responseContent);
         ThirdPartyAdResponse adResponse = getResponseAd();
         adResponse.response = responseContent;
-        LOG.debug("responseContent after replaceMacros is {}", getResponseAd().response);
+        LOG.debug(traceMarker, "responseContent after replaceMacros is {}", getResponseAd().response);
     }
 
 

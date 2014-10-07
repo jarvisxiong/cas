@@ -34,6 +34,8 @@ import com.ning.http.client.RequestBuilder;
 public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 	private static final Logger          LOG           = LoggerFactory.getLogger(DCPWapStartAdNetwork.class);
 
+	private static final String LOGIN = "login";
+	private static final String PROVIDER="wapstart";
 	private String                       latitude      = null;
 	private String                       longitude     = null;
 	private int                          width;
@@ -110,8 +112,15 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 			user.setYob(yob);
 		}
 		if(StringUtils.isNotBlank(casInternalRequestParameters.uid)){
-			user.setUid(casInternalRequestParameters.uid);
+			WapstartData data= new WapstartData();
+			Segment segment = new Segment();
+			segment.setName(LOGIN);
+			segment.setValue(casInternalRequestParameters.uid);
+			data.setSegment(segment);
+			data.setName(PROVIDER);
+			user.setData(data);
 		}
+
 		Geo geo = new Geo();
 		if (StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)) {
 			geo.setLat(latitude);
@@ -160,12 +169,13 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 		Banner[] banners =  new Banner[1];
 		banners[0]=banner;
 		impression.setBanner(banners);
+		
 		WapStartAdrequest adRequest = new WapStartAdrequest();
 		adRequest.setDevice(device);
 		adRequest.setImpression(impression);
 		adRequest.setSite(site);
 		adRequest.setUser(user);
-
+		
 		ObjectMapper mapper = new ObjectMapper();
 
 		try {
