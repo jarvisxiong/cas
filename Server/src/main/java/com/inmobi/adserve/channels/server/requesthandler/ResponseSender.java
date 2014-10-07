@@ -160,8 +160,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
          * NOTE: In case of No Ad, the logging will happen on RP parameters only.
          */
         if (selectedAdNetwork instanceof IXAdNetwork) {
-            List<ChannelSegment> dspRankList = Arrays.asList(this.getAuctionEngine().getAuctionResponse());
-            this.setRankList(dspRankList);
+            getAuctionEngine().setUnfilteredChannelSegmentList(Arrays.asList(this.getAuctionEngine().getAuctionResponse()));
         }
 
         adResponse = selectedAdNetwork.getResponseAd();
@@ -178,28 +177,28 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
 
         LOG.debug("ad received so trying to send ad response");
-        String finalReponse = adResponse.response;
+        String finalResponse = adResponse.response;
         if (sasParams.getSlot() != null && SlotSizeMapping.getDimension(Long.valueOf(sasParams.getSlot())) != null) {
             LOG.debug("slot served is {}", sasParams.getSlot());
             if (getResponseFormat() == ResponseFormat.XHTML) {
                 Dimension dim = SlotSizeMapping.getDimension(Long.valueOf(sasParams.getSlot()));
                 String startElement = String.format(START_TAG, (int) dim.getWidth(), (int) dim.getHeight());
-                finalReponse = startElement + finalReponse + END_TAG;
+                finalResponse = startElement + finalResponse + END_TAG;
             } else if (getResponseFormat() == ResponseFormat.IMAI) {
-                finalReponse = AD_IMAI_START_TAG + finalReponse;
+                finalResponse = AD_IMAI_START_TAG + finalResponse;
             }
         } else {
             LOG.info("invalid slot, so not returning response, even though we got an ad");
             InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
             if (getResponseFormat() == ResponseFormat.XHTML) {
-                finalReponse = NO_AD_XHTML;
+                finalResponse = NO_AD_XHTML;
             }
-            sendResponse(HttpResponseStatus.OK, finalReponse, adResponse.responseHeaders, serverChannel);
+            sendResponse(HttpResponseStatus.OK, finalResponse, adResponse.responseHeaders, serverChannel);
             return;
         }
 
         if (sasParams.getDst() == DCP.getValue()) {
-            sendResponse(HttpResponseStatus.OK, finalReponse, adResponse.responseHeaders, serverChannel);
+            sendResponse(HttpResponseStatus.OK, finalResponse, adResponse.responseHeaders, serverChannel);
             incrementStatsForFills(sasParams.getDst());
         } else {
             String dstName = DemandSourceType.findByValue(sasParams.getDst()).toString();

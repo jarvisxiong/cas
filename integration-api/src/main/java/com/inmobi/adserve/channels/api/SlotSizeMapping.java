@@ -40,7 +40,11 @@ public class SlotSizeMapping {
         slotMap.put(34l, new Dimension(1280, 800));
         slotMap.put(35l, new Dimension(320, 30));
         slotMap.put(36l, new Dimension(320, 26));
-        slotMap.put(0l, new Dimension(0, 0));
+        slotMap.put(37l, new Dimension(320, 100));
+        slotMap.put(38l, new Dimension(320, 568));
+        slotMap.put(39l, new Dimension(568, 320));
+        slotMap.put(40l, new Dimension(250, 300));
+        slotMap.put(0l,  new Dimension(0, 0));
 
         //Adding IX_SLOT_ID_MAP, which is a map from InMobi slot id's to Rubicon slot id's
 
