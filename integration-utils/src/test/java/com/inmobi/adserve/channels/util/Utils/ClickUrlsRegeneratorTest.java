@@ -2,28 +2,29 @@ package com.inmobi.adserve.channels.util.Utils;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
-import org.easymock.classextension.EasyMock;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-
 public class ClickUrlsRegeneratorTest{
-    Configuration mockConfig;
+    static Configuration mockConfig;
 
-    public void prepareMockConfig() {
-        mockConfig = EasyMock.createMock(Configuration.class);
-        EasyMock.expect(mockConfig.getString("key.1.value")).andReturn("SecretKey").times(1);
-        EasyMock.expect(mockConfig.getString("beaconURLPrefix")).andReturn("BeaconURLPrefix").times(2);
-        EasyMock.expect(mockConfig.getString("clickURLPrefix")).andReturn("ClickURLPrefix").times(1);
-        EasyMock.replay(mockConfig);
+    private static void prepareMockConfig() {
+        mockConfig = createMock(Configuration.class);
+        expect(mockConfig.getString("key.1.value")).andReturn("SecretKey").times(1);
+        expect(mockConfig.getString("beaconURLPrefix")).andReturn("BeaconURLPrefix").times(2);
+        expect(mockConfig.getString("clickURLPrefix")).andReturn("ClickURLPrefix").times(1);
+        replay(mockConfig);
     }
 
-    @Before
-    public void setUp() {
+    @BeforeClass
+    public static void setUp() {
         prepareMockConfig();
         ClickUrlsRegenerator.init(mockConfig);
     }
@@ -45,7 +46,7 @@ public class ClickUrlsRegeneratorTest{
 
     @Test
     public void testRegenerateBeaconUrlRmAdFalse() throws Exception {
-        String oldBeaconURL = "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/c124b6b5-0148-1000-c54a-00012e330000/0/5l/-1/0/0/x/0/nw/101/1/1/bc20cfc3";
+        String oldBeaconURL = TestUtils.SampleStrings.beaconUrl;
         String oldImpressionId = "c124b6b5-0148-1000-c54a-00012e330000";
         String newExpectedImpressionId = "c124ba55-0148-1000-f71b-00022d0b0000";
 
@@ -60,7 +61,7 @@ public class ClickUrlsRegeneratorTest{
 
     @Test
     public void testRegenerateClickUrl() throws Exception {
-        String oldClickURL = "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/c124b6b5-0148-1000-c54a-00012e330000/0/5l/-1/1/0/x/0/nw/101/1/1/5f2b3532";
+        String oldClickURL = TestUtils.SampleStrings.clickUrl;
         String oldImpressionId = "c124b6b5-0148-1000-c54a-00012e330000";
         String newExpectedImpressionId = "c124ba55-0148-1000-f71b-00022d0b0000";
 
