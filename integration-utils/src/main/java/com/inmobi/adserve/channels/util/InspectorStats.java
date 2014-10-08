@@ -150,8 +150,13 @@ public class InspectorStats {
 	}
 
 
-    public static String getStats() {
-        return (new JSONObject(ingrapherCounterStats).toString());
+	public static JSONObject getStatsObj() {
+	  return new JSONObject(ingrapherCounterStats);
+	}
+	
+	
+    public static String getStatsString() {
+        return getStatsObj().toString();
     }
     
     
