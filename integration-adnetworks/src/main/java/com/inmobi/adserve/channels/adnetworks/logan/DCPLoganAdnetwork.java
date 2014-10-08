@@ -102,20 +102,15 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
             String udid = null;
             if (casInternalRequestParameters.uidO1 != null) {
                 udid = casInternalRequestParameters.uidO1;
-            }
-            else if (casInternalRequestParameters.uidIFA != null) {
+            } else if (casInternalRequestParameters.uidIFA != null) {
                 udid = casInternalRequestParameters.uidIFA;
-            }
-            else if (casInternalRequestParameters.uidMd5 != null) {
+            } else if (casInternalRequestParameters.uidMd5 != null) {
                 udid = casInternalRequestParameters.uidMd5;
-            }
-            else if (casInternalRequestParameters.uidIDUS1 != null) {
+            } else if (casInternalRequestParameters.uidIDUS1 != null) {
                  udid =  casInternalRequestParameters.uidIDUS1;
-            }
-            else if (!StringUtils.isBlank(casInternalRequestParameters.uid)) {
+            } else if (!StringUtils.isBlank(casInternalRequestParameters.uid)) {
                 udid = casInternalRequestParameters.uid;
-            }
-            else {
+            } else {
                 String gpid = getGPID();
                 if (gpid != null) {
                     udid = gpid;
@@ -139,8 +134,7 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
             }
             LOG.debug("logan url is {}", url);
             return (new URI(url.toString()));
-        }
-        catch (URISyntaxException exception) {
+        } catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.info("{}", exception);
         }
@@ -158,16 +152,14 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             LOG.debug("beacon url inside logan is {}", beaconUrl);
 
             try {
                 JSONArray jArray = null;
                 if (response.endsWith(";")) {
                     jArray = new JSONArray(response.substring(0, response.length() - 1));
-                }
-                else {
+                } else {
                     jArray = new JSONArray(response);
                 }
                 JSONObject adResponse = jArray.getJSONObject(0);
@@ -179,40 +171,35 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
 
                 statusCode = status.code();
                 VelocityContext context = new VelocityContext();
-                context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, adResponse.get("track"));
+                context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, adResponse.get("track"));
                 TemplateType t;
                 if (textAd || bannerAd) {
-                    context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse.getString("url"));
-                    context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
+                    context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, adResponse.getString("url"));
+                    context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
                     if (textAd && StringUtils.isNotBlank(adResponse.getString("text"))) {
-                        context.put(VelocityTemplateFieldConstants.AdText, adResponse.getString("text"));
+                        context.put(VelocityTemplateFieldConstants.AD_TEXT, adResponse.getString("text"));
                         String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                         if (!StringUtils.isEmpty(vmTemplate)) {
-                            context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
+                            context.put(VelocityTemplateFieldConstants.TEMPLATE, vmTemplate);
                             t = TemplateType.RICH;
-                        }
-                        else {
+                        } else {
                             t = TemplateType.PLAIN;
                         }
-                    }
-                    else {
-                        context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getString("img"));
+                    } else {
+                        context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, adResponse.getString("img"));
                         t = TemplateType.IMAGE;
                     }
-                }
-                else {
-                    context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, adResponse.getString("content"));
+                } else {
+                    context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, adResponse.getString("content"));
                     t = TemplateType.HTML;
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            }
-            catch (JSONException exception) {
+            } catch (JSONException exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from logan : {}", exception);
                 LOG.info("Response from logan: {}", response);
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from logan : {}", exception);
                 LOG.info("Response from logan: {}", response);

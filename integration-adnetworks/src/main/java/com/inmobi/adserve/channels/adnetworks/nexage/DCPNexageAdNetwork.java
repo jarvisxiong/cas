@@ -87,8 +87,8 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
 			// segment table
 			pos = entity.getAdditionalParams().getString(POS);
 		} catch (JSONException e) {
-			LOG.info("pos is not configured for the segment:{} {}",
-					entity.getExternalSiteKey(), this.getName());
+			LOG.info("pos is not configured for the segment:{} {}, exception raised {}",
+					entity.getExternalSiteKey(), this.getName(), e);
 			return false;
 		}
 
@@ -97,6 +97,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
 					.getString(JS_AD_TAG));
 		} catch (JSONException e) {
 			jsAdTag = false;
+            LOG.debug("exception raised while retrieving JS_AD_TAG from additional Params {}", e);
 		}
 
 		isApp = (StringUtils.isBlank(sasParams.getSource()) || "WAP"
@@ -143,8 +144,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
 		if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
 			finalUrl.append("&d(id2)=").append(
 					casInternalRequestParameters.uidO1);
-		}
-		else if  (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
+		} else if  (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
             finalUrl.append("&d(id2)=").append(
                     casInternalRequestParameters.uidIDUS1);
         }
@@ -156,8 +156,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
 				finalUrl.append("&u(id)=").append(
 						casInternalRequestParameters.uidMd5);
 			}
-		}
-		else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
+		} else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
             if (isApp) {
                 finalUrl.append("&d(id12)=").append(
                         casInternalRequestParameters.uid);
@@ -165,8 +164,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
                 finalUrl.append("&u(id)=").append(
                         casInternalRequestParameters.uid);
             }
-        }
-		else {
+        } else {
 		    String gpid = getGPID();
 		    if (gpid != null) {
 		    finalUrl.append("&d(id12)=").append(getHashedValue(gpid, "MD5"));
@@ -212,7 +210,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
 		// discarding parameters that have null values
 		for (int i = 1; i < urlParams.length; i++) {
 			String[] paramValue = urlParams[i].split("=");
-			if ((paramValue.length == 2) && !(paramValue[1].equals("null"))
+			if ((paramValue.length == 2) && !("null".equals(paramValue[1]))
 					&& !(StringUtils.isEmpty(paramValue[1]))) {
 				finalUrl.append("&").append(paramValue[0]).append("=")
 						.append(paramValue[1]);
@@ -243,7 +241,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
 		} else {
 			statusCode = status.code();
 			VelocityContext context = new VelocityContext();
-			context.put(VelocityTemplateFieldConstants.PartnerHtmlCode,
+			context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE,
 					response.trim());
 			try {
 				responseContent = Formatter.getResponseFromTemplate(

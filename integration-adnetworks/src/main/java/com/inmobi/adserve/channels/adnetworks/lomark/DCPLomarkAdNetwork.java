@@ -38,6 +38,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
 	
     private static final Logger          LOG         = LoggerFactory.getLogger(DCPLomarkAdNetwork.class);
 
+    private static final String          NO_AD       = "NO_AD";
     private transient String             key;
     private transient String             secretKey;
     private transient String             latitude;
@@ -57,25 +58,25 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
         carrierIdMap.put(787, 1);
         carrierIdMap.put(788, 2);
         // category ip map
-        categoryMap.put(4l, 1);
-        categoryMap.put(23l, 1);
-        categoryMap.put(24l, 1);
-        categoryMap.put(13l, 2);
-        categoryMap.put(3l, 3);
-        categoryMap.put(3l, 9);
-        categoryMap.put(6l, 4);
-        categoryMap.put(10l, 4);
-        categoryMap.put(18l, 4);
-        categoryMap.put(31l, 4);
-        categoryMap.put(30l, 5);
-        categoryMap.put(12l, 6);
-        categoryMap.put(29l, 7);
-        categoryMap.put(11l, 8);
-        categoryMap.put(25l, 8);
-        categoryMap.put(19l, 9);
-        categoryMap.put(32l, 9);
-        categoryMap.put(15l, 10);
-        categoryMap.put(28l, 11);
+        categoryMap.put(4L, 1);
+        categoryMap.put(23L, 1);
+        categoryMap.put(24L, 1);
+        categoryMap.put(13L, 2);
+        categoryMap.put(3L, 3);
+        categoryMap.put(3L, 9);
+        categoryMap.put(6L, 4);
+        categoryMap.put(10L, 4);
+        categoryMap.put(18L, 4);
+        categoryMap.put(31L, 4);
+        categoryMap.put(30L, 5);
+        categoryMap.put(12L, 6);
+        categoryMap.put(29L, 7);
+        categoryMap.put(11L, 8);
+        categoryMap.put(25L, 8);
+        categoryMap.put(19L, 9);
+        categoryMap.put(32L, 9);
+        categoryMap.put(15L, 10);
+        categoryMap.put(28L, 11);
     }
 
     /**
@@ -118,18 +119,15 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
         if (sasParams.getOsId() == HandSetOS.Android.getValue()) { // android
             client = 1;
             siteType = 1; // app
-        }
-        else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) { // iPhone
+        } else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) { // iPhone
             client = 2;
             siteType = 1;// app
-        }
-        else if (sasParams.getOsId() == HandSetOS.Windows_Mobile_OS.getValue()
+        } else if (sasParams.getOsId() == HandSetOS.Windows_Mobile_OS.getValue()
                 || sasParams.getOsId() == HandSetOS.Windows_CE.getValue()
                 || sasParams.getOsId() == HandSetOS.Windows_Phone_OS.getValue()
                 || sasParams.getOsId() == HandSetOS.Windows_RT.getValue()) {
             client = 3;
-        }
-        else {
+        } else {
             LOG.info("Lomark: Device OS - Unsupported OS");
             return false;
         }
@@ -171,8 +169,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
             if(isInterstitial()){
             	url.append("&AdSpaceType=2");
             	requestMap.put("AdSpaceType", "2");
-            }
-            else{
+            } else{
             	url.append("&AdSpaceType=1");
             	requestMap.put("AdSpaceType", "1");
             }
@@ -197,8 +194,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
             Long[] segmentCategories = entity.getTags();
             if (null != segmentCategories && 1 != segmentCategories[0] && null != categoryMap.get(segmentCategories[0])) {
                 category = categoryMap.get(segmentCategories[0]);
-            }
-            else if (null != sasParams.getCategories()) {
+            } else if (null != sasParams.getCategories()) {
                 for (int i = 0; i < sasParams.getCategories().size(); i++) {
                     if (null != categoryMap.get(sasParams.getCategories().get(i))) {
                         category = categoryMap.get(sasParams.getCategories().get(i));
@@ -223,8 +219,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
             url.append("&Sign=").append(getSignature(requestMap, secretKey));
             LOG.debug("lomark url is {}", url);
             return (new URI(url.toString()));
-        }
-        catch (URISyntaxException exception) {
+        } catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.error("{}", exception);
         }
@@ -241,14 +236,13 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             statusCode = status.code();
 
             try {
                 JSONObject jsonObject = new JSONObject(response);
                 if (jsonObject.getInt("status") != 100) {
-                    adStatus = "NO_AD";
+                    adStatus = NO_AD;
                     return;
                 }
                 JSONObject adResponse = jsonObject.getJSONObject("data").getJSONObject("ad").getJSONObject("creative");
@@ -258,7 +252,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
                 int creativeType = displayInfo.getInt("type");
                 if (creativeType == 3 || clickType > 3) {
                     LOG.info("Unsupported Creative type or click type for Lomark");
-                    adStatus = "NO_AD";
+                    adStatus = NO_AD;
                     return;
                 }
                 String imageUrl = displayInfo.getString("img");
@@ -278,43 +272,40 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
                 }
 
                 VelocityContext context = new VelocityContext();
-                context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
-                context.put(VelocityTemplateFieldConstants.PartnerClickUrl, partnerClickUrl);
+                context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
+                context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, partnerClickUrl);
 
                 if (StringUtils.isNotBlank(imageUrl)) {
-                    context.put(VelocityTemplateFieldConstants.PartnerImgUrl, imageUrl);
+                    context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, imageUrl);
                 }
                 if (StringUtils.isNotBlank(partnerClickBeacon)) {
-                    context.put(VelocityTemplateFieldConstants.PartnerClickBeacon, partnerClickBeacon);
+                    context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_BEACON, partnerClickBeacon);
                 }
                 if (StringUtils.isNotBlank(partnerImpressionBeacon)) {
-                    context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, partnerImpressionBeacon);
+                    context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, partnerImpressionBeacon);
                 }
 
                 TemplateType type;
                 if (creativeType == 2) {
-                    context.put(VelocityTemplateFieldConstants.AdText,
+                    context.put(VelocityTemplateFieldConstants.AD_TEXT,
                             displayInfo.getJSONObject("title").getString("text"));
-                    context.put(VelocityTemplateFieldConstants.Description, displayInfo.getString("subtitle"));
+                    context.put(VelocityTemplateFieldConstants.DESCRIPTION, displayInfo.getString("subtitle"));
                     String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                     if (StringUtils.isEmpty(vmTemplate)) {
                         LOG.info("No template found for the slot");
-                        adStatus = "NO_AD";
+                        adStatus = NO_AD;
                         return;
-                    }
-                    else {
-                        context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
+                    } else {
+                        context.put(VelocityTemplateFieldConstants.TEMPLATE, vmTemplate);
                         type = TemplateType.RICH;
                     }
-                }
-                else {
+                } else {
                     type = TemplateType.IMAGE;
                     adStatus = "AD";
                 }
                 responseContent = Formatter.getResponseFromTemplate(type, context, sasParams, beaconUrl);
-            }
-            catch (Exception exception) {
-                adStatus = "NO_AD";
+            } catch (Exception exception) {
+                adStatus = NO_AD;
                 LOG.info("Error parsing response from lomark : {}", exception);
                 LOG.info("Response from lomark : {}", response);
             }
@@ -332,9 +323,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
         return true;
     }
 
-    private String getSignature(final HashMap<String, String> params, final String secret) throws IOException
-
-    {
+    private String getSignature(final HashMap<String, String> params, final String secret) throws IOException {
         // first sort asc as per the paramter names
         Map<String, String> sortedParams = new TreeMap<String, String>(params);
         Set<Entry<String, String>> entrys = sortedParams.entrySet();
@@ -363,13 +352,11 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
             int carrierId = sasParams.getCarrierId();
             if (carrierIdMap.containsKey(carrierId)) {
                 return carrierIdMap.get(carrierId);
-            }
-            else {
+            } else {
                 return 4;
             }
-        }
-        catch (Exception e) {
-            LOG.info("Cannot map carrier Id for Lomark");
+        } catch (Exception e) {
+            LOG.info("Cannot map carrier Id for Lomark, exception raised {}", e);
         }
         return 4;
     }

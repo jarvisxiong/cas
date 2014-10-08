@@ -104,15 +104,13 @@ public class GenericAdapter extends BaseAdNetworkImpl {
         String finalUrl = "";
         if (requestMethod.equals(MacrosAndStrings.GET)) {
             finalUrl = host + "?" + getRequestParams();
-        }
-        else {
+        } else {
             finalUrl = host;
         }
         LOG.debug(traceMarker, "url inside{} : {}", advertiserName, finalUrl);
         try {
             return (new URI(finalUrl));
-        }
-        catch (URISyntaxException exception) {
+        } catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.info(traceMarker, "Error Forming Url inside {} {}", advertiserName, exception);
         }
@@ -133,8 +131,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
             if (paramValue[1] != null) {
                 if (i == 0) {
                     requestParams.append(paramValue[0]).append('=').append(paramValue[1]);
-                }
-                else {
+                } else {
                     requestParams.append('&').append(paramValue[0]).append('=').append(paramValue[1]);
                 }
             }
@@ -153,16 +150,14 @@ public class GenericAdapter extends BaseAdNetworkImpl {
                 }
                 responseContent = "";
                 return;
-            }
-            else {
+            } else {
                 try {
                     JSONObject responseInJson = new JSONObject(response);
                     if (responseInJson.getString(config.getString(advertiserName + MacrosAndStrings.RESPONSE_STATUS))
                             .equals(config.getString(advertiserName + MacrosAndStrings.STATUS_NO_AD))) {
                         statusCode = 500;
                         responseContent = "";
-                    }
-                    else {
+                    } else {
                         statusCode = status.code();
                         adStatus = "AD";
                         String responseWithoutImpressionUrl = responseInJson.getString(config.getString(advertiserName
@@ -173,13 +168,11 @@ public class GenericAdapter extends BaseAdNetworkImpl {
                                 "<img src=\"" + impressionUrl + "\" height=1 width=1 border=0 />"
                                         + MacrosAndStrings.HTML_ENDING);
                     }
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     LOG.debug(traceMarker, "Exception in converting json object from response {}", e);
                 }
             }
-        }
-        else if (responseFormat.equals(MacrosAndStrings.HTML)) {
+        } else if (responseFormat.equals(MacrosAndStrings.HTML)) {
             if (status.code() != 200 || StringUtils.isBlank(response)) {
                 statusCode = status.code();
                 if (200 == statusCode) {
@@ -187,8 +180,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
                 }
                 responseContent = "";
                 return;
-            }
-            else {
+            } else {
                 statusCode = status.code();
                 adStatus = "AD";
                 StringBuilder responseBuilder = new StringBuilder();
@@ -198,8 +190,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
                 responseBuilder.append(MacrosAndStrings.HTML_ENDING);
                 responseContent = responseBuilder.toString();
             }
-        }
-        else {
+        } else {
             statusCode = 500;
             responseContent = "";
         }
@@ -235,8 +226,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
         }
         if (macro.equals(MacrosAndStrings.USER_AGENT)) {
             return sasParams.getUserAgent();
-        }
-        else {
+        } else {
             return null;
         }
     }

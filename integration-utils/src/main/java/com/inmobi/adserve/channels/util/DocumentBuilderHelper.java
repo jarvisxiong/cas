@@ -71,8 +71,7 @@ public class DocumentBuilderHelper {
             Document document = documentBuilder.parse(new InputSource(new StringReader(data)));
             documentBuilderPool.returnObject(documentBuilder);
             return document;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             documentBuilderPool.invalidateObject(documentBuilder);
             throw new RuntimeException(e);
         }

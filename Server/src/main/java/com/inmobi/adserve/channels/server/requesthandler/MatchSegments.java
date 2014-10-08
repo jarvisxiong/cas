@@ -87,19 +87,17 @@ public class MatchSegments {
         int osId = sasParams.getOsId();
         String sourceStr = sasParams.getSource();
         String siteRatingStr = sasParams.getSiteType();
-        Integer targetingPlatform = (sourceStr == null || sourceStr.equalsIgnoreCase("wap")) ? 2 : 1 /* app */;
+        Integer targetingPlatform = (sourceStr == null || "wap".equalsIgnoreCase(sourceStr)) ? 2 : 1 /* app */;
         Integer siteRating = -1;
         if (null == siteRatingStr || slotId == null || sasParams.getCategories() == null
                 || sasParams.getCategories().isEmpty()) {
             return null;
         }
-        if (siteRatingStr.equalsIgnoreCase("performance")) {
+        if ("performance".equalsIgnoreCase(siteRatingStr)) {
             siteRating = 0;
-        }
-        else if (siteRatingStr.equalsIgnoreCase("mature")) {
+        } else if ("mature".equalsIgnoreCase(siteRatingStr)) {
             siteRating = 1;
-        }
-        else if (siteRatingStr.equalsIgnoreCase("family_safe")) {
+        } else if ("family_safe".equalsIgnoreCase(siteRatingStr)) {
             siteRating = 2;
         }
         try {
@@ -115,8 +113,7 @@ public class MatchSegments {
 
             return (matchSegments(slot, getCategories(sasParams), country, targetingPlatform, siteRating, osId,
                     sasParams, traceMarker));
-        }
-        catch (NumberFormatException exception) {
+        } catch (NumberFormatException exception) {
             LOG.error(traceMarker, "Error parsing required arguments {}", exception);
             return null;
         }
@@ -156,7 +153,7 @@ public class MatchSegments {
         Set<ChannelSegmentEntity> allFilteredEntities = new HashSet<ChannelSegmentEntity>();
 
         // adding -1 for all categories
-        categories.add(-1l);
+        categories.add(-1L);
         // adding -1 for all countries
         long[] countries = { -1 };
         if (country != -1) {
@@ -179,13 +176,12 @@ public class MatchSegments {
         List<AdvertiserMatchedSegmentDetail> result = insertChannelSegmentToResultSet(allFilteredEntities, sasParams,
                 traceMarker);
 
-        if (result.size() == 0) {
+        if (result.isEmpty()) {
             LOG.debug(
                     traceMarker,
                     "No matching records for the request - slot: {} categories: {} country: {} targetingPlatform: {} siteRating: {} osId: {}",
                     slotId, categories, country, targetingPlatform, siteRating, osId);
-        }
-        else {
+        } else {
             LOG.debug(traceMarker, "Final selected list of adGroups : ");
             printSegments(result, traceMarker);
         }
@@ -215,7 +211,7 @@ public class MatchSegments {
             if (advertiserIdToNameMap.containsKey(channelSegmentEntity.getAdvertiserId())) {
 
                 InspectorStats.incrementStatCount(advertiserIdToNameMap.get(channelSegmentEntity.getAdvertiserId()),
-                        InspectorStrings.totalMatchedSegments);
+                        InspectorStrings.TOTAL_MATCHED_SEGMENTS);
 
                 ChannelSegment channelSegment = createSegment(channelSegmentEntity, sasParams, traceMarker);
 
@@ -269,8 +265,7 @@ public class MatchSegments {
                 channelSegmentAerospikeFeedbackEntity = segmentAdGroupFeedbackEntity.getAdGroupFeedbackMap().get(
                         channelSegmentEntity.getExternalSiteKey());
             }
-        }
-        else {
+        } else {
             LOG.debug(traceMarker, "No segmentAdGroupFeedbackEntity found");
         }
 

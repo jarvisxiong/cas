@@ -77,13 +77,11 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
                 // segment table
                 adId = additionalParams.getString((sasParams.getSlot()).toString());
 
-            }
-            catch (Exception e) {
-                LOG.error("AdId is not configured for the segment:{}", entity.getExternalSiteKey());
+            } catch (Exception e) {
+                LOG.error("AdId is not configured for the segment:{}, exception raised {}", entity.getExternalSiteKey(), e);
                 return false;
             }
-        }
-        else {
+        } else {
             LOG.debug("mandate parameters missing for pubmatic, so returning from adapter");
             return false;
         }
@@ -183,8 +181,7 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             String htmlCode = "";
             String partnerBeacon = null;
             try {
@@ -193,34 +190,30 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
                 adResponse = adResponse.getJSONObject(pubMaticBid);
                 htmlCode = adResponse.getString(creativeTag).trim();
                 partnerBeacon = adResponse.getString(trackingUrl);
-            }
-            catch (JSONException exception) {
+            } catch (JSONException exception) {
                 adStatus = "NO_AD";
                 LOG.debug("Error parsing response from pubmatic : {}", exception);
                 LOG.info("Response from pubmatic NO_AD: {}", response);
                 return;
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from pubmatic : {}", ex);
                 LOG.info("Response from pubmatic: {}", response);
                 try {
                     throw ex;
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     LOG.info("Error while rethrowing the exception : {}", e);
                     return;
                 }
             }
 
             VelocityContext context = new VelocityContext();
-            context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, partnerBeacon);
-            context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, htmlCode);
+            context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, partnerBeacon);
+            context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, htmlCode);
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from pubmatic : {}", exception);
                 LOG.info("Response from pubmatic: {}", response);

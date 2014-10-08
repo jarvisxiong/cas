@@ -88,8 +88,7 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
             finalUrl.append("&did.o1=").append(casInternalRequestParameters.uidO1);
             finalUrl.append("&did.ma.md5=").append(casInternalRequestParameters.uidMd5);
             finalUrl.append("&did.ma.sha1=").append(casInternalRequestParameters.uidSO1);
-        }
-        else if (HandSetOS.Android.getValue() == sasParams.getOsId()) {
+        } else if (HandSetOS.Android.getValue() == sasParams.getOsId()) {
             finalUrl.append("&did.ai.md5=").append(casInternalRequestParameters.uidMd5);
             finalUrl.append("&did.ai.sha1=").append(casInternalRequestParameters.uidO1);
         }
@@ -103,15 +102,14 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
         // discarding parameters that have null values
         for (int i = 1; i < urlParams.length; i++) {
             String[] paramValue = urlParams[i].split("=");
-            if ((paramValue.length == 2) && !(paramValue[1].equals("null")) && !(StringUtils.isEmpty(paramValue[1]))) {
+            if ((paramValue.length == 2) && !("null".equals(paramValue[1])) && !(StringUtils.isEmpty(paramValue[1]))) {
                 finalUrl.append('&').append(paramValue[0]).append('=').append(paramValue[1]);
             }
         }
         LOG.debug("url inside openx: {}", finalUrl);
         try {
             return (new URI(finalUrl.toString()));
-        }
-        catch (URISyntaxException exception) {
+        } catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.info("Error Forming Url inside openx {}", exception);
         }
@@ -129,22 +127,19 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             statusCode = status.code();
             VelocityContext context = new VelocityContext();
-            context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
+            context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response.trim());
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from openx : {}", exception);
                 LOG.info("Response from openx: {}", response);
                 try {
                     throw exception;
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     LOG.info("Error while rethrowing the exception : {}", e);
                 }
             }

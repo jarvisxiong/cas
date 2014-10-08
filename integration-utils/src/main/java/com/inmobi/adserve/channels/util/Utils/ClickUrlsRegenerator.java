@@ -73,8 +73,7 @@ public class ClickUrlsRegenerator {
         if (isRmAd) {
             // Appending new "/" + hash to beaconURL
             beaconUrl = beaconUrl + '/' + cryptoHashGenerator.generateHash(beaconUrl.substring(rmBeaconURLPrefix.length()));
-        }
-        else {
+        } else {
             // Appending new "/" + hash to beaconURL
             beaconUrl = beaconUrl + '/' + cryptoHashGenerator.generateHash(beaconUrl.substring(imageBeaconURLPrefix.length()));
         }

@@ -57,8 +57,7 @@ public abstract class AbstractAdvertiserLevelFilter implements AdvertiserLevelFi
                 LOG.debug(traceMarker, "Failed in filter {}  , advertiser {}", this.getClass().getSimpleName(),
                         advertiserId);
                 incrementStats(matchedSegmentDetail.getChannelSegmentList());
-            }
-            else {
+            } else {
                 LOG.debug(traceMarker, "Passed in filter {} ,  advertiser {}", this.getClass().getSimpleName(),
                         advertiserId);
             }

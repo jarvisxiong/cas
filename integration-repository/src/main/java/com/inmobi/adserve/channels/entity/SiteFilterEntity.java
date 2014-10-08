@@ -34,25 +34,31 @@ public class SiteFilterEntity implements IdentifiableEntity<SiteFilterQuery> {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         SiteFilterEntity other = (SiteFilterEntity) obj;
-        if (ruleType == null) {
-            if (other.ruleType != null)
+
+        if (null == ruleType) {
+            if (null != other.ruleType) {
                 return false;
-        }
-        else if (!ruleType.equals(other.ruleType))
+            }
+        } else if (!ruleType.equals(other.ruleType)) {
             return false;
-        if (siteId == null) {
-            if (other.siteId != null)
+        }
+        if (null == siteId) {
+            if (null != other.siteId) {
                 return false;
-        }
-        else if (!siteId.equals(other.siteId))
+            }
+        } else if (!siteId.equals(other.siteId)) {
             return false;
+        }
         return true;
     }
 

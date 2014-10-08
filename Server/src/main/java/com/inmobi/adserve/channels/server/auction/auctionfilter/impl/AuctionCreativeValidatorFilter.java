@@ -23,7 +23,7 @@ public class AuctionCreativeValidatorFilter extends AbstractAuctionFilter {
     @Inject
     protected AuctionCreativeValidatorFilter(Provider<Marker> traceMarkerProvider, final RepositoryHelper repositoryHelper,
                                              final ServerConfig serverConfiguration) {
-        super(traceMarkerProvider, InspectorStrings.droppedInCreativeValidatorFilter, serverConfiguration);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_CREATIVE_VALIDATOR_FILTER, serverConfiguration);
         this.repositoryHelper = repositoryHelper;
         isApplicableRTBD = true;
         isApplicableIX = false;

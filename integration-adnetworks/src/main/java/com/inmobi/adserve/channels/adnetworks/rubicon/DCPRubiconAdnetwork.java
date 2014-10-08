@@ -181,7 +181,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		try {
 			siteId = additionalParams.getString(SITE_KEY_ADDL_PARAM);
 		} catch (JSONException e) {
-			LOG.debug("Site Id is not configured in rubicon so exiting adapter");
+			LOG.debug("Site Id is not configured in rubicon so exiting adapter, raised exception {}", e);
 			return false;
 		}
 		zoneId = getZoneId(additionalParams);
@@ -343,14 +343,14 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 			VelocityContext context = new VelocityContext();
 			try {
 				JSONObject adResponse = new JSONObject(response);
-				if (adResponse.getString("status").equalsIgnoreCase("ok")) {
+				if ("ok".equalsIgnoreCase(adResponse.getString("status"))) {
 					JSONObject ad = adResponse.getJSONArray("ads")
 							.getJSONObject(0);
 
 					if (ad.has("impression_url")) {
 						String partnerBeacon = ad.getString("impression_url");
 						context.put(
-								VelocityTemplateFieldConstants.PartnerBeaconUrl,
+								VelocityTemplateFieldConstants.PARTNER_BEACON_URL,
 								partnerBeacon);
 					}
 					String htmlContent = ad.has("script") ? ad
@@ -361,7 +361,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 								responseContent = "";
 								return;
 							}
-							context.put(VelocityTemplateFieldConstants.PartnerHtmlCode,
+							context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE,
 									String.format(RESPONSE_TEMPLATE, htmlContent));
 							TemplateType templateType = TemplateType.HTML;
 							if (!isApp) {
@@ -377,7 +377,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 				}
 			} catch (Exception exception) {
 				adStatus = "NO_AD";
-				LOG.info("Error parsing response from Rubicon");
+				LOG.info("Error parsing response from Rubicon, raised exception {}", exception);
 				LOG.info("Response from Rubicon {}", response);
 			}
 		}
@@ -410,7 +410,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 			}
 
 		} catch (JSONException exception) {
-			LOG.error("Unable to get zone_id for Rubicon ");
+			LOG.error("Unable to get zone_id for Rubicon, raised exception {}", exception);
 		}
 		return categoryZoneId;
 	}
@@ -420,7 +420,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		if (sasParams.getWapSiteUACEntity() != null) {
 			List<String> appstoreCategories = sasParams.getWapSiteUACEntity()
 					.getCategories();
-			if (appstoreCategories != null && appstoreCategories.size() > 0) {
+			if (appstoreCategories != null && (!appstoreCategories.isEmpty())) {
 				appendQueryParam(
 						url,
 						APPSTORE_CATEGORY,
@@ -444,34 +444,29 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		} else {
 			String gpid = getGPID();
 			if(null != gpid){
-				appendQueryParam(url, DEVICE_ID,gpid, false);
-				appendQueryParam(url, DEVICE_ID_TYPE,GPID, false);
+				appendQueryParam(url, DEVICE_ID, gpid, false);
+				appendQueryParam(url, DEVICE_ID_TYPE, GPID, false);
 
-			}else{
+			} else {
 				boolean isUdid = false;
 				if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
-					appendQueryParam(url, MD5_DEVICE_ID,
-							casInternalRequestParameters.uidMd5, false);
-
+					appendQueryParam(url, MD5_DEVICE_ID, casInternalRequestParameters.uidMd5, false);
 					isUdid = true;
 				}
 
 				if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
-					appendQueryParam(url, SHA1_DEVICE_ID,
-							casInternalRequestParameters.uidIDUS1, false);
+					appendQueryParam(url, SHA1_DEVICE_ID, casInternalRequestParameters.uidIDUS1, false);
 					isUdid = true;
 				}
 				else if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
-					appendQueryParam(url, SHA1_DEVICE_ID,
-							casInternalRequestParameters.uidO1, false);
+					appendQueryParam(url, SHA1_DEVICE_ID, casInternalRequestParameters.uidO1, false);
 					isUdid = true;
 				}
 
 				if (isUdid) {
 					appendQueryParam(url, DEVICE_ID_TYPE, UDID, false);
 				} else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
-					appendQueryParam(url, MD5_DEVICE_ID,
-							casInternalRequestParameters.uid, false);
+					appendQueryParam(url, MD5_DEVICE_ID, casInternalRequestParameters.uid, false);
 					appendQueryParam(url, DEVICE_ID_TYPE, OPEN_UDID, false);
 				}
 			}

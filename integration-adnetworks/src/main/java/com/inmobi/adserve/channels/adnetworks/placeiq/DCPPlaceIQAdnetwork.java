@@ -37,7 +37,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 	private int                         width;
 	private int                         height;
 	private String                      os            = null;
-	private static final String         sizeFormat    = "%dx%d";
+	private static final String         SIZE_FORMAT   = "%dx%d";
 
 	private static final String         LAT           = "LT";
 	private static final String         LONG          = "LG";
@@ -66,7 +66,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 	private static final String         WAPTYPE       = "STG,STW,RMG,MRD";
 	private static final String         ANDROID       = "Android";
 	private static final String         IOS           = "iOS";
-	private static final String         auIdFormat    = "%s/%s/%s/%s";
+	private static final String         AU_ID_FORMAT  = "%s/%s/%s/%s";
 	private static final String         XMLFORMAT     = "xml";
 	private final String                partnerId;
 	private final String                requestFormat;
@@ -130,14 +130,13 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 		if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
 
 			Long slotSize = (long) sasParams.getSlot();
-			if (slotSize == 9l) {
-				slotSize = 15l;
+			if (slotSize == 9L) {
+				slotSize = 15L;
 			}
 			Dimension dim = SlotSizeMapping.getDimension(slotSize);
 			width = (int) Math.ceil(dim.getWidth());
 			height = (int) Math.ceil(dim.getHeight());
-		}
-		else {
+		} else {
 			LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
 			return false;
 		}
@@ -150,8 +149,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 				LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
 				return false;
 			}
-		}
-		else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) { // iPhone
+		} else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) { // iPhone
 			os = IOS;
 			isApp = true;
 			if (StringUtils.isEmpty(casInternalRequestParameters.uidIFA) && StringUtils
@@ -159,8 +157,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 				LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
 				return false;
 			}
-		}
-		else {
+		} else {
 			isApp = false;
 			os = "Windows";
 		}
@@ -184,7 +181,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 		// false);
 		appendQueryParam(url, PT, partnerId, false);
 		String category = getCategory();
-		String auId = String.format(auIdFormat, externalSiteId, category, Long.toHexString(sasParams.getSiteIncId()),
+		String auId = String.format(AU_ID_FORMAT, externalSiteId, category, Long.toHexString(sasParams.getSiteIncId()),
 				Long.toHexString(this.entity.getAdgroupIncId()));
 		appendQueryParam(url, ADUNIT, getURLEncode(auId, format), false);
 		appendQueryParam(url, CLIENT_IP, sasParams.getRemoteHostIp(), false);
@@ -205,7 +202,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 			appendQueryParam(url, COUNTRY, sasParams.getCountryCode().toUpperCase(), false);
 		}
 
-		appendQueryParam(url, SIZE, String.format(sizeFormat, width, height), false);
+		appendQueryParam(url, SIZE, String.format(SIZE_FORMAT, width, height), false);
 		if (os.equalsIgnoreCase(IOS)) {
 			if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
 				appendQueryParam(url, IDFA, casInternalRequestParameters.uidIFA, false);
@@ -222,8 +219,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 			}
 			if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
 				appendQueryParam(url, ANDROIDMD5, casInternalRequestParameters.uidMd5, false);
-			}
-			else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
+			} else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
 				appendQueryParam(url, ANDROIDMD5, casInternalRequestParameters.uid, false);
 			}
 
@@ -234,12 +230,10 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 			appendQueryParam(url, APPID, sasParams.getSiteIncId() + "", false);
 			if (isInterstitial()){
 				appendQueryParam(url, ADTYPE, getURLEncode(APPTYPE_INT, format), false);
-			}
-			else{
+			} else{
 				appendQueryParam(url, ADTYPE, getURLEncode(APPTYPE_BANNER, format), false);
 			}
-		}
-		else {
+		} else {
 			appendQueryParam(url, SITEID, sasParams.getSiteIncId() + "", false);
 			appendQueryParam(url, ADTYPE, getURLEncode(WAPTYPE, format), false);
 		}
@@ -260,8 +254,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 			adStatus = "NO_AD";
 			responseContent = "";
 			return;
-		}
-		else {
+		} else {
 			try {
 				VelocityContext context = new VelocityContext();
 				if (XMLFORMAT.equalsIgnoreCase(responseFormat)) {
@@ -278,18 +271,16 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 						Element rootElement = (Element) rootNode;
 
 						Element htmlContent = (Element) rootElement.getElementsByTagName("CONTENT").item(0);
-						context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, htmlContent.getTextContent());
+						context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, htmlContent.getTextContent());
 					}
-				}
-				else {
-					context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response);
+				} else {
+					context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response);
 				}
 
 				statusCode = status.code();
 				responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
 				adStatus = "AD";
-			}
-			catch (Exception exception) {
+			} catch (Exception exception) {
 				adStatus = "NO_AD";
 				LOG.info("Error parsing response from PlaceIQ : {}", exception);
 				LOG.info("Response from PlaceIQ: {}", response);
@@ -322,8 +313,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 				break;
 			}
 
-		}
-		else {
+		} else {
 			for (int index = 0; index < sasParams.getCategories().size(); index++) {
 
 				int cat = sasParams.getCategories().get(index).intValue();
@@ -341,5 +331,4 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 
 		return StringUtils.isBlank(category) ? "uc" : category;
 	}
-
 }

@@ -26,16 +26,18 @@ public class ServletChangeRollout implements Servlet {
     @Override
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
             final Channel serverChannel) throws Exception {
+        Integer percentRollout;
         try {
-            List<String> rollout = (queryStringDecoder.parameters().get("percentRollout"));
-            CasConfigUtil.percentRollout = Integer.parseInt(rollout.get(0));
-        }
-        catch (NumberFormatException ex) {
+            List<String> rollout = queryStringDecoder.parameters().get("percentRollout");
+            percentRollout = Integer.parseInt(rollout.get(0));
+        } catch (NumberFormatException ex) {
             LOG.info("invalid attempt to change rollout percentage {}", ex);
             hrh.responseSender.sendResponse("INVALIDPERCENT", serverChannel);
+            return;
         }
-        InspectorStats.incrementStatCount(InspectorStrings.percentRollout, Long.valueOf(CasConfigUtil.percentRollout));
-        LOG.debug("new roll out percentage is {}", CasConfigUtil.percentRollout);
+
+        InspectorStats.incrementStatCount(InspectorStrings.PERCENT_ROLL_OUT, Long.valueOf(percentRollout));
+        LOG.debug("new roll out percentage is {}", percentRollout);
         hrh.responseSender.sendResponse("OK", serverChannel);
     }
 
