@@ -160,7 +160,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 			url.append("&pt=").append(sourceType);
 
 
-            HashSet<String> bCatSet = new HashSet<String>();
+			HashSet<String> bCatSet = new HashSet<String>();
 
 			if (casInternalRequestParameters.blockedIabCategories != null) {
 				bCatSet.addAll(casInternalRequestParameters.blockedIabCategories);
