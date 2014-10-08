@@ -67,8 +67,7 @@ public class AdGroupMaxSegmentPerRequestFilter implements AdGroupLevelFilter {
                 LOG.debug(traceMarker, "Failed in filter {}  , adgroup {}", this.getClass().getSimpleName(),
                         channelSegment.getChannelSegmentFeedbackEntity().getId());
                 incrementStats(channelSegment);
-            }
-            else {
+            } else {
                 selectedSegmentCount++;
                 LOG.debug(traceMarker, "Passed in filter {} ,  adgroup {}", this.getClass().getSimpleName(),
                         channelSegment.getChannelSegmentFeedbackEntity().getId());
@@ -89,7 +88,7 @@ public class AdGroupMaxSegmentPerRequestFilter implements AdGroupLevelFilter {
      * @param channelSegment
      */
     protected void incrementStats(final ChannelSegment channelSegment) {
-        channelSegment.incrementInspectorStats(InspectorStrings.droppedInSegmentPerRequestFilter);
+        channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_SEGMENT_PER_REQUEST_FILTER);
     }
 
     @Override

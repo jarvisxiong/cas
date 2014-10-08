@@ -31,7 +31,7 @@ public class AdvertiserFailedInAccountSegmentFilter extends AbstractAdvertiserLe
     @Inject
     public AdvertiserFailedInAccountSegmentFilter(final Provider<Marker> traceMarkerProvider,
             @AdvertiserIdNameMap final Map<String, String> advertiserIdNameMap) {
-        super(traceMarkerProvider, InspectorStrings.droppedInAccountSegmentFilter);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_ACCOUNT_SEGMENT_FILTER);
         this.advertiserIdNameMap = advertiserIdNameMap;
     }
 

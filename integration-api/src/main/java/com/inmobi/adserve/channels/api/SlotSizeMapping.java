@@ -6,45 +6,47 @@ import java.util.Map;
 
 
 public class SlotSizeMapping {
-    public static final HashMap<Long, Dimension> slotMap = new HashMap<Long, Dimension>();
+    public static final Map<Long, Dimension> SLOT_MAP = new HashMap<Long, Dimension>();
     private static final Map<Short, Integer> IX_SLOT_ID_MAP = new HashMap<Short, Integer>();
 
     public static void init() {
-        slotMap.put(1l, new Dimension(120, 20));
-        slotMap.put(2l, new Dimension(168, 28));
-        slotMap.put(3l, new Dimension(216, 36));
-        slotMap.put(4l, new Dimension(300, 50));
-        slotMap.put(9l, new Dimension(320, 48));
-        slotMap.put(10l, new Dimension(300, 250));
-        slotMap.put(11l, new Dimension(728, 90));
-        slotMap.put(12l, new Dimension(468, 60));
-        slotMap.put(13l, new Dimension(120, 600));
-        slotMap.put(14l, new Dimension(320, 480));
-        slotMap.put(15l, new Dimension(320, 50));
-        slotMap.put(16l, new Dimension(768, 1024));
-        slotMap.put(17l, new Dimension(800, 1280));
-        slotMap.put(18l, new Dimension(160, 600));
-        slotMap.put(19l, new Dimension(1024, 90));
-        slotMap.put(21l, new Dimension(480, 75));
-        slotMap.put(22l, new Dimension(768, 66));
-        slotMap.put(23l, new Dimension(480, 60));
-        slotMap.put(24l, new Dimension(320, 53));
-        slotMap.put(26l, new Dimension(300, 30));
-        slotMap.put(27l, new Dimension(500, 130));
-        slotMap.put(28l, new Dimension(292, 60));
-        slotMap.put(29l, new Dimension(250, 250));
-        slotMap.put(30l, new Dimension(250, 125));
-        slotMap.put(31l, new Dimension(320, 568));
-        slotMap.put(32l, new Dimension(480, 320));
-        slotMap.put(33l, new Dimension(1024, 768 ));
-        slotMap.put(34l, new Dimension(1280, 800));
-        slotMap.put(35l, new Dimension(320, 30));
-        slotMap.put(36l, new Dimension(320, 26));
-        slotMap.put(37l, new Dimension(320, 100));
-        slotMap.put(38l, new Dimension(320, 568));
-        slotMap.put(39l, new Dimension(568, 320));
-        slotMap.put(40l, new Dimension(250, 300));
-        slotMap.put(0l,  new Dimension(0, 0));
+
+        SLOT_MAP.put(1L, new Dimension(120, 20));
+        SLOT_MAP.put(2L, new Dimension(168, 28));
+        SLOT_MAP.put(3L, new Dimension(216, 36));
+        SLOT_MAP.put(4L, new Dimension(300, 50));
+        SLOT_MAP.put(9L, new Dimension(320, 48));
+        SLOT_MAP.put(10L, new Dimension(300, 250));
+        SLOT_MAP.put(11L, new Dimension(728, 90));
+        SLOT_MAP.put(12L, new Dimension(468, 60));
+        SLOT_MAP.put(13L, new Dimension(120, 600));
+        SLOT_MAP.put(14L, new Dimension(320, 480));
+        SLOT_MAP.put(15L, new Dimension(320, 50));
+        SLOT_MAP.put(16L, new Dimension(768, 1024));
+        SLOT_MAP.put(17L, new Dimension(800, 1280));
+        SLOT_MAP.put(18L, new Dimension(160, 600));
+        SLOT_MAP.put(19L, new Dimension(1024, 90));
+        SLOT_MAP.put(21L, new Dimension(480, 75));
+        SLOT_MAP.put(22L, new Dimension(768, 66));
+        SLOT_MAP.put(23L, new Dimension(480, 60));
+        SLOT_MAP.put(24L, new Dimension(320, 53));
+        SLOT_MAP.put(26L, new Dimension(300, 30));
+        SLOT_MAP.put(27L, new Dimension(500, 130));
+        SLOT_MAP.put(28L, new Dimension(292, 60));
+        SLOT_MAP.put(29L, new Dimension(250, 250));
+        SLOT_MAP.put(30L, new Dimension(250, 125));
+        SLOT_MAP.put(31L, new Dimension(320, 568));
+        SLOT_MAP.put(32L, new Dimension(480, 320));
+        SLOT_MAP.put(33L, new Dimension(1024, 768 ));
+        SLOT_MAP.put(34L, new Dimension(1280, 800));
+        SLOT_MAP.put(35L, new Dimension(320, 30));
+        SLOT_MAP.put(36L, new Dimension(320, 26));
+        SLOT_MAP.put(37L, new Dimension(320, 100));
+        SLOT_MAP.put(38L, new Dimension(320, 568));
+        SLOT_MAP.put(39L, new Dimension(568, 320));
+        SLOT_MAP.put(40L, new Dimension(250, 300));
+        SLOT_MAP.put(0L, new Dimension(0, 0));
+
 
         //Adding IX_SLOT_ID_MAP, which is a map from InMobi slot id's to Rubicon slot id's
 
@@ -65,10 +67,11 @@ public class SlotSizeMapping {
         IX_SLOT_ID_MAP.put((short) 29, 14);
         IX_SLOT_ID_MAP.put((short) 32, 101);
         IX_SLOT_ID_MAP.put((short) 33, 53);
+
     }
 
     public static Dimension getDimension(Long slot) {
-        return (slotMap.get(slot));
+        return (SLOT_MAP.get(slot));
     }
 
     public static boolean isIXSupportedSlot(short inmobiSlot) {

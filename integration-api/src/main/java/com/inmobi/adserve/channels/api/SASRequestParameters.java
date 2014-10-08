@@ -89,7 +89,7 @@ public class SASRequestParameters {
     }
 
     public enum HandSetOS {
-        Others(1),
+        OTHERS(1),
         Linux_Smartphone_OS(2),
         Android(3),
         Nokia_OS(4),

@@ -16,7 +16,7 @@ public class AuctionCreativeAttributeFilter extends AbstractAuctionFilter {
 
     @Inject
     protected AuctionCreativeAttributeFilter(Provider<Marker> traceMarkerProvider,final ServerConfig serverConfiguration) {
-        super(traceMarkerProvider, InspectorStrings.droppedInCreativeAttributesMissingFilter, serverConfiguration);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_CREATIVE_ATTRIBUTES_MISSING_FILTER, serverConfiguration);
         isApplicableRTBD = true;
         isApplicableIX = false;
     }

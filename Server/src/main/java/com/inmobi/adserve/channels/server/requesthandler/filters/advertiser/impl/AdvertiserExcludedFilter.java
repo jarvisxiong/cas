@@ -29,7 +29,7 @@ public class AdvertiserExcludedFilter extends AbstractAdvertiserLevelFilter {
 
     @Inject
     public AdvertiserExcludedFilter(final Provider<Marker> traceMarkerProvider, final RepositoryHelper repositoryHelper) {
-        super(traceMarkerProvider, InspectorStrings.droppedinAdvertiserExclusionFilter);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_ADVERTISER_EXCLUSION_FILTER);
         this.repositoryHelper = repositoryHelper;
     }
 
@@ -47,9 +47,7 @@ public class AdvertiserExcludedFilter extends AbstractAdvertiserLevelFilter {
             // checking if site has advertiser inclusion list
             if (!advertisersIncludedbySite.isEmpty()) {
                 return !advertisersIncludedbySite.contains(advertiserId);
-            }
-            // else checking in publisher advertiser inclusion list if any
-            else {
+            } else { // else checking in publisher advertiser inclusion list if any
                 return !advertisersIncludedbyPublisher.isEmpty()
                         && !advertisersIncludedbyPublisher.contains(advertiserId);
             }

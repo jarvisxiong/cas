@@ -31,7 +31,7 @@ public class AdGroupHandsetTargetingFilter extends AbstractAdGroupLevelFilter {
      */
     @Inject
     protected AdGroupHandsetTargetingFilter(final Provider<Marker> traceMarkerProvider) {
-        super(traceMarkerProvider, InspectorStrings.droppedinHandsetTargetingFilter);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_HANDSET_TARGETING_FILTER);
     }
 
     @Override

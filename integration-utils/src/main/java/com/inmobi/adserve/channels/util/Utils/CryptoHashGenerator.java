@@ -31,11 +31,11 @@ public class CryptoHashGenerator {
                 mac = Mac.getInstance("HmacMD5");
                 mac.init(sk);
                 return mac;
-            }
-            catch (NoSuchAlgorithmException e) {
+            } catch (NoSuchAlgorithmException e) {
+                LOG.debug("Exception raised in CryptoHashGenerator {}", e);
                 return null;
-            }
-            catch (InvalidKeyException e) {
+            } catch (InvalidKeyException e) {
+                LOG.debug("Exception raised CryptoHashGenerator {}", e);
                 return null;
             }
         }

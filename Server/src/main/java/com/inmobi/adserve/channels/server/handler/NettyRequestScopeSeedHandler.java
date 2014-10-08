@@ -65,8 +65,7 @@ public class NettyRequestScopeSeedHandler extends ChannelInboundHandlerAdapter {
             scope.seed(Servlet.class, servlet);
 
             ctx.fireChannelRead(httpRequest);
-        }
-        finally {
+        } finally {
             scope.exit();
         }
     }

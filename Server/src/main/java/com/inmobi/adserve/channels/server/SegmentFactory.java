@@ -56,14 +56,12 @@ public class SegmentFactory {
                 rtbAdNetwork.setName(adapterConfig.getAdapterName());
                 LOG.debug("Created RTB adapter instance for advertiser id : {}", advertiserId);
                 return rtbAdNetwork;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 LOG.error("Error instantiating adapter");
                 throw new RuntimeException(e);
             }
 
-        }
-        else {
+        } else {
 
             try {
                 AdNetworkInterface adNetworkInterface = adNetworkInterfaceClass
@@ -72,8 +70,7 @@ public class SegmentFactory {
                                         Channel.class }).newInstance(config, dcpClientBootstrap, base, channel);
                 adNetworkInterface.setName(adapterConfig.getAdapterName());
                 return adNetworkInterface;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 LOG.error("Error instantiating adapter");
                 throw new RuntimeException(e);
             }

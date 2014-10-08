@@ -84,11 +84,11 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
 			String servletName = servlet.getName();
 
 			Integer dst = null;
-			if (servletName.equalsIgnoreCase("rtbdFill")) {
+			if ("rtbdFill".equalsIgnoreCase(servletName)) {
 				dst = 6;
-			} else if (servletName.equalsIgnoreCase("BackFill")) {
+			} else if ("BackFill".equalsIgnoreCase(servletName)) {
 				dst = 2;
-			} else if (servletName.equalsIgnoreCase("ixFill")) {
+			} else if ("ixFill".equalsIgnoreCase(servletName)) {
 				dst = 8;
 			}
 			LOG.debug("Method is  {}", request.getMethod());
@@ -101,19 +101,19 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
 					tDeserializer.deserialize(adPoolRequest, adPoolRequestBytes);
 					thriftRequestParser.parseRequestParameters(adPoolRequest, sasParams, casInternalRequestParameters, dst);
 				} catch (TException ex) {
-					terminationReason = CasConfigUtil.thriftParsingError;
+					terminationReason = CasConfigUtil.THRIFT_PARSING_ERROR;
 					LOG.debug(traceMarker, "Error in de serializing thrift ", ex);
-					InspectorStats.incrementStatCount(InspectorStrings.thriftParsingError, InspectorStrings.count);
+					InspectorStats.incrementStatCount(InspectorStrings.THRIFT_PARSING_ERROR, InspectorStrings.COUNT);
 				}
 			} else if (params.containsKey("args") && null != dst) {
 				JSONObject jsonObject;
 				try {
 					jsonObject = requestParser.extractParams(params);
 				} catch (JSONException exception) {
-					terminationReason = CasConfigUtil.jsonParsingError;
+					terminationReason = CasConfigUtil.JSON_PARSING_ERROR;
 					jsonObject = new JSONObject();
 					LOG.debug("Encountered Json Error while creating json object inside ", exception);
-					InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
+					InspectorStats.incrementStatCount(InspectorStrings.JSON_PARSING_ERROR, InspectorStrings.COUNT);
 				}
 				requestParser.parseRequestParameters(jsonObject, sasParams, casInternalRequestParameters);
 			} else if (request.getMethod() == HttpMethod.GET && null != dst && params.containsKey("adPoolRequest")) {
@@ -138,9 +138,9 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
 						tDeserializer.deserialize(adPoolRequest, decodedContent);
 						thriftRequestParser.parseRequestParameters(adPoolRequest, sasParams, casInternalRequestParameters, dst);
 					} catch (TException ex) {
-						terminationReason = CasConfigUtil.thriftParsingError;
+						terminationReason = CasConfigUtil.THRIFT_PARSING_ERROR;
 						LOG.debug(traceMarker, "Error in de serializing thrift ", ex);
-						InspectorStats.incrementStatCount(InspectorStrings.thriftParsingError, InspectorStrings.count);
+						InspectorStats.incrementStatCount(InspectorStrings.THRIFT_PARSING_ERROR, InspectorStrings.COUNT);
 					}
 				}
 			}

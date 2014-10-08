@@ -17,7 +17,7 @@ public class AuctionCreativeIdFilter extends AbstractAuctionFilter {
 
     @Inject
     protected AuctionCreativeIdFilter(Provider<Marker> traceMarkerProvider,final ServerConfig serverConfiguration) {
-        super(traceMarkerProvider, InspectorStrings.droppedInCreativeIdMissingFilter, serverConfiguration);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_CREATIVE_ID_MISSING_FILTER, serverConfiguration);
         isApplicableRTBD = true;
         isApplicableIX = true;
     }

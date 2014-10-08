@@ -27,8 +27,7 @@ public class ServletDisableLbStatus implements Servlet {
             ServerStatusInfo.statusCode = 404;
             ServerStatusInfo.statusString = "NOT_OK";
             LOG.debug("asked to shut down the server");
-        }
-        else {
+        } else {
             hrh.responseSender.sendResponse("NOT AUTHORIZED", serverChannel);
         }
     }

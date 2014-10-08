@@ -23,7 +23,7 @@ public class AdvertiserDailyImpressionCeilingExceededFilter extends AbstractAdve
 
     @Inject
     public AdvertiserDailyImpressionCeilingExceededFilter(final Provider<Marker> traceMarkerProvider) {
-        super(traceMarkerProvider, InspectorStrings.droppedInImpressionFilter);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_IMPRESSION_FILTER);
     }
 
     @Override

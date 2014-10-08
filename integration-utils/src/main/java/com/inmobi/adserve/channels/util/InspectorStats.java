@@ -19,12 +19,13 @@ import com.yammer.metrics.reporting.GraphiteReporter;
 
 
 public class InspectorStats {
+
     private static Map<String, ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicLong>>> ingrapherCounterStats = new ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicLong>>>();
     private static Map<String, ConcurrentHashMap<String, ConcurrentHashMap<String, Counter>>> yammerCounterStats = new ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentHashMap<String, Counter>>>();
     private static Map<String, ConcurrentHashMap<String, Histogram>> yammerTimerStats = new ConcurrentHashMap<String, ConcurrentHashMap<String, Histogram>>();
     
-    private static String STATS = "stats";
-    private static String WORK_FLOW = "WorkFlow";
+    private static final String STATS = "stats";
+    private static final String WORK_FLOW = "WorkFlow";
     
 	public static void init(String graphiteServer, int graphitePort, int graphiteInterval) {
 		String metricProducer;
@@ -80,7 +81,6 @@ public class InspectorStats {
                 
         	}
         }
-
         ingrapherCounterStats.get(key).get(STATS).get(parameter).getAndAdd(value);
         incrementYammerCount(key, parameter, value);
     }
@@ -90,8 +90,8 @@ public class InspectorStats {
         if (yammerCounterStats.get(key) == null) {
         	synchronized (parameter) {
         		if (yammerCounterStats.get(key) == null) {
-        			yammerCounterStats.put(key, new ConcurrentHashMap<String, ConcurrentHashMap<String, Counter>>());	
-        		}
+                    yammerCounterStats.put(key, new ConcurrentHashMap<String, ConcurrentHashMap<String, Counter>>());
+                }
         	}
         }
         
@@ -113,7 +113,7 @@ public class InspectorStats {
         
         yammerCounterStats.get(key).get(STATS).get(parameter).inc(value);
     }
-    
+
     public static void updateYammerTimerStats(final String dst, final String parameter, final long value) {
     	String fullKey = dst + "." + parameter;
         if (yammerTimerStats.get(dst) == null) {
@@ -133,6 +133,7 @@ public class InspectorStats {
         }
         
         yammerTimerStats.get(dst).get(parameter).update(value);
+
     }
     
 	public static void resetTimers(){
