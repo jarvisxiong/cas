@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.HashSet;
 
 import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
@@ -321,19 +322,20 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         List<String> seatList = new ArrayList<String>();
         seatList.add(advertiserId);
         bidRequest.setWseat(seatList);
-        List<String> bCatList = new ArrayList<String>();
+        HashSet<String> bCatSet = new HashSet<>();
         if (null != casInternalRequestParameters.blockedIabCategories) {
-            bCatList.addAll(casInternalRequestParameters.blockedIabCategories);
+            bCatSet.addAll(casInternalRequestParameters.blockedIabCategories);
             LOG.debug(traceMarker, "blockedCategories are {}", casInternalRequestParameters.blockedIabCategories);
         }
         // Setting blocked categories
         if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
-            bCatList.addAll(
+            bCatSet.addAll(
                     iabCategoriesInterface.getIABCategories(IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES));
         } else {
-            bCatList.addAll(
+            bCatSet.addAll(
                     iabCategoriesInterface.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES));
         }
+        List<String> bCatList = new ArrayList<String>(bCatSet);
         bidRequest.setBcat(bCatList);
 
         if (null != casInternalRequestParameters.blockedAdvertisers) {
