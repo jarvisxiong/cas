@@ -28,7 +28,7 @@ public class AdGroupSiteExclusionFilter extends AbstractAdGroupLevelFilter {
      */
     @Inject
     protected AdGroupSiteExclusionFilter(final Provider<Marker> traceMarkerProvider) {
-        super(traceMarkerProvider, InspectorStrings.droppedinSiteExclusionFilter);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_SITE_EXCLUSION_FILTER);
     }
 
     @Override
@@ -56,8 +56,7 @@ public class AdGroupSiteExclusionFilter extends AbstractAdGroupLevelFilter {
         boolean result;
         if (channelSegment.getChannelSegmentEntity().getSitesIE().contains(sasParams.getSiteId())) {
             result = !channelSegment.getChannelSegmentEntity().isSiteInclusion();
-        }
-        else {
+        } else {
             result = channelSegment.getChannelSegmentEntity().isSiteInclusion();
         }
         return result;
@@ -73,8 +72,7 @@ public class AdGroupSiteExclusionFilter extends AbstractAdGroupLevelFilter {
         boolean result;
         if (channelSegment.getChannelEntity().getSitesIE().contains(sasParams.getSiteId())) {
             result = !channelSegment.getChannelEntity().isSiteInclusion();
-        }
-        else {
+        } else {
             result = channelSegment.getChannelEntity().isSiteInclusion();
         }
         return result;

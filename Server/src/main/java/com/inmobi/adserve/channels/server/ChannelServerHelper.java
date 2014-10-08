@@ -7,27 +7,24 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class ChannelServerHelper {
-    private final Logger logger;
 
-    public ChannelServerHelper(final Logger serverLogger) {
-        logger = serverLogger;
-    }
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(ChannelServerHelper.class);
 
     public byte getDataCenterId(final String dataCenterIdKey) {
         byte dataCenterIdCode;
         try {
             dataCenterIdCode = Byte.parseByte(System.getProperty(dataCenterIdKey));
-        }
-        catch (NumberFormatException e) {
-            logger.info("NumberFormatException in getDataCenterId");
+        } catch (NumberFormatException e) {
+            LOG.info("NumberFormatException in getDataCenterId");
             dataCenterIdCode = 0;
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("dataCenterId is " + dataCenterIdCode);
-        }
+
+        LOG.debug("dataCenterId is {}", dataCenterIdCode);
+
         return dataCenterIdCode;
     }
 
@@ -39,28 +36,24 @@ public class ChannelServerHelper {
             try {
                 addr = InetAddress.getLocalHost();
                 hostName = addr.getHostName();
-            }
-            catch (UnknownHostException e1) {
-                logger.info("UnknownHostException in getHostId");
+            } catch (UnknownHostException e1) {
+                LOG.info("UnknownHostException in getHostId, exception raised {}", e1);
             }
         }
         try {
             if (null != hostName) {
                 hostId = Short.parseShort(hostName.substring(3, 7));
-            }
-            else {
+            } else {
                 return hostId;
             }
+        } catch (NumberFormatException e) {
+            LOG.info("NumberFormatException in getHostId, exception raised {}", e);
+        } catch (StringIndexOutOfBoundsException e) {
+            LOG.info("StringIndexOutOfRangeException in getHostId, exception raised {}", e);
         }
-        catch (NumberFormatException e) {
-            logger.info("NumberFormatException in getHostId");
-        }
-        catch (StringIndexOutOfBoundsException e) {
-            logger.info("StringIndexOutOfRangeException in getHostId");
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("hostid is " + hostId);
-        }
+
+        LOG.debug("hostid is {}", hostId);
+
         return hostId;
     }
 
@@ -72,13 +65,12 @@ public class ChannelServerHelper {
         Integer maxConnections = null;
         try {
             maxConnections = Integer.parseInt(System.getProperty(connectionsKey));
+        } catch (NumberFormatException e) {
+            LOG.info("NumberFormatException {} maxConnections", connectionType.toString());
         }
-        catch (NumberFormatException e) {
-            logger.info("NumberFormatException " + connectionType.toString() + "maxConnections");
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Max limit for " +  connectionType.toString() + " connections is " + maxConnections);
-        }
+
+        LOG.debug("Max limit for {}, connections is {}", connectionType.toString(), maxConnections);
+
         return maxConnections;
     }
 }

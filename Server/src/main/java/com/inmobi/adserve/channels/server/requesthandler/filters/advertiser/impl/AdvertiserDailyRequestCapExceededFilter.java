@@ -23,7 +23,7 @@ public class AdvertiserDailyRequestCapExceededFilter extends AbstractAdvertiserL
 
     @Inject
     public AdvertiserDailyRequestCapExceededFilter(final Provider<Marker> traceMarkerProvider) {
-        super(traceMarkerProvider, InspectorStrings.droppedInRequestCapFilter);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_REQUEST_CAP_FILTER);
     }
 
     @Override

@@ -95,9 +95,11 @@ public class ThriftRequestMaker {
         cities.add(1);
         geo.setCityIds(cities);
         Set<Integer> states = new HashSet<Integer>();
-        states.add(1); geo.setStateIds(states);
+        states.add(1);
+        geo.setStateIds(states);
         Set<Integer> zips = new HashSet<Integer>();
-        zips.add(1); geo.setZipIds(zips);
+        zips.add(1);
+        geo.setZipIds(zips);
 
         AdPoolRequest adPoolRequest = new AdPoolRequest();
         adPoolRequest.setRequestId("requestId");
@@ -112,7 +114,8 @@ public class ThriftRequestMaker {
         integrationDetails.setIntegrationVersion(370);
 
         adPoolRequest.setRequestedAdType(RequestedAdType.ADHESION);
-        adPoolRequest.setResponseFormat(ResponseFormat.NATIVE); adPoolRequest.setGeo(geo);
+        adPoolRequest.setResponseFormat(ResponseFormat.NATIVE);
+        adPoolRequest.setGeo(geo);
         adPoolRequest.setIpFileVersion(1234);
         adPoolRequest.setIntegrationDetails(integrationDetails);
         List<Short> list = new ArrayList<Short>();
@@ -134,8 +137,7 @@ public class ThriftRequestMaker {
         AdPoolRequest adPoolRequest = new AdPoolRequest();
         try {
             tDeserializer.deserialize(adPoolRequest, decodedContent);
-        }
-        catch (TException ex) {
+        } catch (TException ex) {
             System.out.println(ex);
         }
         return  adPoolRequest;
@@ -158,8 +160,7 @@ public class ThriftRequestMaker {
         TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
         try {
             tDeserializer.deserialize(adPoolRequest1, urlCodec.decode(content.getBytes()));
-        }
-        catch (TException ex) {
+        } catch (TException ex) {
             ex.printStackTrace();
         }
 
@@ -170,9 +171,10 @@ public class ThriftRequestMaker {
         System.out.println("Response Code : " + response.getStatusLine().getStatusCode());
 
         InputStreamReader inputStreamReader = null;
+        BufferedReader rd = null;
         try {
             inputStreamReader = new InputStreamReader(response.getEntity().getContent());
-            BufferedReader rd = new BufferedReader(inputStreamReader);
+            rd = new BufferedReader(inputStreamReader);
 
             StringBuffer result = new StringBuffer();
             String line = "";
@@ -180,8 +182,12 @@ public class ThriftRequestMaker {
                 result.append(line);
             }
             System.out.println(result.toString());
-        }
-        finally {
+        } finally {
+
+            if (rd != null){
+                rd.close();
+            }
+
             if (inputStreamReader != null) {
                 inputStreamReader.close();
             }
@@ -233,11 +239,9 @@ public class ThriftRequestMaker {
             TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
             tDeserializer.deserialize(adPoolResponse, result);
             System.out.println("AdPool Response is" + adPoolResponse.toString());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             if (connection != null) {
                 connection.disconnect();
             }

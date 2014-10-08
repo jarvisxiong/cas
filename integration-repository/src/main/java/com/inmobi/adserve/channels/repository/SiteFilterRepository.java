@@ -25,12 +25,10 @@ public class SiteFilterRepository extends
     @Override
     public SiteFilterEntity queryUniqueResult(RepositoryQuery SiteFilterQuery) throws RepositoryException {
         Collection<SiteFilterEntity> SiteFilterEntityResultSet = query(SiteFilterQuery);
-        if (SiteFilterEntityResultSet == null || SiteFilterEntityResultSet.size() == 0) {
+        if (SiteFilterEntityResultSet == null || SiteFilterEntityResultSet.isEmpty()) {
             return null;
-        } else if (SiteFilterEntityResultSet.size() >= 1) { // TODO: Is this condition needed?
-            return (SiteFilterEntity) SiteFilterEntityResultSet.toArray()[0];
         }
-        return null;
+        return (SiteFilterEntity) SiteFilterEntityResultSet.toArray()[0];
     }
 
     @Override

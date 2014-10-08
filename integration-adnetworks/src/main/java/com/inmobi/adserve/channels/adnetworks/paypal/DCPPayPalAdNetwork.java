@@ -56,8 +56,7 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
             Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
-        }
-        else {
+        } else {
             LOG.debug("mandate parameters missing for paypal, so returning from adapter");
             return false;
         }
@@ -114,8 +113,7 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
                 if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
                     url.append("&idfa=").append(casInternalRequestParameters.uidIFA);
                     url.append("&ate=").append(casInternalRequestParameters.uidADT);
-                }
-                else if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFV)) {
+                } else if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFV)) {
                     url.append("&idfv=").append(casInternalRequestParameters.uidIFV);
                     url.append("&ate=").append(casInternalRequestParameters.uidADT);
                 }
@@ -138,8 +136,7 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
             LOG.debug("paypal url is {}", url);
 
             return (new URI(url.toString()));
-        }
-        catch (URISyntaxException exception) {
+        } catch (URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.error("{}", exception);
         }
@@ -157,8 +154,7 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             statusCode = status.code();
             try {
                 VelocityContext context = new VelocityContext();
@@ -166,24 +162,21 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
 
                 if (responseFormat.equalsIgnoreCase(TemplateType.HTML.name())) {
                     t = TemplateType.HTML;
-                    context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response);
-                }
-                else {
+                    context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response);
+                } else {
                     t = TemplateType.IMAGE;
                     JSONObject adResponse = new JSONObject(response).getJSONObject("adresponse").getJSONObject("imp");
-                    context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse.getString("clickurl"));
-                    context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getString("imgurl"));
-                    context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
+                    context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, adResponse.getString("clickurl"));
+                    context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, adResponse.getString("imgurl"));
+                    context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            }
-            catch (JSONException exception) {
+            } catch (JSONException exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from paypal : {}", exception);
                 LOG.info("Response from paypal: {}", response);
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from paypal : {}", exception);
                 LOG.info("Response from paypal: {}", response);

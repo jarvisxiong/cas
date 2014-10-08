@@ -47,12 +47,10 @@ public class ConfigurationLoader {
         try {
             if (configFile.startsWith("/")) {
                 configuration = new CasBaseConfiguration(configFile);
-            }
-            else {
+            } else {
                 configuration = new CasBaseConfiguration(ConfigurationLoader.class.getClassLoader().getResource(configFile));
             }
-        }
-        catch (ConfigurationException e) {
+        } catch (ConfigurationException e) {
             LOG.error("error loading config {}", e);
             throw new RuntimeException(e);
         }

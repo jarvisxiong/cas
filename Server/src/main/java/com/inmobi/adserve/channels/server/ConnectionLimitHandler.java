@@ -36,12 +36,11 @@ public class ConnectionLimitHandler extends ChannelDuplexHandler {
 
     @Override
     public void channelRegistered(final ChannelHandlerContext ctx) throws Exception {
-        if (maxConnections > 0) {
-            if (activeConnections.getAndIncrement() > maxConnections) {
-                ctx.channel().close();
-                LOG.error("Incoming MaxLimit of connections {} exceeded so closing channel", maxConnections);
-                droppedConnections.incrementAndGet();
-            }
+        if (maxConnections > 0 && activeConnections.getAndIncrement() > maxConnections) {
+            ctx.channel().close();
+            LOG.error("Incoming MaxLimit of connections {} exceeded so closing channel", maxConnections);
+            droppedConnections.incrementAndGet();
+
         }
         super.channelRegistered(ctx);
     }
@@ -49,10 +48,8 @@ public class ConnectionLimitHandler extends ChannelDuplexHandler {
     @Override
     public void channelUnregistered(final ChannelHandlerContext ctx) throws Exception {
         int maxConnections = getMaxConnectionsLimit();
-        if (maxConnections > 0) {
-            if (activeConnections.decrementAndGet() < 0) {
-                LOG.error("BUG in ConnectionLimitHandler");
-            }
+        if (maxConnections > 0 && activeConnections.decrementAndGet() < 0) {
+            LOG.error("BUG in ConnectionLimitHandler");
         }
         super.channelUnregistered(ctx);
     }

@@ -73,8 +73,7 @@ public class AdGroupPartnerCountFilter implements AdGroupLevelFilter {
 
                     // We are interested in capturing stats for all the dropped segments, hence not breaking the loop on this condition.
                     incrementStats(channelSegment);
-                }
-                else {
+                } else {
                     selectedSegmentListForAdvertiser.add(channelSegment);
                     LOG.debug(traceMarker, "Passed in filter {} ,  advertiser {}", this.getClass().getSimpleName(),
                             advertiserId);
@@ -126,7 +125,7 @@ public class AdGroupPartnerCountFilter implements AdGroupLevelFilter {
      * @param channelSegment
      */
     private void incrementTotalSelectedSegmentStats(final ChannelSegment channelSegment) {
-        channelSegment.incrementInspectorStats(InspectorStrings.totalSelectedSegments);
+        channelSegment.incrementInspectorStats(InspectorStrings.TOTAL_SELECTED_SEGMENTS);
     }
 
     @Override

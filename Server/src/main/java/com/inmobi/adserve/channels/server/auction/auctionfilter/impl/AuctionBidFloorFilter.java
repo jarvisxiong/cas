@@ -16,7 +16,7 @@ public class AuctionBidFloorFilter extends AbstractAuctionFilter {
 
     @Inject
     protected AuctionBidFloorFilter(Provider<Marker> traceMarkerProvider,final ServerConfig serverConfiguration) {
-        super(traceMarkerProvider, InspectorStrings.droppedInRtbBidFloorFilter, serverConfiguration);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_RTB_BID_FLOOR_FILTER, serverConfiguration);
         isApplicableRTBD = true;
         isApplicableIX = true;
     }

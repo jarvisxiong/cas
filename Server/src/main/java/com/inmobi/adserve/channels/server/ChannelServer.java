@@ -114,7 +114,7 @@ public class ChannelServer {
             logger.debug("Initializing logger completed");
 
             // parsing the data center id given in the vm parameters
-            ChannelServerHelper channelServerHelper = new ChannelServerHelper(logger);
+            ChannelServerHelper channelServerHelper = new ChannelServerHelper();
             dataCenterIdCode = channelServerHelper.getDataCenterId(ChannelServerStringLiterals.DATA_CENTER_ID_KEY);
             hostIdCode = channelServerHelper.getHostId(ChannelServerStringLiterals.HOST_NAME_KEY);
             dataCentreName = channelServerHelper.getDataCentreName(ChannelServerStringLiterals.DATA_CENTRE_NAME_KEY);
