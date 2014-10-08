@@ -30,7 +30,7 @@ public class AdGroupTimeOfDayTargetingFilter extends AbstractAdGroupLevelFilter 
      */
     @Inject
     protected AdGroupTimeOfDayTargetingFilter(final Provider<Marker> traceMarkerProvider) {
-        super(traceMarkerProvider, InspectorStrings.droppedInTODFilter);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_TOD_FILTER);
     }
 
     @Override

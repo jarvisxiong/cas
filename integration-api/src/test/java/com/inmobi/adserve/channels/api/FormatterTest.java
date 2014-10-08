@@ -61,10 +61,10 @@ public class FormatterTest {
         sasParams.setSource("wap");
         VelocityContext context = new VelocityContext();
         Formatter.updateVelocityContext(context, sasParams, null);
-        assertNull(context.get(VelocityTemplateFieldConstants.IMBeaconUrl));
+        assertNull(context.get(VelocityTemplateFieldConstants.IM_BEACON_URL));
         assertNull(context.get(VelocityTemplateFieldConstants.SDK));
-        assertNull(context.get(VelocityTemplateFieldConstants.SDK360Onwards));
-        assertNull(context.get(VelocityTemplateFieldConstants.IMAIBaseUrl));
+        assertNull(context.get(VelocityTemplateFieldConstants.SDK360_ONWARDS));
+        assertNull(context.get(VelocityTemplateFieldConstants.IMAI_BASE_URL));
     }
 
     @Test
@@ -74,10 +74,10 @@ public class FormatterTest {
         sasParams.setSdkVersion("i360");
         VelocityContext context = new VelocityContext();
         Formatter.updateVelocityContext(context, sasParams, "beacon");
-        assertEquals(context.get(VelocityTemplateFieldConstants.IMBeaconUrl), "beacon");
+        assertEquals(context.get(VelocityTemplateFieldConstants.IM_BEACON_URL), "beacon");
         assertEquals(context.get(VelocityTemplateFieldConstants.SDK), true);
-        assertEquals(context.get(VelocityTemplateFieldConstants.SDK360Onwards), true);
-        assertNull(context.get(VelocityTemplateFieldConstants.IMAIBaseUrl));
+        assertEquals(context.get(VelocityTemplateFieldConstants.SDK360_ONWARDS), true);
+        assertNull(context.get(VelocityTemplateFieldConstants.IMAI_BASE_URL));
     }
 
     @Test
@@ -88,7 +88,7 @@ public class FormatterTest {
         sasParams.setImaiBaseUrl("imai");
         VelocityContext context = new VelocityContext();
         Formatter.updateVelocityContext(context, sasParams, "beacon");
-        assertEquals(context.get(VelocityTemplateFieldConstants.IMAIBaseUrl), "imai");
+        assertEquals(context.get(VelocityTemplateFieldConstants.IMAI_BASE_URL), "imai");
     }
 
     @DataProvider(name = "slot")

@@ -44,7 +44,7 @@ public class SiteAerospikeFeedbackRepository {
     private String                                                    set;
     private DataCenter                                                colo;
     // Cache to store segment feedback entities loaded from aerospike.
-    private ConcurrentHashMap<String/* siteId */, SiteFeedbackEntity> siteSegmentFeedbackCache;
+    private Map<String/* siteId */, SiteFeedbackEntity> siteSegmentFeedbackCache;
     private ConcurrentHashMap<String, Boolean>                        currentlyUpdatingSites;
     private int                                                       refreshTime;
     private ExecutorService                                           executorService;
@@ -78,7 +78,7 @@ public class SiteAerospikeFeedbackRepository {
             
             this.aerospikeClient = new AerospikeClient(clientPolicy, config.getString("host"), config.getInt("port"));
         } catch (AerospikeException e) {
-            LOG.error("Exception while creating Aerospike client: {}", e.getMessage());
+            LOG.error("Exception while creating Aerospike client: {}", e);
             throw new InitializationException("Could not instantiate Aerospike client");
         }
 
@@ -98,18 +98,17 @@ public class SiteAerospikeFeedbackRepository {
             LOG.debug("Got the siteFeedback entity from cache for query: siteId: {}, segmentId: {}", siteId, segmentId);
             if (System.currentTimeMillis() - siteFeedbackEntity.getLastUpdated() < refreshTime) {
                 LOG.debug("siteFeedback entity is fresh for query: siteId: {}, segmentId: {}", siteId, segmentId);
-                InspectorStats.incrementStatCount(InspectorStrings.siteFeedbackCacheHit);
+                InspectorStats.incrementStatCount(InspectorStrings.SITE_FEEDBACK_CACHE_HIT);
                 return siteFeedbackEntity.getSegmentAdGroupFeedbackMap() == null ? null : siteFeedbackEntity
                         .getSegmentAdGroupFeedbackMap().get(segmentId);
             }
             LOG.debug("siteFeedback entity is stale for query: siteId: {}, segmentId: {}", siteId, segmentId);
-        }
-        else {
+        } else {
             LOG.debug("siteFeedback not found for siteId: {}", siteId);
         }
         LOG.debug("Returning default/old siteFeedback entity and fetching new data from aerospike for siteId: {}",
                 siteId);
-        InspectorStats.incrementStatCount(InspectorStrings.siteFeedbackCacheMiss);
+        InspectorStats.incrementStatCount(InspectorStrings.SITE_FEEDBACK_CACHE_MISS);
         asynchronouslyFetchFeedbackFromAerospike(siteId);
         siteFeedbackEntity = siteSegmentFeedbackCache.get(siteId);
         return siteFeedbackEntity == null ? null : (siteFeedbackEntity.getSegmentAdGroupFeedbackMap() == null ? null
@@ -126,8 +125,7 @@ public class SiteAerospikeFeedbackRepository {
             CacheUpdater cacheUpdater = new CacheUpdater(siteId);
             Thread cacheUpdaterThread = new Thread(cacheUpdater);
             executorService.execute(cacheUpdaterThread);
-        }
-        else {
+        } else {
             LOG.debug("Not fetching feedback as site is already updating");
         }
     }
@@ -175,11 +173,11 @@ public class SiteAerospikeFeedbackRepository {
                 final Key key = new Key(namespace, set, site);
                 record = aerospikeClient.get(policy, key);
             } catch (AerospikeException e) {
-                LOG.error("Exception while retrieving record: {}", e.getMessage());
+                LOG.error("Exception while retrieving record: {}", e);
                 record = null;
             }
             time = System.currentTimeMillis() - time;
-            InspectorStats.incrementStatCount(InspectorStrings.siteFeedbackLatency, time);
+            InspectorStats.incrementStatCount(InspectorStrings.SITE_FEEDBACK_LATENCY, time);
             return record;
         }
 
@@ -200,8 +198,7 @@ public class SiteAerospikeFeedbackRepository {
                         try {
                             TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
                             tDeserializer.deserialize(globalFeedback, (byte[]) binValuePair.getValue());
-                        }
-                        catch (TException exception) {
+                        } catch (TException exception) {
                             LOG.debug("Error in deserializing thrift for global feedback for segment {} {}", segmentId,
                                     exception);
                             globalFeedback = null;
@@ -215,8 +212,7 @@ public class SiteAerospikeFeedbackRepository {
                                 throw new TException("No rct data");
                             }
                             tDeserializer.deserialize(rctFeedback, (byte[]) byteArray);
-                        }
-                        catch (TException exception) {
+                        } catch (TException exception) {
                             LOG.debug("Error in deserializing thrift for rct feedback for segment {} {}", segmentId,
                                     exception);
                             rctFeedback = null;
@@ -230,8 +226,7 @@ public class SiteAerospikeFeedbackRepository {
                                 throw new TException("No colo data");
                             }
                             tDeserializer.deserialize(coloFeedback, (byte[]) byteArray);
-                        }
-                        catch (TException exception) {
+                        } catch (TException exception) {
                             LOG.debug("Error in deserializing thrift for local feedback for segment {} {}", segmentId,
                                     exception);
                             coloFeedback = null;
@@ -286,9 +281,7 @@ public class SiteAerospikeFeedbackRepository {
                                 .getExternalSiteKey());
                         builder.setBeacons(builder.getBeacons() + rctBuilder.getBeacons());
                         adGroupFeedbackBuilderMap.put(adGroupFeedback.getExternalSiteKey(), builder);
-                    }
-                    // else adding feedback entity with rct data
-                    else {
+                    } else { // else adding feedback entity with rct data
                         adGroupFeedbackBuilderMap.put(adGroupFeedback.getExternalSiteKey(), rctBuilder);
                     }
                 }
@@ -307,9 +300,7 @@ public class SiteAerospikeFeedbackRepository {
                         builder.setFillRatio(coloBuilder.getFillRatio());
                         builder.setLastHourLatency(coloBuilder.getLastHourLatency());
                         adGroupFeedbackBuilderMap.put(adGroupFeedback.getExternalSiteKey(), builder);
-                    }
-                    // else adding feedback entity with colo local data
-                    else {
+                    } else {// else adding feedback entity with colo local data
                         adGroupFeedbackBuilderMap.put(adGroupFeedback.getExternalSiteKey(), coloBuilder);
                     }
                 }
@@ -322,11 +313,9 @@ public class SiteAerospikeFeedbackRepository {
             Integer segmentId;
             if (globalFeedback != null) {
                 segmentId = globalFeedback.getInventorySegmentId();
-            }
-            else if (rctFeedback != null) {
+            } else if (rctFeedback != null) {
                 segmentId = rctFeedback.getInventorySegmentId();
-            }
-            else {
+            } else {
                 segmentId = coloFeedback.getInventorySegmentId();
             }
             return new SegmentAdGroupFeedbackEntity(segmentId, adGroupFeedbackMap);

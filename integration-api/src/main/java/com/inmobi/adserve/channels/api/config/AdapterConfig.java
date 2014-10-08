@@ -35,8 +35,7 @@ public class AdapterConfig implements CasConfig {
 
         try {
             this.adapterClass = (Class<AdNetworkInterface>) Class.forName(adapterConfig.getString("class"));
-        }
-        catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
@@ -68,12 +67,7 @@ public class AdapterConfig implements CasConfig {
     public boolean isActive() {
         String status = adapterConfig.getString("status", "on");
 
-        if (status.equalsIgnoreCase("on")) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return "on".equalsIgnoreCase(status);
     }
 
     /**

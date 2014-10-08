@@ -33,7 +33,7 @@ public class NativeResponseMaker {
   private final static Logger LOG = LoggerFactory.getLogger(NativeResponseMaker.class);
   private final TemplateParser templateParser;
   private final TemplateDecorator templateDecorator;
-  private static final String errorStr = "%s can't be null.";
+  private static final String ERROR_STR = "%s can't be null.";
   private Gson gson = null;
   @Inject
   RepositoryHelper repositoryHepler = null;
@@ -48,10 +48,10 @@ public class NativeResponseMaker {
 
   public String makeResponse(final BidResponse response, final Map<String, String> params,
       final NativeAdTemplateEntity templateEntity) throws Exception {
-    Preconditions.checkNotNull(response, errorStr, "BidResponse");
-    Preconditions.checkNotNull(params, errorStr, "params");
-    Preconditions.checkNotNull(params.containsKey("siteId"), errorStr, "siteId");
-    Preconditions.checkNotNull(templateEntity, errorStr, "templateEntity");
+    Preconditions.checkNotNull(response, ERROR_STR, "BidResponse");
+    Preconditions.checkNotNull(params, ERROR_STR, "params");
+    Preconditions.checkNotNull(params.containsKey("siteId"), ERROR_STR, "siteId");
+    Preconditions.checkNotNull(templateEntity, ERROR_STR, "templateEntity");
 
     final String siteId = params.get("siteId");
     final App app = gson.fromJson(response.getSeatbid().get(0).getBid().get(0).getAdm(), App.class);
@@ -77,27 +77,29 @@ public class NativeResponseMaker {
     for (final Iterator<Integer> iterator = mandatoryList.iterator(); iterator.hasNext();) {
       final Integer integer = iterator.next();
       switch (integer) {
-        case NativeConstrains.Icon:
-          if (app.getIcons() == null || app.getIcons().size() < 1
+        case NativeConstrains.ICON:
+          if (app.getIcons() == null || app.getIcons().isEmpty()
               || StringUtils.isEmpty(app.getIcons().get(0).getUrl())) {
-            throwException(String.format(errorStr, "Icon"));
+            throwException(String.format(ERROR_STR, "Icon"));
           }
           break;
-        case NativeConstrains.Media:
-          if (app.getScreenshots() == null || app.getScreenshots().size() < 1) {
-            throwException(String.format(errorStr, "Image"));
+        case NativeConstrains.MEDIA:
+          if (app.getScreenshots() == null || app.getScreenshots().isEmpty()) {
+            throwException(String.format(ERROR_STR, "Image"));
           }
           break;
-        case NativeConstrains.Headline:
+        case NativeConstrains.HEADLINE:
           if (StringUtils.isEmpty(app.getTitle())) {
-            throwException(String.format(errorStr, "Title"));
+            throwException(String.format(ERROR_STR, "Title"));
           }
           break;
-        case NativeConstrains.Description:
+        case NativeConstrains.DESCRIPTION:
           if (StringUtils.isEmpty(app.getDesc())) {
-            throwException(String.format(errorStr, "Description"));
+            throwException(String.format(ERROR_STR, "Description"));
           }
           break;
+        default:
+            break;
       }
 
     }
@@ -170,7 +172,7 @@ public class NativeResponseMaker {
         ct.append("\"").append(clickUrls.get(i)).append("\"").append(",");
       }
 
-      if (clickUrls.size() > 0) {
+      if (!clickUrls.isEmpty()) {
         ct.append("\"").append(clickUrls.get(i)).append("\"");
       }
     }

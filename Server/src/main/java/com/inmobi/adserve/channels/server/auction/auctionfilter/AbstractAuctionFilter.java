@@ -52,8 +52,7 @@ public abstract class AbstractAuctionFilter implements AuctionFilter {
                 LOG.debug(traceMarker, "Failed in auction filter {}  , advertiser {}", this.getClass().getSimpleName(),
                         channelSegment.getAdNetworkInterface().getName());
                 incrementStats(channelSegment);
-            }
-            else {
+            } else {
                 LOG.debug(traceMarker, "Passed in auction filter {} ,  advertiser {}", this.getClass().getSimpleName(),
                         channelSegment.getAdNetworkInterface().getName());
             }

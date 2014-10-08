@@ -43,16 +43,14 @@ public class ServletLogParser implements Servlet {
             String[] array = jObject.split("&");
             targetStrings = array[0].split("=")[1];
             logFilePath = array[1].split("=")[1];
-        }
-        else {// handle get request
+        } else {// handle get request
             if (!params.isEmpty()) {
                 for (Entry<String, List<String>> p : params.entrySet()) {
                     String key = p.getKey();
                     List<String> vals = p.getValue();
-                    if (key.equalsIgnoreCase("search")) {
+                    if ("search".equalsIgnoreCase(key)) {
                         targetStrings = vals.get(0);
-                    }
-                    else if (key.equalsIgnoreCase("logFilePath")) {
+                    } else if ("logFilePath".equalsIgnoreCase(key)) {
                         logFilePath = vals.get(0);
                     }
                 }
@@ -68,8 +66,7 @@ public class ServletLogParser implements Servlet {
         int exitStatus = process.waitFor();
         if (exitStatus == 0) {
             hrh.responseSender.sendResponse("PASS", serverChannel);
-        }
-        else {
+        } else {
             hrh.responseSender.sendResponse("FAIL", serverChannel);
         }
     }

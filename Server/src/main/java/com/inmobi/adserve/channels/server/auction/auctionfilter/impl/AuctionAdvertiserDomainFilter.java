@@ -16,7 +16,7 @@ public class AuctionAdvertiserDomainFilter extends AbstractAuctionFilter {
 
     @Inject
     protected AuctionAdvertiserDomainFilter(Provider<Marker> traceMarkerProvider,final ServerConfig serverConfiguration) {
-        super(traceMarkerProvider, InspectorStrings.droppedInAdvertiserDomainsMissingFilter, serverConfiguration);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_ADVERTISER_DOMAINS_MISSING_FILTER, serverConfiguration);
         isApplicableRTBD = true;
         isApplicableIX = false;
     }

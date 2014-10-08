@@ -83,11 +83,9 @@ public class ChannelSegmentFilterModule extends AbstractModule {
             AdvertiserLevelFilter filter = injector.getInstance(class1);
             if (filter instanceof AdvertiserDetailsInvalidFilter) {
                 filter.setOrder(FilterOrder.FIRST);
-            }
-            else if (filter instanceof AdvertiserExcludedFilter) {
+            } else if (filter instanceof AdvertiserExcludedFilter) {
                 filter.setOrder(FilterOrder.SECOND);
-            }
-            else {
+            } else {
                 filter.setOrder(FilterOrder.DEFAULT);
             }
 
@@ -121,14 +119,11 @@ public class ChannelSegmentFilterModule extends AbstractModule {
             AdGroupLevelFilter filter = injector.getInstance(class1);
             if (filter instanceof AdGroupSupplyDemandClassificationFilter) {
                 filter.setOrder(FilterOrder.FIRST);
-            }
-            else if (filter instanceof AdGroupMaxSegmentPerRequestFilter) {
+            } else if (filter instanceof AdGroupMaxSegmentPerRequestFilter) {
                 filter.setOrder(FilterOrder.LAST);
-            }
-            else if (filter instanceof AdGroupPartnerCountFilter) {
+            } else if (filter instanceof AdGroupPartnerCountFilter) {
                 filter.setOrder(FilterOrder.SECOND_LAST);
-            }
-            else {
+            } else {
                 filter.setOrder(FilterOrder.DEFAULT);
             }
 

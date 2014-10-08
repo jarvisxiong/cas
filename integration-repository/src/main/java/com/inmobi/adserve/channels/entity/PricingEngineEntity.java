@@ -68,25 +68,30 @@ public class PricingEngineEntity implements IdentifiableEntity<PricingEngineQuer
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         PricingEngineEntity other = (PricingEngineEntity) obj;
-        if (countryId == null) {
-            if (other.countryId != null)
+        if (null == countryId) {
+            if (null != other.countryId) {
                 return false;
-        }
-        else if (!countryId.equals(other.countryId))
+            }
+        } else if (!countryId.equals(other.countryId)) {
             return false;
+        }
         if (osId == null) {
-            if (other.osId != null)
+            if (other.osId != null) {
                 return false;
-        }
-        else if (!osId.equals(other.osId))
+            }
+        } else if (!osId.equals(other.osId)) {
             return false;
+        }
         return true;
     }
 

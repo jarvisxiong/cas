@@ -86,21 +86,21 @@ public class Logging {
     public static void rrLogging(Marker traceMarker, final ChannelSegment channelSegment, final List<ChannelSegment> rankList,
             final SASRequestParameters sasParams, String terminationReason, final long totalTime) throws JSONException,
             TException {
-        InspectorStats.incrementStatCount(InspectorStrings.latency, totalTime);
+        InspectorStats.incrementStatCount(InspectorStrings.LATENCY, totalTime);
 
         if (null != sasParams) {
             DemandSourceType dst = DemandSourceType.findByValue(sasParams.getDst());
-            InspectorStats.incrementStatCount(dst + "-" +InspectorStrings.latency, totalTime);
+            InspectorStats.incrementStatCount(dst + "-" +InspectorStrings.LATENCY, totalTime);
             if (null != sasParams.getAllParametersJson() && (rankList == null || rankList.isEmpty())) {
-                InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.nomatchsegmentcount);
-                InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.nomatchsegmentlatency, totalTime);
-                InspectorStats.incrementStatCount(InspectorStrings.nomatchsegmentcount);
-                InspectorStats.incrementStatCount(InspectorStrings.nomatchsegmentlatency, totalTime);
+                InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NO_MATCH_SEGMENT_COUNT);
+                InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NO_MATCH_SEGMENT_LATENCY, totalTime);
+                InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_COUNT);
+                InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_LATENCY, totalTime);
             }
-            if (null != sasParams.getRFormat() && sasParams.getRFormat().equalsIgnoreCase("native")) {
+            if (null != sasParams.getRFormat() && "native".equalsIgnoreCase(sasParams.getRFormat())) {
                 InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NATIVE_REQUESTS);
                 if(rankList == null || rankList.isEmpty()){
-                	InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NATIVE_REQUESTS + "-" + InspectorStrings.nomatchsegmentcount);
+                	InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NATIVE_REQUESTS + "-" + InspectorStrings.NO_MATCH_SEGMENT_COUNT);
                 }
             }
         }
@@ -110,8 +110,7 @@ public class Logging {
         boolean isTerminated = false;
         if (null != terminationReason) {
             isTerminated = true;
-        }
-        else {
+        } else {
             terminationReason = "NO";
         }
         short adsServed = 0;
@@ -123,9 +122,8 @@ public class Logging {
                 LOG.info("host cant be empty, abandoning rr logging");
                 return;
             }
-        }
-        catch (UnknownHostException ex) {
-            LOG.info("could not resolve host inside rr logging, so abandoning response");
+        } catch (UnknownHostException ex) {
+            LOG.info("could not resolve host inside rr logging so abandoning response, raised exception {}", ex);
             return;
         }
         InventoryType inventory = getInventoryType(sasParams);
@@ -138,7 +136,7 @@ public class Logging {
         String advertiserId = null;
         if (channelSegment != null) {
             InspectorStats.incrementStatCount(channelSegment.getAdNetworkInterface().getName(),
-                    InspectorStrings.serverImpression);
+                    InspectorStrings.SERVER_IMPRESSION);
             isServerImpression = true;
             advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
             adsServed = 1;
@@ -169,7 +167,7 @@ public class Logging {
             slotServed = sasParams.getSlot();
             countryId = sasParams.getCountryId();
             carrierId = sasParams.getCarrierId();
-            if (null != sasParams.getRqMkSlot() && sasParams.getRqMkSlot().size() > 0) {
+            if (null != sasParams.getRqMkSlot() && (!sasParams.getRqMkSlot().isEmpty())) {
                 requestSlot = sasParams.getRqMkSlot().get(0);
             }
             state = sasParams.getState();
@@ -288,9 +286,8 @@ public class Logging {
                 try {
                     TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
                     msg = new Message(tSerializer.serialize(creativeLog));
-                }
-                catch (TException e) {
-                    LOG.debug("Error while creating creative logs for databus ");
+                } catch (TException e) {
+                    LOG.debug("Error while creating creative logs for databus, raised exception {}", e);
                 }
                 if (null != msg) {
                     dataBusPublisher.publish(umpAdsLogKey, msg);
@@ -317,22 +314,22 @@ public class Logging {
             // Incrementing inspectors
             AdNetworkInterface adNetwork = channelSegment.getAdNetworkInterface();
             ThirdPartyAdResponse adResponse = adNetwork.getResponseStruct();
-            InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalRequests);
-            InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.latency, adResponse.latency);
-            InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.connectionLatency,
+            InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_REQUESTS);
+            InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.LATENCY, adResponse.latency);
+            InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.CONNECTION_LATENCY,
                     adNetwork.getConnectionLatency());
             switch (adResponse.adStatus) {
                 case "AD":
-                    InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalFills);
+                    InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_FILLS);
                     break;
                 case "NO_AD":
-                    InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalNoFills);
+                    InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_NO_FILLS);
                     break;
                 case "TIME_OUT":
-                    InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalTimeout);
+                    InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_TIMEOUT);
                     break;
                 default:
-                    InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.totalTerminate);
+                    InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_TERMINATE);
                     break;
             }
         }
@@ -355,11 +352,9 @@ public class Logging {
     public static AdStatus getAdStatus(final String adStatus) {
         if ("AD".equalsIgnoreCase(adStatus)) {
             return AdStatus.AD;
-        }
-        else if ("NO_AD".equals(adStatus)) {
+        } else if ("NO_AD".equals(adStatus)) {
             return AdStatus.NO_AD;
-        }
-        else if ("TIME_OUT".equals(adStatus)) {
+        } else if ("TIME_OUT".equals(adStatus)) {
             return AdStatus.TIME_OUT;
         }
         return AdStatus.DROPPED;
@@ -382,11 +377,11 @@ public class Logging {
             log.append(sep).append(adResponse.adStatus);
             String response = "";
             String requestUrl = "";
-            if (adResponse.adStatus.equalsIgnoreCase("AD")) {
+            if ("AD".equalsIgnoreCase(adResponse.adStatus)) {
                 response = adNetworkInterface.getHttpResponseContent();
                 log.append(sep).append(response);
             }
-            if (!adNetworkInterface.getRequestUrl().equals("")) {
+            if (!"".equals(adNetworkInterface.getRequestUrl())) {
                 requestUrl = adNetworkInterface.getRequestUrl();
                 log.append(sep).append(requestUrl);
             }
@@ -428,7 +423,7 @@ public class Logging {
             	response = adNetworkInterface.getAdMarkUp();
             }
             
-            if (!adStatus.equalsIgnoreCase("AD") || requestUrl.equals("") || response.equals("")) {
+            if (!"AD".equalsIgnoreCase(adStatus) || "".equals(requestUrl) || "".equals(response)) {
                 continue;
             }
 
@@ -465,9 +460,8 @@ public class Logging {
         try {
             TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
             msg = new Message(tSerializer.serialize(casAdvertisementLog));
-        }
-        catch (TException e) {
-            LOG.debug("Error while creating sampledAdvertiser logs for databus ");
+        } catch (TException e) {
+            LOG.debug("Error while creating sampledAdvertiser logs for databus, raised exception {}", e);
         }
         if (null != msg) {
             dataBusPublisher.publish(sampledAdvertisementLogKey, msg);
@@ -501,17 +495,19 @@ public class Logging {
     }
 
     public static ContentRating getContentRating(final SASRequestParameters sasParams) {
+        String sasSiteType;
         if (sasParams == null || null == sasParams.getSiteType()) {
             return null;
-        }
-        else if (sasParams.getSiteType().equalsIgnoreCase("performance")) {
-            return ContentRating.PERFORMANCE;
-        }
-        else if (sasParams.getSiteType().equalsIgnoreCase("FAMILY_SAFE")) {
-            return ContentRating.FAMILY_SAFE;
-        }
-        else if (sasParams.getSiteType().equalsIgnoreCase("MATURE")) {
-            return ContentRating.MATURE;
+        } else {
+            sasSiteType = sasParams.getSiteType();
+
+            if ("performance".equalsIgnoreCase(sasSiteType)) {
+                return ContentRating.PERFORMANCE;
+            } else if ("FAMILY_SAFE".equalsIgnoreCase(sasSiteType)) {
+                return ContentRating.FAMILY_SAFE;
+            } else if ("MATURE".equalsIgnoreCase(sasSiteType)) {
+                return ContentRating.MATURE;
+            }
         }
         return null;
     }
@@ -519,18 +515,16 @@ public class Logging {
     public static PricingModel getPricingModel(final String pricingModel) {
         if (pricingModel == null) {
             return null;
-        }
-        else if (pricingModel.equalsIgnoreCase("cpc")) {
+        } else if ("cpc".equalsIgnoreCase(pricingModel)) {
             return PricingModel.CPC;
-        }
-        else if (pricingModel.equalsIgnoreCase("cpm")) {
+        } else if ("cpm".equalsIgnoreCase(pricingModel)) {
             return PricingModel.CPM;
         }
         return null;
     }
 
     public static InventoryType getInventoryType(final SASRequestParameters sasParams) {
-        if (null != sasParams && sasParams.getSdkVersion() != null && sasParams.getSdkVersion().equalsIgnoreCase("0")) {
+        if (null != sasParams && sasParams.getSdkVersion() != null && "0".equalsIgnoreCase(sasParams.getSdkVersion())) {
             return InventoryType.BROWSER;
         }
         return InventoryType.APP;
@@ -539,8 +533,7 @@ public class Logging {
     public static Gender getGender(final SASRequestParameters sasParams) {
         if (sasParams == null) {
             return null;
-        }
-        else if (sasParams.getGender().equalsIgnoreCase("m")) {
+        } else if ("m".equalsIgnoreCase(sasParams.getGender())) {
             return Gender.MALE;
         }
         return Gender.FEMALE;
