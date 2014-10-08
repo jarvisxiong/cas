@@ -26,7 +26,7 @@ public class ChannelSegmentAdvertiserCache {
             logger.debug("Lookup in repository for advertiserId " + advertiserId + "returned empty array.");
             return Collections.emptySet();
         }
-        if (entities.size() == 0) {
+        if (entities.isEmpty()) {
             logger.info("No entries found in the database for the advertiser Id: " + advertiserId);
         }
         return entities.values();

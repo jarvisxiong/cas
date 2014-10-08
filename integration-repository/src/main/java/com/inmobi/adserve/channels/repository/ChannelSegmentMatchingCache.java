@@ -25,7 +25,7 @@ public class ChannelSegmentMatchingCache {
             logger.debug("Lookup in repository for key: " + key + "returned empty array");
             return Collections.emptySet();
         }
-        if (entities.size() == 0) {
+        if (entities.isEmpty()) {
             logger.info("No entries found in the database for the key " + key);
         }
         return entities.values();
@@ -68,7 +68,7 @@ public class ChannelSegmentMatchingCache {
                 : entity.getRcList();
         List<Integer> allowedTargetingPlatform = entity.getTargetingPlatform();
         Integer[] allowedSiteRatings = entity.getSiteRatings();
-        List<Integer> allowedOsIds = entity.getOsIds() == null || entity.getOsIds().size() == 0 ? new ArrayList<Integer>(Arrays.asList(new Integer[] { -1 })) : entity.getOsIds();
+        List<Integer> allowedOsIds = entity.getOsIds() == null || entity.getOsIds().isEmpty() ? new ArrayList<Integer>(Arrays.asList(new Integer[] { -1 })) : entity.getOsIds();
         
         Integer dst = entity.getDst();
 

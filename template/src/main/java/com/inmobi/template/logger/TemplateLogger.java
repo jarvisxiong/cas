@@ -11,12 +11,11 @@ public final class TemplateLogger {
 	private TemplateLogger(){}
 	
 	
-	public static TemplateLogger getInstance(){
+	public static TemplateLogger getInstance() {
 		return SINGLETON;
 	}
 	
-	  public void logParameters(Integer asyncType, Integer asyncMethod)
-	  {
+	  public void logParameters(Integer asyncType, Integer asyncMethod) {
 	      LOG.debug("AsyncType : "+asyncType+" | asyncMethod : "+asyncMethod);
 	  }
 

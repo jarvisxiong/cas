@@ -56,7 +56,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
 
     HttpRequest                 httpRequest;
 
-    private static final String suppySource = "DCP";
+    private static final String SUPPY_SOURCE = "DCP";
     private final String        ifcURL;
 
     private String              adGroupID;
@@ -77,9 +77,8 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         JSONObject jsonObject = null;
         try {
             jsonObject = new JSONObject(sasParams.getAllParametersJson());
-        }
-        catch (Exception e) {
-            //
+        } catch (Exception e) {
+            LOG.debug("cannot get AllParametersJson from sasParams, {}", e);
         }
         if (null != jsonObject) {
             try {
@@ -93,22 +92,20 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
                 siteAllowBanner = getFlagParams(jsonObject, "site-allowBanner", false);
                 adcode = stringifyParam(jsonObject, "adcode", true);
                 adGroupID = externalSiteId;
-            }
-            catch (JSONException e) {
+            } catch (JSONException e) {
+                LOG.info("cannot configure parameters in IFCAdNetwork, {}", e);
                 return false;
             }
             try {
                 handset = getHandsetString(jsonObject.getJSONArray("handset"));
-            }
-            catch (JSONException e) {
-                LOG.info("IFC Mandatory Parameter missing: handset");
+            } catch (JSONException e) {
+                LOG.info("IFC Mandatory Parameter missing: handset, exception raised {}", e);
                 return false;
             }
             try {
                 carrier = getCarrierString(jsonObject.getJSONArray("carrier"));
-            }
-            catch (JSONException e) {
-                LOG.info("IFC Mandatory Parameter missing: carrier");
+            } catch (JSONException e) {
+                LOG.info("IFC Mandatory Parameter missing: carrier, exception raised {}", e);
                 return false;
             }
 
@@ -123,12 +120,10 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
                 /*if ((sdkVersion == null || sdkVersion.toLowerCase().equals("0")) && adcode.equalsIgnoreCase("non-js")) {
                     return false;
                 }*/
+            } catch (JSONException e) {
+                LOG.info("Error while parsing 'sdk-version', {}", e);
             }
-            catch (JSONException e) {
-                LOG.info("Error while parsing 'sdk-version'");
-            }
-        }
-        else {
+        } else {
             requestId = sasParams.getTid();
             deviceOsId = String.valueOf(sasParams.getOsId());
             if (null != sasParams.getCity()) {
@@ -146,9 +141,10 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             carrier = String.valueOf(sasParams.getCarrierId());
             deviceOSVersion = sasParams.getOsMajorVersion();
 
-            if (sasParams.getSdkVersion() != null
-                    && (sasParams.getSdkVersion().toLowerCase().startsWith("i30") || sasParams.getSdkVersion()
-                            .toLowerCase().startsWith("a30"))) {
+            String tempSdkVersion = sasParams.getSdkVersion();
+
+            if (tempSdkVersion != null && (tempSdkVersion.toLowerCase().startsWith("i30")
+                    || tempSdkVersion.toLowerCase().startsWith("a30"))) {
                 return false;
             }
         }
@@ -156,21 +152,22 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         if (!isEmpty(sasParams.getUserAgent())) {
             userAgent = getURLEncode(sasParams.getUserAgent(), format);
         }
-        if (!isEmpty(sasParams.getGender())
-                && (sasParams.getGender().equalsIgnoreCase("m") || sasParams.getGender().equalsIgnoreCase("male"))) {
+
+        String tempGender = sasParams.getGender();
+
+        if (!isEmpty(tempGender)
+                && ("m".equalsIgnoreCase(tempGender) || "male".equalsIgnoreCase(tempGender))) {
             gender = "male";
-        }
-        else if (!isEmpty(sasParams.getGender())
-                && (sasParams.getGender().equalsIgnoreCase("f") || sasParams.getGender().equalsIgnoreCase("female"))) {
+        } else if (!isEmpty(tempGender)
+                && ("f".equalsIgnoreCase(tempGender) || "female".equalsIgnoreCase(tempGender))) {
             gender = "female";
         } else{
-		gender = sasParams.getGender();
+		gender = tempGender;
 	} 
 
         if (null != sasParams.getSiteId()) {
             siteID = sasParams.getSiteId();
-        }
-        else {
+        } else {
             LOG.info("IFC Mandatory Parameter missing: SiteName");
             return false;
         }
@@ -178,8 +175,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             slotHeight = String.valueOf(dim.getHeight());
             slotWidth = String.valueOf(dim.getWidth());
-        }
-        else {
+        } else {
             LOG.info("IFC Mandatory Parameter missing: Slot");
             return false;
         }
@@ -196,10 +192,9 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         Boolean booleanVal = null;
         try {
             booleanVal = jsonObject.getBoolean(field);
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             if (isMandatory) {
-                LOG.info("IFC Mandatory Parameter missing: {}", field);
+                LOG.info("IFC Mandatory Parameter missing: {} , raised exception {}", field, e);
                 throw new JSONException("IFC Mandatory Parameter missing:" + field);
             }
         }
@@ -210,13 +205,11 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             throws JSONException {
         try {
             return (String) jObject.get(field);
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             if (isMandatory) {
-                LOG.info("IFC Mandatory Parameter missing: {}", field);
+                LOG.info("IFC Mandatory Parameter missing: {} , and exception thrown {}", field, e);
                 throw new JSONException("IFC Mandatory Parameter missing:" + field);
-            }
-            else {
+            } else {
                 return null;
             }
 
@@ -258,9 +251,8 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             log.put("resp", adStatus);
             log.put("latency", getLatency());
             return log;
-        }
-        catch (JSONException exception) {
-            LOG.info("Error while constructing logline inside ifc adapter");
+        } catch (JSONException exception) {
+            LOG.info("Error while constructing logline inside ifc adapter, exception raised {}", exception);
             return null;
         }
     }
@@ -305,7 +297,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         jsonObject.addProperty("siteAllowBanner", siteAllowBanner);
         jsonObject.addProperty("adCode", adcode);
         jsonObject.addProperty("imaiBaseUrl", sasParams.getImaiBaseUrl());
-        jsonObject.addProperty("supplySource", suppySource);
+        jsonObject.addProperty("supplySource", SUPPY_SOURCE);
         jsonObject.addProperty("blindedSiteId", blindedSiteId);
         jsonObject.addProperty("uidIFA", casInternalRequestParameters.uidIFA);
         jsonObject.addProperty("uidSO1", casInternalRequestParameters.uidSO1);
@@ -362,17 +354,14 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
-        if (null == response
-                || (null != response && (status.code() != 200 || response.startsWith("<!--") || response.trim()
-                        .isEmpty()))) {
+        if (null == response || (status.code() != 200 || response.startsWith("<!--") || response.trim().isEmpty())) {
             statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             responseContent = response;
             statusCode = status.code();
             adStatus = "AD";

@@ -111,8 +111,7 @@ public class ServerModule extends AbstractModule {
 
         try {
             configurator.doConfigure(loggerConfiguration.getString("slf4jLoggerConf"));
-        }
-        catch (JoranException e) {
+        } catch (JoranException e) {
             throw new RuntimeException(e);
         }
     }

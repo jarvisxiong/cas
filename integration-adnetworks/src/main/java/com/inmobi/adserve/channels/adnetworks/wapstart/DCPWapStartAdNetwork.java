@@ -44,6 +44,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 	private String udid;
 
 
+
 	public DCPWapStartAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
 			final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
 		super(config, clientBootstrap, baseRequestHandler, serverChannel);
@@ -63,8 +64,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 			Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
 			width = (int) Math.ceil(dim.getWidth());
 			height = (int) Math.ceil(dim.getHeight());
-		}
-		else {
+		} else {
 			LOG.debug("mandate parameters missing for WapStart, so returning from adapter");
 			return false;
 		}
@@ -98,8 +98,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 		try {
 			StringBuilder url = new StringBuilder(String.format(host,externalSiteId));
 			return (new URI(url.toString()));
-		}
-		catch (URISyntaxException exception) {
+		} catch (URISyntaxException exception) {
 			errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
 			LOG.info("{}", exception);
 		}
@@ -148,8 +147,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 		}
 		if(StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)){
 			device.setAndroid_id(casInternalRequestParameters.uidMd5);
-		}
-		else if(StringUtils.isNotBlank(casInternalRequestParameters.uidO1)){
+		} else if(StringUtils.isNotBlank(casInternalRequestParameters.uidO1)){
 			device.setAndroid_id(casInternalRequestParameters.uidO1);
 		}
 		if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)&& "1".equals(casInternalRequestParameters.uidADT)) {
@@ -192,7 +190,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 			LOG.debug(requestBody);
 			return requestBody;
 		} catch (JsonProcessingException e) {
-			LOG.error(e.getMessage());
+			LOG.error("{}", e);
 		}
 		return null;
 
@@ -236,14 +234,12 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 		}
 		try {
 			JSONObject responseJson = new JSONObject(response).getJSONArray("seat").getJSONObject(0);
-			;
 			TemplateType t;
 			VelocityContext context = new VelocityContext();
 			String partnerClickUrl = null;
 			if(responseJson.has("clink")){
 				partnerClickUrl = responseJson.getString("clink");
-			}
-			else{
+			} else{
 				adStatus = "NO_AD";
 				statusCode = 500;
 				return;
@@ -256,8 +252,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 				String imageUrl = textGraphic.getString("name");
 				context.put(VelocityTemplateFieldConstants.PartnerImgUrl, imageUrl);
 				t = TemplateType.IMAGE;
-			}
-			else if(responseJson.has("text")){
+			} else if(responseJson.has("text")){
 				JSONObject text = responseJson.getJSONObject("text");
 				context.put(VelocityTemplateFieldConstants.AdText, text.getString("title"));
 				if(text.has("content")){
@@ -266,14 +261,12 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 				String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
 				if (StringUtils.isEmpty(vmTemplate)) {
 					t = TemplateType.PLAIN;
-				}
-				else {
+				} else {
 					context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
 					t = TemplateType.RICH;
 				}
 
-			}
-			else{
+			} else {
 				adStatus = "NO_AD";
 				statusCode = 500;
 				return;

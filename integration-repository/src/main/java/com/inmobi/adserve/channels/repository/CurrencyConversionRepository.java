@@ -39,8 +39,7 @@ public class CurrencyConversionRepository extends
                 logger.debug("Found Currency Conversion Entity : " + entity);
             }
             return new DBEntity<CurrencyConversionEntity, String>(entity, modifiedOn);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Error in resultset row", e);
             return new DBEntity<CurrencyConversionEntity, String>(new EntityError<String>(currencyId,
                     "ERROR_IN_EXTRACTING_CURRENCY_CONVERSION_RATE"), modifiedOn);

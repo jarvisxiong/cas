@@ -49,7 +49,7 @@ public class CasExceptionHandler extends ChannelInboundHandlerAdapter {
 			LOG.debug(traceMarker, "Channel is open in channelIdle handler");
 			if (responseSender.getRankList() != null) {
 				for (ChannelSegment channelSegment : responseSender.getRankList()) {
-					if (channelSegment.getAdNetworkInterface().getAdStatus().equals("AD")) {
+					if ("AD".equals(channelSegment.getAdNetworkInterface().getAdStatus())) {
 						LOG.debug(traceMarker, "Got Ad from {} Top Rank was {}", channelSegment.getAdNetworkInterface().getName(), responseSender.getRankList()
 								.get(0).getAdNetworkInterface().getName());
 						responseSender.sendAdResponse(channelSegment.getAdNetworkInterface(), ctx.channel());
@@ -61,16 +61,16 @@ public class CasExceptionHandler extends ChannelInboundHandlerAdapter {
 			// increment the totalTimeout. It means server
 			// could not write the response with in 800 ms
 			LOG.debug(traceMarker, "inside channel idle event handler for Request channel ID: {}", ctx.channel());
-			InspectorStats.incrementStatCount(InspectorStrings.totalTimeout);
+			InspectorStats.incrementStatCount(InspectorStrings.TOTAL_TIMEOUT);
 			LOG.debug(traceMarker, "server timeout");
 
 		} else {
 
 			String exceptionString = cause.getClass().getSimpleName();
-			InspectorStats.incrementStatCount(InspectorStrings.channelException, exceptionString);
-			InspectorStats.incrementStatCount(InspectorStrings.channelException, InspectorStrings.count);
+			InspectorStats.incrementStatCount(InspectorStrings.CHANNEL_EXCEPTION, exceptionString);
+			InspectorStats.incrementStatCount(InspectorStrings.CHANNEL_EXCEPTION, InspectorStrings.COUNT);
 			if (cause instanceof ClosedChannelException || cause instanceof IOException) {
-				InspectorStats.incrementStatCount(InspectorStrings.totalTerminate);
+				InspectorStats.incrementStatCount(InspectorStrings.TOTAL_TERMINATE);
 				LOG.debug(traceMarker, "Channel is terminated {}", ctx.channel());
 			}
 			LOG.info(traceMarker, "Getting netty error in HttpRequestHandler: {}", cause);

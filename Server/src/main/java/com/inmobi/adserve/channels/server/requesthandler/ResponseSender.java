@@ -189,7 +189,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
             }
         } else {
             LOG.info("invalid slot, so not returning response, even though we got an ad");
-            InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
+            InspectorStats.incrementStatCount(InspectorStrings.TOTAL_NO_FILLS);
             if (getResponseFormat() == ResponseFormat.XHTML) {
                 finalResponse = NO_AD_XHTML;
             }
@@ -222,14 +222,14 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
     private void incrementStatsForFills(int dst) {
         if (dst == DemandSourceType.DCP.getValue()) {
-            InspectorStats.incrementStatCount(InspectorStrings.dcpFills);
+            InspectorStats.incrementStatCount(InspectorStrings.DCP_FILLS);
         } else if (dst == DemandSourceType.RTBD.getValue()) {
-            InspectorStats.incrementStatCount(InspectorStrings.ruleEngineFills);
+            InspectorStats.incrementStatCount(InspectorStrings.RULE_ENGINE_FILLS);
         } else if (dst == DemandSourceType.IX.getValue()) {
-            InspectorStats.incrementStatCount(InspectorStrings.ixFills);
+            InspectorStats.incrementStatCount(InspectorStrings.IX_FILLS);
         }
 
-        InspectorStats.incrementStatCount(InspectorStrings.totalFills);
+        InspectorStats.incrementStatCount(InspectorStrings.TOTAL_FILLS);
     }
 
     private boolean checkResponseSent() {
@@ -431,7 +431,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         // This check has been added to prevent totalNoFills from being updated, when any servlet other than the ones
         // mentioned above throws an exception in HttpRequestHandler.
         if (null != sasParams && 0 != sasParams.getDst()) {
-            InspectorStats.incrementStatCount(InspectorStrings.totalNoFills);
+            InspectorStats.incrementStatCount(InspectorStrings.TOTAL_NO_FILLS);
         }
 
         HttpResponseStatus httpResponseStatus;
@@ -461,6 +461,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
             case JS_AD_CODE:
                 httpResponseStatus = HttpResponseStatus.OK;
                 defaultContent = String.format(NO_AD_JS_ADCODE, sasParams.getRqIframe());
+                break;
             default:
                 httpResponseStatus = HttpResponseStatus.OK;
                 defaultContent = NO_AD_HTML;
@@ -501,7 +502,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
         String adCode = sasParams.getAdcode();
         String rqIframe = sasParams.getRqIframe();
-        return adCode != null && rqIframe != null && adCode.equalsIgnoreCase("JS");
+        return adCode != null && rqIframe != null && "JS".equalsIgnoreCase(adCode);
     }
 
     @Override
@@ -622,8 +623,10 @@ public class ResponseSender extends HttpRequestHandlerBase {
             Logging.sampledAdvertiserLogging(list, CasConfigUtil.getLoggerConfig());
             Logging.creativeLogging(list, sasParams);
         } catch (JSONException exception) {
+            LOG.debug("Exception raised in ResponseSender {}", exception);
             LOG.debug(ChannelServer.getMyStackTrace(exception));
         } catch (TException exception) {
+            LOG.debug("Exception raised in ResponseSender {}", exception);
             LOG.debug(ChannelServer.getMyStackTrace(exception));
         }
         LOG.debug("done with logging");

@@ -54,8 +54,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
             List<Integer> segmentFlags;
             if (null != row.getArray("segment_flags")) {
                 segmentFlags = Arrays.asList((Integer[]) row.getArray("segment_flags"));
-            }
-            else {
+            } else {
                 segmentFlags = new ArrayList<Integer>();
             }
             HashSet<Integer> segmentFlagSet = new HashSet<Integer>();
@@ -81,8 +80,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
             if (null == catTax || catTax.length == 0) {
                 allTags = true;
                 categoryTaxomony = new Long[0];
-            }
-            else {
+            } else {
                 categoryTaxomony = new Long[catTax.length];
                 for (int i = 0; i < catTax.length; i++) {
                     categoryTaxomony[i] = Long.valueOf(catTax[i]);
@@ -157,8 +155,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
 
             logger.debug("Adding adgroup " + adgroupId + " to channel segment repository");
             return new DBEntity<ChannelSegmentEntity, String>(entity, modifyTime);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Error in resultset row", e);
             return new DBEntity<ChannelSegmentEntity, String>(new EntityError<String>(adgroupId,
                     "ERROR_IN_EXTRACTING_SEGMENT"), modifyTime);
@@ -169,9 +166,8 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
         if (additionalParams != null) {
             try {
                 return new JSONObject(additionalParams);
-            }
-            catch (JSONException e) {
-                logger.info("Error in parsing aditional params json");
+            } catch (JSONException e) {
+                logger.info("Error in parsing additional params json, exception raised " + e);
             }
         }
         return new JSONObject();
@@ -188,9 +184,8 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
                     osIds.add(osIdsJson.getJSONObject(index).getInt("id"));
                 }
             }
-        }
-        catch (JSONException e) {
-            // Do Nothing
+        } catch (JSONException e) {
+
         }
         return osIds;
     }
@@ -209,8 +204,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
                     }
                 }
             }
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             // Do Nothing
         }
         return modelIds;
@@ -222,8 +216,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
             try {
                 JSONObject jObject = new JSONObject(sIEJson);
                 mode = "inclusion".equals(jObject.getString("mode"));
-            }
-            catch (JSONException e) {
+            } catch (JSONException e) {
                 logger.info("wrong json in site_json in channel repo" + e);
             }
         }
@@ -239,8 +232,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
                 for (int i = 0; i < sites.length(); i++) {
                     sitesIE.add(sites.getString(i));
                 }
-            }
-            catch (JSONException e) {
+            } catch (JSONException e) {
                 logger.info("wrong json in site_json in channel repo" + e);
             }
         }
@@ -261,8 +253,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
                 // Cleanup from ChannelSegmentAdvertiserCache
                 ChannelSegmentAdvertiserCache.cleanupEntityFromCache(oldEntity);
             }
-        }
-        catch (RepositoryException e) {
+        } catch (RepositoryException e) {
             logger.error("Error in cleaning entity in ChannelAdGroupRepository for id" + entity.getId());
         }
         if (entity.isStatus() && entity.getSiteRatings() != null && entity.getSlotIds() != null) {
@@ -270,8 +261,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
             ChannelSegmentMatchingCache.insertEntityToCache(entity, matchingKeys);
             ChannelSegmentAdvertiserCache.insertEntityToCache(entity);
             return false;
-        }
-        else {
+        } else {
             return true;
         }
 

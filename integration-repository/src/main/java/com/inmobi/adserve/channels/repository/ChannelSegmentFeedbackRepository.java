@@ -40,8 +40,7 @@ public class ChannelSegmentFeedbackRepository extends
 
             logger.debug("adgroup id for the loaded channelSegmentFeedbackEntity is " + adGroupId);
             return new DBEntity<ChannelSegmentFeedbackEntity, String>(entity, modifiedOn);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Error in resultset row", e);
             return new DBEntity<ChannelSegmentFeedbackEntity, String>(new EntityError<String>(adGroupId,
                     "ERROR_IN_EXTRACTING_SEGMENT"), modifiedOn);

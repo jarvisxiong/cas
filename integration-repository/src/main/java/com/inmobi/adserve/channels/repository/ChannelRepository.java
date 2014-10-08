@@ -74,8 +74,7 @@ public class ChannelRepository extends AbstractStatsMaintainingDBRepository<Chan
 
             ChannelEntity entity = builder.build();
             return new DBEntity<ChannelEntity, String>(entity, modifiedOn);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Error in resultset row", e);
             return new DBEntity<ChannelEntity, String>(new EntityError<String>(id, "ERROR_IN_EXTRACTING_CHANNEL"),
                     modifiedOn);
@@ -88,8 +87,7 @@ public class ChannelRepository extends AbstractStatsMaintainingDBRepository<Chan
             try {
                 JSONObject jObject = new JSONObject(sIEJson);
                 mode = "inclusion".equals(jObject.getString("mode"));
-            }
-            catch (JSONException e) {
+            } catch (JSONException e) {
                 logger.info("wrong json in site_json in channel repo", e);
             }
         }
@@ -105,8 +103,7 @@ public class ChannelRepository extends AbstractStatsMaintainingDBRepository<Chan
                 for (int i = 0; i < sites.length(); i++) {
                     sitesIE.add(sites.getString(i));
                 }
-            }
-            catch (JSONException e) {
+            } catch (JSONException e) {
                 logger.info("wrong json in site_json in channel repo", e);
             }
         }

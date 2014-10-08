@@ -27,15 +27,15 @@ public class DCPAmoAdAdNetwork extends AbstractDCPAdNetworkImpl {
 	private static final Logger LOG = LoggerFactory
 			.getLogger(DCPAmoAdAdNetwork.class);
 
-	private static final String bannerTag = "<!-- AMoAd Zone: [Inmobi ] --><div class=\"amoad_frame sid_62056d310111552c1081c48959720547417af886416a2ebac81d12f901043a9a container_div color_#0000cc-#444444-#ffffff-#0000FF-#009900 sp\"></div>"
+	private static final String BANNER_TAG = "<!-- AMoAd Zone: [Inmobi ] --><div class=\"amoad_frame sid_62056d310111552c1081c48959720547417af886416a2ebac81d12f901043a9a container_div color_#0000cc-#444444-#ffffff-#0000FF-#009900 sp\"></div>"
 			+ "<script src='http://j.amoad.com/js/aa.js' type='text/javascript' charset='utf-8'></script>";
-	private static final String interstitialTag = "<!-- AMoAd Zone: [Inmobi mega panel] --><div class=\"amoad_frame sid_62056d310111552c1081c48959720547de5a0851cfb70d70576781728f316065 container_div color_#0000CC-#444444-#FFFFFF-#0000FF-#009900 sp wv\"></div><script src='http://j.amoad.com/js/aa.js' type='text/javascript' charset='utf-8'></script>";
+	private static final String INTERSTITIAL_TAG = "<!-- AMoAd Zone: [Inmobi mega panel] --><div class=\"amoad_frame sid_62056d310111552c1081c48959720547de5a0851cfb70d70576781728f316065 container_div color_#0000CC-#444444-#FFFFFF-#0000FF-#009900 sp wv\"></div><script src='http://j.amoad.com/js/aa.js' type='text/javascript' charset='utf-8'></script>";
 	private static Map<Short, String> slotTagMap;
 	static {
 		slotTagMap = new HashMap<Short, String>();
-		slotTagMap.put((short) 9, bannerTag);
-		slotTagMap.put((short) 15, bannerTag);
-		slotTagMap.put((short) 10, interstitialTag);
+		slotTagMap.put((short) 9, BANNER_TAG);
+		slotTagMap.put((short) 15, BANNER_TAG);
+		slotTagMap.put((short) 10, INTERSTITIAL_TAG);
 	}
 
 	public DCPAmoAdAdNetwork(final Configuration config,
@@ -74,7 +74,7 @@ public class DCPAmoAdAdNetwork extends AbstractDCPAdNetworkImpl {
 			return;
 		}
 
-		context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, tag);
+		context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, tag);
 		try {
 			responseContent = Formatter.getResponseFromTemplate(
 					TemplateType.HTML, context, sasParams, beaconUrl);

@@ -123,8 +123,7 @@ public class JaxbHelper {
             marshallerPool.returnObject(poolKey, marshaller);
 
             return result.toString();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             marshallerPool.invalidateObject(poolKey, marshaller);
             throw new RuntimeException(e);
         }
@@ -152,8 +151,7 @@ public class JaxbHelper {
             unmarshallerPool.returnObject(poolKey, unmarshaller);
 
             return result;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             unmarshallerPool.invalidateObject(poolKey, unmarshaller);
             throw new RuntimeException(e);
         }
