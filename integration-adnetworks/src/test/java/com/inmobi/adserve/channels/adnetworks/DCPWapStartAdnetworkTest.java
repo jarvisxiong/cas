@@ -219,7 +219,6 @@ public class DCPWapStartAdnetworkTest extends TestCase {
 		dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null);
 		Request request = dcpWapstartAdNetwork.getNingRequest();
 		String actualResponse = request.getStringData();
-		System.out.print(actualResponse);
 		String expectedResponse = "{\"impression\":{\"banner\":[{\"h\":50,\"w\":320,\"api\":5,\"btype\":1}]},\"site\":{\"id\":1324,\"ctype\":1,\"publisher\":{\"id\":23232,\"name\":\"00000000-0000-0020-0000-000000005ac0\"}},\"device\":{\"ip\":\"206.29.182.240\",\"ua\":\"Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_0 like Mac OS X; en-us) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7\",\"geo\":{\"lat\":\"37.4429\",\"lon\":\"-122.1514\",\"country\":\"RU\"}},\"user\":{\"yob\":0,\"gender\":2,\"data\":{\"name\":\"wapstart\",\"segment\":{\"name\":\"login\",\"value\":\"202cb962ac59075b964b07152d234b70\"}}}}";
 		assertEquals(actualResponse, expectedResponse);
 	}
