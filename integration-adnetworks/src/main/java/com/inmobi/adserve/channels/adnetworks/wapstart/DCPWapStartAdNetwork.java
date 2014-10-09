@@ -244,25 +244,25 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 				statusCode = 500;
 				return;
 			}
-			context.put(VelocityTemplateFieldConstants.PartnerClickUrl, partnerClickUrl);
-			context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
-			context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, responseJson.getString("vlink"));
+			context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, partnerClickUrl);
+			context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
+			context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, responseJson.getString("vlink"));
 			if(responseJson.has("graphic")){
 				JSONObject textGraphic = responseJson.getJSONObject("textgraphic");
 				String imageUrl = textGraphic.getString("name");
-				context.put(VelocityTemplateFieldConstants.PartnerImgUrl, imageUrl);
+				context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, imageUrl);
 				t = TemplateType.IMAGE;
 			} else if(responseJson.has("text")){
 				JSONObject text = responseJson.getJSONObject("text");
-				context.put(VelocityTemplateFieldConstants.AdText, text.getString("title"));
+				context.put(VelocityTemplateFieldConstants.AD_TEXT, text.getString("title"));
 				if(text.has("content")){
-					context.put(VelocityTemplateFieldConstants.Description, text.getString("content"));
+					context.put(VelocityTemplateFieldConstants.DESCRIPTION, text.getString("content"));
 				}
 				String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
 				if (StringUtils.isEmpty(vmTemplate)) {
 					t = TemplateType.PLAIN;
 				} else {
-					context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
+					context.put(VelocityTemplateFieldConstants.TEMPLATE, vmTemplate);
 					t = TemplateType.RICH;
 				}
 
@@ -282,6 +282,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 		}
 		LOG.debug("response length is {}", responseContent.length());
 	}
+
 
 	@Override
 	public String getId() {
