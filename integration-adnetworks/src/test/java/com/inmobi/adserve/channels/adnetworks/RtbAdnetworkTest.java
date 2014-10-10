@@ -13,6 +13,8 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.util.IABCategoriesInterface;
+import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
 import com.inmobi.casthrift.rtb.Bid;
 import com.inmobi.casthrift.rtb.BidResponse;
@@ -332,6 +334,35 @@ public class RtbAdnetworkTest extends TestCase {
     assertEquals(7, rtbAdNetwork.getBidRequest().getBadv().size());
     assertTrue(rtbAdNetwork.getBidRequest().getBadv().containsAll(expectedBlockedAdvertisers));
   }
+
+    @Test
+    public void testShouldHaveBlockedCategories() {
+        String externalSiteKey = "f6wqjq1r5v";
+        ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId,
+                null, null, null, 0, null, null, true, true, externalSiteKey, null, null, null, new Long[]{0L}, true, null, null, 0,
+                null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[]{0}));
+        CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        sasParams.setRemoteHostIp("206.29.182.240");
+        sasParams.setSource("wap");
+        sasParams.setUserAgent(
+                "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
+        casInternalRequestParameters.setBlockedIabCategories(Lists.newArrayList("IAB-1", "IAB-2", "IAB-3"));
+        rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
+
+        //Expected Blocked Categories
+        List<String> expectedBlockedCategories = Lists.newArrayList("IAB-1", "IAB-2", "IAB-3");
+
+        // Add family safe blocked categories to the expected list
+        IABCategoriesInterface iabCategoriesMap = new IABCategoriesMap();
+        List<String> familySafeBlockedCategories = iabCategoriesMap.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES);
+        expectedBlockedCategories.addAll(familySafeBlockedCategories);
+
+        assertEquals(expectedBlockedCategories.size(), rtbAdNetwork.getBidRequest().getBcat().size());
+        assertTrue(rtbAdNetwork.getBidRequest().getBcat().containsAll(expectedBlockedCategories));
+    }
+
 
     @Test
     public void testConfigureParametersWithAllsasparams() {

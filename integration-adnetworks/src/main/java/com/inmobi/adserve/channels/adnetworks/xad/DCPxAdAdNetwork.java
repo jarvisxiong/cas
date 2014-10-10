@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.adnetworks.xad;
 
 import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.util.IABCategoriesInterface;
@@ -19,7 +20,7 @@ import org.slf4j.LoggerFactory;
 import java.awt.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
+import java.util.HashSet;
 
 public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 	private static final Logger LOG = LoggerFactory
@@ -158,19 +159,20 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 			}
 			url.append("&pt=").append(sourceType);
 
-			ArrayList<String> bCat = new ArrayList<String>();
 
-			if (null != casInternalRequestParameters.getBlockedIabCategories()) {
-				bCat.addAll(casInternalRequestParameters.getBlockedIabCategories());
+			HashSet<String> bCatSet = new HashSet<String>();
+
+			if (casInternalRequestParameters.getBlockedIabCategories() != null) {
+				bCatSet.addAll(casInternalRequestParameters.getBlockedIabCategories());
 			}
 
 			if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
-				bCat.addAll(IAB_CATEGORY_MAP.getIABCategories(IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES));
+				bCatSet.addAll(IAB_CATEGORY_MAP.getIABCategories(IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES));
 			} else {
-				bCat.addAll(IAB_CATEGORY_MAP.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES));
+				bCatSet.addAll(IAB_CATEGORY_MAP.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES));
 			}
 
-			for (String bCategory : bCat) {
+			for (String bCategory : bCatSet) {
 				url.append("&bcat=").append(bCategory);
 			}
 			LOG.debug("xAd url is {}", url);

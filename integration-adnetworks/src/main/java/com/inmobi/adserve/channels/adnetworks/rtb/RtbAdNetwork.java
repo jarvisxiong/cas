@@ -323,6 +323,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         seatList.add(advertiserId);
         bidRequest.setWseat(seatList);
         HashSet<String> bCatSet = new HashSet<>();
+
         if (null != casInternalRequestParameters.getBlockedIabCategories()) {
             bCatSet.addAll(casInternalRequestParameters.getBlockedIabCategories());
             LOG.debug(traceMarker, "blockedCategories are {}", casInternalRequestParameters.getBlockedIabCategories());
@@ -335,7 +336,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             bCatSet.addAll(
                     iabCategoriesInterface.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES));
         }
-        List<String> bCatList = new ArrayList<>(bCatSet);
+
+        List<String> bCatList = new ArrayList<String>(bCatSet);
         bidRequest.setBcat(bCatList);
 
         if (null != casInternalRequestParameters.getBlockedAdvertisers()) {
