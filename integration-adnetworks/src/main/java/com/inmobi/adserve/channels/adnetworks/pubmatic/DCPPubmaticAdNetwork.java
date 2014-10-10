@@ -92,8 +92,8 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
             LOG.debug("mandate parameters missing for pubmatic, so returning from adapter");
             return false;
         }
-        if (casInternalRequestParameters.latLong != null) {
-            String[] t = casInternalRequestParameters.latLong.split(",");
+        if (casInternalRequestParameters.getLatLong() != null) {
+            String[] t = casInternalRequestParameters.getLatLong().split(",");
             if (t.length > 1) {
                 latlong = String.format("%s,%s", t[0], t[1]);
             }
@@ -126,8 +126,8 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
             params.append("&loc=").append(latlong);
         }
 
-        if (casInternalRequestParameters.zipCode != null) {
-            params.append("&zip=").append(casInternalRequestParameters.zipCode);
+        if (casInternalRequestParameters.getZipCode() != null) {
+            params.append("&zip=").append(casInternalRequestParameters.getZipCode());
         }
 
         if (sasParams.getCountryCode() != null) {

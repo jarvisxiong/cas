@@ -71,9 +71,9 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
 			return false;
 		}
 
-		if (casInternalRequestParameters.latLong != null
-				&& StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
-			String[] latlong = casInternalRequestParameters.latLong.split(",");
+		if (casInternalRequestParameters.getLatLong() != null
+				&& StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+			String[] latlong = casInternalRequestParameters.getLatLong().split(",");
 			latitude = latlong[0];
 			longitude = latlong[1];
 		}
@@ -123,22 +123,22 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
 			}
 
 			if (client == 2) {
-				if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
-						&& "1".equals(casInternalRequestParameters.uidADT)) {
-					appendQueryParam(url, IDFA, casInternalRequestParameters.uidIFA, false);
+				if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())
+						&& "1".equals(casInternalRequestParameters.getUidADT())) {
+					appendQueryParam(url, IDFA, casInternalRequestParameters.getUidIFA(), false);
 				}
-				if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
-					appendQueryParam(url, UDID, casInternalRequestParameters.uidIDUS1, false);
-				} else if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
-					appendQueryParam(url, UDID, casInternalRequestParameters.uidMd5, false);
+				if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
+					appendQueryParam(url, UDID, casInternalRequestParameters.getUidIDUS1(), false);
+				} else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
+					appendQueryParam(url, UDID, casInternalRequestParameters.getUidMd5(), false);
 				}
 			}
 			else if (client == 1) {
-				if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
-					appendQueryParam(url, ANDROIDID, casInternalRequestParameters.uidMd5, false);
+				if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
+					appendQueryParam(url, ANDROIDID, casInternalRequestParameters.getUidMd5(), false);
 				}
-				else if(StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
-					appendQueryParam(url, ANDROIDID, casInternalRequestParameters.uidMd5, false);
+				else if(StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
+					appendQueryParam(url, ANDROIDID, casInternalRequestParameters.getUidMd5(), false);
 				}
 			}
 

@@ -200,7 +200,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
     public String expandMacro(final String macro) {
 
         if (macro.equals(MacrosAndStrings.IMPRESSION_ID)) {
-            return casInternalRequestParameters.impressionId;
+            return casInternalRequestParameters.getImpressionId();
         }
         if (macro.equals(MacrosAndStrings.CLICK_URL)) {
             return clickUrl;
@@ -212,7 +212,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
             return externalSiteId;
         }
         if (macro.equals(MacrosAndStrings.USER_ID)) {
-            return casInternalRequestParameters.uid;
+            return casInternalRequestParameters.getUid();
         }
         if (macro.equals(MacrosAndStrings.FORMAT)) {
             Dimension format = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot().toString()));

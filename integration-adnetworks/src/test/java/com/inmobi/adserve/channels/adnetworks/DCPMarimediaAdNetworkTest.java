@@ -60,11 +60,11 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
 
         //casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]{50l, 51l}));
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
-        casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        casInternalRequestParameters.uidIFA = "23e2ewq445545";
-        casInternalRequestParameters.uidADT = "0";
-        casInternalRequestParameters.uidIDUS1 = "202cb962ac59075b964b07152d234b70";
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
+        casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
+        casInternalRequestParameters.setUidIFA("23e2ewq445545");
+        casInternalRequestParameters.setUidADT("0");
+        casInternalRequestParameters.setUidIDUS1("202cb962ac59075b964b07152d234b70");
 
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
@@ -87,11 +87,11 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
 
         //casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]{50l, 51l}));
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
-        casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        casInternalRequestParameters.uidIFA = "23e2ewq445545";
-        casInternalRequestParameters.uidADT = "0";
-        casInternalRequestParameters.uidIDUS1 = "202cb962ac59075b964b07152d234b70";
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
+        casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
+        casInternalRequestParameters.setUidIFA("23e2ewq445545");
+        casInternalRequestParameters.setUidADT("0");
+        casInternalRequestParameters.setUidIDUS1("202cb962ac59075b964b07152d234b70");
 
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
@@ -123,11 +123,11 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
 
         //casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]{50l, 51l}));
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
-        casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        casInternalRequestParameters.uidIFA = "23e2ewq445545";
-        casInternalRequestParameters.uidADT = "0";
-        casInternalRequestParameters.uidIDUS1 = "202cb962ac59075b964b07152d234b70";
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
+        casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
+        casInternalRequestParameters.setUidIFA("23e2ewq445545");
+        casInternalRequestParameters.setUidADT("0");
+        casInternalRequestParameters.setUidIDUS1("202cb962ac59075b964b07152d234b70");
 
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
@@ -163,11 +163,11 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
 
         //casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]{50l, 51l}));
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
-        casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        casInternalRequestParameters.uidIFA = "23e2ewq445545";
-        casInternalRequestParameters.uidADT = "0";
-        casInternalRequestParameters.uidIDUS1 = "202cb962ac59075b964b07152d234b70";
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
+        casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
+        casInternalRequestParameters.setUidIFA("23e2ewq445545");
+        casInternalRequestParameters.setUidADT("0");
+        casInternalRequestParameters.setUidIDUS1("202cb962ac59075b964b07152d234b70");
 
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla%2F5.0+%28compatible%3B+MSIE+9.0%3B+Windows+NT+6.1%3B+Trident%2F5.0%29");

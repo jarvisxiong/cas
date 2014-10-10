@@ -318,7 +318,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                                                 final User user, final Device device,final Regs regs) {
         IXBidRequest tempBidRequest = new IXBidRequest(impresssionlist);
 
-        tempBidRequest.setId(casInternalRequestParameters.auctionId);
+        tempBidRequest.setId(casInternalRequestParameters.getAuctionId());
         tempBidRequest.setTmax(tmax);
 
         LOG.debug(traceMarker, "INSIDE CREATE BID REQUEST OBJECT");
@@ -374,7 +374,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     private ProxyDemand createProxyDemandObject() {
         ProxyDemand proxyDemand = new ProxyDemand();
-        proxyDemand.setMarketrate(Math.max(sasParams.getMarketRate(),casInternalRequestParameters.auctionBidFloor));
+        proxyDemand.setMarketrate(Math.max(sasParams.getMarketRate(),casInternalRequestParameters.getAuctionBidFloor()));
         return proxyDemand;
     }
 
@@ -382,7 +382,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private Impression createImpressionObject(final Banner banner, final String displayManager,
                                               final String displayManagerVersion, final ProxyDemand proxyDemand) {
         Impression impression;
-        if (null != casInternalRequestParameters.impressionId) {
+        if (null != casInternalRequestParameters.getImpressionId()) {
             /**
              * In order to conform to the rubicon spec, we are passing a unique integer identifier whose value
              * starts with 1, and increments up to n for n impressions.
@@ -403,7 +403,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         } else {
             impression.setInstl(0);
         }
-        impression.setBidfloor(casInternalRequestParameters.auctionBidFloor);
+        impression.setBidfloor(casInternalRequestParameters.getAuctionBidFloor());
         LOG.debug(traceMarker, "Bid floor is {}", impression.getBidfloor());
         CommonExtension impExt = new CommonExtension();
         JSONObject additionalParams= entity.getAdditionalParams();
@@ -483,9 +483,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private Geo createGeoObject() {
         Geo geo = new Geo();
         //If Coppa is not set, only then send latLong
-        if (!isCoppaSet && StringUtils.isNotBlank(casInternalRequestParameters.latLong)
-                && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
-            String[] latlong = casInternalRequestParameters.latLong.split(",");
+        if (!isCoppaSet && StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
+                && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             geo.setLat(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[0]))));
             geo.setLon(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[1]))));
         }
@@ -493,7 +493,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             geo.setCountry(iabCountriesInterface.getIabCountry(sasParams.getCountryCode()));
         }
 
-        geo.setZip(casInternalRequestParameters.zipCode);
+        geo.setZip(casInternalRequestParameters.getZipCode());
 
         return geo;
     }
@@ -731,35 +731,35 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         // Setting do not track
-        if (null != casInternalRequestParameters.uidADT) {
+        if (null != casInternalRequestParameters.getUidADT()) {
             try {
-                device.setLmt(Integer.parseInt(casInternalRequestParameters.uidADT) == 0 ? 1 : 0);
+                device.setLmt(Integer.parseInt(casInternalRequestParameters.getUidADT()) == 0 ? 1 : 0);
             } catch (NumberFormatException e) {
                 LOG.debug(traceMarker, "Exception while parsing uidADT to integer {}", e);
             }
         }
         // Setting platform id sha1 hashed
-        if (null != casInternalRequestParameters.uidSO1) {
-            device.setDidsha1(casInternalRequestParameters.uidSO1);
-            device.setDpidsha1(casInternalRequestParameters.uidSO1);
-        } else if (null != casInternalRequestParameters.uidO1) {
-            device.setDidsha1(casInternalRequestParameters.uidO1);
-            device.setDpidsha1(casInternalRequestParameters.uidO1);
+        if (null != casInternalRequestParameters.getUidSO1()) {
+            device.setDidsha1(casInternalRequestParameters.getUidSO1());
+            device.setDpidsha1(casInternalRequestParameters.getUidSO1());
+        } else if (null != casInternalRequestParameters.getUidO1()) {
+            device.setDidsha1(casInternalRequestParameters.getUidO1());
+            device.setDpidsha1(casInternalRequestParameters.getUidO1());
         }
 
         // Setting platform id md5 hashed
-        if (null != casInternalRequestParameters.uidMd5) {
-            device.setDidmd5(casInternalRequestParameters.uidMd5);
-            device.setDpidmd5(casInternalRequestParameters.uidMd5);
-        } else if (null != casInternalRequestParameters.uid) {
-            device.setDidmd5(casInternalRequestParameters.uid);
-            device.setDpidmd5(casInternalRequestParameters.uid);
+        if (null != casInternalRequestParameters.getUidMd5()) {
+            device.setDidmd5(casInternalRequestParameters.getUidMd5());
+            device.setDpidmd5(casInternalRequestParameters.getUidMd5());
+        } else if (null != casInternalRequestParameters.getUid()) {
+            device.setDidmd5(casInternalRequestParameters.getUid());
+            device.setDpidmd5(casInternalRequestParameters.getUid());
         }
 
         // Setting Extension for ifa
         //if Coppa is not set, only then set IFA
-        if (!isCoppaSet && !StringUtils.isEmpty(casInternalRequestParameters.uidIFA)) {
-            device.setIfa(casInternalRequestParameters.uidIFA);
+        if (!isCoppaSet && !StringUtils.isEmpty(casInternalRequestParameters.getUidIFA())) {
+            device.setIfa(casInternalRequestParameters.getUidIFA());
         }
 
         final CommonExtension ext= new CommonExtension();

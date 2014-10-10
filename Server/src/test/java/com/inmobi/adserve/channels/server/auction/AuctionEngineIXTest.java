@@ -79,8 +79,8 @@ public class AuctionEngineIXTest {
         replay(mockConfig);
 
         casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.auctionId = "auctionId";
-        casInternalRequestParameters.siteAccountType = AccountType.SELF_SERVE;
+        casInternalRequestParameters.setAuctionId("auctionId");
+        casInternalRequestParameters.setSiteAccountType(AccountType.SELF_SERVE);
         RepositoryHelper repositoryHelper = createMock(RepositoryHelper.class);
         expect(repositoryHelper.queryCreativeRepository(EasyMock.isA(String.class), EasyMock.isA(String.class))).andReturn(null).anyTimes();
         expect(repositoryHelper.getChannelAdGroupRepository()).andReturn(null).anyTimes();
@@ -167,7 +167,7 @@ public class AuctionEngineIXTest {
         rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1));
         auctionEngine.setUnfilteredChannelSegmentList(rtbSegments);
 
-        casInternalRequestParameters.auctionBidFloor = bidFloorInput;
+        casInternalRequestParameters.setAuctionBidFloor(bidFloorInput);
         auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
         AdNetworkInterface auctionEngineResponse = auctionEngine.runAuctionEngine();
@@ -197,7 +197,7 @@ public class AuctionEngineIXTest {
 
         auctionEngine.setUnfilteredChannelSegmentList(rtbSegments);
 
-        casInternalRequestParameters.auctionBidFloor = bidFloorInput;
+        casInternalRequestParameters.setAuctionBidFloor(bidFloorInput);
         auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
         AdNetworkInterface auctionEngineResponse = auctionEngine.runAuctionEngine();
@@ -227,7 +227,7 @@ public class AuctionEngineIXTest {
 
         auctionEngine.setUnfilteredChannelSegmentList(rtbSegments);
 
-        casInternalRequestParameters.auctionBidFloor = bidFloorInput;
+        casInternalRequestParameters.setAuctionBidFloor(bidFloorInput);
         auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
         AdNetworkInterface auctionEngineResponse = auctionEngine.runAuctionEngine();
@@ -258,7 +258,7 @@ public class AuctionEngineIXTest {
 
         auctionEngine.setUnfilteredChannelSegmentList(rtbSegments);
 
-        casInternalRequestParameters.auctionBidFloor = bidFloorInput;
+        casInternalRequestParameters.setAuctionBidFloor(bidFloorInput);
         auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
         AdNetworkInterface auctionEngineResponse = auctionEngine.runAuctionEngine();

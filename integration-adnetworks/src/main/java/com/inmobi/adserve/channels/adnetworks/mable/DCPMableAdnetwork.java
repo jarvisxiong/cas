@@ -69,9 +69,9 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
 
-        if (casInternalRequestParameters.latLong != null
-                && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
-            String[] latlong = casInternalRequestParameters.latLong.split(",");
+        if (casInternalRequestParameters.getLatLong() != null
+                && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
@@ -196,29 +196,29 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     protected String getUid() {
         if (sasParams.getOsId() == HandSetOS.iOS.getValue()
-                && StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
+                && StringUtils.isNotEmpty(casInternalRequestParameters.getUidIFA())) {
             uidType = IFA_FORMAT;
-            return casInternalRequestParameters.uidIFA;
+            return casInternalRequestParameters.getUidIFA();
         }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidMd5())) {
             uidType = UDID_FORMAT;
-            return casInternalRequestParameters.uidMd5;
+            return casInternalRequestParameters.getUidMd5();
         }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uid)) {
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUid())) {
             uidType = UDID_FORMAT;
-            return casInternalRequestParameters.uid;
+            return casInternalRequestParameters.getUid();
         }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidO1)) {
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidO1())) {
             uidType = ODIN_FORMAT;
-            return casInternalRequestParameters.uidO1;
+            return casInternalRequestParameters.getUidO1();
         }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidSO1)) {
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidSO1())) {
             uidType = SODIN1_FORMAT;
-            return casInternalRequestParameters.uidSO1;
+            return casInternalRequestParameters.getUidSO1();
         }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIDUS1)) {
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIDUS1())) {
             uidType = UDID_FORMAT;
-            return casInternalRequestParameters.uidIDUS1;
+            return casInternalRequestParameters.getUidIDUS1();
         } else {
             String gpid = getGPID();
             if (gpid != null) {

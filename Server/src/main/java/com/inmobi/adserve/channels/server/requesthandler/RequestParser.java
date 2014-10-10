@@ -266,20 +266,20 @@ public class RequestParser {
                 return;
             }
             String uid = stringify(userIdMap, "u-id");
-            parameter.uid = (StringUtils.isNotBlank(uid) ? uid : stringify(userIdMap, "UDID"));
-            if (StringUtils.isNotBlank(parameter.uid) && parameter.uid.length() != 32) {
-                parameter.uid = MD5(parameter.uid);
+            parameter.setUid(StringUtils.isNotBlank(uid) ? uid : stringify(userIdMap, "UDID"));
+            if (StringUtils.isNotBlank(parameter.getUid()) && parameter.getUid().length() != 32) {
+                parameter.setUid(MD5(parameter.getUid()));
             }
-            parameter.uidO1 = stringify(userIdMap, "O1");
-            parameter.uidMd5 = stringify(userIdMap, "UM5");
-            parameter.uidIFA = stringify(userIdMap, "IDA");
-            parameter.gpid = stringify(userIdMap, "GPID");
-            parameter.uidSO1 = stringify(userIdMap, "SO1");
-            parameter.uidIFV = stringify(userIdMap, "IDV");
-            parameter.uidIDUS1 = stringify(userIdMap, "IDUS1");
-            parameter.uidADT = stringify(userIdMap, "u-id-adt");
-            parameter.uuidFromUidCookie = stringify(userIdMap, "imuc__5");
-            parameter.uidWC = stringify(userIdMap, "WC");
+            parameter.setUidO1(stringify(userIdMap, "O1"));
+            parameter.setUidMd5(stringify(userIdMap, "UM5"));
+            parameter.setUidIFA(stringify(userIdMap, "IDA"));
+            parameter.setGpid(stringify(userIdMap, "GPID"));
+            parameter.setUidSO1(stringify(userIdMap, "SO1"));
+            parameter.setUidIFV(stringify(userIdMap, "IDV"));
+            parameter.setUidIDUS1(stringify(userIdMap, "IDUS1"));
+            parameter.setUidADT(stringify(userIdMap, "u-id-adt"));
+            parameter.setUuidFromUidCookie(stringify(userIdMap, "imuc__5"));
+            parameter.setUidWC(stringify(userIdMap, "WC"));
         } catch (JSONException exception) {
             LOG.debug(traceMarker, "Error in extracting userid params, {}", exception);
         }

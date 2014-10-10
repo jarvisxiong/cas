@@ -67,9 +67,9 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 			return false;
 		}
 
-		if (casInternalRequestParameters.latLong != null
-				&& StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
-			String[] latlong = casInternalRequestParameters.latLong.split(",");
+		if (casInternalRequestParameters.getLatLong() != null
+				&& StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+			String[] latlong = casInternalRequestParameters.getLatLong().split(",");
 			latitude = latlong[0];
 			longitude = latlong[1];
 
@@ -109,11 +109,11 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 			int yob = year - age;
 			user.setYob(yob);
 		}
-		if(StringUtils.isNotBlank(casInternalRequestParameters.uid)){
+		if(StringUtils.isNotBlank(casInternalRequestParameters.getUid())){
 			WapstartData data= new WapstartData();
 			Segment segment = new Segment();
 			segment.setName(LOGIN);
-			segment.setValue(casInternalRequestParameters.uid);
+			segment.setValue(casInternalRequestParameters.getUid());
 			data.setSegment(segment);
 			data.setName(PROVIDER);
 			user.setData(data);
@@ -136,13 +136,13 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 			device.setAdid(adid);
 
 		}
-		if(StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)){
-			device.setAndroid_id(casInternalRequestParameters.uidMd5);
-		} else if(StringUtils.isNotBlank(casInternalRequestParameters.uidO1)){
-			device.setAndroid_id(casInternalRequestParameters.uidO1);
+		if(StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())){
+			device.setAndroid_id(casInternalRequestParameters.getUidMd5());
+		} else if(StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())){
+			device.setAndroid_id(casInternalRequestParameters.getUidO1());
 		}
-		if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)&& "1".equals(casInternalRequestParameters.uidADT)) {
-			device.setIfa(casInternalRequestParameters.uidIFA);
+		if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIFA())&& "1".equals(casInternalRequestParameters.getUidADT())) {
+			device.setIfa(casInternalRequestParameters.getUidIFA());
 		}
 		device.setGeo(geo);
 

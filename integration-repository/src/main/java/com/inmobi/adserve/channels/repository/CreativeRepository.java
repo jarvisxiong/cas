@@ -26,11 +26,9 @@ public class CreativeRepository extends AbstractStatsMaintainingDBRepository<Cre
   public CreativeEntity queryUniqueResult(final RepositoryQuery creativeQuery) throws RepositoryException {
     final Collection<CreativeEntity> creativeEntityResultSet = query(creativeQuery);
     if (creativeEntityResultSet == null || creativeEntityResultSet.isEmpty()) {
-      return null;
-    } else if (!creativeEntityResultSet.isEmpty()) {
-      return (CreativeEntity) creativeEntityResultSet.toArray()[0];
+        return null;
     }
-    return null;
+    return (CreativeEntity) creativeEntityResultSet.toArray()[0];
   }
 
   @Override

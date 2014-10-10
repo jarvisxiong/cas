@@ -71,10 +71,10 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
 		if (sendTrueLatLongOnly) {
 			if (DERIVED_LAT_LONG.equalsIgnoreCase(sasParams.getLocSrc())) {
 				return false;
-			} else if (casInternalRequestParameters.latLong != null
+			} else if (casInternalRequestParameters.getLatLong() != null
 					&& StringUtils.countMatches(
-							casInternalRequestParameters.latLong, ",") > 0) {
-				String[] latlong = casInternalRequestParameters.latLong
+							casInternalRequestParameters.getLatLong(), ",") > 0) {
+				String[] latlong = casInternalRequestParameters.getLatLong()
 						.split(",");
 				latitude = latlong[0];
 				longitude = latlong[1];
@@ -153,21 +153,21 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
 				url.append("&long=").append(longitude);
 			}
 
-            String casUidMd5 = casInternalRequestParameters.uidMd5;
-            String casUid    = casInternalRequestParameters.uid;
+            String casUidMd5 = casInternalRequestParameters.getUidMd5();
+            String casUid    = casInternalRequestParameters.getUid();
 
 			if (!"wap".equalsIgnoreCase(sasParams.getSource())) {
 				if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
-					if (casInternalRequestParameters.uidIFA != null) {
-						url.append("&uis=a&ui=").append(casInternalRequestParameters.uidIFA);
-					} else if (casInternalRequestParameters.uidSO1 != null) {
-						url.append("&uis=us&ui=").append(casInternalRequestParameters.uidSO1);
-					} else if (casInternalRequestParameters.uidO1 != null) {
-						url.append("&uis=us&ui=").append(casInternalRequestParameters.uidO1);
+					if (casInternalRequestParameters.getUidIFA() != null) {
+						url.append("&uis=a&ui=").append(casInternalRequestParameters.getUidIFA());
+					} else if (casInternalRequestParameters.getUidSO1() != null) {
+						url.append("&uis=us&ui=").append(casInternalRequestParameters.getUidSO1());
+					} else if (casInternalRequestParameters.getUidO1() != null) {
+						url.append("&uis=us&ui=").append(casInternalRequestParameters.getUidO1());
 					} else if (casUidMd5 != null) {
 						url.append("&uis=u&ui=").append(casUidMd5);
-					}else if (casInternalRequestParameters.uidIDUS1 != null) {
-                        url.append("&uis=ds&ui=").append(casInternalRequestParameters.uidIDUS1);
+					}else if (casInternalRequestParameters.getUidIDUS1() != null) {
+                        url.append("&uis=ds&ui=").append(casInternalRequestParameters.getUidIDUS1());
                     }else if (!StringUtils.isBlank(casUid) && !"null".equals(casUid)) {
 						url.append("&uis=v&ui=").append(casUid);
 					}
@@ -185,8 +185,8 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
                 }
 			}
 
-			if (casInternalRequestParameters.zipCode != null) {
-				url.append("&z=").append(casInternalRequestParameters.zipCode);
+			if (casInternalRequestParameters.getZipCode() != null) {
+				url.append("&z=").append(casInternalRequestParameters.getZipCode());
 			}
 
 			url.append("&c=97");// get category map

@@ -74,13 +74,13 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 		}
 		setDeviceIdandType();
 
-		if (casInternalRequestParameters.latLong != null
+		if (null != casInternalRequestParameters.getLatLong()
 				&& StringUtils.countMatches(
-						casInternalRequestParameters.latLong, ",") > 0) {
+						casInternalRequestParameters.getLatLong(), ",") > 0) {
 			if (DERIVED_LAT_LONG.equalsIgnoreCase(sasParams.getLocSrc())) {
 				isLocSourceDerived = true;
 			} else {
-				String[] latlong = casInternalRequestParameters.latLong
+				String[] latlong = casInternalRequestParameters.getLatLong()
 						.split(",");
 				latitude = latlong[0];
 				longitude = latlong[1];
@@ -126,17 +126,17 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 				url.append("&long=").append(longitude);
 			}
 			// }
-			if (casInternalRequestParameters.zipCode != null) {
+			if (null != casInternalRequestParameters.getZipCode()) {
 				url.append("&loc=")
-						.append(casInternalRequestParameters.zipCode);
+						.append(casInternalRequestParameters.getZipCode());
 			}
 			url.append("&uid=").append(deviceId);
 			url.append("&uid_type=").append(getURLEncode(deviceIdType, format));
 			if (IDFA_PLAIN.equals(deviceIdType)
 					&& StringUtils
-							.isNotBlank(casInternalRequestParameters.uidADT)) {
+							.isNotBlank(casInternalRequestParameters.getUidADT())) {
 				url.append("&uid_tr=").append(
-						casInternalRequestParameters.uidADT);
+						casInternalRequestParameters.getUidADT());
 			}
 			url.append("&size=").append(width).append("x").append(height);
 			if (sasParams.getCountryCode() != null) {
@@ -160,8 +160,8 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 
 			ArrayList<String> bCat = new ArrayList<String>();
 
-			if (casInternalRequestParameters.blockedIabCategories != null) {
-				bCat.addAll(casInternalRequestParameters.blockedIabCategories);
+			if (null != casInternalRequestParameters.getBlockedIabCategories()) {
+				bCat.addAll(casInternalRequestParameters.getBlockedIabCategories());
 			}
 
 			if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
@@ -226,60 +226,60 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 	 */
 	private void setDeviceIdandType() {
 		if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
-			if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
-				deviceId = casInternalRequestParameters.uidIFA;
+			if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())) {
+				deviceId = casInternalRequestParameters.getUidIFA();
 				deviceIdType = IDFA_PLAIN;
 				return;
 			}
-			if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
-                deviceId = casInternalRequestParameters.uidIDUS1;
+			if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
+                deviceId = casInternalRequestParameters.getUidIDUS1();
                 deviceIdType = UUID_SHA1;
                 return;
             }
 			
 			
 		} else if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
-			if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
-				deviceId = casInternalRequestParameters.uidMd5;
+			if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
+				deviceId = casInternalRequestParameters.getUidMd5();
 				deviceIdType = ANDROID_ID_MD5;
 				return;
 			}
 			
-			if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
-				deviceId = casInternalRequestParameters.uidO1;
+			if (StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
+				deviceId = casInternalRequestParameters.getUidO1();
 				deviceIdType = ANDROID_ID_SHA1;
 				return;
 			}
-			if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
-				deviceId = casInternalRequestParameters.uid;
+			if (StringUtils.isNotBlank(casInternalRequestParameters.getUid())) {
+				deviceId = casInternalRequestParameters.getUid();
 				deviceIdType = ANDROID_ID_MD5;
 				return;
 			}
 
 		}
 
-		if (StringUtils.isNotBlank(casInternalRequestParameters.uidSO1)) {
-			deviceId = casInternalRequestParameters.uidSO1;
+		if (StringUtils.isNotBlank(casInternalRequestParameters.getUidSO1())) {
+			deviceId = casInternalRequestParameters.getUidSO1();
 			deviceIdType = UUID_SHA1;
 			return;
 		}
-		if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
-			deviceId = casInternalRequestParameters.uidO1;
+		if (StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
+			deviceId = casInternalRequestParameters.getUidO1();
 			deviceIdType = UUID_SHA1;
 			return;
 		}
 		deviceIdType = UUID_MD5;
-		if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
-			deviceId = casInternalRequestParameters.uidMd5;
+		if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
+			deviceId = casInternalRequestParameters.getUidMd5();
 			return;
 		}
-		if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
-			deviceId = casInternalRequestParameters.uid;
+		if (StringUtils.isNotBlank(casInternalRequestParameters.getUid())) {
+			deviceId = casInternalRequestParameters.getUid();
 			return;
 		}
-		deviceId = casInternalRequestParameters.uuidFromUidCookie;
+		deviceId = casInternalRequestParameters.getUuidFromUidCookie();
 		if (StringUtils.isBlank(deviceId)) {
-			deviceId = casInternalRequestParameters.uidWC;
+			deviceId = casInternalRequestParameters.getUidWC();
 		}
 		if (StringUtils.isEmpty(deviceId)) {
 			LOG.debug("setting deviceid to null for xAd");

@@ -65,9 +65,9 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             LOG.debug("Opera user agent found. So exiting the adapter");
             return false;
         }
-        if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
-                && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
-            String[] latlong = casInternalRequestParameters.latLong.split(",");
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
+                && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
@@ -110,8 +110,8 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
                 url.append("&long=").append(longitude);
             }
 
-           if (casInternalRequestParameters.zipCode != null) {
-                url.append("&zip=").append(casInternalRequestParameters.zipCode);
+           if (casInternalRequestParameters.getZipCode() != null) {
+                url.append("&zip=").append(casInternalRequestParameters.getZipCode());
             }
             
             if (isapp) {
@@ -123,41 +123,41 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
                 
             }
             if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
-                if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
+                if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
 
-                    appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.uidMd5, false);
-                } else if (casInternalRequestParameters.uidO1 != null) {
-                    appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.uidO1, false);
+                    appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.getUidMd5(), false);
+                } else if (null != casInternalRequestParameters.getUidO1()) {
+                    appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.getUidO1(), false);
                 }
-                if (!StringUtils.isBlank(casInternalRequestParameters.uid)) {
-                    url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.uid);
+                if (!StringUtils.isBlank(casInternalRequestParameters.getUid())) {
+                    url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.getUid());
                 }
-                if (casInternalRequestParameters.gpid != null) {
-                    url.append("&androidaid=").append(casInternalRequestParameters.gpid);
-                    url.append("&adtracking=").append(casInternalRequestParameters.uidADT);
+                if (null != casInternalRequestParameters.getGpid()) {
+                    url.append("&androidaid=").append(casInternalRequestParameters.getGpid());
+                    url.append("&adtracking=").append(casInternalRequestParameters.getUidADT());
 
                 }
 
             }
             if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
 
-                if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
-                        && "1".equals(casInternalRequestParameters.uidADT)) {
+                if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())
+                        && "1".equals(casInternalRequestParameters.getUidADT())) {
 
-                    appendQueryParam(url, IDFA, casInternalRequestParameters.uidIFA, false);
+                    appendQueryParam(url, IDFA, casInternalRequestParameters.getUidIFA(), false);
                 }
-                if (casInternalRequestParameters.uidSO1 != null) {
-                    url.append("&udidtype=odin1&udid=").append(casInternalRequestParameters.uidSO1);
-                } else if (casInternalRequestParameters.uidMd5 != null) {
-                    url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.uidMd5);
-                } else if (!StringUtils.isBlank(casInternalRequestParameters.uid)) {
-                    url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.uid);
+                if (casInternalRequestParameters.getUidSO1() != null) {
+                    url.append("&udidtype=odin1&udid=").append(casInternalRequestParameters.getUidSO1());
+                } else if (casInternalRequestParameters.getUidMd5() != null) {
+                    url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.getUidMd5());
+                } else if (!StringUtils.isBlank(casInternalRequestParameters.getUid())) {
+                    url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.getUid());
                 }
 
             } else {
                 String uid = getUid();
                 if (!StringUtils.isBlank(uid)) {
-                    url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.uid);
+                    url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.getUid());
                 }
             }
 

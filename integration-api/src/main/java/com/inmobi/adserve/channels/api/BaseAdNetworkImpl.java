@@ -221,7 +221,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             Request ningRequest = getNingRequest();
             LOG.debug("request : {}", ningRequest);
             startTime = System.currentTimeMillis();
-            final boolean isTraceEnabled = casInternalRequestParameters.traceEnabled;
+            final boolean isTraceEnabled = casInternalRequestParameters.isTraceEnabled();
             getAsyncHttpClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
                 @Override
                 public Response onCompleted(final Response response) throws Exception {
@@ -576,20 +576,20 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
      * @return
      */
     protected String getUid() {
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)  && "1".equals(casInternalRequestParameters.uidADT)) {
-            return casInternalRequestParameters.uidIFA;
-        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.gpid) && "1".equals(casInternalRequestParameters.uidADT)) {
-            return casInternalRequestParameters.gpid;
-        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidSO1)) {
-            return casInternalRequestParameters.uidSO1;
-        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
-            return casInternalRequestParameters.uidMd5;
-        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidO1)) {
-            return casInternalRequestParameters.uidO1;
-        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIDUS1)) {
-            return casInternalRequestParameters.uidIDUS1;
-        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.uid)) {
-            return casInternalRequestParameters.uid;
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIFA())  && "1".equals(casInternalRequestParameters.getUidADT())) {
+            return casInternalRequestParameters.getUidIFA();
+        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.getGpid()) && "1".equals(casInternalRequestParameters.getUidADT())) {
+            return casInternalRequestParameters.getGpid();
+        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidSO1())) {
+            return casInternalRequestParameters.getUidSO1();
+        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidMd5())) {
+            return casInternalRequestParameters.getUidMd5();
+        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidO1())) {
+            return casInternalRequestParameters.getUidO1();
+        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIDUS1())) {
+            return casInternalRequestParameters.getUidIDUS1();
+        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.getUid())) {
+            return casInternalRequestParameters.getUid();
         }
         return null;
     }
@@ -847,9 +847,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
   }
 
   protected String getGPID(){
-    return (StringUtils.isNotBlank(casInternalRequestParameters.gpid) &&
-        "1".equals(casInternalRequestParameters.uidADT))
-               ? casInternalRequestParameters.gpid:null;
+    return (StringUtils.isNotBlank(casInternalRequestParameters.getGpid()) &&
+        "1".equals(casInternalRequestParameters.getUidADT()))
+               ? casInternalRequestParameters.getGpid():null;
   }
 
     @Override
