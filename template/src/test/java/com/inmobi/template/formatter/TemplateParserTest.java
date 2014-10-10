@@ -6,7 +6,6 @@ import com.inmobi.template.tool.ToolsImpl;
 import org.apache.velocity.tools.generic.MathTool;
 import org.easymock.classextension.EasyMock;
 import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -29,7 +28,7 @@ public class TemplateParserTest {
 
     }
 
-    @Test
+    //@Test
     public void testFormat() throws Exception {
         TemplateParser templateParser = new TemplateParser(mockTemplateConfig);
 

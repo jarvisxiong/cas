@@ -30,8 +30,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class IXAdNetworkTest2 {
-    static Configuration mockConfig;
-    static final String advertiserName = "ix";
+    private static Configuration mockConfig;
+    private static final String advertiserName = "ix";
 
     private static void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);

@@ -52,7 +52,7 @@ public class SiteEcpmRepository extends AbstractStatsMaintainingDBRepository<Sit
 
     @Override
     public HashIndexKeyBuilder<SiteEcpmEntity> getHashIndexKeyBuilder(String className) {
-        return null; // To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     @Override
