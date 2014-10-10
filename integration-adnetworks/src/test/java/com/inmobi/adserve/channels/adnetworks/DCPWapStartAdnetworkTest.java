@@ -93,6 +93,7 @@ public class DCPWapStartAdnetworkTest extends TestCase {
 		CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
 		sasParams.setRemoteHostIp("206.29.182.240");
 		sasParams.setSlot(Short.valueOf("15"));
+		casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
 		sasParams
 		.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
 		casInternalRequestParameters.setLatLong("37.4429,-122.1514");
@@ -232,6 +233,7 @@ public class DCPWapStartAdnetworkTest extends TestCase {
 		sasParams.setCountryCode("CN");
 		sasParams.setNetworkType(NetworkType.WIFI);
 		sasParams.setGender("F");
+		casInternalRequestParameters.setUidMd5("202cb962ac59075b964b07152d234b70");
 		casInternalRequestParameters.setLatLong(" ,-122.1514");
 		sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
 		casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
@@ -248,7 +250,7 @@ public class DCPWapStartAdnetworkTest extends TestCase {
 		dcpWapstartAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null);
 		Request request = dcpWapstartAdNetwork.getNingRequest();
 		String actualResponse = request.getStringData();
-		String expectedResponse = "{\"impression\":{\"banner\":[{\"h\":50,\"w\":320,\"api\":5,\"btype\":1}]},\"site\":{\"id\":1324,\"ctype\":1,\"publisher\":{\"id\":23232,\"name\":\"00000000-0000-0020-0000-000000005ac0\"}},\"device\":{\"ip\":\"206.29.182.240\",\"ua\":\"Mozilla\",\"geo\":{\"country\":\"CN\"}},\"user\":{\"yob\":0,\"gender\":2,\"data\":{\"name\":\"wapstart\",\"segment\":{\"name\":\"login\",\"value\":\"202cb962ac59075b964b07152d234b70\"}}}}";
+		String expectedResponse = "{\"impression\":{\"banner\":[{\"h\":50,\"w\":320,\"api\":5,\"btype\":1}]},\"site\":{\"id\":1324,\"ctype\":1,\"publisher\":{\"id\":23232,\"name\":\"00000000-0000-0020-0000-000000005ac0\"}},\"device\":{\"ip\":\"206.29.182.240\",\"ua\":\"Mozilla\",\"android_id\":\"202cb962ac59075b964b07152d234b70\",\"geo\":{\"country\":\"CN\"}},\"user\":{\"yob\":0,\"gender\":2,\"data\":{\"name\":\"wapstart\",\"segment\":{\"name\":\"login\",\"value\":\"202cb962ac59075b964b07152d234b70\"}}}}";
 		assertEquals(actualResponse, expectedResponse);
 
 	}

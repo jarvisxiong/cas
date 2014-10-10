@@ -5,12 +5,14 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 
 import javax.ws.rs.Path;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.utils.JarVersionUtil;
 import com.inmobi.adserve.channels.util.InspectorStats;
 
 
@@ -23,7 +25,11 @@ public class ServletStat implements Servlet {
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
             final Channel serverChannel) throws Exception {
         LOG.debug("Inside stat servlet");
-        hrh.responseSender.sendResponse(InspectorStats.getStats(), serverChannel);
+        final JSONObject inspectorJson = InspectorStats.getStatsObj();
+        final JSONObject manifestJson = new JSONObject(JarVersionUtil.getManifestData());
+        
+        inspectorJson.put("manifestData", manifestJson);
+        hrh.responseSender.sendResponse(inspectorJson.toString(), serverChannel);
     }
 
     @Override

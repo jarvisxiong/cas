@@ -34,13 +34,15 @@ import com.ning.http.client.RequestBuilder;
 public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 	private static final Logger          LOG           = LoggerFactory.getLogger(DCPWapStartAdNetwork.class);
 
-	private static final String LOGIN       = "login";
-	private static final String PROVIDER    = "wapstart";
-	private String latitude                 = null;
-	private String longitude                = null;
-	private int    width;
-	private int    height;
-	private String adid                     = null;
+	private static final String LOGIN = "login";
+	private static final String PROVIDER="wapstart";
+	private String                       latitude      = null;
+	private String                       longitude     = null;
+	private int                          width;
+	private int                          height;
+	private String                       adid = null;
+	private String udid;
+
 
 
 	public DCPWapStartAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
@@ -74,6 +76,13 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 			longitude = latlong[1];
 
 		}
+
+		udid = getUid();
+		if(StringUtils.isBlank(udid)){
+			LOG.debug("Udid mandatory for Wapstart");
+			return false;
+		}
+
 
 		LOG.info("Configure parameters inside wapstart returned true");
 		return true;
@@ -109,15 +118,15 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 			int yob = year - age;
 			user.setYob(yob);
 		}
-		if(StringUtils.isNotBlank(casInternalRequestParameters.getUid())){
-			WapstartData data= new WapstartData();
-			Segment segment = new Segment();
-			segment.setName(LOGIN);
-			segment.setValue(casInternalRequestParameters.getUid());
-			data.setSegment(segment);
-			data.setName(PROVIDER);
-			user.setData(data);
-		}
+
+		WapstartData data= new WapstartData();
+		Segment segment = new Segment();
+		segment.setName(LOGIN);
+		segment.setValue(udid);
+		data.setSegment(segment);
+		data.setName(PROVIDER);
+		user.setData(data);
+
 
 		Geo geo = new Geo();
 		if (StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)) {
@@ -166,13 +175,13 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 		Banner[] banners =  new Banner[1];
 		banners[0]=banner;
 		impression.setBanner(banners);
-		
+
 		WapStartAdrequest adRequest = new WapStartAdrequest();
 		adRequest.setDevice(device);
 		adRequest.setImpression(impression);
 		adRequest.setSite(site);
 		adRequest.setUser(user);
-		
+
 		ObjectMapper mapper = new ObjectMapper();
 
 		try {
@@ -273,6 +282,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 		}
 		LOG.debug("response length is {}", responseContent.length());
 	}
+
 
 	@Override
 	public String getId() {

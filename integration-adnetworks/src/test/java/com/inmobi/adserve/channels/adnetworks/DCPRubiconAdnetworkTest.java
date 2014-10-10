@@ -317,7 +317,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 		sasParams.setSiteIncId(6575868);
 
 		SiteEcpmEntity.Builder builder = new SiteEcpmEntity.Builder();
-		builder.setNetworkEcpm(0.50); // THE URL should have 0.4 (80% of network ECPM)
+		builder.setEcpm(0.50); // THE URL should have 0.4 (80% of network ECPM)
 		sasParams.setSiteEcpmEntity(builder.build());
 		sasParams.setOsId(HandSetOS.Android.getValue());
 		String externalKey = "38132";
@@ -376,7 +376,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 		sasParams.setSiteIncId(6575868);
 
 		SiteEcpmEntity.Builder builder = new SiteEcpmEntity.Builder();
-		builder.setNetworkEcpm(0.50); // THE URL should have 0.4 (80% of network ECPM)
+		builder.setEcpm(0.50); // THE URL should have 0.4 (80% of network ECPM)
 		sasParams.setSiteEcpmEntity(builder.build());
 		sasParams.setOsId(HandSetOS.Android.getValue());
 		sasParams.setSdkVersion("i400");
@@ -417,7 +417,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 		sasParams.setSiteIncId(1387380247996547l);
 		sasParams.setCountryId(94l);
 		SiteEcpmEntity.Builder builder = new SiteEcpmEntity.Builder();
-		builder.setNetworkEcpm(0.50); // THE URL should have 0.4 (80% of network ECPM)
+		builder.setEcpm(0.50); // THE URL should have 0.4 (80% of network ECPM)
 		sasParams.setSiteEcpmEntity(builder.build());
 		sasParams.setOsId(HandSetOS.Android.getValue());
 		sasParams.setSdkVersion("i400");

@@ -273,6 +273,10 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 
 		if(siteSpecificFloorDefault == null){
 			if (sasParams.getSiteEcpmEntity() != null
+					&& sasParams.getSiteEcpmEntity().getEcpm() > 0) {
+				appendQueryParam(url, FLOOR_PRICE, ECPM_PERCENTAGE
+						* sasParams.getSiteEcpmEntity().getEcpm(), false);
+			}else if (sasParams.getSiteEcpmEntity() != null
 					&& sasParams.getSiteEcpmEntity().getNetworkEcpm() > 0) {
 				appendQueryParam(url, FLOOR_PRICE, ECPM_PERCENTAGE
 						* sasParams.getSiteEcpmEntity().getNetworkEcpm(), false);
