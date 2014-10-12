@@ -18,6 +18,8 @@ public class TestUtils {
         public static final String beaconUrl = "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/c124b6b5-0148-1000-c54a-00012e330000/0/5l/-1/0/0/x/0/nw/101/1/1/bc20cfc3";
 
         public static final String impressionId = "c124b6b5-0148-1000-c54a-00012e330000";
+
+        public static final String siteId= "df2e3c99edfd4bef90f285b6a7b418a6";
     }
 
     public static class SampleServletQueries {

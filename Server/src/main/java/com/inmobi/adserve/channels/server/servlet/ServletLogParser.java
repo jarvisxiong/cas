@@ -1,26 +1,23 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.server.CasConfigUtil;
+import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.server.api.Servlet;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.CharsetUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.Path;
 import java.net.URLDecoder;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import javax.ws.rs.Path;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.inject.Singleton;
-import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.CasConfigUtil;
-import com.inmobi.adserve.channels.server.api.Servlet;
 
 
 @Path("/logParser")
@@ -35,7 +32,8 @@ public class ServletLogParser implements Servlet {
         HttpRequest request = hrh.getHttpRequest();
         String targetStrings = "";
         String logFilePath = "";
-        // Handle post request
+
+        // Handle POST request
         if (request.getMethod() == HttpMethod.POST) {
             @SuppressWarnings("deprecation")
             String jObject = URLDecoder.decode(((FullHttpRequest) request).content().toString(CharsetUtil.UTF_8))
@@ -44,7 +42,8 @@ public class ServletLogParser implements Servlet {
             targetStrings = array[0].split("=")[1];
             logFilePath = array[1].split("=")[1];
         }
-        else {// handle get request
+        else {
+            // Handle GET request
             if (!params.isEmpty()) {
                 for (Entry<String, List<String>> p : params.entrySet()) {
                     String key = p.getKey();

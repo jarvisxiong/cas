@@ -149,7 +149,7 @@ public abstract class BaseServlet implements Servlet {
                 casInternalRequestParametersGlobal, rtbSegments);
 
         LOG.debug("rtb rankList size is {}", rtbSegments.size());
-        if (dcpSegments.isEmpty() && rtbSegments.isEmpty()) {
+        if (CollectionUtils.isEmpty(dcpSegments) && CollectionUtils.isEmpty(rtbSegments)) {
             LOG.debug("No successful configuration of adapter ");
             hrh.responseSender.sendNoAdResponse(serverChannel);
             return;

@@ -58,7 +58,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
     private final double             ecpmBoost;
     private final Date               ecpmBoostExpiryDate;
     private final Long[]             tod;
-    private final int                dst;                      // Classify rtbd and dcp ad groups
+    private final int                dst;                      // Classify rtbd, ix and dcp ad groups
     private final long               campaignIncId;
     private final Integer[]          AdFormatIds;
 
@@ -81,6 +81,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
         this.allTags = builder.allTags;
         this.pricingModel = builder.pricingModel;
         ArrayList<Integer> targetingPlatform = new ArrayList<>();
+        // TODO: Bug?
         if (builder.targetingPlatform == 1 || builder.targetingPlatform > 2) {
             targetingPlatform.add(1);
         }

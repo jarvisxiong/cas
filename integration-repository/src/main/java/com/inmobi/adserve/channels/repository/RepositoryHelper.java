@@ -64,21 +64,21 @@ public class RepositoryHelper {
         this.nativeAdTemplateRepository = builder.nativeAdTemplateRepository;
         this.repositoryStatsProvider = new RepositoryStatsProvider();
         this.repositoryStatsProvider
-        .addRepositoryToStats(this.nativeAdTemplateRepository)
+                .addRepositoryToStats(this.nativeAdTemplateRepository)
                 .addRepositoryToStats(this.channelRepository)
-                    .addRepositoryToStats(this.channelAdGroupRepository)
-                    .addRepositoryToStats(this.channelFeedbackRepository)
-                    .addRepositoryToStats(this.channelSegmentFeedbackRepository)
-                    .addRepositoryToStats(this.siteMetaDataRepository)
-                    .addRepositoryToStats(this.siteTaxonomyRepository)
-                    .addRepositoryToStats(this.pricingEngineRepository)
-                    .addRepositoryToStats(this.siteFilterRepository)
-                    .addRepositoryToStats(this.siteEcpmRepository)
-                    .addRepositoryToStats(this.currencyConversionRepository)
-                    .addRepositoryToStats(this.wapSiteUACRepository)
-                    .addRepositoryToStats(this.ixAccountMapRepository)
-                    .addRepositoryToStats(this.creativeRepository)
-                    .addRepositoryToStats(this.nativeAdTemplateRepository);
+                .addRepositoryToStats(this.channelAdGroupRepository)
+                .addRepositoryToStats(this.channelFeedbackRepository)
+                .addRepositoryToStats(this.channelSegmentFeedbackRepository)
+                .addRepositoryToStats(this.siteMetaDataRepository)
+                .addRepositoryToStats(this.siteTaxonomyRepository)
+                .addRepositoryToStats(this.pricingEngineRepository)
+                .addRepositoryToStats(this.siteFilterRepository)
+                .addRepositoryToStats(this.siteEcpmRepository)
+                .addRepositoryToStats(this.currencyConversionRepository)
+                .addRepositoryToStats(this.wapSiteUACRepository)
+                .addRepositoryToStats(this.ixAccountMapRepository)
+                .addRepositoryToStats(this.creativeRepository)
+                .addRepositoryToStats(this.nativeAdTemplateRepository);
 
     }
 

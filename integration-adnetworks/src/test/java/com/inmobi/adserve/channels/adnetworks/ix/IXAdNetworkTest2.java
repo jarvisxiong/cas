@@ -29,6 +29,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+// TODO: Merge with IXAdNetworkTest.java
 public class IXAdNetworkTest2 {
     private static Configuration mockConfig;
     private static final String advertiserName = "ix";
@@ -57,7 +58,6 @@ public class IXAdNetworkTest2 {
         prepareMockConfig();
     }
 
-    // TODO: Need better name for this
     @Test
     public void testParseResponseNoAd(){
         HttpResponseStatus mockStatus = createMock(HttpResponseStatus.class);

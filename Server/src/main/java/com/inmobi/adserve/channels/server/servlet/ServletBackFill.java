@@ -28,7 +28,7 @@ import java.util.List;
 @Singleton
 @Path("/backfill")
 public class ServletBackFill extends BaseServlet {
-    private static final Logger               LOG = LoggerFactory.getLogger(ServletIXFill.class);
+    private static final Logger               LOG = LoggerFactory.getLogger(ServletBackFill.class);
 
     
     @Inject
@@ -45,7 +45,6 @@ public class ServletBackFill extends BaseServlet {
         Marker traceMarker = traceMarkerProvider.get();
         LOG.debug(traceMarker, "Inside Servlet {}", this.getClass().getSimpleName());
         InspectorStats.incrementStatCount(InspectorStrings.backFillRequests);
-
         super.handleRequest(hrh, queryStringDecoder, serverChannel);
     }
 

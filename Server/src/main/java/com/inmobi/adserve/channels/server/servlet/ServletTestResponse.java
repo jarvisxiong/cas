@@ -17,12 +17,12 @@ import java.io.File;
 @Singleton
 @Path("/testResponse")
 public class ServletTestResponse implements Servlet {
-    private static final Logger LOG = LoggerFactory.getLogger(ServletStat.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ServletTestResponse.class);
 
     @Override
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
                               final Channel serverChannel) throws Exception {
-        LOG.debug("Inside testTResponse servlet");
+        LOG.debug("Inside testResponse servlet");
         String fileName = "/opt/mkhoj/test/cas/testResponse.txt";
         String testResponse = Files.toString(new File(fileName), Charsets.UTF_8);
         hrh.responseSender.sendResponse(testResponse, serverChannel);
@@ -30,7 +30,6 @@ public class ServletTestResponse implements Servlet {
 
     @Override
     public String getName() {
-        return "stat";
+        return "testResponse";
     }
 }
-
