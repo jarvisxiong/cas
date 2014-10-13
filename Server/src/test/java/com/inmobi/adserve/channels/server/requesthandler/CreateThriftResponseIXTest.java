@@ -14,7 +14,7 @@ import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.types.AdIdChain;
 import com.inmobi.types.GUID;
 import com.inmobi.types.PricingModel;
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -23,8 +23,8 @@ import java.util.HashSet;
 import java.util.UUID;
 
 import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.replay;
 
 // TODO: Needs fixing
 public class CreateThriftResponseIXTest {

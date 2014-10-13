@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.server;
 
+import lombok.Getter;
+
 import javax.annotation.concurrent.GuardedBy;
 import javax.inject.Singleton;
 import java.util.HashSet;
@@ -12,7 +14,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 public class CreativeCache {
-    public final static ConcurrentHashMap<String, HashSet<String>> creativeCache = new ConcurrentHashMap<String, HashSet<String>>();
+    @Getter
+    private final static ConcurrentHashMap<String, HashSet<String>> creativeCache = new ConcurrentHashMap<String, HashSet<String>>();
 
     private final Object lock = new Object();
 

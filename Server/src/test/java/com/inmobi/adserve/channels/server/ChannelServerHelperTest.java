@@ -1,22 +1,34 @@
 package com.inmobi.adserve.channels.server;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-import junit.framework.TestCase;
-
+import com.inmobi.adserve.channels.server.api.ConnectionType;
 import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
-import org.testng.annotations.Test;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.api.easymock.PowerMock;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
-public class ChannelServerHelperTest extends TestCase {
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.replay;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.powermock.api.easymock.PowerMock.mockStatic;
 
-    private ChannelServerHelper channelServerHelper;
-    private Configuration       mockConfig = null;
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({ChannelServerHelper.class, InetAddress.class})
+public class ChannelServerHelperTest{
 
-    @Override
-    public void setUp() throws Exception {
+    private static ChannelServerHelper channelServerHelper;
+    private static Configuration       mockConfig;
+
+    private static void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("rr")).andReturn("rr").anyTimes();
         expect(mockConfig.getString("channel")).andReturn("channel").anyTimes();
@@ -28,31 +40,87 @@ public class ChannelServerHelperTest extends TestCase {
         expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
         expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
         replay(mockConfig);
+    }
+
+    @BeforeClass
+    public static void setUp(){
+        prepareMockConfig();
+
         channelServerHelper = new ChannelServerHelper();
     }
 
     @Test
-    public void testGetDcIdAlreadySet() {
+    public void testGetDataCentreIdNotSet() {
+        assertThat(channelServerHelper.getDataCenterId("dc.id"), is(equalTo((byte)0)));
+    }
+
+    @Test
+    public void testGetDataCentreIdAlreadySet() {
         System.setProperty("dc.id", "2");
-        assertEquals(2, channelServerHelper.getDataCenterId("dc.id"));
+        assertThat(channelServerHelper.getDataCenterId("dc.id"), is(equalTo((byte) 2)));
+        System.clearProperty("dc.id");
+    }
+
+    @Test
+    public void testGetHostIdNotSet() throws UnknownHostException {
+        mockStatic(InetAddress.class);
+        expect(InetAddress.getLocalHost())
+                .andThrow(new UnknownHostException("Unknown Host")).times(1);
+        PowerMock.replay(InetAddress.class);
+
+        assertThat(channelServerHelper.getHostId("host.name"), is(equalTo((short) 0)));
     }
 
     @Test
     public void testGetHostDataCenterOutOfBoundException() {
         System.setProperty("host.name", "web200");
-        assertEquals(0, channelServerHelper.getHostId("host.name"));
+        assertThat(channelServerHelper.getHostId("host.name"), is(equalTo((short) 0)));
+        System.clearProperty("host.name");
     }
 
     @Test
     public void testGetHostDataCenterNumberFormatException() {
         System.setProperty("host.name", "web200abcd");
-        assertEquals(0, channelServerHelper.getHostId("host.name"));
+        assertThat(channelServerHelper.getHostId("host.name"), is(equalTo((short)0)));
+        System.clearProperty("host.name");
     }
 
     @Test
-    public void testgetHostAlreadySet() {
+    public void testgetHostDataCenterPositive() {
         System.setProperty("host.name", "web2004.ads.lhr1.inmobi.com");
         short expected = 2004;
-        assertEquals(expected, channelServerHelper.getHostId("host.name"));
+        assertThat(channelServerHelper.getHostId("host.name"), is(equalTo(expected)));
+        System.clearProperty("host.name");
+    }
+
+    @Test
+    public void testGetDataCentreName() {
+        String dummyHostName = "test";
+        System.setProperty("host.name", dummyHostName);
+        assertThat(channelServerHelper.getDataCentreName("host.name"), is(equalTo(dummyHostName)));
+        System.clearProperty("host.name");
+    }
+
+    @Test
+    public void testGetMaxConnectionsNoKey() {
+        ConnectionType dummyConnectionType = ConnectionType.DCP_OUTGOING;
+        String dummyConnectionsKey = ChannelServerStringLiterals.DCP_OUTGOING_CONNECTIONS;
+        assertThat(channelServerHelper.getMaxConnections(dummyConnectionsKey, dummyConnectionType), is(equalTo(null)));
+    }
+
+    @Test
+    public void testGetMaxConnectionsWithKey() {
+        ConnectionType dummyConnectionType = ConnectionType.RTBD_OUTGOING;
+        String dummyConnectionsKey = ChannelServerStringLiterals.RTBD_OUTGING_CONNECTIONS;
+        System.setProperty(dummyConnectionsKey, "100");
+        assertThat(channelServerHelper.getMaxConnections(dummyConnectionsKey, dummyConnectionType), is(equalTo(100)));
+    }
+
+    @Test
+    public void testGetMaxConnectionsWithAnotherKey() {
+        ConnectionType dummyConnectionType = ConnectionType.INCOMING;
+        String dummyConnectionsKey = ChannelServerStringLiterals.INCOMING_CONNECTIONS;
+        System.setProperty(dummyConnectionsKey, "100");
+        assertThat(channelServerHelper.getMaxConnections(dummyConnectionsKey, dummyConnectionType), is(equalTo(100)));
     }
 }
