@@ -74,16 +74,16 @@
 			<artifactId>easymock</artifactId>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-release-with-junit-easymock-dependencies</artifactId>
-            <type>zip</type>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-core</artifactId>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-release-with-junit-easymock-dependencies</artifactId>
+			<type>zip</type>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-core</artifactId>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 		  <groupId>com.inmobi.adtemplate</groupId>
 		  <artifactId>adtemplate-idl</artifactId>

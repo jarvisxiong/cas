@@ -34,7 +34,7 @@ public class ServletTemplate implements Servlet {
         	String siteId = siteIdList.get(0);
         	NativeAdTemplateRepository templateRepository = CasConfigUtil.repositoryHelper.getNativeAdTemplateRepository();
         	NativeAdTemplateEntity entity = templateRepository.query(siteId);
-        	if(null != entity){
+        	if (null != entity){
         		message = entity.getJSON();
         	} else {
         		message = "No template found for site Id " + siteId;

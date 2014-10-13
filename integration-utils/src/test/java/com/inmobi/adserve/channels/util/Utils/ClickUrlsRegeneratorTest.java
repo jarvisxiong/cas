@@ -79,7 +79,6 @@ public class ClickUrlsRegeneratorTest{
         String oldClickURL = null;
         String oldImpressionId = "c124b6b5-0148-1000-c54a-00012e330000";
         String newExpectedImpressionId = "c124ba55-0148-1000-f71b-00022d0b0000";
-
         String newActualClickURL = ClickUrlsRegenerator.regenerateClickUrl(oldClickURL, oldImpressionId, newExpectedImpressionId);
 
         assertThat(newActualClickURL, is(equalTo(null)));
@@ -90,7 +89,6 @@ public class ClickUrlsRegeneratorTest{
         String oldBeaconURL = null;
         String oldImpressionId = "c124b6b5-0148-1000-c54a-00012e330000";
         String newExpectedImpressionId = "c124ba55-0148-1000-f71b-00022d0b0000";
-
         String newActualBeaconURL = ClickUrlsRegenerator.regenerateBeaconUrl(oldBeaconURL, oldImpressionId, newExpectedImpressionId, true);
 
         assertThat(newActualBeaconURL, is(equalTo(null)));
