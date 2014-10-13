@@ -2,4 +2,4 @@
 # Increase networkaddress cache ttl to avoid thread wait. (SERVOPS-3265)
 #
 networkaddress.cache.ttl=3600
-networkaddress.cache.negative.ttl=60
+networkaddress.cache.negative.ttl=300
