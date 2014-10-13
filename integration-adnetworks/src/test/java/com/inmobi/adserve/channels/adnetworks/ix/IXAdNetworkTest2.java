@@ -70,19 +70,19 @@ public class IXAdNetworkTest2 {
         IXAdNetwork ixAdNetwork = new IXAdNetwork(mockConfig, null, null, null, null, advertiserName, 0, null, false);
 
         ixAdNetwork.parseResponse(response1, mockStatus);
-        assertThat(ixAdNetwork.responseContent, is(equalTo("")));
+        assertThat(ixAdNetwork.getResponseContent(), is(equalTo("")));
         assertThat(ixAdNetwork.getHttpResponseStatusCode(), is(equalTo(404)));
 
         ixAdNetwork.parseResponse(response2, mockStatus);
-        assertThat(ixAdNetwork.responseContent, is(equalTo("")));
+        assertThat(ixAdNetwork.getResponseContent(), is(equalTo("")));
         assertThat(ixAdNetwork.getHttpResponseStatusCode(), is(equalTo(404)));
 
         ixAdNetwork.parseResponse(response1, mockStatus);
-        assertThat(ixAdNetwork.responseContent, is(equalTo("")));
+        assertThat(ixAdNetwork.getResponseContent(), is(equalTo("")));
         assertThat(ixAdNetwork.getHttpResponseStatusCode(), is(equalTo(500)));
 
         ixAdNetwork.parseResponse(response3, mockStatus);
-        assertThat(ixAdNetwork.responseContent, is(equalTo("")));
+        assertThat(ixAdNetwork.getResponseContent(), is(equalTo("")));
         assertThat(ixAdNetwork.getHttpResponseStatusCode(), is(equalTo(500)));
     }
 
@@ -101,7 +101,7 @@ public class IXAdNetworkTest2 {
         replay(ixAdNetwork);
 
         ixAdNetwork.parseResponse(response, mockStatus);
-        assertThat(ixAdNetwork.responseContent, is(equalTo("")));
+        assertThat(ixAdNetwork.getResponseContent(), is(equalTo("")));
         assertThat(ixAdNetwork.getHttpResponseStatusCode(), is(equalTo(500)));
         assertThat(ixAdNetwork.getAdStatus(), is(equalTo("NO_AD")));
     }
@@ -149,7 +149,7 @@ public class IXAdNetworkTest2 {
         ixAdNetwork.parseResponse(response, mockStatus);
         assertThat(ixAdNetwork.getHttpResponseStatusCode(), is(equalTo(200)));
         assertThat(ixAdNetwork.getAdStatus(), is(equalTo("AD")));
-        assertThat(ixAdNetwork.responseContent, is(equalTo("<html><body style=\"margin:0;padding:0;\"><script><style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='https://play.google.com/store/apps/details?id=com.sweetnspicy.recipes&hl=en' target='_blank'><img src='http://redge-a.akamaihd.net/FileData/50758558-c167-463d-873e-f989f75da95215.png' border='0'/></a></p></script><img src='http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/c124b6b5-0148-1000-c54a-00012e330000/0/5l/-1/0/0/x/0/nw/101/1/1/bc20cfc3?b=${WIN_BID}' height=1 width=1 border=0 /><img src='http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}' height=1 width=1 border=0 /></body></html>")));
+        assertThat(ixAdNetwork.getResponseContent(), is(equalTo("<html><body style=\"margin:0;padding:0;\"><script><style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='https://play.google.com/store/apps/details?id=com.sweetnspicy.recipes&hl=en' target='_blank'><img src='http://redge-a.akamaihd.net/FileData/50758558-c167-463d-873e-f989f75da95215.png' border='0'/></a></p></script><img src='http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/c124b6b5-0148-1000-c54a-00012e330000/0/5l/-1/0/0/x/0/nw/101/1/1/bc20cfc3?b=${WIN_BID}' height=1 width=1 border=0 /><img src='http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}' height=1 width=1 border=0 /></body></html>")));
     }
 
     @Test

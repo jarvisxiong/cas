@@ -92,8 +92,8 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         sasParams.setOsId(HandSetOS.Android.getValue());
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
-        casInternalRequestParameters.uid = "23e2ewq445545";
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
+        casInternalRequestParameters.setUid("23e2ewq445545");
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
@@ -119,7 +119,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         sasParams.setOsId(HandSetOS.Android.getValue());
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
@@ -144,8 +144,8 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         sasParams.setOsId(HandSetOS.iOS.getValue());
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
-        casInternalRequestParameters.uidIFA = "23e2ewq445545";
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
+        casInternalRequestParameters.setUidIFA("23e2ewq445545");
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
@@ -169,7 +169,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         sasParams.setOsId(HandSetOS.webOS.getValue());
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
@@ -191,7 +191,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         sasParams.setRemoteHostIp(null);
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
@@ -212,7 +212,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent(" ");
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
@@ -231,16 +231,16 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
     public void testDCPadsmogoRequestUri() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
+        casInternalRequestParameters.setBlockedIabCategories(Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"}));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent(URLEncoder.encode("Mozilla/5.0 (iPhone; CPU iPhone OS 7_0_5 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Mobile/11B601", "UTF-8"));
         sasParams.setSource("APP");
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         List<Long> category = new ArrayList<Long>();
         category.add(3l);
         sasParams.setCategories(category);
-        casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
+        casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
         sasParams.setSlot(Short.valueOf("15"));
         sasParams.setSiteIncId(6575868);
         sasParams.setOsId(HandSetOS.Android.getValue());
@@ -257,7 +257,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
       dcpadsmogoAdNetwork.configureParameters(sasParams,casInternalRequestParameters, entity, null, null);
 
       String actualUrl = dcpadsmogoAdNetwork.getRequestUri().toString();
-      String expectedUrl = "http://api2.adsmogo.com/ad/?ver=100&fmt=0&mk=H&aid=adsmogo_test_7&ip=206.29.182.240&ast=banner&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&lat=37.4429&lon=-122.1514&w=320&h=50&anid=202cb962ac59075b964b07152d234b70";
+      String expectedUrl = "http://api2.adsmogo.com/ad/?ver=100&fmt=0&mk=H&aid=adsmogo_test_7&ip=206.29.182.240&ast=banner&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&os=Android&lat=37.4429&lon=-122.1514&w=320&h=50&anid=202cb962ac59075b964b07152d234b70";
 
       assertEquals(expectedUrl, actualUrl);
 
@@ -265,22 +265,22 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
       String actualMd5Value = ((List<String>)request.getHeaders().get("MOGO_API_SIGNATURE")).get(0);
 
       // Verifying the expected MD5 for the Query String.
-      assertEquals("91f3cbeba1d5c9600b7ed726c3ec2be8", actualMd5Value);
+      assertEquals("6ea14cfbe855497166956561c1059e3e", actualMd5Value);
     }
 
     @Test
     public void testDCPadsmogoRequestUriWithNoCat() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
+        casInternalRequestParameters.setBlockedIabCategories(Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"}));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSource("APP");
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         List<Long> category = new ArrayList<Long>();
         category.add(1l);
-        casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
+        casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
         sasParams.setSlot(Short.valueOf("15"));
         sasParams.setSiteIncId(6575868);
         sasParams.setOsId(HandSetOS.Android.getValue());
@@ -296,7 +296,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         if (dcpadsmogoAdNetwork.configureParameters(sasParams,
                 casInternalRequestParameters, entity, null, null)) {
             String actualUrl = dcpadsmogoAdNetwork.getRequestUri().toString();
-            String expectedUrl = "http://api2.adsmogo.com/ad/?ver=100&fmt=0&mk=H&aid=adsmogo_test_7&ip=206.29.182.240&ast=banner&ua=Mozilla&lat=37.4429&lon=-122.1514&w=320&h=50&anid=202cb962ac59075b964b07152d234b70";
+            String expectedUrl = "http://api2.adsmogo.com/ad/?ver=100&fmt=0&mk=H&aid=adsmogo_test_7&ip=206.29.182.240&ast=banner&ua=Mozilla&os=Android&lat=37.4429&lon=-122.1514&w=320&h=50&anid=202cb962ac59075b964b07152d234b70";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -311,8 +311,8 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         sasParams.setOsId(HandSetOS.iOS.getValue());
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
-        casInternalRequestParameters.uidIFA = "23e2ewq445545";
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
+        casInternalRequestParameters.setUidIFA("23e2ewq445545");
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
@@ -326,7 +326,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         assertEquals(true, dcpadsmogoAdNetwork.configureParameters(sasParams,
                 casInternalRequestParameters, entity, clurl, null));
         String actualUrl = dcpadsmogoAdNetwork.getRequestUri().toString();
-        String expectedUrl = "http://api2.adsmogo.com/ad/?ver=100&fmt=0&mk=H&aid=f6wqjq1r5v&ip=206.29.182.240&ast=banner&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334&lat=37.4429&lon=-122.1514&w=728&h=90&ida=23e2ewq445545";
+        String expectedUrl = "http://api2.adsmogo.com/ad/?ver=100&fmt=0&mk=H&aid=f6wqjq1r5v&ip=206.29.182.240&ast=banner&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334&os=iOS&lat=37.4429&lon=-122.1514&w=728&h=90&ida=23e2ewq445545";
         assertEquals(expectedUrl, actualUrl);
     }
 
@@ -334,13 +334,13 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
     public void testDCPadsmogoParseAd() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
+        casInternalRequestParameters.setBlockedIabCategories(Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"}));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSlot(Short.valueOf("15"));
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setOsId(HandSetOS.Android.getValue());
-        casInternalRequestParameters.uid = "23e2ewq445545saasw232323";
+        casInternalRequestParameters.setUid("23e2ewq445545saasw232323");
         String externalKey = "19100";
         String beaconUrl = "http://c2.w.inmobi.com/c"
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
@@ -411,7 +411,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         String clurl = "http://c2.w.inmobi.com/c"
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
                 + "-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";

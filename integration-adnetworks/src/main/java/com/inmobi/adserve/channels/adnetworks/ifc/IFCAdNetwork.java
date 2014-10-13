@@ -272,11 +272,11 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         jsonObject.addProperty("carrier", carrier);
         jsonObject.addProperty("city", city);
         jsonObject.addProperty("state", state);
-        jsonObject.addProperty("postalCode", casInternalRequestParameters.zipCode);
+        jsonObject.addProperty("postalCode", casInternalRequestParameters.getZipCode());
         jsonObject.addProperty("publisherID", publisherID);
         jsonObject.addProperty("source", sasParams.getSource());
         jsonObject.addProperty("locSrc", sasParams.getLocSrc());
-        jsonObject.addProperty("impressionId", casInternalRequestParameters.impressionId);
+        jsonObject.addProperty("impressionId", casInternalRequestParameters.getImpressionId());
         jsonObject.addProperty("genderOrig", sasParams.getGender());
         jsonObject.addProperty("area", sasParams.getState());
         jsonObject.addProperty("beaconURL", beaconUrl);
@@ -286,10 +286,10 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         jsonObject.addProperty("responseTime", String.valueOf(config.getInt("ifc.readtimeoutMillis")));
         jsonObject.addProperty("slotHeight", slotHeight);
         jsonObject.addProperty("slotWidth", slotWidth);
-        jsonObject.addProperty("uid", casInternalRequestParameters.uid);
+        jsonObject.addProperty("uid", casInternalRequestParameters.getUid());
         jsonObject.addProperty("age", sasParams.getAge());
         jsonObject.addProperty("gender", gender);
-        jsonObject.addProperty("latLong", casInternalRequestParameters.latLong);
+        jsonObject.addProperty("latLong", casInternalRequestParameters.getLatLong());
         jsonObject.addProperty("country", sasParams.getCountryCode());
         jsonObject.addProperty("siteID", siteID);
         jsonObject.addProperty("adGroupID", adGroupID);
@@ -299,12 +299,12 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         jsonObject.addProperty("imaiBaseUrl", sasParams.getImaiBaseUrl());
         jsonObject.addProperty("supplySource", SUPPY_SOURCE);
         jsonObject.addProperty("blindedSiteId", blindedSiteId);
-        jsonObject.addProperty("uidIFA", casInternalRequestParameters.uidIFA);
-        jsonObject.addProperty("uidSO1", casInternalRequestParameters.uidSO1);
-        jsonObject.addProperty("uidO1", casInternalRequestParameters.uidO1);
-        jsonObject.addProperty("uidMD5", casInternalRequestParameters.uidMd5);
-        jsonObject.addProperty("uidIDUS1", casInternalRequestParameters.uidIDUS1);
-        jsonObject.addProperty("uidIFV", casInternalRequestParameters.uidIFV);
+        jsonObject.addProperty("uidIFA", casInternalRequestParameters.getUidIFA());
+        jsonObject.addProperty("uidSO1", casInternalRequestParameters.getUidSO1());
+        jsonObject.addProperty("uidO1", casInternalRequestParameters.getUidO1());
+        jsonObject.addProperty("uidMD5", casInternalRequestParameters.getUidMd5());
+        jsonObject.addProperty("uidIDUS1", casInternalRequestParameters.getUidIDUS1());
+        jsonObject.addProperty("uidIFV", casInternalRequestParameters.getUidIFV());
 
         return jsonObject.toString();
     }

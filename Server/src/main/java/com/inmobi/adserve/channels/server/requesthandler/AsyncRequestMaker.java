@@ -132,32 +132,32 @@ public class AsyncRequestMaker {
             final CasInternalRequestParameters casInternalRequestParameterGlobal,
             final ChannelSegmentEntity channelSegmentEntity) {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.impressionId = sasParams.getImpressionId();
-        casInternalRequestParameters.blockedIabCategories = casInternalRequestParameterGlobal.blockedIabCategories;
-        casInternalRequestParameters.blockedAdvertisers = casInternalRequestParameterGlobal.blockedAdvertisers;
-        casInternalRequestParameters.highestEcpm = casInternalRequestParameterGlobal.highestEcpm;
-        casInternalRequestParameters.auctionBidFloor = casInternalRequestParameterGlobal.auctionBidFloor;
-        casInternalRequestParameters.auctionId = casInternalRequestParameterGlobal.auctionId;
-        casInternalRequestParameters.uid = casInternalRequestParameterGlobal.uid;
-        casInternalRequestParameters.uidO1 = casInternalRequestParameterGlobal.uidO1;
-        casInternalRequestParameters.uidIFA = casInternalRequestParameterGlobal.uidIFA;
-        casInternalRequestParameters.gpid = casInternalRequestParameterGlobal.gpid;
-        casInternalRequestParameters.uidIFV = casInternalRequestParameterGlobal.uidIFV;
-        casInternalRequestParameters.uidSO1 = casInternalRequestParameterGlobal.uidSO1;
-        casInternalRequestParameters.uidIDUS1 = casInternalRequestParameterGlobal.uidIDUS1;
-        casInternalRequestParameters.uidMd5 = casInternalRequestParameterGlobal.uidMd5;
-        casInternalRequestParameters.uidADT = casInternalRequestParameterGlobal.uidADT;
+        casInternalRequestParameters.setImpressionId(sasParams.getImpressionId());
+        casInternalRequestParameters.setBlockedIabCategories(casInternalRequestParameterGlobal.getBlockedIabCategories());
+        casInternalRequestParameters.setBlockedAdvertisers(casInternalRequestParameterGlobal.getBlockedAdvertisers());
+        casInternalRequestParameters.setHighestEcpm(casInternalRequestParameterGlobal.getHighestEcpm());
+        casInternalRequestParameters.setAuctionBidFloor(casInternalRequestParameterGlobal.getAuctionBidFloor());
+        casInternalRequestParameters.setAuctionId(casInternalRequestParameterGlobal.getAuctionId());
+        casInternalRequestParameters.setUid(casInternalRequestParameterGlobal.getUid());
+        casInternalRequestParameters.setUidO1(casInternalRequestParameterGlobal.getUidO1());
+        casInternalRequestParameters.setUidIFA(casInternalRequestParameterGlobal.getUidIFA());
+        casInternalRequestParameters.setGpid(casInternalRequestParameterGlobal.getGpid());
+        casInternalRequestParameters.setUidIFV(casInternalRequestParameterGlobal.getUidIFV());
+        casInternalRequestParameters.setUidSO1(casInternalRequestParameterGlobal.getUidSO1());
+        casInternalRequestParameters.setUidIDUS1(casInternalRequestParameterGlobal.getUidIDUS1());
+        casInternalRequestParameters.setUidMd5(casInternalRequestParameterGlobal.getUidMd5());
+        casInternalRequestParameters.setUidADT(casInternalRequestParameterGlobal.getUidADT());
         if (null != sasParams.getPostalCode()) {
-            casInternalRequestParameters.zipCode = sasParams.getPostalCode().toString();
+            casInternalRequestParameters.setZipCode(sasParams.getPostalCode().toString());
         }
-        casInternalRequestParameters.latLong = sasParams.getLatLong();
-        casInternalRequestParameters.appUrl = sasParams.getAppUrl();
-        casInternalRequestParameters.traceEnabled = casInternalRequestParameterGlobal.traceEnabled;
-        casInternalRequestParameters.siteAccountType = casInternalRequestParameterGlobal.siteAccountType;
+        casInternalRequestParameters.setLatLong(sasParams.getLatLong());
+        casInternalRequestParameters.setAppUrl(sasParams.getAppUrl());
+        casInternalRequestParameters.setTraceEnabled(casInternalRequestParameterGlobal.isTraceEnabled());
+        casInternalRequestParameters.setSiteAccountType(casInternalRequestParameterGlobal.getSiteAccountType());
 
         // Set impressionIdForVideo if banner video is supported on this request.
-        casInternalRequestParameters.impressionIdForVideo = getImpressionIdForVideo(sasParams,
-                channelSegmentEntity.getAdFormatIds(), channelSegmentEntity.getIncIds());
+        casInternalRequestParameters.setImpressionIdForVideo(getImpressionIdForVideo(sasParams,
+                channelSegmentEntity.getAdFormatIds(), channelSegmentEntity.getIncIds()));
 
         return casInternalRequestParameters;
     }
@@ -185,24 +185,24 @@ public class AsyncRequestMaker {
     private void controlEnrichment(final CasInternalRequestParameters casInternalRequestParameters,
             final ChannelSegmentEntity channelSegmentEntity) {
         if (channelSegmentEntity.isStripUdId()) {
-            casInternalRequestParameters.uid = null;
-            casInternalRequestParameters.uidO1 = null;
-            casInternalRequestParameters.uidMd5 = null;
-            casInternalRequestParameters.uidIFA = null;
-            casInternalRequestParameters.gpid = null;
-            casInternalRequestParameters.uidIFV = null;
-            casInternalRequestParameters.uidIDUS1 = null;
-            casInternalRequestParameters.uidSO1 = null;
-            casInternalRequestParameters.uidADT = null;
+            casInternalRequestParameters.setUid(null);
+            casInternalRequestParameters.setUidO1(null);
+            casInternalRequestParameters.setUidMd5(null);
+            casInternalRequestParameters.setUidIFA(null);
+            casInternalRequestParameters.setGpid(null);
+            casInternalRequestParameters.setUidIFV(null);
+            casInternalRequestParameters.setUidIDUS1(null);
+            casInternalRequestParameters.setUidSO1(null);
+            casInternalRequestParameters.setUidADT(null);
         }
         if (channelSegmentEntity.isStripZipCode()) {
-            casInternalRequestParameters.zipCode = null;
+            casInternalRequestParameters.setZipCode(null);
         }
         if (channelSegmentEntity.isStripLatlong()) {
-            casInternalRequestParameters.latLong = null;
+            casInternalRequestParameters.setLatLong(null);
         }
         if (!channelSegmentEntity.isAppUrlEnabled()) {
-            casInternalRequestParameters.appUrl = null;
+            casInternalRequestParameters.setAppUrl(null);
         }
 
     }

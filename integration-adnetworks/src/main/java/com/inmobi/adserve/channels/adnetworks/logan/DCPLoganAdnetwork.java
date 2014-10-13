@@ -62,9 +62,9 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
         }
         host = config.getString("logan.host");
 
-        if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
-                && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
-            String[] latlong = casInternalRequestParameters.latLong.split(",");
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
+                && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
@@ -100,16 +100,16 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
                 appendQueryParam(url, LONG, longitude, false);
             }
             String udid = null;
-            if (casInternalRequestParameters.uidO1 != null) {
-                udid = casInternalRequestParameters.uidO1;
-            } else if (casInternalRequestParameters.uidIFA != null) {
-                udid = casInternalRequestParameters.uidIFA;
-            } else if (casInternalRequestParameters.uidMd5 != null) {
-                udid = casInternalRequestParameters.uidMd5;
-            } else if (casInternalRequestParameters.uidIDUS1 != null) {
-                 udid =  casInternalRequestParameters.uidIDUS1;
-            } else if (!StringUtils.isBlank(casInternalRequestParameters.uid)) {
-                udid = casInternalRequestParameters.uid;
+            if (casInternalRequestParameters.getUidO1() != null) {
+                udid = casInternalRequestParameters.getUidO1();
+            } else if (casInternalRequestParameters.getUidIFA() != null) {
+                udid = casInternalRequestParameters.getUidIFA();
+            } else if (casInternalRequestParameters.getUidMd5() != null) {
+                udid = casInternalRequestParameters.getUidMd5();
+            } else if (casInternalRequestParameters.getUidIDUS1() != null) {
+                 udid =  casInternalRequestParameters.getUidIDUS1();
+            } else if (!StringUtils.isBlank(casInternalRequestParameters.getUid())) {
+                udid = casInternalRequestParameters.getUid();
             } else {
                 String gpid = getGPID();
                 if (gpid != null) {
@@ -120,8 +120,8 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
             if (udid != null) {
                 appendQueryParam(url, UDID, udid, false);
             }
-            if (casInternalRequestParameters.zipCode != null) {
-                appendQueryParam(url, ZIP, casInternalRequestParameters.zipCode, false);
+            if (casInternalRequestParameters.getZipCode() != null) {
+                appendQueryParam(url, ZIP, casInternalRequestParameters.getZipCode(), false);
             }
             if (sasParams.getCountryCode() != null) {
                 appendQueryParam(url, COUNTRY, sasParams.getCountryCode(), false);
@@ -212,6 +212,6 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString("logan.advertiserId"));
+        return config.getString("logan.advertiserId");
     }
 }

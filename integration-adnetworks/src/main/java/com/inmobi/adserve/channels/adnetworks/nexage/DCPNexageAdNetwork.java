@@ -68,9 +68,9 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
 			return false;
 		}
 
-		if (casInternalRequestParameters.latLong != null
+		if (casInternalRequestParameters.getLatLong() != null
 				&& StringUtils.countMatches(
-						casInternalRequestParameters.latLong, ",") > 0) {
+						casInternalRequestParameters.getLatLong(), ",") > 0) {
 			isGeo = true;
 		}
 
@@ -114,7 +114,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
 
 	@Override
 	public String getId() {
-		return (config.getString("nexage.advertiserId"));
+		return config.getString("nexage.advertiserId");
 	}
 
 	// get URI
@@ -141,28 +141,28 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
 			finalUrl.append("fs");
 		}
 
-		if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
+		if (StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
 			finalUrl.append("&d(id2)=").append(
-					casInternalRequestParameters.uidO1);
-		} else if  (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
+					casInternalRequestParameters.getUidO1());
+		} else if  (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
             finalUrl.append("&d(id2)=").append(
-                    casInternalRequestParameters.uidIDUS1);
+                    casInternalRequestParameters.getUidIDUS1());
         }
-		if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
+		if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
 			if (isApp) {
 				finalUrl.append("&d(id12)=").append(
-						casInternalRequestParameters.uidMd5);
+						casInternalRequestParameters.getUidMd5());
 			} else {
 				finalUrl.append("&u(id)=").append(
-						casInternalRequestParameters.uidMd5);
+						casInternalRequestParameters.getUidMd5());
 			}
-		} else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
+		} else if (StringUtils.isNotBlank(casInternalRequestParameters.getUid())) {
             if (isApp) {
                 finalUrl.append("&d(id12)=").append(
-                        casInternalRequestParameters.uid);
+                        casInternalRequestParameters.getUid());
             } else {
                 finalUrl.append("&u(id)=").append(
-                        casInternalRequestParameters.uid);
+                        casInternalRequestParameters.getUid());
             }
         } else {
 		    String gpid = getGPID();
@@ -172,7 +172,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
 		}
 		if (isGeo) {
 			finalUrl.append("&req(loc)=").append(
-					getURLEncode(casInternalRequestParameters.latLong, format));
+					getURLEncode(casInternalRequestParameters.getLatLong(), format));
 		}
 
 		finalUrl.append("&cn=").append(
@@ -186,9 +186,9 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
 			finalUrl.append("&u(gender)=").append(sasParams.getGender());
 		}
 
-		if (StringUtils.isNotBlank(casInternalRequestParameters.zipCode)) {
+		if (StringUtils.isNotBlank(casInternalRequestParameters.getZipCode())) {
 			finalUrl.append("&req(zip)=").append(
-					casInternalRequestParameters.zipCode);
+					casInternalRequestParameters.getZipCode());
 		}
 
 		finalUrl.append("&p(blind_id)=").append(blindedSiteId); // send
@@ -271,7 +271,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
 				getCategories(',', true, true).split(",")[0].trim());
 		context.put(BLINDED_SITE_ID, blindedSiteId);
 		if (isGeo) {
-			context.put(LAT_LONG, casInternalRequestParameters.latLong);
+			context.put(LAT_LONG, casInternalRequestParameters.getLatLong());
 		}
 		try {
 			responseContent = Formatter.getResponseFromTemplate(

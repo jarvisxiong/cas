@@ -98,9 +98,9 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
         host = config.getString("smaato.host");
-        if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
-                && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
-            String[] latlong = casInternalRequestParameters.latLong.split(",");
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
+                && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
@@ -144,22 +144,22 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         appendQueryParam(url, DIMENSION_STRICT, STRICT_FIELD, false);
 
         // TODO map the udids
-        if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
-            appendQueryParam(url, IFA, casInternalRequestParameters.uidIFA, false);
-            appendQueryParam(url, IFA_TRACKING, casInternalRequestParameters.uidADT, false);
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())) {
+            appendQueryParam(url, IFA, casInternalRequestParameters.getUidIFA(), false);
+            appendQueryParam(url, IFA_TRACKING, casInternalRequestParameters.getUidADT(), false);
         }
-        if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
-            appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.uidMd5, false);
-        } else if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
-            appendQueryParam(url, OPEN_UDID, casInternalRequestParameters.uidIDUS1, false);
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
+            appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.getUidMd5(), false);
+        } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
+            appendQueryParam(url, OPEN_UDID, casInternalRequestParameters.getUidIDUS1(), false);
         }
-        if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
-            appendQueryParam(url, OPEN_UDID, casInternalRequestParameters.uid, false);
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getUid())) {
+            appendQueryParam(url, OPEN_UDID, casInternalRequestParameters.getUid(), false);
         }
-        if (StringUtils.isNotBlank(casInternalRequestParameters.uidSO1)) {
-            appendQueryParam(url, ODIN1, casInternalRequestParameters.uidSO1, false);
-        } else if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
-            appendQueryParam(url, ODIN1, casInternalRequestParameters.uidO1, false);
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getUidSO1())) {
+            appendQueryParam(url, ODIN1, casInternalRequestParameters.getUidSO1(), false);
+        } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
+            appendQueryParam(url, ODIN1, casInternalRequestParameters.getUidO1(), false);
         }
 
         if (StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)) {
@@ -263,7 +263,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString("smaato.advertiserId"));
+        return config.getString("smaato.advertiserId");
     }
 
     @Override

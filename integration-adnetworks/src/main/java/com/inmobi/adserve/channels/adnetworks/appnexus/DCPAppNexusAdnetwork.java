@@ -83,9 +83,9 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
 
-        if (casInternalRequestParameters.latLong != null
-                && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
-            String[] latlong = casInternalRequestParameters.latLong.split(",");
+        if (casInternalRequestParameters.getLatLong() != null
+                && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
@@ -129,30 +129,30 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
             }
 
             if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
-                if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
-                    appendQueryParam(url, ANDROID_ID_MD5, getURLEncode(casInternalRequestParameters.uidMd5, format),
+                if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
+                    appendQueryParam(url, ANDROID_ID_MD5, getURLEncode(casInternalRequestParameters.getUidMd5(), format),
                             false);
-                } else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
-                    appendQueryParam(url, ANDROID_ID_MD5, getURLEncode(casInternalRequestParameters.uid, format), false);
+                } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUid())) {
+                    appendQueryParam(url, ANDROID_ID_MD5, getURLEncode(casInternalRequestParameters.getUid(), format), false);
                 }
-                if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
-                    appendQueryParam(url, ANDROID_ID_SHA1, getURLEncode(casInternalRequestParameters.uidO1, format),
+                if (StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
+                    appendQueryParam(url, ANDROID_ID_SHA1, getURLEncode(casInternalRequestParameters.getUidO1(), format),
                             false);
                 }
                 
 
             }
             if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
-                if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
-                    appendQueryParam(url, ODIN1, getURLEncode(casInternalRequestParameters.uidO1, format), false);
-                } else if (StringUtils.isNotBlank(casInternalRequestParameters.uidSO1)) {
-                    appendQueryParam(url, ODIN1, getURLEncode(casInternalRequestParameters.uidSO1, format), false);
+                if (StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
+                    appendQueryParam(url, ODIN1, getURLEncode(casInternalRequestParameters.getUidO1(), format), false);
+                } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidSO1())) {
+                    appendQueryParam(url, ODIN1, getURLEncode(casInternalRequestParameters.getUidSO1(), format), false);
                 }
-                if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
-                    appendQueryParam(url, IDFA, getURLEncode(casInternalRequestParameters.uidIFA, format), false);
+                if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())) {
+                    appendQueryParam(url, IDFA, getURLEncode(casInternalRequestParameters.getUidIFA(), format), false);
                 }
-                if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
-                    appendQueryParam(url, OPENUDID_SHA1, getURLEncode(casInternalRequestParameters.uidIDUS1, format),
+                if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
+                    appendQueryParam(url, OPENUDID_SHA1, getURLEncode(casInternalRequestParameters.getUidIDUS1(), format),
                             false);
                 }
             }
@@ -206,7 +206,7 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString(name + ".advertiserId"));
+        return config.getString(name + ".advertiserId");
     }
 
     @Override
