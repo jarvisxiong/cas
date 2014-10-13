@@ -11,8 +11,8 @@ import org.slf4j.Marker;
 import org.testng.annotations.Test;
 
 import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.replay;
 
 
 public class RequestParserTest extends TestCase

@@ -15,6 +15,8 @@ import java.util.List;
  * @author abhishek.parwal
  * 
  */
+
+//TODO: looks like a duplicate of ServerConfig in package com.inmobi.adserve.channels.api.config
 @Singleton
 public class ServerConfig implements CasConfig {
 

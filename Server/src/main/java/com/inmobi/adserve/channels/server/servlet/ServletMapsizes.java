@@ -12,6 +12,7 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 import org.json.JSONObject;
 
 import javax.ws.rs.Path;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 @Singleton
@@ -28,9 +29,10 @@ public class ServletMapsizes implements Servlet {
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
             final Channel serverChannel) throws Exception {
         JSONObject mapsizes = new JSONObject();
-        mapsizes.put("SampledAdvertiserLog", Logging.getSampledadvertiserlognos().size());
-        mapsizes.put("SampledAdvertiserMap", Logging.sampledAdvertiserLogNos);
-        mapsizes.put("creativeCache", CreativeCache.creativeCache.size());
+        ConcurrentHashMap<String, String> sampledAdvertiserLogNos = Logging.getSampledadvertiserlognos();
+        mapsizes.put("SampledAdvertiserLog", sampledAdvertiserLogNos.size());
+        mapsizes.put("SampledAdvertiserMap", sampledAdvertiserLogNos);
+        mapsizes.put("creativeCache", CreativeCache.getCreativeCache().size());
         if (null != incomingConnectionLimitHandler) {
             mapsizes.put("IncomingMaxConnections", incomingConnectionLimitHandler.getMaxConnectionsLimit());
             mapsizes.put("IncomingDroppedConnections", incomingConnectionLimitHandler.getDroppedConnections());
