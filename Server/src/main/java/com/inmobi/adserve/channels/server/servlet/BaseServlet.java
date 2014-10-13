@@ -68,7 +68,7 @@ public abstract class BaseServlet implements Servlet {
             final Channel serverChannel) throws Exception {
         CasContext casContext = new CasContext();
         Marker traceMarker = traceMarkerProvider.get();
-        InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
+        InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
         SASRequestParameters sasParams = hrh.responseSender.sasParams;
 
         hrh.responseSender.getAuctionEngine().sasParams = hrh.responseSender.sasParams;
@@ -126,7 +126,7 @@ public abstract class BaseServlet implements Servlet {
         List<ChannelSegment> filteredSegments = channelSegmentFilterApplier.getChannelSegments(matchedSegmentDetails,
                 sasParams, casContext, advertiserLevelFilters, adGroupLevelFilters);
 
-        if (filteredSegments == null || filteredSegments.size() == 0) {
+        if (filteredSegments == null || filteredSegments.isEmpty()) {
             LOG.debug(traceMarker, "All segments dropped in filters");
             hrh.responseSender.sendNoAdResponse(serverChannel);
             return;

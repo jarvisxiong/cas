@@ -26,7 +26,7 @@ public class AdGroupPropertyViolationFilter extends AbstractAdGroupLevelFilter {
      */
     @Inject
     protected AdGroupPropertyViolationFilter(final Provider<Marker> traceMarkerProvider) {
-        super(traceMarkerProvider, InspectorStrings.droppedInPropertyViolationFilter);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_PROPERTY_VIOLATION_FILTER);
     }
 
     @Override
@@ -36,31 +36,32 @@ public class AdGroupPropertyViolationFilter extends AbstractAdGroupLevelFilter {
         ChannelSegmentEntity channelSegmentEntity = channelSegment.getChannelSegmentEntity();
 
         if (channelSegmentEntity.isUdIdRequired()
-                && ((StringUtils.isEmpty(sasParams.getUidParams()) || sasParams.getUidParams().equals("{}"))
+                && ((StringUtils.isEmpty(sasParams.getUidParams()) || "{}".equals(sasParams.getUidParams()))
                 && (null == sasParams.getTUidParams() || sasParams.getTUidParams().isEmpty()))) {
-            channelSegment.incrementInspectorStats(InspectorStrings.droppedInUdidFilter);
+            channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_UDID_FILTER);
             return true;
         }
         if (channelSegmentEntity.isZipCodeRequired() && sasParams.getPostalCode() == null) {
-            channelSegment.incrementInspectorStats(InspectorStrings.droppedInZipcodeFilter);
+            channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_ZIPCODE_FILTER);
             return true;
         }
         if (channelSegmentEntity.isLatlongRequired() && StringUtils.isEmpty(sasParams.getLatLong())) {
-            channelSegment.incrementInspectorStats(InspectorStrings.droppedInLatLongFilter);
+            channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_LAT_LONG_FILTER);
             return true;
         }
         if (channelSegmentEntity.isRestrictedToRichMediaOnly() && !sasParams.isRichMedia()) {
-            channelSegment.incrementInspectorStats(InspectorStrings.droppedInRichMediaFilter);
+            channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_RICH_MEDIA_FILTER);
             return true;
         }
-        if (channelSegmentEntity.isInterstitialOnly()
-                && (sasParams.getRqAdType() == null || !sasParams.getRqAdType().equals("int"))) {
-            channelSegment.incrementInspectorStats(InspectorStrings.droppedInOnlyInterstitialFilter);
+
+        String rqAdType = sasParams.getRqAdType();
+
+        if (channelSegmentEntity.isInterstitialOnly() && (rqAdType == null || !"int".equals(rqAdType))) {
+            channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_ONLY_INTERSTITIAL_FILTER);
             return true;
         }
-        if (channelSegmentEntity.isNonInterstitialOnly() && sasParams.getRqAdType() != null
-                && sasParams.getRqAdType().equals("int")) {
-            channelSegment.incrementInspectorStats(InspectorStrings.droppedInOnlyNonInterstitialFilter);
+        if (channelSegmentEntity.isNonInterstitialOnly() && rqAdType != null && "int".equals(rqAdType)) {
+            channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_ONLY_NON_INTERSTITIAL_FILTER);
             return true;
         }
 

@@ -6,6 +6,8 @@ import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 import lombok.Getter;
 import lombok.Setter;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ import java.util.Set;
 public class ChannelSegmentEntity implements IdentifiableEntity<String> {
 
     private static final long        serialVersionUID = 1L;
+    private final static Logger LOG = LoggerFactory.getLogger(ChannelSegmentEntity.class);
 
     private final String             advertiserId;
     private final String             adgroupId;
@@ -185,8 +188,9 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
     public long getIncId(final ADCreativeType creativeType) {
         long notFound = -1L;
 
-        if (getAdFormatIds() == null)
+        if (null == getAdFormatIds()) {
             return notFound;
+        }
 
         int requestedAdFormatId = getAdFormatId(creativeType);
         try {
@@ -196,6 +200,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
                 }
             }
         } catch (ArrayIndexOutOfBoundsException e) {
+            LOG.debug("Exception raised in ChannelSegmentEntity {}", e);
             return notFound;
         }
         // This would happen only with inconsistent data.
@@ -208,8 +213,9 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
     public String getAdId(final ADCreativeType creativeType) {
         String notFound = "";
 
-        if (getAdFormatIds() == null)
+        if (null == getAdFormatIds()) {
             return notFound;
+        }
 
         int requestedAdFormatId = getAdFormatId(creativeType);
         try {
@@ -219,6 +225,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
                 }
             }
         } catch (ArrayIndexOutOfBoundsException e) {
+            LOG.debug("Exception raised in ChannelSegmentEntity {}", e);
             return notFound;
         }
         // This would happen only with inconsistent data.
@@ -235,7 +242,8 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
             return AdFormatType.VIDEO.getValue();         // VIDEO
         } else if (creativeType == ADCreativeType.BANNER) {
             return AdFormatType.TEXT.getValue();          // BANNER
-        } else
+        } else {
             return -1; // not found
+        }
     }
 }

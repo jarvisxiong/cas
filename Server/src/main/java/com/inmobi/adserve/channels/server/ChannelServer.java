@@ -114,7 +114,7 @@ public class ChannelServer {
             logger.debug("Initializing logger completed");
 
             // parsing the data center id given in the vm parameters
-            ChannelServerHelper channelServerHelper = new ChannelServerHelper(logger);
+            ChannelServerHelper channelServerHelper = new ChannelServerHelper();
             dataCenterIdCode = channelServerHelper.getDataCenterId(ChannelServerStringLiterals.DATA_CENTER_ID_KEY);
             hostIdCode = channelServerHelper.getHostId(ChannelServerStringLiterals.HOST_NAME_KEY);
             dataCentreName = channelServerHelper.getDataCentreName(ChannelServerStringLiterals.DATA_CENTRE_NAME_KEY);
@@ -131,6 +131,13 @@ public class ChannelServer {
 
             // Initialising ClickUrlsRegenerator
             ClickUrlsRegenerator.init(configurationLoader.getServerConfiguration().subset("clickmaker"));
+
+            // Increase networkaddress cache ttl to avoid thread wait. (SERVOPS-3265)
+            java.security.Security.setProperty("networkaddress.cache.ttl",
+                    configurationLoader.getServerConfiguration().getString("networkaddress.cache.ttl", "3600"));
+
+            java.security.Security.setProperty("networkaddress.cache.negative.ttl",
+                    configurationLoader.getServerConfiguration().getString("networkaddress.cache.negative.ttl", "300"));
 
             String rrLogKey = configurationLoader.getServerConfiguration().getString("rrLogKey");
             String advertisementLogKey = configurationLoader.getServerConfiguration().getString("adsLogKey");

@@ -40,17 +40,16 @@ public class ServletChangeConfig implements Servlet {
         JSONObject jObject = null;
         try {
             jObject = requestParser.extractParams(params, "update");
-        }
-        catch (JSONException exception) {
-            LOG.debug("Encountered Json Error while creating json object inside servlet");
-            hrh.setTerminationReason(CasConfigUtil.jsonParsingError);
-            InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
+        } catch (JSONException exeption) {
+            LOG.debug("Encountered Json Error while creating json object inside servlet, {}", exeption);
+            hrh.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
+            InspectorStats.incrementStatCount(InspectorStrings.JSON_PARSING_ERROR, InspectorStrings.COUNT);
             hrh.responseSender.sendResponse("Incorrect Json", serverChannel);
             return;
         }
         if (jObject == null) {
-            LOG.debug("jObject is null so returning");
-            hrh.setTerminationReason(CasConfigUtil.jsonParsingError);
+            LOG.debug("jobject is null so returning");
+            hrh.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
             hrh.responseSender.sendResponse("Incorrect Json", serverChannel);
             return;
         }
@@ -83,10 +82,9 @@ public class ServletChangeConfig implements Servlet {
                 }
             }
             hrh.responseSender.sendResponse(updates.toString(), serverChannel);
-        }
-        catch (JSONException ex) {
-            LOG.debug("Encountered Json Error while creating json object inside HttpRequest Handler for config change");
-            hrh.responseSender.setTerminationReason(CasConfigUtil.jsonParsingError);
+        } catch (JSONException ex) {
+            LOG.debug("Encountered Json Error while creating json object inside HttpRequest Handler for config change, exception raised {}", ex);
+            hrh.responseSender.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
         }
     }
 

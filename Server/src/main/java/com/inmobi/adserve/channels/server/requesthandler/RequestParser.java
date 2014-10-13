@@ -80,14 +80,12 @@ public class RequestParser {
         params.setCountryCode(parseArray(jObject, "carrier", 2));
         try {
             params.setCity(Integer.parseInt(parseArray(jObject, "carrier", 3)));
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             LOG.debug(traceMarker, "City not found in request");
         }
         try {
             params.setState(Integer.parseInt(parseArray(jObject, "carrier", 4)));
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             LOG.debug(traceMarker, "State not found in request");
         }
         String slot = stringify(jObject, "slot-served");
@@ -134,17 +132,15 @@ public class RequestParser {
             if (siteInfo != null && siteInfo.length() > 0) {
                 params.setSiteIncId(siteInfo.getLong(0));
             }
-        }
-        catch (JSONException exception) {
-            LOG.debug(traceMarker, "site object not found in request");
+        } catch (JSONException exception) {
+            LOG.debug(traceMarker, "site object not found in request, {}", exception);
             params.setSiteIncId(0);
         }
         try {
             JSONArray jsonArray = jObject.getJSONArray("handset");
             params.setHandsetInternalId(Long.parseLong(jsonArray.get(0).toString()));
-        }
-        catch (JSONException e) {
-            LOG.debug(traceMarker, "Handset array not found");
+        } catch (JSONException e) {
+            LOG.debug(traceMarker, "Handset array not found, {}", e);
         }
         params.setOsId(jObject.optInt("os-id", -1));
         params.setRichMedia(jObject.optBoolean("rich-media", false));
@@ -155,15 +151,14 @@ public class RequestParser {
 
     public String stringify(final JSONObject jObject, final String field) {
         Marker traceMarker = traceMarkerProvider.get();
-
         String fieldValue = "";
         try {
             Object fieldValueObject = jObject.get(field);
             if (null != fieldValueObject) {
                 fieldValue = fieldValueObject.toString();
             }
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
+            LOG.debug(traceMarker, "exception {} while Stringifying {} from JSON", e, field);
             return null;
         }
         LOG.debug(traceMarker, "Retrived from json {} = {}", field, fieldValue);
@@ -171,6 +166,7 @@ public class RequestParser {
     }
 
     public String parseArray(final JSONObject jObject, final String param, final int index) {
+        Marker traceMarker = traceMarkerProvider.get();
         if (null == jObject) {
             return null;
         }
@@ -178,19 +174,17 @@ public class RequestParser {
             JSONArray jArray = jObject.getJSONArray(param);
             if (null == jArray) {
                 return null;
-            }
-            else {
+            } else {
                 return (jArray.getString(index));
             }
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
+            LOG.debug(traceMarker, "exception {} while parsing field at index {} from {}", e, index, jObject);
             return null;
         }
     }
 
     public List<Long> getCategory(final JSONObject jObject, final String oldORnew) {
         Marker traceMarker = traceMarkerProvider.get();
-
         try {
             JSONArray categories = jObject.getJSONArray(oldORnew);
             Long[] category = new Long[categories.length()];
@@ -198,8 +192,7 @@ public class RequestParser {
                 category[index] = categories.getLong(index);
             }
             return Arrays.asList(category);
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             LOG.debug(traceMarker, "error while reading category array {}", e);
             return null;
         }
@@ -207,7 +200,6 @@ public class RequestParser {
 
     public Set<Integer> getAcoountSegments(final JSONObject jObject) {
         Marker traceMarker = traceMarkerProvider.get();
-
         try {
             JSONArray segments = jObject.optJSONArray("segments");
             HashSet<Integer> accountSegments = new HashSet<Integer>();
@@ -215,8 +207,7 @@ public class RequestParser {
                 accountSegments.add(segments.getInt(index));
             }
             return accountSegments;
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             LOG.debug(traceMarker, "error while reading account segments array {}", e);
             return new HashSet<Integer>();
         }
@@ -225,7 +216,6 @@ public class RequestParser {
     // Get user specific params
     public SASRequestParameters getUserParams(final SASRequestParameters parameter, final JSONObject jObject) {
         Marker traceMarker = traceMarkerProvider.get();
-
         LOG.debug(traceMarker, "inside parsing user params");
         String utf8 = "UTF-8";
         try {
@@ -253,15 +243,12 @@ public class RequestParser {
                     Collections.addAll(advertiserSet, advertiserList);
                     parameter.setUAdapters(advertiserSet);
                 }
-            }
-            catch (UnsupportedEncodingException e) {
+            } catch (UnsupportedEncodingException e) {
                 LOG.debug(traceMarker, "Error in encoding u params {}", e);
             }
-        }
-        catch (JSONException exception) {
+        } catch (JSONException exception) {
             LOG.debug(traceMarker, "json exception in parsing u params {}", exception);
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             LOG.debug(traceMarker, "number format exception in u params {}", e);
         }
         return parameter;
@@ -270,7 +257,6 @@ public class RequestParser {
     // Get user id params
     public void setUserIdParams(final CasInternalRequestParameters parameter, final JSONObject jObject) {
         Marker traceMarker = traceMarkerProvider.get();
-
         if (null == jObject) {
             return;
         }
@@ -294,9 +280,8 @@ public class RequestParser {
             parameter.uidADT = stringify(userIdMap, "u-id-adt");
             parameter.uuidFromUidCookie = stringify(userIdMap, "imuc__5");
             parameter.uidWC = stringify(userIdMap, "WC");
-        }
-        catch (JSONException exception) {
-            LOG.debug(traceMarker, "Error in extracting userid params");
+        } catch (JSONException exception) {
+            LOG.debug(traceMarker, "Error in extracting userid params, {}", exception);
         }
     }
 
@@ -309,8 +294,7 @@ public class RequestParser {
                 sb.append(Integer.toHexString((anArray & 0xFF) | 0x100).substring(1, 3));
             }
             return sb.toString();
-        }
-        catch (java.security.NoSuchAlgorithmException ignored) {
+        } catch (java.security.NoSuchAlgorithmException ignored) {
         }
         return null;
     }

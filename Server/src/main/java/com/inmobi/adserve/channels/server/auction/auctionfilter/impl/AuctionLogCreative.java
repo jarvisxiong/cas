@@ -21,7 +21,7 @@ public class AuctionLogCreative extends AbstractAuctionFilter {
     @Inject
     protected AuctionLogCreative(Provider<Marker> traceMarkerProvider, final RepositoryHelper repositoryHelper,
                                              final ServerConfig serverConfiguration, final CreativeCache creativeCache) {
-        super(traceMarkerProvider, InspectorStrings.droppedInCreativeValidatorFilter, serverConfiguration);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_CREATIVE_VALIDATOR_FILTER, serverConfiguration);
         this.repositoryHelper = repositoryHelper;
         this.creativeCache = creativeCache;
         isApplicableRTBD = true;

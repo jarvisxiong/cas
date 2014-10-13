@@ -44,7 +44,7 @@ public class ServletIXFill extends BaseServlet {
             final Channel serverChannel) throws Exception {
         Marker traceMarker = traceMarkerProvider.get();
         LOG.debug(traceMarker, "Inside Servlet {}", this.getClass().getSimpleName());
-        InspectorStats.incrementStatCount(InspectorStrings.ixRequests);
+        InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
         super.handleRequest(hrh, queryStringDecoder, serverChannel);
     }
 

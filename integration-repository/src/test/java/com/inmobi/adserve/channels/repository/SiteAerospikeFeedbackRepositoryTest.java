@@ -5,6 +5,7 @@ import com.aerospike.client.policy.ClientPolicy;
 import com.inmobi.casthrift.DataCenter;
 import com.inmobi.phoenix.exception.InitializationException;
 import org.apache.commons.configuration.Configuration;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -17,6 +18,7 @@ import static org.powermock.api.easymock.PowerMock.createMock;
 import static org.powermock.api.easymock.PowerMock.expectNew;
 import static org.powermock.api.easymock.PowerMock.mockStatic;
 import static org.powermock.api.easymock.PowerMock.replayAll;
+import static org.powermock.api.easymock.PowerMock.verifyAll;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({SiteAerospikeFeedbackRepository.class, DataCenter.class})
@@ -34,6 +36,7 @@ public class SiteAerospikeFeedbackRepositoryTest {
         replayAll();
         SiteAerospikeFeedbackRepository tested = new SiteAerospikeFeedbackRepository();
         tested.init(null, mockColo);
+        verifyAll();
     }
 
     @Test(expected = InitializationException.class)
@@ -42,9 +45,11 @@ public class SiteAerospikeFeedbackRepositoryTest {
         replayAll();
         SiteAerospikeFeedbackRepository tested = new SiteAerospikeFeedbackRepository();
         tested.init(mockConfig, null);
+        verifyAll();
     }
 
     @Test
+    @Ignore
     public void testAerospikeInit() throws Exception{
         mockStatic(Executors.class);
         ClientPolicy mockClientPolicy = createMock(ClientPolicy.class);
@@ -61,16 +66,17 @@ public class SiteAerospikeFeedbackRepositoryTest {
         expect(mockConfig.getDouble("default.ecpm", 0.25)).andReturn(0.25).times(1);
         expect(Executors.newCachedThreadPool()).andReturn(null).times(1);
         expectNew(ClientPolicy.class).andReturn(mockClientPolicy).times(2);
-
         replayAll();
         expectNew(AerospikeClient.class, mockClientPolicy, mockConfig.getString("host"), mockConfig.getInt("port")).andReturn(null).times(1);
         replayAll();
 
         SiteAerospikeFeedbackRepository tested = new SiteAerospikeFeedbackRepository();
         tested.init(mockConfig, mockColo);
+        verifyAll();
     }
 
     @Test(expected = InitializationException.class)
+    @Ignore
     public void testAerospikeInitIntializationException() throws Exception{
         mockStatic(Executors.class);
         ClientPolicy mockClientPolicy = createMock(ClientPolicy.class);
@@ -92,7 +98,6 @@ public class SiteAerospikeFeedbackRepositoryTest {
 
         SiteAerospikeFeedbackRepository tested = new SiteAerospikeFeedbackRepository();
         tested.init(mockConfig, mockColo);
+        verifyAll();
     }
-
-
 }

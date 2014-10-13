@@ -30,7 +30,7 @@ public class ServletTemplate implements Servlet {
         List<String> siteIdList = params.get("siteId");
         String message = "Invalid siteId";
 
-        if(null != siteIdList && siteIdList.size() > 0){
+        if(null != siteIdList && (!siteIdList.isEmpty())){
         	String siteId = siteIdList.get(0);
         	NativeAdTemplateRepository templateRepository = CasConfigUtil.repositoryHelper.getNativeAdTemplateRepository();
         	NativeAdTemplateEntity entity = templateRepository.query(siteId);

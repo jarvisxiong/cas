@@ -38,8 +38,7 @@ public class AuctionIXImpressionIdFilter extends AbstractAuctionFilter {
                         && responseImpressionId >= 1 && responseImpressionId <= ixAdNetwork.getImpressionObjCount()) {
                     return false;
                 }
-            }
-            catch (NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 return false;
             }
 

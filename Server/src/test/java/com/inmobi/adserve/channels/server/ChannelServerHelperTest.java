@@ -46,7 +46,7 @@ public class ChannelServerHelperTest{
     public static void setUp(){
         prepareMockConfig();
 
-        channelServerHelper = new ChannelServerHelper(Logger.getLogger(mockConfig.getString("debug")));
+        channelServerHelper = new ChannelServerHelper();
     }
 
     @Test

@@ -47,41 +47,29 @@ public class AuctionFilterModule extends AbstractModule {
             AuctionFilter filter = injector.getInstance(class1);
             if (filter instanceof AuctionNoAdFilter) {
                 filter.setOrder(FilterOrder.FIRST);
-            }
-            else if (filter instanceof AuctionBidFloorFilter) {
+            } else if (filter instanceof AuctionBidFloorFilter) {
                 filter.setOrder(FilterOrder.SECOND);
-            }
-            else if (filter instanceof AuctionSeatIdFilter) {
+            } else if (filter instanceof AuctionSeatIdFilter) {
                 filter.setOrder(FilterOrder.THIRD);
-            }
-            else if (filter instanceof AuctionImpressionIdFilter) {
+            } else if (filter instanceof AuctionImpressionIdFilter) {
                 filter.setOrder(FilterOrder.FOURTH);
-            }
-            else if (filter instanceof AuctionIdFilter) {
+            } else if (filter instanceof AuctionIdFilter) {
                 filter.setOrder(FilterOrder.FIFTH);
-            }
-            else if (filter instanceof AuctionCurrencyFilter) {
+            } else if (filter instanceof AuctionCurrencyFilter) {
                 filter.setOrder(FilterOrder.SIXTH);
-            }
-            else if (filter instanceof AuctionCreativeIdFilter) {
+            } else if (filter instanceof AuctionCreativeIdFilter) {
                 filter.setOrder(FilterOrder.SEVENTH);
-            }
-            else if (filter instanceof AuctionIUrlFilter) {
+            } else if (filter instanceof AuctionIUrlFilter) {
                 filter.setOrder(FilterOrder.EIGHT);
-            }
-            else if (filter instanceof AuctionAdvertiserDomainFilter) {
+            } else if (filter instanceof AuctionAdvertiserDomainFilter) {
                 filter.setOrder(FilterOrder.NINTH);
-            }
-            else if (filter instanceof AuctionCreativeAttributeFilter) {
+            } else if (filter instanceof AuctionCreativeAttributeFilter) {
                 filter.setOrder(FilterOrder.TENTH);
-            }
-            else if (filter instanceof AuctionCreativeValidatorFilter) {
+            } else if (filter instanceof AuctionCreativeValidatorFilter) {
                 filter.setOrder(FilterOrder.SECOND_LAST);
-            }
-            else if (filter instanceof AuctionLogCreative) {
+            } else if (filter instanceof AuctionLogCreative) {
                 filter.setOrder(FilterOrder.LAST);
-            }
-            else {
+            } else {
                 filter.setOrder(FilterOrder.DEFAULT);
             }
 

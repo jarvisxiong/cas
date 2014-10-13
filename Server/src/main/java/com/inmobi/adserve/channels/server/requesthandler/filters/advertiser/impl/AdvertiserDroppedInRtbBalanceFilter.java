@@ -4,8 +4,6 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import com.google.inject.Provider;
@@ -32,7 +30,7 @@ public class AdvertiserDroppedInRtbBalanceFilter extends AbstractAdvertiserLevel
     @Inject
     public AdvertiserDroppedInRtbBalanceFilter(final Provider<Marker> traceMarkerProvider,
             final Map<String, AdapterConfig> advertiserIdConfigMap, final ServerConfig serverConfiguration) {
-        super(traceMarkerProvider, InspectorStrings.droppedInRtbBalanceFilter);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_RTB_BALANCE_FILTER);
         this.advertiserIdConfigMap = advertiserIdConfigMap;
         this.serverConfiguration = serverConfiguration;
     }

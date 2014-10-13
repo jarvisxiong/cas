@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.entity;
 
 import com.inmobi.casthrift.ADCreativeType;
 import org.json.JSONObject;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.sql.Timestamp;
@@ -13,6 +14,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+@Ignore
 public class ChannelSegmentEntityTest {
 
     public ChannelSegmentEntity.Builder getChannelSegmentEntityBuilder(final String advertiserId,

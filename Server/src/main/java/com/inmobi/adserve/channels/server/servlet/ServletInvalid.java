@@ -22,7 +22,6 @@ import com.inmobi.adserve.channels.server.api.Servlet;
 
 @Singleton
 public class ServletInvalid implements Servlet {
-    private static final Logger LOG = LoggerFactory.getLogger(ServletInvalid.class);
 
     @SuppressWarnings("deprecation")
     @Override

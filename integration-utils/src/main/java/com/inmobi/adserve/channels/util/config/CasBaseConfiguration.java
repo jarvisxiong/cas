@@ -80,8 +80,7 @@ public class CasBaseConfiguration extends PropertiesConfiguration {
 
 	
 	@Override
-    public Configuration subset(String prefix)
-    {
+    public Configuration subset(String prefix) {
         return new CasSubsetConfiguration(this, prefix, ".");
     }
 }

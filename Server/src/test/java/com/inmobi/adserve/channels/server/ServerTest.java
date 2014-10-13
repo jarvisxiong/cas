@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import org.slf4j.Marker;
 import org.testng.annotations.Test;
 
+import javax.inject.Inject;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.Arrays;

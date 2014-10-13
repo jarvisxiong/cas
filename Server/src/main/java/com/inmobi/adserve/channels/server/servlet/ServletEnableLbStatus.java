@@ -26,8 +26,7 @@ public class ServletEnableLbStatus implements Servlet {
             ServerStatusInfo.statusCode = 200;
             ServerStatusInfo.statusString = "OK";
             LOG.debug("asked to shut down the server");
-        }
-        else {
+        } else {
             hrh.responseSender.sendResponse("NOT AUTHORIZED", serverChannel);
         }
     }

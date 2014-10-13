@@ -1,15 +1,10 @@
 package com.inmobi.adserve.channels.adnetworks.googleadx;
 
-import com.google.common.base.Strings;
-
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 import org.apache.commons.configuration.Configuration;
@@ -45,8 +40,8 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
   @Override
   public boolean configureParameters() {
 
-    if ((sasParams.getUserAgent() != null && sasParams.getUserAgent().toLowerCase().contains("opera"))
-            || (sasParams.getDeviceType() != null && sasParams.getDeviceType().equals("FEATURE_PHONE"))) {
+    if ((sasParams.getUserAgent() != null && sasParams.getUserAgent().toLowerCase().contains("opera mini"))
+            || (sasParams.getDeviceType() != null && "FEATURE_PHONE".equals(sasParams.getDeviceType()))) {
       return false;
     }
 
@@ -89,7 +84,7 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
     sb.append("</script>");
     sb.append(SCRIPT_END_PART);
 
-    context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, sb.toString());
+    context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, sb.toString());
     try {
       TemplateType templateType = TemplateType.HTML;
       if (StringUtils.isBlank(sasParams.getSource()) || "WAP".equalsIgnoreCase(sasParams.getSource())) {

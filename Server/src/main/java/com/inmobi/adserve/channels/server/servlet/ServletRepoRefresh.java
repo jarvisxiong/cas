@@ -69,56 +69,49 @@ public class ServletRepoRefresh implements Servlet {
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getChannelAdGroupRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
-            }
-            else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_REPOSITORY)) {
+            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_REPOSITORY)) {
                 final String query = config.getCacheConfiguration()
                         .subset(ChannelServerStringLiterals.CHANNEL_REPOSITORY)
                         .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getChannelRepository()
                         .newUpdateFromResultSetToOptimizeUpdate(resultSet);
-            }
-            else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY)) {
+            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY)) {
                 final String query = config.getCacheConfiguration()
                         .subset(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY)
                         .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getChannelFeedbackRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
-            }
-            else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY)) {
+            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY)) {
                 final String query = config.getCacheConfiguration()
                         .subset(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY)
                         .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getChannelSegmentFeedbackRepository()
                         .newUpdateFromResultSetToOptimizeUpdate(resultSet);
-            }
-            else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)) {
+            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)) {
                 final String query = config.getCacheConfiguration()
                         .subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)
                         .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getSiteMetaDataRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
-            }
-            else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY)) {
+            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY)) {
                 final String query = config.getCacheConfiguration()
                         .subset(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY)
                         .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getSiteTaxonomyRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
-            }
-            else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY)) {
+            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY)) {
                 final String query = config.getCacheConfiguration()
                         .subset(ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY)
                         .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getPricingEngineRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
-            }
-            else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY)) {
+            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY)) {
                 final String query = config.getCacheConfiguration()
                         .subset(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY)
                         .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
@@ -130,16 +123,13 @@ public class ServletRepoRefresh implements Servlet {
 
             LOG.debug("Successfully updated {}", repoName);
             hrh.responseSender.sendResponse("OK", serverChannel);
-        }
-        catch (SQLException e1) {
+        } catch (SQLException e1) {
             LOG.info("error is {}", e1);
             hrh.responseSender.sendResponse("NOTOK", serverChannel);
-        }
-        catch (RepositoryException e2) {
+        } catch (RepositoryException e2) {
             LOG.info("error is {}", e2);
             hrh.responseSender.sendResponse("NOTOK", serverChannel);
-        }
-        finally {
+        } finally {
             if (null != statement) {
                 statement.close();
             }
