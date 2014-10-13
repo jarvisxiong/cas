@@ -25,6 +25,8 @@ import io.netty.channel.ChannelFuture;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONObject;
@@ -58,11 +60,13 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected long                                startTime;
     public volatile boolean                       isRequestComplete       = false;
     protected int                                 statusCode;
-    public String                                 responseContent;
-    public Map                                    responseHeaders;
+    @Getter
+    protected String                              responseContent;
+    private Map                                   responseHeaders;
     private long                                  latency;
-    public long                                   connectionLatency;
-    public String                                 adStatus                = "NO_AD";
+    private long                                  connectionLatency;
+    @Getter
+    protected String                              adStatus                = "NO_AD";
     protected ThirdPartyAdResponse.ResponseStatus errorStatus             = ThirdPartyAdResponse.ResponseStatus.SUCCESS;
     
     protected boolean 							  isHTMLResponseSupported = true;
@@ -130,15 +134,25 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     //Overriding these methods in IXAdNetwork
-    public String returnBuyer(){return null;}
+    public String returnBuyer() {
+        return null;
+    }
 
-    public String returnDealId(){return null;}
+    public String returnDealId() {
+        return null;
+    }
 
-    public double returnAdjustBid(){return 0;}
+    public double returnAdjustBid() {
+        return 0;
+    }
 
-    public Integer returnPmpTier() { return 0; }
+    public Integer returnPmpTier() {
+        return 0;
+    }
 
-    public String returnAqid() { return null; }
+    public String returnAqid() {
+        return null;
+    }
 
     @Override
     public void setName(final String adapterName) {
@@ -160,9 +174,13 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     @Override
-    public boolean isIxPartner() { return isIxPartner; }
+    public boolean isIxPartner() {
+        return isIxPartner;
+    }
 
-    public void setIxPartner(final boolean isIxPartner) { this.isIxPartner = isIxPartner; }
+    public void setIxPartner(final boolean isIxPartner) {
+        this.isIxPartner = isIxPartner;
+    }
 
     public void processResponse() {
         LOG.debug("Inside process Response for the partner: {}", getName());
@@ -293,7 +311,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                         LOG.debug("{} timeout latency {}", getName(), latency);
                         adStatus = "TIME_OUT";
                         processResponse();
-                        InspectorStats.incrementStatCount(InspectorStrings.timeoutException);
+                        InspectorStats.incrementStatCount(InspectorStrings.TIMEOUT_EXCEPTION);
                         return;
                     }
 
@@ -375,8 +393,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             LOG.debug("inside cleanup for channel {}", this.getId());
             adStatus = "TERM";
             responseStruct = new ThirdPartyAdResponse();
-            responseStruct.latency = latency;
-            responseStruct.adStatus = adStatus;
+            responseStruct.setLatency(latency);
+            responseStruct.setAdStatus(adStatus);
         }
     }
 
@@ -389,30 +407,30 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             return responseStruct;
         }
         responseStruct = new ThirdPartyAdResponse();
-        responseStruct.responseFormat = isNativeRequest()?ThirdPartyAdResponse.ResponseFormat.JSON:ThirdPartyAdResponse.ResponseFormat.HTML;
-        responseStruct.response = getHttpResponseContent();
-        responseStruct.responseHeaders = getResponseHeaders();
+        responseStruct.setResponseFormat(isNativeRequest()?ThirdPartyAdResponse.ResponseFormat.JSON:ThirdPartyAdResponse.ResponseFormat.HTML);
+        responseStruct.setResponse(getHttpResponseContent());
+        responseStruct.setResponseHeaders(getResponseHeaders());
         if (statusCode >= 400) {
-            responseStruct.responseStatus = ThirdPartyAdResponse.ResponseStatus.FAILURE_NETWORK_ERROR;
+            responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.FAILURE_NETWORK_ERROR);
         } else if (statusCode >= 300) {
-            responseStruct.responseStatus = ThirdPartyAdResponse.ResponseStatus.FAILURE_REQUEST_ERROR;
+            responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.FAILURE_REQUEST_ERROR);
         } else if (statusCode == 200) {
             if (StringUtils.isBlank(responseContent) || !"AD".equalsIgnoreCase(adStatus)) {
                 adStatus = "NO_AD";
-                responseStruct.responseStatus = ThirdPartyAdResponse.ResponseStatus.FAILURE_NO_AD;
+                responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.FAILURE_NO_AD);
             } else {
-                responseStruct.responseStatus = ThirdPartyAdResponse.ResponseStatus.SUCCESS;
+                responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.SUCCESS);
                 adStatus = "AD";
             }
         } else if (statusCode >= 204) {
-            responseStruct.responseStatus = ThirdPartyAdResponse.ResponseStatus.FAILURE_NO_AD;
+            responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.FAILURE_NO_AD);
         }
-        responseStruct.latency = latency;
+        responseStruct.setLatency(latency);
         LOG.debug("getting response ad for channel {}", this.getId());
         if (isClickUrlRequired()) {
-            responseStruct.clickUrl = getClickUrl();
+            responseStruct.setClickUrl(getClickUrl());
         }
-        responseStruct.adStatus = adStatus;
+        responseStruct.setAdStatus(adStatus);
         return responseStruct;
     }
 
@@ -619,14 +637,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected String getYearofBirth() {
         if (sasParams.getAge() != null && sasParams.getAge().toString().matches("\\d+")) {
             Calendar cal = new GregorianCalendar();
-            return (Integer.toString(cal.get(Calendar.YEAR) - sasParams.getAge()));
+            return Integer.toString(cal.get(Calendar.YEAR) - sasParams.getAge());
         }
         return null;
-    }
-
-    @Override
-    public String getAdStatus() {
-        return this.adStatus;
     }
 
     @Override

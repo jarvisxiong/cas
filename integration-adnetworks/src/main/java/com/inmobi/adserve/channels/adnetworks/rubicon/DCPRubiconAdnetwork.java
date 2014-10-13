@@ -389,7 +389,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 
 	@Override
 	public String getId() {
-		return (config.getString("rubicon.advertiserId"));
+		return config.getString("rubicon.advertiserId");
 	}
 
 	public String getZoneId(JSONObject additionalParams) {
@@ -461,8 +461,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 				if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
 					appendQueryParam(url, SHA1_DEVICE_ID, casInternalRequestParameters.getUidIDUS1(), false);
 					isUdid = true;
-				}
-				else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
+				} else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
 					appendQueryParam(url, SHA1_DEVICE_ID, casInternalRequestParameters.getUidO1(), false);
 					isUdid = true;
 				}

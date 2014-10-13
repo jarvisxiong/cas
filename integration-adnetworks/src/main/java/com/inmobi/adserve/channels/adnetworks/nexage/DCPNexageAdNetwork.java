@@ -114,7 +114,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
 
 	@Override
 	public String getId() {
-		return (config.getString("nexage.advertiserId"));
+		return config.getString("nexage.advertiserId");
 	}
 
 	// get URI

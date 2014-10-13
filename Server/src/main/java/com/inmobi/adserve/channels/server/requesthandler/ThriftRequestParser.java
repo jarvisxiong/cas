@@ -349,6 +349,7 @@ public class ThriftRequestParser {
             }
             return sb.toString();
         } catch (java.security.NoSuchAlgorithmException ignored) {
+            LOG.debug("Exception {} raised with String {} in MD5", ignored, md5);
         }
         return null;
     }

@@ -187,6 +187,6 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString("paypal.advertiserId"));
+        return config.getString("paypal.advertiserId");
     }
 }

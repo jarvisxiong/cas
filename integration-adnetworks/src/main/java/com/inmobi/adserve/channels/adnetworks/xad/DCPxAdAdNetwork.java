@@ -218,7 +218,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 
 	@Override
 	public String getId() {
-		return (config.getString("xad.advertiserId"));
+		return config.getString("xad.advertiserId");
 	}
 
 	/**

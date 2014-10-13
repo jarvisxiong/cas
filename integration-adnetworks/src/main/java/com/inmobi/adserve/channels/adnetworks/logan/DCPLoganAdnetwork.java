@@ -212,6 +212,6 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString("logan.advertiserId"));
+        return config.getString("logan.advertiserId");
     }
 }

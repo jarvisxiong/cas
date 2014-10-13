@@ -170,6 +170,6 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString("baidu.advertiserId"));
+        return config.getString("baidu.advertiserId");
     }
 }

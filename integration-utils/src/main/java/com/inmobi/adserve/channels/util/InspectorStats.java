@@ -16,10 +16,13 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Counter;
 import com.yammer.metrics.core.Histogram;
 import com.yammer.metrics.reporting.GraphiteReporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class InspectorStats {
 
+    private static final Logger LOG = LoggerFactory.getLogger(InspectorStats.class);
     private static Map<String, ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicLong>>> ingrapherCounterStats = new ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicLong>>>();
     private static Map<String, ConcurrentHashMap<String, ConcurrentHashMap<String, Counter>>> yammerCounterStats = new ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentHashMap<String, Counter>>>();
     private static Map<String, ConcurrentHashMap<String, Histogram>> yammerTimerStats = new ConcurrentHashMap<String, ConcurrentHashMap<String, Histogram>>();
@@ -33,6 +36,7 @@ public class InspectorStats {
 			metricProducer = metricsPrefix(InetAddress.getLocalHost().getHostName().toLowerCase());
 		} catch (UnknownHostException e) {
 			metricProducer = "unknown-host";
+            LOG.debug("Metric Producer could not resolve host so setting to unknown host, exception {}", e);
 		}
 		GraphiteReporter.enable(graphiteInterval, TimeUnit.MINUTES, graphiteServer, graphitePort, metricProducer);
 	}

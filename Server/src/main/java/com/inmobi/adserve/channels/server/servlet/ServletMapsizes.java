@@ -29,10 +29,10 @@ public class ServletMapsizes implements Servlet {
             final Channel serverChannel) throws Exception {
         JSONObject mapsizes = new JSONObject();
         mapsizes.put("SampledAdvertiserLog", Logging.getSampledadvertiserlognos().size());
-        mapsizes.put("SampledAdvertiserMap", Logging.sampledAdvertiserLogNos);
-        mapsizes.put("creativeCache", CreativeCache.creativeCache.size());
+        mapsizes.put("SampledAdvertiserMap", Logging.SAMPLED_ADVERTISER_LOG_NOS);
+        mapsizes.put("creativeCache", CreativeCache.CREATIVE_CACHE.size());
         if (null != incomingConnectionLimitHandler) {
-            mapsizes.put("IncomingMaxConnections", incomingConnectionLimitHandler.getMaxConnectionsLimit());
+            mapsizes.put("IncomingMaxConnections", incomingConnectionLimitHandler.getMaxConnections());
             mapsizes.put("IncomingDroppedConnections", incomingConnectionLimitHandler.getDroppedConnections());
             mapsizes.put("IncomingActiveConnections", incomingConnectionLimitHandler.getActiveConnections());
         }

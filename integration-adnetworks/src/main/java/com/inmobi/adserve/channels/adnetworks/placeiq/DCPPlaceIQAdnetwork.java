@@ -144,8 +144,8 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 		if (sasParams.getOsId() == HandSetOS.Android.getValue()) { // android
 			os = ANDROID;
 			isApp = true;
-			if ((StringUtils.isEmpty(casInternalRequestParameters.getUidMd5())
-					&& StringUtils.isEmpty(casInternalRequestParameters.getUid()) )) {
+			if (StringUtils.isEmpty(casInternalRequestParameters.getUidMd5())
+					&& StringUtils.isEmpty(casInternalRequestParameters.getUid()) ) {
 				LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
 				return false;
 			}
@@ -292,7 +292,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 
 	@Override
 	public String getId() {
-		return (config.getString("placeiq.advertiserId"));
+		return config.getString("placeiq.advertiserId");
 	}
 
 	private String getCategory() {

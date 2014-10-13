@@ -315,7 +315,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString("lomark.advertiserId"));
+        return config.getString("lomark.advertiserId");
     }
 
     @Override

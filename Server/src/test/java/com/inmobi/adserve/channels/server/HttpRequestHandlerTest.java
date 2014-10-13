@@ -660,8 +660,8 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.getAttribute()).andReturn(cAttributes).anyTimes();
         expect(adNetworkInterface1.getIUrl()).andReturn("iurl").anyTimes();
         ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
-        thirdPartyAdResponse.adStatus = "AD";
-        thirdPartyAdResponse.latency = 12;
+        thirdPartyAdResponse.setAdStatus("AD");
+        thirdPartyAdResponse.setLatency(12);
         expect(adNetworkInterface1.getResponseStruct()).andReturn(thirdPartyAdResponse).anyTimes();
         replay(adNetworkInterface1);
         ChannelSegmentEntity channelSegmentEntity = createMock(ChannelSegmentEntity.class);

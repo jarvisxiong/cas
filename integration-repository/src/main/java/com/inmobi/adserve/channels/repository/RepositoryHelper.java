@@ -25,6 +25,7 @@ import com.inmobi.adserve.channels.query.PricingEngineQuery;
 import com.inmobi.adserve.channels.query.SiteEcpmQuery;
 import com.inmobi.adserve.channels.query.SiteFilterQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
+import org.slf4j.LoggerFactory;
 
 
 @Getter
@@ -45,6 +46,8 @@ public class RepositoryHelper {
     private final CreativeRepository               creativeRepository;
     private final RepositoryStatsProvider          repositoryStatsProvider;
     private final NativeAdTemplateRepository	   nativeAdTemplateRepository;
+
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(RepositoryHelper.class);
 
     public RepositoryHelper(final Builder builder) {
         this.channelRepository = builder.channelRepository;
@@ -128,6 +131,7 @@ public class RepositoryHelper {
         try {
             return channelRepository.query(channelId);
         } catch (RepositoryException ignored) {
+            LOG.debug("Exception while querying Channel Repository, {}", ignored);
         }
         return null;
     }
@@ -136,6 +140,7 @@ public class RepositoryHelper {
         try {
             return channelAdGroupRepository.query(adGroupId);
         } catch (RepositoryException ignored) {
+            LOG.debug("Exception while querying ChannelAdGroup Repository, {}", ignored);
         }
         return null;
     }
@@ -144,6 +149,7 @@ public class RepositoryHelper {
         try {
             return channelSegmentFeedbackRepository.query(adGroupId);
         } catch (RepositoryException ignored) {
+            LOG.debug("Exception while querying ChannelSegmentFeedback Repository, {}", ignored);
         }
         return null;
     }
@@ -152,6 +158,7 @@ public class RepositoryHelper {
         try {
             return channelFeedbackRepository.query(advertiserId);
         } catch (RepositoryException ignored) {
+            LOG.debug("Exception while querying ChannelFeedback Repository, {}", ignored);
         }
         return null;
     }
@@ -160,6 +167,7 @@ public class RepositoryHelper {
         try {
             return siteTaxonomyRepository.query(id);
         } catch (RepositoryException ignored) {
+            LOG.debug("Exception while querying SiteTaxonomy Repository, {}", ignored);
         }
         return null;
     }
@@ -168,6 +176,7 @@ public class RepositoryHelper {
         try {
             return siteMetaDataRepository.query(siteId);
         } catch (RepositoryException ignored) {
+            LOG.debug("Exception while querying SiteMetaData Repository, {}", ignored);
         }
         return null;
     }
@@ -185,6 +194,7 @@ public class RepositoryHelper {
         try {
             return pricingEngineRepository.query(new PricingEngineQuery(country, os));
         } catch (RepositoryException ignored) {
+            LOG.debug("Exception while querying PricingEngine Repository, {}", ignored);
         }
         return null;
     }
@@ -193,6 +203,7 @@ public class RepositoryHelper {
         try {
             return creativeRepository.query(new CreativeQuery(advertiserId, creativeId));
         } catch (RepositoryException ignored) {
+            LOG.debug("Exception while querying Creative Repository, {}", ignored);
         }
         return null;
     }
@@ -200,8 +211,8 @@ public class RepositoryHelper {
     public SiteFilterEntity querySiteFilterRepository(final String siteId, final Integer ruleType) {
         try {
             return siteFilterRepository.query(new SiteFilterQuery(siteId, ruleType));
-        }
-        catch (RepositoryException ignored) {
+        } catch (RepositoryException ignored) {
+            LOG.debug("Exception while querying SiteFilter Repository, {}", ignored);
         }
         return null;
     }
@@ -210,6 +221,7 @@ public class RepositoryHelper {
         try {
             return siteEcpmRepository.query(new SiteEcpmQuery(siteId, countryId, osId));
         } catch (RepositoryException ignored) {
+            LOG.debug("Exception while querying SiteEcpm Repository, {}", ignored);
         }
         return null;
     }
@@ -218,6 +230,7 @@ public class RepositoryHelper {
         try {
             return currencyConversionRepository.query(countryId);
         } catch (RepositoryException ignored) {
+            LOG.debug("Exception while querying CurrencyConversion Repository, {}", ignored);
         }
         return null;
     }
@@ -226,6 +239,7 @@ public class RepositoryHelper {
         try {
             return wapSiteUACRepository.query(id);
         } catch (RepositoryException ignored) {
+            LOG.debug("Exception while querying WapSiteUAC Repository, {}", ignored);
         }
         return null;
     }
@@ -234,6 +248,7 @@ public class RepositoryHelper {
       try {
           return ixAccountMapRepository.query(rpNetworkId);
       } catch (RepositoryException ignored) {
+          LOG.debug("Exception while querying IXAccountMap Repository, {}", ignored);
       }
       return null;
   }
@@ -242,6 +257,7 @@ public class RepositoryHelper {
         try {
             return nativeAdTemplateRepository.query(siteId);
         } catch (RepositoryException ignored) {
+            LOG.debug("Exception while querying NativeAdTemplate Repository, {}", ignored);
         }
         return null;
     }

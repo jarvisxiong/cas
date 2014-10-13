@@ -191,7 +191,7 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString("mobfox.advertiserId"));
+        return config.getString("mobfox.advertiserId");
     }
 
     @XmlRootElement

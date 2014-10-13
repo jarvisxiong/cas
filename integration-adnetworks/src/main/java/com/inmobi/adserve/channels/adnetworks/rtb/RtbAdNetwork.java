@@ -369,8 +369,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             	bidRequestJson = bidRequestJson.replaceFirst("nativeObject", "native");
             }
             LOG.info(traceMarker, "RTB request json is : {}", bidRequestJson);
-        }
-        catch (TException e) {
+        } catch (TException e) {
             LOG.debug(traceMarker, "Could not create json from bidrequest for partner {}", advertiserName);
             LOG.info(traceMarker, "Configure parameters inside rtb returned false {}, exception raised {}", advertiserName, e);
             return false;
@@ -950,8 +949,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             if (!StringUtils.isEmpty(callbackUrl)) {
                 LOG.debug(traceMarker, "inside wn from config");
                 winUrl = callbackUrl;
-            }
-            else if (!StringUtils.isEmpty(nUrl)) {
+            } else if (!StringUtils.isEmpty(nUrl)) {
                 LOG.debug(traceMarker, "inside wn from nurl");
                 winUrl = nUrl;
             }
@@ -980,14 +978,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     		params.put("siteId", this.sasParams.getSiteId());
     		responseContent = nativeResponseMaker.makeResponse(bidResponse, params, repositoryHelper.queryNativeAdTemplateRepository(sasParams.getSiteId()));
 		} catch (Exception e) {
-			
-			if(LOG.isDebugEnabled()){
-				e.printStackTrace();
-			}
+
 			 adStatus = NO_AD;
 			 responseContent = "";
-	         LOG.error("Some exception is caught while filling the native template for partner "+e.getLocalizedMessage(),
-	                    advertiserName, e);
+	         LOG.error("Some exception is caught while filling the native template for partner {}, advertiser = {}, exception = {}",
+                     e.getLocalizedMessage(), advertiserName, e);
 		}
     	
     }
@@ -1023,8 +1018,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             }
 
             return true;
-        }
-        catch (NullPointerException e) {
+        } catch (NullPointerException e) {
             LOG.info(traceMarker, "Could not parse the rtb response from partner: {}, exception thrown {}", this.getName(), e);
             return false;
         }
@@ -1189,8 +1183,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         LOG.debug(traceMarker, "responseContent before replaceMacros is {}", responseContent);
         this.responseContent = replaceRTBMacros(this.responseContent);
         ThirdPartyAdResponse adResponse = getResponseAd();
-        adResponse.response = responseContent;
-        LOG.debug(traceMarker, "responseContent after replaceMacros is {}", getResponseAd().response);
+        adResponse.setResponse(responseContent);
+        LOG.debug(traceMarker, "responseContent after replaceMacros is {}", getResponseAd().getResponse());
     }
 
     @Override

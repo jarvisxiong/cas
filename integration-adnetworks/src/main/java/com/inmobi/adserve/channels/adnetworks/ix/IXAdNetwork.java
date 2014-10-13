@@ -185,7 +185,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         super(baseRequestHandler, serverChannel);
         this.advertiserId = config.getString(advertiserName + ".advertiserId");
         this.urlArg = config.getString(advertiserName + ".urlArg");
-        //this.rtbVer = config.getString(advertiserName + ".rtbVer", "2.0");
         this.callbackUrl = config.getString(advertiserName + ".wnUrlback");
         this.ixMethod = config.getString(advertiserName + ".ixMethod");
         this.wnRequired = config.getBoolean(advertiserName + ".isWnRequired");
@@ -396,7 +395,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             impression.setBanner(banner);
         }
         impression.setProxydemand(proxyDemand);
-        //impression.setBidfloorcur(USD);
         // Set interstitial or not
         if (null != sasParams.getRqAdType() && "int".equalsIgnoreCase(sasParams.getRqAdType())) {
             impression.setInstl(1);
@@ -865,7 +863,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             adStatus = "AD";
 
             if(isNativeRequest()){
-                // TODO add nativeAdBuilding();
+                // TODO add nativeAdBuilding
                 LOG.debug(traceMarker, "we do not support native request");
             } else {
                 nonNativeAdBuilding();
@@ -1108,8 +1106,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 InspectorStats.incrementStatCount(this.getName(), InspectorStrings.INVALID_DSP_ID);
             }
             return result;
-        }
-        catch (NullPointerException e) {
+        } catch (NullPointerException e) {
             LOG.info(traceMarker, "Could not parse the ix response from partner: {}, exception raised {}", this.getName(), e);
             return false;
         }
@@ -1159,8 +1156,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         LOG.debug(traceMarker, "responseContent before replaceMacros is {}", this.responseContent);
         this.responseContent = replaceIXMacros(this.responseContent);
         ThirdPartyAdResponse adResponse = getResponseAd();
-        adResponse.response = responseContent;
-        LOG.debug(traceMarker, "responseContent after replaceMacros is {}", getResponseAd().response);
+        adResponse.setResponse(responseContent);
+        LOG.debug(traceMarker, "responseContent after replaceMacros is {}", getResponseAd().getResponse());
     }
 
 

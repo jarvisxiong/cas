@@ -23,22 +23,23 @@ public class ConnectionLimitHandler extends ChannelDuplexHandler {
     private final AtomicInteger activeConnections  = new AtomicInteger(0);
     @Getter
     private final AtomicInteger droppedConnections = new AtomicInteger(0);
-
-    private final ServerConfig  serverConfig;
-
-	private int maxConnections;
+    @Getter
+	private final int maxConnections;
 
     @Inject
-    public ConnectionLimitHandler(final ServerConfig serverConfig) {
-        this.serverConfig = serverConfig;
-        maxConnections = getMaxConnectionsLimit() * Runtime.getRuntime().availableProcessors();
+    public ConnectionLimitHandler(final ServerConfig serverConfig) throws Exception {
+        maxConnections = serverConfig.getMaxIncomingConnections() * Runtime.getRuntime().availableProcessors();
+        if (maxConnections <= 0) {
+            throw new Exception("Max connection can not be less or equal to zero");
+        }
     }
 
     @Override
     public void channelRegistered(final ChannelHandlerContext ctx) throws Exception {
-        if (maxConnections > 0 && activeConnections.getAndIncrement() > maxConnections) {
+        if (activeConnections.incrementAndGet() > maxConnections) {
             ctx.channel().close();
             LOG.error("Incoming MaxLimit of connections {} exceeded so closing channel", maxConnections);
+            activeConnections.decrementAndGet();
             droppedConnections.incrementAndGet();
 
         }
@@ -47,15 +48,10 @@ public class ConnectionLimitHandler extends ChannelDuplexHandler {
 
     @Override
     public void channelUnregistered(final ChannelHandlerContext ctx) throws Exception {
-        int maxConnections = getMaxConnectionsLimit();
-        if (maxConnections > 0 && activeConnections.decrementAndGet() < 0) {
+        if (activeConnections.decrementAndGet() < 0) {
+            activeConnections.incrementAndGet();
             LOG.error("BUG in ConnectionLimitHandler");
         }
         super.channelUnregistered(ctx);
     }
-
-    public int getMaxConnectionsLimit() {
-        return serverConfig.getMaxIncomingConnections();
-    }
-
 }

@@ -263,7 +263,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString("smaato.advertiserId"));
+        return config.getString("smaato.advertiserId");
     }
 
     @Override

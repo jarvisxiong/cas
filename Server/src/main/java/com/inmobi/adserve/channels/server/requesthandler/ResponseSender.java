@@ -177,7 +177,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
 
         LOG.debug("ad received so trying to send ad response");
-        String finalResponse = adResponse.response;
+        String finalResponse = adResponse.getResponse();
         if (sasParams.getSlot() != null && SlotSizeMapping.getDimension(Long.valueOf(sasParams.getSlot())) != null) {
             LOG.debug("slot served is {}", sasParams.getSlot());
             if (getResponseFormat() == ResponseFormat.XHTML) {
@@ -193,16 +193,16 @@ public class ResponseSender extends HttpRequestHandlerBase {
             if (getResponseFormat() == ResponseFormat.XHTML) {
                 finalResponse = NO_AD_XHTML;
             }
-            sendResponse(HttpResponseStatus.OK, finalResponse, adResponse.responseHeaders, serverChannel);
+            sendResponse(HttpResponseStatus.OK, finalResponse, adResponse.getResponseHeaders(), serverChannel);
             return;
         }
 
         if (sasParams.getDst() == DCP.getValue()) {
-            sendResponse(HttpResponseStatus.OK, finalResponse, adResponse.responseHeaders, serverChannel);
+            sendResponse(HttpResponseStatus.OK, finalResponse, adResponse.getResponseHeaders(), serverChannel);
             incrementStatsForFills(sasParams.getDst());
         } else {
             String dstName = DemandSourceType.findByValue(sasParams.getDst()).toString();
-            AdPoolResponse rtbdOrIxResponse = createThriftResponse(adResponse.response);
+            AdPoolResponse rtbdOrIxResponse = createThriftResponse(adResponse.getResponse());
             LOG.debug("{} response json to RE is {}", dstName, rtbdOrIxResponse);
             if (null == rtbdOrIxResponse || !SUPPORTED_RESPONSE_FORMATS.contains(sasParams.getRFormat())) {
                 sendNoAdResponse(serverChannel);
@@ -210,7 +210,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 try {
                     TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
                     byte[] serializedResponse = serializer.serialize(rtbdOrIxResponse);
-                    sendResponse(HttpResponseStatus.OK, serializedResponse, adResponse.responseHeaders, serverChannel);
+                    sendResponse(HttpResponseStatus.OK, serializedResponse, adResponse.getResponseHeaders(), serverChannel);
                     incrementStatsForFills(sasParams.getDst());
                 } catch (TException e) {
                     LOG.error("Error in serializing the adPool response ", e);
@@ -536,7 +536,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
             LOG.debug("reassignRanks iterating for {} and index is {}", adNetwork.getName(), index);
 
             if (adNetwork.isRequestCompleted()) {
-                if (adNetwork.getResponseAd().responseStatus == ThirdPartyAdResponse.ResponseStatus.SUCCESS) {
+                if (adNetwork.getResponseAd().getResponseStatus() == ThirdPartyAdResponse.ResponseStatus.SUCCESS) {
                     // Sends the response if request is completed for the
                     // specific adapter.
                     sendAdResponse(adNetwork, serverChannel);
@@ -676,7 +676,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
         ChannelSegment segment = this.getRankList().get(rankIndex);
         while (segment.getAdNetworkInterface().isRequestCompleted()) {
-            if (segment.getAdNetworkInterface().getResponseAd().responseStatus == ResponseStatus.SUCCESS) {
+            if (segment.getAdNetworkInterface().getResponseAd().getResponseStatus() == ResponseStatus.SUCCESS) {
                 this.sendAdResponse(segment.getAdNetworkInterface(), channel);
                 break;
             }
@@ -697,7 +697,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
             return;
         }
         LOG.debug("the channel is eligible for processing");
-        if (adNetworkInterface.getResponseAd().responseStatus == ThirdPartyAdResponse.ResponseStatus.SUCCESS) {
+        if (adNetworkInterface.getResponseAd().getResponseStatus() == ThirdPartyAdResponse.ResponseStatus.SUCCESS) {
             sendAdResponse(adNetworkInterface, channel);
             cleanUp();
         } else if (isLastEntry(adNetworkInterface)) {
@@ -713,12 +713,12 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
         private String[] formats;
 
-        private static final Map<String, ResponseFormat> stringToFormatMap = Maps.newHashMap();
+        private static final Map<String, ResponseFormat> STRING_TO_FORMAT_MAP = Maps.newHashMap();
 
         static {
             for (ResponseFormat responseFormat : ResponseFormat.values()) {
                 for (String format : responseFormat.formats) {
-                    stringToFormatMap.put(format, responseFormat);
+                    STRING_TO_FORMAT_MAP.put(format, responseFormat);
                 }
             }
 
@@ -729,7 +729,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
 
         public static ResponseFormat getValue(final String format) {
-            return stringToFormatMap.get(format.toLowerCase());
+            return STRING_TO_FORMAT_MAP.get(format.toLowerCase());
         }
 
     }

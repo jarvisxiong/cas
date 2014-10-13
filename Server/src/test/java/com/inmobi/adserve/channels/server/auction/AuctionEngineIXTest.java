@@ -113,7 +113,7 @@ public class AuctionEngineIXTest {
 
         AdNetworkInterface mockAdnetworkInterface = createMock(IXAdNetwork.class);
         ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
-        thirdPartyAdResponse.adStatus = "AD";
+        thirdPartyAdResponse.setAdStatus("AD");
         expect(mockAdnetworkInterface.getAdStatus()).andReturn("AD").anyTimes();
         expect(mockAdnetworkInterface.getResponseStruct()).andReturn(thirdPartyAdResponse).anyTimes();
         expect(mockAdnetworkInterface.getSecondBidPriceInUsd()).andReturn(4d).anyTimes();

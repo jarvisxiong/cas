@@ -204,6 +204,6 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString("httpool.advertiserId"));
+        return config.getString("httpool.advertiserId");
     }
 }

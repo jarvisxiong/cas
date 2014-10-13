@@ -61,7 +61,7 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString("openx.advertiserId"));
+        return config.getString("openx.advertiserId");
     }
 
     // get URI

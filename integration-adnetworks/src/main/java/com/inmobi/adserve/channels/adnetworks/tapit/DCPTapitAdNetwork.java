@@ -185,6 +185,6 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
 
 	@Override
 	public String getId() {
-		return (config.getString("tapit.advertiserId"));
+		return config.getString("tapit.advertiserId");
 	}
 }

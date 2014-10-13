@@ -190,7 +190,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString("mable.advertiserId"));
+        return config.getString("mable.advertiserId");
     }
 
     @Override

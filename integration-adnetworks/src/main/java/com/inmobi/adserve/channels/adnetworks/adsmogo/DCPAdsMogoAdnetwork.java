@@ -101,10 +101,17 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
         }
         isApp = (StringUtils.isBlank(sasParams.getSource()) || WAP
 				.equalsIgnoreCase(sasParams.getSource())) ? false : true;
+/*
+        Integer sasParamsOsId = sasParams.getOsId();
+        if (sasParamsOsId > 0 && sasParamsOsId < 21) {
+            os = HandSetOS.values()[sasParamsOsId - 1].toString();
+        }
+*/
 		if (isApp && StringUtils.isEmpty(getUid())) {
 			LOG.debug("mandatory parameter udid is missing for APP traffic in AdsMogo so exiting adapter");
 			return false;
 		}
+
         return true;
     }
 
@@ -249,7 +256,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString("adsmogo.advertiserId"));
+        return config.getString("adsmogo.advertiserId");
     }
     
     @Override

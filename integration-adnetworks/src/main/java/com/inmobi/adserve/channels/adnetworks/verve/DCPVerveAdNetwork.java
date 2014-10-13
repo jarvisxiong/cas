@@ -238,6 +238,6 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
 
 	@Override
 	public String getId() {
-		return (config.getString("verve.advertiserId"));
+		return config.getString("verve.advertiserId");
 	}
 }

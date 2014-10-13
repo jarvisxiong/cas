@@ -261,6 +261,6 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString("huntmads.advertiserId"));
+        return config.getString("huntmads.advertiserId");
     }
 }

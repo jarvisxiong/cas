@@ -462,13 +462,13 @@ public class RtbAdnetworkTest extends TestCase {
         rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
         TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
         rtbAdNetwork.parseResponse(serializer.toString(bidResponse), HttpResponseStatus.OK);
-        assertEquals(responseAdm.toString(), rtbAdNetwork.responseContent);
+        assertEquals(responseAdm.toString(), rtbAdNetwork.getResponseContent());
         rtbAdNetwork.setEncryptedBid("0.23");
         rtbAdNetwork.setSecondBidPrice(0.23);
         String afterMacros = rtbAdNetwork.replaceRTBMacros(responseAdm.toString());
-        assertEquals(afterMacros, rtbAdNetwork.responseContent);
+        assertEquals(afterMacros, rtbAdNetwork.getResponseContent());
         rtbAdNetwork.parseResponse(str.toString(), HttpResponseStatus.NOT_FOUND);
-        assertEquals("", rtbAdNetwork.responseContent);
+        assertEquals("", rtbAdNetwork.getResponseContent());
     }
 
     @Test
@@ -493,11 +493,11 @@ public class RtbAdnetworkTest extends TestCase {
         rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
         TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
         rtbAdNetwork.parseResponse(serializer.toString(bidResponse), HttpResponseStatus.OK);
-        assertEquals(responseAdm.toString(), rtbAdNetwork.responseContent);
+        assertEquals(responseAdm.toString(), rtbAdNetwork.getResponseContent());
         rtbAdNetwork.setEncryptedBid("0.23");
         rtbAdNetwork.setSecondBidPrice(0.23);
         String afterMacros = rtbAdNetwork.replaceRTBMacros(responseAdm.toString());
-        assertEquals(afterMacros, rtbAdNetwork.responseContent);
+        assertEquals(afterMacros, rtbAdNetwork.getResponseContent());
     }
 
     @Test
@@ -537,9 +537,9 @@ public class RtbAdnetworkTest extends TestCase {
 
         // Verify that new impression id is used in the generate response.
         // 5 times = 1 impression url + 2 beacon url + 2 click url
-        assertEquals(5, StringUtils.countMatches(rtbAdNetwork.responseContent, newImpressionId));
+        assertEquals(5, StringUtils.countMatches(rtbAdNetwork.getResponseContent(), newImpressionId));
 
         // Old impression id should not be used.
-        assertEquals(0, StringUtils.countMatches(rtbAdNetwork.responseContent, oldImpressionId));
+        assertEquals(0, StringUtils.countMatches(rtbAdNetwork.getResponseContent(), oldImpressionId));
     }
 }

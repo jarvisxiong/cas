@@ -12,14 +12,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 public class CreativeCache {
-    public final static ConcurrentHashMap<String, HashSet<String>> creativeCache = new ConcurrentHashMap<String, HashSet<String>>();
+    public final static ConcurrentHashMap<String, HashSet<String>> CREATIVE_CACHE = new ConcurrentHashMap<String, HashSet<String>>();
 
     private final Object lock = new Object();
 
     @GuardedBy("lock")
     public boolean isPresentInCache(String advertiserId, String creativeId) {
         synchronized (lock) {
-            Set<String> creatives = creativeCache.get(advertiserId);
+            Set<String> creatives = CREATIVE_CACHE.get(advertiserId);
             return null != creatives && creatives.contains(creativeId);
         }
     }
@@ -27,10 +27,10 @@ public class CreativeCache {
     @GuardedBy("lock")
     public void addToCache(String advertiserId, String creativeId) {
         synchronized (lock) {
-            HashSet<String> creatives = creativeCache.get(advertiserId);
+            HashSet<String> creatives = CREATIVE_CACHE.get(advertiserId);
             if (null == creatives) {
                 creatives = new HashSet<String>();
-                creativeCache.put(advertiserId, creatives);
+                CREATIVE_CACHE.put(advertiserId, creatives);
             }
             creatives.add(creativeId);
         }
@@ -39,7 +39,7 @@ public class CreativeCache {
     @GuardedBy("lock")
     public void removeFromCache(String advertiserId, String creativeId) {
         synchronized (lock) {
-            HashSet<String> creatives = creativeCache.get(advertiserId);
+            HashSet<String> creatives = CREATIVE_CACHE.get(advertiserId);
             if (null != creatives) {
                 creatives.remove(creativeId);
             }

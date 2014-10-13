@@ -92,8 +92,7 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
                 || null == SlotSizeMapping.getDimension((long) sasParams.getSlot())) {
             LOG.debug("Mandatory parameters missing for Marimedia so exiting adapter");
             return false;
-        }
-        else {
+        } else {
             Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
@@ -235,15 +234,13 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
                 JSONObject ad = new JSONObject(response);
 
                 // Banner or Interstitial.
-                if (ad.getString("adType").equalsIgnoreCase("banner")) {
+                if ("banner".equalsIgnoreCase(ad.getString("adType"))) {
                     String imageUrl = ad.getString("imageUrl");
                     context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, imageUrl);
-                }
-                else if( ad.getString("adType").equalsIgnoreCase("html")) {
+                } else if("html".equalsIgnoreCase(ad.getString("adType"))) {
                     String htmlUrl = ad.getString("htmlUrl");
                     context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, htmlUrl);
-                }
-                else {
+                } else {
                     // Other format.
                     // adType is "video" or "empty".
                     adStatus = "NO_AD";
@@ -268,7 +265,7 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = "AD";
             } catch (Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from Marimedia");
+                LOG.info("Error parsing response from Marimedia, exception {}", exception);
                 LOG.info("Response from Marimedia {}", response);
             }
         }
@@ -281,7 +278,7 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString("marimedia.advertiserId"));
+        return config.getString("marimedia.advertiserId");
     }
 
     @Override

@@ -68,7 +68,7 @@ public class LoggingTest extends TestCase {
         List<ChannelSegment> rankList = createMock(ArrayList.class);
         AdNetworkInterface mockAdnetworkInterface = createMock(DCPTapitAdNetwork.class);
         ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
-        thirdPartyAdResponse.adStatus = "AD";
+        thirdPartyAdResponse.setAdStatus("AD");
         expect(mockAdnetworkInterface.getResponseStruct()).andReturn(thirdPartyAdResponse).anyTimes();
         expect(mockAdnetworkInterface.getCreativeType()).andReturn(ADCreativeType.BANNER).anyTimes();
         expect(mockAdnetworkInterface.getName()).andReturn("DummyAdNetwork1").anyTimes();
@@ -100,7 +100,7 @@ public class LoggingTest extends TestCase {
         List<ChannelSegment> rankList = createMock(ArrayList.class);
         AdNetworkInterface mockAdnetworkInterface = createMock(DCPTapitAdNetwork.class);
         ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
-        thirdPartyAdResponse.adStatus = "AD";
+        thirdPartyAdResponse.setAdStatus("AD");
         expect(mockAdnetworkInterface.getResponseStruct()).andReturn(thirdPartyAdResponse).anyTimes();
         expect(mockAdnetworkInterface.getName()).andReturn("DummyAdNetwork2").anyTimes();
         expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
@@ -132,7 +132,7 @@ public class LoggingTest extends TestCase {
         List<ChannelSegment> rankList = createMock(ArrayList.class);
         AdNetworkInterface mockAdnetworkInterface = createMock(DCPTapitAdNetwork.class);
         ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
-        thirdPartyAdResponse.adStatus = "AD";
+        thirdPartyAdResponse.setAdStatus("AD");
         expect(mockAdnetworkInterface.getResponseStruct()).andReturn(thirdPartyAdResponse).anyTimes();
         expect(mockAdnetworkInterface.getName()).andReturn("DummyAdNetwork2").anyTimes();
         expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
@@ -164,7 +164,7 @@ public class LoggingTest extends TestCase {
         List<ChannelSegment> rankList = createMock(ArrayList.class);
         AdNetworkInterface mockAdnetworkInterface = createMock(DCPTapitAdNetwork.class);
         ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
-        thirdPartyAdResponse.adStatus = "AD";
+        thirdPartyAdResponse.setAdStatus("AD");
         expect(mockAdnetworkInterface.getResponseStruct()).andReturn(thirdPartyAdResponse).anyTimes();
         expect(mockAdnetworkInterface.getName()).andReturn("DummyAdNetwork2").anyTimes();
         expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();

@@ -206,7 +206,7 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString(name + ".advertiserId"));
+        return config.getString(name + ".advertiserId");
     }
 
     @Override

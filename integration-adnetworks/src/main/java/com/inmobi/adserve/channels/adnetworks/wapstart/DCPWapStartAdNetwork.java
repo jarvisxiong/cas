@@ -286,7 +286,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 
 	@Override
 	public String getId() {
-		return (config.getString("wapstart.advertiserId"));
+		return config.getString("wapstart.advertiserId");
 	}
 
 	@Override

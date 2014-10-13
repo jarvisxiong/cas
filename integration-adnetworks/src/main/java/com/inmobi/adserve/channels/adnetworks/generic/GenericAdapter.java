@@ -96,7 +96,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString(advertiserName.concat(MacrosAndStrings.ADVERTISER_ID)));
+        return config.getString(advertiserName.concat(MacrosAndStrings.ADVERTISER_ID));
     }
 
     @Override

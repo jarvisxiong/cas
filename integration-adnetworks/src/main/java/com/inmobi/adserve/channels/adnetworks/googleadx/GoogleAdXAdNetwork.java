@@ -65,7 +65,7 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
 
   @Override
   public String getId() {
-    return (config.getString("googleadx.advertiserId"));
+    return config.getString("googleadx.advertiserId");
   }
 
   @Override
