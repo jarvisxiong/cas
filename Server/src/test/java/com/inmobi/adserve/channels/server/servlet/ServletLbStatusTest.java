@@ -40,9 +40,9 @@ public class ServletLbStatusTest {
         mockStatic(InspectorStats.class);
         ResponseSender mockResponseSender = createMock(ResponseSender.class);
 
-        InspectorStats.incrementStatCount("LbStatus", InspectorStrings.totalRequests);
+        InspectorStats.incrementStatCount("LbStatus", InspectorStrings.TOTAL_REQUESTS);
         expectLastCall().times(1);
-        InspectorStats.incrementStatCount("LbStatus", InspectorStrings.successfulRequests);
+        InspectorStats.incrementStatCount("LbStatus", InspectorStrings.SUCCESSFUL_REQUESTS);
         expectLastCall().times(1);
         mockResponseSender.sendResponse("OK", null);
         expectLastCall().times(1);
@@ -79,7 +79,7 @@ public class ServletLbStatusTest {
                 .andReturn((DefaultFullHttpResponse) response).times(1);
         expect(mockChannel.writeAndFlush(response)).andReturn(mockFuture).times(1);
         expect(mockFuture.addListener(ChannelFutureListener.CLOSE)).andReturn(null).times(1);
-        InspectorStats.incrementStatCount("LbStatus", InspectorStrings.totalRequests);
+        InspectorStats.incrementStatCount("LbStatus", InspectorStrings.TOTAL_REQUESTS);
         expectLastCall().times(1);
 
         replayAll();

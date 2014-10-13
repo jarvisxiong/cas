@@ -67,9 +67,9 @@ public class ServletGetSegmentTest {
 
         expect(mockQueryStringDecoder.parameters()).andReturn(null).times(1);
         expect(mockRequestParser.extractParams(null, "segments")).andThrow(new JSONException("Json Exception"));
-        mockHttpRequestHandler.setTerminationReason(CasConfigUtil.jsonParsingError);
+        mockHttpRequestHandler.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
         expectLastCall().times(1);
-        InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
+        InspectorStats.incrementStatCount(InspectorStrings.JSON_PARSING_ERROR, InspectorStrings.COUNT);
         expectLastCall().times(1);
         mockResponseSender.sendResponse("Incorrect Json", null);
         expectLastCall().times(1);
@@ -92,7 +92,7 @@ public class ServletGetSegmentTest {
 
         expect(mockQueryStringDecoder.parameters()).andReturn(null).times(1);
         expect(mockRequestParser.extractParams(null, "segments")).andReturn(null).times(1);
-        mockHttpRequestHandler.setTerminationReason(CasConfigUtil.jsonParsingError);
+        mockHttpRequestHandler.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
         expectLastCall().times(1);
         mockResponseSender.sendResponse("Incorrect Json", null);
         expectLastCall().times(1);

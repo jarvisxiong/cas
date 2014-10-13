@@ -896,7 +896,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
         String DSPAccountId = ixAccountMapEntity.getInmobiAccountId();
 
-        if(StringUtils.isEmpty(accountId)) {
+        if(StringUtils.isEmpty(DSPAccountId)) {
             LOG.error("Inmobi Account ID is null or empty for Rubicon DSP id: {}", buyer);
             return false;
         }

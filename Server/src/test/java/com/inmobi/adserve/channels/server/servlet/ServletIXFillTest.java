@@ -75,9 +75,9 @@ public class ServletIXFillTest {
         expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).times(1);
         expect(mockHttpHeaders.get("x-mkhoj-tracer")).andReturn("true");
         expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(true).times(1);
-        InspectorStats.incrementStatCount(InspectorStrings.ixRequests);
+        InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
         expectLastCall().times(1);
-        InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
+        InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
         expectLastCall().times(1);
         mockResponseSender.sendNoAdResponse(null);
         expectLastCall().times(1);
@@ -135,9 +135,9 @@ public class ServletIXFillTest {
         mockSASRequestParameters.setImaiBaseUrl(null);
         expectLastCall().times(1);
 
-        InspectorStats.incrementStatCount(InspectorStrings.ixRequests);
+        InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
         expectLastCall().times(1);
-        InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
+        InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
         expectLastCall().times(1);
 
         mockResponseSender.sendNoAdResponse(null);
@@ -210,9 +210,9 @@ public class ServletIXFillTest {
         mockSASRequestParameters.setImaiBaseUrl(null);
         expectLastCall().times(1);
 
-        InspectorStats.incrementStatCount(InspectorStrings.ixRequests);
+        InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
         expectLastCall().times(1);
-        InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
+        InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
         expectLastCall().times(1);
 
         mockResponseSender.sendNoAdResponse(null);
@@ -296,9 +296,9 @@ public class ServletIXFillTest {
         mockSASRequestParameters.setImaiBaseUrl(null);
         expectLastCall().times(1);
 
-        InspectorStats.incrementStatCount(InspectorStrings.ixRequests);
+        InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
         expectLastCall().times(1);
-        InspectorStats.incrementStatCount(InspectorStrings.totalRequests);
+        InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
         expectLastCall().times(1);
 
         mockResponseSender.sendNoAdResponse(null);
