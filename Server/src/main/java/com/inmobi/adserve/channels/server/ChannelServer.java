@@ -93,6 +93,12 @@ public class ChannelServer {
     public static byte                              dataCenterIdCode;
     public static short                             hostIdCode;
     public static String                            dataCentreName;
+    
+    static {
+      // Increase networkaddress cache ttl to avoid thread wait. (SERVOPS-3265)
+      java.security.Security.setProperty("networkaddress.cache.ttl","3600");
+      java.security.Security.setProperty("networkaddress.cache.negative.ttl", "60");
+    }
 
     public static void main(final String[] args) throws Exception {
         configFile=System.getProperty("configFile",DEFAULT_CONFIG_FILE);
