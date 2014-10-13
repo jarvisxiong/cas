@@ -59,6 +59,7 @@ public class ServletGetSegment implements Servlet {
         }
 
         if (null == jObject) {
+            hrh.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
             hrh.responseSender.sendResponse("Incorrect Json", serverChannel);
             return;
         }

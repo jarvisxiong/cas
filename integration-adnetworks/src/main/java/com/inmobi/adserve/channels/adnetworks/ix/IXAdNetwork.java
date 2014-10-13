@@ -874,16 +874,30 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         LOG.debug(traceMarker, "response is {}", responseContent);
     }
 
-
     public boolean updateDSPAccountInfo(String buyer) {
         LOG.debug(traceMarker, "Inside updateDSPAccountInfo");
+
+        Long buyerId;
+        try {
+            buyerId = Long.parseLong(buyer);
+        }
+        catch (NumberFormatException e) {
+            LOG.debug("NumberFormatException: Invalid DSP Buyer ID Format");
+            return false;
+        }
+
         // Get Inmobi account id for the DSP on Rubicon side
-        IXAccountMapEntity ixAccountMapEntity = repositoryHelper.queryIXAccountMapRepository(Long.parseLong(buyer));
+        IXAccountMapEntity ixAccountMapEntity = repositoryHelper.queryIXAccountMapRepository(buyerId);
         if (null == ixAccountMapEntity) {
-            LOG.error("Invalid Rubicon DSP id: DSP id:{}", buyer);
+            LOG.error("Invalid Rubicon DSP id: {}", buyer);
             return false;
         }
         String DSPAccountId = ixAccountMapEntity.getInmobiAccountId();
+
+        if(StringUtils.isEmpty(DSPAccountId)) {
+            LOG.error("Inmobi Account ID is null or empty for Rubicon DSP id: {}", buyer);
+            return false;
+        }
 
         // Get collection of Channel Segment Entities for the particular Inmobi account id
         ChannelAdGroupRepository channelAdGroupRepository = repositoryHelper.getChannelAdGroupRepository();
@@ -894,7 +908,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         Collection<ChannelSegmentEntity> adGroupMap = channelAdGroupRepository.getEntities(DSPAccountId);
 
-        if (adGroupMap.isEmpty()) {
+        if (null == adGroupMap || adGroupMap.isEmpty()) {
             // If collection is empty
             LOG.error("Channel Segment Entity collection for Rubicon DSP is empty: DSP id:{}, inmobi account id:{}", buyer, DSPAccountId);
             return false;
@@ -1022,7 +1036,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
 
-    private String getADMContent(){
+    protected String getADMContent(){
 
         SeatBid seatBid = bidResponse.getSeatbid().get(0);
         Bid bid = seatBid.getBid().get(0);
@@ -1032,7 +1046,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
 
-    private void createWin(VelocityContext velocityContext){
+    protected void createWin(VelocityContext velocityContext){
         if (wnRequired) {
             // setCallbackContent();
             // Win notification is required

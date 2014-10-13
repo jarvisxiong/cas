@@ -187,6 +187,7 @@ public class ChannelServer {
 
             instantiateRepository(logger, configurationLoader);
             CasConfigUtil.init(configurationLoader, repositoryHelper);
+            // TODO: IX_OUTGOING_CONNECTIONS?
             Integer maxIncomingConnections = channelServerHelper.getMaxConnections(
                     ChannelServerStringLiterals.INCOMING_CONNECTIONS, ConnectionType.INCOMING);
             Integer maxRTbdOutGoingConnections = channelServerHelper.getMaxConnections(
@@ -372,6 +373,7 @@ public class ChannelServer {
 
     private static DataCenter getDataCenter() {
         DataCenter colo = DataCenter.ALL;
+        // TODO: Remove UA2?
         if (DataCenter.UA2.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
             colo = DataCenter.UA2;
         } else if (DataCenter.UJ1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {

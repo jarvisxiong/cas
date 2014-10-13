@@ -22,15 +22,15 @@ import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.replay;
 
 
 public class HttpRequestHandlerTest extends TestCase {

@@ -71,7 +71,17 @@
 		</dependency>
 		<dependency>
 			<groupId>org.easymock</groupId>
-			<artifactId>easymockclassextension</artifactId>
+			<artifactId>easymock</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-release-with-junit-easymock-dependencies</artifactId>
+			<type>zip</type>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-core</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
