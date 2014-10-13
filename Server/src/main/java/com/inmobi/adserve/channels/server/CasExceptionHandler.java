@@ -36,36 +36,29 @@ public class CasExceptionHandler extends ChannelInboundHandlerAdapter {
 	}
 
 	/**
-	 * Invoked when an exception occurs whenever channel throws
-	 * closedchannelexception increment the totalterminate means channel is
-	 * closed by party who requested for the ad
+	 * Invoked when an exception occurs whenever:  
+	 * 1) channel throws closedchannelexception increment the totalterminate means channel is closed by party who requested for the ad.
+	 * 2) When timeoutexception occurs, among the partners who gave us the ad, we run the auction from here and return it.
 	 */
 	@Override
 	public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
 		MDC.put("requestId", String.format("0x%08x", ctx.channel().hashCode()));
 
 		if (cause instanceof ReadTimeoutException) {
-
-			LOG.debug(traceMarker, "Channel is open in channelIdle handler");
-			if (responseSender.getRankList() != null) {
-				for (ChannelSegment channelSegment : responseSender.getRankList()) {
-					if ("AD".equals(channelSegment.getAdNetworkInterface().getAdStatus())) {
-						LOG.debug(traceMarker, "Got Ad from {} Top Rank was {}", channelSegment.getAdNetworkInterface().getName(), responseSender.getRankList()
-								.get(0).getAdNetworkInterface().getName());
-						responseSender.sendAdResponse(channelSegment.getAdNetworkInterface(), ctx.channel());
-						return;
-					}
-				}
-			}
-			responseSender.sendNoAdResponse(ctx.channel());
-			// increment the totalTimeout. It means server
-			// could not write the response with in 800 ms
+			// increment the totalTimeout. It means server could not write the response with in the timeout we specified
 			LOG.debug(traceMarker, "inside channel idle event handler for Request channel ID: {}", ctx.channel());
 			InspectorStats.incrementStatCount(InspectorStrings.TOTAL_TIMEOUT);
 			LOG.debug(traceMarker, "server timeout");
 
+			if (responseSender.getRankList() != null) {
+				//We need to send one response from this point, so take the best from here and return it.
+				for (ChannelSegment channelSegment : responseSender.getRankList()) {
+					channelSegment.getAdNetworkInterface().processResponse();
+				}
+				return;
+			}
+			responseSender.sendNoAdResponse(ctx.channel());
 		} else {
-
 			String exceptionString = cause.getClass().getSimpleName();
 			InspectorStats.incrementStatCount(InspectorStrings.CHANNEL_EXCEPTION, exceptionString);
 			InspectorStats.incrementStatCount(InspectorStrings.CHANNEL_EXCEPTION, InspectorStrings.COUNT);

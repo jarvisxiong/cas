@@ -164,6 +164,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     public void setIxPartner(final boolean isIxPartner) { this.isIxPartner = isIxPartner; }
 
+    @Override
     public void processResponse() {
         LOG.debug("Inside process Response for the partner: {}", getName());
         if (isRequestComplete) {
@@ -171,7 +172,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             return;
         }
         LOG.debug("Inside process Response for the partner: {}", getName());
-        getResponseAd();
+        if (isRequestComplete == false) {
+        	getResponseAd();	
+        }
         isRequestComplete = true;
         if (baseRequestHandler.getAuctionEngine().areAllChannelSegmentRequestsComplete()) {
             LOG.debug("areAllChannelSegmentRequestsComplete is true");
