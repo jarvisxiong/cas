@@ -2,19 +2,21 @@ package com.inmobi.adserve.channels.entity;
 
 import com.inmobi.casthrift.ADCreativeType;
 import org.json.JSONObject;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-@Ignore
+@RunWith(PowerMockRunner.class)
 public class ChannelSegmentEntityTest {
 
     public ChannelSegmentEntity.Builder getChannelSegmentEntityBuilder(final String advertiserId,
@@ -27,7 +29,7 @@ public class ChannelSegmentEntityTest {
                                                                               final boolean appUrlEnabled, final boolean interstitialOnly, final boolean nonInterstitialOnly,
                                                                               final boolean stripUdId, final boolean stripZipCode, final boolean stripLatlong,
                                                                               final JSONObject additionalParams, final List<Integer> manufModelTargetingList, final double ecpmBoost,
-                                                                              final Timestamp eCPMBoostDate, final Long[] tod, final long adGroupIncId, final Integer[] AdFormatIds) {
+                                                                              final Date eCPMBoostDate, final Long[] tod, final long adGroupIncId, final Integer[] AdFormatIds) {
         ChannelSegmentEntity.Builder builder = ChannelSegmentEntity.newBuilder();
         builder.setAdvertiserId(advertiserId);
         builder.setAdvertiserId(advertiserId);
@@ -53,7 +55,7 @@ public class ChannelSegmentEntityTest {
         builder.setOsIds(osIds);
         builder.setUdIdRequired(udIdRequired);
         builder.setLatlongRequired(latlongRequired);
-        builder.setStripZipCode(zipCodeRequired);
+        builder.setZipCodeRequired(zipCodeRequired);
         builder.setRestrictedToRichMediaOnly(richMediaOnly);
         builder.setAppUrlEnabled(appUrlEnabled);
         builder.setInterstitialOnly(interstitialOnly);
@@ -86,7 +88,7 @@ public class ChannelSegmentEntityTest {
         final Timestamp modified_on = new Timestamp(15L);
         final String campaignId = "CampaignId";
         final Long[] slotIds = {9L, 15L};
-        final Long[] incIds = {21L, 25L};
+        final Long[] incIds = {21L, 25L, 35L};
         final boolean allTags = true;
         final String pricingModel = "PricingModel";
         final Integer[] siteRatings = {25, 26};
@@ -105,7 +107,7 @@ public class ChannelSegmentEntityTest {
         final JSONObject additionalParams = null;
         final List<Integer> manufModelTargetingList = Arrays.asList(4, 5);
         final double ecpmBoost = 0.5;
-        final Timestamp eCPMBoostDate = new Timestamp(25L);
+        final Date eCPMBoostDate = new Date();
         final Long[] tod = {11L, 12L};
         final long adGroupIncId = 65L;
         final Integer[] adFormatIds = {9, 11, 0, -1};
@@ -134,7 +136,10 @@ public class ChannelSegmentEntityTest {
         assertThat(tested.isAllTags(), is(equalTo(allTags)));
         assertThat(tested.getPricingModel(), is(equalTo(pricingModel)));
         assertThat(tested.getSiteRatings(), is(equalTo(siteRatings)));
-        //assertThat(tested.getTargetingPlatform(), is(equalTo(targetingPlatform)));
+
+        ArrayList<Integer> targetingPlatformList = new ArrayList<>();
+        targetingPlatformList.add(targetingPlatform);
+        assertThat(tested.getTargetingPlatform(), is(equalTo(targetingPlatformList)));
         //assertThat(tested.getOsIds(), is(equalTo(osIds)));
         assertThat(tested.isUdIdRequired(), is(equalTo(udIdRequired)));
         assertThat(tested.isZipCodeRequired(), is(equalTo(zipCodeRequired)));
@@ -149,7 +154,7 @@ public class ChannelSegmentEntityTest {
         assertThat(tested.getAdditionalParams(), is(equalTo(additionalParams)));
         assertThat(tested.getManufModelTargetingList(), is(equalTo(manufModelTargetingList)));
         assertThat(tested.getEcpmBoost(), is(equalTo(ecpmBoost)));
-       // assertThat(tested.getEcpmBoostExpiryDate(), is(equalTo(eCPMBoostDate)));
+        assertThat(tested.getEcpmBoostExpiryDate(), is(equalTo(eCPMBoostDate)));
         assertThat(tested.getTod(), is(equalTo(tod)));
         assertThat(tested.getAdgroupIncId(), is(equalTo(adGroupIncId)));
         assertThat(tested.getAdFormatIds(), is(equalTo(adFormatIds)));
@@ -159,7 +164,7 @@ public class ChannelSegmentEntityTest {
         assertThat(tested.getIncId(ADCreativeType.NATIVE), is(equalTo(incIds[0])));
         assertThat(tested.getIncId(ADCreativeType.INTERSTITIAL_VIDEO), is(equalTo(incIds[1])));
         assertThat(tested.getIncId(ADCreativeType.BANNER), is(equalTo(incIds[2])));
-        //assertThat(tested.getIncId(ADCreativeType.findByValue(-1)), is(equalTo("")));
+        assertThat(tested.getIncId(ADCreativeType.findByValue(-1)), is(equalTo(-1L)));
         assertThat(tested.getAdId(ADCreativeType.NATIVE), is(equalTo(adIds[0])));
         assertThat(tested.getAdId(ADCreativeType.INTERSTITIAL_VIDEO), is(equalTo(adIds[1])));
         assertThat(tested.getAdId(ADCreativeType.BANNER), is(equalTo(adIds[2])));

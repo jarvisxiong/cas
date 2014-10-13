@@ -76,18 +76,13 @@ public class RepositoryHelperTest {
     public static SiteEcpmQuery                    mockSiteEcpmQuery = createMock(SiteEcpmQuery.class);
 
     public static RepositoryHelper tested;
-    public static String query1 = "query1";
-    public static String query2 = "query2";
-    public static int    query3 = 5;
-    public static long   query4 = 6;
+    public static String  query1 = "query1";
+    public static String  query2 = "query2";
+    public static Integer query3 = 5;
+    public static long    query4 = 6;
 
     @BeforeClass
     public static void setUp () throws Exception{
-        expectNew(PricingEngineQuery.class, query3, query3).andReturn(mockPricingEngineQuery).times(2);
-        expectNew(CreativeQuery.class, query1, query2).andReturn(mockCreativeQuery).times(2);
-        expectNew(SiteFilterQuery.class, query1, query3).andReturn(mockSiteFilterQuery).times(2);
-        expectNew(SiteEcpmQuery.class, query1, query3, query3).andReturn(mockSiteEcpmQuery).times(2);
-
         expect(mockChannelRepository.query(query1))
                 .andThrow(new RepositoryException("Repository Exception")).times(1)
                 .andReturn(mockChannelEntity).times(1);
@@ -134,6 +129,17 @@ public class RepositoryHelperTest {
         expect(mockNativeAdTemplateRepository.query(query1))
                 .andThrow(new RepositoryException("Repository Exception")).times(1)
                 .andReturn(mockNativeAdTemplateEntity).times(1);
+        replayAll();
+
+        expectNew(PricingEngineQuery.class, new Class[]{Integer.class, Integer.class}, query3, query3)
+                .andReturn(mockPricingEngineQuery).times(2);
+        expectNew(CreativeQuery.class, new Class[]{String.class, String.class}, query1, query2)
+                .andReturn(mockCreativeQuery).times(2);
+        expectNew(SiteFilterQuery.class, new Class[]{String.class, Integer.class}, query1, query3)
+                .andReturn(mockSiteFilterQuery).times(2);
+        expectNew(SiteEcpmQuery.class, new Class[]{String.class, Integer.class, Integer.class} ,query1, query3, query3)
+                .andReturn(mockSiteEcpmQuery).times(2);
+
         replayAll();
 
         RepositoryHelper.Builder builder = RepositoryHelper.newBuilder();
@@ -221,15 +227,15 @@ public class RepositoryHelperTest {
         assertThat(tested.querySiteAerospikeFeedbackRepository(query1, query3), is(equalTo(mockSegmentAdGroupFeedbackEntity)));
     }
 
-    @Test
     @Ignore
+    @Test
     public void testQueryPricingEngineRepository() throws Exception {
         assertThat(tested.queryPricingEngineRepository(query3, query3), is(equalTo(null)));
         assertThat(tested.queryPricingEngineRepository(query3, query3), is(equalTo(mockPricingEngineEntity)));
     }
 
-    @Test
     @Ignore
+    @Test
     public void testQueryCreativeRepository() throws Exception {
         assertThat(tested.queryCreativeRepository(query1, query2), is(equalTo(null)));
         assertThat(tested.queryCreativeRepository(query1, query2), is(equalTo(mockCreativeEntity)));

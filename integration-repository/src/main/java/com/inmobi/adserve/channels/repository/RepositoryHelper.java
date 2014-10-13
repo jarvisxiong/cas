@@ -181,7 +181,7 @@ public class RepositoryHelper {
         return siteAerospikeFeedbackRepository.query(siteId);
     }
 
-    public PricingEngineEntity queryPricingEngineRepository(final int country, final int os) {
+    public PricingEngineEntity queryPricingEngineRepository(final Integer country, final Integer os) {
         try {
             return pricingEngineRepository.query(new PricingEngineQuery(country, os));
         } catch (RepositoryException ignored) {
