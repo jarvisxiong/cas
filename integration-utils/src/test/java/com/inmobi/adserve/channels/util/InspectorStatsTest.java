@@ -122,44 +122,4 @@ public class InspectorStatsTest {
 
         verifyAll();
     }
-
-    /*@Test
-    public void testIncrementStatCount() throws Exception {
-
-    }
-
-    @Test
-    public void testIncrementStatCount2() throws Exception {
-
-    }
-
-    @Test
-    public void testIncrementStatCount3() throws Exception {
-
-    }
-
-    @Test
-    public void testIncrementYammerCount() throws Exception {
-
-    }
-
-    @Test
-    public void testUpdateYammerTimerStats() throws Exception {
-
-    }
-
-    @Test
-    public void testResetTimers() throws Exception {
-
-    }
-
-    @Test
-    public void testGetStatsObj() throws Exception {
-
-    }
-
-    @Test
-    public void testGetStatsString() throws Exception {
-
-    }*/
 }
