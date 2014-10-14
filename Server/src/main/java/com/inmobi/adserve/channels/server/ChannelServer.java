@@ -367,10 +367,7 @@ public class ChannelServer {
 
     private static DataCenter getDataCenter() {
         DataCenter colo = DataCenter.ALL;
-        // TODO: Remove UA2?
-        if (DataCenter.UA2.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
-            colo = DataCenter.UA2;
-        } else if (DataCenter.UJ1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
+        if (DataCenter.UJ1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
             colo = DataCenter.UJ1;
         } else if (DataCenter.UH1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
             colo = DataCenter.UH1;
