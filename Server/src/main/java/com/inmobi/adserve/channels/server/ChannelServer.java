@@ -181,22 +181,6 @@ public class ChannelServer {
 
             instantiateRepository(logger, configurationLoader);
             CasConfigUtil.init(configurationLoader, repositoryHelper);
-            // TODO: IX_OUTGOING_CONNECTIONS?
-            Integer maxIncomingConnections = channelServerHelper.getMaxConnections(
-                    ChannelServerStringLiterals.INCOMING_CONNECTIONS, ConnectionType.INCOMING);
-            Integer maxRTbdOutGoingConnections = channelServerHelper.getMaxConnections(
-                    ChannelServerStringLiterals.RTBD_OUTGING_CONNECTIONS, ConnectionType.RTBD_OUTGOING);
-            Integer maxDCpOutGoingConnections = channelServerHelper.getMaxConnections(
-                    ChannelServerStringLiterals.DCP_OUTGOING_CONNECTIONS, ConnectionType.DCP_OUTGOING);
-            if (null != maxIncomingConnections) {
-                CasConfigUtil.getServerConfig().setProperty("incomingMaxConnections", maxIncomingConnections);
-            }
-            if (null != maxRTbdOutGoingConnections) {
-                CasConfigUtil.getServerConfig().setProperty("rtbOutGoingMaxConnections", maxRTbdOutGoingConnections);
-            }
-            if (null != maxDCpOutGoingConnections) {
-                CasConfigUtil.getServerConfig().setProperty("dcpOutGoingMaxConnections", maxDCpOutGoingConnections);
-            }
 
             // Configure the netty server.
             Injector injector = LifecycleInjector

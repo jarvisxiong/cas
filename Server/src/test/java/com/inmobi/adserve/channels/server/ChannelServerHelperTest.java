@@ -100,27 +100,4 @@ public class ChannelServerHelperTest{
         assertThat(channelServerHelper.getDataCentreName("host.name"), is(equalTo(dummyHostName)));
         System.clearProperty("host.name");
     }
-
-    @Test
-    public void testGetMaxConnectionsNoKey() {
-        ConnectionType dummyConnectionType = ConnectionType.DCP_OUTGOING;
-        String dummyConnectionsKey = ChannelServerStringLiterals.DCP_OUTGOING_CONNECTIONS;
-        assertThat(channelServerHelper.getMaxConnections(dummyConnectionsKey, dummyConnectionType), is(equalTo(null)));
-    }
-
-    @Test
-    public void testGetMaxConnectionsWithKey() {
-        ConnectionType dummyConnectionType = ConnectionType.RTBD_OUTGOING;
-        String dummyConnectionsKey = ChannelServerStringLiterals.RTBD_OUTGING_CONNECTIONS;
-        System.setProperty(dummyConnectionsKey, "100");
-        assertThat(channelServerHelper.getMaxConnections(dummyConnectionsKey, dummyConnectionType), is(equalTo(100)));
-    }
-
-    @Test
-    public void testGetMaxConnectionsWithAnotherKey() {
-        ConnectionType dummyConnectionType = ConnectionType.INCOMING;
-        String dummyConnectionsKey = ChannelServerStringLiterals.INCOMING_CONNECTIONS;
-        System.setProperty(dummyConnectionsKey, "100");
-        assertThat(channelServerHelper.getMaxConnections(dummyConnectionsKey, dummyConnectionType), is(equalTo(100)));
-    }
 }
