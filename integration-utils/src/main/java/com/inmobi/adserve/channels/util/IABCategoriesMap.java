@@ -14,8 +14,8 @@ public class IABCategoriesMap implements IABCategoriesInterface {
 
     public static final Long                     FAMILY_SAFE_BLOCK_CATEGORIES = 10000L;
     public static final Long                     PERFORMANCE_BLOCK_CATEGORIES = 10001L;
-    static {
 
+    static {
         categoriesToIABMapping.put(1L, new String[] { "IAB24" });
         categoriesToIABMapping.put(2L, new String[] { "IAB1-1", "IAB5" });
         categoriesToIABMapping.put(3L, new String[] { "IAB4", "IAB19-15", "IAB3", "IAB5-15" });
@@ -108,7 +108,11 @@ public class IABCategoriesMap implements IABCategoriesInterface {
 
     @Override
     public List<String> getIABCategories(Long category) {
-        return new ArrayList<String>(Arrays.asList(categoriesToIABMapping.get(category)));
+        String[] categories = categoriesToIABMapping.get(category);
+        if (null != categories)
+            return new ArrayList<String>(Arrays.asList(categories));
+        else
+            return null;
     }
 
     @Override

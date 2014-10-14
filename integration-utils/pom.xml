@@ -112,6 +112,11 @@
 			<artifactId>testng</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-release-with-junit-easymock-dependencies</artifactId>
+			<type>zip</type>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
