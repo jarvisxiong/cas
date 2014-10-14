@@ -6,6 +6,7 @@ import io.netty.handler.timeout.ReadTimeoutException;
 
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
+import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -50,13 +51,27 @@ public class CasExceptionHandler extends ChannelInboundHandlerAdapter {
 			InspectorStats.incrementStatCount(InspectorStrings.TOTAL_TIMEOUT);
 			LOG.debug(traceMarker, "server timeout");
 
-			if (responseSender.getRankList() != null) {
+			//This list contains rtb or ix channel segments
+			List<ChannelSegment> unfilteredChannelSegmentList = responseSender.getAuctionEngine().getUnfilteredChannelSegmentList();
+
+			//This contains dcp channel segments
+			List<ChannelSegment> dcpChannelSegmentList = responseSender.getRankList();
+			
+			List<ChannelSegment> segmentList = dcpChannelSegmentList;
+			
+			//The request is for either dcp or rtb or ix, hence only one will be valid.
+			if(unfilteredChannelSegmentList != null && unfilteredChannelSegmentList.size() > 0){
+				segmentList = unfilteredChannelSegmentList;
+			}
+			
+			if (segmentList != null && segmentList.size() > 0) {
 				//We need to send one response from this point, so take the best from here and return it.
-				for (ChannelSegment channelSegment : responseSender.getRankList()) {
+				for (ChannelSegment channelSegment : segmentList) {
 					channelSegment.getAdNetworkInterface().processResponse();
 				}
 				return;
 			}
+			
 			responseSender.sendNoAdResponse(ctx.channel());
 		} else {
 			String exceptionString = cause.getClass().getSimpleName();

@@ -101,7 +101,7 @@ public class ServerConfig implements CasConfig {
 	}
 
 	public int getServerTimeoutInMillisForRTB() {
-		return serverConfiguration.getInt("serverTimeoutMillisForRTB", 175);
+		return serverConfiguration.getInt("serverTimeoutMillisForRTB", 170);
 	}
 
 	public int getServerTimeoutInMillisForDCP() {
