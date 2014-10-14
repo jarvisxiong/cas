@@ -296,42 +296,42 @@ public class ThriftRequestParser {
 
     private void setUserIdParams(final CasInternalRequestParameters parameter, final UidParams uidParams) {
         Map<UidType, String> uidMap = uidParams.getRawUidValues();
-        parameter.uidADT = uidParams.isLimitIOSAdTracking() ? "0" : "1";
-        parameter.uuidFromUidCookie = uidParams.getUuidFromUidCookie();
+        parameter.setUidADT(uidParams.isLimitIOSAdTracking() ? "0" : "1");
+        parameter.setUuidFromUidCookie(uidParams.getUuidFromUidCookie());
 
         for (Entry<UidType, String> entry : uidMap.entrySet()) {
             UidType uidType = entry.getKey();
             String uidValue = entry.getValue();
             switch (uidType) {
                 case UDID:
-                    parameter.uid = uidValue;
-                    if (StringUtils.isNotBlank(parameter.uid) && parameter.uid.length() != 32) {
-                        parameter.uid = MD5(parameter.uid);
+                    parameter.setUid(uidValue);
+                    if (StringUtils.isNotBlank(parameter.getUid()) && parameter.getUid().length() != 32) {
+                        parameter.setUid(MD5(parameter.getUid()));
                     }
                     break;
                 case O1:
-                    parameter.uidO1 = uidValue;
+                    parameter.setUidO1(uidValue);
                     break;
                 case UM5:
-                    parameter.uidMd5 = uidValue;
+                    parameter.setUidMd5(uidValue);
                     break;
                 case IDA:
-                    parameter.uidIFA = uidValue;
+                    parameter.setUidIFA(uidValue);
                     break;
                 case SO1:
-                    parameter.uidSO1 = uidValue;
+                    parameter.setUidSO1(uidValue);
                     break;
                 case IDV:
-                    parameter.uidIFV = uidValue;
+                    parameter.setUidIFV(uidValue);
                     break;
                 case IUDS1:
-                    parameter.uidIDUS1 = uidValue;
+                    parameter.setUidIDUS1(uidValue);
                     break;
                 case WC:
-                    parameter.uidWC = uidValue;
+                    parameter.setUidWC(uidValue);
                     break;
                 case GPID:
-                    parameter.gpid = uidValue;
+                    parameter.setGpid(uidValue);
                     break;
                 default:
                     break;
@@ -349,6 +349,7 @@ public class ThriftRequestParser {
             }
             return sb.toString();
         } catch (java.security.NoSuchAlgorithmException ignored) {
+            LOG.debug("Exception {} raised with String {} in MD5", ignored, md5);
         }
         return null;
     }

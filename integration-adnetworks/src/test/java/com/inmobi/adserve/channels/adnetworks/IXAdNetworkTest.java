@@ -186,8 +186,8 @@ public class IXAdNetworkTest extends TestCase {
         sasParams.setSource("wap");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
-        casInternalRequestParameters.impressionId = "4f8d98e2-4bbd-40bc-8795-22da170700f9";
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
+        casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         String externalSiteKey = "f6wqjq1r5v";
         String beaconUrl = "";
@@ -221,7 +221,7 @@ public class IXAdNetworkTest extends TestCase {
             sasParams.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
             sasParams.setUserAgent(
                     "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-            casInternalRequestParameters.impressionId = "4f8d98e2-4bbd-40bc-8795-22da170700f9";
+            casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
             adapterCreated = ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
 
             assertFalse(adapterCreated);
@@ -257,7 +257,7 @@ public class IXAdNetworkTest extends TestCase {
             sasParams.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
             sasParams.setUserAgent(
                     "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-            casInternalRequestParameters.impressionId = "4f8d98e2-4bbd-40bc-8795-22da170700f9";
+            casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
             adapterCreated = ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
 
             assertFalse(adapterCreated);
@@ -295,7 +295,7 @@ public class IXAdNetworkTest extends TestCase {
             sasParams.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
             sasParams.setUserAgent(
                     "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-            casInternalRequestParameters.impressionId = "4f8d98e2-4bbd-40bc-8795-22da170700f9";
+            casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
 
             //Test case for transparency false
             adapterCreated = ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
@@ -377,7 +377,7 @@ public class IXAdNetworkTest extends TestCase {
             sasParams.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
             sasParams.setUserAgent(
                     "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-            casInternalRequestParameters.impressionId = "4f8d98e2-4bbd-40bc-8795-22da170700f9";
+            casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
 
             sasParams.setSource("wap");
             adapterCreated = ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
@@ -444,7 +444,7 @@ public class IXAdNetworkTest extends TestCase {
             sasParams.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
             sasParams.setUserAgent(
                     "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-            casInternalRequestParameters.impressionId = "4f8d98e2-4bbd-40bc-8795-22da170700f9";
+            casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
             adapterCreated = ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
 
             assertTrue(adapterCreated);

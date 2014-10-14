@@ -23,7 +23,7 @@ public class AuctionIdFilter extends AbstractAuctionFilter {
 
     @Override
     protected boolean failedInFilter(ChannelSegment rtbSegment, CasInternalRequestParameters casInternalRequestParameters) {
-        if (casInternalRequestParameters.auctionId.equalsIgnoreCase(rtbSegment.getAdNetworkInterface()
+        if (casInternalRequestParameters.getAuctionId().equalsIgnoreCase(rtbSegment.getAdNetworkInterface()
                 .getAuctionId())) {
             return false;
         }

@@ -111,8 +111,7 @@ public class MatchSegments {
                 country = countryId;
             }
 
-            return (matchSegments(slot, getCategories(sasParams), country, targetingPlatform, siteRating, osId,
-                    sasParams, traceMarker));
+            return matchSegments(slot, getCategories(sasParams), country, targetingPlatform, siteRating, osId, sasParams, traceMarker);
         } catch (NumberFormatException exception) {
             LOG.error(traceMarker, "Error parsing required arguments {}", exception);
             return null;

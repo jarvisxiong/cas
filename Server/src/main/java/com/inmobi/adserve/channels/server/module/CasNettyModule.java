@@ -60,7 +60,7 @@ public class CasNettyModule extends AbstractModule {
 
 	@Provides
 	@Singleton
-	ConnectionLimitHandler incomingConnectionLimitHandler(final ServerConfig serverConfig) {
+	ConnectionLimitHandler incomingConnectionLimitHandler(final ServerConfig serverConfig) throws Exception {
 		return new ConnectionLimitHandler(serverConfig);
 	}
 

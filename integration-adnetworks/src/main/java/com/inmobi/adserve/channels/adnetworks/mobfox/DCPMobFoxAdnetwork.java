@@ -78,9 +78,9 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
         host = config.getString("mobfox.host");
-        if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
-                && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
-            String[] latlong = casInternalRequestParameters.latLong.split(",");
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
+                && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
@@ -109,21 +109,21 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
         // TODO is [p(url for sites) required?]
         appendQueryParam(url, TRAFFICTYPE, TYPE, false);
         appendQueryParam(url, MRAIDSUPPORT, MRAID_TYPE, false);
-        if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
-            appendQueryParam(url, IFA, casInternalRequestParameters.uidIFA, false);
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())) {
+            appendQueryParam(url, IFA, casInternalRequestParameters.getUidIFA(), false);
         }
-        if (StringUtils.isNotBlank(casInternalRequestParameters.uidSO1)) {
-            appendQueryParam(url, SHA1UDID, casInternalRequestParameters.uidSO1, false);
-        } else if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
-            appendQueryParam(url, SHA1UDID, casInternalRequestParameters.uidO1, false);
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getUidSO1())) {
+            appendQueryParam(url, SHA1UDID, casInternalRequestParameters.getUidSO1(), false);
+        } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
+            appendQueryParam(url, SHA1UDID, casInternalRequestParameters.getUidO1(), false);
         }
-        if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
-            appendQueryParam(url, MD5UDID, casInternalRequestParameters.uidMd5, false);
-        } else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
-            appendQueryParam(url, MD5UDID, casInternalRequestParameters.uid, false);
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
+            appendQueryParam(url, MD5UDID, casInternalRequestParameters.getUidMd5(), false);
+        } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUid())) {
+            appendQueryParam(url, MD5UDID, casInternalRequestParameters.getUid(), false);
         }
-        if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
-            appendQueryParam(url, SHA1UDID, casInternalRequestParameters.uidIDUS1, false);
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
+            appendQueryParam(url, SHA1UDID, casInternalRequestParameters.getUidIDUS1(), false);
         } else {
             String gpid = getGPID();
             if (gpid != null) {
@@ -191,7 +191,7 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString("mobfox.advertiserId"));
+        return config.getString("mobfox.advertiserId");
     }
 
     @XmlRootElement

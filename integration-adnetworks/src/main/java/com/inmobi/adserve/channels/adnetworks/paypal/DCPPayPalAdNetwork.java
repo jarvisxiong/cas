@@ -68,9 +68,9 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
                 return false;
             }
         }
-        if (casInternalRequestParameters.latLong != null
-                && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
-            String[] latlong = casInternalRequestParameters.latLong.split(",");
+        if (casInternalRequestParameters.getLatLong() != null
+                && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
@@ -105,30 +105,30 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
                 url.append("&lat=").append(latitude);
                 url.append("&lng=").append(longitude);
             }
-            if (casInternalRequestParameters.zipCode != null) {
-                url.append("&zip=").append(casInternalRequestParameters.zipCode);
+            if (casInternalRequestParameters.getZipCode() != null) {
+                url.append("&zip=").append(casInternalRequestParameters.getZipCode());
             }
 
             if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
-                if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
-                    url.append("&idfa=").append(casInternalRequestParameters.uidIFA);
-                    url.append("&ate=").append(casInternalRequestParameters.uidADT);
-                } else if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFV)) {
-                    url.append("&idfv=").append(casInternalRequestParameters.uidIFV);
-                    url.append("&ate=").append(casInternalRequestParameters.uidADT);
+                if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())) {
+                    url.append("&idfa=").append(casInternalRequestParameters.getUidIFA());
+                    url.append("&ate=").append(casInternalRequestParameters.getUidADT());
+                } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFV())) {
+                    url.append("&idfv=").append(casInternalRequestParameters.getUidIFV());
+                    url.append("&ate=").append(casInternalRequestParameters.getUidADT());
                 }
             }
 
-            if (StringUtils.isNotBlank(casInternalRequestParameters.uidSO1)) {
-                url.append("&odn1=").append(casInternalRequestParameters.uidSO1);
+            if (StringUtils.isNotBlank(casInternalRequestParameters.getUidSO1())) {
+                url.append("&odn1=").append(casInternalRequestParameters.getUidSO1());
             }
 
-            if (StringUtils.isNotBlank(casInternalRequestParameters.uidSO1)) {
-                url.append("&ms1=").append(casInternalRequestParameters.uidO1);
+            if (StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
+                url.append("&ms1=").append(casInternalRequestParameters.getUidO1());
             }
 
-            if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
-                url.append("&u=").append(casInternalRequestParameters.uidMd5);
+            if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
+                url.append("&u=").append(casInternalRequestParameters.getUidMd5());
             }
 
             url.append("&cat=").append(getURLEncode(getCategories(','), format));
@@ -187,6 +187,6 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString("paypal.advertiserId"));
+        return config.getString("paypal.advertiserId");
     }
 }

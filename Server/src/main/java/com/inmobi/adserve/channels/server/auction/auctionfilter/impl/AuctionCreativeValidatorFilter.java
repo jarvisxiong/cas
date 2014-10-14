@@ -45,7 +45,7 @@ public class AuctionCreativeValidatorFilter extends AbstractAuctionFilter {
         //Filtering logic
         if (creativeExposure == CreativeExposure.ALL) {
            return false;
-        } else if ((creativeExposure == CreativeExposure.SELF_SERVE) && casInternalRequestParameters.siteAccountType == AccountType.SELF_SERVE) {
+        } else if ((creativeExposure == CreativeExposure.SELF_SERVE) && casInternalRequestParameters.getSiteAccountType() == AccountType.SELF_SERVE) {
            return false;
         }
 

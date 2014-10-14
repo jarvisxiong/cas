@@ -33,8 +33,8 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String        CLIENT_UA          = "clientua";
     private static final String        AGE                = "age";
     private static final String        IS_BEACON_RQD      = "use_beacon";
-    private static final String        slotFormat         = "%s.slot_%s_%s";
-    private static final String        beaconRequiredFlag = "1";
+    private static final String        SLOT_FORMAT        = "%s.slot_%s_%s";
+    private static final String        BEACON_REQUIRED_FLAG = "1";
     private String              placementId        = null;
     private String              name;
 
@@ -58,7 +58,7 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
         }
         host = config.getString(name + ".host");
         String siteRating = (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) ? "p" : "fs";
-        placementId = config.getString(String.format(slotFormat, name, sasParams.getSlot(), siteRating));
+        placementId = config.getString(String.format(SLOT_FORMAT, name, sasParams.getSlot(), siteRating));
         if (StringUtils.isBlank(placementId)) {
             LOG.debug("Slot is not configured for {}", externalSiteId);
             return false;
@@ -83,7 +83,7 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
         try {
             StringBuilder url = new StringBuilder(String.format(host, placementId));
             appendQueryParam(url, FORMAT, "json", true);
-            appendQueryParam(url, IS_BEACON_RQD, beaconRequiredFlag, false);
+            appendQueryParam(url, IS_BEACON_RQD, BEACON_REQUIRED_FLAG, false);
             appendQueryParam(url, KEYWORD, getURLEncode(getCategories(','), format), false);
             appendQueryParam(url, PUBID, blindedSiteId, false);
             appendQueryParam(url, CLIENT_IP, sasParams.getRemoteHostIp(), false);
@@ -155,7 +155,7 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString(name + ".advertiserId"));
+        return config.getString(name + ".advertiserId");
     }
 
     @Override

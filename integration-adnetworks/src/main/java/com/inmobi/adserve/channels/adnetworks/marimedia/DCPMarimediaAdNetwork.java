@@ -92,8 +92,7 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
                 || null == SlotSizeMapping.getDimension((long) sasParams.getSlot())) {
             LOG.debug("Mandatory parameters missing for Marimedia so exiting adapter");
             return false;
-        }
-        else {
+        } else {
             Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
@@ -151,9 +150,9 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
         }
 
         // Set Latitude & Longitude.
-        if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
-                && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
-            String[] latlong = casInternalRequestParameters.latLong.split(",");
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
+                && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
 
             appendQueryParam(url, LATITUDE, getURLEncode(latlong[0], format), false);
             appendQueryParam(url, LONGITUDE, getURLEncode(latlong[1], format), false);
@@ -161,31 +160,31 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
 
         // Set Android ID.
         if (isAndroid()) {
-            if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
-                appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.uidMd5, false);
-                appendQueryParam(url, ANDROID_ID_MD5, casInternalRequestParameters.uidMd5, false);
-            } else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
-                appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.uid, false);
-            } else if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
-                appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.uidO1, false);
-                appendQueryParam(url, ANDROID_ID_SHA1, casInternalRequestParameters.uidO1, false);
+            if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
+                appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.getUidMd5(), false);
+                appendQueryParam(url, ANDROID_ID_MD5, casInternalRequestParameters.getUidMd5(), false);
+            } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUid())) {
+                appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.getUid(), false);
+            } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
+                appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.getUidO1(), false);
+                appendQueryParam(url, ANDROID_ID_SHA1, casInternalRequestParameters.getUidO1(), false);
             }
 
-            if (StringUtils.isNotBlank(casInternalRequestParameters.gpid)) {
-                appendQueryParam(url, ANDROID_ADVERTISING_ID, casInternalRequestParameters.gpid, false);
+            if (StringUtils.isNotBlank(casInternalRequestParameters.getGpid())) {
+                appendQueryParam(url, ANDROID_ADVERTISING_ID, casInternalRequestParameters.getGpid(), false);
             }
         }
 
         // Set IDFA and UDID.
         if (isIOS()) {
-            if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
-                appendQueryParam(url, UDID, casInternalRequestParameters.uidIDUS1, false);
+            if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
+                appendQueryParam(url, UDID, casInternalRequestParameters.getUidIDUS1(), false);
             }
-            if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
-                appendQueryParam(url, IDFA, casInternalRequestParameters.uidIFA, false);
+            if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())) {
+                appendQueryParam(url, IDFA, casInternalRequestParameters.getUidIFA(), false);
             }
-            if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
-                appendQueryParam(url, UDID_MD5, casInternalRequestParameters.uidMd5, false);
+            if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
+                appendQueryParam(url, UDID_MD5, casInternalRequestParameters.getUidMd5(), false);
             }
         }
 
@@ -235,15 +234,13 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
                 JSONObject ad = new JSONObject(response);
 
                 // Banner or Interstitial.
-                if (ad.getString("adType").equalsIgnoreCase("banner")) {
+                if ("banner".equalsIgnoreCase(ad.getString("adType"))) {
                     String imageUrl = ad.getString("imageUrl");
                     context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, imageUrl);
-                }
-                else if( ad.getString("adType").equalsIgnoreCase("html")) {
+                } else if("html".equalsIgnoreCase(ad.getString("adType"))) {
                     String htmlUrl = ad.getString("htmlUrl");
                     context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, htmlUrl);
-                }
-                else {
+                } else {
                     // Other format.
                     // adType is "video" or "empty".
                     adStatus = "NO_AD";
@@ -268,7 +265,7 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = "AD";
             } catch (Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from Marimedia");
+                LOG.info("Error parsing response from Marimedia, exception {}", exception);
                 LOG.info("Response from Marimedia {}", response);
             }
         }
@@ -281,7 +278,7 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString("marimedia.advertiserId"));
+        return config.getString("marimedia.advertiserId");
     }
 
     @Override

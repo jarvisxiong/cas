@@ -41,7 +41,7 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
     private int                          height;
     private String                       deviceId;
     private String                       adId;
-    private final String                 dateFormat  = "yyyy-MM-dd HH:mm:ss";
+    private static final String          DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     private static String                creativeTag = "creative_tag";
     private static String                trackingUrl = "tracking_url";
     private static String                pubMaticBid = "PubMatic_Bid";
@@ -92,8 +92,8 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
             LOG.debug("mandate parameters missing for pubmatic, so returning from adapter");
             return false;
         }
-        if (casInternalRequestParameters.latLong != null) {
-            String[] t = casInternalRequestParameters.latLong.split(",");
+        if (casInternalRequestParameters.getLatLong() != null) {
+            String[] t = casInternalRequestParameters.getLatLong().split(",");
             if (t.length > 1) {
                 latlong = String.format("%s,%s", t[0], t[1]);
             }
@@ -126,8 +126,8 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
             params.append("&loc=").append(latlong);
         }
 
-        if (casInternalRequestParameters.zipCode != null) {
-            params.append("&zip=").append(casInternalRequestParameters.zipCode);
+        if (casInternalRequestParameters.getZipCode() != null) {
+            params.append("&zip=").append(casInternalRequestParameters.getZipCode());
         }
 
         if (sasParams.getCountryCode() != null) {
@@ -138,7 +138,7 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
         params.append("&kadwidth=").append(width).append("&kadheight=").append(height);
         params.append("&pageURL=").append(blindedSiteId);
         params.append("&keywords=").append(getURLEncode(getCategories(','), format));
-        SimpleDateFormat dfm = new SimpleDateFormat(dateFormat);
+        SimpleDateFormat dfm = new SimpleDateFormat(DATE_FORMAT);
         params.append("&kltstamp=").append(getURLEncode(dfm.format(Calendar.getInstance().getTime()), format));
         params.append("&ranreq=").append(Math.random());
 
@@ -224,6 +224,6 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString("pubmatic.advertiserId"));
+        return config.getString("pubmatic.advertiserId");
     }
 }
