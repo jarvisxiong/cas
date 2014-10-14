@@ -109,10 +109,11 @@ public class IABCategoriesMap implements IABCategoriesInterface {
     @Override
     public List<String> getIABCategories(Long category) {
         String[] categories = categoriesToIABMapping.get(category);
-        if (null != categories)
+        if (null != categories) {
             return new ArrayList<String>(Arrays.asList(categories));
-        else
-            return null;
+        } else {
+            return new ArrayList<String>();
+        }
     }
 
     @Override
