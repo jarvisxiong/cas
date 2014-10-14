@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.server.servlet;
 
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
+import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.ChannelServerStringLiterals;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
@@ -54,14 +55,13 @@ public class ServletRepoRefresh implements Servlet {
         Connection con = null;
         Statement statement = null;
         ResultSet resultSet;
+        Boolean foundMatch = true;
+
         try {
-            // TODO: remove hardCoding of config file
-            ConfigurationLoader config = ConfigurationLoader
-                    .getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
+            ConfigurationLoader config = ConfigurationLoader.getInstance(ChannelServer.getConfigFile());
             con = DriverManager.getConnection(connectionString, dbUser, dbPassword);
             statement = con.createStatement();
 
-            // TODO: some repos seem to be missing
             if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY)) {
                 final String query = config.getCacheConfiguration()
                         .subset(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY)
@@ -111,6 +111,13 @@ public class ServletRepoRefresh implements Servlet {
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getPricingEngineRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
+            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_FILTER_REPOSITORY)) {
+                final String query = config.getCacheConfiguration()
+                        .subset(ChannelServerStringLiterals.SITE_FILTER_REPOSITORY)
+                        .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                resultSet = statement.executeQuery(query);
+                CasConfigUtil.repositoryHelper.getSiteFilterRepository().newUpdateFromResultSetToOptimizeUpdate(
+                        resultSet);
             } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY)) {
                 final String query = config.getCacheConfiguration()
                         .subset(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY)
@@ -118,11 +125,45 @@ public class ServletRepoRefresh implements Servlet {
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getSiteEcpmRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
+            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY)) {
+                final String query = config.getCacheConfiguration()
+                        .subset(ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY)
+                        .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                resultSet = statement.executeQuery(query);
+                CasConfigUtil.repositoryHelper.getCurrencyConversionRepository().newUpdateFromResultSetToOptimizeUpdate(
+                        resultSet);
+            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY)) {
+                final String query = config.getCacheConfiguration()
+                        .subset(ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY)
+                        .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                resultSet = statement.executeQuery(query);
+                CasConfigUtil.repositoryHelper.getWapSiteUACRepository().newUpdateFromResultSetToOptimizeUpdate(
+                        resultSet);
+            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY)) {
+                final String query = config.getCacheConfiguration()
+                        .subset(ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY)
+                        .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                resultSet = statement.executeQuery(query);
+                CasConfigUtil.repositoryHelper.getIxAccountMapRepository().newUpdateFromResultSetToOptimizeUpdate(
+                        resultSet);
+            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CREATIVE_REPOSITORY)) {
+                final String query = config.getCacheConfiguration()
+                        .subset(ChannelServerStringLiterals.CREATIVE_REPOSITORY)
+                        .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                resultSet = statement.executeQuery(query);
+                CasConfigUtil.repositoryHelper.getCreativeRepository().newUpdateFromResultSetToOptimizeUpdate(
+                        resultSet);
+            } else {
+                // RepoName could not be matched
+                LOG.debug("RepoName: {} could not be matched", repoName);
+                hrh.responseSender.sendResponse("NOTOK RepoName could not be matched", serverChannel);
+                foundMatch = false;
             }
-            // TODO: missing default case
 
-            LOG.debug("Successfully updated {}", repoName);
-            hrh.responseSender.sendResponse("OK", serverChannel);
+            if (foundMatch) {
+                LOG.debug("Successfully updated {}", repoName);
+                hrh.responseSender.sendResponse("OK", serverChannel);
+            }
         } catch (SQLException e1) {
             LOG.info("error is {}", e1);
             hrh.responseSender.sendResponse("NOTOK", serverChannel);

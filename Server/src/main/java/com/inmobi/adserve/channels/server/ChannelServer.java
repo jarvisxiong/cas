@@ -38,6 +38,7 @@ import com.netflix.governator.guice.LifecycleInjector;
 import com.netflix.governator.lifecycle.LifecycleManager;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Slf4JLoggerFactory;
+import lombok.Getter;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbcp2.ConnectionFactory;
 import org.apache.commons.dbcp2.DriverManagerConnectionFactory;
@@ -89,6 +90,7 @@ public class ChannelServer {
     private static CreativeRepository               creativeRepository;
     private static NativeAdTemplateRepository       nativeAdTemplateRepository;
     private static final String                     DEFAULT_CONFIG_FILE="/opt/mkhoj/conf/cas/channel-server.properties";
+    @Getter
     private static String                           configFile;
     public static byte                              dataCenterIdCode;
     public static short                             hostIdCode;
