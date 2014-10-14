@@ -36,7 +36,7 @@ public class IABCategoriesMapTest {
     @Test
     public void testGetIABCategoriesNull() throws Exception {
         Long category = -1L;
-        List<String> expected = null;
+        List<String> expected = new ArrayList<String>();
 
         IABCategoriesMap tested = new IABCategoriesMap();
         assertThat(tested.getIABCategories(category), is(equalTo(expected)));
