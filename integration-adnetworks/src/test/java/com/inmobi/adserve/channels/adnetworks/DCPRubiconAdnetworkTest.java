@@ -96,7 +96,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 		sasParams.setOsId(HandSetOS.Android.getValue());
 		sasParams
 		.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-		casInternalRequestParameters.latLong = "37.4429,-122.1514";
+		casInternalRequestParameters.setLatLong("37.4429,-122.1514");
 		String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
 		sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
 		String externalKey = "f6wqjq1r5v";
@@ -123,8 +123,8 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 		sasParams.setCategories(category);
 		sasParams
 		.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-		casInternalRequestParameters.latLong = "37.4429,-122.1514";
-		casInternalRequestParameters.uid = "23e2ewq445545";
+		casInternalRequestParameters.setLatLong("37.4429,-122.1514");
+		casInternalRequestParameters.setUid("23e2ewq445545");
 		String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
 		sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
 		String externalKey = "f6wqjq1r5v";
@@ -153,8 +153,8 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 		sasParams
 		.setUserAgent(
 				"Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-		casInternalRequestParameters.latLong = "37.4429,-122.1514";
-		casInternalRequestParameters.uidIFA = "23e2ewq445545";
+		casInternalRequestParameters.setLatLong("37.4429,-122.1514");
+		casInternalRequestParameters.setUidIFA("23e2ewq445545");
 		String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
 		sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
 		List<Long> category = new ArrayList<Long>();
@@ -185,7 +185,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 		sasParams.setCategories(category);
 		sasParams
 		.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-		casInternalRequestParameters.latLong = "37.4429,-122.1514";
+		casInternalRequestParameters.setLatLong("37.4429,-122.1514");
 		String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
 		sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
 		String externalKey = "f6wqjq1r5v";
@@ -208,7 +208,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 		sasParams.setRemoteHostIp(null);
 		sasParams
 		.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-		casInternalRequestParameters.latLong = "37.4429,-122.1514";
+		casInternalRequestParameters.setLatLong("37.4429,-122.1514");
 		String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
 		sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
 		String externalKey = "f6wqjq1r5v";
@@ -230,7 +230,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 		CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
 		sasParams.setRemoteHostIp("206.29.182.240");
 		sasParams.setUserAgent(" ");
-		casInternalRequestParameters.latLong = "37.4429,-122.1514";
+		casInternalRequestParameters.setLatLong("37.4429,-122.1514");
 		String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
 		sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
 		String externalKey = "f6wqjq1r5v";
@@ -250,16 +250,16 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 	public void testDCPrubiconRequestUri() throws Exception {
 		SASRequestParameters sasParams = new SASRequestParameters();
 		CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-		casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
+		casInternalRequestParameters.setBlockedIabCategories(Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"}));
 		sasParams.setRemoteHostIp("206.29.182.240");
 		sasParams.setUserAgent(URLEncoder.encode("Mozilla/5.0 (iPhone; CPU iPhone OS 7_0_5 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Mobile/11B601", "UTF-8"));
 		sasParams.setSource("APP");
-		casInternalRequestParameters.latLong = "37.4429,-122.1514";
+		casInternalRequestParameters.setLatLong("37.4429,-122.1514");
 		sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
 		List<Long> category = new ArrayList<Long>();
 		category.add(3l);
 		sasParams.setCategories(category);
-		casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
+		casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
 		sasParams.setSlot(Short.valueOf("15"));
 		sasParams.setSiteIncId(6575868);
 		sasParams.setOsId(HandSetOS.Android.getValue());
@@ -302,17 +302,17 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 	public void testDCPrubiconRequestUriWithMultipleUdid() throws Exception {
 		SASRequestParameters sasParams = new SASRequestParameters();
 		CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-		casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
+		casInternalRequestParameters.setBlockedIabCategories(Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"}));
 		sasParams.setRemoteHostIp("206.29.182.240");
 		sasParams.setUserAgent(URLEncoder.encode("Mozilla/5.0 (iPhone; CPU iPhone OS 7_0_5 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Mobile/11B601", "UTF-8"));
 		sasParams.setSource("APP");
-		casInternalRequestParameters.latLong = "37.4429,-122.1514";
+		casInternalRequestParameters.setLatLong("37.4429,-122.1514");
 		sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
 		List<Long> category = new ArrayList<Long>();
 		category.add(3l);
 		sasParams.setCategories(category);
-		casInternalRequestParameters.uidMd5 = "202cb962ac59075b964b07152d234b70";
-		casInternalRequestParameters.uidIDUS1 = "1234202cb962ac59075b964b07152d234b705432";
+		casInternalRequestParameters.setUidMd5("202cb962ac59075b964b07152d234b70");
+		casInternalRequestParameters.setUidIDUS1("1234202cb962ac59075b964b07152d234b705432");
 		sasParams.setSlot(Short.valueOf("15"));
 		sasParams.setSiteIncId(6575868);
 
@@ -340,14 +340,14 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 
 		// Fallback to casInternalParams RTB Floor.
 		sasParams.setSiteEcpmEntity(null);
-		casInternalRequestParameters.auctionBidFloor = 0.68;
+		casInternalRequestParameters.setAuctionBidFloor(0.68);
 		dcpRubiconAdNetwork.configureParameters(sasParams,casInternalRequestParameters, entity, null, null);
 		String actualUrl2 = dcpRubiconAdNetwork.getRequestUri().toString();
 		String expectedUrl2 = "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.6575868&app.domain=com.inmobi-exchange&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&app.rating=4+&p_block_keys=blk6575868%2CInMobiFS&rp_floor=0.68&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpidsha1=1234202cb962ac59075b964b07152d234b705432&device.dpid_type=udid&kw=38132";
 		assertEquals(expectedUrl2, actualUrl2);
 
 		// Fallback to default minimum ecpm of $0.1 value.
-		casInternalRequestParameters.auctionBidFloor = 0.0;
+		casInternalRequestParameters.setAuctionBidFloor(0.0);
 		dcpRubiconAdNetwork.configureParameters(sasParams,casInternalRequestParameters, entity, null, null);
 		String actualUrl3 = dcpRubiconAdNetwork.getRequestUri().toString();
 		String expectedUrl3 = "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.6575868&app.domain=com.inmobi-exchange&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&app.rating=4+&p_block_keys=blk6575868%2CInMobiFS&rp_floor=0.1&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpidsha1=1234202cb962ac59075b964b07152d234b705432&device.dpid_type=udid&kw=38132";
@@ -361,17 +361,17 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 	public void testDCPrubiconRequestUriWithUAC() throws Exception {
 		SASRequestParameters sasParams = new SASRequestParameters();
 		CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-		casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
+		casInternalRequestParameters.setBlockedIabCategories(Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"}));
 		sasParams.setRemoteHostIp("206.29.182.240");
 		sasParams.setUserAgent(URLEncoder.encode("Mozilla/5.0 (iPhone; CPU iPhone OS 7_0_5 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Mobile/11B601", "UTF-8"));
 		sasParams.setSource("APP");
-		casInternalRequestParameters.latLong = "37.4429,-122.1514";
+		casInternalRequestParameters.setLatLong("37.4429,-122.1514");
 		sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
 		List<Long> category = new ArrayList<Long>();
 		category.add(3l);
 		sasParams.setCategories(category);
-		casInternalRequestParameters.uidMd5 = "202cb962ac59075b964b07152d234b70";
-		casInternalRequestParameters.uidIDUS1 = "1234202cb962ac59075b964b07152d234b705432";
+		casInternalRequestParameters.setUidMd5("202cb962ac59075b964b07152d234b70");
+		casInternalRequestParameters.setUidIDUS1("1234202cb962ac59075b964b07152d234b705432");
 		sasParams.setSlot(Short.valueOf("15"));
 		sasParams.setSiteIncId(6575868);
 
@@ -402,17 +402,17 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 	public void testDCPrubiconRequestUriWithSiteSpecificFloor() throws Exception {
 		SASRequestParameters sasParams = new SASRequestParameters();
 		CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-		casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
+		casInternalRequestParameters.setBlockedIabCategories(Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"}));
 		sasParams.setRemoteHostIp("206.29.182.240");
 		sasParams.setUserAgent(URLEncoder.encode("Mozilla/5.0 (iPhone; CPU iPhone OS 7_0_5 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Mobile/11B601", "UTF-8"));
 		sasParams.setSource("APP");
-		casInternalRequestParameters.latLong = "37.4429,-122.1514";
+		casInternalRequestParameters.setLatLong("37.4429,-122.1514");
 		sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
 		List<Long> category = new ArrayList<Long>();
 		category.add(3l);
 		sasParams.setCategories(category);
-		casInternalRequestParameters.uidMd5 = "202cb962ac59075b964b07152d234b70";
-		casInternalRequestParameters.uidIDUS1 = "1234202cb962ac59075b964b07152d234b705432";
+		casInternalRequestParameters.setUidMd5("202cb962ac59075b964b07152d234b70");
+		casInternalRequestParameters.setUidIDUS1("1234202cb962ac59075b964b07152d234b705432");
 		sasParams.setSlot(Short.valueOf("15"));
 		sasParams.setSiteIncId(1387380247996547l);
 		sasParams.setCountryId(94l);
@@ -451,17 +451,17 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 	public void testDCPrubiconRequestUriWithSpecificSlot() throws Exception {
 		SASRequestParameters sasParams = new SASRequestParameters();
 		CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-		casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
+		casInternalRequestParameters.setBlockedIabCategories(Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"}));
 		sasParams.setRemoteHostIp("206.29.182.240");
 		sasParams.setUserAgent("Mozilla");
 		sasParams.setSource("APP");
-		casInternalRequestParameters.latLong = "37.4429,-122.1514";
+		casInternalRequestParameters.setLatLong("37.4429,-122.1514");
 		sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
 		List<Long> category = new ArrayList<Long>();
 		category.add(3l);
 		sasParams.setCategories(category);
 
-		casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
+		casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
 		sasParams.setSlot(Short.valueOf("9"));
 		sasParams.setSiteIncId(6575868);
 		sasParams.setSource("APP");
@@ -489,18 +489,18 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 	public void testDCPrubiconRequestUriWithGPID() throws Exception {
 		SASRequestParameters sasParams = new SASRequestParameters();
 		CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-		casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
+		casInternalRequestParameters.setBlockedIabCategories(Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"}));
 		sasParams.setRemoteHostIp("206.29.182.240");
 		sasParams.setUserAgent("Mozilla");
 		sasParams.setSource("APP");
-		casInternalRequestParameters.latLong = "37.4429,-122.1514";
+		casInternalRequestParameters.setLatLong("37.4429,-122.1514");
 		sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
 		List<Long> category = new ArrayList<Long>();
 		category.add(3l);
 		sasParams.setCategories(category);
 
-		casInternalRequestParameters.gpid = "202cb962ac59075b964b07152d234b70";
-		casInternalRequestParameters.uidADT = "1";
+		casInternalRequestParameters.setGpid("202cb962ac59075b964b07152d234b70");
+		casInternalRequestParameters.setUidADT("1");
 
 		sasParams.setSlot(Short.valueOf("9"));
 		sasParams.setSiteIncId(6575868);
@@ -530,13 +530,13 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 	public void testDCPrubiconParseAdWap() throws Exception {
 		SASRequestParameters sasParams = new SASRequestParameters();
 		CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-		casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
+		casInternalRequestParameters.setBlockedIabCategories(Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"}));
 		sasParams.setRemoteHostIp("206.29.182.240");
 		sasParams.setUserAgent("Mozilla");
 		sasParams.setSlot(Short.valueOf("15"));
-		casInternalRequestParameters.latLong = "37.4429,-122.1514";
+		casInternalRequestParameters.setLatLong("37.4429,-122.1514");
 		sasParams.setOsId(HandSetOS.Android.getValue());
-		casInternalRequestParameters.uid = "23e2ewq445545saasw232323";
+		casInternalRequestParameters.setUid("23e2ewq445545saasw232323");
 		String externalKey = "19100";
 		String beaconUrl = "http://c2.w.inmobi.com/c"
 				+ ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
@@ -591,14 +591,14 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 	public void testDCPrubiconParseAdApp() throws Exception {
 		SASRequestParameters sasParams = new SASRequestParameters();
 		CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-		casInternalRequestParameters.blockedIabCategories = Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"});
+		casInternalRequestParameters.setBlockedIabCategories(Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"}));
 		sasParams.setRemoteHostIp("206.29.182.240");
 		sasParams.setUserAgent("Mozilla");
 		sasParams.setSlot(Short.valueOf("15"));
-		casInternalRequestParameters.latLong = "37.4429,-122.1514";
+		casInternalRequestParameters.setLatLong("37.4429,-122.1514");
 		sasParams.setOsId(HandSetOS.Android.getValue());
 		sasParams.setSource("APP");
-		casInternalRequestParameters.uid = "23e2ewq445545saasw232323";
+		casInternalRequestParameters.setUid("23e2ewq445545saasw232323");
 		String externalKey = "19100";
 		String beaconUrl = "http://c2.w.inmobi.com/c"
 				+ ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
@@ -670,7 +670,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 		sasParams.setRemoteHostIp("206.29.182.240");
 		sasParams
 		.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-		casInternalRequestParameters.latLong = "37.4429,-122.1514";
+		casInternalRequestParameters.setLatLong("37.4429,-122.1514");
 		String clurl = "http://c2.w.inmobi.com/c"
 				+ ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
 				+ "-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";

@@ -38,6 +38,7 @@ import com.netflix.governator.guice.LifecycleInjector;
 import com.netflix.governator.lifecycle.LifecycleManager;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Slf4JLoggerFactory;
+import lombok.Getter;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbcp2.ConnectionFactory;
 import org.apache.commons.dbcp2.DriverManagerConnectionFactory;
@@ -89,16 +90,11 @@ public class ChannelServer {
     private static CreativeRepository               creativeRepository;
     private static NativeAdTemplateRepository       nativeAdTemplateRepository;
     private static final String                     DEFAULT_CONFIG_FILE="/opt/mkhoj/conf/cas/channel-server.properties";
+    @Getter
     private static String                           configFile;
     public static byte                              dataCenterIdCode;
     public static short                             hostIdCode;
     public static String                            dataCentreName;
-    
-    static {
-      // Increase networkaddress cache ttl to avoid thread wait. (SERVOPS-3265)
-      java.security.Security.setProperty("networkaddress.cache.ttl","3600");
-      java.security.Security.setProperty("networkaddress.cache.negative.ttl", "60");
-    }
 
     public static void main(final String[] args) throws Exception {
         configFile=System.getProperty("configFile",DEFAULT_CONFIG_FILE);
@@ -228,9 +224,9 @@ public class ChannelServer {
             // If client bootstrap is not present throwing exception which will
             // set
             // lbStatus as NOT_OK.
-        }
-        catch (Exception exception) {
-            System.out.println(exception);
+
+        } catch (Exception exception) {
+            logger.info("Exception in Channel Server "+ exception);
             ServerStatusInfo.statusString = getMyStackTrace(exception);
             ServerStatusInfo.statusCode = 404;
             logger.info("stack trace is " + getMyStackTrace(exception));
@@ -357,13 +353,11 @@ public class ChannelServer {
             config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)
                     .subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY);
 
-        }
-        catch (NamingException exception) {
+        } catch (NamingException exception) {
             logger.error("failed to creatre binding for postgresql data source " + exception.getMessage());
             ServerStatusInfo.statusCode = 404;
             ServerStatusInfo.statusString = getMyStackTrace(exception);
-        }
-        catch (InitializationException exception) {
+        } catch (InitializationException exception) {
             logger.error("failed to initialize repository " + exception.getMessage());
             ServerStatusInfo.statusCode = 404;
             ServerStatusInfo.statusString = getMyStackTrace(exception);
@@ -375,20 +369,13 @@ public class ChannelServer {
 
     private static DataCenter getDataCenter() {
         DataCenter colo = DataCenter.ALL;
-        // TODO: Remove UA2?
-        if (DataCenter.UA2.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
-            colo = DataCenter.UA2;
-        }
-        else if (DataCenter.UJ1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
+        if (DataCenter.UJ1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
             colo = DataCenter.UJ1;
-        }
-        else if (DataCenter.UH1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
+        } else if (DataCenter.UH1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
             colo = DataCenter.UH1;
-        }
-        else if (DataCenter.LHR1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
+        } else if (DataCenter.LHR1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
             colo = DataCenter.LHR1;
-        }
-        else if (DataCenter.HKG1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
+        } else if (DataCenter.HKG1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
             colo = DataCenter.HKG1;
         }
         return colo;
@@ -453,14 +440,14 @@ public class ChannelServer {
             message.setSubject("Channel Ad Server Crashed on Host " + addr.getHostName());
             message.setText(errorMessage + stackTrace);
             Transport.send(message);
-        }
-        catch (MessagingException mex) {
+        } catch (MessagingException mex) {
             // logger.info("Error while sending mail");
-            mex.printStackTrace();
-        }
-        catch (UnknownHostException ex) {
+            logger.info("MessagingException raised while sending mail " + mex);
+            //mex.printStackTrace();
+        } catch (UnknownHostException ex) {
             // logger.debug("could not resolve host inside send mail");
-            ex.printStackTrace();
+            logger.info("UnknownException raised while sending mail " + ex);
+            //ex.printStackTrace();
         }
     }
 }

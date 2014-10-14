@@ -78,7 +78,7 @@ public class GenericAdapterTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        casInternalRequestParameters.uid = "1234";
+        casInternalRequestParameters.setUid("1234");
         String externalKey = "118398";
         sasParams.setSlot(Short.valueOf("9"));
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
@@ -97,7 +97,7 @@ public class GenericAdapterTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        casInternalRequestParameters.uid = "1234";
+        casInternalRequestParameters.setUid("1234");
         sasParams.setAdIncId(32);
         sasParams.setSiteIncId(18);
         sasParams.setSlot(Short.valueOf("9"));
@@ -115,7 +115,7 @@ public class GenericAdapterTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        casInternalRequestParameters.uid = "1234";
+        casInternalRequestParameters.setUid("1234");
         String externalKey = "118398";
         sasParams.setSlot(Short.valueOf("9"));
         String beaconUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";

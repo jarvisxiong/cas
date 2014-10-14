@@ -23,36 +23,36 @@ public class SiteFilterRepository extends
         RepositoryManager {
 
     @Override
-    public SiteFilterEntity queryUniqueResult(RepositoryQuery SiteFilterQuery) throws RepositoryException {
-        Collection<SiteFilterEntity> SiteFilterEntityResultSet = query(SiteFilterQuery);
-        if (SiteFilterEntityResultSet == null || SiteFilterEntityResultSet.isEmpty()) {
+    public SiteFilterEntity queryUniqueResult(RepositoryQuery siteFilterQuery) throws RepositoryException {
+        Collection<SiteFilterEntity> siteFilterEntityResultSet = query(siteFilterQuery);
+        if (siteFilterEntityResultSet == null || siteFilterEntityResultSet.isEmpty()) {
             return null;
         }
-        return (SiteFilterEntity) SiteFilterEntityResultSet.toArray()[0];
+        return (SiteFilterEntity) siteFilterEntityResultSet.toArray()[0];
     }
 
     @Override
     public DBEntity<SiteFilterEntity, SiteFilterQuery> buildObjectFromRow(ResultSetRow resultSetRow)
             throws RepositoryException {
         NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
-        SiteFilterEntity SiteFilterEntity = new SiteFilterEntity();
+        SiteFilterEntity siteFilterEntity = new SiteFilterEntity();
         Timestamp modifyTime = row.getTimestamp("modified_on");
-        SiteFilterEntity.setRuleType(row.getInt("rule_type_id"));
-        SiteFilterEntity.setSiteId(row.getString("site_id"));
-        SiteFilterEntity.setPubId(row.getString("pub_id"));
+        siteFilterEntity.setRuleType(row.getInt("rule_type_id"));
+        siteFilterEntity.setSiteId(row.getString("site_id"));
+        siteFilterEntity.setPubId(row.getString("pub_id"));
         String[] tempArray = (String[]) row.getArray("filter_data");
 
-        if (SiteFilterEntity.getRuleType() == 4) {
-            SiteFilterEntity.setBlockedIabCategories(tempArray);
-        } else if (SiteFilterEntity.getRuleType() == 6) {
-            SiteFilterEntity.setBlockedAdvertisers(tempArray);
+        if (siteFilterEntity.getRuleType() == 4) {
+            siteFilterEntity.setBlockedIabCategories(tempArray);
+        } else if (siteFilterEntity.getRuleType() == 6) {
+            siteFilterEntity.setBlockedAdvertisers(tempArray);
         } else {
-            SiteFilterEntity = new SiteFilterEntity();
+            siteFilterEntity = new SiteFilterEntity();
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("Got SiteFilterEntity Entity" + SiteFilterEntity.toString());
+            logger.debug("Got SiteFilterEntity Entity" + siteFilterEntity.toString());
         }
-        return new DBEntity<SiteFilterEntity, SiteFilterQuery>(SiteFilterEntity, modifyTime);
+        return new DBEntity<SiteFilterEntity, SiteFilterQuery>(siteFilterEntity, modifyTime);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class SiteFilterRepository extends
     }
 
     @Override
-    public boolean isObjectToBeDeleted(SiteFilterEntity SiteFilterEntity) {
+    public boolean isObjectToBeDeleted(SiteFilterEntity siteFilterEntity) {
         return false;
     }
 }

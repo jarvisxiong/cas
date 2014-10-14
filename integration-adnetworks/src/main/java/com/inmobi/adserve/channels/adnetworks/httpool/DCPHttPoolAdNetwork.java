@@ -54,9 +54,9 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
         }
         host = config.getString("httpool.host");
 
-        if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
-                && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
-            String[] latlong = casInternalRequestParameters.latLong.split(",");
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
+                && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
@@ -204,6 +204,6 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString("httpool.advertiserId"));
+        return config.getString("httpool.advertiserId");
     }
 }

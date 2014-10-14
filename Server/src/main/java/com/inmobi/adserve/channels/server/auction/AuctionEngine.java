@@ -83,7 +83,7 @@ public class AuctionEngine implements AuctionEngineInterface {
             // response are 1.
             if (DemandSourceType.RTBD == auctionResponse.getAdNetworkInterface().getDst()) {
                 // For RTBD
-                secondBidPrice = Math.min(casInternalRequestParameters.auctionBidFloor,
+                secondBidPrice = Math.min(casInternalRequestParameters.getAuctionBidFloor(),
                         auctionResponse.getAdNetworkInterface().getBidPriceInUsd());
             } else {
                 // For IX,
@@ -140,7 +140,7 @@ public class AuctionEngine implements AuctionEngineInterface {
         secondBidPrice = filteredChannelSegmentList.get(secondHighestBid).getAdNetworkInterface().getBidPriceInUsd();
         double winnerBid = filteredChannelSegmentList.get(lowestLatencyBid).getAdNetworkInterface().getBidPriceInUsd();
         if (winnerBid == secondBidPrice) {
-            secondBidPrice = casInternalRequestParameters.auctionBidFloor;
+            secondBidPrice = casInternalRequestParameters.getAuctionBidFloor();
         }
 
         // Ensure secondHighestBidPrice never crosses response bid.

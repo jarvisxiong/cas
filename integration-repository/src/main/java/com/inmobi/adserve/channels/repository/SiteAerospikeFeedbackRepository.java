@@ -154,7 +154,7 @@ public class SiteAerospikeFeedbackRepository {
             Record record = getFromAerospike(siteId);
             if (null == record) {
                 LOG.debug("Key not found in aerospike");
-                InspectorStats.incrementStatCount(InspectorStrings.siteFeedbackFailedToLoadFromAerospike);
+                InspectorStats.incrementStatCount(InspectorStrings.SITE_FEEDBACK_FAILED_TO_LOAD_FROM_AEROSPIKE);
                 return;
             }
             LOG.debug("Key found in aerospike");
@@ -165,7 +165,7 @@ public class SiteAerospikeFeedbackRepository {
          * Method which makes a call to aerospike to load the complete site info
          */
         Record getFromAerospike(final String site) {
-            InspectorStats.incrementStatCount(InspectorStrings.siteFeedbackRequestsToAerospike);
+            InspectorStats.incrementStatCount(InspectorStrings.SITE_FEEDBACK_REQUESTS_TO_AEROSPIKE);
             long time = System.currentTimeMillis();
             Record record;
 
@@ -337,8 +337,7 @@ public class SiteAerospikeFeedbackRepository {
                 try {
                     age = (date.getTime() - dateFormat.parse(entry.getKey().split(" ")[0]).getTime())
                             / (1000 * 60 * 60 * 24);
-                }
-                catch (ParseException e) {
+                } catch (ParseException e) {
                     age = feedbackTimeFrame / 2;
                 }
                 if (age >= 0 && age < feedbackTimeFrame) {

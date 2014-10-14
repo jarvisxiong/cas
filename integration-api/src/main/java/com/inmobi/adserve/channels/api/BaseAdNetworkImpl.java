@@ -25,6 +25,8 @@ import io.netty.channel.ChannelFuture;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONObject;
@@ -58,11 +60,13 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected long                                startTime;
     public volatile boolean                       isRequestComplete       = false;
     protected int                                 statusCode;
-    public String                                 responseContent;
-    public Map                                    responseHeaders;
+    @Getter
+    protected String                              responseContent;
+    private Map                                   responseHeaders;
     private long                                  latency;
-    public long                                   connectionLatency;
-    public String                                 adStatus                = "NO_AD";
+    private long                                  connectionLatency;
+    @Getter
+    protected String                              adStatus                = "NO_AD";
     protected ThirdPartyAdResponse.ResponseStatus errorStatus             = ThirdPartyAdResponse.ResponseStatus.SUCCESS;
     
     protected boolean 							  isHTMLResponseSupported = true;
@@ -130,15 +134,25 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     //Overriding these methods in IXAdNetwork
-    public String returnBuyer(){return null;}
+    public String returnBuyer() {
+        return null;
+    }
 
-    public String returnDealId(){return null;}
+    public String returnDealId() {
+        return null;
+    }
 
-    public double returnAdjustBid(){return 0;}
+    public double returnAdjustBid() {
+        return 0;
+    }
 
-    public Integer returnPmpTier() { return 0; }
+    public Integer returnPmpTier() {
+        return 0;
+    }
 
-    public String returnAqid() { return null; }
+    public String returnAqid() {
+        return null;
+    }
 
     @Override
     public void setName(final String adapterName) {
@@ -160,9 +174,13 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     @Override
-    public boolean isIxPartner() { return isIxPartner; }
+    public boolean isIxPartner() {
+        return isIxPartner;
+    }
 
-    public void setIxPartner(final boolean isIxPartner) { this.isIxPartner = isIxPartner; }
+    public void setIxPartner(final boolean isIxPartner) {
+        this.isIxPartner = isIxPartner;
+    }
 
     @Override
     public void processResponse() {
@@ -224,7 +242,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             Request ningRequest = getNingRequest();
             LOG.debug("request : {}", ningRequest);
             startTime = System.currentTimeMillis();
-            final boolean isTraceEnabled = casInternalRequestParameters.traceEnabled;
+            final boolean isTraceEnabled = casInternalRequestParameters.isTraceEnabled();
             getAsyncHttpClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
                 @Override
                 public Response onCompleted(final Response response) throws Exception {
@@ -292,7 +310,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                         LOG.debug("{} timeout latency {}", getName(), latency);
                         adStatus = "TIME_OUT";
                         processResponse();
-                        InspectorStats.incrementStatCount(InspectorStrings.timeoutException);
+                        InspectorStats.incrementStatCount(InspectorStrings.TIMEOUT_EXCEPTION);
                         return;
                     }
                     
@@ -378,8 +396,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             LOG.debug("inside cleanup for channel {}", this.getId());
             adStatus = "TERM";
             responseStruct = new ThirdPartyAdResponse();
-            responseStruct.latency = latency;
-            responseStruct.adStatus = adStatus;
+            responseStruct.setLatency(latency);
+            responseStruct.setAdStatus(adStatus);
         }
     }
 
@@ -392,30 +410,30 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             return responseStruct;
         }
         responseStruct = new ThirdPartyAdResponse();
-        responseStruct.responseFormat = isNativeRequest()?ThirdPartyAdResponse.ResponseFormat.JSON:ThirdPartyAdResponse.ResponseFormat.HTML;
-        responseStruct.response = getHttpResponseContent();
-        responseStruct.responseHeaders = getResponseHeaders();
+        responseStruct.setResponseFormat(isNativeRequest()?ThirdPartyAdResponse.ResponseFormat.JSON:ThirdPartyAdResponse.ResponseFormat.HTML);
+        responseStruct.setResponse(getHttpResponseContent());
+        responseStruct.setResponseHeaders(getResponseHeaders());
         if (statusCode >= 400) {
-            responseStruct.responseStatus = ThirdPartyAdResponse.ResponseStatus.FAILURE_NETWORK_ERROR;
+            responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.FAILURE_NETWORK_ERROR);
         } else if (statusCode >= 300) {
-            responseStruct.responseStatus = ThirdPartyAdResponse.ResponseStatus.FAILURE_REQUEST_ERROR;
+            responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.FAILURE_REQUEST_ERROR);
         } else if (statusCode == 200) {
             if (StringUtils.isBlank(responseContent) || !"AD".equalsIgnoreCase(adStatus)) {
                 adStatus = "NO_AD";
-                responseStruct.responseStatus = ThirdPartyAdResponse.ResponseStatus.FAILURE_NO_AD;
+                responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.FAILURE_NO_AD);
             } else {
-                responseStruct.responseStatus = ThirdPartyAdResponse.ResponseStatus.SUCCESS;
+                responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.SUCCESS);
                 adStatus = "AD";
             }
         } else if (statusCode >= 204) {
-            responseStruct.responseStatus = ThirdPartyAdResponse.ResponseStatus.FAILURE_NO_AD;
+            responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.FAILURE_NO_AD);
         }
-        responseStruct.latency = latency;
+        responseStruct.setLatency(latency);
         LOG.debug("getting response ad for channel {}", this.getId());
         if (isClickUrlRequired()) {
-            responseStruct.clickUrl = getClickUrl();
+            responseStruct.setClickUrl(getClickUrl());
         }
-        responseStruct.adStatus = adStatus;
+        responseStruct.setAdStatus(adStatus);
         return responseStruct;
     }
 
@@ -579,20 +597,20 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
      * @return
      */
     protected String getUid() {
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)  && "1".equals(casInternalRequestParameters.uidADT)) {
-            return casInternalRequestParameters.uidIFA;
-        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.gpid) && "1".equals(casInternalRequestParameters.uidADT)) {
-            return casInternalRequestParameters.gpid;
-        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidSO1)) {
-            return casInternalRequestParameters.uidSO1;
-        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
-            return casInternalRequestParameters.uidMd5;
-        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidO1)) {
-            return casInternalRequestParameters.uidO1;
-        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIDUS1)) {
-            return casInternalRequestParameters.uidIDUS1;
-        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.uid)) {
-            return casInternalRequestParameters.uid;
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIFA())  && "1".equals(casInternalRequestParameters.getUidADT())) {
+            return casInternalRequestParameters.getUidIFA();
+        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.getGpid()) && "1".equals(casInternalRequestParameters.getUidADT())) {
+            return casInternalRequestParameters.getGpid();
+        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidSO1())) {
+            return casInternalRequestParameters.getUidSO1();
+        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidMd5())) {
+            return casInternalRequestParameters.getUidMd5();
+        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidO1())) {
+            return casInternalRequestParameters.getUidO1();
+        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIDUS1())) {
+            return casInternalRequestParameters.getUidIDUS1();
+        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.getUid())) {
+            return casInternalRequestParameters.getUid();
         }
         return null;
     }
@@ -622,14 +640,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected String getYearofBirth() {
         if (sasParams.getAge() != null && sasParams.getAge().toString().matches("\\d+")) {
             Calendar cal = new GregorianCalendar();
-            return (Integer.toString(cal.get(Calendar.YEAR) - sasParams.getAge()));
+            return Integer.toString(cal.get(Calendar.YEAR) - sasParams.getAge());
         }
         return null;
-    }
-
-    @Override
-    public String getAdStatus() {
-        return this.adStatus;
     }
 
     @Override
@@ -850,9 +863,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
   }
 
   protected String getGPID(){
-    return (StringUtils.isNotBlank(casInternalRequestParameters.gpid) &&
-        "1".equals(casInternalRequestParameters.uidADT))
-               ? casInternalRequestParameters.gpid:null;
+    return (StringUtils.isNotBlank(casInternalRequestParameters.getGpid()) &&
+        "1".equals(casInternalRequestParameters.getUidADT()))
+               ? casInternalRequestParameters.getGpid():null;
   }
 
     @Override

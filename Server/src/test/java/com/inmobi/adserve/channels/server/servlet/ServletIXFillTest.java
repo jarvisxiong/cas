@@ -16,6 +16,7 @@ import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.server.requesthandler.beans.AdvertiserMatchedSegmentDetail;
 import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilterApplier;
 import com.inmobi.adserve.channels.server.utils.CasUtils;
+import com.inmobi.adserve.channels.types.AccountType;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
@@ -75,6 +76,8 @@ public class ServletIXFillTest {
         expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).times(1);
         expect(mockHttpHeaders.get("x-mkhoj-tracer")).andReturn("true");
         expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(true).times(1);
+        mockCasInternalRequestParameters.setTraceEnabled(true);
+        expectLastCall();
         InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
         expectLastCall().times(1);
         InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
@@ -129,6 +132,8 @@ public class ServletIXFillTest {
         expect(mockResponseSender.getResponseFormat()).andReturn(ResponseSender.ResponseFormat.XHTML).times(1);
         expect(mockMatchSegments.matchSegments(mockSASRequestParameters)).andReturn(new ArrayList<AdvertiserMatchedSegmentDetail>());
         expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).times(1);
+        mockCasInternalRequestParameters.setTraceEnabled(true);
+        expectLastCall();
 
         mockSASRequestParameters.setResponseOnlyFromDcp(false);
         expectLastCall().times(1);
@@ -204,6 +209,10 @@ public class ServletIXFillTest {
         expect(mockRepositoryHelper.querySiteMetaDetaRepository(TestUtils.SampleStrings.siteId)).andReturn(null).times(1);
         expect(mockChannelSegmentFilterApplier.getChannelSegments(mockList, mockSASRequestParameters, mockCasContext, null, null))
                 .andReturn(null).times(1);
+        mockCasInternalRequestParameters.setSiteAccountType(AccountType.SELF_SERVE);
+        expectLastCall();
+        mockCasInternalRequestParameters.setTraceEnabled(true);
+        expectLastCall();
 
         mockSASRequestParameters.setResponseOnlyFromDcp(false);
         expectLastCall().times(1);
@@ -290,6 +299,9 @@ public class ServletIXFillTest {
         expect(CasConfigUtil.getRtbConfig()).andReturn(mockConfig).times(1);
         expect(CasConfigUtil.getAdapterConfig()).andReturn(mockConfig).times(1);
         expect(mockSASRequestParameters.getUAdapters()).andReturn(null).times(1);
+        expect(mockCasInternalRequestParameters.getAuctionBidFloor()).andReturn(0.5).times(1);
+        mockCasInternalRequestParameters.setTraceEnabled(true);
+        expectLastCall();
 
         mockSASRequestParameters.setResponseOnlyFromDcp(false);
         expectLastCall().times(1);
@@ -303,6 +315,8 @@ public class ServletIXFillTest {
 
         mockResponseSender.sendNoAdResponse(null);
         expectLastCall().times(1);
+        mockCasInternalRequestParameters.setSiteAccountType(AccountType.SELF_SERVE);
+        expectLastCall();
 
         suppress(method(BaseServlet.class, "enrichCasInternalRequestParameters"));
 
@@ -310,7 +324,6 @@ public class ServletIXFillTest {
         mockHttpRequestHandler.responseSender = mockResponseSender;
         mockResponseSender.sasParams = mockSASRequestParameters;
         mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
-        mockCasInternalRequestParameters.auctionBidFloor = 0.5;
 
         ServletIXFill tested = new ServletIXFill(mockTraceMarkerProvider, mockMatchSegments, mockRequestFilters, mockChannelSegmentFilterApplier, mockCasUtils, mockAsyncRequestMaker, null, null);
         tested.handleRequest(mockHttpRequestHandler, null, null);

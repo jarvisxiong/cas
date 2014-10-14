@@ -23,6 +23,7 @@ import com.inmobi.types.LocationSource;
 import com.inmobi.types.SupplySource;
 import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,6 +50,7 @@ public class ThriftRequestParserTest extends TestCase {
         thriftRequestParser = new ThriftRequestParser();
     }
 
+    @Test
     public void testParseRequestParameters() {
         Site site = new Site();
         site.setContentRatingDeprecated(ContentRating.FAMILY_SAFE);

@@ -120,9 +120,9 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 			LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
 			return false;
 		}
-		if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
-				&& StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
-			String[] latlong = casInternalRequestParameters.latLong.split(",");
+		if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
+				&& StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+			String[] latlong = casInternalRequestParameters.getLatLong().split(",");
 			latitude = latlong[0];
 			longitude = latlong[1];
 		}
@@ -144,16 +144,16 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 		if (sasParams.getOsId() == HandSetOS.Android.getValue()) { // android
 			os = ANDROID;
 			isApp = true;
-			if ((StringUtils.isEmpty(casInternalRequestParameters.uidMd5)
-					&& StringUtils.isEmpty(casInternalRequestParameters.uid) )) {
+			if (StringUtils.isEmpty(casInternalRequestParameters.getUidMd5())
+					&& StringUtils.isEmpty(casInternalRequestParameters.getUid()) ) {
 				LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
 				return false;
 			}
 		} else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) { // iPhone
 			os = IOS;
 			isApp = true;
-			if (StringUtils.isEmpty(casInternalRequestParameters.uidIFA) && StringUtils
-					.isEmpty(casInternalRequestParameters.uidIDUS1)) {
+			if (StringUtils.isEmpty(casInternalRequestParameters.getUidIFA()) && StringUtils
+					.isEmpty(casInternalRequestParameters.getUidIDUS1())) {
 				LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
 				return false;
 			}
@@ -204,12 +204,12 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 
 		appendQueryParam(url, SIZE, String.format(SIZE_FORMAT, width, height), false);
 		if (os.equalsIgnoreCase(IOS)) {
-			if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
-				appendQueryParam(url, IDFA, casInternalRequestParameters.uidIFA, false);
+			if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())) {
+				appendQueryParam(url, IDFA, casInternalRequestParameters.getUidIFA(), false);
 
 			}
-			if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
-				appendQueryParam(url, IOSSHA1, casInternalRequestParameters.uidIDUS1, false);
+			if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
+				appendQueryParam(url, IOSSHA1, casInternalRequestParameters.getUidIDUS1(), false);
 			}
 		}
 		if (os.equalsIgnoreCase(ANDROID)) {
@@ -217,10 +217,10 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 			if(null!=gpid){
 				appendQueryParam(url, GPID, gpid, false);
 			}
-			if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
-				appendQueryParam(url, ANDROIDMD5, casInternalRequestParameters.uidMd5, false);
-			} else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
-				appendQueryParam(url, ANDROIDMD5, casInternalRequestParameters.uid, false);
+			if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
+				appendQueryParam(url, ANDROIDMD5, casInternalRequestParameters.getUidMd5(), false);
+			} else if (StringUtils.isNotBlank(casInternalRequestParameters.getUid())) {
+				appendQueryParam(url, ANDROIDMD5, casInternalRequestParameters.getUid(), false);
 			}
 
 		}
@@ -292,7 +292,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 
 	@Override
 	public String getId() {
-		return (config.getString("placeiq.advertiserId"));
+		return config.getString("placeiq.advertiserId");
 	}
 
 	private String getCategory() {

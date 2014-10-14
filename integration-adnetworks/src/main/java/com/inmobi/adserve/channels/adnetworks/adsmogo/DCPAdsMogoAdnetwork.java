@@ -36,7 +36,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
     private int width;
     private int height;
 
-    private final String os = null;
+    private String os = null;
     private String authSignature = null;
     private final String authKey;
     private final String authSecret;
@@ -81,10 +81,10 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
             LOG.debug("mandatory parameters missing for AdsMogo so exiting adapter");
             return false;
         }
-        if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
                 && StringUtils.countMatches(
-                        casInternalRequestParameters.latLong, ",") > 0) {
-            String[] latlong = casInternalRequestParameters.latLong.split(",");
+                        casInternalRequestParameters.getLatLong(), ",") > 0) {
+            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
@@ -101,10 +101,17 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
         }
         isApp = (StringUtils.isBlank(sasParams.getSource()) || WAP
 				.equalsIgnoreCase(sasParams.getSource())) ? false : true;
+
+        Integer sasParamsOsId = sasParams.getOsId();
+        if (sasParamsOsId > 0 && sasParamsOsId < 21) {
+            os = HandSetOS.values()[sasParamsOsId - 1].toString();
+        }
+
 		if (isApp && StringUtils.isEmpty(getUid())) {
 			LOG.debug("mandatory parameter udid is missing for APP traffic in AdsMogo so exiting adapter");
 			return false;
 		}
+
         return true;
     }
 
@@ -148,33 +155,33 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
         appendQueryParam(url, ADSPACE_HEIGHT, height, false);
 
         if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
-            if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
+            if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())) {
                 appendQueryParam(url, IDFA,
-                        casInternalRequestParameters.uidIFA, false);
+                        casInternalRequestParameters.getUidIFA(), false);
 
             }
-            if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
-                appendQueryParam(url, IOS_OPEN_UDID, casInternalRequestParameters.uid,
+            if (StringUtils.isNotBlank(casInternalRequestParameters.getUid())) {
+                appendQueryParam(url, IOS_OPEN_UDID, casInternalRequestParameters.getUid(),
                         false);
             } else if (StringUtils
-                    .isNotBlank(casInternalRequestParameters.uidIDUS1)) {
+                    .isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
                 appendQueryParam(url, IOS_ID,
-                        casInternalRequestParameters.uidIDUS1, false);
-            } else if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
+                        casInternalRequestParameters.getUidIDUS1(), false);
+            } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
                 appendQueryParam(url, IOS_ID,
-                        casInternalRequestParameters.uidMd5, false);
+                        casInternalRequestParameters.getUidMd5(), false);
             }
         }
 
         if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
-            if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
+            if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
                 appendQueryParam(url, ANDROID_ID,
-                        casInternalRequestParameters.uidMd5, false);
-            } else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
+                        casInternalRequestParameters.getUidMd5(), false);
+            } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUid())) {
                 appendQueryParam(url, ANDROID_ID,
-                        casInternalRequestParameters.uid, false);
-            } else if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
-                appendQueryParam(url, ANDROID_ID, getURLEncode(casInternalRequestParameters.uidO1, format), false);
+                        casInternalRequestParameters.getUid(), false);
+            } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
+                appendQueryParam(url, ANDROID_ID, getURLEncode(casInternalRequestParameters.getUidO1(), format), false);
             }
         }
         String gen = sasParams.getGender();
@@ -249,22 +256,22 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString("adsmogo.advertiserId"));
+        return config.getString("adsmogo.advertiserId");
     }
     
     @Override
     protected String getUid() {
-    	if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
-            return casInternalRequestParameters.uidIFA;
+    	if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIFA())) {
+            return casInternalRequestParameters.getUidIFA();
         }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
-            return casInternalRequestParameters.uidMd5;
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidMd5())) {
+            return casInternalRequestParameters.getUidMd5();
         }        
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIDUS1)) {
-            return casInternalRequestParameters.uidIDUS1;
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIDUS1())) {
+            return casInternalRequestParameters.getUidIDUS1();
         }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uid)) {
-            return casInternalRequestParameters.uid;
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUid())) {
+            return casInternalRequestParameters.getUid();
         }
         return null;
     }

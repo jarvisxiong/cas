@@ -71,9 +71,9 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
 			return false;
 		}
 
-		if (casInternalRequestParameters.latLong != null
-				&& StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
-			String[] latlong = casInternalRequestParameters.latLong.split(",");
+		if (casInternalRequestParameters.getLatLong() != null
+				&& StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+			String[] latlong = casInternalRequestParameters.getLatLong().split(",");
 			latitude = latlong[0];
 			longitude = latlong[1];
 		}
@@ -113,32 +113,30 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
 			StringBuilder url = new StringBuilder(host);
 			appendQueryParam(url, EXT_SITE_KEY, externalSiteId, false);
 			appendQueryParam(url, UA, getURLEncode(sasParams.getUserAgent(), format), false);
-			appendQueryParam(url, IP_ADDR, (sasParams.getRemoteHostIp()),false);
+			appendQueryParam(url, IP_ADDR, sasParams.getRemoteHostIp(), false);
 			appendQueryParam(url, DEVICE_ID,getUid(),false);
 			appendQueryParam(url, TIME,System.currentTimeMillis(),false);
-			appendQueryParam(url, CATEGORIES,getURLEncode(getCategories(',',true),format),false);
+			appendQueryParam(url, CATEGORIES,getURLEncode(getCategories(',',true),format), false);
 			if (width != 0 && height != 0) {
 				appendQueryParam(url, WIDTH, width, false);
 				appendQueryParam(url, HEIGHT, height, false);
 			}
 
 			if (client == 2) {
-				if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
-						&& "1".equals(casInternalRequestParameters.uidADT)) {
-					appendQueryParam(url, IDFA, casInternalRequestParameters.uidIFA, false);
+				if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())
+						&& "1".equals(casInternalRequestParameters.getUidADT())) {
+					appendQueryParam(url, IDFA, casInternalRequestParameters.getUidIFA(), false);
 				}
-				if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
-					appendQueryParam(url, UDID, casInternalRequestParameters.uidIDUS1, false);
-				} else if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
-					appendQueryParam(url, UDID, casInternalRequestParameters.uidMd5, false);
+				if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
+					appendQueryParam(url, UDID, casInternalRequestParameters.getUidIDUS1(), false);
+				} else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
+					appendQueryParam(url, UDID, casInternalRequestParameters.getUidMd5(), false);
 				}
-			}
-			else if (client == 1) {
-				if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
-					appendQueryParam(url, ANDROIDID, casInternalRequestParameters.uidMd5, false);
-				}
-				else if(StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
-					appendQueryParam(url, ANDROIDID, casInternalRequestParameters.uidMd5, false);
+			} else if (client == 1) {
+				if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
+					appendQueryParam(url, ANDROIDID, casInternalRequestParameters.getUidMd5(), false);
+				} else if(StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
+					appendQueryParam(url, ANDROIDID, casInternalRequestParameters.getUidMd5(), false);
 				}
 			}
 
@@ -203,7 +201,7 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
 
 	@Override
 	public String getId() {
-		return (config.getString(name+".advertiserId"));
+		return config.getString(name+".advertiserId");
 	}
 
 }

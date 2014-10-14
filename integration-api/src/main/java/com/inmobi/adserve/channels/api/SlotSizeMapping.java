@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.api;
 
+import com.inmobi.types.adserving.Slot;
+
 import java.awt.Dimension;
 import java.util.HashMap;
 import java.util.Map;
@@ -71,7 +73,7 @@ public class SlotSizeMapping {
     }
 
     public static Dimension getDimension(Long slot) {
-        return (SLOT_MAP.get(slot));
+        return SLOT_MAP.get(slot);
     }
 
     public static boolean isIXSupportedSlot(short inmobiSlot) {

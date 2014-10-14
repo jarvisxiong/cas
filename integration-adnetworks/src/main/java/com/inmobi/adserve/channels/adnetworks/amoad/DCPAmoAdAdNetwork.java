@@ -58,7 +58,7 @@ public class DCPAmoAdAdNetwork extends AbstractDCPAdNetworkImpl {
 
 	@Override
 	public String getId() {
-		return (config.getString("amoad.advertiserId"));
+		return config.getString("amoad.advertiserId");
 	}
 
 	@Override

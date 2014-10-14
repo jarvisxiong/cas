@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>com.inmobi.channels</groupId>
 		<artifactId>cas</artifactId>
-		<version>3.209-SNAPSHOT</version>
+		<version>3.211-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
@@ -111,6 +111,11 @@
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-release-with-junit-easymock-dependencies</artifactId>
+			<type>zip</type>
 		</dependency>
 	</dependencies>
 	<build>

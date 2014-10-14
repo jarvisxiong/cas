@@ -50,6 +50,9 @@ public class ServletBackFillTest {
         expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).times(1);
         expect(mockHttpHeaders.get("x-mkhoj-tracer")).andReturn("true");
         expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(true).times(1);
+        mockCasInternalRequestParameters.setTraceEnabled(true);
+        expectLastCall();
+
         InspectorStats.incrementStatCount(InspectorStrings.BACK_FILL_REQUESTS);
         expectLastCall().times(1);
         InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
