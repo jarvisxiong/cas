@@ -23,15 +23,6 @@ public class SiteFilterRepository extends
         RepositoryManager {
 
     @Override
-    public SiteFilterEntity queryUniqueResult(RepositoryQuery siteFilterQuery) throws RepositoryException {
-        Collection<SiteFilterEntity> siteFilterEntityResultSet = query(siteFilterQuery);
-        if (siteFilterEntityResultSet == null || siteFilterEntityResultSet.isEmpty()) {
-            return null;
-        }
-        return (SiteFilterEntity) siteFilterEntityResultSet.toArray()[0];
-    }
-
-    @Override
     public DBEntity<SiteFilterEntity, SiteFilterQuery> buildObjectFromRow(ResultSetRow resultSetRow)
             throws RepositoryException {
         NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
@@ -40,6 +31,7 @@ public class SiteFilterRepository extends
         siteFilterEntity.setRuleType(row.getInt("rule_type_id"));
         siteFilterEntity.setSiteId(row.getString("site_id"));
         siteFilterEntity.setPubId(row.getString("pub_id"));
+        siteFilterEntity.setModified_on(modifyTime);
         String[] tempArray = (String[]) row.getArray("filter_data");
 
         if (siteFilterEntity.getRuleType() == 4) {
@@ -56,12 +48,21 @@ public class SiteFilterRepository extends
     }
 
     @Override
+    public boolean isObjectToBeDeleted(SiteFilterEntity siteFilterEntity) {
+        return false;
+    }
+
+    @Override
     public HashIndexKeyBuilder<SiteFilterEntity> getHashIndexKeyBuilder(String className) {
         return null;
     }
 
     @Override
-    public boolean isObjectToBeDeleted(SiteFilterEntity siteFilterEntity) {
-        return false;
+    public SiteFilterEntity queryUniqueResult(RepositoryQuery siteFilterQuery) throws RepositoryException {
+        Collection<SiteFilterEntity> siteFilterEntityResultSet = query(siteFilterQuery);
+        if (siteFilterEntityResultSet == null || siteFilterEntityResultSet.isEmpty()) {
+            return null;
+        }
+        return (SiteFilterEntity) siteFilterEntityResultSet.toArray()[0];
     }
 }
