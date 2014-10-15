@@ -1,8 +1,21 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.server.CasConfigUtil;
+import com.inmobi.adserve.channels.server.ChannelServer;
+import com.inmobi.adserve.channels.server.ChannelServerStringLiterals;
+import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import com.inmobi.phoenix.exception.RepositoryException;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.QueryStringDecoder;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -10,21 +23,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
-
-import javax.ws.rs.Path;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.inject.Singleton;
-import com.inmobi.adserve.channels.server.ChannelServerStringLiterals;
-import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.CasConfigUtil;
-import com.inmobi.adserve.channels.server.api.Servlet;
-import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import com.inmobi.phoenix.exception.RepositoryException;
 
 
 @Singleton
@@ -38,28 +36,32 @@ public class ServletRepoRefresh implements Servlet {
     @Override
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
             final Channel serverChannel) throws Exception {
+
         Map<String, List<String>> params = queryStringDecoder.parameters();
         String requestParam = params.get("args").toString();
         JSONArray jsonArray = new JSONArray(requestParam);
         JSONObject jObject = jsonArray.getJSONObject(0);
         LOG.debug("requestParam {} jObject {}", requestParam, jObject);
-        String repoName = jObject.get("repoName").toString();
+
+        String repoName   = jObject.get("repoName").toString();
+        String dbHost     = jObject.get("DBHost").toString();
+        String dbPort     = jObject.get("DBPort").toString();
+        String dbName     = jObject.get("DBSnapshot").toString();
+        String dbUser     = jObject.get("DBUser").toString();
+        String dbPassword = jObject.get("DBPassword").toString();
         LOG.debug("RepoName is {}", repoName);
 
-        String dbHost = jObject.get("DBHost").toString();
-        String dbPort = jObject.get("DBPort").toString();
-        String dbName = jObject.get("DBSnapshot").toString();
-        String dbUser = jObject.get("DBUser").toString();
-        String dbPassword = jObject.get("DBPassword").toString();
         String connectionString = "jdbc:postgresql://" + dbHost + ":" + dbPort + "/" + dbName;
         Connection con = null;
         Statement statement = null;
         ResultSet resultSet;
+        Boolean foundMatch = true;
+
         try {
-            ConfigurationLoader config = ConfigurationLoader
-                    .getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
+            ConfigurationLoader config = ConfigurationLoader.getInstance(ChannelServer.getConfigFile());
             con = DriverManager.getConnection(connectionString, dbUser, dbPassword);
             statement = con.createStatement();
+
             if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY)) {
                 final String query = config.getCacheConfiguration()
                         .subset(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY)
@@ -109,6 +111,13 @@ public class ServletRepoRefresh implements Servlet {
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getPricingEngineRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
+            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_FILTER_REPOSITORY)) {
+                final String query = config.getCacheConfiguration()
+                        .subset(ChannelServerStringLiterals.SITE_FILTER_REPOSITORY)
+                        .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                resultSet = statement.executeQuery(query);
+                CasConfigUtil.repositoryHelper.getSiteFilterRepository().newUpdateFromResultSetToOptimizeUpdate(
+                        resultSet);
             } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY)) {
                 final String query = config.getCacheConfiguration()
                         .subset(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY)
@@ -116,9 +125,52 @@ public class ServletRepoRefresh implements Servlet {
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getSiteEcpmRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
+            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY)) {
+                final String query = config.getCacheConfiguration()
+                        .subset(ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY)
+                        .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                resultSet = statement.executeQuery(query);
+                CasConfigUtil.repositoryHelper.getCurrencyConversionRepository().newUpdateFromResultSetToOptimizeUpdate(
+                        resultSet);
+            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY)) {
+                final String query = config.getCacheConfiguration()
+                        .subset(ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY)
+                        .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                resultSet = statement.executeQuery(query);
+                CasConfigUtil.repositoryHelper.getWapSiteUACRepository().newUpdateFromResultSetToOptimizeUpdate(
+                        resultSet);
+            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY)) {
+                final String query = config.getCacheConfiguration()
+                        .subset(ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY)
+                        .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                resultSet = statement.executeQuery(query);
+                CasConfigUtil.repositoryHelper.getIxAccountMapRepository().newUpdateFromResultSetToOptimizeUpdate(
+                        resultSet);
+            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CREATIVE_REPOSITORY)) {
+                final String query = config.getCacheConfiguration()
+                        .subset(ChannelServerStringLiterals.CREATIVE_REPOSITORY)
+                        .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                resultSet = statement.executeQuery(query);
+                CasConfigUtil.repositoryHelper.getCreativeRepository().newUpdateFromResultSetToOptimizeUpdate(
+                        resultSet);
+            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY)) {
+                final String query = config.getCacheConfiguration()
+                        .subset(ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY)
+                        .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                resultSet = statement.executeQuery(query);
+                CasConfigUtil.repositoryHelper.getNativeAdTemplateRepository().newUpdateFromResultSetToOptimizeUpdate(
+                        resultSet);
+            } else {
+                // RepoName could not be matched
+                LOG.debug("RepoName: {} could not be matched", repoName);
+                hrh.responseSender.sendResponse("NOTOK RepoName could not be matched", serverChannel);
+                foundMatch = false;
             }
-            LOG.debug("Successfully updated {}", repoName);
-            hrh.responseSender.sendResponse("OK", serverChannel);
+
+            if (foundMatch) {
+                LOG.debug("Successfully updated {}", repoName);
+                hrh.responseSender.sendResponse("OK", serverChannel);
+            }
         } catch (SQLException e1) {
             LOG.info("error is {}", e1);
             hrh.responseSender.sendResponse("NOTOK", serverChannel);

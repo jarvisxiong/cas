@@ -1,5 +1,8 @@
 package com.inmobi.adserve.channels.server.netty;
 
+import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.server.ChannelServerPipelineFactory;
+import com.inmobi.adserve.channels.server.ChannelStatServerPipelineFactory;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelOption;
@@ -8,16 +11,10 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.concurrent.DefaultThreadFactory;
 
-import java.net.InetSocketAddress;
-import java.util.concurrent.Executors;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
-
-import com.google.inject.Singleton;
-import com.inmobi.adserve.channels.server.ChannelServerPipelineFactory;
-import com.inmobi.adserve.channels.server.ChannelStatServerPipelineFactory;
+import java.net.InetSocketAddress;
 
 
 /**

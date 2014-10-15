@@ -1,8 +1,10 @@
 package com.inmobi.adserve.channels.api;
 
+import lombok.Data;
+
 import java.util.Map;
 
-
+@Data
 public class ThirdPartyAdResponse {
 
     public enum ResponseStatus {
@@ -18,22 +20,22 @@ public class ThirdPartyAdResponse {
         SOCKET_ERROR,
         MANDATE_PARAM_MISSING,
         MALFORMED_URL
-    };
+    }
 
-    public ResponseStatus responseStatus;
-    public String         response;
-    public Map            responseHeaders;
+    private ResponseStatus responseStatus;
+    private String         response;
+    private Map            responseHeaders;
 
     public enum ResponseFormat {
         HTML,
         WML,
         JSON
-    };
+    }
 
-    public ResponseFormat responseFormat;
-    public String         adStatus;
+    private ResponseFormat responseFormat;
+    private String         adStatus;
     // Latency in ms.
-    public long           latency;
-    public String         impressionId = null;
-    public String         clickUrl     = null;
+    private long           latency;
+    private String         impressionId = null;
+    private String         clickUrl     = null;
 }

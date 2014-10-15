@@ -292,4 +292,5 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
 	public boolean isClickUrlRequired() {
 		return true;
 	}
+
 }

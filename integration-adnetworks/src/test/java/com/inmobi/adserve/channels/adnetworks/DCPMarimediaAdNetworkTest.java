@@ -1,7 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-// Created by Dhanasekaran K P on 24/9/14.
-
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
@@ -202,4 +200,5 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
 
 		assertEquals(actualResponse, expectedResponse);
 	}
+
 }

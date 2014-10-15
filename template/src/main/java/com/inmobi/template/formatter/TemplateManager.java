@@ -17,12 +17,12 @@ public class TemplateManager {
 	
 	private static final  Logger LOG                                 = LoggerFactory.getLogger(TemplateManager.class);
 	
-	private  final StringResourceRepository stringResourceRepository = new StringResourceRepositoryImpl();
-	private  static final String STRING_REPO_NAME = "rtb-service-template-test-internal-repo";
-	private  final VelocityEngine velocityEngine = new VelocityEngine();
+	private final StringResourceRepository stringResourceRepository = new StringResourceRepositoryImpl();
+	private static final String STRING_REPO_NAME = "rtb-service-template-test-internal-repo";
+	private final VelocityEngine velocityEngine = new VelocityEngine();
 	
-	private  final String errorStr = "%s can't be null."; 
-	private  final String logMsg = "Adding to template cache for site id %s ";
+	private static final String ERROR_STR = "%s can't be null.";
+	private static final String LOG_MSG = "Adding to template cache for site id %s ";
 	
 	private static TemplateManager SINGLETON = new TemplateManager();
 	
@@ -48,10 +48,10 @@ public class TemplateManager {
 	
 	
 	public  void addToTemplateCache(String templateName, String templateContent) {
-		Preconditions.checkNotNull(templateName, errorStr,templateName);
-		Preconditions.checkNotNull(templateName, errorStr,templateContent);
+		Preconditions.checkNotNull(templateName, ERROR_STR,templateName);
+		Preconditions.checkNotNull(templateName, ERROR_STR,templateContent);
 		
-		LOG.debug(String.format(logMsg, templateName));
+		LOG.debug(String.format(LOG_MSG, templateName));
 		
         stringResourceRepository.putStringResource(templateName, templateContent);
 	}

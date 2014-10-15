@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.inmobi.channels</groupId>
 	<artifactId>cas</artifactId>
-	<version>3.205-SNAPSHOT</version>
+	<version>3.211-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<url>https://github.corp.inmobi.com/channel-adserve</url>
 	<parent>
@@ -157,10 +157,22 @@
 				<scope>test</scope>
 			</dependency>
 			<dependency>
+ 				<groupId>org.hamcrest</groupId>
+ 				<artifactId>hamcrest-core</artifactId>
+ 				<version>1.3</version>
+ 				<scope>test</scope>
+			</dependency>
+			<dependency>
 				<groupId>org.easymock</groupId>
 				<artifactId>easymock</artifactId>
 				<version>3.1</version>
-				<scope>test</scope>
+                <scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.powermock</groupId>
+				<artifactId>powermock-release-with-junit-easymock-dependencies</artifactId>
+				<version>1.4.11</version>
+				<type>zip</type>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.thrift</groupId>
@@ -192,9 +204,9 @@
 				<version>9.0-801.jdbc3</version>
 			</dependency>
 			<dependency>
-                		<groupId>com.aerospike</groupId>
-                		<artifactId>aerospike-client</artifactId>
-                		<version>3.0.27</version>
+				<groupId>com.aerospike</groupId>
+				<artifactId>aerospike-client</artifactId>
+				<version>3.0.27</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.guava</groupId>
@@ -398,6 +410,16 @@
 		<directory>target</directory>
 
 		<plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
+                <configuration>
+                    <skipTests>${skipTests}</skipTests>
+                    <forkMode>once</forkMode>
+                    <argLine>-XX:-UseSplitVerifier</argLine>
+                </configuration>
+            </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>

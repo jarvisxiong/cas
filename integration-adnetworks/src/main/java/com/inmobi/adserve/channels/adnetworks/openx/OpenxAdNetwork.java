@@ -44,9 +44,9 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
 
-        if (casInternalRequestParameters.latLong != null
-                && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
-            String[] latlong = casInternalRequestParameters.latLong.split(",");
+        if (casInternalRequestParameters.getLatLong() != null
+                && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
@@ -61,7 +61,7 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString("openx.advertiserId"));
+        return config.getString("openx.advertiserId");
     }
 
     // get URI
@@ -79,21 +79,21 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isNotEmpty(latitude)) {
             finalUrl.append("&lt=3");
         }
-        finalUrl.append("&zip=").append(casInternalRequestParameters.zipCode).append("&c.siteId=")
+        finalUrl.append("&zip=").append(casInternalRequestParameters.getZipCode()).append("&c.siteId=")
                 .append(blindedSiteId);
 
         if (HandSetOS.iOS.getValue() == sasParams.getOsId()) {
-            finalUrl.append("&did.ia=").append(casInternalRequestParameters.uidIFA);
-            finalUrl.append("&did.iat=").append(casInternalRequestParameters.uidADT);
-            finalUrl.append("&did.o1=").append(casInternalRequestParameters.uidO1);
-            finalUrl.append("&did.ma.md5=").append(casInternalRequestParameters.uidMd5);
-            finalUrl.append("&did.ma.sha1=").append(casInternalRequestParameters.uidSO1);
+            finalUrl.append("&did.ia=").append(casInternalRequestParameters.getUidIFA());
+            finalUrl.append("&did.iat=").append(casInternalRequestParameters.getUidADT());
+            finalUrl.append("&did.o1=").append(casInternalRequestParameters.getUidO1());
+            finalUrl.append("&did.ma.md5=").append(casInternalRequestParameters.getUidMd5());
+            finalUrl.append("&did.ma.sha1=").append(casInternalRequestParameters.getUidSO1());
         } else if (HandSetOS.Android.getValue() == sasParams.getOsId()) {
-            finalUrl.append("&did.ai.md5=").append(casInternalRequestParameters.uidMd5);
-            finalUrl.append("&did.ai.sha1=").append(casInternalRequestParameters.uidO1);
+            finalUrl.append("&did.ai.md5=").append(casInternalRequestParameters.getUidMd5());
+            finalUrl.append("&did.ai.sha1=").append(casInternalRequestParameters.getUidO1());
         }
 
-        finalUrl.append("&did=").append(casInternalRequestParameters.uid);
+        finalUrl.append("&did=").append(casInternalRequestParameters.getUid());
 
         String[] urlParams = finalUrl.toString().split("&");
         finalUrl.delete(0, finalUrl.length());

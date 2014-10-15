@@ -155,10 +155,10 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 			return false;
 		}
 		host = config.getString("rubicon.host");
-		if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
+		if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
 				&& StringUtils.countMatches(
-						casInternalRequestParameters.latLong, ",") > 0) {
-			String[] latlong = casInternalRequestParameters.latLong.split(",");
+						casInternalRequestParameters.getLatLong(), ",") > 0) {
+			String[] latlong = casInternalRequestParameters.getLatLong().split(",");
 			latitude = latlong[0];
 			longitude = latlong[1];
 		}
@@ -280,9 +280,9 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 					&& sasParams.getSiteEcpmEntity().getNetworkEcpm() > 0) {
 				appendQueryParam(url, FLOOR_PRICE, ECPM_PERCENTAGE
 						* sasParams.getSiteEcpmEntity().getNetworkEcpm(), false);
-			} else if (casInternalRequestParameters.auctionBidFloor > 0) {
+			} else if (casInternalRequestParameters.getAuctionBidFloor() > 0) {
 				appendQueryParam(url, FLOOR_PRICE,
-						casInternalRequestParameters.auctionBidFloor, false);
+						casInternalRequestParameters.getAuctionBidFloor(), false);
 			} else {
 				appendQueryParam(url, FLOOR_PRICE, MIN_ECPM, false);
 			}
@@ -389,7 +389,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 
 	@Override
 	public String getId() {
-		return (config.getString("rubicon.advertiserId"));
+		return config.getString("rubicon.advertiserId");
 	}
 
 	public String getZoneId(JSONObject additionalParams) {
@@ -440,10 +440,10 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 		// Device id type 1 (IDFA), 2 (OpenUDID), 3 (Apple UDID), 4 (Android
 		// device ID)
 
-		if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)
-				&& "1".equals(casInternalRequestParameters.uidADT)) {
+		if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())
+				&& "1".equals(casInternalRequestParameters.getUidADT())) {
 			appendQueryParam(url, DEVICE_ID,
-					casInternalRequestParameters.uidIFA, false);
+					casInternalRequestParameters.getUidIFA(), false);
 			appendQueryParam(url, DEVICE_ID_TYPE, IDFA, false);
 		} else {
 			String gpid = getGPID();
@@ -453,24 +453,23 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 
 			} else {
 				boolean isUdid = false;
-				if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
-					appendQueryParam(url, MD5_DEVICE_ID, casInternalRequestParameters.uidMd5, false);
+				if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
+					appendQueryParam(url, MD5_DEVICE_ID, casInternalRequestParameters.getUidMd5(), false);
 					isUdid = true;
 				}
 
-				if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
-					appendQueryParam(url, SHA1_DEVICE_ID, casInternalRequestParameters.uidIDUS1, false);
+				if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
+					appendQueryParam(url, SHA1_DEVICE_ID, casInternalRequestParameters.getUidIDUS1(), false);
 					isUdid = true;
-				}
-				else if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
-					appendQueryParam(url, SHA1_DEVICE_ID, casInternalRequestParameters.uidO1, false);
+				} else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
+					appendQueryParam(url, SHA1_DEVICE_ID, casInternalRequestParameters.getUidO1(), false);
 					isUdid = true;
 				}
 
 				if (isUdid) {
 					appendQueryParam(url, DEVICE_ID_TYPE, UDID, false);
-				} else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
-					appendQueryParam(url, MD5_DEVICE_ID, casInternalRequestParameters.uid, false);
+				} else if (StringUtils.isNotBlank(casInternalRequestParameters.getUid())) {
+					appendQueryParam(url, MD5_DEVICE_ID, casInternalRequestParameters.getUid(), false);
 					appendQueryParam(url, DEVICE_ID_TYPE, OPEN_UDID, false);
 				}
 			}

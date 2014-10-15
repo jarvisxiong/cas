@@ -315,7 +315,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private boolean createBidRequestObject(final List<Impression> impresssionlist, final Site site, final App app,
             final User user, final Device device) {
         //nullcheck for casInternalRequestParams and sasParams done while configuring adapter
-        bidRequest = new BidRequest(casInternalRequestParameters.auctionId, impresssionlist);
+        bidRequest = new BidRequest(casInternalRequestParameters.getAuctionId(), impresssionlist);
         bidRequest.setTmax(tmax);
         bidRequest.setAt(AUCTION_TYPE);
         bidRequest.setCur(Collections.<String>emptyList());
@@ -323,9 +323,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         seatList.add(advertiserId);
         bidRequest.setWseat(seatList);
         HashSet<String> bCatSet = new HashSet<>();
-        if (null != casInternalRequestParameters.blockedIabCategories) {
-            bCatSet.addAll(casInternalRequestParameters.blockedIabCategories);
-            LOG.debug(traceMarker, "blockedCategories are {}", casInternalRequestParameters.blockedIabCategories);
+
+        if (null != casInternalRequestParameters.getBlockedIabCategories()) {
+            bCatSet.addAll(casInternalRequestParameters.getBlockedIabCategories());
+            LOG.debug(traceMarker, "blockedCategories are {}", casInternalRequestParameters.getBlockedIabCategories());
         }
         // Setting blocked categories
         if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
@@ -335,12 +336,13 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             bCatSet.addAll(
                     iabCategoriesInterface.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES));
         }
+
         List<String> bCatList = new ArrayList<String>(bCatSet);
         bidRequest.setBcat(bCatList);
 
-        if (null != casInternalRequestParameters.blockedAdvertisers) {
-            blockedAdvertisers.addAll(casInternalRequestParameters.blockedAdvertisers);
-            LOG.debug(traceMarker, "blockedAdvertisers are {}", casInternalRequestParameters.blockedAdvertisers);
+        if (null != casInternalRequestParameters.getBlockedAdvertisers()) {
+            blockedAdvertisers.addAll(casInternalRequestParameters.getBlockedAdvertisers());
+            LOG.debug(traceMarker, "blockedAdvertisers are {}", casInternalRequestParameters.getBlockedAdvertisers());
         }
         bidRequest.setBadv(blockedAdvertisers);
 
@@ -367,8 +369,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             	bidRequestJson = bidRequestJson.replaceFirst("nativeObject", "native");
             }
             LOG.info(traceMarker, "RTB request json is : {}", bidRequestJson);
-        }
-        catch (TException e) {
+        } catch (TException e) {
             LOG.debug(traceMarker, "Could not create json from bidrequest for partner {}", advertiserName);
             LOG.info(traceMarker, "Configure parameters inside rtb returned false {}, exception raised {}", advertiserName, e);
             return false;
@@ -381,8 +382,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             final String displayManagerVersion) {
         //nullcheck for casInternalRequestParams and sasParams done while configuring adapter
         Impression impression;
-        if (null != casInternalRequestParameters.impressionId) {
-            impression = new Impression(casInternalRequestParameters.impressionId);
+        if (null != casInternalRequestParameters.getImpressionId()) {
+            impression = new Impression(casInternalRequestParameters.getImpressionId());
         } else {
             LOG.info(traceMarker, "Impression id can not be null in casInternal Request Params");
             return null;
@@ -399,7 +400,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             impression.setInstl(0);
         }
 
-        impression.setBidfloor(casInternalRequestParameters.auctionBidFloor);
+        impression.setBidfloor(casInternalRequestParameters.getAuctionBidFloor());
         LOG.debug(traceMarker, "Bid floor is {}", impression.getBidfloor());
 
         if (null != displayManager) {
@@ -448,7 +449,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     
     private Banner createBannerObject() {
         Banner banner = new Banner();
-        banner.setId(casInternalRequestParameters.impressionId);
+        banner.setId(casInternalRequestParameters.getImpressionId());
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
             Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             banner.setW((int) dim.getWidth());
@@ -505,9 +506,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     private Geo createGeoObject() {
         Geo geo = new Geo();
-        if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
-                && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
-            String[] latlong = casInternalRequestParameters.latLong.split(",");
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
+                && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             geo.setLat(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[0]))));
             geo.setLon(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[1]))));
         }
@@ -517,7 +518,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         /*if (null != iabCitiesInterface.getIABCity(sasParams.getCity() + "")) {
             geo.setCity(iabCitiesInterface.getIABCity(sasParams.getCity() + ""));
         }*/
-        geo.setZip(casInternalRequestParameters.zipCode);
+        geo.setZip(casInternalRequestParameters.getZipCode());
         // Setting type of geo data
         if ("DERIVED_LAT_LON".equalsIgnoreCase(sasParams.getLocSrc())) {
             geo.setType(1);
@@ -534,9 +535,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             user.setGender(gender);  
         }
         
-        if (casInternalRequestParameters.uid != null) {
-            user.setId(casInternalRequestParameters.uid);
-            user.setBuyeruid(casInternalRequestParameters.uid);
+        if (null != casInternalRequestParameters.getUid()) {
+            user.setId(casInternalRequestParameters.getUid());
+            user.setBuyeruid(casInternalRequestParameters.getUid());
         }
 
         try {
@@ -659,42 +660,42 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
 
         // Setting do not track
-        if (null != casInternalRequestParameters.uidADT) {
+        if (null != casInternalRequestParameters.getUidADT()) {
             try {
-                device.setDnt(Integer.parseInt(casInternalRequestParameters.uidADT) == 0 ? 1 : 0);
+                device.setDnt(Integer.parseInt(casInternalRequestParameters.getUidADT()) == 0 ? 1 : 0);
             } catch (NumberFormatException e) {
                 LOG.debug(traceMarker, "Exception while parsing uidADT to integer {}", e);
             }
         }
         // Setting platform id sha1 hashed
-        if (null != casInternalRequestParameters.uidSO1) {
-            device.setDidsha1(casInternalRequestParameters.uidSO1);
-            device.setDpidsha1(casInternalRequestParameters.uidSO1);
-        } else if (null != casInternalRequestParameters.uidO1) {
-            device.setDidsha1(casInternalRequestParameters.uidO1);
-            device.setDpidsha1(casInternalRequestParameters.uidO1);
+        if (null != casInternalRequestParameters.getUidSO1()) {
+            device.setDidsha1(casInternalRequestParameters.getUidSO1());
+            device.setDpidsha1(casInternalRequestParameters.getUidSO1());
+        } else if (null != casInternalRequestParameters.getUidO1()) {
+            device.setDidsha1(casInternalRequestParameters.getUidO1());
+            device.setDpidsha1(casInternalRequestParameters.getUidO1());
         }
 
         // Setting platform id md5 hashed
-        if (null != casInternalRequestParameters.uidMd5) {
-            device.setDidmd5(casInternalRequestParameters.uidMd5);
-            device.setDpidmd5(casInternalRequestParameters.uidMd5);
-        } else if (null != casInternalRequestParameters.uid) {
-            device.setDidmd5(casInternalRequestParameters.uid);
-            device.setDpidmd5(casInternalRequestParameters.uid);
+        if (null != casInternalRequestParameters.getUidMd5()) {
+            device.setDidmd5(casInternalRequestParameters.getUidMd5());
+            device.setDpidmd5(casInternalRequestParameters.getUidMd5());
+        } else if (null != casInternalRequestParameters.getUid()) {
+            device.setDidmd5(casInternalRequestParameters.getUid());
+            device.setDpidmd5(casInternalRequestParameters.getUid());
         }
 
         // Setting Extension for idfa
-        if (!StringUtils.isEmpty(casInternalRequestParameters.uidIFA)) {
+        if (!StringUtils.isEmpty(casInternalRequestParameters.getUidIFA())) {
         	final  Map<String, String> deviceExtensions = getDeviceExt(device);
-            deviceExtensions.put("idfa", casInternalRequestParameters.uidIFA);
-            deviceExtensions.put("idfasha1", getHashedValue(casInternalRequestParameters.uidIFA, "SHA-1"));
-            deviceExtensions.put("idfamd5", getHashedValue(casInternalRequestParameters.uidIFA, "MD5"));
+            deviceExtensions.put("idfa", casInternalRequestParameters.getUidIFA());
+            deviceExtensions.put("idfasha1", getHashedValue(casInternalRequestParameters.getUidIFA(), "SHA-1"));
+            deviceExtensions.put("idfamd5", getHashedValue(casInternalRequestParameters.getUidIFA(), "MD5"));
         }
         
-        if (!StringUtils.isEmpty(casInternalRequestParameters.gpid)) {
+        if (!StringUtils.isEmpty(casInternalRequestParameters.getGpid())) {
         	final  Map<String, String> deviceExtensions = getDeviceExt(device);
-       	 	deviceExtensions.put("gpid", casInternalRequestParameters.gpid);
+       	 	deviceExtensions.put("gpid", casInternalRequestParameters.getGpid());
        	}
         return device;
     }
@@ -948,8 +949,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             if (!StringUtils.isEmpty(callbackUrl)) {
                 LOG.debug(traceMarker, "inside wn from config");
                 winUrl = callbackUrl;
-            }
-            else if (!StringUtils.isEmpty(nUrl)) {
+            } else if (!StringUtils.isEmpty(nUrl)) {
                 LOG.debug(traceMarker, "inside wn from nurl");
                 winUrl = nUrl;
             }
@@ -978,14 +978,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     		params.put("siteId", this.sasParams.getSiteId());
     		responseContent = nativeResponseMaker.makeResponse(bidResponse, params, repositoryHelper.queryNativeAdTemplateRepository(sasParams.getSiteId()));
 		} catch (Exception e) {
-			
-			if(LOG.isDebugEnabled()){
-				e.printStackTrace();
-			}
+
 			 adStatus = NO_AD;
 			 responseContent = "";
-	         LOG.error("Some exception is caught while filling the native template for partner "+e.getLocalizedMessage(),
-	                    advertiserName, e);
+	         LOG.error("Some exception is caught while filling the native template for partner {}, advertiser = {}, exception = {}",
+                     e.getLocalizedMessage(), advertiserName, e);
 		}
     	
     }
@@ -1021,8 +1018,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             }
 
             return true;
-        }
-        catch (NullPointerException e) {
+        } catch (NullPointerException e) {
             LOG.info(traceMarker, "Could not parse the rtb response from partner: {}, exception thrown {}", this.getName(), e);
             return false;
         }
@@ -1047,7 +1043,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             // A valid video response is received. Set the flag.
             isVideoResponseReceived = true;
 
-            String newImpressionId = this.casInternalRequestParameters.impressionIdForVideo;
+            String newImpressionId = this.casInternalRequestParameters.getImpressionIdForVideo();
             if (StringUtils.isNotEmpty(newImpressionId)) {
 
                 // Update the response impression id so that this doesn't get filtered in AuctionImpressionIdFilter.
@@ -1187,8 +1183,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         LOG.debug(traceMarker, "responseContent before replaceMacros is {}", responseContent);
         this.responseContent = replaceRTBMacros(this.responseContent);
         ThirdPartyAdResponse adResponse = getResponseAd();
-        adResponse.response = responseContent;
-        LOG.debug(traceMarker, "responseContent after replaceMacros is {}", getResponseAd().response);
+        adResponse.setResponse(responseContent);
+        LOG.debug(traceMarker, "responseContent after replaceMacros is {}", getResponseAd().getResponse());
     }
 
     @Override

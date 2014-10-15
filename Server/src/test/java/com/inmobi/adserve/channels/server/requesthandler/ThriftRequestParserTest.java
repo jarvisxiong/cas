@@ -1,19 +1,5 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import junit.framework.TestCase;
-
-import org.apache.commons.configuration.Configuration;
-
 import com.inmobi.adserve.adpool.AdCodeType;
 import com.inmobi.adserve.adpool.AdPoolRequest;
 import com.inmobi.adserve.adpool.Carrier;
@@ -35,6 +21,19 @@ import com.inmobi.types.Gender;
 import com.inmobi.types.InventoryType;
 import com.inmobi.types.LocationSource;
 import com.inmobi.types.SupplySource;
+import junit.framework.TestCase;
+import org.apache.commons.configuration.Configuration;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
 
 
 public class ThriftRequestParserTest extends TestCase {
@@ -51,6 +50,7 @@ public class ThriftRequestParserTest extends TestCase {
         thriftRequestParser = new ThriftRequestParser();
     }
 
+    @Test
     public void testParseRequestParameters() {
         Site site = new Site();
         site.setContentRatingDeprecated(ContentRating.FAMILY_SAFE);

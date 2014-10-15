@@ -51,9 +51,9 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
 			return false;
 		}
 		host = config.getString("tapit.host");
-		if (casInternalRequestParameters.latLong != null
-				&& StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
-			String[] latlong = casInternalRequestParameters.latLong.split(",");
+		if (casInternalRequestParameters.getLatLong() != null
+				&& StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+			String[] latlong = casInternalRequestParameters.getLatLong().split(",");
 			latitude = latlong[0];
 			longitude = latlong[1];
 		}
@@ -92,16 +92,16 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
 				url.append("&long=").append(longitude);
 			}
 
-			if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
-				url.append("&enctype=raw&idfa=").append(casInternalRequestParameters.uidIFA);
+			if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIFA())) {
+				url.append("&enctype=raw&idfa=").append(casInternalRequestParameters.getUidIFA());
 			}
 
-			if (StringUtils.isNotEmpty(casInternalRequestParameters.uidO1)) {
-				url.append("&enctype=sha1&udid=").append(casInternalRequestParameters.uidO1);
-			} else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
-				url.append("&enctype=md5&udid=").append(casInternalRequestParameters.uidMd5);
-			} else if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
-				appendQueryParam(url,"&enctype=sha1&udid=", casInternalRequestParameters.uidIDUS1, false);
+			if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidO1())) {
+				url.append("&enctype=sha1&udid=").append(casInternalRequestParameters.getUidO1());
+			} else if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidMd5())) {
+				url.append("&enctype=md5&udid=").append(casInternalRequestParameters.getUidMd5());
+			} else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
+				appendQueryParam(url,"&enctype=sha1&udid=", casInternalRequestParameters.getUidIDUS1(), false);
 			}
 			String gpid = getGPID();
 			if (gpid != null) {
@@ -185,6 +185,6 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
 
 	@Override
 	public String getId() {
-		return (config.getString("tapit.advertiserId"));
+		return config.getString("tapit.advertiserId");
 	}
 }

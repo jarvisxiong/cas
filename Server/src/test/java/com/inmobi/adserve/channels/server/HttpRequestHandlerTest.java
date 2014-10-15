@@ -22,15 +22,15 @@ import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.replay;
 
 
 public class HttpRequestHandlerTest extends TestCase {
@@ -138,9 +138,9 @@ public class HttpRequestHandlerTest extends TestCase {
         httpRequestHandler.getAuctionEngine().getUnfilteredChannelSegmentList().add(channelSegment1);
         httpRequestHandler.getAuctionEngine().getUnfilteredChannelSegmentList().add(channelSegment2);
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.auctionBidFloor = 0;
-        casInternalRequestParameters.auctionId = "auctionId";
-        casInternalRequestParameters.siteAccountType = AccountType.SELF_SERVE;
+        casInternalRequestParameters.setAuctionBidFloor(0);
+        casInternalRequestParameters.setAuctionId("auctionId");
+        casInternalRequestParameters.setSiteAccountType(AccountType.SELF_SERVE);
         httpRequestHandler.getAuctionEngine().casInternalRequestParameters = casInternalRequestParameters;
         httpRequestHandler.getAuctionEngine().sasParams = new SASRequestParameters();
         httpRequestHandler.getAuctionEngine().sasParams.setDst(DemandSourceType.RTBD.getValue());
@@ -180,9 +180,9 @@ public class HttpRequestHandlerTest extends TestCase {
         httpRequestHandler.getAuctionEngine().setUnfilteredChannelSegmentList(new ArrayList<ChannelSegment>());
         httpRequestHandler.getAuctionEngine().getUnfilteredChannelSegmentList().add(channelSegment1);
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.auctionBidFloor = 0;
-        casInternalRequestParameters.auctionId = "auctionId";
-        casInternalRequestParameters.siteAccountType = AccountType.SELF_SERVE;
+        casInternalRequestParameters.setAuctionBidFloor(0);
+        casInternalRequestParameters.setAuctionId("auctionId");
+        casInternalRequestParameters.setSiteAccountType(AccountType.SELF_SERVE);
         httpRequestHandler.getAuctionEngine().casInternalRequestParameters = casInternalRequestParameters;
         httpRequestHandler.getAuctionEngine().sasParams = new SASRequestParameters();
         httpRequestHandler.getAuctionEngine().sasParams.setDst(DemandSourceType.RTBD.getValue());
@@ -195,9 +195,9 @@ public class HttpRequestHandlerTest extends TestCase {
     public void testrunRtbSecondPriceAuctionEngineTotalsegmentZero() {
         ResponseSender httpRequestHandler = new ResponseSender(null);
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.auctionBidFloor = 0;
-        casInternalRequestParameters.auctionId = "auctionId";
-        casInternalRequestParameters.siteAccountType = AccountType.SELF_SERVE;
+        casInternalRequestParameters.setAuctionBidFloor(0);
+        casInternalRequestParameters.setAuctionId("auctionId");
+        casInternalRequestParameters.setSiteAccountType(AccountType.SELF_SERVE);
         httpRequestHandler.getAuctionEngine().setUnfilteredChannelSegmentList(new ArrayList<ChannelSegment>());
         httpRequestHandler.getAuctionEngine().casInternalRequestParameters = casInternalRequestParameters;
         httpRequestHandler.getAuctionEngine().sasParams = new SASRequestParameters();
@@ -277,9 +277,9 @@ public class HttpRequestHandlerTest extends TestCase {
         ChannelSegment channelSegment3 = new ChannelSegment(null, channelentity, null, null, null, adNetworkInterface3,
                 0);
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.auctionBidFloor = 0;
-        casInternalRequestParameters.auctionId = "auctionId";
-        casInternalRequestParameters.siteAccountType = AccountType.SELF_SERVE;
+        casInternalRequestParameters.setAuctionBidFloor(0);
+        casInternalRequestParameters.setAuctionId("auctionId");
+        casInternalRequestParameters.setSiteAccountType(AccountType.SELF_SERVE);
         httpRequestHandler.getAuctionEngine().casInternalRequestParameters = casInternalRequestParameters;
         httpRequestHandler.getAuctionEngine().sasParams = new SASRequestParameters();
         httpRequestHandler.getAuctionEngine().sasParams.setDst(DemandSourceType.RTBD.getValue());
@@ -362,9 +362,9 @@ public class HttpRequestHandlerTest extends TestCase {
         ChannelSegment channelSegment3 = new ChannelSegment(null, channelentity, null, null, null, adNetworkInterface3,
                 0);
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.auctionBidFloor = 0;
-        casInternalRequestParameters.auctionId = "auctionId";
-        casInternalRequestParameters.siteAccountType = AccountType.SELF_SERVE;
+        casInternalRequestParameters.setAuctionBidFloor(0);
+        casInternalRequestParameters.setAuctionId("auctionId");
+        casInternalRequestParameters.setSiteAccountType(AccountType.SELF_SERVE);
         httpRequestHandler.getAuctionEngine().casInternalRequestParameters = casInternalRequestParameters;
         httpRequestHandler.getAuctionEngine().sasParams = new SASRequestParameters();
         httpRequestHandler.getAuctionEngine().sasParams.setDst(DemandSourceType.RTBD.getValue());
@@ -447,9 +447,9 @@ public class HttpRequestHandlerTest extends TestCase {
         ChannelSegment channelSegment3 = new ChannelSegment(null, channelentity, null, null, null, adNetworkInterface3,
                 0);
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.auctionBidFloor = 0;
-        casInternalRequestParameters.auctionId = "auctionId";
-        casInternalRequestParameters.siteAccountType = AccountType.SELF_SERVE;
+        casInternalRequestParameters.setAuctionBidFloor(0);
+        casInternalRequestParameters.setAuctionId("auctionId");
+        casInternalRequestParameters.setSiteAccountType(AccountType.SELF_SERVE);
         rs.getAuctionEngine().casInternalRequestParameters = casInternalRequestParameters;
         rs.getAuctionEngine().sasParams = new SASRequestParameters();
         rs.getAuctionEngine().sasParams.setDst(DemandSourceType.RTBD.getValue());
@@ -528,9 +528,9 @@ public class HttpRequestHandlerTest extends TestCase {
         ChannelSegment channelSegment3 = new ChannelSegment(null, channelentity, null, null, null, adNetworkInterface3,
                 0);
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.auctionBidFloor = 0;
-        casInternalRequestParameters.auctionId = "auctionId";
-        casInternalRequestParameters.siteAccountType = AccountType.SELF_SERVE;
+        casInternalRequestParameters.setAuctionBidFloor(0);
+        casInternalRequestParameters.setAuctionId("auctionId");
+        casInternalRequestParameters.setSiteAccountType(AccountType.SELF_SERVE);
         httpRequestHandler.getAuctionEngine().casInternalRequestParameters = casInternalRequestParameters;
         httpRequestHandler.getAuctionEngine().sasParams = new SASRequestParameters();
         httpRequestHandler.getAuctionEngine().sasParams.setDst(DemandSourceType.RTBD.getValue());
@@ -612,9 +612,9 @@ public class HttpRequestHandlerTest extends TestCase {
         ChannelSegment channelSegment3 = new ChannelSegment(null, channelentity, null, null, null, adNetworkInterface3,
                 0);
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.auctionBidFloor = 0;
-        casInternalRequestParameters.auctionId = "auctionId";
-        casInternalRequestParameters.siteAccountType = AccountType.SELF_SERVE;
+        casInternalRequestParameters.setAuctionBidFloor(0);
+        casInternalRequestParameters.setAuctionId("auctionId");
+        casInternalRequestParameters.setSiteAccountType(AccountType.SELF_SERVE);
         httpRequestHandler.getAuctionEngine().casInternalRequestParameters = casInternalRequestParameters;
         httpRequestHandler.getAuctionEngine().sasParams = new SASRequestParameters();
         httpRequestHandler.getAuctionEngine().sasParams.setDst(DemandSourceType.RTBD.getValue());
@@ -660,8 +660,8 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.getAttribute()).andReturn(cAttributes).anyTimes();
         expect(adNetworkInterface1.getIUrl()).andReturn("iurl").anyTimes();
         ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
-        thirdPartyAdResponse.adStatus = "AD";
-        thirdPartyAdResponse.latency = 12;
+        thirdPartyAdResponse.setAdStatus("AD");
+        thirdPartyAdResponse.setLatency(12);
         expect(adNetworkInterface1.getResponseStruct()).andReturn(thirdPartyAdResponse).anyTimes();
         replay(adNetworkInterface1);
         ChannelSegmentEntity channelSegmentEntity = createMock(ChannelSegmentEntity.class);

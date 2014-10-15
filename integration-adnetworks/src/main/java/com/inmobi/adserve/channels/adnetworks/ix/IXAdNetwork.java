@@ -185,7 +185,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         super(baseRequestHandler, serverChannel);
         this.advertiserId = config.getString(advertiserName + ".advertiserId");
         this.urlArg = config.getString(advertiserName + ".urlArg");
-        //this.rtbVer = config.getString(advertiserName + ".rtbVer", "2.0");
         this.callbackUrl = config.getString(advertiserName + ".wnUrlback");
         this.ixMethod = config.getString(advertiserName + ".ixMethod");
         this.wnRequired = config.getBoolean(advertiserName + ".isWnRequired");
@@ -318,7 +317,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                                                 final User user, final Device device,final Regs regs) {
         IXBidRequest tempBidRequest = new IXBidRequest(impresssionlist);
 
-        tempBidRequest.setId(casInternalRequestParameters.auctionId);
+        tempBidRequest.setId(casInternalRequestParameters.getAuctionId());
         tempBidRequest.setTmax(tmax);
 
         LOG.debug(traceMarker, "INSIDE CREATE BID REQUEST OBJECT");
@@ -374,7 +373,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     private ProxyDemand createProxyDemandObject() {
         ProxyDemand proxyDemand = new ProxyDemand();
-        proxyDemand.setMarketrate(Math.max(sasParams.getMarketRate(),casInternalRequestParameters.auctionBidFloor));
+        proxyDemand.setMarketrate(Math.max(sasParams.getMarketRate(),casInternalRequestParameters.getAuctionBidFloor()));
         return proxyDemand;
     }
 
@@ -382,7 +381,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private Impression createImpressionObject(final Banner banner, final String displayManager,
                                               final String displayManagerVersion, final ProxyDemand proxyDemand) {
         Impression impression;
-        if (null != casInternalRequestParameters.impressionId) {
+        if (null != casInternalRequestParameters.getImpressionId()) {
             /**
              * In order to conform to the rubicon spec, we are passing a unique integer identifier whose value
              * starts with 1, and increments up to n for n impressions.
@@ -396,14 +395,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             impression.setBanner(banner);
         }
         impression.setProxydemand(proxyDemand);
-        //impression.setBidfloorcur(USD);
         // Set interstitial or not
         if (null != sasParams.getRqAdType() && "int".equalsIgnoreCase(sasParams.getRqAdType())) {
             impression.setInstl(1);
         } else {
             impression.setInstl(0);
         }
-        impression.setBidfloor(casInternalRequestParameters.auctionBidFloor);
+        impression.setBidfloor(casInternalRequestParameters.getAuctionBidFloor());
         LOG.debug(traceMarker, "Bid floor is {}", impression.getBidfloor());
         CommonExtension impExt = new CommonExtension();
         JSONObject additionalParams= entity.getAdditionalParams();
@@ -483,9 +481,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private Geo createGeoObject() {
         Geo geo = new Geo();
         //If Coppa is not set, only then send latLong
-        if (!isCoppaSet && StringUtils.isNotBlank(casInternalRequestParameters.latLong)
-                && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
-            String[] latlong = casInternalRequestParameters.latLong.split(",");
+        if (!isCoppaSet && StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
+                && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             geo.setLat(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[0]))));
             geo.setLon(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[1]))));
         }
@@ -493,7 +491,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             geo.setCountry(iabCountriesInterface.getIabCountry(sasParams.getCountryCode()));
         }
 
-        geo.setZip(casInternalRequestParameters.zipCode);
+        geo.setZip(casInternalRequestParameters.getZipCode());
 
         return geo;
     }
@@ -731,35 +729,35 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         // Setting do not track
-        if (null != casInternalRequestParameters.uidADT) {
+        if (null != casInternalRequestParameters.getUidADT()) {
             try {
-                device.setLmt(Integer.parseInt(casInternalRequestParameters.uidADT) == 0 ? 1 : 0);
+                device.setLmt(Integer.parseInt(casInternalRequestParameters.getUidADT()) == 0 ? 1 : 0);
             } catch (NumberFormatException e) {
                 LOG.debug(traceMarker, "Exception while parsing uidADT to integer {}", e);
             }
         }
         // Setting platform id sha1 hashed
-        if (null != casInternalRequestParameters.uidSO1) {
-            device.setDidsha1(casInternalRequestParameters.uidSO1);
-            device.setDpidsha1(casInternalRequestParameters.uidSO1);
-        } else if (null != casInternalRequestParameters.uidO1) {
-            device.setDidsha1(casInternalRequestParameters.uidO1);
-            device.setDpidsha1(casInternalRequestParameters.uidO1);
+        if (null != casInternalRequestParameters.getUidSO1()) {
+            device.setDidsha1(casInternalRequestParameters.getUidSO1());
+            device.setDpidsha1(casInternalRequestParameters.getUidSO1());
+        } else if (null != casInternalRequestParameters.getUidO1()) {
+            device.setDidsha1(casInternalRequestParameters.getUidO1());
+            device.setDpidsha1(casInternalRequestParameters.getUidO1());
         }
 
         // Setting platform id md5 hashed
-        if (null != casInternalRequestParameters.uidMd5) {
-            device.setDidmd5(casInternalRequestParameters.uidMd5);
-            device.setDpidmd5(casInternalRequestParameters.uidMd5);
-        } else if (null != casInternalRequestParameters.uid) {
-            device.setDidmd5(casInternalRequestParameters.uid);
-            device.setDpidmd5(casInternalRequestParameters.uid);
+        if (null != casInternalRequestParameters.getUidMd5()) {
+            device.setDidmd5(casInternalRequestParameters.getUidMd5());
+            device.setDpidmd5(casInternalRequestParameters.getUidMd5());
+        } else if (null != casInternalRequestParameters.getUid()) {
+            device.setDidmd5(casInternalRequestParameters.getUid());
+            device.setDpidmd5(casInternalRequestParameters.getUid());
         }
 
         // Setting Extension for ifa
         //if Coppa is not set, only then set IFA
-        if (!isCoppaSet && !StringUtils.isEmpty(casInternalRequestParameters.uidIFA)) {
-            device.setIfa(casInternalRequestParameters.uidIFA);
+        if (!isCoppaSet && !StringUtils.isEmpty(casInternalRequestParameters.getUidIFA())) {
+            device.setIfa(casInternalRequestParameters.getUidIFA());
         }
 
         final CommonExtension ext= new CommonExtension();
@@ -865,7 +863,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             adStatus = "AD";
 
             if(isNativeRequest()){
-                // TODO add nativeAdBuilding();
+                // TODO add nativeAdBuilding
                 LOG.debug(traceMarker, "we do not support native request");
             } else {
                 nonNativeAdBuilding();
@@ -876,16 +874,30 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         LOG.debug(traceMarker, "response is {}", responseContent);
     }
 
-
     public boolean updateDSPAccountInfo(String buyer) {
         LOG.debug(traceMarker, "Inside updateDSPAccountInfo");
+
+        Long buyerId;
+        try {
+            buyerId = Long.parseLong(buyer);
+        }
+        catch (NumberFormatException e) {
+            LOG.debug("NumberFormatException: Invalid DSP Buyer ID Format");
+            return false;
+        }
+
         // Get Inmobi account id for the DSP on Rubicon side
-        IXAccountMapEntity ixAccountMapEntity = repositoryHelper.queryIXAccountMapRepository(Long.parseLong(buyer));
+        IXAccountMapEntity ixAccountMapEntity = repositoryHelper.queryIXAccountMapRepository(buyerId);
         if (null == ixAccountMapEntity) {
-            LOG.error("Invalid Rubicon DSP id: DSP id:{}", buyer);
+            LOG.error("Invalid Rubicon DSP id: {}", buyer);
             return false;
         }
         String DSPAccountId = ixAccountMapEntity.getInmobiAccountId();
+
+        if(StringUtils.isEmpty(DSPAccountId)) {
+            LOG.error("Inmobi Account ID is null or empty for Rubicon DSP id: {}", buyer);
+            return false;
+        }
 
         // Get collection of Channel Segment Entities for the particular Inmobi account id
         ChannelAdGroupRepository channelAdGroupRepository = repositoryHelper.getChannelAdGroupRepository();
@@ -896,7 +908,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         Collection<ChannelSegmentEntity> adGroupMap = channelAdGroupRepository.getEntities(DSPAccountId);
 
-        if (adGroupMap.isEmpty()) {
+        if (null == adGroupMap || adGroupMap.isEmpty()) {
             // If collection is empty
             LOG.error("Channel Segment Entity collection for Rubicon DSP is empty: DSP id:{}, inmobi account id:{}", buyer, DSPAccountId);
             return false;
@@ -1024,7 +1036,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
 
-    private String getADMContent(){
+    protected String getADMContent(){
 
         SeatBid seatBid = bidResponse.getSeatbid().get(0);
         Bid bid = seatBid.getBid().get(0);
@@ -1034,7 +1046,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
 
-    private void createWin(VelocityContext velocityContext){
+    protected void createWin(VelocityContext velocityContext){
         if (wnRequired) {
             // setCallbackContent();
             // Win notification is required
@@ -1108,8 +1120,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 InspectorStats.incrementStatCount(this.getName(), InspectorStrings.INVALID_DSP_ID);
             }
             return result;
-        }
-        catch (NullPointerException e) {
+        } catch (NullPointerException e) {
             LOG.info(traceMarker, "Could not parse the ix response from partner: {}, exception raised {}", this.getName(), e);
             return false;
         }
@@ -1159,8 +1170,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         LOG.debug(traceMarker, "responseContent before replaceMacros is {}", this.responseContent);
         this.responseContent = replaceIXMacros(this.responseContent);
         ThirdPartyAdResponse adResponse = getResponseAd();
-        adResponse.response = responseContent;
-        LOG.debug(traceMarker, "responseContent after replaceMacros is {}", getResponseAd().response);
+        adResponse.setResponse(responseContent);
+        LOG.debug(traceMarker, "responseContent after replaceMacros is {}", getResponseAd().getResponse());
     }
 
 

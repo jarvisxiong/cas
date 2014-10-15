@@ -38,6 +38,7 @@ import com.netflix.governator.guice.LifecycleInjector;
 import com.netflix.governator.lifecycle.LifecycleManager;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Slf4JLoggerFactory;
+import lombok.Getter;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbcp2.ConnectionFactory;
 import org.apache.commons.dbcp2.DriverManagerConnectionFactory;
@@ -89,6 +90,7 @@ public class ChannelServer {
     private static CreativeRepository               creativeRepository;
     private static NativeAdTemplateRepository       nativeAdTemplateRepository;
     private static final String                     DEFAULT_CONFIG_FILE="/opt/mkhoj/conf/cas/channel-server.properties";
+    @Getter
     private static String                           configFile;
     public static byte                              dataCenterIdCode;
     public static short                             hostIdCode;
@@ -181,21 +183,6 @@ public class ChannelServer {
 
             instantiateRepository(logger, configurationLoader);
             CasConfigUtil.init(configurationLoader, repositoryHelper);
-            Integer maxIncomingConnections = channelServerHelper.getMaxConnections(
-                    ChannelServerStringLiterals.INCOMING_CONNECTIONS, ConnectionType.INCOMING);
-            Integer maxRTbdOutGoingConnections = channelServerHelper.getMaxConnections(
-                    ChannelServerStringLiterals.RTBD_OUTGING_CONNECTIONS, ConnectionType.RTBD_OUTGOING);
-            Integer maxDCpOutGoingConnections = channelServerHelper.getMaxConnections(
-                    ChannelServerStringLiterals.DCP_OUTGOING_CONNECTIONS, ConnectionType.DCP_OUTGOING);
-            if (null != maxIncomingConnections) {
-                CasConfigUtil.getServerConfig().setProperty("incomingMaxConnections", maxIncomingConnections);
-            }
-            if (null != maxRTbdOutGoingConnections) {
-                CasConfigUtil.getServerConfig().setProperty("rtbOutGoingMaxConnections", maxRTbdOutGoingConnections);
-            }
-            if (null != maxDCpOutGoingConnections) {
-                CasConfigUtil.getServerConfig().setProperty("dcpOutGoingMaxConnections", maxDCpOutGoingConnections);
-            }
 
             // Configure the netty server.
             Injector injector = LifecycleInjector
@@ -221,9 +208,9 @@ public class ChannelServer {
             // If client bootstrap is not present throwing exception which will
             // set
             // lbStatus as NOT_OK.
-        }
-        catch (Exception exception) {
-            System.out.println(exception);
+
+        } catch (Exception exception) {
+            logger.info("Exception in Channel Server "+ exception);
             ServerStatusInfo.statusString = getMyStackTrace(exception);
             ServerStatusInfo.statusCode = 404;
             logger.info("stack trace is " + getMyStackTrace(exception));
@@ -350,13 +337,11 @@ public class ChannelServer {
             config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)
                     .subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY);
 
-        }
-        catch (NamingException exception) {
+        } catch (NamingException exception) {
             logger.error("failed to creatre binding for postgresql data source " + exception.getMessage());
             ServerStatusInfo.statusCode = 404;
             ServerStatusInfo.statusString = getMyStackTrace(exception);
-        }
-        catch (InitializationException exception) {
+        } catch (InitializationException exception) {
             logger.error("failed to initialize repository " + exception.getMessage());
             ServerStatusInfo.statusCode = 404;
             ServerStatusInfo.statusString = getMyStackTrace(exception);
@@ -368,19 +353,13 @@ public class ChannelServer {
 
     private static DataCenter getDataCenter() {
         DataCenter colo = DataCenter.ALL;
-        if (DataCenter.UA2.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
-            colo = DataCenter.UA2;
-        }
-        else if (DataCenter.UJ1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
+        if (DataCenter.UJ1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
             colo = DataCenter.UJ1;
-        }
-        else if (DataCenter.UH1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
+        } else if (DataCenter.UH1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
             colo = DataCenter.UH1;
-        }
-        else if (DataCenter.LHR1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
+        } else if (DataCenter.LHR1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
             colo = DataCenter.LHR1;
-        }
-        else if (DataCenter.HKG1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
+        } else if (DataCenter.HKG1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
             colo = DataCenter.HKG1;
         }
         return colo;
@@ -445,14 +424,14 @@ public class ChannelServer {
             message.setSubject("Channel Ad Server Crashed on Host " + addr.getHostName());
             message.setText(errorMessage + stackTrace);
             Transport.send(message);
-        }
-        catch (MessagingException mex) {
+        } catch (MessagingException mex) {
             // logger.info("Error while sending mail");
-            mex.printStackTrace();
-        }
-        catch (UnknownHostException ex) {
+            logger.info("MessagingException raised while sending mail " + mex);
+            //mex.printStackTrace();
+        } catch (UnknownHostException ex) {
             // logger.debug("could not resolve host inside send mail");
-            ex.printStackTrace();
+            logger.info("UnknownException raised while sending mail " + ex);
+            //ex.printStackTrace();
         }
     }
 }

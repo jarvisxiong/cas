@@ -74,7 +74,7 @@ public abstract class BaseServlet implements Servlet {
         hrh.responseSender.getAuctionEngine().sasParams = hrh.responseSender.sasParams;
         CasInternalRequestParameters casInternalRequestParametersGlobal = hrh.responseSender.casInternalRequestParameters;
 
-        casInternalRequestParametersGlobal.traceEnabled = Boolean.valueOf(hrh.getHttpRequest().headers().get("x-mkhoj-tracer"));
+        casInternalRequestParametersGlobal.setTraceEnabled(Boolean.valueOf(hrh.getHttpRequest().headers().get("x-mkhoj-tracer")));
 
         if (requestFilters.isDroppedInRequestFilters(hrh)) {
             LOG.debug("Request is dropped in request filters");
@@ -117,9 +117,9 @@ public abstract class BaseServlet implements Servlet {
         }
 
         SiteMetaDataEntity siteMetaDataEntity = matchSegments.getRepositoryHelper().querySiteMetaDetaRepository(sasParams.getSiteId());
-        casInternalRequestParametersGlobal.siteAccountType = AccountType.SELF_SERVE;
+        casInternalRequestParametersGlobal.setSiteAccountType(AccountType.SELF_SERVE);
         if (null != siteMetaDataEntity) {
-            casInternalRequestParametersGlobal.siteAccountType = siteMetaDataEntity.getAccountTypesAllowed();
+            casInternalRequestParametersGlobal.setSiteAccountType(siteMetaDataEntity.getAccountTypesAllowed());
         }
 
         // applying all the filters
@@ -134,7 +134,7 @@ public abstract class BaseServlet implements Servlet {
 
         double networkSiteEcpm = casUtils.getNetworkSiteEcpm(casContext, sasParams);
         double segmentFloor = casUtils.getRtbFloor(casContext, hrh.responseSender.sasParams);
-        enrichCasInternalRequestParameters(hrh, filteredSegments, casInternalRequestParametersGlobal.auctionBidFloor,
+        enrichCasInternalRequestParameters(hrh, filteredSegments, casInternalRequestParametersGlobal.getAuctionBidFloor(),
                 sasParams.getSiteFloor(), sasParams.getSiteIncId(), networkSiteEcpm, segmentFloor);
         hrh.responseSender.casInternalRequestParameters = casInternalRequestParametersGlobal;
         hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternalRequestParametersGlobal;
@@ -149,7 +149,7 @@ public abstract class BaseServlet implements Servlet {
                 casInternalRequestParametersGlobal, rtbSegments);
 
         LOG.debug("rtb rankList size is {}", rtbSegments.size());
-        if (dcpSegments.isEmpty() && rtbSegments.isEmpty()) {
+        if (CollectionUtils.isEmpty(dcpSegments) && CollectionUtils.isEmpty(rtbSegments)) {
             LOG.debug("No successful configuration of adapter ");
             hrh.responseSender.sendNoAdResponse(serverChannel);
             return;
@@ -190,24 +190,24 @@ public abstract class BaseServlet implements Servlet {
             final List<ChannelSegment> filteredSegments, final Double rtbdFloor, final Double siteFloor,
             final long siteIncId, final double networkSiteEcpm, final double segmentFloor) {
         CasInternalRequestParameters casInternalRequestParametersGlobal = hrh.responseSender.casInternalRequestParameters;
-        casInternalRequestParametersGlobal.highestEcpm = getHighestEcpm(filteredSegments);
-        casInternalRequestParametersGlobal.blockedIabCategories = getBlockedIabCategories(hrh);
-        casInternalRequestParametersGlobal.blockedAdvertisers = getBlockedAdvertisers(hrh);
+        casInternalRequestParametersGlobal.setHighestEcpm(getHighestEcpm(filteredSegments));
+        casInternalRequestParametersGlobal.setBlockedIabCategories(getBlockedIabCategories(hrh));
+        casInternalRequestParametersGlobal.setBlockedAdvertisers(getBlockedAdvertisers(hrh));
         double minimumRtbFloor = 0.05;
-        casInternalRequestParametersGlobal.auctionBidFloor = hrh.responseSender.getAuctionEngine().calculateAuctionFloor(
-                hrh.responseSender.sasParams.getSiteFloor(), 0.0, segmentFloor, minimumRtbFloor, networkSiteEcpm);
-        casInternalRequestParametersGlobal.auctionId = ImpressionIdGenerator.getInstance().getImpressionId(siteIncId);
+        casInternalRequestParametersGlobal.setAuctionBidFloor(hrh.responseSender.getAuctionEngine().calculateAuctionFloor(
+                hrh.responseSender.sasParams.getSiteFloor(), 0.0, segmentFloor, minimumRtbFloor, networkSiteEcpm));
+        casInternalRequestParametersGlobal.setAuctionId(ImpressionIdGenerator.getInstance().getImpressionId(siteIncId));
         LOG.debug("RTB floor from the pricing engine entity is {}", rtbdFloor);
         LOG.debug("RTB floor from the pricing engine entity is {}", segmentFloor);
-        LOG.debug("Highest Ecpm is {}", casInternalRequestParametersGlobal.highestEcpm);
-        LOG.debug("BlockedCategories are {}", casInternalRequestParametersGlobal.blockedIabCategories);
-        LOG.debug("BlockedAdvertisers are {}", casInternalRequestParametersGlobal.blockedAdvertisers);
+        LOG.debug("Highest Ecpm is {}", casInternalRequestParametersGlobal.getHighestEcpm());
+        LOG.debug("BlockedCategories are {}", casInternalRequestParametersGlobal.getBlockedIabCategories());
+        LOG.debug("BlockedAdvertisers are {}", casInternalRequestParametersGlobal.getBlockedAdvertisers());
         LOG.debug("Site floor is {}", siteFloor);
         LOG.debug("NetworkSiteEcpm is {}", networkSiteEcpm);
         LOG.debug("SegmentFloor is {}", segmentFloor);
         LOG.debug("Minimum rtb floor is {}", minimumRtbFloor);
-        LOG.debug("Final rtbFloor is {}", casInternalRequestParametersGlobal.auctionBidFloor);
-        LOG.debug("Auction id generated is {}", casInternalRequestParametersGlobal.auctionId);
+        LOG.debug("Final rtbFloor is {}", casInternalRequestParametersGlobal.getAuctionBidFloor());
+        LOG.debug("Auction id generated is {}", casInternalRequestParametersGlobal.getAuctionId());
     }
 
     private double getHighestEcpm(final List<ChannelSegment> channelSegments) {

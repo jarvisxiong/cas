@@ -61,9 +61,9 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
     private final double             ecpmBoost;
     private final Date               ecpmBoostExpiryDate;
     private final Long[]             tod;
-    private final int                dst;                      // Classify rtbd and dcp ad groups
+    private final int                dst;                      // Classify rtbd, ix and dcp ad groups
     private final long               campaignIncId;
-    private final Integer[]          AdFormatIds;
+    private final Integer[]          adFormatIds;
 
     public ChannelSegmentEntity(Builder builder) {
         this.advertiserId = builder.advertiserId;
@@ -114,7 +114,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
         this.tod = builder.tod;
         this.dst = builder.dst;
         this.campaignIncId = builder.campaignIncId;
-        this.AdFormatIds = builder.AdFormatIds;
+        this.adFormatIds = builder.adFormatIds;
     }
 
     public static Builder newBuilder() {
@@ -164,7 +164,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
         private Long[]        tod;
         private int           dst;
         private long          campaignIncId;
-        private Integer[]     AdFormatIds;
+        private Integer[]     adFormatIds;
 
         public ChannelSegmentEntity build() {
             return new ChannelSegmentEntity(this);

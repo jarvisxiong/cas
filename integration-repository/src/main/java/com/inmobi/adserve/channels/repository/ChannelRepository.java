@@ -1,13 +1,5 @@
 package com.inmobi.adserve.channels.repository;
 
-import java.sql.Timestamp;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.phoenix.batteries.data.AbstractStatsMaintainingDBRepository;
 import com.inmobi.phoenix.batteries.data.DBEntity;
@@ -18,6 +10,13 @@ import com.inmobi.phoenix.batteries.data.rdbmsrow.ResultSetRow;
 import com.inmobi.phoenix.data.RepositoryManager;
 import com.inmobi.phoenix.data.RepositoryQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.sql.Timestamp;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class ChannelRepository extends AbstractStatsMaintainingDBRepository<ChannelEntity, String> implements
@@ -81,7 +80,7 @@ public class ChannelRepository extends AbstractStatsMaintainingDBRepository<Chan
         }
     }
 
-    private boolean getMode(final String sIEJson) {
+    protected boolean getMode(final String sIEJson) {
         boolean mode = false;
         if (sIEJson != null) {
             try {
@@ -94,7 +93,7 @@ public class ChannelRepository extends AbstractStatsMaintainingDBRepository<Chan
         return mode;
     }
 
-    private Set<String> getSites(final String sIEJson) {
+    protected Set<String> getSites(final String sIEJson) {
         Set<String> sitesIE = new HashSet<String>();
         if (sIEJson != null) {
             try {

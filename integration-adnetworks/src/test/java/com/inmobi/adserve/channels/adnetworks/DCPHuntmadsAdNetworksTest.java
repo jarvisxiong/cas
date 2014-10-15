@@ -71,7 +71,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
@@ -91,7 +91,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         sasParams.setRemoteHostIp(null);
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
@@ -111,7 +111,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "";
@@ -130,7 +130,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent(" ");
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         String clurl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String externalKey = "f6wqjq1r5v";
@@ -149,9 +149,9 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-        casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
+        casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
         sasParams.setSlot((short) 15);
         sasParams.setSource("APP");
         sasParams.setOsId(5);
@@ -176,9 +176,9 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-        casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
+        casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
         sasParams.setCountryCode("US");
         sasParams.setSlot((short) 12);
         sasParams.setSource("WAP");
@@ -203,12 +203,12 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        casInternalRequestParameters.latLong = " ,-122.1514";
+        casInternalRequestParameters.setLatLong(" ,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-        casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
-        casInternalRequestParameters.uidMd5="111a222b333c444d555e666f777";
-        casInternalRequestParameters.uidIFA="12q12q12q12q12q12q12q12q12q12q12q";
-        casInternalRequestParameters.uidADT="1";
+        casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
+        casInternalRequestParameters.setUidMd5("111a222b333c444d555e666f777");
+        casInternalRequestParameters.setUidIFA("12q12q12q12q12q12q12q12q12q12q12q");
+        casInternalRequestParameters.setUidADT("1");
         sasParams.setSource("APP");
         sasParams.setOsId(3);
         sasParams.setSlot((short) 15);
@@ -234,9 +234,9 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-        casInternalRequestParameters.uid = "202cb962ac59075b964b07152d234b70";
+        casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
         sasParams.setCategories(Arrays.asList(new Long[] { 10l, 13l, 30l }));
         sasParams.setOsId(5);
         String externalKey = "1324";
@@ -428,7 +428,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         String clurl = "http://c2.w.inmobi.com/c"
                 + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");

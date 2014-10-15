@@ -8,9 +8,6 @@ sysctl -w net.ipv4.tcp_tw_reuse=1
 DC_NAME=`facter| grep 'colo =>'|awk '{print $3}'`
 MEM_SIZE=`facter| grep 'memorysize =>'|awk '{print $3}'`
 echo $MEM_SIZE
-IN_CNXN=`echo "$MEM_SIZE 10.0" | awk '{if ($1 > $2) print "1050" ; else print "80"}'`
-DCP_OUT_CNXN=`echo "$MEM_SIZE 10.0" | awk '{if ($1 > $2) print "7200" ; else print "400"}'`
-RTB_OUT_CNXN=`echo "$MEM_SIZE 10.0" | awk '{if ($1 > $2) print "7200" ; else print "400"}'`
 JMX_MEM=`echo "$MEM_SIZE 10.0" | awk '{if ($1 > $2) print "8192M" ; else print "2048M"}'`
 echo $DC_NAME
 DC_ID=`grep $DC_NAME: /opt/mkhoj/conf/dc_info/dc_info.cfg  |awk -F':' '{print $2}'`
@@ -19,13 +16,9 @@ if [ $DC_ID > 0 ]
 then
     echo $DC_ID
     echo $DC_NAME
-    export DC_ID
-    export $DC_NAME
   exec /usr/lib/jvm/java7/bin/java -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9004 -Duser.timezone=UTC\
  -Ddc.id=$DC_ID -Ddc.name=$DC_NAME -Dhost.name=$(hostname)\
- -Dincoming.connections=$IN_CNXN\
- -Drtboutbound.connections=$RTB_OUT_CNXN\
- -Ddcpoutbound.connections=$DCP_OUT_CNXN\
+ -Djava.security.properties=/opt/mkhoj/conf/cas/java.security\
  -Dcom.sun.management.jmxremote.local.only=false\
  -Dcom.sun.management.jmxremote.authenticate=false\
  -Dcom.sun.management.jmxremote.ssl=false\

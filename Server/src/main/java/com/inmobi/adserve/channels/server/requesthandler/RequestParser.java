@@ -175,7 +175,7 @@ public class RequestParser {
             if (null == jArray) {
                 return null;
             } else {
-                return (jArray.getString(index));
+                return jArray.getString(index);
             }
         } catch (JSONException e) {
             LOG.debug(traceMarker, "exception {} while parsing field at index {} from {}", e, index, jObject);
@@ -214,42 +214,54 @@ public class RequestParser {
     }
 
     // Get user specific params
-    public SASRequestParameters getUserParams(final SASRequestParameters parameter, final JSONObject jObject) {
+    public SASRequestParameters getUserParams(SASRequestParameters parameter, final JSONObject jObject) {
         Marker traceMarker = traceMarkerProvider.get();
         LOG.debug(traceMarker, "inside parsing user params");
-        String utf8 = "UTF-8";
         try {
             JSONObject userMap = (JSONObject) jObject.get("uparams");
-            parameter.setAge(Short.valueOf(stringify(userMap, "u-age")));
-            parameter.setGender(stringify(userMap, "u-gender"));
-            parameter.setPostalCode(Integer.parseInt(stringify(userMap, "u-postalcode")));
-            try {
-                if (null != parameter.getAge()) {
-                    parameter.setAge(Short.valueOf(URLEncoder.encode(String.valueOf(parameter.getAge()), utf8)));
-                }
-                if (null != parameter.getGender()) {
-                    parameter.setGender(URLEncoder.encode(parameter.getGender(), utf8));
-                }
-                if (null != parameter.getPostalCode()) {
-                    parameter.setPostalCode(Integer.valueOf(URLEncoder.encode(
-                            String.valueOf(parameter.getPostalCode()), utf8)));
-                }
-                String[] advertiserList = null;
-                if (userMap.get("u-adapter") != null) {
-                    advertiserList = ((String) userMap.get("u-adapter")).split(",");
-                }
-                Set<String> advertiserSet = new HashSet<String>();
-                if (advertiserList != null) {
-                    Collections.addAll(advertiserSet, advertiserList);
-                    parameter.setUAdapters(advertiserSet);
-                }
-            } catch (UnsupportedEncodingException e) {
-                LOG.debug(traceMarker, "Error in encoding u params {}", e);
+            if (null != stringify(userMap,"u-age")) {
+                parameter.setAge(Short.valueOf(stringify(userMap, "u-age")));
             }
+            if (null != stringify(userMap, "u-gender")) {
+                parameter.setGender(stringify(userMap, "u-gender"));
+            }
+            if (null != stringify(userMap, "u-postalcode")) {
+                parameter.setPostalCode(Integer.parseInt(stringify(userMap, "u-postalcode")));
+            }
+            parameter = encodeParams(parameter, userMap);
         } catch (JSONException exception) {
             LOG.debug(traceMarker, "json exception in parsing u params {}", exception);
         } catch (NumberFormatException e) {
             LOG.debug(traceMarker, "number format exception in u params {}", e);
+        }
+        return parameter;
+    }
+
+    private SASRequestParameters encodeParams(final SASRequestParameters parameter, final JSONObject userMap) throws JSONException {
+        Marker traceMarker = traceMarkerProvider.get();
+        String utf8 = "UTF-8";
+        try {
+            if (null != parameter.getAge()) {
+                parameter.setAge(Short.valueOf(URLEncoder.encode(String.valueOf(parameter.getAge()), utf8)));
+            }
+            if (null != parameter.getGender()) {
+                parameter.setGender(URLEncoder.encode(parameter.getGender(), utf8));
+            }
+            if (null != parameter.getPostalCode()) {
+                parameter.setPostalCode(Integer.valueOf(URLEncoder.encode(
+                        String.valueOf(parameter.getPostalCode()), utf8)));
+            }
+            String[] advertiserList = null;
+            if (userMap.get("u-adapter") != null) {
+                advertiserList = ((String) userMap.get("u-adapter")).split(",");
+            }
+            Set<String> advertiserSet = new HashSet<String>();
+            if (advertiserList != null) {
+                Collections.addAll(advertiserSet, advertiserList);
+                parameter.setUAdapters(advertiserSet);
+            }
+        } catch (UnsupportedEncodingException e) {
+            LOG.debug(traceMarker, "Error in encoding u params {}", e);
         }
         return parameter;
     }
@@ -266,20 +278,20 @@ public class RequestParser {
                 return;
             }
             String uid = stringify(userIdMap, "u-id");
-            parameter.uid = (StringUtils.isNotBlank(uid) ? uid : stringify(userIdMap, "UDID"));
-            if (StringUtils.isNotBlank(parameter.uid) && parameter.uid.length() != 32) {
-                parameter.uid = MD5(parameter.uid);
+            parameter.setUid(StringUtils.isNotBlank(uid) ? uid : stringify(userIdMap, "UDID"));
+            if (StringUtils.isNotBlank(parameter.getUid()) && parameter.getUid().length() != 32) {
+                parameter.setUid(MD5(parameter.getUid()));
             }
-            parameter.uidO1 = stringify(userIdMap, "O1");
-            parameter.uidMd5 = stringify(userIdMap, "UM5");
-            parameter.uidIFA = stringify(userIdMap, "IDA");
-            parameter.gpid = stringify(userIdMap, "GPID");
-            parameter.uidSO1 = stringify(userIdMap, "SO1");
-            parameter.uidIFV = stringify(userIdMap, "IDV");
-            parameter.uidIDUS1 = stringify(userIdMap, "IDUS1");
-            parameter.uidADT = stringify(userIdMap, "u-id-adt");
-            parameter.uuidFromUidCookie = stringify(userIdMap, "imuc__5");
-            parameter.uidWC = stringify(userIdMap, "WC");
+            parameter.setUidO1(stringify(userIdMap, "O1"));
+            parameter.setUidMd5(stringify(userIdMap, "UM5"));
+            parameter.setUidIFA(stringify(userIdMap, "IDA"));
+            parameter.setGpid(stringify(userIdMap, "GPID"));
+            parameter.setUidSO1(stringify(userIdMap, "SO1"));
+            parameter.setUidIFV(stringify(userIdMap, "IDV"));
+            parameter.setUidIDUS1(stringify(userIdMap, "IDUS1"));
+            parameter.setUidADT(stringify(userIdMap, "u-id-adt"));
+            parameter.setUuidFromUidCookie(stringify(userIdMap, "imuc__5"));
+            parameter.setUidWC(stringify(userIdMap, "WC"));
         } catch (JSONException exception) {
             LOG.debug(traceMarker, "Error in extracting userid params, {}", exception);
         }
@@ -295,6 +307,7 @@ public class RequestParser {
             }
             return sb.toString();
         } catch (java.security.NoSuchAlgorithmException ignored) {
+            LOG.debug("Exception {} raised with String {} in MD5", ignored, md5);
         }
         return null;
     }

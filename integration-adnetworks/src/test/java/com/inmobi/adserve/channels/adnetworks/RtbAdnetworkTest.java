@@ -16,6 +16,7 @@ import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.IABCategoriesInterface;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
+import com.inmobi.adserve.channels.util.Utils.TestUtils;
 import com.inmobi.casthrift.rtb.Bid;
 import com.inmobi.casthrift.rtb.BidResponse;
 import com.inmobi.casthrift.rtb.SeatBid;
@@ -214,8 +215,8 @@ public class RtbAdnetworkTest extends TestCase {
         sasParams.setSource("wap");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
-        casInternalRequestParameters.impressionId = "4f8d98e2-4bbd-40bc-8795-22da170700f9";
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
+        casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         String externalSiteKey = "f6wqjq1r5v";
         String beaconUrl = "";
@@ -244,7 +245,7 @@ public class RtbAdnetworkTest extends TestCase {
     sasParams.setWapSiteUACEntity(new WapSiteUACEntity(builder));
     sasParams.setUserAgent(
         "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-    casInternalRequestParameters.impressionId = "4f8d98e2-4bbd-40bc-8795-22da170700f9";
+    casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
     rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
 
     //First UAC Entity Category should be present as Site Name.
@@ -303,12 +304,12 @@ public class RtbAdnetworkTest extends TestCase {
     sasParams.setSource("wap");
     sasParams.setUserAgent(
         "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-    casInternalRequestParameters.impressionId = "4f8d98e2-4bbd-40bc-8795-22da170700f9";
+    casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
     rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
 
     //Expected Blocked Advertisers
     ArrayList<String> expectedBlockedAdvertisers = Lists.newArrayList("king.com", "supercell.net", "paps.com", "fhs.com", "china.supercell.com", "supercell.com");
-    assertNull(casInternalRequestParameters.blockedAdvertisers);
+    assertNull(casInternalRequestParameters.getBlockedAdvertisers());
     assertEquals(6, rtbAdNetwork.getBidRequest().getBadv().size());
     assertTrue(rtbAdNetwork.getBidRequest().getBadv().containsAll(expectedBlockedAdvertisers));
   }
@@ -321,16 +322,16 @@ public class RtbAdnetworkTest extends TestCase {
                                                                                                          null, false, false, false, false, false, false, false, false, false, false, null,
                                                                                                          new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
     CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-    casInternalRequestParameters.blockedAdvertisers = Lists.newArrayList("abcd.com");
+    casInternalRequestParameters.setBlockedAdvertisers(Lists.newArrayList("abcd.com"));
     sasParams.setRemoteHostIp("206.29.182.240");
     sasParams.setSource("wap");
     sasParams.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-    casInternalRequestParameters.impressionId = "4f8d98e2-4bbd-40bc-8795-22da170700f9";
+    casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
     rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
 
     //Expected Blocked Advertisers
     ArrayList<String> expectedBlockedAdvertisers = Lists.newArrayList("abcd.com", "king.com", "supercell.net", "paps.com", "fhs.com", "china.supercell.com", "supercell.com");
-    assertEquals(1, casInternalRequestParameters.blockedAdvertisers.size());
+    assertEquals(1, casInternalRequestParameters.getBlockedAdvertisers().size());
     assertEquals(7, rtbAdNetwork.getBidRequest().getBadv().size());
     assertTrue(rtbAdNetwork.getBidRequest().getBadv().containsAll(expectedBlockedAdvertisers));
   }
@@ -347,8 +348,8 @@ public class RtbAdnetworkTest extends TestCase {
         sasParams.setSource("wap");
         sasParams.setUserAgent(
                 "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-        casInternalRequestParameters.impressionId = "4f8d98e2-4bbd-40bc-8795-22da170700f9";
-        casInternalRequestParameters.blockedIabCategories = Lists.newArrayList("IAB-1", "IAB-2", "IAB-3");
+        casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
+        casInternalRequestParameters.setBlockedIabCategories(Lists.newArrayList("IAB-1", "IAB-2", "IAB-3"));
         rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
 
         //Expected Blocked Categories
@@ -377,14 +378,14 @@ public class RtbAdnetworkTest extends TestCase {
         sasParams.setCategories(Arrays.asList(catLong));
         sasParams.setLocSrc("wifi");
         sasParams.setGender("Male");
-        casInternalRequestParameters.uid = "1234";
+        casInternalRequestParameters.setUid("1234");
         sasParams.setAge((short)26);
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
-        casInternalRequestParameters.impressionId = ("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-        casInternalRequestParameters.auctionId = ("4f8d98e2-4bbd-40bc-8795-22da170700f9");
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
+        casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
+        casInternalRequestParameters.setAuctionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         String externalSiteKey = "f6wqjq1r5v";
         String beaconUrl = "";
@@ -427,7 +428,7 @@ public class RtbAdnetworkTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-        casInternalRequestParameters.impressionId = "4f8d98e2-4bbd-40bc-8795-22da170700f9";
+        casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId,
                 null, null, null, 0, null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                 null, false, false, false, false, false, false, false, false, false, false, null,
@@ -445,7 +446,8 @@ public class RtbAdnetworkTest extends TestCase {
     @Test
     public void testParseResponse() throws TException {
         StringBuilder str = new StringBuilder();
-        str.append("{\"id\":\"4f8d98e2-4bbd-40bc-8795-22da170700f9\",\"imp\":[{\"id\":\"4f8d98e2-4bbd-40bc-8795-22da170700f9\",\"banner\":{\"w\":120,\"h\":20,\"id\":\"4f8d98e2-4bbd-40bc-8795-22da170700f9\"},\"bidfloorcur\":\"USD\",\"iframebuster\":[\"None\"]}],\"app\":{\"id\":\"0000000000\",\"cat\":[\"IAB1-1\",\"IAB24\",\"IAB5\"]},\"device\":{\"ua\":\"Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334\",\"ip\":\"206.29.182.240\",\"geo\":{\"lat\":37.442901611328125,\"lon\":-122.15139770507812,\"type\":2},\"connectiontype\":2},\"user\":{\"id\":\"1234\",\"buyerid\":\"1234\",\"yob\":1987,\"gender\":\"Male\"},\"at\":2,\"tmax\":200,\"cur\":[\"USD\"]}");
+        // Temporarily using ixResponseJSON instead of rtbdResponseJSON
+        str.append(TestUtils.SampleStrings.ixResponseJson);
         StringBuilder responseAdm = new StringBuilder();
         responseAdm.append("<html><body style=\"margin:0;padding:0;\">");
         responseAdm
@@ -462,13 +464,13 @@ public class RtbAdnetworkTest extends TestCase {
         rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
         TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
         rtbAdNetwork.parseResponse(serializer.toString(bidResponse), HttpResponseStatus.OK);
-        assertEquals(responseAdm.toString(), rtbAdNetwork.responseContent);
+        assertEquals(responseAdm.toString(), rtbAdNetwork.getResponseContent());
         rtbAdNetwork.setEncryptedBid("0.23");
         rtbAdNetwork.setSecondBidPrice(0.23);
         String afterMacros = rtbAdNetwork.replaceRTBMacros(responseAdm.toString());
-        assertEquals(afterMacros, rtbAdNetwork.responseContent);
+        assertEquals(afterMacros, rtbAdNetwork.getResponseContent());
         rtbAdNetwork.parseResponse(str.toString(), HttpResponseStatus.NOT_FOUND);
-        assertEquals("", rtbAdNetwork.responseContent);
+        assertEquals("", rtbAdNetwork.getResponseContent());
     }
 
     @Test
@@ -493,11 +495,11 @@ public class RtbAdnetworkTest extends TestCase {
         rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
         TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
         rtbAdNetwork.parseResponse(serializer.toString(bidResponse), HttpResponseStatus.OK);
-        assertEquals(responseAdm.toString(), rtbAdNetwork.responseContent);
+        assertEquals(responseAdm.toString(), rtbAdNetwork.getResponseContent());
         rtbAdNetwork.setEncryptedBid("0.23");
         rtbAdNetwork.setSecondBidPrice(0.23);
         String afterMacros = rtbAdNetwork.replaceRTBMacros(responseAdm.toString());
-        assertEquals(afterMacros, rtbAdNetwork.responseContent);
+        assertEquals(afterMacros, rtbAdNetwork.getResponseContent());
     }
 
     @Test
@@ -521,7 +523,7 @@ public class RtbAdnetworkTest extends TestCase {
         sasParams.setImpressionId(oldImpressionId);
 
         // Set the  video specific impression Id.
-        casInternalRequestParameters.impressionIdForVideo = newImpressionId;
+        casInternalRequestParameters.setImpressionIdForVideo(newImpressionId);
 
         ClickUrlsRegenerator.init(mockConfig);
 
@@ -537,9 +539,9 @@ public class RtbAdnetworkTest extends TestCase {
 
         // Verify that new impression id is used in the generate response.
         // 5 times = 1 impression url + 2 beacon url + 2 click url
-        assertEquals(5, StringUtils.countMatches(rtbAdNetwork.responseContent, newImpressionId));
+        assertEquals(5, StringUtils.countMatches(rtbAdNetwork.getResponseContent(), newImpressionId));
 
         // Old impression id should not be used.
-        assertEquals(0, StringUtils.countMatches(rtbAdNetwork.responseContent, oldImpressionId));
+        assertEquals(0, StringUtils.countMatches(rtbAdNetwork.getResponseContent(), oldImpressionId));
     }
 }

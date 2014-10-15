@@ -11,8 +11,8 @@ import org.slf4j.Marker;
 import org.testng.annotations.Test;
 
 import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.replay;
 
 
 public class RequestParserTest extends TestCase
@@ -78,12 +78,13 @@ public class RequestParserTest extends TestCase
         assertEquals(sasRequestParameters.getSource(), "APP");
         assertEquals(sasRequestParameters.getAdcode(), "NON-JS");
         assertEquals(sasRequestParameters.getSdkVersion(), "i357");
-        assertEquals(casInternalRequestParameters.uidO1, "8d10846582eef7c6f5873883b09a5a63");
-        assertNull(casInternalRequestParameters.uidSO1);
-        assertNull(casInternalRequestParameters.uidMd5);
-        assertNull(casInternalRequestParameters.uidIFA);
-        assertNull(casInternalRequestParameters.uidIFV);
-        assertNull(casInternalRequestParameters.uidIDUS1);
-        assertNull(casInternalRequestParameters.uidADT);
+        assertEquals(sasRequestParameters.getPostalCode(), Integer.valueOf(302015));
+        assertEquals(casInternalRequestParameters.getUidO1(), "8d10846582eef7c6f5873883b09a5a63");
+        assertNull(casInternalRequestParameters.getUidSO1());
+        assertNull(casInternalRequestParameters.getUidMd5());
+        assertNull(casInternalRequestParameters.getUidIFA());
+        assertNull(casInternalRequestParameters.getUidIFV());
+        assertNull(casInternalRequestParameters.getUidIDUS1());
+        assertNull(casInternalRequestParameters.getUidADT());
     }
 }

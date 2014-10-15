@@ -59,14 +59,14 @@ public class Logging {
     private static String                                  umpAdsLogKey;
     private static boolean                                 enableFileLogging;
     private static boolean                                 enableDatabusLogging;
-    public final static ConcurrentHashMap<String, String>  sampledAdvertiserLogNos = new ConcurrentHashMap<String, String>(
+    public static final ConcurrentHashMap<String, String> SAMPLED_ADVERTISER_LOG_NOS = new ConcurrentHashMap<String, String>(
                                                                                            2000);
     @AdvertiserIdNameMap
     @Inject
     private static Map<String, String>                     advertiserIdNameMap;
 
     public static ConcurrentHashMap<String, String> getSampledadvertiserlognos() {
-        return sampledAdvertiserLogNos;
+        return SAMPLED_ADVERTISER_LOG_NOS;
     }
 
     private static int totalCount;
@@ -243,7 +243,7 @@ public class Logging {
         // Logging real time stats for graphite
         if (null != sasParams) {
             DemandSourceType dst = DemandSourceType.findByValue(sasParams.getDst());
-            InspectorStats.updateYammerTimerStats(dst.name(), InspectorStrings.timerLatency, totalTime);
+            InspectorStats.updateYammerTimerStats(dst.name(), InspectorStrings.TIMER_LATENCY, totalTime);
         }
     }
     
@@ -268,7 +268,7 @@ public class Logging {
                 String partnerName = adNetworkInterface.getName();
                 String externalSiteKey = channelSegment.getChannelSegmentEntity().getExternalSiteKey();
                 String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
-                String adStatus = adResponse.adStatus;
+                String adStatus = adResponse.getAdStatus();
 
                 CasAdvertisementLog creativeLog = new CasAdvertisementLog(partnerName, requestUrl, response,
                         adStatus, externalSiteKey, advertiserId);
@@ -315,10 +315,10 @@ public class Logging {
             AdNetworkInterface adNetwork = channelSegment.getAdNetworkInterface();
             ThirdPartyAdResponse adResponse = adNetwork.getResponseStruct();
             InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_REQUESTS);
-            InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.LATENCY, adResponse.latency);
+            InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.LATENCY, adResponse.getLatency());
             InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.CONNECTION_LATENCY,
                     adNetwork.getConnectionLatency());
-            switch (adResponse.adStatus) {
+            switch (adResponse.getAdStatus()) {
                 case "AD":
                     InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_FILLS);
                     break;
@@ -374,10 +374,10 @@ public class Logging {
             ThirdPartyAdResponse adResponse = adNetworkInterface.getResponseStruct();
             String partnerName = adNetworkInterface.getName();
             log.append(partnerName);
-            log.append(sep).append(adResponse.adStatus);
+            log.append(sep).append(adResponse.getAdStatus());
             String response = "";
             String requestUrl = "";
-            if ("AD".equalsIgnoreCase(adResponse.adStatus)) {
+            if ("AD".equalsIgnoreCase(adResponse.getAdStatus())) {
                 response = adNetworkInterface.getHttpResponseContent();
                 log.append(sep).append(response);
             }
@@ -413,7 +413,7 @@ public class Logging {
         for (int index = 0; rankList != null && index < rankList.size(); index++) {
             AdNetworkInterface adNetworkInterface = rankList.get(index).getAdNetworkInterface();
             ThirdPartyAdResponse adResponse = adNetworkInterface.getResponseStruct();
-            String adStatus = adResponse.adStatus;
+            String adStatus = adResponse.getAdStatus();
             String partnerName = adNetworkInterface.getName();
             String externalSiteKey = rankList.get(index).getChannelSegmentEntity().getExternalSiteKey();
             String advertiserId = rankList.get(index).getChannelSegmentEntity().getAdvertiserId();
@@ -477,20 +477,20 @@ public class Logging {
      */
     private static boolean decideToLog(String partnerName, String externalSiteId) {
         long currentTime = System.currentTimeMillis();
-        if (null == sampledAdvertiserLogNos.get(partnerName + externalSiteId)) {
-            sampledAdvertiserLogNos.put(partnerName + externalSiteId, currentTime + "_" + 0);
+        if (null == SAMPLED_ADVERTISER_LOG_NOS.get(partnerName + externalSiteId)) {
+            SAMPLED_ADVERTISER_LOG_NOS.put(partnerName + externalSiteId, currentTime + "_" + 0);
         }
-        Long time = Long.parseLong(sampledAdvertiserLogNos.get(partnerName + externalSiteId).split("_")[0]);
+        Long time = Long.parseLong(SAMPLED_ADVERTISER_LOG_NOS.get(partnerName + externalSiteId).split("_")[0]);
         if (currentTime - time >= 3600000) {
-            sampledAdvertiserLogNos.put(partnerName + externalSiteId, currentTime + "_" + 0);
-            time = Long.parseLong(sampledAdvertiserLogNos.get(partnerName + externalSiteId).split("_")[0]);
+            SAMPLED_ADVERTISER_LOG_NOS.put(partnerName + externalSiteId, currentTime + "_" + 0);
+            time = Long.parseLong(SAMPLED_ADVERTISER_LOG_NOS.get(partnerName + externalSiteId).split("_")[0]);
         }
-        Integer count = Integer.parseInt(sampledAdvertiserLogNos.get(partnerName + externalSiteId).split("_")[1]);
+        Integer count = Integer.parseInt(SAMPLED_ADVERTISER_LOG_NOS.get(partnerName + externalSiteId).split("_")[1]);
         if (count >= totalCount) {
             return false;
         }
         count++;
-        sampledAdvertiserLogNos.put(partnerName + externalSiteId, time + "_" + count);
+        SAMPLED_ADVERTISER_LOG_NOS.put(partnerName + externalSiteId, time + "_" + count);
         return true;
     }
 
