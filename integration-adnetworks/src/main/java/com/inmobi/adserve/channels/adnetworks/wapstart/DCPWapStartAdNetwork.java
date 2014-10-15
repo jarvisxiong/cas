@@ -248,7 +248,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 			context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
 			context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, responseJson.getString("vlink"));
 			if(responseJson.has("graphic")){
-				JSONObject textGraphic = responseJson.getJSONObject("textgraphic");
+				JSONObject textGraphic = responseJson.getJSONObject("graphic").getJSONObject("picture");
 				String imageUrl = textGraphic.getString("name");
 				context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, imageUrl);
 				t = TemplateType.IMAGE;
