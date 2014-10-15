@@ -60,17 +60,4 @@ public class ChannelServerHelper {
     public String getDataCentreName(final String key) {
         return System.getProperty(key);
     }
-
-    public Integer getMaxConnections(String connectionsKey, ConnectionType connectionType) {
-        Integer maxConnections = null;
-        try {
-            maxConnections = Integer.parseInt(System.getProperty(connectionsKey));
-        } catch (NumberFormatException e) {
-            LOG.info("NumberFormatException {} maxConnections", connectionType.toString());
-        }
-
-        LOG.debug("Max limit for {}, connections is {}", connectionType.toString(), maxConnections);
-
-        return maxConnections;
-    }
 }
