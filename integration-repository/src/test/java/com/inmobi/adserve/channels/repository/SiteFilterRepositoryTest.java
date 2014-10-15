@@ -19,7 +19,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.powermock.api.easymock.PowerMock.createMock;
-import static org.powermock.api.easymock.PowerMock.expectLastCall;
+import static org.powermock.api.easymock.PowerMock.createNiceMock;
 import static org.powermock.api.easymock.PowerMock.expectNew;
 import static org.powermock.api.easymock.PowerMock.replayAll;
 import static org.powermock.api.easymock.PowerMock.verifyAll;
@@ -43,7 +43,7 @@ public class SiteFilterRepositoryTest {
         String[] filterData = {"tango", "down"};
 
         NullAsZeroResultSetRow mockNullAsZeroResultSetRow = createMock(NullAsZeroResultSetRow.class);
-        Logger mockLogger = createMock(Logger.class);
+        Logger mockLogger = createNiceMock(Logger.class);
 
         expect(mockNullAsZeroResultSetRow.getString("site_id")).andReturn(siteId).times(1);
         expect(mockNullAsZeroResultSetRow.getString("pub_id")).andReturn(pubId).times(1);
@@ -51,8 +51,6 @@ public class SiteFilterRepositoryTest {
         expect(mockNullAsZeroResultSetRow.getInt("rule_type_id")).andReturn(ruleTypeId).times(1);
         expect(mockNullAsZeroResultSetRow.getArray("filter_data")).andReturn(filterData).times(1);
         expect(mockLogger.isDebugEnabled()).andReturn(true).times(1);
-        mockLogger.debug("Got SiteFilterEntity EntitySiteFilterEntity(siteId=siteId, pubId=pubId, blockedIabCategories=[tango, down], blockedAdvertisers=null, ruleType=4, isExpired=false, modified_on=1970-01-01 05:30:01.234)");
-        expectLastCall().times(1);
         expectNew(NullAsZeroResultSetRow.class, new Class[]{ResultSetRow.class}, null)
                 .andReturn(mockNullAsZeroResultSetRow).times(1);
 

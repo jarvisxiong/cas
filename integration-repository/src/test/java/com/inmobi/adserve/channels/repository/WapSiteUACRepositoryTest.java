@@ -21,7 +21,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.powermock.api.easymock.PowerMock.createMock;
-import static org.powermock.api.easymock.PowerMock.expectLastCall;
+import static org.powermock.api.easymock.PowerMock.createNiceMock;
 import static org.powermock.api.easymock.PowerMock.expectNew;
 import static org.powermock.api.easymock.PowerMock.replayAll;
 import static org.powermock.api.easymock.PowerMock.verifyAll;
@@ -67,7 +67,7 @@ public class WapSiteUACRepositoryTest {
         List<Integer> expectedBlindList = new ArrayList<Integer>(Arrays.asList(siteBlindArr));
 
         NullAsZeroResultSetRow mockNullAsZeroResultSetRow = createMock(NullAsZeroResultSetRow.class);
-        Logger mockLogger = createMock(Logger.class);
+        Logger mockLogger = createNiceMock(Logger.class);
 
         expect(mockNullAsZeroResultSetRow.getString("id")).andReturn(id).times(1);
         expect(mockNullAsZeroResultSetRow.getTimestamp("wsu_modified_on")).andReturn(wsuModifiedOn).times(1);
@@ -87,8 +87,6 @@ public class WapSiteUACRepositoryTest {
         expect(mockNullAsZeroResultSetRow.getString("title")).andReturn(appTitle).times(1);
         expect(mockNullAsZeroResultSetRow.getString("bundle_id")).andReturn(bundleId).times(1);
         expect(mockLogger.isDebugEnabled()).andReturn(true).times(1);
-        mockLogger.debug("Found WapSiteUACEntity : WapSiteUACEntity(id=id, marketId=marketId, siteTypeId=22, contentRating=4+, appType=app_type, categories=[a, b, c], isCoppaEnabled=true, isTransparencyEnabled=true, blindList=[6, 10], siteUrl=site_url, siteName=site_name, appTitle=title, bundleId=bundle_id, modifiedOn=1970-01-01 05:30:00.1)");
-        expectLastCall().times(1);
 
         expectNew(NullAsZeroResultSetRow.class, new Class[]{ResultSetRow.class}, null)
                 .andReturn(mockNullAsZeroResultSetRow).times(1);
