@@ -84,7 +84,6 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
         this.allTags = builder.allTags;
         this.pricingModel = builder.pricingModel;
         ArrayList<Integer> targetingPlatform = new ArrayList<>();
-        // TODO: Bug?
         if (builder.targetingPlatform == 1 || builder.targetingPlatform > 2) {
             targetingPlatform.add(1);
         }
