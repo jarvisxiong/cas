@@ -39,6 +39,7 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final String ANDROID_ID_SHA1 = "tt_android_id_sha1";
     private static final String ANDROID_ID_MD5 = "tt_android_id_md5";
     private static final String ANDROID_ADVERTISING_ID = "tt_advertising_id";
+    private static final String BLINDED_SITE_ID = "tt_sub_aff";
 
     private static final String IDFA = "tt_idfa";
     private static final String UDID = "tt_udid";
@@ -200,6 +201,7 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
         if(null != sasParams.getGender()) {
             appendQueryParam(url, GENDER, getURLEncode(sasParams.getGender(), format), false);
         }
+	appendQueryParam(url, BLINDED_SITE_ID, blindedSiteId, false);
 
         LOG.debug("Marimedia url is {}", url);
         return new URI(url.toString());

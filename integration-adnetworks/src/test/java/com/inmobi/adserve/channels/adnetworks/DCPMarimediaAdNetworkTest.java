@@ -1,24 +1,26 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
-
-// Created by Dhanasekaran K P on 24/9/14.
-
-import com.inmobi.adserve.channels.adnetworks.marimedia.DCPMarimediaAdNetwork;
-import com.inmobi.adserve.channels.api.*;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import junit.framework.TestCase;
-import org.apache.commons.configuration.Configuration;
-import org.testng.annotations.Test;
 
 import java.io.File;
 import java.util.ArrayList;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import junit.framework.TestCase;
+
+import org.apache.commons.configuration.Configuration;
+import org.testng.annotations.Test;
+
+import com.inmobi.adserve.channels.adnetworks.marimedia.DCPMarimediaAdNetwork;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 
 public class DCPMarimediaAdNetworkTest extends TestCase {
     private Configuration mockConfig = null;
@@ -115,7 +117,7 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
 
         // Compare the expected URL with actual URL.
         String actualUrl = dcpMarimediaAdNetwork.getRequestUri().toString();
-        String expectedUrl = "http://ad.taptica.com/aff_ad?rt=0&u=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.0.3%3B+ko-kr%3B+LG-L160L+Build%2FIML74K%29+AppleWebkit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&a=918a1f78-811c-4145-912e-c1a45f7705a0&i=206.29.182.240&t=2&r=216x36&lat=37.4429&lon=-122.1514&tt_udid=202cb962ac59075b964b07152d234b70&tt_idfa=23e2ewq445545&nt=carrier";
+        String expectedUrl = "http://ad.taptica.com/aff_ad?rt=0&u=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.0.3%3B+ko-kr%3B+LG-L160L+Build%2FIML74K%29+AppleWebkit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&a=918a1f78-811c-4145-912e-c1a45f7705a0&i=206.29.182.240&t=2&r=216x36&lat=37.4429&lon=-122.1514&tt_udid=202cb962ac59075b964b07152d234b70&tt_idfa=23e2ewq445545&nt=carrier&tt_sub_aff=00000000-0000-0000-0000-000000000000";
         assertEquals(expectedUrl, actualUrl);
     }
 
