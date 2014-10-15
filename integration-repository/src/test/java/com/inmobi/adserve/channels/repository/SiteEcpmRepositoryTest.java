@@ -68,8 +68,8 @@ public class SiteEcpmRepositoryTest {
         SiteEcpmRepository tested = new SiteEcpmRepository();
         SiteEcpmEntity mockSiteEcpmEntity = createMock(SiteEcpmEntity.class);
 
-        Timestamp fourDayOldTimeStamp = new Timestamp(DateUtils.addDays(new Timestamp((new Date()).getTime()), -4).getTime());
-        Timestamp twoDayOldTimeStamp = new Timestamp(DateUtils.addDays(new Timestamp((new Date()).getTime()), -2).getTime());
+        Timestamp fourDayOldTimeStamp = new Timestamp(DateUtils.addDays(new Date(), -4).getTime());
+        Timestamp twoDayOldTimeStamp = new Timestamp(DateUtils.addDays(new Date(), -2).getTime());
 
         expect(mockSiteEcpmEntity.getModifiedOn())
                 .andReturn(fourDayOldTimeStamp).times(1)
