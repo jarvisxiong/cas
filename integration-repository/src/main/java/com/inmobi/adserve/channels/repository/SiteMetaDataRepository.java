@@ -29,6 +29,7 @@ public class SiteMetaDataRepository extends AbstractStatsMaintainingDBRepository
         Timestamp modifiedOn = row.getTimestamp("modified_on");
         String[] siteAdvertisers = (String[]) row.getArray("site_advertiser_incl_list");
         String[] publisherAdvertisers = (String[]) row.getArray("pub_advertiser_incl_list");
+
         Set<String> advertisersIncludedBySite = new HashSet<String>();
         Set<String> advertisersIncludedByPublisher = new HashSet<String>();
         if (siteAdvertisers != null) {
@@ -37,6 +38,7 @@ public class SiteMetaDataRepository extends AbstractStatsMaintainingDBRepository
         if (publisherAdvertisers != null) {
             advertisersIncludedByPublisher.addAll(Arrays.asList(publisherAdvertisers));
         }
+
         SiteMetaDataEntity.Builder builder = SiteMetaDataEntity.newBuilder();
         builder.setSiteId(siteId);
         builder.setPubId(pubId);
