@@ -181,6 +181,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         this.isIxPartner = isIxPartner;
     }
 
+    @Override
     public void processResponse() {
         LOG.debug("Inside process Response for the partner: {}", getName());
         if (isRequestComplete) {
@@ -188,7 +189,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             return;
         }
         LOG.debug("Inside process Response for the partner: {}", getName());
-        getResponseAd();
+        getResponseAd();	
         isRequestComplete = true;
         if (baseRequestHandler.getAuctionEngine().areAllChannelSegmentRequestsComplete()) {
             LOG.debug("areAllChannelSegmentRequestsComplete is true");
@@ -282,10 +283,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
                     LOG.debug("error while fetching response from: {} {}", getName(), t);
 
-                    if (isRequestComplete) {
-                        return;
-                    }
-                    
                 	String dst;
                 	if (isRtbPartner()){
                 		dst = "RTBD";
@@ -311,6 +308,10 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                         adStatus = "TIME_OUT";
                         processResponse();
                         InspectorStats.incrementStatCount(InspectorStrings.TIMEOUT_EXCEPTION);
+                        return;
+                    }
+                    
+                    if (isRequestComplete) {
                         return;
                     }
 
