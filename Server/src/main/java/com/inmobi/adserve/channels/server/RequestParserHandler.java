@@ -33,6 +33,7 @@ import com.google.inject.Provider;
 import com.inmobi.adserve.adpool.AdPoolRequest;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.scope.NettyRequestScope;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
 import com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParser;
@@ -50,18 +51,19 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
 	private final Provider<Servlet> servletProvider;
 	private final URLCodec urlCodec = new URLCodec();
 	private final Provider<HttpRequestHandler> httpRequestHandlerProvider;
-
+	private final NettyRequestScope scope;
 	private final Injector injector;
 
 	@Inject
 	RequestParserHandler(final RequestParser requestParser, final ThriftRequestParser thriftRequestParser, final Provider<Marker> traceMarkerProvider,
-			final Provider<Servlet> servletProvider, final Provider<HttpRequestHandler> httpRequestHandlerProvider, final Injector injector) {
+			final Provider<Servlet> servletProvider, final Provider<HttpRequestHandler> httpRequestHandlerProvider, final Injector injector, final NettyRequestScope scope) {
 		this.requestParser = requestParser;
 		this.thriftRequestParser = thriftRequestParser;
 		this.traceMarkerProvider = traceMarkerProvider;
 		this.servletProvider = servletProvider;
 		this.httpRequestHandlerProvider = httpRequestHandlerProvider;
 		this.injector = injector;
+		this.scope = scope;
 	}
 
 	@Override
@@ -92,6 +94,7 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
 				dst = 8;
 			}
 			LOG.debug("Method is  {}", request.getMethod());
+			boolean isTraceEnabled =  false;
 			if (request.getMethod() == HttpMethod.POST && null != dst) {
 				AdPoolRequest adPoolRequest = new AdPoolRequest();
 				TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
@@ -99,6 +102,7 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
 					byte[] adPoolRequestBytes = new byte[request.content().readableBytes()];
 					request.content().getBytes(0, adPoolRequestBytes);
 					tDeserializer.deserialize(adPoolRequest, adPoolRequestBytes);
+					isTraceEnabled = adPoolRequest.isTraceRequest();
 					thriftRequestParser.parseRequestParameters(adPoolRequest, sasParams, casInternalRequestParameters, dst);
 				} catch (TException ex) {
 					terminationReason = CasConfigUtil.THRIFT_PARSING_ERROR;
@@ -117,7 +121,6 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
 				}
 				requestParser.parseRequestParameters(jsonObject, sasParams, casInternalRequestParameters);
 			} else if (request.getMethod() == HttpMethod.GET && null != dst && params.containsKey("adPoolRequest")) {
-
 				String rawContent = null;
 				if (!params.isEmpty()) {
 					List<String> values = params.get("adPoolRequest");
@@ -125,9 +128,7 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
 						rawContent = values.iterator().next();
 					}
 				}
-
 				LOG.debug("adPoolRequest: {}", rawContent);
-
 				AdPoolRequest adPoolRequest = new AdPoolRequest();
 
 				if (StringUtils.isNotEmpty(rawContent)) {
@@ -143,6 +144,10 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
 						InspectorStats.incrementStatCount(InspectorStrings.THRIFT_PARSING_ERROR, InspectorStrings.COUNT);
 					}
 				}
+			}
+			LOG.debug("isTraceEnabled {} ", isTraceEnabled);
+			if(traceMarker == null) {
+			  scope.seed(Marker.class, isTraceEnabled ? NettyRequestScope.TRACE_MAKER : null);
 			}
 		} finally {
 			out.add(new RequestParameterHolder(sasParams, casInternalRequestParameters, request.getUri(), terminationReason, request));
@@ -160,7 +165,6 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
 			}
 
 			pipeline.addLast("casExceptionHandler", injector.getInstance(CasExceptionHandler.class));
-
 		}
 	}
 }

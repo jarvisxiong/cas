@@ -3,7 +3,6 @@ package com.inmobi.adserve.channels.api;
 import com.inmobi.adserve.channels.types.AccountType;
 import lombok.Data;
 
-import java.util.HashMap;
 import java.util.List;
 
 @Data

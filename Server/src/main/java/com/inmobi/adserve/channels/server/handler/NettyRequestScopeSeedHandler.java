@@ -1,22 +1,25 @@
 package com.inmobi.adserve.channels.server.handler;
 
-import com.google.inject.Key;
+import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.QueryStringDecoder;
+
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.slf4j.Marker;
+
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.scope.NettyRequestScope;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.server.servlet.ServletInvalid;
-import io.netty.channel.ChannelHandler.Sharable;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.QueryStringDecoder;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Marker;
-
-import javax.inject.Inject;
-import java.util.Map;
 
 
 /**
@@ -50,8 +53,8 @@ public class NettyRequestScopeSeedHandler extends ChannelInboundHandlerAdapter {
         Marker traceMarker = isTracer ? NettyRequestScope.TRACE_MAKER : null;
         scope.enter();
         try {
-            scope.seed(Key.get(Marker.class), traceMarker);
-            scope.seed(Key.get(ResponseSender.class), new ResponseSender(traceMarkerProvider));
+            scope.seed(Marker.class, traceMarker);
+            scope.seed(ResponseSender.class, new ResponseSender(traceMarkerProvider));
 
             QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httpRequest.getUri());
             String path = queryStringDecoder.path();
