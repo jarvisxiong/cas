@@ -128,7 +128,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         this.baseRequestHandler = baseRequestHandler;
         this.serverChannel = serverChannel;
         if(traceMarkerProvider != null) {
-          this.traceMarker = traceMarkerProvider.get();
+         traceMarker = traceMarkerProvider.get();
         }
     }
 
