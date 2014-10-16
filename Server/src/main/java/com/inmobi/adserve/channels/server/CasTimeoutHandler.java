@@ -37,6 +37,8 @@ public class CasTimeoutHandler extends ChannelDuplexHandler {
 		executor = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
 	};
 	private volatile int dst;
+	
+	private DemandSourceType demandSourceType;
 
 	@Inject
 	private static Map<String, Servlet> pathToServletMap;
@@ -70,6 +72,8 @@ public class CasTimeoutHandler extends ChannelDuplexHandler {
 			dst = DemandSourceType.DCP.getValue();
 		}
 
+		demandSourceType = DemandSourceType.findByValue(dst);
+		
 		initialize(ctx);
 
 		super.channelRead(ctx, msg);
@@ -119,8 +123,6 @@ public class CasTimeoutHandler extends ChannelDuplexHandler {
 			// if rtbd we are going with timeout of 170ms
 			// else if dcp we are going with timeout of 600 ms
 			long latency = currentTime - lastReadTime;
-
-			DemandSourceType demandSourceType = DemandSourceType.findByValue(dst);
 
 			InspectorStats.updateYammerTimerStats(demandSourceType.name(), InspectorStrings.CAS_TIMEOUT_HANDLER_LATENCY, latency);
 			if (latency >= timeoutInMillis) {

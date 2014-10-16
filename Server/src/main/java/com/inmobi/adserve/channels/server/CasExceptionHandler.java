@@ -55,9 +55,7 @@ public class CasExceptionHandler extends ChannelInboundHandlerAdapter {
 			List<ChannelSegment> unfilteredChannelSegmentList = responseSender.getAuctionEngine().getUnfilteredChannelSegmentList();
 
 			//This contains dcp channel segments
-			List<ChannelSegment> dcpChannelSegmentList = responseSender.getRankList();
-			
-			List<ChannelSegment> segmentList = dcpChannelSegmentList;
+			List<ChannelSegment> segmentList = responseSender.getRankList();
 			
 			//The request is for either dcp or rtb or ix, hence only one will be valid.
 			if(unfilteredChannelSegmentList != null && unfilteredChannelSegmentList.size() > 0){
