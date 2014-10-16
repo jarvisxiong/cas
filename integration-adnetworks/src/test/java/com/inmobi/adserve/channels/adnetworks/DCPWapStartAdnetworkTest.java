@@ -16,7 +16,6 @@ import org.apache.commons.configuration.Configuration;
 import org.testng.annotations.Test;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Injector;
 import com.google.inject.util.Modules;
 import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.adnetworks.wapstart.DCPWapStartAdNetwork;
@@ -72,7 +71,7 @@ public class DCPWapStartAdnetworkTest extends TestCase {
 		HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
 		prepareMockConfig();
 		SlotSizeMapping.init();
-		Injector injector = LifecycleInjector.builder().withModules(Modules.combine(new AbstractModule() {
+		LifecycleInjector.builder().withModules(Modules.combine(new AbstractModule() {
 
 			@Override
 			public void configure() {
@@ -81,7 +80,7 @@ public class DCPWapStartAdnetworkTest extends TestCase {
 				bind(DocumentBuilderHelper.class).asEagerSingleton();
 				requestStaticInjection(BaseAdNetworkImpl.class);
 			}
-		})).usingBasePackages("com.inmobi.adserve.channels.server.netty", "com.inmobi.adserve.channels.api.provider")
+		}), new TestScopeModule()).usingBasePackages("com.inmobi.adserve.channels.server.netty", "com.inmobi.adserve.channels.api.provider")
 		.build().createInjector();
 		dcpWapstartAdNetwork = new DCPWapStartAdNetwork(mockConfig, null, base, serverChannel);
 
