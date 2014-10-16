@@ -1,15 +1,10 @@
 package com.inmobi.adserve.channels.api.provider;
 
-import io.netty.util.concurrent.DefaultThreadFactory;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-
-import org.apache.http.client.HttpClient;
-import org.jboss.netty.bootstrap.ClientBootstrap;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Inject;
@@ -17,10 +12,6 @@ import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.util.annotations.WorkerExecutorService;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
-import com.ning.http.client.AsyncHttpProvider;
-import com.ning.http.client.extra.ThrottleRequestFilter;
-import com.ning.http.client.providers.netty.NettyAsyncHttpProvider;
-import com.ning.http.client.providers.netty.NettyAsyncHttpProviderConfig;
 
 
 /**

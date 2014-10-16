@@ -19,7 +19,6 @@ import org.json.JSONObject;
 import org.testng.annotations.Test;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Injector;
 import com.google.inject.util.Modules;
 import com.inmobi.adserve.channels.adnetworks.mobfox.DCPMobFoxAdnetwork;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
@@ -72,7 +71,7 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
         prepareMockConfig();
         SlotSizeMapping.init();
         Formatter.init();
-        Injector injector = LifecycleInjector.builder().withModules(Modules.combine(new AbstractModule() {
+        LifecycleInjector.builder().withModules(Modules.combine(new AbstractModule() {
 
             @Override
             public void configure() {
@@ -81,7 +80,7 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
                 bind(DocumentBuilderHelper.class).asEagerSingleton();
                 requestStaticInjection(BaseAdNetworkImpl.class);
             }
-        })).usingBasePackages("com.inmobi.adserve.channels.server.netty", "com.inmobi.adserve.channels.api.provider")
+        }), new TestScopeModule()).usingBasePackages("com.inmobi.adserve.channels.server.netty", "com.inmobi.adserve.channels.api.provider")
                 .build().createInjector();
         dcpMobfoxAdNetwork = new DCPMobFoxAdnetwork(mockConfig, null, base, serverChannel);
     }

@@ -26,7 +26,6 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONObject;
@@ -82,7 +81,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     private boolean                               isRtbPartner            = false;
     private boolean                               isIxPartner             = false;
     protected ChannelSegmentEntity                entity;
-    protected Marker                              traceMarker; 
+    protected static Marker                       traceMarker; 
 
     protected String                              externalSiteId;
     protected String                              host;
@@ -123,14 +122,14 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     private static NettyRequestScope              scope;
     
     @Inject
-    private Provider<Marker>                      traceMarkerProvider;
+    private static Provider<Marker>              traceMarkerProvider;
     
     public BaseAdNetworkImpl(final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         this.baseRequestHandler = baseRequestHandler;
         this.serverChannel = serverChannel;
-    if (traceMarkerProvider != null) {
-      this.traceMarker = traceMarkerProvider.get();
-    }
+        if(traceMarkerProvider != null) {
+         traceMarker = traceMarkerProvider.get();
+        }
     }
 
     //Overriding these methods in IXAdNetwork
@@ -182,6 +181,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         this.isIxPartner = isIxPartner;
     }
 
+    @Override
     public void processResponse() {
         LOG.debug("Inside process Response for the partner: {}", getName());
         if (isRequestComplete) {
@@ -189,7 +189,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             return;
         }
         LOG.debug("Inside process Response for the partner: {}", getName());
-        getResponseAd();
+        getResponseAd();	
         isRequestComplete = true;
         if (baseRequestHandler.getAuctionEngine().areAllChannelSegmentRequestsComplete()) {
             LOG.debug("areAllChannelSegmentRequestsComplete is true");
@@ -283,10 +283,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
                     LOG.debug("error while fetching response from: {} {}", getName(), t);
 
-                    if (isRequestComplete) {
-                        return;
-                    }
-                    
                 	String dst;
                 	if (isRtbPartner()){
                 		dst = "RTBD";
@@ -312,6 +308,10 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                         adStatus = "TIME_OUT";
                         processResponse();
                         InspectorStats.incrementStatCount(InspectorStrings.TIMEOUT_EXCEPTION);
+                        return;
+                    }
+                    
+                    if (isRequestComplete) {
                         return;
                     }
 
