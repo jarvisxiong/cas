@@ -78,8 +78,8 @@ public class NettyRequestScope implements Scope {
 
     public <T> void seed(final Key<T> key, final T value) {
         Map<Key<?>, Object> scopedObjects = getScopedObjectMap(key);
-        checkState(!scopedObjects.containsKey(key), "A value for the key %s was "
-                + "already seeded in this scope. Old value: %s New value: %s", key, scopedObjects.get(key), value);
+        checkState(scopedObjects.get(key) == null, "A value for the key %s was already seeded in this scope. Old value: %s New value: %s", 
+            key, scopedObjects.get(key), value);
         scopedObjects.put(key, value);
     }
 

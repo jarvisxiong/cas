@@ -10,6 +10,7 @@ import com.inmobi.phoenix.batteries.data.rdbmsrow.ResultSetRow;
 import com.inmobi.phoenix.data.RepositoryManager;
 import com.inmobi.phoenix.data.RepositoryQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
+import org.apache.commons.lang.StringUtils;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -36,7 +37,6 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
     public DBEntity<WapSiteUACEntity, String> buildObjectFromRow(final ResultSetRow resultSetRow) throws RepositoryException {
         final NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
         final String id = row.getString("id");
-
         final Timestamp modifiedOn = row.getTimestamp("modified_on");
         try {
             final String marketId = row.getString("market_id");
@@ -53,15 +53,14 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
             final String siteName = row.getString("site_name");
             final String appTitle = row.getString("title");
             final String bundleId = row.getString("bundle_id");
+
             boolean pubTransparencyEnabled = false;
-            if(exchange_settings==1){//exchange_settings=1 => Publisher is transparent and exchange enabled
+            if(1 == exchange_settings){
+                // exchange_settings==1 => Publisher is transparent and exchange enabled
                 pubTransparencyEnabled=true;
             }
 
             final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
-            builder.setId(id);
-            builder.setMarketId(marketId);
-            builder.setSiteTypeId(siteTypeId);
 
             if (siteTypeId == ANDROID_SITE_TYPE && contentRating != null && !contentRating.trim().isEmpty()) {
                 builder.setContentRating(CONTENT_RATING_MAP.get(contentRating));
@@ -69,10 +68,8 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
                 builder.setContentRating(contentRating);
             }
 
-            builder.setAppType(appType);
-
             final List<String> catList = new ArrayList<>();
-            if (categories != null && !categories.isEmpty()) {
+            if (StringUtils.isNotEmpty(categories)) {
                 for (String cat : categories.split(",")) {
                     if (cat != null) {
                         cat = cat.trim();
@@ -84,16 +81,21 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
                 builder.setCategories(catList);
             }
 
-            builder.setCoppaEnabled(coppaEnabled);
-            //Both Publisher level and site level transparency has to be enabled for an ad request to be transparent
+            // Both Publisher level and site level transparency have to be enabled for an ad request to be transparent
             builder.setTransparencyEnabled(pubTransparencyEnabled && siteTransparencyEnabled);
-            //if Site Id is set, we take site level blindlist, otherwise publisher level blind list
-            if (null != siteBlindArr && siteBlindArr.length>0) {
+
+            // If Site Id is set, we take site level blindlist, otherwise publisher level blind list
+            if (null != siteBlindArr && siteBlindArr.length > 0) {
                 builder.setBlindList(Arrays.asList(siteBlindArr));
-            } else if (null != pubBlindArr && pubBlindArr.length>0) {
+            } else if (null != pubBlindArr && pubBlindArr.length > 0) {
                 builder.setBlindList(Arrays.asList(pubBlindArr));
             }
 
+            builder.setId(id);
+            builder.setMarketId(marketId);
+            builder.setSiteTypeId(siteTypeId);
+            builder.setCoppaEnabled(coppaEnabled);
+            builder.setAppType(appType);
             builder.setSiteUrl(siteUrl);
             builder.setSiteName(siteName);
             builder.setAppTitle(appTitle);
