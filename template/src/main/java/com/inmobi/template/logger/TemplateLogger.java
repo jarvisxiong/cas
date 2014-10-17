@@ -5,18 +5,19 @@ import org.slf4j.LoggerFactory;
 
 
 public final class TemplateLogger {
-	
-	private final static Logger            LOG                          = LoggerFactory.getLogger(TemplateLogger.class);
-	private static TemplateLogger SINGLETON = new TemplateLogger(); 
-	private TemplateLogger(){}
-	
-	
-	public static TemplateLogger getInstance() {
-		return SINGLETON;
-	}
-	
-	  public void logParameters(Integer asyncType, Integer asyncMethod) {
-	      LOG.debug("AsyncType : "+asyncType+" | asyncMethod : "+asyncMethod);
-	  }
+
+  private final static Logger LOG = LoggerFactory.getLogger(TemplateLogger.class);
+  private static TemplateLogger SINGLETON = new TemplateLogger();
+
+  private TemplateLogger() {}
+
+
+  public static TemplateLogger getInstance() {
+    return SINGLETON;
+  }
+
+  public void logParameters(final Integer asyncType, final Integer asyncMethod) {
+    LOG.debug("AsyncType : " + asyncType + " | asyncMethod : " + asyncMethod);
+  }
 
 }

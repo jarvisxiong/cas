@@ -1,12 +1,13 @@
 package com.inmobi.template.context;
 
-import com.inmobi.template.interfaces.Context;
+import java.util.List;
+import java.util.Map;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.List;
-import java.util.Map;
+import com.inmobi.template.interfaces.Context;
 
 
 @Getter
@@ -57,8 +58,8 @@ public final class App extends AbstractContext {
     params.put(KeyConstants.APP_RATING_COUNT, rating_count);
     params.put(KeyConstants.APP_DOWNLOADS, downloads);
 
-    params.put(KeyConstants.IMNATIVE_CREATIVE_HEADLINE, new CreativeBean("text", this.title));
-    params.put(KeyConstants.IMNATIVE_CREATIVE_DESC, new CreativeBean("text", this.desc));
+    params.put(KeyConstants.IMNATIVE_CREATIVE_HEADLINE, new CreativeBean("text", title));
+    params.put(KeyConstants.IMNATIVE_CREATIVE_DESC, new CreativeBean("text", desc));
     params.put(KeyConstants.IMNATIVE_CREATIVE_HEADLINE_TEXT, title);
     params.put(KeyConstants.IMNATIVE_CREATIVE_DESC_TEXT, desc);
 

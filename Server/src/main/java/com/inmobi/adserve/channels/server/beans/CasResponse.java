@@ -10,9 +10,9 @@ import lombok.experimental.Builder;
 @Builder
 public class CasResponse {
 
-    private final boolean noFill;
+  private final boolean noFill;
 
-    private final String  htmlSnippet;
+  private final String htmlSnippet;
 
-    private final boolean keepAlive;
+  private final boolean keepAlive;
 }

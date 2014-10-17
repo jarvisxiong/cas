@@ -10,15 +10,14 @@ import java.util.List;
  */
 public interface IABCategoriesInterface {
 
-    /**
-     * Maps new inmobi categories to IAB categories.
-     *
-     * @param List
-     *            of new inmobi categories.
-     * @return List of IAB Categories code.
-     */
-    List<String> getIABCategories(List<Long> categories);
+  /**
+   * Maps new inmobi categories to IAB categories.
+   * 
+   * @param List of new inmobi categories.
+   * @return List of IAB Categories code.
+   */
+  List<String> getIABCategories(final List<Long> categories);
 
-    List<String> getIABCategories(Long category);
+  List<String> getIABCategories(final Long category);
 
 }

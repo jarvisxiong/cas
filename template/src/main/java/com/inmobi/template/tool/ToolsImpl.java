@@ -8,8 +8,7 @@ public class ToolsImpl extends Tools {
 
   Gson gson = new Gson();
 
-  public ToolsImpl() {
-  }
+  public ToolsImpl() {}
 
 
   @Override

@@ -1,150 +1,150 @@
 package com.inmobi.adserve.channels.api;
 
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.casthrift.ADCreativeType;
-import com.inmobi.casthrift.DemandSourceType;
-
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.casthrift.ADCreativeType;
+import com.inmobi.casthrift.DemandSourceType;
+
 public interface AdNetworkInterface {
 
-    // Returns the Adstatus.
-    String getAdStatus();
+  // Returns the Adstatus.
+  String getAdStatus();
 
-    // Return the latency.
-    long getLatency();
+  // Return the latency.
+  long getLatency();
 
-    // Return the creative id.
-    String getCreativeId();
+  // Return the creative id.
+  String getCreativeId();
 
-    // Return the sample image url.
-    String getIUrl();
+  // Return the sample image url.
+  String getIUrl();
 
-    // Return the creative attributes.
-    List<Integer> getAttribute();
+  // Return the creative attributes.
+  List<Integer> getAttribute();
 
-    // Return the advertiser domains.
-    List<String> getADomain();
+  // Return the advertiser domains.
+  List<String> getADomain();
 
-    // Returns whether to log creative or not
-    String getAdMarkUp();
-    
-    ADCreativeType getCreativeType();
+  // Returns whether to log creative or not
+  String getAdMarkUp();
 
-    // Returns whether to log creative or not
-    boolean isLogCreative();
+  ADCreativeType getCreativeType();
 
-    // Set whether creative logging is required or not
-    void setLogCreative(boolean logCreative);
+  // Returns whether to log creative or not
+  boolean isLogCreative();
 
-    // Return the bid price for rtb, for other will return the -1.
-    double getBidPriceInUsd();
+  // Set whether creative logging is required or not
+  void setLogCreative(final boolean logCreative);
 
-    // Returns teh bid price for rtbd in local currency in which partner has bid
-    double getBidPriceInLocal();
+  // Return the bid price for rtb, for other will return the -1.
+  double getBidPriceInUsd();
 
-    // Sets the secondBid price after running the auction.
-    // Sets the price in both local and USD currency(Auction currency)
-    void setSecondBidPrice(final Double price);
+  // Returns teh bid price for rtbd in local currency in which partner has bid
+  double getBidPriceInLocal();
 
-    // Returns the second bid price after auctioning.
-    double getSecondBidPriceInUsd();
+  // Sets the secondBid price after running the auction.
+  // Sets the price in both local and USD currency(Auction currency)
+  void setSecondBidPrice(final Double price);
 
-    // Returns the second bid price in local currency after auction
-    double getSecondBidPriceInLocal();
+  // Returns the second bid price after auctioning.
+  double getSecondBidPriceInUsd();
 
-    // Return bidder currency
-    String getCurrency();
+  // Returns the second bid price in local currency after auction
+  double getSecondBidPriceInLocal();
 
-    // Returns true for rtb partner, false otherwise.
-    boolean isRtbPartner();
+  // Return bidder currency
+  String getCurrency();
 
-    //Returns true for ix partner, false otherwise.
-    boolean isIxPartner();
-    
-    void processResponse();
+  // Returns true for rtb partner, false otherwise.
+  boolean isRtbPartner();
 
-    // Returns auction id sent in the rtb response
-    String getAuctionId();
+  // Returns true for ix partner, false otherwise.
+  boolean isIxPartner();
 
-    // Returns impression Id sent in the rtb response
-    String getRtbImpressionId();
+  void processResponse();
 
-    // Returns seat id sent in the rtb response
-    String getSeatId();
+  // Returns auction id sent in the rtb response
+  String getAuctionId();
 
-    // Returns the name of the third party ad network.
-    String getName();
+  // Returns impression Id sent in the rtb response
+  String getRtbImpressionId();
 
-    // Returns the Channel Id for the TPAN as in our database.
-    String getId();
+  // Returns seat id sent in the rtb response
+  String getSeatId();
 
-    // Updates the request parameters according to the Ad Network. Returns true on
-    // success.
-    boolean configureParameters(final SASRequestParameters param,
-            final CasInternalRequestParameters casInternalRequestParameters, final ChannelSegmentEntity entity,
-            final String clickUrl, final String beaconUrl);
+  // Returns the name of the third party ad network.
+  String getName();
 
-    // Makes asynchronous request to Ad Network server. Returns true on success.
-    boolean makeAsyncRequest();
+  // Returns the Channel Id for the TPAN as in our database.
+  String getId();
 
-    // Constructs the request url
-    URI getRequestUri() throws Exception;
+  // Updates the request parameters according to the Ad Network. Returns true on
+  // success.
+  boolean configureParameters(final SASRequestParameters param,
+      final CasInternalRequestParameters casInternalRequestParameters, final ChannelSegmentEntity entity,
+      final String clickUrl, final String beaconUrl);
 
-    // whether click url is used by adapter
-    boolean isBeaconUrlRequired();
+  // Makes asynchronous request to Ad Network server. Returns true on success.
+  boolean makeAsyncRequest();
 
-    // whether click url is used by adapter
-    boolean isClickUrlRequired();
+  // Constructs the request url
+  URI getRequestUri() throws Exception;
 
-    // Returns true if the adapter is an internal partner.
-    boolean isInternal();
+  // whether click url is used by adapter
+  boolean isBeaconUrlRequired();
 
-    // Called after the adapter is selected for impression.
-    void impressionCallback();
+  // whether click url is used by adapter
+  boolean isClickUrlRequired();
 
-    // Called after the adapter is not selected for impression.
-    void noImpressionCallBack();
+  // Returns true if the adapter is an internal partner.
+  boolean isInternal();
 
-    // get click url
-    String getClickUrl();
+  // Called after the adapter is selected for impression.
+  void impressionCallback();
 
-    // get Impression Id
-    String getImpressionId();
+  // Called after the adapter is not selected for impression.
+  void noImpressionCallBack();
 
-    // Returns true if request is completed.
-    boolean isRequestCompleted();
+  // get click url
+  String getClickUrl();
 
-    // Constructs the response from status and content.
-    ThirdPartyAdResponse getResponseAd();
+  // get Impression Id
+  String getImpressionId();
 
-    // get request url
-    String getRequestUrl();
+  // Returns true if request is completed.
+  boolean isRequestCompleted();
 
-    // get Response content
-    String getHttpResponseContent();
+  // Constructs the response from status and content.
+  ThirdPartyAdResponse getResponseAd();
 
-    Map getResponseHeaders();
+  // get request url
+  String getRequestUrl();
 
-    // Does the clean up for the channels and closes the port.
-    void cleanUp();
+  // get Response content
+  String getHttpResponseContent();
 
-    // return response Struct
-    ThirdPartyAdResponse getResponseStruct();
+  Map getResponseHeaders();
 
-    // return connection latency
-    long getConnectionLatency();
+  // Does the clean up for the channels and closes the port.
+  void cleanUp();
 
-    boolean useJsAdTag();
+  // return response Struct
+  ThirdPartyAdResponse getResponseStruct();
 
-    void setEncryptedBid(final String encryptedBid);
+  // return connection latency
+  long getConnectionLatency();
 
-    void generateJsAdResponse();
+  boolean useJsAdTag();
 
-    void setName(final String adapterName);
+  void setEncryptedBid(final String encryptedBid);
 
-    // Get Demand Source Type
-    DemandSourceType getDst();
+  void generateJsAdResponse();
+
+  void setName(final String adapterName);
+
+  // Get Demand Source Type
+  DemandSourceType getDst();
 }

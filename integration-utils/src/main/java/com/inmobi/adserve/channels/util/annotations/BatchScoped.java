@@ -14,8 +14,7 @@ import com.google.inject.ScopeAnnotation;
  * @author abhishek.parwal
  * 
  */
-@Target({ TYPE, METHOD })
+@Target({TYPE, METHOD})
 @Retention(RUNTIME)
 @ScopeAnnotation
-public @interface BatchScoped {
-}
+public @interface BatchScoped {}

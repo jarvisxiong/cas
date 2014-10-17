@@ -5,7 +5,7 @@ import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 
 
 public interface NativeBuilderFactory {
-	
-	public NativeBuilder create(NativeAdTemplateEntity entiry);
+
+  public NativeBuilder create(final NativeAdTemplateEntity entiry);
 
 }

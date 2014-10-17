@@ -10,20 +10,20 @@ import com.ning.http.client.Request;
 
 
 public class ImpressionCallbackHelper {
-    private final static Logger LOG = LoggerFactory.getLogger(ImpressionCallbackHelper.class);
+  private final static Logger LOG = LoggerFactory.getLogger(ImpressionCallbackHelper.class);
 
-    public boolean writeResponse(final URI uriCallBack, final Request callBackRequest,
-                                 final AsyncHttpClient asyncHttpClient) {
+  public boolean writeResponse(final URI uriCallBack, final Request callBackRequest,
+      final AsyncHttpClient asyncHttpClient) {
 
-        LOG.debug("In Adapter {}", this.getClass().getSimpleName());
+    LOG.debug("In Adapter {}", this.getClass().getSimpleName());
 
-        try {
-            asyncHttpClient.executeRequest(callBackRequest);
-        } catch (Exception e) {
-            LOG.debug("Exception in makeAsyncRequest : {}", e);
-        }
-
-        return true;
-
+    try {
+      asyncHttpClient.executeRequest(callBackRequest);
+    } catch (final Exception e) {
+      LOG.debug("Exception in makeAsyncRequest : {}", e);
     }
+
+    return true;
+
+  }
 }

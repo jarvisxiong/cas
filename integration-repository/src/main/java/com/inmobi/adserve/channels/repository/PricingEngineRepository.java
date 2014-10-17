@@ -24,64 +24,71 @@ import com.inmobi.phoenix.data.RepositoryQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
 
 
-public class PricingEngineRepository extends
-        AbstractStatsMaintainingDBRepository<PricingEngineEntity, PricingEngineQuery> implements Repository,
-        RepositoryManager {
+public class PricingEngineRepository
+    extends AbstractStatsMaintainingDBRepository<PricingEngineEntity, PricingEngineQuery>
+    implements
+      Repository,
+      RepositoryManager {
 
-    private static final String JSON_ERROR = "JSON_ERROR";
+  private static final String JSON_ERROR = "JSON_ERROR";
 
-    @Override
-    public PricingEngineEntity queryUniqueResult(final RepositoryQuery pricingEngineIdQuery) throws RepositoryException {
-        Collection<PricingEngineEntity> pricingEngineEntityResultSet = query(pricingEngineIdQuery);
-        if (pricingEngineEntityResultSet == null || pricingEngineEntityResultSet.isEmpty()) {
-            return null;
-        }
-        return (PricingEngineEntity) pricingEngineEntityResultSet.toArray()[0];
+  @Override
+  public PricingEngineEntity queryUniqueResult(final RepositoryQuery pricingEngineIdQuery) throws RepositoryException {
+    final Collection<PricingEngineEntity> pricingEngineEntityResultSet = query(pricingEngineIdQuery);
+    if (pricingEngineEntityResultSet == null || pricingEngineEntityResultSet.isEmpty()) {
+      return null;
     }
+    return (PricingEngineEntity) pricingEngineEntityResultSet.toArray()[0];
+  }
 
-    @Override
-    public DBEntity<PricingEngineEntity, PricingEngineQuery> buildObjectFromRow(final ResultSetRow resultSetRow)
-            throws RepositoryException {
-        NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
-        Timestamp modifyTime = row.getTimestamp("modified_on");
-        PricingEngineEntity.Builder builder = PricingEngineEntity.newBuilder();
-        int countryId = row.getInt("country_id");
-        int osId = row.getInt("os_id");
-        builder.setCountryId(countryId);
-        builder.setOsId(osId);
-        builder.setRtbFloor(row.getDouble("rtb_floor"));
-        builder.setDcpFloor(row.getDouble("dcp_floor"));
-        try {
-            builder.setSupplyToDemandMap(getSupplyToDemandMap(row.getString("supply_demand_json")));
-        } catch (Exception e) {
-            return new DBEntity<PricingEngineEntity, PricingEngineQuery>(new EntityError<PricingEngineQuery>(
-                    new PricingEngineQuery(countryId, osId), JSON_ERROR), modifyTime);
-        }
-        PricingEngineEntity entity = builder.build();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Adding pricing entity : " + entity);
-        }
-        return new DBEntity<PricingEngineEntity, PricingEngineQuery>(entity, modifyTime);
+  @Override
+  public DBEntity<PricingEngineEntity, PricingEngineQuery> buildObjectFromRow(final ResultSetRow resultSetRow)
+      throws RepositoryException {
+    final NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
+    final Timestamp modifyTime = row.getTimestamp("modified_on");
+    final PricingEngineEntity.Builder builder = PricingEngineEntity.newBuilder();
+    final int countryId = row.getInt("country_id");
+    final int osId = row.getInt("os_id");
+    builder.setCountryId(countryId);
+    builder.setOsId(osId);
+    builder.setRtbFloor(row.getDouble("rtb_floor"));
+    builder.setDcpFloor(row.getDouble("dcp_floor"));
+    try {
+      builder.setSupplyToDemandMap(getSupplyToDemandMap(row.getString("supply_demand_json")));
+    } catch (final Exception e) {
+      return new DBEntity<PricingEngineEntity, PricingEngineQuery>(new EntityError<PricingEngineQuery>(
+          new PricingEngineQuery(countryId, osId), JSON_ERROR), modifyTime);
     }
+    final PricingEngineEntity entity = builder.build();
 
-    Map<String, Set<String>> getSupplyToDemandMap(final String supplyDemandJson) {
-        if (supplyDemandJson == null) {
-            return null;
-        }
-        Gson gson = new Gson();
-        Type type = new TypeToken<HashMap<String, HashSet<String>>>() {
-        }.getType();
-        return gson.fromJson(supplyDemandJson, type);
+    if (logger.isDebugEnabled()) {
+      logger.debug("Adding pricing entity : " + entity);
     }
+    return new DBEntity<PricingEngineEntity, PricingEngineQuery>(entity, modifyTime);
+  }
 
-    @Override
-    public HashIndexKeyBuilder<PricingEngineEntity> getHashIndexKeyBuilder(final String className) {
-        return null;
+  Map<String, Set<String>> getSupplyToDemandMap(final String supplyDemandJson) {
+    if (supplyDemandJson == null) {
+      return null;
     }
+    final Gson gson = new Gson();
+    final Type type = new TypeToken<HashMap<String, HashSet<String>>>() {
 
-    @Override
-    public boolean isObjectToBeDeleted(final PricingEngineEntity pricingEngineEntity) {
-        return pricingEngineEntity.getRtbFloor() == 0.0 && pricingEngineEntity.getDcpFloor() == 0.0;
-    }
+      /**
+           * 
+           */
+      private static final long serialVersionUID = 1L;
+    }.getType();
+    return gson.fromJson(supplyDemandJson, type);
+  }
+
+  @Override
+  public HashIndexKeyBuilder<PricingEngineEntity> getHashIndexKeyBuilder(final String className) {
+    return null;
+  }
+
+  @Override
+  public boolean isObjectToBeDeleted(final PricingEngineEntity pricingEngineEntity) {
+    return pricingEngineEntity.getRtbFloor() == 0.0 && pricingEngineEntity.getDcpFloor() == 0.0;
+  }
 }

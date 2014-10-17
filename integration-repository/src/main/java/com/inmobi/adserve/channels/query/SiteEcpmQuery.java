@@ -1,11 +1,11 @@
 package com.inmobi.adserve.channels.query;
 
-import com.inmobi.phoenix.data.RepositoryQuery;
-
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
+import com.inmobi.phoenix.data.RepositoryQuery;
 
 
 @EqualsAndHashCode
@@ -14,8 +14,8 @@ import lombok.ToString;
 @ToString
 public class SiteEcpmQuery implements RepositoryQuery {
 
-    private String  siteId;
-    private Integer countryId;
-    private Integer osId;
+  private String siteId;
+  private Integer countryId;
+  private Integer osId;
 
 }

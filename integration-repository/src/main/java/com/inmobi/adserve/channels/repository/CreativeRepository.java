@@ -20,13 +20,15 @@ import com.inmobi.phoenix.exception.RepositoryException;
 
 
 public class CreativeRepository extends AbstractStatsMaintainingDBRepository<CreativeEntity, CreativeQuery>
-    implements Repository, RepositoryManager {
+    implements
+      Repository,
+      RepositoryManager {
 
   @Override
   public CreativeEntity queryUniqueResult(final RepositoryQuery creativeQuery) throws RepositoryException {
     final Collection<CreativeEntity> creativeEntityResultSet = query(creativeQuery);
     if (creativeEntityResultSet == null || creativeEntityResultSet.isEmpty()) {
-        return null;
+      return null;
     }
     return (CreativeEntity) creativeEntityResultSet.toArray()[0];
   }

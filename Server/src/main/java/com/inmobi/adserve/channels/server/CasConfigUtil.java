@@ -15,70 +15,71 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 
 public class CasConfigUtil {
 
-    private static final Logger    LOG                      = LoggerFactory.getLogger(CasConfigUtil.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CasConfigUtil.class);
 
-    // TODO: clear up all these responses, configs to separate module
-    public static final String     JSON_PARSING_ERROR       = "EJSON";
-    public static final String     THRIFT_PARSING_ERROR     = "ETHRIFT";
-    public static final String     PROCESSING_ERROR         = "ESERVER";
-    public static final String     MISSING_SITE_ID          = "NOSITE";
-    public static final String     INCOMPATIBLE_SITE_TYPE   = "ESITE";
-    public static final String     LOW_SDK_VERSION          = "LSDK";
-    public static final String     MISSING_CATEGORY         = "MISSINGCATEGORY";
-    public static final String     CLOSED_CHANNEL_EXCEPTION = "java.nio.channels.ClosedChannelException";
-    public static final String     CONNECTION_RESET_PEER    = "java.io.IOException: Connection reset by peer";
+  // TODO: clear up all these responses, configs to separate module
+  public static final String JSON_PARSING_ERROR = "EJSON";
+  public static final String THRIFT_PARSING_ERROR = "ETHRIFT";
+  public static final String PROCESSING_ERROR = "ESERVER";
+  public static final String MISSING_SITE_ID = "NOSITE";
+  public static final String INCOMPATIBLE_SITE_TYPE = "ESITE";
+  public static final String LOW_SDK_VERSION = "LSDK";
+  public static final String MISSING_CATEGORY = "MISSINGCATEGORY";
+  public static final String CLOSED_CHANNEL_EXCEPTION = "java.nio.channels.ClosedChannelException";
+  public static final String CONNECTION_RESET_PEER = "java.io.IOException: Connection reset by peer";
 
-    private static Configuration   serverConfig;
-    private static Configuration   rtbConfig;
-    private static Configuration   adapterConfig;
-    private static Configuration   loggerConfig;
-    private static Configuration   log4jConfig;
-    private static Configuration   databaseConfig;
+  private static Configuration serverConfig;
+  private static Configuration rtbConfig;
+  private static Configuration adapterConfig;
+  private static Configuration loggerConfig;
+  private static Configuration log4jConfig;
+  private static Configuration databaseConfig;
 
-    public static RepositoryHelper repositoryHelper;
-    public static List<String>     allowedSiteTypes;
-    public static int              rollCount                = 0;
-    public static final Random     RANDOM                   = new Random();
+  public static RepositoryHelper repositoryHelper;
+  public static List<String> allowedSiteTypes;
+  public static int rollCount = 0;
+  public static final Random RANDOM = new Random();
 
-    public static void init(final ConfigurationLoader config, final RepositoryHelper repositoryHelper) {
-        CasConfigUtil.rtbConfig = config.getRtbConfiguration();
-        CasConfigUtil.loggerConfig = config.getLoggerConfiguration();
-        CasConfigUtil.serverConfig = config.getServerConfiguration();
-        CasConfigUtil.adapterConfig = config.getAdapterConfiguration();
-        CasConfigUtil.log4jConfig = config.getLog4jConfiguration();
-        CasConfigUtil.databaseConfig = config.getDatabaseConfiguration();
-        CasConfigUtil.repositoryHelper = repositoryHelper;
-        allowedSiteTypes = CasConfigUtil.serverConfig.getList("allowedSiteTypes");
+  public static void init(final ConfigurationLoader config, final RepositoryHelper repositoryHelper) {
+    CasConfigUtil.rtbConfig = config.getRtbConfiguration();
+    CasConfigUtil.loggerConfig = config.getLoggerConfiguration();
+    CasConfigUtil.serverConfig = config.getServerConfiguration();
+    CasConfigUtil.adapterConfig = config.getAdapterConfiguration();
+    CasConfigUtil.log4jConfig = config.getLog4jConfiguration();
+    CasConfigUtil.databaseConfig = config.getDatabaseConfiguration();
+    CasConfigUtil.repositoryHelper = repositoryHelper;
+    allowedSiteTypes = CasConfigUtil.serverConfig.getList("allowedSiteTypes");
 
-        InspectorStats.incrementStatCount(InspectorStrings.PERCENT_ROLL_OUT, CasConfigUtil.serverConfig.getInt("percentRollout", 100));
-    }
+    InspectorStats.incrementStatCount(InspectorStrings.PERCENT_ROLL_OUT,
+        CasConfigUtil.serverConfig.getInt("percentRollout", 100));
+  }
 
-    public static Configuration getServerConfig() {
-        return serverConfig;
-    }
+  public static Configuration getServerConfig() {
+    return serverConfig;
+  }
 
-    public static Configuration getAdapterConfig() {
-        return adapterConfig;
-    }
+  public static Configuration getAdapterConfig() {
+    return adapterConfig;
+  }
 
-    public static Configuration getLoggerConfig() {
-        return loggerConfig;
-    }
+  public static Configuration getLoggerConfig() {
+    return loggerConfig;
+  }
 
-    public static Configuration getLog4jConfig() {
-        return log4jConfig;
-    }
+  public static Configuration getLog4jConfig() {
+    return log4jConfig;
+  }
 
-    public static Configuration getDatabaseConfig() {
-        return databaseConfig;
-    }
+  public static Configuration getDatabaseConfig() {
+    return databaseConfig;
+  }
 
-    public static Configuration getRtbConfig() {
-        return CasConfigUtil.rtbConfig;
-    }
+  public static Configuration getRtbConfig() {
+    return CasConfigUtil.rtbConfig;
+  }
 
-    public static void setRtbConfig(final Configuration rtbConfig) {
-        CasConfigUtil.rtbConfig = rtbConfig;
-    }
+  public static void setRtbConfig(final Configuration rtbConfig) {
+    CasConfigUtil.rtbConfig = rtbConfig;
+  }
 
 }

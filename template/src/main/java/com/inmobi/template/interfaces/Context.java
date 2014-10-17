@@ -9,6 +9,6 @@ public interface Context {
    * @param key
    * @return
    */
-  Object get(String key);
+  Object get(final String key);
 
 }

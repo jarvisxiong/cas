@@ -13,8 +13,8 @@ import com.inmobi.template.interfaces.Context;
 public class ImageDeserializer implements JsonDeserializer<Context> {
 
   @Override
-  public Context deserialize(final JsonElement json, final Type typeOf,
-      final JsonDeserializationContext context) throws JsonParseException {
+  public Context deserialize(final JsonElement json, final Type typeOf, final JsonDeserializationContext context)
+      throws JsonParseException {
 
     final JsonObject jsonObj = json.getAsJsonObject();
     final int w = jsonObj.get("w").getAsInt();

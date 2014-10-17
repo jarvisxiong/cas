@@ -1,5 +1,19 @@
 package com.inmobi.adserve.channels.api;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import lombok.Data;
+
+import org.apache.commons.codec.Charsets;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.VelocityContext;
+import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
@@ -14,18 +28,6 @@ import com.inmobi.template.exception.TemplateException;
 import com.inmobi.template.formatter.TemplateDecorator;
 import com.inmobi.template.formatter.TemplateParser;
 import com.inmobi.template.interfaces.TemplateConfiguration;
-import lombok.Data;
-import org.apache.commons.codec.Charsets;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
-import org.apache.velocity.VelocityContext;
-import org.json.JSONException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 public class NativeResponseMaker {
   private final static Logger LOG = LoggerFactory.getLogger(NativeResponseMaker.class);
@@ -54,7 +56,7 @@ public class NativeResponseMaker {
     final String siteId = params.get("siteId");
     // TODO: Redudancy: templateParser already has a function that gets the app from adm
     final App app = gson.fromJson(response.getSeatbid().get(0).getBid().get(0).getAdm(), App.class);
-    
+
     app.setAdImpressionId(params.get("impressionId"));
     validateResponse(app, templateEntity);
 
@@ -77,8 +79,7 @@ public class NativeResponseMaker {
       final Integer integer = iterator.next();
       switch (integer) {
         case NativeConstrains.ICON:
-          if (app.getIcons() == null || app.getIcons().isEmpty()
-              || StringUtils.isEmpty(app.getIcons().get(0).getUrl())) {
+          if (app.getIcons() == null || app.getIcons().isEmpty() || StringUtils.isEmpty(app.getIcons().get(0).getUrl())) {
             throwException(String.format(ERROR_STR, "Icon"));
           }
           break;
@@ -98,7 +99,7 @@ public class NativeResponseMaker {
           }
           break;
         default:
-            break;
+          break;
       }
 
     }

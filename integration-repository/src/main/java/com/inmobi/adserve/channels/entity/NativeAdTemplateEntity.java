@@ -16,12 +16,12 @@ public final class NativeAdTemplateEntity implements IdentifiableEntity<String> 
   private final String imageKey;
   private final Timestamp modifiedOn;
 
-  private NativeAdTemplateEntity(Builder builder) {
-    this.siteId = builder.siteId;
-    this.nativeAdId = builder.nativeAdId;
-    this.imageKey = builder.imageKey;
-    this.mandatoryKey = builder.mandatoryKey;
-    this.modifiedOn = builder.modifiedOn;
+  private NativeAdTemplateEntity(final Builder builder) {
+    siteId = builder.siteId;
+    nativeAdId = builder.nativeAdId;
+    imageKey = builder.imageKey;
+    mandatoryKey = builder.mandatoryKey;
+    modifiedOn = builder.modifiedOn;
   }
 
   @Override
@@ -32,7 +32,7 @@ public final class NativeAdTemplateEntity implements IdentifiableEntity<String> 
 
   @Override
   public String getId() {
-    return this.siteId;
+    return siteId;
   }
 
   public static Builder newBuilder() {

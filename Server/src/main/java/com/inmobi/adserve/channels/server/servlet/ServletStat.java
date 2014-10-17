@@ -39,7 +39,7 @@ public class ServletStat implements Servlet {
     inspectorJson.put("manifestData", manifestJson);
     final JSONObject connectionJson = connectionLimitHandler.getConnectionJson();
     inspectorJson.put("connectionData", connectionJson);
-    
+
     hrh.responseSender.sendResponse(inspectorJson.toString(), serverChannel);
   }
 

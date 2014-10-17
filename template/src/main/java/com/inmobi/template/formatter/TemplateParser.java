@@ -1,12 +1,7 @@
 package com.inmobi.template.formatter;
 
-import com.google.inject.Inject;
-import com.inmobi.template.context.App;
-import com.inmobi.template.exception.TemplateException;
-import com.inmobi.template.gson.GsonManager;
-import com.inmobi.template.interfaces.Context;
-import com.inmobi.template.interfaces.TemplateConfiguration;
-import com.inmobi.template.interfaces.Tools;
+import java.io.StringWriter;
+
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.exception.ParseErrorException;
@@ -15,7 +10,13 @@ import org.apache.velocity.tools.generic.MathTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.StringWriter;
+import com.google.inject.Inject;
+import com.inmobi.template.context.App;
+import com.inmobi.template.exception.TemplateException;
+import com.inmobi.template.gson.GsonManager;
+import com.inmobi.template.interfaces.Context;
+import com.inmobi.template.interfaces.TemplateConfiguration;
+import com.inmobi.template.interfaces.Tools;
 
 
 public class TemplateParser {
@@ -39,9 +40,9 @@ public class TemplateParser {
     return velocityContext;
   }
 
-  public String format(final String adm, final String templateName)
-      throws ResourceNotFoundException, ParseErrorException, Exception {
-      // TODO: Redundant exceptions?
+  public String format(final String adm, final String templateName) throws ResourceNotFoundException,
+      ParseErrorException, Exception {
+    // TODO: Redundant exceptions?
     final App app = gsonManager.createGson().fromJson(adm, App.class);
     return format(app, templateName);
   }

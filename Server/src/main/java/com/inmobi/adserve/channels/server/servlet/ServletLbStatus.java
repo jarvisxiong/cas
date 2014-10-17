@@ -28,27 +28,28 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 @Path("/lbstatus")
 public class ServletLbStatus implements Servlet {
-    private static final Logger LOG = LoggerFactory.getLogger(ServletLbStatus.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ServletLbStatus.class);
 
-    @Override
-    public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
-            final Channel serverChannel) throws Exception {
-        LOG.debug("asked for load balancer status");
-        InspectorStats.incrementStatCount("LbStatus", InspectorStrings.TOTAL_REQUESTS);
-        if (ServerStatusInfo.statusCode != 404) {
-            InspectorStats.incrementStatCount("LbStatus", InspectorStrings.SUCCESSFUL_REQUESTS);
-            hrh.responseSender.sendResponse("OK", serverChannel);
-            return;
-        }
-        // TODO: remove header validation
-        HttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND,
-                Unpooled.copiedBuffer(ServerStatusInfo.statusString, Charset.defaultCharset()));
-        ChannelFuture future = serverChannel.writeAndFlush(response);
-        future.addListener(ChannelFutureListener.CLOSE);
+  @Override
+  public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
+      final Channel serverChannel) throws Exception {
+    LOG.debug("asked for load balancer status");
+    InspectorStats.incrementStatCount("LbStatus", InspectorStrings.TOTAL_REQUESTS);
+    if (ServerStatusInfo.statusCode != 404) {
+      InspectorStats.incrementStatCount("LbStatus", InspectorStrings.SUCCESSFUL_REQUESTS);
+      hrh.responseSender.sendResponse("OK", serverChannel);
+      return;
     }
+    // TODO: remove header validation
+    final HttpResponse response =
+        new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND, Unpooled.copiedBuffer(
+            ServerStatusInfo.statusString, Charset.defaultCharset()));
+    final ChannelFuture future = serverChannel.writeAndFlush(response);
+    future.addListener(ChannelFutureListener.CLOSE);
+  }
 
-    @Override
-    public String getName() {
-        return "lbstatus";
-    }
+  @Override
+  public String getName() {
+    return "lbstatus";
+  }
 }

@@ -24,8 +24,7 @@ public abstract class Tools {
 
   public abstract String nativeAd(final Context context, final String pubContent);
 
-  public boolean newAsyncMode(final Boolean abTestingMode, final List<String> list,
-      final String value) {
+  public boolean newAsyncMode(final Boolean abTestingMode, final List<String> list, final String value) {
     return true;
   }
 

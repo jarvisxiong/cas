@@ -2,8 +2,6 @@ package com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.imp
 
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import com.google.inject.Provider;
@@ -21,15 +19,15 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 public class AdvertiserDailyImpressionCeilingExceededFilter extends AbstractAdvertiserLevelFilter {
 
-    @Inject
-    public AdvertiserDailyImpressionCeilingExceededFilter(final Provider<Marker> traceMarkerProvider) {
-        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_IMPRESSION_FILTER);
-    }
+  @Inject
+  public AdvertiserDailyImpressionCeilingExceededFilter(final Provider<Marker> traceMarkerProvider) {
+    super(traceMarkerProvider, InspectorStrings.DROPPED_IN_IMPRESSION_FILTER);
+  }
 
-    @Override
-    protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams) {
-        return channelSegment.getChannelFeedbackEntity().getTodayImpressions() > channelSegment.getChannelEntity()
-                .getImpressionCeil();
-    }
+  @Override
+  protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams) {
+    return channelSegment.getChannelFeedbackEntity().getTodayImpressions() > channelSegment.getChannelEntity()
+        .getImpressionCeil();
+  }
 
 }

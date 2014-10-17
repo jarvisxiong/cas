@@ -27,107 +27,108 @@ import com.inmobi.casthrift.DemandSourceType;
  */
 public class CasTimeoutHandler extends ChannelDuplexHandler {
 
-	private volatile long timeoutInMillis;
-	private final long timeoutMillisForRTB;
-	private final long timeoutMillisForDCP;
-	private volatile long lastReadTime;
-	private volatile ScheduledFuture<?> timeout;
-	private static ScheduledExecutorService executor;
-	static {
-		executor = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
-	};
-	private volatile int dst;
-	
-	private DemandSourceType demandSourceType;
+  private volatile long timeoutInMillis;
+  private final long timeoutMillisForRTB;
+  private final long timeoutMillisForDCP;
+  private volatile long lastReadTime;
+  private volatile ScheduledFuture<?> timeout;
+  private static ScheduledExecutorService executor;
+  static {
+    executor = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
+  };
+  private volatile int dst;
 
-	@Inject
-	private static Map<String, Servlet> pathToServletMap;
+  private DemandSourceType demandSourceType;
 
-	public CasTimeoutHandler(final int timeoutMillisForRTB, final int timeoutMillisForDCP) {
-		this.timeoutMillisForRTB = timeoutMillisForRTB;
-		this.timeoutMillisForDCP = timeoutMillisForDCP;
-	}
+  @Inject
+  private static Map<String, Servlet> pathToServletMap;
 
-	@Override
-	public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
+  public CasTimeoutHandler(final int timeoutMillisForRTB, final int timeoutMillisForDCP) {
+    this.timeoutMillisForRTB = timeoutMillisForRTB;
+    this.timeoutMillisForDCP = timeoutMillisForDCP;
+  }
 
-		// if rtbd we are going with timeout of 175ms
-		// else if dcp we are going with timeout of 600 ms
+  @Override
+  public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
 
-		HttpRequest httpRequest = (HttpRequest) msg;
+    // if rtbd we are going with timeout of 175ms
+    // else if dcp we are going with timeout of 600 ms
 
-		QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httpRequest.getUri());
-		String path = queryStringDecoder.path();
+    final HttpRequest httpRequest = (HttpRequest) msg;
 
-		Servlet servlet = pathToServletMap.get(path);
+    final QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httpRequest.getUri());
+    final String path = queryStringDecoder.path();
 
-		if (servlet instanceof ServletRtbd) {
-			timeoutInMillis = timeoutMillisForRTB;
-			dst = DemandSourceType.RTBD.getValue();
-		} else if(servlet instanceof ServletIXFill){
-			timeoutInMillis = timeoutMillisForRTB;
-			dst = DemandSourceType.IX.getValue();
-		} else {
-			timeoutInMillis = timeoutMillisForDCP;
-			dst = DemandSourceType.DCP.getValue();
-		}
+    final Servlet servlet = pathToServletMap.get(path);
 
-		demandSourceType = DemandSourceType.findByValue(dst);
-		
-		initialize(ctx);
+    if (servlet instanceof ServletRtbd) {
+      timeoutInMillis = timeoutMillisForRTB;
+      dst = DemandSourceType.RTBD.getValue();
+    } else if (servlet instanceof ServletIXFill) {
+      timeoutInMillis = timeoutMillisForRTB;
+      dst = DemandSourceType.IX.getValue();
+    } else {
+      timeoutInMillis = timeoutMillisForDCP;
+      dst = DemandSourceType.DCP.getValue();
+    }
 
-		super.channelRead(ctx, msg);
-	}
+    demandSourceType = DemandSourceType.findByValue(dst);
 
-	private void initialize(final ChannelHandlerContext ctx) {
-		lastReadTime = System.currentTimeMillis();
-		timeout = executor.schedule(new ReadTimeoutTask(ctx), timeoutInMillis, TimeUnit.MILLISECONDS);
-	}
+    initialize(ctx);
 
-	@Override
-	public void write(final ChannelHandlerContext ctx, final Object msg, final ChannelPromise promise) throws Exception {
-		if (!ctx.channel().isOpen()) {
-			return;
-		}
-		destroy();
-		super.write(ctx, msg, promise);
-	}
+    super.channelRead(ctx, msg);
+  }
 
-	private void destroy() {
-		if (timeout != null) {
-			timeout.cancel(true);
-			timeout = null;
-		}
-	}
+  private void initialize(final ChannelHandlerContext ctx) {
+    lastReadTime = System.currentTimeMillis();
+    timeout = executor.schedule(new ReadTimeoutTask(ctx), timeoutInMillis, TimeUnit.MILLISECONDS);
+  }
 
-	private void readTimedOut(final ChannelHandlerContext ctx) {
-		ctx.fireExceptionCaught(ReadTimeoutException.INSTANCE);
-	}
+  @Override
+  public void write(final ChannelHandlerContext ctx, final Object msg, final ChannelPromise promise) throws Exception {
+    if (!ctx.channel().isOpen()) {
+      return;
+    }
+    destroy();
+    super.write(ctx, msg, promise);
+  }
 
-	private final class ReadTimeoutTask implements Runnable {
+  private void destroy() {
+    if (timeout != null) {
+      timeout.cancel(true);
+      timeout = null;
+    }
+  }
 
-		private final ChannelHandlerContext ctx;
+  private void readTimedOut(final ChannelHandlerContext ctx) {
+    ctx.fireExceptionCaught(ReadTimeoutException.INSTANCE);
+  }
 
-		ReadTimeoutTask(final ChannelHandlerContext ctx) {
-			this.ctx = ctx;
-		}
+  private final class ReadTimeoutTask implements Runnable {
 
-		@Override
-		public void run() {
-			if (!ctx.channel().isOpen()) {
-				return;
-			}
+    private final ChannelHandlerContext ctx;
 
-			long currentTime = System.currentTimeMillis();
+    ReadTimeoutTask(final ChannelHandlerContext ctx) {
+      this.ctx = ctx;
+    }
 
-			// if rtbd we are going with timeout of 170ms
-			// else if dcp we are going with timeout of 600 ms
-			long latency = currentTime - lastReadTime;
+    @Override
+    public void run() {
+      if (!ctx.channel().isOpen()) {
+        return;
+      }
 
-			InspectorStats.updateYammerTimerStats(demandSourceType.name(), InspectorStrings.CAS_TIMEOUT_HANDLER_LATENCY, latency);
-			if (latency >= timeoutInMillis) {
-				readTimedOut(ctx);
-			}
-		}
-	}
+      final long currentTime = System.currentTimeMillis();
+
+      // if rtbd we are going with timeout of 170ms
+      // else if dcp we are going with timeout of 600 ms
+      final long latency = currentTime - lastReadTime;
+
+      InspectorStats.updateYammerTimerStats(demandSourceType.name(), InspectorStrings.CAS_TIMEOUT_HANDLER_LATENCY,
+          latency);
+      if (latency >= timeoutInMillis) {
+        readTimedOut(ctx);
+      }
+    }
+  }
 }

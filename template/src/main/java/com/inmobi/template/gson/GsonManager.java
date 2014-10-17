@@ -12,23 +12,23 @@ import com.inmobi.template.interfaces.Context;
 import com.inmobi.template.interfaces.DeserializerConfiguration;
 
 public class GsonManager {
-	
-	private GsonBuilder gsonBuilder = new GsonBuilder();
-	
-	@Inject
-	public void setDeserializer(DeserializerConfiguration dc){
-		 gsonBuilder.registerTypeAdapter(App.class, dc.getAppDeserializer());
-		 gsonBuilder.registerTypeAdapter(Icon.class, dc.getIconDeserializer());
-		 gsonBuilder.registerTypeAdapter(Screenshot.class, dc.getImageDeserializer());
-		 gsonBuilder.registerTypeAdapter(DataMap.class, dc.getDataDeserializer());
-	}
-	
-	public void setDeserializer(Class<Context> clazz,JsonDeserializer<Context> deserializer){
-		gsonBuilder.registerTypeAdapter(clazz, deserializer);
-	}
-	
-	public Gson createGson(){
-		return gsonBuilder.create();
-	}
+
+  private final GsonBuilder gsonBuilder = new GsonBuilder();
+
+  @Inject
+  public void setDeserializer(final DeserializerConfiguration dc) {
+    gsonBuilder.registerTypeAdapter(App.class, dc.getAppDeserializer());
+    gsonBuilder.registerTypeAdapter(Icon.class, dc.getIconDeserializer());
+    gsonBuilder.registerTypeAdapter(Screenshot.class, dc.getImageDeserializer());
+    gsonBuilder.registerTypeAdapter(DataMap.class, dc.getDataDeserializer());
+  }
+
+  public void setDeserializer(final Class<Context> clazz, final JsonDeserializer<Context> deserializer) {
+    gsonBuilder.registerTypeAdapter(clazz, deserializer);
+  }
+
+  public Gson createGson() {
+    return gsonBuilder.create();
+  }
 
 }

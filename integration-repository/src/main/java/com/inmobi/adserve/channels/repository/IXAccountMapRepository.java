@@ -14,7 +14,8 @@ import com.inmobi.phoenix.data.RepositoryQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
 
 public class IXAccountMapRepository extends AbstractStatsMaintainingDBRepository<IXAccountMapEntity, Long>
-    implements RepositoryManager {
+    implements
+      RepositoryManager {
 
   @Override
   public DBEntity<IXAccountMapEntity, Long> buildObjectFromRow(final ResultSetRow resultSetRow)

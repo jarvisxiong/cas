@@ -1,9 +1,10 @@
 package com.inmobi.adserve.channels.query;
 
-import com.inmobi.phoenix.data.RepositoryQuery;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+
+import com.inmobi.phoenix.data.RepositoryQuery;
 
 
 @EqualsAndHashCode
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CreativeQuery implements RepositoryQuery {
 
-    private String advertiserId;
-    private String creativeId;
+  private String advertiserId;
+  private String creativeId;
 
 }

@@ -14,8 +14,8 @@ import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
 import com.google.inject.util.Providers;
-import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.config.AdapterConfig;
 import com.inmobi.adserve.channels.api.config.AdapterConfigFactory;
@@ -28,89 +28,89 @@ import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
  */
 public class AdapterConfigModule extends AbstractModule {
 
-    private final Configuration allAdapterConfiguration;
-    private final String        dcName;
+  private final Configuration allAdapterConfiguration;
+  private final String dcName;
 
-    public AdapterConfigModule(final Configuration allAdapterConfiguration, final String dcName) {
-        this.allAdapterConfiguration = allAdapterConfiguration;
-        this.dcName = dcName;
+  public AdapterConfigModule(final Configuration allAdapterConfiguration, final String dcName) {
+    this.allAdapterConfiguration = allAdapterConfiguration;
+    this.dcName = dcName;
+  }
+
+  @Override
+  protected void configure() {
+
+    requestStaticInjection(BaseAdNetworkImpl.class);
+    requestStaticInjection(RtbAdNetwork.class);
+    requestStaticInjection(IXAdNetwork.class);
+
+    install(new FactoryModuleBuilder().build(AdapterConfigFactory.class));
+    bind(String.class).annotatedWith(Names.named("dcName")).toProvider(Providers.of(dcName));
+  }
+
+  @Provides
+  @Singleton
+  Map<String, AdapterConfig> provideAdvertiserIdConfigMap(final AdapterConfigFactory adapterConfigFactory) {
+
+    @SuppressWarnings("unchecked")
+    final Iterator<String> keyIterator = allAdapterConfiguration.getKeys();
+
+    final Set<String> adapterNames = Sets.newHashSet();
+
+    final Set<AdapterConfig> adapterConfigs = Sets.newHashSet();
+
+    while (keyIterator.hasNext()) {
+      final String key = keyIterator.next();
+
+      final String adapterName = key.substring(0, key.indexOf("."));
+      adapterNames.add(adapterName);
     }
 
-    @Override
-    protected void configure() {
-
-        requestStaticInjection(BaseAdNetworkImpl.class);
-        requestStaticInjection(RtbAdNetwork.class);
-        requestStaticInjection(IXAdNetwork.class);
-
-        install(new FactoryModuleBuilder().build(AdapterConfigFactory.class));
-        bind(String.class).annotatedWith(Names.named("dcName")).toProvider(Providers.of(dcName));
+    for (final String adapterName : adapterNames) {
+      final Configuration adapterConfiguration = allAdapterConfiguration.subset(adapterName);
+      final AdapterConfig adapterConfig = adapterConfigFactory.create(adapterConfiguration, adapterName);
+      adapterConfigs.add(adapterConfig);
     }
 
-    @Provides
-    @Singleton
-    Map<String, AdapterConfig> provideAdvertiserIdConfigMap(final AdapterConfigFactory adapterConfigFactory) {
+    final Map<String, AdapterConfig> advertiserIdConfigMap = Maps.newHashMap();
 
-        @SuppressWarnings("unchecked")
-        Iterator<String> keyIterator = allAdapterConfiguration.getKeys();
+    for (final AdapterConfig adapterConfig : adapterConfigs) {
+      advertiserIdConfigMap.put(adapterConfig.getAdvertiserId(), adapterConfig);
+    }
+    return advertiserIdConfigMap;
+  }
 
-        Set<String> adapterNames = Sets.newHashSet();
+  @Provides
+  @Singleton
+  @AdvertiserIdNameMap
+  Map<String, String> provideAdvertiserIdToNameMap(final AdapterConfigFactory adapterConfigFactory) {
 
-        Set<AdapterConfig> adapterConfigs = Sets.newHashSet();
+    @SuppressWarnings("unchecked")
+    final Iterator<String> keyIterator = allAdapterConfiguration.getKeys();
 
-        while (keyIterator.hasNext()) {
-            String key = keyIterator.next();
+    final Set<String> adapterNames = Sets.newHashSet();
 
-            String adapterName = key.substring(0, key.indexOf("."));
-            adapterNames.add(adapterName);
-        }
+    final Set<AdapterConfig> adapterConfigs = Sets.newHashSet();
 
-        for (String adapterName : adapterNames) {
-            Configuration adapterConfiguration = allAdapterConfiguration.subset(adapterName);
-            AdapterConfig adapterConfig = adapterConfigFactory.create(adapterConfiguration, adapterName);
-            adapterConfigs.add(adapterConfig);
-        }
+    while (keyIterator.hasNext()) {
+      final String key = keyIterator.next();
 
-        Map<String, AdapterConfig> advertiserIdConfigMap = Maps.newHashMap();
-
-        for (AdapterConfig adapterConfig : adapterConfigs) {
-            advertiserIdConfigMap.put(adapterConfig.getAdvertiserId(), adapterConfig);
-        }
-        return advertiserIdConfigMap;
+      final String adapterName = key.substring(0, key.indexOf("."));
+      adapterNames.add(adapterName);
     }
 
-    @Provides
-    @Singleton
-    @AdvertiserIdNameMap
-    Map<String, String> provideAdvertiserIdToNameMap(final AdapterConfigFactory adapterConfigFactory) {
-
-        @SuppressWarnings("unchecked")
-        Iterator<String> keyIterator = allAdapterConfiguration.getKeys();
-
-        Set<String> adapterNames = Sets.newHashSet();
-
-        Set<AdapterConfig> adapterConfigs = Sets.newHashSet();
-
-        while (keyIterator.hasNext()) {
-            String key = keyIterator.next();
-
-            String adapterName = key.substring(0, key.indexOf("."));
-            adapterNames.add(adapterName);
-        }
-
-        for (String adapterName : adapterNames) {
-            Configuration adapterConfiguration = allAdapterConfiguration.subset(adapterName);
-            AdapterConfig adapterConfig = adapterConfigFactory.create(adapterConfiguration, adapterName);
-            adapterConfigs.add(adapterConfig);
-        }
-
-        Map<String, String> advertiserIdToNameMap = Maps.newHashMap();
-
-        for (AdapterConfig adapterConfig : adapterConfigs) {
-            advertiserIdToNameMap.put(adapterConfig.getAdvertiserId(), adapterConfig.getAdapterName());
-        }
-
-        return advertiserIdToNameMap;
+    for (final String adapterName : adapterNames) {
+      final Configuration adapterConfiguration = allAdapterConfiguration.subset(adapterName);
+      final AdapterConfig adapterConfig = adapterConfigFactory.create(adapterConfiguration, adapterName);
+      adapterConfigs.add(adapterConfig);
     }
+
+    final Map<String, String> advertiserIdToNameMap = Maps.newHashMap();
+
+    for (final AdapterConfig adapterConfig : adapterConfigs) {
+      advertiserIdToNameMap.put(adapterConfig.getAdvertiserId(), adapterConfig.getAdapterName());
+    }
+
+    return advertiserIdToNameMap;
+  }
 
 }

@@ -16,7 +16,8 @@ public class NativeConstrains {
 
 
   public enum Mandatory {
-    ICON(NativeConstrains.ICON, "icon"), MEDIA(NativeConstrains.MEDIA, "Media"), HEADLINE(NativeConstrains.HEADLINE, "Headline"), DESCRIPTION(NativeConstrains.DESCRIPTION, "Description");
+    ICON(NativeConstrains.ICON, "icon"), MEDIA(NativeConstrains.MEDIA, "Media"), HEADLINE(NativeConstrains.HEADLINE,
+        "Headline"), DESCRIPTION(NativeConstrains.DESCRIPTION, "Description");
 
     private final int index;
     private final String name;
@@ -57,11 +58,11 @@ public class NativeConstrains {
     mandatoryMap.put(LAYOUT_CONSTRAINT_1,
         Lists.asList(Mandatory.ICON.getIndex(), new Integer[] {Mandatory.HEADLINE.getIndex()}));
     mandatoryMap.put(
-            LAYOUT_CONSTRAINT_2,
+        LAYOUT_CONSTRAINT_2,
         Lists.asList(Mandatory.ICON.getIndex(),
             new Integer[] {Mandatory.HEADLINE.getIndex(), Mandatory.DESCRIPTION.getIndex()}));
     mandatoryMap.put(
-            LAYOUT_CONSTRAINT_3,
+        LAYOUT_CONSTRAINT_3,
         Lists.asList(Mandatory.ICON.getIndex(),
             new Integer[] {Mandatory.HEADLINE.getIndex(), Mandatory.MEDIA.getIndex()}));
 
