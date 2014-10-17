@@ -35,7 +35,6 @@ public class WapSiteUACRepositoryTest {
     public void testBuildObjectFromRow1() throws Exception {
         /**
          * Conditions/Branches followed:
-         *  wsuModifiedOn is after wsModifiedOn
          *  exchange_settings is 1
          *  siteTypeId == ANDROID_SITE_TYPE && ...
          *  categoryList is present
@@ -45,8 +44,7 @@ public class WapSiteUACRepositoryTest {
          */
 
         String id = "id";
-        Timestamp wsModifiedOn = new Timestamp(10L);
-        Timestamp wsuModifiedOn = new Timestamp(100L);
+        Timestamp modifiedOn = new Timestamp(10L);
         String marketId = "marketId";
         long siteTypeId = ANDROID_SITE_TYPE;
         String contentRating = "Everyone";
@@ -70,8 +68,7 @@ public class WapSiteUACRepositoryTest {
         Logger mockLogger = createNiceMock(Logger.class);
 
         expect(mockNullAsZeroResultSetRow.getString("id")).andReturn(id).times(1);
-        expect(mockNullAsZeroResultSetRow.getTimestamp("wsu_modified_on")).andReturn(wsuModifiedOn).times(1);
-        expect(mockNullAsZeroResultSetRow.getTimestamp("ws_modified_on")).andReturn(wsModifiedOn).times(1);
+        expect(mockNullAsZeroResultSetRow.getTimestamp("modified_on")).andReturn(modifiedOn).times(1);
         expect(mockNullAsZeroResultSetRow.getString("market_id")).andReturn(marketId).times(1);
         expect(mockNullAsZeroResultSetRow.getLong("site_type_id")).andReturn(siteTypeId).times(1);
         expect(mockNullAsZeroResultSetRow.getString("content_rating")).andReturn(contentRating).times(1);
@@ -109,12 +106,12 @@ public class WapSiteUACRepositoryTest {
         assertThat(output.getSiteName(), is(equalTo(siteName)));
         assertThat(output.getAppTitle(), is(equalTo(appTitle)));
         assertThat(output.getBundleId(), is(equalTo(bundleId)));
-        assertThat(output.getModifiedOn(), is(equalTo(wsuModifiedOn)));
+        assertThat(output.getModifiedOn(), is(equalTo(modifiedOn)));
         assertThat(output.getContentRating(), is(equalTo(expectedContentRating)));
         assertThat(output.getCategories(), is(equalTo(expectedCategories)));
         assertThat(output.isTransparencyEnabled(), is(equalTo(true)));
         assertThat(output.getBlindList(), is(equalTo(expectedBlindList)));
-        assertThat(outputModifiedOn, is(equalTo(wsuModifiedOn)));
+        assertThat(outputModifiedOn, is(equalTo(modifiedOn)));
 
         verifyAll();
     }
@@ -123,7 +120,6 @@ public class WapSiteUACRepositoryTest {
     public void testBuildObjectFromRow2() throws Exception {
         /**
          * Conditions/Branches followed:
-         *  wsuModifiedOn is not after wsModifiedOn
          *  exchange_settings is not 1
          *  siteTypeId != ANDROID_SITE_TYPE
          *  categoryList is not present
@@ -133,8 +129,7 @@ public class WapSiteUACRepositoryTest {
          */
 
         String id = "id";
-        Timestamp wsModifiedOn = new Timestamp(1000L);
-        Timestamp wsuModifiedOn = new Timestamp(100L);
+        Timestamp modifiedOn = new Timestamp(1000L);
         String marketId = "marketId";
         long siteTypeId = 20;
         String contentRating = "contentRating";
@@ -158,8 +153,7 @@ public class WapSiteUACRepositoryTest {
         Logger mockLogger = createMock(Logger.class);
 
         expect(mockNullAsZeroResultSetRow.getString("id")).andReturn(id).times(1);
-        expect(mockNullAsZeroResultSetRow.getTimestamp("wsu_modified_on")).andReturn(wsuModifiedOn).times(1);
-        expect(mockNullAsZeroResultSetRow.getTimestamp("ws_modified_on")).andReturn(wsModifiedOn).times(1);
+        expect(mockNullAsZeroResultSetRow.getTimestamp("modified_on")).andReturn(modifiedOn).times(1);
         expect(mockNullAsZeroResultSetRow.getString("market_id")).andReturn(marketId).times(1);
         expect(mockNullAsZeroResultSetRow.getLong("site_type_id")).andReturn(siteTypeId).times(1);
         expect(mockNullAsZeroResultSetRow.getString("content_rating")).andReturn(contentRating).times(1);
@@ -197,12 +191,12 @@ public class WapSiteUACRepositoryTest {
         assertThat(output.getSiteName(), is(equalTo(siteName)));
         assertThat(output.getAppTitle(), is(equalTo(appTitle)));
         assertThat(output.getBundleId(), is(equalTo(bundleId)));
-        assertThat(output.getModifiedOn(), is(equalTo(wsModifiedOn)));
+        assertThat(output.getModifiedOn(), is(equalTo(modifiedOn)));
         assertThat(output.getContentRating(), is(equalTo(expectedContentRating)));
         assertThat(output.getCategories(), is(equalTo(expectedCategories)));
         assertThat(output.isTransparencyEnabled(), is(equalTo(false)));
         assertThat(output.getBlindList(), is(equalTo(expectedBlindList)));
-        assertThat(outputModifiedOn, is(equalTo(wsModifiedOn)));
+        assertThat(outputModifiedOn, is(equalTo(modifiedOn)));
 
         verifyAll();
     }
