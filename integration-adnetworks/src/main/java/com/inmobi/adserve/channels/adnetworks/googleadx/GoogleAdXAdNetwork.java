@@ -6,7 +6,9 @@ import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -15,10 +17,6 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.net.URI;
-
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
 
 public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
 
@@ -79,7 +77,9 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
     sb.append("google_ad_width = ").append(width).append(";");
     sb.append("google_ad_height = ").append(height).append(";");
     if (!isApp()) {
-      sb.append("google_page_url = \"").append(sasParams.getAppUrl()).append("\";");
+      sb.append("google_page_url = \"")
+              .append(sasParams.getReferralUrl() != null ? sasParams.getReferralUrl() : sasParams.getAppUrl())
+              .append("\";");
     }
     sb.append("</script>");
     sb.append(SCRIPT_END_PART);
