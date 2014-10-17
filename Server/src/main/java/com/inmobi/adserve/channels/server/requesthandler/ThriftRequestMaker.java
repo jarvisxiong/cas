@@ -102,7 +102,7 @@ public class ThriftRequestMaker {
         geo.setZipIds(zips);
 
         AdPoolRequest adPoolRequest = new AdPoolRequest();
-        adPoolRequest.setRequestId("requestId");
+        adPoolRequest.setTaskId("requestId");
         adPoolRequest.setRemoteHostIp("10.14.118.13");
         adPoolRequest.setSite(site);
         adPoolRequest.setSegmentId(0);

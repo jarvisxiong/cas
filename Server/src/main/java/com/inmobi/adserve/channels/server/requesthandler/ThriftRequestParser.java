@@ -1,20 +1,5 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.inject.Singleton;
 import com.inmobi.adserve.adpool.AdPoolRequest;
 import com.inmobi.adserve.adpool.DemandType;
@@ -31,6 +16,20 @@ import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.types.InventoryType;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 
 @Singleton
@@ -55,7 +54,7 @@ public class ThriftRequestParser {
         params.setRqMkSlot(tObject.selectedSlots);
         params.setRFormat(getResponseFormat(tObject.responseFormat));
         params.setRqMkAdcount(tObject.requestedAdCount);
-        params.setTid(tObject.requestId);
+        params.setTid(tObject.taskId);
         params.setAllowBannerAds(tObject.isSetSupplyCapabilities()
                 && tObject.supplyCapabilities.contains(SupplyCapability.BANNER));
         // TODO use segment id in cas as long
@@ -72,6 +71,7 @@ public class ThriftRequestParser {
         params.setSst(tObject.isSetSupplySource() ? tObject.supplySource.getValue() : 0);
         EncryptionKeys encryptionKeys = tObject.getEncryptionKeys();
         params.setEncryptionKey(encryptionKeys);
+        params.setReferralUrl(tObject.referralUrl);
 
         // Fill params from integration details object
         if (tObject.isSetIntegrationDetails()) {
