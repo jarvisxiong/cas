@@ -299,12 +299,17 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         jsonObject.addProperty("imaiBaseUrl", sasParams.getImaiBaseUrl());
         jsonObject.addProperty("supplySource", SUPPY_SOURCE);
         jsonObject.addProperty("blindedSiteId", blindedSiteId);
-        jsonObject.addProperty("uidIFA", casInternalRequestParameters.getUidIFA());
-        jsonObject.addProperty("uidSO1", casInternalRequestParameters.getUidSO1());
+        jsonObject.addProperty("gpid", casInternalRequestParameters.getGpid());
+        jsonObject.addProperty("uid", casInternalRequestParameters.getUid());
         jsonObject.addProperty("uidO1", casInternalRequestParameters.getUidO1());
         jsonObject.addProperty("uidMD5", casInternalRequestParameters.getUidMd5());
-        jsonObject.addProperty("uidIDUS1", casInternalRequestParameters.getUidIDUS1());
+        jsonObject.addProperty("uidIFA", casInternalRequestParameters.getUidIFA());
         jsonObject.addProperty("uidIFV", casInternalRequestParameters.getUidIFV());
+        jsonObject.addProperty("uidSO1", casInternalRequestParameters.getUidSO1());
+        jsonObject.addProperty("uidIDUS1", casInternalRequestParameters.getUidIDUS1());
+        jsonObject.addProperty("uidADT", casInternalRequestParameters.getUidADT());
+        jsonObject.addProperty("uidWC", casInternalRequestParameters.getUidWC());
+        jsonObject.addProperty("uuidFromUidCookie", casInternalRequestParameters.getUuidFromUidCookie());
 
         return jsonObject.toString();
     }
