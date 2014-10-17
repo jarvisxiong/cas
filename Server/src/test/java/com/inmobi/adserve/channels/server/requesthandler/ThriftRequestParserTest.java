@@ -113,11 +113,12 @@ public class ThriftRequestParserTest extends TestCase {
         selectedSlots.add((short) 12);
         adPoolRequest.setSelectedSlots(selectedSlots);
         adPoolRequest.setRequestedAdCount((short) 1);
-        adPoolRequest.setRequestId("tid");
+        adPoolRequest.setTaskId("tid");
         adPoolRequest.setResponseFormat(ResponseFormat.XHTML);
         adPoolRequest.setIntegrationDetails(integrationDetails);
         adPoolRequest.setIpFileVersion(3456);
         adPoolRequest.setSupplySource(SupplySource.RTB_EXCHANGE);
+        adPoolRequest.setReferralUrl("refUrl");
 
         SASRequestParameters sasRequestParameters = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
@@ -168,5 +169,6 @@ public class ThriftRequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getAccountSegment(), Collections.<Integer> emptySet());
         assertEquals(sasRequestParameters.isResponseOnlyFromDcp(), false);
         assertEquals(sasRequestParameters.getSst(), 100);
+        assertEquals(sasRequestParameters.getReferralUrl(), "refUrl");
     }
 }

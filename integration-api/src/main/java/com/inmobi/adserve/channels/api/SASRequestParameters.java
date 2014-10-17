@@ -83,6 +83,7 @@ public class SASRequestParameters {
     private SiteEcpmEntity      siteEcpmEntity;
 
     private boolean             isBannerVideoSupported;
+    private String              referralUrl;
 
     public SASRequestParameters() {
         // Do Nothing.
