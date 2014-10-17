@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>template</artifactId>
 	<packaging>jar</packaging>
@@ -20,9 +21,9 @@
 			<artifactId>json-path</artifactId>
 		</dependency>
 		<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-api</artifactId>
-			</dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
@@ -35,10 +36,8 @@
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
 		</dependency>
-		<!-- <dependency>
-			<groupId>velocity</groupId>
-			<artifactId>velocity</artifactId>
-		</dependency> -->
+		<!-- <dependency> <groupId>velocity</groupId> <artifactId>velocity</artifactId> 
+			</dependency> -->
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
@@ -47,18 +46,12 @@
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
 		</dependency>
-		<!-- <dependency>
-			<groupId>com.google.code.guice</groupId>
-			<artifactId>guice</artifactId>
-		</dependency> -->
-		<!-- <dependency>
-			<groupId>javax.inject</groupId>
-			<artifactId>javax.inject</artifactId>
-		</dependency> -->
-		<!-- <dependency>
-			<groupId>aopalliance</groupId>
-			<artifactId>aopalliance</artifactId>
-		</dependency> -->
+		<!-- <dependency> <groupId>com.google.code.guice</groupId> <artifactId>guice</artifactId> 
+			</dependency> -->
+		<!-- <dependency> <groupId>javax.inject</groupId> <artifactId>javax.inject</artifactId> 
+			</dependency> -->
+		<!-- <dependency> <groupId>aopalliance</groupId> <artifactId>aopalliance</artifactId> 
+			</dependency> -->
 		<dependency>
 			<groupId>com.google.inject.extensions</groupId>
 			<artifactId>guice-assistedinject</artifactId>
