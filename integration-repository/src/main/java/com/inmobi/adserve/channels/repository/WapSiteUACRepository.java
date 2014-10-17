@@ -37,16 +37,7 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
     public DBEntity<WapSiteUACEntity, String> buildObjectFromRow(final ResultSetRow resultSetRow) throws RepositoryException {
         final NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
         final String id = row.getString("id");
-        final Timestamp modifiedOn;
-        final Timestamp wsuModifiedOn = row.getTimestamp("wsu_modified_on");
-        final Timestamp wsModifiedOn = row.getTimestamp("ws_modified_on");
-
-        if (null != wsuModifiedOn) {
-            modifiedOn = wsuModifiedOn.after(wsModifiedOn) ? wsuModifiedOn : wsModifiedOn;
-        } else {
-            modifiedOn = wsModifiedOn;
-        }
-
+        final Timestamp modifiedOn = row.getTimestamp("modified_on");
         try {
             final String marketId = row.getString("market_id");
             final long siteTypeId = row.getLong("site_type_id");
