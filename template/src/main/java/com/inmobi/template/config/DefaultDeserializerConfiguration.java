@@ -10,17 +10,17 @@ import com.inmobi.template.interfaces.DeserializerConfiguration;
 
 public class DefaultDeserializerConfiguration implements DeserializerConfiguration {
 
-	@Getter
-	private final AppDeserializer appDeserializer = new AppDeserializer();
+    @Getter
+    private final AppDeserializer appDeserializer = new AppDeserializer();
 
-	@Getter
-	private final IconDeserializer iconDeserializer = new IconDeserializer();
+    @Getter
+    private final IconDeserializer iconDeserializer = new IconDeserializer();
 
-	@Getter
-	private final ImageDeserializer imageDeserializer = new ImageDeserializer();
+    @Getter
+    private final ImageDeserializer imageDeserializer = new ImageDeserializer();
 
-	@Getter
-	private final DataDeserializer dataDeserializer = new DataDeserializer();
+    @Getter
+    private final DataDeserializer dataDeserializer = new DataDeserializer();
 
 
 }

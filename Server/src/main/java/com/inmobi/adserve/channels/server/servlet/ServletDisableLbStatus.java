@@ -17,24 +17,24 @@ import com.inmobi.adserve.channels.server.api.Servlet;
 @Singleton
 @Path("/disablelbstatus")
 public class ServletDisableLbStatus implements Servlet {
-	private static final Logger LOG = LoggerFactory.getLogger(ServletDisableLbStatus.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ServletDisableLbStatus.class);
 
-	@Override
-	public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
-			final Channel serverChannel) throws Exception {
-		if (hrh.isRequestFromLocalHost()) {
-			hrh.responseSender.sendResponse("OK", serverChannel);
-			ServerStatusInfo.statusCode = 404;
-			ServerStatusInfo.statusString = "NOT_OK";
-			LOG.debug("asked to shut down the server");
-		} else {
-			hrh.responseSender.sendResponse("NOT AUTHORIZED", serverChannel);
-		}
-	}
+    @Override
+    public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
+            final Channel serverChannel) throws Exception {
+        if (hrh.isRequestFromLocalHost()) {
+            hrh.responseSender.sendResponse("OK", serverChannel);
+            ServerStatusInfo.statusCode = 404;
+            ServerStatusInfo.statusString = "NOT_OK";
+            LOG.debug("asked to shut down the server");
+        } else {
+            hrh.responseSender.sendResponse("NOT AUTHORIZED", serverChannel);
+        }
+    }
 
-	@Override
-	public String getName() {
-		return "disablelbstatus";
-	}
+    @Override
+    public String getName() {
+        return "disablelbstatus";
+    }
 
 }

@@ -12,7 +12,7 @@ import com.inmobi.phoenix.data.RepositoryQuery;
 @NoArgsConstructor
 public class PricingEngineQuery implements RepositoryQuery {
 
-	private Integer countryId;
-	private Integer osId;
+    private Integer countryId;
+    private Integer osId;
 
 }

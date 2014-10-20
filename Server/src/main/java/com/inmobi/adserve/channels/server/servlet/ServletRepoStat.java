@@ -17,19 +17,19 @@ import com.inmobi.adserve.channels.server.api.Servlet;
 @Singleton
 @Path("/repostat")
 public class ServletRepoStat implements Servlet {
-	private static final Logger LOG = LoggerFactory.getLogger(ServletRepoStat.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ServletRepoStat.class);
 
-	@Override
-	public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
-			final Channel serverChannel) throws Exception {
-		LOG.debug("Inside repostat servlet");
-		hrh.responseSender.sendResponse(CasConfigUtil.repositoryHelper.getRepositoryStatsProvider().getStats(),
-				serverChannel);
-	}
+    @Override
+    public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
+            final Channel serverChannel) throws Exception {
+        LOG.debug("Inside repostat servlet");
+        hrh.responseSender.sendResponse(CasConfigUtil.repositoryHelper.getRepositoryStatsProvider().getStats(),
+                serverChannel);
+    }
 
-	@Override
-	public String getName() {
-		return "repostat";
-	}
+    @Override
+    public String getName() {
+        return "repostat";
+    }
 
 }

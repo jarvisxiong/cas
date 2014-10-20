@@ -16,19 +16,19 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 public class AuctionIUrlFilter extends AbstractAuctionFilter {
 
-	@Inject
-	protected AuctionIUrlFilter(final Provider<Marker> traceMarkerProvider, final ServerConfig serverConfiguration) {
-		super(traceMarkerProvider, InspectorStrings.DROPPED_IN_SAMPLE_IMAGE_URL_MISSING_FILTER, serverConfiguration);
-		isApplicableRTBD = true;
-		isApplicableIX = false;
-	}
+    @Inject
+    protected AuctionIUrlFilter(final Provider<Marker> traceMarkerProvider, final ServerConfig serverConfiguration) {
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_SAMPLE_IMAGE_URL_MISSING_FILTER, serverConfiguration);
+        isApplicableRTBD = true;
+        isApplicableIX = false;
+    }
 
-	@Override
-	protected boolean failedInFilter(final ChannelSegment rtbSegment,
-			final CasInternalRequestParameters casInternalRequestParameters) {
-		if (StringUtils.isEmpty(rtbSegment.getAdNetworkInterface().getIUrl())) {
-			return true;
-		}
-		return false;
-	}
+    @Override
+    protected boolean failedInFilter(final ChannelSegment rtbSegment,
+            final CasInternalRequestParameters casInternalRequestParameters) {
+        if (StringUtils.isEmpty(rtbSegment.getAdNetworkInterface().getIUrl())) {
+            return true;
+        }
+        return false;
+    }
 }

@@ -36,148 +36,148 @@ import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 @PrepareForTest({CasConfigUtil.class, ServletLogParser.class})
 public class ServletLogParserTest {
 
-	private Map<String, List<String>> createMapFromStringPair(final String key, final String value) {
-		final Map<String, List<String>> params = new HashMap<>();
-		params.put(key, Arrays.asList(value));
-		return params;
-	}
+    private Map<String, List<String>> createMapFromStringPair(final String key, final String value) {
+        final Map<String, List<String>> params = new HashMap<>();
+        params.put(key, Arrays.asList(value));
+        return params;
+    }
 
-	@Test
-	public void testHandleRequestHttpMethodIsPostExitStatusIs0() throws Exception {
-		final String targetStrings = "targetStrings";
-		final String logFilePath = "logFilePath";
-		// TODO: StringBuilder
-		final String jObject = "a=" + targetStrings + "&b=" + logFilePath + "&c&d";
+    @Test
+    public void testHandleRequestHttpMethodIsPostExitStatusIs0() throws Exception {
+        final String targetStrings = "targetStrings";
+        final String logFilePath = "logFilePath";
+        // TODO: StringBuilder
+        final String jObject = "a=" + targetStrings + "&b=" + logFilePath + "&c&d";
 
-		mockStatic(CasConfigUtil.class);
-		final QueryStringDecoder mockQueryStringDecoder = createMock(QueryStringDecoder.class);
-		final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-		final ResponseSender mockResponseSender = createMock(ResponseSender.class);
-		final FullHttpRequest mockHttpRequest = createMock(FullHttpRequest.class);
-		final ByteBuf mockByteBuf = createMock(ByteBuf.class);
+        mockStatic(CasConfigUtil.class);
+        final QueryStringDecoder mockQueryStringDecoder = createMock(QueryStringDecoder.class);
+        final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+        final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+        final FullHttpRequest mockHttpRequest = createMock(FullHttpRequest.class);
+        final ByteBuf mockByteBuf = createMock(ByteBuf.class);
 
-		final Configuration mockConfig = createMock(Configuration.class);
-		final Process mockProcess = createMock(Process.class);
+        final Configuration mockConfig = createMock(Configuration.class);
+        final Process mockProcess = createMock(Process.class);
 
-		expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).times(1);
-		expect(mockHttpRequest.getMethod()).andReturn(HttpMethod.POST).times(1);
-		expect(mockHttpRequest.content()).andReturn(mockByteBuf).times(1);
-		expect(mockByteBuf.toString(CharsetUtil.UTF_8)).andReturn(jObject).times(1);
-		expect(mockQueryStringDecoder.parameters()).andReturn(null).times(1);
-		expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).times(2);
-		expect(mockConfig.getString("logParserScript")).andReturn("/opt/bin/mkhoj/parser.sh").times(2);
-		expect(mockProcess.waitFor()).andReturn(0).times(1);
+        expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).times(1);
+        expect(mockHttpRequest.getMethod()).andReturn(HttpMethod.POST).times(1);
+        expect(mockHttpRequest.content()).andReturn(mockByteBuf).times(1);
+        expect(mockByteBuf.toString(CharsetUtil.UTF_8)).andReturn(jObject).times(1);
+        expect(mockQueryStringDecoder.parameters()).andReturn(null).times(1);
+        expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).times(2);
+        expect(mockConfig.getString("logParserScript")).andReturn("/opt/bin/mkhoj/parser.sh").times(2);
+        expect(mockProcess.waitFor()).andReturn(0).times(1);
 
-		mockResponseSender.sendResponse("PASS", null);
-		expectLastCall().times(1);
+        mockResponseSender.sendResponse("PASS", null);
+        expectLastCall().times(1);
 
-		replayAll();
-		mockHttpRequestHandler.responseSender = mockResponseSender;
+        replayAll();
+        mockHttpRequestHandler.responseSender = mockResponseSender;
 
-		final ProcessBuilder mockProcessBuilder = createMock(ProcessBuilder.class);
-		expect(mockProcessBuilder.start()).andReturn(mockProcess).times(1);
-		expectNew(ProcessBuilder.class, CasConfigUtil.getServerConfig().getString("logParserScript"), "-t",
-				targetStrings, "-l", logFilePath).andReturn(mockProcessBuilder).times(1);
-		replayAll();
+        final ProcessBuilder mockProcessBuilder = createMock(ProcessBuilder.class);
+        expect(mockProcessBuilder.start()).andReturn(mockProcess).times(1);
+        expectNew(ProcessBuilder.class, CasConfigUtil.getServerConfig().getString("logParserScript"), "-t",
+                targetStrings, "-l", logFilePath).andReturn(mockProcessBuilder).times(1);
+        replayAll();
 
-		final ServletLogParser tested = new ServletLogParser();
-		tested.handleRequest(mockHttpRequestHandler, mockQueryStringDecoder, null);
+        final ServletLogParser tested = new ServletLogParser();
+        tested.handleRequest(mockHttpRequestHandler, mockQueryStringDecoder, null);
 
-		verifyAll();
-	}
+        verifyAll();
+    }
 
-	@Test
-	public void testHandleRequestHttpMethodIsGetKeyIsSearchExitStatusIsNot0() throws Exception {
-		final String targetStrings = "targetStrings";
-		final String logFilePath = "logFilePath";
-		// TODO: StringBuilder
-		final String jObject = "a=" + targetStrings + "&b=" + logFilePath + "&c&d";
+    @Test
+    public void testHandleRequestHttpMethodIsGetKeyIsSearchExitStatusIsNot0() throws Exception {
+        final String targetStrings = "targetStrings";
+        final String logFilePath = "logFilePath";
+        // TODO: StringBuilder
+        final String jObject = "a=" + targetStrings + "&b=" + logFilePath + "&c&d";
 
-		mockStatic(CasConfigUtil.class);
-		final QueryStringDecoder mockQueryStringDecoder = createMock(QueryStringDecoder.class);
-		final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-		final ResponseSender mockResponseSender = createMock(ResponseSender.class);
-		final FullHttpRequest mockHttpRequest = createMock(FullHttpRequest.class);
-		final ByteBuf mockByteBuf = createMock(ByteBuf.class);
+        mockStatic(CasConfigUtil.class);
+        final QueryStringDecoder mockQueryStringDecoder = createMock(QueryStringDecoder.class);
+        final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+        final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+        final FullHttpRequest mockHttpRequest = createMock(FullHttpRequest.class);
+        final ByteBuf mockByteBuf = createMock(ByteBuf.class);
 
-		final Configuration mockConfig = createMock(Configuration.class);
-		final Process mockProcess = createMock(Process.class);
+        final Configuration mockConfig = createMock(Configuration.class);
+        final Process mockProcess = createMock(Process.class);
 
-		expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).times(1);
-		expect(mockHttpRequest.getMethod()).andReturn(HttpMethod.POST).times(1);
-		expect(mockHttpRequest.content()).andReturn(mockByteBuf).times(1);
-		expect(mockByteBuf.toString(CharsetUtil.UTF_8)).andReturn(jObject).times(1);
-		expect(mockQueryStringDecoder.parameters()).andReturn(createMapFromStringPair("searcH", targetStrings))
-				.times(1);
-		expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).times(2);
-		expect(mockConfig.getString("logParserScript")).andReturn("/opt/bin/mkhoj/parser.sh").times(2);
-		expect(mockProcess.waitFor()).andReturn(-1).times(1);
+        expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).times(1);
+        expect(mockHttpRequest.getMethod()).andReturn(HttpMethod.POST).times(1);
+        expect(mockHttpRequest.content()).andReturn(mockByteBuf).times(1);
+        expect(mockByteBuf.toString(CharsetUtil.UTF_8)).andReturn(jObject).times(1);
+        expect(mockQueryStringDecoder.parameters()).andReturn(createMapFromStringPair("searcH", targetStrings))
+                .times(1);
+        expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).times(2);
+        expect(mockConfig.getString("logParserScript")).andReturn("/opt/bin/mkhoj/parser.sh").times(2);
+        expect(mockProcess.waitFor()).andReturn(-1).times(1);
 
-		mockResponseSender.sendResponse("FAIL", null);
-		expectLastCall().times(1);
+        mockResponseSender.sendResponse("FAIL", null);
+        expectLastCall().times(1);
 
-		replayAll();
-		mockHttpRequestHandler.responseSender = mockResponseSender;
+        replayAll();
+        mockHttpRequestHandler.responseSender = mockResponseSender;
 
-		final ProcessBuilder mockProcessBuilder = createMock(ProcessBuilder.class);
-		expect(mockProcessBuilder.start()).andReturn(mockProcess).times(1);
-		expectNew(ProcessBuilder.class, CasConfigUtil.getServerConfig().getString("logParserScript"), "-t",
-				targetStrings, "-l", logFilePath).andReturn(mockProcessBuilder).times(1);
-		replayAll();
+        final ProcessBuilder mockProcessBuilder = createMock(ProcessBuilder.class);
+        expect(mockProcessBuilder.start()).andReturn(mockProcess).times(1);
+        expectNew(ProcessBuilder.class, CasConfigUtil.getServerConfig().getString("logParserScript"), "-t",
+                targetStrings, "-l", logFilePath).andReturn(mockProcessBuilder).times(1);
+        replayAll();
 
-		final ServletLogParser tested = new ServletLogParser();
-		tested.handleRequest(mockHttpRequestHandler, mockQueryStringDecoder, null);
+        final ServletLogParser tested = new ServletLogParser();
+        tested.handleRequest(mockHttpRequestHandler, mockQueryStringDecoder, null);
 
-		verifyAll();
-	}
+        verifyAll();
+    }
 
-	@Test
-	public void testHandleRequestHttpMethodIsGetKeyIsLogFilePathExitStatusIsNot0() throws Exception {
-		final String targetStrings = "targetStrings";
-		final String logFilePath = "/opt/mkhoj/logs/cas/debug/";
-		// TODO: StringBuilder
-		final String jObject = "a=" + targetStrings + "&b=" + logFilePath + "&c&d";
+    @Test
+    public void testHandleRequestHttpMethodIsGetKeyIsLogFilePathExitStatusIsNot0() throws Exception {
+        final String targetStrings = "targetStrings";
+        final String logFilePath = "/opt/mkhoj/logs/cas/debug/";
+        // TODO: StringBuilder
+        final String jObject = "a=" + targetStrings + "&b=" + logFilePath + "&c&d";
 
-		mockStatic(CasConfigUtil.class);
-		final QueryStringDecoder mockQueryStringDecoder = createMock(QueryStringDecoder.class);
-		final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-		final ResponseSender mockResponseSender = createMock(ResponseSender.class);
-		final FullHttpRequest mockHttpRequest = createMock(FullHttpRequest.class);
-		final ByteBuf mockByteBuf = createMock(ByteBuf.class);
+        mockStatic(CasConfigUtil.class);
+        final QueryStringDecoder mockQueryStringDecoder = createMock(QueryStringDecoder.class);
+        final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+        final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+        final FullHttpRequest mockHttpRequest = createMock(FullHttpRequest.class);
+        final ByteBuf mockByteBuf = createMock(ByteBuf.class);
 
-		final Configuration mockConfig = createMock(Configuration.class);
-		final Process mockProcess = createMock(Process.class);
+        final Configuration mockConfig = createMock(Configuration.class);
+        final Process mockProcess = createMock(Process.class);
 
-		expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).times(1);
-		expect(mockHttpRequest.getMethod()).andReturn(HttpMethod.POST).times(1);
-		expect(mockHttpRequest.content()).andReturn(mockByteBuf).times(1);
-		expect(mockByteBuf.toString(CharsetUtil.UTF_8)).andReturn(jObject).times(1);
-		expect(mockQueryStringDecoder.parameters()).andReturn(createMapFromStringPair("logFilePath", null)).times(1);
-		expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).times(2);
-		expect(mockConfig.getString("logParserScript")).andReturn("/opt/bin/mkhoj/parser.sh").times(2);
-		expect(mockProcess.waitFor()).andReturn(-1).times(1);
+        expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).times(1);
+        expect(mockHttpRequest.getMethod()).andReturn(HttpMethod.POST).times(1);
+        expect(mockHttpRequest.content()).andReturn(mockByteBuf).times(1);
+        expect(mockByteBuf.toString(CharsetUtil.UTF_8)).andReturn(jObject).times(1);
+        expect(mockQueryStringDecoder.parameters()).andReturn(createMapFromStringPair("logFilePath", null)).times(1);
+        expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).times(2);
+        expect(mockConfig.getString("logParserScript")).andReturn("/opt/bin/mkhoj/parser.sh").times(2);
+        expect(mockProcess.waitFor()).andReturn(-1).times(1);
 
-		mockResponseSender.sendResponse("FAIL", null);
-		expectLastCall().times(1);
+        mockResponseSender.sendResponse("FAIL", null);
+        expectLastCall().times(1);
 
-		replayAll();
-		mockHttpRequestHandler.responseSender = mockResponseSender;
+        replayAll();
+        mockHttpRequestHandler.responseSender = mockResponseSender;
 
-		final ProcessBuilder mockProcessBuilder = createMock(ProcessBuilder.class);
-		expect(mockProcessBuilder.start()).andReturn(mockProcess).times(1);
-		expectNew(ProcessBuilder.class, CasConfigUtil.getServerConfig().getString("logParserScript"), "-t",
-				targetStrings, "-l", logFilePath).andReturn(mockProcessBuilder).times(1);
-		replayAll();
+        final ProcessBuilder mockProcessBuilder = createMock(ProcessBuilder.class);
+        expect(mockProcessBuilder.start()).andReturn(mockProcess).times(1);
+        expectNew(ProcessBuilder.class, CasConfigUtil.getServerConfig().getString("logParserScript"), "-t",
+                targetStrings, "-l", logFilePath).andReturn(mockProcessBuilder).times(1);
+        replayAll();
 
-		final ServletLogParser tested = new ServletLogParser();
-		tested.handleRequest(mockHttpRequestHandler, mockQueryStringDecoder, null);
+        final ServletLogParser tested = new ServletLogParser();
+        tested.handleRequest(mockHttpRequestHandler, mockQueryStringDecoder, null);
 
-		verifyAll();
-	}
+        verifyAll();
+    }
 
-	@Test
-	public void testGetName() throws Exception {
-		final ServletLogParser tested = new ServletLogParser();
-		assertThat(tested.getName(), is(IsEqual.equalTo("LogParser")));
-	}
+    @Test
+    public void testGetName() throws Exception {
+        final ServletLogParser tested = new ServletLogParser();
+        assertThat(tested.getName(), is(IsEqual.equalTo("LogParser")));
+    }
 }

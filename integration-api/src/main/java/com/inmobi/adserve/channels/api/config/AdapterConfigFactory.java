@@ -8,5 +8,5 @@ import org.apache.commons.configuration.Configuration;
  * 
  */
 public interface AdapterConfigFactory {
-	AdapterConfig create(final Configuration adapterConfig, final String adapterName);
+    AdapterConfig create(final Configuration adapterConfig, final String adapterName);
 }

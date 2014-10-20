@@ -20,23 +20,23 @@ import com.inmobi.adserve.channels.server.api.Servlet;
 @Singleton
 public class ServletInvalid implements Servlet {
 
-	@SuppressWarnings("deprecation")
-	@Override
-	public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
-			final Channel serverChannel) throws Exception {
-		// invalid request
-		// TODO: remove header validation
-		final HttpResponse response =
-				new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND, Unpooled.copiedBuffer(
-						"Page not Found", Charset.defaultCharset()), true);
+    @SuppressWarnings("deprecation")
+    @Override
+    public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
+            final Channel serverChannel) throws Exception {
+        // invalid request
+        // TODO: remove header validation
+        final HttpResponse response =
+                new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND, Unpooled.copiedBuffer(
+                        "Page not Found", Charset.defaultCharset()), true);
 
-		final ChannelFuture future = serverChannel.writeAndFlush(response);
-		future.addListener(ChannelFutureListener.CLOSE);
-	}
+        final ChannelFuture future = serverChannel.writeAndFlush(response);
+        future.addListener(ChannelFutureListener.CLOSE);
+    }
 
-	@Override
-	public String getName() {
-		return "Invalid Servlet";
-	}
+    @Override
+    public String getName() {
+        return "Invalid Servlet";
+    }
 
 }

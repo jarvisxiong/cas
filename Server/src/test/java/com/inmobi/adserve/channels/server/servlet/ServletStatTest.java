@@ -28,42 +28,42 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({JarVersionUtil.class, InspectorStats.class})
 public class ServletStatTest {
-	@Ignore
-	@Test
-	// todo Ishan fix this
-	public void testHandleRequest() throws Exception {
-		final JSONObject inspectorJson = new JSONObject();
-		final JSONObject inspectorJsonWithManifest = new JSONObject();
-		inspectorJson.put("workflow", 50);
-		inspectorJsonWithManifest.put("workflow", 50);
+    @Ignore
+    @Test
+    // todo Ishan fix this
+    public void testHandleRequest() throws Exception {
+        final JSONObject inspectorJson = new JSONObject();
+        final JSONObject inspectorJsonWithManifest = new JSONObject();
+        inspectorJson.put("workflow", 50);
+        inspectorJsonWithManifest.put("workflow", 50);
 
-		final Map<String, String> manifestData = new HashMap<>();
-		manifestData.put("key", "value");
-		inspectorJsonWithManifest.put("manifestData", manifestData);
+        final Map<String, String> manifestData = new HashMap<>();
+        manifestData.put("key", "value");
+        inspectorJsonWithManifest.put("manifestData", manifestData);
 
-		mockStatic(InspectorStats.class);
-		mockStatic(JarVersionUtil.class);
-		final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-		final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+        mockStatic(InspectorStats.class);
+        mockStatic(JarVersionUtil.class);
+        final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+        final ResponseSender mockResponseSender = createMock(ResponseSender.class);
 
-		expect(InspectorStats.getStatsObj()).andReturn(inspectorJson).times(1);
-		expect(JarVersionUtil.getManifestData()).andReturn(manifestData).times(1);
+        expect(InspectorStats.getStatsObj()).andReturn(inspectorJson).times(1);
+        expect(JarVersionUtil.getManifestData()).andReturn(manifestData).times(1);
 
-		mockResponseSender.sendResponse(inspectorJsonWithManifest.toString(), null);
-		expectLastCall().times(1);
+        mockResponseSender.sendResponse(inspectorJsonWithManifest.toString(), null);
+        expectLastCall().times(1);
 
-		replayAll();
-		mockHttpRequestHandler.responseSender = mockResponseSender;
+        replayAll();
+        mockHttpRequestHandler.responseSender = mockResponseSender;
 
-		final ServletStat tested = new ServletStat(null);
-		tested.handleRequest(mockHttpRequestHandler, null, null);
+        final ServletStat tested = new ServletStat(null);
+        tested.handleRequest(mockHttpRequestHandler, null, null);
 
-		verifyAll();
-	}
+        verifyAll();
+    }
 
-	@Test
-	public void testGetName() throws Exception {
-		final ServletStat tested = new ServletStat(null);
-		assertThat(tested.getName(), is(IsEqual.equalTo("stat")));
-	}
+    @Test
+    public void testGetName() throws Exception {
+        final ServletStat tested = new ServletStat(null);
+        assertThat(tested.getName(), is(IsEqual.equalTo("stat")));
+    }
 }

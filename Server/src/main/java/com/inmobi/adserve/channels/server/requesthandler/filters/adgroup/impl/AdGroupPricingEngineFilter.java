@@ -25,62 +25,62 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
  */
 @Singleton
 public class AdGroupPricingEngineFilter extends AbstractAdGroupLevelFilter {
-	private static final Logger LOG = LoggerFactory.getLogger(AdGroupPricingEngineFilter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AdGroupPricingEngineFilter.class);
 
-	/**
-	 * @param traceMarkerProvider
-	 */
-	@Inject
-	protected AdGroupPricingEngineFilter(final Provider<Marker> traceMarkerProvider) {
-		super(traceMarkerProvider, InspectorStrings.DROPPED_IN_PRICING_ENGINE_FILTER);
-	}
+    /**
+     * @param traceMarkerProvider
+     */
+    @Inject
+    protected AdGroupPricingEngineFilter(final Provider<Marker> traceMarkerProvider) {
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_PRICING_ENGINE_FILTER);
+    }
 
-	@Override
-	protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
-			final CasContext casContext) {
+    @Override
+    protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
+            final CasContext casContext) {
 
-		final Marker traceMarker = traceMarkerProvider.get();
+        final Marker traceMarker = traceMarkerProvider.get();
 
-		final PricingEngineEntity pricingEngineEntity = casContext.getPricingEngineEntity();
+        final PricingEngineEntity pricingEngineEntity = casContext.getPricingEngineEntity();
 
-		final Double dcpFloor = pricingEngineEntity == null ? null : pricingEngineEntity.getDcpFloor();
+        final Double dcpFloor = pricingEngineEntity == null ? null : pricingEngineEntity.getDcpFloor();
 
-		if (dcpFloor != null) {
-			// applying the boost
-			final Date eCPMBoostExpiryDate = channelSegment.getChannelSegmentEntity().getEcpmBoostExpiryDate();
-			final Date today = new Date();
-			double ecpm = channelSegment.getChannelSegmentAerospikeFeedbackEntity().getECPM();
-			if (null != eCPMBoostExpiryDate && eCPMBoostExpiryDate.compareTo(today) > 0) {
-				LOG.debug(traceMarker, "EcpmBoost is applied for {}", channelSegment.getChannelSegmentEntity()
-						.getAdgroupId());
-				LOG.debug(traceMarker, "Ecpm before boost is {}", ecpm);
-				ecpm = ecpm + channelSegment.getChannelSegmentEntity().getEcpmBoost();
-				LOG.debug(traceMarker, "Ecpm after boost is {}", ecpm);
-			}
+        if (dcpFloor != null) {
+            // applying the boost
+            final Date eCPMBoostExpiryDate = channelSegment.getChannelSegmentEntity().getEcpmBoostExpiryDate();
+            final Date today = new Date();
+            double ecpm = channelSegment.getChannelSegmentAerospikeFeedbackEntity().getECPM();
+            if (null != eCPMBoostExpiryDate && eCPMBoostExpiryDate.compareTo(today) > 0) {
+                LOG.debug(traceMarker, "EcpmBoost is applied for {}", channelSegment.getChannelSegmentEntity()
+                        .getAdgroupId());
+                LOG.debug(traceMarker, "Ecpm before boost is {}", ecpm);
+                ecpm = ecpm + channelSegment.getChannelSegmentEntity().getEcpmBoost();
+                LOG.debug(traceMarker, "Ecpm after boost is {}", ecpm);
+            }
 
-			// applying dcp floor
-			int percentage;
-			if (dcpFloor > 0.0) {
-				percentage = (int) (ecpm / dcpFloor * 100);
-			} else {
-				percentage = 150;
-			}
+            // applying dcp floor
+            int percentage;
+            if (dcpFloor > 0.0) {
+                percentage = (int) (ecpm / dcpFloor * 100);
+            } else {
+                percentage = 150;
+            }
 
-			// Allow percentage of times any segment
-			if (percentage > 100) {
-				percentage = 100;
-			} else if (percentage == 100) {
-				percentage = 50;
-			} else if (percentage >= 80) {
-				percentage = 10;
-			} else {
-				percentage = 1;
-			}
+            // Allow percentage of times any segment
+            if (percentage > 100) {
+                percentage = 100;
+            } else if (percentage == 100) {
+                percentage = 50;
+            } else if (percentage >= 80) {
+                percentage = 10;
+            } else {
+                percentage = 1;
+            }
 
-			return CasConfigUtil.RANDOM.nextInt(100) >= percentage;
-		}
+            return CasConfigUtil.RANDOM.nextInt(100) >= percentage;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
 }

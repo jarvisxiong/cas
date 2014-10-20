@@ -12,7 +12,7 @@ import com.inmobi.phoenix.data.RepositoryQuery;
 @NoArgsConstructor
 public class CreativeQuery implements RepositoryQuery {
 
-	private String advertiserId;
-	private String creativeId;
+    private String advertiserId;
+    private String creativeId;
 
 }

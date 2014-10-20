@@ -42,229 +42,229 @@ import com.inmobi.casthrift.DemandSourceType;
 
 public class AuctionEngineIXTest {
 
-	Configuration mockConfig;
-	Configuration mockAdapterConfig;
-	Capture<String> encryptedBid1;
-	Capture<Double> secondPrice1;
-	CasInternalRequestParameters casInternalRequestParameters;
-	AuctionFilterApplier auctionFilterApplier;
-	AuctionEngine auctionEngine;
+    Configuration mockConfig;
+    Configuration mockAdapterConfig;
+    Capture<String> encryptedBid1;
+    Capture<Double> secondPrice1;
+    CasInternalRequestParameters casInternalRequestParameters;
+    AuctionFilterApplier auctionFilterApplier;
+    AuctionEngine auctionEngine;
 
-	@BeforeMethod
-	public void setUp() throws IOException {
-		final ConfigurationLoader config = ConfigurationLoader.getInstance("channel-server.properties");
-		CasConfigUtil.init(config, null);
+    @BeforeMethod
+    public void setUp() throws IOException {
+        final ConfigurationLoader config = ConfigurationLoader.getInstance("channel-server.properties");
+        CasConfigUtil.init(config, null);
 
-		ImpressionIdGenerator.init((short) 123, (byte) 10);
+        ImpressionIdGenerator.init((short) 123, (byte) 10);
 
-		// this is done, to track the encryptedBid variable getting set inside the AuctionEngine.
-		encryptedBid1 = new Capture<String>();
+        // this is done, to track the encryptedBid variable getting set inside the AuctionEngine.
+        encryptedBid1 = new Capture<String>();
 
-		// this is done, to track the secondBidPrice variable getting set inside the AuctionEngine.
-		secondPrice1 = new Capture<Double>();
+        // this is done, to track the secondBidPrice variable getting set inside the AuctionEngine.
+        secondPrice1 = new Capture<Double>();
 
-		mockConfig = createMock(Configuration.class);
-		expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
-		expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
-		expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
-		expect(mockConfig.getInt("totalSegmentNo")).andReturn(5).anyTimes();
-		expect(mockConfig.getDouble("revenueWindow", 0.33)).andReturn(10.0).anyTimes();
-		expect(mockConfig.getDouble("ecpmShift", 0.1)).andReturn(0.0).anyTimes();
-		expect(mockConfig.getDouble("feedbackPower", 2.0)).andReturn(1.0).anyTimes();
-		expect(mockConfig.getInt("partnerSegmentNo", 2)).andReturn(2).anyTimes();
-		expect(mockConfig.getInt("whiteListedSitesRefreshtime", 1000 * 300)).andReturn(0).anyTimes();
-		expect(mockConfig.getInt("RTBreadtimeoutMillis")).andReturn(200).anyTimes();
-		expect(mockConfig.getBoolean("isRtbEnabled")).andReturn(true).anyTimes();
-		expect(mockConfig.getInt("rtb.maxconnections")).andReturn(50).anyTimes();
+        mockConfig = createMock(Configuration.class);
+        expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
+        expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
+        expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
+        expect(mockConfig.getInt("totalSegmentNo")).andReturn(5).anyTimes();
+        expect(mockConfig.getDouble("revenueWindow", 0.33)).andReturn(10.0).anyTimes();
+        expect(mockConfig.getDouble("ecpmShift", 0.1)).andReturn(0.0).anyTimes();
+        expect(mockConfig.getDouble("feedbackPower", 2.0)).andReturn(1.0).anyTimes();
+        expect(mockConfig.getInt("partnerSegmentNo", 2)).andReturn(2).anyTimes();
+        expect(mockConfig.getInt("whiteListedSitesRefreshtime", 1000 * 300)).andReturn(0).anyTimes();
+        expect(mockConfig.getInt("RTBreadtimeoutMillis")).andReturn(200).anyTimes();
+        expect(mockConfig.getBoolean("isRtbEnabled")).andReturn(true).anyTimes();
+        expect(mockConfig.getInt("rtb.maxconnections")).andReturn(50).anyTimes();
 
-		replay(mockConfig);
+        replay(mockConfig);
 
-		casInternalRequestParameters = new CasInternalRequestParameters();
-		casInternalRequestParameters.setAuctionId("auctionId");
-		casInternalRequestParameters.setSiteAccountType(AccountType.SELF_SERVE);
-		final RepositoryHelper repositoryHelper = createMock(RepositoryHelper.class);
-		expect(repositoryHelper.queryCreativeRepository(EasyMock.isA(String.class), EasyMock.isA(String.class)))
-				.andReturn(null).anyTimes();
-		expect(repositoryHelper.getChannelAdGroupRepository()).andReturn(null).anyTimes();
-		replay(repositoryHelper);
+        casInternalRequestParameters = new CasInternalRequestParameters();
+        casInternalRequestParameters.setAuctionId("auctionId");
+        casInternalRequestParameters.setSiteAccountType(AccountType.SELF_SERVE);
+        final RepositoryHelper repositoryHelper = createMock(RepositoryHelper.class);
+        expect(repositoryHelper.queryCreativeRepository(EasyMock.isA(String.class), EasyMock.isA(String.class)))
+                .andReturn(null).anyTimes();
+        expect(repositoryHelper.getChannelAdGroupRepository()).andReturn(null).anyTimes();
+        replay(repositoryHelper);
 
-		final Injector injector =
-				Guice.createInjector(Modules.override(new ServerModule(config, repositoryHelper),
-						new CasNettyModule(config.getServerConfiguration())).with(new TestScopeModule()));
-		auctionFilterApplier = injector.getInstance(AuctionFilterApplier.class);
-		auctionEngine = injector.getInstance(AuctionEngine.class);
+        final Injector injector =
+                Guice.createInjector(Modules.override(new ServerModule(config, repositoryHelper),
+                        new CasNettyModule(config.getServerConfiguration())).with(new TestScopeModule()));
+        auctionFilterApplier = injector.getInstance(AuctionFilterApplier.class);
+        auctionEngine = injector.getInstance(AuctionEngine.class);
 
 
-	}
+    }
 
-	private ChannelSegment setBidder(final String advId, final String channelId, final String externalSiteKey,
-			final String adNetworkName, final Double bidValue, final Long latencyValue) {
+    private ChannelSegment setBidder(final String advId, final String channelId, final String externalSiteKey,
+            final String adNetworkName, final Double bidValue, final Long latencyValue) {
 
-		final Long[] rcList = null;
-		final Long[] tags = null;
-		final Timestamp modified_on = null;
-		final Long[] slotIds = null;
-		final Integer[] siteRatings = null;
-		final ChannelSegmentEntity channelSegmentEntity1 =
-				new ChannelSegmentEntity(ChannelSegmentFilterApplierTest.getChannelSegmentEntityBuilder(advId,
-						"adgroupId", "adId", channelId, 1, rcList, tags, true, true, externalSiteKey, modified_on,
-						"campaignId", slotIds, 1, true, "pricingModel", siteRatings, 1, null, false, false, false,
-						false, false, false, false, false, false, false, null, null, 0.0d, null, null, false,
-						new HashSet<String>(), 0));
-		final ChannelEntity.Builder builder = ChannelEntity.newBuilder();
-		builder.setAccountId(advId);
-		final ChannelEntity channelEntity = builder.build();
+        final Long[] rcList = null;
+        final Long[] tags = null;
+        final Timestamp modified_on = null;
+        final Long[] slotIds = null;
+        final Integer[] siteRatings = null;
+        final ChannelSegmentEntity channelSegmentEntity1 =
+                new ChannelSegmentEntity(ChannelSegmentFilterApplierTest.getChannelSegmentEntityBuilder(advId,
+                        "adgroupId", "adId", channelId, 1, rcList, tags, true, true, externalSiteKey, modified_on,
+                        "campaignId", slotIds, 1, true, "pricingModel", siteRatings, 1, null, false, false, false,
+                        false, false, false, false, false, false, false, null, null, 0.0d, null, null, false,
+                        new HashSet<String>(), 0));
+        final ChannelEntity.Builder builder = ChannelEntity.newBuilder();
+        builder.setAccountId(advId);
+        final ChannelEntity channelEntity = builder.build();
 
-		final AdNetworkInterface mockAdnetworkInterface = createMock(IXAdNetwork.class);
-		final ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
-		thirdPartyAdResponse.setAdStatus("AD");
-		expect(mockAdnetworkInterface.getAdStatus()).andReturn("AD").anyTimes();
-		expect(mockAdnetworkInterface.getResponseStruct()).andReturn(thirdPartyAdResponse).anyTimes();
-		expect(mockAdnetworkInterface.getSecondBidPriceInUsd()).andReturn(4d).anyTimes();
-		expect(mockAdnetworkInterface.getName()).andReturn(adNetworkName).anyTimes();
-		expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
-		expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("DummyResponsecontent").anyTimes();
-		expect(mockAdnetworkInterface.getConnectionLatency()).andReturn(2l).anyTimes();
-		expect(mockAdnetworkInterface.getId()).andReturn("2").anyTimes();
-		expect(mockAdnetworkInterface.getLatency()).andReturn(latencyValue).anyTimes();
-		expect(mockAdnetworkInterface.getBidPriceInUsd()).andReturn(bidValue).anyTimes();
-		expect(mockAdnetworkInterface.isRtbPartner()).andReturn(true).anyTimes();
-		expect(mockAdnetworkInterface.getAuctionId()).andReturn("auctionId").anyTimes();
-		expect(mockAdnetworkInterface.getRtbImpressionId()).andReturn("1").anyTimes();
-		expect(mockAdnetworkInterface.getImpressionId()).andReturn("impressionId").anyTimes();
-		expect(mockAdnetworkInterface.getSeatId()).andReturn(advId).anyTimes();
-		expect(mockAdnetworkInterface.getCurrency()).andReturn("USD").anyTimes();
-		expect(mockAdnetworkInterface.getCreativeId()).andReturn("creativeId").anyTimes();
-		expect(mockAdnetworkInterface.getDst()).andReturn(DemandSourceType.IX).anyTimes();
-		expect(((IXAdNetwork) mockAdnetworkInterface).getResponseBidObjCount()).andReturn(1).anyTimes();
-		expect(((IXAdNetwork) mockAdnetworkInterface).getImpressionObjCount()).andReturn(1).anyTimes();
-		// responseBidObjCount
-		// this is done, to track the encryptedBid variable getting set inside the AuctionEngine.
-		mockAdnetworkInterface.setEncryptedBid(EasyMock.capture(encryptedBid1));
-		EasyMock.expectLastCall().anyTimes();
+        final AdNetworkInterface mockAdnetworkInterface = createMock(IXAdNetwork.class);
+        final ThirdPartyAdResponse thirdPartyAdResponse = new ThirdPartyAdResponse();
+        thirdPartyAdResponse.setAdStatus("AD");
+        expect(mockAdnetworkInterface.getAdStatus()).andReturn("AD").anyTimes();
+        expect(mockAdnetworkInterface.getResponseStruct()).andReturn(thirdPartyAdResponse).anyTimes();
+        expect(mockAdnetworkInterface.getSecondBidPriceInUsd()).andReturn(4d).anyTimes();
+        expect(mockAdnetworkInterface.getName()).andReturn(adNetworkName).anyTimes();
+        expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
+        expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("DummyResponsecontent").anyTimes();
+        expect(mockAdnetworkInterface.getConnectionLatency()).andReturn(2l).anyTimes();
+        expect(mockAdnetworkInterface.getId()).andReturn("2").anyTimes();
+        expect(mockAdnetworkInterface.getLatency()).andReturn(latencyValue).anyTimes();
+        expect(mockAdnetworkInterface.getBidPriceInUsd()).andReturn(bidValue).anyTimes();
+        expect(mockAdnetworkInterface.isRtbPartner()).andReturn(true).anyTimes();
+        expect(mockAdnetworkInterface.getAuctionId()).andReturn("auctionId").anyTimes();
+        expect(mockAdnetworkInterface.getRtbImpressionId()).andReturn("1").anyTimes();
+        expect(mockAdnetworkInterface.getImpressionId()).andReturn("impressionId").anyTimes();
+        expect(mockAdnetworkInterface.getSeatId()).andReturn(advId).anyTimes();
+        expect(mockAdnetworkInterface.getCurrency()).andReturn("USD").anyTimes();
+        expect(mockAdnetworkInterface.getCreativeId()).andReturn("creativeId").anyTimes();
+        expect(mockAdnetworkInterface.getDst()).andReturn(DemandSourceType.IX).anyTimes();
+        expect(((IXAdNetwork) mockAdnetworkInterface).getResponseBidObjCount()).andReturn(1).anyTimes();
+        expect(((IXAdNetwork) mockAdnetworkInterface).getImpressionObjCount()).andReturn(1).anyTimes();
+        // responseBidObjCount
+        // this is done, to track the encryptedBid variable getting set inside the AuctionEngine.
+        mockAdnetworkInterface.setEncryptedBid(EasyMock.capture(encryptedBid1));
+        EasyMock.expectLastCall().anyTimes();
 
-		// this is done, to track the secondBidPrice variable getting set inside the AuctionEngine.
-		mockAdnetworkInterface.setSecondBidPrice(EasyMock.capture(secondPrice1));
-		EasyMock.expectLastCall().anyTimes();
+        // this is done, to track the secondBidPrice variable getting set inside the AuctionEngine.
+        mockAdnetworkInterface.setSecondBidPrice(EasyMock.capture(secondPrice1));
+        EasyMock.expectLastCall().anyTimes();
 
-		replay(mockAdnetworkInterface);
+        replay(mockAdnetworkInterface);
 
-		return new ChannelSegment(channelSegmentEntity1, channelEntity, null, null, null, mockAdnetworkInterface, 0);
+        return new ChannelSegment(channelSegmentEntity1, channelEntity, null, null, null, mockAdnetworkInterface, 0);
 
-	}
+    }
 
-	@Test
-	// 1. 1 IX bid
-	public void testOneBid() {
+    @Test
+    // 1. 1 IX bid
+    public void testOneBid() {
 
-		final Double bidFloorInput = .70d;
-		final Double bidInputVal1 = 1d;
-		final Long latencyInputVal1 = 100l;
-		final Double expectedSecondPriceVal = 1d;
-		final String expectedRTBAdNetworkName = "A";
+        final Double bidFloorInput = .70d;
+        final Double bidInputVal1 = 1d;
+        final Long latencyInputVal1 = 100l;
+        final Double expectedSecondPriceVal = 1d;
+        final String expectedRTBAdNetworkName = "A";
 
-		final AuctionEngine auctionEngine = new AuctionEngine();
-		auctionEngine.sasParams = new SASRequestParameters();
-		auctionEngine.sasParams.setDst(DemandSourceType.IX.getValue());
-		final List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
+        final AuctionEngine auctionEngine = new AuctionEngine();
+        auctionEngine.sasParams = new SASRequestParameters();
+        auctionEngine.sasParams.setDst(DemandSourceType.IX.getValue());
+        final List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
-		rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1));
-		auctionEngine.setUnfilteredChannelSegmentList(rtbSegments);
+        rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1));
+        auctionEngine.setUnfilteredChannelSegmentList(rtbSegments);
 
-		casInternalRequestParameters.setAuctionBidFloor(bidFloorInput);
-		auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
+        casInternalRequestParameters.setAuctionBidFloor(bidFloorInput);
+        auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
-		final AdNetworkInterface auctionEngineResponse = auctionEngine.runAuctionEngine();
+        final AdNetworkInterface auctionEngineResponse = auctionEngine.runAuctionEngine();
 
-		Assert.assertEquals(secondPrice1.getValue(), expectedSecondPriceVal);
-		Assert.assertEquals(auctionEngineResponse.getName(), expectedRTBAdNetworkName);
-		Assert.assertEquals(auctionEngineResponse.getBidPriceInUsd(), bidInputVal1);
+        Assert.assertEquals(secondPrice1.getValue(), expectedSecondPriceVal);
+        Assert.assertEquals(auctionEngineResponse.getName(), expectedRTBAdNetworkName);
+        Assert.assertEquals(auctionEngineResponse.getBidPriceInUsd(), bidInputVal1);
 
-	}
+    }
 
-	@Test
-	// 2. 1 IX bid with price 0.1 above floor price
-	public void testOneBidWithPrice1AboveFloorPrice() {
+    @Test
+    // 2. 1 IX bid with price 0.1 above floor price
+    public void testOneBidWithPrice1AboveFloorPrice() {
 
-		final Double bidFloorInput = .70d;
-		final Double bidInputVal1 = .71d;
-		final Long latencyInputVal1 = 100l;
-		final Double expectedSecondPriceVal = .71d;
-		final String expectedRTBAdNetworkName = "A";
+        final Double bidFloorInput = .70d;
+        final Double bidInputVal1 = .71d;
+        final Long latencyInputVal1 = 100l;
+        final Double expectedSecondPriceVal = .71d;
+        final String expectedRTBAdNetworkName = "A";
 
-		final AuctionEngine auctionEngine = new AuctionEngine();
-		auctionEngine.sasParams = new SASRequestParameters();
-		auctionEngine.sasParams.setDst(DemandSourceType.IX.getValue());
-		final List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
+        final AuctionEngine auctionEngine = new AuctionEngine();
+        auctionEngine.sasParams = new SASRequestParameters();
+        auctionEngine.sasParams.setDst(DemandSourceType.IX.getValue());
+        final List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
-		rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1));
+        rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1));
 
-		auctionEngine.setUnfilteredChannelSegmentList(rtbSegments);
+        auctionEngine.setUnfilteredChannelSegmentList(rtbSegments);
 
-		casInternalRequestParameters.setAuctionBidFloor(bidFloorInput);
-		auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
+        casInternalRequestParameters.setAuctionBidFloor(bidFloorInput);
+        auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
-		final AdNetworkInterface auctionEngineResponse = auctionEngine.runAuctionEngine();
+        final AdNetworkInterface auctionEngineResponse = auctionEngine.runAuctionEngine();
 
-		Assert.assertEquals(secondPrice1.getValue(), expectedSecondPriceVal);
-		Assert.assertEquals(auctionEngineResponse.getName(), expectedRTBAdNetworkName);
-		Assert.assertEquals(auctionEngineResponse.getBidPriceInUsd(), bidInputVal1);
+        Assert.assertEquals(secondPrice1.getValue(), expectedSecondPriceVal);
+        Assert.assertEquals(auctionEngineResponse.getName(), expectedRTBAdNetworkName);
+        Assert.assertEquals(auctionEngineResponse.getBidPriceInUsd(), bidInputVal1);
 
-	}
+    }
 
-	@Test
-	// 3. Only 1 bid with price 0.1 below floor price. this bid will get
-	// directly cut off at floor price filter
-	public void testOneBidWithPrice1BelowFloorPrice() {
+    @Test
+    // 3. Only 1 bid with price 0.1 below floor price. this bid will get
+    // directly cut off at floor price filter
+    public void testOneBidWithPrice1BelowFloorPrice() {
 
-		final Double bidFloorInput = .70d;
-		final Double bidInputVal1 = .69d;
-		final Long latencyInputVal1 = 100l;
-		final String expectedAuctionEngineResponse = null;
+        final Double bidFloorInput = .70d;
+        final Double bidInputVal1 = .69d;
+        final Long latencyInputVal1 = 100l;
+        final String expectedAuctionEngineResponse = null;
 
-		final AuctionEngine auctionEngine = new AuctionEngine();
-		auctionEngine.sasParams = new SASRequestParameters();
-		auctionEngine.sasParams.setDst(DemandSourceType.IX.getValue());
-		final List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
+        final AuctionEngine auctionEngine = new AuctionEngine();
+        auctionEngine.sasParams = new SASRequestParameters();
+        auctionEngine.sasParams.setDst(DemandSourceType.IX.getValue());
+        final List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
-		rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1));
+        rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1));
 
-		auctionEngine.setUnfilteredChannelSegmentList(rtbSegments);
+        auctionEngine.setUnfilteredChannelSegmentList(rtbSegments);
 
-		casInternalRequestParameters.setAuctionBidFloor(bidFloorInput);
-		auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
+        casInternalRequestParameters.setAuctionBidFloor(bidFloorInput);
+        auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
-		final AdNetworkInterface auctionEngineResponse = auctionEngine.runAuctionEngine();
+        final AdNetworkInterface auctionEngineResponse = auctionEngine.runAuctionEngine();
 
-		try {
-			secondPrice1.getValue();
-			Assert.fail("Value is not supposed to set.");
-		} catch (final AssertionError er) {
+        try {
+            secondPrice1.getValue();
+            Assert.fail("Value is not supposed to set.");
+        } catch (final AssertionError er) {
 
-		}
+        }
 
-		Assert.assertEquals(auctionEngineResponse, expectedAuctionEngineResponse);
+        Assert.assertEquals(auctionEngineResponse, expectedAuctionEngineResponse);
 
-	}
+    }
 
-	@Test
-	// 4. 0 IX bid
-	public void testZeroBid() {
+    @Test
+    // 4. 0 IX bid
+    public void testZeroBid() {
 
-		final Double bidFloorInput = .70d;
-		final String expectedAuctionEngineResponse = null;
+        final Double bidFloorInput = .70d;
+        final String expectedAuctionEngineResponse = null;
 
-		final AuctionEngine auctionEngine = new AuctionEngine();
-		auctionEngine.sasParams = new SASRequestParameters();
-		auctionEngine.sasParams.setDst(DemandSourceType.IX.getValue());
-		final List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
+        final AuctionEngine auctionEngine = new AuctionEngine();
+        auctionEngine.sasParams = new SASRequestParameters();
+        auctionEngine.sasParams.setDst(DemandSourceType.IX.getValue());
+        final List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
-		auctionEngine.setUnfilteredChannelSegmentList(rtbSegments);
+        auctionEngine.setUnfilteredChannelSegmentList(rtbSegments);
 
-		casInternalRequestParameters.setAuctionBidFloor(bidFloorInput);
-		auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
+        casInternalRequestParameters.setAuctionBidFloor(bidFloorInput);
+        auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
 
-		final AdNetworkInterface auctionEngineResponse = auctionEngine.runAuctionEngine();
-		Assert.assertEquals(auctionEngineResponse, expectedAuctionEngineResponse);
-	}
+        final AdNetworkInterface auctionEngineResponse = auctionEngine.runAuctionEngine();
+        Assert.assertEquals(auctionEngineResponse, expectedAuctionEngineResponse);
+    }
 }

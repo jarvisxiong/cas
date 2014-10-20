@@ -26,35 +26,35 @@ import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ServletTestResponse.class, Files.class})
 public class ServletTestResponseTest {
-	private static final String FILE_NAME = "/opt/mkhoj/test/cas/testResponse.txt";
+    private static final String FILE_NAME = "/opt/mkhoj/test/cas/testResponse.txt";
 
-	@Test
-	public void testHandleRequest() throws Exception {
-		final String response = "response";
+    @Test
+    public void testHandleRequest() throws Exception {
+        final String response = "response";
 
-		mockStatic(Files.class);
-		final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-		final ResponseSender mockResponseSender = createMock(ResponseSender.class);
-		final File mockFile = createMock(File.class);
+        mockStatic(Files.class);
+        final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+        final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+        final File mockFile = createMock(File.class);
 
-		expectNew(File.class, new Class[] {String.class}, FILE_NAME).andReturn(mockFile).times(1);
-		expect(Files.toString(mockFile, Charsets.UTF_8)).andReturn(response).times(1);
+        expectNew(File.class, new Class[] {String.class}, FILE_NAME).andReturn(mockFile).times(1);
+        expect(Files.toString(mockFile, Charsets.UTF_8)).andReturn(response).times(1);
 
-		mockResponseSender.sendResponse(response, null);
-		expectLastCall().times(1);
+        mockResponseSender.sendResponse(response, null);
+        expectLastCall().times(1);
 
-		replayAll();
-		mockHttpRequestHandler.responseSender = mockResponseSender;
+        replayAll();
+        mockHttpRequestHandler.responseSender = mockResponseSender;
 
-		final ServletTestResponse tested = new ServletTestResponse();
-		tested.handleRequest(mockHttpRequestHandler, null, null);
+        final ServletTestResponse tested = new ServletTestResponse();
+        tested.handleRequest(mockHttpRequestHandler, null, null);
 
-		verifyAll();
-	}
+        verifyAll();
+    }
 
-	@Test
-	public void testGetName() throws Exception {
-		final ServletTestResponse tested = new ServletTestResponse();
-		assertThat(tested.getName(), is(IsEqual.equalTo("testResponse")));
-	}
+    @Test
+    public void testGetName() throws Exception {
+        final ServletTestResponse tested = new ServletTestResponse();
+        assertThat(tested.getName(), is(IsEqual.equalTo("testResponse")));
+    }
 }

@@ -11,6 +11,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class SegmentAdGroupFeedbackEntity {
-	private final Integer segmentId;
-	private final Map<String/* AdgroupId */, ChannelSegmentFeedbackEntity> adGroupFeedbackMap;
+    private final Integer segmentId;
+    private final Map<String/* AdgroupId */, ChannelSegmentFeedbackEntity> adGroupFeedbackMap;
 }

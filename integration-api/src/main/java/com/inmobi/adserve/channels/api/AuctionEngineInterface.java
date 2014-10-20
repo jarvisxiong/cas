@@ -3,15 +3,15 @@ package com.inmobi.adserve.channels.api;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 
 public interface AuctionEngineInterface {
-	boolean areAllChannelSegmentRequestsComplete();
+    boolean areAllChannelSegmentRequestsComplete();
 
-	double getSecondBidPrice();
+    double getSecondBidPrice();
 
-	AdNetworkInterface runAuctionEngine();
+    AdNetworkInterface runAuctionEngine();
 
-	boolean isAuctionComplete();
+    boolean isAuctionComplete();
 
-	boolean isAuctionResponseNull();
+    boolean isAuctionResponseNull();
 
-	public void updateIXChannelSegment(final ChannelSegmentEntity dspChannelSegmentEntity);
+    public void updateIXChannelSegment(final ChannelSegmentEntity dspChannelSegmentEntity);
 }

@@ -9,8 +9,8 @@ import com.inmobi.adserve.channels.server.constants.FilterOrder;
  */
 public interface ChannelSegmentFilter {
 
-	void setOrder(final FilterOrder priority);
+    void setOrder(final FilterOrder priority);
 
-	FilterOrder getOrder();
+    FilterOrder getOrder();
 
 }

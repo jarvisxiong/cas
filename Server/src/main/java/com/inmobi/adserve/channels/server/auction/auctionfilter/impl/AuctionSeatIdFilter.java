@@ -15,20 +15,20 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 public class AuctionSeatIdFilter extends AbstractAuctionFilter {
 
-	@Inject
-	public AuctionSeatIdFilter(final Provider<Marker> traceMarkerProvider, final ServerConfig serverConfiguration) {
-		super(traceMarkerProvider, InspectorStrings.DROPPED_IN_RTB_SEATID_MIS_MATCH_FILTER, serverConfiguration);
-		isApplicableRTBD = true;
-		isApplicableIX = false;
-	}
+    @Inject
+    public AuctionSeatIdFilter(final Provider<Marker> traceMarkerProvider, final ServerConfig serverConfiguration) {
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_RTB_SEATID_MIS_MATCH_FILTER, serverConfiguration);
+        isApplicableRTBD = true;
+        isApplicableIX = false;
+    }
 
-	@Override
-	protected boolean failedInFilter(final ChannelSegment rtbSegment,
-			final CasInternalRequestParameters casInternalRequestParameters) {
-		if (rtbSegment.getChannelEntity().getAccountId()
-				.equalsIgnoreCase(rtbSegment.getAdNetworkInterface().getSeatId())) {
-			return false;
-		}
-		return true;
-	}
+    @Override
+    protected boolean failedInFilter(final ChannelSegment rtbSegment,
+            final CasInternalRequestParameters casInternalRequestParameters) {
+        if (rtbSegment.getChannelEntity().getAccountId()
+                .equalsIgnoreCase(rtbSegment.getAdNetworkInterface().getSeatId())) {
+            return false;
+        }
+        return true;
+    }
 }

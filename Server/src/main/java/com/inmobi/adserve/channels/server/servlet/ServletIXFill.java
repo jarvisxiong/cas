@@ -31,35 +31,35 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 @Path("/ixFill")
 public class ServletIXFill extends BaseServlet {
-	private static final Logger LOG = LoggerFactory.getLogger(ServletIXFill.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ServletIXFill.class);
 
 
-	@Inject
-	public ServletIXFill(final Provider<Marker> traceMarkerProvider, final MatchSegments matchSegments,
-			final RequestFilters requestFilters, final ChannelSegmentFilterApplier channelSegmentFilterApplier,
-			final CasUtils casUtils, final AsyncRequestMaker asyncRequestMaker,
-			@IxAdvertiserLevelFilters final List<AdvertiserLevelFilter> advertiserLevelFilters,
-			@IXAdGroupLevelFilters final List<AdGroupLevelFilter> adGroupLevelFilters) {
-		super(matchSegments, traceMarkerProvider, channelSegmentFilterApplier, casUtils, requestFilters,
-				asyncRequestMaker, advertiserLevelFilters, adGroupLevelFilters);
-	}
+    @Inject
+    public ServletIXFill(final Provider<Marker> traceMarkerProvider, final MatchSegments matchSegments,
+            final RequestFilters requestFilters, final ChannelSegmentFilterApplier channelSegmentFilterApplier,
+            final CasUtils casUtils, final AsyncRequestMaker asyncRequestMaker,
+            @IxAdvertiserLevelFilters final List<AdvertiserLevelFilter> advertiserLevelFilters,
+            @IXAdGroupLevelFilters final List<AdGroupLevelFilter> adGroupLevelFilters) {
+        super(matchSegments, traceMarkerProvider, channelSegmentFilterApplier, casUtils, requestFilters,
+                asyncRequestMaker, advertiserLevelFilters, adGroupLevelFilters);
+    }
 
-	@Override
-	public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
-			final Channel serverChannel) throws Exception {
-		final Marker traceMarker = traceMarkerProvider.get();
-		LOG.debug(traceMarker, "Inside Servlet {}", this.getClass().getSimpleName());
-		InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
-		super.handleRequest(hrh, queryStringDecoder, serverChannel);
-	}
+    @Override
+    public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
+            final Channel serverChannel) throws Exception {
+        final Marker traceMarker = traceMarkerProvider.get();
+        LOG.debug(traceMarker, "Inside Servlet {}", this.getClass().getSimpleName());
+        InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
+        super.handleRequest(hrh, queryStringDecoder, serverChannel);
+    }
 
-	@Override
-	public String getName() {
-		return "ixFill";
-	}
+    @Override
+    public String getName() {
+        return "ixFill";
+    }
 
-	@Override
-	protected Logger getLogger() {
-		return LOG;
-	}
+    @Override
+    protected Logger getLogger() {
+        return LOG;
+    }
 }

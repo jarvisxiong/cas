@@ -31,66 +31,66 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentF
 
 public class AuctionFilterModule extends AbstractModule {
 
-	private final Reflections reflections;
-	private final static Comparator<ChannelSegmentFilter> FILTER_COMPARATOR = new Comparator<ChannelSegmentFilter>() {
-		@Override
-		public int compare(final ChannelSegmentFilter o1, final ChannelSegmentFilter o2) {
-			return o1.getOrder().getValue() - o2.getOrder().getValue();
-		}
-	};
+    private final Reflections reflections;
+    private final static Comparator<ChannelSegmentFilter> FILTER_COMPARATOR = new Comparator<ChannelSegmentFilter>() {
+        @Override
+        public int compare(final ChannelSegmentFilter o1, final ChannelSegmentFilter o2) {
+            return o1.getOrder().getValue() - o2.getOrder().getValue();
+        }
+    };
 
-	public AuctionFilterModule() {
-		reflections = new Reflections("com.inmobi.adserve.channels.server.auction.auctionfilter.impl");
-	}
+    public AuctionFilterModule() {
+        reflections = new Reflections("com.inmobi.adserve.channels.server.auction.auctionfilter.impl");
+    }
 
-	@Override
-	protected void configure() {
+    @Override
+    protected void configure() {
 
-	}
+    }
 
-	@Singleton
-	@Provides
-	List<AuctionFilter> provideAuctionFilters(final Injector injector) {
-		final List<AuctionFilter> auctionFilterList = Lists.newArrayList();
+    @Singleton
+    @Provides
+    List<AuctionFilter> provideAuctionFilters(final Injector injector) {
+        final List<AuctionFilter> auctionFilterList = Lists.newArrayList();
 
-		final Set<Class<? extends AuctionFilter>> classes = reflections.getSubTypesOf(AuctionFilter.class);
-		classes.addAll(reflections.getSubTypesOf(AbstractAuctionFilter.class));
+        final Set<Class<? extends AuctionFilter>> classes = reflections.getSubTypesOf(AuctionFilter.class);
+        classes.addAll(reflections.getSubTypesOf(AbstractAuctionFilter.class));
 
-		for (final Class<? extends AuctionFilter> class1 : classes) {
-			final AuctionFilter filter = injector.getInstance(class1);
-			if (filter instanceof AuctionNoAdFilter) {
-				filter.setOrder(FilterOrder.FIRST);
-			} else if (filter instanceof AuctionBidFloorFilter) {
-				filter.setOrder(FilterOrder.SECOND);
-			} else if (filter instanceof AuctionSeatIdFilter) {
-				filter.setOrder(FilterOrder.THIRD);
-			} else if (filter instanceof AuctionImpressionIdFilter) {
-				filter.setOrder(FilterOrder.FOURTH);
-			} else if (filter instanceof AuctionIdFilter) {
-				filter.setOrder(FilterOrder.FIFTH);
-			} else if (filter instanceof AuctionCurrencyFilter) {
-				filter.setOrder(FilterOrder.SIXTH);
-			} else if (filter instanceof AuctionCreativeIdFilter) {
-				filter.setOrder(FilterOrder.SEVENTH);
-			} else if (filter instanceof AuctionIUrlFilter) {
-				filter.setOrder(FilterOrder.EIGHT);
-			} else if (filter instanceof AuctionAdvertiserDomainFilter) {
-				filter.setOrder(FilterOrder.NINTH);
-			} else if (filter instanceof AuctionCreativeAttributeFilter) {
-				filter.setOrder(FilterOrder.TENTH);
-			} else if (filter instanceof AuctionCreativeValidatorFilter) {
-				filter.setOrder(FilterOrder.SECOND_LAST);
-			} else if (filter instanceof AuctionLogCreative) {
-				filter.setOrder(FilterOrder.LAST);
-			} else {
-				filter.setOrder(FilterOrder.DEFAULT);
-			}
+        for (final Class<? extends AuctionFilter> class1 : classes) {
+            final AuctionFilter filter = injector.getInstance(class1);
+            if (filter instanceof AuctionNoAdFilter) {
+                filter.setOrder(FilterOrder.FIRST);
+            } else if (filter instanceof AuctionBidFloorFilter) {
+                filter.setOrder(FilterOrder.SECOND);
+            } else if (filter instanceof AuctionSeatIdFilter) {
+                filter.setOrder(FilterOrder.THIRD);
+            } else if (filter instanceof AuctionImpressionIdFilter) {
+                filter.setOrder(FilterOrder.FOURTH);
+            } else if (filter instanceof AuctionIdFilter) {
+                filter.setOrder(FilterOrder.FIFTH);
+            } else if (filter instanceof AuctionCurrencyFilter) {
+                filter.setOrder(FilterOrder.SIXTH);
+            } else if (filter instanceof AuctionCreativeIdFilter) {
+                filter.setOrder(FilterOrder.SEVENTH);
+            } else if (filter instanceof AuctionIUrlFilter) {
+                filter.setOrder(FilterOrder.EIGHT);
+            } else if (filter instanceof AuctionAdvertiserDomainFilter) {
+                filter.setOrder(FilterOrder.NINTH);
+            } else if (filter instanceof AuctionCreativeAttributeFilter) {
+                filter.setOrder(FilterOrder.TENTH);
+            } else if (filter instanceof AuctionCreativeValidatorFilter) {
+                filter.setOrder(FilterOrder.SECOND_LAST);
+            } else if (filter instanceof AuctionLogCreative) {
+                filter.setOrder(FilterOrder.LAST);
+            } else {
+                filter.setOrder(FilterOrder.DEFAULT);
+            }
 
-			auctionFilterList.add(filter);
-		}
+            auctionFilterList.add(filter);
+        }
 
-		Collections.sort(auctionFilterList, FILTER_COMPARATOR);
+        Collections.sort(auctionFilterList, FILTER_COMPARATOR);
 
-		return auctionFilterList;
-	}
+        return auctionFilterList;
+    }
 }

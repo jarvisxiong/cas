@@ -23,33 +23,33 @@ import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 @RunWith(PowerMockRunner.class)
 public class ServletErrorDetailsTest {
 
-	@Test
-	public void testHandleRequest() throws Exception {
-		final String errorDetails = "errorDetails";
-		mockStatic(CasConfigUtil.class);
-		final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-		final ResponseSender mockResponseSender = createMock(ResponseSender.class);
-		final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-		final RepositoryStatsProvider mockRepositoryStatsProvider = createMock(RepositoryStatsProvider.class);
+    @Test
+    public void testHandleRequest() throws Exception {
+        final String errorDetails = "errorDetails";
+        mockStatic(CasConfigUtil.class);
+        final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+        final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+        final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
+        final RepositoryStatsProvider mockRepositoryStatsProvider = createMock(RepositoryStatsProvider.class);
 
-		expect(mockRepositoryHelper.getRepositoryStatsProvider()).andReturn(mockRepositoryStatsProvider).times(1);
-		expect(mockRepositoryStatsProvider.getErrorDetails()).andReturn(errorDetails).times(1);
-		mockResponseSender.sendResponse(errorDetails, null);
-		expectLastCall().times(1);
+        expect(mockRepositoryHelper.getRepositoryStatsProvider()).andReturn(mockRepositoryStatsProvider).times(1);
+        expect(mockRepositoryStatsProvider.getErrorDetails()).andReturn(errorDetails).times(1);
+        mockResponseSender.sendResponse(errorDetails, null);
+        expectLastCall().times(1);
 
-		replayAll();
-		mockHttpRequestHandler.responseSender = mockResponseSender;
-		CasConfigUtil.repositoryHelper = mockRepositoryHelper;
+        replayAll();
+        mockHttpRequestHandler.responseSender = mockResponseSender;
+        CasConfigUtil.repositoryHelper = mockRepositoryHelper;
 
-		final ServletErrorDetails tested = new ServletErrorDetails();
-		tested.handleRequest(mockHttpRequestHandler, null, null);
+        final ServletErrorDetails tested = new ServletErrorDetails();
+        tested.handleRequest(mockHttpRequestHandler, null, null);
 
-		verifyAll();
-	}
+        verifyAll();
+    }
 
-	@Test
-	public void testGetName() throws Exception {
-		final ServletErrorDetails tested = new ServletErrorDetails();
-		assertThat(tested.getName(), is(IsEqual.equalTo("ErrorDetailstat")));
-	}
+    @Test
+    public void testGetName() throws Exception {
+        final ServletErrorDetails tested = new ServletErrorDetails();
+        assertThat(tested.getName(), is(IsEqual.equalTo("ErrorDetailstat")));
+    }
 }

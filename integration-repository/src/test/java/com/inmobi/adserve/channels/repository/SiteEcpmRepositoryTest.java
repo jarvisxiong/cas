@@ -28,70 +28,70 @@ import com.inmobi.phoenix.batteries.data.rdbmsrow.ResultSetRow;
 @PrepareForTest({NullAsZeroResultSetRow.class, ResultSetRow.class, SiteEcpmRepository.class})
 public class SiteEcpmRepositoryTest {
 
-	@Test
-	public void testBuildObjectFromRow() throws Exception {
-		final String siteId = "siteId";
-		final int countryId = 15;
-		final int osId = 3;
-		final double ecpm = 25.0;
-		final double networkEcpm = 5.0;
-		final Timestamp modifiedOn = new Timestamp(1234L);
+    @Test
+    public void testBuildObjectFromRow() throws Exception {
+        final String siteId = "siteId";
+        final int countryId = 15;
+        final int osId = 3;
+        final double ecpm = 25.0;
+        final double networkEcpm = 5.0;
+        final Timestamp modifiedOn = new Timestamp(1234L);
 
-		final NullAsZeroResultSetRow mockNullAsZeroResultSetRow = createMock(NullAsZeroResultSetRow.class);
+        final NullAsZeroResultSetRow mockNullAsZeroResultSetRow = createMock(NullAsZeroResultSetRow.class);
 
-		expect(mockNullAsZeroResultSetRow.getString("site_id")).andReturn(siteId).times(1);
-		expect(mockNullAsZeroResultSetRow.getInt("country_id")).andReturn(countryId).times(1);
-		expect(mockNullAsZeroResultSetRow.getInt("os_id")).andReturn(osId).times(1);
-		expect(mockNullAsZeroResultSetRow.getDouble("ecpm")).andReturn(ecpm).times(1);
-		expect(mockNullAsZeroResultSetRow.getDouble("network_ecpm")).andReturn(networkEcpm).times(1);
-		expect(mockNullAsZeroResultSetRow.getTimestamp("modified_on")).andReturn(modifiedOn).times(1);
-		expectNew(NullAsZeroResultSetRow.class, new Class[] {ResultSetRow.class}, null).andReturn(
-				mockNullAsZeroResultSetRow).times(1);
+        expect(mockNullAsZeroResultSetRow.getString("site_id")).andReturn(siteId).times(1);
+        expect(mockNullAsZeroResultSetRow.getInt("country_id")).andReturn(countryId).times(1);
+        expect(mockNullAsZeroResultSetRow.getInt("os_id")).andReturn(osId).times(1);
+        expect(mockNullAsZeroResultSetRow.getDouble("ecpm")).andReturn(ecpm).times(1);
+        expect(mockNullAsZeroResultSetRow.getDouble("network_ecpm")).andReturn(networkEcpm).times(1);
+        expect(mockNullAsZeroResultSetRow.getTimestamp("modified_on")).andReturn(modifiedOn).times(1);
+        expectNew(NullAsZeroResultSetRow.class, new Class[] {ResultSetRow.class}, null).andReturn(
+                mockNullAsZeroResultSetRow).times(1);
 
-		replayAll();
+        replayAll();
 
-		final SiteEcpmRepository tested = new SiteEcpmRepository();
-		final DBEntity<SiteEcpmEntity, SiteEcpmQuery> entity = tested.buildObjectFromRow(null);
-		final SiteEcpmEntity output = entity.getObject();
+        final SiteEcpmRepository tested = new SiteEcpmRepository();
+        final DBEntity<SiteEcpmEntity, SiteEcpmQuery> entity = tested.buildObjectFromRow(null);
+        final SiteEcpmEntity output = entity.getObject();
 
-		assertThat(output.getSiteId(), is(equalTo(siteId)));
-		assertThat(output.getCountryId(), is(equalTo(countryId)));
-		assertThat(output.getOsId(), is(equalTo(osId)));
-		assertThat(output.getEcpm(), is(equalTo(ecpm)));
-		assertThat(output.getNetworkEcpm(), is(equalTo(networkEcpm)));
-		assertThat(output.getModifiedOn(), is(equalTo(modifiedOn)));
+        assertThat(output.getSiteId(), is(equalTo(siteId)));
+        assertThat(output.getCountryId(), is(equalTo(countryId)));
+        assertThat(output.getOsId(), is(equalTo(osId)));
+        assertThat(output.getEcpm(), is(equalTo(ecpm)));
+        assertThat(output.getNetworkEcpm(), is(equalTo(networkEcpm)));
+        assertThat(output.getModifiedOn(), is(equalTo(modifiedOn)));
 
-		verifyAll();
-	}
+        verifyAll();
+    }
 
-	@Test
-	public void testIsObjectToBeDeleted() throws Exception {
-		final SiteEcpmRepository tested = new SiteEcpmRepository();
-		final SiteEcpmEntity mockSiteEcpmEntity = createMock(SiteEcpmEntity.class);
+    @Test
+    public void testIsObjectToBeDeleted() throws Exception {
+        final SiteEcpmRepository tested = new SiteEcpmRepository();
+        final SiteEcpmEntity mockSiteEcpmEntity = createMock(SiteEcpmEntity.class);
 
-		final Timestamp fourDayOldTimeStamp = new Timestamp(DateUtils.addDays(new Date(), -4).getTime());
-		final Timestamp twoDayOldTimeStamp = new Timestamp(DateUtils.addDays(new Date(), -2).getTime());
+        final Timestamp fourDayOldTimeStamp = new Timestamp(DateUtils.addDays(new Date(), -4).getTime());
+        final Timestamp twoDayOldTimeStamp = new Timestamp(DateUtils.addDays(new Date(), -2).getTime());
 
-		expect(mockSiteEcpmEntity.getModifiedOn()).andReturn(fourDayOldTimeStamp).times(1)
-				.andReturn(twoDayOldTimeStamp).times(1);
+        expect(mockSiteEcpmEntity.getModifiedOn()).andReturn(fourDayOldTimeStamp).times(1)
+                .andReturn(twoDayOldTimeStamp).times(1);
 
-		replayAll();
+        replayAll();
 
-		assertThat(tested.isObjectToBeDeleted(mockSiteEcpmEntity), is(equalTo(true)));
-		assertThat(tested.isObjectToBeDeleted(mockSiteEcpmEntity), is(equalTo(false)));
+        assertThat(tested.isObjectToBeDeleted(mockSiteEcpmEntity), is(equalTo(true)));
+        assertThat(tested.isObjectToBeDeleted(mockSiteEcpmEntity), is(equalTo(false)));
 
-		verifyAll();
-	}
+        verifyAll();
+    }
 
-	@Test
-	public void testGetHashIndexKeyBuilder() throws Exception {
-		final SiteEcpmRepository tested = new SiteEcpmRepository();
-		assertThat(tested.getHashIndexKeyBuilder(null), is(equalTo(null)));
-	}
+    @Test
+    public void testGetHashIndexKeyBuilder() throws Exception {
+        final SiteEcpmRepository tested = new SiteEcpmRepository();
+        assertThat(tested.getHashIndexKeyBuilder(null), is(equalTo(null)));
+    }
 
-	@Test
-	public void testQueryUniqueResult() throws Exception {
-		final SiteEcpmRepository tested = new SiteEcpmRepository();
-		assertThat(tested.queryUniqueResult(null), is(equalTo(null)));
-	}
+    @Test
+    public void testQueryUniqueResult() throws Exception {
+        final SiteEcpmRepository tested = new SiteEcpmRepository();
+        assertThat(tested.queryUniqueResult(null), is(equalTo(null)));
+    }
 }

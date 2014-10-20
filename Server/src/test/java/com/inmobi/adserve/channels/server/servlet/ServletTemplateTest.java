@@ -33,92 +33,92 @@ import com.inmobi.adserve.channels.util.Utils.TestUtils;
 @PrepareForTest({NativeAdTemplateRepository.class, NativeAdTemplateEntity.class})
 public class ServletTemplateTest {
 
-	private Map<String, List<String>> createMapFromString(final String siteId) {
-		final Map<String, List<String>> params = new HashMap<>();
-		if (null != siteId) {
-			params.put("siteId", Arrays.asList(siteId));
-		}
-		return params;
-	}
+    private Map<String, List<String>> createMapFromString(final String siteId) {
+        final Map<String, List<String>> params = new HashMap<>();
+        if (null != siteId) {
+            params.put("siteId", Arrays.asList(siteId));
+        }
+        return params;
+    }
 
-	@Test
-	public void testHandleRequestSiteIdFoundEntityNotNull() throws Exception {
-		final String siteId = TestUtils.SampleStrings.siteId;
+    @Test
+    public void testHandleRequestSiteIdFoundEntityNotNull() throws Exception {
+        final String siteId = TestUtils.SampleStrings.siteId;
 
-		mockStatic(CasConfigUtil.class);
-		final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-		final QueryStringDecoder mockQueryStringDecoder = createMock(QueryStringDecoder.class);
-		final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-		final ResponseSender mockResponseSender = createMock(ResponseSender.class);
-		final NativeAdTemplateRepository mockTemplateRepository = createMock(NativeAdTemplateRepository.class);
-		final NativeAdTemplateEntity mockEntity = createMock(NativeAdTemplateEntity.class);
+        mockStatic(CasConfigUtil.class);
+        final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
+        final QueryStringDecoder mockQueryStringDecoder = createMock(QueryStringDecoder.class);
+        final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+        final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+        final NativeAdTemplateRepository mockTemplateRepository = createMock(NativeAdTemplateRepository.class);
+        final NativeAdTemplateEntity mockEntity = createMock(NativeAdTemplateEntity.class);
 
-		expect(mockQueryStringDecoder.parameters()).andReturn(createMapFromString(siteId)).times(1);
-		expect(mockRepositoryHelper.getNativeAdTemplateRepository()).andReturn(mockTemplateRepository).times(1);
-		expect(mockTemplateRepository.query(siteId)).andReturn(mockEntity).times(1);
-		expect(mockEntity.getJSON()).andReturn("{dummy}").times(1);
-		mockResponseSender.sendResponse("{dummy}", null);
-		expectLastCall().times(1);
+        expect(mockQueryStringDecoder.parameters()).andReturn(createMapFromString(siteId)).times(1);
+        expect(mockRepositoryHelper.getNativeAdTemplateRepository()).andReturn(mockTemplateRepository).times(1);
+        expect(mockTemplateRepository.query(siteId)).andReturn(mockEntity).times(1);
+        expect(mockEntity.getJSON()).andReturn("{dummy}").times(1);
+        mockResponseSender.sendResponse("{dummy}", null);
+        expectLastCall().times(1);
 
-		replayAll();
-		mockHttpRequestHandler.responseSender = mockResponseSender;
-		CasConfigUtil.repositoryHelper = mockRepositoryHelper;
+        replayAll();
+        mockHttpRequestHandler.responseSender = mockResponseSender;
+        CasConfigUtil.repositoryHelper = mockRepositoryHelper;
 
-		final ServletTemplate tested = new ServletTemplate();
-		tested.handleRequest(mockHttpRequestHandler, mockQueryStringDecoder, null);
+        final ServletTemplate tested = new ServletTemplate();
+        tested.handleRequest(mockHttpRequestHandler, mockQueryStringDecoder, null);
 
-		verifyAll();
-	}
+        verifyAll();
+    }
 
-	@Test
-	public void testHandleRequestSiteIdFoundEntityNull() throws Exception {
-		final String siteId = TestUtils.SampleStrings.siteId;
+    @Test
+    public void testHandleRequestSiteIdFoundEntityNull() throws Exception {
+        final String siteId = TestUtils.SampleStrings.siteId;
 
-		mockStatic(CasConfigUtil.class);
-		final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-		final QueryStringDecoder mockQueryStringDecoder = createMock(QueryStringDecoder.class);
-		final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-		final ResponseSender mockResponseSender = createMock(ResponseSender.class);
-		final NativeAdTemplateRepository mockTemplateRepository = createMock(NativeAdTemplateRepository.class);
+        mockStatic(CasConfigUtil.class);
+        final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
+        final QueryStringDecoder mockQueryStringDecoder = createMock(QueryStringDecoder.class);
+        final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+        final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+        final NativeAdTemplateRepository mockTemplateRepository = createMock(NativeAdTemplateRepository.class);
 
-		expect(mockQueryStringDecoder.parameters()).andReturn(createMapFromString(siteId)).times(1);
-		expect(mockRepositoryHelper.getNativeAdTemplateRepository()).andReturn(mockTemplateRepository).times(1);
-		expect(mockTemplateRepository.query(siteId)).andReturn(null).times(1);
-		mockResponseSender.sendResponse("No template found for site Id " + siteId, null);
-		expectLastCall().times(1);
+        expect(mockQueryStringDecoder.parameters()).andReturn(createMapFromString(siteId)).times(1);
+        expect(mockRepositoryHelper.getNativeAdTemplateRepository()).andReturn(mockTemplateRepository).times(1);
+        expect(mockTemplateRepository.query(siteId)).andReturn(null).times(1);
+        mockResponseSender.sendResponse("No template found for site Id " + siteId, null);
+        expectLastCall().times(1);
 
-		replayAll();
-		mockHttpRequestHandler.responseSender = mockResponseSender;
-		CasConfigUtil.repositoryHelper = mockRepositoryHelper;
+        replayAll();
+        mockHttpRequestHandler.responseSender = mockResponseSender;
+        CasConfigUtil.repositoryHelper = mockRepositoryHelper;
 
-		final ServletTemplate tested = new ServletTemplate();
-		tested.handleRequest(mockHttpRequestHandler, mockQueryStringDecoder, null);
+        final ServletTemplate tested = new ServletTemplate();
+        tested.handleRequest(mockHttpRequestHandler, mockQueryStringDecoder, null);
 
-		verifyAll();
-	}
+        verifyAll();
+    }
 
-	@Test
-	public void testHandleRequestSiteIdNotFound() throws Exception {
-		final QueryStringDecoder mockQueryStringDecoder = createMock(QueryStringDecoder.class);
-		final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-		final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+    @Test
+    public void testHandleRequestSiteIdNotFound() throws Exception {
+        final QueryStringDecoder mockQueryStringDecoder = createMock(QueryStringDecoder.class);
+        final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+        final ResponseSender mockResponseSender = createMock(ResponseSender.class);
 
-		expect(mockQueryStringDecoder.parameters()).andReturn(createMapFromString(null)).times(1);
-		mockResponseSender.sendResponse("Invalid siteId", null);
-		expectLastCall().times(1);
+        expect(mockQueryStringDecoder.parameters()).andReturn(createMapFromString(null)).times(1);
+        mockResponseSender.sendResponse("Invalid siteId", null);
+        expectLastCall().times(1);
 
-		replayAll();
-		mockHttpRequestHandler.responseSender = mockResponseSender;
+        replayAll();
+        mockHttpRequestHandler.responseSender = mockResponseSender;
 
-		final ServletTemplate tested = new ServletTemplate();
-		tested.handleRequest(mockHttpRequestHandler, mockQueryStringDecoder, null);
+        final ServletTemplate tested = new ServletTemplate();
+        tested.handleRequest(mockHttpRequestHandler, mockQueryStringDecoder, null);
 
-		verifyAll();
-	}
+        verifyAll();
+    }
 
-	@Test
-	public void testGetName() throws Exception {
-		final ServletTemplate tested = new ServletTemplate();
-		assertThat(tested.getName(), is(IsEqual.equalTo("template")));
-	}
+    @Test
+    public void testGetName() throws Exception {
+        final ServletTemplate tested = new ServletTemplate();
+        assertThat(tested.getName(), is(IsEqual.equalTo("template")));
+    }
 }

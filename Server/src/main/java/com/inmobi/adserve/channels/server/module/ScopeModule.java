@@ -15,16 +15,16 @@ import com.inmobi.adserve.channels.util.annotations.BatchScoped;
  */
 public class ScopeModule extends AbstractModule {
 
-	@Override
-	protected void configure() {
-		final NettyRequestScope nettyRequestScope = new NettyRequestScope();
-		bindScope(BatchScoped.class, nettyRequestScope);
-		bind(NettyRequestScope.class).toInstance(nettyRequestScope);
-		bind(Marker.class).toProvider(NettyRequestScope.<Marker>seededKeyProvider()).in(nettyRequestScope);
-		bind(Servlet.class).toProvider(NettyRequestScope.<Servlet>seededKeyProvider()).in(nettyRequestScope);
-		bind(ResponseSender.class).toProvider(NettyRequestScope.<ResponseSender>seededKeyProvider()).in(
-				nettyRequestScope);
+    @Override
+    protected void configure() {
+        final NettyRequestScope nettyRequestScope = new NettyRequestScope();
+        bindScope(BatchScoped.class, nettyRequestScope);
+        bind(NettyRequestScope.class).toInstance(nettyRequestScope);
+        bind(Marker.class).toProvider(NettyRequestScope.<Marker>seededKeyProvider()).in(nettyRequestScope);
+        bind(Servlet.class).toProvider(NettyRequestScope.<Servlet>seededKeyProvider()).in(nettyRequestScope);
+        bind(ResponseSender.class).toProvider(NettyRequestScope.<ResponseSender>seededKeyProvider()).in(
+                nettyRequestScope);
 
-	}
+    }
 
 }

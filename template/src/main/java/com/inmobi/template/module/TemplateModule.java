@@ -17,35 +17,35 @@ import com.inmobi.template.tool.ToolsImpl;
 
 public class TemplateModule extends AbstractModule {
 
-	@Override
-	protected void configure() {
-		bind(TemplateParser.class).asEagerSingleton();
-		bindConstant().annotatedWith(Names.named("ContextCodeFile")).to("/contextCode.vm");
-		bind(TemplateConfiguration.class).to(defaultTemplateInitializer()).asEagerSingleton();
-		bind(DeserializerConfiguration.class).to(DefaultDeserializerConfiguration.class);
-	}
+    @Override
+    protected void configure() {
+        bind(TemplateParser.class).asEagerSingleton();
+        bindConstant().annotatedWith(Names.named("ContextCodeFile")).to("/contextCode.vm");
+        bind(TemplateConfiguration.class).to(defaultTemplateInitializer()).asEagerSingleton();
+        bind(DeserializerConfiguration.class).to(DefaultDeserializerConfiguration.class);
+    }
 
 
 
-	/**
-	 * Just used to created default configuration.
-	 * 
-	 * @return
-	 */
-	private Class<? extends TemplateConfiguration> defaultTemplateInitializer() {
+    /**
+     * Just used to created default configuration.
+     * 
+     * @return
+     */
+    private Class<? extends TemplateConfiguration> defaultTemplateInitializer() {
 
-		/**
-		 * Caution : never directly use Tools,MathTool,GsonManager to Inject rather use TemplateConfiguration
-		 * Implementation. I did it just because I am lazy.
-		 */
-		bind(Tools.class).to(ToolsImpl.class);
-		bind(MathTool.class).asEagerSingleton();
-		bind(GsonManager.class).asEagerSingleton();
-		bind(TemplateDecorator.class).asEagerSingleton();
+        /**
+         * Caution : never directly use Tools,MathTool,GsonManager to Inject rather use TemplateConfiguration
+         * Implementation. I did it just because I am lazy.
+         */
+        bind(Tools.class).to(ToolsImpl.class);
+        bind(MathTool.class).asEagerSingleton();
+        bind(GsonManager.class).asEagerSingleton();
+        bind(TemplateDecorator.class).asEagerSingleton();
 
-		return DefaultConfiguration.class;
+        return DefaultConfiguration.class;
 
-	}
+    }
 
 
 }

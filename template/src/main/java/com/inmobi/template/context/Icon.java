@@ -12,43 +12,43 @@ import com.inmobi.template.interfaces.Context;
 @ToString
 public class Icon extends AbstractContext {
 
-	private final int w;
-	private final int width;
-	private final int height;
-	private final int h;
-	private final String url;
+    private final int w;
+    private final int width;
+    private final int height;
+    private final int h;
+    private final String url;
 
-	private Icon(final Builder builder) {
-		w = builder.w;
-		h = builder.h;
-		height = builder.h;
-		width = builder.w;
-		url = builder.url;
-		setValues(params);
-	}
+    private Icon(final Builder builder) {
+        w = builder.w;
+        h = builder.h;
+        height = builder.h;
+        width = builder.w;
+        url = builder.url;
+        setValues(params);
+    }
 
-	@Override
-	void setValues(final Map<String, Object> params) {
-		params.put(KeyConstants.WIDTH, w);
-		params.put(KeyConstants.HEIGHT, h);
-		params.put(KeyConstants.URL, url);
-	}
+    @Override
+    void setValues(final Map<String, Object> params) {
+        params.put(KeyConstants.WIDTH, w);
+        params.put(KeyConstants.HEIGHT, h);
+        params.put(KeyConstants.URL, url);
+    }
 
-	public static Builder newBuilder() {
-		return new Builder();
-	}
+    public static Builder newBuilder() {
+        return new Builder();
+    }
 
-	@Setter
-	public static class Builder {
+    @Setter
+    public static class Builder {
 
-		private int w;
-		private int h;
-		private String url;
+        private int w;
+        private int h;
+        private String url;
 
-		public Context build() {
-			return new Icon(this);
-		}
+        public Context build() {
+            return new Icon(this);
+        }
 
-	}
+    }
 
 }

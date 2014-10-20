@@ -14,19 +14,19 @@ import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 @Singleton
 public class AuctionNoAdFilter extends AbstractAuctionFilter {
 
-	@Inject
-	protected AuctionNoAdFilter(final Provider<Marker> traceMarkerProvider, final ServerConfig serverConfiguration) {
-		super(traceMarkerProvider, null, serverConfiguration);
-		isApplicableRTBD = true;
-		isApplicableIX = true;
-	}
+    @Inject
+    protected AuctionNoAdFilter(final Provider<Marker> traceMarkerProvider, final ServerConfig serverConfiguration) {
+        super(traceMarkerProvider, null, serverConfiguration);
+        isApplicableRTBD = true;
+        isApplicableIX = true;
+    }
 
-	@Override
-	protected boolean failedInFilter(final ChannelSegment rtbSegment,
-			final CasInternalRequestParameters casInternalRequestParameters) {
-		if ("AD".equalsIgnoreCase(rtbSegment.getAdNetworkInterface().getAdStatus())) {
-			return false;
-		}
-		return true;
-	}
+    @Override
+    protected boolean failedInFilter(final ChannelSegment rtbSegment,
+            final CasInternalRequestParameters casInternalRequestParameters) {
+        if ("AD".equalsIgnoreCase(rtbSegment.getAdNetworkInterface().getAdStatus())) {
+            return false;
+        }
+        return true;
+    }
 }

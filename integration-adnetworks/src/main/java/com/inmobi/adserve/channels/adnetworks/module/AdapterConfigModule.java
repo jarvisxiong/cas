@@ -28,89 +28,89 @@ import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
  */
 public class AdapterConfigModule extends AbstractModule {
 
-	private final Configuration allAdapterConfiguration;
-	private final String dcName;
+    private final Configuration allAdapterConfiguration;
+    private final String dcName;
 
-	public AdapterConfigModule(final Configuration allAdapterConfiguration, final String dcName) {
-		this.allAdapterConfiguration = allAdapterConfiguration;
-		this.dcName = dcName;
-	}
+    public AdapterConfigModule(final Configuration allAdapterConfiguration, final String dcName) {
+        this.allAdapterConfiguration = allAdapterConfiguration;
+        this.dcName = dcName;
+    }
 
-	@Override
-	protected void configure() {
+    @Override
+    protected void configure() {
 
-		requestStaticInjection(BaseAdNetworkImpl.class);
-		requestStaticInjection(RtbAdNetwork.class);
-		requestStaticInjection(IXAdNetwork.class);
+        requestStaticInjection(BaseAdNetworkImpl.class);
+        requestStaticInjection(RtbAdNetwork.class);
+        requestStaticInjection(IXAdNetwork.class);
 
-		install(new FactoryModuleBuilder().build(AdapterConfigFactory.class));
-		bind(String.class).annotatedWith(Names.named("dcName")).toProvider(Providers.of(dcName));
-	}
+        install(new FactoryModuleBuilder().build(AdapterConfigFactory.class));
+        bind(String.class).annotatedWith(Names.named("dcName")).toProvider(Providers.of(dcName));
+    }
 
-	@Provides
-	@Singleton
-	Map<String, AdapterConfig> provideAdvertiserIdConfigMap(final AdapterConfigFactory adapterConfigFactory) {
+    @Provides
+    @Singleton
+    Map<String, AdapterConfig> provideAdvertiserIdConfigMap(final AdapterConfigFactory adapterConfigFactory) {
 
-		@SuppressWarnings("unchecked")
-		final Iterator<String> keyIterator = allAdapterConfiguration.getKeys();
+        @SuppressWarnings("unchecked")
+        final Iterator<String> keyIterator = allAdapterConfiguration.getKeys();
 
-		final Set<String> adapterNames = Sets.newHashSet();
+        final Set<String> adapterNames = Sets.newHashSet();
 
-		final Set<AdapterConfig> adapterConfigs = Sets.newHashSet();
+        final Set<AdapterConfig> adapterConfigs = Sets.newHashSet();
 
-		while (keyIterator.hasNext()) {
-			final String key = keyIterator.next();
+        while (keyIterator.hasNext()) {
+            final String key = keyIterator.next();
 
-			final String adapterName = key.substring(0, key.indexOf("."));
-			adapterNames.add(adapterName);
-		}
+            final String adapterName = key.substring(0, key.indexOf("."));
+            adapterNames.add(adapterName);
+        }
 
-		for (final String adapterName : adapterNames) {
-			final Configuration adapterConfiguration = allAdapterConfiguration.subset(adapterName);
-			final AdapterConfig adapterConfig = adapterConfigFactory.create(adapterConfiguration, adapterName);
-			adapterConfigs.add(adapterConfig);
-		}
+        for (final String adapterName : adapterNames) {
+            final Configuration adapterConfiguration = allAdapterConfiguration.subset(adapterName);
+            final AdapterConfig adapterConfig = adapterConfigFactory.create(adapterConfiguration, adapterName);
+            adapterConfigs.add(adapterConfig);
+        }
 
-		final Map<String, AdapterConfig> advertiserIdConfigMap = Maps.newHashMap();
+        final Map<String, AdapterConfig> advertiserIdConfigMap = Maps.newHashMap();
 
-		for (final AdapterConfig adapterConfig : adapterConfigs) {
-			advertiserIdConfigMap.put(adapterConfig.getAdvertiserId(), adapterConfig);
-		}
-		return advertiserIdConfigMap;
-	}
+        for (final AdapterConfig adapterConfig : adapterConfigs) {
+            advertiserIdConfigMap.put(adapterConfig.getAdvertiserId(), adapterConfig);
+        }
+        return advertiserIdConfigMap;
+    }
 
-	@Provides
-	@Singleton
-	@AdvertiserIdNameMap
-	Map<String, String> provideAdvertiserIdToNameMap(final AdapterConfigFactory adapterConfigFactory) {
+    @Provides
+    @Singleton
+    @AdvertiserIdNameMap
+    Map<String, String> provideAdvertiserIdToNameMap(final AdapterConfigFactory adapterConfigFactory) {
 
-		@SuppressWarnings("unchecked")
-		final Iterator<String> keyIterator = allAdapterConfiguration.getKeys();
+        @SuppressWarnings("unchecked")
+        final Iterator<String> keyIterator = allAdapterConfiguration.getKeys();
 
-		final Set<String> adapterNames = Sets.newHashSet();
+        final Set<String> adapterNames = Sets.newHashSet();
 
-		final Set<AdapterConfig> adapterConfigs = Sets.newHashSet();
+        final Set<AdapterConfig> adapterConfigs = Sets.newHashSet();
 
-		while (keyIterator.hasNext()) {
-			final String key = keyIterator.next();
+        while (keyIterator.hasNext()) {
+            final String key = keyIterator.next();
 
-			final String adapterName = key.substring(0, key.indexOf("."));
-			adapterNames.add(adapterName);
-		}
+            final String adapterName = key.substring(0, key.indexOf("."));
+            adapterNames.add(adapterName);
+        }
 
-		for (final String adapterName : adapterNames) {
-			final Configuration adapterConfiguration = allAdapterConfiguration.subset(adapterName);
-			final AdapterConfig adapterConfig = adapterConfigFactory.create(adapterConfiguration, adapterName);
-			adapterConfigs.add(adapterConfig);
-		}
+        for (final String adapterName : adapterNames) {
+            final Configuration adapterConfiguration = allAdapterConfiguration.subset(adapterName);
+            final AdapterConfig adapterConfig = adapterConfigFactory.create(adapterConfiguration, adapterName);
+            adapterConfigs.add(adapterConfig);
+        }
 
-		final Map<String, String> advertiserIdToNameMap = Maps.newHashMap();
+        final Map<String, String> advertiserIdToNameMap = Maps.newHashMap();
 
-		for (final AdapterConfig adapterConfig : adapterConfigs) {
-			advertiserIdToNameMap.put(adapterConfig.getAdvertiserId(), adapterConfig.getAdapterName());
-		}
+        for (final AdapterConfig adapterConfig : adapterConfigs) {
+            advertiserIdToNameMap.put(adapterConfig.getAdvertiserId(), adapterConfig.getAdapterName());
+        }
 
-		return advertiserIdToNameMap;
-	}
+        return advertiserIdToNameMap;
+    }
 
 }

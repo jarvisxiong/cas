@@ -14,8 +14,8 @@ import com.inmobi.phoenix.data.RepositoryQuery;
 @ToString
 public class SiteEcpmQuery implements RepositoryQuery {
 
-	private String siteId;
-	private Integer countryId;
-	private Integer osId;
+    private String siteId;
+    private Integer countryId;
+    private Integer osId;
 
 }

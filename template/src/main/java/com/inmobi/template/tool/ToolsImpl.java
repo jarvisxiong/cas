@@ -6,29 +6,29 @@ import com.inmobi.template.interfaces.Tools;
 
 public class ToolsImpl extends Tools {
 
-	Gson gson = new Gson();
+    Gson gson = new Gson();
 
-	public ToolsImpl() {}
+    public ToolsImpl() {}
 
 
-	@Override
-	public Object jpath(final Context context, final String key) {
-		return context.get(key);
-	}
+    @Override
+    public Object jpath(final Context context, final String key) {
+        return context.get(key);
+    }
 
-	@Override
-	public String jpathStr(final Context context, final String key) {
-		return (String) jpath(context, key);
-	}
+    @Override
+    public String jpathStr(final Context context, final String key) {
+        return (String) jpath(context, key);
+    }
 
-	@Override
-	public String jsonEncode(final Object map) {
-		return gson.toJson(map);
-	}
+    @Override
+    public String jsonEncode(final Object map) {
+        return gson.toJson(map);
+    }
 
-	@Override
-	public String nativeAd(final Context creativeContext, final String pubContent) {
-		return pubContent;
-	}
+    @Override
+    public String nativeAd(final Context creativeContext, final String pubContent) {
+        return pubContent;
+    }
 
 }

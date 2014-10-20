@@ -11,27 +11,27 @@ import org.testng.annotations.Test;
 
 
 public class RepositoryTest {
-	ChannelAdGroupRepository channelAdGroupRepository;
-	PricingEngineRepository pricingEngineRepository;
+    ChannelAdGroupRepository channelAdGroupRepository;
+    PricingEngineRepository pricingEngineRepository;
 
-	@BeforeMethod
-	public void setUp() throws IOException {
-		channelAdGroupRepository = new ChannelAdGroupRepository();
-		pricingEngineRepository = new PricingEngineRepository();
-	}
+    @BeforeMethod
+    public void setUp() throws IOException {
+        channelAdGroupRepository = new ChannelAdGroupRepository();
+        pricingEngineRepository = new PricingEngineRepository();
+    }
 
-	@Test
-	public void testParseManufacturingIds() {
-		final String modelTargetingJson = "{\"manuf\": [{\"id\":8,\"modelIds\":[7473],\"incl\":true}]}";
-		assertEquals(1, channelAdGroupRepository.parseManufacturingIds(modelTargetingJson).size());
-		assertEquals(7473, channelAdGroupRepository.parseManufacturingIds(modelTargetingJson).get(0).intValue());
-	}
+    @Test
+    public void testParseManufacturingIds() {
+        final String modelTargetingJson = "{\"manuf\": [{\"id\":8,\"modelIds\":[7473],\"incl\":true}]}";
+        assertEquals(1, channelAdGroupRepository.parseManufacturingIds(modelTargetingJson).size());
+        assertEquals(7473, channelAdGroupRepository.parseManufacturingIds(modelTargetingJson).get(0).intValue());
+    }
 
-	@Test
-	public void testGetSupplyToDemandMap() {
-		final String json = "{\"0\":[\"0\",\"1\"],\"1\":[\"0\",\"1\",\"2\"]}";
-		final Map<String, Set<String>> map = pricingEngineRepository.getSupplyToDemandMap(json);
-		assertEquals(true, map.get("0").contains("1"));
-		assertEquals(true, map.get("1").contains("2"));
-	}
+    @Test
+    public void testGetSupplyToDemandMap() {
+        final String json = "{\"0\":[\"0\",\"1\"],\"1\":[\"0\",\"1\",\"2\"]}";
+        final Map<String, Set<String>> map = pricingEngineRepository.getSupplyToDemandMap(json);
+        assertEquals(true, map.get("0").contains("1"));
+        assertEquals(true, map.get("1").contains("2"));
+    }
 }

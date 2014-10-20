@@ -8,9 +8,9 @@ import com.inmobi.adserve.channels.server.HttpRequestHandler;
 
 public interface Servlet {
 
-	void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
-			final Channel severChannel) throws Exception;
+    void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
+            final Channel severChannel) throws Exception;
 
-	String getName();
+    String getName();
 
 }

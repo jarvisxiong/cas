@@ -14,12 +14,12 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentF
  */
 public interface AdGroupLevelFilter extends ChannelSegmentFilter {
 
-	/**
-	 * @param channelSegments
-	 * @param sasParams
-	 * @param casContext
-	 */
-	void filter(final List<ChannelSegment> channelSegments, final SASRequestParameters sasParams,
-			final CasContext casContext);
+    /**
+     * @param channelSegments
+     * @param sasParams
+     * @param casContext
+     */
+    void filter(final List<ChannelSegment> channelSegments, final SASRequestParameters sasParams,
+            final CasContext casContext);
 
 }

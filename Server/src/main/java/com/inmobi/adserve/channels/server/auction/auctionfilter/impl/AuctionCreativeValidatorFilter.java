@@ -19,42 +19,42 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 public class AuctionCreativeValidatorFilter extends AbstractAuctionFilter {
 
-	private final RepositoryHelper repositoryHelper;
+    private final RepositoryHelper repositoryHelper;
 
-	@Inject
-	protected AuctionCreativeValidatorFilter(final Provider<Marker> traceMarkerProvider,
-			final RepositoryHelper repositoryHelper, final ServerConfig serverConfiguration) {
-		super(traceMarkerProvider, InspectorStrings.DROPPED_IN_CREATIVE_VALIDATOR_FILTER, serverConfiguration);
-		this.repositoryHelper = repositoryHelper;
-		isApplicableRTBD = true;
-		isApplicableIX = false;
-	}
+    @Inject
+    protected AuctionCreativeValidatorFilter(final Provider<Marker> traceMarkerProvider,
+            final RepositoryHelper repositoryHelper, final ServerConfig serverConfiguration) {
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_CREATIVE_VALIDATOR_FILTER, serverConfiguration);
+        this.repositoryHelper = repositoryHelper;
+        isApplicableRTBD = true;
+        isApplicableIX = false;
+    }
 
-	@Override
-	protected boolean failedInFilter(final ChannelSegment rtbSegment,
-			final CasInternalRequestParameters casInternalRequestParameters) {
-		final CreativeEntity creativeEntity =
-				repositoryHelper.queryCreativeRepository(rtbSegment.getChannelEntity().getAccountId(), rtbSegment
-						.getAdNetworkInterface().getCreativeId());
-		CreativeExposure creativeExposure = CreativeExposure.SELF_SERVE;
+    @Override
+    protected boolean failedInFilter(final ChannelSegment rtbSegment,
+            final CasInternalRequestParameters casInternalRequestParameters) {
+        final CreativeEntity creativeEntity =
+                repositoryHelper.queryCreativeRepository(rtbSegment.getChannelEntity().getAccountId(), rtbSegment
+                        .getAdNetworkInterface().getCreativeId());
+        CreativeExposure creativeExposure = CreativeExposure.SELF_SERVE;
 
-		// Setting appropriate exposure level
-		if (null != creativeEntity) {
-			creativeExposure = creativeEntity.getExposureLevel();
-			if (creativeExposure == CreativeExposure.ALL
-					&& !creativeEntity.getImageUrl().equalsIgnoreCase(rtbSegment.getAdNetworkInterface().getIUrl())) {
-				creativeExposure = CreativeExposure.SELF_SERVE;
-			}
-		}
+        // Setting appropriate exposure level
+        if (null != creativeEntity) {
+            creativeExposure = creativeEntity.getExposureLevel();
+            if (creativeExposure == CreativeExposure.ALL
+                    && !creativeEntity.getImageUrl().equalsIgnoreCase(rtbSegment.getAdNetworkInterface().getIUrl())) {
+                creativeExposure = CreativeExposure.SELF_SERVE;
+            }
+        }
 
-		// Filtering logic
-		if (creativeExposure == CreativeExposure.ALL) {
-			return false;
-		} else if (creativeExposure == CreativeExposure.SELF_SERVE
-				&& casInternalRequestParameters.getSiteAccountType() == AccountType.SELF_SERVE) {
-			return false;
-		}
+        // Filtering logic
+        if (creativeExposure == CreativeExposure.ALL) {
+            return false;
+        } else if (creativeExposure == CreativeExposure.SELF_SERVE
+                && casInternalRequestParameters.getSiteAccountType() == AccountType.SELF_SERVE) {
+            return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
 }

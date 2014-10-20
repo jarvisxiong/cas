@@ -19,11 +19,11 @@ import com.google.inject.Singleton;
 @Singleton
 public class RequestIdHandler extends ChannelInboundHandlerAdapter {
 
-	public RequestIdHandler() {}
+    public RequestIdHandler() {}
 
-	@Override
-	public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
-		MDC.put("requestId", String.format("0x%08x", ctx.channel().hashCode()));
-		ctx.fireChannelRead(msg);
-	}
+    @Override
+    public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
+        MDC.put("requestId", String.format("0x%08x", ctx.channel().hashCode()));
+        ctx.fireChannelRead(msg);
+    }
 }

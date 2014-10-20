@@ -28,76 +28,76 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 public class AdGroupMaxSegmentPerRequestFilter implements AdGroupLevelFilter {
 
-	private static final Logger LOG = LoggerFactory.getLogger(AbstractAdGroupLevelFilter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractAdGroupLevelFilter.class);
 
-	private final Provider<Marker> traceMarkerProvider;
+    private final Provider<Marker> traceMarkerProvider;
 
-	private final ServerConfig serverConfig;
+    private final ServerConfig serverConfig;
 
-	private FilterOrder order;
+    private FilterOrder order;
 
-	@Inject
-	AdGroupMaxSegmentPerRequestFilter(final Provider<Marker> traceMarkerProvider, final ServerConfig serverConfig) {
-		this.traceMarkerProvider = traceMarkerProvider;
-		this.serverConfig = serverConfig;
-	}
+    @Inject
+    AdGroupMaxSegmentPerRequestFilter(final Provider<Marker> traceMarkerProvider, final ServerConfig serverConfig) {
+        this.traceMarkerProvider = traceMarkerProvider;
+        this.serverConfig = serverConfig;
+    }
 
-	@Override
-	public void filter(final List<ChannelSegment> channelSegments, final SASRequestParameters sasParams,
-			final CasContext casContext) {
+    @Override
+    public void filter(final List<ChannelSegment> channelSegments, final SASRequestParameters sasParams,
+            final CasContext casContext) {
 
-		final Marker traceMarker = traceMarkerProvider.get();
+        final Marker traceMarker = traceMarkerProvider.get();
 
-		final int maxSegmentSelectionCount = serverConfig.getMaxSegmentSelectionCount();
+        final int maxSegmentSelectionCount = serverConfig.getMaxSegmentSelectionCount();
 
-		if (maxSegmentSelectionCount == -1) {
-			return;
-		}
+        if (maxSegmentSelectionCount == -1) {
+            return;
+        }
 
-		int selectedSegmentCount = 0;
+        int selectedSegmentCount = 0;
 
-		for (final Iterator<ChannelSegment> iterator = channelSegments.listIterator(); iterator.hasNext();) {
-			final ChannelSegment channelSegment = iterator.next();
+        for (final Iterator<ChannelSegment> iterator = channelSegments.listIterator(); iterator.hasNext();) {
+            final ChannelSegment channelSegment = iterator.next();
 
-			final boolean result = failedInFilter(maxSegmentSelectionCount, selectedSegmentCount);
+            final boolean result = failedInFilter(maxSegmentSelectionCount, selectedSegmentCount);
 
-			if (result) {
-				// TODO: we can optimize if we don't need these inspector stats , then we can shorten our iteration
-				iterator.remove();
-				LOG.debug(traceMarker, "Failed in filter {}  , adgroup {}", this.getClass().getSimpleName(),
-						channelSegment.getChannelSegmentFeedbackEntity().getId());
-				incrementStats(channelSegment);
-			} else {
-				selectedSegmentCount++;
-				LOG.debug(traceMarker, "Passed in filter {} ,  adgroup {}", this.getClass().getSimpleName(),
-						channelSegment.getChannelSegmentFeedbackEntity().getId());
-			}
-		}
-	}
+            if (result) {
+                // TODO: we can optimize if we don't need these inspector stats , then we can shorten our iteration
+                iterator.remove();
+                LOG.debug(traceMarker, "Failed in filter {}  , adgroup {}", this.getClass().getSimpleName(),
+                        channelSegment.getChannelSegmentFeedbackEntity().getId());
+                incrementStats(channelSegment);
+            } else {
+                selectedSegmentCount++;
+                LOG.debug(traceMarker, "Passed in filter {} ,  adgroup {}", this.getClass().getSimpleName(),
+                        channelSegment.getChannelSegmentFeedbackEntity().getId());
+            }
+        }
+    }
 
-	/**
-	 * @param maxSegmentSelectionCount
-	 * @param selectedSegmentCount
-	 * @return
-	 */
-	private boolean failedInFilter(final int maxSegmentSelectionCount, final int selectedSegmentCount) {
-		return selectedSegmentCount >= maxSegmentSelectionCount;
-	}
+    /**
+     * @param maxSegmentSelectionCount
+     * @param selectedSegmentCount
+     * @return
+     */
+    private boolean failedInFilter(final int maxSegmentSelectionCount, final int selectedSegmentCount) {
+        return selectedSegmentCount >= maxSegmentSelectionCount;
+    }
 
-	/**
-	 * @param channelSegment
-	 */
-	protected void incrementStats(final ChannelSegment channelSegment) {
-		channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_SEGMENT_PER_REQUEST_FILTER);
-	}
+    /**
+     * @param channelSegment
+     */
+    protected void incrementStats(final ChannelSegment channelSegment) {
+        channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_SEGMENT_PER_REQUEST_FILTER);
+    }
 
-	@Override
-	final public void setOrder(final FilterOrder order) {
-		this.order = order;
-	}
+    @Override
+    final public void setOrder(final FilterOrder order) {
+        this.order = order;
+    }
 
-	@Override
-	public FilterOrder getOrder() {
-		return order;
-	}
+    @Override
+    public FilterOrder getOrder() {
+        return order;
+    }
 }

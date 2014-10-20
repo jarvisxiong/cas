@@ -29,40 +29,40 @@ import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 @PrepareForTest({CasConfigUtil.class, ConfigurationConverter.class})
 public class ServletGetServerConfigTest {
 
-	private Map<String, List<String>> createMapFromStringPair(final String key, final String value) {
-		final Map<String, List<String>> params = new HashMap<>();
-		params.put(key, Arrays.asList(value));
-		return params;
-	}
+    private Map<String, List<String>> createMapFromStringPair(final String key, final String value) {
+        final Map<String, List<String>> params = new HashMap<>();
+        params.put(key, Arrays.asList(value));
+        return params;
+    }
 
-	@Test
-	public void testHandleRequest() throws Exception {
-		final String key = "key";
-		final String response = "response";
+    @Test
+    public void testHandleRequest() throws Exception {
+        final String key = "key";
+        final String response = "response";
 
-		mockStatic(CasConfigUtil.class);
-		mockStatic(ConfigurationConverter.class);
+        mockStatic(CasConfigUtil.class);
+        mockStatic(ConfigurationConverter.class);
 
-		final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-		final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+        final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+        final ResponseSender mockResponseSender = createMock(ResponseSender.class);
 
-		expect(CasConfigUtil.getServerConfig()).andReturn(null).times(1);
-		expect(ConfigurationConverter.getMap(null)).andReturn(createMapFromStringPair(key, response)).times(1);
-		mockResponseSender.sendResponse("{\"" + key + "\":[\"" + response + "\"]}", null);
-		expectLastCall().times(1);
+        expect(CasConfigUtil.getServerConfig()).andReturn(null).times(1);
+        expect(ConfigurationConverter.getMap(null)).andReturn(createMapFromStringPair(key, response)).times(1);
+        mockResponseSender.sendResponse("{\"" + key + "\":[\"" + response + "\"]}", null);
+        expectLastCall().times(1);
 
-		replayAll();
-		mockHttpRequestHandler.responseSender = mockResponseSender;
+        replayAll();
+        mockHttpRequestHandler.responseSender = mockResponseSender;
 
-		final ServletGetServerConfig tested = new ServletGetServerConfig();
-		tested.handleRequest(mockHttpRequestHandler, null, null);
+        final ServletGetServerConfig tested = new ServletGetServerConfig();
+        tested.handleRequest(mockHttpRequestHandler, null, null);
 
-		verifyAll();
-	}
+        verifyAll();
+    }
 
-	@Test
-	public void testGetName() throws Exception {
-		final ServletGetServerConfig tested = new ServletGetServerConfig();
-		assertThat(tested.getName(), is(IsEqual.equalTo("getServerConfig")));
-	}
+    @Test
+    public void testGetName() throws Exception {
+        final ServletGetServerConfig tested = new ServletGetServerConfig();
+        assertThat(tested.getName(), is(IsEqual.equalTo("getServerConfig")));
+    }
 }

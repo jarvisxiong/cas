@@ -11,36 +11,36 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @RunWith(PowerMockRunner.class)
 public class IABCountriesMapTest {
 
-	@Test
-	public void testGetIabCountryNull() throws Exception {
-		final IABCountriesMap tested = new IABCountriesMap();
-		assertThat(tested.getIabCountry(null), is(equalTo(null)));
-	}
+    @Test
+    public void testGetIabCountryNull() throws Exception {
+        final IABCountriesMap tested = new IABCountriesMap();
+        assertThat(tested.getIabCountry(null), is(equalTo(null)));
+    }
 
-	@Test
-	public void testGetIabCountryFound() throws Exception {
-		final String country = "GS";
-		final String expectedIabMapping = "SGS";
+    @Test
+    public void testGetIabCountryFound() throws Exception {
+        final String country = "GS";
+        final String expectedIabMapping = "SGS";
 
-		final IABCountriesMap tested = new IABCountriesMap();
-		assertThat(tested.getIabCountry(country), is(equalTo(expectedIabMapping)));
-	}
+        final IABCountriesMap tested = new IABCountriesMap();
+        assertThat(tested.getIabCountry(country), is(equalTo(expectedIabMapping)));
+    }
 
-	@Test
-	public void testGetIabCountryNotFound() throws Exception {
-		final String country = "Sealand";
-		final String expectedIabMapping = null;
+    @Test
+    public void testGetIabCountryNotFound() throws Exception {
+        final String country = "Sealand";
+        final String expectedIabMapping = null;
 
-		final IABCountriesMap tested = new IABCountriesMap();
-		assertThat(tested.getIabCountry(country), is(equalTo(expectedIabMapping)));
-	}
+        final IABCountriesMap tested = new IABCountriesMap();
+        assertThat(tested.getIabCountry(country), is(equalTo(expectedIabMapping)));
+    }
 
-	@Test
-	public void testGetIabCountryLowerCase() throws Exception {
-		final String country = "gs";
-		final String expectedIabMapping = "SGS";
+    @Test
+    public void testGetIabCountryLowerCase() throws Exception {
+        final String country = "gs";
+        final String expectedIabMapping = "SGS";
 
-		final IABCountriesMap tested = new IABCountriesMap();
-		assertThat(tested.getIabCountry(country), is(equalTo(expectedIabMapping)));
-	}
+        final IABCountriesMap tested = new IABCountriesMap();
+        assertThat(tested.getIabCountry(country), is(equalTo(expectedIabMapping)));
+    }
 }

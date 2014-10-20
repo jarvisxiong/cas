@@ -9,15 +9,15 @@ import com.inmobi.casthrift.DemandSourceType;
 
 public interface AuctionFilter extends ChannelSegmentFilter {
 
-	/**
-	 * @param channelSegments
-	 * @param casInternalRequestParameters
-	 */
-	void filter(final List<ChannelSegment> channelSegments,
-			final CasInternalRequestParameters casInternalRequestParameters);
+    /**
+     * @param channelSegments
+     * @param casInternalRequestParameters
+     */
+    void filter(final List<ChannelSegment> channelSegments,
+            final CasInternalRequestParameters casInternalRequestParameters);
 
-	boolean isApplicable(final String advertiserId);
+    boolean isApplicable(final String advertiserId);
 
-	boolean isApplicable(final DemandSourceType dst);
+    boolean isApplicable(final DemandSourceType dst);
 
 }

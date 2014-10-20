@@ -21,24 +21,24 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
  */
 @Singleton
 public class AdGroupDailyImpressionCountFilter extends AbstractAdGroupLevelFilter {
-	private static final Logger LOG = LoggerFactory.getLogger(AdGroupTimeOfDayTargetingFilter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AdGroupTimeOfDayTargetingFilter.class);
 
-	/**
-	 * @param traceMarkerProvider
-	 */
-	@Inject
-	protected AdGroupDailyImpressionCountFilter(final Provider<Marker> traceMarkerProvider) {
-		super(traceMarkerProvider, InspectorStrings.DROPPED_IN_DAILY_IMP_COUNT_FILTER);
+    /**
+     * @param traceMarkerProvider
+     */
+    @Inject
+    protected AdGroupDailyImpressionCountFilter(final Provider<Marker> traceMarkerProvider) {
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_DAILY_IMP_COUNT_FILTER);
 
-	}
+    }
 
-	@Override
-	protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
-			final CasContext casContext) {
+    @Override
+    protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
+            final CasContext casContext) {
 
-		return channelSegment.getChannelSegmentFeedbackEntity().getTodayImpressions() > channelSegment
-				.getChannelSegmentEntity().getImpressionCeil();
+        return channelSegment.getChannelSegmentFeedbackEntity().getTodayImpressions() > channelSegment
+                .getChannelSegmentEntity().getImpressionCeil();
 
-	}
+    }
 
 }

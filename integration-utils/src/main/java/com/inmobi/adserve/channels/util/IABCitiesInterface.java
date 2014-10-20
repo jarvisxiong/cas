@@ -7,11 +7,11 @@ package com.inmobi.adserve.channels.util;
  */
 public interface IABCitiesInterface {
 
-	/**
-	 * Maps inmobi cities to IAB cities.
-	 * 
-	 * @param City .
-	 * @return IAB city.
-	 */
-	String getIABCity(final String city);
+    /**
+     * Maps inmobi cities to IAB cities.
+     * 
+     * @param City .
+     * @return IAB city.
+     */
+    String getIABCity(final String city);
 }

@@ -45,75 +45,75 @@ import com.inmobi.template.module.TemplateModule;
  */
 public class ServerModule extends AbstractModule {
 
-	private final Configuration loggerConfiguration;
-	private final RepositoryHelper repositoryHelper;
-	private final Reflections reflections;
-	private final Configuration adapterConfiguration;
-	private final Configuration serverConfiguration;
-	private final Configuration rtbConfiguration;
+    private final Configuration loggerConfiguration;
+    private final RepositoryHelper repositoryHelper;
+    private final Reflections reflections;
+    private final Configuration adapterConfiguration;
+    private final Configuration serverConfiguration;
+    private final Configuration rtbConfiguration;
 
-	public ServerModule(final ConfigurationLoader configurationLoader, final RepositoryHelper repositoryHelper) {
-		loggerConfiguration = configurationLoader.getLoggerConfiguration();
-		adapterConfiguration = configurationLoader.getAdapterConfiguration();
-		serverConfiguration = configurationLoader.getServerConfiguration();
-		rtbConfiguration = configurationLoader.getRtbConfiguration();
-		this.repositoryHelper = repositoryHelper;
-		reflections = new Reflections("com.inmobi.adserve.channels", new TypeAnnotationsScanner());
-	}
+    public ServerModule(final ConfigurationLoader configurationLoader, final RepositoryHelper repositoryHelper) {
+        loggerConfiguration = configurationLoader.getLoggerConfiguration();
+        adapterConfiguration = configurationLoader.getAdapterConfiguration();
+        serverConfiguration = configurationLoader.getServerConfiguration();
+        rtbConfiguration = configurationLoader.getRtbConfiguration();
+        this.repositoryHelper = repositoryHelper;
+        reflections = new Reflections("com.inmobi.adserve.channels", new TypeAnnotationsScanner());
+    }
 
-	@Override
-	protected void configure() {
+    @Override
+    protected void configure() {
 
-		configureApplicationLogger();
+        configureApplicationLogger();
 
-		bind(RepositoryHelper.class).toInstance(repositoryHelper);
-		bind(MatchSegments.class).asEagerSingleton();
-		bind(Configuration.class).annotatedWith(ServerConfiguration.class).toInstance(serverConfiguration);
-		bind(Configuration.class).annotatedWith(LoggerConfiguration.class).toInstance(loggerConfiguration);
-		bind(Configuration.class).annotatedWith(RtbConfiguration.class).toInstance(rtbConfiguration);
-		bind(JaxbHelper.class).asEagerSingleton();
-		bind(DocumentBuilderHelper.class).asEagerSingleton();
+        bind(RepositoryHelper.class).toInstance(repositoryHelper);
+        bind(MatchSegments.class).asEagerSingleton();
+        bind(Configuration.class).annotatedWith(ServerConfiguration.class).toInstance(serverConfiguration);
+        bind(Configuration.class).annotatedWith(LoggerConfiguration.class).toInstance(loggerConfiguration);
+        bind(Configuration.class).annotatedWith(RtbConfiguration.class).toInstance(rtbConfiguration);
+        bind(JaxbHelper.class).asEagerSingleton();
+        bind(DocumentBuilderHelper.class).asEagerSingleton();
 
-		requestStaticInjection(BaseAdNetworkImpl.class);
-		requestStaticInjection(ChannelSegment.class);
-		requestStaticInjection(Logging.class);
-		requestStaticInjection(AuctionFilterApplier.class);
-		requestStaticInjection(AuctionEngine.class);
-		requestStaticInjection(ResponseSender.class);
+        requestStaticInjection(BaseAdNetworkImpl.class);
+        requestStaticInjection(ChannelSegment.class);
+        requestStaticInjection(Logging.class);
+        requestStaticInjection(AuctionFilterApplier.class);
+        requestStaticInjection(AuctionEngine.class);
+        requestStaticInjection(ResponseSender.class);
 
-		install(new NativeModule());
-		install(new TemplateModule());
-		install(new AdapterConfigModule(adapterConfiguration, ChannelServer.dataCentreName));
-		install(new ChannelSegmentFilterModule());
-		install(new ScopeModule());
-		install(new AuctionFilterModule());
-	}
+        install(new NativeModule());
+        install(new TemplateModule());
+        install(new AdapterConfigModule(adapterConfiguration, ChannelServer.dataCentreName));
+        install(new ChannelSegmentFilterModule());
+        install(new ScopeModule());
+        install(new AuctionFilterModule());
+    }
 
-	@Singleton
-	@Provides
-	Map<String, Servlet> provideServletMap(final Injector injector) {
+    @Singleton
+    @Provides
+    Map<String, Servlet> provideServletMap(final Injector injector) {
 
-		final Map<String, Servlet> pathToServletMap = Maps.newHashMap();
+        final Map<String, Servlet> pathToServletMap = Maps.newHashMap();
 
-		final Set<Class<?>> classes = reflections.getTypesAnnotatedWith(Path.class);
+        final Set<Class<?>> classes = reflections.getTypesAnnotatedWith(Path.class);
 
-		for (final Class<?> class1 : classes) {
-			pathToServletMap.put(class1.getAnnotation(Path.class).value(), (Servlet) injector.getInstance(class1));
-		}
-		return pathToServletMap;
-	}
+        for (final Class<?> class1 : classes) {
+            pathToServletMap.put(class1.getAnnotation(Path.class).value(), (Servlet) injector.getInstance(class1));
+        }
+        return pathToServletMap;
+    }
 
-	private void configureApplicationLogger() {
-		final LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-		final JoranConfigurator configurator = new JoranConfigurator();
-		configurator.setContext(lc);
-		lc.reset();
+    private void configureApplicationLogger() {
+        final LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+        final JoranConfigurator configurator = new JoranConfigurator();
+        configurator.setContext(lc);
+        lc.reset();
 
-		try {
-			configurator.doConfigure(loggerConfiguration.getString("slf4jLoggerConf"));
-		} catch (final JoranException e) {
-			throw new RuntimeException(e);
-		}
-	}
+        try {
+            configurator.doConfigure(loggerConfiguration.getString("slf4jLoggerConf"));
+        } catch (final JoranException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }

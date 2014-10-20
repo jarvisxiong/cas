@@ -12,15 +12,15 @@ import com.google.inject.Provider;
  */
 public class TestScopeModule extends AbstractModule {
 
-	@Override
-	protected void configure() {
-		bind(Marker.class).toProvider(new Provider<Marker>() {
-			@Override
-			public Marker get() {
-				return null;
-			}
-		});
+    @Override
+    protected void configure() {
+        bind(Marker.class).toProvider(new Provider<Marker>() {
+            @Override
+            public Marker get() {
+                return null;
+            }
+        });
 
-	}
+    }
 
 }
