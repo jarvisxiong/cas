@@ -296,7 +296,7 @@ pilot:
       mondemand_port:
          - '12555'
       log_type :
-         - 'DEBUG'
+         - 'ERROR'
       debug_log_type :
          - 'INFO'
       graphite_host :
@@ -349,7 +349,7 @@ pilot:
       mondemand_port:
          - '12555'
       log_type :
-         - 'DEBUG'
+         - 'ERROR'
       debug_log_type :
          - 'INFO'
       graphite_host :
@@ -402,7 +402,7 @@ pilot:
       mondemand_port:
          - '12555'
       log_type :
-         - 'DEBUG'
+         - 'ERROR'
       debug_log_type :
          - 'INFO'
       graphite_host :
@@ -455,7 +455,7 @@ pilot:
       mondemand_port:
          - '12555'
       log_type :
-         - 'DEBUG'
+         - 'ERROR'
       debug_log_type :
          - 'INFO'
       graphite_host :
@@ -508,7 +508,7 @@ pilot:
       mondemand_port:
          - '12555'
       log_type :
-         - 'DEBUG'
+         - 'ERROR'
       debug_log_type :
          - 'INFO'
       graphite_host :
@@ -560,7 +560,7 @@ nonprod:
       mondemand_port:
          - '12555'
       log_type :
-         - 'DEBUG'
+         - 'ERROR'
    corp:
       db_host:
          - db.corp.inmobi.com
@@ -587,7 +587,7 @@ nonprod:
       mondemand_port:
          - '12555'
       log_type :
-         - 'DEBUG'
+         - 'ERROR'
       debug_log_type :
          - 'INFO'
       graphite_host :
@@ -640,7 +640,7 @@ nonprod:
       mondemand_port:
          - '12555'
       log_type :
-         - 'DEBUG'
+         - 'ERROR'
       debug_log_type :
          - 'INFO'
       graphite_host :
