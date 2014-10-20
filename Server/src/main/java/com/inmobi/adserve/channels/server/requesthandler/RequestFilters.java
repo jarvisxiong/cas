@@ -2,7 +2,6 @@ package com.inmobi.adserve.channels.server.requesthandler;
 
 import java.util.ArrayList;
 
-import com.inmobi.casthrift.DemandSourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,6 +9,7 @@ import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.casthrift.DemandSourceType;
 
 
 public class RequestFilters {
@@ -50,7 +50,8 @@ public class RequestFilters {
 
         if (!hrh.responseSender.sasParams.getAllowBannerAds()) {
             LOG.error("Request not being served because of banner not allowed.");
-            InspectorStats.incrementStatCount(InspectorStrings.DROPPED_IN_BANNER_NOT_ALLOWED_FILTER, InspectorStrings.COUNT);
+            InspectorStats.incrementStatCount(InspectorStrings.DROPPED_IN_BANNER_NOT_ALLOWED_FILTER,
+                    InspectorStrings.COUNT);
             return true;
         }
 
@@ -61,13 +62,12 @@ public class RequestFilters {
             InspectorStats.incrementStatCount(InspectorStrings.INCOMPATIBLE_SITE_TYPE, InspectorStrings.COUNT);
             return true;
         }
-        String tempSdkVersion = hrh.responseSender.sasParams.getSdkVersion();
+        final String tempSdkVersion = hrh.responseSender.sasParams.getSdkVersion();
 
         if (null != tempSdkVersion) {
             try {
-                if (("i".equalsIgnoreCase(tempSdkVersion.substring(0, 1))
-                        || "a".equalsIgnoreCase(tempSdkVersion.substring(0, 1)))
-                        && Integer.parseInt(tempSdkVersion.substring(1, 2)) < 3) {
+                if (("i".equalsIgnoreCase(tempSdkVersion.substring(0, 1)) || "a".equalsIgnoreCase(tempSdkVersion
+                        .substring(0, 1))) && Integer.parseInt(tempSdkVersion.substring(1, 2)) < 3) {
                     LOG.error("Terminating request as sdkVersion is less than 3");
                     hrh.setTerminationReason(CasConfigUtil.LOW_SDK_VERSION);
                     InspectorStats.incrementStatCount(InspectorStrings.LOW_SDK_VERSION, InspectorStrings.COUNT);
@@ -75,9 +75,9 @@ public class RequestFilters {
                 } else {
                     LOG.debug("sdk-version : {}", tempSdkVersion);
                 }
-            } catch (StringIndexOutOfBoundsException exception) {
+            } catch (final StringIndexOutOfBoundsException exception) {
                 LOG.error("Invalid sdk-version, Exception raised {}", exception);
-            } catch (NumberFormatException exception) {
+            } catch (final NumberFormatException exception) {
                 LOG.error("Invalid sdk-version, Exception raised {}", exception);
             }
 

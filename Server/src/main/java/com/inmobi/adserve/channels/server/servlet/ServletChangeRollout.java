@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -28,9 +27,9 @@ public class ServletChangeRollout implements Servlet {
             final Channel serverChannel) throws Exception {
         Integer percentRollout;
         try {
-            List<String> rollout = queryStringDecoder.parameters().get("percentRollout");
+            final List<String> rollout = queryStringDecoder.parameters().get("percentRollout");
             percentRollout = Integer.parseInt(rollout.get(0));
-        } catch (NumberFormatException ex) {
+        } catch (final NumberFormatException ex) {
             LOG.info("invalid attempt to change rollout percentage {}", ex);
             hrh.responseSender.sendResponse("INVALIDPERCENT", serverChannel);
             return;

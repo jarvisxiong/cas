@@ -1,5 +1,17 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
+
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.ws.rs.Path;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
@@ -14,35 +26,28 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.Adve
 import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.QueryStringDecoder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
-import javax.inject.Inject;
-import javax.ws.rs.Path;
-import java.util.List;
 
 
 @Singleton
 @Path("/backfill")
 public class ServletBackFill extends BaseServlet {
-    private static final Logger               LOG = LoggerFactory.getLogger(ServletBackFill.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ServletBackFill.class);
 
-    
+
     @Inject
     public ServletBackFill(final Provider<Marker> traceMarkerProvider, final MatchSegments matchSegments,
             final RequestFilters requestFilters, final ChannelSegmentFilterApplier channelSegmentFilterApplier,
-            final CasUtils casUtils, final AsyncRequestMaker asyncRequestMaker, @DcpAndRtbdAdvertiserLevelFilters final List<AdvertiserLevelFilter> advertiserLevelFilters,
-    		@DcpAndRtbAdGroupLevelFilters final List<AdGroupLevelFilter> adGroupLevelFilters) {
-    	super(matchSegments, traceMarkerProvider, channelSegmentFilterApplier, casUtils, requestFilters, asyncRequestMaker, advertiserLevelFilters, adGroupLevelFilters);
+            final CasUtils casUtils, final AsyncRequestMaker asyncRequestMaker,
+            @DcpAndRtbdAdvertiserLevelFilters final List<AdvertiserLevelFilter> advertiserLevelFilters,
+            @DcpAndRtbAdGroupLevelFilters final List<AdGroupLevelFilter> adGroupLevelFilters) {
+        super(matchSegments, traceMarkerProvider, channelSegmentFilterApplier, casUtils, requestFilters,
+                asyncRequestMaker, advertiserLevelFilters, adGroupLevelFilters);
     }
 
     @Override
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
             final Channel serverChannel) throws Exception {
-        Marker traceMarker = traceMarkerProvider.get();
+        final Marker traceMarker = traceMarkerProvider.get();
         LOG.debug(traceMarker, "Inside Servlet {}", this.getClass().getSimpleName());
         InspectorStats.incrementStatCount(InspectorStrings.BACK_FILL_REQUESTS);
         super.handleRequest(hrh, queryStringDecoder, serverChannel);
@@ -53,8 +58,8 @@ public class ServletBackFill extends BaseServlet {
         return "BackFill";
     }
 
-	@Override
-	protected Logger getLogger() {
-		return LOG;
-	}
+    @Override
+    protected Logger getLogger() {
+        return LOG;
+    }
 }

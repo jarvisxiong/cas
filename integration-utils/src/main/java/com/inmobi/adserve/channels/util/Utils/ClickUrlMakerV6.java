@@ -1,18 +1,20 @@
 package com.inmobi.adserve.channels.util.Utils;
 
-import com.google.gson.Gson;
+import java.util.Map;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
+import com.google.gson.Gson;
 
 /**
- *
+ * 
  * @author devi.chand@inmobi.com
  */
 
@@ -22,59 +24,61 @@ public class ClickUrlMakerV6 {
     private static final Logger LOG = LoggerFactory.getLogger(ClickUrlMakerV6.class);
 
 
-    private static final String       DEFAULT_UDID_VALUE                            = "x";
-    private static final String       URLPATHSEP                                    = "/";
-    private static final String       URLVERSIONINITSTR                             = "/C";
-    private static final String       URLMARKERCPC                                  = "/t";
-    private static final String       URLMARKERCPM                                  = "/b";
-    private static final String       DEFAULTIMSDK                                  = "-1";
-    private static final String       CLICK                                         = "1";
-    private static final String       BEACON                                        = "0";
-    private static final String       IS_TEST                                       = "1";
-    private static final String       IS_NOT_TEST                                   = "0";
-    private static final String       RTB_SUPPLY                                    = "rtb";
-    private static final String       NON_RTB_SUPPLY                                = "nw";
-    private static final Long         CLICK_URL_HASHING_SECRET_KEY_VERSION          = (long) 1;
-    private static final String       CLICK_URL_HASHING_SECRET_KEY_VERSION_BASE_36  = getIdBase36(CLICK_URL_HASHING_SECRET_KEY_VERSION);
-    private static final Long         CLICK_URL_HASHING_SECRET_KEY_TEST_MODE_VERSION = (long) 2;
-    private static final String       CLICK_URL_HASHING_SECRET_KEY_TEST_MODE_VERSION_BASE_36 = getIdBase36(CLICK_URL_HASHING_SECRET_KEY_TEST_MODE_VERSION);
+    private static final String DEFAULT_UDID_VALUE = "x";
+    private static final String URLPATHSEP = "/";
+    private static final String URLVERSIONINITSTR = "/C";
+    private static final String URLMARKERCPC = "/t";
+    private static final String URLMARKERCPM = "/b";
+    private static final String DEFAULTIMSDK = "-1";
+    private static final String CLICK = "1";
+    private static final String BEACON = "0";
+    private static final String IS_TEST = "1";
+    private static final String IS_NOT_TEST = "0";
+    private static final String RTB_SUPPLY = "rtb";
+    private static final String NON_RTB_SUPPLY = "nw";
+    private static final Long CLICK_URL_HASHING_SECRET_KEY_VERSION = (long) 1;
+    private static final String CLICK_URL_HASHING_SECRET_KEY_VERSION_BASE_36 =
+            getIdBase36(CLICK_URL_HASHING_SECRET_KEY_VERSION);
+    private static final Long CLICK_URL_HASHING_SECRET_KEY_TEST_MODE_VERSION = (long) 2;
+    private static final String CLICK_URL_HASHING_SECRET_KEY_TEST_MODE_VERSION_BASE_36 =
+            getIdBase36(CLICK_URL_HASHING_SECRET_KEY_TEST_MODE_VERSION);
     @Getter
-    private String                    beaconUrl;
+    private String beaconUrl;
     @Getter
-    private String                    clickUrl;
+    private String clickUrl;
 
-    private final Map<String, String> udIdVal;                                                                                             // Uppercase
-    private final String              testCryptoSecretKey;
-    private final String              cryptoSecretKey;
-    private final String              rmBeaconURLPrefix;
-    private final String              imageBeaconURLPrefix;
-    private final Integer             segmentId;
-    private final String              clickURLPrefix;
-    private final String              imSdk;
-    private final String              impressionId;
-    private final boolean             isRmAd;
-    private final Boolean             isBillableDemog;
-    private final boolean             isCPC;
-    private final Long                siteIncId;
-    private final Long                handsetInternalId;
-    private final Long                ipFileVersion;
-    private final int                 carrierId;
-    private final int                 countryId;
-    private final String              gender;
-    private final int                 age;
-    private final int                 location;
-    private final boolean             testMode;
-    private final boolean             isBeaconEnabledOnSite;
-    private final boolean             imageBeaconFlag;
-    private final String              tierInfo;
-    private final boolean             isTestRequest;
-    private final String              latlonval;
-    private final boolean             isRtbSite;
-    private final String              creativeId;
-    private final String              budgetBucketId;
-    private final String              dst;
+    private final Map<String, String> udIdVal; // Uppercase
+    private final String testCryptoSecretKey;
+    private final String cryptoSecretKey;
+    private final String rmBeaconURLPrefix;
+    private final String imageBeaconURLPrefix;
+    private final Integer segmentId;
+    private final String clickURLPrefix;
+    private final String imSdk;
+    private final String impressionId;
+    private final boolean isRmAd;
+    private final Boolean isBillableDemog;
+    private final boolean isCPC;
+    private final Long siteIncId;
+    private final Long handsetInternalId;
+    private final Long ipFileVersion;
+    private final int carrierId;
+    private final int countryId;
+    private final String gender;
+    private final int age;
+    private final int location;
+    private final boolean testMode;
+    private final boolean isBeaconEnabledOnSite;
+    private final boolean imageBeaconFlag;
+    private final String tierInfo;
+    private final boolean isTestRequest;
+    private final String latlonval;
+    private final boolean isRtbSite;
+    private final String creativeId;
+    private final String budgetBucketId;
+    private final String dst;
 
-    public ClickUrlMakerV6(Builder builder) {
+    public ClickUrlMakerV6(final Builder builder) {
         udIdVal = builder.udIdVal;
         testCryptoSecretKey = builder.testCryptoSecretKey;
         cryptoSecretKey = builder.cryptoSecretKey;
@@ -142,39 +146,39 @@ public class ClickUrlMakerV6 {
     @Setter
     public static class Builder {
         private Map<String, String> udIdVal;
-        private String              testCryptoSecretKey;
-        private String              cryptoSecretKey;
-        private String              rmBeaconURLPrefix;
-        private String              imageBeaconURLPrefix;
-        private Integer             segmentId;
-        private String              clickURLPrefix;
-        private String              imSdk;
-        private String              impressionId;
-        private boolean             isRmAd;
-        private Boolean             isBillableDemog;
-        private boolean             isCPC;
-        private Long                siteIncId;
-        private Long                handsetInternalId;
-        private Long                ipFileVersion;
-        private int                 carrierId;
-        private int                 countryId;
-        private String              gender;
-        private int                 age;
-        private int                 location;
-        private boolean             testMode;
-        private boolean             isBeaconEnabledOnSite;
-        private boolean             imageBeaconFlag;
-        private String              tierInfo;
-        private boolean             isTestRequest;
-        private String              latlonval;
-        private boolean             isRtbSite;
-        private String              creativeId;
-        private String              budgetBucketId;
-        private String              dst;
+        private String testCryptoSecretKey;
+        private String cryptoSecretKey;
+        private String rmBeaconURLPrefix;
+        private String imageBeaconURLPrefix;
+        private Integer segmentId;
+        private String clickURLPrefix;
+        private String imSdk;
+        private String impressionId;
+        private boolean isRmAd;
+        private Boolean isBillableDemog;
+        private boolean isCPC;
+        private Long siteIncId;
+        private Long handsetInternalId;
+        private Long ipFileVersion;
+        private int carrierId;
+        private int countryId;
+        private String gender;
+        private int age;
+        private int location;
+        private boolean testMode;
+        private boolean isBeaconEnabledOnSite;
+        private boolean imageBeaconFlag;
+        private String tierInfo;
+        private boolean isTestRequest;
+        private String latlonval;
+        private boolean isRtbSite;
+        private String creativeId;
+        private String budgetBucketId;
+        private String dst;
     }
 
     public void createClickUrls() {
-        StringBuilder adUrlSuffix = new StringBuilder(100);
+        final StringBuilder adUrlSuffix = new StringBuilder(100);
         // 1st URL component: url format version info
         adUrlSuffix.append(URLVERSIONINITSTR);
         // 2nd URL component: CPC/CPM information
@@ -292,7 +296,8 @@ public class ClickUrlMakerV6 {
         CryptoHashGenerator cryptoHashGenerator;
         if (testMode) {
             adUrlSuffix.append(appendSeparator(ClickUrlMakerV6.CLICK_URL_HASHING_SECRET_KEY_TEST_MODE_VERSION_BASE_36));
-            beaconUrlSuffix.append(appendSeparator(ClickUrlMakerV6.CLICK_URL_HASHING_SECRET_KEY_TEST_MODE_VERSION_BASE_36));
+            beaconUrlSuffix
+                    .append(appendSeparator(ClickUrlMakerV6.CLICK_URL_HASHING_SECRET_KEY_TEST_MODE_VERSION_BASE_36));
             cryptoHashGenerator = new CryptoHashGenerator(testCryptoSecretKey);
         } else {
             adUrlSuffix.append(appendSeparator(ClickUrlMakerV6.CLICK_URL_HASHING_SECRET_KEY_VERSION_BASE_36));
@@ -302,45 +307,45 @@ public class ClickUrlMakerV6 {
         adUrlSuffix.append(appendSeparator(cryptoHashGenerator.generateHash(adUrlSuffix.toString())));
         beaconUrlSuffix.append(appendSeparator(cryptoHashGenerator.generateHash(beaconUrlSuffix.toString())));
         if (null != clickURLPrefix) {
-            clickUrl = this.clickURLPrefix + adUrlSuffix.toString();
+            clickUrl = clickURLPrefix + adUrlSuffix.toString();
         }
 
         if (isRmAd) {
             if (null != rmBeaconURLPrefix) {
-                beaconUrl = this.rmBeaconURLPrefix + beaconUrlSuffix.toString();
+                beaconUrl = rmBeaconURLPrefix + beaconUrlSuffix.toString();
             }
             return;
         }
 
-        if (this.imageBeaconFlag || isBeaconEnabledOnSite) {
+        if (imageBeaconFlag || isBeaconEnabledOnSite) {
             if (null != imageBeaconURLPrefix) {
-                beaconUrl = this.imageBeaconURLPrefix + beaconUrlSuffix.toString();
+                beaconUrl = imageBeaconURLPrefix + beaconUrlSuffix.toString();
             }
         }
     }
 
-    public static String getIdBase36(Long id) {
+    public static String getIdBase36(final Long id) {
         return Long.toString(id, 36);
     }
 
-    public static String getIdBase36(int id) {
+    public static String getIdBase36(final int id) {
         return Integer.toString(id, 36);
     }
 
-    public String getCarrierIdBase36(int carrierId, int countryId) {
+    public String getCarrierIdBase36(final int carrierId, final int countryId) {
         return Long.toString(carrierId != 0 ? carrierId : -countryId, 36);
     }
 
-    public String getEncodedJson(Map<String, String> clickUidMap) {
-        Gson gson = new Gson();
+    public String getEncodedJson(final Map<String, String> clickUidMap) {
+        final Gson gson = new Gson();
         String temp = gson.toJson(clickUidMap);
-        byte[] unEncoded = temp.getBytes();
-        String encoded = new String(Base64.encodeBase64(unEncoded));
+        final byte[] unEncoded = temp.getBytes();
+        final String encoded = new String(Base64.encodeBase64(unEncoded));
         temp = encoded.replaceAll("\\+", "-").replaceAll("\\/", "_").replaceAll("=", "~");
         return temp;
     }
 
-    private String appendSeparator(String parameter) {
-        return (URLPATHSEP + parameter);
+    private String appendSeparator(final String parameter) {
+        return URLPATHSEP + parameter;
     }
 }

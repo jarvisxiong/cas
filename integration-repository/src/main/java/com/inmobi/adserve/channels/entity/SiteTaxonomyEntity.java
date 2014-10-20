@@ -1,8 +1,9 @@
 package com.inmobi.adserve.channels.entity;
 
-import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 
 
 @Data
@@ -11,11 +12,11 @@ public class SiteTaxonomyEntity implements IdentifiableEntity<String> {
 
     private static final long serialVersionUID = 1L;
 
-    private String            id;
-    private String            name;
-    private String            parentId;
+    private String id;
+    private String name;
+    private String parentId;
 
-    public SiteTaxonomyEntity(String id, String name, String parentId) {
+    public SiteTaxonomyEntity(final String id, final String name, final String parentId) {
         super();
         this.id = id;
         this.name = name;

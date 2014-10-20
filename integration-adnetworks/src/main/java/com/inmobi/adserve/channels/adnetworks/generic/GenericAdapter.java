@@ -36,12 +36,12 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 
 public class GenericAdapter extends BaseAdNetworkImpl {
 
-    private static final Logger LOG            = LoggerFactory.getLogger(GenericAdapter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GenericAdapter.class);
 
-    private String              advertiserName = "";
+    private String advertiserName = "";
     private final Configuration config;
-    private String              requestMethod  = "";
-    private String              responseFormat = "";
+    private String requestMethod = "";
+    private String responseFormat = "";
 
     public GenericAdapter(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String advertiserName) {
@@ -49,11 +49,11 @@ public class GenericAdapter extends BaseAdNetworkImpl {
         this.config = config;
         this.clientBootstrap = clientBootstrap;
         this.advertiserName = advertiserName;
-        this.host = config.getString(advertiserName.concat(MacrosAndStrings.HOST));
+        host = config.getString(advertiserName.concat(MacrosAndStrings.HOST));
         // get or post
-        this.requestMethod = config.getString(advertiserName.concat(MacrosAndStrings.REQUEST_METHOD));
+        requestMethod = config.getString(advertiserName.concat(MacrosAndStrings.REQUEST_METHOD));
         // html or json
-        this.responseFormat = config.getString(advertiserName.concat(MacrosAndStrings.RESPONSE_FORMAT));
+        responseFormat = config.getString(advertiserName.concat(MacrosAndStrings.RESPONSE_FORMAT));
     }
 
     @Override
@@ -67,8 +67,8 @@ public class GenericAdapter extends BaseAdNetworkImpl {
 
     // checking if any of the mandatory parameter is absent
     public boolean isMandateParamAbsent() {
-        String mandateParams = config.getString(advertiserName.concat(MacrosAndStrings.MANDATORY_PARAMETERS));
-        String[] listParams = mandateParams.split("&");
+        final String mandateParams = config.getString(advertiserName.concat(MacrosAndStrings.MANDATORY_PARAMETERS));
+        final String[] listParams = mandateParams.split("&");
         for (int i = 0; i < listParams.length; i++) {
             if (StringUtils.isBlank(expandMacro(listParams[i]))) {
                 return true;
@@ -109,8 +109,8 @@ public class GenericAdapter extends BaseAdNetworkImpl {
         }
         LOG.debug(traceMarker, "url inside{} : {}", advertiserName, finalUrl);
         try {
-            return (new URI(finalUrl));
-        } catch (URISyntaxException exception) {
+            return new URI(finalUrl);
+        } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.info(traceMarker, "Error Forming Url inside {} {}", advertiserName, exception);
         }
@@ -118,14 +118,14 @@ public class GenericAdapter extends BaseAdNetworkImpl {
     }
 
     public String getRequestParams() {
-        StringBuilder requestParams = new StringBuilder(config.getString(advertiserName
-                + MacrosAndStrings.REQUEST_PARAMETERS));
-        String[] urlParams = requestParams.toString().split("&");
+        final StringBuilder requestParams =
+                new StringBuilder(config.getString(advertiserName + MacrosAndStrings.REQUEST_PARAMETERS));
+        final String[] urlParams = requestParams.toString().split("&");
         requestParams.delete(0, requestParams.length());
         for (int i = 0; i < urlParams.length; i++) {
-            String[] paramValue = urlParams[i].split("=");
+            final String[] paramValue = urlParams[i].split("=");
             if (paramValue[1].startsWith("$")) {
-                String expMacro = expandMacro(paramValue[1]);
+                final String expMacro = expandMacro(paramValue[1]);
                 paramValue[1] = expMacro;
             }
             if (paramValue[1] != null) {
@@ -152,7 +152,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
                 return;
             } else {
                 try {
-                    JSONObject responseInJson = new JSONObject(response);
+                    final JSONObject responseInJson = new JSONObject(response);
                     if (responseInJson.getString(config.getString(advertiserName + MacrosAndStrings.RESPONSE_STATUS))
                             .equals(config.getString(advertiserName + MacrosAndStrings.STATUS_NO_AD))) {
                         statusCode = 500;
@@ -160,15 +160,17 @@ public class GenericAdapter extends BaseAdNetworkImpl {
                     } else {
                         statusCode = status.code();
                         adStatus = "AD";
-                        String responseWithoutImpressionUrl = responseInJson.getString(config.getString(advertiserName
-                                + MacrosAndStrings.CONTENT));
-                        String impressionUrl = responseInJson.getString(config.getString(advertiserName
-                                .concat(MacrosAndStrings.IMPRESSION_URL_FIELD)));
-                        responseContent = responseWithoutImpressionUrl.replaceAll(MacrosAndStrings.HTML_ENDING,
-                                "<img src=\"" + impressionUrl + "\" height=1 width=1 border=0 />"
+                        final String responseWithoutImpressionUrl =
+                                responseInJson.getString(config.getString(advertiserName + MacrosAndStrings.CONTENT));
+                        final String impressionUrl =
+                                responseInJson.getString(config.getString(advertiserName
+                                        .concat(MacrosAndStrings.IMPRESSION_URL_FIELD)));
+                        responseContent =
+                                responseWithoutImpressionUrl.replaceAll(MacrosAndStrings.HTML_ENDING, "<img src=\""
+                                        + impressionUrl + "\" height=1 width=1 border=0 />"
                                         + MacrosAndStrings.HTML_ENDING);
                     }
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     LOG.debug(traceMarker, "Exception in converting json object from response {}", e);
                 }
             }
@@ -183,7 +185,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
             } else {
                 statusCode = status.code();
                 adStatus = "AD";
-                StringBuilder responseBuilder = new StringBuilder();
+                final StringBuilder responseBuilder = new StringBuilder();
                 responseBuilder.append(MacrosAndStrings.HTML_STARTING);
                 responseBuilder.append(response);
                 responseBuilder.append("<img src=\"").append(beaconUrl).append("\" height=1 width=1 border=0 />");
@@ -215,7 +217,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
             return casInternalRequestParameters.getUid();
         }
         if (macro.equals(MacrosAndStrings.FORMAT)) {
-            Dimension format = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot().toString()));
+            final Dimension format = SlotSizeMapping.getDimension(Long.parseLong(sasParams.getSlot().toString()));
             if (format != null) {
                 return (int) format.getWidth() + "x" + (int) format.getHeight();
             }

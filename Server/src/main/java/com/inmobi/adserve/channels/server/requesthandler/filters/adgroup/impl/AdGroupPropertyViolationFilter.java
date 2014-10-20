@@ -1,5 +1,10 @@
 package com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl;
 
+import javax.inject.Inject;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Marker;
+
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
@@ -8,10 +13,6 @@ import com.inmobi.adserve.channels.server.beans.CasContext;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AbstractAdGroupLevelFilter;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Marker;
-
-import javax.inject.Inject;
 
 
 /**
@@ -33,11 +34,11 @@ public class AdGroupPropertyViolationFilter extends AbstractAdGroupLevelFilter {
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
             final CasContext casContext) {
 
-        ChannelSegmentEntity channelSegmentEntity = channelSegment.getChannelSegmentEntity();
+        final ChannelSegmentEntity channelSegmentEntity = channelSegment.getChannelSegmentEntity();
 
         if (channelSegmentEntity.isUdIdRequired()
-                && ((StringUtils.isEmpty(sasParams.getUidParams()) || "{}".equals(sasParams.getUidParams()))
-                && (null == sasParams.getTUidParams() || sasParams.getTUidParams().isEmpty()))) {
+                && (StringUtils.isEmpty(sasParams.getUidParams()) || "{}".equals(sasParams.getUidParams()))
+                && (null == sasParams.getTUidParams() || sasParams.getTUidParams().isEmpty())) {
             channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_UDID_FILTER);
             return true;
         }
@@ -54,7 +55,7 @@ public class AdGroupPropertyViolationFilter extends AbstractAdGroupLevelFilter {
             return true;
         }
 
-        String rqAdType = sasParams.getRqAdType();
+        final String rqAdType = sasParams.getRqAdType();
 
         if (channelSegmentEntity.isInterstitialOnly() && (rqAdType == null || !"int".equals(rqAdType))) {
             channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_ONLY_INTERSTITIAL_FILTER);

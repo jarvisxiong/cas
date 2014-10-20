@@ -1,21 +1,22 @@
 package com.inmobi.adserve.channels.util.Utils;
 
-import junit.framework.TestCase;
-import org.apache.commons.configuration.Configuration;
-import org.testng.annotations.Test;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import junit.framework.TestCase;
+
+import org.apache.commons.configuration.Configuration;
+import org.testng.annotations.Test;
 
 
 public class ClickUrlMakerV6Test extends TestCase {
 
     public void prepareMockConfig() {
-        Configuration mockConfig = createMock(Configuration.class);
+        final Configuration mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
         expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
         replay(mockConfig);
@@ -28,7 +29,7 @@ public class ClickUrlMakerV6Test extends TestCase {
 
     @Test
     public void testClickUrlMaker() {
-        ClickUrlMakerV6.Builder builder = ClickUrlMakerV6.newBuilder();
+        final ClickUrlMakerV6.Builder builder = ClickUrlMakerV6.newBuilder();
         builder.setTestMode(false);
         builder.setAge(20);
         builder.setBeaconEnabledOnSite(true);
@@ -51,12 +52,12 @@ public class ClickUrlMakerV6Test extends TestCase {
         builder.setSiteIncId((long) 1);
         builder.setHandsetInternalId((long) 1);
         builder.setBudgetBucketId("101");
-        Map<String, String> updMap = new HashMap<String, String>();
+        final Map<String, String> updMap = new HashMap<String, String>();
         updMap.put("UDID", "uidvalue");
         builder.setUdIdVal(updMap);
         builder.setIpFileVersion((long) 1);
         builder.setCryptoSecretKey("clickmaker.key.1.value");
-        ClickUrlMakerV6 clickUrlMakerV6 = new ClickUrlMakerV6(builder);
+        final ClickUrlMakerV6 clickUrlMakerV6 = new ClickUrlMakerV6(builder);
         clickUrlMakerV6.createClickUrls();
         assertEquals(
                 "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/76256371268/0/5l/-1/0/0/x/0/nw/101/1/1/bc20cfc3",

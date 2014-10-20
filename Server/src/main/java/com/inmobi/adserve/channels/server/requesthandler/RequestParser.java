@@ -1,9 +1,17 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import com.google.inject.Provider;
-import com.google.inject.Singleton;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
@@ -13,16 +21,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
-import javax.inject.Inject;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.security.MessageDigest;
-import java.util.*;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
 
 
 @Singleton
 public class RequestParser {
-    private static final Logger    LOG = LoggerFactory.getLogger(RequestParser.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RequestParser.class);
     private final Provider<Marker> traceMarkerProvider;
 
     @Inject
@@ -38,9 +45,9 @@ public class RequestParser {
     public JSONObject extractParams(final Map<String, List<String>> params, final String jsonKey) throws JSONException,
             UnsupportedEncodingException {
         if (!params.isEmpty()) {
-            List<String> values = params.get(jsonKey);
+            final List<String> values = params.get(jsonKey);
             if (CollectionUtils.isNotEmpty(values)) {
-                String stringVal = values.iterator().next();
+                final String stringVal = values.iterator().next();
                 return new JSONObject(stringVal);
             }
         }
@@ -49,7 +56,7 @@ public class RequestParser {
 
     public void parseRequestParameters(final JSONObject jObject, SASRequestParameters params,
             final CasInternalRequestParameters casInternalRequestParameters) {
-        Marker traceMarker = traceMarkerProvider.get();
+        final Marker traceMarker = traceMarkerProvider.get();
 
         LOG.debug(traceMarker, "Inside parameter parser");
         if (null == jObject) {
@@ -58,9 +65,9 @@ public class RequestParser {
             return;
         }
         params.setAllParametersJson(jObject.toString());
-        int dst = jObject.optInt("dst", 2);
-        Set<Integer> accountSegments = getAcoountSegments(jObject);
-        boolean isResponseOnlyFromDcp = jObject.optBoolean("isResponseOnlyFromDcp", false);
+        final int dst = jObject.optInt("dst", 2);
+        final Set<Integer> accountSegments = getAcoountSegments(jObject);
+        final boolean isResponseOnlyFromDcp = jObject.optBoolean("isResponseOnlyFromDcp", false);
         LOG.debug(traceMarker, "dst type is {} isResponseOnlyFromDcp  {} and account segments are {}", dst,
                 isResponseOnlyFromDcp, accountSegments);
         params.setDst(dst);
@@ -80,19 +87,19 @@ public class RequestParser {
         params.setCountryCode(parseArray(jObject, "carrier", 2));
         try {
             params.setCity(Integer.parseInt(parseArray(jObject, "carrier", 3)));
-        } catch (NumberFormatException e) {
+        } catch (final NumberFormatException e) {
             LOG.debug(traceMarker, "City not found in request");
         }
         try {
             params.setState(Integer.parseInt(parseArray(jObject, "carrier", 4)));
-        } catch (NumberFormatException e) {
+        } catch (final NumberFormatException e) {
             LOG.debug(traceMarker, "State not found in request");
         }
-        String slot = stringify(jObject, "slot-served");
+        final String slot = stringify(jObject, "slot-served");
         if (StringUtils.isNotEmpty(slot)) {
             params.setSlot(Short.parseShort(slot));
         }
-        String rqMkSlot = stringify(jObject, "rqMkAdSlot");
+        final String rqMkSlot = stringify(jObject, "rqMkAdSlot");
         if (StringUtils.isNotEmpty(rqMkSlot)) {
             params.setRqMkSlot(Arrays.asList(Short.parseShort(rqMkSlot)));
         }
@@ -128,18 +135,18 @@ public class RequestParser {
         setUserIdParams(casInternalRequestParameters, jObject);
         params = getUserParams(params, jObject);
         try {
-            JSONArray siteInfo = jObject.getJSONArray("site");
+            final JSONArray siteInfo = jObject.getJSONArray("site");
             if (siteInfo != null && siteInfo.length() > 0) {
                 params.setSiteIncId(siteInfo.getLong(0));
             }
-        } catch (JSONException exception) {
+        } catch (final JSONException exception) {
             LOG.debug(traceMarker, "site object not found in request, {}", exception);
             params.setSiteIncId(0);
         }
         try {
-            JSONArray jsonArray = jObject.getJSONArray("handset");
+            final JSONArray jsonArray = jObject.getJSONArray("handset");
             params.setHandsetInternalId(Long.parseLong(jsonArray.get(0).toString()));
-        } catch (JSONException e) {
+        } catch (final JSONException e) {
             LOG.debug(traceMarker, "Handset array not found, {}", e);
         }
         params.setOsId(jObject.optInt("os-id", -1));
@@ -150,14 +157,14 @@ public class RequestParser {
     }
 
     public String stringify(final JSONObject jObject, final String field) {
-        Marker traceMarker = traceMarkerProvider.get();
+        final Marker traceMarker = traceMarkerProvider.get();
         String fieldValue = "";
         try {
-            Object fieldValueObject = jObject.get(field);
+            final Object fieldValueObject = jObject.get(field);
             if (null != fieldValueObject) {
                 fieldValue = fieldValueObject.toString();
             }
-        } catch (JSONException e) {
+        } catch (final JSONException e) {
             LOG.debug(traceMarker, "exception {} while Stringifying {} from JSON", e, field);
             return null;
         }
@@ -166,48 +173,48 @@ public class RequestParser {
     }
 
     public String parseArray(final JSONObject jObject, final String param, final int index) {
-        Marker traceMarker = traceMarkerProvider.get();
+        final Marker traceMarker = traceMarkerProvider.get();
         if (null == jObject) {
             return null;
         }
         try {
-            JSONArray jArray = jObject.getJSONArray(param);
+            final JSONArray jArray = jObject.getJSONArray(param);
             if (null == jArray) {
                 return null;
             } else {
                 return jArray.getString(index);
             }
-        } catch (JSONException e) {
+        } catch (final JSONException e) {
             LOG.debug(traceMarker, "exception {} while parsing field at index {} from {}", e, index, jObject);
             return null;
         }
     }
 
     public List<Long> getCategory(final JSONObject jObject, final String oldORnew) {
-        Marker traceMarker = traceMarkerProvider.get();
+        final Marker traceMarker = traceMarkerProvider.get();
         try {
-            JSONArray categories = jObject.getJSONArray(oldORnew);
-            Long[] category = new Long[categories.length()];
+            final JSONArray categories = jObject.getJSONArray(oldORnew);
+            final Long[] category = new Long[categories.length()];
             for (int index = 0; index < categories.length(); index++) {
                 category[index] = categories.getLong(index);
             }
             return Arrays.asList(category);
-        } catch (JSONException e) {
+        } catch (final JSONException e) {
             LOG.debug(traceMarker, "error while reading category array {}", e);
             return null;
         }
     }
 
     public Set<Integer> getAcoountSegments(final JSONObject jObject) {
-        Marker traceMarker = traceMarkerProvider.get();
+        final Marker traceMarker = traceMarkerProvider.get();
         try {
-            JSONArray segments = jObject.optJSONArray("segments");
-            HashSet<Integer> accountSegments = new HashSet<Integer>();
+            final JSONArray segments = jObject.optJSONArray("segments");
+            final HashSet<Integer> accountSegments = new HashSet<Integer>();
             for (int index = 0; segments != null && index < segments.length(); index++) {
                 accountSegments.add(segments.getInt(index));
             }
             return accountSegments;
-        } catch (JSONException e) {
+        } catch (final JSONException e) {
             LOG.debug(traceMarker, "error while reading account segments array {}", e);
             return new HashSet<Integer>();
         }
@@ -215,11 +222,11 @@ public class RequestParser {
 
     // Get user specific params
     public SASRequestParameters getUserParams(SASRequestParameters parameter, final JSONObject jObject) {
-        Marker traceMarker = traceMarkerProvider.get();
+        final Marker traceMarker = traceMarkerProvider.get();
         LOG.debug(traceMarker, "inside parsing user params");
         try {
-            JSONObject userMap = (JSONObject) jObject.get("uparams");
-            if (null != stringify(userMap,"u-age")) {
+            final JSONObject userMap = (JSONObject) jObject.get("uparams");
+            if (null != stringify(userMap, "u-age")) {
                 parameter.setAge(Short.valueOf(stringify(userMap, "u-age")));
             }
             if (null != stringify(userMap, "u-gender")) {
@@ -229,17 +236,18 @@ public class RequestParser {
                 parameter.setPostalCode(Integer.parseInt(stringify(userMap, "u-postalcode")));
             }
             parameter = encodeParams(parameter, userMap);
-        } catch (JSONException exception) {
+        } catch (final JSONException exception) {
             LOG.debug(traceMarker, "json exception in parsing u params {}", exception);
-        } catch (NumberFormatException e) {
+        } catch (final NumberFormatException e) {
             LOG.debug(traceMarker, "number format exception in u params {}", e);
         }
         return parameter;
     }
 
-    private SASRequestParameters encodeParams(final SASRequestParameters parameter, final JSONObject userMap) throws JSONException {
-        Marker traceMarker = traceMarkerProvider.get();
-        String utf8 = "UTF-8";
+    private SASRequestParameters encodeParams(final SASRequestParameters parameter, final JSONObject userMap)
+            throws JSONException {
+        final Marker traceMarker = traceMarkerProvider.get();
+        final String utf8 = "UTF-8";
         try {
             if (null != parameter.getAge()) {
                 parameter.setAge(Short.valueOf(URLEncoder.encode(String.valueOf(parameter.getAge()), utf8)));
@@ -248,19 +256,19 @@ public class RequestParser {
                 parameter.setGender(URLEncoder.encode(parameter.getGender(), utf8));
             }
             if (null != parameter.getPostalCode()) {
-                parameter.setPostalCode(Integer.valueOf(URLEncoder.encode(
-                        String.valueOf(parameter.getPostalCode()), utf8)));
+                parameter.setPostalCode(Integer.valueOf(URLEncoder.encode(String.valueOf(parameter.getPostalCode()),
+                        utf8)));
             }
             String[] advertiserList = null;
             if (userMap.get("u-adapter") != null) {
                 advertiserList = ((String) userMap.get("u-adapter")).split(",");
             }
-            Set<String> advertiserSet = new HashSet<String>();
+            final Set<String> advertiserSet = new HashSet<String>();
             if (advertiserList != null) {
                 Collections.addAll(advertiserSet, advertiserList);
                 parameter.setUAdapters(advertiserSet);
             }
-        } catch (UnsupportedEncodingException e) {
+        } catch (final UnsupportedEncodingException e) {
             LOG.debug(traceMarker, "Error in encoding u params {}", e);
         }
         return parameter;
@@ -268,16 +276,16 @@ public class RequestParser {
 
     // Get user id params
     public void setUserIdParams(final CasInternalRequestParameters parameter, final JSONObject jObject) {
-        Marker traceMarker = traceMarkerProvider.get();
+        final Marker traceMarker = traceMarkerProvider.get();
         if (null == jObject) {
             return;
         }
         try {
-            JSONObject userIdMap = (JSONObject) jObject.get("raw-uid");
+            final JSONObject userIdMap = (JSONObject) jObject.get("raw-uid");
             if (null == userIdMap) {
                 return;
             }
-            String uid = stringify(userIdMap, "u-id");
+            final String uid = stringify(userIdMap, "u-id");
             parameter.setUid(StringUtils.isNotBlank(uid) ? uid : stringify(userIdMap, "UDID"));
             if (StringUtils.isNotBlank(parameter.getUid()) && parameter.getUid().length() != 32) {
                 parameter.setUid(MD5(parameter.getUid()));
@@ -292,21 +300,21 @@ public class RequestParser {
             parameter.setUidADT(stringify(userIdMap, "u-id-adt"));
             parameter.setUuidFromUidCookie(stringify(userIdMap, "imuc__5"));
             parameter.setUidWC(stringify(userIdMap, "WC"));
-        } catch (JSONException exception) {
+        } catch (final JSONException exception) {
             LOG.debug(traceMarker, "Error in extracting userid params, {}", exception);
         }
     }
 
     public String MD5(final String md5) {
         try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] array = md.digest(md5.getBytes());
-            StringBuffer sb = new StringBuffer();
-            for (byte anArray : array) {
-                sb.append(Integer.toHexString((anArray & 0xFF) | 0x100).substring(1, 3));
+            final MessageDigest md = MessageDigest.getInstance("MD5");
+            final byte[] array = md.digest(md5.getBytes());
+            final StringBuffer sb = new StringBuffer();
+            for (final byte anArray : array) {
+                sb.append(Integer.toHexString(anArray & 0xFF | 0x100).substring(1, 3));
             }
             return sb.toString();
-        } catch (java.security.NoSuchAlgorithmException ignored) {
+        } catch (final java.security.NoSuchAlgorithmException ignored) {
             LOG.debug("Exception {} raised with String {} in MD5", ignored, md5);
         }
         return null;

@@ -1,5 +1,38 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import static com.inmobi.casthrift.DemandSourceType.DCP;
+import static com.inmobi.casthrift.DemandSourceType.IX;
+import static com.inmobi.casthrift.DemandSourceType.RTBD;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
+import io.netty.util.CharsetUtil;
+
+import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import javax.inject.Inject;
+
+import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
 import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.inject.Provider;
@@ -31,35 +64,6 @@ import com.inmobi.commons.security.util.exception.InvalidMessageException;
 import com.inmobi.types.AdIdChain;
 import com.inmobi.types.GUID;
 import com.inmobi.types.PricingModel;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
-import io.netty.util.CharsetUtil;
-import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.json.JSONException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
-import javax.inject.Inject;
-import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
-import static com.inmobi.casthrift.DemandSourceType.*;
 
 public class ResponseSender extends HttpRequestHandlerBase {
 
@@ -67,14 +71,16 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
     private final static Logger LOG = LoggerFactory.getLogger(ResponseSender.class);
 
-    private static final String START_TAG = "<AdResponse><Ads number=\"1\"><Ad type=\"rm\" width=\"%s\" height=\"%s\"><![CDATA[";
+    private static final String START_TAG =
+            "<AdResponse><Ads number=\"1\"><Ad type=\"rm\" width=\"%s\" height=\"%s\"><![CDATA[";
     private static final String END_TAG = " ]]></Ad></Ads></AdResponse>";
     private static final String AD_IMAI_START_TAG = "<!DOCTYPE html>";
     private static final String NO_AD_IMAI = "";
     private static final String NO_AD_XHTML = "<AdResponse><Ads></Ads></AdResponse>";
     private static final String NO_AD_HTML = "<!-- mKhoj: No advt for this position -->";
     private static final String NO_AD_JS_ADCODE = "<html><head><title></title><style type=\"text/css\">"
-            + " body {margin: 0; overflow: hidden; background-color: transparent}" + " </style></head><body class=\"nofill\"><!-- NO FILL -->"
+            + " body {margin: 0; overflow: hidden; background-color: transparent}"
+            + " </style></head><body class=\"nofill\"><!-- NO FILL -->"
             + "<script type=\"text/javascript\" charset=\"utf-8\">"
             + "parent.postMessage('{\"topic\":\"nfr\",\"container\" : \"%s\"}', '*');</script></body></html>";
     private static Set<String> SUPPORTED_RESPONSE_FORMATS = Sets.newHashSet("html", "xhtml", "axml", "imai", "native");
@@ -107,7 +113,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     public List<ChannelSegment> getRankList() {
-        return this.rankList;
+        return rankList;
     }
 
     public void setRankList(final List<ChannelSegment> rankList) {
@@ -119,7 +125,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     public ThirdPartyAdResponse getAdResponse() {
-        return this.adResponse;
+        return adResponse;
     }
 
     public ChannelSegment getRtbResponse() {
@@ -127,27 +133,27 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     public int getSelectedAdIndex() {
-        return this.selectedAdIndex;
+        return selectedAdIndex;
     }
 
     public long getTotalTime() {
-        return this.totalTime;
+        return totalTime;
     }
 
     @Inject
     public ResponseSender(final Provider<Marker> traceMarkerProvider) {
-        this.initialTime = System.currentTimeMillis();
-        this.totalTime = 0;
-        this.rankList = null;
-        this.adResponse = null;
-        this.responseSent = false;
-        this.sasParams = null;
-        this.rankIndexToProcess = 0;
-        this.selectedAdIndex = 0;
-        this.requestCleaned = false;
-        this.auctionEngine = new AuctionEngine();
+        initialTime = System.currentTimeMillis();
+        totalTime = 0;
+        rankList = null;
+        adResponse = null;
+        responseSent = false;
+        sasParams = null;
+        rankIndexToProcess = 0;
+        selectedAdIndex = 0;
+        requestCleaned = false;
+        auctionEngine = new AuctionEngine();
         if (null != traceMarkerProvider) {
-            this.traceMarker = traceMarkerProvider.get();
+            traceMarker = traceMarkerProvider.get();
         }
     }
 
@@ -160,7 +166,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
          * NOTE: In case of No Ad, the logging will happen on RP parameters only.
          */
         if (selectedAdNetwork instanceof IXAdNetwork) {
-            getAuctionEngine().setUnfilteredChannelSegmentList(Arrays.asList(this.getAuctionEngine().getAuctionResponse()));
+            getAuctionEngine().setUnfilteredChannelSegmentList(Arrays.asList(getAuctionEngine().getAuctionResponse()));
         }
 
         adResponse = selectedAdNetwork.getResponseAd();
@@ -169,7 +175,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     // send Ad Response
-    private void sendAdResponse(final ThirdPartyAdResponse adResponse, final Channel serverChannel) throws NullPointerException {
+    private void sendAdResponse(final ThirdPartyAdResponse adResponse, final Channel serverChannel)
+            throws NullPointerException {
 
         // Making sure response is sent only once
         if (checkResponseSent()) {
@@ -181,8 +188,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
         if (sasParams.getSlot() != null && SlotSizeMapping.getDimension(Long.valueOf(sasParams.getSlot())) != null) {
             LOG.debug("slot served is {}", sasParams.getSlot());
             if (getResponseFormat() == ResponseFormat.XHTML) {
-                Dimension dim = SlotSizeMapping.getDimension(Long.valueOf(sasParams.getSlot()));
-                String startElement = String.format(START_TAG, (int) dim.getWidth(), (int) dim.getHeight());
+                final Dimension dim = SlotSizeMapping.getDimension(Long.valueOf(sasParams.getSlot()));
+                final String startElement = String.format(START_TAG, (int) dim.getWidth(), (int) dim.getHeight());
                 finalResponse = startElement + finalResponse + END_TAG;
             } else if (getResponseFormat() == ResponseFormat.IMAI) {
                 finalResponse = AD_IMAI_START_TAG + finalResponse;
@@ -201,18 +208,19 @@ public class ResponseSender extends HttpRequestHandlerBase {
             sendResponse(HttpResponseStatus.OK, finalResponse, adResponse.getResponseHeaders(), serverChannel);
             incrementStatsForFills(sasParams.getDst());
         } else {
-            String dstName = DemandSourceType.findByValue(sasParams.getDst()).toString();
-            AdPoolResponse rtbdOrIxResponse = createThriftResponse(adResponse.getResponse());
+            final String dstName = DemandSourceType.findByValue(sasParams.getDst()).toString();
+            final AdPoolResponse rtbdOrIxResponse = createThriftResponse(adResponse.getResponse());
             LOG.debug("{} response json to RE is {}", dstName, rtbdOrIxResponse);
             if (null == rtbdOrIxResponse || !SUPPORTED_RESPONSE_FORMATS.contains(sasParams.getRFormat())) {
                 sendNoAdResponse(serverChannel);
             } else {
                 try {
-                    TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
-                    byte[] serializedResponse = serializer.serialize(rtbdOrIxResponse);
-                    sendResponse(HttpResponseStatus.OK, serializedResponse, adResponse.getResponseHeaders(), serverChannel);
+                    final TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
+                    final byte[] serializedResponse = serializer.serialize(rtbdOrIxResponse);
+                    sendResponse(HttpResponseStatus.OK, serializedResponse, adResponse.getResponseHeaders(),
+                            serverChannel);
                     incrementStatsForFills(sasParams.getDst());
-                } catch (TException e) {
+                } catch (final TException e) {
                     LOG.error("Error in serializing the adPool response ", e);
                     sendNoAdResponse(serverChannel);
                 }
@@ -220,7 +228,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
     }
 
-    private void incrementStatsForFills(int dst) {
+    private void incrementStatsForFills(final int dst) {
         if (dst == DemandSourceType.DCP.getValue()) {
             InspectorStats.incrementStatCount(InspectorStrings.DCP_FILLS);
         } else if (dst == DemandSourceType.RTBD.getValue()) {
@@ -248,12 +256,12 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     protected AdPoolResponse createThriftResponse(final String finalResponse) {
-        AdPoolResponse adPoolResponse = new AdPoolResponse();
-        AdInfo rtbdAd = new AdInfo();
-        AdIdChain adIdChain = new AdIdChain();
+        final AdPoolResponse adPoolResponse = new AdPoolResponse();
+        final AdInfo rtbdAd = new AdInfo();
+        final AdIdChain adIdChain = new AdIdChain();
 
-        ChannelSegmentEntity channelSegmentEntity = getRtbResponse().getChannelSegmentEntity();
-        ADCreativeType responseCreativeType = getRtbResponse().getAdNetworkInterface().getCreativeType();
+        final ChannelSegmentEntity channelSegmentEntity = getRtbResponse().getChannelSegmentEntity();
+        final ADCreativeType responseCreativeType = getRtbResponse().getAdNetworkInterface().getCreativeType();
 
         adIdChain.setAdgroup_guid(channelSegmentEntity.getAdgroupId());
         adIdChain.setAd_guid(channelSegmentEntity.getAdId(responseCreativeType));
@@ -270,10 +278,10 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
                 // Set IX specific parameters
                 if (getRtbResponse().getAdNetworkInterface() instanceof IXAdNetwork) {
-                    IXAdNetwork ixAdNetwork = (IXAdNetwork) getRtbResponse().getAdNetworkInterface();
-                    String dealId = ixAdNetwork.returnDealId();
-                    long highestBid = (long) (ixAdNetwork.returnAdjustBid() * Math.pow(10, 6));
-                    int pmpTier = ixAdNetwork.returnPmpTier();
+                    final IXAdNetwork ixAdNetwork = (IXAdNetwork) getRtbResponse().getAdNetworkInterface();
+                    final String dealId = ixAdNetwork.returnDealId();
+                    final long highestBid = (long) (ixAdNetwork.returnAdjustBid() * Math.pow(10, 6));
+                    final int pmpTier = ixAdNetwork.returnPmpTier();
 
                     // Checking whether a dealId was provided in the bid response
                     if (null != dealId) {
@@ -304,48 +312,52 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 break;
         }
 
-        List<AdIdChain> adIdChains = new ArrayList<AdIdChain>();
+        final List<AdIdChain> adIdChains = new ArrayList<AdIdChain>();
         adIdChains.add(adIdChain);
         rtbdAd.setAdIds(adIdChains);
 
         rtbdAd.setPricingModel(PricingModel.CPM);
-        long bid = (long) (getRtbResponse().getAdNetworkInterface().getBidPriceInUsd() * Math.pow(10, 6));
+        final long bid = (long) (getRtbResponse().getAdNetworkInterface().getBidPriceInUsd() * Math.pow(10, 6));
         rtbdAd.setPrice(bid);
         rtbdAd.setBid(bid);
-        UUID uuid = UUID.fromString(getRtbResponse().getAdNetworkInterface().getImpressionId());
+        final UUID uuid = UUID.fromString(getRtbResponse().getAdNetworkInterface().getImpressionId());
         rtbdAd.setImpressionId(new GUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits()));
         rtbdAd.setSlotServed(sasParams.getSlot());
-        Creative rtbdCreative = new Creative();
+        final Creative rtbdCreative = new Creative();
         rtbdCreative.setValue(finalResponse);
         rtbdAd.setCreative(rtbdCreative);
         adPoolResponse.setAds(Arrays.asList(rtbdAd));
-        adPoolResponse.setMinChargedValue((long) (getRtbResponse().getAdNetworkInterface().getSecondBidPriceInUsd() * Math.pow(10, 6)));
+        adPoolResponse
+                .setMinChargedValue((long) (getRtbResponse().getAdNetworkInterface().getSecondBidPriceInUsd() * Math
+                        .pow(10, 6)));
         if (!"USD".equalsIgnoreCase(getRtbResponse().getAdNetworkInterface().getCurrency())) {
             rtbdAd.setOriginalCurrencyName(getRtbResponse().getAdNetworkInterface().getCurrency());
-            rtbdAd.setBidInOriginalCurrency((long) (getRtbResponse().getAdNetworkInterface().getBidPriceInLocal() * Math.pow(10, 6)));
+            rtbdAd.setBidInOriginalCurrency((long) (getRtbResponse().getAdNetworkInterface().getBidPriceInLocal() * Math
+                    .pow(10, 6)));
         }
         return adPoolResponse;
     }
 
     // send response to the caller
-    private void sendResponse(final HttpResponseStatus status, final String responseString, final Map responseHeaders, final Channel serverChannel)
-            throws NullPointerException {
+    private void sendResponse(final HttpResponseStatus status, final String responseString, final Map responseHeaders,
+            final Channel serverChannel) throws NullPointerException {
 
-        byte[] bytes = responseString.getBytes(Charsets.UTF_8);
+        final byte[] bytes = responseString.getBytes(Charsets.UTF_8);
         sendResponse(status, bytes, responseHeaders, serverChannel);
     }
 
     // send response to the caller
-    private void sendResponse(final HttpResponseStatus status, byte[] responseBytes, final Map responseHeaders, final Channel serverChannel)
-            throws NullPointerException {
+    private void sendResponse(final HttpResponseStatus status, byte[] responseBytes, final Map responseHeaders,
+            final Channel serverChannel) throws NullPointerException {
         LOG.debug("Inside send Response");
 
         responseBytes = encryptResponseIfRequired(responseBytes);
 
-        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, Unpooled.wrappedBuffer(responseBytes), false);
+        final FullHttpResponse response =
+                new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, Unpooled.wrappedBuffer(responseBytes), false);
 
         if (null != responseHeaders) {
-            for (Map.Entry entry : (Set<Map.Entry>) responseHeaders.entrySet()) {
+            for (final Map.Entry entry : (Set<Map.Entry>) responseHeaders.entrySet()) {
                 response.headers().add(entry.getKey().toString(), responseHeaders.get(entry.getValue()));
             }
         }
@@ -381,20 +393,25 @@ public class ResponseSender extends HttpRequestHandlerBase {
      * @return
      */
     private byte[] encryptResponseIfRequired(byte[] responseBytes) {
-        if (sasParams.getSdkVersion() != null && Integer.parseInt(sasParams.getSdkVersion().substring(1)) >= ENCRYPTED_SDK_BASE_VERSION
+        if (sasParams.getSdkVersion() != null
+                && Integer.parseInt(sasParams.getSdkVersion().substring(1)) >= ENCRYPTED_SDK_BASE_VERSION
                 && sasParams.getDst() == 2) {
 
             LOG.debug("Encrypting the response as request is from SDK: {}", sasParams.getSdkVersion());
-            EncryptionKeys encryptionKey = sasParams.getEncryptionKey();
-            InmobiSession inmobiSession = new InmobiSecurityImpl(null).newSession(null);
+            final EncryptionKeys encryptionKey = sasParams.getEncryptionKey();
+            final InmobiSession inmobiSession = new InmobiSecurityImpl(null).newSession(null);
 
             try {
 
-                responseBytes = inmobiSession.write(responseBytes, encryptionKey.getAesKey(), encryptionKey.getInitializationVector());
+                responseBytes =
+                        inmobiSession.write(responseBytes, encryptionKey.getAesKey(),
+                                encryptionKey.getInitializationVector());
 
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("Encyption Details:  EncryptionKey: {}  IVBytes: {}  Response: {}", new String(encryptionKey.getAesKey(), CharsetUtil.UTF_8),
-                            new String(encryptionKey.getInitializationVector(), CharsetUtil.UTF_8), new String(responseBytes, CharsetUtil.UTF_8));
+                    LOG.debug("Encyption Details:  EncryptionKey: {}  IVBytes: {}  Response: {}", new String(
+                            encryptionKey.getAesKey(), CharsetUtil.UTF_8),
+                            new String(encryptionKey.getInitializationVector(), CharsetUtil.UTF_8), new String(
+                                    responseBytes, CharsetUtil.UTF_8));
                 }
 
             } catch (InmobiSecureException | InvalidMessageException e) {
@@ -469,8 +486,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
 
         sendResponse(getResponseStatus(sasParams.getDst(), httpResponseStatus),
-                getResponseBytes(sasParams.getDst(), defaultContent),
-                new HashMap<String, String>(), serverChannel);
+                getResponseBytes(sasParams.getDst(), defaultContent), new HashMap<String, String>(), serverChannel);
     }
 
     private HttpResponseStatus getResponseStatus(final int dstType, final HttpResponseStatus httpResponseStatus) {
@@ -482,11 +498,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
     private byte[] getResponseBytes(final int dstType, final String defaultResponse) {
         if (dstType == RTBD.getValue() || dstType == IX.getValue()) {
-            AdPoolResponse rtbdResponse = new AdPoolResponse();
+            final AdPoolResponse rtbdResponse = new AdPoolResponse();
             try {
-                TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
+                final TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
                 return serializer.serialize(rtbdResponse);
-            } catch (TException e) {
+            } catch (final TException e) {
                 LOG.error("Error in serializing the adPool response ", e);
                 return "".getBytes(Charsets.UTF_8);
             }
@@ -500,8 +516,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
         if (null == sasParams) {
             return false;
         }
-        String adCode = sasParams.getAdcode();
-        String rqIframe = sasParams.getRqIframe();
+        final String adCode = sasParams.getAdcode();
+        final String rqIframe = sasParams.getRqIframe();
         return adCode != null && rqIframe != null && "JS".equalsIgnoreCase(adCode);
     }
 
@@ -510,14 +526,14 @@ public class ResponseSender extends HttpRequestHandlerBase {
         if (null == rankList) {
             return false;
         }
-        int index = getRankIndex(adNetwork);
+        final int index = getRankIndex(adNetwork);
         LOG.debug("inside isEligibleForProcess for {} and index is {}", adNetwork.getName(), index);
         return index == 0 || index == rankIndexToProcess;
     }
 
     @Override
     public Boolean isLastEntry(final AdNetworkInterface adNetwork) {
-        int index = getRankIndex(adNetwork);
+        final int index = getRankIndex(adNetwork);
         LOG.debug("inside isLastEntry for {} and index is {}", adNetwork.getName(), index);
         return index == rankList.size() - 1;
     }
@@ -530,8 +546,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
         LOG.debug("reassignRanks called for {} and index is {}", adNetworkCaller.getName(), index);
 
         while (index < rankList.size()) {
-            ChannelSegment channelSegment = rankList.get(index);
-            AdNetworkInterface adNetwork = channelSegment.getAdNetworkInterface();
+            final ChannelSegment channelSegment = rankList.get(index);
+            final AdNetworkInterface adNetwork = channelSegment.getAdNetworkInterface();
 
             LOG.debug("reassignRanks iterating for {} and index is {}", adNetwork.getName(), index);
 
@@ -572,20 +588,22 @@ public class ResponseSender extends HttpRequestHandlerBase {
             LOG.debug("calling clean up for channel {}", rankList.get(index).getAdNetworkInterface());
             try {
                 rankList.get(index).getAdNetworkInterface().cleanUp();
-            } catch (Exception exception) {
-                LOG.debug("Error in closing channel for index: {} Name: {} Exception: {}", index, rankList.get(index).getAdNetworkInterface(), exception);
+            } catch (final Exception exception) {
+                LOG.debug("Error in closing channel for index: {} Name: {} Exception: {}", index, rankList.get(index)
+                        .getAdNetworkInterface(), exception);
             }
         }
 
         // Closing RTB channels
-        List<ChannelSegment> rtbList = auctionEngine.getUnfilteredChannelSegmentList();
+        final List<ChannelSegment> rtbList = auctionEngine.getUnfilteredChannelSegmentList();
 
         for (int index = 0; rtbList != null && index < rtbList.size(); index++) {
             LOG.debug("calling clean up for channel {}", rtbList.get(index).getAdNetworkInterface().getId());
             try {
                 rtbList.get(index).getAdNetworkInterface().cleanUp();
-            } catch (Exception exception) {
-                LOG.debug("Error in closing channel for index: {}  Name: {} Exception: {}", index, rtbList.get(index).getAdNetworkInterface(), exception);
+            } catch (final Exception exception) {
+                LOG.debug("Error in closing channel for index: {}  Name: {} Exception: {}", index, rtbList.get(index)
+                        .getAdNetworkInterface(), exception);
             }
         }
 
@@ -600,7 +618,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
             LOG.debug("done with logging");
             return;
         }
-        List<ChannelSegment> list = new ArrayList<ChannelSegment>();
+        final List<ChannelSegment> list = new ArrayList<ChannelSegment>();
         if (null != getRankList()) {
             list.addAll(getRankList());
         }
@@ -622,10 +640,10 @@ public class ResponseSender extends HttpRequestHandlerBase {
             Logging.advertiserLogging(list, CasConfigUtil.getLoggerConfig());
             Logging.sampledAdvertiserLogging(list, CasConfigUtil.getLoggerConfig());
             Logging.creativeLogging(list, sasParams);
-        } catch (JSONException exception) {
+        } catch (final JSONException exception) {
             LOG.debug("Exception raised in ResponseSender {}", exception);
             LOG.debug(ChannelServer.getMyStackTrace(exception));
-        } catch (TException exception) {
+        } catch (final TException exception) {
             LOG.debug("Exception raised in ResponseSender {}", exception);
             LOG.debug(ChannelServer.getMyStackTrace(exception));
         }
@@ -648,7 +666,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
             return ResponseFormat.HTML;
         }
 
-        String responseFormat = sasParams.getRFormat();
+        final String responseFormat = sasParams.getRFormat();
         if (isJsAdRequest()) {
             return ResponseFormat.JS_AD_CODE;
         } else if (null == responseFormat) {
@@ -665,34 +683,34 @@ public class ResponseSender extends HttpRequestHandlerBase {
     public void processDcpList(final Channel channel) {
         // There would always be rtb partner before going to dcp list
         // So will iterate over the dcp list once.
-        if (this.getRankList().isEmpty()) {
+        if (getRankList().isEmpty()) {
             LOG.debug("dcp list is empty so sending NoAd");
-            this.sendNoAdResponse(channel);
+            sendNoAdResponse(channel);
             return;
         }
         int rankIndex = rankIndexToProcess;
         if (rankList.size() <= rankIndex) {
             return;
         }
-        ChannelSegment segment = this.getRankList().get(rankIndex);
+        ChannelSegment segment = getRankList().get(rankIndex);
         while (segment.getAdNetworkInterface().isRequestCompleted()) {
             if (segment.getAdNetworkInterface().getResponseAd().getResponseStatus() == ResponseStatus.SUCCESS) {
                 this.sendAdResponse(segment.getAdNetworkInterface(), channel);
                 break;
             }
             rankIndex++;
-            if (rankIndex >= this.getRankList().size()) {
-                this.sendNoAdResponse(channel);
+            if (rankIndex >= getRankList().size()) {
+                sendNoAdResponse(channel);
                 break;
             }
             segment = getRankList().get(rankIndex);
         }
-        this.setRankIndexToProcess(rankIndex);
+        setRankIndexToProcess(rankIndex);
     }
 
     @Override
     public void processDcpPartner(final Channel channel, final AdNetworkInterface adNetworkInterface) {
-        if (!this.isEligibleForProcess(adNetworkInterface)) {
+        if (!isEligibleForProcess(adNetworkInterface)) {
             LOG.debug("{} is not eligible for processing", adNetworkInterface.getName());
             return;
         }
@@ -716,8 +734,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
         private static final Map<String, ResponseFormat> STRING_TO_FORMAT_MAP = Maps.newHashMap();
 
         static {
-            for (ResponseFormat responseFormat : ResponseFormat.values()) {
-                for (String format : responseFormat.formats) {
+            for (final ResponseFormat responseFormat : ResponseFormat.values()) {
+                for (final String format : responseFormat.formats) {
                     STRING_TO_FORMAT_MAP.put(format, responseFormat);
                 }
             }

@@ -1,5 +1,34 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import static org.easymock.EasyMock.expect;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.powermock.api.easymock.PowerMock.createMock;
+import static org.powermock.api.easymock.PowerMock.createNiceMock;
+import static org.powermock.api.easymock.PowerMock.expectLastCall;
+import static org.powermock.api.easymock.PowerMock.expectNew;
+import static org.powermock.api.easymock.PowerMock.mockStatic;
+import static org.powermock.api.easymock.PowerMock.replayAll;
+import static org.powermock.api.easymock.PowerMock.verifyAll;
+import static org.powermock.api.support.membermodification.MemberMatcher.method;
+import static org.powermock.api.support.membermodification.MemberModifier.suppress;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpRequest;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.commons.configuration.Configuration;
+import org.hamcrest.core.IsEqual;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
 import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
@@ -21,34 +50,6 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
 import com.inmobi.casthrift.DemandSourceType;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpRequest;
-import org.apache.commons.configuration.Configuration;
-import org.hamcrest.core.IsEqual;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.easymock.EasyMock.expect;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.powermock.api.easymock.PowerMock.createMock;
-import static org.powermock.api.easymock.PowerMock.createNiceMock;
-import static org.powermock.api.easymock.PowerMock.expectLastCall;
-import static org.powermock.api.easymock.PowerMock.expectNew;
-import static org.powermock.api.easymock.PowerMock.mockStatic;
-import static org.powermock.api.easymock.PowerMock.replayAll;
-import static org.powermock.api.easymock.PowerMock.verifyAll;
-import static org.powermock.api.support.membermodification.MemberMatcher.method;
-import static org.powermock.api.support.membermodification.MemberModifier.suppress;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({InspectorStats.class, CasConfigUtil.class, BaseServlet.class})
@@ -57,18 +58,18 @@ public class ServletIXFillTest {
     @Test
     public void testHandleRequestDroppedInRequestFilters() throws Exception {
         /**
-         * Branches/Conditions followed:
-         *  Is dropped in request filters
+         * Branches/Conditions followed: Is dropped in request filters
          */
         mockStatic(InspectorStats.class);
-        HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-        ResponseSender mockResponseSender = createMock(ResponseSender.class);
-        Provider<Marker> mockTraceMarkerProvider = createMock(Provider.class);
-        AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
-        CasInternalRequestParameters mockCasInternalRequestParameters = createMock(CasInternalRequestParameters.class);
-        HttpRequest mockHttpRequest = createMock(HttpRequest.class);
-        HttpHeaders mockHttpHeaders = createMock((HttpHeaders.class));
-        RequestFilters mockRequestFilters = createMock(RequestFilters.class);
+        final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+        final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+        final Provider<Marker> mockTraceMarkerProvider = createMock(Provider.class);
+        final AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
+        final CasInternalRequestParameters mockCasInternalRequestParameters =
+                createMock(CasInternalRequestParameters.class);
+        final HttpRequest mockHttpRequest = createMock(HttpRequest.class);
+        final HttpHeaders mockHttpHeaders = createMock(HttpHeaders.class);
+        final RequestFilters mockRequestFilters = createMock(RequestFilters.class);
 
         expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
         expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).times(1);
@@ -90,7 +91,8 @@ public class ServletIXFillTest {
         mockResponseSender.sasParams = null;
         mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
 
-        ServletIXFill tested = new ServletIXFill(mockTraceMarkerProvider, null, mockRequestFilters, null, null, null, null, null);
+        final ServletIXFill tested =
+                new ServletIXFill(mockTraceMarkerProvider, null, mockRequestFilters, null, null, null, null, null);
         tested.handleRequest(mockHttpRequestHandler, null, null);
 
         verifyAll();
@@ -99,26 +101,23 @@ public class ServletIXFillTest {
     @Test
     public void testHandleRequestNoMatchedSegmentDetails() throws Exception {
         /**
-         * Branches/Conditions followed:
-         *  Is not dropped in request filters
-         *  IsResponseOnlyFromDcp is false
-         *  DemandSourceType is IX
-         *  ResponseFormat is XHTML
-         *  MatchedSegmentDetails is empty
+         * Branches/Conditions followed: Is not dropped in request filters IsResponseOnlyFromDcp is false
+         * DemandSourceType is IX ResponseFormat is XHTML MatchedSegmentDetails is empty
          */
         mockStatic(InspectorStats.class);
         mockStatic(CasConfigUtil.class);
-        HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-        ResponseSender mockResponseSender = createMock(ResponseSender.class);
-        Provider<Marker> mockTraceMarkerProvider = createMock(Provider.class);
-        AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
-        CasInternalRequestParameters mockCasInternalRequestParameters = createMock(CasInternalRequestParameters.class);
-        HttpRequest mockHttpRequest = createMock(HttpRequest.class);
-        HttpHeaders mockHttpHeaders = createMock((HttpHeaders.class));
-        RequestFilters mockRequestFilters = createMock(RequestFilters.class);
-        SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
-        Configuration mockConfig = createMock(Configuration.class);
-        MatchSegments mockMatchSegments = createMock(MatchSegments.class);
+        final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+        final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+        final Provider<Marker> mockTraceMarkerProvider = createMock(Provider.class);
+        final AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
+        final CasInternalRequestParameters mockCasInternalRequestParameters =
+                createMock(CasInternalRequestParameters.class);
+        final HttpRequest mockHttpRequest = createMock(HttpRequest.class);
+        final HttpHeaders mockHttpHeaders = createMock(HttpHeaders.class);
+        final RequestFilters mockRequestFilters = createMock(RequestFilters.class);
+        final SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
+        final Configuration mockConfig = createMock(Configuration.class);
+        final MatchSegments mockMatchSegments = createMock(MatchSegments.class);
 
         expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
         expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).times(1);
@@ -130,7 +129,8 @@ public class ServletIXFillTest {
         expect(mockConfig.getBoolean("isResponseOnyFromDCP", false)).andReturn(false).times(1);
         expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).times(1);
         expect(mockResponseSender.getResponseFormat()).andReturn(ResponseSender.ResponseFormat.XHTML).times(1);
-        expect(mockMatchSegments.matchSegments(mockSASRequestParameters)).andReturn(new ArrayList<AdvertiserMatchedSegmentDetail>());
+        expect(mockMatchSegments.matchSegments(mockSASRequestParameters)).andReturn(
+                new ArrayList<AdvertiserMatchedSegmentDetail>());
         expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).times(1);
         mockCasInternalRequestParameters.setTraceEnabled(true);
         expectLastCall();
@@ -153,7 +153,9 @@ public class ServletIXFillTest {
         mockResponseSender.sasParams = mockSASRequestParameters;
         mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
 
-        ServletIXFill tested = new ServletIXFill(mockTraceMarkerProvider, mockMatchSegments, mockRequestFilters, null, null, null, null, null);
+        final ServletIXFill tested =
+                new ServletIXFill(mockTraceMarkerProvider, mockMatchSegments, mockRequestFilters, null, null, null,
+                        null, null);
         tested.handleRequest(mockHttpRequestHandler, null, null);
 
         verifyAll();
@@ -162,33 +164,30 @@ public class ServletIXFillTest {
     @Test
     public void testHandleRequestNullFilteredSegments() throws Exception {
         /**
-         * Branches/Conditions followed:
-         *  Is not dropped in request filters
-         *  IsResponseOnlyFromDcp is false
-         *  DemandSourceType is IX
-         *  ResponseFormat is XHTML
-         *  MatchedSegmentDetails is not empty
-         *  siteMetaDataEntity is null
-         *  filteredSegments are null
+         * Branches/Conditions followed: Is not dropped in request filters IsResponseOnlyFromDcp is false
+         * DemandSourceType is IX ResponseFormat is XHTML MatchedSegmentDetails is not empty siteMetaDataEntity is null
+         * filteredSegments are null
          */
         mockStatic(InspectorStats.class);
         mockStatic(CasConfigUtil.class);
-        HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-        ResponseSender mockResponseSender = createMock(ResponseSender.class);
-        Provider<Marker> mockTraceMarkerProvider = createMock(Provider.class);
-        AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
-        CasInternalRequestParameters mockCasInternalRequestParameters = createMock(CasInternalRequestParameters.class);
-        HttpRequest mockHttpRequest = createMock(HttpRequest.class);
-        HttpHeaders mockHttpHeaders = createMock((HttpHeaders.class));
-        RequestFilters mockRequestFilters = createMock(RequestFilters.class);
-        SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
-        Configuration mockConfig = createMock(Configuration.class);
-        MatchSegments mockMatchSegments = createMock(MatchSegments.class);
-        RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-        ChannelSegmentFilterApplier mockChannelSegmentFilterApplier = createMock(ChannelSegmentFilterApplier.class);
-        CasContext mockCasContext = createMock(CasContext.class);
+        final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+        final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+        final Provider<Marker> mockTraceMarkerProvider = createMock(Provider.class);
+        final AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
+        final CasInternalRequestParameters mockCasInternalRequestParameters =
+                createMock(CasInternalRequestParameters.class);
+        final HttpRequest mockHttpRequest = createMock(HttpRequest.class);
+        final HttpHeaders mockHttpHeaders = createMock(HttpHeaders.class);
+        final RequestFilters mockRequestFilters = createMock(RequestFilters.class);
+        final SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
+        final Configuration mockConfig = createMock(Configuration.class);
+        final MatchSegments mockMatchSegments = createMock(MatchSegments.class);
+        final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
+        final ChannelSegmentFilterApplier mockChannelSegmentFilterApplier =
+                createMock(ChannelSegmentFilterApplier.class);
+        final CasContext mockCasContext = createMock(CasContext.class);
 
-        List<AdvertiserMatchedSegmentDetail> mockList = Arrays.asList(new AdvertiserMatchedSegmentDetail(null));
+        final List<AdvertiserMatchedSegmentDetail> mockList = Arrays.asList(new AdvertiserMatchedSegmentDetail(null));
 
         expectNew(CasContext.class).andReturn(mockCasContext).times(1);
 
@@ -206,9 +205,11 @@ public class ServletIXFillTest {
         expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).times(1);
         expect(mockMatchSegments.getRepositoryHelper()).andReturn(mockRepositoryHelper).times(1);
         expect(mockSASRequestParameters.getSiteId()).andReturn(TestUtils.SampleStrings.siteId).times(1);
-        expect(mockRepositoryHelper.querySiteMetaDetaRepository(TestUtils.SampleStrings.siteId)).andReturn(null).times(1);
-        expect(mockChannelSegmentFilterApplier.getChannelSegments(mockList, mockSASRequestParameters, mockCasContext, null, null))
-                .andReturn(null).times(1);
+        expect(mockRepositoryHelper.querySiteMetaDetaRepository(TestUtils.SampleStrings.siteId)).andReturn(null).times(
+                1);
+        expect(
+                mockChannelSegmentFilterApplier.getChannelSegments(mockList, mockSASRequestParameters, mockCasContext,
+                        null, null)).andReturn(null).times(1);
         mockCasInternalRequestParameters.setSiteAccountType(AccountType.SELF_SERVE);
         expectLastCall();
         mockCasInternalRequestParameters.setTraceEnabled(true);
@@ -232,7 +233,9 @@ public class ServletIXFillTest {
         mockResponseSender.sasParams = mockSASRequestParameters;
         mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
 
-        ServletIXFill tested = new ServletIXFill(mockTraceMarkerProvider, mockMatchSegments, mockRequestFilters, mockChannelSegmentFilterApplier, null, null, null, null);
+        final ServletIXFill tested =
+                new ServletIXFill(mockTraceMarkerProvider, mockMatchSegments, mockRequestFilters,
+                        mockChannelSegmentFilterApplier, null, null, null, null);
         tested.handleRequest(mockHttpRequestHandler, null, null);
 
         verifyAll();
@@ -241,37 +244,34 @@ public class ServletIXFillTest {
     @Test
     public void testHandleRequestRankListIsEmpty() throws Exception {
         /**
-         * Branches/Conditions followed:
-         *  Is not dropped in request filters
-         *  IsResponseOnlyFromDcp is false
-         *  DemandSourceType is IX
-         *  ResponseFormat is XHTML
-         *  MatchedSegmentDetails is not empty
-         *  siteMetaDataEntity is null
-         *  filteredSegments are not empty
-         *  rankList is empty
+         * Branches/Conditions followed: Is not dropped in request filters IsResponseOnlyFromDcp is false
+         * DemandSourceType is IX ResponseFormat is XHTML MatchedSegmentDetails is not empty siteMetaDataEntity is null
+         * filteredSegments are not empty rankList is empty
          */
         mockStatic(InspectorStats.class);
         mockStatic(CasConfigUtil.class);
-        HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-        ResponseSender mockResponseSender = createMock(ResponseSender.class);
-        Provider<Marker> mockTraceMarkerProvider = createMock(Provider.class);
-        AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
-        CasInternalRequestParameters mockCasInternalRequestParameters = createMock(CasInternalRequestParameters.class);
-        HttpRequest mockHttpRequest = createMock(HttpRequest.class);
-        HttpHeaders mockHttpHeaders = createMock((HttpHeaders.class));
-        RequestFilters mockRequestFilters = createMock(RequestFilters.class);
-        SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
-        Configuration mockConfig = createMock(Configuration.class);
-        MatchSegments mockMatchSegments = createMock(MatchSegments.class);
-        RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-        ChannelSegmentFilterApplier mockChannelSegmentFilterApplier = createMock(ChannelSegmentFilterApplier.class);
-        CasContext mockCasContext = createMock(CasContext.class);
-        CasUtils mockCasUtils = createMock(CasUtils.class);
-        AsyncRequestMaker mockAsyncRequestMaker = createNiceMock(AsyncRequestMaker.class);
+        final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+        final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+        final Provider<Marker> mockTraceMarkerProvider = createMock(Provider.class);
+        final AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
+        final CasInternalRequestParameters mockCasInternalRequestParameters =
+                createMock(CasInternalRequestParameters.class);
+        final HttpRequest mockHttpRequest = createMock(HttpRequest.class);
+        final HttpHeaders mockHttpHeaders = createMock(HttpHeaders.class);
+        final RequestFilters mockRequestFilters = createMock(RequestFilters.class);
+        final SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
+        final Configuration mockConfig = createMock(Configuration.class);
+        final MatchSegments mockMatchSegments = createMock(MatchSegments.class);
+        final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
+        final ChannelSegmentFilterApplier mockChannelSegmentFilterApplier =
+                createMock(ChannelSegmentFilterApplier.class);
+        final CasContext mockCasContext = createMock(CasContext.class);
+        final CasUtils mockCasUtils = createMock(CasUtils.class);
+        final AsyncRequestMaker mockAsyncRequestMaker = createNiceMock(AsyncRequestMaker.class);
 
-        List<AdvertiserMatchedSegmentDetail> mockList = Arrays.asList(new AdvertiserMatchedSegmentDetail(null));
-        List<ChannelSegment> mockChannelSegmentList = Arrays.asList(new ChannelSegment(null, null, null, null, null, null, 0.5));
+        final List<AdvertiserMatchedSegmentDetail> mockList = Arrays.asList(new AdvertiserMatchedSegmentDetail(null));
+        final List<ChannelSegment> mockChannelSegmentList =
+                Arrays.asList(new ChannelSegment(null, null, null, null, null, null, 0.5));
 
         expectNew(CasContext.class).andReturn(mockCasContext).times(1);
 
@@ -289,9 +289,11 @@ public class ServletIXFillTest {
         expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).times(1);
         expect(mockMatchSegments.getRepositoryHelper()).andReturn(mockRepositoryHelper).times(1);
         expect(mockSASRequestParameters.getSiteId()).andReturn(TestUtils.SampleStrings.siteId).times(1);
-        expect(mockRepositoryHelper.querySiteMetaDetaRepository(TestUtils.SampleStrings.siteId)).andReturn(null).times(1);
-        expect(mockChannelSegmentFilterApplier.getChannelSegments(mockList, mockSASRequestParameters, mockCasContext, null, null))
-                .andReturn(mockChannelSegmentList).times(1);
+        expect(mockRepositoryHelper.querySiteMetaDetaRepository(TestUtils.SampleStrings.siteId)).andReturn(null).times(
+                1);
+        expect(
+                mockChannelSegmentFilterApplier.getChannelSegments(mockList, mockSASRequestParameters, mockCasContext,
+                        null, null)).andReturn(mockChannelSegmentList).times(1);
         expect(mockCasUtils.getNetworkSiteEcpm(mockCasContext, mockSASRequestParameters)).andReturn(0.5).times(1);
         expect(mockCasUtils.getRtbFloor(mockCasContext, mockSASRequestParameters)).andReturn(0.5).times(1);
         expect(mockSASRequestParameters.getSiteFloor()).andReturn(0.5).times(1);
@@ -325,7 +327,9 @@ public class ServletIXFillTest {
         mockResponseSender.sasParams = mockSASRequestParameters;
         mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
 
-        ServletIXFill tested = new ServletIXFill(mockTraceMarkerProvider, mockMatchSegments, mockRequestFilters, mockChannelSegmentFilterApplier, mockCasUtils, mockAsyncRequestMaker, null, null);
+        final ServletIXFill tested =
+                new ServletIXFill(mockTraceMarkerProvider, mockMatchSegments, mockRequestFilters,
+                        mockChannelSegmentFilterApplier, mockCasUtils, mockAsyncRequestMaker, null, null);
         tested.handleRequest(mockHttpRequestHandler, null, null);
 
         verifyAll();
@@ -333,13 +337,13 @@ public class ServletIXFillTest {
 
     @Test
     public void testGetName() throws Exception {
-        ServletIXFill tested = new ServletIXFill(null, null, null, null, null, null, null, null);
+        final ServletIXFill tested = new ServletIXFill(null, null, null, null, null, null, null, null);
         assertThat(tested.getName(), is(IsEqual.equalTo("ixFill")));
     }
 
     @Test
     public void testGetLogger() throws Exception {
-        ServletIXFill tested = new ServletIXFill(null, null, null, null, null, null, null, null);
+        final ServletIXFill tested = new ServletIXFill(null, null, null, null, null, null, null, null);
         assertThat(tested.getLogger(), is(equalTo(LoggerFactory.getLogger(ServletIXFill.class))));
     }
 }

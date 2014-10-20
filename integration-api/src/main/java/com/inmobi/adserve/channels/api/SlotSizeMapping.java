@@ -1,7 +1,5 @@
 package com.inmobi.adserve.channels.api;
 
-import com.inmobi.types.adserving.Slot;
-
 import java.awt.Dimension;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,7 +37,7 @@ public class SlotSizeMapping {
         SLOT_MAP.put(30L, new Dimension(250, 125));
         SLOT_MAP.put(31L, new Dimension(320, 568));
         SLOT_MAP.put(32L, new Dimension(480, 320));
-        SLOT_MAP.put(33L, new Dimension(1024, 768 ));
+        SLOT_MAP.put(33L, new Dimension(1024, 768));
         SLOT_MAP.put(34L, new Dimension(1280, 800));
         SLOT_MAP.put(35L, new Dimension(320, 30));
         SLOT_MAP.put(36L, new Dimension(320, 26));
@@ -50,7 +48,7 @@ public class SlotSizeMapping {
         SLOT_MAP.put(0L, new Dimension(0, 0));
 
 
-        //Adding IX_SLOT_ID_MAP, which is a map from InMobi slot id's to Rubicon slot id's
+        // Adding IX_SLOT_ID_MAP, which is a map from InMobi slot id's to Rubicon slot id's
 
         IX_SLOT_ID_MAP.put((short) 4, 44);
         // Mapping 320x48 to 320x50
@@ -72,15 +70,15 @@ public class SlotSizeMapping {
 
     }
 
-    public static Dimension getDimension(Long slot) {
+    public static Dimension getDimension(final Long slot) {
         return SLOT_MAP.get(slot);
     }
 
-    public static boolean isIXSupportedSlot(short inmobiSlot) {
+    public static boolean isIXSupportedSlot(final short inmobiSlot) {
         return IX_SLOT_ID_MAP.containsKey(inmobiSlot);
     }
 
-    public static Integer getIXMappedSlotId(short inmobiSlot) {
+    public static Integer getIXMappedSlotId(final short inmobiSlot) {
         return IX_SLOT_ID_MAP.get(inmobiSlot);
     }
 }

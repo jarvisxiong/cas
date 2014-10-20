@@ -1,5 +1,20 @@
 package com.inmobi.adserve.channels.repository;
 
+import static org.easymock.EasyMock.expect;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.powermock.api.easymock.PowerMock.createMock;
+import static org.powermock.api.easymock.PowerMock.expectNew;
+import static org.powermock.api.easymock.PowerMock.replayAll;
+
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
@@ -21,128 +36,111 @@ import com.inmobi.adserve.channels.query.PricingEngineQuery;
 import com.inmobi.adserve.channels.query.SiteEcpmQuery;
 import com.inmobi.adserve.channels.query.SiteFilterQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-
-import static org.easymock.EasyMock.expect;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.powermock.api.easymock.PowerMock.createMock;
-import static org.powermock.api.easymock.PowerMock.expectNew;
-import static org.powermock.api.easymock.PowerMock.replayAll;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({RepositoryHelper.class, NativeAdTemplateEntity.class})
 public class RepositoryHelperTest {
-    public static ChannelEntity                    mockChannelEntity = createMock(ChannelEntity.class);
-    public static ChannelSegmentEntity             mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
-    public static ChannelFeedbackEntity            mockChannelFeedbackEntity = createMock(ChannelFeedbackEntity.class);
-    public static ChannelSegmentFeedbackEntity     mockChannelSegmentFeedbackEntity = createMock(ChannelSegmentFeedbackEntity.class);
-    public static SiteMetaDataEntity               mockSiteMetaDataEntity = createMock(SiteMetaDataEntity.class);
-    public static SiteTaxonomyEntity               mockSiteTaxonomyEntity = createMock(SiteTaxonomyEntity.class);
-    public static SiteFeedbackEntity               mockSiteFeedbackEntity = createMock(SiteFeedbackEntity.class);
-    public static PricingEngineEntity              mockPricingEngineEntity = createMock(PricingEngineEntity.class);
-    public static SiteFilterEntity                 mockSiteFilterEntity = createMock(SiteFilterEntity.class);
-    public static SiteEcpmEntity                   mockSiteEcpmEntity = createMock(SiteEcpmEntity.class);
-    public static CurrencyConversionEntity         mockCurrencyConversionEntity = createMock(CurrencyConversionEntity.class);
-    public static WapSiteUACEntity                 mockWapSiteUACEntity = createMock(WapSiteUACEntity.class);
-    public static IXAccountMapEntity               mockIxAccountMapEntity = createMock(IXAccountMapEntity.class);
-    public static CreativeEntity                   mockCreativeEntity = createMock(CreativeEntity.class);
-    public static NativeAdTemplateEntity           mockNativeAdTemplateEntity = createMock(NativeAdTemplateEntity.class);
-    public static SegmentAdGroupFeedbackEntity     mockSegmentAdGroupFeedbackEntity = createMock(SegmentAdGroupFeedbackEntity.class);
-    public static ChannelRepository                mockChannelRepository = createMock(ChannelRepository.class);
-    public static ChannelAdGroupRepository         mockChannelAdGroupRepository = createMock(ChannelAdGroupRepository.class);
-    public static ChannelFeedbackRepository        mockChannelFeedbackRepository = createMock(ChannelFeedbackRepository.class);
-    public static ChannelSegmentFeedbackRepository mockChannelSegmentFeedbackRepository = createMock(ChannelSegmentFeedbackRepository.class);
-    public static SiteMetaDataRepository           mockSiteMetaDataRepository = createMock(SiteMetaDataRepository.class);
-    public static SiteTaxonomyRepository           mockSiteTaxonomyRepository = createMock(SiteTaxonomyRepository.class);
-    public static SiteAerospikeFeedbackRepository  mockSiteAerospikeFeedbackRepository = createMock(SiteAerospikeFeedbackRepository.class);
-    public static PricingEngineRepository          mockPricingEngineRepository = createMock(PricingEngineRepository.class);
-    public static SiteFilterRepository             mockSiteFilterRepository = createMock(SiteFilterRepository.class);
-    public static SiteEcpmRepository               mockSiteEcpmRepository = createMock(SiteEcpmRepository.class);
-    public static CurrencyConversionRepository     mockCurrencyConversionRepository = createMock(CurrencyConversionRepository.class);
-    public static WapSiteUACRepository             mockWapSiteUACRepository = createMock(WapSiteUACRepository.class);
-    public static IXAccountMapRepository           mockIxAccountMapRepository = createMock(IXAccountMapRepository.class);
-    public static CreativeRepository               mockCreativeRepository = createMock(CreativeRepository.class);
-    public static NativeAdTemplateRepository       mockNativeAdTemplateRepository = createMock(NativeAdTemplateRepository.class);
-    public static PricingEngineQuery               mockPricingEngineQuery = createMock(PricingEngineQuery.class);
-    public static CreativeQuery                    mockCreativeQuery = createMock(CreativeQuery.class);
-    public static SiteFilterQuery                  mockSiteFilterQuery = createMock(SiteFilterQuery.class);
-    public static SiteEcpmQuery                    mockSiteEcpmQuery = createMock(SiteEcpmQuery.class);
+    public static ChannelEntity mockChannelEntity = createMock(ChannelEntity.class);
+    public static ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
+    public static ChannelFeedbackEntity mockChannelFeedbackEntity = createMock(ChannelFeedbackEntity.class);
+    public static ChannelSegmentFeedbackEntity mockChannelSegmentFeedbackEntity =
+            createMock(ChannelSegmentFeedbackEntity.class);
+    public static SiteMetaDataEntity mockSiteMetaDataEntity = createMock(SiteMetaDataEntity.class);
+    public static SiteTaxonomyEntity mockSiteTaxonomyEntity = createMock(SiteTaxonomyEntity.class);
+    public static SiteFeedbackEntity mockSiteFeedbackEntity = createMock(SiteFeedbackEntity.class);
+    public static PricingEngineEntity mockPricingEngineEntity = createMock(PricingEngineEntity.class);
+    public static SiteFilterEntity mockSiteFilterEntity = createMock(SiteFilterEntity.class);
+    public static SiteEcpmEntity mockSiteEcpmEntity = createMock(SiteEcpmEntity.class);
+    public static CurrencyConversionEntity mockCurrencyConversionEntity = createMock(CurrencyConversionEntity.class);
+    public static WapSiteUACEntity mockWapSiteUACEntity = createMock(WapSiteUACEntity.class);
+    public static IXAccountMapEntity mockIxAccountMapEntity = createMock(IXAccountMapEntity.class);
+    public static CreativeEntity mockCreativeEntity = createMock(CreativeEntity.class);
+    public static NativeAdTemplateEntity mockNativeAdTemplateEntity = createMock(NativeAdTemplateEntity.class);
+    public static SegmentAdGroupFeedbackEntity mockSegmentAdGroupFeedbackEntity =
+            createMock(SegmentAdGroupFeedbackEntity.class);
+    public static ChannelRepository mockChannelRepository = createMock(ChannelRepository.class);
+    public static ChannelAdGroupRepository mockChannelAdGroupRepository = createMock(ChannelAdGroupRepository.class);
+    public static ChannelFeedbackRepository mockChannelFeedbackRepository = createMock(ChannelFeedbackRepository.class);
+    public static ChannelSegmentFeedbackRepository mockChannelSegmentFeedbackRepository =
+            createMock(ChannelSegmentFeedbackRepository.class);
+    public static SiteMetaDataRepository mockSiteMetaDataRepository = createMock(SiteMetaDataRepository.class);
+    public static SiteTaxonomyRepository mockSiteTaxonomyRepository = createMock(SiteTaxonomyRepository.class);
+    public static SiteAerospikeFeedbackRepository mockSiteAerospikeFeedbackRepository =
+            createMock(SiteAerospikeFeedbackRepository.class);
+    public static PricingEngineRepository mockPricingEngineRepository = createMock(PricingEngineRepository.class);
+    public static SiteFilterRepository mockSiteFilterRepository = createMock(SiteFilterRepository.class);
+    public static SiteEcpmRepository mockSiteEcpmRepository = createMock(SiteEcpmRepository.class);
+    public static CurrencyConversionRepository mockCurrencyConversionRepository =
+            createMock(CurrencyConversionRepository.class);
+    public static WapSiteUACRepository mockWapSiteUACRepository = createMock(WapSiteUACRepository.class);
+    public static IXAccountMapRepository mockIxAccountMapRepository = createMock(IXAccountMapRepository.class);
+    public static CreativeRepository mockCreativeRepository = createMock(CreativeRepository.class);
+    public static NativeAdTemplateRepository mockNativeAdTemplateRepository =
+            createMock(NativeAdTemplateRepository.class);
+    public static PricingEngineQuery mockPricingEngineQuery = createMock(PricingEngineQuery.class);
+    public static CreativeQuery mockCreativeQuery = createMock(CreativeQuery.class);
+    public static SiteFilterQuery mockSiteFilterQuery = createMock(SiteFilterQuery.class);
+    public static SiteEcpmQuery mockSiteEcpmQuery = createMock(SiteEcpmQuery.class);
 
     public static RepositoryHelper tested;
-    public static String  query1 = "query1";
-    public static String  query2 = "query2";
+    public static String query1 = "query1";
+    public static String query2 = "query2";
     public static Integer query3 = 5;
-    public static long    query4 = 6;
+    public static long query4 = 6;
 
     @BeforeClass
-    public static void setUp () throws Exception{
-        expect(mockChannelRepository.query(query1))
-                .andThrow(new RepositoryException("Repository Exception")).times(1)
+    public static void setUp() throws Exception {
+        expect(mockChannelRepository.query(query1)).andThrow(new RepositoryException("Repository Exception")).times(1)
                 .andReturn(mockChannelEntity).times(1);
-        expect(mockChannelAdGroupRepository.query(query1))
-                .andThrow(new RepositoryException("Repository Exception")).times(1)
-                .andReturn(mockChannelSegmentEntity).times(1);
-        expect(mockChannelFeedbackRepository.query(query1))
-                .andThrow(new RepositoryException("Repository Exception")).times(1)
-                .andReturn(mockChannelFeedbackEntity).times(1);
+        expect(mockChannelAdGroupRepository.query(query1)).andThrow(new RepositoryException("Repository Exception"))
+                .times(1).andReturn(mockChannelSegmentEntity).times(1);
+        expect(mockChannelFeedbackRepository.query(query1)).andThrow(new RepositoryException("Repository Exception"))
+                .times(1).andReturn(mockChannelFeedbackEntity).times(1);
         expect(mockChannelSegmentFeedbackRepository.query(query1))
                 .andThrow(new RepositoryException("Repository Exception")).times(1)
                 .andReturn(mockChannelSegmentFeedbackEntity).times(1);
-        expect(mockSiteMetaDataRepository.query(query1))
-                .andThrow(new RepositoryException("Repository Exception")).times(1)
-                .andReturn(mockSiteMetaDataEntity).times(1);
-        expect(mockSiteTaxonomyRepository.query(query1))
-                .andThrow(new RepositoryException("Repository Exception")).times(1)
-                .andReturn(mockSiteTaxonomyEntity).times(1);
-        expect(mockSiteAerospikeFeedbackRepository.query(query1))
-                .andReturn(mockSiteFeedbackEntity).times(1);
-        expect(mockSiteAerospikeFeedbackRepository.query(query1, query3))
-                .andReturn(mockSegmentAdGroupFeedbackEntity).times(1);
+        expect(mockSiteMetaDataRepository.query(query1)).andThrow(new RepositoryException("Repository Exception"))
+                .times(1).andReturn(mockSiteMetaDataEntity).times(1);
+        expect(mockSiteTaxonomyRepository.query(query1)).andThrow(new RepositoryException("Repository Exception"))
+                .times(1).andReturn(mockSiteTaxonomyEntity).times(1);
+        expect(mockSiteAerospikeFeedbackRepository.query(query1)).andReturn(mockSiteFeedbackEntity).times(1);
+        expect(mockSiteAerospikeFeedbackRepository.query(query1, query3)).andReturn(mockSegmentAdGroupFeedbackEntity)
+                .times(1);
         expect(mockPricingEngineRepository.query(mockPricingEngineQuery))
-                .andThrow(new RepositoryException("Repository Exception")).times(1)
-                .andReturn(mockPricingEngineEntity).times(1);
+                .andThrow(new RepositoryException("Repository Exception")).times(1).andReturn(mockPricingEngineEntity)
+                .times(1);
         expect(mockSiteFilterRepository.query(mockSiteFilterQuery))
-                .andThrow(new RepositoryException("Repository Exception")).times(1)
-                .andReturn(mockSiteFilterEntity).times(1);
+                .andThrow(new RepositoryException("Repository Exception")).times(1).andReturn(mockSiteFilterEntity)
+                .times(1);
         expect(mockSiteEcpmRepository.query(mockSiteEcpmQuery))
-                .andThrow(new RepositoryException("Repository Exception")).times(1)
-                .andReturn(mockSiteEcpmEntity).times(1);
+                .andThrow(new RepositoryException("Repository Exception")).times(1).andReturn(mockSiteEcpmEntity)
+                .times(1);
         expect(mockCurrencyConversionRepository.query(query1))
                 .andThrow(new RepositoryException("Repository Exception")).times(1)
                 .andReturn(mockCurrencyConversionEntity).times(1);
-        expect(mockWapSiteUACRepository.query(query1))
-                .andThrow(new RepositoryException("Repository Exception")).times(1)
-                .andReturn(mockWapSiteUACEntity).times(1);
-        expect(mockIxAccountMapRepository.query(query4))
-                .andThrow(new RepositoryException("Repository Exception")).times(1)
-                .andReturn(mockIxAccountMapEntity).times(1);
+        expect(mockWapSiteUACRepository.query(query1)).andThrow(new RepositoryException("Repository Exception"))
+                .times(1).andReturn(mockWapSiteUACEntity).times(1);
+        expect(mockIxAccountMapRepository.query(query4)).andThrow(new RepositoryException("Repository Exception"))
+                .times(1).andReturn(mockIxAccountMapEntity).times(1);
         expect(mockCreativeRepository.query(mockCreativeQuery))
-                .andThrow(new RepositoryException("Repository Exception")).times(1)
-                .andReturn(mockCreativeEntity).times(1);
-        expect(mockNativeAdTemplateRepository.query(query1))
-                .andThrow(new RepositoryException("Repository Exception")).times(1)
-                .andReturn(mockNativeAdTemplateEntity).times(1);
+                .andThrow(new RepositoryException("Repository Exception")).times(1).andReturn(mockCreativeEntity)
+                .times(1);
+        expect(mockNativeAdTemplateRepository.query(query1)).andThrow(new RepositoryException("Repository Exception"))
+                .times(1).andReturn(mockNativeAdTemplateEntity).times(1);
         replayAll();
 
-        expectNew(PricingEngineQuery.class, new Class[]{Integer.class, Integer.class}, query3, query3)
-                .andReturn(mockPricingEngineQuery).times(2);
-        expectNew(CreativeQuery.class, new Class[]{String.class, String.class}, query1, query2)
-                .andReturn(mockCreativeQuery).times(2);
-        expectNew(SiteFilterQuery.class, new Class[]{String.class, Integer.class}, query1, query3)
-                .andReturn(mockSiteFilterQuery).times(2);
-        expectNew(SiteEcpmQuery.class, new Class[]{String.class, Integer.class, Integer.class} ,query1, query3, query3)
+        expectNew(PricingEngineQuery.class, new Class[] {Integer.class, Integer.class}, query3, query3).andReturn(
+                mockPricingEngineQuery).times(2);
+        expectNew(CreativeQuery.class, new Class[] {String.class, String.class}, query1, query2).andReturn(
+                mockCreativeQuery).times(2);
+        expectNew(SiteFilterQuery.class, new Class[] {String.class, Integer.class}, query1, query3).andReturn(
+                mockSiteFilterQuery).times(2);
+        expectNew(SiteEcpmQuery.class, new Class[] {String.class, Integer.class, Integer.class}, query1, query3, query3)
                 .andReturn(mockSiteEcpmQuery).times(2);
 
         replayAll();
 
-        RepositoryHelper.Builder builder = RepositoryHelper.newBuilder();
+        final RepositoryHelper.Builder builder = RepositoryHelper.newBuilder();
         builder.setChannelAdGroupRepository(mockChannelAdGroupRepository);
         builder.setChannelFeedbackRepository(mockChannelFeedbackRepository);
         builder.setChannelRepository(mockChannelRepository);
@@ -224,7 +222,8 @@ public class RepositoryHelperTest {
 
     @Test
     public void testQuerySiteAerospikeFeedbackRepository1() throws Exception {
-        assertThat(tested.querySiteAerospikeFeedbackRepository(query1, query3), is(equalTo(mockSegmentAdGroupFeedbackEntity)));
+        assertThat(tested.querySiteAerospikeFeedbackRepository(query1, query3),
+                is(equalTo(mockSegmentAdGroupFeedbackEntity)));
     }
 
     @Ignore

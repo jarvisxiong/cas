@@ -24,33 +24,33 @@ import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
 public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
-    private static final Logger LOG          = LoggerFactory.getLogger(DCPBaiduAdNetwork.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DCPBaiduAdNetwork.class);
 
-    private transient String    latitude;
-    private transient String    longitude;
-    private int                 width;
-    private int                 height;
-    private String              uid;
-    private String              os;
+    private transient String latitude;
+    private transient String longitude;
+    private int width;
+    private int height;
+    private String uid;
+    private String os;
 
-    private static final String APP_ID       = "appid";
-    private static final String WIDTH        = "w";
-    private static final String HEIGHT       = "h";
-    private static final String IP           = "ip";
-    private static final String IMP_T_URL    = "impt";
-    private static final String CLK_T_URL    = "clkt";
+    private static final String APP_ID = "appid";
+    private static final String WIDTH = "w";
+    private static final String HEIGHT = "h";
+    private static final String IP = "ip";
+    private static final String IMP_T_URL = "impt";
+    private static final String CLK_T_URL = "clkt";
     private static final String GPS_LOCATION = "g";
-    private static final String SN           = "sn";
+    private static final String SN = "sn";
     private static final String LP_ACT_VALUE = "LP,PH,DL,MAP,SMS,MAI,VD,RM";
-    private static final String LP_ACT_TYPE  = "act";
+    private static final String LP_ACT_TYPE = "act";
     private static final String GEO_TEMPLATE = "%s_%s_%s";
-    private static final String Q_FORMAT     = "%s_cpr";
-    private static final String Q_APPID      = "q";
-    private static final String OS           = "os";
-    private static final String ANDROID      = "android";
-    private static final String IOS          = "iOS";
-    private static final String SYMBIAN      = "symbian";
-    private static final String WEB          = "web";
+    private static final String Q_FORMAT = "%s_cpr";
+    private static final String Q_APPID = "q";
+    private static final String OS = "os";
+    private static final String ANDROID = "android";
+    private static final String IOS = "iOS";
+    private static final String SYMBIAN = "symbian";
+    private static final String WEB = "web";
 
     public DCPBaiduAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
@@ -68,12 +68,12 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
 
         if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
                 && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
-            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
+            final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
+            final Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             // Baidu wanted in that format
             height = (int) Math.ceil(dim.getWidth());
             width = (int) Math.ceil(dim.getHeight());
@@ -110,7 +110,7 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
 
-        StringBuilder url = new StringBuilder(host);
+        final StringBuilder url = new StringBuilder(host);
 
         appendQueryParam(url, APP_ID, externalSiteId, false);
         appendQueryParam(url, OS, os, false);
@@ -125,8 +125,9 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
 
         if (StringUtils.isNotEmpty(latitude) && StringUtils.isNotEmpty(longitude)) {
 
-            String geo = String.format(GEO_TEMPLATE, String.valueOf(Calendar.getInstance().getTimeInMillis()),
-                    longitude, latitude);
+            final String geo =
+                    String.format(GEO_TEMPLATE, String.valueOf(Calendar.getInstance().getTimeInMillis()), longitude,
+                            latitude);
             appendQueryParam(url, GPS_LOCATION, geo, false);
         }
 
@@ -152,12 +153,12 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
             return;
         } else {
             statusCode = status.code();
-            VelocityContext context = new VelocityContext();
+            final VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response.trim());
 
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, null);
-            } catch (Exception exception) {
+            } catch (final Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from baidu : {}", exception);
                 LOG.info("Response from baidu: {}", response);

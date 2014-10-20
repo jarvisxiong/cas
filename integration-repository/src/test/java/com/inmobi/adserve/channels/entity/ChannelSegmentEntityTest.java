@@ -1,10 +1,8 @@
 package com.inmobi.adserve.channels.entity;
 
-import com.inmobi.casthrift.ADCreativeType;
-import org.json.JSONObject;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.modules.junit4.PowerMockRunner;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -12,25 +10,28 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.json.JSONObject;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.modules.junit4.PowerMockRunner;
+
+import com.inmobi.casthrift.ADCreativeType;
 
 @RunWith(PowerMockRunner.class)
 public class ChannelSegmentEntityTest {
 
     public ChannelSegmentEntity.Builder getChannelSegmentEntityBuilder(final String advertiserId,
-                                                                              final String adgroupId, final String[] adIds, final String channelId, final long platformTargeting,
-                                                                              final Long[] rcList, final Long[] tags, final boolean status, final boolean isTestMode,
-                                                                              final String externalSiteKey, final Timestamp modified_on, final String campaignId, final Long[] slotIds,
-                                                                              final Long[] incIds, final boolean allTags, final String pricingModel, final Integer[] siteRatings,
-                                                                              final int targetingPlatform, final ArrayList<Integer> osIds, final boolean udIdRequired,
-                                                                              final boolean zipCodeRequired, final boolean latlongRequired, final boolean richMediaOnly,
-                                                                              final boolean appUrlEnabled, final boolean interstitialOnly, final boolean nonInterstitialOnly,
-                                                                              final boolean stripUdId, final boolean stripZipCode, final boolean stripLatlong,
-                                                                              final JSONObject additionalParams, final List<Integer> manufModelTargetingList, final double ecpmBoost,
-                                                                              final Date eCPMBoostDate, final Long[] tod, final long adGroupIncId, final Integer[] AdFormatIds) {
-        ChannelSegmentEntity.Builder builder = ChannelSegmentEntity.newBuilder();
+            final String adgroupId, final String[] adIds, final String channelId, final long platformTargeting,
+            final Long[] rcList, final Long[] tags, final boolean status, final boolean isTestMode,
+            final String externalSiteKey, final Timestamp modified_on, final String campaignId, final Long[] slotIds,
+            final Long[] incIds, final boolean allTags, final String pricingModel, final Integer[] siteRatings,
+            final int targetingPlatform, final ArrayList<Integer> osIds, final boolean udIdRequired,
+            final boolean zipCodeRequired, final boolean latlongRequired, final boolean richMediaOnly,
+            final boolean appUrlEnabled, final boolean interstitialOnly, final boolean nonInterstitialOnly,
+            final boolean stripUdId, final boolean stripZipCode, final boolean stripLatlong,
+            final JSONObject additionalParams, final List<Integer> manufModelTargetingList, final double ecpmBoost,
+            final Date eCPMBoostDate, final Long[] tod, final long adGroupIncId, final Integer[] AdFormatIds) {
+        final ChannelSegmentEntity.Builder builder = ChannelSegmentEntity.newBuilder();
         builder.setAdvertiserId(advertiserId);
         builder.setAdvertiserId(advertiserId);
         builder.setAdgroupId(adgroupId);
@@ -112,13 +113,13 @@ public class ChannelSegmentEntityTest {
         final long adGroupIncId = 65L;
         final Integer[] adFormatIds = {9, 11, 0, -1};
 
-        ChannelSegmentEntity tested = getChannelSegmentEntityBuilder(advertiserId, adgroupId, adIds, channelId,
-                platformTargeting, rcList, tags, status, isTestMode, externalSiteKey, modified_on, campaignId,
-                slotIds, incIds, allTags, pricingModel, siteRatings, targetingPlatform, osIds, udIdRequired,
-                zipCodeRequired, latlongRequired, richMediaOnly, appUrlEnabled, interstitialOnly, nonInterstitialOnly,
-                stripUdId, stripZipCode, stripLatlong, additionalParams, manufModelTargetingList, ecpmBoost,
-                eCPMBoostDate, tod, adGroupIncId, adFormatIds)
-                .build();
+        final ChannelSegmentEntity tested =
+                getChannelSegmentEntityBuilder(advertiserId, adgroupId, adIds, channelId, platformTargeting, rcList,
+                        tags, status, isTestMode, externalSiteKey, modified_on, campaignId, slotIds, incIds, allTags,
+                        pricingModel, siteRatings, targetingPlatform, osIds, udIdRequired, zipCodeRequired,
+                        latlongRequired, richMediaOnly, appUrlEnabled, interstitialOnly, nonInterstitialOnly,
+                        stripUdId, stripZipCode, stripLatlong, additionalParams, manufModelTargetingList, ecpmBoost,
+                        eCPMBoostDate, tod, adGroupIncId, adFormatIds).build();
 
         assertThat(tested.getAdvertiserId(), is(equalTo(advertiserId)));
         assertThat(tested.getAdgroupId(), is(equalTo(adgroupId)));
@@ -137,10 +138,10 @@ public class ChannelSegmentEntityTest {
         assertThat(tested.getPricingModel(), is(equalTo(pricingModel)));
         assertThat(tested.getSiteRatings(), is(equalTo(siteRatings)));
 
-        ArrayList<Integer> targetingPlatformList = new ArrayList<>();
+        final ArrayList<Integer> targetingPlatformList = new ArrayList<>();
         targetingPlatformList.add(targetingPlatform);
         assertThat(tested.getTargetingPlatform(), is(equalTo(targetingPlatformList)));
-        //assertThat(tested.getOsIds(), is(equalTo(osIds)));
+        // assertThat(tested.getOsIds(), is(equalTo(osIds)));
         assertThat(tested.isUdIdRequired(), is(equalTo(udIdRequired)));
         assertThat(tested.isZipCodeRequired(), is(equalTo(zipCodeRequired)));
         assertThat(tested.isLatlongRequired(), is(equalTo(latlongRequired)));

@@ -1,11 +1,13 @@
 package com.inmobi.adserve.channels.server.logging;
 
+import org.slf4j.Marker;
+
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.turbo.TurboFilter;
 import ch.qos.logback.core.spi.FilterReply;
+
 import com.inmobi.adserve.channels.scope.NettyRequestScope;
-import org.slf4j.Marker;
 
 
 /**
@@ -13,10 +15,10 @@ import org.slf4j.Marker;
  * 
  */
 public class MarkerAndLevelFilter extends TurboFilter {
-    private static final Marker TRACE_MARKER               = NettyRequestScope.TRACE_MAKER;
-    private Level               levelToEnforce             = Level.ERROR;
+    private static final Marker TRACE_MARKER = NettyRequestScope.TRACE_MAKER;
+    private Level levelToEnforce = Level.ERROR;
 
-    private String              excludedTurboFilteringLogs = "";
+    private String excludedTurboFilteringLogs = "";
 
     @Override
     public void start() {
@@ -47,13 +49,12 @@ public class MarkerAndLevelFilter extends TurboFilter {
      */
     public void setLevel(final String levelStr) {
         if (levelStr != null) {
-            this.levelToEnforce = Level.toLevel(levelStr);
+            levelToEnforce = Level.toLevel(levelStr);
         }
     }
 
     /**
-     * @param excludedTurboFilteringLogs
-     *            the excludedTurboFilteringLogs to set
+     * @param excludedTurboFilteringLogs the excludedTurboFilteringLogs to set
      */
     public void setExcludedTurboFilteringLogs(final String excludedTurboFilteringLogs) {
         if (excludedTurboFilteringLogs != null) {

@@ -1,5 +1,14 @@
 package com.inmobi.adserve.channels.repository;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.phoenix.batteries.data.AbstractStatsMaintainingDBRepository;
 import com.inmobi.phoenix.batteries.data.DBEntity;
@@ -10,17 +19,10 @@ import com.inmobi.phoenix.batteries.data.rdbmsrow.ResultSetRow;
 import com.inmobi.phoenix.data.RepositoryManager;
 import com.inmobi.phoenix.data.RepositoryQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
-import org.apache.commons.lang.StringUtils;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<WapSiteUACEntity, String> implements
-        RepositoryManager {
+public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<WapSiteUACEntity, String>
+        implements
+            RepositoryManager {
     // private static final long IOS_SITE_TYPE = 21;
     private static final long ANDROID_SITE_TYPE = 22;
     private static final Map<String, String> CONTENT_RATING_MAP = new HashMap<>();
@@ -34,7 +36,8 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
     }
 
     @Override
-    public DBEntity<WapSiteUACEntity, String> buildObjectFromRow(final ResultSetRow resultSetRow) throws RepositoryException {
+    public DBEntity<WapSiteUACEntity, String> buildObjectFromRow(final ResultSetRow resultSetRow)
+            throws RepositoryException {
         final NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
         final String id = row.getString("id");
         final Timestamp modifiedOn = row.getTimestamp("modified_on");
@@ -46,8 +49,8 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
             final String categories = row.getString("categories");
             final boolean coppaEnabled = row.getBoolean("coppa_enabled");
             final Integer exchange_settings = row.getInt("exchange_settings");
-            final Integer pubBlindArr[] = (Integer[])row.getArray("pub_blind_list");
-            final Integer siteBlindArr[] = (Integer[])row.getArray("site_blind_list");
+            final Integer pubBlindArr[] = (Integer[]) row.getArray("pub_blind_list");
+            final Integer siteBlindArr[] = (Integer[]) row.getArray("site_blind_list");
             final boolean siteTransparencyEnabled = row.getBoolean("is_site_transparent");
             final String siteUrl = row.getString("site_url");
             final String siteName = row.getString("site_name");
@@ -55,9 +58,9 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
             final String bundleId = row.getString("bundle_id");
 
             boolean pubTransparencyEnabled = false;
-            if(1 == exchange_settings){
+            if (1 == exchange_settings) {
                 // exchange_settings==1 => Publisher is transparent and exchange enabled
-                pubTransparencyEnabled=true;
+                pubTransparencyEnabled = true;
             }
 
             final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
@@ -109,8 +112,8 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
             return new DBEntity<WapSiteUACEntity, String>(entity, modifiedOn);
         } catch (final Exception exp) {
             logger.error("Error in resultset row", exp);
-            return new DBEntity<WapSiteUACEntity, String>(new EntityError<String>(id, "ERROR_IN_EXTRACTING_WAP_SITE_UAC"),
-                    modifiedOn);
+            return new DBEntity<WapSiteUACEntity, String>(new EntityError<String>(id,
+                    "ERROR_IN_EXTRACTING_WAP_SITE_UAC"), modifiedOn);
         }
 
     }

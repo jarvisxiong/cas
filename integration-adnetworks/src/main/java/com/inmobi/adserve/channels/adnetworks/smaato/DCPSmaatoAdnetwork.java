@@ -1,5 +1,22 @@
 package com.inmobi.adserve.channels.adnetworks.smaato;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
+import java.awt.Dimension;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -10,62 +27,47 @@ import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 import com.smaato.soma.oapi.Response;
 import com.smaato.soma.oapi.Response.Ads.Ad;
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.velocity.VelocityContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 
 public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
 
-    private static final Logger         LOG              = LoggerFactory.getLogger(DCPSmaatoAdnetwork.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DCPSmaatoAdnetwork.class);
 
-    private transient String            latitude;
-    private transient String            longitude;
-    private int                         width;
-    private int                         height;
-    private String                      dimension;
+    private transient String latitude;
+    private transient String longitude;
+    private int width;
+    private int height;
+    private String dimension;
 
-    private static final String         PUBID            = "pub";
-    private static final String         UA               = "device";
-    private static final String         CLIENT_IP        = "devip";
-    private static final String         ADSPACEID        = "adspace";
+    private static final String PUBID = "pub";
+    private static final String UA = "device";
+    private static final String CLIENT_IP = "devip";
+    private static final String ADSPACEID = "adspace";
 
-    private static final String         IFA              = "iosadid";
-    private static final String         IFA_TRACKING     = "iosadtracking";
-    private static final String         OPEN_UDID        = "openudid";
-    private static final String         ANDROID_ID       = "androidid";
-    private static final String         ODIN1            = "odin";
+    private static final String IFA = "iosadid";
+    private static final String IFA_TRACKING = "iosadtracking";
+    private static final String OPEN_UDID = "openudid";
+    private static final String ANDROID_ID = "androidid";
+    private static final String ODIN1 = "odin";
     // private static final String VERSION = "apiver";
-    protected static final String       LATLONG          = "gps";
-    protected static final String       GENDER           = "gender";
-    protected static final String       KEYWORDS         = "kws";
-    protected static final String       AGE              = "age";
-    private static final String         WIDTH            = "width";
-    private static final String         HEIGHT           = "height";
-    private static final String         FORMAT           = "format";
+    protected static final String LATLONG = "gps";
+    protected static final String GENDER = "gender";
+    protected static final String KEYWORDS = "kws";
+    protected static final String AGE = "age";
+    private static final String WIDTH = "width";
+    private static final String HEIGHT = "height";
+    private static final String FORMAT = "format";
     // private static final String FORMAT_STRICT = "formatstrict";
-    private static final String         DIMENSION        = "dimension";
-    private static final String         DIMENSION_STRICT = "dimensionstrict";
-    private static final String         SUCCESS          = "success";
-    private static final String         IMAGE_TYPE       = "IMG";
-    private static final String         TEXT_TYPE        = "TXT";
+    private static final String DIMENSION = "dimension";
+    private static final String DIMENSION_STRICT = "dimensionstrict";
+    private static final String SUCCESS = "success";
+    private static final String IMAGE_TYPE = "IMG";
+    private static final String TEXT_TYPE = "TXT";
 
-    private static final String         RESPONSE_FORMAT  = "all";
-    private static final String         STRICT_FIELD     = "true";
-    private static final String         LAT_LONG_FORMAT  = "%s,%s";
-    private final String                publisherId;
+    private static final String RESPONSE_FORMAT = "all";
+    private static final String STRICT_FIELD = "true";
+    private static final String LAT_LONG_FORMAT = "%s,%s";
+    private final String publisherId;
 
     private static Map<Integer, String> slotIdMap;
 
@@ -100,17 +102,17 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         host = config.getString("smaato.host");
         if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
                 && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
-            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
+            final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            dimension = slotIdMap.get((sasParams.getSlot()).intValue());
+            dimension = slotIdMap.get(sasParams.getSlot().intValue());
             if (StringUtils.isBlank(dimension)) {
                 LOG.debug("mandatory parameters missing for smaato so exiting adapter");
                 return false;
             }
-            Dimension dim = SlotSizeMapping.getDimension((sasParams.getSlot()).longValue());
+            final Dimension dim = SlotSizeMapping.getDimension(sasParams.getSlot().longValue());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
 
@@ -131,7 +133,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public URI getRequestUri() throws Exception {
-        StringBuilder url = new StringBuilder(host);
+        final StringBuilder url = new StringBuilder(host);
         // appendQueryParam(url, VERSION, apiVersion, true);
 
         appendQueryParam(url, ADSPACEID, externalSiteId, true);
@@ -194,7 +196,8 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
             uri = new URIBuilder(uri).setPort(80).build();
         }
 
-        return new RequestBuilder().setUrl(uri.toString()).setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+        return new RequestBuilder().setUrl(uri.toString())
+                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
                 .setHeader("x-mh-User-Agent", sasParams.getUserAgent())
@@ -216,9 +219,9 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
             return;
         } else {
             statusCode = status.code();
-            VelocityContext context = new VelocityContext();
+            final VelocityContext context = new VelocityContext();
             try {
-                Response smaatoResponse = jaxbHelper.unmarshal(response, com.smaato.soma.oapi.Response.class);
+                final Response smaatoResponse = jaxbHelper.unmarshal(response, com.smaato.soma.oapi.Response.class);
 
                 if (!SUCCESS.equalsIgnoreCase(smaatoResponse.getStatus()) || smaatoResponse.getAds().getAd() == null) {
                     adStatus = "NO_AD";
@@ -227,7 +230,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
                     return;
                 }
 
-                Ad ad = smaatoResponse.getAds().getAd();
+                final Ad ad = smaatoResponse.getAds().getAd();
 
                 TemplateType t = null;
                 context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, ad.getAction().getTarget());
@@ -239,7 +242,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
                     t = TemplateType.IMAGE;
                 } else if (TEXT_TYPE.equalsIgnoreCase(ad.getType()) && StringUtils.isNotBlank(ad.getAdtext())) {
                     context.put(VelocityTemplateFieldConstants.AD_TEXT, ad.getAdtext());
-                    String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
+                    final String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                     if (StringUtils.isEmpty(vmTemplate)) {
                         t = TemplateType.PLAIN;
                     } else {
@@ -253,7 +256,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
 
-            } catch (Exception exception) {
+            } catch (final Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from Smaato, exception raised {}", exception);
                 LOG.info("Response from Smaato {}", response);

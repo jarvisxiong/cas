@@ -1,12 +1,17 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import com.inmobi.adserve.channels.server.CasConfigUtil;
-import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
-import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
+import static org.easymock.EasyMock.expect;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.powermock.api.easymock.PowerMock.createMock;
+import static org.powermock.api.easymock.PowerMock.expectLastCall;
+import static org.powermock.api.easymock.PowerMock.mockStatic;
+import static org.powermock.api.easymock.PowerMock.replayAll;
+import static org.powermock.api.easymock.PowerMock.verifyAll;
 import io.netty.handler.codec.http.QueryStringDecoder;
+
+import java.util.Iterator;
+
 import org.apache.commons.configuration.Configuration;
 import org.hamcrest.core.IsEqual;
 import org.json.JSONException;
@@ -16,16 +21,12 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.util.Iterator;
-
-import static org.easymock.EasyMock.expect;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.powermock.api.easymock.PowerMock.createMock;
-import static org.powermock.api.easymock.PowerMock.expectLastCall;
-import static org.powermock.api.easymock.PowerMock.mockStatic;
-import static org.powermock.api.easymock.PowerMock.replayAll;
-import static org.powermock.api.easymock.PowerMock.verifyAll;
+import com.inmobi.adserve.channels.server.CasConfigUtil;
+import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
+import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({CasConfigUtil.class, InspectorStats.class})
@@ -34,10 +35,10 @@ public class ServletChangeConfigTest {
     @Test
     public void testHandleRequestJsonException() throws Exception {
         mockStatic(InspectorStats.class);
-        HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-        ResponseSender mockResponseSender = createMock(ResponseSender.class);
-        QueryStringDecoder mockQueryStringDecoder = createMock(QueryStringDecoder.class);
-        RequestParser mockRequestParser = createMock(RequestParser.class);
+        final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+        final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+        final QueryStringDecoder mockQueryStringDecoder = createMock(QueryStringDecoder.class);
+        final RequestParser mockRequestParser = createMock(RequestParser.class);
 
         expect(mockQueryStringDecoder.parameters()).andReturn(null).times(1);
         expect(mockRequestParser.extractParams(null, "update")).andThrow(new JSONException("Json Exception"));
@@ -51,7 +52,7 @@ public class ServletChangeConfigTest {
         replayAll();
         mockHttpRequestHandler.responseSender = mockResponseSender;
 
-        ServletChangeConfig tested = new ServletChangeConfig(mockRequestParser);
+        final ServletChangeConfig tested = new ServletChangeConfig(mockRequestParser);
         tested.handleRequest(mockHttpRequestHandler, mockQueryStringDecoder, null);
 
         verifyAll();
@@ -59,10 +60,10 @@ public class ServletChangeConfigTest {
 
     @Test
     public void testHandleRequestJsonObjectIsNull() throws Exception {
-        HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-        ResponseSender mockResponseSender = createMock(ResponseSender.class);
-        QueryStringDecoder mockQueryStringDecoder = createMock(QueryStringDecoder.class);
-        RequestParser mockRequestParser = createMock(RequestParser.class);
+        final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+        final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+        final QueryStringDecoder mockQueryStringDecoder = createMock(QueryStringDecoder.class);
+        final RequestParser mockRequestParser = createMock(RequestParser.class);
 
         expect(mockQueryStringDecoder.parameters()).andReturn(null).times(1);
         expect(mockRequestParser.extractParams(null, "update")).andReturn(null).times(1);
@@ -74,7 +75,7 @@ public class ServletChangeConfigTest {
         replayAll();
         mockHttpRequestHandler.responseSender = mockResponseSender;
 
-        ServletChangeConfig tested = new ServletChangeConfig(mockRequestParser);
+        final ServletChangeConfig tested = new ServletChangeConfig(mockRequestParser);
         tested.handleRequest(mockHttpRequestHandler, mockQueryStringDecoder, null);
 
         verifyAll();
@@ -82,33 +83,30 @@ public class ServletChangeConfigTest {
 
     @Test
     public void testHandleRequestJsonSuccessfull() throws Exception {
-        String configKey1 = "adapter.key";
-        String configKey2 = "server.key";
-        String configKey3 = "reserTimers";
-        String value = "value";
-        String response = "Successfully changed Config!!!!!!!!!!!!!!!!!\nThe changes are\nadapter.key=key\nserver.key=key\n";
+        final String configKey1 = "adapter.key";
+        final String configKey2 = "server.key";
+        final String configKey3 = "reserTimers";
+        final String value = "value";
+        final String response =
+                "Successfully changed Config!!!!!!!!!!!!!!!!!\nThe changes are\nadapter.key=key\nserver.key=key\n";
 
         mockStatic(CasConfigUtil.class);
-        HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-        ResponseSender mockResponseSender = createMock(ResponseSender.class);
-        QueryStringDecoder mockQueryStringDecoder = createMock(QueryStringDecoder.class);
-        RequestParser mockRequestParser = createMock(RequestParser.class);
-        JSONObject mockJsonObject = createMock(JSONObject.class);
-        Iterator mockIterator = createMock(Iterator.class);
-        Configuration mockConfig = createMock(Configuration.class);
+        final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+        final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+        final QueryStringDecoder mockQueryStringDecoder = createMock(QueryStringDecoder.class);
+        final RequestParser mockRequestParser = createMock(RequestParser.class);
+        final JSONObject mockJsonObject = createMock(JSONObject.class);
+        final Iterator mockIterator = createMock(Iterator.class);
+        final Configuration mockConfig = createMock(Configuration.class);
 
         expect(mockQueryStringDecoder.parameters()).andReturn(null).times(1);
         expect(mockRequestParser.extractParams(null, "update")).andReturn(mockJsonObject).times(1);
         expect(mockJsonObject.keys()).andReturn(mockIterator).times(1);
         expect(mockJsonObject.getString(configKey1)).andReturn(value).times(1);
         expect(mockJsonObject.getString(configKey2)).andReturn(value).times(1);
-        expect(mockIterator.hasNext())
-                .andReturn(true).times(3)
-                .andReturn(false).times(1);
-        expect(mockIterator.next())
-                .andReturn(configKey1).times(1)
-                .andReturn(configKey2).times(1)
-                .andReturn(configKey3).times(1);
+        expect(mockIterator.hasNext()).andReturn(true).times(3).andReturn(false).times(1);
+        expect(mockIterator.next()).andReturn(configKey1).times(1).andReturn(configKey2).times(1).andReturn(configKey3)
+                .times(1);
         expect(CasConfigUtil.getAdapterConfig()).andReturn(mockConfig).times(3);
         expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).times(3);
         expect(mockConfig.containsKey("key")).andReturn(true).times(2);
@@ -124,7 +122,7 @@ public class ServletChangeConfigTest {
         replayAll();
         mockHttpRequestHandler.responseSender = mockResponseSender;
 
-        ServletChangeConfig tested = new ServletChangeConfig(mockRequestParser);
+        final ServletChangeConfig tested = new ServletChangeConfig(mockRequestParser);
         tested.handleRequest(mockHttpRequestHandler, mockQueryStringDecoder, null);
 
         verifyAll();
@@ -132,7 +130,7 @@ public class ServletChangeConfigTest {
 
     @Test
     public void testGetName() throws Exception {
-        ServletChangeConfig tested = new ServletChangeConfig(null);
+        final ServletChangeConfig tested = new ServletChangeConfig(null);
         assertThat(tested.getName(), is(IsEqual.equalTo("configchange")));
     }
 }

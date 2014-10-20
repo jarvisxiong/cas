@@ -50,20 +50,19 @@ import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 
 
 public class Logging {
-    private static final Logger                            LOG                     = LoggerFactory
-                                                                                           .getLogger(Logging.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Logging.class);
 
-    private static AbstractMessagePublisher                dataBusPublisher;
-    private static String                                  rrLogKey;
-    private static String                                  sampledAdvertisementLogKey;
-    private static String                                  umpAdsLogKey;
-    private static boolean                                 enableFileLogging;
-    private static boolean                                 enableDatabusLogging;
-    public static final ConcurrentHashMap<String, String> SAMPLED_ADVERTISER_LOG_NOS = new ConcurrentHashMap<String, String>(
-                                                                                           2000);
+    private static AbstractMessagePublisher dataBusPublisher;
+    private static String rrLogKey;
+    private static String sampledAdvertisementLogKey;
+    private static String umpAdsLogKey;
+    private static boolean enableFileLogging;
+    private static boolean enableDatabusLogging;
+    public static final ConcurrentHashMap<String, String> SAMPLED_ADVERTISER_LOG_NOS =
+            new ConcurrentHashMap<String, String>(2000);
     @AdvertiserIdNameMap
     @Inject
-    private static Map<String, String>                     advertiserIdNameMap;
+    private static Map<String, String> advertiserIdNameMap;
 
     public static ConcurrentHashMap<String, String> getSampledadvertiserlognos() {
         return SAMPLED_ADVERTISER_LOG_NOS;
@@ -83,14 +82,14 @@ public class Logging {
     }
 
     // Writing rrlogs
-    public static void rrLogging(Marker traceMarker, final ChannelSegment channelSegment, final List<ChannelSegment> rankList,
-            final SASRequestParameters sasParams, String terminationReason, final long totalTime) throws JSONException,
-            TException {
+    public static void rrLogging(final Marker traceMarker, final ChannelSegment channelSegment,
+            final List<ChannelSegment> rankList, final SASRequestParameters sasParams, String terminationReason,
+            final long totalTime) throws JSONException, TException {
         InspectorStats.incrementStatCount(InspectorStrings.LATENCY, totalTime);
 
         if (null != sasParams) {
-            DemandSourceType dst = DemandSourceType.findByValue(sasParams.getDst());
-            InspectorStats.incrementStatCount(dst + "-" +InspectorStrings.LATENCY, totalTime);
+            final DemandSourceType dst = DemandSourceType.findByValue(sasParams.getDst());
+            InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.LATENCY, totalTime);
             if (null != sasParams.getAllParametersJson() && (rankList == null || rankList.isEmpty())) {
                 InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NO_MATCH_SEGMENT_COUNT);
                 InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NO_MATCH_SEGMENT_LATENCY, totalTime);
@@ -99,8 +98,9 @@ public class Logging {
             }
             if (null != sasParams.getRFormat() && "native".equalsIgnoreCase(sasParams.getRFormat())) {
                 InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NATIVE_REQUESTS);
-                if(rankList == null || rankList.isEmpty()){
-                	InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NATIVE_REQUESTS + "-" + InspectorStrings.NO_MATCH_SEGMENT_COUNT);
+                if (rankList == null || rankList.isEmpty()) {
+                    InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NATIVE_REQUESTS + "-"
+                            + InspectorStrings.NO_MATCH_SEGMENT_COUNT);
                 }
             }
         }
@@ -116,18 +116,18 @@ public class Logging {
         short adsServed = 0;
         String host;
         try {
-            InetAddress addr = InetAddress.getLocalHost();
+            final InetAddress addr = InetAddress.getLocalHost();
             host = addr.getHostName();
             if (host == null) {
                 LOG.info("host cant be empty, abandoning rr logging");
                 return;
             }
-        } catch (UnknownHostException ex) {
+        } catch (final UnknownHostException ex) {
             LOG.info("could not resolve host inside rr logging so abandoning response, raised exception {}", ex);
             return;
         }
-        InventoryType inventory = getInventoryType(sasParams);
-        String timestamp = new Date().toString();
+        final InventoryType inventory = getInventoryType(sasParams);
+        final String timestamp = new Date().toString();
         AdIdChain adChain;
         AdMeta adMeta;
         Ad ad;
@@ -140,17 +140,19 @@ public class Logging {
             isServerImpression = true;
             advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
             adsServed = 1;
-            ChannelSegmentEntity channelSegmentEntity = channelSegment.getChannelSegmentEntity();
-            adChain = new AdIdChain(channelSegmentEntity.getAdId(channelSegment.getAdNetworkInterface().getCreativeType()),
-                    channelSegmentEntity.getAdgroupId(), channelSegmentEntity.getCampaignId(),
-                    channelSegmentEntity.getAdvertiserId(), channelSegmentEntity.getExternalSiteKey());
-            ContentRating contentRating = getContentRating(sasParams);
-            PricingModel pricingModel = getPricingModel(channelSegmentEntity.getPricingModel());
+            final ChannelSegmentEntity channelSegmentEntity = channelSegment.getChannelSegmentEntity();
+            adChain =
+                    new AdIdChain(
+                            channelSegmentEntity.getAdId(channelSegment.getAdNetworkInterface().getCreativeType()),
+                            channelSegmentEntity.getAdgroupId(), channelSegmentEntity.getCampaignId(),
+                            channelSegmentEntity.getAdvertiserId(), channelSegmentEntity.getExternalSiteKey());
+            final ContentRating contentRating = getContentRating(sasParams);
+            final PricingModel pricingModel = getPricingModel(channelSegmentEntity.getPricingModel());
             adMeta = new AdMeta(contentRating, pricingModel, "BANNER"); // TODO: Check "BANNER" point
             ad = new Ad(adChain, adMeta);
             impression = new Impression(channelSegment.getAdNetworkInterface().getImpressionId(), ad);
             impression.setAdChain(createCasAdChain(channelSegment));
-            double winBid = channelSegment.getAdNetworkInterface().getSecondBidPriceInUsd();
+            final double winBid = channelSegment.getAdNetworkInterface().getSecondBidPriceInUsd();
             if (winBid != -1) {
                 ad.setWinBid(winBid);
             }
@@ -167,7 +169,7 @@ public class Logging {
             slotServed = sasParams.getSlot();
             countryId = sasParams.getCountryId();
             carrierId = sasParams.getCarrierId();
-            if (null != sasParams.getRqMkSlot() && (!sasParams.getRqMkSlot().isEmpty())) {
+            if (null != sasParams.getRqMkSlot() && !sasParams.getRqMkSlot().isEmpty()) {
                 requestSlot = sasParams.getRqMkSlot().get(0);
             }
             state = sasParams.getState();
@@ -185,7 +187,7 @@ public class Logging {
             }
         }
 
-        HandsetMeta handsetMeta = new HandsetMeta();
+        final HandsetMeta handsetMeta = new HandsetMeta();
         if (null != handsetInternalId) {
             handsetMeta.setId(handsetInternalId.intValue());
         }
@@ -194,7 +196,7 @@ public class Logging {
             handsetMeta.setOsId(sasParams.getOsId());
         }
 
-        User user = new User();
+        final User user = new User();
         if (null != sasParams) {
             if (null != sasParams.getAge()) {
                 user.setAge(sasParams.getAge());
@@ -204,9 +206,11 @@ public class Logging {
             }
             user.setUids(sasParams.getTUidParams());
         }
-        short adRequested = 1;
-        Request request = new Request(adRequested, adsServed, sasParams == null ? null : sasParams.getSiteId(),
-                sasParams == null ? null : sasParams.getTid());
+        final short adRequested = 1;
+        final Request request =
+                new Request(adRequested, adsServed, sasParams == null ? null : sasParams.getSiteId(), sasParams == null
+                        ? null
+                        : sasParams.getTid());
         if (slotServed != null) {
             request.setSlot_served(Integer.valueOf(slotServed).shortValue());
         }
@@ -230,53 +234,55 @@ public class Logging {
             impressions = new ArrayList<Impression>();
             impressions.add(impression);
         }
-        AdRR adRR = new AdRR(host, timestamp, request, impressions, isTerminated, terminationReason);
+        final AdRR adRR = new AdRR(host, timestamp, request, impressions, isTerminated, terminationReason);
         adRR.setTime_stamp(new Date().getTime());
-        List<Channel> channels = createChannelsLog(rankList);
+        final List<Channel> channels = createChannelsLog(rankList);
         adRR.setChannels(channels);
         if (enableDatabusLogging) {
-            TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
-            Message msg = new Message(tSerializer.serialize(adRR));
+            final TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
+            final Message msg = new Message(tSerializer.serialize(adRR));
             dataBusPublisher.publish(rrLogKey, msg);
             LOG.debug(traceMarker, "ADRR is : {}", adRR);
         }
         // Logging real time stats for graphite
         if (null != sasParams) {
-            DemandSourceType dst = DemandSourceType.findByValue(sasParams.getDst());
+            final DemandSourceType dst = DemandSourceType.findByValue(sasParams.getDst());
             InspectorStats.updateYammerTimerStats(dst.name(), InspectorStrings.TIMER_LATENCY, totalTime);
         }
     }
-    
-    
+
+
 
     // Writing creatives
-    public static void creativeLogging(final List<ChannelSegment> channelSegments, final SASRequestParameters sasRequestParameters) {
+    public static void creativeLogging(final List<ChannelSegment> channelSegments,
+            final SASRequestParameters sasRequestParameters) {
         LOG.debug("inside creativeLogging");
         if (null == channelSegments || channelSegments.isEmpty()) {
             return;
         }
 
-        for (ChannelSegment channelSegment : channelSegments) {
-            AdNetworkInterface adNetworkInterface = channelSegment.getAdNetworkInterface();
+        for (final ChannelSegment channelSegment : channelSegments) {
+            final AdNetworkInterface adNetworkInterface = channelSegment.getAdNetworkInterface();
             if (adNetworkInterface.isRtbPartner() && adNetworkInterface.isLogCreative()) {
                 String response = adNetworkInterface.getHttpResponseContent();
-                if(adNetworkInterface.getCreativeType() == ADCreativeType.NATIVE){
-                	response = adNetworkInterface.getAdMarkUp();
+                if (adNetworkInterface.getCreativeType() == ADCreativeType.NATIVE) {
+                    response = adNetworkInterface.getAdMarkUp();
                 }
-                String requestUrl = adNetworkInterface.getRequestUrl();
-                ThirdPartyAdResponse adResponse = adNetworkInterface.getResponseStruct();
-                String partnerName = adNetworkInterface.getName();
-                String externalSiteKey = channelSegment.getChannelSegmentEntity().getExternalSiteKey();
-                String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
-                String adStatus = adResponse.getAdStatus();
+                final String requestUrl = adNetworkInterface.getRequestUrl();
+                final ThirdPartyAdResponse adResponse = adNetworkInterface.getResponseStruct();
+                final String partnerName = adNetworkInterface.getName();
+                final String externalSiteKey = channelSegment.getChannelSegmentEntity().getExternalSiteKey();
+                final String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
+                final String adStatus = adResponse.getAdStatus();
 
-                CasAdvertisementLog creativeLog = new CasAdvertisementLog(partnerName, requestUrl, response,
-                        adStatus, externalSiteKey, advertiserId);
+                final CasAdvertisementLog creativeLog =
+                        new CasAdvertisementLog(partnerName, requestUrl, response, adStatus, externalSiteKey,
+                                advertiserId);
                 creativeLog.setCountryId(sasRequestParameters.getCountryId().intValue());
-                if(adNetworkInterface.getDst() == DemandSourceType.RTBD) {
-                creativeLog.setImageUrl(adNetworkInterface.getIUrl());
-                creativeLog.setCreativeAttributes(adNetworkInterface.getAttribute());
-                creativeLog.setAdvertiserDomains(adNetworkInterface.getADomain());
+                if (adNetworkInterface.getDst() == DemandSourceType.RTBD) {
+                    creativeLog.setImageUrl(adNetworkInterface.getIUrl());
+                    creativeLog.setCreativeAttributes(adNetworkInterface.getAttribute());
+                    creativeLog.setAdvertiserDomains(adNetworkInterface.getADomain());
                 }
                 creativeLog.setCreativeId(adNetworkInterface.getCreativeId());
                 creativeLog.setCreativeType(adNetworkInterface.getCreativeType());
@@ -284,9 +290,9 @@ public class Logging {
                 LOG.info("Creative msg is {}", creativeLog);
                 Message msg = null;
                 try {
-                    TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
+                    final TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
                     msg = new Message(tSerializer.serialize(creativeLog));
-                } catch (TException e) {
+                } catch (final TException e) {
                     LOG.debug("Error while creating creative logs for databus, raised exception {}", e);
                 }
                 if (null != msg) {
@@ -300,20 +306,20 @@ public class Logging {
         if (null == rankList) {
             return new ArrayList<Channel>();
         }
-        List<Channel> channels = new ArrayList<Channel>();
-        for (ChannelSegment channelSegment : rankList) {
-            Channel channel = new Channel();
+        final List<Channel> channels = new ArrayList<Channel>();
+        for (final ChannelSegment channelSegment : rankList) {
+            final Channel channel = new Channel();
             channel.setAdStatus(getAdStatus(channelSegment.getAdNetworkInterface().getAdStatus()));
             channel.setLatency(channelSegment.getAdNetworkInterface().getLatency());
             channel.setAdChain(createCasAdChain(channelSegment));
-            double bid = channelSegment.getAdNetworkInterface().getBidPriceInUsd();
+            final double bid = channelSegment.getAdNetworkInterface().getBidPriceInUsd();
             if (bid > 0) {
                 channel.setBid(bid);
             }
             channels.add(channel);
             // Incrementing inspectors
-            AdNetworkInterface adNetwork = channelSegment.getAdNetworkInterface();
-            ThirdPartyAdResponse adResponse = adNetwork.getResponseStruct();
+            final AdNetworkInterface adNetwork = channelSegment.getAdNetworkInterface();
+            final ThirdPartyAdResponse adResponse = adNetwork.getResponseStruct();
             InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_REQUESTS);
             InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.LATENCY, adResponse.getLatency());
             InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.CONNECTION_LATENCY,
@@ -337,7 +343,7 @@ public class Logging {
     }
 
     public static CasAdChain createCasAdChain(final ChannelSegment channelSegment) {
-        CasAdChain casAdChain = new CasAdChain();
+        final CasAdChain casAdChain = new CasAdChain();
         casAdChain.setAdvertiserId(channelSegment.getChannelSegmentEntity().getAdvertiserId());
         casAdChain.setCampaign_inc_id(channelSegment.getChannelSegmentEntity().getCampaignIncId());
         casAdChain.setAdgroup_inc_id(channelSegment.getChannelSegmentEntity().getAdgroupIncId());
@@ -362,17 +368,17 @@ public class Logging {
 
     public static void advertiserLogging(final List<ChannelSegment> rankList, final Configuration config) {
         LOG.debug("came inside advertiser log");
-        Logger advertiserLogger = LoggerFactory.getLogger(config.getString("advertiser"));
+        final Logger advertiserLogger = LoggerFactory.getLogger(config.getString("advertiser"));
         if (!advertiserLogger.isDebugEnabled()) {
             return;
         }
-        char sep = 0x01;
-        StringBuilder log = new StringBuilder();
+        final char sep = 0x01;
+        final StringBuilder log = new StringBuilder();
         LOG.debug("got logger handle for advertiser logs");
         for (int index = 0; rankList != null && index < rankList.size(); index++) {
-            AdNetworkInterface adNetworkInterface = rankList.get(index).getAdNetworkInterface();
-            ThirdPartyAdResponse adResponse = adNetworkInterface.getResponseStruct();
-            String partnerName = adNetworkInterface.getName();
+            final AdNetworkInterface adNetworkInterface = rankList.get(index).getAdNetworkInterface();
+            final ThirdPartyAdResponse adResponse = adNetworkInterface.getResponseStruct();
+            final String partnerName = adNetworkInterface.getName();
             log.append(partnerName);
             log.append(sep).append(adResponse.getAdStatus());
             String response = "";
@@ -396,45 +402,47 @@ public class Logging {
     }
 
     /**
-     *
+     * 
      * @param rankList
      * @param config
      */
     public static void sampledAdvertiserLogging(final List<ChannelSegment> rankList, final Configuration config) {
         LOG.debug("came inside sampledAdvertiser log");
-        Logger sampledAdvertiserLogger = LoggerFactory.getLogger(config.getString("sampledadvertiser"));
+        final Logger sampledAdvertiserLogger = LoggerFactory.getLogger(config.getString("sampledadvertiser"));
         if (!sampledAdvertiserLogger.isDebugEnabled()) {
             return;
         }
-        char sep = 0x01;
-        StringBuilder log = new StringBuilder();
+        final char sep = 0x01;
+        final StringBuilder log = new StringBuilder();
         LOG.debug("got logger handle for sampledAdvertiser logs");
 
         for (int index = 0; rankList != null && index < rankList.size(); index++) {
-            AdNetworkInterface adNetworkInterface = rankList.get(index).getAdNetworkInterface();
-            ThirdPartyAdResponse adResponse = adNetworkInterface.getResponseStruct();
-            String adStatus = adResponse.getAdStatus();
-            String partnerName = adNetworkInterface.getName();
-            String externalSiteKey = rankList.get(index).getChannelSegmentEntity().getExternalSiteKey();
-            String advertiserId = rankList.get(index).getChannelSegmentEntity().getAdvertiserId();
-            String requestUrl = adNetworkInterface.getRequestUrl();
+            final AdNetworkInterface adNetworkInterface = rankList.get(index).getAdNetworkInterface();
+            final ThirdPartyAdResponse adResponse = adNetworkInterface.getResponseStruct();
+            final String adStatus = adResponse.getAdStatus();
+            final String partnerName = adNetworkInterface.getName();
+            final String externalSiteKey = rankList.get(index).getChannelSegmentEntity().getExternalSiteKey();
+            final String advertiserId = rankList.get(index).getChannelSegmentEntity().getAdvertiserId();
+            final String requestUrl = adNetworkInterface.getRequestUrl();
             String response = adNetworkInterface.getHttpResponseContent();
-            if(adNetworkInterface.getCreativeType() == ADCreativeType.NATIVE){
-            	response = adNetworkInterface.getAdMarkUp();
+            if (adNetworkInterface.getCreativeType() == ADCreativeType.NATIVE) {
+                response = adNetworkInterface.getAdMarkUp();
             }
-            
+
             if (!"AD".equalsIgnoreCase(adStatus) || "".equals(requestUrl) || "".equals(response)) {
                 continue;
             }
 
             if (enableDatabusLogging && decideToLog(partnerName, externalSiteKey)) {
-                //Actual Logging to stream
-                CasAdvertisementLog casAdvertisementLog = new CasAdvertisementLog(partnerName, requestUrl, response, adStatus, externalSiteKey, advertiserId);
+                // Actual Logging to stream
+                final CasAdvertisementLog casAdvertisementLog =
+                        new CasAdvertisementLog(partnerName, requestUrl, response, adStatus, externalSiteKey,
+                                advertiserId);
                 casAdvertisementLog.setCreativeType(adNetworkInterface.getCreativeType());
                 sendToDatabus(casAdvertisementLog, sampledAdvertisementLogKey);
             }
 
-            //File Logging
+            // File Logging
             if (index > 0 && partnerName.length() > 0 && log.length() > 0) {
                 log.append("\n");
             }
@@ -444,7 +452,7 @@ public class Logging {
             log.append(sep).append(response).append(sep).append(advertiserId);
         }
 
-        //Actual File Logging
+        // Actual File Logging
         if (enableFileLogging && log.length() > 0) {
             sampledAdvertiserLogger.debug(log.toString());
             LOG.debug("done with sampledAdvertiser logging");
@@ -452,15 +460,16 @@ public class Logging {
     }
 
     /**
-     *
+     * 
      * @param casAdvertisementLog
      */
-    private static void sendToDatabus(CasAdvertisementLog casAdvertisementLog, String sampledAdvertisementLogKey) {
+    private static void sendToDatabus(final CasAdvertisementLog casAdvertisementLog,
+            final String sampledAdvertisementLogKey) {
         Message msg = null;
         try {
-            TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
+            final TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
             msg = new Message(tSerializer.serialize(casAdvertisementLog));
-        } catch (TException e) {
+        } catch (final TException e) {
             LOG.debug("Error while creating sampledAdvertiser logs for databus, raised exception {}", e);
         }
         if (null != msg) {
@@ -470,13 +479,13 @@ public class Logging {
     }
 
     /**
-     *
+     * 
      * @param partnerName
      * @param externalSiteId
      * @return true if logging required otherwise false
      */
-    private static boolean decideToLog(String partnerName, String externalSiteId) {
-        long currentTime = System.currentTimeMillis();
+    private static boolean decideToLog(final String partnerName, final String externalSiteId) {
+        final long currentTime = System.currentTimeMillis();
         if (null == SAMPLED_ADVERTISER_LOG_NOS.get(partnerName + externalSiteId)) {
             SAMPLED_ADVERTISER_LOG_NOS.put(partnerName + externalSiteId, currentTime + "_" + 0);
         }

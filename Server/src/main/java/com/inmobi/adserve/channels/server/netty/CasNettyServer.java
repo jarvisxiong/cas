@@ -1,8 +1,5 @@
 package com.inmobi.adserve.channels.server.netty;
 
-import com.google.inject.Singleton;
-import com.inmobi.adserve.channels.server.ChannelServerPipelineFactory;
-import com.inmobi.adserve.channels.server.ChannelStatServerPipelineFactory;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelOption;
@@ -11,10 +8,15 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.concurrent.DefaultThreadFactory;
 
+import java.net.InetSocketAddress;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
-import java.net.InetSocketAddress;
+
+import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.server.ChannelServerPipelineFactory;
+import com.inmobi.adserve.channels.server.ChannelStatServerPipelineFactory;
 
 
 /**
@@ -23,29 +25,29 @@ import java.net.InetSocketAddress;
  */
 @Singleton
 public class CasNettyServer {
-    private final ServerBootstrap                  serverBootstrap;
-    private final EventLoopGroup                   bossGroup;
-    private final EventLoopGroup                   workerGroup;
+    private final ServerBootstrap serverBootstrap;
+    private final EventLoopGroup bossGroup;
+    private final EventLoopGroup workerGroup;
     private final ChannelStatServerPipelineFactory statServerChannelInitializer;
-    private final ChannelServerPipelineFactory     serverChannelInitializer;
-    private final ServerBootstrap                  statServerBootstrap;
+    private final ChannelServerPipelineFactory serverChannelInitializer;
+    private final ServerBootstrap statServerBootstrap;
 
     @Inject
     public CasNettyServer(final ChannelServerPipelineFactory serverChannelInitializer,
             final ChannelStatServerPipelineFactory statServerChannelInitializer) {
 
-        this.bossGroup = new NioEventLoopGroup();
-        
-        this.workerGroup = new NioEventLoopGroup(0, new DefaultThreadFactory("Inbound netty threads"));
-        this.serverBootstrap = new ServerBootstrap();
-        this.statServerBootstrap = new ServerBootstrap();
+        bossGroup = new NioEventLoopGroup();
+
+        workerGroup = new NioEventLoopGroup(0, new DefaultThreadFactory("Inbound netty threads"));
+        serverBootstrap = new ServerBootstrap();
+        statServerBootstrap = new ServerBootstrap();
         this.serverChannelInitializer = serverChannelInitializer;
         this.statServerChannelInitializer = statServerChannelInitializer;
     }
 
     @PostConstruct
     public void setup() throws InterruptedException {
-        PooledByteBufAllocator allocator = new PooledByteBufAllocator(true);
+        final PooledByteBufAllocator allocator = new PooledByteBufAllocator(true);
         // initialize and start server
         serverBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
                 .localAddress(new InetSocketAddress(8800)).childHandler(serverChannelInitializer)

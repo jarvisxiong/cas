@@ -13,8 +13,8 @@ public class DocumentBuilderHelperTest {
 
     @Test
     public void testParse() throws Exception {
-        DocumentBuilderHelper documentBuilderHelper = new DocumentBuilderHelper();
-        Document document = documentBuilderHelper.parse("<ad id=\"100\"><name>abhishek</name></ad>");
+        final DocumentBuilderHelper documentBuilderHelper = new DocumentBuilderHelper();
+        final Document document = documentBuilderHelper.parse("<ad id=\"100\"><name>abhishek</name></ad>");
         Assert.assertNotNull(document);
     }
 }

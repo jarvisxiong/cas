@@ -1,8 +1,17 @@
 package com.inmobi.adserve.channels.server;
 
-import com.inmobi.adserve.channels.server.api.ConnectionType;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.powermock.api.easymock.PowerMock.mockStatic;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import org.apache.commons.configuration.Configuration;
-import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,23 +19,12 @@ import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.replay;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.powermock.api.easymock.PowerMock.mockStatic;
-
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ChannelServerHelper.class, InetAddress.class})
-public class ChannelServerHelperTest{
+public class ChannelServerHelperTest {
 
     private static ChannelServerHelper channelServerHelper;
-    private static Configuration       mockConfig;
+    private static Configuration mockConfig;
 
     private static void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -43,7 +41,7 @@ public class ChannelServerHelperTest{
     }
 
     @BeforeClass
-    public static void setUp(){
+    public static void setUp() {
         prepareMockConfig();
 
         channelServerHelper = new ChannelServerHelper();
@@ -51,7 +49,7 @@ public class ChannelServerHelperTest{
 
     @Test
     public void testGetDataCentreIdNotSet() {
-        assertThat(channelServerHelper.getDataCenterId("dc.id"), is(equalTo((byte)0)));
+        assertThat(channelServerHelper.getDataCenterId("dc.id"), is(equalTo((byte) 0)));
     }
 
     @Test
@@ -64,8 +62,7 @@ public class ChannelServerHelperTest{
     @Test
     public void testGetHostIdNotSet() throws UnknownHostException {
         mockStatic(InetAddress.class);
-        expect(InetAddress.getLocalHost())
-                .andThrow(new UnknownHostException("Unknown Host")).times(1);
+        expect(InetAddress.getLocalHost()).andThrow(new UnknownHostException("Unknown Host")).times(1);
         PowerMock.replay(InetAddress.class);
 
         assertThat(channelServerHelper.getHostId("host.name"), is(equalTo((short) 0)));
@@ -81,21 +78,21 @@ public class ChannelServerHelperTest{
     @Test
     public void testGetHostDataCenterNumberFormatException() {
         System.setProperty("host.name", "web200abcd");
-        assertThat(channelServerHelper.getHostId("host.name"), is(equalTo((short)0)));
+        assertThat(channelServerHelper.getHostId("host.name"), is(equalTo((short) 0)));
         System.clearProperty("host.name");
     }
 
     @Test
     public void testgetHostDataCenterPositive() {
         System.setProperty("host.name", "web2004.ads.lhr1.inmobi.com");
-        short expected = 2004;
+        final short expected = 2004;
         assertThat(channelServerHelper.getHostId("host.name"), is(equalTo(expected)));
         System.clearProperty("host.name");
     }
 
     @Test
     public void testGetDataCentreName() {
-        String dummyHostName = "test";
+        final String dummyHostName = "test";
         System.setProperty("host.name", dummyHostName);
         assertThat(channelServerHelper.getDataCentreName("host.name"), is(equalTo(dummyHostName)));
         System.clearProperty("host.name");
